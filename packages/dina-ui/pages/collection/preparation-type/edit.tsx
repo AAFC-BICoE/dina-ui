@@ -37,11 +37,16 @@ export default function PreparationTypeEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <div>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id={title} />
           </h1>
           {id ? (

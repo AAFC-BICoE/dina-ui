@@ -26,10 +26,15 @@ export default function MetadataRevisionListPage() {
 
     return (
       <>
-        <Head title={pageTitle} />
+        <Head
+          title={pageTitle}
+          lang={formatMessage("languageOfPage")}
+          creator={formatMessage("agricultureCanada")}
+          subject={formatMessage("subjectTermsForPage")}
+        />
         <Nav />
         <main className="container-fluid">
-          <h1>{pageTitle}</h1>
+          <h1 id="wb-cont">{pageTitle}</h1>
           <div className="mb-3">
             <Link href={`/object-store/object/view?id=${metadata.id}`}>
               <a>

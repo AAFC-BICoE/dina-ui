@@ -88,14 +88,21 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       }
     case "collection-api/storage-unit-type":
       return { data: [], meta: { totalResourceCount: 0 } };
-    case "collection-api/storage-unit/A/storageUnitChildren":
+    case "collection-api/storage-unit/A?include=storageUnitChildren":
       // The fetcher for all current children before executing the Save operation:
       return {
-        data: STORAGE_UNIT_CHILDREN,
-        meta: { totalResourceCount: STORAGE_UNIT_CHILDREN.length }
+        data: STORAGE_A,
+        meta: { totalResourceCount: 1 }
       };
-    case "collection-api/storage-unit/X/storageUnitChildren":
-      return { data: [], meta: { totalResourceCount: 0 } };
+    case "collection-api/storage-unit/X?include=storageUnitChildren":
+      return { data: STORAGE_X };
+    case "collection-api/material-sample":
+      // Stored material samples:
+      if (params?.filter?.rsql === "storageUnit.uuid==A") {
+        return { data: [{ id: "ms-1", type: "material-sample" }] };
+      } else {
+        return { data: [{ id: "ms-1", type: "material-sample" }] };
+      }
   }
 });
 
@@ -126,7 +133,7 @@ describe("StorageUnitChildrenViewer component", () => {
     );
   });
 
-  it("Lets you move all children to another storage unit.", async () => {
+  it("Lets you move all stored samples and storages to another storage unit.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
         <StorageUnitChildrenViewer parentId="A" />,
@@ -149,14 +156,27 @@ describe("StorageUnitChildrenViewer component", () => {
     wrapper.update();
 
     expect(mockSave).lastCalledWith(
-      STORAGE_UNIT_CHILDREN.map(unit => ({
-        resource: {
-          id: unit.id,
-          type: "storage-unit",
-          parentStorageUnit: { type: "storage-unit", id: "B" }
-        },
-        type: "storage-unit"
-      })),
+      [
+        ...STORAGE_UNIT_CHILDREN.map(unit => ({
+          resource: {
+            id: unit.id,
+            type: "storage-unit",
+            parentStorageUnit: { type: "storage-unit", id: "B" }
+          },
+          type: "storage-unit"
+        })),
+        {
+          resource: {
+            id: "ms-1",
+            storageUnit: {
+              id: "B",
+              type: "storage-unit"
+            },
+            type: "material-sample"
+          },
+          type: "material-sample"
+        }
+      ],
       { apiBaseUrl: "/collection-api" }
     );
     // The browser is navigated to the new location:

@@ -27,14 +27,21 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
 
+  const title = id ? "editObjectSubtypeTitle" : "addObjectSubtypeTitle";
+
   return (
     <div>
-      <Head title={formatMessage("editObjectSubtypeTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editObjectSubtypeTitle" />
             </h1>
             <Query<ObjectSubtype>

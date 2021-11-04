@@ -39,13 +39,18 @@ export default function PcrProfileListPage() {
 
   return (
     <>
-      <Head title={formatMessage("pcrProfileListTitle")} />
+      <Head
+        title={formatMessage("pcrProfileListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="pcrProfileListTitle" />
         </h1>
         <ListPageLayout

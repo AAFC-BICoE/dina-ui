@@ -8,13 +8,24 @@ import {
   TextField,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  ResourceSelectField,
+  filterBy,
+  SelectOption
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { NextRouter, useRouter } from "next/router";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  IdentifierFields
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Collection } from "../../../types/collection-api";
+import { Collection, Institution } from "../../../types/collection-api";
+import { toPairs, fromPairs } from "lodash";
+import { Field } from "formik";
+import { CollectionIdentifierType } from "../../../types/collection-api/resources/CollectionIdentifier";
 
 export default function CollectionEditPage() {
   const router = useRouter();
@@ -25,7 +36,7 @@ export default function CollectionEditPage() {
   } = router;
 
   const collectionQuery = useQuery<Collection>(
-    { path: `collection-api/collection/${id}` },
+    { path: `collection-api/collection/${id}`, include: "institution" },
     { disabled: !id }
   );
 
@@ -33,12 +44,14 @@ export default function CollectionEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
-        <h1>
-          <DinaMessage id={title} />
-        </h1>
         {id ? (
           withResponse(collectionQuery, ({ data }) => (
             <CollectionForm collection={data} router={router} />
@@ -57,16 +70,42 @@ export interface CollectionFormProps {
 }
 
 export function CollectionForm({ collection, router }: CollectionFormProps) {
-  const initialValues = collection || { type: "collection" };
+  const initialValues = collection
+    ? {
+        ...collection,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          collection.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
+      }
+    : { type: "collection", institution: undefined };
+
+  const {
+    query: { id }
+  } = router;
+
+  const title = id ? "editCollectionTitle" : "addCollectionTitle";
 
   async function onSubmit({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<Collection>) {
+    const input: Collection = {
+      ...submittedValues,
+      // Convert the editable format to the stored format:
+      multilingualDescription: {
+        descriptions: toPairs(submittedValues.multilingualDescription).map(
+          ([lang, desc]) => ({ lang, desc: desc as any })
+        )
+      }
+    };
+
     const [savedCollection] = await save(
       [
         {
-          resource: submittedValues,
+          resource: input,
           type: "collection"
         }
       ],
@@ -88,15 +127,25 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
   return (
     <DinaForm<Collection> initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <CollectionFormFields />
+      <CollectionFormFields title={title} />
     </DinaForm>
   );
 }
 
 /** Re-usable field layout between edit and view pages. */
-export function CollectionFormFields() {
-  const { initialValues, readOnly } = useDinaFormContext();
-  const collection: Collection = initialValues;
+export function CollectionFormFields({ title }) {
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+  const typeOptions: SelectOption<string | undefined>[] = [
+    {
+      label: CollectionIdentifierType.GRSCICOLL,
+      value: CollectionIdentifierType.GRSCICOLL
+    },
+    {
+      label: CollectionIdentifierType.INDEX_HERBARIORUM,
+      value: CollectionIdentifierType.INDEX_HERBARIORUM
+    }
+  ];
 
   return (
     <div>
@@ -105,12 +154,67 @@ export function CollectionFormFields() {
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
+          showAllGroups={true}
+        />
+      </div>
+      <h1 id="wb-cont">
+        <DinaMessage id={title} />
+      </h1>
+      <div className="row">
+        <ResourceSelectField<Institution>
+          name="institution"
+          readOnlyLink="/collection/institution/view?id="
+          filter={filterBy(["name"])}
+          model="collection-api/institution"
+          optionLabel={institution => institution.name as any}
+          className="col-md-6"
+        />
+        <ResourceSelectField<Collection>
+          name="collection"
+          readOnlyLink="/collection/collection/view?id="
+          filter={filterBy(["name"])}
+          model="collection-api/collection"
+          optionLabel={collection => collection.name as any}
+          className="col-md-6"
+          isDisabled={true}
+          label={formatMessage("parentCollectionLabel")}
         />
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="code" />
+        <TextField className="col-md-6" name="code" noSpace={true} />
       </div>
+      <div className="row">
+        <TextField
+          className="english-description col-md-6"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+        <TextField
+          className="french-description col-md-6"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="webpage" />
+        <TextField className="col-md-6" name="contact" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="address" multiLines={true} />
+        <TextField className="col-md-6" name="remarks" multiLines={true} />
+      </div>
+      <Field name="identifiers">
+        {({ form: { values: formState } }) =>
+          !readOnly ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : !!formState.identifiers?.length ? (
+            <IdentifierFields typeOptions={typeOptions} />
+          ) : null
+        }
+      </Field>
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

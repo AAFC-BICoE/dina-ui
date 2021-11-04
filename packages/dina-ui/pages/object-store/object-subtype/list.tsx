@@ -35,10 +35,15 @@ export default function ObjectSubtypeListPage() {
 
   return (
     <>
-      <Head title={formatMessage("objectSubtypeListTitle")} />
+      <Head
+        title={formatMessage("objectSubtypeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="objectSubtypeListTitle" />
         </h1>
         <ButtonBar>

@@ -43,7 +43,12 @@ export default function DinaUserDetailsPage() {
 
   return (
     <div>
-      <Head title={formatMessage("userViewTitle")} />
+      <Head
+        title={formatMessage("userViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       {withResponse(userQuery, ({ data: dinaUser }) => (
         <main className="container">
@@ -57,7 +62,7 @@ export default function DinaUserDetailsPage() {
               />
             )}
           </ButtonBar>
-          <h1>
+          <h1 id="wb-cont">
             <DinaMessage id={"userViewTitle"} />
           </h1>
           <DinaForm<DinaUser> initialValues={dinaUser}>

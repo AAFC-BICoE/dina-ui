@@ -16,7 +16,9 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { ReactNode } from "react";
 import {
+  AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
@@ -25,6 +27,7 @@ import {
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
+import { Metadata } from "../../../types/objectstore-api";
 import {
   PcrBatch,
   PcrPrimer,
@@ -32,14 +35,14 @@ import {
   Region
 } from "../../../types/seqdb-api";
 
-export function usePcrBatchQuery(id?: string) {
+export function usePcrBatchQuery(id?: string, deps?: any[]) {
   const { bulkGet } = useApiClient();
 
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment"
     },
     {
       disabled: !id,
@@ -54,7 +57,24 @@ export function usePcrBatchQuery(id?: string) {
           // Omit null (deleted) records:
           pcrBatch.experimenters = agents.filter(it => it);
         }
-      }
+
+        if (pcrBatch.attachment) {
+          try {
+            const metadatas = await bulkGet<Metadata>(
+              pcrBatch.attachment.map(collector => `/metadata/${collector.id}`),
+              {
+                apiBaseUrl: "/objectstore-api",
+                returnNullForMissingResource: true
+              }
+            );
+            // Omit null (deleted) records:
+            pcrBatch.attachment = metadatas.filter(it => it);
+          } catch (error) {
+            console.warn("Attachment join failed: ", error);
+          }
+        }
+      },
+      deps
     }
   );
 }
@@ -75,10 +95,15 @@ export default function PcrBatchEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id={title} />
         </h1>
         {id ? (
@@ -96,9 +121,19 @@ export default function PcrBatchEditPage() {
 export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+  buttonBar?: ReactNode;
 }
 
-export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
+export function PcrBatchForm({
+  pcrBatch,
+  onSaved,
+  buttonBar = (
+    <ButtonBar>
+      <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  )
+}: PcrBatchFormProps) {
   const { username } = useAccount();
 
   const initialValues = pcrBatch || {
@@ -123,6 +158,17 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
       };
     }
     delete submittedValues.experimenters;
+
+    // Add attachments if they were selected:
+    (submittedValues as any).relationships.attachment = {
+      data:
+        submittedValues.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete submittedValues.attachment;
 
     const inputResource = {
       ...submittedValues,
@@ -154,13 +200,6 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     await onSaved(savedResource);
   }
 
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
-
   return (
     <DinaForm<Partial<PcrBatch>>
       initialValues={initialValues}
@@ -168,13 +207,14 @@ export function PcrBatchForm({ pcrBatch, onSaved }: PcrBatchFormProps) {
     >
       {buttonBar}
       <PcrBatchFormFields />
+      {buttonBar}
     </DinaForm>
   );
 }
 
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
 
   return (
@@ -239,7 +279,17 @@ export function PcrBatchFormFields() {
           optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
+        <TextField className="col-md-6" name="thermocycler" />
+        <TextField className="col-md-6" name="objective" />
+        <TextField className="col-md-6" name="positiveControl" />
+        <TextField className="col-md-6" name="reactionVolume" />
+        <DateField className="col-md-6" name="reactionDate" />
       </div>
+      <AttachmentsField
+        name="attachment"
+        attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}
+        title={<DinaMessage id="attachments" />}
+      />
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />

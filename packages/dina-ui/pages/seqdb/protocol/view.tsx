@@ -22,7 +22,12 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("protocolViewTitle")} />
+      <Head
+        title={formatMessage("protocolViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/protocol" />
@@ -39,7 +44,7 @@ export function ProtocolDetailsPage({ router }: WithRouterProps) {
 
           return (
             <main className="container-fluid">
-              <h1>
+              <h1 id="wb-cont">
                 <SeqdbMessage id="protocolViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />

@@ -76,8 +76,9 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadataId, setPreviewMetadataId] =
-    useState<string | null>(null);
+  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
+    null
+  );
   const [tableSectionWidth, previewSectionWidth] = previewMetadataId
     ? [8, 4]
     : [12, 0];
@@ -85,7 +86,11 @@ export default function MetadataListPage() {
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
       Cell: ({ original: metadata }) => (
-        <CheckBoxField key={metadata.id} resource={metadata} />
+        <CheckBoxField
+          key={metadata.id}
+          resource={metadata}
+          fileHyperlinkId={`file-name-${metadata.id}`}
+        />
       ),
       Header: CheckBoxHeader,
       sortable: false
@@ -93,9 +98,9 @@ export default function MetadataListPage() {
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`}>
+          <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
             {originalFilename}
-          </Link>
+          </a>
         ) : null,
       accessor: "originalFilename"
     },
@@ -141,12 +146,17 @@ export default function MetadataListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("objectListTitle")} />
+      <Head
+        title={formatMessage("objectListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         <div className="list-inline">
           <div className="list-inline-item">
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="objectListTitle" />
             </h1>
           </div>
@@ -170,9 +180,7 @@ export default function MetadataListPage() {
               <ListPageLayout<Metadata>
                 additionalFilters={filterForm => ({
                   // Apply group filter:
-                  ...(filterForm.group && { bucket: filterForm.group }),
-                  // Filter out the derived objects e.g. thumbnails:
-                  rsql: "acSubtypeId==null"
+                  ...(filterForm.group && { bucket: filterForm.group })
                 })}
                 defaultSort={[
                   {

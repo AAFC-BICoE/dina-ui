@@ -38,7 +38,12 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("collectorGroupViewTitle")} />
+      <Head
+        title={formatMessage("collectorGroupViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <BackButton
@@ -48,7 +53,7 @@ export function CollectorGroupDetailsPage({ router }: WithRouterProps) {
         />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="collectorGroupViewTitle" />
         </h1>
         {withResponse(collGroupQuery, ({ data: collectorGroup }) => (

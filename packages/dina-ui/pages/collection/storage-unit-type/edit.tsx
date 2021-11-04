@@ -6,6 +6,7 @@ import {
   DinaFormSubmitParams,
   SubmitButton,
   TextField,
+  ToggleField,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -37,10 +38,15 @@ export default function StorageUnitTypeEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
@@ -124,6 +130,7 @@ export function StorageUnitTypeFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
+        <ToggleField className="col-md-6" name="isInseperable" />
       </div>
       {readOnly && (
         <div className="row">

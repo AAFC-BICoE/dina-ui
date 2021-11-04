@@ -17,7 +17,7 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Promisable } from "type-fest";
 import { GroupSelectField, Head, Nav } from "../../../components";
-import { useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { MolecularSample, Product, Protocol } from "../../../types/seqdb-api";
 
@@ -51,9 +51,7 @@ export default function MolecularSampleEditPage() {
   const id = router.query.id?.toString();
   const { formatMessage } = useSeqdbIntl();
 
-  const pageTitle = formatMessage(
-    id ? "editMolecularSampleTitle" : "addMolecularSampleTitle"
-  );
+  const title = id ? "editMolecularSampleTitle" : "addMolecularSampleTitle";
 
   const molecularSampleQuery = useMolecularSample(id);
 
@@ -65,11 +63,18 @@ export default function MolecularSampleEditPage() {
 
   return (
     <div>
-      <Head title={pageTitle} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <div>
-          <h1>{pageTitle}</h1>
+          <h1 id="wb-cont">
+            <SeqdbMessage id={title} />
+          </h1>
           {id ? (
             withResponse(molecularSampleQuery, ({ data }) => (
               <MolecularSampleForm
@@ -152,10 +157,6 @@ export function MolecularSampleFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="version" />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="notes" multiLines={true} />
       </div>
       <div className="row">
         <ResourceSelectField<Product>
@@ -177,7 +178,7 @@ export function MolecularSampleFields() {
         <ResourceSelectField<MaterialSample>
           name="materialSample"
           className="col-md-6"
-          filter={filterBy(["materialSampleName", "dwcCatalogNumber"], {
+          filter={filterBy(["materialSampleName"], {
             // Only allow linking to the built-in Molecular Sample type:
             extraFilters: [
               {
@@ -188,9 +189,7 @@ export function MolecularSampleFields() {
             ]
           })}
           model="collection-api/material-sample"
-          optionLabel={it =>
-            it.materialSampleName || it.dwcCatalogNumber || it.id
-          }
+          optionLabel={it => it.materialSampleName || it.id}
           readOnlyLink="/collection/material-sample/view?id="
         />
       </div>

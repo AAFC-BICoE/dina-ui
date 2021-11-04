@@ -56,6 +56,9 @@ declare module "kitsu" {
 
     /** Vendor-specific parameter for paginating listed data. */
     page?: any;
+
+    /** Custom headers for the request */
+    header?: {};
   }
 
   /** Parameter for requesting sparse fields. */
@@ -108,8 +111,7 @@ declare module "kitsu" {
       : TData[P] extends KitsuResource | undefined
       ? PersistedResource<TData[P]> | undefined
       : TData[P];
-  } &
-    Required<KitsuResource>;
+  } & Required<KitsuResource>;
 
   /**
    * Used when creating or updating a resource.

@@ -19,7 +19,12 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("regionViewTitle")} />
+      <Head
+        title={formatMessage("regionViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <EditButton entityId={id as string} entityLink="seqdb/region" />
@@ -28,7 +33,7 @@ export function RegionDetailsPage({ router }: WithRouterProps) {
       <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
         {({ loading, response }) => (
           <main className="container-fluid">
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="regionViewTitle" />
             </h1>
             <LoadingSpinner loading={loading} />

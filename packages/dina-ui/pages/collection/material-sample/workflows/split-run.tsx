@@ -7,15 +7,15 @@ import {
   FormikButton,
   LoadingSpinner,
   SelectFieldWithNav,
-  TextField,
   useAccount,
   useApiClient,
   useModal,
   useQuery
 } from "common-ui";
 import { Field, FieldArray } from "formik";
-import { isArray, omitBy, range } from "lodash";
-import { useRouter } from "next/router";
+import { isArray, omit, omitBy, range } from "lodash";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { useRouter, withRouter } from "next/router";
 import React, {
   Dispatch,
   SetStateAction,
@@ -26,7 +26,6 @@ import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { Head } from "../../../../../dina-ui/components/head";
-import { useAttachmentsModal } from "../../../../../dina-ui/components/object-store";
 import { StorageLinkerField } from "../../../../../dina-ui/components/storage/StorageLinker";
 import {
   DinaMessage,
@@ -40,10 +39,10 @@ import {
   START,
   TYPE_NUMERIC
 } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
+import { AttachmentsField } from "../../../../components";
 import {
   BLANK_PREPARATION,
-  PreparationField,
-  PREPARATION_FIELDS
+  PreparationField
 } from "../../../../components/collection/PreparationField";
 import { MaterialSampleIdentifiersFormLayout } from "../edit";
 import {
@@ -54,7 +53,8 @@ import {
 export const SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY =
   "split-child-sample-run-action-result";
 
-export default function SplitRunAction() {
+export function SplitRunAction({ router }: WithRouterProps) {
+  const parentId = router.query.id?.toString();
   // Load from local storage the run config
   const [splitChildSampleRunConfig, _setSplitChildSampleRunConfig] =
     useLocalStorage<MaterialSampleRunConfig | null | undefined>(
@@ -72,7 +72,8 @@ export default function SplitRunAction() {
     start = START,
     suffix = "",
     suffixType = TYPE_NUMERIC,
-    generationMode = "SERIES"
+    generationMode = "SERIES",
+    collection
   } = splitChildSampleRunConfig?.configure ?? {};
 
   const { sampleNames = [] } =
@@ -83,20 +84,8 @@ export default function SplitRunAction() {
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { groupNames } = useAccount();
-  const router = useRouter();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { openModal } = useModal();
-
-  const {
-    selectedMetadatas,
-    attachedMetadatasUI: materialSampleAttachmentsUI
-  } = useAttachmentsModal({
-    initialMetadatas: [],
-    deps: [],
-    index: selectedIndex.toString(),
-    title: <DinaMessage id="materialSampleAttachments" />,
-    id: "material-sample-attachments-section"
-  });
 
   /* Initialize the prepatation and storage for all pages including default to be open by default */
   const prepMap = new Map<string, boolean>();
@@ -150,19 +139,17 @@ export default function SplitRunAction() {
   }
 
   // Retrive the parent material sample upfront
-  const { loading, response: parentResp } = useQuery<MaterialSample[]>({
-    filter: {
-      materialSampleName: baseName as string
-    },
-    path: "collection-api/material-sample",
-    include: "preparationType"
+  const { loading, response: parentResp } = useQuery<MaterialSample>({
+    path: `collection-api/material-sample/${parentId}`,
+    include: "preparationType,materialSampleType"
   });
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  const parentSampleId = parentResp?.data?.[0]?.id ?? null;
+  const parentSample = parentResp?.data;
+  const parentSampleId = parentSample?.id ?? null;
 
   // Get form initial values from run config
   for (let i = 0; i < numOfChildToCreate; i++) {
@@ -174,12 +161,13 @@ export default function SplitRunAction() {
     const generatedSampleName =
       generationMode === "BATCH"
         ? `${baseName}${suffix}`
-        : `${baseName}-${computedSuffix}`;
+        : `${baseName}${computedSuffix}`;
 
     initialChildSamples.push({
       group: groupNames?.[0],
       type: "material-sample",
-      materialSampleName: splitChildSampleName ?? generatedSampleName
+      materialSampleName: splitChildSampleName ?? generatedSampleName,
+      collection
     });
   }
 
@@ -191,44 +179,58 @@ export default function SplitRunAction() {
     // the first is the default value
     const [defaultValueSample, ...samplesToSave] = submittedValues.childSamples;
 
-    const defaultValues = {
+    const defaultValues: Partial<MaterialSample> = {
       // link to parent
       ...(parentSampleId && {
         parentMaterialSample: { type: "material-sample", id: parentSampleId }
       }),
+      // Re-use the publiclyReleasable value from the parent. TODO review this:
+      publiclyReleasable: parentSample?.publiclyReleasable,
+
       ...omitBy(defaultValueSample, isBlankResourceAttribute)
     };
 
-    const saveInputs = samplesToSave.map((sample, index) => {
-      const tabIndex = String(index + 1);
-      return {
-        resource: {
-          // Apply the default "Set All" values:
-          ...defaultValues,
+    const saveInputs = (samplesToSave as Partial<MaterialSample>[]).map(
+      (sample, index) => {
+        const tabIndex = String(index + 1);
+        return {
+          resource: {
+            type: "material-sample",
 
-          // Apply the manually inputted values:
-          ...omitBy(sample, isBlankResourceAttribute),
+            // Apply the default "Set All" values:
+            ...defaultValues,
 
-          // Only persist the preparation fields if the preparations toggle is enabled:
-          ...(!enablePreparations.get(tabIndex) && BLANK_PREPARATION),
+            // Apply the manually inputted values:
+            ...omitBy(sample, isBlankResourceAttribute),
 
-          // Only persist the Storage Unit field if the Storage Unit toggle is enabled:
-          ...(!enableStorage.get(tabIndex) && {
-            storageUnit: { id: null, type: "storage-unit" }
-          }),
+            // Only persist the preparation fields if the preparations toggle is enabled:
+            ...(!enablePreparations.get(tabIndex) && BLANK_PREPARATION),
 
-          // Apply default attachment or manual attachments if any:
-          relationships: {
-            attachment: {
-              data: selectedMetadatas?.get(tabIndex)?.length
-                ? selectedMetadatas?.get(tabIndex)
-                : selectedMetadatas?.get("0") ?? []
+            // Only persist the Storage Unit field if the Storage Unit toggle is enabled:
+            ...(!enableStorage.get(tabIndex) && {
+              storageUnit: { id: null, type: "storage-unit" }
+            }),
+
+            // Apply default attachment or manual attachments if any:
+            attachment: undefined,
+            preparationAttachment: undefined,
+            relationships: {
+              attachment: {
+                data: sample.attachment?.length
+                  ? sample.attachment
+                  : defaultValues.attachment ?? []
+              },
+              preparationAttachment: {
+                data: sample.preparationAttachment?.length
+                  ? sample.preparationAttachment
+                  : defaultValues.preparationAttachment ?? []
+              }
             }
-          }
-        },
-        type: "material-sample"
-      };
-    });
+          },
+          type: "material-sample"
+        };
+      }
+    );
 
     // save samples
     const response = await save<MaterialSample>(saveInputs, {
@@ -263,30 +265,26 @@ export default function SplitRunAction() {
     const childSamplesPath = "childSamples";
     const childSamplePath = `${childSamplesPath}[${index}]`;
     const commonRoot = childSamplePath + ".";
-    const parentSample = parentResp?.data?.[0];
     // Use the first one from return til material sample name is unuque
-    for (const fieldName of PREPARATION_FIELDS) {
-      formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+    if (parentSample) {
+      const keys: (keyof MaterialSample)[] = Object.keys(
+        omit(parentSample, ["id", "materialSampleName", "collectingEvent"])
+      ) as any;
+      for (const fieldName of keys) {
+        formik.setFieldValue(commonRoot + fieldName, parentSample?.[fieldName]);
+      }
+      formik.setFieldValue(
+        commonRoot + "dwcOtherCatalogNumbers",
+        parentSample?.dwcOtherCatalogNumbers
+      );
     }
-
-    formik.setFieldValue(
-      commonRoot + "dwcCatalogNumber",
-      parentSample?.dwcCatalogNumber
-    );
-
-    // formik.setFieldValue(
-    //   commonRoot + "materialSampleName",
-    //   parentSample?.materialSampleName
-    // );
-
-    formik.setFieldValue(
-      commonRoot + "dwcOtherCatalogNumbers",
-      parentSample?.dwcOtherCatalogNumbers
-    );
   };
 
   function computeDefaultSampleName(index) {
-    return baseName + "-" + computeSuffix({ index, start, suffixType });
+    return (
+      initialChildSamples[index + 1].materialSampleName ??
+      baseName + computeSuffix({ index, start, suffixType })
+    );
   }
 
   function childSampleInternal(index, form) {
@@ -296,17 +294,6 @@ export default function SplitRunAction() {
 
     return (
       <>
-        <span className="d-flex fw-bold flex-row">
-          {formatMessage("materialSample") + " " + formatMessage("description")}
-          :
-        </span>
-        <div className="container">
-          <TextField
-            name={commonRoot + "description"}
-            hideLabel={true}
-            multiLines={true}
-          />
-        </div>
         <FormikButton
           onClick={() => {
             onCopyFromParent({ index, formik: form });
@@ -355,7 +342,9 @@ export default function SplitRunAction() {
               namePrefix={commonRoot}
               className="flex-grow-1"
               sampleNamePlaceHolder={
-                index > 0 ? computeDefaultSampleName(index - 1) : ""
+                index === 0
+                  ? formatMessage("multiple")
+                  : computeDefaultSampleName(index - 1)
               }
             />
             <FieldSet legend={<DinaMessage id="components" />}>
@@ -404,7 +393,12 @@ export default function SplitRunAction() {
                   />{" "}
                 </FieldSet>
               )}
-              {materialSampleAttachmentsUI}
+              <AttachmentsField
+                name={`${commonRoot}attachment`}
+                title={<DinaMessage id="materialSampleAttachments" />}
+                attachmentPath="collection-api/material-sample/TODO/attachment"
+                id="material-sample-attachments-section"
+              />
             </div>
           </div>
         </div>
@@ -426,10 +420,15 @@ export default function SplitRunAction() {
   const length = samples?.length;
   return (
     <div>
-      <Head title={formatMessage("splitSubsampleTitle")} />
+      <Head
+        title={formatMessage("splitSubsampleTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="splitSubsampleTitle" />
         </h1>
         <DinaForm
@@ -557,3 +556,5 @@ function isBlankResourceAttribute(value: any) {
       return false;
   }
 }
+
+export default withRouter(SplitRunAction);

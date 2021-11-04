@@ -13,7 +13,7 @@ import { JsonValue } from "type-fest";
 export interface CollectingEventAttributes {
   type: "collecting-event";
 
-  startEventDateTime: string;
+  startEventDateTime?: string | null | undefined;
   endEventDateTime?: string | null;
   dwcRecordedBy?: string;
   verbatimEventDateTime?: string;
@@ -28,6 +28,10 @@ export interface CollectingEventAttributes {
   dwcVerbatimDepth?: string;
   dwcOtherRecordNumbers?: string[];
   dwcRecordNumber?: string;
+  dwcMinimumElevationInMeters?: number;
+  dwcMinimumDepthInMeters?: number;
+  dwcMaximumElevationInMeters?: number;
+  dwcMaximumDepthInMeters?: number;
 
   dwcCountry?: string;
   dwcCountryCode?: string;
@@ -44,6 +48,13 @@ export interface CollectingEventAttributes {
   srcAdminLevels?: SourceAdministrativeLevel[];
 
   habitat?: string;
+  host?: string;
+
+  substrate?: string;
+  remarks?: string;
+
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;

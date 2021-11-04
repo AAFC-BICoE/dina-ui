@@ -4,22 +4,25 @@ import {
   FieldSet,
   filterBy,
   ResourceSelectField,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { AttachmentsField } from "..";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api";
 import {
   MaterialSample,
-  MaterialSampleType,
   PreparationType,
   Vocabulary
 } from "../../types/collection-api";
+import { AllowAttachmentsConfig } from "../object-store";
 
 export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
+  attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /**
@@ -27,30 +30,45 @@ export interface PreparationFieldProps {
  * This should be updated when fields are added or removed in the PreparationField component.
  */
 export const PREPARATION_FIELDS = [
-  "materialSampleType",
   "preparationType",
   "preparationDate",
+  "preparationMethod",
   "preparedBy",
   "preparationRemarks",
-  "dwcDegreeOfEstablishment"
+  "dwcDegreeOfEstablishment",
+  "preparationAttachment"
 ] as const;
 
 /** Blank values for all Preparation fields. */
 export const BLANK_PREPARATION: Required<
   Pick<InputResource<MaterialSample>, typeof PREPARATION_FIELDS[number]>
 > = Object.seal({
-  materialSampleType: Object.seal({ id: null, type: "material-sample-type" }),
   preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
   preparedBy: Object.seal({ id: null, type: "person" }),
   preparationRemarks: null,
-  dwcDegreeOfEstablishment: null
+  dwcDegreeOfEstablishment: null,
+  preparationMethod: null,
+  preparationAttachment: []
 });
 
 export function PreparationField({
   className,
-  namePrefix = ""
+  namePrefix = "",
+  attachmentsConfig = { allowExisting: true, allowNew: true }
 }: PreparationFieldProps) {
+  const { locale } = useDinaIntl();
+  const { initialValues } = useDinaFormContext();
+
+  /** Applies name prefix to field props */
+  function fieldProps(fieldName: string) {
+    return {
+      name: `${namePrefix}${fieldName}`,
+      // Don't use the prefix for the labels and tooltips:
+      customName: fieldName
+    };
+  }
+
   return (
     <FieldSet
       className={className}
@@ -58,67 +76,75 @@ export function PreparationField({
       legend={<DinaMessage id="preparations" />}
     >
       <div className="row">
-        <ResourceSelectField<MaterialSampleType>
-          name={`${namePrefix}materialSampleType`}
-          customName="materialSampleType"
-          className="col-sm-6"
-          filter={filterBy(["name"])}
-          model="collection-api/material-sample-type"
-          optionLabel={it => it.name}
-          readOnlyLink="/collection/material-sample-type/view?id="
-        />
-        <ResourceSelectField<Person>
-          name={`${namePrefix}preparedBy`}
-          customName="preparedBy"
-          className="col-sm-6"
-          filter={filterBy(["displayName"])}
-          model="agent-api/person"
-          optionLabel={person => person.displayName}
-          readOnlyLink="/person/view?id="
-        />
-        <Field name={`${namePrefix}preparationType`}>
-          {({ form: { values } }) => (
-            <ResourceSelectField<PreparationType>
-              name={`${namePrefix}preparationType`}
-              customName="preparationType"
-              model="collection-api/preparation-type"
-              optionLabel={it => it.name}
-              readOnlyLink="/collection/preparation-type/view?id="
-              className="col-sm-6 preparation-type"
-              filter={input =>
-                values.group
-                  ? {
-                      ...filterBy(["name"])(input),
-                      group: { EQ: `${values.group}` }
-                    }
-                  : { ...filterBy(["name"])(input) }
+        <div className="col-md-6">
+          <Field name={`${namePrefix}preparationType`}>
+            {({ form: { values } }) => (
+              <ResourceSelectField<PreparationType>
+                {...fieldProps("preparationType")}
+                model="collection-api/preparation-type"
+                optionLabel={it => it.name}
+                readOnlyLink="/collection/preparation-type/view?id="
+                className="preparation-type"
+                filter={input =>
+                  values.group
+                    ? {
+                        ...filterBy(["name"])(input),
+                        group: { EQ: `${values.group}` }
+                      }
+                    : { ...filterBy(["name"])(input) }
+                }
+                key={values.group}
+              />
+            )}
+          </Field>
+          <AutoSuggestTextField<MaterialSample>
+            {...fieldProps("preparationMethod")}
+            query={(search, ctx) => ({
+              path: "collection-api/material-sample",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `preparationMethod==${search}*`
               }
-              key={values.group}
-            />
-          )}
-        </Field>
-        <DateField
-          name={`${namePrefix}preparationDate`}
-          customName="preparationDate"
-          className="col-sm-6"
-        />
-        <TextField
-          name={`${namePrefix}preparationRemarks`}
-          customName="preparationRemarks"
-          multiLines={true}
-        />
-        <AutoSuggestTextField<Vocabulary>
-          name={`${namePrefix}dwcDegreeOfEstablishment`}
-          customName="dwcDegreeOfEstablishment"
-          className="col-sm-6"
-          query={() => ({
-            path: "collection-api/vocabulary/degreeOfEstablishment"
-          })}
-          suggestion={vocabElement =>
-            vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ?? ""
-          }
-          shouldRenderSuggestions={() => true}
-          tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={sample => sample?.preparationMethod ?? ""}
+            tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
+          />
+          <ResourceSelectField<Person>
+            {...fieldProps("preparedBy")}
+            filter={filterBy(["displayName"])}
+            model="agent-api/person"
+            optionLabel={person => person.displayName}
+            readOnlyLink="/person/view?id="
+          />
+          <DateField {...fieldProps("preparationDate")} />
+        </div>
+        <div className="col-md-6">
+          <TextField {...fieldProps("preparationRemarks")} multiLines={true} />
+          <AutoSuggestTextField<Vocabulary>
+            {...fieldProps("dwcDegreeOfEstablishment")}
+            query={() => ({
+              path: "collection-api/vocabulary/degreeOfEstablishment"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
+            tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
+          />
+        </div>
+      </div>
+      <div>
+        <AttachmentsField
+          {...fieldProps("preparationAttachment")}
+          title={<DinaMessage id="preparationProtocols" />}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          id="preparation-protocols-section"
+          allowAttachmentsConfig={attachmentsConfig}
+          attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
         />
       </div>
     </FieldSet>

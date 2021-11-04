@@ -1,13 +1,14 @@
 import { SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
-import Select from "react-select";
 import ReactSwitch from "react-switch";
+import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   CollectingEvent,
-  PreparationProcessDefinition
+  PreparationProcessDefinition,
+  StorageUnit
 } from "../../../../types/collection-api";
 
 const mockOnSaved = jest.fn();
@@ -45,10 +46,12 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "collection-api/collecting-event":
       return { data: [testCollectionEvent()] };
-    case "collection-api/collecting-event/321?include=collectors,attachment":
+    case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod":
       return { data: testCollectionEvent() };
     case "agent-api/person":
     case "collection-api/material-sample-type":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/srs":
       return { data: [] };
     case "collection-api/preparation-type":
       return { data: [TEST_PREP_TYPE] };
@@ -92,6 +95,11 @@ async function mountForm(
     wrapper.find(".enable-collecting-event").find(ReactSwitch);
   const catalogSwitch = () =>
     wrapper.find(".enable-catalogue-info").find(ReactSwitch);
+  const storageSwitch = () => wrapper.find(".enable-storage").find(ReactSwitch);
+  const determinationSwitch = () =>
+    wrapper.find(".enable-determination").find(ReactSwitch);
+  const scheduledActionsSwitch = () =>
+    wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -118,21 +126,16 @@ async function mountForm(
     await toggleDataComponent(catalogSwitch(), val);
   }
 
-  async function toggleActionType(
-    val: PreparationProcessDefinition["actionType"]
-  ) {
-    wrapper
-      .find(`input.actionType-${val}`)
-      .simulate("change", { target: { checked: true } });
-    await new Promise(setImmediate);
-    wrapper.update();
+  async function toggleStorage(val: boolean) {
+    await toggleDataComponent(storageSwitch(), val);
+  }
 
-    if (wrapper.find(".modal-content form").exists()) {
-      wrapper.find(".modal-content form").simulate("submit");
-    }
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
+  async function toggleDeterminations(val: boolean) {
+    await toggleDataComponent(determinationSwitch(), val);
+  }
+
+  async function toggleScheduledActions(val: boolean) {
+    await toggleDataComponent(scheduledActionsSwitch(), val);
   }
 
   async function fillOutRequiredFields() {
@@ -140,11 +143,6 @@ async function mountForm(
     wrapper
       .find(".workflow-main-details .name-field input")
       .simulate("change", { target: { value: "test-config" } });
-    // Set the group:
-    wrapper
-      .find(".workflow-main-details .group-field")
-      .find(Select)
-      .prop<any>("onChange")({ value: TEST_GROUP_1.name });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -160,11 +158,16 @@ async function mountForm(
     wrapper,
     toggleColEvent,
     togglePreparations,
+    toggleStorage,
+    toggleDeterminations,
+    toggleScheduledActions,
     colEventSwitch,
     catalogSwitch,
+    storageSwitch,
+    scheduledActionsSwitch,
+    determinationSwitch,
     fillOutRequiredFields,
-    submitForm,
-    toggleActionType
+    submitForm
   };
 }
 
@@ -172,18 +175,21 @@ describe("Workflow template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
-    const { colEventSwitch, catalogSwitch } = await mountForm();
+    const { colEventSwitch, catalogSwitch, storageSwitch } = await mountForm();
     // Switches are off by default:
     expect(colEventSwitch().prop("checked")).toEqual(false);
     expect(catalogSwitch().prop("checked")).toEqual(false);
+    expect(storageSwitch().prop("checked")).toEqual(false);
   });
 
   it("Submits a new ADD-type action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
       togglePreparations,
+      toggleStorage,
       catalogSwitch,
       colEventSwitch,
+      storageSwitch,
       fillOutRequiredFields,
       submitForm
     } = await mountForm();
@@ -193,6 +199,8 @@ describe("Workflow template edit page", () => {
     expect(colEventSwitch().prop("checked")).toEqual(true);
     await togglePreparations(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
+    await toggleStorage(true);
+    expect(storageSwitch().prop("checked")).toEqual(true);
 
     await fillOutRequiredFields();
 
@@ -275,6 +283,10 @@ describe("Workflow template edit page", () => {
               // No default value set:
               enabled: true
             },
+            endEventDateTime: {
+              // No default value set:
+              enabled: true
+            },
             verbatimEventDateTime: {
               defaultValue: "test-verbatim-default-datetime",
               enabled: true
@@ -340,6 +352,50 @@ describe("Workflow template edit page", () => {
     });
   });
 
+  it("Submits a new ADD-type action-definition: Only set Determinations template fields.", async () => {
+    const { wrapper, toggleDeterminations, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleDeterminations(true);
+
+    // Only allow new attachments:
+    wrapper
+      .find("#material-sample-attachments-section input.allow-new-checkbox")
+      .simulate("change", { target: { checked: true } });
+
+    // Set a default verbatim scientific name:
+    wrapper
+      .find(".verbatimScientificName input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".verbatimScientificName-field input")
+      .simulate("change", { target: { value: "test scientific name" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowNew: true,
+          templateFields: {
+            "determination[0].verbatimScientificName": {
+              defaultValue: "test scientific name",
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
   it("Submits a new ADD-type action-definition: Link to an existing Collecting Event.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
@@ -383,19 +439,107 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
-    const { colEventSwitch, catalogSwitch } = await mountForm({
+  it("Submits a new ADD-type action-definition: Only set the storage template fields.", async () => {
+    const { wrapper, toggleStorage, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleStorage(true);
+
+    // Add a default storage unit:
+    wrapper
+      .find("#storage-section input[type='checkbox']")
+      .first()
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(StorageLinker).prop<any>("onChange")({
+      id: "TEST_STORAGE",
+      name: "TEST_STORAGE"
+    });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
       actionType: "ADD",
-      formTemplates: {},
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            storageUnit: {
+              enabled: true,
+              defaultValue: {
+                id: "TEST_STORAGE",
+                name: "TEST_STORAGE"
+              }
+            }
+          }
+        }
+      },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       type: "material-sample-action-definition"
     });
+  });
+
+  it("Submits a new ADD-type action-definition: Only set the scheduled action template fields.", async () => {
+    const {
+      wrapper,
+      toggleScheduledActions,
+      fillOutRequiredFields,
+      submitForm
+    } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleScheduledActions(true);
+
+    // Add default remarks:
+    wrapper
+      .find("#scheduled-actions-section input[type='checkbox']")
+      .last()
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find("#scheduled-actions-section .remarks-field textarea")
+      .simulate("change", { target: { value: "default-remarks" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            "scheduledAction.remarks": {
+              defaultValue: "default-remarks",
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
+    const { colEventSwitch, catalogSwitch, scheduledActionsSwitch } =
+      await mountForm({
+        actionType: "ADD",
+        formTemplates: {},
+        group: "test-group-1",
+        id: "123",
+        name: "test-config",
+        type: "material-sample-action-definition"
+      });
 
     // Checkboxes are unchecked:
     expect(colEventSwitch().prop("checked")).toEqual(false);
     expect(catalogSwitch().prop("checked")).toEqual(false);
+    expect(scheduledActionsSwitch().prop("checked")).toEqual(false);
   });
 
   it("Edits an existing action-definition: Can unlink an existing Collecting Event.", async () => {
@@ -551,8 +695,14 @@ describe("Workflow template edit page", () => {
     const {
       colEventSwitch,
       catalogSwitch,
+      storageSwitch,
+      determinationSwitch,
+      scheduledActionsSwitch,
       toggleColEvent,
       togglePreparations,
+      toggleStorage,
+      toggleDeterminations,
+      toggleScheduledActions,
       submitForm
     } = await mountForm({
       actionType: "ADD",
@@ -578,6 +728,24 @@ describe("Workflow template edit page", () => {
                 type: "preparation-type"
               },
               enabled: true
+            },
+            storageUnit: {
+              enabled: true,
+              defaultValue: {
+                id: "TEST_STORAGE",
+                type: "storage-unit",
+                name: "TEST_STORAGE"
+              } as StorageUnit
+            },
+            ...{
+              "determination[0].verbatimScientificName": {
+                defaultValue: "test scientific name",
+                enabled: true
+              },
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
+              }
             }
           }
         }
@@ -591,10 +759,16 @@ describe("Workflow template edit page", () => {
     // Data Component checkboxes are checked:
     expect(colEventSwitch().prop("checked")).toEqual(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
+    expect(storageSwitch().prop("checked")).toEqual(true);
+    expect(determinationSwitch().prop("checked")).toEqual(true);
+    expect(scheduledActionsSwitch().prop("checked")).toEqual(true);
 
-    // Remove both data components:
+    // Remove all data components:
     await toggleColEvent(false);
     await togglePreparations(false);
+    await toggleStorage(false);
+    await toggleDeterminations(false);
+    await toggleScheduledActions(false);
 
     await submitForm();
 
@@ -615,7 +789,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Edits an existing action-definition: Splits the Material Sample's Identifiers and Preparation sub-forms correctly.", async () => {
+  it("Edits an existing action-definition: Splits the Identifiers and Preparation subforms correctly", async () => {
     const { wrapper, submitForm } = await mountForm({
       actionType: "ADD",
       formTemplates: {
@@ -625,10 +799,6 @@ describe("Workflow template edit page", () => {
           templateFields: {
             materialSampleName: {
               defaultValue: "test-default-name",
-              enabled: true
-            },
-            dwcCatalogNumber: {
-              defaultValue: "test-catalog-number",
               enabled: true
             },
             dwcOtherCatalogNumbers: {
@@ -656,9 +826,6 @@ describe("Workflow template edit page", () => {
     expect(
       wrapper.find(".materialSampleName-field input").prop("value")
     ).toEqual("test-default-name");
-    expect(wrapper.find(".dwcCatalogNumber-field input").prop("value")).toEqual(
-      "test-catalog-number"
-    );
     expect(
       wrapper.find(".dwcOtherCatalogNumbers-field textarea").prop("value")
     ).toEqual("other-number-1\nother-number-2\n");
@@ -671,8 +838,8 @@ describe("Workflow template edit page", () => {
     });
 
     wrapper
-      .find(".dwcCatalogNumber-field input")
-      .simulate("change", { target: { value: "edited-catalog-number" } });
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "edited-material-sample-name" } });
 
     await submitForm();
 
@@ -683,64 +850,15 @@ describe("Workflow template edit page", () => {
           allowExisting: true,
           allowNew: true,
           templateFields: {
-            dwcCatalogNumber: {
-              // The edited value:
-              defaultValue: "edited-catalog-number",
-              enabled: true
-            },
             dwcOtherCatalogNumbers: {
               defaultValue: ["other-number-1", "other-number-2"],
               enabled: true
             },
             materialSampleName: {
-              defaultValue: "test-default-name",
+              // The edited value:
+              defaultValue: "edited-material-sample-name",
               enabled: true
             },
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
-              },
-              enabled: true
-            }
-          }
-        }
-      },
-      group: "test-group-1",
-      id: "123",
-      name: "test-config",
-      type: "material-sample-action-definition"
-    });
-  });
-
-  it("Adds a new SPLIT-type action definition", async () => {
-    const { wrapper, fillOutRequiredFields, toggleActionType, submitForm } =
-      await mountForm();
-    await fillOutRequiredFields();
-    await toggleActionType("SPLIT");
-
-    // Only allow new attachments:
-    wrapper
-      .find("input.allow-new-checkbox")
-      .simulate("change", { target: { checked: true } });
-
-    // Set a default prep type:
-    wrapper
-      .find(".preparation-type input[type='checkbox']")
-      .simulate("change", { target: { checked: true } });
-    wrapper.find(".preparationType-field Select").prop<any>("onChange")({
-      resource: TEST_PREP_TYPE
-    });
-
-    await submitForm();
-
-    expect(mockOnSaved).lastCalledWith({
-      actionType: "SPLIT",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          templateFields: {
             preparationType: {
               defaultValue: {
                 id: "100",

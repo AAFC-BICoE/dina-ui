@@ -1,7 +1,7 @@
 import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
-import { useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
 const TABLE_COLUMNS = [
@@ -11,7 +11,6 @@ const TABLE_COLUMNS = [
     ),
     accessor: "name"
   },
-  "version",
   "sampleType",
   "group",
   "createdBy",
@@ -21,14 +20,19 @@ const TABLE_COLUMNS = [
 export default function MolecularSampleListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("molecularSampleListTitle");
-
   return (
     <div>
-      <Head title={title} />
+      <Head
+        title={formatMessage("molecularSampleListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>{title}</h1>
+        <h1 id="wb-cont">
+          <SeqdbMessage id="molecularSampleListTitle" />
+        </h1>
         <ButtonBar>
           <CreateButton entityLink="/seqdb/molecular-sample" />
         </ButtonBar>

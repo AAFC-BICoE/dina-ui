@@ -24,19 +24,35 @@ const mockGet = jest.fn(async (_, {}) => {
   return MOCK_TODOS;
 });
 
+const mockBulkGet = jest.fn(async (paths, _) => {
+  if (paths.length === 0) {
+    return [];
+  }
+  return paths.map((path: string) => {
+    const id = path.replace("todo/", "");
+    return {
+      // Return a mock todo with the supplied ID:
+      id,
+      type: "todo",
+      name: `${id}-fetched-from-bulkGet`
+    };
+  });
+});
+
 const apiContext = {
   apiClient: {
     get: mockGet
-  }
+  },
+  bulkGet: mockBulkGet
 } as any;
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.spyOn(lodash, "debounce").mockImplementation(fn => fn as any);
 
 describe("ResourceSelect component", () => {
-  const DEFAULT_SELECT_PROPS: ResourceSelectProps<any> = {
+  const DEFAULT_SELECT_PROPS: ResourceSelectProps<Todo> = {
     filter: input => ({ name: input }),
-    model: "todo",
+    model: "todo-api/todo",
     optionLabel: todo => todo.name
   };
 
@@ -88,11 +104,11 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const selectProps = wrapper.find(Select).props();
+    const selectProps = wrapper.find<any>(Select).props();
     const { options, onChange } = selectProps;
 
     // Select the third option (excluding the <none option>).
-    onChange(options[3], null);
+    onChange(options[3]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
@@ -127,7 +143,10 @@ describe("ResourceSelect component", () => {
     wrapper.update();
 
     expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGet).lastCalledWith("todo", { include: "group", sort: "name" });
+    expect(mockGet).lastCalledWith("todo-api/todo", {
+      include: "group",
+      sort: "name"
+    });
   });
 
   it("Omits optional 'sort' and 'include' props from the GET request when they are not passed as props.", async () => {
@@ -143,7 +162,7 @@ describe("ResourceSelect component", () => {
 
     // Get the params of the last call to Kitsu's GET method.
     const [model, getParams] = mockGet.mock.calls[0];
-    expect(model).toEqual("todo");
+    expect(model).toEqual("todo-api/todo");
 
     // The query's GET params should not have any values explicitly set to undefined.
     // This would create an invalid request URL, e.g. /api/todo?fields=undefined
@@ -170,7 +189,7 @@ describe("ResourceSelect component", () => {
     // The GET function shsould have been called twice: for the initial query and again for the
     // filtered query.
     expect(mockGet).toHaveBeenCalledTimes(2);
-    expect(mockGet).lastCalledWith("todo", {
+    expect(mockGet).lastCalledWith("todo-api/todo", {
       filter: {
         description: "test filter value"
       }
@@ -233,7 +252,7 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find(Select).props();
+    const { options, onChange } = wrapper.find<any>(Select).props();
 
     const nullOption = options[0];
 
@@ -246,7 +265,7 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption, null);
+    onChange(nullOption);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
@@ -292,10 +311,10 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find(Select).props();
+    const { options, onChange } = wrapper.find<any>(Select).props();
 
     // Select the second and third options.
-    onChange([options[1], options[2]], null);
+    onChange([options[1], options[2]]);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith([
@@ -384,7 +403,7 @@ describe("ResourceSelect component", () => {
     expect(options.length).toEqual(5);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop("onChange")(last(options));
+    wrapper.find(Select).prop<any>("onChange")(last(options));
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -416,13 +435,13 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const options = wrapper.find(Select).prop("options");
+    const options = wrapper.find(Select).prop<any>("options");
 
     // There should be 4 options including the custom callback option:
     expect(options.length).toEqual(4);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop("onChange")([options[0], last(options)]);
+    wrapper.find(Select).prop<any>("onChange")([options[0], last(options)]);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -430,5 +449,56 @@ describe("ResourceSelect component", () => {
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
     expect(mockOnChange).lastCalledWith([options[0].resource, TEST_ASYNC_TODO]);
+  });
+
+  it("Fetches the selected value's full object when only a shallow reference (id+type) is provided.", async () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        value={{ id: "ABC", type: "todo" }} // Shallow reference
+      />
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockBulkGet).lastCalledWith(["todo/ABC"], {
+      apiBaseUrl: "/todo-api",
+      returnNullForMissingResource: true
+    });
+
+    expect(wrapper.find(Select).prop("value")).toEqual({
+      label: "ABC-fetched-from-bulkGet",
+      resource: {
+        id: "ABC",
+        name: "ABC-fetched-from-bulkGet", // The name was fetched using bulkGet.
+        type: "todo"
+      },
+      value: "ABC"
+    });
+  });
+
+  it("Doesn't fetch the selected value's full object when a full value (not shallow reference) provided.", async () => {
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        value={{ id: "ABC", type: "todo", name: "example-custom-name" }} // Shallow reference
+      />
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockBulkGet).toHaveBeenCalledTimes(0);
+
+    expect(wrapper.find(Select).prop("value")).toEqual({
+      label: "example-custom-name",
+      resource: {
+        id: "ABC",
+        name: "example-custom-name", // The name was fetched using bulkGet.
+        type: "todo"
+      },
+      value: "ABC"
+    });
   });
 });

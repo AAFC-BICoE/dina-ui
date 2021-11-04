@@ -5,6 +5,7 @@ import TextareaAutosize, {
 } from "react-textarea-autosize";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import classnames from "classnames";
+import React from "react";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;
@@ -13,7 +14,11 @@ export interface TextFieldProps extends LabelWrapperParams {
   placeholder?: string;
   numberOnly?: boolean;
   letterOnly?: boolean;
-  customInput?: (inputProps: InputHTMLAttributes<any>) => JSX.Element;
+  noSpace?: boolean;
+  customInput?: (
+    inputProps: InputHTMLAttributes<any>,
+    form: FormikProps<any>
+  ) => JSX.Element;
   onChangeExternal?: (
     form: FormikProps<any>,
     name: string,
@@ -35,6 +40,7 @@ export function TextField(props: TextFieldProps) {
     onChangeExternal,
     numberOnly,
     letterOnly,
+    noSpace,
     ...labelWrapperProps
   } = props;
 
@@ -61,15 +67,10 @@ export function TextField(props: TextFieldProps) {
             /^(Backspace|Delete|ArrowLeft|ArrowRight)$/;
           const LETTER_ALLOWED_CHARS_REGEXP = /[A-Za-z]+/;
           if (
-            numberOnly &&
-            !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key) &&
-            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
-          ) {
-            e.preventDefault();
-          } else if (
-            letterOnly &&
-            !LETTER_ALLOWED_CHARS_REGEXP.test(e.key) &&
-            !CTRL_ALLOWED_CHARS_REGEXP.test(e.key)
+            (!CTRL_ALLOWED_CHARS_REGEXP.test(e.key) &&
+              ((numberOnly && !NUMBER_ALLOWED_CHARS_REGEXP.test(e.key)) ||
+                (letterOnly && !LETTER_ALLOWED_CHARS_REGEXP.test(e.key)))) ||
+            (noSpace && e.code === "Space")
           ) {
             e.preventDefault();
           }
@@ -79,7 +80,7 @@ export function TextField(props: TextFieldProps) {
         // controlled input that we manually pass the "onChange" and "value" props. Otherwise
         // we will get React's warning about switching from an uncontrolled to controlled input.
         return (
-          customInput?.(inputPropsInternal) ??
+          customInput?.(inputPropsInternal, formik) ??
           (multiLines ? (
             <TextareaAutosize
               minRows={4}

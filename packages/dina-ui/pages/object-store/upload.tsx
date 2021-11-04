@@ -93,7 +93,7 @@ export default function UploadPage() {
                     dup.originalFilename && (
                       <tr key={idx} className={`${idx}-row`}>
                         <td>{dup.originalFilename}</td>
-                        <td>{dup.meta?.warnings.duplicate_found}</td>
+                        <td>{dup.meta?.warnings?.duplicate_found}</td>
                       </tr>
                     )
                 )}
@@ -116,10 +116,15 @@ export default function UploadPage() {
 
   return (
     <div>
-      <Head title={formatMessage("uploadPageTitle")} />
+      <Head
+        title={formatMessage("uploadPageTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="uploadPageTitle" />
         </h1>
         {!accountInitialized || !groupNames?.length ? (
@@ -130,31 +135,33 @@ export default function UploadPage() {
           <DinaForm<OnSubmitValues>
             initialValues={{ defaultValuesConfig: null }}
           >
-            <div className="row">
-              <GroupSelectField
-                className="col-md-3"
-                name="group"
-                enableStoredDefaultGroup={true}
-              />
-              <DefaultValuesConfigSelectField
-                allowBlank={true}
-                name="defaultValuesConfig"
-                className="offset-md-3 col-md-3"
-                styles={customStyles}
-              />
-              <div className="col-md-3">
-                <FormikButton
-                  className="btn btn-primary mt-4"
-                  onClick={({ defaultValuesConfig }, { setFieldValue }) =>
-                    openDefaultValuesModal({
-                      index: defaultValuesConfig,
-                      onSave: index =>
-                        setFieldValue("defaultValuesConfig", index)
-                    })
-                  }
-                >
-                  <DinaMessage id="configureDefaultValues" />
-                </FormikButton>
+            <div className="container">
+              <div className="row">
+                <GroupSelectField
+                  className="col-md-3"
+                  name="group"
+                  enableStoredDefaultGroup={true}
+                />
+                <DefaultValuesConfigSelectField
+                  allowBlank={true}
+                  name="defaultValuesConfig"
+                  className="offset-md-3 col-md-3"
+                  styles={customStyles}
+                />
+                <div className="col-md-3" style={{ margin: "2em 0em 2em 0em" }}>
+                  <FormikButton
+                    className="btn btn-primary"
+                    onClick={({ defaultValuesConfig }, { setFieldValue }) =>
+                      openDefaultValuesModal({
+                        index: defaultValuesConfig,
+                        onSave: index =>
+                          setFieldValue("defaultValuesConfig", index)
+                      })
+                    }
+                  >
+                    <DinaMessage id="configureDefaultValues" />
+                  </FormikButton>
+                </div>
               </div>
             </div>
             <div>

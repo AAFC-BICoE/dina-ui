@@ -1,6 +1,12 @@
-import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
+import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  GroupSelectField,
+  Head,
+  KeepContentsTogetherToggleForm,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const STORAGE_UNIT_TYPE_FILTER_ATTRIBUTES = ["name", "createdBy"];
@@ -12,19 +18,30 @@ const STORAGE_UNIT_TYPE_TABLE_COLUMNS = [
     accessor: "name"
   },
   "group",
+  {
+    Cell: ({ original }) => (
+      <KeepContentsTogetherToggleForm initialValues={original} />
+    ),
+    accessor: "isInseperable"
+  },
   "createdBy",
   dateCell("createdOn")
 ];
 
-export default function storageUnitTypeListPage() {
+export default function StorageUnitTypeListPage() {
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitTypeListTitle")} />
+      <Head
+        title={formatMessage("storageUnitTypeListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="storageUnitTypeListTitle" />
         </h1>
         <ButtonBar>

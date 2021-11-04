@@ -1,7 +1,14 @@
-import { AreYouSureModal, DinaForm } from "common-ui";
+import {
+  AreYouSureModal,
+  DinaForm,
+  DinaFormSubmitParams,
+  useApiClient,
+  useModal,
+  useQuery
+} from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, isEmpty, isEqual } from "lodash";
+import { InputResource, KitsuResource } from "kitsu";
+import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -11,24 +18,24 @@ import {
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import {
-  DinaFormSubmitParams,
-  useApiClient,
-  useModal,
-  useQuery
-} from "../../../common-ui/lib";
-import {
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
-  Metadata
+  Metadata,
+  Person
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig, useAttachmentsModal } from "../object-store";
-import { toPairs, fromPairs } from "lodash";
+import { AllowAttachmentsConfig } from "../object-store";
+import { HOSTORGANISM_FIELDS } from "./AssociationsField";
+import { DETERMINATION_FIELDS } from "./DeterminationField";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
+import { ORGANISM_FIELDS } from "./OrganismStateField";
 import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
+import { SCHEDULEDACTION_FIELDS } from "./ScheduledActionsField";
+import { useLastUsedCollection } from "./useLastUsedCollection";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -36,8 +43,20 @@ export function useMaterialSampleQuery(id?: string | null) {
   const materialSampleQuery = useQuery<MaterialSample>(
     {
       path: `collection-api/material-sample/${id}`,
-      include:
-        "collectingEvent,attachment,preparationType,materialSampleType,preparedBy,storageUnit"
+      include: [
+        "collection",
+        "collectingEvent",
+        "attachment",
+        "preparationAttachment",
+        "preparationType",
+        "materialSampleType",
+        "preparedBy",
+        "storageUnit",
+        "hierarchy",
+        "organism",
+        "materialSampleChildren",
+        "parentMaterialSample"
+      ].join(",")
     },
     {
       disabled: !id,
@@ -76,13 +95,39 @@ export function useMaterialSampleQuery(id?: string | null) {
           delete data?.managedAttributes;
           data.managedAttributeValues = managedAttributeValues;
         }
+        if (data.determination) {
+          // Retrieve determiner arrays on determination.
+          for (const determination of data.determination) {
+            if (determination.determiner) {
+              determination.determiner = await bulkGet<Person>(
+                determination.determiner.map(
+                  (personId: string) => `/person/${personId}`
+                ),
+                {
+                  apiBaseUrl: "/agent-api",
+                  returnNullForMissingResource: true
+                }
+              );
+            }
+          }
+        }
+        if (data.materialSampleChildren) {
+          data.materialSampleChildren = await bulkGet<MaterialSample>(
+            data.materialSampleChildren.map(
+              child => `/material-sample/${child.id}?include=materialSampleType`
+            ),
+            {
+              apiBaseUrl: "/collection-api",
+              returnNullForMissingResource: true
+            }
+          );
+        }
       }
     }
   );
 
   return materialSampleQuery;
 }
-
 export interface UseMaterialSampleSaveParams {
   /** Material Sample form initial values. */
   materialSample?: InputResource<MaterialSample>;
@@ -98,7 +143,7 @@ export interface UseMaterialSampleSaveParams {
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
+  materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -108,7 +153,6 @@ export interface UseMaterialSampleSaveParams {
     collectingEvent?: string[];
   };
 
-  materialSampleAttachmentsConfig?: AllowAttachmentsConfig;
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
@@ -118,11 +162,10 @@ export function useMaterialSampleSave({
   onSaved,
   collectingEvtFormRef,
   isTemplate,
-  colEventTemplateInitialValues,
   enabledFields,
-  materialSampleAttachmentsConfig,
   collectingEventAttachmentsConfig,
-  preparationsTemplateInitialValues
+  colEventTemplateInitialValues,
+  materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
 
@@ -131,10 +174,65 @@ export function useMaterialSampleSave({
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
-  // For editing existing templates:
   const hasPreparationsTemplate =
     isTemplate &&
-    !isEmpty(preparationsTemplateInitialValues?.templateCheckboxes);
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...PREPARATION_FIELDS
+      )
+    );
+
+  const hasOrganismTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ORGANISM_FIELDS.map(
+          organismFieldName => `organism.${organismFieldName}`
+        )
+      )
+    );
+
+  const hasStorageTemplate =
+    isTemplate &&
+    materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
+
+  // For editing existing templates:
+  const hasDeterminationTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+      )
+    );
+
+  const hasScheduledActionsTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        SCHEDULEDACTION_FIELDS.map(fieldName => `scheduledAction.${fieldName}`)
+      )
+    );
+
+  const hasAssociationsTemplate =
+    isTemplate &&
+    (!isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+          fieldName => `association.${fieldName}`
+        )
+      )
+    ) ||
+      !isEmpty(
+        pick(
+          materialSampleTemplateInitialValues?.templateCheckboxes,
+          HOSTORGANISM_FIELDS.map(fieldName => `hostOrganism.${fieldName}`)
+        )
+      ));
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -150,18 +248,135 @@ export function useMaterialSampleSave({
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
           prepFieldName =>
-            materialSample?.[prepFieldName] ||
+            !isEmpty(materialSample?.[prepFieldName]) ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
     )
   );
 
-  const initialValues: InputResource<MaterialSample> = materialSample
-    ? { ...materialSample }
-    : {
-        type: "material-sample",
-        managedAttributes: {}
+  const [enableOrganism, setEnableOrganism] = useState(
+    Boolean(
+      hasOrganismTemplate ||
+        // Show the organism section if a field is set or the field is enabled:
+        ORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.organism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `organism.${organismFieldName}`
+            )
+        )
+    )
+  );
+
+  const [enableStorage, setEnableStorage] = useState(
+    // Show the Storage section if the storage field is set or the template enables it:
+    Boolean(
+      hasStorageTemplate ||
+        materialSample?.storageUnit?.id ||
+        enabledFields?.materialSample?.includes("storageUnit")
+    )
+  );
+
+  const [enableDetermination, setEnableDetermination] = useState(
+    Boolean(
+      hasDeterminationTemplate ||
+        // Show the determination section if a field is set or the field is enabled:
+        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("determination[")
+        )
+    )
+  );
+
+  const [enableScheduledActions, setEnableScheduledActions] = useState(
+    // Show the Scheduled Actions section if the field is set or the template enables it:
+    Boolean(
+      hasScheduledActionsTemplate ||
+        materialSample?.scheduledActions?.length ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("scheduledAction.")
+        )
+    )
+  );
+
+  const [enableAssociations, setEnableAssociations] = useState(
+    // Show the associations section if the field is set or the template enables it:
+    Boolean(
+      hasAssociationsTemplate ||
+        materialSample?.associations?.length ||
+        HOSTORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.hostOrganism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `hostOrganism.${organismFieldName}`
+            )
+        ) ||
+        enabledFields?.materialSample?.some(
+          enabledField =>
+            enabledField.startsWith("association.") ||
+            enabledField.startsWith("hostOrganism.")
+        )
+    )
+  );
+
+  // The state describing which Data components (Form sections) are enabled:
+  const dataComponentState = {
+    enableCollectingEvent,
+    setEnableCollectingEvent,
+    enablePreparations,
+    setEnablePreparations,
+    enableOrganism,
+    setEnableOrganism,
+    enableStorage,
+    setEnableStorage,
+    enableDetermination,
+    setEnableDetermination,
+    enableScheduledActions,
+    setEnableScheduledActions,
+    enableAssociations,
+    setEnableAssociations,
+    /** Wraps the useState setter with an AreYouSure modal when setting to false. */
+    dataComponentToggler(
+      setBoolean: Dispatch<SetStateAction<boolean>>,
+      componentName: string
+    ) {
+      return function toggleDataComponent(enabled: boolean) {
+        if (!enabled) {
+          // When removing data, ask the user for confirmation first:
+          openModal(
+            <AreYouSureModal
+              actionMessage={
+                <DinaMessage
+                  id="removeComponentData"
+                  values={{ component: componentName }}
+                />
+              }
+              onYesButtonClicked={() => setBoolean(enabled)}
+            />
+          );
+        } else {
+          setBoolean(enabled);
+        }
       };
+    }
+  };
+
+  const { loading, lastUsedCollection } = useLastUsedCollection();
+
+  const initialValues: InputResource<MaterialSample> = {
+    ...(materialSample
+      ? { ...materialSample }
+      : {
+          type: "material-sample",
+          managedAttributes: {},
+          // Defaults to the last Collection used to create a Material Sample:
+          collection: lastUsedCollection,
+          publiclyReleasable: true
+        }),
+    determination: materialSample?.determination?.length
+      ? materialSample?.determination
+      : [{ isPrimary: true }]
+  };
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef =
@@ -177,27 +392,10 @@ export function useMaterialSampleSave({
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI: colEventAttachmentsUI,
     collectingEventFormSchema
   } = useCollectingEventSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
-    fetchedCollectingEvent: colEventQuery.response?.data,
-    isTemplate
-  });
-
-  const {
-    attachedMetadatasUI: materialSampleAttachmentsUI,
-    selectedMetadatas
-  } = useAttachmentsModal({
-    initialMetadatas:
-      materialSample?.attachment as PersistedResource<Metadata>[],
-    deps: [materialSample?.id],
-    title: <DinaMessage id="materialSampleAttachments" />,
-    isTemplate,
-    allowAttachmentsConfig: materialSampleAttachmentsConfig,
-    allowNewFieldName: "attachmentsConfig.allowNew",
-    allowExistingFieldName: "attachmentsConfig.allowExisting",
-    id: "material-sample-attachments-section"
+    fetchedCollectingEvent: colEventQuery.response?.data
   });
 
   const collectingEventInitialValues =
@@ -206,37 +404,12 @@ export function useMaterialSampleSave({
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
     const dataComponents = document?.querySelectorAll<HTMLDivElement>(
-      ".data-components > fieldset:not(.d-none)"
+      ".data-components fieldset:not(.d-none, .non-strip)"
     );
     dataComponents?.forEach((element, index) => {
       element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
     });
   });
-
-  /** Wraps the useState setter with an AreYouSure modal when setting to false. */
-  function dataComponentToggler(
-    setBoolean: Dispatch<SetStateAction<boolean>>,
-    componentName: string
-  ) {
-    return function toggleDataComponent(enabled: boolean) {
-      if (!enabled) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: componentName }}
-              />
-            }
-            onYesButtonClicked={() => setBoolean(enabled)}
-          />
-        );
-      } else {
-        setBoolean(enabled);
-      }
-    };
-  }
 
   async function onSubmit({
     api: { save },
@@ -252,6 +425,19 @@ export function useMaterialSampleSave({
     // Only persist the preparation fields if the preparations toggle is enabled:
     if (!enablePreparations) {
       Object.assign(materialSampleInput, BLANK_PREPARATION);
+    }
+
+    // Only persist the organism fields if toggle is enabled:
+    if (!enableOrganism) {
+      materialSampleInput.organism = null as any;
+    }
+
+    // Only persist the storage link if the Storage toggle is enabled:
+    if (!enableStorage) {
+      materialSampleInput.storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
     }
 
     if (!enableCollectingEvent) {
@@ -299,13 +485,25 @@ export function useMaterialSampleSave({
     }
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
-      (materialSampleInput as any).relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
-      };
-    }
+    (materialSampleInput as any).relationships.attachment = {
+      data:
+        materialSampleInput.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete materialSampleInput.attachment;
+
+    (materialSampleInput as any).relationships.preparationAttachment = {
+      data:
+        materialSampleInput.preparationAttachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete materialSampleInput.preparationAttachment;
 
     // Shuffle the managedAttributesValue to managedAttribute
     materialSampleInput.managedAttributes = {};
@@ -319,7 +517,30 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.managedAttributeValues;
 
-    // Save the MaterialSample:
+    // Only persist determination when enabled
+    if (!enableDetermination) {
+      materialSampleInput.determination = [];
+    }
+
+    // convert determination determiner to list
+    if (materialSampleInput.determination) {
+      for (const determination of materialSampleInput.determination) {
+        const determinerRef = determination.determiner;
+        if (determinerRef && typeof determinerRef !== "string") {
+          determination.determiner = determinerRef.map(it =>
+            typeof it !== "string" ? it.id : (null as any)
+          );
+        }
+      }
+    }
+
+    if (!enableAssociations) {
+      materialSampleInput.associations = [];
+      materialSampleInput.hostOrganism = null;
+    }
+
+    delete materialSampleInput.association;
+
     const [savedMaterialSample] = await save(
       [
         {
@@ -347,23 +568,20 @@ export function useMaterialSampleSave({
       readOnly={isTemplate ? !!colEventId : false}
       enabledFields={enabledFields?.collectingEvent}
     >
-      <CollectingEventFormLayout />
-      <div className="mb-3">{colEventAttachmentsUI}</div>
+      <CollectingEventFormLayout
+        attachmentsConfig={collectingEventAttachmentsConfig}
+      />
     </DinaForm>
   );
 
   return {
     initialValues,
     nestedCollectingEventForm,
-    dataComponentToggler,
-    enablePreparations,
-    setEnablePreparations,
-    enableCollectingEvent,
-    setEnableCollectingEvent,
+    dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,
-    materialSampleAttachmentsUI,
-    onSubmit
+    onSubmit,
+    loading
   };
 }

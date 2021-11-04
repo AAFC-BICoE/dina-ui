@@ -2,6 +2,7 @@ import { KeyboardEvent } from "react";
 import DatePicker from "react-datepicker";
 import { DateView } from "../date/DateView";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import classnames from "classnames";
 
 export interface DateFieldProps {
   showTime?: boolean;
@@ -14,8 +15,11 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
   const { showTime, disabled, onKeyDown } = props;
 
   return (
-    <FieldWrapper {...props} readOnlyRender={val => <DateView date={val} />}>
-      {({ setValue, value }) => {
+    <FieldWrapper
+      {...props}
+      readOnlyRender={val => (showTime ? <DateView date={val} /> : val)}
+    >
+      {({ setValue, value, invalid }) => {
         function onChange(date: Date) {
           if (showTime) {
             setValue(date && date.toISOString());
@@ -27,7 +31,7 @@ export function DateField(props: LabelWrapperParams & DateFieldProps) {
         return (
           <div>
             <DatePicker
-              className="form-control"
+              className={classnames("form-control", invalid && "is-invalid")}
               wrapperClassName="w-100"
               dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
               isClearable={!disabled}

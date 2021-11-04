@@ -30,17 +30,25 @@ interface ManagedAttributeFormProps {
 }
 
 export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
+  const { formatMessage } = useDinaIntl();
   const { id } = router.query;
+  const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
   return (
     <div>
-      <Head title="Managed Attribute Details" />
+      {/* <Head title="Managed Attribute Details" /> */}
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         {id ? (
           <div>
-            <h1>
-              <DinaMessage id="managedAttributeEditTitle" />
+            <h1 id="wb-cont">
+              <DinaMessage id="editManagedAttributeTitle" />
             </h1>
             <Query<ManagedAttribute>
               query={{
@@ -62,8 +70,8 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
-              <DinaMessage id="addManagedAttributeButtonText" />
+            <h1 id="wb-cont">
+              <DinaMessage id="addManagedAttributeTitle" />
             </h1>
             <br />
             <ManagedAttributeForm router={router} />

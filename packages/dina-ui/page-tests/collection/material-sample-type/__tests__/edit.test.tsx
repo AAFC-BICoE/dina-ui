@@ -6,16 +6,13 @@ import { MaterialSampleType } from "../../../../types/collection-api";
 const TEST_MST: PersistedResource<MaterialSampleType> = {
   id: "123",
   type: "material-sample-type",
-  name: "test material sample type",
-  group: "cnc"
+  name: "test material sample type"
 };
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/material-sample-type/123":
       return { data: TEST_MST };
-    case "user-api/group":
-      return { data: [] };
   }
 });
 

@@ -1,36 +1,14 @@
-import {
-  BackButton,
-  ButtonBar,
-  DateField,
-  DinaForm,
-  DinaFormSubmitParams,
-  filterBy,
-  ResourceSelectField,
-  SubmitButton,
-  TextField,
-  useDinaFormContext,
-  useQuery,
-  withResponse
-} from "common-ui";
-import { Field } from "formik";
+import { useQuery, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { object } from "yup";
 import {
-  GroupSelectField,
   Head,
   Nav,
-  StorageLinkerField,
-  StorageUnitBreadCrumb,
-  StorageUnitChildrenViewer,
-  storageUnitDisplayName
+  storageUnitDisplayName,
+  StorageUnitForm
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
-
-const storageUnitFormSchema = object({
-  storageUnitType: object().required()
-});
+import { StorageUnit } from "../../../types/collection-api";
 
 export function useStorageUnit(id?: string) {
   return useQuery<StorageUnit>(
@@ -72,10 +50,15 @@ export default function StorageUnitEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
@@ -99,109 +82,6 @@ export default function StorageUnitEditPage() {
           <StorageUnitForm onSaved={goToViewPage} />
         )}
       </div>
-    </div>
-  );
-}
-
-export interface StorageUnitFormProps {
-  initialParent?: PersistedResource<StorageUnit>;
-  storageUnit?: PersistedResource<StorageUnit>;
-  onSaved: (storageUnit: PersistedResource<StorageUnit>) => Promise<void>;
-}
-
-export function StorageUnitForm({
-  initialParent,
-  storageUnit,
-  onSaved
-}: StorageUnitFormProps) {
-  const initialValues = storageUnit || {
-    type: "storage-unit",
-    parentStorageUnit: initialParent
-  };
-
-  async function onSubmit({
-    submittedValues,
-    api: { save }
-  }: DinaFormSubmitParams<StorageUnit>) {
-    const [savedStorage] = await save<StorageUnit>(
-      [
-        {
-          resource: submittedValues,
-          type: "storage-unit"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    await onSaved(savedStorage);
-  }
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={storageUnit?.id}
-        entityLink="/collection/storage-unit"
-      />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
-
-  return (
-    <DinaForm<Partial<StorageUnit>>
-      initialValues={initialValues}
-      validationSchema={storageUnitFormSchema}
-      onSubmit={onSubmit}
-    >
-      {buttonBar}
-      <StorageUnitFormFields />
-    </DinaForm>
-  );
-}
-
-/** Re-usable field layout between edit and view pages. */
-export function StorageUnitFormFields() {
-  const { readOnly, initialValues } = useDinaFormContext();
-
-  return (
-    <div>
-      <Field>
-        {({ form: { values: storageUnit } }) => (
-          <h2>
-            <StorageUnitBreadCrumb
-              storageUnit={storageUnit}
-              // Don't have the page link to itself:
-              disableLastLink={true}
-            />
-          </h2>
-        )}
-      </Field>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <ResourceSelectField<StorageUnitType>
-          className="col-md-6"
-          model="collection-api/storage-unit-type"
-          name="storageUnitType"
-          optionLabel={it => it.name}
-          filter={filterBy(["name"])}
-          omitNullOption={true}
-          readOnlyLink="/collection/storage-unit-type/view?id="
-        />
-        <TextField className="col-md-6" name="name" />
-      </div>
-      <StorageLinkerField name="parentStorageUnit" />
-      {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
-      {readOnly && (
-        <div className="row">
-          <DateField className="col-md-6" name="createdOn" />
-          <TextField className="col-md-6" name="createdBy" />
-        </div>
-      )}
     </div>
   );
 }

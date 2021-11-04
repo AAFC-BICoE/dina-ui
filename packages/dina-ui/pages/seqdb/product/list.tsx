@@ -34,13 +34,18 @@ export default function ProductListPage() {
 
   return (
     <>
-      <Head title={formatMessage("productListTitle")} />
+      <Head
+        title={formatMessage("productListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/product" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="productListTitle" />
         </h1>
         <ListPageLayout

@@ -24,7 +24,12 @@ export function StorageUnitTypeDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("storageUnitType")} />
+      <Head
+        title={formatMessage("storageUnitType")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         <ButtonBar>

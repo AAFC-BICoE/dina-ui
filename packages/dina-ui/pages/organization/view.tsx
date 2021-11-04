@@ -29,7 +29,12 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("organizationViewTitle")} />
+      <Head
+        title={formatMessage("organizationViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <Query<Organization> query={{ path: `agent-api/organization/${id}` }}>
         {({ loading, response }) => {
@@ -52,7 +57,7 @@ export function OrganizationDetailsPage({ router }: WithRouterProps) {
           return (
             <main className="container-fluid">
               {buttonBar}
-              <h1>
+              <h1 id="wb-cont">
                 <DinaMessage id="organizationViewTitle" />
               </h1>
               <LoadingSpinner loading={loading} />

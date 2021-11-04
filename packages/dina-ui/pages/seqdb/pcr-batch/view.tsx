@@ -21,7 +21,12 @@ export function PcrBatchDetailsPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage("pcrBatchViewTitle")} />
+      <Head
+        title={formatMessage("pcrBatchViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
         {withResponse(resourceQuery, ({ data }) => (

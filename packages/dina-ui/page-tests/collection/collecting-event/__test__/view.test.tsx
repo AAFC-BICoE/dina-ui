@@ -26,7 +26,7 @@ const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/100?include=collectors,attachment"
+    "collection-api/collecting-event/100?include=collectors,attachment,collectionMethod"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
@@ -47,19 +47,6 @@ const mockBulkGet = jest.fn(async paths => {
       id: path.replace("/person/", ""),
       type: "agent",
       displayName: "person a"
-    }));
-  }
-
-  if (
-    (paths[0] as string).startsWith(
-      "/georeference-assertion/1?include=georeferencedBy"
-    )
-  ) {
-    return paths.map(path => ({
-      id: path.replace("/georeference-assertion/", ""),
-      type: "georeference-assertion",
-      dwcDecimalLongitude: 12.5,
-      georeferencedBy: [{ id: "1", type: "agent" }]
     }));
   }
 });

@@ -6,14 +6,14 @@ import {
   SubmitButton,
   TextField,
   useModal,
-  StringArrayField,
-  FormikButton
+  StringArrayField
 } from "common-ui";
 import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
-import { Organization } from "packages/dina-ui/types/agent-api/resources/Organization";
+import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
+import { PersonFormFields } from "./PersonFormFields";
 
 interface PersonFormProps {
   person?: Person;
@@ -22,8 +22,9 @@ interface PersonFormProps {
 
 /** Form to add or edit a Person. */
 export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
-  const initialValues: Partial<Person> = person || { type: "person" };
-
+  const initialValues: Partial<Person> = person || {
+    type: "person"
+  };
   const id = person?.id;
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -84,6 +85,13 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           isMulti={true}
           optionLabel={organization => organization.names?.[0].name}
         />
+      </div>
+      <PersonFormFields width="30rem" />
+      <div style={{ width: "30rem" }}>
+        <TextField name="webpage" />
+      </div>
+      <div style={{ width: "30rem" }}>
+        <TextField name="remarks" multiLines={true} />
       </div>
       <div className="mb-3 list-inline">
         <div className="list-inline-item">

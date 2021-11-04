@@ -1,31 +1,48 @@
 import {
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  filterBy,
   FormikButton,
+  LoadingSpinner,
+  ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
+import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useContext } from "react";
-import Switch from "react-switch";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
+import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
+import { ReactNode, useContext, useState, useRef } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
+  AttachmentsField,
+  CollectionSelectField,
+  Footer,
   GroupSelectField,
   Head,
+  MaterialSampleBreadCrumb,
+  MaterialSampleFormNav,
   Nav,
-  StorageLinkerField
+  ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
-import { CollectingEventLinker } from "../../../components/collection";
+import {
+  CollectingEventLinker,
+  SetDefaultSampleName
+} from "../../../components/collection";
+import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
   useMaterialSampleQuery,
   useMaterialSampleSave
@@ -33,41 +50,112 @@ import {
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent, MaterialSample } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  MaterialSample,
+  MaterialSampleType,
+  Vocabulary
+} from "../../../types/collection-api";
+
+export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
 export default function MaterialSampleEditPage() {
   const router = useRouter();
-  const {
-    query: { id }
-  } = router;
+
+  const id = router.query.id?.toString();
+  const copyFromId = router.query.copyFromId?.toString();
+
   const { formatMessage } = useDinaIntl();
-  const materialSampleQuery = useMaterialSampleQuery(id as any);
+
+  const materialSampleQuery = useMaterialSampleQuery(id);
+  const copyFromQuery = useMaterialSampleQuery(copyFromId);
+
+  /** The page to redirect to after saving. */
+  const [saveRedirect, setSaveRedirect] = useState<PostSaveRedirect>("VIEW");
 
   async function moveToViewPage(savedId: string) {
     await router.push(`/collection/material-sample/view?id=${savedId}`);
   }
 
+  async function moveToNextSamplePage(savedId: string) {
+    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
+  }
+
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
+
+  const sampleFormProps = {
+    buttonBar: (
+      <ButtonBar>
+        <BackButton
+          className="me-auto"
+          entityId={id}
+          entityLink="/collection/material-sample"
+        />
+        {!id && (
+          <SubmitButton
+            buttonProps={() => ({
+              style: { width: "12rem" },
+              onClick: () => setSaveRedirect("CREATE_NEXT")
+            })}
+          >
+            <DinaMessage id="saveAndCopyToNext" />
+          </SubmitButton>
+        )}
+        <SubmitButton
+          buttonProps={() => ({ onClick: () => setSaveRedirect("VIEW") })}
+        />
+      </ButtonBar>
+    ),
+    // On save either redirect to the view page or create the next sample with the same values:
+    onSaved:
+      saveRedirect === "CREATE_NEXT" ? moveToNextSamplePage : moveToViewPage
+  };
 
   return (
     <div>
-      <Head title={formatMessage(title)} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        {!id &&
+          !!copyFromId &&
+          withResponse(copyFromQuery, ({ data: originalSample }) => (
+            <SaveAndCopyToNextSuccessAlert
+              id={copyFromId}
+              displayName={
+                !!originalSample.materialSampleName?.length
+                  ? originalSample.materialSampleName
+                  : copyFromId
+              }
+              entityPath={"collection/material-sample"}
+            />
+          ))}
+        <h1 id="wb-cont">
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(materialSampleQuery, ({ data }) => (
-            <MaterialSampleForm
-              materialSample={data}
-              onSaved={moveToViewPage}
-            />
+          withResponse(materialSampleQuery, ({ data: sample }) => (
+            <MaterialSampleForm {...sampleFormProps} materialSample={sample} />
           ))
+        ) : copyFromId ? (
+          withResponse(copyFromQuery, ({ data: originalSample }) => {
+            const initialValues = nextSampleInitialValues(originalSample);
+            return (
+              <MaterialSampleForm
+                {...sampleFormProps}
+                materialSample={initialValues}
+              />
+            );
+          })
         ) : (
-          <MaterialSampleForm onSaved={moveToViewPage} />
+          <MaterialSampleForm {...sampleFormProps} />
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -77,17 +165,12 @@ export interface MaterialSampleFormProps {
   collectingEventInitialValues?: InputResource<CollectingEvent>;
 
   onSaved?: (id: string) => Promise<void>;
-  preparationsSectionRef?: React.RefObject<FormikProps<any>>;
-  identifiersSectionRef?: React.RefObject<FormikProps<any>>;
 
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
   /** Template form values for template mode. */
-  preparationsTemplateInitialValues?: Partial<MaterialSample> & {
-    templateCheckboxes?: Record<string, boolean | undefined>;
-  };
-  identifiersTemplateInitialValues?: Partial<MaterialSample> & {
+  templateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
@@ -109,8 +192,6 @@ export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
   onSaved,
-  preparationsSectionRef,
-  identifiersSectionRef,
   materialSampleSaveHook,
   enabledFields,
   attachmentsConfig,
@@ -122,31 +203,22 @@ export function MaterialSampleForm({
       />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  ),
-  preparationsTemplateInitialValues,
-  identifiersTemplateInitialValues
+  )
 }: MaterialSampleFormProps) {
-  const { formatMessage } = useDinaIntl();
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-
   const {
     initialValues,
     nestedCollectingEventForm,
-    dataComponentToggler,
-    enablePreparations,
-    setEnablePreparations,
-    enableCollectingEvent,
-    setEnableCollectingEvent,
+    dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,
     onSubmit,
-    materialSampleAttachmentsUI
+    loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
-      materialSampleAttachmentsConfig: attachmentsConfig?.materialSample,
       materialSample,
       collectingEventInitialValues,
       onSaved,
@@ -161,263 +233,233 @@ export function MaterialSampleForm({
   );
 
   const mateirialSampleInternal = (
-    <div className="d-flex">
-      <div>
-        <nav
-          className="card card-body sticky-top d-none d-md-block"
-          style={{ width: "20rem" }}
-        >
-          <h2>
-            <DinaMessage id="formNavigation" />
-          </h2>
-          <div className="list-group">
-            {!isTemplate && (
-              <a href="#material-sample-section" className="list-group-item">
-                <DinaMessage id="materialSample" />
-              </a>
-            )}
-            {!isTemplate && (
-              <a href="#identifiers-section" className="list-group-item">
-                <DinaMessage id="identifiers" />
-              </a>
-            )}
-            {enableCollectingEvent && (
-              <a href="#collecting-event-section" className="list-group-item">
-                <DinaMessage id="collectingEvent" />
-              </a>
-            )}
-            {enablePreparations && (
-              <a href="#preparations-section" className="list-group-item">
-                <DinaMessage id="preparations" />
-              </a>
-            )}
-            <a href="#managedAttributes-section" className="list-group-item">
-              <DinaMessage id="managedAttributeListTitle" />
-            </a>
-            <a
-              href="#material-sample-attachments-section"
-              className="list-group-item"
-            >
-              <DinaMessage id="materialSampleAttachments" />
-            </a>
-          </div>
-        </nav>
+    <div className="d-md-flex">
+      <div style={{ minWidth: "20rem" }}>
+        <MaterialSampleFormNav dataComponentState={dataComponentState} />
       </div>
       <div className="flex-grow-1 container-fluid">
-        {!isTemplate && <MaterialSampleMainInfoFormLayout />}
-        <div className="row">
-          <div className="col-md-6">
-            {isTemplate ? (
-              <DinaForm
-                initialValues={identifiersTemplateInitialValues}
-                innerRef={identifiersSectionRef}
-                isTemplate={true}
-              >
-                <MaterialSampleIdentifiersFormLayout />
-              </DinaForm>
-            ) : (
-              <MaterialSampleIdentifiersFormLayout />
-            )}{" "}
-          </div>
-        </div>
-
-        {!isTemplate && (
-          <div className="card card-body mb-3">
-            <StorageLinkerField name="storageUnit" removeLabelTag={true} />
-          </div>
+        {!isTemplate && materialSample && (
+          <MaterialSampleBreadCrumb
+            disableLastLink={true}
+            materialSample={materialSample as any}
+          />
         )}
-        <FieldSet legend={<DinaMessage id="components" />}>
-          <div className="row">
-            <label className="enable-collecting-event d-flex align-items-center fw-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enableCollectingEvent}
-                onChange={dataComponentToggler(
-                  setEnableCollectingEvent,
-                  formatMessage("collectingEvent")
-                )}
-              />
-              <DinaMessage id="collectingEvent" />
-            </label>
-            <label className="enable-catalogue-info d-flex align-items-center fw-bold col-sm-3">
-              <Switch
-                className="mx-2"
-                checked={enablePreparations}
-                onChange={dataComponentToggler(
-                  setEnablePreparations,
-                  formatMessage("preparations")
-                )}
-              />
-              <DinaMessage id="preparations" />
-            </label>
-          </div>
-        </FieldSet>
+        {!isTemplate && <MaterialSampleInfoFormLayout />}
+        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+        <MaterialSampleIdentifiersFormLayout />
+        <MaterialSampleFormLayout />
         <div className="data-components">
-          <FieldSet
-            id="collecting-event-section"
-            className={enableCollectingEvent ? "" : "d-none"}
-            legend={<DinaMessage id="collectingEvent" />}
-          >
-            <Tabs
-              // Re-initialize the form when the linked CollectingEvent changes:
-              key={colEventId}
-              // Prevent unmounting the form on tab switch to avoid losing the form state:
-              forceRenderTabPanel={true}
+          {dataComponentState.enableCollectingEvent && (
+            <FieldSet
+              id="collecting-event-section"
+              legend={<DinaMessage id="collectingEvent" />}
             >
-              <TabList>
-                <Tab>
-                  {colEventId ? (
-                    <DinaMessage id="attachedCollectingEvent" />
-                  ) : (
-                    <DinaMessage id="createNew" />
-                  )}
-                </Tab>
-                <Tab disabled={templateAttachesCollectingEvent}>
-                  <DinaMessage id="attachExisting" />
-                </Tab>
-              </TabList>
-              <TabPanel>
-                {
-                  // If there is already a linked CollectingEvent then wait for it to load first:
-                  colEventId
-                    ? withResponse(
-                        colEventQuery,
-                        ({ data: linkedColEvent }) => (
-                          <>
-                            <div className="mb-3 d-flex justify-content-end align-items-center">
-                              <Link
-                                href={`/collection/collecting-event/view?id=${colEventId}`}
-                              >
-                                <a target="_blank">
-                                  <DinaMessage id="collectingEventDetailsPageLink" />
-                                </a>
-                              </Link>
+              <Tabs
+                // Re-initialize the form when the linked CollectingEvent changes:
+                key={colEventId}
+                // Prevent unmounting the form on tab switch to avoid losing the form state:
+                forceRenderTabPanel={true}
+              >
+                <TabList>
+                  <Tab>
+                    {colEventId ? (
+                      <DinaMessage id="attachedCollectingEvent" />
+                    ) : (
+                      <DinaMessage id="createNew" />
+                    )}
+                  </Tab>
+                  <Tab disabled={templateAttachesCollectingEvent}>
+                    <DinaMessage id="attachExisting" />
+                  </Tab>
+                </TabList>
+                <TabPanel>
+                  {
+                    // If there is already a linked CollectingEvent then wait for it to load first:
+                    colEventId
+                      ? withResponse(
+                          colEventQuery,
+                          ({ data: linkedColEvent }) => (
+                            <>
+                              <div className="mb-3 d-flex justify-content-end align-items-center">
+                                <Link
+                                  href={`/collection/collecting-event/view?id=${colEventId}`}
+                                >
+                                  <a target="_blank">
+                                    <DinaMessage id="collectingEventDetailsPageLink" />
+                                  </a>
+                                </Link>
+                                {
+                                  // Do not allow changing an attached Collecting Event from a template:
+                                  !templateAttachesCollectingEvent && (
+                                    <FormikButton
+                                      className="btn btn-danger detach-collecting-event-button ms-5"
+                                      onClick={() => setColEventId(null)}
+                                    >
+                                      <DinaMessage id="detachCollectingEvent" />
+                                    </FormikButton>
+                                  )
+                                }
+                              </div>
                               {
-                                // Do not allow changing an attached Collecting Event from a template:
-                                !templateAttachesCollectingEvent && (
-                                  <FormikButton
-                                    className="btn btn-danger detach-collecting-event-button ms-5"
-                                    onClick={() => setColEventId(null)}
-                                  >
-                                    <DinaMessage id="detachCollectingEvent" />
-                                  </FormikButton>
+                                // In template mode or Workflow Run mode, only show a link to the linked Collecting Event:
+                                isTemplate ||
+                                templateAttachesCollectingEvent ? (
+                                  <div>
+                                    <div className="attached-collecting-event-link mb-3">
+                                      <DinaMessage id="attachedCollectingEvent" />
+                                      :{" "}
+                                      <Link
+                                        href={`/collection/collecting-event/view?id=${colEventId}`}
+                                      >
+                                        <a target="_blank">
+                                          {linkedColEvent.id}
+                                        </a>
+                                      </Link>
+                                    </div>
+                                    <CollectingEventBriefDetails
+                                      collectingEvent={linkedColEvent}
+                                    />
+                                  </div>
+                                ) : (
+                                  // In form mode, show the actual editable Collecting Event form:
+                                  nestedCollectingEventForm
                                 )
                               }
-                            </div>
-                            {
-                              // In template mode or Workflow Run mode, only show a link to the linked Collecting Event:
-                              isTemplate || templateAttachesCollectingEvent ? (
-                                <div>
-                                  <div className="attached-collecting-event-link mb-3">
-                                    <DinaMessage id="attachedCollectingEvent" />
-                                    :{" "}
-                                    <Link
-                                      href={`/collection/collecting-event/view?id=${colEventId}`}
-                                    >
-                                      <a target="_blank">{linkedColEvent.id}</a>
-                                    </Link>
-                                  </div>
-                                  <CollectingEventBriefDetails
-                                    collectingEvent={linkedColEvent}
-                                  />
-                                </div>
-                              ) : (
-                                // In form mode, show the actual editable Collecting Event form:
-                                nestedCollectingEventForm
-                              )
-                            }
-                          </>
+                            </>
+                          )
                         )
-                      )
-                    : nestedCollectingEventForm
-                }
-              </TabPanel>
-              <TabPanel>
-                <CollectingEventLinker
-                  onCollectingEventSelect={colEventToLink => {
-                    setColEventId(colEventToLink.id);
-                  }}
-                />
-              </TabPanel>
-            </Tabs>
-          </FieldSet>
-          {isTemplate ? (
-            <DinaForm
-              initialValues={preparationsTemplateInitialValues}
-              innerRef={preparationsSectionRef}
-              isTemplate={true}
-            >
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-              {materialSampleAttachmentsUI}
-            </DinaForm>
-          ) : (
-            <>
-              {enablePreparations && (
-                <div className="row">
-                  <div className="col-md-6">
-                    <PreparationField />
-                  </div>
-                </div>
-              )}
-
-              <FieldSet
-                legend={<DinaMessage id="managedAttributeListTitle" />}
-                id="managedAttributes-section"
-              >
-                <DinaFormSection
-                  // Disabled the template's restrictions for this section:
-                  enabledFields={null}
-                >
-                  <ManagedAttributesEditor
-                    valuesPath="managedAttributeValues"
-                    valueFieldName="assignedValue"
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    apiBaseUrl="/collection-api"
-                    managedAttributeComponent="MATERIAL_SAMPLE"
-                    managedAttributeKeyField="key"
+                      : nestedCollectingEventForm
+                  }
+                </TabPanel>
+                <TabPanel>
+                  <CollectingEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
                   />
-                </DinaFormSection>
-              </FieldSet>
-              {materialSampleAttachmentsUI}
-            </>
+                </TabPanel>
+              </Tabs>
+            </FieldSet>
           )}
+          {dataComponentState.enablePreparations && (
+            <PreparationField
+              // Use the same attachments config for preparations as the Material Sample:
+              attachmentsConfig={attachmentsConfig?.materialSample}
+            />
+          )}
+          {dataComponentState.enableOrganism && <OrganismStateField />}
+          {dataComponentState.enableDetermination && <DeterminationField />}
+          {dataComponentState.enableAssociations && <AssociationsField />}
+          {dataComponentState.enableStorage && (
+            <FieldSet
+              id="storage-section"
+              legend={<DinaMessage id="storage" />}
+            >
+              <div className="card card-body mb-3">
+                <StorageLinkerField name="storageUnit" removeLabelTag={true} />
+              </div>
+            </FieldSet>
+          )}
+          {dataComponentState.enableScheduledActions && (
+            <ScheduledActionsField />
+          )}
+          {!isTemplate && (
+            <FieldSet
+              legend={<DinaMessage id="managedAttributeListTitle" />}
+              id="managedAttributes-section"
+            >
+              <DinaFormSection
+                // Disabled the template's restrictions for this section:
+                enabledFields={null}
+              >
+                <ManagedAttributesEditor
+                  valuesPath="managedAttributeValues"
+                  valueFieldName="assignedValue"
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  apiBaseUrl="/collection-api"
+                  managedAttributeComponent="MATERIAL_SAMPLE"
+                  managedAttributeKeyField="key"
+                />
+              </DinaFormSection>
+            </FieldSet>
+          )}
+          <AttachmentsField
+            name="attachment"
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id="material-sample-attachments-section"
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          />
         </div>
       </div>
     </div>
   );
 
-  return !isTemplate ? (
+  return isTemplate ? (
+    mateirialSampleInternal
+  ) : loading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
     <DinaForm<InputResource<MaterialSample>>
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
     >
+      {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
       {mateirialSampleInternal}
       {buttonBar}
     </DinaForm>
-  ) : (
-    mateirialSampleInternal
   );
 }
-export function MaterialSampleMainInfoFormLayout() {
+export function MaterialSampleInfoFormLayout() {
   return (
-    <div id="material-sample-section">
-      <div className="row">
-        <div className="col-md-6">
-          <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-        </div>
+    <div className="row">
+      <div className="col-md-6">
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
       </div>
     </div>
   );
 }
 
+export function MaterialSampleFormLayout() {
+  const { locale } = useDinaIntl();
+  return (
+    <FieldSet
+      id="material-sample-section"
+      legend={<DinaMessage id="materialSample" />}
+    >
+      <div className="row">
+        <div className="col-md-6">
+          <ResourceSelectField<MaterialSampleType>
+            name="materialSampleType"
+            filter={filterBy(["name"])}
+            model="collection-api/material-sample-type"
+            optionLabel={it => it.name}
+            readOnlyLink="/collection/material-sample-type/view?id="
+          />
+          <AutoSuggestTextField<Vocabulary>
+            name="materialSampleState"
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleState"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
+          />
+        </div>
+        <div className="col-md-6">
+          <TextField name="materialSampleRemarks" multiLines={true} />
+        </div>
+      </div>
+    </FieldSet>
+  );
+}
 export interface MaterialSampleIdentifiersFormLayoutProps {
   disableSampleName?: boolean;
   hideOtherCatalogNumbers?: boolean;
@@ -426,6 +468,19 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   sampleNamePlaceHolder?: string;
 }
 
+export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
+  "collection",
+  "materialSampleName",
+  "dwcOtherCatalogNumbers",
+  "barcode"
+];
+
+export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
+  "materialSampleRemarks",
+  "materialSampleState",
+  "materialSampleType"
+];
+
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
   disableSampleName,
@@ -433,7 +488,6 @@ export function MaterialSampleIdentifiersFormLayout({
   namePrefix = "",
   sampleNamePlaceHolder
 }: MaterialSampleIdentifiersFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
   return (
     <FieldSet
       id="identifiers-section"
@@ -442,29 +496,22 @@ export function MaterialSampleIdentifiersFormLayout({
     >
       <div className="row">
         <div className="col-md-6">
+          <CollectionSelectField
+            name={`${namePrefix}collection`}
+            customName="collection"
+          />
           <TextField
             name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
-            placeholder={sampleNamePlaceHolder}
             readOnly={disableSampleName}
+            placeholder={sampleNamePlaceHolder}
           />
-
-          <TextField
-            name={`${
-              namePrefix ? namePrefix + "dwcCatalogNumber" : "dwcCatalogNumber"
-            }`}
-            customName="dwcCatalogNumber"
-            className="dwcCatalogNumber"
-          />
+          <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">
           <StringArrayField
-            name={`${
-              namePrefix
-                ? namePrefix + "dwcOtherCatalogNumbers"
-                : "dwcOtherCatalogNumbers"
-            }`}
+            name={`${namePrefix}dwcOtherCatalogNumbers`}
             customName="dwcOtherCatalogNumbers"
           />
         </div>
@@ -503,4 +550,47 @@ export function CollectingEventBriefDetails({
       </div>
     </DinaForm>
   );
+}
+
+/** Calculates the next sample name based on the previous name's suffix. */
+export function nextSampleName(previousName?: string | null): string {
+  if (!previousName) {
+    return "";
+  }
+
+  const originalNumberSuffix = /\d+$/.exec(previousName)?.[0];
+
+  if (!originalNumberSuffix) {
+    return "";
+  }
+
+  const suffixLength = originalNumberSuffix.length;
+  const nextNumberSuffix = padStart(
+    (Number(originalNumberSuffix) + 1).toString(),
+    suffixLength,
+    "0"
+  );
+  const newMaterialSampleName = nextNumberSuffix
+    ? previousName.replace(/\d+$/, nextNumberSuffix)
+    : previousName;
+
+  return newMaterialSampleName;
+}
+
+export function nextSampleInitialValues(
+  originalSample: PersistedResource<MaterialSample>
+) {
+  // Use the copied sample as a base, omitting some fields that shouldn't be copied:
+  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
+    originalSample;
+
+  // Calculate the next suffix:
+  const newMaterialSampleName = nextSampleName(materialSampleName);
+
+  const initialValues = {
+    ...copiedValues,
+    materialSampleName: newMaterialSampleName
+  };
+
+  return initialValues;
 }

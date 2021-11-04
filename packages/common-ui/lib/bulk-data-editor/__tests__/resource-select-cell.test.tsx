@@ -24,7 +24,7 @@ const mockApiContext = { apiClient: { get: mockGet } };
 jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
 
 describe("resource-select-cell", () => {
-  it("Provides a select cell that queries the back-end.", done => {
+  it("Provides a select cell that queries the back-end.", async () => {
     mockGet.mockImplementationOnce(async () => ({
       data: [
         { id: "1", type: "todo", name: "todo 1" },
@@ -44,25 +44,25 @@ describe("resource-select-cell", () => {
       useEffect(() => {
         (async () => {
           await (cell.source as any)("test input", mockProcess);
-
-          // GET should be called with the supplied filter input:
-          expect(mockGet).lastCalledWith("todo", {
-            filter: { rsql: "name==*test input*" }
-          });
-
-          // "process" should be called with the encoded response resources:
-          expect(mockProcess).lastCalledWith([
-            "todo 1 (todo/1)",
-            "todo 2 (todo/2)"
-          ]);
-          done();
         })();
       });
 
       return <div />;
     }
 
-    mountWithAppContext(<TestComponent />, { apiContext: mockApiContext });
+    mountWithAppContext(<TestComponent />, {
+      apiContext: mockApiContext
+    });
+    await new Promise(setImmediate);
+
+    // GET should be called with the supplied filter input:
+    expect(mockGet).lastCalledWith("todo", {
+      filter: { rsql: "name==*test input*" },
+      sort: "-createdOn"
+    });
+
+    // "process" should be called with the encoded response resources:
+    expect(mockProcess).lastCalledWith(["todo 1 (todo/1)", "todo 2 (todo/2)"]);
   });
 
   it("Does not submit a filter when the cell already has an encoded resource in it.", done => {
@@ -90,7 +90,7 @@ describe("resource-select-cell", () => {
           );
 
           // GET should be called with the supplied filter input:
-          expect(mockGet).lastCalledWith("todo", {});
+          expect(mockGet).lastCalledWith("todo", { sort: "-createdOn" });
 
           done();
         })();

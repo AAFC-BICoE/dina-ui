@@ -8,7 +8,7 @@ import {
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
-  NumberField,
+  NumberRangeFields,
   ResourceSelectField,
   StringArrayField,
   TextField,
@@ -18,22 +18,26 @@ import {
 } from "common-ui";
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
-import { Vocabulary } from "../../types/collection-api";
 import { ChangeEvent, useRef, useState } from "react";
-import { ShouldRenderReasons } from "react-autosuggest";
-import Switch from "react-switch";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
 import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
-import { GroupSelectField, useAddPersonModal } from "..";
+import {
+  AttachmentsField,
+  GroupSelectField,
+  NotPubliclyReleasableWarning,
+  ParseVerbatimToRangeButton,
+  TagsAndRestrictionsSection,
+  useAddPersonModal
+} from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
+import { Vocabulary } from "../../types/collection-api";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
 } from "../../types/collection-api/resources/CollectingEvent";
 import {
-  CoordinateSystem,
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
 } from "../../types/collection-api/resources/CoordinateSystem";
@@ -41,10 +45,11 @@ import {
   geographicPlaceSourceUrl,
   SourceAdministrativeLevel
 } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { SRS } from "../../types/collection-api/resources/SRS";
+import { AllowAttachmentsConfig } from "../object-store";
 import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
+import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
 import {
   nominatimAddressDetailSearch,
   NominatimAddressDetailSearchProps,
@@ -56,16 +61,17 @@ interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
   initialValuesForTemplate?: any;
+  attachmentsConfig?: AllowAttachmentsConfig;
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
-  setDefaultVerbatimSRS
+  setDefaultVerbatimSRS,
+  attachmentsConfig
 }: CollectingEventFormLayoutProps) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, locale } = useDinaIntl();
   const { openAddPersonModal } = useAddPersonModal();
-  const [rangeEnabled, setRangeEnabled] = useState(false);
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -93,22 +99,13 @@ export function CollectingEventFormLayout({
     [selectedSearchResult, "nominatimAddressDetailSearch"],
     nominatimAddressDetailSearch,
     {
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
   );
 
   const commonSrcDetailRoot = "geographicPlaceNameSourceDetail";
-
-  function toggleRangeEnabled(
-    newValue: boolean,
-    formik: FormikContextType<{}>
-  ) {
-    if (!newValue) {
-      formik.setFieldValue("endEventDateTime", null);
-    }
-    setRangeEnabled(newValue);
-  }
 
   async function selectSearchResult(
     result: NominatumApiSearchResult,
@@ -149,9 +146,13 @@ export function CollectingEventFormLayout({
       GeographicPlaceNameSource.OSM
     );
     if (isTemplate) {
-      // Include the hidden geographicPlaceNameSource value in the enabled template fields:
+      // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSource']",
+        true
+      );
+      formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -245,6 +246,10 @@ export function CollectingEventFormLayout({
         false
       );
       formik.setFieldValue(
+        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
+        false
+      );
+      formik.setFieldValue(
         "templateCheckboxes['geographicPlaceNameSourceDetail.country']",
         false
       );
@@ -271,15 +276,6 @@ export function CollectingEventFormLayout({
     // Do the geo-search automatically:
     setImmediate(() =>
       document?.querySelector<HTMLElement>(".geo-search-button")?.click()
-    );
-  }
-
-  /* Ensure config is rendered when input get focuse without needing to enter any value */
-  function shouldRenderSuggestions(value: string, reason: ShouldRenderReasons) {
-    return (
-      value?.length >= 0 ||
-      reason === "input-changed" ||
-      reason === "input-focused"
     );
   }
 
@@ -341,23 +337,29 @@ export function CollectingEventFormLayout({
   }
   return (
     <div ref={layoutWrapperRef}>
+      <NotPubliclyReleasableWarning />
       {!isTemplate && (
         <DinaFormSection horizontal={[3, 9]}>
           <div className="row">
-            <div className="col-md-6">
-              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-            </div>
-            <div className="col-md-6">
-              <StringArrayField name="dwcOtherRecordNumbers" />
-            </div>
+            <GroupSelectField
+              className="col-md-6"
+              name="group"
+              enableStoredDefaultGroup={true}
+            />
+            <StringArrayField
+              className="col-md-6"
+              name="dwcOtherRecordNumbers"
+            />
           </div>
         </DinaFormSection>
       )}
+      <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       <div className="row">
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingDateLegend" />}
             id="collectingDateLegend"
+            className="non-strip"
           >
             {isTemplate && (
               <Field name="includeAllCollectingDate">
@@ -371,43 +373,20 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
+            <TextField
+              name="verbatimEventDateTime"
+              label={formatMessage("verbatimEventDateTime")}
+            />
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
-              label={formatMessage("startEventDateTimeLabel")}
+              label={formatMessage("startEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
-            <Field name="endEventDateTime">
-              {({ field: { value: endEventDateTime }, form }) => (
-                <div>
-                  {(rangeEnabled || endEventDateTime) && (
-                    <FormattedTextField
-                      name="endEventDateTime"
-                      label={formatMessage("endEventDateTimeLabel")}
-                      placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
-                    />
-                  )}
-                  {!readOnly && (
-                    <label
-                      className="mb-3"
-                      style={{ marginLeft: 15, marginTop: -15 }}
-                    >
-                      <span>{formatMessage("enableDateRangeLabel")}</span>
-                      <Switch
-                        onChange={newValue =>
-                          toggleRangeEnabled(newValue, form)
-                        }
-                        checked={rangeEnabled || !!endEventDateTime || false}
-                        className="react-switch dateRange"
-                      />
-                    </label>
-                  )}
-                </div>
-              )}
-            </Field>
-            <TextField
-              name="verbatimEventDateTime"
-              label={formatMessage("verbatimEventDateTimeLabel")}
+            <FormattedTextField
+              name="endEventDateTime"
+              label={formatMessage("endEventDateTime")}
+              placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>
         </div>
@@ -415,6 +394,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingAgentsLegend" />}
             id="collectingAgentsLegend"
+            className="non-strip"
           >
             {isTemplate && (
               <Field name="includeAllCollectingAgent">
@@ -457,513 +437,560 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
       </div>
-      <FieldSet legend={<DinaMessage id="collectingLocationLegend" />}>
-        <FieldSet
-          legend={<DinaMessage id="verbatimLabelLegend" />}
-          id="verbatimLabelLegend"
-        >
-          <div className="row">
-            <div className="col-md-6">
-              {isTemplate && (
-                <Field name="includeAllVerbatimCoordinates">
-                  {() => (
-                    <CheckBoxWithoutWrapper
-                      name="includeAllVerbatimCoordinates"
-                      parentContainerId="verbatimLabelLegend"
-                      onClickIncludeAll={onClickIncludeAll}
-                      includeAllLabel={formatMessage("includeAll")}
-                      customLayout={["col-sm-1", "col-sm-4"]}
-                    />
-                  )}
-                </Field>
-              )}
-            </div>
-          </div>
-          <div className="row">
-            <div className="col-md-6">
-              <TextField name="dwcVerbatimLocality" />
-              <AutoSuggestTextField<Vocabulary>
-                name="dwcVerbatimCoordinateSystem"
-                query={() => ({
-                  path: "collection-api/vocabulary/coordinateSystem"
-                })}
-                suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
-                }
-                shouldRenderSuggestions={shouldRenderSuggestions}
-                onSuggestionSelected={onSuggestionSelected}
-                onChangeExternal={onChangeExternal}
-              />
-              <Field name="dwcVerbatimCoordinateSystem">
-                {({ field: { value: coordSysSelected } }) => {
-                  /* note need to consider there is also possible user enter their own verbatime coordsys
-                    and not select any one from the dropdown*/
-                  const hasDegree =
-                    coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE;
-
-                  const hasMinute =
-                    coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES;
-
-                  const hasSecond =
-                    coordSysSelected ===
-                    CoordinateSystemEnum.DEGREE_MINUTES_SECONDS;
-
-                  const isUTM = coordSysSelected === CoordinateSystemEnum.UTM;
-
-                  return (
-                    <>
-                      <TextField
-                        name="dwcVerbatimCoordinates"
-                        placeholder={
-                          isUTM
-                            ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
-                            : null
-                        }
-                        className={
-                          !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
-                        }
-                      />
-                      <TextFieldWithCoordButtons
-                        name="dwcVerbatimLatitude"
-                        placeholder={
-                          hasDegree || hasMinute || hasSecond
-                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
-                            : undefined
-                        }
-                        isExternallyControlled={true}
-                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
-                        shouldShowMinute={hasMinute || hasSecond}
-                        shouldShowSecond={hasSecond}
-                        className={
-                          hasDegree || hasMinute || hasSecond ? "" : "d-none"
-                        }
-                      />
-                      <TextFieldWithCoordButtons
-                        name="dwcVerbatimLongitude"
-                        placeholder={
-                          hasDegree || hasMinute || hasSecond
-                            ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
-                            : undefined
-                        }
-                        isExternallyControlled={true}
-                        shouldShowDegree={hasDegree || hasMinute || hasSecond}
-                        shouldShowMinute={hasMinute || hasSecond}
-                        shouldShowSecond={hasSecond}
-                        className={
-                          hasDegree || hasMinute || hasSecond ? "" : "d-none"
-                        }
-                      />
-                      <div
-                        className={
-                          hasDegree || hasMinute || hasSecond
-                            ? "mb-3"
-                            : "d-none"
-                        }
-                      >
-                        <SetCoordinatesFromVerbatimButton
-                          sourceLatField="dwcVerbatimLatitude"
-                          sourceLonField="dwcVerbatimLongitude"
-                          targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
-                          targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
-                          onClick={({ lat, lon }) =>
-                            setGeoSearchValue(`${lat}, ${lon}`)
-                          }
-                        >
-                          <DinaMessage id="latLongAutoSetterButton" />
-                        </SetCoordinatesFromVerbatimButton>
-                      </div>
-                    </>
-                  );
-                }}
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet
+            legend={<DinaMessage id="verbatimLabelLegend" />}
+            id="verbatimLabelLegend"
+            className="non-strip"
+          >
+            {isTemplate && (
+              <Field name="includeAllVerbatimCoordinates">
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllVerbatimCoordinates"
+                    parentContainerId="verbatimLabelLegend"
+                    onClickIncludeAll={onClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                    customLayout={["col-sm-1", "col-sm-4"]}
+                  />
+                )}
               </Field>
-            </div>
-            <div className="col-md-6">
-              <AutoSuggestTextField<Vocabulary>
-                name="dwcVerbatimSRS"
-                query={() => ({
-                  path: "collection-api/vocabulary/srs"
-                })}
-                suggestion={vocabElement =>
-                  vocabElement?.vocabularyElements?.map(it => it?.name ?? "") ??
-                  ""
-                }
-                shouldRenderSuggestions={shouldRenderSuggestions}
-                onChangeExternal={onChangeExternal}
-              />
-              <TextField name="dwcVerbatimElevation" />
-              <TextField name="dwcVerbatimDepth" />
-              <NumberField
-                name="dwcMinimumElevationInMeters"
-                isInteger={true}
-              />
-              <NumberField name="dwcMinimumDepthInMeters" isInteger={true} />
-            </div>
-          </div>
-        </FieldSet>
-        <div className="row">
-          <div className="col-lg-6">
-            <FieldSet
-              legend={<DinaMessage id="geoReferencingLegend" />}
-              id="geoReferencingLegend"
-            >
-              {isTemplate && (
-                <Field name="includeAllGeoReference">
-                  {() => (
-                    <CheckBoxWithoutWrapper
-                      name="includeAllGeoReference"
-                      parentContainerId="geoReferencingLegend"
-                      onClickIncludeAll={onClickIncludeAll}
-                      includeAllLabel={formatMessage("includeAll")}
-                      customLayout={["col-sm-1", "col-sm-4"]}
-                    />
-                  )}
-                </Field>
-              )}
-              <FieldArray name="geoReferenceAssertions">
-                {({ form, push, remove }) => {
-                  const assertions =
-                    (form.values as CollectingEvent).geoReferenceAssertions ??
-                    [];
+            )}
 
-                  function addGeoReference() {
-                    push({ isPrimary: assertions?.length === 0 });
-                    setActiveTabIdx(assertions.length);
-                  }
+            <TextField name="dwcVerbatimLocality" />
+            <AutoSuggestTextField<Vocabulary>
+              name="dwcVerbatimCoordinateSystem"
+              query={() => ({
+                path: "collection-api/vocabulary/coordinateSystem"
+              })}
+              suggestion={vocabElement =>
+                vocabElement?.vocabularyElements?.map(
+                  it => it?.labels?.[locale] ?? ""
+                ) ?? ""
+              }
+              onSuggestionSelected={onSuggestionSelected}
+              alwaysShowSuggestions={true}
+              onChangeExternal={onChangeExternal}
+            />
+            <Field name="dwcVerbatimCoordinateSystem">
+              {({ field: { value: coordSysSelected } }) => {
+                /* note need to consider there is also possible user enter their own verbatime coordsys
+                  and not select any one from the dropdown*/
+                const hasDegree =
+                  coordSysSelected === CoordinateSystemEnum.DECIMAL_DEGREE;
 
-                  function removeGeoReference(index: number) {
-                    remove(index);
-                    // Stay on the current tab number, or reduce if removeing the last element:
-                    setActiveTabIdx(current =>
-                      clamp(current, 0, assertions.length - 2)
-                    );
-                  }
-                  return (
-                    <div className="georeference-assertion-section">
-                      <Tabs
-                        selectedIndex={activeTabIdx}
-                        onSelect={setActiveTabIdx}
-                      >
-                        {
-                          // Only show the tabs when there is more than 1 assertion:
-                          <TabList
-                            className={`react-tabs__tab-list ${
-                              assertions.length === 1 ? "d-none" : ""
-                            }`}
-                          >
-                            {assertions.map((assertion, index) => (
-                              <Tab key={index}>
-                                <span className="m-3">
-                                  {index + 1}
-                                  {assertion.isPrimary &&
-                                    ` (${formatMessage("primary")})`}
-                                </span>
-                              </Tab>
-                            ))}
-                          </TabList>
-                        }
-                        {assertions.length
-                          ? assertions.map((assertion, index) => (
-                              <TabPanel key={index}>
-                                <GeoReferenceAssertionRow
-                                  index={index}
-                                  openAddPersonModal={openAddPersonModal}
-                                  assertion={assertion}
-                                />
-                                {!readOnly && !isTemplate && (
-                                  <div className="list-inline mb-3">
-                                    <FormikButton
-                                      className="list-inline-item btn btn-primary add-assertion-button"
-                                      onClick={addGeoReference}
-                                    >
-                                      <DinaMessage id="addAnotherAssertion" />
-                                    </FormikButton>
-                                    <FormikButton
-                                      className="list-inline-item btn btn-dark"
-                                      onClick={() => removeGeoReference(index)}
-                                    >
-                                      <DinaMessage id="removeAssertionLabel" />
-                                    </FormikButton>
-                                  </div>
-                                )}
-                              </TabPanel>
-                            ))
-                          : null}
-                      </Tabs>
-                      {!assertions.length && !readOnly && !isTemplate && (
-                        <FormikButton
-                          className="btn btn-primary add-assertion-button"
-                          onClick={addGeoReference}
-                        >
-                          <DinaMessage id="addAssertion" />
-                        </FormikButton>
-                      )}
-                    </div>
-                  );
-                }}
-              </FieldArray>
-            </FieldSet>
-          </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="toponymyLegend" />}>
-              <div
-                style={{
-                  overflowY: "auto",
-                  overflowX: "hidden",
-                  maxHeight: 520
-                }}
-              >
-                <Field name="geographicPlaceNameSourceDetail">
-                  {({ field: { value: detail }, form }) =>
-                    detail ? (
-                      <div>
-                        {!hideCustomPlace && !readOnly && (
-                          <div className="m-3">
-                            <div className="d-flex flex-row">
-                              <label
-                                className="p-2"
-                                style={{ marginLeft: -20 }}
-                              >
-                                <strong>
-                                  <DinaMessage id="customPlaceName" />
-                                </strong>
-                              </label>
-                              <input
-                                aria-label="customPlace"
-                                className="p-2 form-control"
-                                style={{ width: "60%" }}
-                                onChange={e =>
-                                  setCustomPlaceValue(e.target.value)
-                                }
-                                onKeyDown={e => {
-                                  if (e.key === "Enter") {
-                                    e.preventDefault();
-                                    if (customPlaceValue?.length > 0) {
-                                      addCustomPlaceName(form);
-                                    }
-                                  }
-                                }}
-                              />
-                              <button
-                                className="mb-2 btn btn-primary"
-                                type="button"
-                                onClick={() => addCustomPlaceName(form)}
-                              >
-                                <DinaMessage id="addCustomPlaceName" />
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                        {detailResultsIsLoading ? (
-                          <LoadingSpinner loading={true} />
-                        ) : (
-                          form.values.srcAdminLevels?.length > 0 && (
-                            <FieldArray name="srcAdminLevels">
-                              {({ remove }) => {
-                                const geoNames = form.values.srcAdminLevels;
-                                function removeItem(index: number) {
-                                  remove(index);
-                                }
-                                return (
-                                  <div className="pb-4">
-                                    {geoNames.map((_, idx) => (
-                                      <TextFieldWithRemoveButton
-                                        name={`srcAdminLevels[${idx}].name`}
-                                        templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
-                                        readOnly={true}
-                                        removeLabel={true}
-                                        removeFormGroupClass={true}
-                                        removeItem={removeItem}
-                                        key={Math.random()}
-                                        index={idx}
-                                        hideCloseBtn={hideRemoveBtn}
-                                        inputProps={{
-                                          style: {
-                                            backgroundColor: `${
-                                              idx % 2 === 0
-                                                ? "#e9ecef"
-                                                : "white"
-                                            }`
-                                          }
-                                        }}
-                                      />
-                                    ))}
-                                  </div>
-                                );
-                              }}
-                            </FieldArray>
-                          )
-                        )}
-                        <DinaFormSection horizontal={[3, 9]}>
-                          <TextField
-                            name={`${commonSrcDetailRoot}.stateProvince.name`}
-                            templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
-                            label={formatMessage("stateProvinceLabel")}
-                            readOnly={true}
-                          />
-                          <TextField
-                            name={`${commonSrcDetailRoot}.country.name`}
-                            templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
-                            label={formatMessage("countryLabel")}
-                            readOnly={true}
-                          />
-                        </DinaFormSection>
-                        <div className="row">
-                          {!readOnly && (
-                            <div className="col-md-4">
-                              <FormikButton
-                                className="btn btn-dark"
-                                onClick={(_, formik) => removeThisPlace(formik)}
-                              >
-                                <DinaMessage id="removeThisPlaceLabel" />
-                              </FormikButton>
-                            </div>
-                          )}
-                          <div className="col-md-4">
-                            {detail.sourceUrl && (
-                              <a
-                                href={`${detail.sourceUrl}`}
-                                target="_blank"
-                                className="btn btn-info"
-                              >
-                                <DinaMessage id="viewDetailButtonLabel" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ) : !readOnly ? (
-                      <GeographySearchBox
-                        inputValue={geoSearchValue}
-                        onInputChange={setGeoSearchValue}
-                        onSelectSearchResult={selectSearchResult}
-                        renderUnderSearchBar={
-                          <Field>
-                            {({ form: { values: formState } }) => {
-                              const colEvent: Partial<CollectingEvent> =
-                                formState;
-                              const activeAssertion =
-                                colEvent.geoReferenceAssertions?.[activeTabIdx];
+                const hasMinute =
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_DECIMAL_MINUTES;
 
-                              const decimalLat =
-                                activeAssertion?.dwcDecimalLatitude;
-                              const decimalLon =
-                                activeAssertion?.dwcDecimalLongitude;
+                const hasSecond =
+                  coordSysSelected ===
+                  CoordinateSystemEnum.DEGREE_MINUTES_SECONDS;
 
-                              const hasVerbatimLocality =
-                                !!colEvent.dwcVerbatimLocality;
-                              const hasDecimalCoords = !!(
-                                decimalLat && decimalLon
-                              );
+                const isUTM = coordSysSelected === CoordinateSystemEnum.UTM;
 
-                              const hasAnyLocation =
-                                hasVerbatimLocality || hasDecimalCoords;
-
-                              return hasAnyLocation ? (
-                                <div className="mb-3 d-flex flex-row align-items-center">
-                                  <div className="pe-3">
-                                    <DinaMessage id="search" />:
-                                  </div>
-                                  <FormikButton
-                                    className={
-                                      hasVerbatimLocality
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state =>
-                                      doGeoSearch(state.dwcVerbatimLocality)
-                                    }
-                                  >
-                                    <DinaMessage id="field_dwcVerbatimLocality" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className={
-                                      hasDecimalCoords
-                                        ? "btn btn-link"
-                                        : "d-none"
-                                    }
-                                    onClick={state => {
-                                      const assertion =
-                                        state.geoReferenceAssertions?.[
-                                          activeTabIdx
-                                        ];
-                                      const lat = assertion?.dwcDecimalLatitude;
-                                      const lon =
-                                        assertion?.dwcDecimalLongitude;
-                                      doGeoSearch(`${lat}, ${lon}`);
-                                    }}
-                                  >
-                                    <DinaMessage id="decimalLatLong" />
-                                  </FormikButton>
-                                </div>
-                              ) : null;
-                            }}
-                          </Field>
-                        }
-                      />
-                    ) : null
-                  }
-                </Field>
-              </div>
-            </FieldSet>
-          </div>
-          <div className="col-lg-6">
-            <FieldSet legend={<DinaMessage id="locationDescriptionLegend" />}>
-              <TextField name="habitat" />
-            </FieldSet>
-          </div>
-        </div>
-      </FieldSet>
-      {!isTemplate && (
-        <div className="row">
-          <div className="col-md-6">
-            <FieldSet
-              legend={<DinaMessage id="collectingEventManagedAttributes" />}
-            >
-              {readOnly ? (
-                <FastField name="managedAttributeValues">
-                  {({ field: { value } }) => (
-                    <ManagedAttributesViewer
-                      values={value}
-                      managedAttributeApiPath={key =>
-                        `collection-api/managed-attribute/collecting_event.${key}`
+                return (
+                  <>
+                    <TextField
+                      name="dwcVerbatimCoordinates"
+                      placeholder={
+                        isUTM
+                          ? CoordinateSystemEnumPlaceHolder[coordSysSelected]
+                          : null
+                      }
+                      className={
+                        !hasDegree && !hasMinute && !hasSecond ? "" : "d-none"
                       }
                     />
-                  )}
-                </FastField>
-              ) : (
-                <DinaFormSection
-                  // Disabled the template's restrictions for this section:
-                  enabledFields={null}
-                >
-                  <ManagedAttributesEditor
-                    valuesPath="managedAttributeValues"
-                    valueFieldName="assignedValue"
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    apiBaseUrl="/collection-api"
-                    managedAttributeComponent="COLLECTING_EVENT"
-                    managedAttributeKeyField="key"
-                  />
-                </DinaFormSection>
-              )}
-            </FieldSet>
-          </div>
-        </div>
-      )}
-      {readOnly && (
-        <div className="mb-3">
-          <Field name="id">
-            {({ field: { value: id } }) => (
-              <AttachmentReadOnlySection
-                attachmentPath={`collection-api/collecting-event/${id}/attachment`}
-                detachTotalSelected={true}
-                title={<DinaMessage id="collectingEventAttachments" />}
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLatitude"
+                      placeholder={
+                        hasDegree || hasMinute || hasSecond
+                          ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}N`
+                          : undefined
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                      shouldShowMinute={hasMinute || hasSecond}
+                      shouldShowSecond={hasSecond}
+                      className={
+                        hasDegree || hasMinute || hasSecond ? "" : "d-none"
+                      }
+                    />
+                    <TextFieldWithCoordButtons
+                      name="dwcVerbatimLongitude"
+                      placeholder={
+                        hasDegree || hasMinute || hasSecond
+                          ? `${CoordinateSystemEnumPlaceHolder[coordSysSelected]}E`
+                          : undefined
+                      }
+                      isExternallyControlled={true}
+                      shouldShowDegree={hasDegree || hasMinute || hasSecond}
+                      shouldShowMinute={hasMinute || hasSecond}
+                      shouldShowSecond={hasSecond}
+                      className={
+                        hasDegree || hasMinute || hasSecond ? "" : "d-none"
+                      }
+                    />
+                    <div
+                      className={
+                        hasDegree || hasMinute || hasSecond ? "mb-3" : "d-none"
+                      }
+                    >
+                      <SetCoordinatesFromVerbatimButton
+                        sourceLatField="dwcVerbatimLatitude"
+                        sourceLonField="dwcVerbatimLongitude"
+                        targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
+                        targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
+                        onClick={({ lat, lon }) =>
+                          setGeoSearchValue(`${lat}, ${lon}`)
+                        }
+                      >
+                        <DinaMessage id="latLongAutoSetterButton" />
+                      </SetCoordinatesFromVerbatimButton>
+                    </div>
+                  </>
+                );
+              }}
+            </Field>
+            <AutoSuggestTextField<Vocabulary>
+              name="dwcVerbatimSRS"
+              query={() => ({
+                path: "collection-api/vocabulary/srs"
+              })}
+              suggestion={vocabElement =>
+                vocabElement?.vocabularyElements?.map(
+                  it => it?.labels?.[locale] ?? ""
+                ) ?? ""
+              }
+              alwaysShowSuggestions={true}
+              onChangeExternal={onChangeExternal}
+            />
+            <TextField name="dwcVerbatimElevation" />
+            <div>
+              <ParseVerbatimToRangeButton
+                verbatimField="dwcVerbatimElevation"
+                rangeFields={[
+                  "dwcMinimumElevationInMeters",
+                  "dwcMaximumElevationInMeters"
+                ]}
+                buttonText={formatMessage("convertToElevationMinMax")}
               />
-            )}
-          </Field>
+            </div>
+            <TextField name="dwcVerbatimDepth" />
+            <div>
+              {" "}
+              <ParseVerbatimToRangeButton
+                verbatimField="dwcVerbatimDepth"
+                rangeFields={[
+                  "dwcMinimumDepthInMeters",
+                  "dwcMaximumDepthInMeters"
+                ]}
+                buttonText={formatMessage("convertToDepthMinMax")}
+              />
+            </div>
+          </FieldSet>
         </div>
+        <div className="col-md-6">
+          <FieldSet
+            legend={<DinaMessage id="collectingEventDetails" />}
+            className="non-strip"
+          >
+            <TextField name="habitat" />
+            <TextField name="host" />
+            <Field name="group">
+              {({ field: { value: group } }) => (
+                // Collection methods should be filtered by the Collecting Event's group:
+                <CollectionMethodSelectField
+                  name="collectionMethod"
+                  filter={filterBy(["name"], {
+                    extraFilters: group
+                      ? [
+                          {
+                            selector: "group",
+                            comparison: "==",
+                            arguments: group
+                          }
+                        ]
+                      : undefined
+                  })}
+                  shouldUpdate={() => true}
+                />
+              )}
+            </Field>
+            <AutoSuggestTextField<CollectingEvent>
+              name="substrate"
+              query={(searchValue, ctx) => ({
+                path: "collection-api/collecting-event",
+                filter: {
+                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                  rsql: `substrate==${searchValue}*`
+                }
+              })}
+              suggestion={collEvent => collEvent.substrate ?? ""}
+            />
+            <NumberRangeFields
+              names={[
+                "dwcMinimumElevationInMeters",
+                "dwcMaximumElevationInMeters"
+              ]}
+              labelMsg={<DinaMessage id="elevationInMeters" />}
+            />
+            <NumberRangeFields
+              names={["dwcMinimumDepthInMeters", "dwcMaximumDepthInMeters"]}
+              labelMsg={<DinaMessage id="depthInMeters" />}
+            />
+            <TextField name="remarks" multiLines={true} />
+          </FieldSet>
+        </div>
+      </div>
+
+      <div className="row">
+        <div className="col-md-6">
+          <FieldSet
+            legend={<DinaMessage id="geoReferencingLegend" />}
+            id="geoReferencingLegend"
+            className="non-strip"
+          >
+            {isTemplate && (
+              <Field name="includeAllGeoReference">
+                {() => (
+                  <CheckBoxWithoutWrapper
+                    name="includeAllGeoReference"
+                    parentContainerId="geoReferencingLegend"
+                    onClickIncludeAll={onClickIncludeAll}
+                    includeAllLabel={formatMessage("includeAll")}
+                    customLayout={["col-sm-1", "col-sm-4"]}
+                  />
+                )}
+              </Field>
+            )}
+            <FieldArray name="geoReferenceAssertions">
+              {({ form, push, remove }) => {
+                const assertions =
+                  (form.values as CollectingEvent).geoReferenceAssertions ?? [];
+
+                function addGeoReference() {
+                  push({ isPrimary: assertions?.length === 0 });
+                  setActiveTabIdx(assertions.length);
+                }
+
+                function removeGeoReference(index: number) {
+                  remove(index);
+                  // Stay on the current tab number, or reduce if removeing the last element:
+                  setActiveTabIdx(current =>
+                    clamp(current, 0, assertions.length - 2)
+                  );
+                }
+                return (
+                  <div className="georeference-assertion-section">
+                    <Tabs
+                      selectedIndex={activeTabIdx}
+                      onSelect={setActiveTabIdx}
+                    >
+                      {
+                        // Only show the tabs when there is more than 1 assertion:
+                        <TabList
+                          className={`react-tabs__tab-list ${
+                            assertions.length === 1 ? "d-none" : ""
+                          }`}
+                        >
+                          {assertions.map((assertion, index) => (
+                            <Tab key={index}>
+                              <span className="m-3">
+                                {index + 1}
+                                {assertion.isPrimary &&
+                                  ` (${formatMessage("primary")})`}
+                              </span>
+                            </Tab>
+                          ))}
+                        </TabList>
+                      }
+                      {assertions.length
+                        ? assertions.map((assertion, index) => (
+                            <TabPanel key={index}>
+                              <GeoReferenceAssertionRow
+                                index={index}
+                                openAddPersonModal={openAddPersonModal}
+                                assertion={assertion}
+                              />
+                              {!readOnly && !isTemplate && (
+                                <div className="list-inline mb-3">
+                                  <FormikButton
+                                    className="list-inline-item btn btn-primary add-assertion-button"
+                                    onClick={addGeoReference}
+                                  >
+                                    <DinaMessage id="addAnotherAssertion" />
+                                  </FormikButton>
+                                  <FormikButton
+                                    className="list-inline-item btn btn-dark"
+                                    onClick={() => removeGeoReference(index)}
+                                  >
+                                    <DinaMessage id="removeAssertionLabel" />
+                                  </FormikButton>
+                                </div>
+                              )}
+                            </TabPanel>
+                          ))
+                        : null}
+                    </Tabs>
+                    {!assertions.length && !readOnly && !isTemplate && (
+                      <FormikButton
+                        className="btn btn-primary add-assertion-button"
+                        onClick={addGeoReference}
+                      >
+                        <DinaMessage id="addAssertion" />
+                      </FormikButton>
+                    )}
+                  </div>
+                );
+              }}
+            </FieldArray>
+          </FieldSet>
+        </div>
+        <div className="col-md-6">
+          <FieldSet
+            legend={<DinaMessage id="toponymyLegend" />}
+            className="non-strip"
+          >
+            <div
+              style={{
+                overflowY: "auto",
+                overflowX: "hidden",
+                maxHeight: 520
+              }}
+            >
+              <Field name="geographicPlaceNameSourceDetail">
+                {({ field: { value: detail }, form }) =>
+                  detail ? (
+                    <div>
+                      {!hideCustomPlace && !readOnly && (
+                        <div className="m-3">
+                          <div className="d-flex flex-row">
+                            <label className="p-2" style={{ marginLeft: -20 }}>
+                              <strong>
+                                <DinaMessage id="customPlaceName" />
+                              </strong>
+                            </label>
+                            <input
+                              aria-label="customPlace"
+                              className="p-2 form-control"
+                              style={{ width: "60%" }}
+                              onChange={e =>
+                                setCustomPlaceValue(e.target.value)
+                              }
+                              onKeyDown={e => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  if (customPlaceValue?.length > 0) {
+                                    addCustomPlaceName(form);
+                                  }
+                                }
+                              }}
+                            />
+                            <button
+                              className="mb-2 btn btn-primary"
+                              type="button"
+                              onClick={() => addCustomPlaceName(form)}
+                            >
+                              <DinaMessage id="addCustomPlaceName" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                      {detailResultsIsLoading ? (
+                        <LoadingSpinner loading={true} />
+                      ) : (
+                        form.values.srcAdminLevels?.length > 0 && (
+                          <FieldArray name="srcAdminLevels">
+                            {({ remove }) => {
+                              const geoNames = form.values.srcAdminLevels;
+                              function removeItem(index: number) {
+                                remove(index);
+                              }
+                              return (
+                                <div className="pb-4">
+                                  {geoNames.map((_, idx) => (
+                                    <TextFieldWithRemoveButton
+                                      name={`srcAdminLevels[${idx}].name`}
+                                      templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
+                                      readOnly={true}
+                                      removeLabel={true}
+                                      removeBottomMargin={true}
+                                      removeItem={removeItem}
+                                      key={Math.random()}
+                                      index={idx}
+                                      hideCloseBtn={hideRemoveBtn}
+                                      inputProps={{
+                                        style: {
+                                          backgroundColor: `${
+                                            idx % 2 === 0 ? "#e9ecef" : "white"
+                                          }`
+                                        }
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              );
+                            }}
+                          </FieldArray>
+                        )
+                      )}
+                      <DinaFormSection horizontal={[3, 9]}>
+                        <TextField
+                          name={`${commonSrcDetailRoot}.stateProvince.name`}
+                          templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
+                          label={formatMessage("stateProvinceLabel")}
+                          readOnly={true}
+                        />
+                        <TextField
+                          name={`${commonSrcDetailRoot}.country.name`}
+                          templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
+                          label={formatMessage("countryLabel")}
+                          readOnly={true}
+                        />
+                      </DinaFormSection>
+                      <div className="row">
+                        {!readOnly && (
+                          <div className="col-md-4">
+                            <FormikButton
+                              className="btn btn-dark"
+                              onClick={(_, formik) => removeThisPlace(formik)}
+                            >
+                              <DinaMessage id="removeThisPlaceLabel" />
+                            </FormikButton>
+                          </div>
+                        )}
+                        <div className="col-md-4">
+                          {detail.sourceUrl && (
+                            <a
+                              href={`${detail.sourceUrl}`}
+                              target="_blank"
+                              className="btn btn-info"
+                            >
+                              <DinaMessage id="viewDetailButtonLabel" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : !readOnly ? (
+                    <GeographySearchBox
+                      inputValue={geoSearchValue}
+                      onInputChange={setGeoSearchValue}
+                      onSelectSearchResult={selectSearchResult}
+                      renderUnderSearchBar={
+                        <Field>
+                          {({ form: { values: formState } }) => {
+                            const colEvent: Partial<CollectingEvent> =
+                              formState;
+                            const activeAssertion =
+                              colEvent.geoReferenceAssertions?.[activeTabIdx];
+
+                            const decimalLat =
+                              activeAssertion?.dwcDecimalLatitude;
+                            const decimalLon =
+                              activeAssertion?.dwcDecimalLongitude;
+
+                            const hasVerbatimLocality =
+                              !!colEvent.dwcVerbatimLocality;
+                            const hasDecimalCoords = !!(
+                              decimalLat && decimalLon
+                            );
+
+                            const hasAnyLocation =
+                              hasVerbatimLocality || hasDecimalCoords;
+
+                            return hasAnyLocation ? (
+                              <div className="mb-3 d-flex flex-row align-items-center">
+                                <div className="pe-3">
+                                  <DinaMessage id="search" />:
+                                </div>
+                                <FormikButton
+                                  className={
+                                    hasVerbatimLocality
+                                      ? "btn btn-link"
+                                      : "d-none"
+                                  }
+                                  onClick={state =>
+                                    doGeoSearch(state.dwcVerbatimLocality)
+                                  }
+                                >
+                                  <DinaMessage id="field_dwcVerbatimLocality" />
+                                </FormikButton>
+                                <FormikButton
+                                  className={
+                                    hasDecimalCoords ? "btn btn-link" : "d-none"
+                                  }
+                                  onClick={state => {
+                                    const assertion =
+                                      state.geoReferenceAssertions?.[
+                                        activeTabIdx
+                                      ];
+                                    const lat = assertion?.dwcDecimalLatitude;
+                                    const lon = assertion?.dwcDecimalLongitude;
+                                    doGeoSearch(`${lat}, ${lon}`);
+                                  }}
+                                >
+                                  <DinaMessage id="decimalLatLong" />
+                                </FormikButton>
+                              </div>
+                            ) : null;
+                          }}
+                        </Field>
+                      }
+                    />
+                  ) : null
+                }
+              </Field>
+            </div>
+          </FieldSet>
+        </div>
+      </div>
+
+      {!isTemplate && (
+        <FieldSet
+          legend={<DinaMessage id="collectingEventManagedAttributes" />}
+        >
+          {readOnly ? (
+            <FastField name="managedAttributeValues">
+              {({ field: { value } }) => (
+                <ManagedAttributesViewer
+                  values={value}
+                  managedAttributeApiPath={key =>
+                    `collection-api/managed-attribute/collecting_event.${key}`
+                  }
+                />
+              )}
+            </FastField>
+          ) : (
+            <DinaFormSection
+              // Disabled the template's restrictions for this section:
+              enabledFields={null}
+            >
+              <ManagedAttributesEditor
+                valuesPath="managedAttributeValues"
+                valueFieldName="assignedValue"
+                managedAttributeApiPath="collection-api/managed-attribute"
+                apiBaseUrl="/collection-api"
+                managedAttributeComponent="COLLECTING_EVENT"
+                managedAttributeKeyField="key"
+              />
+            </DinaFormSection>
+          )}
+        </FieldSet>
       )}
+      <div className="mb-3">
+        <AttachmentsField
+          name="attachment"
+          title={<DinaMessage id="collectingEventAttachments" />}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          allowAttachmentsConfig={attachmentsConfig}
+          attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+        />
+      </div>
     </div>
   );
 }

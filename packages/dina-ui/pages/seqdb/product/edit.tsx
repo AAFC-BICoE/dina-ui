@@ -23,15 +23,21 @@ interface ProductFormProps {
 export function ProductEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editProductTitle" : "addProductTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editProductTitle")} />
+      <Head
+        title={formatMessage(title)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editProductTitle" />
             </h1>
             <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
@@ -47,7 +53,7 @@ export function ProductEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addProductTitle" />
             </h1>
             <ProductForm router={router} />

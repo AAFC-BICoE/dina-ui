@@ -39,14 +39,17 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
 export default function PcrBatchListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("pcrBatchListTitle");
-
   return (
     <div>
-      <Head title={title} />
+      <Head
+        title={formatMessage("pcrBatchListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>{title}</h1>
+        <h1 id="wb-cont">{formatMessage("pcrBatchListTitle")}</h1>
         <ButtonBar>
           <CreateButton entityLink="/seqdb/pcr-batch" />
         </ButtonBar>

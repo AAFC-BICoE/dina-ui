@@ -1,57 +1,52 @@
-import {
-  BackButton,
-  ButtonBar,
-  DeleteButton,
-  DinaForm,
-  EditButton,
-  useQuery,
-  withResponse
-} from "common-ui";
+import { DinaForm, useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { withRouter } from "next/router";
+import { Head, Nav, ResourceViewButtonBar } from "../../../components";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection } from "../../../types/collection-api";
 import { CollectionFormFields } from "./edit";
-import { withRouter } from "next/router";
+import { fromPairs } from "lodash";
 
 export function CollectionDetailsPage({ router }: WithRouterProps) {
   const id = String(router.query.id);
   const { formatMessage } = useDinaIntl();
 
   const collectionQuery = useQuery<Collection>({
-    path: `collection-api/collection/${id}`
+    path: `collection-api/collection/${id}`,
+    include: "institution",
+    header: { "include-dina-permission": "true" }
   });
 
   return (
     <div>
-      <Head title={formatMessage("collectionViewTitle")} />
+      <Head
+        title={formatMessage("collectionViewTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container">
-        <h1>
-          <DinaMessage id="collectionViewTitle" />
-        </h1>
-        <ButtonBar>
-          <BackButton
-            entityId={id}
-            entityLink="/collection/collection"
-            byPassView={true}
-          />
-          <EditButton
-            className="ms-auto"
-            entityId={id}
-            entityLink="collection/collection"
-          />
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/collection/list"
-            type="collection"
-          />
-        </ButtonBar>
         {withResponse(collectionQuery, ({ data: collection }) => (
-          <DinaForm<Collection> initialValues={collection} readOnly={true}>
-            <CollectionFormFields />
+          <DinaForm<Collection>
+            initialValues={{
+              ...collection,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                collection.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
+                )
+              )
+            }}
+            readOnly={true}
+          >
+            <ResourceViewButtonBar
+              resource={collection}
+              apiBaseUrl="/collection-api"
+              resourceBaseUrl="collection/collection"
+              withLeadingSlash={true}
+            />
+            <CollectionFormFields title={"collectionViewTitle"} />
           </DinaForm>
         ))}
       </main>

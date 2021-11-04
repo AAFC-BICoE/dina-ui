@@ -1,5 +1,4 @@
 import {
-  AreYouSureModal,
   BackButton,
   ButtonBar,
   DinaForm,
@@ -8,24 +7,27 @@ import {
   FieldSet,
   SubmitButton,
   TextField,
-  useModal,
   useQuery,
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { PersistedResource } from "kitsu";
-import { get, isEmpty, mapValues, pick, set, toPairs } from "lodash";
+import { InputResource, PersistedResource } from "kitsu";
+import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import React, { RefObject, useRef, useState } from "react";
+import { HOSTORGANISM_FIELDS } from "../../../components/collection";
+import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
 import {
-  PreparationField,
-  PREPARATION_FIELDS
-} from "../../../components/collection/PreparationField";
+  GroupSelectField,
+  Head,
+  Nav,
+  SCHEDULEDACTION_FIELDS
+} from "../../../components";
+import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
+import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
+import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
 import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
-import { useAttachmentsModal } from "../../../components/object-store";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -33,12 +35,21 @@ import {
   TemplateField,
   TemplateFields
 } from "../../../types/collection-api";
-import { MaterialSampleForm } from "../material-sample/edit";
+import {
+  IDENTIFIERS_FIELDS,
+  MaterialSampleForm,
+  MATERIALSAMPLE_FIELDSET_FIELDS
+} from "../material-sample/edit";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
   name: yup.string().trim().required(),
-  group: yup.string().required()
+  group: yup.string().required(),
+  attachmentsConfig: yup.mixed(),
+
+  storageUnit: yup.mixed(),
+  templateCheckboxes: yup.mixed()
 });
 
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
@@ -63,10 +74,15 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head title={formatMessage(pageTitle)} />
+      <Head
+        title={formatMessage(pageTitle)}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (
@@ -95,34 +111,9 @@ export function WorkflowTemplateForm({
   fetchedActionDefinition,
   onSaved
 }: WorkflowTemplateFormProps) {
-  const { formatMessage } = useDinaIntl();
-
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
-  const preparationsAndAttachmentsFormRef = useRef<FormikProps<any>>(null);
-  const identifiersSectionRef = useRef<FormikProps<any>>(null);
-
-  const { actionType, setActionType } = useActionTypeToggle(
-    fetchedActionDefinition?.actionType ?? "ADD",
-    [
-      collectingEvtFormRef,
-      preparationsAndAttachmentsFormRef,
-      identifiersSectionRef
-    ]
-  );
-
-  const { attachedMetadatasUI: materialSampleAttachmentsUI } =
-    useAttachmentsModal({
-      initialMetadatas: [],
-      deps: [],
-      title: <DinaMessage id="materialSampleAttachments" />,
-      isTemplate: true,
-      allowNewFieldName: "attachmentsConfig.allowNew",
-      allowExistingFieldName: "attachmentsConfig.allowExisting"
-    });
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
-
-  const initialValues: Partial<WorkflowFormValues> = initialDefinition ?? {};
 
   // Initialize the tempalte form default values and checkbox states:
   const colEventTemplateInitialValues =
@@ -133,105 +124,140 @@ export function WorkflowTemplateForm({
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
-  // Split the material sample form template into Identifiers and Preparations:
+  const materialSampleTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(
+      formTemplates?.MATERIAL_SAMPLE
+    );
+  if (!materialSampleTemplateInitialValues.determination?.length) {
+    materialSampleTemplateInitialValues.determination = [{}];
+  }
 
-  const identifiersTemplate = {
-    templateFields: pick(
-      formTemplates?.MATERIAL_SAMPLE?.templateFields,
-      "materialSampleName",
-      "dwcCatalogNumber",
-      "dwcOtherCatalogNumbers"
-    )
+  const initialValues: Partial<WorkflowFormValues> = {
+    ...initialDefinition,
+    ...materialSampleTemplateInitialValues
   };
-
-  const preparationsTemplate = {
-    allowNew: formTemplates?.MATERIAL_SAMPLE?.allowNew,
-    allowExisting: formTemplates?.MATERIAL_SAMPLE?.allowExisting,
-    templateFields: pick(
-      formTemplates?.MATERIAL_SAMPLE?.templateFields,
-      ...PREPARATION_FIELDS
-    )
-  };
-
-  const preparationsTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(preparationsTemplate);
-  const identifiersTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(identifiersTemplate);
 
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
-    preparationsTemplateInitialValues,
+    materialSampleTemplateInitialValues,
     collectingEvtFormRef
   });
 
   const {
     colEventId: attachedColEventId,
-    enableCollectingEvent,
-    enablePreparations
+    dataComponentState: {
+      enableCollectingEvent,
+      enablePreparations,
+      enableStorage,
+      enableDetermination,
+      enableOrganism,
+      enableScheduledActions,
+      enableAssociations
+    }
   } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
     api: { save },
-    submittedValues: mainTemplateFields
+    submittedValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
+    const mainTemplateFields = pick(submittedValues, "id", "group", "name");
+
+    const enabledTemplateFields =
+      getEnabledTemplateFieldsFromForm(submittedValues);
+
+    const identifierTemplateFields = pick(
+      enabledTemplateFields,
+      ...IDENTIFIERS_FIELDS
+    );
+
+    const materialSampleFieldsetTemplateFields = pick(
+      enabledTemplateFields,
+      ...MATERIALSAMPLE_FIELDSET_FIELDS
+    );
+
+    const preparationTemplateFields = enablePreparations
+      ? pick(enabledTemplateFields, ...PREPARATION_FIELDS)
+      : {};
+
+    const organismTemplateFields = enableOrganism
+      ? pick(
+          enabledTemplateFields,
+          ...ORGANISM_FIELDS.map(field => `organism.${field}`)
+        )
+      : {};
+
+    const determinationTemplateFields = enableDetermination
+      ? pick(
+          enabledTemplateFields,
+          ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+        )
+      : {};
+
+    const storageTemplateFields = enableStorage
+      ? pick(enabledTemplateFields, "storageUnit")
+      : {};
+
+    const scheduledActionsTemplateFields = enableScheduledActions
+      ? pick(
+          enabledTemplateFields,
+          ...SCHEDULEDACTION_FIELDS.map(field => `scheduledAction.${field}`)
+        )
+      : {};
+
+    const associationTemplateFields = enableAssociations
+      ? {
+          ...pick(
+            enabledTemplateFields,
+            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
+          ),
+          ...pick(
+            enabledTemplateFields,
+            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+              field => `association.${field}`
+            )
+          )
+        }
+      : {};
+
     // Construct the template definition to persist based on the form values:
-    const definition: PreparationProcessDefinition = {
+    const definition: InputResource<PreparationProcessDefinition> = {
       ...mainTemplateFields,
-      actionType,
-      formTemplates:
-        actionType === "ADD"
-          ? {
-              MATERIAL_SAMPLE: {
-                ...preparationsAndAttachmentsFormRef.current?.values
-                  .attachmentsConfig,
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          ...submittedValues.attachmentsConfig,
+          templateFields: {
+            ...identifierTemplateFields,
+            ...materialSampleFieldsetTemplateFields,
+            ...preparationTemplateFields,
+            ...organismTemplateFields,
+            ...determinationTemplateFields,
+            ...storageTemplateFields,
+            ...scheduledActionsTemplateFields,
+            ...associationTemplateFields
+          }
+        },
+        COLLECTING_EVENT: enableCollectingEvent
+          ? attachedColEventId
+            ? {
+                // When linking the template to an existing Col event, only set the ID here:
                 templateFields: {
-                  ...(identifiersSectionRef.current &&
-                    getEnabledTemplateFieldsFromForm(
-                      identifiersSectionRef.current.values
-                    )),
-                  ...(enablePreparations &&
-                  preparationsAndAttachmentsFormRef.current
-                    ? getEnabledTemplateFieldsFromForm(
-                        preparationsAndAttachmentsFormRef.current.values
-                      )
-                    : undefined)
+                  id: { enabled: true, defaultValue: attachedColEventId }
                 }
-              },
-              COLLECTING_EVENT: enableCollectingEvent
-                ? attachedColEventId
-                  ? {
-                      // When linking the template to an existing Col event, only set the ID here:
-                      templateFields: {
-                        id: { enabled: true, defaultValue: attachedColEventId }
-                      }
-                    }
-                  : {
-                      // When making a template for a new Collecting Event, set all chosen fields here:
-                      ...collectingEvtFormRef.current?.values
-                        ?.attachmentsConfig,
-                      templateFields: {
-                        ...getEnabledTemplateFieldsFromForm(
-                          collectingEvtFormRef.current?.values
-                        ),
-                        id: undefined
-                      }
-                    }
-                : undefined
-            }
-          : actionType === "SPLIT"
-          ? {
-              MATERIAL_SAMPLE: {
-                ...preparationsAndAttachmentsFormRef.current?.values
-                  .attachmentsConfig,
-                templateFields: preparationsAndAttachmentsFormRef.current
-                  ? getEnabledTemplateFieldsFromForm(
-                      preparationsAndAttachmentsFormRef.current.values
-                    )
-                  : undefined
               }
-            }
-          : {},
+            : {
+                // When making a template for a new Collecting Event, set all chosen fields here:
+                ...collectingEvtFormRef.current?.values?.attachmentsConfig,
+                templateFields: {
+                  ...getEnabledTemplateFieldsFromForm(
+                    collectingEvtFormRef.current?.values
+                  ),
+                  id: undefined
+                }
+              }
+          : undefined
+      },
       type: "material-sample-action-definition"
     };
 
@@ -278,110 +304,26 @@ export function WorkflowTemplateForm({
               <TextField name="name" className="row" />
               <GroupSelectField name="group" enableStoredDefaultGroup={true} />
             </div>
-            <div className="col-md-6">
-              <label className="mx-3">
-                <input
-                  className="actionType-ADD"
-                  type="radio"
-                  checked={actionType === "ADD"}
-                  onChange={() => setActionType("ADD")}
-                />
-                <p>{formatMessage("creatNewWorkflow")}</p>
-              </label>
-              <label className="mx-3">
-                <input
-                  className="actionType-SPLIT"
-                  type="radio"
-                  checked={actionType === "SPLIT"}
-                  onChange={() => setActionType("SPLIT")}
-                />
-                <p>{formatMessage("createSplitWorkflow")}</p>
-              </label>
-            </div>
           </div>
         </FieldSet>
       </div>
-      {actionType === "ADD" ? (
-        <DinaFormSection isTemplate={true}>
-          <MaterialSampleForm
-            preparationsTemplateInitialValues={
-              preparationsTemplateInitialValues
-            }
-            identifiersTemplateInitialValues={identifiersTemplateInitialValues}
-            materialSampleSaveHook={materialSampleSaveHook}
-            preparationsSectionRef={preparationsAndAttachmentsFormRef}
-            identifiersSectionRef={identifiersSectionRef}
-          />
-        </DinaFormSection>
-      ) : actionType === "SPLIT" ? (
-        <DinaForm
-          innerRef={preparationsAndAttachmentsFormRef}
-          initialValues={preparationsTemplateInitialValues}
-          isTemplate={true}
-        >
-          <PreparationField />
-          {materialSampleAttachmentsUI}
-        </DinaForm>
-      ) : null}
+      <DinaFormSection isTemplate={true}>
+        <MaterialSampleForm
+          templateInitialValues={materialSampleTemplateInitialValues}
+          materialSampleSaveHook={materialSampleSaveHook}
+        />
+      </DinaFormSection>
       {buttonBar}
     </DinaForm>
   );
-}
-
-export function useActionTypeToggle(
-  initialValue: PreparationProcessDefinition["actionType"],
-  templateFormRefs: RefObject<FormikProps<any>>[]
-) {
-  const { openModal } = useModal();
-  const { formatMessage } = useDinaIntl();
-  const [actionType, setActionTypeInner] = useState(initialValue ?? "ADD");
-
-  /** Prompt the user before removing their form template. */
-  function setActionType(newValue: PreparationProcessDefinition["actionType"]) {
-    const aTemplateIsDefined = Boolean(
-      templateFormRefs.filter(
-        ref => !isEmpty(ref.current?.values.templateCheckboxes)
-      ).length
-    );
-
-    // Only prompt if a template is already defined:
-    if (aTemplateIsDefined) {
-      openModal(
-        <AreYouSureModal
-          actionMessage={
-            <DinaMessage
-              id="switchToActionType"
-              values={{
-                actionType:
-                  newValue === "ADD"
-                    ? formatMessage("creatNewWorkflow")
-                    : newValue === "SPLIT"
-                    ? formatMessage("createSplitWorkflow")
-                    : newValue
-              }}
-            />
-          }
-          messageBody={
-            <DinaMessage
-              id="thisWillRemoveYourTemplate"
-              values={{ actionType: newValue }}
-            />
-          }
-          onYesButtonClicked={() => setActionTypeInner(newValue)}
-        />
-      );
-    } else {
-      setActionTypeInner(newValue);
-    }
-  }
-
-  return { actionType, setActionType };
 }
 
 /** Get the enabled template fields with their default values from the form. */
 export function getEnabledTemplateFieldsFromForm(
   formValues: any
 ): TemplateFields {
+  // delete the key "determination" as children with index are actual keys
+  delete formValues.templateCheckboxes?.determination;
   return mapValues(
     formValues.templateCheckboxes ?? {},
     (val: boolean | undefined, key) =>

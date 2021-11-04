@@ -53,14 +53,19 @@ export default function PcrPrimerListPage() {
   const { formatMessage } = useSeqdbIntl();
 
   return (
-    <>
-      <Head title={formatMessage("pcrPrimerListTitle")} />
+    <div>
+      <Head
+        title={formatMessage("pcrPrimerListTitle")}
+        lang={formatMessage("languageOfPage")}
+        creator={formatMessage("agricultureCanada")}
+        subject={formatMessage("subjectTermsForPage")}
+      />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="pcrPrimerListTitle" />
         </h1>
         <ListPageLayout
@@ -73,6 +78,6 @@ export default function PcrPrimerListPage() {
           }}
         />
       </main>
-    </>
+    </div>
   );
 }
