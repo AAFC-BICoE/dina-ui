@@ -5,22 +5,15 @@ import {
   KitsuResourceLink,
   PersistedResource
 } from "kitsu";
-import {
-  castArray,
-  compact,
-  debounce,
-  isEqual,
-  isUndefined,
-  keys,
-  omitBy
-} from "lodash";
-import React, { ComponentProps, useCallback, useEffect, useState } from "react";
+import { castArray, compact, isEqual, isUndefined, keys, omitBy } from "lodash";
+import React, { ComponentProps, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
-  StylesConfig,
-  components as reactSelectComponents
+  components as reactSelectComponents,
+  StylesConfig
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { useDebounce } from "use-debounce";
 import { SelectOption } from "../..";
 import { useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
@@ -73,6 +66,12 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Page limit. */
   pageSize?: number;
+
+  /** Use a different query hook instead of the REST API. */
+  useCustomQuery?: (inputValue: string) => {
+    loading?: boolean;
+    response?: { data: TData[] };
+  };
 }
 
 /**
@@ -113,27 +112,19 @@ export function ResourceSelect<TData extends KitsuResource>({
   omitNullOption,
   invalid,
   selectProps,
-  pageSize
+  pageSize,
+  useCustomQuery
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
-  const [search, setSearch] = useState({
-    /** The user's typed input. */
-    input: "",
-    /** The actual search value, which is updated after a throttle to avoid excessive API requests. */
-    value: ""
-  });
+  /** The value of the input element. */
+  const [inputValue, setInputValue] = useState("");
 
-  /** Updates the actual search value passed to the API. */
-  const debouncedSearchUpdate = useCallback(
-    debounce(() => setSearch(({ input }) => ({ input, value: input })), 250),
-    []
-  );
-
-  useEffect(debouncedSearchUpdate, [search.input]);
+  /** The debounced input value passed to the fetcher. */
+  const [searchValue, { isPending }] = useDebounce(inputValue, 250);
 
   // Omit blank/null filters:
-  const filterParam = omitBy(filter(search.value), val =>
+  const filterParam = omitBy(filter(searchValue), val =>
     ["", null, undefined].includes(val as string)
   ) as FilterParam;
 
@@ -146,12 +137,14 @@ export function ResourceSelect<TData extends KitsuResource>({
     val => isUndefined(val) || isEqual(val, {})
   );
 
-  const { loading: queryIsLoading, response } = useQuery<TData[]>({
-    path: model,
-    ...getParams
-  });
+  const { loading: queryIsLoading, response } =
+    useCustomQuery?.(inputValue) ??
+    useQuery<TData[]>({
+      path: model,
+      ...getParams
+    });
 
-  const isLoading = queryIsLoading || search.input !== search.value;
+  const isLoading = queryIsLoading || inputValue !== searchValue || isPending();
 
   // Build the list of options from the returned resources.
   const resourceOptions =
@@ -163,7 +156,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Only show the null option when in single-resource mode and when there is no search input value.
   const options = [
-    ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
+    ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),
     ...resourceOptions,
     ...(asyncOptions
       ? asyncOptions.map(option => ({
@@ -247,10 +240,8 @@ export function ResourceSelect<TData extends KitsuResource>({
     <SortableSelect
       // react-select AsyncSelect props:
       isMulti={isMulti}
-      onInputChange={newVal =>
-        setSearch(current => ({ ...current, input: newVal }))
-      }
-      inputValue={search.input}
+      onInputChange={newVal => setInputValue(newVal)}
+      inputValue={inputValue}
       onChange={onChange}
       isLoading={isLoading}
       options={options}

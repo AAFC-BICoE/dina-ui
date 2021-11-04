@@ -1,27 +1,13 @@
-import { DocWithData } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
-import { deserialise } from "kitsu-core";
-import { compact, debounce, get, startCase } from "lodash";
+import { debounce, get, startCase } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useCallback, useEffect, useState } from "react";
-import Select, { components, OptionProps, OptionTypeBase } from "react-select";
-import useSWR from "swr";
+import Select, { components, OptionProps } from "react-select";
 import { useApiClient } from "../../../common-ui/lib";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
-import { AxiosInstance } from "axios";
-
-// The parts of the API response used by this component:
-export interface AutocompleteSearchResponse {
-  hits?: {
-    hits?: {
-      id?: string;
-      index?: string;
-      sourceAsMap?: DocWithData;
-    }[];
-  };
-}
+import { useAutocompleteSearch } from "./useSearch";
 
 // The data passed from each API search result into a Select Option:
 export interface SearchResult {
@@ -72,14 +58,13 @@ export function SearchBox() {
 
   useEffect(debouncedSearchUpdate, [search.input]);
 
-  const { data, error, isValidating } = useSWR([search.value], () =>
-    doSearch(apiClient.axios, search.value)
-  );
+  const { searchResult, isLoading, inputValue, setInputValue } =
+    useAutocompleteSearch();
 
   const selectOptions =
-    data?.map(result => ({
+    searchResult?.map(getLink)?.map(result => ({
       label: result.name,
-      value: result.link
+      value: result.link ?? ""
     })) ?? [];
 
   const customStyle: any = {
@@ -87,7 +72,7 @@ export function SearchBox() {
     control: base => ({ ...base, cursor: "text" }),
     dropdownIndicator: base => ({ ...base, display: "none" }),
     // Hide the menu when there is no data:
-    menu: base => ({ ...base, ...(!data && { display: "none" }) }),
+    menu: base => ({ ...base, ...(!searchResult && { display: "none" }) }),
     option: base => ({ ...base, cursor: "pointer" })
   };
 
@@ -100,7 +85,7 @@ export function SearchBox() {
       }
       onChange={option => option?.value && router.push(option.value)}
       inputValue={search.input}
-      isLoading={isValidating}
+      isLoading={isLoading}
       value={null}
       styles={customStyle}
       components={{
@@ -112,7 +97,7 @@ export function SearchBox() {
 }
 
 /** Changes the select menu Option into a regular link for the Search Box. */
-function LinkOption(props: OptionProps<OptionTypeBase, boolean>) {
+function LinkOption(props: OptionProps<{ value: string }, false>) {
   const link = props.data.value;
 
   // Customize react-select's Option component:
@@ -137,39 +122,4 @@ function LinkOption(props: OptionProps<OptionTypeBase, boolean>) {
   ) : (
     option
   );
-}
-
-/** Does the search against the search API. */
-export async function doSearch(
-  axios: Pick<AxiosInstance, "get">,
-  searchValue?: string
-) {
-  if (!searchValue) {
-    return null;
-  }
-
-  const response = await axios.get<AutocompleteSearchResponse>(
-    "search-api/search/auto-complete",
-    {
-      params: {
-        prefix: searchValue,
-        autoCompleteField: "data.attributes.displayName",
-        additionalField: "",
-        indexName: "dina_document_index"
-      }
-    }
-  );
-
-  const jsonApiDocs = compact(
-    response.data.hits?.hits?.map(hit => hit.sourceAsMap)
-  );
-
-  // Deserialize the responses to Kitsu format.
-  const resources = await Promise.all(
-    jsonApiDocs.map<Promise<KitsuResource>>(
-      async doc => (await deserialise(doc)).data
-    )
-  );
-
-  return resources.map(getLink);
 }

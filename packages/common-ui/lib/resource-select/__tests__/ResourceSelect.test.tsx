@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import lodash, { last } from "lodash";
+import { last } from "lodash";
 import Select from "react-select/base";
 import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
@@ -47,7 +47,9 @@ const apiContext = {
 } as any;
 
 // Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation(fn => fn as any);
+jest.mock("use-debounce", () => ({
+  useDebounce: fn => [fn, { isPending: () => false }]
+}));
 
 describe("ResourceSelect component", () => {
   const DEFAULT_SELECT_PROPS: ResourceSelectProps<Todo> = {

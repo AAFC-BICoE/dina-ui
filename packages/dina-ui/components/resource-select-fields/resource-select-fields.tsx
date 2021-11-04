@@ -7,11 +7,12 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { useField } from "formik";
+import { SetOptional } from "type-fest";
 import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
-import { useField } from "formik";
+import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { SetOptional } from "type-fest";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -105,6 +106,20 @@ export function UserSelectField(
       // TODO allow filtering by group
       filter={() => ({})}
       pageSize={1000}
+      {...props}
+    />
+  );
+}
+
+export function PersonSelectField(
+  props: SetOptional<ResourceSelectFieldProps<Person>, ProvidedProps>
+) {
+  return (
+    <ResourceSelectField<Person>
+      readOnlyLink="/dina-user/view?id="
+      filter={filterBy(["displayName"])}
+      model="agent-api/person"
+      optionLabel={person => person.displayName}
       {...props}
     />
   );
