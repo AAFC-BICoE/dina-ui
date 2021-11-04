@@ -50,7 +50,7 @@
 #bulkedittable .ht_clone_top,
 #bulkedittable .ht_clone_left,
 #bulkedittable .ht_clone_top_left_corner {
-  z-index: 0;
+  z-index: 1!important;
 }
 
 /* Prevent the dropdowns from being from being hidden at the bottom of the table: https://github.com/handsontable/handsontable/issues/5032 */
@@ -64,10 +64,6 @@
   color: rgb(51,51,51);
 }
 
-#bulkedittable .handsontable .rowHeader {
-  color: rgb(51,51,51);
-  background-color: rgb(240,240,240);
-}
 
 #bulkedittable .handsontable .htDimmed {
   color: rgb(108,117,125); 
