@@ -40,14 +40,13 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   // Default sort and page-size from the QueryTable. These are only used on the initial
   // QueryTable render, and are saved in localStorage when the table's sort or page-size is changed.
-  const [storedDefaultSort, setStoredDefaultSort] = useLocalStorage<
-    SortingRule[]
-  >(tableSortKey);
-  const defaultSort = storedDefaultSort ?? defaultSortProp;
+  const [storedDefaultSort, setStoredDefaultSort] =
+    useLocalStorage<SortingRule[]>(tableSortKey);
+  const defaultSort = storedDefaultSort ??
+    defaultSortProp ?? [{ id: "createdOn", desc: true }];
 
-  const [defaultPageSize, setDefaultPageSize] = useLocalStorage<number>(
-    tablePageSizeKey
-  );
+  const [defaultPageSize, setDefaultPageSize] =
+    useLocalStorage<number>(tablePageSizeKey);
 
   let filterBuilderRsql = "";
   try {
@@ -59,9 +58,11 @@ export function ListPageLayout<TData extends KitsuResource>({
     setImmediate(() => setFilterForm({}));
   }
 
-  const additionalFilters = (typeof additionalFiltersProp === "function"
-    ? additionalFiltersProp(filterForm)
-    : additionalFiltersProp) as Record<string, string>;
+  const additionalFilters = (
+    typeof additionalFiltersProp === "function"
+      ? additionalFiltersProp(filterForm)
+      : additionalFiltersProp
+  ) as Record<string, string>;
 
   // Combine the inner rsql with the passed additionalFilters?.rsql filter if they are set:
   const combinedRsql = [
