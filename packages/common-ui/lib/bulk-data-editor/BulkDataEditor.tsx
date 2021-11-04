@@ -115,29 +115,7 @@ export function BulkDataEditor<TRow>({
   };
 
   return (
-    <div ref={tableWrapperRef}>
-      <style>{`
-        /* Prevent the handsontable header from covering the react-select menu options: */
-        .ht_clone_top, .ht_clone_left, .ht_clone_top_left_corner {
-          z-index: 0 !important;
-        }
-        /* Prevent the dropdowns from being from being hidden at the bottom of the table: https://github.com/handsontable/handsontable/issues/5032 */
-        .handsontableEditor.autocompleteEditor, .handsontableEditor.autocompleteEditor .ht_master .wtHolder {
-          min-height: 138px;
-        }
-        /* Fix the place holder color contrast */        
-        .htPlaceholder.htAutocomplete {
-          color: rgb(51,51,51);
-        }
-        /* Fix need to review issue (critical): .htDimmed:nth-child(2) need sufficient color contrast */
-        .handsontable .htDimmed {
-          color: rgb(108,117,125); 
-        }
-        /* Fix need to review issue : ..htAutocompleteArrow need sufficient color contrast */
-        .htAutocomplete .htAutocompleteArrow {
-          color: rgb(108,117,125);
-        }
-      `}</style>
+    <div ref={tableWrapperRef} id="bulkedittable">
       {validationAlertJsx}
       <div
         className="mb-3"

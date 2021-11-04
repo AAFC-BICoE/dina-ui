@@ -27,6 +27,14 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
           htHolder.tabIndex = 0;
         }
         // Fix text area within hot table sometimes has the "Ensure scrollable region has keyboard access" issue
+        const textAreaWrapper = wrapper?.querySelector<HTMLDivElement>(
+          ".handsontableInputHolder"
+        );
+        if (textAreaWrapper) {
+          textAreaWrapper.tabIndex = 0;
+          textAreaWrapper.style.zIndex="0";
+          textAreaWrapper.style.visibility="hidden";
+        }
         const textArea = wrapper?.querySelector<HTMLDivElement>(
           ".handsontableInputHolder .handsontableInput"
         );

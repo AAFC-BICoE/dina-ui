@@ -11,11 +11,21 @@
 }
 
 /*
-* Fixes WCAG contrast issue for react-select input elements
+* Fix WCAG overlapped element contrast issue for react-select input elements
 * Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
 */
 input[id^="react-select"] {
   padding: 1px !important;
+}
+
+/* Fix WCAG overlapped element contrast issue for react-select div elements */
+div[id^="react-select"] {
+  z-index: 1;
+}
+
+/* Quick fix for WCAG overlapped element contrast issue occuring in filter records elements */
+.css-qc6sy-singleValue {
+  z-index: 1;
 }
 
 /*
