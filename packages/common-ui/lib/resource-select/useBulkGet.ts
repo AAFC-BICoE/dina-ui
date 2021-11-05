@@ -40,8 +40,7 @@ export function useBulkGet<TData extends KitsuResource>({
     });
 
     const fetchedNonNull = fetched.map(
-      (resource, idx) =>
-        resource ?? ({ id: ids[idx], type: typeName } as KitsuResource)
+      (resource, idx) => resource ?? { id: ids[idx], type: typeName }
     );
 
     return fetchedNonNull;
