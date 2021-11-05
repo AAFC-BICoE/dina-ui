@@ -1,5 +1,5 @@
 import { ApiClientI } from "common-ui";
-import { flatMap, keys, uniq } from "lodash";
+import { compact, flatMap, keys, uniq } from "lodash";
 import {
   ManagedAttribute,
   ManagedAttributeValues
@@ -28,14 +28,17 @@ export async function getManagedAttributesInUse(
   const managedAttributeKeys = uniq(flatMap(managedAttributeMaps.map(keys)));
 
   // Fetch the managed attributes from the back-end:
-  const newInitialEditableManagedAttributes = await bulkGet<ManagedAttribute>(
+  const newInitialEditableManagedAttributes = await bulkGet<
+    ManagedAttribute,
+    true
+  >(
     managedAttributeKeys.map(
       key => `${managedAttributePath}/${keyPrefix ? keyPrefix + "." : ""}${key}`
     ),
     { apiBaseUrl, returnNullForMissingResource: true }
   );
 
-  return newInitialEditableManagedAttributes.map(
+  return compact(newInitialEditableManagedAttributes).map(
     // If the Managed Attribute is missing from the back-end then return a shallow copy with just the key field:
     (attr, index) =>
       attr ?? { [managedAttributeKeyField]: managedAttributeKeys[index] }

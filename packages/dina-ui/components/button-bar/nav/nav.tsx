@@ -337,12 +337,6 @@ function NavCollectionDropdown() {
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          className="d-none"
-          href="/collection/collector-group/list"
-        >
-          <DinaMessage id="collectorGroupListTitle" />
-        </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>
   );

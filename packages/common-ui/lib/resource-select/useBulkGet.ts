@@ -19,7 +19,9 @@ export function useBulkGet<TData extends KitsuResource>({
 }: UseBulkGetParams) {
   const { bulkGet } = useApiClient();
 
-  async function fetchResources() {
+  async function fetchResources(): Promise<
+    (TData | KitsuResource)[] | undefined
+  > {
     if (disabled) {
       return undefined;
     }
@@ -32,12 +34,17 @@ export function useBulkGet<TData extends KitsuResource>({
     const [_, apiBaseUrl, typeName] = listPathMatch;
     const paths = ids.map(id => `${typeName}/${id}`);
 
-    const fetched = bulkGet<TData>(paths, {
+    const fetched = await bulkGet<TData, true>(paths, {
       apiBaseUrl: `/${apiBaseUrl}`,
       returnNullForMissingResource: true
     });
 
-    return fetched;
+    const fetchedNonNull = fetched.map(
+      (resource, idx) =>
+        resource ?? ({ id: ids[idx], type: typeName } as KitsuResource)
+    );
+
+    return fetchedNonNull;
   }
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
