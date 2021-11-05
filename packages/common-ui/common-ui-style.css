@@ -24,3 +24,9 @@ input[id^="react-select"] {
 .css-1wa3eu0-placeholder {
   color: #333333 !important;
 }
+
+.fieldset-h2-adjustment {
+  font-size: 1.7rem!important;
+  margin-top: 15px!important;
+  margin-bottom: 10px!important;
+}
