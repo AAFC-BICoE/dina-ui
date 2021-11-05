@@ -11,7 +11,7 @@ import {
   TextField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { NextRouter } from "next/router";
+import { NextRouter, withRouter } from "next/router";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
@@ -159,3 +159,5 @@ export function PcrProfileFormFields() {
     </div>
   );
 }
+
+export default withRouter(PcrProfileEditPage);

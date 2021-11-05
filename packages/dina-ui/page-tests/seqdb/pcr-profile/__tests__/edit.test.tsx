@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { PcrProfileEditPage } from "../../../../pages/seqdb/pcr-profile/edit";
+import PcrProfileEditPage from "../../../../pages/seqdb/pcr-profile/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
 import { writeStorage } from "@rehooks/local-storage";
