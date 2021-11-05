@@ -86,7 +86,11 @@ export default function MetadataListPage() {
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
     {
       Cell: ({ original: metadata }) => (
-        <CheckBoxField key={metadata.id} resource={metadata} />
+        <CheckBoxField
+          key={metadata.id}
+          resource={metadata}
+          fileHyperlinkId={`file-name-${metadata.id}`}
+        />
       ),
       Header: CheckBoxHeader,
       sortable: false
@@ -94,9 +98,9 @@ export default function MetadataListPage() {
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`}>
+          <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
             {originalFilename}
-          </Link>
+          </a>
         ) : null,
       accessor: "originalFilename"
     },

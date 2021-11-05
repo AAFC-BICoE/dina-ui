@@ -8,6 +8,7 @@ import { useIntl } from "react-intl";
 
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
+  fileHyperlinkId?: string;
 }
 
 export interface GroupedCheckBoxesParams {
@@ -23,7 +24,10 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
 
-  function CheckBoxField({ resource }: CheckBoxFieldProps<TData>) {
+  function CheckBoxField({
+    resource,
+    fileHyperlinkId
+  }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.id}]`;
 
     return (
@@ -61,7 +65,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
             <div className="d-flex">
               <div className="mx-auto">
                 <input
-                  aria-label={formatMessage({ id: "select" })}
+                  aria-labelledby={`select-column-header ${fileHyperlinkId}`}
                   checked={value || false}
                   onClick={onCheckBoxClick}
                   onChange={noop}
@@ -109,7 +113,10 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     return (
       <div className="grouped-checkbox-header text-center">
         <div>
-          <CommonMessage id="select" /> <CheckAllCheckBox />
+          <span id="select-column-header">
+            <CommonMessage id="select" />
+          </span>
+          <CheckAllCheckBox />
           <Tooltip id="checkAllTooltipMessage" />
           {!detachTotalSelected && (
             <div>

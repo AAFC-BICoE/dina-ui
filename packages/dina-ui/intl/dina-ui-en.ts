@@ -47,6 +47,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   assignedTo: "Assigned To",
   assignContentsToNewStorage: "Assign Contents to New Storage",
   associatedAgent: "Associated Agent",
+  associatedMaterialSample: " Associated Material Sample",
+  associationsLegend: "Associations",
+  associationType: "Association Type",
   attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
@@ -258,6 +261,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_text_label: "Text",
   field_materialSampleName: "Primary ID",
   "field_materialSampleType.name": "Material Sample Type",
+  field_materialSampleState_tooltip:
+    "Represents the state of a material sample when its condition is negatively impacted.",
   field_materialSampleType_tooltip:
     "A system-defined term that prescribes the downstream expectations and logic\
   in how derivative (or child) Material Samples are to be interpreted and digitally managed.",
@@ -320,6 +325,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   goToThePreviousStep: "Go to the previous step",
   group: "Group",
   groupMustBeSelected: "Group must be selected",
+  hostOrganismLegend: "Host Organism",
   identifierLegend: "Identifiers",
   identifiers: "Identifiers",
   identifierType: "Identifier Type",
@@ -345,6 +351,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSamples: "Material Samples",
+  materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleInfo: "Material Sample Info",
   materialSampleListTitle: "Material Samples",

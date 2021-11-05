@@ -87,6 +87,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   remarks: "Remarks",
   remove: "Remove",
   resetButtonText: "Reset",
+  resetSort: "Reset Sort",
   results: " Results",
   rows: "rows",
   search: "Search",
