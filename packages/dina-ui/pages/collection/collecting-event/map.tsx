@@ -19,71 +19,40 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
-  const { id } = router.query;
   const { formatMessage } = useDinaIntl();
-
-  const collectingEventQuery = useCollectingEventQuery(id?.toString());
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={id as string}
-        entityLink="/collection/collecting-event"
-        byPassView={true}
-      />
-      <EditButton
-        className="ms-auto"
-        entityId={id as string}
-        entityLink="collection/collecting-event"
-      />
-      <Link href={`/collection/collecting-event/revisions?id=${id}`}>
-        <a className="btn btn-info">
-          <DinaMessage id="revisionsButtonText" />
-        </a>
-      </Link>
-      <DeleteButton
-        className="ms-5"
-        id={id as string}
-        options={{ apiBaseUrl: "/collection-api" }}
-        postDeleteRedirect="/collection/collecting-event/list"
-        type="collecting-event"
-      />
-    </ButtonBar>
-  );
 
   // Getting params from URL
   const queryParams = new URLSearchParams(window.location.search);
-  const mlat = queryParams.get('mlat') as string;
-  const mlon = queryParams.get('mlon') as string;
+  const mlat = queryParams.get("mlat") as string;
+  const mlon = queryParams.get("mlon") as string;
   // casting to numbers
   const latitude = Number(mlat);
   const longitude = Number(mlon);
 
   return (
     <div>
-      <Head title={formatMessage("collectingEventViewTitle")} 
-      />
+      <Head title={formatMessage("collectingEventViewTitle")} />
       <Nav />
-      <CollectingEventMap 
-          geometry={{
-            type: "point", // autocasts as new Point()
-            latitude,
-            longitude
-          }} 
-          symbol={{
-            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-            color: [226, 119, 40],
-            size: "10px",  // pixels
-          }}
-          map={{
-            basemap: "hybrid"
-          }}
-          options={{
-            view: {
-              center: [longitude, latitude],
-              zoom: 5
-            }
-          }}
+      <CollectingEventMap
+        geometry={{
+          type: "point", // autocasts as new Point()
+          latitude,
+          longitude
+        }}
+        symbol={{
+          type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+          color: [226, 119, 40],
+          size: "10px" // pixels
+        }}
+        map={{
+          basemap: "hybrid"
+        }}
+        options={{
+          view: {
+            center: [longitude, latitude],
+            zoom: 25
+          }
+        }}
       />
       <Footer />
     </div>
