@@ -1,22 +1,10 @@
 import React from "react";
 import { useMap, useGraphics, useGraphic, useEvent } from "esri-loader-hooks";
-import {
-  BackButton,
-  ButtonBar,
-  DeleteButton,
-  DinaForm,
-  EditButton,
-  withResponse
-} from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
-import Link from "next/link";
 import { withRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { CollectingEventMap } from "../../../components/collection/event-map/CollectingEventMap";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export function CollectingEventDetailsPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -42,7 +30,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
         symbol={{
           type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
           color: [226, 119, 40],
-          size: "10px" // pixels
+          size: "14px" // pixels
         }}
         map={{
           basemap: "hybrid"
@@ -50,7 +38,7 @@ export function CollectingEventDetailsPage({ router }: WithRouterProps) {
         options={{
           view: {
             center: [longitude, latitude],
-            zoom: 25
+            zoom: 12
           }
         }}
       />
