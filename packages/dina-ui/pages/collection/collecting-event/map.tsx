@@ -6,7 +6,7 @@ import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventMap } from "../../../components/collection/event-map/CollectingEventMap";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
-export function CollectingEventDetailsPage({ router }: WithRouterProps) {
+export function CollectingEventDetailsPage() {
   const { formatMessage } = useDinaIntl();
 
   // Getting params from URL
