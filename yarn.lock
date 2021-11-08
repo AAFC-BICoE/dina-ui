@@ -2770,6 +2770,18 @@ esquery@^1.0.1:
   dependencies:
     estraverse "^5.1.0"
 
+esri-loader-hooks@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/esri-loader-hooks/-/esri-loader-hooks-0.4.0.tgz#e617edf0e3de20ab348c978be6c1df6da7cbe2ca"
+  integrity sha512-0q+wHEWGvhp5cQCyHAJ+0Ovi77PquGncrS8K6zZYY+TlaWFNNcLbv4LcZtKwrJK3fwLbHuSEhAFaCPPuVZQAKw==
+  dependencies:
+    hooks "^0.3.2"
+
+esri-loader@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/esri-loader/-/esri-loader-3.3.0.tgz#e2bc245a72d8d887a71cebc445c6d211d1befdd4"
+  integrity sha512-ptg11ANOVFJ/VPSQWNBHRo62Gkq82Z7c6Wu0ZFDxplm4lAs97kQ+6GRkLQPnWXE6jpHK2XEIW3Pq1iMBPMsdgg==
+
 estraverse@^5.1.0, estraverse@^5.2.0:
   version "5.3.0"
   resolved "https://registry.yarnpkg.com/estraverse/-/estraverse-5.3.0.tgz#2eea5290702f26ab8fe5370370ff86c965d21123"
@@ -3188,6 +3200,11 @@ hoist-non-react-statics@^3.3.0, hoist-non-react-statics@^3.3.1, hoist-non-react-
   integrity sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==
   dependencies:
     react-is "^16.7.0"
+
+hooks@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/hooks/-/hooks-0.3.2.tgz#a31f060c2026cea6cf1ca3eb178430e718e1c4a3"
+  integrity sha1-ox8GDCAmzqbPHKPrF4Qw5xjhxKM=
 
 hoopy@^0.1.2:
   version "0.1.4"
