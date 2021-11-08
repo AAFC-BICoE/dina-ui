@@ -11,6 +11,7 @@ export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   /** Overridable for mocking in tests. */
   fetchJson?: (url: string) => Promise<any>;
   index?: number;
+  isDetermination?: boolean;
 }
 
 export function CatalogueOfLifeNameField({
@@ -18,6 +19,7 @@ export function CatalogueOfLifeNameField({
   scientificNameSourceField,
   fetchJson,
   index,
+  isDetermination,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
   const [searchInitiated, setSearchInitiated] = useState(false);
@@ -72,6 +74,9 @@ export function CatalogueOfLifeNameField({
             index={index}
             setValue={setValue}
             initSearchValue={value ?? ""}
+            formik={formik}
+            onChange={onChange}
+            isDetermination={isDetermination}
           />
         )
       }

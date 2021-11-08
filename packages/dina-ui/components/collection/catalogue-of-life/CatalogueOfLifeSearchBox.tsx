@@ -4,12 +4,12 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
-import { useState, ReactNode } from "react";
+import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
 import DOMPurify from "dompurify";
-import { Field } from "formik";
+import { Field, FormikProps } from "formik";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -24,6 +24,12 @@ export interface CatalogueOfLifeSearchBoxProps {
 
   /** user entered initial search value. */
   initSearchValue?: string;
+
+  onChange?: (selection: string | null, formik: FormikProps<any>) => void;
+
+  formik?: FormikProps<any>;
+
+  isDetermination?: boolean;
 }
 
 export function CatalogueOfLifeSearchBox({
@@ -31,7 +37,10 @@ export function CatalogueOfLifeSearchBox({
   onSelect,
   index,
   setValue,
-  initSearchValue
+  initSearchValue,
+  onChange,
+  formik,
+  isDetermination
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -66,6 +75,7 @@ export function CatalogueOfLifeSearchBox({
   const onChangeInternal = value => {
     setInputValue(value);
     setValue?.(value);
+    onChange?.(value, formik as any);
   };
 
   return (
@@ -120,29 +130,32 @@ export function CatalogueOfLifeSearchBox({
           </div>
         </div>
       </div>
-      <Field>
-        {({ form: { values: formState } }) => {
-          const materialSample = formState;
-          const verbatimScientificName =
-            materialSample.determination?.[index ?? 0]?.verbatimScientificName;
-          const hasVerbatimScientificName = !!verbatimScientificName;
-          return (
-            hasVerbatimScientificName && (
-              <div className="d-flex align-items-center mb-3">
-                <div className="pe-3">
-                  <DinaMessage id="search" />:
+      {isDetermination && (
+        <Field>
+          {({ form: { values: formState } }) => {
+            const materialSample = formState;
+            const verbatimScientificName =
+              materialSample.determination?.[index ?? 0]
+                ?.verbatimScientificName;
+            const hasVerbatimScientificName = !!verbatimScientificName;
+            return (
+              hasVerbatimScientificName && (
+                <div className="d-flex align-items-center mb-3">
+                  <div className="pe-3">
+                    <DinaMessage id="search" />:
+                  </div>
+                  <FormikButton
+                    className="btn btn-link"
+                    onClick={() => doThrottledSearch(verbatimScientificName)}
+                  >
+                    <DinaMessage id="field_verbatimScientificName" />
+                  </FormikButton>
                 </div>
-                <FormikButton
-                  className="btn btn-link"
-                  onClick={() => doThrottledSearch(verbatimScientificName)}
-                >
-                  <DinaMessage id="field_verbatimScientificName" />
-                </FormikButton>
-              </div>
-            )
-          );
-        }}
-      </Field>
+              )
+            );
+          }}
+        </Field>
+      )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!nameResults?.length && (
         <div className="list-group">
