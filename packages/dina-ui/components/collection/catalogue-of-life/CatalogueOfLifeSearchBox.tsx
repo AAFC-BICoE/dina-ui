@@ -19,12 +19,19 @@ export interface CatalogueOfLifeSearchBoxProps {
 
   /** The determination index within the material sample. */
   index?: number;
+
+  setValue?: (newValue: any) => void;
+
+  /** user entered initial search value. */
+  initSearchValue?: string;
 }
 
 export function CatalogueOfLifeSearchBox({
   fetchJson,
   onSelect,
-  index
+  index,
+  setValue,
+  initSearchValue
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -50,10 +57,16 @@ export function CatalogueOfLifeSearchBox({
         searchValue,
         fetchJson
       }),
-    timeoutMs: 1000
+    timeoutMs: 1000,
+    initSearchValue
   });
 
   const nameResults = searchResult?.result;
+
+  const onChangeInternal = value => {
+    setInputValue(value);
+    setValue?.(value);
+  };
 
   return (
     <div className="card card-body border">
@@ -85,7 +98,7 @@ export function CatalogueOfLifeSearchBox({
             <input
               aria-label={formatMessage("colSearchLabel")}
               className="form-control col-search-input"
-              onChange={e => setInputValue(e.target.value)}
+              onChange={e => onChangeInternal(e.target.value)}
               onFocus={e => e.target.select()}
               onKeyDown={e => {
                 if (e.keyCode === 13) {

@@ -72,25 +72,6 @@ describe("CatalogueOfLifeNameField component", () => {
         '<a rel="noopener" target="_blank" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
       scientificNameSource: "COLPLUS"
     });
-  });
-
-  it("Can remove the value.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{
-          scientificName: "Poa muralis Wibel, nom. illeg.",
-          scientificNameSource: "COLPLUS"
-        }}
-        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
-      >
-        <CatalogueOfLifeNameField
-          name="scientificName"
-          scientificNameSourceField="scientificNameSource"
-          onChange={mockOnChange}
-          fetchJson={mockFetchJson}
-        />
-      </DinaForm>
-    );
 
     // Remove the name:
     wrapper.find("button.remove-button").simulate("click");

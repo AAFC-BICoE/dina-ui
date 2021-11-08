@@ -3,6 +3,7 @@ import { FormikProps } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CatalogueOfLifeSearchBox } from "./CatalogueOfLifeSearchBox";
 import DOMPurify from "dompurify";
+import { useState } from "react";
 
 export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
@@ -19,6 +20,7 @@ export function CatalogueOfLifeNameField({
   index,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
+  const [searchInitiated, setSearchInitiated] = useState(false);
   return (
     <FieldWrapper
       {...fieldWrapperProps}
@@ -36,7 +38,7 @@ export function CatalogueOfLifeNameField({
       )}
     >
       {({ formik, setValue, value }) =>
-        value ? (
+        value && searchInitiated ? (
           <div className="card card-body">
             <CatalogueOfLifeNameReadOnly
               value={value}
@@ -52,6 +54,7 @@ export function CatalogueOfLifeNameField({
                 onClick={() => {
                   onChange?.(null, formik);
                   setValue(null);
+                  setSearchInitiated(false);
                 }}
               >
                 <DinaMessage id="remove" />
@@ -64,8 +67,11 @@ export function CatalogueOfLifeNameField({
             onSelect={newValue => {
               onChange?.(newValue, formik);
               setValue(newValue);
+              setSearchInitiated(true);
             }}
             index={index}
+            setValue={setValue}
+            initSearchValue={value ?? ""}
           />
         )
       }
