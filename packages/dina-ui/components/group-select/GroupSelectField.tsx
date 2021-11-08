@@ -1,18 +1,17 @@
 import {
   SelectField,
   SelectFieldProps,
-  SelectOption,
   useAccount,
   useDinaFormContext,
   useQuery
 } from "common-ui";
+import { useField } from "formik";
 import { get, uniq } from "lodash";
+import { useEffect } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
 import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
-import { useField } from "formik";
-import { useEffect } from "react";
 
 interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
   /** Show the "any" option. */
@@ -39,8 +38,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     ...selectFieldProps
   } = groupSelectFieldProps;
 
-  const { locale } = useDinaIntl();
-  const { groupNames: myGroupNames, roles } = useAccount();
+  const { isAdmin } = useAccount();
   const { initialValues, readOnly } = useDinaFormContext();
   const [{ value }, {}, { setValue }] = useField(selectFieldProps.name);
 
@@ -51,42 +49,13 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
 
   const initialGroupName = get(initialValues, selectFieldProps.name);
 
-  const selectableGroupNames = uniq([
-    // If the value is already set, include it in the dropdown regardless of user permissions.
-    ...(initialGroupName ? [initialGroupName] : []),
-    // Include the group names the user belongs to.
-    ...(myGroupNames ?? [])
-  ]);
-
-  const { response } = useQuery<Group[]>({
-    path: "user-api/group",
-    page: { limit: 1000 },
-    // Get the group from backend when groupName is not within current user's group
-    filter: showAllGroups
-      ? undefined
-      : JSON.stringify({ name: selectableGroupNames })
+  const { groupSelectOptions } = useAvailableGroupOptions({
+    initialGroupName,
+    showAllGroups
   });
 
-  const groupOptions: SelectOption<string>[] | undefined = response?.data?.map(
-    group => ({
-      label: group.labels[locale] ?? group.name,
-      value: group.name
-    })
-  );
-
-  const groupSelectOptions: {
-    label: string;
-    value: string | undefined | null;
-  }[] =
-    groupOptions ??
-    // If no labelled groups are available, fallback to unlabelled group names from useAccount:
-    selectableGroupNames?.map(name => ({ label: name, value: name })) ??
-    [];
-
   const hasOnlyOneOption =
-    enableStoredDefaultGroup &&
-    !roles.includes("dina-admin") &&
-    groupSelectOptions.length === 1;
+    enableStoredDefaultGroup && !isAdmin && groupSelectOptions.length === 1;
 
   useEffect(() => {
     if (hasOnlyOneOption && value === undefined) {
@@ -94,15 +63,15 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
     }
   }, [String(groupSelectOptions), hasOnlyOneOption]);
 
-  const options = [
-    ...(showAnyOption ? [{ label: "<any>", value: undefined }] : []),
-    ...groupSelectOptions
-  ];
-
   // Hide the field when there is only one group to pick from:
   if (hasOnlyOneOption && !readOnly) {
     return <div />;
   }
+
+  const options = [
+    ...(showAnyOption ? [{ label: "<any>", value: undefined }] : []),
+    ...groupSelectOptions
+  ];
 
   return (
     <SelectField
@@ -120,4 +89,56 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
       selectProps={{ isDisabled: hasOnlyOneOption }}
     />
   );
+}
+
+export interface UseAvailableGroupOptionsParams {
+  initialGroupName?: string;
+
+  /**
+   * Show all groups, even those the user doesn't belong to.
+   * The default (false) is to only show the groups the user belongs to.
+   */
+  showAllGroups?: boolean;
+}
+
+/**
+ * Gets the available Group Select options based on whether the User API is available and
+ * whether the User is a dina-admin.
+ */
+export function useAvailableGroupOptions({
+  initialGroupName,
+  showAllGroups
+}: UseAvailableGroupOptionsParams = {}) {
+  const { groupNames: myGroupNames, isAdmin } = useAccount();
+  const { locale } = useDinaIntl();
+
+  const selectableGroupNames = uniq([
+    // If the value is already set, include it in the dropdown regardless of user permissions.
+    ...(initialGroupName ? [initialGroupName] : []),
+    // Include the group names the user belongs to.
+    ...(myGroupNames ?? [])
+  ]);
+
+  const { response } = useQuery<Group[]>({
+    path: "user-api/group",
+    page: { limit: 1000 },
+    // Get the group from backend when groupName is not within current user's group
+    filter:
+      showAllGroups || isAdmin
+        ? undefined
+        : JSON.stringify({ name: selectableGroupNames })
+  });
+
+  const groupOptions = response?.data?.map(group => ({
+    label: group.labels[locale] ?? group.name,
+    value: group.name
+  }));
+
+  const groupSelectOptions =
+    groupOptions ??
+    // If no labelled groups are available, fallback to unlabelled group names from useAccount:
+    selectableGroupNames.map(name => ({ label: name, value: name })) ??
+    [];
+
+  return { groupSelectOptions };
 }
