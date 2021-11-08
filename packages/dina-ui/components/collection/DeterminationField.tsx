@@ -8,10 +8,9 @@ import {
   ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext,
-  Tooltip
+  Tooltip,
+  useDinaFormContext
 } from "common-ui";
-import DOMPurify from "dompurify";
 import { FieldArray, FormikContextType } from "formik";
 import { clamp, get } from "lodash";
 import { useState } from "react";
@@ -317,12 +316,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     suggestions={(_, formik) =>
                       formik.values.determination?.flatMap(det => [
                         det.verbatimScientificName,
-                        // Scientific name can be html:
-                        det.scientificName &&
-                          new DOMParser().parseFromString(
-                            DOMPurify.sanitize(det.scientificName),
-                            "text/html"
-                          ).documentElement.textContent
+                        det.scientificName
                       ]) ?? []
                     }
                   />
