@@ -69,7 +69,7 @@ describe("CollectionSelectField", () => {
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
-      { ...testCtx, accountContext: { roles: ["dina-admin"] } }
+      { ...testCtx, accountContext: { isAdmin: true } }
     );
 
     await new Promise(setImmediate);
