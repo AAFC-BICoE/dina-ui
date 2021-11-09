@@ -37,12 +37,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   return (
     <div>
       {/* <Head title="Managed Attribute Details" /> */}
-      <Head
-        title={formatMessage(title)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
         {id ? (

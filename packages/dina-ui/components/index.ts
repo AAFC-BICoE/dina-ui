@@ -1,7 +1,6 @@
 export * from "./add-person/PersonForm";
 export * from "./add-person/PersonFormFields";
 export * from "./button-bar/nav/nav";
-export * from "./button-bar/ResourceViewButtonBar";
 export * from "./collection/MaterialSampleBreadCrumb";
 export * from "./collection/MaterialSampleFormNav";
 export * from "./collection/ParseVerbatimToRangeButton";
@@ -13,6 +12,7 @@ export * from "./head";
 export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
 export * from "./object-store/attachment-list/AttachmentsField";
+export * from "./page-layouts/ViewPageLayout";
 export * from "./resource-select-fields/resource-select-fields";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
 export * from "./storage-unit-type/KeepContentsTogetherToggleForm";

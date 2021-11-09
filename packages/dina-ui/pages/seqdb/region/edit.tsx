@@ -1,6 +1,6 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
@@ -26,14 +26,9 @@ export function RegionEditPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head
-        title={formatMessage(title)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -91,22 +86,29 @@ function RegionForm({ region, router }: RegionFormProps) {
         <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/region" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-        <div className="row">
-          <TextField className="col-md-2" name="name" />
-          <TextField className="col-md-2" name="symbol" />
-          <TextField className="col-md-2" name="description" />
-        </div>
-        <SubmitButton />
-      </div>
+      <RegionFormFields />
     </DinaForm>
+  );
+}
+
+export function RegionFormFields() {
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-6"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="symbol" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="description" />
+      </div>
+    </div>
   );
 }
 
