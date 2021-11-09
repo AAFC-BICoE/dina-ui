@@ -22,7 +22,7 @@ describe("filterBy function", () => {
           comparison: "=="
         }
       ],
-      otherFilters: { parent: null }
+      nullValueFilters: { parent: null }
     })("value");
     expect(rsqlFilter).toEqual({
       rsql: "(attribute1==*value*,attribute2==*value*);attribute3==test-search-value",

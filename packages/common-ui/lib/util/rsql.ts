@@ -1,9 +1,8 @@
 import { transformToRSQL } from "@molgenis/rsql";
-import { merge } from "lodash";
 
 interface RsqlFilterOptions {
   extraFilters?: RsqlFilterObject[];
-  otherFilters?: {};
+  nullValueFilters?: {};
 }
 
 interface RsqlFilterObject {
@@ -37,7 +36,7 @@ export function filterBy(
   fields: string[],
   options?: RsqlFilterOptions
 ): (value: string) => Record<string, string> | {} {
-  const otherFilters = options?.otherFilters;
+  const otherFilters = options?.nullValueFilters;
   return value => {
     const rsqlFilter = (transformToRSQL as any)({
       operator: "AND",
@@ -58,9 +57,7 @@ export function filterBy(
       ]
     });
 
-    const combinedFilters = otherFilters
-      ? merge({ rsql: rsqlFilter }, otherFilters)
-      : { rsql: rsqlFilter };
+    const combinedFilters = { ...{ rsql: rsqlFilter }, ...otherFilters };
     return combinedFilters;
   };
 }
