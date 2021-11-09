@@ -19,7 +19,7 @@ export function CollectingEventDetailsPage() {
 
   return (
     <div>
-      <Head title={formatMessage("collectingEventViewTitle")} />
+      <Head title={formatMessage("collectingEvent")} />
       <Nav />
       <CollectingEventMap
         geometry={{

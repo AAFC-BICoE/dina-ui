@@ -38,12 +38,7 @@ export default function CollectionListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("collectionListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("collectionListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

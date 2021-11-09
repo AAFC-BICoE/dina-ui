@@ -40,12 +40,7 @@ export default function ProtocolListPage() {
 
   return (
     <>
-      <Head
-        title={formatMessage("protocolListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("protocolListTitle")} />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/protocol" />

@@ -1,9 +1,9 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrProfileEditPage } from "../../../../pages/seqdb/pcr-profile/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
-import { writeStorage } from "@rehooks/local-storage";
-import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);

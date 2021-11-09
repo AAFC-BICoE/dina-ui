@@ -1,0 +1,33 @@
+= React Component Types
+
+These are some common patterns we use when working with React components:
+
+== Pages
+
+Stored in "packages/dina-ui/pages". The folder path and filename correspond to the pages's URL, which is automatically routed by Next.js.
+
+More info: https://nextjs.org/docs/basic-features/pages
+
+== Page Layouts
+
+e.g. ViewPageLayout and ListPageLayout. If a set of pages with a similar layout exists we can make
+page layout components to avoid duplicating code across page Components.
+
+== DinaForm
+
+The main way to create forms in dina-ui. It's a wrapper around https://jaredpalmer.com/formik/[Formik] with
+some added props and error message handling.
+
+== Form Fields
+
+Usually stored in "packages/common-ui/lib/formik-connected" with the Component name ending in "Field".
+These are form inputs with a "name" prop for the property in the form data the field edits.
+
+e.g.
+
+[source,tsx]
+----
+<DinaForm initialValues={{ myField: "initial text" }}>
+  <TextField name="myField" className="col-md-6" />
+</DinaForm>
+----

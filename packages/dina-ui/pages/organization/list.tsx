@@ -38,12 +38,7 @@ export default function OrganizationListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("organizationListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("organizationListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

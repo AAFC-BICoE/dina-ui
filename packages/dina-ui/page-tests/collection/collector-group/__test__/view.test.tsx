@@ -1,5 +1,5 @@
 import { Person } from "packages/dina-ui/types/objectstore-api";
-import { CollectorGroupDetailsPage } from "../../../../pages/collection/collector-group/view";
+import CollectorGroupDetailsPage from "../../../../pages/collection/collector-group/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectorGroup } from "../../../../types/collection-api/resources/CollectorGroup";
 
@@ -24,7 +24,7 @@ const TEST_AGENT: Person = {
 
 const mockBulkGet = jest.fn<any, any>(async paths =>
   paths.map(path => {
-    if (path === "/person/a8fb14f7-cda9-4313-9cc7-f313db653cad") {
+    if (/\/?person\/a8fb14f7-cda9-4313-9cc7-f313db653cad/.test(path)) {
       return TEST_AGENT;
     }
   })
@@ -47,21 +47,23 @@ const apiContext = {
   apiClient: { get: mockGet }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("CollectorGroup details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <CollectorGroupDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectorGroupDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the CollectorGroup details", async () => {
-    const wrapper = mountWithAppContext(
-      <CollectorGroupDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectorGroupDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
@@ -69,9 +71,9 @@ describe("CollectorGroup details page", () => {
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
-    expect(wrapper.find(".agents-field .field-view").text()).toEqual(
-      "person a"
-    );
+    expect(
+      wrapper.find(".agentIdentifiers-field .read-only-view").text()
+    ).toEqual("person a");
     expect(wrapper.find(".name-field .field-view").text()).toEqual(
       "test collector group"
     );
