@@ -151,7 +151,7 @@ export function CollectionFormFields({ title }) {
   ];
 
   const filter = filterBy(["name"], {
-    otherFilters: { parentCollection: null }
+    nullValueFilters: { parentCollection: null }
   });
 
   return (
