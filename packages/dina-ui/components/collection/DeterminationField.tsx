@@ -183,6 +183,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         )
                       }
                       index={index}
+                      isDetermination={true}
                     />
                     <ResourceSelectField<Person>
                       {...fieldProps("determiner")}

@@ -71,25 +71,6 @@ describe("CatalogueOfLifeNameField component", () => {
       scientificName: "Poa muralis Wibel, nom. illeg.",
       scientificNameSource: "COLPLUS"
     });
-  });
-
-  it("Can remove the value.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{
-          scientificName: "Poa muralis Wibel, nom. illeg.",
-          scientificNameSource: "COLPLUS"
-        }}
-        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
-      >
-        <CatalogueOfLifeNameField
-          name="scientificName"
-          scientificNameSourceField="scientificNameSource"
-          onChange={mockOnChange}
-          fetchJson={mockFetchJson}
-        />
-      </DinaForm>
-    );
 
     // Remove the name:
     wrapper.find("button.remove-button").simulate("click");

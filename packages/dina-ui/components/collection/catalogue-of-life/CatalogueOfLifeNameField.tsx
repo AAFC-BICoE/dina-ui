@@ -2,13 +2,15 @@ import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CatalogueOfLifeSearchBox } from "./CatalogueOfLifeSearchBox";
-import isArray from "lodash";
+import { useState } from "react";
+import { isArray } from "lodash";
 export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
   /** Overridable for mocking in tests. */
   fetchJson?: (url: string) => Promise<any>;
   index?: number;
+  isDetermination?: boolean;
 }
 
 export function CatalogueOfLifeNameField({
@@ -16,8 +18,10 @@ export function CatalogueOfLifeNameField({
   scientificNameSourceField,
   fetchJson,
   index,
+  isDetermination,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
+  const [searchInitiated, setSearchInitiated] = useState(false);
   return (
     <FieldWrapper
       {...fieldWrapperProps}
@@ -35,7 +39,7 @@ export function CatalogueOfLifeNameField({
       )}
     >
       {({ formik, setValue, value }) =>
-        value ? (
+        value && searchInitiated ? (
           <div className="card card-body">
             <CatalogueOfLifeNameReadOnly
               value={value}
@@ -51,6 +55,7 @@ export function CatalogueOfLifeNameField({
                 onClick={() => {
                   onChange?.(null, formik);
                   setValue(null);
+                  setSearchInitiated(false);
                 }}
               >
                 <DinaMessage id="remove" />
@@ -64,8 +69,14 @@ export function CatalogueOfLifeNameField({
               const val = isArray(newValue) ? newValue?.[1] : newValue;
               onChange?.(val as any, formik);
               setValue(val);
+              setSearchInitiated(true);
             }}
             index={index}
+            setValue={setValue}
+            initSearchValue={value ?? ""}
+            formik={formik}
+            onChange={onChange}
+            isDetermination={isDetermination}
           />
         )
       }
