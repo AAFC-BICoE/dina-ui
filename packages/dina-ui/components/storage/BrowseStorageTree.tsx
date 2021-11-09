@@ -74,6 +74,7 @@ export function StorageTreeList({
     path: `collection-api/storage-unit`,
     include: "hierarchy,storageUnitChildren,storageUnitType",
     page: { limit, offset },
+    sort: "storageUnitType.name,name",
     filter: {
       rsql: rsql({
         type: "FILTER_GROUP",
