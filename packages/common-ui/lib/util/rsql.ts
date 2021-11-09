@@ -21,7 +21,7 @@ interface RsqlFilterObject {
     | "=out=";
 
   /** The search value. */
-  arguments: string;
+  arguments: string | string[];
 }
 
 /**

@@ -45,7 +45,7 @@ export function CollectionSelectField(
             {
               selector: "group",
               comparison: "=in=",
-              arguments: (groupNames || []).join(",")
+              arguments: groupNames || []
             }
           ]
         }
