@@ -36,7 +36,10 @@ export default function CollectionEditPage() {
   } = router;
 
   const collectionQuery = useQuery<Collection>(
-    { path: `collection-api/collection/${id}`, include: "institution" },
+    {
+      path: `collection-api/collection/${id}`,
+      include: "institution,parentCollection"
+    },
     { disabled: !id }
   );
 
@@ -142,6 +145,10 @@ export function CollectionFormFields({ title }) {
     }
   ];
 
+  const filter = filterBy(["name"], {
+    nullValueFilters: { parentCollection: null }
+  });
+
   return (
     <div>
       <div className="row">
@@ -156,22 +163,21 @@ export function CollectionFormFields({ title }) {
         <DinaMessage id={title} />
       </h1>
       <div className="row">
-        <ResourceSelectField<Institution>
+        {/* <ResourceSelectField<Institution>
           name="institution"
           readOnlyLink="/collection/institution/view?id="
           filter={filterBy(["name"])}
           model="collection-api/institution"
           optionLabel={institution => institution.name as any}
           className="col-md-6"
-        />
+        /> */}
         <ResourceSelectField<Collection>
-          name="collection"
+          name="parentCollection"
           readOnlyLink="/collection/collection/view?id="
-          filter={filterBy(["name"])}
+          filter={filter}
           model="collection-api/collection"
           optionLabel={collection => collection.name as any}
           className="col-md-6"
-          isDisabled={true}
           label={formatMessage("parentCollectionLabel")}
         />
       </div>

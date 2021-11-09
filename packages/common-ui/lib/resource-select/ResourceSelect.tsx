@@ -134,7 +134,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Omit blank/null filters:
   const filterParam = omitBy(filter(search.value), val =>
-    ["", null, undefined].includes(val as string)
+    ["", undefined].includes(val as string)
   ) as FilterParam;
 
   const page = pageSize ? { limit: pageSize } : undefined;

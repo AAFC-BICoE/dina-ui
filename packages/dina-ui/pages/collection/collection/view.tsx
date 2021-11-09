@@ -25,7 +25,7 @@ export default function CollectionDetailsPage() {
       )}
       query={id => ({
         path: `collection-api/collection/${id}`,
-        include: "institution"
+        include: "institution,parentCollection"
       })}
       entityLink="/collection/collection"
       type="collection"
