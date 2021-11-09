@@ -2,9 +2,8 @@ import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CatalogueOfLifeSearchBox } from "./CatalogueOfLifeSearchBox";
-import DOMPurify from "dompurify";
 import { useState } from "react";
-
+import { isArray } from "lodash";
 export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -67,8 +66,9 @@ export function CatalogueOfLifeNameField({
           <CatalogueOfLifeSearchBox
             fetchJson={fetchJson}
             onSelect={newValue => {
-              onChange?.(newValue, formik);
-              setValue(newValue);
+              const val = isArray(newValue) ? newValue?.[1] : newValue;
+              onChange?.(val as any, formik);
+              setValue(val);
               setSearchInitiated(true);
             }}
             index={index}
@@ -85,12 +85,9 @@ export function CatalogueOfLifeNameField({
 }
 
 function CatalogueOfLifeNameReadOnly({ value, scientificNameSource }) {
-  const sanitizedHtml = DOMPurify.sanitize(value, {
-    ADD_ATTR: ["target", "rel"]
-  });
   return (
     <div style={{ whiteSpace: "pre-wrap" }}>
-      <p dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />{" "}
+      <p> {value} </p>
       {scientificNameSource && (
         <p>
           <strong>

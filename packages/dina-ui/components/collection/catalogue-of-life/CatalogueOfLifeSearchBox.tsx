@@ -15,7 +15,7 @@ export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
   fetchJson?: (url: string) => Promise<any>;
 
-  onSelect?: (selection: string | null) => void;
+  onSelect?: (selection: string | string[] | null) => void;
 
   /** The determination index within the material sample. */
   index?: number;
@@ -174,6 +174,10 @@ export function CatalogueOfLifeSearchBox({
             const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
               ADD_ATTR: ["target", "rel"]
             });
+
+            const resultArray: string[] = [];
+            resultArray.push(safeHtmlLink);
+            resultArray.push(result.label ?? "");
             return (
               <div
                 key={result.id ?? idx}
@@ -185,7 +189,7 @@ export function CatalogueOfLifeSearchBox({
                 <FormikButton
                   className="btn btn-primary col-name-select-button"
                   buttonProps={() => ({ style: { width: "8rem" } })}
-                  onClick={() => onSelect?.(safeHtmlLink)}
+                  onClick={() => onSelect?.(resultArray)}
                 >
                   <DinaMessage id="select" />
                 </FormikButton>

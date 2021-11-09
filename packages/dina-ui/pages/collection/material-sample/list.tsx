@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, Head, Nav, GroupSelectField } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -22,13 +22,15 @@ export interface SampleListLayoutProps {
   classNames?: string;
   btnMsg?: string;
   hideTopPagination?: boolean;
+  hideGroupFilter?: boolean;
 }
 
 export function SampleListLayout({
   onSelect,
   classNames,
   btnMsg,
-  hideTopPagination
+  hideTopPagination,
+  hideGroupFilter
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -107,6 +109,21 @@ export function SampleListLayout({
         include: "collection,materialSampleType",
         hideTopPagination
       }}
+      filterFormchildren={({ submitForm }) =>
+        !hideGroupFilter ? (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
+            </div>
+          </div>
+        ) : (
+          <></>
+        )
+      }
     />
   );
 }

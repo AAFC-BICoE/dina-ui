@@ -113,6 +113,7 @@ export function AssociatedMaterialSampleSearchBox(
                       classNames="btn btn-primary selectMaterialSample"
                       btnMsg={formatMessage("select")}
                       hideTopPagination={true}
+                      hideGroupFilter={true}
                     />
                   </div>
                 </div>
