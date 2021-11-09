@@ -74,12 +74,7 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage(pageTitle)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(pageTitle)} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

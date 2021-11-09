@@ -5,14 +5,16 @@ import { useDebounce } from "use-debounce";
 export interface UseThrottledFetchParams<TData> {
   fetcher: (query: string) => Promise<TData>;
   timeoutMs: number;
+  initSearchValue?: string;
 }
 
 export function useThrottledFetch<TData>({
   fetcher,
-  timeoutMs
+  timeoutMs,
+  initSearchValue
 }: UseThrottledFetchParams<TData>) {
   /** The value of the input element. */
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState(initSearchValue ?? "");
 
   /**
    * The query passed to the Catalogue of Life API.

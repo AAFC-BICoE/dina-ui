@@ -29,12 +29,7 @@ export default function WorkflowListPage() {
 
   return (
     <>
-      <Head
-        title={formatMessage("workflowListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("workflowListTitle")} />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/workflow" />

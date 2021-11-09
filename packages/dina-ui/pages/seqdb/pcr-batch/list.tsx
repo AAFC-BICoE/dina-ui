@@ -41,12 +41,7 @@ export default function PcrBatchListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("pcrBatchListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("pcrBatchListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage("pcrBatchListTitle")}</h1>

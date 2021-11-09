@@ -19,7 +19,6 @@ import {
 } from "../../../components/collection/useCollectingEvent";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import { omit, merge } from "lodash";
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
@@ -38,12 +37,7 @@ export default function CollectingEventEditPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage(title)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
         {id ? (

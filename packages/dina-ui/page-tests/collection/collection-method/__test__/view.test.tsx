@@ -1,6 +1,6 @@
+import CollectionMethodDetailsPage from "../../../../pages/collection/collection-method/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectionMethod } from "../../../../types/collection-api/resources/CollectionMethod";
-import { CollectionMethodDetailsPage } from "../../../../pages/collection/collection-method/view";
 
 /** Test collection-method with all fields defined. */
 const TEST_COLLECTION_METHOD: CollectionMethod = {
@@ -25,21 +25,23 @@ const apiContext = {
   apiClient: { get: mockGet }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("CollectionMethod details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <CollectionMethodDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the CollectionMethod details", async () => {
-    const wrapper = mountWithAppContext(
-      <CollectionMethodDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectionMethodDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

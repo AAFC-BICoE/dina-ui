@@ -30,12 +30,7 @@ export default function CollectorGroupEditPage() {
   const { formatMessage } = useDinaIntl();
   return (
     <div>
-      <Head
-        title={formatMessage("addCollectorGroupTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("addCollectorGroupTitle")} />
       <Nav />
       <main className="container-fluid">
         <div>
@@ -106,24 +101,32 @@ function CollectorGroupForm({
           type="collector-group"
         />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <TextField
-            className="col-md-3 collectorGroupName"
-            name="name"
-            label={formatMessage("collectorGroupNameLabel")}
-          />
-          <ResourceSelectField<Person>
-            name="agentIdentifiers"
-            filter={filterBy(["displayName"])}
-            model="agent-api/person"
-            isMulti={true}
-            className="col-md-3"
-            optionLabel={agent => agent.displayName}
-            label={formatMessage("collectorGroupAgentsLabel")}
-          />
-        </div>
-      </div>
+      <CollectorGroupFields />
     </DinaForm>
+  );
+}
+
+export function CollectorGroupFields() {
+  const { formatMessage } = useDinaIntl();
+
+  return (
+    <div>
+      <div className="row">
+        <TextField
+          className="col-md-3 collectorGroupName"
+          name="name"
+          label={formatMessage("collectorGroupNameLabel")}
+        />
+        <ResourceSelectField<Person>
+          name="agentIdentifiers"
+          filter={filterBy(["displayName"])}
+          model="agent-api/person"
+          isMulti={true}
+          className="col-md-3"
+          optionLabel={agent => agent.displayName}
+          label={formatMessage("collectorGroupAgentsLabel")}
+        />
+      </div>
+    </div>
   );
 }

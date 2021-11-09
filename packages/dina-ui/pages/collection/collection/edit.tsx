@@ -47,12 +47,7 @@ export default function CollectionEditPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage(title)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
         {id ? (

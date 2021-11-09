@@ -52,12 +52,7 @@ export default function MetadataEditPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("editMetadataTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("editMetadataTitle")} />
       <Nav />
       <main className="container">
         {id && (
