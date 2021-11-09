@@ -44,11 +44,10 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     determinedOn: true,
     qualifier: true,
     scientificNameSource: true,
-    scientificNameDetails: true,
     scientificName: true,
     transcriberRemarks: true,
     isPrimary: true,
-    scientificNameSourceDetails: true
+    scientificNameDetails: true
   };
 
 /** All fields of the Determination type. */
@@ -178,14 +177,34 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       scientificNameSourceField={
                         fieldProps("scientificNameSource").name
                       }
+                      scientificNameDetailsSrcUrlField={
+                        fieldProps("scientificNameDetails.sourceUrl").name
+                      }
+                      scientificNameDetailsLabelHtmlField={
+                        fieldProps("scientificNameDetails.labelHtml").name
+                      }
                       onChange={(newValue, formik) => {
                         formik.setFieldValue(
                           fieldProps("scientificNameSource").name,
                           newValue ? "COLPLUS" : null
                         );
                         formik.setFieldValue(
-                          fieldProps("scientificNameSourceDetails").name,
-                          newValue && isArray(newValue) ? newValue[0] : null
+                          fieldProps("scientificNameDetails.labelHtml").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].labelHtml
+                            : null
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameDetails.sourceUrl").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].sourceUrl
+                            : null
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameDetails.recordedOn").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].recordedOn
+                            : null
                         );
                       }}
                       index={index}
