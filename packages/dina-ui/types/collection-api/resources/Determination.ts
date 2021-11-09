@@ -14,7 +14,14 @@ export interface Determination {
   scientificName?: string;
   transcriberRemarks?: string;
   isPrimary?: boolean;
+  scientificNameSourceDetails?: ScientificNameSourceDetails;
 }
+
+export type ScientificNameSourceDetails = {
+  labelHtml?: string;
+  sourceUrl?: string;
+  recordedOn?: string;
+};
 
 export enum ScientificNameSource {
   COLPLUS = "COLPLUS"

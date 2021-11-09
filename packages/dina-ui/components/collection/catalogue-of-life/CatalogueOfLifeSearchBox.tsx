@@ -10,6 +10,8 @@ import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import moment from "moment";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -175,8 +177,13 @@ export function CatalogueOfLifeSearchBox({
               ADD_ATTR: ["target", "rel"]
             });
 
-            const resultArray: string[] = [];
-            resultArray.push(safeHtmlLink);
+            const resultArray: any[] = [];
+            const detail: ScientificNameSourceDetails = {};
+            detail.labelHtml = result.labelHtml ?? "";
+            detail.sourceUrl = safeHtmlLink;
+            detail.recordedOn = moment().format();
+
+            resultArray.push(detail);
             resultArray.push(result.label ?? "");
             return (
               <div

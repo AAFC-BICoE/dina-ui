@@ -67,7 +67,7 @@ export function CatalogueOfLifeNameField({
             fetchJson={fetchJson}
             onSelect={newValue => {
               const val = isArray(newValue) ? newValue?.[1] : newValue;
-              onChange?.(val as any, formik);
+              onChange?.(newValue as any, formik);
               setValue(val);
               setSearchInitiated(true);
             }}

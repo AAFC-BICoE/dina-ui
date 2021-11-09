@@ -25,6 +25,7 @@ import {
   Vocabulary
 } from "../../types/collection-api";
 import { useAddPersonModal } from "../add-person/PersonForm";
+import { isArray } from "lodash";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -46,7 +47,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     scientificNameDetails: true,
     scientificName: true,
     transcriberRemarks: true,
-    isPrimary: true
+    isPrimary: true,
+    scientificNameSourceDetails: true
   };
 
 /** All fields of the Determination type. */
@@ -176,12 +178,16 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       scientificNameSourceField={
                         fieldProps("scientificNameSource").name
                       }
-                      onChange={(newValue, formik) =>
+                      onChange={(newValue, formik) => {
                         formik.setFieldValue(
                           fieldProps("scientificNameSource").name,
                           newValue ? "COLPLUS" : null
-                        )
-                      }
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameSourceDetails").name,
+                          newValue && isArray(newValue) ? newValue[0] : null
+                        );
+                      }}
                       index={index}
                       isDetermination={true}
                     />
