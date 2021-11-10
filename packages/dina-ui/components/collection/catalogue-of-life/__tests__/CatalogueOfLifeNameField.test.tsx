@@ -28,6 +28,7 @@ describe("CatalogueOfLifeNameField component", () => {
           scientificNameSourceField="scientificNameSource"
           onChange={mockOnChange}
           fetchJson={mockFetchJson}
+          dateSupplier={() => "2021-11-09"}
         />
       </DinaForm>
     );
