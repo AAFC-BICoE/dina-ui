@@ -1,6 +1,7 @@
 import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import Select, { StylesConfig } from "react-select";
 
 const mockGet = jest.fn<any, any>(async path => {
   if (path === "user-api/group") {
@@ -18,7 +19,7 @@ describe("User edit page", () => {
   it("Lets you edit the Roles per Group.", async () => {
     const mockSubmit = jest.fn();
 
-    const testUser = {
+    const testUserToEdit = {
       rolesPerGroup: {
         cnc: ["student"],
         aafc: ["staff"]
@@ -27,15 +28,22 @@ describe("User edit page", () => {
 
     const wrapper = mountWithAppContext(
       <DinaForm
-        initialValues={testUser}
+        initialValues={testUserToEdit}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
-        <RolesPerGroupEditor initialRolesPerGroup={testUser.rolesPerGroup} />
+        <RolesPerGroupEditor
+          initialRolesPerGroup={testUserToEdit.rolesPerGroup}
+        />
       </DinaForm>,
       {
         apiContext,
         accountContext: {
-          groupNames: ["cnc", "aafc", "test-group"]
+          groupNames: ["cnc", "aafc", "test-group"],
+          // The logged in user is a collection manager for CNC and test-group:
+          rolesPerGroup: {
+            cnc: ["collection-manager"],
+            "test-group": ["collection-manager"]
+          }
         }
       }
     );
@@ -45,6 +53,18 @@ describe("User edit page", () => {
     expect(wrapper.find("tr.aafc-row").exists()).toEqual(true);
     expect(wrapper.find("tr.test-group-row").exists()).toEqual(false);
 
+    // The logged in user must be collection-manager to edit a group's row:
+    // Can edit the cnc row:
+    expect(wrapper.find("tr.cnc-row .remove-button").exists()).toEqual(true);
+    expect(
+      wrapper.find("tr.cnc-row .role-select").find(Select).prop("isDisabled")
+    ).toEqual(false);
+    // Can't edit the AAFC row:
+    expect(wrapper.find("tr.aafc-row .remove-button").exists()).toEqual(false);
+    expect(
+      wrapper.find("tr.aafc-row .role-select").find(Select).prop("isDisabled")
+    ).toEqual(true);
+
     // Add new group + roles:
     wrapper.find(".add-group Select").prop<any>("onChange")({
       value: "test-group"
@@ -53,9 +73,9 @@ describe("User edit page", () => {
     wrapper.update();
     expect(wrapper.find("tr.test-group-row").exists()).toEqual(true);
 
-    wrapper
-      .find("tr.test-group-row .role-select Select")
-      .prop<any>("onChange")([{ value: "role1" }, { value: "role2" }]);
+    wrapper.find("tr.test-group-row .role-select Select").prop<any>("onChange")(
+      [{ value: "role1" }, { value: "role2" }]
+    );
 
     // Remove a group:
     wrapper.find("tr.cnc-row .remove-group button").simulate("click");
