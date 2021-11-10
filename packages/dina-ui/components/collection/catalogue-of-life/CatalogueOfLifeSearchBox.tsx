@@ -10,12 +10,16 @@ import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import moment from "moment";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
   fetchJson?: (url: string) => Promise<any>;
 
-  onSelect?: (selection: string | string[] | null) => void;
+  onSelect?: (
+    selection: (string | ScientificNameSourceDetails | undefined)[]
+  ) => void;
 
   /** The determination index within the material sample. */
   index?: number;
@@ -74,7 +78,11 @@ export function CatalogueOfLifeSearchBox({
 
   const onChangeInternal = value => {
     setInputValue(value);
-    setValue?.(value);
+    // Will save the user entry if it is not the determination scientific name
+    // use case is for association host organism
+    if (!isDetermination) {
+      setValue?.(value);
+    }
     onChange?.(value, formik as any);
   };
 
@@ -175,9 +183,14 @@ export function CatalogueOfLifeSearchBox({
               ADD_ATTR: ["target", "rel"]
             });
 
-            const resultArray: string[] = [];
-            resultArray.push(safeHtmlLink);
-            resultArray.push(result.label ?? "");
+            const detail: ScientificNameSourceDetails = {};
+            detail.labelHtml = result.labelHtml ?? "";
+            detail.sourceUrl = link.href;
+            detail.recordedOn = moment().format("YYYY-MM-DD");
+
+            // Use detail to populate source details fields, result.label to populate the searchbox bound field
+            const resultArray = [detail, result.label];
+
             return (
               <div
                 key={result.id ?? idx}

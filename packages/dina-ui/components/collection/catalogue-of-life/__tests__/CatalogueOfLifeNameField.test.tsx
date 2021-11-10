@@ -51,10 +51,23 @@ describe("CatalogueOfLifeNameField component", () => {
 
     wrapper.find("button.col-name-select-button").at(1).simulate("click");
 
-    expect(mockOnChange).lastCalledWith(
-      "Poa muralis Wibel, nom. illeg.",
-      expect.anything()
-    );
+    expect(mockOnChange).toBeCalledTimes(2);
+
+    expect(mockOnChange.mock.calls).toEqual([
+      ["  Poa muralis  ", expect.anything()],
+      [
+        [
+          {
+            labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg.",
+            recordedOn: "2021-11-09",
+            sourceUrl:
+              "https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"
+          },
+          expect.anything()
+        ],
+        expect.anything()
+      ]
+    ]);
     // The whitespace for the query string should be trimmed:
     expect(mockFetchJson).lastCalledWith(
       "https://api.catalogueoflife.org/dataset/2328/nameusage?q=Poa+muralis"
