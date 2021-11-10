@@ -4,14 +4,14 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
+import DOMPurify from "dompurify";
+import { Field, FormikProps } from "formik";
+import moment from "moment";
 import { useState } from "react";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
-import DOMPurify from "dompurify";
-import { Field, FormikProps } from "formik";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
-import moment from "moment";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -34,6 +34,9 @@ export interface CatalogueOfLifeSearchBoxProps {
   formik?: FormikProps<any>;
 
   isDetermination?: boolean;
+
+  /** Mock this out in tests so it gives a predictable value. */
+  dateSupplier?: () => string;
 }
 
 export function CatalogueOfLifeSearchBox({
@@ -44,7 +47,8 @@ export function CatalogueOfLifeSearchBox({
   initSearchValue,
   onChange,
   formik,
-  isDetermination
+  isDetermination,
+  dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -186,7 +190,7 @@ export function CatalogueOfLifeSearchBox({
             const detail: ScientificNameSourceDetails = {};
             detail.labelHtml = result.labelHtml ?? "";
             detail.sourceUrl = link.href;
-            detail.recordedOn = moment().format("YYYY-MM-DD");
+            detail.recordedOn = dateSupplier();
 
             // Use detail to populate source details fields, result.label to populate the searchbox bound field
             const resultArray = [detail, result.label];
