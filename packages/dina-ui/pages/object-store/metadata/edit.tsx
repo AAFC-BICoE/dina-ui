@@ -26,12 +26,7 @@ export default function EditMetadatasPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("metadataBulkEditTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <main className="container-fluid">
         <ButtonBar>

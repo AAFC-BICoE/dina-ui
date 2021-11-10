@@ -1,4 +1,4 @@
-import { ProductDetailsPage } from "../../../../pages/seqdb/product/view";
+import ProductDetailsPage from "../../../../pages/seqdb/product/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Product } from "../../../../types/seqdb-api/resources/Product";
 
@@ -20,25 +20,24 @@ const mockGet = jest.fn(async () => {
 
 const apiContext: any = { apiClient: { get: mockGet } };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } }),
+  withRouter: fn => fn
+}));
+
 describe("Product details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <ProductDetailsPage router={{ query: { id: "100" } } as any} />,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the Product details", async () => {
-    const wrapper = mountWithAppContext(
-      <ProductDetailsPage router={{ query: { id: "100" } } as any} />,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ProductDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

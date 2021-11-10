@@ -1,56 +1,33 @@
-import { DinaForm, useQuery, withResponse } from "common-ui";
+import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
-import { Head, Nav, ResourceViewButtonBar } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ViewPageLayout } from "../../../components";
 import { Institution } from "../../../types/collection-api";
 import { InstitutionFormLayout } from "./edit";
 
-export function InstitutionDetailsPage({ router }: WithRouterProps) {
-  const id = String(router.query.id);
-  const { formatMessage } = useDinaIntl();
-
-  const institutionQuery = useQuery<Institution>({
-    path: `collection-api/institution/${id}`,
-    header: { "include-dina-permission": "true" }
-  });
-
+export default function InstitutionDetailsPage() {
   return (
-    <div>
-      <Head
-        title={formatMessage("institution")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
-      <Nav />
-      <main className="container">
-        {withResponse(institutionQuery, ({ data: institution }) => (
-          <DinaForm<Institution>
-            initialValues={{
-              ...institution,
-              // Convert multilingualDescription to editable Dictionary format:
-              multilingualDescription: fromPairs<string | undefined>(
-                institution.multilingualDescription?.descriptions?.map(
-                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
-                )
+    <ViewPageLayout<Institution>
+      form={props => (
+        <DinaForm<Institution>
+          {...props}
+          initialValues={{
+            ...props.initialValues,
+            // Convert multilingualDescription to editable Dictionary format:
+            multilingualDescription: fromPairs<string | undefined>(
+              props.initialValues.multilingualDescription?.descriptions?.map(
+                ({ desc, lang }) => [lang ?? "", desc ?? ""]
               )
-            }}
-            readOnly={true}
-          >
-            <ResourceViewButtonBar
-              resource={institution}
-              apiBaseUrl="/collection-api"
-              resourceBaseUrl="collection/institution"
-              withLeadingSlash={true}
-            />
-            <InstitutionFormLayout />
-          </DinaForm>
-        ))}
-      </main>
-    </div>
+            )
+          }}
+        >
+          <InstitutionFormLayout />
+        </DinaForm>
+      )}
+      query={id => ({ path: `collection-api/institution/${id}` })}
+      entityLink="/collection/institution"
+      type="institution"
+      apiBaseUrl="/collection-api"
+      isRestricted={true}
+    />
   );
 }
-
-export default withRouter(InstitutionDetailsPage);

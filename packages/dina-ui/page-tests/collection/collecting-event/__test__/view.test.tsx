@@ -1,5 +1,5 @@
 import { Person } from "../../../../types/agent-api/resources/Person";
-import { CollectingEventDetailsPage } from "../../../../pages/collection/collecting-event/view";
+import CollectingEventDetailsPage from "../../../../pages/collection/collecting-event/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
@@ -57,21 +57,23 @@ const apiContext: any = {
   bulkGet: mockBulkGet
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("CollectingEvent details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <CollectingEventDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the CollectingEvent details", async () => {
-    const wrapper = mountWithAppContext(
-      <CollectingEventDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

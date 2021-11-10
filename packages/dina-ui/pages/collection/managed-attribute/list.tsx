@@ -68,12 +68,7 @@ export default function ManagedAttributesListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("collectionManagedAttributeListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("collectionManagedAttributeListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

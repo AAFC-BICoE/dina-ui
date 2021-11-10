@@ -21,7 +21,9 @@ export function FieldSet({
       className={`mb-3 border card px-4 py-2 ${className ?? ""}`}
       id={id}
     >
-      <legend className="w-auto"><h2 className="fieldset-h2-adjustment">{legend}</h2></legend>
+      <legend className="w-auto">
+        <h2 className="fieldset-h2-adjustment">{legend}</h2>
+      </legend>
       <DinaFormSection {...formSectionProps} />
     </fieldset>
   );

@@ -1,4 +1,5 @@
 import {
+  DinaFormContext,
   SelectField,
   SelectFieldProps,
   useAccount,
@@ -7,7 +8,7 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { get, uniq } from "lodash";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
@@ -111,6 +112,7 @@ export function useAvailableGroupOptions({
 }: UseAvailableGroupOptionsParams = {}) {
   const { groupNames: myGroupNames, isAdmin } = useAccount();
   const { locale } = useDinaIntl();
+  const { readOnly } = useContext(DinaFormContext) ?? {};
 
   const selectableGroupNames = uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.
@@ -119,15 +121,20 @@ export function useAvailableGroupOptions({
     ...(myGroupNames ?? [])
   ]);
 
-  const { response } = useQuery<Group[]>({
-    path: "user-api/group",
-    page: { limit: 1000 },
-    // Get the group from backend when groupName is not within current user's group
-    filter:
-      showAllGroups || isAdmin
-        ? undefined
-        : JSON.stringify({ name: selectableGroupNames })
-  });
+  const { response } = useQuery<Group[]>(
+    {
+      path: "user-api/group",
+      page: { limit: 1000 },
+      // Get the group from backend when groupName is not within current user's group
+      filter:
+        showAllGroups || isAdmin
+          ? undefined
+          : JSON.stringify({ name: selectableGroupNames })
+    },
+    {
+      disabled: readOnly
+    }
+  );
 
   const groupOptions = response?.data?.map(group => ({
     label: group.labels[locale] ?? group.name,

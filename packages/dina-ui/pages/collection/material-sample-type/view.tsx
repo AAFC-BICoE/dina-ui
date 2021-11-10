@@ -1,59 +1,21 @@
-import {
-  BackButton,
-  ButtonBar,
-  DeleteButton,
-  DinaForm,
-  useQuery,
-  withResponse
-} from "common-ui";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
-import { Head, Nav } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaForm } from "common-ui";
+import { ViewPageLayout } from "../../../components";
 import { MaterialSampleType } from "../../../types/collection-api";
-
 import { MaterialSampleTypeFormFields } from "./edit";
 
-export function MaterialSampleTypeDetailsPage({ router }: WithRouterProps) {
-  const id = String(router.query.id);
-  const { formatMessage } = useDinaIntl();
-
-  const materialSampleTypeQuery = useQuery<MaterialSampleType>({
-    path: `collection-api/material-sample-type/${id}`
-  });
-
+export default function MaterialSampleTypeDetailsPage() {
   return (
-    <div>
-      <Head
-        title={formatMessage("materialSampleTypeViewTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
-      <Nav />
-      <main className="container">
-        <ButtonBar>
-          <BackButton
-            entityId={id}
-            entityLink="/collection/material-sample-type"
-            byPassView={true}
-          />
-          <DeleteButton
-            className="ms-5"
-            id={id}
-            options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample-type/list"
-            type="material-sample-type"
-          />
-        </ButtonBar>
-        {withResponse(materialSampleTypeQuery, ({ data: mst }) => (
-          <DinaForm<MaterialSampleType> initialValues={mst} readOnly={true}>
-            <MaterialSampleTypeFormFields />
-          </DinaForm>
-        ))}
-      </main>
-    </div>
+    <ViewPageLayout<MaterialSampleType>
+      form={props => (
+        <DinaForm<MaterialSampleType> {...props}>
+          <MaterialSampleTypeFormFields />
+        </DinaForm>
+      )}
+      query={id => ({ path: `collection-api/material-sample-type/${id}` })}
+      entityLink="/collection/material-sample-type"
+      type="material-sample-type"
+      apiBaseUrl="/collection-api"
+      isRestricted={true}
+    />
   );
 }
-
-export default withRouter(MaterialSampleTypeDetailsPage);

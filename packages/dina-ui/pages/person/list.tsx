@@ -29,12 +29,7 @@ export default function AgentListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("personListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("personListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -48,7 +43,17 @@ export default function AgentListPage() {
           id="person-list"
           queryTableProps={{
             columns: AGENT_TABLE_COLUMNS,
-            path: "agent-api/person"
+            path: "agent-api/person",
+            defaultSort: [
+              {
+                id: "familyNames",
+                desc: false
+              },
+              {
+                id: "givenNames",
+                desc: false
+              }
+            ]
           }}
         />
       </main>
