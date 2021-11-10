@@ -1,7 +1,6 @@
 import { DinaForm } from "../../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
-import { CatalogueOfLifeNameSearchResult } from "../name-search-types";
 import { NameUsageSearchResult } from "../nameusage-types";
 
 const mockOnChange = jest.fn((val, form) =>
@@ -28,6 +27,7 @@ describe("CatalogueOfLifeNameField component", () => {
           scientificNameSourceField="scientificNameSource"
           onChange={mockOnChange}
           fetchJson={mockFetchJson}
+          dateSupplier={() => "2021-11-09"}
         />
       </DinaForm>
     );
