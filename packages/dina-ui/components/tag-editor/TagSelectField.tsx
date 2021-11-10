@@ -82,7 +82,7 @@ function TagSelect({
   tagsFieldName = "tags"
 }: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
-  const { isAdmin, groupNames } = useAccount();
+  const { roles, groupNames } = useAccount();
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
@@ -91,7 +91,7 @@ function TagSelect({
 
   const filter = filterBy(
     [tagsFieldName],
-    !isAdmin
+    !roles.includes("dina-admin")
       ? {
           extraFilters: [
             // Restrict the list to just the user's groups:

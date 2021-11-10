@@ -34,11 +34,11 @@ export function CollectionSelectField(
   props: SetOptional<ResourceSelectFieldProps<Collection>, ProvidedProps>
 ) {
   const [{ value }] = useField(props.name);
-  const { isAdmin, groupNames } = useAccount();
+  const { roles, groupNames } = useAccount();
 
   const filter = filterBy(
     ["name"],
-    !isAdmin
+    !roles.includes("dina-admin")
       ? {
           extraFilters: [
             // Restrict the list to just the user's groups:
@@ -60,11 +60,12 @@ export function CollectionSelectField(
   return withResponse(collectionQuery, ({ data, meta }) => {
     // Disable this input when the collection set is the only one available:
     const collectionCannotBeChanged =
-      !isAdmin && meta?.totalResourceCount === 1 && data[0].id === value?.id;
+      !roles.includes("dina-admin") &&
+      meta?.totalResourceCount === 1 &&
+      data[0].id === value?.id;
 
     return (
       <ResourceSelectField<Collection>
-        key={String(isAdmin)}
         readOnlyLink="/collection/collection/view?id="
         filter={filter}
         model="collection-api/collection"

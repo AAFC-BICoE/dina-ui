@@ -39,8 +39,7 @@ export function MockAppContextProvider({
       logout: noop,
       roles: ["user"],
       token: "test-token",
-      username: "test-user",
-      isAdmin: false
+      username: "test-user"
     }),
     []
   );

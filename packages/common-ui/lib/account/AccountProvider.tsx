@@ -5,8 +5,6 @@ import {
 } from "@react-keycloak/nextjs";
 import { uniq } from "lodash";
 import { createContext, ReactNode, useContext } from "react";
-import { useQuery } from "..";
-import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
 
 export interface AccountContextI {
   agentId?: string;
@@ -19,8 +17,6 @@ export interface AccountContextI {
   roles: string[];
   username?: string;
   subject?: string;
-  isAdmin?: boolean;
-  rolesPerGroup?: Record<string, string[] | undefined>;
 }
 
 const AccountContext = createContext<AccountContextI | null>(null);
@@ -54,7 +50,7 @@ export function useAccount(): AccountContextI {
   if (!ctx) {
     throw new Error("No AccountContext available.");
   }
-  return ctx;
+  return ctx as any;
 }
 
 /** Converts the Keycloak context to the generic AccountContextI. */
@@ -78,16 +74,6 @@ function KeycloakAccountProviderInternal({
     keycloakGroups &&
     keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
-  const userQuery = useQuery<DinaUser>(
-    { path: `user-api/user/${subject}` },
-    { disabled: !subject }
-  );
-
-  const rolesPerGroup = userQuery.response?.data?.rolesPerGroup;
-
-  // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
-  const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
-
   return (
     <AccountProvider
       value={{
@@ -100,9 +86,7 @@ function KeycloakAccountProviderInternal({
         roles: realmAccess?.roles ?? [],
         token,
         username,
-        subject,
-        isAdmin,
-        rolesPerGroup
+        subject
       }}
     >
       {children}
