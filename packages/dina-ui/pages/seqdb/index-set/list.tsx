@@ -30,12 +30,7 @@ export default function IndexSetListPage() {
 
   return (
     <>
-      <Head
-        title={formatMessage("indexSetListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("indexSetListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

@@ -3,6 +3,7 @@ import {
   FieldHeader,
   FieldSet,
   LoadingSpinner,
+  Tooltip,
   useBulkGet,
   useDinaFormContext,
   useModal,
@@ -16,6 +17,7 @@ import { AllowAttachmentsConfig, AttachmentSection } from "..";
 import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
+import Link from "next/link";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -146,15 +148,40 @@ export function AttachmentsEditor({
               <div className="mb-3">
                 <ReactTable
                   columns={[
-                    ...[
-                      "originalFilename",
-                      "acCaption",
-                      "xmpMetadataDate",
-                      "acTags"
-                    ].map(accessor => ({
-                      accessor,
-                      Header: <FieldHeader name={accessor} />
-                    })),
+                    {
+                      accessor: "originalFilename",
+                      Header: <FieldHeader name="originalFilename" />,
+                      Cell: ({ original: metadata }) => {
+                        // When this Metadata has been deleted, show a "deleted" message in this cell:
+                        if (Object.keys(metadata).length === 2) {
+                          return (
+                            <div>
+                              {`<${formatMessage("deleted")}>`}
+                              <Tooltip
+                                id="deletedMetadata_tooltip"
+                                intlValues={{ id: metadata.id }}
+                              />
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <Link
+                            href={`/object-store/object/view?id=${metadata.id}`}
+                          >
+                            <a target="_blank">
+                              {metadata?.originalFilename ?? metadata.id}
+                            </a>
+                          </Link>
+                        );
+                      }
+                    },
+                    ...["acCaption", "xmpMetadataDate", "acTags"].map(
+                      accessor => ({
+                        accessor,
+                        Header: <FieldHeader name={accessor} />
+                      })
+                    ),
                     {
                       Header: <FieldHeader name={formatMessage("remove")} />,
                       Cell: ({ original: { id: mId } }) => (
@@ -168,8 +195,8 @@ export function AttachmentsEditor({
                       )
                     }
                   ]}
-                  data={metadatas}
-                  minRows={value.length}
+                  data={metadatas ?? []}
+                  minRows={metadatas?.length ?? 0}
                   showPagination={false}
                 />
               </div>

@@ -1,53 +1,106 @@
-import { KeyboardEvent } from "react";
-import DatePicker from "react-datepicker";
-import { DateView } from "../date/DateView";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import classnames from "classnames";
+import moment from "moment";
+import { ComponentProps, FocusEvent, SyntheticEvent } from "react";
+import DatePicker from "react-datepicker";
+import { useIntl } from "react-intl";
+import { FieldWrapperProps } from "..";
+import { DateView } from "../date/DateView";
+import { FieldWrapper } from "./FieldWrapper";
 
-export interface DateFieldProps {
+export interface DateFieldProps extends FieldWrapperProps {
   showTime?: boolean;
   disabled?: boolean;
-  onKeyDown?: (event: KeyboardEvent<HTMLDivElement>) => void;
 }
 
+const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
+
 /** Formik-connected date input. */
-export function DateField(props: LabelWrapperParams & DateFieldProps) {
-  const { showTime, disabled, onKeyDown } = props;
+export function DateField(props: DateFieldProps) {
+  const { showTime, disabled } = props;
+
+  const { formatMessage } = useIntl();
+
+  function validate(value: unknown) {
+    if (value && typeof value === "string") {
+      if (!props.showTime) {
+        if (!DATE_REGEX_NO_TIME.test(value)) {
+          return formatMessage({ id: "dateMustBeFormattedYyyyMmDd" });
+        }
+        // Check for invalid dates like 2021-02-29
+        const parsed = moment(value, true);
+        if (!parsed.isValid()) {
+          return `${formatMessage({ id: "invalidDate" })}: ${value}`;
+        }
+      }
+    }
+  }
 
   return (
     <FieldWrapper
       {...props}
       readOnlyRender={val => (showTime ? <DateView date={val} /> : val)}
+      validate={validate}
+      disableLabelClick={true} // Stops the datepicker from staying open after choosing a date.
     >
-      {({ setValue, value, invalid }) => {
-        function onChange(date: Date) {
-          if (showTime) {
-            setValue(date && date.toISOString());
-          } else {
-            setValue(date && date.toISOString().slice(0, 10));
+      {({ formik, invalid, setValue, value }) => {
+        function onChange(
+          date: Date | null,
+          event?: SyntheticEvent<any, Event>
+        ) {
+          // When selecting from the date picker:
+          if (!event || event?.type === "click" || event?.type === "keydown") {
+            setValue(
+              date && date.toISOString().slice(0, showTime ? undefined : 10)
+            );
           }
         }
 
+        function onChangeRaw(event: FocusEvent<HTMLInputElement>) {
+          // When typing into the input:
+          if (event?.type === "change") {
+            const newText = event.target.value;
+            setValue(newText);
+          }
+        }
+
+        function onBlur(event: FocusEvent<HTMLInputElement, Element>) {
+          const error = validate?.(event.target.value);
+          if (error) {
+            formik.setFieldError(props.name, error);
+          }
+        }
+
+        // Date object or null is needed by datepicker:
+        const parsedValue = value ? moment(value, true) : null;
+        const dateObject = parsedValue?.isValid() ? parsedValue.toDate() : null;
+
+        // Props that depend on "showTime":
+        const datePickerProps: Partial<ComponentProps<typeof DatePicker>> =
+          showTime
+            ? {
+                dateFormat: "Pp",
+                showTimeSelect: true
+              }
+            : {
+                dateFormat: "yyyy-MM-dd",
+                placeholderText: "YYYY-MM-DD",
+                value // The text value in the input element.
+              };
+
         return (
-          <div>
+          <div className={classnames(invalid && "is-invalid")}>
             <DatePicker
               className={classnames("form-control", invalid && "is-invalid")}
               wrapperClassName="w-100"
-              dateFormat={showTime ? "Pp" : "yyyy-MM-dd"}
               isClearable={!disabled}
               onChange={onChange}
-              selected={
-                value
-                  ? showTime
-                    ? new Date(`${value}`)
-                    : new Date(`${value}T12:00:00Z`)
-                  : null
-              }
-              showTimeSelect={showTime}
+              onChangeRaw={onChangeRaw}
               showYearDropdown={true}
               todayButton="Today"
               disabled={disabled}
-              onKeyDown={onKeyDown}
+              onBlur={onBlur}
+              selected={dateObject}
+              {...datePickerProps}
             />
           </div>
         );

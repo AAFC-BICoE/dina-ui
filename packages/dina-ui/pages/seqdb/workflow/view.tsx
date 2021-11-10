@@ -32,9 +32,6 @@ export default function WorkflowViewPage() {
         title={`${formatMessage("workflowViewTitle")}${
           response ? `: ${response.data.name}` : ""
         }`}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
       />
       <Nav />
       <ButtonBar>

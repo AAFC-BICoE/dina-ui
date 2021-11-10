@@ -1,4 +1,4 @@
-import { PersonDetailsPage } from "../../../pages/person/view";
+import PersonDetailsPage from "../../../pages/person/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";
 
@@ -24,21 +24,19 @@ const apiContext: any = {
   apiClient: { get: mockGet }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("Person details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <PersonDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the Person details", async () => {
-    const wrapper = mountWithAppContext(
-      <PersonDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PersonDetailsPage />, { apiContext });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

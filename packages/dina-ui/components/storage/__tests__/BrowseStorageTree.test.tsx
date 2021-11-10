@@ -139,7 +139,8 @@ describe("BrowseStorageTree component", () => {
       page: {
         limit: 100,
         offset: 0
-      }
+      },
+      sort: "storageUnitType.name,name"
     });
 
     wrapper
@@ -159,7 +160,8 @@ describe("BrowseStorageTree component", () => {
       page: {
         limit: 100,
         offset: 0
-      }
+      },
+      sort: "storageUnitType.name,name"
     });
 
     // Reset the search:
@@ -178,7 +180,8 @@ describe("BrowseStorageTree component", () => {
       page: {
         limit: 100,
         offset: 0
-      }
+      },
+      sort: "storageUnitType.name,name"
     });
   });
 });

@@ -45,12 +45,7 @@ export default function SangerWorkflowListPage() {
 
   return (
     <div>
-      <Head
-        title={title}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={title} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
