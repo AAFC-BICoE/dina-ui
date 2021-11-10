@@ -35,6 +35,7 @@ export function AssociationsField() {
         <CatalogueOfLifeNameField
           name={"hostOrganism.name"}
           customName="name"
+          isDetermination={false}
         />
         <TextField
           multiLines={true}

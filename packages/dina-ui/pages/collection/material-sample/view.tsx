@@ -95,12 +95,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head
-        title={formatMessage("materialSampleViewTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
       {withResponse(materialSampleQuery, ({ data: materialSample }) => {
         const hasPreparations = PREPARATION_FIELDS.some(

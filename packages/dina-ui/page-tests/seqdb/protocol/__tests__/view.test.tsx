@@ -1,4 +1,4 @@
-import { ProtocolDetailsPage } from "../../../../pages/seqdb/protocol/view";
+import ProtocolDetailsPage from "../../../../pages/seqdb/protocol/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   Protocol,
@@ -24,25 +24,24 @@ const mockGet = jest.fn(async () => {
 
 const apiContext: any = { apiClient: { get: mockGet } };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } }),
+  withRouter: fn => fn
+}));
+
 describe("Protocol details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the Protocol details", async () => {
-    const wrapper = mountWithAppContext(
-      <ProtocolDetailsPage router={{ query: { id: "100" } } as any} />,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ProtocolDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
@@ -58,6 +57,8 @@ describe("Protocol details page", () => {
     wrapper.debug();
 
     // The protol's kit name should be rendered in a FieldView.
-    expect(wrapper.containsMatchingElement(<div>test kit</div>)).toEqual(true);
+    expect(wrapper.find(".kit-field .read-only-view").text()).toEqual(
+      "test kit"
+    );
   });
 });

@@ -8,10 +8,9 @@ import {
   ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
-  useDinaFormContext,
-  Tooltip
+  Tooltip,
+  useDinaFormContext
 } from "common-ui";
-import DOMPurify from "dompurify";
 import { FieldArray, FormikContextType } from "formik";
 import { clamp, get } from "lodash";
 import { useState } from "react";
@@ -26,6 +25,7 @@ import {
   Vocabulary
 } from "../../types/collection-api";
 import { useAddPersonModal } from "../add-person/PersonForm";
+import { isArray } from "lodash";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -44,10 +44,10 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     determinedOn: true,
     qualifier: true,
     scientificNameSource: true,
-    scientificNameDetails: true,
     scientificName: true,
     transcriberRemarks: true,
-    isPrimary: true
+    isPrimary: true,
+    scientificNameDetails: true
   };
 
 /** All fields of the Determination type. */
@@ -177,13 +177,38 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       scientificNameSourceField={
                         fieldProps("scientificNameSource").name
                       }
-                      onChange={(newValue, formik) =>
+                      scientificNameDetailsSrcUrlField={
+                        fieldProps("scientificNameDetails.sourceUrl").name
+                      }
+                      scientificNameDetailsLabelHtmlField={
+                        fieldProps("scientificNameDetails.labelHtml").name
+                      }
+                      onChange={(newValue, formik) => {
                         formik.setFieldValue(
                           fieldProps("scientificNameSource").name,
                           newValue ? "COLPLUS" : null
-                        )
-                      }
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameDetails.labelHtml").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].labelHtml
+                            : null
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameDetails.sourceUrl").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].sourceUrl
+                            : null
+                        );
+                        formik.setFieldValue(
+                          fieldProps("scientificNameDetails.recordedOn").name,
+                          newValue && isArray(newValue)
+                            ? newValue[0].recordedOn
+                            : null
+                        );
+                      }}
                       index={index}
+                      isDetermination={true}
                     />
                     <ResourceSelectField<Person>
                       {...fieldProps("determiner")}
@@ -317,12 +342,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     suggestions={(_, formik) =>
                       formik.values.determination?.flatMap(det => [
                         det.verbatimScientificName,
-                        // Scientific name can be html:
-                        det.scientificName &&
-                          new DOMParser().parseFromString(
-                            DOMPurify.sanitize(det.scientificName),
-                            "text/html"
-                          ).documentElement.textContent
+                        det.scientificName
                       ]) ?? []
                     }
                   />

@@ -51,10 +51,23 @@ describe("CatalogueOfLifeNameField component", () => {
 
     wrapper.find("button.col-name-select-button").at(1).simulate("click");
 
-    expect(mockOnChange).lastCalledWith(
-      '<a rel="noopener" target="_blank" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
-      expect.anything()
-    );
+    expect(mockOnChange).toBeCalledTimes(2);
+
+    expect(mockOnChange.mock.calls).toEqual([
+      ["  Poa muralis  ", expect.anything()],
+      [
+        [
+          {
+            labelHtml: "<i>Poa muralis</i> Wibel, nom. illeg.",
+            recordedOn: "2021-11-09",
+            sourceUrl:
+              "https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"
+          },
+          expect.anything()
+        ],
+        expect.anything()
+      ]
+    ]);
     // The whitespace for the query string should be trimmed:
     expect(mockFetchJson).lastCalledWith(
       "https://api.catalogueoflife.org/dataset/2328/nameusage?q=Poa+muralis"
@@ -68,29 +81,9 @@ describe("CatalogueOfLifeNameField component", () => {
     wrapper.update();
 
     expect(mockOnSubmit).lastCalledWith({
-      scientificName:
-        '<a rel="noopener" target="_blank" href="https://data.catalogueoflife.org/dataset/2328/name/f3d46805-704b-459a-a3f6-58816dad2138"><i>Poa muralis</i> Wibel, nom. illeg.</a>',
+      scientificName: "Poa muralis Wibel, nom. illeg.",
       scientificNameSource: "COLPLUS"
     });
-  });
-
-  it("Can remove the value.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{
-          scientificName: "Poa muralis Wibel, nom. illeg.",
-          scientificNameSource: "COLPLUS"
-        }}
-        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
-      >
-        <CatalogueOfLifeNameField
-          name="scientificName"
-          scientificNameSourceField="scientificNameSource"
-          onChange={mockOnChange}
-          fetchJson={mockFetchJson}
-        />
-      </DinaForm>
-    );
 
     // Remove the name:
     wrapper.find("button.remove-button").simulate("click");

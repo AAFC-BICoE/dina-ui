@@ -4,27 +4,47 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
-import { useState, ReactNode } from "react";
+import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
 import DOMPurify from "dompurify";
-import { Field } from "formik";
+import { Field, FormikProps } from "formik";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
+import moment from "moment";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
   fetchJson?: (url: string) => Promise<any>;
 
-  onSelect?: (selection: string | null) => void;
+  onSelect?: (
+    selection: (string | ScientificNameSourceDetails | undefined)[]
+  ) => void;
 
   /** The determination index within the material sample. */
   index?: number;
+
+  setValue?: (newValue: any) => void;
+
+  /** user entered initial search value. */
+  initSearchValue?: string;
+
+  onChange?: (selection: string | null, formik: FormikProps<any>) => void;
+
+  formik?: FormikProps<any>;
+
+  isDetermination?: boolean;
 }
 
 export function CatalogueOfLifeSearchBox({
   fetchJson,
   onSelect,
-  index
+  index,
+  setValue,
+  initSearchValue,
+  onChange,
+  formik,
+  isDetermination
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -50,10 +70,21 @@ export function CatalogueOfLifeSearchBox({
         searchValue,
         fetchJson
       }),
-    timeoutMs: 1000
+    timeoutMs: 1000,
+    initSearchValue
   });
 
   const nameResults = searchResult?.result;
+
+  const onChangeInternal = value => {
+    setInputValue(value);
+    // Will save the user entry if it is not the determination scientific name
+    // use case is for association host organism
+    if (!isDetermination) {
+      setValue?.(value);
+    }
+    onChange?.(value, formik as any);
+  };
 
   return (
     <div className="card card-body border">
@@ -85,7 +116,7 @@ export function CatalogueOfLifeSearchBox({
             <input
               aria-label={formatMessage("colSearchLabel")}
               className="form-control col-search-input"
-              onChange={e => setInputValue(e.target.value)}
+              onChange={e => onChangeInternal(e.target.value)}
               onFocus={e => e.target.select()}
               onKeyDown={e => {
                 if (e.keyCode === 13) {
@@ -107,29 +138,32 @@ export function CatalogueOfLifeSearchBox({
           </div>
         </div>
       </div>
-      <Field>
-        {({ form: { values: formState } }) => {
-          const materialSample = formState;
-          const verbatimScientificName =
-            materialSample.determination?.[index ?? 0]?.verbatimScientificName;
-          const hasVerbatimScientificName = !!verbatimScientificName;
-          return (
-            hasVerbatimScientificName && (
-              <div className="d-flex align-items-center mb-3">
-                <div className="pe-3">
-                  <DinaMessage id="search" />:
+      {isDetermination && (
+        <Field>
+          {({ form: { values: formState } }) => {
+            const materialSample = formState;
+            const verbatimScientificName =
+              materialSample.determination?.[index ?? 0]
+                ?.verbatimScientificName;
+            const hasVerbatimScientificName = !!verbatimScientificName;
+            return (
+              hasVerbatimScientificName && (
+                <div className="d-flex align-items-center mb-3">
+                  <div className="pe-3">
+                    <DinaMessage id="search" />:
+                  </div>
+                  <FormikButton
+                    className="btn btn-link"
+                    onClick={() => doThrottledSearch(verbatimScientificName)}
+                  >
+                    <DinaMessage id="field_verbatimScientificName" />
+                  </FormikButton>
                 </div>
-                <FormikButton
-                  className="btn btn-link"
-                  onClick={() => doThrottledSearch(verbatimScientificName)}
-                >
-                  <DinaMessage id="field_verbatimScientificName" />
-                </FormikButton>
-              </div>
-            )
-          );
-        }}
-      </Field>
+              )
+            );
+          }}
+        </Field>
+      )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!nameResults?.length && (
         <div className="list-group">
@@ -148,6 +182,15 @@ export function CatalogueOfLifeSearchBox({
             const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
               ADD_ATTR: ["target", "rel"]
             });
+
+            const detail: ScientificNameSourceDetails = {};
+            detail.labelHtml = result.labelHtml ?? "";
+            detail.sourceUrl = link.href;
+            detail.recordedOn = moment().format("YYYY-MM-DD");
+
+            // Use detail to populate source details fields, result.label to populate the searchbox bound field
+            const resultArray = [detail, result.label];
+
             return (
               <div
                 key={result.id ?? idx}
@@ -159,7 +202,7 @@ export function CatalogueOfLifeSearchBox({
                 <FormikButton
                   className="btn btn-primary col-name-select-button"
                   buttonProps={() => ({ style: { width: "8rem" } })}
-                  onClick={() => onSelect?.(safeHtmlLink)}
+                  onClick={() => onSelect?.(resultArray)}
                 >
                   <DinaMessage id="select" />
                 </FormikButton>
