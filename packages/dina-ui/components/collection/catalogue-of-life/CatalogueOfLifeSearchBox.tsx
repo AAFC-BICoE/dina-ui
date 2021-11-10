@@ -34,9 +34,6 @@ export interface CatalogueOfLifeSearchBoxProps {
   formik?: FormikProps<any>;
 
   isDetermination?: boolean;
-
-  /** Mock this out in tests so it gives a predictable value. */
-  dateSupplier?: () => string;
 }
 
 export function CatalogueOfLifeSearchBox({
@@ -47,8 +44,7 @@ export function CatalogueOfLifeSearchBox({
   initSearchValue,
   onChange,
   formik,
-  isDetermination,
-  dateSupplier = () => moment().format("YYYY-MM-DD")
+  isDetermination
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -190,7 +186,7 @@ export function CatalogueOfLifeSearchBox({
             const detail: ScientificNameSourceDetails = {};
             detail.labelHtml = result.labelHtml ?? "";
             detail.sourceUrl = link.href;
-            detail.recordedOn = dateSupplier();
+            detail.recordedOn = moment().format("YYYY-MM-DD");
 
             // Use detail to populate source details fields, result.label to populate the searchbox bound field
             const resultArray = [detail, result.label];

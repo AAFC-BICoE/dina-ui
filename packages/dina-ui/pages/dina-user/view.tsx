@@ -17,7 +17,7 @@ import { DinaUser } from "../../types/user-api/resources/DinaUser";
 
 export default function DinaUserDetailsPage() {
   const router = useRouter();
-  const { isAdmin, rolesPerGroup, subject } = useAccount();
+  const { roles: myRoles, subject } = useAccount();
 
   // Get the user ID from the URL, otherwise use the current user:
   const id = router.query.id?.toString() ?? subject;
@@ -38,11 +38,8 @@ export default function DinaUserDetailsPage() {
     }
   );
 
-  // Editable if current user is dina-admin, or a collection manager of any group:
   const currentUserCanEdit =
-    Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
-      ?.includes("collection-manager") || isAdmin;
+    myRoles.includes("collection-manager") || myRoles.includes("admin");
 
   return (
     <div>

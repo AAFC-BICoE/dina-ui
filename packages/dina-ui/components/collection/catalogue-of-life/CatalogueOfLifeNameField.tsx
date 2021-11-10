@@ -14,9 +14,6 @@ export interface CatalogueOfLifeNameFieldProps extends FieldWrapperProps {
   isDetermination?: boolean;
   scientificNameDetailsSrcUrlField?: string;
   scientificNameDetailsLabelHtmlField?: string;
-
-  /** Mock this out in tests so it gives a predictable value. */
-  dateSupplier?: () => string;
 }
 
 export function CatalogueOfLifeNameField({
@@ -27,7 +24,6 @@ export function CatalogueOfLifeNameField({
   isDetermination,
   scientificNameDetailsSrcUrlField,
   scientificNameDetailsLabelHtmlField,
-  dateSupplier,
   ...fieldWrapperProps
 }: CatalogueOfLifeNameFieldProps) {
   const [searchInitiated, setSearchInitiated] = useState(false);
@@ -120,7 +116,6 @@ export function CatalogueOfLifeNameField({
             formik={formik}
             onChange={onChange}
             isDetermination={isDetermination}
-            dateSupplier={dateSupplier}
           />
         );
       }}

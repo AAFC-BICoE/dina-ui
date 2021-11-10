@@ -1,10 +1,4 @@
-import {
-  LanguageSelector,
-  NavbarUserControl,
-  useAccount,
-  useQuery,
-  withResponse
-} from "common-ui";
+import { LanguageSelector, NavbarUserControl, useAccount } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -12,18 +6,15 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext, useState } from "react";
 import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
 import Dropdown from "react-bootstrap/Dropdown";
-import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 
 export function Nav() {
-  const { isAdmin, rolesPerGroup } = useAccount();
+  const { roles } = useAccount();
   const { formatMessage } = useDinaIntl();
   const { locale } = useContext(intlContext);
 
-  // Editable if current user is dina-admin, or a collection manager of any group:
-  const showUserNav =
-    Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
-      ?.includes("collection-manager") || isAdmin;
+  // Only show the Users UI to collection-managers and admins:
+  const showUsersLinks =
+    roles.includes("collection-manager") || roles.includes("admin");
 
   return (
     <>
@@ -102,7 +93,7 @@ export function Nav() {
               <li className="list-inline-item my-auto">
                 <NavCollectionDropdown />
               </li>
-              {showUserNav && (
+              {showUsersLinks && (
                 <li className="list-inline-item my-auto">
                   <NavDinaUserDropdown />
                 </li>
