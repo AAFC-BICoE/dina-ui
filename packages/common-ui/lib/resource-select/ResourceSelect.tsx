@@ -65,6 +65,12 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Determines if the async options should be rendered before the search suggestions. */
   asyncOptionsFirst?: boolean;
 
+  /**
+   * If the async options should always be displayed even after searching,
+   * this will even replace the "no options" message.
+   */
+  asyncOptionsAlwaysVisible?: boolean;
+
   isDisabled?: boolean;
 
   /** Omits the "<none>" option. */
@@ -113,6 +119,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   value,
   asyncOptions,
   asyncOptionsFirst = false,
+  asyncOptionsAlwaysVisible = false,
   isDisabled,
   omitNullOption,
   invalid,
@@ -169,6 +176,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const asyncOptionsList =
     asyncOptions?.map(option => ({
       ...option,
+      value: asyncOptionsAlwaysVisible ? search.input : null,
       label: <strong>{option.label}</strong>
     })) ?? [];
 
