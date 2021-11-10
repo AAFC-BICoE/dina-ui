@@ -57,9 +57,9 @@ describe("ErrorViewer component", () => {
 
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
       [
-        "Nested Array Element Field: Nested Array Element Error",
+        "Top Level Field: Error",
         "Nested Field: Nested Error",
-        "Top Level Field: Error"
+        "Nested Array Element Field: Nested Array Element Error"
       ].join("\n")
     );
   });
