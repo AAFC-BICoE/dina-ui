@@ -151,13 +151,6 @@ const Home: React.FunctionComponent = () => (
           <DinaMessage id="collectionSectionTitle" />
         </h2>
         <ul>
-          <li className="d-none">
-            <Link href="/collection/collector-group/list">
-              <a>
-                <DinaMessage id="collectorGroupListTitle" />
-              </a>
-            </Link>
-          </li>
           <li>
             <Link href="/collection/collection/list">
               <a>
