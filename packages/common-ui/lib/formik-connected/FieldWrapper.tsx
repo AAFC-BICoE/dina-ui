@@ -2,6 +2,7 @@ import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
 import { isArray } from "lodash";
 import { ReactNode, useMemo } from "react";
+import { ErrorBoundary } from "react-error-boundary";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
@@ -59,6 +60,8 @@ export interface LabelWrapperParams {
 
   /** Override FastField's default shouldComponentUpdate */
   shouldUpdate?: (nextProps: LabelWrapperParams, props: {}) => boolean;
+
+  validate?: (value: any) => string | void;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
@@ -100,7 +103,8 @@ export function FieldWrapper({
   tooltipLinkText,
   templateCheckboxFieldName,
   removeLabelTag,
-  shouldUpdate
+  shouldUpdate,
+  validate
 }: FieldWrapperProps) {
   const { horizontal, readOnly, isTemplate, enabledFields } =
     useDinaFormContext();
@@ -139,9 +143,18 @@ export function FieldWrapper({
 
   const fieldWrapperInternal = (
     <div className={valueClass} style={{ minHeight: "25px", cursor: "auto" }}>
-      <FastField name={name} shouldUpdate={shouldUpdate}>
+      <FastField name={name} shouldUpdate={shouldUpdate} validate={validate}>
         {({ field: { value }, form, meta: { error } }) => (
-          <>
+          <ErrorBoundary
+            // The error boundary is just for render errors
+            // so an error thrown in a form field's render function kills just that field,
+            // not the whole page.
+            FallbackComponent={({ error: renderError }) => (
+              <div className="alert alert-danger" role="alert">
+                <pre className="mb-0">{renderError.message}</pre>
+              </div>
+            )}
+          >
             {readOnly || !children
               ? readOnlyRender?.(value, form) ?? (
                   <ReadOnlyValue link={link} value={value} />
@@ -160,7 +173,7 @@ export function FieldWrapper({
                 })
               : children}
             {error && <div className="invalid-feedback">{error}</div>}
-          </>
+          </ErrorBoundary>
         )}
       </FastField>
     </div>
