@@ -72,9 +72,7 @@ export function ExistingObjectsAttacher({
     <ListPageLayout
       additionalFilters={filterForm => ({
         // Apply group filter:
-        ...(filterForm.group && { bucket: filterForm.group }),
-        // Filter out the derived objects e.g. thumbnails:
-        rsql: "acSubTypeId==null"
+        ...(filterForm.group && { bucket: filterForm.group })
       })}
       filterAttributes={METADATA_FILTER_ATTRIBUTES}
       filterFormchildren={({ submitForm }) => (

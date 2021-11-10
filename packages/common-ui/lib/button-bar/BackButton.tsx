@@ -12,9 +12,6 @@ interface BackButtonProps {
   /** Boolean to use to by pass the view page if there is none */
   byPassView?: boolean;
 
-  /** The link for where to redirect the user  */
-  navigateTo?: string;
-
   className?: string;
 }
 
@@ -25,24 +22,23 @@ export function BackButton({
   entityId,
   entityLink,
   byPassView,
-  navigateTo,
   className
 }: BackButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
   // When placed in view page, will accept url to navigate to
-  const href = navigateTo
-    ? navigateTo
-    : entityId
-    ? byPassView
-      ? `${entityLink}/list`
-      : `${entityLink}/view?id=${entityId}`
-    : `${entityLink}/list`;
+  const { href, message } =
+    byPassView || !entityId
+      ? { href: `${entityLink}/list`, message: "backToList" as const }
+      : {
+          href: `${entityLink}/view?id=${entityId}`,
+          message: "backToReadOnlyPage" as const
+        };
 
   return (
     <Link href={href}>
       <a className={`my-auto ${className}`}>
-        <CommonMessage id="backLabel" />
+        <CommonMessage id={message} />
       </a>
     </Link>
   );

@@ -2,6 +2,7 @@ import { mount } from "enzyme";
 import { DocWithErrors } from "jsonapi-typescript";
 import { KitsuResource, KitsuResponse } from "kitsu";
 import { last } from "lodash";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ApiClientContext, ApiClientImpl } from "../ApiClientContext";
 import { Query } from "../Query";
 
@@ -64,7 +65,7 @@ const MOCK_500_ERROR: DocWithErrors = {
 };
 
 // Mock Kitsu class' "get" method.
-const mockGet = jest.fn((path, { fields, page }) => {
+const mockGet = jest.fn<any, any>((path, { fields, page }) => {
   if (path === "todo") {
     if (fields && fields.todo === "unknownAttribute") {
       throw MOCK_500_ERROR;
@@ -78,18 +79,7 @@ const mockGet = jest.fn((path, { fields, page }) => {
   }
 });
 
-const contextValue = new ApiClientImpl();
-
-/**
- * Helper method to create a paged query element with the required context.
- */
-function pagedQueryWithContext(pageSpec, childFunction?) {
-  return (
-    <ApiClientContext.Provider value={contextValue}>
-      {pagedQuery(pageSpec, childFunction)}
-    </ApiClientContext.Provider>
-  );
-}
+const testCtx = { apiContext: { apiClient: { get: mockGet } } };
 
 /**
  * Helper method to create a paged query element without the required context.
@@ -102,79 +92,64 @@ function pagedQuery(pageSpec, childFunction?) {
   );
 }
 
-// Mock Kitsu, the client class that talks to the backend.
-jest.mock(
-  "kitsu",
-  () =>
-    class {
-      public get = mockGet;
-    }
-);
-
 describe("Query component", () => {
   const { objectContaining, anything } = expect;
 
-  beforeEach(() => {
-    // Clear the spy's call and instance data.
-    mockGet.mockClear();
-  });
+  beforeEach(jest.clearAllMocks);
 
   it("Renders with loading as true before sending a request", done => {
     let renderCount = 0;
-    mount(
-      <ApiClientContext.Provider value={contextValue}>
-        <Query<Todo[]> query={{ path: "todo" }}>
-          {({ loading }) => {
-            // Query should be rendered once with loading as true.
-            if (renderCount === 0) {
-              expect(loading).toEqual(true);
-              done();
-            }
-            renderCount++;
-            return <div />;
-          }}
-        </Query>
-      </ApiClientContext.Provider>
+    mountWithAppContext(
+      <Query<Todo[]> query={{ path: "todo" }}>
+        {({ loading }) => {
+          // Query should be rendered once with loading as true.
+          if (renderCount === 0) {
+            expect(loading).toEqual(true);
+            done();
+          }
+          renderCount++;
+          return <div />;
+        }}
+      </Query>,
+      testCtx
     );
   });
 
   it("Passes single-resource data from the mocked API to child components", done => {
-    mount(
-      <ApiClientContext.Provider value={contextValue}>
-        <Query<Todo> query={{ path: "todo/25" }}>
-          {({ loading, response }) => {
-            if (response) {
-              expect(loading).toEqual(false);
-              expect(response).toEqual(MOCK_TODO_RESPONSE);
-              // Make sure the response data field has the Todo type.
-              expect(response.data.name).toBeDefined();
-              done();
-            }
-            return <div />;
-          }}
-        </Query>
-      </ApiClientContext.Provider>
+    mountWithAppContext(
+      <Query<Todo> query={{ path: "todo/25" }}>
+        {({ loading, response }) => {
+          if (response) {
+            expect(loading).toEqual(false);
+            expect(response).toEqual(MOCK_TODO_RESPONSE);
+            // Make sure the response data field has the Todo type.
+            expect(response.data.name).toBeDefined();
+            done();
+          }
+          return <div />;
+        }}
+      </Query>,
+      testCtx
     );
   });
 
   it("Passes list data from the mocked API to child components", done => {
-    mount(
-      <ApiClientContext.Provider value={contextValue}>
-        <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
-          {({ loading, response }) => {
-            if (response) {
-              expect(loading).toEqual(false);
-              expect(response).toEqual(MOCK_TODOS_RESPONSE);
-              // Make sure the response data field has the Todo array type.
-              expect(response.data[0].name).toBeDefined();
-              // Make sure the response meta field has the MetaWithTotal type.
-              expect(response.meta.totalResourceCount).toBeDefined();
-              done();
-            }
-            return <div />;
-          }}
-        </Query>
-      </ApiClientContext.Provider>
+    mountWithAppContext(
+      <Query<Todo[], MetaWithTotal> query={{ path: "todo" }}>
+        {({ loading, response }) => {
+          if (response) {
+            expect(loading).toEqual(false);
+            expect(response).toEqual(MOCK_TODOS_RESPONSE);
+            // Make sure the response data field has the Todo array type.
+            expect(response.data[0].name).toBeDefined();
+            // Make sure the response meta field has the MetaWithTotal type.
+            expect(response.meta.totalResourceCount).toBeDefined();
+            done();
+          }
+          return <div />;
+        }}
+      </Query>,
+      testCtx
     );
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -192,21 +167,20 @@ describe("Query component", () => {
   });
 
   it("Supports JSONAPI GET params", () => {
-    mount(
-      <ApiClientContext.Provider value={contextValue}>
-        <Query<Todo[]>
-          query={{
-            fields: { todo: "name,description" },
-            filter: { name: "todo 2" },
-            include: "group",
-            page: { offset: 200, limit: 100 },
-            path: "todo",
-            sort: "name"
-          }}
-        >
-          {() => <div />}
-        </Query>
-      </ApiClientContext.Provider>
+    mountWithAppContext(
+      <Query<Todo[]>
+        query={{
+          fields: { todo: "name,description" },
+          filter: { name: "todo 2" },
+          include: "group",
+          page: { offset: 200, limit: 100 },
+          path: "todo",
+          sort: "name"
+        }}
+      >
+        {() => <div />}
+      </Query>,
+      testCtx
     );
 
     expect(mockGet).toHaveBeenCalledTimes(1);
@@ -227,21 +201,20 @@ describe("Query component", () => {
 
   it("Renders an error to child components", done => {
     // Get an error by requesting an attribute that the resource doesn't have.
-    mount(
-      <ApiClientContext.Provider value={contextValue}>
-        <Query<Todo[]>
-          query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
-        >
-          {({ loading, error, response }) => {
-            if (!loading) {
-              expect(error).toEqual(MOCK_500_ERROR);
-              expect(response).toBeUndefined();
-              done();
-            }
-            return <div />;
-          }}
-        </Query>
-      </ApiClientContext.Provider>
+    mountWithAppContext(
+      <Query<Todo[]>
+        query={{ path: "todo", fields: { todo: "unknownAttribute" } }}
+      >
+        {({ loading, error, response }) => {
+          if (!loading) {
+            expect(error).toEqual(MOCK_500_ERROR);
+            expect(response).toBeUndefined();
+            done();
+          }
+          return <div />;
+        }}
+      </Query>,
+      testCtx
     );
   });
 
@@ -249,8 +222,9 @@ describe("Query component", () => {
     const mockChild = jest.fn(() => null);
 
     // The first render will fetch the data once.
-    const wrapper = mount(
-      pagedQueryWithContext({ offset: 0, limit: 3 }, mockChild)
+    const wrapper = mountWithAppContext(
+      pagedQuery({ offset: 0, limit: 3 }, mockChild),
+      testCtx
     );
     expect(mockGet).toHaveBeenCalledTimes(1);
 
@@ -276,10 +250,8 @@ describe("Query component", () => {
 
     expect(mockGet).toHaveBeenCalledTimes(2);
 
-    // The first response is still rendered when waiting for the second fetch.
-    expect(mockChild).lastCalledWith(
-      objectContaining({ response: MOCK_TODOS_RESPONSE })
-    );
+    // The loading state is returned when waiting for the second fetch.
+    expect(mockChild).lastCalledWith({ loading: true });
 
     // Continue the test after the second request finishes.
     await new Promise(setImmediate);
@@ -293,20 +265,19 @@ describe("Query component", () => {
     const mockChild = jest.fn(() => null);
 
     // Initial render.
-    const wrapper = mount(
-      pagedQueryWithContext({ offset: 0, limit: 3 }, mockChild)
+    const wrapper = mountWithAppContext(
+      pagedQuery({ offset: 0, limit: 3 }, mockChild),
+      testCtx
     );
 
-    // The react async hook renders the component twice when initializing.
     // Renders with loading as true when initially fetching data.
-    expect(mockChild).toHaveBeenCalledTimes(2);
     expect(mockChild).lastCalledWith(objectContaining({ loading: true }));
 
     // Continue the test after the first query finishes.
     await new Promise(setImmediate);
 
     // The component renders a third time when the first query finishes.
-    expect(mockChild).toHaveBeenCalledTimes(3);
+    expect(mockChild).toHaveBeenCalledTimes(2);
     expect(mockChild).lastCalledWith(objectContaining({ loading: false }));
 
     // Render the component again with new props.
@@ -328,7 +299,7 @@ describe("Query component", () => {
     const pageSpec = { offset: 0, limit: 3 };
 
     // The first render will fetch the data once.
-    const wrapper = mount(pagedQueryWithContext(pageSpec));
+    const wrapper = mountWithAppContext(pagedQuery(pageSpec), testCtx);
     expect(mockGet).toHaveBeenCalledTimes(1);
 
     // The second render with the same props will not fetch again.

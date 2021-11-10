@@ -1,5 +1,5 @@
-import { mount } from "enzyme";
-import { ModalProvider, useModal } from "../modal";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { useModal } from "../modal";
 
 function TestComponent() {
   const { closeModal, openModal } = useModal();
@@ -31,11 +31,7 @@ function TestComponentNestedModals() {
 
 describe("Modal", () => {
   it("Lets you open a modal.", () => {
-    const wrapper = mount(
-      <ModalProvider appElement={document.querySelector("body")}>
-        <TestComponent />
-      </ModalProvider>
-    );
+    const wrapper = mountWithAppContext(<TestComponent />);
 
     // Closed initially:
     expect(wrapper.find(".test-modal-content").exists()).toEqual(false);
@@ -54,11 +50,7 @@ describe("Modal", () => {
   });
 
   it("Lets you open multiple modals in first-in-last-out order.", async () => {
-    const wrapper = mount(
-      <ModalProvider appElement={document.querySelector("body")}>
-        <TestComponentNestedModals />
-      </ModalProvider>
-    );
+    const wrapper = mountWithAppContext(<TestComponentNestedModals />);
 
     // Open the modal:
     wrapper.find("button.open-modal").simulate("click");

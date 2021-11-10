@@ -9,6 +9,8 @@ export function AuthenticatedApiClientProvider({
   const apiContext = useApiClient();
   const { authenticated, initialized, login, token } = useAccount();
   const authTokenRef = useRef<string>();
+  // Update the token ref on every render:
+  authTokenRef.current = token;
 
   // All pages require authentication.
   // Redirect to the login page if not logged in:
@@ -28,11 +30,6 @@ export function AuthenticatedApiClientProvider({
       return config;
     });
   }, [apiContext.apiClient.axios]);
-
-  // Update the token ref when useAccount's token changes:
-  useEffect(() => {
-    authTokenRef.current = token;
-  }, [token]);
 
   return <>{authenticated && initialized ? children : null}</>;
 }

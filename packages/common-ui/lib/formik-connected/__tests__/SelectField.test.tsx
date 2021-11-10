@@ -51,7 +51,7 @@ describe("SelectField component", () => {
   it("Displays the Formik field's value.", () => {
     const wrapper = getWrapper();
 
-    const { value } = wrapper.find(Select).props();
+    const { value } = wrapper.find<any>(Select).props();
 
     // The selected option object should be passed into the Select component.
     expect(value).toEqual({
@@ -63,16 +63,13 @@ describe("SelectField component", () => {
   it("Changes the Formik field's value.", () => {
     const wrapper = getWrapper();
 
-    const { onChange } = wrapper.find(Select).props();
+    const { onChange } = wrapper.find<any>(Select).props();
 
     // Simulate changing the selected option.
-    onChange(
-      {
-        label: "Fusion Primer",
-        value: "FUSION_PRIMER"
-      },
-      null
-    );
+    onChange({
+      label: "Fusion Primer",
+      value: "FUSION_PRIMER"
+    });
 
     // The new value should be re-rendered into the value-display div.
     expect(wrapper.find("#value-display").text()).toEqual("FUSION_PRIMER");
@@ -83,7 +80,7 @@ describe("SelectField component", () => {
     const wrapper = getWrapper({ onChange: mockOnChange });
 
     // Change the value.
-    wrapper.find(Select).prop("onChange")({ value: "newTestValue" }, null);
+    wrapper.find(Select).prop<any>("onChange")({ value: "newTestValue" });
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith("newTestValue", expect.anything());
@@ -94,10 +91,10 @@ describe("SelectField component", () => {
     const wrapper = getWrapper({ onChange: mockOnChange });
 
     // Change the value to the first two options:
-    wrapper.find(Select).prop("onChange")(
-      [PRIMER_TYPE_OPTIONS[0], PRIMER_TYPE_OPTIONS[1]],
-      null
-    );
+    wrapper.find(Select).prop<any>("onChange")([
+      PRIMER_TYPE_OPTIONS[0],
+      PRIMER_TYPE_OPTIONS[1]
+    ]);
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith(["PRIMER", "MID"], expect.anything());

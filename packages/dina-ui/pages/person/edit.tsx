@@ -11,26 +11,31 @@ export default function PersonEditPage() {
   } = router;
 
   const { formatMessage } = useDinaIntl();
+  const title = id ? "editPersonTitle" : "addPersonTitle";
 
   async function onSubmitSuccess() {
     await router.push(`/person/list`);
   }
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/person"
+        byPassView={true}
+      />
+    </ButtonBar>
+  );
+
   return (
     <div>
-      <Head title={formatMessage("editPersonTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
-      <ButtonBar>
-        <BackButton
-          entityId={id as string}
-          entityLink="/person"
-          byPassView={true}
-        />
-      </ButtonBar>
       <main className="container-fluid">
+        {buttonBar}
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="editPersonTitle" />
             </h1>
             <Query<Person>
@@ -51,7 +56,7 @@ export default function PersonEditPage() {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <DinaMessage id="addPersonTitle" />
             </h1>
             <PersonForm onSubmitSuccess={onSubmitSuccess} />

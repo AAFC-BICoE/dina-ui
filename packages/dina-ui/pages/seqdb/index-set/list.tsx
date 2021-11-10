@@ -33,7 +33,7 @@ export default function IndexSetListPage() {
       <Head title={formatMessage("indexSetListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="indexSetListTitle" />
         </h1>
         <ListPageLayout
@@ -41,7 +41,7 @@ export default function IndexSetListPage() {
           id="index-set-list"
           queryTableProps={{
             columns: INDEX_SET_TABLE_COLUMNS,
-            path: "seqdb-api/indexSet"
+            path: "seqdb-api/index-set"
           }}
         />
       </main>

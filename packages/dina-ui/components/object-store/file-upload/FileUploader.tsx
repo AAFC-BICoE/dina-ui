@@ -113,12 +113,16 @@ export function FileUploader<TValues = any>({
           }}
           styles={{
             dropzone: { overflow: "initial" },
-            inputLabel: { padding: "1.25rem" },
+            inputLabel: { padding: "1.25rem", color: "#333333" },
             preview: { zIndex: "auto" }
           }}
           inputContent={formatMessage("uploadFormInstructions")}
           inputWithFilesContent={formatMessage("addFilesButton")}
           submitButtonContent={formatMessage("submitBtnText")}
+          classNames={{
+            submitButton: "btn btn-success",
+            inputLabelWithFiles: "btn btn-default dzu-inputLabelAddFiles"
+          }}
         />
       </div>
     );

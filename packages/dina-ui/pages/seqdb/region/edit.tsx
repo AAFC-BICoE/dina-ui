@@ -1,6 +1,6 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
@@ -22,15 +22,16 @@ interface RegionFormProps {
 export function RegionEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editRegionTitle" : "addRegionTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editRegionTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editRegionTitle" />
             </h1>
             <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
@@ -46,7 +47,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addRegionTitle" />
             </h1>
             <RegionForm router={router} />
@@ -85,22 +86,29 @@ function RegionForm({ region, router }: RegionFormProps) {
         <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/region" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-        <div className="row">
-          <TextField className="col-md-2" name="name" />
-          <TextField className="col-md-2" name="symbol" />
-          <TextField className="col-md-2" name="description" />
-        </div>
-        <SubmitButton />
-      </div>
+      <RegionFormFields />
     </DinaForm>
+  );
+}
+
+export function RegionFormFields() {
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-6"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="name" />
+        <TextField className="col-md-6" name="symbol" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-6" name="description" />
+      </div>
+    </div>
   );
 }
 

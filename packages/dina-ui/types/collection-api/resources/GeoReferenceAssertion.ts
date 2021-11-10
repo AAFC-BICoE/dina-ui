@@ -15,6 +15,19 @@ export interface GeoReferenceAssertionAttributes {
   dwcGeoreferenceVerificationStatus?: GeoreferenceVerificationStatus;
   isPrimary?: boolean;
   georeferencedBy?: (string | Person)[];
+
+  includeAllGeoReference?: boolean;
+  dwcDecimalLatitudeEnabled?: boolean;
+  dwcDecimalLongitudeEnabled?: boolean;
+  dwcCoordinateUncertaintyInMetersEnabled?: boolean;
+  dwcGeoreferencedDateEnabled?: boolean;
+  literalGeoreferencedByEnabled?: boolean;
+  dwcGeoreferenceProtocolEnabled?: boolean;
+  dwcGeoreferenceSourcesEnabled?: boolean;
+  dwcGeoreferenceRemarksEnabled?: boolean;
+  dwcGeodeticDatumEnabled?: boolean;
+  dwcGeoreferenceVerificationStatusEnabled?: boolean;
+  georeferencedByEnabled?: boolean;
 }
 
 export enum GeoreferenceVerificationStatus {

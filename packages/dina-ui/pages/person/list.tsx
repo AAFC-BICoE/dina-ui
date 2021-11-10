@@ -32,7 +32,7 @@ export default function AgentListPage() {
       <Head title={formatMessage("personListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="personListTitle" />
         </h1>
         <ButtonBar>
@@ -43,7 +43,17 @@ export default function AgentListPage() {
           id="person-list"
           queryTableProps={{
             columns: AGENT_TABLE_COLUMNS,
-            path: "agent-api/person"
+            path: "agent-api/person",
+            defaultSort: [
+              {
+                id: "familyNames",
+                desc: false
+              },
+              {
+                id: "givenNames",
+                desc: false
+              }
+            ]
           }}
         />
       </main>

@@ -79,7 +79,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
             value: <DateView date={metadata.xmpMetadataDate} />
           },
           "acMetadataCreator.displayName",
-          "acSubType"
+          "acSubtype"
         ]}
         title={formatMessage("metadataUploadDetailsLabel")}
       />
@@ -106,20 +106,14 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "dcCreator.displayName",
           "dcType",
           "dcFormat",
-          "acCaption"
+          "acCaption",
+          "orientation"
         ]}
         title={formatMessage("metadataMediaDetailsLabel")}
       />
       <MetadataAttributeGroup
         metadata={metadata}
-        fields={[
-          "dcRights",
-          "xmpRightsWebStatement",
-          "publiclyReleasable",
-          ...(metadata.publiclyReleasable
-            ? []
-            : ["notPubliclyReleasableReason"])
-        ]}
+        fields={["dcRights", "xmpRightsWebStatement"]}
         title={formatMessage("metadataRightsDetailsLabel")}
       />
       <MetadataAttributeGroup
@@ -127,7 +121,6 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
         title={formatMessage("metadataFileStorageDetailsLabel")}
       />
-      <MetadataTags tags={metadata.acTags} />
     </div>
   );
 }
@@ -177,37 +170,6 @@ function MetadataAttributeGroup({
         showPagination={false}
       />
     </CollapsableSection>
-  );
-}
-
-interface MetadataTagsProps {
-  tags?: string[];
-}
-
-function MetadataTags({ tags }: MetadataTagsProps) {
-  return (
-    <div className="mb-3">
-      <h4>
-        <DinaMessage id="metadataTagsLabel" />
-      </h4>
-      <div className="metadata-tags">
-        {tags?.length
-          ? tags.map((tag, i) => (
-              <span
-                key={i}
-                style={{
-                  background: "yellow",
-                  borderRadius: "25px",
-                  margin: "0.5rem",
-                  padding: "0.5rem"
-                }}
-              >
-                {tag}
-              </span>
-            ))
-          : "None"}
-      </div>
-    </div>
   );
 }
 

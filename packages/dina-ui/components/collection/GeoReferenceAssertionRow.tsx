@@ -6,7 +6,8 @@ import {
   FormikButton,
   ResourceSelectField,
   TextField,
-  Tooltip
+  Tooltip,
+  useDinaFormContext
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
@@ -21,14 +22,12 @@ import {
 
 export interface GeoReferenceAssertionRowProps {
   index: number;
-  viewOnly?: boolean;
   assertion: GeoReferenceAssertion;
   openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  viewOnly,
   assertion,
   openAddPersonModal
 }: GeoReferenceAssertionRowProps) {
@@ -39,6 +38,8 @@ export function GeoReferenceAssertionRow({
   );
 
   const reservedAssertion = useRef({ ...assertion });
+
+  const { isTemplate, readOnly } = useDinaFormContext();
 
   const assertionsPath = "geoReferenceAssertions";
   const assertionPath = `${assertionsPath}[${index}]`;
@@ -131,10 +132,10 @@ export function GeoReferenceAssertionRow({
   return (
     <div>
       <DinaFormSection horizontal={true}>
-        {viewOnly && (
+        {readOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
-        {!viewOnly && (
+        {!readOnly && !isTemplate && (
           <div className="mb-3">
             <FormikButton
               className="btn btn-primary primary-assertion-button"
@@ -160,10 +161,10 @@ export function GeoReferenceAssertionRow({
             <CheckBoxField
               name={commonRoot + "dwcGeoreferenceVerificationStatus"}
               onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-              disabled={viewOnly}
+              disabled={readOnly}
               customName="dwcGeoreferenceVerificationStatus"
-              type={viewOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
-              hideLabel={viewOnly && !georeferenceDisabled ? true : false}
+              type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
+              hideLabel={readOnly && !georeferenceDisabled ? true : false}
             />
           )}
         </Field>
@@ -257,7 +258,7 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     return showButton ? (
       <div className="mb-3">
         <a
-          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
+          href={`/collection/collecting-event/map?mlat=${lat}&mlon=${lon}`}
           target="_blank"
           className="btn btn-info"
         >

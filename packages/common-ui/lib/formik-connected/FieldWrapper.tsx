@@ -1,6 +1,9 @@
+import classNames from "classnames";
 import { FastField, FormikProps } from "formik";
-import { ReactNode } from "react";
+import { isArray } from "lodash";
+import { ReactNode, useMemo } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { ReadOnlyValue } from "./FieldView";
 
@@ -24,18 +27,45 @@ export interface LabelWrapperParams {
   link?: string;
 
   /** Custom element to render when the form is in read-only mode. */
-  readOnlyRender?: (value: any) => ReactNode;
+  readOnlyRender?: (value: any, form: FormikProps<any>) => ReactNode;
 
-  removeFormGroupClass?: boolean;
+  removeBottomMargin?: boolean;
 
   /** Remove the label. */
   removeLabel?: boolean;
+
+  /** Disables how clicking a label clicks the inner element. */
+  disableLabelClick?: boolean;
+
+  /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
+  tooltipImage?: string;
+
+  /** Accessability text, only used if a tooltip image is provided. */
+  tooltipImageAlt?: string;
+
+  /** Add a link to a tooltip. */
+  tooltipLink?: string;
+
+  /** The text that appears for the link. */
+  tooltipLinkText?: string;
+
+  /**
+   * Custom field name for the template checkbox.
+   * e.g. passing "srcAdminLevels[0]" will change the default
+   * "templateCheckboxes['srcAdminLevels[0].name']"
+   * to "templateCheckboxes['srcAdminLevels[0]']".
+   */
+  templateCheckboxFieldName?: string;
+
+  /** Override FastField's default shouldComponentUpdate */
+  shouldUpdate?: (nextProps: LabelWrapperParams, props: {}) => boolean;
 }
 
 export interface FieldWrapperProps extends LabelWrapperParams {
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
+  removeLabelTag?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
@@ -54,6 +84,7 @@ export interface FieldWrapperRenderProps {
  */
 export function FieldWrapper({
   className,
+  disableLabelClick,
   hideLabel = false,
   name,
   label,
@@ -61,64 +92,120 @@ export function FieldWrapper({
   customName,
   link,
   readOnlyRender,
-  removeFormGroupClass,
-  removeLabel
+  removeBottomMargin,
+  removeLabel,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText,
+  templateCheckboxFieldName,
+  removeLabelTag,
+  shouldUpdate
 }: FieldWrapperProps) {
-  const { horizontal, readOnly } = useDinaFormContext();
+  const { horizontal, readOnly, isTemplate, enabledFields } =
+    useDinaFormContext();
 
-  const fieldLabel = label ?? (
-    <FieldHeader name={name} customName={customName} />
+  /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
+  const disabledByFormTemplate = useMemo(
+    () =>
+      enabledFields
+        ? !enabledFields.includes(templateCheckboxFieldName || name)
+        : false,
+    [enabledFields]
   );
 
-  const [labelCol, valueCol] =
-    typeof horizontal === "boolean" ? [6, 6] : horizontal || [];
+  const fieldLabel = label ?? (
+    <FieldHeader
+      name={name}
+      customName={customName}
+      tooltipImage={tooltipImage}
+      tooltipImageAlt={tooltipImageAlt}
+      tooltipLink={tooltipLink}
+      tooltipLinkText={tooltipLinkText}
+    />
+  );
+
+  const [labelClass, valueClass] =
+    horizontal === true
+      ? ["col-sm-6", "col-sm-6"]
+      : horizontal === "flex"
+      ? ["", "flex-grow-1"]
+      : (horizontal || []).map(col => `col-sm-${col}`) ||
+        (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
+
+  if (disabledByFormTemplate) {
+    return null;
+  }
+
+  const fieldWrapperInternal = (
+    <div className={valueClass} style={{ minHeight: "25px", cursor: "auto" }}>
+      <FastField name={name} shouldUpdate={shouldUpdate}>
+        {({ field: { value }, form, meta: { error } }) => (
+          <>
+            {readOnly || !children
+              ? readOnlyRender?.(value, form) ?? (
+                  <ReadOnlyValue link={link} value={value} />
+                )
+              : typeof children === "function"
+              ? children?.({
+                  invalid: Boolean(error),
+                  value,
+                  setValue: newValue => {
+                    // Remove the error message when the user edits the field:
+                    form.setFieldError(name, undefined);
+                    form.setFieldValue(name, newValue);
+                    form.setFieldTouched(name);
+                  },
+                  formik: form
+                })
+              : children}
+            {error && <div className="invalid-feedback">{error}</div>}
+          </>
+        )}
+      </FastField>
+    </div>
+  );
 
   return (
-    <div className={className}>
-      <label
-        className={`${name}-field ${horizontal ? "row" : "w-100"} ${
-          removeFormGroupClass ? "" : "mb-3"
-        }`}
-      >
-        {!removeLabel && (
-          <div
-            className={[
-              `${labelCol ? `col-sm-${labelCol}` : ""}`,
-              // Adjust alignment for editable inputs:
-              horizontal && !readOnly ? "mt-sm-2" : "",
-              "mb-2"
-            ].join(" ")}
-          >
-            {!hideLabel && <strong>{fieldLabel}</strong>}
-          </div>
-        )}
-        <div className={valueCol ? `col-sm-${valueCol}` : ""}>
-          <FastField name={name}>
-            {({ field: { value }, form, meta: { error } }) => (
-              <>
-                {readOnly || !children
-                  ? readOnlyRender?.(value) ?? (
-                      <ReadOnlyValue link={link} value={value} />
-                    )
-                  : typeof children === "function"
-                  ? children?.({
-                      invalid: Boolean(error),
-                      value,
-                      setValue: newValue => {
-                        // Remove the error message when the user edits the field:
-                        form.setFieldError(name, undefined);
-                        form.setFieldValue(name, newValue);
-                        form.setFieldTouched(name);
-                      },
-                      formik: form
-                    })
-                  : children}
-                {error && <div className="invalid-feedback">{error}</div>}
-              </>
-            )}
-          </FastField>
-        </div>
-      </label>
+    <div className={classNames(className, { row: isTemplate })}>
+      {isTemplate && (
+        <CheckBoxWithoutWrapper
+          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
+          className="col-sm-1 templateCheckBox"
+        />
+      )}
+      {removeLabelTag ? (
+        <>
+          {!removeLabel && (
+            <div className={classNames(labelClass, !horizontal && "mb-2")}>
+              {!hideLabel && <strong>{fieldLabel}</strong>}
+            </div>
+          )}
+
+          {fieldWrapperInternal}
+        </>
+      ) : (
+        <label
+          className={classNames(
+            `${name}-field`,
+            customName && `${customName}-field`,
+            horizontal === "flex" && "d-flex gap-2",
+            horizontal ? "align-items-center" : "mb-2",
+            (horizontal === true || isArray(horizontal)) && "row",
+            isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
+            !isTemplate && !horizontal && "w-100",
+            !removeBottomMargin && "mb-3"
+          )}
+          htmlFor={disableLabelClick ? "none" : undefined}
+        >
+          {!removeLabel && (
+            <div className={classNames(labelClass, !horizontal && "mb-2")}>
+              {!hideLabel && <strong>{fieldLabel}</strong>}
+            </div>
+          )}
+          {fieldWrapperInternal}
+        </label>
+      )}
     </div>
   );
 }

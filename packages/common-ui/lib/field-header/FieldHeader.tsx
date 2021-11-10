@@ -1,5 +1,5 @@
+import { startCase } from "lodash";
 import { useIntl } from "react-intl";
-import titleCase from "title-case";
 import { Tooltip } from "../tooltip/Tooltip";
 
 export interface FieldNameProps {
@@ -7,20 +7,48 @@ export interface FieldNameProps {
 
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
+
+  /** Optional image source to display an image in a tooltip. */
+  tooltipImage?: string;
+
+  /** Optional image alt text for image accessability. */
+  tooltipImageAlt?: string;
+
+  /** Optional link. */
+  tooltipLink?: string;
+
+  /** Optional link text, should be used when adding a link. */
+  tooltipLinkText?: string;
 }
 
 /** Get the field label and tooltip given the camelCase field key. */
 export function useFieldLabels() {
   const { formatMessage, messages } = useIntl();
 
-  function getFieldLabel(name: string) {
+  function getFieldLabel({
+    name,
+    tooltipImage,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
+  }: FieldNameProps) {
     const messageKey = `field_${name}`;
     const tooltipKey = `${messageKey}_tooltip`;
-    const tooltip = messages[tooltipKey] ? <Tooltip id={tooltipKey} /> : null;
+
+    const tooltip =
+      messages[tooltipKey] || tooltipImage || tooltipLink ? (
+        <Tooltip
+          id={messages[tooltipKey] ? tooltipKey : undefined}
+          image={tooltipImage}
+          altImage={tooltipImageAlt}
+          link={tooltipLink}
+          linkText={tooltipLinkText}
+        />
+      ) : null;
 
     const fieldLabel = messages[messageKey]
       ? formatMessage({ id: messageKey as any })
-      : titleCase(name);
+      : startCase(name);
 
     return { tooltip, fieldLabel };
   }
@@ -33,9 +61,22 @@ export function useFieldLabels() {
  * The tooltip is found from the intl messages file using the key "field_{fieldName}_tooltip".
  * e.g. field_acMetadataCreator.displayName_tooltip
  */
-export function FieldHeader({ name, customName }: FieldNameProps) {
+export function FieldHeader({
+  name,
+  customName,
+  tooltipImage,
+  tooltipImageAlt,
+  tooltipLink,
+  tooltipLinkText
+}: FieldNameProps) {
   const { getFieldLabel } = useFieldLabels();
-  const { fieldLabel, tooltip } = getFieldLabel(customName ?? name);
+  const { fieldLabel, tooltip } = getFieldLabel({
+    name: customName ?? name,
+    tooltipImage,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
+  });
 
   return (
     <div className={`${customName ?? name}-field-header`}>

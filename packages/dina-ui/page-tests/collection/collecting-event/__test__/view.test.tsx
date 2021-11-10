@@ -1,5 +1,5 @@
 import { Person } from "../../../../types/agent-api/resources/Person";
-import { CollectingEventDetailsPage } from "../../../../pages/collection/collecting-event/view";
+import CollectingEventDetailsPage from "../../../../pages/collection/collecting-event/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CollectingEvent } from "../../../../types/collection-api/resources/CollectingEvent";
 
@@ -10,7 +10,6 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   verbatimEventDateTime: "From 2019, 1,1,10,10,10 to 2019, 1.6, 10,10,10",
   id: "100",
   type: "collecting-event",
-  uuid: "323423-23423-234",
   group: "test group",
   dwcOtherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
@@ -27,7 +26,7 @@ const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
     model ===
-    "collection-api/collecting-event/100?include=collectors,attachment"
+    "collection-api/collecting-event/100?include=collectors,attachment,collectionMethod"
   ) {
     return { data: TEST_COLLECTION_EVENT };
   } else if (model === "agent-api/person") {
@@ -50,19 +49,6 @@ const mockBulkGet = jest.fn(async paths => {
       displayName: "person a"
     }));
   }
-
-  if (
-    (paths[0] as string).startsWith(
-      "/georeference-assertion/1?include=georeferencedBy"
-    )
-  ) {
-    return paths.map(path => ({
-      id: path.replace("/georeference-assertion/", ""),
-      type: "georeference-assertion",
-      dwcDecimalLongitude: 12.5,
-      georeferencedBy: [{ id: "1", type: "agent" }]
-    }));
-  }
 });
 
 // Mock API requests:
@@ -71,21 +57,23 @@ const apiContext: any = {
   bulkGet: mockBulkGet
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("CollectingEvent details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <CollectingEventDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the CollectingEvent details", async () => {
-    const wrapper = mountWithAppContext(
-      <CollectingEventDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<CollectingEventDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

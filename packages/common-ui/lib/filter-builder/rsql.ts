@@ -18,15 +18,22 @@ interface RsqlOperandGroup {
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-export function rsql(filter: FilterGroupModel | null): string {
+export function rsql(filter: FilterGroupModel | FilterRowModel | null): string {
   if (!filter) {
     return "";
   }
-  return transformToRSQL(toGroup(filter));
+  switch (filter.type) {
+    case "FILTER_GROUP":
+      return transformToRSQL(toGroup(filter));
+    case "FILTER_ROW":
+      return transformToRSQL(toPredicate(filter));
+  }
 }
 
 /** Converts a FilterGroupModel to an RSQL expression. */
-function toGroup(filterGroup: FilterGroupModel): RsqlOperandGroup {
+function toGroup(
+  filterGroup: FilterGroupModel
+): RsqlOperandGroup | RsqlOperand {
   const { children, operator } = filterGroup;
 
   return {
@@ -40,6 +47,10 @@ function toGroup(filterGroup: FilterGroupModel): RsqlOperandGroup {
               child.searchType === "EXACT_MATCH") &&
             !child.value
           )
+      )
+      // Exclude filter groups with no children:
+      .filter(
+        child => !(child.type === "FILTER_GROUP" && !child.children.length)
       )
       .map(child => {
         switch (child.type) {

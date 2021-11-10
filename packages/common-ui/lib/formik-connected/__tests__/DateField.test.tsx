@@ -1,7 +1,4 @@
-import {
-  default as DatePicker,
-  default as ReactDatePicker
-} from "react-datepicker";
+import ReactDatePicker from "react-datepicker";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
@@ -35,23 +32,23 @@ describe("DateField component", () => {
 
   it("Changes the Formik field's value.", () => {
     const wrapper = getWrapper();
-    const { onChange } = wrapper.find(ReactDatePicker).props();
+    const { onChange } = wrapper.find<any>(ReactDatePicker).props();
 
     onChange(new Date("2019-05-25T12:00:00Z"), undefined);
     wrapper.update();
 
-    expect(wrapper.find(DatePicker).prop("selected")).toEqual(
+    expect(wrapper.find(ReactDatePicker).prop("selected")).toEqual(
       new Date("2019-05-25T12:00:00.000Z")
     );
   });
 
   it("Can set the date field to null.", () => {
     const wrapper = getWrapper();
-    const { onChange } = wrapper.find(ReactDatePicker).props();
+    const { onChange } = wrapper.find<any>(ReactDatePicker).props();
 
     onChange(null, undefined);
     wrapper.update();
 
-    expect(wrapper.find(DatePicker).prop("selected")).toEqual(null);
+    expect(wrapper.find(ReactDatePicker).prop("selected")).toEqual(null);
   });
 });

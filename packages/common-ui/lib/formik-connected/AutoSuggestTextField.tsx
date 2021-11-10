@@ -6,36 +6,42 @@ import {
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
-import { debounce, noop, uniq } from "lodash";
+import { castArray, compact, uniq } from "lodash";
 import React, {
+  ChangeEvent,
   InputHTMLAttributes,
-  useCallback,
-  useState,
-  ChangeEvent
+  useEffect,
+  useState
 } from "react";
-import AutoSuggest, {
-  InputProps,
-  ShouldRenderReasons
-} from "react-autosuggest";
+import AutoSuggest, { InputProps } from "react-autosuggest";
+import { useIntl } from "react-intl";
+import { useDebounce } from "use-debounce";
 import { OnFormikSubmit } from "./safeSubmit";
 
-export type AutoSuggestTextFieldProps<
-  T extends KitsuResource
-> = TextFieldProps & AutoSuggestConfig<T>;
+type SingleOrArray<T> = T | T[];
+
+export type AutoSuggestTextFieldProps<T extends KitsuResource> =
+  TextFieldProps & AutoSuggestConfig<T>;
 
 interface AutoSuggestConfig<T extends KitsuResource> {
   query?: (
     searchValue: string,
     formikCtx: FormikContextType<any>
   ) => JsonApiQuerySpec;
-  suggestion?: (resource: PersistedResource<T>) => string;
-  configQuery?: () => JsonApiQuerySpec;
-  configSuggestion?: (resource: PersistedResource<T>) => string[];
-  shouldRenderSuggestions?: (
-    value: string,
-    reason: ShouldRenderReasons
-  ) => boolean;
+  /** Hard-coded suggestions */
+  suggestions?: (
+    searchValue: string,
+    formikCtx: FormikContextType<any>
+  ) => (string | null | undefined)[];
+  /** Configures a  */
+  suggestion?: (
+    resource: PersistedResource<T>,
+    searchValue: string
+  ) => SingleOrArray<string | null | undefined>;
   onSuggestionSelected?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
+  timeoutMs?: number;
+  /** Show the suggestions even when the input is blank. */
+  alwaysShowSuggestions?: boolean;
 }
 
 /**
@@ -45,10 +51,10 @@ interface AutoSuggestConfig<T extends KitsuResource> {
 export function AutoSuggestTextField<T extends KitsuResource>({
   query,
   suggestion,
-  shouldRenderSuggestions,
-  configQuery,
-  configSuggestion,
+  suggestions,
   onSuggestionSelected,
+  timeoutMs,
+  alwaysShowSuggestions,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   return (
@@ -58,11 +64,12 @@ export function AutoSuggestTextField<T extends KitsuResource>({
         <AutoSuggestTextFieldInternal
           query={query}
           suggestion={suggestion}
-          configQuery={configQuery}
-          configSuggestion={configSuggestion}
+          suggestions={suggestions}
           {...inputProps}
-          shouldRenderSuggestions={shouldRenderSuggestions}
           onSuggestionSelected={onSuggestionSelected}
+          alwaysShowSuggestions={alwaysShowSuggestions}
+          id={textFieldProps.name}
+          timeoutMs={timeoutMs}
         />
       )}
     />
@@ -71,72 +78,106 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
 function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   query,
-  suggestion,
-  shouldRenderSuggestions,
-  configQuery,
-  configSuggestion,
+  suggestions,
+  suggestion = (it, searchVal) => (!searchVal ? String(it) : String(searchVal)),
   onSuggestionSelected,
+  id,
+  timeoutMs = 250,
+  alwaysShowSuggestions,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
-  const formikCtx = useFormikContext<any>();
+  const formik = useFormikContext<any>();
+  const { formatMessage } = useIntl();
 
   const [searchValue, setSearchValue] = useState("");
-  const debouncedSetSearchValue = useCallback(
-    debounce(setSearchValue, 250),
-    []
-  );
+  const [debouncedSearchValue] = timeoutMs
+    ? useDebounce(searchValue, timeoutMs)
+    : [searchValue];
 
   const { loading, response } = useQuery<T[]>(
-    configQuery ? configQuery() : (query?.(searchValue, formikCtx) as any)
+    {
+      path: "",
+      // Default newest first:
+      sort: "-createdOn",
+      ...query?.(debouncedSearchValue, formik)
+    },
+    {
+      // Don't show results when the search is empty:
+      disabled:
+        !query || (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
+    }
   );
 
-  const suggestions = !loading
-    ? configSuggestion
-      ? configSuggestion(response?.data?.[0] as any)
-      : uniq((response?.data ?? []).map(suggestion ?? noop))
-    : [];
+  const allSuggestions = compact([
+    ...(suggestions?.(searchValue, formik) || []),
+    ...(response && !loading
+      ? uniq(
+          castArray(response.data).flatMap(it =>
+            suggestion(it, debouncedSearchValue)
+          )
+        )
+      : [])
+  ]);
+
+  useEffect(() => {
+    const autosuggestGeneratedDivs =
+      document?.querySelectorAll<any>(".autosuggest div");
+    // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
 
   return (
     <>
       <style>{`
-        .autosuggest .container-open {      
-            position: absolute;
-            z-index: 2; 
-            margin: 0 0 0 -15px; 
-         },
-        .autosuggest .container {
-           display:none;
+        .autosuggest-container {
+          position: relative;
         }
-        .autosuggest .autosuggest-highlighted { 
-          background-color: #ddd; 
+        .autosuggest .suggestions-container {
+          display: none;
+        }
+        .autosuggest .suggestions-container-open {
+          display: block;
+          position: absolute;
+          width: 100%;
+          z-index: 20;
+        }
+        .autosuggest .suggestion-highlighted { 
+          background-color: #ddd;
+          cursor: pointer;
         }
         `}</style>
       <div className="autosuggest">
         <AutoSuggest
-          suggestions={suggestions}
+          id={id}
+          suggestions={allSuggestions}
           getSuggestionValue={s => s}
-          onSuggestionsFetchRequested={({ value }) =>
-            debouncedSetSearchValue(value)
-          }
+          onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
           onSuggestionSelected={(_, data) => {
             inputProps.onChange?.({
               target: { value: data.suggestion }
             } as any);
-            onSuggestionSelected?.(data.suggestion, formikCtx);
+            onSuggestionSelected?.(data.suggestion, formik);
           }}
-          onSuggestionsClearRequested={() => {
-            debouncedSetSearchValue.cancel();
-            debouncedSetSearchValue("");
-          }}
+          onSuggestionsClearRequested={() => setSearchValue("")}
           renderSuggestion={text => <div>{text}</div>}
-          shouldRenderSuggestions={shouldRenderSuggestions}
-          inputProps={inputProps as InputProps<any>}
+          shouldRenderSuggestions={
+            alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
+          }
+          inputProps={{
+            ...(inputProps as InputProps<any>),
+            placeholder: formatMessage({ id: "typeHereToSearch" })
+          }}
           theme={{
             suggestionsList: "list-group",
             suggestion: "list-group-item",
-            suggestionHighlighted: "autosuggest-highlighted",
-            suggestionsContainerOpen: "container-open",
-            suggestionsContainer: "container"
+            suggestionHighlighted: "suggestion-highlighted",
+            suggestionsContainerOpen: "suggestions-container-open",
+            suggestionsContainer: "suggestions-container",
+            container: "autosuggest-container"
           }}
         />
       </div>

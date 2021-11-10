@@ -1,10 +1,9 @@
-import { PreparationTypeDetailsPage } from "../../../../pages/collection/preparation-type/view";
+import PreparationTypeDetailsPage from "../../../../pages/collection/preparation-type/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PreparationType } from "../../../../types/collection-api/resources/PreparationType";
 
 /** Test preparation-type with all fields defined. */
 const TEST_PREPARATION_TYPE: PreparationType = {
-  uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
   id: "1",
   name: "test preparation type",
   type: "preparation-type"
@@ -26,21 +25,23 @@ const apiContext = {
   apiClient: { get: mockGet }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("PreparationType details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <PreparationTypeDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the PreparationType details", async () => {
-    const wrapper = mountWithAppContext(
-      <PreparationTypeDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<PreparationTypeDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);

@@ -2,10 +2,10 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { orderBy } from "lodash";
+import { compact, fromPairs, orderBy, toPairs } from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   CollectingEvent,
   GeoReferenceAssertion
@@ -13,8 +13,8 @@ import {
 import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../types/collection-api/resources/SRS";
-import { Metadata, Person } from "../../types/objectstore-api";
-import { useAttachmentsModal } from "../object-store";
+import { ManagedAttributeValues, Person } from "../../types/objectstore-api";
+import { AllowAttachmentsConfig } from "../object-store";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -25,51 +25,27 @@ export function useCollectingEventQuery(id?: string | null) {
   // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod`
     },
     {
       // Return undefined when ID is undefined:
       disabled: !id,
       onSuccess: async ({ data }) => {
         // Do client-side multi-API joins on one-to-many fields:
-
-        if (data.collectors) {
-          const agents = await bulkGet<Person>(
-            data.collectors.map(collector => `/person/${collector.id}`),
-            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
-          );
-          // Omit null (deleted) records:
-          data.collectors = agents.filter(it => it);
-        }
-
-        if (data.attachment) {
-          try {
-            const metadatas = await bulkGet<Metadata>(
-              data.attachment.map(collector => `/metadata/${collector.id}`),
-              {
-                apiBaseUrl: "/objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-            // Omit null (deleted) records:
-            data.attachment = metadatas.filter(it => it);
-          } catch (error) {
-            console.warn("Attachment join failed: ", error);
-          }
-        }
-
         if (data.geoReferenceAssertions) {
           // Retrieve georeferencedBy agent arrays on GeoReferenceAssertions.
           for (const assertion of data.geoReferenceAssertions) {
             if (assertion.georeferencedBy) {
-              assertion.georeferencedBy = await bulkGet<Person>(
-                assertion.georeferencedBy.map(
-                  (personId: string) => `/person/${personId}`
-                ),
-                {
-                  apiBaseUrl: "/agent-api",
-                  returnNullForMissingResource: true
-                }
+              assertion.georeferencedBy = compact(
+                await bulkGet<Person, true>(
+                  assertion.georeferencedBy.map(
+                    (personId: string) => `/person/${personId}`
+                  ),
+                  {
+                    apiBaseUrl: "/agent-api",
+                    returnNullForMissingResource: true
+                  }
+                )
               );
             }
           }
@@ -103,6 +79,19 @@ export function useCollectingEventQuery(id?: string | null) {
             (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         data.srcAdminLevels = srcAdminLevels;
+
+        // parse managedAttributes to editor formats
+        if (data.managedAttributes) {
+          const managedAttributeValues: ManagedAttributeValues = {};
+          toPairs(data?.managedAttributes as any).map(
+            attr =>
+              (managedAttributeValues[attr[0]] = {
+                assignedValue: attr[1] as any
+              })
+          );
+          delete data?.managedAttributes;
+          data.managedAttributeValues = managedAttributeValues;
+        }
       }
     }
   );
@@ -110,12 +99,19 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
+interface UseCollectingEventSaveParams {
+  fetchedCollectingEvent?: PersistedResource<CollectingEvent>;
+  attachmentsConfig?: AllowAttachmentsConfig;
+}
+
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
-export function useCollectingEventSave(
-  fetchedCollectingEvent?: PersistedResource<CollectingEvent>
-) {
+export function useCollectingEventSave({
+  fetchedCollectingEvent,
+  attachmentsConfig
+}: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
+  const { formatMessage } = useDinaIntl();
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
@@ -134,8 +130,6 @@ export function useCollectingEventSave(
       }
     : {
         type: "collecting-event",
-        // This value needs to be here or else Cleave throws an error when Enzyme simulates a change:
-        startEventDateTime: "YYYY-MM-DDTHH:MM:SS.MMM",
         collectors: [],
         collectorGroups: [],
         geoReferenceAssertions: [
@@ -146,99 +140,118 @@ export function useCollectingEventSave(
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
         dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-        managedAttributeValues: {}
+        managedAttributeValues: {},
+        publiclyReleasable: true
       };
 
-  // The selected Metadatas to be attached to this Collecting Event:
-  const { selectedMetadatas, attachedMetadatasUI } = useAttachmentsModal({
-    initialMetadatas:
-      fetchedCollectingEvent?.attachment as PersistedResource<Metadata>[],
-    deps: [fetchedCollectingEvent?.id],
-    title: <DinaMessage id="collectingEventAttachments" />
-  });
-
   async function saveCollectingEvent(
-    submittedValues,
+    submittedValues: CollectingEvent,
     collectingEventFormik: FormikContextType<any>
   ) {
     // Init relationships object for one-to-many relations:
-    submittedValues.relationships = {};
+    (submittedValues as any).relationships = {};
 
     // handle converting to relationship manually due to crnk bug
-    if (submittedValues.collectors?.length > 0) {
-      submittedValues.relationships.collectors = {
-        data: submittedValues.collectors.map(collector => ({
+    if (
+      submittedValues &&
+      submittedValues.collectors &&
+      submittedValues.collectors.length > 0
+    ) {
+      (submittedValues as any).relationships.collectors = {
+        data: submittedValues?.collectors.map(collector => ({
           id: collector.id,
-          type: "agent"
+          type: "person"
         }))
       };
     }
     delete submittedValues.collectors;
 
-    if (submittedValues.collectorGroups?.id)
-      submittedValues.collectorGroupUuid = submittedValues.collectorGroups.id;
+    if ((submittedValues.collectorGroups as any)?.id)
+      submittedValues.collectorGroupUuid = (
+        submittedValues.collectorGroups as any
+      ).id;
     delete submittedValues.collectorGroups;
 
     // Treat empty array or undefined as null:
     if (!submittedValues.dwcOtherRecordNumbers?.length) {
-      submittedValues.dwcOtherRecordNumbers = null;
+      submittedValues.dwcOtherRecordNumbers = null as any;
     }
 
     // Add attachments if they were selected:
-    if (selectedMetadatas.length) {
-      submittedValues.relationships.attachment = {
-        data: selectedMetadatas.map(it => ({ id: it.id, type: it.type }))
-      };
-    }
+    (submittedValues as any).relationships.attachment = {
+      data:
+        submittedValues.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
     // Convert georeferenceByAgents to relationship
-    for (const assertion of submittedValues.geoReferenceAssertions || []) {
-      assertion.georeferencedBy = assertion.georeferencedBy?.map(it => it.id);
+    if (
+      submittedValues.geoReferenceAssertions &&
+      submittedValues.geoReferenceAssertions.length > 0
+    ) {
+      for (const assertion of submittedValues.geoReferenceAssertions) {
+        const referenceBy = assertion.georeferencedBy;
+        if (referenceBy && typeof referenceBy !== "string") {
+          assertion.georeferencedBy = referenceBy.map(it =>
+            typeof it !== "string" ? it.id : (null as any)
+          );
+        }
+      }
     }
 
     // Parse srcAdminLevels to geographicPlaceNameSourceDetail
     // Reset the 3 fields which should be updated with user address entries : srcAdminLevels
-    if (submittedValues.geographicPlaceNameSourceDetail) {
-      submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces =
-        null;
-      submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace =
-        null;
-      submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
-        null;
+    const srcDetail = submittedValues.geographicPlaceNameSourceDetail;
+    const srcAdminLevels = submittedValues.srcAdminLevels;
+
+    if (srcDetail) {
+      srcDetail.higherGeographicPlaces = null as any;
+      srcDetail.selectedGeographicPlace = null as any;
+      srcDetail.customGeographicPlace = null as any;
     }
 
-    if (submittedValues.srcAdminLevels?.length > 0) {
-      if (submittedValues.srcAdminLevels?.length > 1)
-        submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces =
-          [];
-      submittedValues.srcAdminLevels.map((srcAdminLevel, idx) => {
-        // remove the braceket from placeName
-        const typeStart = srcAdminLevel.name.indexOf("[");
-        srcAdminLevel.name = srcAdminLevel.name
-          .slice(0, typeStart !== -1 ? typeStart : srcAdminLevel.name.length)
-          .trim();
-        // the first one can either be selectedGeographicPlace or customGeographicPlace
-        // when the entry only has name in it, it is user entered customPlaceName entry
-        // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
-        if (idx === 0) {
-          if (!srcAdminLevel.id) {
-            submittedValues.geographicPlaceNameSourceDetail.customGeographicPlace =
-              srcAdminLevel.name;
+    if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
+      if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
+      srcAdminLevels
+        .filter(srcAdminLevel => srcAdminLevel)
+        .map((srcAdminLevel, idx) => {
+          const srcAdminLevelName = srcAdminLevel?.name;
+          // remove the braceket from placeName
+          const typeStart = srcAdminLevelName?.indexOf("[");
+          srcAdminLevel.name = srcAdminLevelName
+            ?.slice(0, typeStart !== -1 ? typeStart : srcAdminLevelName.length)
+            .trim();
+          // the first one can either be selectedGeographicPlace or customGeographicPlace
+          // when the entry only has name in it, it is user entered customPlaceName entry
+          // when the enry does not have osm_id, it will be saved as customPlaceName (e.g central experimental farm)
+          if (idx === 0) {
+            if (!srcAdminLevel.id) {
+              srcDetail.customGeographicPlace = srcAdminLevel.name;
+            } else {
+              srcDetail.selectedGeographicPlace = srcAdminLevel;
+            }
           } else {
-            submittedValues.geographicPlaceNameSourceDetail.selectedGeographicPlace =
-              srcAdminLevel;
+            srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
           }
-        } else {
-          submittedValues.geographicPlaceNameSourceDetail.higherGeographicPlaces.push(
-            srcAdminLevel
-          );
-        }
-      });
+        });
+    }
+    delete submittedValues.srcAdminLevels;
+
+    // Shuffle the managedAttributesValue to managedAttribute
+    if (submittedValues.managedAttributeValues) {
+      submittedValues.managedAttributes = fromPairs(
+        toPairs(submittedValues.managedAttributeValues).map(value => [
+          value[0],
+          value[1].assignedValue as string
+        ])
+      );
     }
 
-    delete submittedValues.srcAdminLevels;
+    delete submittedValues.managedAttributeValues;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
@@ -262,7 +275,7 @@ export function useCollectingEventSave(
   return {
     collectingEventInitialValues,
     saveCollectingEvent,
-    attachedMetadatasUI,
+    attachmentsConfig,
     collectingEventFormSchema
   };
 }
@@ -325,9 +338,9 @@ function useCollectingEventFormSchema() {
     > = yup.object({
       startEventDateTime: yup
         .string()
-        .required(formatMessage("field_collectingEvent_startDateTimeError"))
+        .nullable()
         .test({
-          test: isValidDatePrecision,
+          test: val => (val ? isValidDatePrecision(val) : true),
           message: formatMessage("field_collectingEvent_startDateTimeError")
         }),
       endEventDateTime: yup

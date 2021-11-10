@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { Head, Nav } from "../../../components";
+import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import {
   DEFAULT_VERBATIM_COORDSYS_KEY,
@@ -31,17 +31,19 @@ export default function CollectingEventEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
+  const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle";
+
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
     <div>
-      <Head title={formatMessage("editCollectingEventTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
-              <DinaMessage id="editCollectingEventTitle" />
+            <h1 id="wb-cont">
+              <DinaMessage id={title} />
             </h1>
             {withResponse(collectingEventQuery, ({ data }) => (
               <CollectingEventForm collectingEvent={data} />
@@ -50,12 +52,13 @@ export default function CollectingEventEditPage() {
         ) : (
           <div>
             <h1>
-              <DinaMessage id="addCollectingEventTitle" />
+              <DinaMessage id={title} />
             </h1>
             <CollectingEventForm />
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }
@@ -64,11 +67,10 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const router = useRouter();
 
   const {
-    attachedMetadatasUI,
     collectingEventInitialValues,
     saveCollectingEvent,
     collectingEventFormSchema
-  } = useCollectingEventSave(collectingEvent);
+  } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
     string | null | undefined
@@ -78,7 +80,10 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  const onSubmit: DinaFormOnSubmit = async ({ submittedValues, formik }) => {
+  const onSubmit: DinaFormOnSubmit<CollectingEvent> = async ({
+    submittedValues,
+    formik
+  }) => {
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
       formik
@@ -99,9 +104,14 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     </ButtonBar>
   );
 
+  const initValues = {
+    ...collectingEventInitialValues,
+    type: "collecting-event" as const
+  };
+
   return (
-    <DinaForm
-      initialValues={collectingEventInitialValues}
+    <DinaForm<CollectingEvent>
+      initialValues={initValues}
       onSubmit={onSubmit}
       enableReinitialize={true}
       validationSchema={collectingEventFormSchema}
@@ -111,7 +121,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
         setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
         setDefaultVerbatimSRS={setDefaultVerbatimSRS}
       />
-      <div className="mb-3">{attachedMetadatasUI}</div>
       {buttonBar}
     </DinaForm>
   );

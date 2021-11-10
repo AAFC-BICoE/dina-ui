@@ -1,9 +1,9 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { PcrProfileEditPage } from "../../../../pages/seqdb/pcr-profile/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
-import { writeStorage } from "@rehooks/local-storage";
-import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
@@ -11,7 +11,7 @@ jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 /** Mock Kitsu "get" method. */
 const mockGet = jest.fn(async path => {
   // The get request will return the existing profile.
-  if (path === "seqdb-api/thermocyclerprofile/100") {
+  if (path === "seqdb-api/thermocycler-profile/100") {
     // The request for the profile returns the test profile.
     return { data: TEST_PROFILE };
   } else {
@@ -43,7 +43,7 @@ describe("PcrProfile edit page", () => {
         {
           data: {
             id: "1",
-            type: "thermocyclerprofile"
+            type: "thermocycler-profile"
           },
           status: 201
         }
@@ -69,14 +69,14 @@ describe("PcrProfile edit page", () => {
         [
           {
             op: "POST",
-            path: "thermocyclerprofile",
+            path: "thermocycler-profile",
             value: {
               attributes: {
                 group: "aafc",
                 name: "New PcrProfile"
               },
               id: "00000000-0000-0000-0000-000000000000",
-              type: "thermocyclerprofile"
+              type: "thermocycler-profile"
             }
           }
         ],
@@ -124,14 +124,14 @@ describe("PcrProfile edit page", () => {
     });
   });
 
-  it("Provides a form to edit a PcrProfile.", async done => {
+  it("Provides a form to edit a PcrProfile.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
         {
           data: {
             id: "1",
-            type: "thermocyclerprofile"
+            type: "thermocycler-profile"
           },
           status: 201
         }
@@ -164,38 +164,37 @@ describe("PcrProfile edit page", () => {
     // Submit the form.
     wrapper.find("form").simulate("submit");
 
-    setImmediate(() => {
-      // "patch" should have been called with a jsonpatch request containing the existing values
-      // and the modified one.
-      expect(mockPatch).lastCalledWith(
-        "/seqdb-api/operations",
-        [
-          {
-            op: "PATCH",
-            path: "thermocyclerprofile/1",
-            value: {
-              attributes: expect.objectContaining({
-                application: "new app value",
-                group: "aafc",
-                name: "PROF1"
-              }),
-              id: "1",
-              relationships: {
-                region: {
-                  data: expect.objectContaining({ id: "2", type: "region" })
-                }
-              },
-              type: "thermocyclerprofile"
-            }
-          }
-        ],
-        expect.anything()
-      );
+    await new Promise(setImmediate);
 
-      // The user should be redirected to the existing profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
-      done();
-    });
+    // "patch" should have been called with a jsonpatch request containing the existing values
+    // and the modified one.
+    expect(mockPatch).lastCalledWith(
+      "/seqdb-api/operations",
+      [
+        {
+          op: "PATCH",
+          path: "thermocycler-profile/1",
+          value: {
+            attributes: expect.objectContaining({
+              application: "new app value",
+              group: "aafc",
+              name: "PROF1"
+            }),
+            id: "1",
+            relationships: {
+              region: {
+                data: expect.objectContaining({ id: "2", type: "region" })
+              }
+            },
+            type: "thermocycler-profile"
+          }
+        }
+      ],
+      expect.anything()
+    );
+
+    // The user should be redirected to the existing profile's details page.
+    expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
   });
 });
 
@@ -229,5 +228,5 @@ const TEST_PROFILE: Required<PcrProfile> = {
   step7: null,
   step8: null,
   step9: null,
-  type: "thermocyclerprofile"
+  type: "thermocycler-profile"
 };

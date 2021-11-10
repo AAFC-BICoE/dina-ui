@@ -1,8 +1,13 @@
 import { AxiosError } from "axios";
 import { cacheAdapterEnhancer } from "axios-extensions";
-import Kitsu, { GetParams, KitsuResource, PersistedResource } from "kitsu";
+import Kitsu, {
+  GetParams,
+  KitsuResource,
+  KitsuResourceLink,
+  PersistedResource
+} from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
-import { keys } from "lodash";
+import { keys, omit } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -11,17 +16,22 @@ import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 import {
   FailedOperation,
   Operation,
-  OperationsResponse,
   SuccessfulOperation
 } from "./operations-types";
 
-export interface BulkGetOptions {
+export interface BulkGetOptions<TReturnNull extends boolean = false> {
   apiBaseUrl?: string;
   joinSpecs?: ClientSideJoinSpec[];
 
   /** Return null for missing resource instead of throwing an Error. */
-  returnNullForMissingResource?: boolean;
+  returnNullForMissingResource?: TReturnNull;
 }
+
+export type BulkGetOperation =
+  | SuccessfulOperation
+  | FailedOperation
+  // For replacing missing/deleted data with null locally:
+  | { data: null; status: 404 };
 
 export interface DoOperationsOptions {
   apiBaseUrl?: string;
@@ -48,10 +58,14 @@ export interface ApiClientI {
   ) => Promise<PersistedResource<TData>[]>;
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
-  bulkGet: <T extends KitsuResource>(
+  bulkGet: <T extends KitsuResource, TReturnNull extends boolean = false>(
     paths: readonly string[],
-    options?: BulkGetOptions
-  ) => Promise<PersistedResource<T>[]>;
+    options?: BulkGetOptions<TReturnNull>
+  ) => Promise<
+    (TReturnNull extends true
+      ? PersistedResource<T> | null
+      : PersistedResource<T>)[]
+  >;
 }
 
 /** Config for creating an API client. */
@@ -69,7 +83,7 @@ export interface SaveArgs<T extends KitsuResource = KitsuResource> {
 }
 
 export interface DeleteArgs {
-  delete: PersistedResource<any>;
+  delete: KitsuResourceLink | PersistedResource<any>;
 }
 
 /**
@@ -157,7 +171,7 @@ export class ApiClientImpl implements ApiClientI {
       }
     );
 
-    const responses: OperationsResponse = axiosResponse.data;
+    const responses: BulkGetOperation[] = axiosResponse.data;
 
     // Optionally return null instead of throwing an error for missing resources:
     if (returnNullForMissingResource) {
@@ -165,7 +179,7 @@ export class ApiClientImpl implements ApiClientI {
         // 404 Not Found or 410 Gone
         if ([404, 410].includes(responses[i].status)) {
           responses[i] = {
-            data: null as any,
+            data: null,
             status: 404
           };
         }
@@ -232,14 +246,22 @@ export class ApiClientImpl implements ApiClientI {
   }
 
   /** Bulk GET operations: Run many find-by-id queries in a single HTTP request. */
-  public async bulkGet<T extends KitsuResource>(
+  public async bulkGet<
+    T extends KitsuResource,
+    TReturnNull extends boolean = false
+  >(
     paths: string[],
     {
       apiBaseUrl = "",
       joinSpecs = [],
       returnNullForMissingResource
-    }: BulkGetOptions = {}
+    }: BulkGetOptions<TReturnNull> = {}
   ) {
+    // Don't do an empty operations request:
+    if (!paths.length) {
+      return [];
+    }
+
     const getOperations = paths.map<Operation>(path => ({
       op: "GET",
       path
@@ -250,7 +272,9 @@ export class ApiClientImpl implements ApiClientI {
       returnNullForMissingResource
     });
 
-    const resources: PersistedResource<T>[] = (
+    const resources: (TReturnNull extends true
+      ? PersistedResource<T> | null
+      : PersistedResource<T>)[] = (
       await Promise.all(responses.map(deserialise))
     ).map(res => res.data);
 
@@ -264,7 +288,7 @@ export class ApiClientImpl implements ApiClientI {
 
 /** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
 function getErrorMessage(
-  operationsResponse: OperationsResponse
+  operationsResponse: BulkGetOperation[]
 ): string | null {
   // Filter down to just the error responses.
   const errorResponses = operationsResponse.filter(
@@ -320,14 +344,15 @@ export function makeAxiosErrorMoreReadable(error: AxiosError) {
 export class CustomDinaKitsu extends Kitsu {
   /**
    * The default Kitsu 'get' method omits the last part of URLs with multiple slashes.
-   * e.g. "seqdb-api/indexSet/1/ngsindexes" becomes "seqdb-api/indexSet/1".
+   * e.g. "seqdb-api/index-set/1/ngsindexes" becomes "seqdb-api/index-set/1".
    * Override the 'get' method so it works with our long URLs:
    */
   async get(path: string, params: GetParams = {}) {
+    const paramsNet = omit(params, "header");
     try {
       const { data } = await this.axios.get(path, {
-        headers: this.headers,
-        params,
+        headers: { ...this.headers, ...params.header },
+        params: paramsNet,
         paramsSerializer: p => query(p)
       });
 

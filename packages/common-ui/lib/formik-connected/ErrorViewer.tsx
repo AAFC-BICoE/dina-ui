@@ -19,7 +19,7 @@ export function ErrorViewer() {
         .map(
           ([field, error]) =>
             `${
-              getFieldLabel(String(last(field.split(".")))).fieldLabel
+              getFieldLabel({ name: String(last(field.split("."))) }).fieldLabel
             }: ${error}`
         )
         .join("\n");
@@ -43,6 +43,7 @@ export function ErrorViewer() {
         <div
           className="alert alert-danger"
           style={{ whiteSpace: "pre-wrap", wordWrap: "break-word" }}
+          role="status"
         >
           {errorMessage}
         </div>

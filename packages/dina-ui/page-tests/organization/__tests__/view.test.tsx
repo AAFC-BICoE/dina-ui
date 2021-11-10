@@ -1,4 +1,4 @@
-import { OrganizationDetailsPage } from "../../../pages/organization/view";
+import OrganizationDetailsPage from "../../../pages/organization/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Organization } from "../../../types/agent-api/resources/Organization";
 
@@ -29,21 +29,23 @@ const apiContext: any = {
   apiClient: { get: mockGet }
 };
 
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "100" } })
+}));
+
 describe("Organization details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(
-      <OrganizationDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<OrganizationDetailsPage />, {
+      apiContext
+    });
 
     expect(wrapper.find(".spinner-border").exists()).toEqual(true);
   });
 
   it("Render the Organization details", async () => {
-    const wrapper = mountWithAppContext(
-      <OrganizationDetailsPage router={{ query: { id: "100" } } as any} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<OrganizationDetailsPage />, {
+      apiContext
+    });
 
     // Wait for the page to load.
     await new Promise(setImmediate);
@@ -60,7 +62,6 @@ describe("Organization details page", () => {
     );
 
     // The organization's email should be rendered in a FieldView.
-    expect(wrapper.find(".aliases-field-header").exists()).toEqual(true);
     expect(wrapper.find(".aliases-field .field-view").text()).toEqual(
       "org1, org2"
     );

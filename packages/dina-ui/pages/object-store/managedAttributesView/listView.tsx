@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
@@ -40,13 +40,12 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   },
   {
     Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
-      const labelKey:
-        | keyof typeof DINAUI_MESSAGES_ENGLISH
-        | undefined = acceptedValues?.length
-        ? "field_managedAttributeType_picklist_label"
-        : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-            option => option.value === managedAttributeType
-          )?.labelKey;
+      const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
+        acceptedValues?.length
+          ? "field_managedAttributeType_picklist_label"
+          : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
+              option => option.value === managedAttributeType
+            )?.labelKey;
 
       return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
     },
@@ -66,12 +65,14 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
 const ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
 export default function ManagedAttributesListPage() {
+  const { formatMessage } = useDinaIntl();
+
   return (
     <div>
-      <Head title="Managed Attributes" />
+      <Head title={formatMessage("managedAttributeListTitle")} />
       <Nav />
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="managedAttributeListTitle" />
         </h1>
         <ButtonBar>

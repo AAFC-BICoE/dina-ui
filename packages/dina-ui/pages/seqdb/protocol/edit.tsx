@@ -29,15 +29,16 @@ interface ProtocolFormProps {
 export function ProtocolEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const title = id ? "editProtocolTitle" : "addProtocolTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editProtocolTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
             <Query<Protocol>
@@ -55,7 +56,7 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
           </div>
         ) : (
           <div>
-            <h1>
+            <h1 id="wb-cont">
               <SeqdbMessage id="addProtocolTitle" />
             </h1>
             <ProtocolForm router={router} />
@@ -99,44 +100,50 @@ function ProtocolForm({ protocol, router }: ProtocolFormProps) {
         <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/protocol" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-        <div className="row">
-          <SelectField
-            className="col-md-2"
-            name="type"
-            label="Potocol Type"
-            options={PROTOCOL_TYPE_OPTIONS}
-          />
-          <TextField className="col-md-2" name="name" />
-          <TextField className="col-md-2" name="version" />
-          <TextField className="col-md-2" name="description" />
-        </div>
-        <div className="row">
-          <TextField className="col-md-8" name="steps" />
-        </div>
-        <div className="row">
-          <TextField className="col-md-8" name="notes" multiLines={true} />
-        </div>
-        <div className="row">
-          <TextField className="col-md-2" name="reference" />
-          <TextField className="col-md-2" name="equipment" />
-          <ResourceSelectField<Product>
-            className="col-md-4"
-            name="kit"
-            filter={filterBy(["name"])}
-            model="seqdb-api/product"
-            optionLabel={product => product.name}
-          />
-        </div>
-      </div>
+      <ProtocolFormFields />
     </DinaForm>
+  );
+}
+
+export function ProtocolFormFields() {
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-2"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
+        <SelectField
+          className="col-md-2"
+          name="type"
+          label="Protocol Type"
+          options={PROTOCOL_TYPE_OPTIONS}
+        />
+        <TextField className="col-md-2" name="name" />
+        <TextField className="col-md-2" name="version" />
+        <TextField className="col-md-2" name="description" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-8" name="steps" />
+      </div>
+      <div className="row">
+        <TextField className="col-md-8" name="notes" multiLines={true} />
+      </div>
+      <div className="row">
+        <TextField className="col-md-2" name="reference" />
+        <TextField className="col-md-2" name="equipment" />
+        <ResourceSelectField<Product>
+          className="col-md-4"
+          name="kit"
+          filter={filterBy(["name"])}
+          model="seqdb-api/product"
+          optionLabel={product => product.name}
+        />
+      </div>
+    </div>
   );
 }
 

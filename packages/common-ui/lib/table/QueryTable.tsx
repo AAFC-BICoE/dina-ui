@@ -67,6 +67,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   reactTableProps?:
     | Partial<TableProps>
     | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
+
+  hideTopPagination?: boolean;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -89,9 +91,10 @@ export function QueryTable<TData extends KitsuResource>({
   onPageSizeChange,
   onSortedChange,
   path,
+  hideTopPagination,
   reactTableProps
 }: QueryTableProps<TData>) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -170,7 +173,13 @@ export function QueryTable<TData extends KitsuResource>({
 
   const { error, loading: queryIsLoading, response } = queryState;
 
-  const totalCount = response?.meta?.totalResourceCount;
+  const lastSuccessfulResponse =
+    useRef<KitsuResponse<TData[], MetaWithTotal>>();
+  if (response) {
+    lastSuccessfulResponse.current = response;
+  }
+
+  const totalCount = lastSuccessfulResponse.current?.meta?.totalResourceCount;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
@@ -181,8 +190,19 @@ export function QueryTable<TData extends KitsuResource>({
       ? reactTableProps(queryState)
       : reactTableProps;
 
+  // Show the last loaded page while loading the next page:
+  const displayData = lastSuccessfulResponse.current?.data;
+  const shouldShowPagination = !!displayData?.length;
+
+  const [visible, setVisible] = useState(false);
+
   return (
-    <div className="query-table-wrapper" ref={divWrapperRef}>
+    <div
+      className="query-table-wrapper"
+      ref={divWrapperRef}
+      role="search"
+      aria-label={formatMessage({ id: "queryTable" })}
+    >
       {!omitPaging && (
         <span>
           <CommonMessage id="tableTotalCount" values={{ totalCount }} />
@@ -192,21 +212,24 @@ export function QueryTable<TData extends KitsuResource>({
         <span className="mx-3">
           <Tooltip
             id="queryTableMultiSortExplanation"
+            setVisible={setVisible}
+            visible={visible}
             visibleElement={
-              <a href="#">
+              <a
+                href="#"
+                aria-describedby={"queryTableMultiSortExplanation"}
+                onKeyUp={e =>
+                  e.key === "Escape" ? setVisible(false) : setVisible(true)
+                }
+                onMouseOver={() => setVisible(true)}
+                onMouseOut={() => setVisible(false)}
+                onBlur={() => setVisible(false)}
+              >
                 <CommonMessage id="queryTableMultiSortTooltipTitle" />
               </a>
             }
           />
         </span>
-      )}
-      {error && (
-        <div
-          className="alert alert-danger"
-          style={{ position: "absolute", zIndex: 1, whiteSpace: "pre-line" }}
-        >
-          {error.errors?.map(e => e.detail).join("\n") ?? String(error)}
-        </div>
       )}
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
@@ -220,7 +243,7 @@ export function QueryTable<TData extends KitsuResource>({
         TdComponent={DefaultTd}
         className="-striped"
         columns={mappedColumns}
-        data={response?.data}
+        data={displayData}
         defaultPageSize={page.limit}
         defaultSorted={sortingRules}
         loading={loadingProp || queryIsLoading}
@@ -229,7 +252,8 @@ export function QueryTable<TData extends KitsuResource>({
         onFetchData={onFetchData}
         pageSizeOptions={[25, 50, 100, 200, 500]}
         pages={numberOfPages}
-        showPaginationTop={true}
+        showPaginationTop={shouldShowPagination && !hideTopPagination}
+        showPaginationBottom={shouldShowPagination}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
         onPageSizeChange={onPageSizeChange}
@@ -237,12 +261,44 @@ export function QueryTable<TData extends KitsuResource>({
         rowsText={formatMessage({ id: "rows" })}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
-        showPagination={!omitPaging}
+        showPagination={!omitPaging && shouldShowPagination}
         {...resolvedReactTableProps}
         pageText={<CommonMessage id="page" />}
+        TbodyComponent={
+          error
+            ? () => (
+                <div
+                  className="alert alert-danger"
+                  style={{
+                    whiteSpace: "pre-line"
+                  }}
+                >
+                  <p>
+                    {error.errors?.map(e => e.detail).join("\n") ??
+                      String(error)}
+                  </p>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => {
+                      const newSort = [{ id: "createdOn", desc: true }];
+                      onSortedChange?.(newSort);
+                      setSortingRules(newSort);
+                    }}
+                  >
+                    <CommonMessage id="resetSort" />
+                  </button>
+                </div>
+              )
+            : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+        }
       />
     </div>
   );
+}
+
+function DefaultTBody(props) {
+  return <div {...props} className="rt-tbody" />;
 }
 
 export function DefaultTd({ className, style, children, onClick }) {

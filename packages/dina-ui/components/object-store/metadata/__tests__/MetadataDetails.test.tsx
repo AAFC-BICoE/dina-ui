@@ -17,22 +17,23 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata"
 };
 
+/** Mock Kitsu "get" method. */
+const mockGet = jest.fn();
+
+const apiContext: any = {
+  apiClient: { get: mockGet }
+};
+
 describe("MetadataDetails component", () => {
-  it("Renders the metadata details.", () => {
+  it("Renders the metadata details.", async () => {
     const wrapper = mountWithAppContext(
-      <MetadataDetails metadata={TEST_METADATA} />
+      <MetadataDetails metadata={TEST_METADATA} />,
+      { apiContext }
     );
 
-    expect(
-      wrapper.find(".metadata-tags span").map(node => node.text())
-    ).toEqual(["tag1", "tag2"]);
-  });
+    await new Promise(setImmediate);
+    wrapper.update();
 
-  it("Renders 'None' in the tag section when there are no tags.", () => {
-    const wrapper = mountWithAppContext(
-      <MetadataDetails metadata={{ ...TEST_METADATA, acTags: [] }} />
-    );
-
-    expect(wrapper.find(".metadata-tags").text()).toEqual("None");
+    expect(wrapper.text().includes("attr1 value")).toEqual(true);
   });
 });

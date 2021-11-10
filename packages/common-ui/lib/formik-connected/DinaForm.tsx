@@ -7,7 +7,13 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import { createContext, Fragment, PropsWithChildren, useContext } from "react";
+import {
+  createContext,
+  Fragment,
+  PropsWithChildren,
+  useContext,
+  useMemo
+} from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -27,10 +33,24 @@ export interface DinaFormContextI {
    * If a [number, number] is passed then those are the bootstrap grid columns for the label and value.
    * "true" defaults to [6, 6].
    */
-  horizontal?: boolean | [number, number];
+  horizontal?: boolean | [number, number] | "flex";
 
   /** The initial form values passed into Formik. */
   initialValues?: any;
+
+  /** Add a checkbox beside the wrapper field if true */
+  isTemplate?: boolean;
+
+  /** Optionally restrict the writable fields to this list. */
+  enabledFields?: string[] | null;
+
+  /**
+   * @deperecated
+   * Whether this DinaForm is nested in another DinaForm. Nested forms are bad so avoid this.
+   */
+  isNestedForm?: boolean;
+
+  isTemplateRun?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
@@ -67,25 +87,27 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     });
   });
 
-  const FormWrapperInternal = isNestedForm ? Fragment : FormWrapper;
-
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => (
-        <FormWrapperInternal>{childrenProp(formikProps)}</FormWrapperInternal>
-      )
+      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
     ) : (
-      <FormWrapperInternal>{childrenProp}</FormWrapperInternal>
+      <FormWrapper>{childrenProp}</FormWrapper>
     );
+
+  // Clone the initialValues object so it isn't modified in the form:
+  const initialValues = useMemo(
+    () => cloneDeep(props.initialValues),
+    [props.initialValues]
+  );
 
   return (
     <DinaFormContext.Provider
       value={{
-        readOnly: props.readOnly ?? false,
-        horizontal: props.horizontal,
-        initialValues: props.initialValues
+        ...props,
+        isNestedForm,
+        readOnly: props.readOnly ?? false
       }}
     >
       <Formik
@@ -94,6 +116,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
         validateOnChange={false}
         validateOnBlur={false}
         {...props}
+        initialValues={initialValues}
         onSubmit={onSubmitInternal}
       >
         {childrenInternal}
@@ -104,15 +127,29 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 
 /** Wraps the inner content with the Form + ErrorViewer components. */
 function FormWrapper({ children }: PropsWithChildren<{}>) {
+  const { isNestedForm } = useDinaFormContext();
+
+  // Disable enter to submit form in nested forms.
+  function disableEnterToSubmitOuterForm(e) {
+    // Pressing enter should not submit the outer form:
+    if (e.keyCode === 13 && e.target.tagName !== "TEXTAREA") {
+      e.preventDefault();
+    }
+  }
+
+  const Wrapper = isNestedForm ? "div" : Form;
+
   return (
-    <Form>
+    <Wrapper
+      onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
+    >
       <ErrorViewer />
       {children}
-    </Form>
+    </Wrapper>
   );
 }
 
-const DinaFormContext = createContext<DinaFormContextI | null>(null);
+export const DinaFormContext = createContext<DinaFormContextI | null>(null);
 
 export function useDinaFormContext() {
   const ctx = useContext(DinaFormContext);

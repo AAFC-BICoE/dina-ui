@@ -1,6 +1,6 @@
-import { HotTableProps } from "@handsontable/react";
+import type { HotTableProps } from "@handsontable/react";
 import { FormikContextType, useFormikContext } from "formik";
-import { GridSettings } from "handsontable";
+import type { GridSettings } from "handsontable";
 import { cloneDeep, isEmpty, isEqual, zipWith } from "lodash";
 import dynamic from "next/dynamic";
 import { Component, useEffect, useState } from "react";
@@ -167,7 +167,10 @@ export function BulkDataEditor<TRow>({
       <FormikButton
         className="btn btn-primary bulk-editor-submit-button"
         onClick={onSubmitInternal}
-        buttonProps={() => ({ disabled: hasValidationErrors })}
+        buttonProps={() => ({
+          disabled: hasValidationErrors,
+          style: { width: "10rem" }
+        })}
       >
         <CommonMessage id="submitBtnText" />
       </FormikButton>
@@ -183,7 +186,12 @@ const DynamicHotTable = dynamic(
     // Handsontable must only be loaded in the browser, because it depends on the global
     // navigator object to be available.
     const { HotTable } = await import("@handsontable/react");
-    const { renderers } = await import("handsontable");
+
+    // One of the two import styles for "renderers" should work, depending on how typescript/babel resolves imports:
+    const { renderers: renderersImport, default: handsontable } = await import(
+      "handsontable"
+    );
+    const renderers = handsontable?.renderers ?? renderersImport;
 
     const readableAutocompleteRenderer = getUserFriendlyAutoCompleteRenderer(
       renderers.AutocompleteRenderer

@@ -3,7 +3,7 @@ import { LibraryPool } from "./LibraryPool";
 import { LibraryPrepBatch } from "./LibraryPrepBatch";
 
 interface LibraryPoolContentAttributes {
-  type: "libraryPoolContent";
+  type: "library-pool-content";
 }
 
 interface LibraryPoolContentRelationships {

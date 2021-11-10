@@ -1,9 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FieldWrapper, LabelWrapperParams, SelectOption } from "common-ui";
-import Select from "react-select";
-import { DinaMessage } from "../../../../intl/dina-ui-intl";
+import Select, { StylesConfig } from "react-select";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
-import { Styles } from "react-select/src/styles";
 
 export interface DefaultValueConfigSelectProps {
   allowBlank?: boolean;
@@ -11,7 +10,7 @@ export interface DefaultValueConfigSelectProps {
   onChangeConfigIndex: (index: number | null) => void;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
-  styles?: Partial<Styles<SelectOption<any>, boolean>>;
+  styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
 }
 
 /** Lists, adds, edits, and removes Default Value Configs. */
@@ -21,10 +20,8 @@ export function DefaultValueConfigManager({
   onChangeConfigIndex,
   dateSupplier = () => new Date().toLocaleString()
 }: DefaultValueConfigSelectProps) {
-  const {
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  } = useStoredDefaultValuesConfigs();
+  const { storedDefaultValuesConfigs, saveDefaultValuesConfigs } =
+    useStoredDefaultValuesConfigs();
 
   function addNewConfig() {
     const newConfigs = [
@@ -84,13 +81,8 @@ export function DefaultValueConfigManager({
 }
 
 export function useStoredDefaultValuesConfigs() {
-  const [
-    storedDefaultValuesConfigs,
-    saveDefaultValuesConfigs
-  ] = useLocalStorage<DefaultValuesConfig[]>(
-    "metadata_defaultValuesConfigs",
-    []
-  );
+  const [storedDefaultValuesConfigs, saveDefaultValuesConfigs] =
+    useLocalStorage<DefaultValuesConfig[]>("metadata_defaultValuesConfigs", []);
 
   return { storedDefaultValuesConfigs, saveDefaultValuesConfigs };
 }
@@ -103,6 +95,7 @@ export function DefaultValuesConfigSelect({
   styles
 }: DefaultValueConfigSelectProps) {
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
+  const { formatMessage } = useDinaIntl();
 
   const ruleConfigOptions = storedDefaultValuesConfigs.map((cfg, index) => ({
     label: cfg.name || `Rule Set ${cfg.createdOn}`,
@@ -115,7 +108,11 @@ export function DefaultValuesConfigSelect({
 
   return (
     <Select<{ label: string; value: number | null }>
-      instanceId="config-select"
+      instanceId={
+        "config-select-" +
+        document.getElementsByClassName("ReactModalPortal").length
+      }
+      aria-label={formatMessage("selectRuleSet")}
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}
       value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
@@ -128,7 +125,7 @@ export function DefaultValuesConfigSelect({
 export function DefaultValuesConfigSelectField(
   props: LabelWrapperParams & {
     allowBlank?: boolean;
-    styles?: Partial<Styles<SelectOption<any>, boolean>>;
+    styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
   }
 ) {
   const { allowBlank, styles, ...labelWrapperProps } = props;

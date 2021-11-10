@@ -1,0 +1,32 @@
+/*
+* CSS classes for elements that common across multiple pages and/or styled in JS files (i.e. styled after the CSS file loaded)
+*/
+
+/*
+ * Changes the default color of the badge to dark grey. 
+ * Currently there is no background color that is applied.
+ */
+.badge {
+  background-color: #333333;
+}
+
+/*
+* Fixes WCAG contrast issue for react-select input elements
+* Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
+*/
+input[id^="react-select"] {
+  padding: 1px !important;
+}
+
+/*
+* Fixes WCAG contrast issue for placeholder text in various textfields
+*/
+.css-1wa3eu0-placeholder {
+  color: #333333 !important;
+}
+
+.fieldset-h2-adjustment {
+  font-size: 1.7rem !important;
+  margin-top: 15px !important;
+  margin-bottom: 10px !important;
+}

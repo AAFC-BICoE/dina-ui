@@ -6,6 +6,7 @@ import {
   SubmitButton
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
+import { SeqdbMessage } from "../../../../../intl/seqdb-intl";
 import {
   LibraryPrep,
   LibraryPrepBatch,
@@ -65,7 +66,7 @@ export function IndexGrid(props: IndexGridProps) {
                 filter={filterBy(["name"])}
                 name={`indexI5s[${rowLetter}]`}
                 optionLabel={primer => primer.name}
-                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/index-set/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </div>
@@ -114,7 +115,7 @@ export function IndexGrid(props: IndexGridProps) {
                 filter={filterBy(["name"])}
                 name={`indexI7s[${columnLabel}]`}
                 optionLabel={primer => primer.name}
-                model={`seqdb-api/indexSet/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
+                model={`seqdb-api/index-set/${libraryPrepBatch.indexSet.id}/ngsIndexes`}
                 styles={{ menu: () => ({ zIndex: 5 }) }}
               />
             </>
@@ -132,14 +133,15 @@ export function IndexGrid(props: IndexGridProps) {
         onSubmit={onSubmit}
       >
         <style>{`
-            .rt-td {
-              padding: 0 !important;
-            }
-          `}</style>
-        <div style={{ height: "50px" }}>
-          <div className="float-end">
-            <SubmitButton />
-          </div>
+          .rt-td {
+            padding: 0 !important;
+          }
+        `}</style>
+        <div className="alert alert-warning d-inline-block">
+          <SeqdbMessage id="indexGridInstructions" />
+        </div>
+        <div>
+          <SubmitButton className="mb-3" />
         </div>
         <ReactTable
           columns={columns}

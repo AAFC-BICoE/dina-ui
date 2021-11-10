@@ -5,16 +5,26 @@ import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../useStoredDefaultGroup";
 import Select from "react-select";
 
+const mockSubmit = jest.fn();
+
+const testCtx = {
+  apiContext: {
+    apiClient: { get: () => undefined } as any
+  }
+};
+
 describe("GroupSelectField component", () => {
   // Clear the local storage:
   beforeEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
+  beforeEach(jest.clearAllMocks);
   afterEach(() => deleteFromStorage(DEFAULT_GROUP_STORAGE_KEY));
 
   it("Renders the default group list without accessing the user API.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -78,7 +88,8 @@ describe("GroupSelectField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -93,7 +104,8 @@ describe("GroupSelectField component", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-      </DinaForm>
+      </DinaForm>,
+      testCtx
     );
 
     await new Promise(setImmediate);
@@ -105,21 +117,71 @@ describe("GroupSelectField component", () => {
     });
   });
 
-  it("Doesn't set the default group if a group is passes using initialValues.", async () => {
+  it("Doesn't set the default group if a group is passed using initialValues.", async () => {
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
 
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ group: "aafc" }}>
         <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-      </DinaForm>
+      </DinaForm>,
+      // User has only one group:
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
     );
 
     await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(Select).prop("value")).toEqual({
-      label: "AAFC",
+      label: "aafc",
       value: "aafc"
     });
+  });
+
+  it("Hides the field and sets the only option when the default option is the only option.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+      </DinaForm>,
+      // User has only one group:
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(Select).exists()).toEqual(false);
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+    // The default group was selected:
+    expect(mockSubmit).lastCalledWith({ group: "cnc" });
+  });
+
+  it("Doesn't set the default value when the initial value is null.", async () => {
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "cnc");
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ group: null }}
+        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
+      >
+        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+      </DinaForm>,
+      // User has only one group:
+      { ...testCtx, accountContext: { groupNames: ["cnc"] } }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+    // The default group was selected:
+    expect(mockSubmit).lastCalledWith({ group: null });
   });
 });

@@ -1,8 +1,9 @@
 import { DocWithErrors } from "jsonapi-typescript";
 import { GetParams, KitsuResponse, KitsuResponseData } from "kitsu";
 import { isArray, isUndefined, omitBy } from "lodash";
-import { useCallback, useContext, useRef } from "react";
-import { useAsyncRun, useAsyncTask } from "react-hooks-async";
+import { useContext, useDebugValue, useMemo } from "react";
+import useSWR from "swr";
+import { v4 as uuidv4 } from "uuid";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { ApiClientContext } from "./ApiClientContext";
 import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
@@ -10,6 +11,7 @@ import { ClientSideJoiner, ClientSideJoinSpec } from "./client-side-join";
 /** Attributes that compose a JsonApi query. */
 export interface JsonApiQuerySpec extends GetParams {
   path: string;
+  header?: {};
 }
 
 /** Query hook state. */
@@ -41,29 +43,24 @@ export interface QueryOptions<TData extends KitsuResponseData, TMeta> {
 export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   querySpec: JsonApiQuerySpec,
   {
-    deps,
-    joinSpecs,
+    deps = [],
+    joinSpecs = [],
     onSuccess,
     disabled = false
   }: QueryOptions<TData, TMeta> = {}
 ): QueryState<TData, TMeta> {
   const { apiClient, bulkGet } = useContext(ApiClientContext);
-
-  const previousResponseRef = useRef<KitsuResponse<TData, TMeta> | undefined>(
-    undefined
-  );
-
   // Memoize the callback. Only re-create it when the query spec changes.
-  const fetchData = useCallback(async () => {
+  async function fetchData() {
     if (disabled) {
       return undefined;
     }
 
     // Omit undefined values from the GET params, which would otherwise cause an invalid request.
     // e.g. /api/region?fields=undefined
-    const { path, fields, filter, sort, include, page } = querySpec;
+    const { path, fields, filter, sort, include, page, header } = querySpec;
     const getParams = omitBy<GetParams>(
-      { fields, filter, sort, include, page },
+      { fields, filter, sort, include, page, header },
       isUndefined
     );
 
@@ -77,9 +74,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
       );
     }
 
-    if (onSuccess) {
-      await onSuccess(response);
-    }
+    await onSuccess?.(response);
 
     if (joinSpecs) {
       const { data } = response;
@@ -91,21 +86,29 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
     }
 
     return response;
-  }, [JSON.stringify(querySpec), disabled, ...(deps ?? [])]);
-
-  // fetchData function should re-run when the query spec changes.
-  const task = useAsyncTask(fetchData);
-  useAsyncRun(task);
-
-  // When the hook is re-fetching after a change of props, provide the previous response while loading.
-  if (task.result && task.result !== previousResponseRef.current) {
-    previousResponseRef.current = task.result;
   }
 
+  const queryKey = JSON.stringify({ querySpec, disabled, deps });
+
+  // Invalidate the query cache on query change, don't use SWR's built-in cache:
+  const cacheId = useMemo(() => uuidv4(), [queryKey]);
+
+  const {
+    data: apiResponse,
+    error,
+    isValidating: loading
+  } = useSWR([queryKey, cacheId], fetchData, {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  });
+
+  useDebugValue({ querySpec });
+
   return {
-    error: task.error as any,
-    loading: !!task.pending,
-    response: disabled ? undefined : previousResponseRef.current
+    error,
+    loading,
+    response: disabled || loading ? undefined : apiResponse
   };
 }
 
@@ -115,7 +118,9 @@ export function withResponse<
   TMeta = undefined
 >(
   { loading, error, response }: QueryState<TData, TMeta>,
-  responseRenderer: (response: KitsuResponse<TData, TMeta>) => JSX.Element
+  responseRenderer: (
+    response: KitsuResponse<TData, TMeta>
+  ) => JSX.Element | null
 ): JSX.Element | null {
   if (loading) {
     return <LoadingSpinner loading={true} />;

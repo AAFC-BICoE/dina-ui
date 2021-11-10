@@ -26,8 +26,9 @@ export function DefaultValueRuleEditor({
   const { storedDefaultValuesConfigs, saveDefaultValuesConfigs } =
     useStoredDefaultValuesConfigs();
 
-  const [ruleConfigIndex, setRuleConfigIndex] =
-    useState<number | null>(initialIndex);
+  const [ruleConfigIndex, setRuleConfigIndex] = useState<number | null>(
+    initialIndex
+  );
 
   const selectedConfig: DefaultValuesConfig | undefined =
     storedDefaultValuesConfigs[ruleConfigIndex ?? -1] ?? undefined;
@@ -67,7 +68,7 @@ export function DefaultValueRuleEditor({
           {({ values }) => (
             <div>
               <TextField className="col-md-3" name="name" />
-              <ul className="list-group">
+              <ul className="list-group" style={{ listStyleType: "none" }}>
                 <FieldArray name="defaultValueRules">
                   {arrayHelpers =>
                     values.defaultValueRules.length ? (
@@ -85,14 +86,16 @@ export function DefaultValueRuleEditor({
                         </li>
                       ))
                     ) : (
-                      <button
-                        style={{ width: "10rem" }}
-                        className="btn btn-primary add-rule-button"
-                        type="button"
-                        onClick={() => arrayHelpers.push(blankRule())}
-                      >
-                        <DinaMessage id="addRule" />
-                      </button>
+                      <li>
+                        <button
+                          style={{ width: "10rem" }}
+                          className="btn btn-primary add-rule-button"
+                          type="button"
+                          onClick={() => arrayHelpers.push(blankRule())}
+                        >
+                          <DinaMessage id="addRule" />
+                        </button>
+                      </li>
                     )
                   }
                 </FieldArray>

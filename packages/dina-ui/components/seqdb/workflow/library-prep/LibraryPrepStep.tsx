@@ -22,10 +22,10 @@ export function LibraryPrepStep(props: StepRendererProps) {
   const { loading, response } = useQuery<StepResource[]>(
     {
       fields: {
-        indexSet: "name",
+        "index-set": "name",
         product: "name",
         protocol: "name",
-        thermocyclerprofile: "name"
+        "thermocycler-profile": "name"
       },
       filter: {
         "chain.uuid": chain.id as string,
@@ -33,7 +33,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
       },
       include:
         "libraryPrepBatch,libraryPrepBatch.product,libraryPrepBatch.protocol,libraryPrepBatch.containerType,libraryPrepBatch.thermocyclerProfile,libraryPrepBatch.indexSet",
-      path: "seqdb-api/stepResource"
+      path: "seqdb-api/step-resource"
     },
     {
       deps: [lastSave]
@@ -73,7 +73,7 @@ export function LibraryPrepStep(props: StepRendererProps) {
       <>
         <h2>Library Prep Batch</h2>
         <button
-          className="btn btn-primary float-end"
+          className="btn btn-primary mb-3"
           onClick={() => setEditBatchDetails(true)}
           type="button"
         >
@@ -84,21 +84,25 @@ export function LibraryPrepStep(props: StepRendererProps) {
         </div>
         <div className="mb-3 list-inline">
           <Link
-            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
+            href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
             <a className="list-inline-item btn btn-primary" target="_blank">
               Library Prep Worksheet With Table
             </a>
           </Link>
           <Link
-            href={`/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
+            href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
           >
             <a className="list-inline-item btn btn-primary" target="_blank">
               Library Prep Worksheet With Grid
             </a>
           </Link>
         </div>
-        <div className="mb-3">
+        <div
+          className="mb-3"
+          // Give this section enough min height so you don't lose your scroll position when changing tabs:
+          style={{ minHeight: "70rem" }}
+        >
           <Tabs>
             <TabList>
               <Tab>Substep 1: Library Prep Details Table</Tab>

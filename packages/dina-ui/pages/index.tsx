@@ -1,16 +1,16 @@
 import Link from "next/link";
 import React from "react";
 import { Footer, Head, Nav } from "../components";
-import { DinaMessage } from "../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
-    <Head title="Home" />
+    <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
     <Nav />
     <main role="main">
       <div className="container">
-        <h1>
+        <h1 id="wb-cont">
           <DinaMessage id="dinaHomeH1" />
         </h1>
         <h2>
@@ -84,6 +84,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/seqdb/sanger-workflow/list">
+              <a>
+                <SeqdbMessage id="sangerWorkflowListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/seqdb/index-set/list">
               <a>
                 <SeqdbMessage id="indexSetListTitle" />
@@ -101,6 +108,13 @@ const Home: React.FunctionComponent = () => (
             <Link href="/seqdb/pcr-profile/list">
               <a>
                 <SeqdbMessage id="pcrProfileListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/seqdb/pcr-batch/list">
+              <a>
+                <SeqdbMessage id="pcrBatchListTitle" />
               </a>
             </Link>
           </li>
@@ -125,15 +139,36 @@ const Home: React.FunctionComponent = () => (
               </a>
             </Link>
           </li>
+          <li>
+            <Link href="/seqdb/molecular-sample/list">
+              <a>
+                <SeqdbMessage id="molecularSampleListTitle" />
+              </a>
+            </Link>
+          </li>
         </ul>
         <h2>
           <DinaMessage id="collectionSectionTitle" />
         </h2>
         <ul>
-          <li className="d-none">
-            <Link href="/collection/collector-group/list">
+          <li>
+            <Link href="/collection/collection/list">
               <a>
-                <DinaMessage id="collectorGroupListTitle" />
+                <DinaMessage id="collectionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/collection-method/list">
+              <a>
+                <DinaMessage id="collectionMethodListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/institution/list">
+              <a>
+                <DinaMessage id="institutionListTitle" />
               </a>
             </Link>
           </li>
@@ -159,17 +194,44 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/material-sample-type/list">
+              <a>
+                <DinaMessage id="materialSampleTypeListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/preparation-type/list">
               <a>
                 <DinaMessage id="preparationTypeListTitle" />
               </a>
             </Link>
           </li>
-
+          <li>
+            <Link href="/collection/storage-unit-type/list">
+              <a>
+                <DinaMessage id="storageUnitTypeListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/storage-unit/list">
+              <a>
+                <DinaMessage id="storageUnitListTitle" />
+              </a>
+            </Link>
+          </li>
           <li>
             <Link href="/collection/revisions-by-user">
               <a>
                 <DinaMessage id="revisionsByUserPageTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/workflow-template/list">
+              <a>
+                <DinaMessage id="workflowTemplateListTitle" />
               </a>
             </Link>
           </li>

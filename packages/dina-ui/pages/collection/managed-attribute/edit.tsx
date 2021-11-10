@@ -26,6 +26,8 @@ import {
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
 
+import { GroupSelectField } from "../../../components";
+
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
   router: NextRouter;
@@ -34,16 +36,17 @@ interface ManagedAttributeFormProps {
 export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useDinaIntl();
+  const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
   return (
     <div>
-      <Head title={formatMessage("managedAttributeEditTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
+      <main className="container">
         {id ? (
           <div>
-            <h1>
-              <DinaMessage id="managedAttributeEditTitle" />
+            <h1 id="wb-cont">
+              <DinaMessage id="editManagedAttributeTitle" />
             </h1>
             <Query<ManagedAttribute>
               query={{ path: `collection-api/managed-attribute/${id}` }}
@@ -64,7 +67,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1>
-              <DinaMessage id="addManagedAttributeButtonText" />
+              <DinaMessage id="addManagedAttributeTitle" />
             </h1>
             <br />
             <ManagedAttributeForm router={router} />
@@ -153,46 +156,52 @@ function ManagedAttributeForm({
           </a>
         </Link>
       </ButtonBar>
-      <div style={{ width: "25rem" }}>
-        <TextField name="name" readOnly={id !== undefined} />
+      <div className="row">
+        <GroupSelectField
+          className="col-md-6"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
       </div>
-      <div style={{ width: "25rem" }}>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="name"
+          readOnly={id !== undefined}
+        />
+        <TextField className="col-md-6" name="key" readOnly={true} />
+      </div>
+      <div className="row">
         <SelectField
+          className="col-md-6"
           name="managedAttributeComponent"
           options={ATTRIBUTE_COMPONENT_OPTIONS}
         />
       </div>
-      <div style={{ width: "25rem" }}>
+      <div className="row">
         <SelectField
+          className="col-md-6"
           name="managedAttributeType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
         />
       </div>
       {type === "PICKLIST" && (
-        <div style={{ width: "25rem" }}>
-          <StringArrayField name="acceptedValues" />
+        <div className="row">
+          <div className="col-md-6">
+            <StringArrayField name="acceptedValues" />
+          </div>
         </div>
       )}
       {id && (
-        <div style={{ width: "25rem" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeCreatedOn" />
-          </h4>
+        <div className="row">
           <DateField
+            className="col-md-6"
             showTime={true}
             name="createdOn"
             disabled={true}
-            hideLabel={true}
           />
-        </div>
-      )}
-      {id && (
-        <div style={{ width: "25rem" }}>
-          <h4>
-            <DinaMessage id="field_managedAttributeCreatedBy" />
-          </h4>
-          <TextField name="createdBy" hideLabel={true} readOnly={true} />
+          <TextField className="col-md-6" name="createdBy" readOnly={true} />
         </div>
       )}
     </DinaForm>

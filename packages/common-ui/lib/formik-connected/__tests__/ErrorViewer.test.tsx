@@ -13,7 +13,9 @@ describe("ErrorViewer component", () => {
       </Formik>
     );
 
-    expect(wrapper.html()).toEqual('<div style="scroll-margin: 20px;"></div>');
+    expect(wrapper.find(ErrorViewer).html()).toEqual(
+      '<div style="scroll-margin: 20px;"></div>'
+    );
   });
 
   it("Renders the formik status as an error message.", async () => {

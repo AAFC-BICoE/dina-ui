@@ -9,7 +9,7 @@ const TEST_PROFILES: PcrProfile[] = [
   {
     id: "4",
     name: "Test Profile 1",
-    type: "PRORILE"
+    type: "PROFILE"
   },
   {
     id: "5",

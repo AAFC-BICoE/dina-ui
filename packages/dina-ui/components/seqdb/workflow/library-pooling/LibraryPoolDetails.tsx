@@ -10,6 +10,7 @@ export function LibraryPoolDetails({ libraryPool }: LibraryPoolDetailsProps) {
     <DinaForm<LibraryPool> initialValues={libraryPool}>
       <>
         <div className="row">
+          <FieldView className="col-md-2" name="group" />
           <FieldView className="col-md-2" name="name" />
           <FieldView className="col-md-2" name="dateUsed" />
         </div>

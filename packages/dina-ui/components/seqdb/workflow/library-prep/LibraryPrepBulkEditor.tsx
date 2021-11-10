@@ -10,6 +10,7 @@ import {
   SaveArgs,
   useResourceSelectCells
 } from "common-ui";
+import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
 import {
@@ -95,8 +96,8 @@ export function LibraryPrepBulkEditor({
                 {
                   filter: filterBy(["name"]),
                   label: ngsIndex => ngsIndex.name,
-                  model: `seqdb-api/indexSet/${libraryPrepBatch.indexSet?.id}/ngsIndexes`,
-                  type: "ngsIndex"
+                  model: `seqdb-api/index-set/${libraryPrepBatch.indexSet?.id}/ngsIndexes`,
+                  type: "ngs-index"
                 },
                 {
                   data: `${indexField}`,
@@ -113,10 +114,10 @@ export function LibraryPrepBulkEditor({
     // Load the StepResources of the Sample Select step.
     // There should be one table row per StepResource (selected Sample).
     const { data: sampleSrs } = await apiClient.get<SampleStepResource[]>(
-      "seqdb-api/stepResource",
+      "seqdb-api/step-resource",
       {
         fields: {
-          molecularSample: "name"
+          "molecular-sample": "name"
         },
         filter: {
           "chain.uuid": chain.id as string,
@@ -129,7 +130,7 @@ export function LibraryPrepBulkEditor({
 
     // Fetch the existing LibraryPreps for this LibraryPrepBatch:
     const { data: libraryPreps } = await apiClient.get<LibraryPrep[]>(
-      `seqdb-api/libraryPrepBatch/${libraryPrepBatch.id}/libraryPreps`,
+      `seqdb-api/library-prep-batch/${libraryPrepBatch.id}/libraryPreps`,
       {
         include: "molecularSample,indexI5,indexI7",
         page: { limit: 1000 }
@@ -172,7 +173,7 @@ export function LibraryPrepBulkEditor({
       const id = change.original.libraryPrep?.id;
 
       const libraryPrepEdit = {
-        type: "libraryPrep",
+        type: "library-prep",
         ...(id ? { id } : {}),
         libraryPrepBatch,
         molecularSample: change.original.molecularSample,
@@ -190,7 +191,7 @@ export function LibraryPrepBulkEditor({
 
       return {
         resource: libraryPrepEdit,
-        type: "libraryPrep"
+        type: "library-prep"
       };
     });
 

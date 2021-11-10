@@ -53,14 +53,14 @@ export default function PcrPrimerListPage() {
   const { formatMessage } = useSeqdbIntl();
 
   return (
-    <>
+    <div>
       <Head title={formatMessage("pcrPrimerListTitle")} />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-primer" />
       </ButtonBar>
       <main className="container-fluid">
-        <h1>
+        <h1 id="wb-cont">
           <SeqdbMessage id="pcrPrimerListTitle" />
         </h1>
         <ListPageLayout
@@ -69,10 +69,10 @@ export default function PcrPrimerListPage() {
           queryTableProps={{
             columns: PCRPRIMER_TABLE_COLUMNS,
             include: "region",
-            path: "seqdb-api/pcrPrimer"
+            path: "seqdb-api/pcr-primer"
           }}
         />
       </main>
-    </>
+    </div>
   );
 }

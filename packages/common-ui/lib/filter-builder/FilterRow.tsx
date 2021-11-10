@@ -1,4 +1,4 @@
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import moment from "moment";
 import React from "react";
 import Select from "react-select";
@@ -54,29 +54,23 @@ export type FilterDropdownOption<TValue> = {
 
 export class FilterRow extends React.Component<FilterRowProps> {
   public static contextType = FilterBuilderContext;
-  public context!: FilterBuilderContextI;
 
   public render() {
-    const {
-      model,
-      onAndClick,
-      onRemoveClick,
-      onOrClick,
-      showRemoveButton
-    } = this.props;
+    const { model, onAndClick, onRemoveClick, onOrClick, showRemoveButton } =
+      this.props;
 
     // If only a string is passed, create the default attribute config object:
     const attribute = this.attributeConfig();
 
     // Get the selected Filter Attribute from the parent FilterBuilder's list:
-    const selectedAttributeOption = this.context.attributeOptions.find(
-      option => {
-        const optionAttrString =
-          typeof option.value === "string" ? option.value : option.value.name;
+    const selectedAttributeOption = (
+      this.context as FilterBuilderContextI
+    ).attributeOptions.find(option => {
+      const optionAttrString =
+        typeof option.value === "string" ? option.value : option.value.name;
 
-        return attribute.name === optionAttrString;
-      }
-    );
+      return attribute.name === optionAttrString;
+    });
 
     /** The predicate types to put into the dropdown. */
     const predicateTypes =
@@ -89,19 +83,35 @@ export class FilterRow extends React.Component<FilterRowProps> {
         ? SEARCH_TYPES_EXACT_ONLY
         : STRING_SEARCH_TYPES;
 
+    const customStyle: any = {
+      multiValueLabel: base => ({ ...base, cursor: "move" }),
+      placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
+      option: (_, state) => ({
+        ...{
+          backgroundColor:
+            // Use the same color for all dropdown items when highlighting regardless they are selected or not
+            state.isFocused ? "#DEEBFF" : "transparent",
+          padding: "8px 12px"
+        }
+      })
+    };
+
     return (
       <div className="list-inline">
-        <label className="list-inline-item" style={{ width: 320 }}>
+        <div className="list-inline-item" style={{ width: 320 }}>
           <Select<FilterAttributeOption>
+            aria-label="Filter Attribute"
             className="filter-attribute"
             instanceId={`attribute_${model.id}`}
             options={this.context.attributeOptions}
             onChange={this.onPropertyChanged}
             value={selectedAttributeOption}
+            styles={customStyle}
           />
-        </label>
-        <label className="list-inline-item" style={{ width: "12rem" }}>
+        </div>
+        <div className="list-inline-item" style={{ width: "12rem" }}>
           <Select
+            aria-label="Filter Predicate"
             className="filter-predicate"
             instanceId={`predicate_${model.id}`}
             options={predicateTypes}
@@ -109,11 +119,13 @@ export class FilterRow extends React.Component<FilterRowProps> {
             value={predicateTypes.find(
               option => option.value === model.predicate
             )}
+            styles={customStyle}
           />
-        </label>
-        <label className="list-inline-item">
+        </div>
+        <div className="list-inline-item">
           {attribute.type === "DATE" && (
             <FilterRowDatePicker
+              aria-label="Search Date"
               isRange={model.predicate === "BETWEEN"}
               value={model.value as string | DateRange}
               onDateValueChanged={this.onDateValueChanged}
@@ -122,13 +134,14 @@ export class FilterRow extends React.Component<FilterRowProps> {
           {attribute.type === "DROPDOWN" && (
             <div style={{ width: "16rem" }}>
               <ResourceSelect
+                aria-label="Select Option"
                 onChange={this.onSelectValueChanged}
                 filter={attribute.filter ?? (() => ({}))}
                 model={attribute.resourcePath ?? ""}
                 optionLabel={attribute.optionLabel ?? (() => "---")}
                 value={
                   typeof model.value !== "string"
-                    ? (model.value as KitsuResource)
+                    ? (model.value as PersistedResource)
                     : undefined
                 }
               />
@@ -148,10 +161,11 @@ export class FilterRow extends React.Component<FilterRowProps> {
               onChange={this.onValueChanged}
             />
           )}
-        </label>
+        </div>
         {attribute.type !== "DATE" && (
-          <label className="list-inline-item" style={{ width: "12rem" }}>
+          <div className="list-inline-item" style={{ width: "12rem" }}>
             <Select
+              aria-label="Search Type"
               className="filter-search-type"
               instanceId={`searchType_${model.id}`}
               options={searchTypes}
@@ -159,8 +173,9 @@ export class FilterRow extends React.Component<FilterRowProps> {
               value={searchTypes.find(
                 option => option.value === model.searchType
               )}
+              styles={customStyle}
             />
-          </label>
+          </div>
         )}
         <div className="filter-row-buttons list-inline-item">
           <button

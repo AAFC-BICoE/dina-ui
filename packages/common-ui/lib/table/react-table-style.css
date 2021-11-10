@@ -1,11 +1,20 @@
-/* Wraps long text instead of shortening it. */
+/* Wraps long text when necessary in columns */
+/* Corrects contrast issue for preview pane and details page when page is reduced in size */
 .ReactTable .rt-td {
-  white-space: unset !important;
+  white-space: normal !important;
+  flex: 50% 0 !important;
+  width: auto !important;
+}
+
+/* Wraps long text in column header when necessary */
+/* Corrects contrast error when page size reduced */
+.ReactTable .rt-th {
+  white-space: normal !important;
 }
 
 /* Align the header titles to the left to match the cell text alignment. */
 .ReactTable .rt-thead .rt-tr {
-  text-align: left;
+  text-align: left !important;
 }
 
 /*
@@ -19,4 +28,20 @@
 
 .ReactTable input[type="number"] {
   -moz-appearance: textfield;
+}
+
+.ReactTable .rt-noData {
+  top: 60% !important;
+  background: rgba(255, 255, 255, 1) !important;
+  padding: 0px !important;
+  color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.query-table-wrapper .ReactTable .rt-tr-group:hover {
+  /* Highlights the hovered table row in green. */
+  background-color: rgb(222, 252, 222) !important;
+}
+
+.ReactTable .-pagination .-center .select-wrap.-pageSizeOptions > select:focus {
+  border-color: #66afe9;
 }

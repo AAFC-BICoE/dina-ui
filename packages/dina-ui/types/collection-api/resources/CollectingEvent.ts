@@ -8,11 +8,12 @@ import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
 import { ManagedAttributeValues } from "../../objectstore-api";
 
+import { JsonValue } from "type-fest";
+
 export interface CollectingEventAttributes {
   type: "collecting-event";
-  uuid: string;
 
-  startEventDateTime: string;
+  startEventDateTime?: string | null | undefined;
   endEventDateTime?: string | null;
   dwcRecordedBy?: string;
   verbatimEventDateTime?: string;
@@ -27,6 +28,10 @@ export interface CollectingEventAttributes {
   dwcVerbatimDepth?: string;
   dwcOtherRecordNumbers?: string[];
   dwcRecordNumber?: string;
+  dwcMinimumElevationInMeters?: number;
+  dwcMinimumDepthInMeters?: number;
+  dwcMaximumElevationInMeters?: number;
+  dwcMaximumDepthInMeters?: number;
 
   dwcCountry?: string;
   dwcCountryCode?: string;
@@ -37,14 +42,22 @@ export interface CollectingEventAttributes {
   createdOn?: string;
   collectorGroupUuid?: string;
 
-  group: string;
+  group?: string;
   geographicPlaceNameSourceDetail?: GeographicPlaceNameSourceDetail;
   geographicPlaceNameSource?: GeographicPlaceNameSource;
   srcAdminLevels?: SourceAdministrativeLevel[];
 
   habitat?: string;
+  host?: string;
+
+  substrate?: string;
+  remarks?: string;
+
+  publiclyReleasable?: boolean;
+  notPubliclyReleasableReason?: string;
 
   managedAttributeValues?: ManagedAttributeValues;
+  managedAttributes?: JsonValue;
 }
 
 export enum GeographicPlaceNameSource {

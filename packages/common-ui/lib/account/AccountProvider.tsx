@@ -50,7 +50,7 @@ export function useAccount(): AccountContextI {
   if (!ctx) {
     throw new Error("No AccountContext available.");
   }
-  return ctx;
+  return ctx as any;
 }
 
 /** Converts the Keycloak context to the generic AccountContextI. */

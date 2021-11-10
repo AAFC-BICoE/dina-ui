@@ -34,18 +34,22 @@ let mockQuery: any = {};
 const mockGet = jest.fn(async model => {
   // The get request will return the existing collecting-event.
   if (
-    model === "collection-api/collecting-event/1?include=collectors,attachment"
+    model ===
+    "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod"
   ) {
     return { data: testCollectingEvent() };
   } else if (model === "agent-api/person") {
     return { data: [testAgent()] };
-  } else if (model === "collection-api/srs") {
+  } else if (model === "collection-api/vocabulary/srs") {
     return { data: [testSrs()] };
-  } else if (model === "collection-api/coordinate-system") {
+  } else if (model === "collection-api/vocabulary/coordinateSystem") {
     return { data: [testCoordinates()] };
   } else if (model === "collection-api/collecting-event") {
     return { data: [] };
-  } else if (model === "collection-api/managed-attribute") {
+  } else if (
+    model === "collection-api/managed-attribute" ||
+    model === "collection-api/collection-method"
+  ) {
     return { data: [] };
   } else if (model === "user-api/group") {
     return { data: [] };
@@ -112,30 +116,8 @@ describe("collecting-event edit page", () => {
     });
 
     expect(wrapper.find(".startEventDateTime-field")).toHaveLength(1);
-    // initially renders without end event datetime
-    expect(wrapper.find(".endEventDateTime-field")).toHaveLength(0);
-    expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
-
-    // simulate turn on the date range switch
-    wrapper.find(".react-switch.dateRange input").simulate("change", {
-      target: {
-        type: "checkbox",
-        checked: true
-      }
-    });
-    await new Promise(setImmediate);
-
-    // renders end event datetime
     expect(wrapper.find(".endEventDateTime-field")).toHaveLength(1);
-
-    // Edit the start event datetime
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
-      target: {
-        name: "startEventDateTime",
-        value: "201912211600"
-      }
-    });
-
+    expect(wrapper.find(".verbatimEventDateTime-field")).toHaveLength(1);
     // Edit the verbatime datetime
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
@@ -166,11 +148,16 @@ describe("collecting-event edit page", () => {
             attributes: {
               dwcVerbatimCoordinateSystem: "decimal degrees",
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
-              managedAttributeValues: {},
-              startEventDateTime: "2019-12-21T16:00",
+              managedAttributes: {},
+              publiclyReleasable: true, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
               dwcOtherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
+            },
+            relationships: {
+              attachment: {
+                data: []
+              }
             },
             id: "00000000-0000-0000-0000-000000000000",
             type: "collecting-event"
@@ -208,11 +195,11 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the start event datetime
-    wrapper.find(".startEventDateTime-field input").simulate("change", {
+    // Edit the verbatime datetime
+    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
       target: {
-        name: "startEventDateTime",
-        value: "201912211600"
+        name: "verbatimEventDateTime",
+        value: "From 2019,12,21 4pm to 2019,12,22 5pm"
       }
     });
 
@@ -252,8 +239,14 @@ describe("collecting-event edit page", () => {
                     dwcDecimalLatitude: "45.394728",
                     dwcDecimalLongitude: "-75.701452"
                   }
-                ]
+                ],
+                verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
               }),
+              relationships: {
+                attachment: {
+                  data: []
+                }
+              },
               id: "00000000-0000-0000-0000-000000000000",
               type: "collecting-event"
             }
@@ -327,7 +320,6 @@ describe("collecting-event edit page", () => {
               ],
               group: "test group",
               startEventDateTime: "2019-11-11",
-              uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 6pm"
             },
             id: "1",
@@ -340,8 +332,8 @@ describe("collecting-event edit page", () => {
               },
               collectors: {
                 data: [
-                  { id: "111", type: "agent" },
-                  { id: "222", type: "agent" }
+                  { id: "111", type: "person" },
+                  { id: "222", type: "person" }
                 ]
               }
             },
@@ -360,9 +352,9 @@ describe("collecting-event edit page", () => {
         {
           errors: [
             {
-              detail: "Start event datetime should not be blank",
+              detail: "Test Error Detail",
               status: "422",
-              title: "Constraint violation"
+              title: "Test Error Title"
             }
           ],
           status: 422
@@ -376,11 +368,6 @@ describe("collecting-event edit page", () => {
       apiContext
     });
 
-    // Need to emulate by setting the value to test back end error is actually rendered
-    wrapper.find(".startEventDateTime input").simulate("change", {
-      target: { name: "startEventDateTime", value: "2020" }
-    });
-
     wrapper.find(".group-field Select").prop<any>("onChange")([
       { label: "group", value: "test group" }
     ]);
@@ -391,7 +378,7 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Start event datetime should not be blank"
+      "Test Error Title: Test Error Detail"
     );
     expect(mockPush).toBeCalledTimes(0);
   });
@@ -433,7 +420,6 @@ describe("collecting-event edit page", () => {
 /** Test collecting-event with all fields defined. */
 function testCollectingEvent(): CollectingEvent {
   return {
-    uuid: "617a27e2-8145-4077-a4a5-65af3de416d7",
     id: "1",
     type: "collecting-event",
     startEventDateTime: "2019-11-11",

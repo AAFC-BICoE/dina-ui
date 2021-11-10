@@ -1,12 +1,15 @@
 import { KitsuResource, PersistedResource } from "kitsu";
-import {
-  ResourceSelect,
-  ResourceSelectProps
-} from "../resource-select/ResourceSelect";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
-import { castArray } from "lodash";
-import { Fragment } from "react";
+import { castArray, compact } from "lodash";
 import Link from "next/link";
+import { Fragment } from "react";
+import {
+  FieldWrapper,
+  isShallowReference,
+  LabelWrapperParams,
+  ResourceSelect,
+  ResourceSelectProps,
+  useBulkGet
+} from "..";
 
 /** The value could be one element or an array. */
 export type SingleOrArray<T> = T | T[];
@@ -25,55 +28,79 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const {
-    name,
-    onChange,
-    readOnlyLink,
-    ...resourceSelectProps
-  } = resourceSelectFieldProps;
+  const { name, onChange, ...resourceSelectProps } = resourceSelectFieldProps;
 
   return (
     <FieldWrapper
       {...resourceSelectFieldProps}
       readOnlyRender={(
         value?: SingleOrArray<PersistedResource<TData> | null>
-      ) => {
-        const values = castArray(value);
-        return (
-          <div className="read-only-view">
-            {values.map((resource, index) => {
-              const valueText = resource
-                ? resourceSelectProps.optionLabel(resource)
-                : "";
-              return (
-                <Fragment key={resource?.id ?? index}>
-                  {readOnlyLink && resource ? (
-                    <Link href={readOnlyLink + resource.id}>{valueText}</Link>
-                  ) : (
-                    valueText
-                  )}
-                  {index === values.length - 1 ? "" : ", "}
-                </Fragment>
-              );
-            })}
-          </div>
-        );
-      }}
+      ) => (
+        <div className="read-only-view">
+          <ReadOnlyResourceLink
+            value={value}
+            resourceSelectFieldProps={resourceSelectFieldProps}
+          />
+        </div>
+      )}
     >
-      {({ setValue, value }) => {
+      {({ setValue, value, invalid }) => {
         function onChangeInternal(resource) {
           setValue(resource);
           onChange?.(resource);
         }
 
         return (
-          <ResourceSelect
-            {...resourceSelectProps}
-            onChange={onChangeInternal}
-            value={value}
-          />
+          <div className={invalid ? "is-invalid" : ""}>
+            <ResourceSelect
+              {...resourceSelectProps}
+              invalid={invalid}
+              onChange={onChangeInternal}
+              value={value}
+            />
+          </div>
         );
       }}
     </FieldWrapper>
+  );
+}
+
+export interface ReadOnlyResourceLinkProps<TData extends KitsuResource> {
+  value?: SingleOrArray<PersistedResource<TData> | null>;
+  resourceSelectFieldProps: ResourceSelectFieldProps<TData>;
+}
+
+/** Shows a link to the resource. Tries to fetch the resource if theres only a shallow reference. */
+export function ReadOnlyResourceLink<TData extends KitsuResource>({
+  value,
+  resourceSelectFieldProps: { readOnlyLink, model, optionLabel }
+}: ReadOnlyResourceLinkProps<TData>) {
+  const values = compact(castArray(value));
+  const valueIsShallowReference = isShallowReference(values);
+  const resources =
+    useBulkGet<TData>({
+      ids: values.map(it => it.id),
+      listPath: model,
+      disabled: !valueIsShallowReference
+    }).data ?? values;
+
+  return (
+    <Fragment>
+      {resources.map((resource, index) => {
+        const valueText = resource
+          ? optionLabel(resource as any) ?? resource.id
+          : "";
+        return (
+          <Fragment key={resource?.id ?? index}>
+            {readOnlyLink && resource ? (
+              <Link href={readOnlyLink + resource.id}>{valueText ?? ""}</Link>
+            ) : (
+              valueText
+            )}
+            {index === resources.length - 1 ? "" : ", "}
+          </Fragment>
+        );
+      })}
+    </Fragment>
   );
 }

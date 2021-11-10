@@ -29,7 +29,7 @@ export default function CollectingEventRevisionListPage() {
         <Head title={pageTitle} />
         <Nav />
         <main className="container-fluid">
-          <h1>{pageTitle}</h1>
+          <h1 id="wb-cont">{pageTitle}</h1>
           <div className="mb-3">
             <Link
               href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
