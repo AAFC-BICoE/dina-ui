@@ -432,7 +432,6 @@ export function CollectingEventFormLayout({
                   getResource: openAddPersonModal
                 }
               ]}
-              asyncOptionsFirst={true}
             />
             <TextField name="dwcRecordNumber" />
           </FieldSet>

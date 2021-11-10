@@ -118,8 +118,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   styles,
   value,
   asyncOptions,
-  asyncOptionsFirst = false,
-  asyncOptionsAlwaysVisible = false,
+  asyncOptionsFirst = true,
+  asyncOptionsAlwaysVisible = true,
   isDisabled,
   omitNullOption,
   invalid,
@@ -182,8 +182,8 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Only show the null option when in single-resource mode and when there is no search input value.
   const options = [
-    ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
     ...(asyncOptionsFirst ? asyncOptionsList : []),
+    ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
     ...resourceOptions,
     ...(!asyncOptionsFirst ? asyncOptionsList : [])
   ];
