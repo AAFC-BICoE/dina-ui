@@ -2,7 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { fromPairs, orderBy, toPairs } from "lodash";
+import { compact, fromPairs, orderBy, toPairs } from "lodash";
 import { object, SchemaOf, string } from "yup";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../types/collection-api";
@@ -32,44 +32,20 @@ export function useCollectingEventQuery(id?: string | null) {
       disabled: !id,
       onSuccess: async ({ data }) => {
         // Do client-side multi-API joins on one-to-many fields:
-
-        if (data.collectors) {
-          const agents = await bulkGet<Person>(
-            data.collectors.map(collector => `/person/${collector.id}`),
-            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
-          );
-          // Omit null (deleted) records:
-          data.collectors = agents.filter(it => it);
-        }
-
-        if (data.attachment) {
-          try {
-            const metadatas = await bulkGet<Metadata>(
-              data.attachment.map(collector => `/metadata/${collector.id}`),
-              {
-                apiBaseUrl: "/objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-            // Omit null (deleted) records:
-            data.attachment = metadatas.filter(it => it);
-          } catch (error) {
-            console.warn("Attachment join failed: ", error);
-          }
-        }
-
         if (data.geoReferenceAssertions) {
           // Retrieve georeferencedBy agent arrays on GeoReferenceAssertions.
           for (const assertion of data.geoReferenceAssertions) {
             if (assertion.georeferencedBy) {
-              assertion.georeferencedBy = await bulkGet<Person>(
-                assertion.georeferencedBy.map(
-                  (personId: string) => `/person/${personId}`
-                ),
-                {
-                  apiBaseUrl: "/agent-api",
-                  returnNullForMissingResource: true
-                }
+              assertion.georeferencedBy = compact(
+                await bulkGet<Person, true>(
+                  assertion.georeferencedBy.map(
+                    (personId: string) => `/person/${personId}`
+                  ),
+                  {
+                    apiBaseUrl: "/agent-api",
+                    returnNullForMissingResource: true
+                  }
+                )
               );
             }
           }

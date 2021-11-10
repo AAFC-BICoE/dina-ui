@@ -9,7 +9,6 @@ import {
   SubmitButton,
   TextField,
   useAccount,
-  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -27,7 +26,6 @@ import {
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
-import { Metadata } from "../../../types/objectstore-api";
 import {
   PcrBatch,
   PcrPrimer,
@@ -36,46 +34,13 @@ import {
 } from "../../../types/seqdb-api";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
-  const { bulkGet } = useApiClient();
-
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
         "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment"
     },
-    {
-      disabled: !id,
-      onSuccess: async ({ data: pcrBatch }) => {
-        if (pcrBatch.experimenters) {
-          const agents = await bulkGet<Person>(
-            pcrBatch.experimenters.map(
-              experimenter => `/person/${experimenter.id}`
-            ),
-            { apiBaseUrl: "/agent-api", returnNullForMissingResource: true }
-          );
-          // Omit null (deleted) records:
-          pcrBatch.experimenters = agents.filter(it => it);
-        }
-
-        if (pcrBatch.attachment) {
-          try {
-            const metadatas = await bulkGet<Metadata>(
-              pcrBatch.attachment.map(collector => `/metadata/${collector.id}`),
-              {
-                apiBaseUrl: "/objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-            // Omit null (deleted) records:
-            pcrBatch.attachment = metadatas.filter(it => it);
-          } catch (error) {
-            console.warn("Attachment join failed: ", error);
-          }
-        }
-      },
-      deps
-    }
+    { disabled: !id, deps }
   );
 }
 

@@ -7,8 +7,16 @@ import {
   useQuery
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource, KitsuResource } from "kitsu";
-import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
+import { InputResource } from "kitsu";
+import {
+  cloneDeep,
+  compact,
+  fromPairs,
+  isEmpty,
+  isEqual,
+  pick,
+  toPairs
+} from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -69,21 +77,6 @@ export function useMaterialSampleQuery(id?: string | null) {
         }
       ],
       onSuccess: async ({ data }) => {
-        if (data.attachment) {
-          try {
-            const metadatas = await bulkGet<Metadata>(
-              data.attachment.map(collector => `/metadata/${collector.id}`),
-              {
-                apiBaseUrl: "/objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-            // Omit null (deleted) records:
-            data.attachment = metadatas.filter(it => it);
-          } catch (error) {
-            console.warn("Attachment join failed: ", error);
-          }
-        }
         if (data.managedAttributes) {
           const managedAttributeValues: ManagedAttributeValues = {};
           toPairs(data?.managedAttributes as any).map(
@@ -99,27 +92,32 @@ export function useMaterialSampleQuery(id?: string | null) {
           // Retrieve determiner arrays on determination.
           for (const determination of data.determination) {
             if (determination.determiner) {
-              determination.determiner = await bulkGet<Person>(
-                determination.determiner.map(
-                  (personId: string) => `/person/${personId}`
-                ),
-                {
-                  apiBaseUrl: "/agent-api",
-                  returnNullForMissingResource: true
-                }
+              determination.determiner = compact(
+                await bulkGet<Person, true>(
+                  determination.determiner.map(
+                    (personId: string) => `/person/${personId}`
+                  ),
+                  {
+                    apiBaseUrl: "/agent-api",
+                    returnNullForMissingResource: true
+                  }
+                )
               );
             }
           }
         }
         if (data.materialSampleChildren) {
-          data.materialSampleChildren = await bulkGet<MaterialSample>(
-            data.materialSampleChildren.map(
-              child => `/material-sample/${child.id}?include=materialSampleType`
-            ),
-            {
-              apiBaseUrl: "/collection-api",
-              returnNullForMissingResource: true
-            }
+          data.materialSampleChildren = compact(
+            await bulkGet<MaterialSample, true>(
+              data.materialSampleChildren.map(
+                child =>
+                  `/material-sample/${child.id}?include=materialSampleType`
+              ),
+              {
+                apiBaseUrl: "/collection-api",
+                returnNullForMissingResource: true
+              }
+            )
           );
         }
       }
