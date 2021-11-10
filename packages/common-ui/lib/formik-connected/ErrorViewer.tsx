@@ -1,5 +1,5 @@
 import { useFormikContext } from "formik";
-import { isArray, last, omitBy, toPairs } from "lodash";
+import { last, toPairs } from "lodash";
 import { useEffect, useMemo, useRef } from "react";
 import { treeToFlatMap } from "tree-to-flat-map";
 import { useFieldLabels } from "../field-header/FieldHeader";
@@ -13,9 +13,7 @@ export function ErrorViewer() {
   /** A string of form-level and field-level error messages. */
   const errorMessage = useMemo(
     () => {
-      // Omit array field errors for now because they fail treeToFlatMap, until we need them:
-      const nonArrayFieldErrors = omitBy(errors, isArray);
-      const fieldErrorMsg = toPairs(treeToFlatMap(nonArrayFieldErrors))
+      const fieldErrorMsg = toPairs(treeToFlatMap(errors))
         .map(
           ([field, error]) =>
             `${

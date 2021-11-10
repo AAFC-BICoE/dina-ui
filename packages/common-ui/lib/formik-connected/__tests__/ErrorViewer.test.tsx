@@ -42,20 +42,25 @@ describe("ErrorViewer component", () => {
         initialValues={{}}
         initialErrors={{
           topLevelField: "Error",
-          nestedObject: { nestedField: "Nested Error" }
+          nestedObject: { nestedField: "Nested Error" },
+          nestedArrayObject: [
+            { nestedArrayElementField: "Nested Array Element Error" }
+          ]
         }}
       >
         <SubmitButton />
       </DinaForm>
     );
 
-    // wrapper.find("form").simulate("submit");
-
     await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      ["Nested Field: Nested Error", "Top Level Field: Error"].join("\n")
+      [
+        "Nested Array Element Field: Nested Array Element Error",
+        "Nested Field: Nested Error",
+        "Top Level Field: Error"
+      ].join("\n")
     );
   });
 });

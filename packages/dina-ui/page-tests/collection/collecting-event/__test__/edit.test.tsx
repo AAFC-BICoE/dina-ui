@@ -231,7 +231,6 @@ describe("collecting-event edit page", () => {
             path: "collecting-event",
             value: {
               attributes: expect.objectContaining({
-                startEventDateTime: "2019-12-21T16:00",
                 geoReferenceAssertions: [
                   {
                     isPrimary: true,

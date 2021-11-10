@@ -249,10 +249,10 @@ describe("Workflow template edit page", () => {
       .find(".dwcDecimalLongitude input[type='checkbox']")
       .simulate("change", { target: { checked: true } });
     wrapper
-      .find(".dwcDecimalLatitude input")
+      .find(".dwcDecimalLatitude input[type='text']")
       .simulate("change", { target: { value: "1" } });
     wrapper
-      .find(".dwcDecimalLongitude input")
+      .find(".dwcDecimalLongitude input[type='text']")
       .simulate("change", { target: { value: "2" } });
 
     // Only allow new attachments:
@@ -272,11 +272,11 @@ describe("Workflow template edit page", () => {
           allowNew: true,
           templateFields: {
             "geoReferenceAssertions[0].dwcDecimalLatitude": {
-              defaultValue: 1,
+              defaultValue: "1",
               enabled: true
             },
             "geoReferenceAssertions[0].dwcDecimalLongitude": {
-              defaultValue: 2,
+              defaultValue: "2",
               enabled: true
             },
             startEventDateTime: {
