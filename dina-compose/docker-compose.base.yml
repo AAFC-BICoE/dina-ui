@@ -148,10 +148,10 @@ services:
           "spring.datasource.continue-on-error": "true",
           "spring.liquibase.user": "postgres",
           "spring.liquibase.password": "p",
+          "spring.liquibase.liquibase-schema": "userapi",
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.credentials.secret": "120c0b7a-5ed2-4295-9a31-29c2fcbc714f",
-          "keycloak.secret": "120c0b7a-5ed2-4295-9a31-29c2fcbc714f",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
         }
     extra_hosts:

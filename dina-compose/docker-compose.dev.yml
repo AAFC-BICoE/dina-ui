@@ -16,10 +16,10 @@ services:
     ports:
       - "5005:5005" # debug port
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    working_dir: /app
     command: >
       bash -c "
       mvn
-      -f /app/pom.xml
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
@@ -40,13 +40,12 @@ services:
       # Use the host maven repository:
       - "~/.m2:/var/maven/.m2"
     ports:
-      - "8080:8080" # app port
       - "5008:5005" # debug port
+    working_dir: /app
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
-      -f /app/pom.xml
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
@@ -68,8 +67,8 @@ services:
       - "~/.m2:/var/maven/.m2"
     ports:
       - "5006:5005" # debug port
-    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     working_dir: /app
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
@@ -94,11 +93,11 @@ services:
       - "~/.m2:/var/maven/.m2"
     ports:
       - "5007:5005" # debug port
+    working_dir: /app
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
-      -f /app/pom.xml
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"
@@ -120,11 +119,11 @@ services:
       - "~/.m2:/var/maven/.m2"
     ports:
       - "5009:5005" # debug port
+    working_dir: /app
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >
       bash -c "
       mvn
-      -f /app/pom.xml
       -Duser.home=/var/maven
       -Dspring-boot-maven-plugin.fork=true
       -Dspring-boot.run.jvmArguments=\"

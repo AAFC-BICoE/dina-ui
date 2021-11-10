@@ -24,17 +24,6 @@ services:
       - 9300:9300
     labels:
       - "traefik.http.routers.elasticsearch.rule=Host(`${ELASTICSEARCH_DOMAIN}`)"
-
-  # Addition of Kibana, for development purpose or browsing through the dina indices.
-  kibana-dina:
-    image: docker.elastic.co/kibana/kibana:7.13.3
-    environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch-dina:9200
-    ports:
-      - 5601:5601
-    depends_on:
-      - elasticsearch-dina
-
   # Check the status of elasticsearch and configure indices if not already present.
   elastic-configurator:
     build: ../repos/dina-search-api/es-init-container
@@ -49,10 +38,6 @@ services:
       - ./elastic-configurator-settings:/usr/share/elastic-configurator/settings
     depends_on:
       - elasticsearch-dina
-
-  search-ws:
-    build: ../repos/dina-search-api/search-ws
-
   search-cli:
     build: ../repos/dina-search-api/search-cli
     environment:
@@ -78,4 +63,4 @@ volumes:
   elasticsearch-data:
     driver: local
   elastic-configurator-settings:
-    driver: local      
+    driver: local     

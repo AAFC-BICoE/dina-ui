@@ -1,0 +1,39 @@
+version: "3.7"
+
+services:
+  search-ws:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/dina-search-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5010:5005" # debug port
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    working_dir: /app
+    command: >
+      bash -c "
+      mvn
+      -f search-ws/pom.xml
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+      \"
+      spring-boot:run
+      "
+  # Addition of Kibana, for development purpose or browsing through the dina indices.
+  kibana-dina:
+    image: docker.elastic.co/kibana/kibana:7.13.3
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch-dina:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch-dina
