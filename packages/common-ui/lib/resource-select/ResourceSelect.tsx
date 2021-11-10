@@ -62,6 +62,15 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
   asyncOptions?: AsyncOption<TData>[];
 
+  /** Determines if the async options should be rendered before the search suggestions. */
+  asyncOptionsFirst?: boolean;
+
+  /**
+   * If the async options should always be displayed even after searching,
+   * this will even replace the "no options" message.
+   */
+  asyncOptionsAlwaysVisible?: boolean;
+
   isDisabled?: boolean;
 
   /** Omits the "<none>" option. */
@@ -109,6 +118,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   styles,
   value,
   asyncOptions,
+  asyncOptionsFirst = true,
+  asyncOptionsAlwaysVisible = true,
   isDisabled,
   omitNullOption,
   invalid,
@@ -161,16 +172,20 @@ export function ResourceSelect<TData extends KitsuResource>({
       value: resource.id
     })) ?? [];
 
+  // Build the list of async options to attach to the top or bottom of the list.
+  const asyncOptionsList =
+    asyncOptions?.map(option => ({
+      ...option,
+      value: asyncOptionsAlwaysVisible ? search.input : null,
+      label: <strong>{option.label}</strong>
+    })) ?? [];
+
   // Only show the null option when in single-resource mode and when there is no search input value.
   const options = [
+    ...(asyncOptionsFirst ? asyncOptionsList : []),
     ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
     ...resourceOptions,
-    ...(asyncOptions
-      ? asyncOptions.map(option => ({
-          ...option,
-          label: <strong>{option.label}</strong>
-        }))
-      : [])
+    ...(!asyncOptionsFirst ? asyncOptionsList : [])
   ];
 
   async function onChange(newSelectedRaw) {

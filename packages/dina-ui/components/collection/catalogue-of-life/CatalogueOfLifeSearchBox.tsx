@@ -4,14 +4,14 @@ import {
   Tooltip,
   useThrottledFetch
 } from "common-ui";
+import DOMPurify from "dompurify";
+import { Field, FormikProps } from "formik";
+import moment from "moment";
 import { useState } from "react";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { DataSetResult } from "./dataset-search-types";
 import { NameUsageSearchResult } from "./nameusage-types";
-import DOMPurify from "dompurify";
-import { Field, FormikProps } from "formik";
-import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
-import moment from "moment";
 
 export interface CatalogueOfLifeSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
@@ -48,7 +48,7 @@ export function CatalogueOfLifeSearchBox({
   onChange,
   formik,
   isDetermination,
-  dateSupplier = () => moment().format("YYYY-MM-DD")
+  dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: CatalogueOfLifeSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
 
