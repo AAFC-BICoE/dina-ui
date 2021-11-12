@@ -50,7 +50,9 @@ const apiContext: any = {
 };
 
 // Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
+jest.mock("use-debounce", () => ({
+  useDebounce: fn => [fn, { isPending: () => false }]
+}));
 
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {

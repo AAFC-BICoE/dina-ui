@@ -116,12 +116,9 @@ export function CollectingEventLinker({
           <FieldSet legend={<DinaMessage id="search" />} className="non-strip">
             <div className="row">
               {/* Filter by agent? Un-comment when the back-end can allow this. */}
-              {/* <ResourceSelectField<Person>
+              {/* <PersonSelectField<Person>
               className="col-md-4"
               name="agent"
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              optionLabel={person => person.displayName}
             /> */}
               <TextField
                 name="createdBy"

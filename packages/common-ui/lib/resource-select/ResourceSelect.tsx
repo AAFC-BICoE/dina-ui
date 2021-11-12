@@ -134,7 +134,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const [inputValue, setInputValue] = useState("");
 
   /** The debounced input value passed to the fetcher. */
-  const [searchValue, { isPending }] = useDebounce(inputValue, 250);
+  const [searchValue] = useDebounce(inputValue, 250);
 
   // Omit blank/null filters:
   const filterParam = omitBy(filter(searchValue), val =>
@@ -156,7 +156,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const { loading: queryIsLoading, response } =
     useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
-  const isLoading = queryIsLoading || inputValue !== searchValue || isPending();
+  const isLoading = queryIsLoading || inputValue !== searchValue;
 
   // Build the list of options from the returned resources.
   const resourceOptions =
