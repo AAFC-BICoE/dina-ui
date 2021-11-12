@@ -9,14 +9,13 @@ import {
 } from "common-ui";
 import { useField } from "formik";
 import { SetOptional } from "type-fest";
+import { useAddPersonModal } from "..";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { useAutocompleteSearch } from "../search/useSearch";
-import { useEffect } from "react";
-import { useAddPersonModal } from "..";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -122,17 +121,16 @@ export function PersonSelectField(
 
   return (
     <ResourceSelectField<Person>
-      useCustomQuery={selectInput => {
-        const { setInputValue, isLoading, searchResult } =
-          useAutocompleteSearch<Person>({
-            indexName: "dina_agent_index",
-            searchField: "displayName"
-          });
-
-        useEffect(() => setInputValue(selectInput), [selectInput]);
-
-        return { loading: isLoading, response: { data: searchResult ?? [] } };
-      }}
+      // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
+      // but fallback to the regular RSQL search if that fails.
+      useCustomQuery={(searchQuery, querySpec) =>
+        useAutocompleteSearchButFallbackToRsqlApiSearch({
+          searchQuery,
+          querySpec,
+          indexName: "dina_agent_index",
+          searchField: "displayName"
+        })
+      }
       readOnlyLink="/dina-user/view?id="
       filter={filterBy(["displayName"])}
       model="agent-api/person"

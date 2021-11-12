@@ -78,17 +78,17 @@ export function useDebouncedFetch<TData>({
   /** The debounced input value passed to the fetcher. */
   const [searchValue, { isPending }] = useDebounce(inputValue, timeoutMs);
 
-  const { isValidating: searchIsLoading, data: searchResult } = useSWR(
-    [searchValue],
-    () => fetcher(searchValue),
-    {
-      shouldRetryOnError: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
+  const {
+    isValidating: searchIsLoading,
+    data: searchResult,
+    error
+  } = useSWR([searchValue], () => fetcher(searchValue), {
+    shouldRetryOnError: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  });
 
   const isLoading = !!inputValue && (searchIsLoading || isPending());
 
-  return { inputValue, setInputValue, isLoading, searchResult };
+  return { inputValue, setInputValue, isLoading, searchResult, error };
 }

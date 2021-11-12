@@ -1,6 +1,6 @@
-import { doSearch } from "../SearchBox";
+import { doSearch } from "../useSearch";
 
-describe("SearchBox", () => {
+describe("doSearch function", () => {
   it("Fetches the search result data.", async () => {
     const mockGet = jest.fn<any, any>(async () => ({
       data: {
@@ -22,12 +22,20 @@ describe("SearchBox", () => {
       }
     }));
 
-    const results = await doSearch({ get: mockGet }, "test-search");
+    const results = await doSearch(
+      { get: mockGet },
+      {
+        indexName: "dina_agent_index",
+        searchField: "displayName",
+        searchValue: "test-search"
+      }
+    );
 
     expect(results).toEqual([
       {
-        link: "/person/view?id=100",
-        name: "Person: Mat Poff"
+        displayName: "Mat Poff",
+        id: "100",
+        type: "person"
       }
     ]);
 
@@ -38,7 +46,7 @@ describe("SearchBox", () => {
           params: {
             additionalField: "",
             autoCompleteField: "data.attributes.displayName",
-            indexName: "dina_document_index",
+            indexName: "dina_agent_index",
             prefix: "test-search"
           }
         }

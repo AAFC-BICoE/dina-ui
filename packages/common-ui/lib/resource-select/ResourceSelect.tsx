@@ -1,6 +1,5 @@
 import {
   FilterParam,
-  GetParams,
   KitsuResource,
   KitsuResourceLink,
   PersistedResource
@@ -15,7 +14,7 @@ import Select, {
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
 import { SelectOption } from "../..";
-import { useQuery } from "../api-client/useQuery";
+import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
 
 /** ResourceSelect component props. */
@@ -68,9 +67,12 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   pageSize?: number;
 
   /** Use a different query hook instead of the REST API. */
-  useCustomQuery?: (inputValue: string) => {
+  useCustomQuery?: (
+    searchQuery: string,
+    querySpec: JsonApiQuerySpec
+  ) => {
     loading?: boolean;
-    response?: { data: TData[] };
+    response?: { data: PersistedResource<TData>[] };
   };
 }
 
@@ -132,17 +134,16 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Omit undefined values from the GET params, which would otherwise cause an invalid request.
   // e.g. /api/region?include=undefined
-  const getParams = omitBy<GetParams>(
-    { filter: filterParam, include, sort, page },
-    val => isUndefined(val) || isEqual(val, {})
-  );
+  const querySpec: JsonApiQuerySpec = {
+    path: model,
+    ...omitBy(
+      { filter: filterParam, include, sort, page },
+      val => isUndefined(val) || isEqual(val, {})
+    )
+  };
 
   const { loading: queryIsLoading, response } =
-    useCustomQuery?.(inputValue) ??
-    useQuery<TData[]>({
-      path: model,
-      ...getParams
-    });
+    useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
   const isLoading = queryIsLoading || inputValue !== searchValue || isPending();
 

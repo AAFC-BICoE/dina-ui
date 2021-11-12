@@ -1,7 +1,7 @@
 import { AxiosInstance } from "axios";
 import { useApiClient, useDebouncedFetch } from "common-ui";
 import { DocWithData } from "jsonapi-typescript";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { deserialise } from "kitsu-core";
 import { compact } from "lodash";
 
@@ -64,7 +64,9 @@ export async function doSearch<T extends KitsuResource>(
 
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(
-    jsonApiDocs.map<Promise<T>>(async doc => (await deserialise(doc)).data)
+    jsonApiDocs.map<Promise<PersistedResource<T>>>(
+      async doc => (await deserialise(doc)).data
+    )
   );
 
   return resources;
