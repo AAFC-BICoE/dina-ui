@@ -9,15 +9,20 @@ import {
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  useAccount,
   useQuery,
-  withResponse
+  withResponse,
+  useAccount
 } from "common-ui";
 import { FieldArray } from "formik";
-import { last, uniq, keys, omit } from "lodash";
+import { keys, last, omit, uniq } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import Select from "react-select";
-import { GroupLabel, Head, Nav } from "../../components";
+import {
+  GroupLabel,
+  Head,
+  Nav,
+  useAvailableGroupOptions
+} from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
@@ -50,12 +55,7 @@ export default function DinaUserEditPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("editDinaUserTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("editDinaUserTitle")} />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">
@@ -146,9 +146,11 @@ export interface RolesPerGroupEditorProps {
 export function RolesPerGroupEditor({
   initialRolesPerGroup
 }: RolesPerGroupEditorProps) {
-  const { groupNames: myGroupNames } = useAccount();
+  const { groupSelectOptions } = useAvailableGroupOptions();
+  const { rolesPerGroup: editorsRolesPerGroup, isAdmin: editorIsAdmin } =
+    useAccount();
 
-  const editableRoles = ["staff", "student"];
+  const editableRoles = ["staff", "student", "collection-manager"];
 
   return (
     <label className="w-100">
@@ -157,8 +159,12 @@ export function RolesPerGroupEditor({
       </strong>
       <FieldArray name="rolesPerGroup">
         {({ form }) => {
-          const rolesPerGroup = (form.values as DinaUser).rolesPerGroup;
-          const usersGroups = keys(rolesPerGroup) ?? [];
+          const usersGroups =
+            keys((form.values as DinaUser).rolesPerGroup) ?? [];
+
+          const unsetGroupOptions = groupSelectOptions.filter(
+            it => !keys(form.values.rolesPerGroup).includes(it.value)
+          );
 
           return (
             <table className="table table-bordered">
@@ -175,49 +181,60 @@ export function RolesPerGroupEditor({
               </thead>
               <tbody>
                 {usersGroups.length ? (
-                  usersGroups.map(groupName => (
-                    <tr key={groupName} className={`${groupName}-row`}>
-                      <td>
-                        <GroupLabel groupName={groupName} />
-                      </td>
-                      <td className="role-select">
-                        <SelectField
-                          name={`rolesPerGroup.${groupName}`}
-                          hideLabel={true}
-                          isMulti={true}
-                          // Only allow one group at a time:
-                          onChange={(selectedRoles, formik) => {
-                            const newRole = last(selectedRoles);
-                            formik.setFieldValue(
-                              `rolesPerGroup.${groupName}`,
-                              newRole ? [newRole] : []
-                            );
-                          }}
-                          // Options should be the possible groups or the
-                          options={uniq([
-                            ...editableRoles,
-                            ...(initialRolesPerGroup[groupName] ?? [])
-                          ]).map(it => ({
-                            label: it,
-                            value: it
-                          }))}
-                        />
-                      </td>
-                      <td className="remove-group">
-                        <FormikButton
-                          className="btn btn-dark"
-                          onClick={() =>
-                            form.setFieldValue(
-                              "rolesPerGroup",
-                              omit(form.values.rolesPerGroup, groupName)
-                            )
-                          }
-                        >
-                          <DinaMessage id="removeGroup" />
-                        </FormikButton>
-                      </td>
-                    </tr>
-                  ))
+                  usersGroups.map(groupName => {
+                    const canEdit =
+                      editorIsAdmin ||
+                      editorsRolesPerGroup?.[groupName]?.includes(
+                        "collection-manager"
+                      );
+
+                    return (
+                      <tr key={groupName} className={`${groupName}-row`}>
+                        <td>
+                          <GroupLabel groupName={groupName} />
+                        </td>
+                        <td className="role-select">
+                          <SelectField
+                            name={`rolesPerGroup.${groupName}`}
+                            hideLabel={true}
+                            isMulti={true}
+                            // Only allow one group at a time:
+                            onChange={(selectedRoles, formik) => {
+                              const newRole = last(selectedRoles);
+                              formik.setFieldValue(
+                                `rolesPerGroup.${groupName}`,
+                                newRole ? [newRole] : []
+                              );
+                            }}
+                            // Options should be the possible groups or the
+                            options={uniq([
+                              ...editableRoles,
+                              ...(initialRolesPerGroup[groupName] ?? [])
+                            ]).map(it => ({
+                              label: it,
+                              value: it
+                            }))}
+                            disabled={!canEdit}
+                          />
+                        </td>
+                        <td className="remove-group">
+                          {canEdit && (
+                            <FormikButton
+                              className="btn btn-dark remove-button"
+                              onClick={() =>
+                                form.setFieldValue(
+                                  "rolesPerGroup",
+                                  omit(form.values.rolesPerGroup, groupName)
+                                )
+                              }
+                            >
+                              <DinaMessage id="removeGroup" />
+                            </FormikButton>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan={3}>
@@ -242,12 +259,7 @@ export function RolesPerGroupEditor({
                           }
                         }}
                         placeholder={<DinaMessage id="selectGroup" />}
-                        options={(myGroupNames ?? [])
-                          .filter(it => !usersGroups.includes(it))
-                          .map(groupName => ({
-                            label: groupName,
-                            value: groupName
-                          }))}
+                        options={unsetGroupOptions}
                       />
                     </label>
                   </td>

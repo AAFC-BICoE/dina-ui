@@ -18,7 +18,7 @@ describe("ViewInMapButton component", () => {
     );
 
     expect(wrapper.find("a").prop("href")).toEqual(
-      "https://www.openstreetmap.org/?mlat=45.3930327&mlon=-75.7098208"
+      "/collection/collecting-event/map?mlat=45.3930327&mlon=-75.7098208"
     );
   });
 

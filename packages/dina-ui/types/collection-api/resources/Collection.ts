@@ -19,6 +19,7 @@ export interface CollectionAttributes {
 
 export interface CollectionRelationships {
   institution: Institution | undefined;
+  parentCollection?: Collection | undefined;
 }
 
 export type Collection = KitsuResource &

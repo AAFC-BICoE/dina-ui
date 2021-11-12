@@ -87,7 +87,9 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
   return (
     <Fragment>
       {resources.map((resource, index) => {
-        const valueText = resource ? optionLabel(resource) ?? resource.id : "";
+        const valueText = resource
+          ? optionLabel(resource as any) ?? resource.id
+          : "";
         return (
           <Fragment key={resource?.id ?? index}>
             {readOnlyLink && resource ? (

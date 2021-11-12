@@ -21,10 +21,12 @@ describe("filterBy function", () => {
           arguments: "test-search-value",
           comparison: "=="
         }
-      ]
+      ],
+      nullValueFilters: { parent: null }
     })("value");
     expect(rsqlFilter).toEqual({
-      rsql: "(attribute1==*value*,attribute2==*value*);attribute3==test-search-value"
+      rsql: "(attribute1==*value*,attribute2==*value*);attribute3==test-search-value",
+      parent: null
     });
   });
 

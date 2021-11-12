@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, Head, Nav, GroupSelectField } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -22,13 +22,15 @@ export interface SampleListLayoutProps {
   classNames?: string;
   btnMsg?: string;
   hideTopPagination?: boolean;
+  hideGroupFilter?: boolean;
 }
 
 export function SampleListLayout({
   onSelect,
   classNames,
   btnMsg,
-  hideTopPagination
+  hideTopPagination,
+  hideGroupFilter
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -72,23 +74,25 @@ export function SampleListLayout({
     { accessor: "materialSampleType.name" },
     "createdBy",
     dateCell("createdOn"),
-    onSelect
-      ? {
-          Cell: ({ original: sample }) => (
-            <div className="d-flex">
-              <button
-                type="button"
-                className={classNames}
-                onClick={() => onSelect(sample)}
-              >
-                {btnMsg}
-              </button>
-            </div>
-          ),
-          Header: formatMessage("actions"),
-          sortable: false
-        }
-      : {}
+    ...(onSelect
+      ? [
+          {
+            Cell: ({ original: sample }) => (
+              <div className="d-flex">
+                <button
+                  type="button"
+                  className={classNames}
+                  onClick={() => onSelect(sample)}
+                >
+                  {btnMsg}
+                </button>
+              </div>
+            ),
+            Header: formatMessage("actions"),
+            sortable: false
+          }
+        ]
+      : [])
   ];
 
   return (
@@ -105,6 +109,21 @@ export function SampleListLayout({
         include: "collection,materialSampleType",
         hideTopPagination
       }}
+      filterFormchildren={({ submitForm }) =>
+        !hideGroupFilter ? (
+          <div className="mb-3">
+            <div style={{ width: "300px" }}>
+              <GroupSelectField
+                onChange={() => setImmediate(submitForm)}
+                name="group"
+                showAnyOption={true}
+              />
+            </div>
+          </div>
+        ) : (
+          <></>
+        )
+      }
     />
   );
 }
@@ -114,12 +133,7 @@ export default function MaterialSampleListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("materialSampleListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("materialSampleListTitle")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">

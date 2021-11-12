@@ -6,12 +6,7 @@ import { SeqdbMessage } from "../intl/seqdb-intl";
 
 const Home: React.FunctionComponent = () => (
   <div>
-    <Head
-      title={useDinaIntl().formatMessage("dinaHomeH1")}
-      lang={useDinaIntl().formatMessage("languageOfPage")}
-      creator={useDinaIntl().formatMessage("agricultureCanada")}
-      subject={useDinaIntl().formatMessage("subjectTermsForPage")}
-    />
+    <Head title={useDinaIntl().formatMessage("dinaHomeH1")} />
     <Nav />
     <main role="main">
       <div className="container">
@@ -156,13 +151,6 @@ const Home: React.FunctionComponent = () => (
           <DinaMessage id="collectionSectionTitle" />
         </h2>
         <ul>
-          <li className="d-none">
-            <Link href="/collection/collector-group/list">
-              <a>
-                <DinaMessage id="collectorGroupListTitle" />
-              </a>
-            </Link>
-          </li>
           <li>
             <Link href="/collection/collection/list">
               <a>

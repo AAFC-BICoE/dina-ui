@@ -27,6 +27,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   created: "created",
   createNew: "Create New",
   date: "Date",
+  dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   description: "Description",
@@ -61,6 +62,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   geoSuggest: "Geo-Suggest",
   geoSuggestTooltip:
     "This button shows some suggested geo-locations based on what you've typed into the field.",
+  invalidDate: "Invalid Date",
   jumpToPage: "jump to page",
   rowsPerPage: "rows per page",
   languageOfPage: "eng",
@@ -87,6 +89,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   remarks: "Remarks",
   remove: "Remove",
   resetButtonText: "Reset",
+  resetSort: "Reset Sort",
   results: " Results",
   rows: "rows",
   search: "Search",

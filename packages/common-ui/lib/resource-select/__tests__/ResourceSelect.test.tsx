@@ -391,6 +391,8 @@ describe("ResourceSelect component", () => {
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         asyncOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptionsAlwaysVisible={false}
+        asyncOptionsFirst={false}
         onChange={mockOnChange}
       />
     );
@@ -428,6 +430,8 @@ describe("ResourceSelect component", () => {
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         asyncOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptionsAlwaysVisible={false}
+        asyncOptionsFirst={false}
         isMulti={true}
         onChange={mockOnChange}
       />
@@ -451,6 +455,89 @@ describe("ResourceSelect component", () => {
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
     expect(mockOnChange).lastCalledWith([options[0].resource, TEST_ASYNC_TODO]);
+  });
+
+  it("Renders the async options first if the asyncOptionsFirst is enabled", async () => {
+    const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
+    const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
+
+    const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
+      label: <>asyncOption</>,
+      getResource: mockGetResource
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptionsFirst={true}
+      />
+    );
+
+    // Wait for the options to load.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // There should be 5 options including the custom callback option and the none option.
+    const options = wrapper.find(Select).prop<any>("options");
+    expect(options.length).toEqual(5);
+
+    // Select the first option, which should be the custom callback option.
+    wrapper.find(Select).prop<any>("onChange")(options[0]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // If the resource has been called, then the selected option was the async option.
+    expect(mockGetResource).toHaveBeenCalledTimes(1);
+  });
+
+  it("Always renders the async options, no matter what the search is, if the asyncOptionsAlwaysVisible is enabled.", async () => {
+    const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
+    const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
+    const mockOnChange = jest.fn();
+
+    const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
+      label: <>asyncOption</>,
+      getResource: mockGetResource
+    };
+
+    const wrapper = mountWithContext(
+      <ResourceSelect<Todo>
+        {...DEFAULT_SELECT_PROPS}
+        asyncOptions={[TEST_CALLBACK_OPTION]}
+        asyncOptionsAlwaysVisible={true}
+        onChange={mockOnChange}
+      />
+    );
+
+    // Wait for the options to load.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // There should be 5 options including the custom callback option and the none option.
+    const options = wrapper.find(Select).prop<any>("options");
+    expect(options.length).toEqual(5);
+
+    const { onInputChange } = wrapper.find(Select).props();
+
+    // Simulate searching something that does not exist.
+    onInputChange("incorrect search with no matches", {
+      action: "input-change"
+    });
+
+    // Wait for the options to load after the search has been entered.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Select the first option, which should be the custom callback option.
+    wrapper.find(Select).prop<any>("onChange")(options[0]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // If the resource has been called, then the selected option was the async option.
+    expect(mockGetResource).toHaveBeenCalledTimes(1);
   });
 
   it("Fetches the selected value's full object when only a shallow reference (id+type) is provided.", async () => {

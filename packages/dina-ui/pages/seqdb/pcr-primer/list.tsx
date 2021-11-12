@@ -54,12 +54,7 @@ export default function PcrPrimerListPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage("pcrPrimerListTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("pcrPrimerListTitle")} />
       <Nav />
       <ButtonBar>
         <CreateButton entityLink="/seqdb/pcr-primer" />
