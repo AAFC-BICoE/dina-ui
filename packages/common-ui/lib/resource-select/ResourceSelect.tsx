@@ -156,7 +156,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Main options group.
   const mainOptions = {
     label: searchValue
-      ? formatMessage({ id: "searchResults" })
+      ? formatMessage({ id: "dropdownSearchResults" })
       : formatMessage({ id: "typeToSearchOrChooseFromNewest" }),
     options: [
       ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),

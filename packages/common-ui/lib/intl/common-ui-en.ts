@@ -33,6 +33,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   description: "Description",
   destroyedLabel: "Destroyed",
   done: "Done",
+  dropdownSearchResults: "Search results",
   editButtonText: "Edit",
   editableTable: "Editable Table",
   errorPageTitle: "Error",
