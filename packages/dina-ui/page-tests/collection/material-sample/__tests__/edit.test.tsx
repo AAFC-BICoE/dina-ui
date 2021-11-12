@@ -83,20 +83,15 @@ const mockGet = jest.fn<any, any>(async path => {
 
 const mockSave = jest.fn<any, any>(async saves => {
   return saves.map(save => {
-    if (save.type === "material-sample") {
-      // Test duplicate name error:
-      if (
-        save.resource.materialSampleName === "test-duplicate-name" &&
-        !save.resource.allowDuplicateName
-      ) {
-        throw new Error(
-          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [material_sample_name_unique]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
-        );
-      }
-      return testMaterialSample();
-    }
-    if (save.type === "collecting-event") {
-      return testCollectionEvent();
+    // Test duplicate name error:
+    if (
+      save.type === "material-sample" &&
+      save.resource.materialSampleName === "test-duplicate-name" &&
+      !save.resource.allowDuplicateName
+    ) {
+      throw new Error(
+        "Data integrity violation: could not execute statement; SQL [n/a]; constraint [material_sample_name_unique]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+      );
     }
     return {
       ...save.resource,
@@ -935,6 +930,6 @@ describe("Material Sample Edit Page", () => {
     wrapper.update();
 
     // Form submitted successfully:
-    expect(mockOnSaved).lastCalledWith("1");
+    expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
   });
 });
