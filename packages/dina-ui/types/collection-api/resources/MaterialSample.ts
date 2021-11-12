@@ -49,6 +49,9 @@ export interface MaterialSampleAttributes {
   associations?: MaterialSampleAssociation[];
 
   association?: MaterialSampleAssociation;
+
+  materialSampleStateMetaDate?: string;
+  materialSampleStateMetaRemarks?: string;
 }
 
 export interface HostOrganism {

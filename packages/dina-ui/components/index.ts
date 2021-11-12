@@ -23,3 +23,4 @@ export * from "./storage/StorageUnitChildrenViewer";
 export * from "./storage/StorageUnitForm";
 export * from "./tag-editor/NotPubliclyReleasableWarning";
 export * from "./tag-editor/TagsAndRestrictionsSection";
+export * from "./collection/MaterialSampleStateWarning";
