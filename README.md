@@ -68,6 +68,11 @@ sh pre-docker-build.sh
 ./prod.sh up
 ```
 
+Or if you also want to add the dina-search-api:
+```
+./prod.sh -f docker-compose.search.base.yml -f docker-compose.search.prod.yml up
+```
+
 ## VS Code Error: command 'java.execute.workspaceCommand' not found
 
 If you get this error using VS Code Remote, you may need to uninstall VS Code's Lombok extension from the host VS Code.
