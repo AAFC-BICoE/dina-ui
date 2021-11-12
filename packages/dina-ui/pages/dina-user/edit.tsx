@@ -5,7 +5,6 @@ import {
   DinaFormOnSubmit,
   FieldView,
   FormikButton,
-  PersonSelectField,
   SelectField,
   SubmitButton,
   useAccount,
@@ -20,6 +19,7 @@ import {
   GroupLabel,
   Head,
   Nav,
+  PersonSelectField,
   useAvailableGroupOptions
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";

@@ -116,7 +116,7 @@ export function CollectingEventLinker({
           <FieldSet legend={<DinaMessage id="search" />} className="non-strip">
             <div className="row">
               {/* Filter by agent? Un-comment when the back-end can allow this. */}
-              {/* <PersonSelectField<Person>
+              {/* <PersonSelectField
               className="col-md-4"
               name="agent"
             /> */}

@@ -117,10 +117,13 @@ describe("ResourceSelectField component", () => {
     expect(mockGet).lastCalledWith("test-api/group", {
       filter: {
         groupName: "Mat"
-      }
+      },
+      page: { limit: 6 },
+      sort: "-createdOn"
     });
 
-    const { onChange, options } = wrapper.find<any>(Select).props();
+    const options = wrapper.find<any>(Select).prop("options")[0].options;
+    const onChange = wrapper.find<any>(Select).prop("onChange");
 
     const groupToSelect = options[0];
 

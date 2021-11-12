@@ -33,10 +33,12 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
 
   const searchApiFailed = searchResult?.length === 0 || searchApiError;
 
+  const fallbackToRsqlApi = searchApiFailed || !searchQuery;
+
   // Use the API query with RSQL as a fallback if Search API returns empty:
   const { loading: apiLoading, response: apiResponse } = useQuery<T[]>(
     querySpec,
-    { disabled: !searchApiFailed }
+    { disabled: !fallbackToRsqlApi }
   );
 
   // Put the ResourceSelect's input into the Search hook's state:
