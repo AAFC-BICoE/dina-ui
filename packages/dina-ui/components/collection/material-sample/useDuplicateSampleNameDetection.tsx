@@ -12,7 +12,7 @@ export function useDuplicateSampleNameDetection() {
     } catch (error) {
       if (
         error instanceof Error &&
-        error.message.includes("unique_material_sample_name")
+        error.message.includes("material_sample_name_unique")
       ) {
         // Replace the server's error message with a cusotm one on the UI:
         formik.setFieldError(

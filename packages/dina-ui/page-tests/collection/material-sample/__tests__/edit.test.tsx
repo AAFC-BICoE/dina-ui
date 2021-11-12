@@ -85,7 +85,7 @@ const mockSave = jest.fn<any, any>(async saves => {
         !save.resource.allowDuplicateName
       ) {
         throw new Error(
-          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [unique_material_sample_name]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+          "Data integrity violation: could not execute statement; SQL [n/a]; constraint [material_sample_name_unique]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
         );
       }
       return testMaterialSample();
