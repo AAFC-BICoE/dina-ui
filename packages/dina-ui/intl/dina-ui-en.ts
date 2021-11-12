@@ -300,9 +300,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
-  filedAs: "Filed As",
-  filedAsDeterminationButton_tooltip:
-    "Make this determination the filed as. Only one determination can be filed as",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -336,6 +333,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   includeAll: "Include All",
   institution: "Institution",
   institutionListTitle: "Institutions",
+  isFileAs: "Filed As",
+  isFileAsDeterminationButton_tooltip:
+    "Make this determination the filed as. Only one determination can be filed as",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",
   languageDescriptionFrench: "French",

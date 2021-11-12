@@ -1,7 +1,6 @@
 import {
   AutoSuggestTextField,
   DateField,
-  DinaFormSection,
   FieldSet,
   filterBy,
   FormikButton,
@@ -48,7 +47,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     transcriberRemarks: true,
     isPrimary: true,
     scientificNameDetails: true,
-    filedAs: true,
+    isFileAs: true,
     remarks: true
   };
 
@@ -91,9 +90,9 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
       get(formik.values, determinationsPath) ?? [];
 
     assertions.forEach((_, idx) => {
-      formik.setFieldValue(`${determinationsPath}[${idx}].filedAs`, false);
+      formik.setFieldValue(`${determinationsPath}[${idx}].isFileAs`, false);
     });
-    formik.setFieldValue(`${determinationsPath}[${index}].filedAs`, true);
+    formik.setFieldValue(`${determinationsPath}[${index}].isFileAs`, true);
   }
 
   return (
@@ -105,7 +104,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
           function addDetermination() {
             push({
               isPrimary: determinations?.length === 0,
-              filedAs: determinations?.length === 0
+              isFileAs: determinations?.length === 0
             });
             setActiveTabIdx(determinations.length);
           }
@@ -157,15 +156,15 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     <FormikButton
                       className="btn btn-primary filed-as-button"
                       buttonProps={ctx => {
-                        const filedAs =
+                        const isFileAs =
                           get(
                             ctx.values,
-                            `${determinationsPath}[${index}].` + "filedAs"
+                            `${determinationsPath}[${index}].` + "isFileAs"
                           ) ?? false;
                         return {
-                          disabled: filedAs,
-                          children: filedAs ? (
-                            <DinaMessage id="filedAs" />
+                          disabled: isFileAs,
+                          children: isFileAs ? (
+                            <DinaMessage id="isFileAs" />
                           ) : (
                             <DinaMessage id="makeFiledAs" />
                           )
@@ -173,7 +172,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       }}
                       onClick={(_, formik) => makeFiledAs(formik, index)}
                     />
-                    <Tooltip id="filedAsDeterminationButton_tooltip" />
+                    <Tooltip id="isFileAsDeterminationButton_tooltip" />
                   </div>
                 )}
                 <div className="col-md-6">
@@ -319,12 +318,12 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         <Tab key={index}>
                           <span className="m-3">
                             {index + 1}
-                            {determination.isPrimary && determination.filedAs
+                            {determination.isPrimary && determination.isFileAs
                               ? ` (${formatMessage(
                                   "primary"
-                                )} | ${formatMessage("filedAs")})`
-                              : (determination.filedAs &&
-                                  `(${formatMessage("filedAs")})`) ||
+                                )} | ${formatMessage("isFileAs")})`
+                              : (determination.isFileAs &&
+                                  `(${formatMessage("isFileAs")})`) ||
                                 (determination.isPrimary &&
                                   `(${formatMessage("primary")})`)}
                           </span>
@@ -373,24 +372,6 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     <DinaMessage id="addDetermination" />
                   </FormikButton>
                 )}
-              </div>
-              <div className="row">
-                <DinaFormSection horizontal="flex">
-                  <AutoSuggestTextField
-                    name="filedAs"
-                    className="col-sm-6"
-                    alwaysShowSuggestions={true}
-                    placeholder={formatMessage(
-                      "typeAnythingOrPickAScientificName"
-                    )}
-                    suggestions={(_, formik) =>
-                      formik.values.determination?.flatMap(det => [
-                        det.verbatimScientificName,
-                        det.scientificName
-                      ]) ?? []
-                    }
-                  />
-                </DinaFormSection>
               </div>
             </FieldSet>
           );
