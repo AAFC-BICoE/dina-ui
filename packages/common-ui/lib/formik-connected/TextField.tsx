@@ -5,6 +5,7 @@ import TextareaAutosize, {
 } from "react-textarea-autosize";
 import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
 import classnames from "classnames";
+import React from "react";
 
 export interface TextFieldProps extends LabelWrapperParams {
   readOnly?: boolean;

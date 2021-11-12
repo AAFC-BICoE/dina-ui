@@ -264,7 +264,7 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     return showButton ? (
       <div className="mb-3">
         <a
-          href={`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}`}
+          href={`/collection/collecting-event/map?mlat=${lat}&mlon=${lon}`}
           target="_blank"
           className="btn btn-info"
         >

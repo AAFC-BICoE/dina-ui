@@ -2,6 +2,7 @@ import { transformToRSQL } from "@molgenis/rsql";
 
 interface RsqlFilterOptions {
   extraFilters?: RsqlFilterObject[];
+  nullValueFilters?: {};
 }
 
 interface RsqlFilterObject {
@@ -20,7 +21,7 @@ interface RsqlFilterObject {
     | "=out=";
 
   /** The search value. */
-  arguments: string;
+  arguments: string | string[];
 }
 
 /**
@@ -35,8 +36,9 @@ export function filterBy(
   fields: string[],
   options?: RsqlFilterOptions
 ): (value: string) => Record<string, string> | {} {
-  return value => ({
-    rsql: (transformToRSQL as any)({
+  const otherFilters = options?.nullValueFilters;
+  return value => {
+    const rsqlFilter = (transformToRSQL as any)({
       operator: "AND",
       operands: [
         ...(value
@@ -53,6 +55,9 @@ export function filterBy(
           : []),
         ...(options?.extraFilters ?? [])
       ]
-    })
-  });
+    });
+
+    const combinedFilters = { ...{ rsql: rsqlFilter }, ...otherFilters };
+    return combinedFilters;
+  };
 }

@@ -1,13 +1,14 @@
 import {
-  ButtonBar,
   BackButton,
-  DeleteButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
+  FieldView,
   LoadingSpinner,
   Query,
   SubmitButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Head, Nav } from "../../components";
@@ -34,11 +35,8 @@ export default function OrganizationEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage(title)} />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
@@ -170,37 +168,45 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
           entityLink="/organization"
           byPassView={true}
         />
-        <DeleteButton
-          className="ms-5"
-          id={id as string}
-          options={{ apiBaseUrl: "/agent-api" }}
-          postDeleteRedirect="/organization/list"
-          type="organization"
-        />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <TextField
-            className="col-md-4 nameEN"
-            name="name.EN"
-            label={formatMessage("organizationEnglishNameLabel")}
-          />
-        </div>
-        <div className="row">
-          <TextField
-            className="col-md-4 nameFR"
-            name="name.FR"
-            label={formatMessage("organizationFrenchNameLabel")}
-          />
-        </div>
-        <div className="row">
-          <TextField
-            className="col-md-4"
-            name="aliases"
-            label={formatMessage("editOrganizationAliasesLabel")}
-          />
-        </div>
-      </div>
+      <OrganizationFields />
     </DinaForm>
+  );
+}
+
+export function OrganizationFields() {
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+
+  return (
+    <div>
+      <div className="row">
+        <TextField
+          className="col-md-4 nameEN"
+          name="name.EN"
+          label={formatMessage("organizationEnglishNameLabel")}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-4 nameFR"
+          name="name.FR"
+          label={formatMessage("organizationFrenchNameLabel")}
+        />
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-4"
+          name="aliases"
+          label={formatMessage("editOrganizationAliasesLabel")}
+        />
+      </div>
+      {readOnly && (
+        <div className="row">
+          <FieldView className="col-md-2" name="createdBy" />
+          <FieldView className="col-md-2" name="createdOn" />
+        </div>
+      )}
+    </div>
   );
 }

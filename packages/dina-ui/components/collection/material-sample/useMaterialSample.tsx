@@ -8,7 +8,15 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { cloneDeep, fromPairs, isEmpty, isEqual, pick, toPairs } from "lodash";
+import {
+  cloneDeep,
+  compact,
+  fromPairs,
+  isEmpty,
+  isEqual,
+  pick,
+  toPairs
+} from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -34,11 +42,12 @@ import {
 } from "../../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
-  Metadata,
   Person
 } from "../../../../dina-ui/types/objectstore-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { HOSTORGANISM_FIELDS } from "../AssociationsField";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../MaterialSampleAssociationsField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -72,21 +81,6 @@ export function useMaterialSampleQuery(id?: string | null) {
         }
       ],
       onSuccess: async ({ data }) => {
-        if (data.attachment) {
-          try {
-            const metadatas = await bulkGet<Metadata>(
-              data.attachment.map(collector => `/metadata/${collector.id}`),
-              {
-                apiBaseUrl: "/objectstore-api",
-                returnNullForMissingResource: true
-              }
-            );
-            // Omit null (deleted) records:
-            data.attachment = metadatas.filter(it => it);
-          } catch (error) {
-            console.warn("Attachment join failed: ", error);
-          }
-        }
         if (data.managedAttributes) {
           const managedAttributeValues: ManagedAttributeValues = {};
           toPairs(data?.managedAttributes as any).map(
@@ -102,27 +96,32 @@ export function useMaterialSampleQuery(id?: string | null) {
           // Retrieve determiner arrays on determination.
           for (const determination of data.determination) {
             if (determination.determiner) {
-              determination.determiner = await bulkGet<Person>(
-                determination.determiner.map(
-                  (personId: string) => `/person/${personId}`
-                ),
-                {
-                  apiBaseUrl: "/agent-api",
-                  returnNullForMissingResource: true
-                }
+              determination.determiner = compact(
+                await bulkGet<Person, true>(
+                  determination.determiner.map(
+                    (personId: string) => `/person/${personId}`
+                  ),
+                  {
+                    apiBaseUrl: "/agent-api",
+                    returnNullForMissingResource: true
+                  }
+                )
               );
             }
           }
         }
         if (data.materialSampleChildren) {
-          data.materialSampleChildren = await bulkGet<MaterialSample>(
-            data.materialSampleChildren.map(
-              child => `/material-sample/${child.id}?include=materialSampleType`
-            ),
-            {
-              apiBaseUrl: "/collection-api",
-              returnNullForMissingResource: true
-            }
+          data.materialSampleChildren = compact(
+            await bulkGet<MaterialSample, true>(
+              data.materialSampleChildren.map(
+                child =>
+                  `/material-sample/${child.id}?include=materialSampleType`
+              ),
+              {
+                apiBaseUrl: "/collection-api",
+                returnNullForMissingResource: true
+              }
+            )
           );
         }
       }
@@ -131,7 +130,6 @@ export function useMaterialSampleQuery(id?: string | null) {
 
   return materialSampleQuery;
 }
-
 export interface UseMaterialSampleSaveParams {
   /** Material Sample form initial values. */
   materialSample?: InputResource<MaterialSample>;
@@ -221,6 +219,23 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasAssociationsTemplate =
+    isTemplate &&
+    (!isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+          fieldName => `association.${fieldName}`
+        )
+      )
+    ) ||
+      !isEmpty(
+        pick(
+          materialSampleTemplateInitialValues?.templateCheckboxes,
+          HOSTORGANISM_FIELDS.map(fieldName => `hostOrganism.${fieldName}`)
+        )
+      ));
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
@@ -235,7 +250,7 @@ export function useMaterialSampleSave({
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
           prepFieldName =>
-            materialSample?.[prepFieldName] ||
+            !isEmpty(materialSample?.[prepFieldName]) ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
     )
@@ -286,6 +301,26 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableAssociations, setEnableAssociations] = useState(
+    // Show the associations section if the field is set or the template enables it:
+    Boolean(
+      hasAssociationsTemplate ||
+        materialSample?.associations?.length ||
+        HOSTORGANISM_FIELDS.some(
+          organismFieldName =>
+            materialSample?.hostOrganism?.[`${organismFieldName}`] ||
+            enabledFields?.materialSample?.includes(
+              `hostOrganism.${organismFieldName}`
+            )
+        ) ||
+        enabledFields?.materialSample?.some(
+          enabledField =>
+            enabledField.startsWith("association.") ||
+            enabledField.startsWith("hostOrganism.")
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -300,6 +335,8 @@ export function useMaterialSampleSave({
     setEnableDetermination,
     enableScheduledActions,
     setEnableScheduledActions,
+    enableAssociations,
+    setEnableAssociations,
     /** Wraps the useState setter with an AreYouSure modal when setting to false. */
     dataComponentToggler(
       setBoolean: Dispatch<SetStateAction<boolean>>,
@@ -500,6 +537,14 @@ export function useMaterialSampleSave({
         }
       }
     }
+
+    if (!enableAssociations) {
+      materialSampleInput.associations = [];
+      materialSampleInput.hostOrganism = null;
+    }
+
+    delete materialSampleInput.association;
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(
       async () =>

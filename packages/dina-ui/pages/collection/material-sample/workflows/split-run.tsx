@@ -420,12 +420,7 @@ export function SplitRunAction({ router }: WithRouterProps) {
   const length = samples?.length;
   return (
     <div>
-      <Head
-        title={formatMessage("splitSubsampleTitle")}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage("splitSubsampleTitle")} />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">

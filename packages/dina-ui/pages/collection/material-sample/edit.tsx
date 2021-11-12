@@ -36,13 +36,14 @@ import {
 import {
   CollectingEventLinker,
   DeterminationField,
-  OrganismStateField,
   PreparationField,
   ScheduledActionsField,
   SetDefaultSampleName,
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection";
+import { AssociationsField } from "../../../components/collection/AssociationsField";
+import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
@@ -110,12 +111,7 @@ export default function MaterialSampleEditPage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage(title)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
         {!id &&
@@ -203,7 +199,6 @@ export function MaterialSampleForm({
   )
 }: MaterialSampleFormProps) {
   const { isTemplate } = useContext(DinaFormContext) ?? {};
-
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -347,6 +342,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableOrganism && <OrganismStateField />}
           {dataComponentState.enableDetermination && <DeterminationField />}
+          {dataComponentState.enableAssociations && <AssociationsField />}
           {dataComponentState.enableStorage && (
             <FieldSet
               id="storage-section"

@@ -1,7 +1,7 @@
 import { ApiClientContext, LoadingSpinner } from "common-ui";
-import { mount } from "enzyme";
-import { LibraryPrep, StepResource } from "../../../../types/seqdb-api";
 import LibraryPrepWorksheetPage from "../../../../pages/seqdb/workflow/library-prep-worksheet";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { LibraryPrep, StepResource } from "../../../../types/seqdb-api";
 
 const mockUseRouter = jest.fn();
 jest.mock("next/router", () => ({
@@ -10,17 +10,15 @@ jest.mock("next/router", () => ({
 
 const mockGet = jest.fn();
 const mockCtx = {
-  apiClient: {
-    get: mockGet
+  apiContext: {
+    apiClient: {
+      get: mockGet
+    }
   }
 };
 
 function getWrapper() {
-  return mount(
-    <ApiClientContext.Provider value={mockCtx as any}>
-      <LibraryPrepWorksheetPage />
-    </ApiClientContext.Provider>
-  );
+  return mountWithAppContext(<LibraryPrepWorksheetPage />, mockCtx);
 }
 
 describe("Library Prep Worksheet page", () => {

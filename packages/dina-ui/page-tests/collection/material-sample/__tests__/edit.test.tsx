@@ -55,9 +55,14 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/collecting-event/1?include=collectors,attachment,collectionMethod":
       // Populate the linker table:
       return { data: testCollectionEvent() };
+    case "collection-api/material-sample":
+      return {
+        data: [
+          { id: "1", materialSampleName: "test name", type: "material-sample" }
+        ]
+      };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
-    case "collection-api/material-sample":
     case "collection-api/material-sample-type":
     case "user-api/group":
     case "agent-api/person":
@@ -187,12 +192,14 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
+              hostOrganism: null,
               managedAttributes: {},
               determination: [],
               publiclyReleasable: true, // Default value
@@ -258,12 +265,14 @@ describe("Material Sample Edit Page", () => {
           // New material-sample:
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "1",
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
+              hostOrganism: null,
               managedAttributes: {},
               determination: [],
               organism: null,
@@ -320,6 +329,7 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               id: "1",
+              associations: [],
               type: "material-sample",
               group: "test group",
               materialSampleName: "test-material-sample-id",
@@ -329,6 +339,7 @@ describe("Material Sample Edit Page", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
+              hostOrganism: null,
               determination: [],
               organism: null,
               managedAttributes: {},
@@ -425,6 +436,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
@@ -439,6 +451,7 @@ describe("Material Sample Edit Page", () => {
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
               determination: [],
+              hostOrganism: null,
               managedAttributes: {},
               organism: null,
               relationships: {
@@ -542,13 +555,126 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.find("#determination-section").exists()).toEqual(true);
   });
 
+  it("Renders an existing Material Sample with the Assoication section enabled.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          associations: [
+            { associatedSample: "test name", associationType: "host" }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Assoications are enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+  });
+
+  it("Save association with uuid mapped correctly for saving.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          materialSampleName: "test-ms",
+          associations: [{ associatedSample: "1", associationType: "host" }]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Associations are enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              associations: [
+                {
+                  associatedSample: "1",
+                  associationType: "host"
+                }
+              ],
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              determination: [],
+              dwcDegreeOfEstablishment: null,
+              id: "333",
+              managedAttributes: {},
+              materialSampleName: "test-ms",
+              organism: null,
+              preparationDate: null,
+              preparationMethod: null,
+              preparationRemarks: null,
+              preparationType: {
+                id: null,
+                type: "preparation-type"
+              },
+              preparedBy: {
+                id: null,
+                type: "person"
+              },
+              relationships: {
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              },
+              storageUnit: {
+                id: null,
+                type: "storage-unit"
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        {
+          apiBaseUrl: "/collection-api"
+        }
+      ]
+    ]);
+  });
+
   it("Renders an existing Material Sample with all toggleable data components disabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
           id: "333",
-          materialSampleName: "test-ms"
+          materialSampleName: "test-ms",
+          preparationAttachment: [], // This empty array should be treated as a blank value.
+          attachment: []
         }}
         onSaved={mockOnSaved}
       />,
@@ -560,16 +686,25 @@ describe("Material Sample Edit Page", () => {
 
     // Data components are disabled:
     expect(
+      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper
+        .find(".enable-scheduled-actions")
+        .find(ReactSwitch)
+        .prop("checked")
     ).toEqual(false);
   });
 
@@ -602,12 +737,14 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              associations: [],
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
               id: "333",
+              hostOrganism: null,
               managedAttributes: {
                 testAttr: "do the test"
               },

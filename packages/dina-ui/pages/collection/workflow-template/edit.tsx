@@ -20,11 +20,13 @@ import * as yup from "yup";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import {
   DETERMINATION_FIELDS,
+  HOSTORGANISM_FIELDS,
   ORGANISM_FIELDS,
   PREPARATION_FIELDS,
   SCHEDULEDACTION_FIELDS,
   useMaterialSampleSave
 } from "../../../components/collection";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -70,12 +72,7 @@ export default function PreparationProcessTemplatePage() {
 
   return (
     <div>
-      <Head
-        title={formatMessage(pageTitle)}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={formatMessage(pageTitle)} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -148,7 +145,8 @@ export function WorkflowTemplateForm({
       enableStorage,
       enableDetermination,
       enableOrganism,
-      enableScheduledActions
+      enableScheduledActions,
+      enableAssociations
     }
   } = materialSampleSaveHook;
 
@@ -200,6 +198,21 @@ export function WorkflowTemplateForm({
         )
       : {};
 
+    const associationTemplateFields = enableAssociations
+      ? {
+          ...pick(
+            enabledTemplateFields,
+            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
+          ),
+          ...pick(
+            enabledTemplateFields,
+            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
+              field => `association.${field}`
+            )
+          )
+        }
+      : {};
+
     // Construct the template definition to persist based on the form values:
     const definition: InputResource<PreparationProcessDefinition> = {
       ...mainTemplateFields,
@@ -214,7 +227,8 @@ export function WorkflowTemplateForm({
             ...organismTemplateFields,
             ...determinationTemplateFields,
             ...storageTemplateFields,
-            ...scheduledActionsTemplateFields
+            ...scheduledActionsTemplateFields,
+            ...associationTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent

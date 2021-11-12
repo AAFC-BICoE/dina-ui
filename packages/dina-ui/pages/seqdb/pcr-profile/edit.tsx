@@ -1,6 +1,6 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
@@ -29,11 +29,8 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
 
   return (
     <div>
-      <Head title={formatMessage(title)}
-						lang={formatMessage("languageOfPage")} 
-						creator={formatMessage("agricultureCanada")}
-						subject={formatMessage("subjectTermsForPage")} />
-			<Nav />
+      <Head title={formatMessage(title)} />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>
@@ -100,60 +97,66 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
         <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/pcr-profile" />
       </ButtonBar>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            className="col-md-2"
-            name="group"
-            enableStoredDefaultGroup={true}
-          />
-        </div>
-        <div className="row">
-          <ResourceSelectField<Region>
-            className="col-md-2"
-            name="region"
-            filter={filterBy(["name"])}
-            label="Select Gene Region"
-            model="seqdb-api/region"
-            optionLabel={region => region.name}
-          />
-          <TextField
-            className="col-md-2"
-            name="name"
-            label="Thermocycler Profile Name"
-          />
-          <TextField className="col-md-2" name="application" />
-          <TextField className="col-md-2" name="cycles" />
-        </div>
-        <div className="row">
-          <div className="col-md-6">
-            <div className="card-group row" style={{ padding: 15 }}>
-              <div className="card card-body col-md-4">
-                <TextField name="step1" />
-                <TextField name="step2" />
-                <TextField name="step3" />
-                <TextField name="step4" />
-                <TextField name="step5" />
-              </div>
-              <div className="card card-body col-md-4">
-                <TextField name="step6" />
-                <TextField name="step7" />
-                <TextField name="step8" />
-                <TextField name="step9" />
-                <TextField name="step10" />
-              </div>
-              <div className="card card-body col-md-4">
-                <TextField name="step11" />
-                <TextField name="step12" />
-                <TextField name="step13" />
-                <TextField name="step14" />
-                <TextField name="step15" />
-              </div>
+      <PcrProfileFormFields />
+    </DinaForm>
+  );
+}
+
+export function PcrProfileFormFields() {
+  return (
+    <div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-2"
+          name="group"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
+      <div className="row">
+        <ResourceSelectField<Region>
+          className="col-md-2"
+          name="region"
+          filter={filterBy(["name"])}
+          label="Select Gene Region"
+          model="seqdb-api/region"
+          optionLabel={region => region.name}
+        />
+        <TextField
+          className="col-md-2"
+          name="name"
+          label="Thermocycler Profile Name"
+        />
+        <TextField className="col-md-2" name="application" />
+        <TextField className="col-md-2" name="cycles" />
+      </div>
+      <div className="row">
+        <div className="col-md-6">
+          <div className="card-group row" style={{ padding: 15 }}>
+            <div className="card card-body col-md-4">
+              <TextField name="step1" />
+              <TextField name="step2" />
+              <TextField name="step3" />
+              <TextField name="step4" />
+              <TextField name="step5" />
+            </div>
+            <div className="card card-body col-md-4">
+              <TextField name="step6" />
+              <TextField name="step7" />
+              <TextField name="step8" />
+              <TextField name="step9" />
+              <TextField name="step10" />
+            </div>
+            <div className="card card-body col-md-4">
+              <TextField name="step11" />
+              <TextField name="step12" />
+              <TextField name="step13" />
+              <TextField name="step14" />
+              <TextField name="step15" />
             </div>
           </div>
         </div>
       </div>
-    </DinaForm>
+    </div>
   );
 }
 

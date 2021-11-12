@@ -32,23 +32,39 @@ describe("DateField component", () => {
 
   it("Changes the Formik field's value.", () => {
     const wrapper = getWrapper();
-    const { onChange } = wrapper.find<any>(ReactDatePicker).props();
+    wrapper
+      .find("input")
+      .simulate("change", { target: { value: "2019-05-25" } });
 
-    onChange(new Date("2019-05-25T12:00:00Z"), undefined);
-    wrapper.update();
-
-    expect(wrapper.find(ReactDatePicker).prop("selected")).toEqual(
-      new Date("2019-05-25T12:00:00.000Z")
-    );
+    expect(wrapper.find("input").prop("value")).toEqual("2019-05-25");
   });
 
   it("Can set the date field to null.", () => {
     const wrapper = getWrapper();
-    const { onChange } = wrapper.find<any>(ReactDatePicker).props();
-
-    onChange(null, undefined);
-    wrapper.update();
+    wrapper.find("input").simulate("change", { target: { value: "" } });
 
     expect(wrapper.find(ReactDatePicker).prop("selected")).toEqual(null);
+  });
+
+  it("Shows an error on non-existing dates.", () => {
+    const wrapper = getWrapper();
+    wrapper
+      .find("input")
+      .simulate("change", { target: { value: "2021-02-29" } });
+    wrapper.find("input").simulate("blur");
+
+    expect(wrapper.find(".invalid-feedback").text()).toEqual(
+      "Invalid Date: 2021-02-29"
+    );
+  });
+
+  it("Shows an error on invalid date formats.", () => {
+    const wrapper = getWrapper();
+    wrapper.find("input").simulate("change", { target: { value: "2021" } });
+    wrapper.find("input").simulate("blur");
+
+    expect(wrapper.find(".invalid-feedback").text()).toEqual(
+      "Date must be formatted as YYYY-MM-DD"
+    );
   });
 });

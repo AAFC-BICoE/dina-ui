@@ -32,13 +32,13 @@ const mockGet = jest.fn<any, any>(async (path, options) => {
     case "collection-api/collection":
       switch (options.filter?.rsql) {
         // For users with 1 group / 1 collection:
-        case "group=in=aafc":
+        case "group=in=(aafc)":
           return {
             data: [COLL1],
             meta: { totalResourceCount: 1 }
           };
         // For users with 2 groups / 2 collections:
-        case "group=in='aafc,cnc'":
+        case "group=in=(aafc,cnc)":
           return {
             data: [COLL1, COLL2],
             meta: { totalResourceCount: 2 }
@@ -69,7 +69,7 @@ describe("CollectionSelectField", () => {
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
-      { ...testCtx, accountContext: { roles: ["dina-admin"] } }
+      { ...testCtx, accountContext: { isAdmin: true } }
     );
 
     await new Promise(setImmediate);
@@ -96,8 +96,8 @@ describe("CollectionSelectField", () => {
 
     expect(wrapper.find(Select).prop("isDisabled")).toEqual(true);
     expect(mockGet.mock.calls).toEqual([
-      ["collection-api/collection", { filter: { rsql: "group=in=aafc" } }],
-      ["collection-api/collection", { filter: { rsql: "group=in=aafc" } }]
+      ["collection-api/collection", { filter: { rsql: "group=in=(aafc)" } }],
+      ["collection-api/collection", { filter: { rsql: "group=in=(aafc)" } }]
     ]);
   });
 
@@ -116,9 +116,9 @@ describe("CollectionSelectField", () => {
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
-        { filter: { rsql: "group=in='aafc,cnc'" } }
+        { filter: { rsql: "group=in=(aafc,cnc)" } }
       ],
-      ["collection-api/collection", { filter: { rsql: "group=in='aafc,cnc'" } }]
+      ["collection-api/collection", { filter: { rsql: "group=in=(aafc,cnc)" } }]
     ]);
   });
 });

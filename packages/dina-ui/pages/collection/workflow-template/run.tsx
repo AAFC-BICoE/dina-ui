@@ -3,7 +3,8 @@ import {
   ButtonBar,
   SubmitButton,
   useQuery,
-  withResponse
+  withResponse,
+  DinaForm
 } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
 import { compact, isNil, set, toPairs, pick } from "lodash";
@@ -48,12 +49,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 
   return (
     <div>
-      <Head
-        title={pageTitle}
-        lang={formatMessage("languageOfPage")}
-        creator={formatMessage("agricultureCanada")}
-        subject={formatMessage("subjectTermsForPage")}
-      />
+      <Head title={pageTitle} />
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
@@ -194,7 +190,6 @@ function useWorkflowMaterialSampleInitialValues(
         ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
-
     return {
       materialSampleInitialValues,
       collectingEventInitialValues,
