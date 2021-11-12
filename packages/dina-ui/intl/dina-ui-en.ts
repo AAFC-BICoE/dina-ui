@@ -300,6 +300,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
+  filedAs: "Filed As",
+  filedAsDeterminationButton_tooltip:
+    "Make this determination the filed as. Only one determination can be filed as",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -345,6 +348,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
+  makeFiledAs: "Make Filed As",
   makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
   managedAttributeListTitle: "Managed Attributes",

@@ -47,7 +47,9 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     scientificName: true,
     transcriberRemarks: true,
     isPrimary: true,
-    scientificNameDetails: true
+    scientificNameDetails: true,
+    filedAs: true,
+    remarks: true
   };
 
 /** All fields of the Determination type. */
@@ -83,6 +85,17 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
     formik.setFieldValue(`${determinationsPath}[${index}].isPrimary`, true);
   }
 
+  /** Make this Assertion Filed As. */
+  function makeFiledAs(formik: FormikContextType<any>, index) {
+    const assertions: Determination[] =
+      get(formik.values, determinationsPath) ?? [];
+
+    assertions.forEach((_, idx) => {
+      formik.setFieldValue(`${determinationsPath}[${idx}].filedAs`, false);
+    });
+    formik.setFieldValue(`${determinationsPath}[${index}].filedAs`, true);
+  }
+
   return (
     <div>
       <FieldArray name="determination">
@@ -90,7 +103,10 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
           const determinations =
             (form.values.determination as Determination[]) ?? [];
           function addDetermination() {
-            push({ isPrimary: determinations?.length === 0 });
+            push({
+              isPrimary: determinations?.length === 0,
+              filedAs: determinations?.length === 0
+            });
             setActiveTabIdx(determinations.length);
           }
 
@@ -137,6 +153,27 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       onClick={(_, formik) => makePrimary(formik, index)}
                     />
                     <Tooltip id="primaryDeterminationButton_tooltip" />
+
+                    <FormikButton
+                      className="btn btn-primary filed-as-button"
+                      buttonProps={ctx => {
+                        const filedAs =
+                          get(
+                            ctx.values,
+                            `${determinationsPath}[${index}].` + "filedAs"
+                          ) ?? false;
+                        return {
+                          disabled: filedAs,
+                          children: filedAs ? (
+                            <DinaMessage id="filedAs" />
+                          ) : (
+                            <DinaMessage id="makeFiledAs" />
+                          )
+                        };
+                      }}
+                      onClick={(_, formik) => makeFiledAs(formik, index)}
+                    />
+                    <Tooltip id="filedAsDeterminationButton_tooltip" />
                   </div>
                 )}
                 <div className="col-md-6">
@@ -229,6 +266,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       {...fieldProps("determinedOn")}
                       label={formatMessage("determiningDate")}
                     />
+                    <TextField {...fieldProps("remarks")} />
                   </FieldSet>
                   <FieldSet
                     legend={<DinaMessage id="typeSpecimen" />}
@@ -281,8 +319,14 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         <Tab key={index}>
                           <span className="m-3">
                             {index + 1}
-                            {determination.isPrimary &&
-                              ` (${formatMessage("primary")})`}
+                            {determination.isPrimary && determination.filedAs
+                              ? ` (${formatMessage(
+                                  "primary"
+                                )} | ${formatMessage("filedAs")})`
+                              : (determination.filedAs &&
+                                  `(${formatMessage("filedAs")})`) ||
+                                (determination.isPrimary &&
+                                  `(${formatMessage("primary")})`)}
                           </span>
                         </Tab>
                       ))}

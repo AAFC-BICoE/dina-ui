@@ -14,6 +14,8 @@ export interface Determination {
   transcriberRemarks?: string;
   isPrimary?: boolean;
   scientificNameDetails?: ScientificNameSourceDetails;
+  filedAs?: boolean;
+  remarks?: string;
 }
 
 export type ScientificNameSourceDetails = {
