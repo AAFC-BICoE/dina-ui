@@ -655,7 +655,9 @@ export function useMaterialSampleSave({
 
   const acqEventProps = {
     innerRef: acqEventFormRef,
-    initialValues: isTemplate ? acqEventTemplateInitialValues : {},
+    initialValues: isTemplate
+      ? acqEventTemplateInitialValues
+      : { type: "acquisition-event" },
     isTemplate,
     readOnly: isTemplate ? !!acqEventId : false,
     enabledFields: enabledFields?.acquisitionEvent

@@ -77,7 +77,7 @@ export function AcquisitionEventListLayout({
             Cell: ({ original: acqEvent }) => (
               <div className="d-flex">
                 <FormikButton
-                  className="btn btn-primary"
+                  className="btn btn-primary acquisition-event-link-button"
                   onClick={async () => await onSelect(acqEvent)}
                 >
                   <DinaMessage id="select" />
