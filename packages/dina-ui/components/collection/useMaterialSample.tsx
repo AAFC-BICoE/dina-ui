@@ -306,7 +306,10 @@ export function useMaterialSampleSave({
     Boolean(
       hasDeterminationTemplate ||
         // Show the determination section if a field is set or the field is enabled:
-        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        // Ignore the "isPrimary": field:
+        materialSample?.determination?.some(
+          ({ isPrimary, ...det }) => !isEmpty(det)
+        ) ||
         enabledFields?.materialSample?.some(enabledField =>
           enabledField.startsWith("determination[")
         )

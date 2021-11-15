@@ -232,7 +232,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [{ isPrimary: true }],
+              determination: [],
               organism: null,
               managedAttributes: {},
               relationships: {
@@ -326,7 +326,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [{ isPrimary: true }],
+              determination: [],
               organism: null,
               managedAttributes: {},
               relationships: {
@@ -358,19 +358,31 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // Both should be disabled:
+    // All switches should be disabled:
     expect(
       wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(".enable-acquisition-event")
+        .find(ReactSwitch)
+        .prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
-    ).toEqual(true);
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+    expect(
+      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
     expect(
       wrapper
         .find(".enable-scheduled-actions")
@@ -407,7 +419,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
               organism: null,
-              determination: [{ isPrimary: true }],
+              determination: [],
 
               relationships: {
                 attachment: {
