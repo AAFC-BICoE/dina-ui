@@ -41,14 +41,14 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     typeStatusEvidence: true,
     determiner: true,
     determinedOn: true,
-    qualifier: true,
+    verbatimRemarks: true,
     scientificNameSource: true,
     scientificName: true,
     transcriberRemarks: true,
     isPrimary: true,
     scientificNameDetails: true,
     isFileAs: true,
-    remarks: true
+    determinationRemarks: true
   };
 
 /** All fields of the Determination type. */
@@ -197,10 +197,13 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     />
                     <TextField {...fieldProps("verbatimDate")} />
                     <TextField
+                      {...fieldProps("verbatimRemarks")}
+                      multiLines={true}
+                    />
+                    <TextField
                       {...fieldProps("transcriberRemarks")}
                       multiLines={true}
                     />
-                    <TextField {...fieldProps("qualifier")} multiLines={true} />
                   </FieldSet>
                 </div>
                 <div className="col-md-6">
@@ -265,7 +268,7 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       {...fieldProps("determinedOn")}
                       label={formatMessage("determiningDate")}
                     />
-                    <TextField {...fieldProps("remarks")} />
+                    <TextField {...fieldProps("determinationRemarks")} />
                   </FieldSet>
                   <FieldSet
                     legend={<DinaMessage id="typeSpecimen" />}
