@@ -272,9 +272,7 @@ export function WorkflowTemplateForm({
                       acqEventFormRef.current?.values
                     ),
                     id: undefined
-                  },
-              allowNew: true,
-              allowExisting: true
+                  }
             }
           : undefined
       },

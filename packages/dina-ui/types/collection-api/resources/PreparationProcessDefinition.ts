@@ -5,8 +5,8 @@ import { MaterialSample } from "./MaterialSample";
 
 /** Form template config and default values. */
 export interface FormTemplate<TFormValues> {
-  allowNew: boolean;
-  allowExisting: boolean;
+  allowNew?: boolean;
+  allowExisting?: boolean;
   templateFields: TemplateFields<TFormValues>;
 }
 

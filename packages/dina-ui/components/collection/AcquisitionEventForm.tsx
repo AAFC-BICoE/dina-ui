@@ -51,11 +51,9 @@ export function AcquisitionEventFormLayout() {
             />
             <DateField name="receivedDate" />
           </div>
-          <TextField
-            name="receptionRemarks"
-            className="col-sm-6"
-            multiLines={true}
-          />
+          <div className="col-sm-6 receptionRemarks">
+            <TextField name="receptionRemarks" multiLines={true} />
+          </div>
         </div>
       </FieldSet>
       <FieldSet legend={<DinaMessage id="externalIsolation" />}>

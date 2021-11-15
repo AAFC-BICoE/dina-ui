@@ -6,6 +6,7 @@ import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
+  AcquisitionEvent,
   CollectingEvent,
   PreparationProcessDefinition,
   StorageUnit
@@ -34,6 +35,15 @@ function testCollectionEvent(): Partial<CollectingEvent> {
   };
 }
 
+function testAcquisitionEvent(): Partial<AcquisitionEvent> {
+  return {
+    id: "987",
+    type: "acquisition-event",
+    group: "test group",
+    receptionRemarks: "test reception remarks"
+  };
+}
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "user-api/group":
@@ -48,6 +58,10 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [testCollectionEvent()] };
     case "collection-api/collecting-event/321?include=collectors,attachment,collectionMethod":
       return { data: testCollectionEvent() };
+    case "collection-api/acquisition-event":
+      return { data: [testAcquisitionEvent()] };
+    case "collection-api/acquisition-event/987":
+      return { data: testAcquisitionEvent() };
     case "agent-api/person":
     case "collection-api/material-sample-type":
     case "collection-api/vocabulary/degreeOfEstablishment":
@@ -100,6 +114,8 @@ async function mountForm(
     wrapper.find(".enable-determination").find(ReactSwitch);
   const scheduledActionsSwitch = () =>
     wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
+  const acquisitionEventSwitch = () =>
+    wrapper.find(".enable-acquisition-event").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -138,6 +154,10 @@ async function mountForm(
     await toggleDataComponent(scheduledActionsSwitch(), val);
   }
 
+  async function toggleAcquisitionEvent(val: boolean) {
+    await toggleDataComponent(acquisitionEventSwitch(), val);
+  }
+
   async function fillOutRequiredFields() {
     // Set the name:
     wrapper
@@ -161,11 +181,13 @@ async function mountForm(
     toggleStorage,
     toggleDeterminations,
     toggleScheduledActions,
+    toggleAcquisitionEvent,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
     scheduledActionsSwitch,
     determinationSwitch,
+    acquisitionEventSwitch,
     fillOutRequiredFields,
     submitForm
   };
@@ -175,14 +197,24 @@ describe("Workflow template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
-    const { colEventSwitch, catalogSwitch, storageSwitch } = await mountForm();
+    const {
+      colEventSwitch,
+      catalogSwitch,
+      storageSwitch,
+      scheduledActionsSwitch,
+      determinationSwitch,
+      acquisitionEventSwitch
+    } = await mountForm();
     // Switches are off by default:
     expect(colEventSwitch().prop("checked")).toEqual(false);
     expect(catalogSwitch().prop("checked")).toEqual(false);
     expect(storageSwitch().prop("checked")).toEqual(false);
+    expect(scheduledActionsSwitch().prop("checked")).toEqual(false);
+    expect(determinationSwitch().prop("checked")).toEqual(false);
+    expect(acquisitionEventSwitch().prop("checked")).toEqual(false);
   });
 
-  it("Submits a new ADD-type action-definition: minimal form submission.", async () => {
+  it("Submits a new action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
       togglePreparations,
@@ -224,7 +256,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set collecting event template fields.", async () => {
+  it("Submits a new action-definition: Only set collecting event template fields.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -304,7 +336,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set preparations template fields.", async () => {
+  it("Submits a new action-definition: Only set preparations template fields.", async () => {
     const { wrapper, togglePreparations, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -352,7 +384,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set Determinations template fields.", async () => {
+  it("Submits a new action-definition: Only set Determinations template fields.", async () => {
     const { wrapper, toggleDeterminations, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -396,7 +428,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Link to an existing Collecting Event.", async () => {
+  it("Submits a new action-definition: Link to an existing Collecting Event.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -439,7 +471,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set the storage template fields.", async () => {
+  it("Submits a new action-definition: Only set the storage template fields.", async () => {
     const { wrapper, toggleStorage, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -482,7 +514,7 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new ADD-type action-definition: Only set the scheduled action template fields.", async () => {
+  it("Submits a new action-definition: Only set the scheduled action template fields.", async () => {
     const {
       wrapper,
       toggleScheduledActions,
@@ -516,6 +548,99 @@ describe("Workflow template edit page", () => {
               enabled: true
             }
           }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Submits a new action-definition: Only set the acquisition event template fields.", async () => {
+    const {
+      wrapper,
+      toggleAcquisitionEvent,
+      fillOutRequiredFields,
+      submitForm
+    } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleAcquisitionEvent(true);
+
+    // Add default remarks:
+    wrapper
+      .find(".receptionRemarks input[type='checkbox']")
+      .last()
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".receptionRemarks-field textarea")
+      .simulate("change", { target: { value: "default-reception-remarks" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {}
+        },
+        ACQUISITION_EVENT: {
+          templateFields: {
+            receptionRemarks: {
+              defaultValue: "default-reception-remarks",
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Submits a new action-definition: Link to an existing Acquisition Event.", async () => {
+    const {
+      wrapper,
+      toggleAcquisitionEvent,
+      fillOutRequiredFields,
+      submitForm
+    } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleAcquisitionEvent(true);
+
+    wrapper.find("button.acquisition-event-link-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".attached-resource-link").text()).toEqual(
+      "Attached: 987"
+    );
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        ACQUISITION_EVENT: {
+          templateFields: {
+            // Only includes the linked acquisition event's ID:
+            id: {
+              defaultValue: "987",
+              enabled: true
+            }
+          }
+        },
+        MATERIAL_SAMPLE: {
+          templateFields: {}
         }
       },
       group: "test-group-1",
