@@ -410,7 +410,7 @@ describe("Workflow template edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".attached-collecting-event-link").text()).toEqual(
+    expect(wrapper.find(".attached-resource-link").text()).toEqual(
       "Attached Collecting Event: 321"
     );
 
@@ -567,12 +567,12 @@ describe("Workflow template edit page", () => {
     expect(colEventSwitch().prop("checked")).toEqual(true);
     expect(catalogSwitch().prop("checked")).toEqual(false);
 
-    expect(wrapper.find(".attached-collecting-event-link").text()).toEqual(
+    expect(wrapper.find(".attached-resource-link").text()).toEqual(
       "Attached Collecting Event: 321"
     );
 
     // Unlink the Collecting Event:
-    wrapper.find("button.detach-collecting-event-button").simulate("click");
+    wrapper.find("button.detach-resource-button").simulate("click");
 
     await submitForm();
 

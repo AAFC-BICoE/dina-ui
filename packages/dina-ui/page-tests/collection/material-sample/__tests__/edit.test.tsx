@@ -364,7 +364,7 @@ describe("Material Sample Edit Page", () => {
       wrapper.find(".verbatimEventDateTime-field input").prop("value")
     ).toEqual("2021-04-13");
 
-    wrapper.find("button.detach-collecting-event-button").simulate("click");
+    wrapper.find("button.detach-resource-button").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();

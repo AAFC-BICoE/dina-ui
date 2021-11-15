@@ -9,3 +9,4 @@ export * from "./useCollectingEvent";
 export * from "./useLastUsedCollection";
 export * from "./SetDefaultSampleName";
 export * from "./AssociationsField";
+export * from "./TabbedResourceLinker";

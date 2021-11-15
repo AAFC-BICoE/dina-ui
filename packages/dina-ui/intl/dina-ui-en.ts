@@ -2,6 +2,7 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  acquisitionEvent: "Acquisition Event",
   actionType: "Action Type",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
@@ -53,7 +54,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
-  attachedCollectingEvent: "Attached Collecting Event",
   attachments: "Attachments",
   attributeLabel: "Attribute",
   baseNameLabel: "Base Name",
@@ -70,7 +70,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEvent: "Collecting Event",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
-  collectingEventDetailsPageLink: "Collecting Event Details Page",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",

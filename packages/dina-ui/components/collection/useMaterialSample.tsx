@@ -2,6 +2,7 @@ import {
   AreYouSureModal,
   DinaForm,
   DinaFormSubmitParams,
+  LoadingSpinner,
   useApiClient,
   useModal,
   useQuery
@@ -26,12 +27,12 @@ import {
 } from "react";
 import { useCollectingEventQuery, useCollectingEventSave } from ".";
 import {
+  AcquisitionEvent,
   CollectingEvent,
   MaterialSample
 } from "../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
-  Metadata,
   Person
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
@@ -134,7 +135,8 @@ export interface UseMaterialSampleSaveParams {
 
   onSaved?: (id: string) => Promise<void>;
 
-  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
+  colEventFormRef?: React.RefObject<FormikProps<any>>;
+  acquisitionEventFormRef?: React.RefObject<FormikProps<any>>;
 
   isTemplate?: boolean;
 
@@ -158,7 +160,8 @@ export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
   onSaved,
-  collectingEvtFormRef,
+  colEventFormRef: colEventFormRefProp,
+  acquisitionEventFormRef: acquisitionEventFormRefProp,
   isTemplate,
   enabledFields,
   collectingEventAttachmentsConfig,
@@ -172,6 +175,11 @@ export function useMaterialSampleSave({
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
+
+  const hasAcquisitionEventTemplate =
+    isTemplate &&
+    materialSampleTemplateInitialValues?.templateCheckboxes?.acquisitionEvent;
+
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(
@@ -237,6 +245,14 @@ export function useMaterialSampleSave({
       hasColEventTemplate ||
         materialSample?.collectingEvent ||
         enabledFields?.collectingEvent?.length
+    )
+  );
+
+  const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState(
+    Boolean(
+      hasAcquisitionEventTemplate ||
+        materialSample?.acquisitionEvent ||
+        enabledFields?.materialSample?.includes("acquisitionEvent")
     )
   );
 
@@ -321,6 +337,8 @@ export function useMaterialSampleSave({
   const dataComponentState = {
     enableCollectingEvent,
     setEnableCollectingEvent,
+    enableAcquisitionEvent,
+    setEnableAcquisitionEvent,
     enablePreparations,
     setEnablePreparations,
     enableOrganism,
@@ -377,16 +395,13 @@ export function useMaterialSampleSave({
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
-  const colEventFormRef =
-    collectingEvtFormRef ?? useRef<FormikProps<any>>(null);
-
+  const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
   const [colEventId, setColEventId] = useState<string | null | undefined>(
     isTemplate
       ? colEventTemplateInitialValues?.id
       : materialSample?.collectingEvent?.id
   );
   const colEventQuery = useCollectingEventQuery(colEventId);
-
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
@@ -395,9 +410,18 @@ export function useMaterialSampleSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
     fetchedCollectingEvent: colEventQuery.response?.data
   });
-
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
+
+  const acqEventFormRef =
+    acquisitionEventFormRefProp ?? useRef<FormikProps<any>>(null);
+  const [acqEventId, setAcqEventId] = useState<string | null | undefined>(
+    materialSample?.acquisitionEvent?.id
+  );
+  const acqEventQuery = useQuery<AcquisitionEvent>(
+    { path: `collection-api/acquisition-event/${acqEventId}` },
+    { disabled: !acqEventId }
+  );
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -572,12 +596,27 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
+  const nestedAcqEventForm = acqEventQuery.loading ? (
+    <LoadingSpinner loading={true} />
+  ) : (
+    <DinaForm
+      innerRef={acqEventFormRef}
+      initialValues={acqEventQuery.response?.data}
+      readOnly={isTemplate ? !!acqEventId : false}
+    >
+      <div>TODO acq event form</div>
+    </DinaForm>
+  );
+
   return {
     initialValues,
     nestedCollectingEventForm,
+    nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
+    acqEventId,
+    setAcqEventId,
     colEventQuery,
     onSubmit,
     loading

@@ -19,10 +19,10 @@ import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
-import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
-import { ReactNode, useContext, useState, useRef } from "react";
+import { ReactNode, useContext, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
+import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -38,7 +38,8 @@ import {
 } from "../../../components";
 import {
   CollectingEventLinker,
-  SetDefaultSampleName
+  SetDefaultSampleName,
+  TabbedResourceLinker
 } from "../../../components/collection";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
 import { PreparationField } from "../../../components/collection/PreparationField";
@@ -249,91 +250,24 @@ export function MaterialSampleForm({
               id="collecting-event-section"
               legend={<DinaMessage id="collectingEvent" />}
             >
-              <Tabs
-                // Re-initialize the form when the linked CollectingEvent changes:
-                key={colEventId}
-                // Prevent unmounting the form on tab switch to avoid losing the form state:
-                forceRenderTabPanel={true}
-              >
-                <TabList>
-                  <Tab>
-                    {colEventId ? (
-                      <DinaMessage id="attachedCollectingEvent" />
-                    ) : (
-                      <DinaMessage id="createNew" />
-                    )}
-                  </Tab>
-                  <Tab disabled={templateAttachesCollectingEvent}>
-                    <DinaMessage id="attachExisting" />
-                  </Tab>
-                </TabList>
-                <TabPanel>
-                  {
-                    // If there is already a linked CollectingEvent then wait for it to load first:
-                    colEventId
-                      ? withResponse(
-                          colEventQuery,
-                          ({ data: linkedColEvent }) => (
-                            <>
-                              <div className="mb-3 d-flex justify-content-end align-items-center">
-                                <Link
-                                  href={`/collection/collecting-event/view?id=${colEventId}`}
-                                >
-                                  <a target="_blank">
-                                    <DinaMessage id="collectingEventDetailsPageLink" />
-                                  </a>
-                                </Link>
-                                {
-                                  // Do not allow changing an attached Collecting Event from a template:
-                                  !templateAttachesCollectingEvent && (
-                                    <FormikButton
-                                      className="btn btn-danger detach-collecting-event-button ms-5"
-                                      onClick={() => setColEventId(null)}
-                                    >
-                                      <DinaMessage id="detachCollectingEvent" />
-                                    </FormikButton>
-                                  )
-                                }
-                              </div>
-                              {
-                                // In template mode or Workflow Run mode, only show a link to the linked Collecting Event:
-                                isTemplate ||
-                                templateAttachesCollectingEvent ? (
-                                  <div>
-                                    <div className="attached-collecting-event-link mb-3">
-                                      <DinaMessage id="attachedCollectingEvent" />
-                                      :{" "}
-                                      <Link
-                                        href={`/collection/collecting-event/view?id=${colEventId}`}
-                                      >
-                                        <a target="_blank">
-                                          {linkedColEvent.id}
-                                        </a>
-                                      </Link>
-                                    </div>
-                                    <CollectingEventBriefDetails
-                                      collectingEvent={linkedColEvent}
-                                    />
-                                  </div>
-                                ) : (
-                                  // In form mode, show the actual editable Collecting Event form:
-                                  nestedCollectingEventForm
-                                )
-                              }
-                            </>
-                          )
-                        )
-                      : nestedCollectingEventForm
-                  }
-                </TabPanel>
-                <TabPanel>
+              <TabbedResourceLinker<CollectingEvent>
+                briefDetails={colEvent => (
+                  <CollectingEventBriefDetails collectingEvent={colEvent} />
+                )}
+                linkerTabContent={
                   <CollectingEventLinker
                     onCollectingEventSelect={colEventToLink => {
                       setColEventId(colEventToLink.id);
                     }}
                   />
-                </TabPanel>
-              </Tabs>
+                }
+                nestedForm={nestedCollectingEventForm}
+                resourceQuery={colEventQuery}
+                setResourceId={setColEventId}
+                disableLinkerTab={templateAttachesCollectingEvent}
+                readOnlyLink="/collection/collecting-event/view?id="
+                resourceId={colEventId}
+              />
             </FieldSet>
           )}
           {dataComponentState.enablePreparations && (

@@ -50,7 +50,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachExisting: "Joindre l’existant",
   attachExistingObjects: "Joindre des objets existants",
   attachSelected: "Joindre la sélection",
-  attachedCollectingEvent: "Événement de collecte en annexe",
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
   baseNameLabel: "Nom de base",
