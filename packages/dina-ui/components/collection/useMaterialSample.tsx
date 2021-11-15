@@ -2,13 +2,13 @@ import {
   AreYouSureModal,
   DinaForm,
   DinaFormSubmitParams,
-  LoadingSpinner,
   useApiClient,
   useModal,
-  useQuery
+  useQuery,
+  withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import {
   cloneDeep,
   compact,
@@ -38,6 +38,10 @@ import {
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { AllowAttachmentsConfig } from "../object-store";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "./AcquisitionEventForm";
 import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
@@ -55,6 +59,7 @@ export function useMaterialSampleQuery(id?: string | null) {
       include: [
         "collection",
         "collectingEvent",
+        "acquisitionEvent",
         "attachment",
         "preparationAttachment",
         "preparationType",
@@ -252,7 +257,9 @@ export function useMaterialSampleSave({
     Boolean(
       hasAcquisitionEventTemplate ||
         materialSample?.acquisitionEvent ||
-        enabledFields?.materialSample?.includes("acquisitionEvent")
+        enabledFields?.materialSample?.some(fieldName =>
+          fieldName.startsWith("acquisitionEvent.")
+        )
     )
   );
 
@@ -418,10 +425,7 @@ export function useMaterialSampleSave({
   const [acqEventId, setAcqEventId] = useState<string | null | undefined>(
     materialSample?.acquisitionEvent?.id
   );
-  const acqEventQuery = useQuery<AcquisitionEvent>(
-    { path: `collection-api/acquisition-event/${acqEventId}` },
-    { disabled: !acqEventId }
-  );
+  const acqEventQuery = useAcquisitionEvent(acqEventId);
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -470,9 +474,7 @@ export function useMaterialSampleSave({
       };
     } else if (colEventFormRef.current) {
       // Return if the Collecting Event sub-form has errors:
-      const colEventErrors = await (
-        colEventFormRef as any
-      ).current.validateForm();
+      const colEventErrors = await colEventFormRef.current.validateForm();
       if (!isEmpty(colEventErrors)) {
         formik.setErrors({ ...formik.errors, ...colEventErrors });
         return;
@@ -480,7 +482,7 @@ export function useMaterialSampleSave({
 
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
-        (colEventFormRef as any).current.values
+        colEventFormRef.current.values
       );
 
       const collectingEventWasEdited = !isEqual(
@@ -492,7 +494,7 @@ export function useMaterialSampleSave({
         ? // Use the same save method as the Collecting Event page:
           await saveCollectingEvent(
             submittedCollectingEvent,
-            (colEventFormRef as any).current
+            colEventFormRef.current
           )
         : submittedCollectingEvent;
 
@@ -503,6 +505,54 @@ export function useMaterialSampleSave({
       materialSampleInput.collectingEvent = {
         id: savedCollectingEvent.id,
         type: savedCollectingEvent.type
+      };
+    }
+
+    if (!enableAcquisitionEvent) {
+      // Unlink the AcquisitionEvent if its switch is unchecked:
+      materialSampleInput.acquisitionEvent = {
+        id: null,
+        type: "acquisition-event"
+      };
+    } else if (acqEventFormRef.current) {
+      // Return if the Acq Event sub-form has errors:
+      const acqEventErrors = await acqEventFormRef.current.validateForm();
+      if (!isEmpty(acqEventErrors)) {
+        formik.setErrors({ ...formik.errors, ...acqEventErrors });
+        return;
+      }
+
+      // Save the linked AcqEvent if included:
+      const submittedAcqEvent: PersistedResource<AcquisitionEvent> = cloneDeep(
+        acqEventFormRef.current.values
+      );
+
+      const acqEventWasEdited = !isEqual(
+        submittedAcqEvent,
+        acqEventFormRef.current.initialValues
+      );
+
+      // Only send the save request if the Acq Event was edited:
+      const [savedAcqEvent] = acqEventWasEdited
+        ? // Use the same save method as the Acq Event page:
+          await save<AcquisitionEvent>(
+            [
+              {
+                resource: submittedAcqEvent,
+                type: "acquisition-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          )
+        : [submittedAcqEvent];
+
+      // Set the acqEventId here in case the next operation fails:
+      setAcqEventId(savedAcqEvent.id);
+
+      // Link the MaterialSample to the AcquisitionEvent:
+      materialSampleInput.acquisitionEvent = {
+        id: savedAcqEvent.id,
+        type: savedAcqEvent.type
       };
     }
 
@@ -596,15 +646,19 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
-  const nestedAcqEventForm = acqEventQuery.loading ? (
-    <LoadingSpinner loading={true} />
+  const nestedAcqEventForm = acqEventId ? (
+    withResponse(acqEventQuery, ({ data }) => (
+      <DinaForm
+        innerRef={acqEventFormRef}
+        initialValues={data}
+        readOnly={isTemplate ? !!acqEventId : false}
+      >
+        <AcquisitionEventFormLayout />
+      </DinaForm>
+    ))
   ) : (
-    <DinaForm
-      innerRef={acqEventFormRef}
-      initialValues={acqEventQuery.response?.data}
-      readOnly={isTemplate ? !!acqEventId : false}
-    >
-      <div>TODO acq event form</div>
+    <DinaForm innerRef={acqEventFormRef} initialValues={{}}>
+      <AcquisitionEventFormLayout />
     </DinaForm>
   );
 
@@ -615,6 +669,7 @@ export function useMaterialSampleSave({
     dataComponentState,
     colEventId,
     setColEventId,
+    acqEventQuery,
     acqEventId,
     setAcqEventId,
     colEventQuery,

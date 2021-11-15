@@ -411,7 +411,7 @@ describe("Workflow template edit page", () => {
     wrapper.update();
 
     expect(wrapper.find(".attached-resource-link").text()).toEqual(
-      "Attached Collecting Event: 321"
+      "Attached: 321"
     );
 
     await submitForm();
@@ -568,7 +568,7 @@ describe("Workflow template edit page", () => {
     expect(catalogSwitch().prop("checked")).toEqual(false);
 
     expect(wrapper.find(".attached-resource-link").text()).toEqual(
-      "Attached Collecting Event: 321"
+      "Attached: 321"
     );
 
     // Unlink the Collecting Event:

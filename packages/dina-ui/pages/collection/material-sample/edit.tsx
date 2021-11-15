@@ -18,8 +18,6 @@ import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode, useContext, useState } from "react";
-import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -38,7 +36,10 @@ import {
   SetDefaultSampleName,
   TabbedResourceLinker
 } from "../../../components/collection";
+import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
+import { AssociationsField } from "../../../components/collection/AssociationsField";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
+import { OrganismStateField } from "../../../components/collection/OrganismStateField";
 import { PreparationField } from "../../../components/collection/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import {
@@ -49,11 +50,11 @@ import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  AcquisitionEvent,
   CollectingEvent,
   MaterialSample,
   MaterialSampleType,
-  Vocabulary,
-  AcquisitionEvent
+  Vocabulary
 } from "../../../types/collection-api";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
@@ -208,6 +209,9 @@ export function MaterialSampleForm({
     colEventId,
     setColEventId,
     colEventQuery,
+    acqEventQuery,
+    acqEventId,
+    setAcqEventId,
     onSubmit,
     loading
   } =
@@ -272,14 +276,14 @@ export function MaterialSampleForm({
           {dataComponentState.enableAcquisitionEvent && (
             <FieldSet
               id="acquisition-event-section"
-              legend={<DinaMessage id="collectingEvent" />}
+              legend={<DinaMessage id="acquisitionEvent" />}
             >
               <TabbedResourceLinker<AcquisitionEvent>
                 briefDetails={acqEvent => <>todo brief details {acqEvent.id}</>}
                 linkerTabContent={
                   <AcquisitionEventLinker
-                    onCollectingEventSelect={colEventToLink => {
-                      setColEventId(colEventToLink.id);
+                    onAcquisitionEventSelect={acqEventToLink => {
+                      setAcqEventId(acqEventToLink.id);
                     }}
                   />
                 }

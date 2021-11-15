@@ -218,6 +218,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               hostOrganism: null,
               collectingEvent: {
@@ -307,6 +311,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               hostOrganism: null,
               collectingEvent: {
@@ -382,6 +390,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               hostOrganism: null,
               associations: [],
               collectingEvent: {

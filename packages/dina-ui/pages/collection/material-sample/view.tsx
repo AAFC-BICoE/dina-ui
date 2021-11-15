@@ -13,11 +13,6 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
-  OrganismStateField,
-  ORGANISM_FIELDS
-} from "../../../../dina-ui/components/collection/OrganismStateField";
-import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
-import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
@@ -27,12 +22,25 @@ import {
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "../../../components/collection/AcquisitionEventForm";
+import {
+  AssociationsField,
+  HOSTORGANISM_FIELDS
+} from "../../../components/collection/AssociationsField";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
+import {
+  OrganismStateField,
+  ORGANISM_FIELDS
+} from "../../../components/collection/OrganismStateField";
 import {
   PreparationField,
   PREPARATION_FIELDS
 } from "../../../components/collection/PreparationField";
+import { SamplesView } from "../../../components/collection/SamplesView";
 import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
 import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
@@ -40,13 +48,9 @@ import { ManagedAttributesViewer } from "../../../components/object-store/manage
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import {
-  MaterialSampleIdentifiersFormLayout,
-  MaterialSampleFormLayout
+  MaterialSampleFormLayout,
+  MaterialSampleIdentifiersFormLayout
 } from "./edit";
-import {
-  AssociationsField,
-  HOSTORGANISM_FIELDS
-} from "../../../components/collection/AssociationsField";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -58,8 +62,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const colEventQuery = useCollectingEventQuery(
     materialSampleQuery.response?.data?.collectingEvent?.id
   );
-
-  const collectingEvent = colEventQuery.response?.data;
+  const acqEventQuery = useAcquisitionEvent(
+    materialSampleQuery.response?.data?.acquisitionEvent?.id
+  );
 
   const buttonBar = id && (
     <ButtonBar className="flex">
@@ -146,12 +151,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
               )}
               <MaterialSampleFormLayout />
-              {collectingEvent && (
+              {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-                  <DinaForm initialValues={collectingEvent} readOnly={true}>
+                  <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link
-                        href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
+                        href={`/collection/collecting-event/view?id=${colEvent.id}`}
                       >
                         <a target="_blank">
                           <DinaMessage id="detailsPageLink" />
@@ -161,7 +166,26 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <CollectingEventFormLayout />
                   </DinaForm>
                 </FieldSet>
-              )}
+              ))}
+              {withResponse(acqEventQuery, ({ data: acqEvent }) => (
+                <FieldSet
+                  id="acquisition-event-section"
+                  legend={<DinaMessage id="acquisitionEvent" />}
+                >
+                  <DinaForm initialValues={acqEvent} readOnly={true}>
+                    <div className="mb-3 d-flex justify-content-end align-items-center">
+                      <Link
+                        href={`/collection/acquisition-event/view?id=${acqEvent.id}`}
+                      >
+                        <a target="_blank">
+                          <DinaMessage id="detailsPageLink" />
+                        </a>
+                      </Link>
+                    </div>
+                    <AcquisitionEventFormLayout />
+                  </DinaForm>
+                </FieldSet>
+              ))}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}
               {hasDetermination && <DeterminationField />}

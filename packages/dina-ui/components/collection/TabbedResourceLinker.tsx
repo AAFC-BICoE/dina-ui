@@ -1,9 +1,4 @@
-import {
-  FormikButton,
-  QueryState,
-  useDinaFormContext,
-  withResponse
-} from "common-ui";
+import { QueryState, useDinaFormContext, withResponse } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { ReactNode } from "react";
@@ -68,12 +63,13 @@ export function TabbedResourceLinker<T extends KitsuResource>({
                     {
                       // Do not allow changing an attached resource from a template:
                       !disableLinkerTab && (
-                        <FormikButton
+                        <button
+                          type="button"
                           className="btn btn-danger detach-resource-button ms-5"
                           onClick={() => setResourceId(null)}
                         >
                           <DinaMessage id="detach" />
-                        </FormikButton>
+                        </button>
                       )
                     }
                   </div>

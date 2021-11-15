@@ -154,6 +154,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   endEventDateTime: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
+  externalIsolation: "External Isolation",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
@@ -429,6 +430,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryDeterminationButton_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
+  reception: "Reception",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
   removeDeterminationLabel: "Remove this Determination",

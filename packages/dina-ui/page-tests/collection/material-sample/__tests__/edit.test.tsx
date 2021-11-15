@@ -174,6 +174,10 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
@@ -247,6 +251,10 @@ describe("Material Sample Edit Page", () => {
           // New material-sample:
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               collectingEvent: {
                 id: "1",
@@ -311,6 +319,10 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               id: "1",
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               type: "material-sample",
               group: "test group",
@@ -418,6 +430,10 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
@@ -597,6 +613,10 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [
                 {
                   associatedSample: "1",
@@ -608,22 +628,13 @@ describe("Material Sample Edit Page", () => {
                 type: "collecting-event"
               },
               determination: [],
-              dwcDegreeOfEstablishment: null,
               id: "333",
               managedAttributes: {},
               materialSampleName: "test-ms",
               organism: null,
-              preparationDate: null,
-              preparationMethod: null,
-              preparationRemarks: null,
-              preparationType: {
-                id: null,
-                type: "preparation-type"
-              },
-              preparedBy: {
-                id: null,
-                type: "person"
-              },
+              // Preparations are not enabled, so the preparation fields are set to null:
+              ...BLANK_PREPARATION,
+              preparationAttachment: undefined,
               relationships: {
                 attachment: {
                   data: []
@@ -719,6 +730,10 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
               associations: [],
               collectingEvent: {
                 id: null,

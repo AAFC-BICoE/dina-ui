@@ -135,7 +135,8 @@ export function WorkflowTemplateForm({
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
-    materialSampleTemplateInitialValues
+    materialSampleTemplateInitialValues,
+    colEventFormRef: collectingEvtFormRef
   });
 
   const {
@@ -316,8 +317,6 @@ export function WorkflowTemplateForm({
 export function getEnabledTemplateFieldsFromForm(
   formValues: any
 ): TemplateFields {
-  // delete the key "determination" as children with index are actual keys
-  delete formValues.templateCheckboxes?.determination;
   return mapValues(
     formValues.templateCheckboxes ?? {},
     (val: boolean | undefined, key) =>
