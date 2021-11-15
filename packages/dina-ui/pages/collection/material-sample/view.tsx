@@ -154,7 +154,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                         href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
                       >
                         <a target="_blank">
-                          <DinaMessage id="collectingEventDetailsPageLink" />
+                          <DinaMessage id="detailsPageLink" />
                         </a>
                       </Link>
                     </div>

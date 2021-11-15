@@ -7,7 +7,6 @@ import {
   DinaFormSection,
   FieldSet,
   filterBy,
-  FormikButton,
   LoadingSpinner,
   ResourceSelectField,
   StringArrayField,
@@ -17,10 +16,8 @@ import {
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useContext, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
 import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
 import {
@@ -55,7 +52,8 @@ import {
   CollectingEvent,
   MaterialSample,
   MaterialSampleType,
-  Vocabulary
+  Vocabulary,
+  AcquisitionEvent
 } from "../../../types/collection-api";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
@@ -205,6 +203,7 @@ export function MaterialSampleForm({
   const {
     initialValues,
     nestedCollectingEventForm,
+    nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
@@ -267,6 +266,28 @@ export function MaterialSampleForm({
                 disableLinkerTab={templateAttachesCollectingEvent}
                 readOnlyLink="/collection/collecting-event/view?id="
                 resourceId={colEventId}
+              />
+            </FieldSet>
+          )}
+          {dataComponentState.enableAcquisitionEvent && (
+            <FieldSet
+              id="acquisition-event-section"
+              legend={<DinaMessage id="collectingEvent" />}
+            >
+              <TabbedResourceLinker<AcquisitionEvent>
+                briefDetails={acqEvent => <>todo brief details {acqEvent.id}</>}
+                linkerTabContent={
+                  <AcquisitionEventLinker
+                    onCollectingEventSelect={colEventToLink => {
+                      setColEventId(colEventToLink.id);
+                    }}
+                  />
+                }
+                nestedForm={nestedAcqEventForm}
+                resourceQuery={acqEventQuery}
+                setResourceId={setAcqEventId}
+                readOnlyLink="/collection/acquisition-event/view?id="
+                resourceId={acqEventId}
               />
             </FieldSet>
           )}

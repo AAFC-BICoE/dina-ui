@@ -135,8 +135,7 @@ export function WorkflowTemplateForm({
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     colEventTemplateInitialValues,
-    materialSampleTemplateInitialValues,
-    collectingEvtFormRef
+    materialSampleTemplateInitialValues
   });
 
   const {
