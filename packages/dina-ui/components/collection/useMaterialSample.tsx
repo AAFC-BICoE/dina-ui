@@ -145,6 +145,9 @@ export interface UseMaterialSampleSaveParams {
 
   isTemplate?: boolean;
 
+  acqEventTemplateInitialValues?: Partial<AcquisitionEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
@@ -156,6 +159,7 @@ export interface UseMaterialSampleSaveParams {
   enabledFields?: {
     materialSample?: string[];
     collectingEvent?: string[];
+    acquisitionEvent?: string[];
   };
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
@@ -170,6 +174,7 @@ export function useMaterialSampleSave({
   isTemplate,
   enabledFields,
   collectingEventAttachmentsConfig,
+  acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
@@ -183,7 +188,8 @@ export function useMaterialSampleSave({
 
   const hasAcquisitionEventTemplate =
     isTemplate &&
-    materialSampleTemplateInitialValues?.templateCheckboxes?.acquisitionEvent;
+    (!isEmpty(acqEventTemplateInitialValues?.templateCheckboxes) ||
+      acqEventTemplateInitialValues?.id);
 
   const hasPreparationsTemplate =
     isTemplate &&
@@ -257,9 +263,7 @@ export function useMaterialSampleSave({
     Boolean(
       hasAcquisitionEventTemplate ||
         materialSample?.acquisitionEvent ||
-        enabledFields?.materialSample?.some(fieldName =>
-          fieldName.startsWith("acquisitionEvent.")
-        )
+        enabledFields?.acquisitionEvent?.length
     )
   );
 
@@ -646,18 +650,22 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
+  const acqEventProps = {
+    innerRef: acqEventFormRef,
+    initialValues: isTemplate ? acqEventTemplateInitialValues : {},
+    isTemplate,
+    readOnly: isTemplate ? !!acqEventId : false,
+    enabledFields: enabledFields?.acquisitionEvent
+  };
+
   const nestedAcqEventForm = acqEventId ? (
     withResponse(acqEventQuery, ({ data }) => (
-      <DinaForm
-        innerRef={acqEventFormRef}
-        initialValues={data}
-        readOnly={isTemplate ? !!acqEventId : false}
-      >
+      <DinaForm {...acqEventProps} initialValues={data}>
         <AcquisitionEventFormLayout />
       </DinaForm>
     ))
   ) : (
-    <DinaForm innerRef={acqEventFormRef} initialValues={{}}>
+    <DinaForm {...acqEventProps}>
       <AcquisitionEventFormLayout />
     </DinaForm>
   );

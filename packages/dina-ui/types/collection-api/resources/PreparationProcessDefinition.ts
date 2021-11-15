@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { AcquisitionEvent } from "..";
 import { CollectingEvent } from "./CollectingEvent";
 import { MaterialSample } from "./MaterialSample";
 
@@ -30,6 +31,7 @@ export interface PreparationProcessDefinitionAttributes {
   formTemplates: {
     COLLECTING_EVENT?: FormTemplate<CollectingEvent>;
     MATERIAL_SAMPLE?: FormTemplate<MaterialSample>;
+    ACQUISITION_EVENT?: FormTemplate<AcquisitionEvent>;
   };
 }
 

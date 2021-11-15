@@ -42,10 +42,9 @@ export function AcquisitionEventListLayout({
   const { formatMessage } = useDinaIntl();
 
   const FILTER_ATTRIBUTES: FilterAttribute[] = [
-    "receivedDate",
     "receptionRemarks",
     {
-      name: "receivedFrom.uuid",
+      name: "receivedFrom",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
       filter: filterBy(["displayName"]),
@@ -57,13 +56,21 @@ export function AcquisitionEventListLayout({
     {
       Cell: ({ original: { id, receivedDate } }) => (
         <Link href={`/collection/acquisition-event/view?id=${id}`}>
-          {receivedDate || id}
+          {receivedDate || formatMessage("none")}
         </Link>
       ),
       accessor: "receivedDate"
     },
     "receptionRemarks",
-    "receivedFrom.displayName",
+    {
+      Cell: ({ original: { receivedFrom } }) => (
+        <Link href={`/person/view?id=${receivedFrom?.id}`}>
+          <a>{receivedFrom?.displayName}</a>
+        </Link>
+      ),
+      accessor: "receivedFrom",
+      sortable: false
+    },
     ...(onSelect
       ? [
           {
@@ -93,14 +100,21 @@ export function AcquisitionEventListLayout({
         joinSpecs: [
           {
             apiBaseUrl: "/agent-api",
-            idField: "receivedFrom",
+            idField: "receivedFrom.id",
             joinField: "receivedFrom",
             path: (acqEvent: AcquisitionEvent) =>
               `person/${acqEvent.receivedFrom?.id}`
+          },
+          {
+            apiBaseUrl: "/agent-api",
+            idField: "externallyIsolatedBy.id",
+            joinField: "externallyIsolatedBy",
+            path: (acqEvent: AcquisitionEvent) =>
+              `person/${acqEvent.externallyIsolatedBy?.id}`
           }
         ],
-        path: "collection-api/material-sample",
-        include: "collection,materialSampleType",
+        path: "collection-api/acquisition-event",
+        include: "receivedFrom,externallyIsolatedBy",
         hideTopPagination
       }}
       {...(hideGroupFilter

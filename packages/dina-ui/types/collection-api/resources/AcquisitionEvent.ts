@@ -8,13 +8,13 @@ interface AcquisitionEventAttributes {
   group?: string;
   receivedDate?: string;
   receptionRemarks?: string;
-  externallyIsolatedBy?: string;
   externallyIsolatedOn?: string;
   externallyIsolationRemarks?: string;
 }
 
 interface AcquisitionEventRelationships {
   receivedFrom?: Person;
+  externallyIsolatedBy?: Person;
 }
 
 export type AcquisitionEvent = KitsuResource &

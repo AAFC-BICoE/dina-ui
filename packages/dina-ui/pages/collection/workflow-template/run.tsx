@@ -188,6 +188,11 @@ function useWorkflowMaterialSampleInitialValues(
         toPairs(
           actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
         ).map(([key, val]) => (val?.enabled ? key : null))
+      ),
+      acquisitionEvent: compact(
+        toPairs(
+          actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+        ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
     return {
