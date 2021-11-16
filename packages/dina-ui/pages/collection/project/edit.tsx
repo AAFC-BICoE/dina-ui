@@ -32,8 +32,8 @@ export default function ProjectEditPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  async function goToViewPage(colMethod: PersistedResource<Project>) {
-    await router.push(`/collection/project/view?id=${colMethod.id}`);
+  async function goToViewPage(project: PersistedResource<Project>) {
+    await router.push(`/collection/project/view?id=${project.id}`);
   }
 
   const title = id ? "editProjectTitle" : "addProjectTitle";
@@ -48,7 +48,7 @@ export default function ProjectEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            <Query<Project> query={{ path: `collection-api/project/${id}` }}>
+            <Query<Project> query={{ path: `collection-api/project/${id}?include=attachment` }}>
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -100,7 +100,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       }
     };
 
-    const [saveColMethod] = await save<Project>(
+    const [savedProject] = await save<Project>(
       [
         {
           resource: input,
@@ -111,7 +111,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         apiBaseUrl: "/collection-api"
       }
     );
-    await onSaved(saveColMethod);
+    await onSaved(savedProject);
   };
 
   return (
@@ -184,12 +184,6 @@ export function ProjectFormLayout() {
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn = {true}
       />
-      {readOnly && (
-        <div className="row">
-          <DateField name="createdOn" />
-          <TextField name="createdBy" />
-        </div>
-      )}
     </div>
   );
 }

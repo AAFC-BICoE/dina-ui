@@ -1,3 +1,4 @@
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { MultilingualDescription } from "..";
 
@@ -10,4 +11,8 @@ export interface ProjectAttributes {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type Project = KitsuResource & ProjectAttributes;
+export interface ProjectRelationships {
+  attachment?: ResourceIdentifierObject[];
+}
+
+export type Project = KitsuResource & ProjectAttributes & ProjectRelationships;
