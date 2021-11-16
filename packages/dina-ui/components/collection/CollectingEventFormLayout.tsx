@@ -19,9 +19,8 @@ import {
 import { FastField, Field, FieldArray, FormikContextType } from "formik";
 import { clamp } from "lodash";
 import { ChangeEvent, useRef, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
-import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
+import { GeographySearchBox } from ".";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -46,7 +45,6 @@ import {
   SourceAdministrativeLevel
 } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../object-store";
-import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
@@ -55,6 +53,7 @@ import {
   NominatimAddressDetailSearchProps,
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
+import { GeoReferenceAssertionField } from "./GeoReferenceAssertionField";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 
 interface CollectingEventFormLayoutProps {
@@ -76,17 +75,7 @@ export function CollectingEventFormLayout({
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
-  // Open the tab with the Primary geoassertion even if it's not the first one.
-  // Defaults to 0 if there's no primary assertion.
-  const intialPrimaryAssertionIndex = clamp(
-    (
-      initialValues as Partial<CollectingEvent>
-    ).geoReferenceAssertions?.findIndex(assertion => assertion?.isPrimary) ?? 0,
-    0,
-    Infinity
-  );
-
-  const [activeTabIdx, setActiveTabIdx] = useState(intialPrimaryAssertionIndex);
+  const [geoAssertionTabIdx, setGeoAssertionTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
 
@@ -541,8 +530,8 @@ export function CollectingEventFormLayout({
                       <SetCoordinatesFromVerbatimButton
                         sourceLatField="dwcVerbatimLatitude"
                         sourceLonField="dwcVerbatimLongitude"
-                        targetLatField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLatitude`}
-                        targetLonField={`geoReferenceAssertions[${activeTabIdx}].dwcDecimalLongitude`}
+                        targetLatField={`geoReferenceAssertions[${geoAssertionTabIdx}].dwcDecimalLatitude`}
+                        targetLonField={`geoReferenceAssertions[${geoAssertionTabIdx}].dwcDecimalLongitude`}
                         onClick={({ lat, lon }) =>
                           setGeoSearchValue(`${lat}, ${lon}`)
                         }
@@ -648,106 +637,9 @@ export function CollectingEventFormLayout({
 
       <div className="row">
         <div className="col-md-6">
-          <FieldSet
-            legend={<DinaMessage id="geoReferencingLegend" />}
-            id="geoReferencingLegend"
-            className="non-strip"
-          >
-            {isTemplate && (
-              <Field name="includeAllGeoReference">
-                {() => (
-                  <CheckBoxWithoutWrapper
-                    name="includeAllGeoReference"
-                    parentContainerId="geoReferencingLegend"
-                    onClickIncludeAll={onClickIncludeAll}
-                    includeAllLabel={formatMessage("includeAll")}
-                    customLayout={["col-sm-1", "col-sm-4"]}
-                  />
-                )}
-              </Field>
-            )}
-            <FieldArray name="geoReferenceAssertions">
-              {({ form, push, remove }) => {
-                const assertions =
-                  (form.values as CollectingEvent).geoReferenceAssertions ?? [];
-
-                function addGeoReference() {
-                  push({ isPrimary: assertions?.length === 0 });
-                  setActiveTabIdx(assertions.length);
-                }
-
-                function removeGeoReference(index: number) {
-                  remove(index);
-                  // Stay on the current tab number, or reduce if removeing the last element:
-                  setActiveTabIdx(current =>
-                    clamp(current, 0, assertions.length - 2)
-                  );
-                }
-                return (
-                  <div className="georeference-assertion-section">
-                    <Tabs
-                      selectedIndex={activeTabIdx}
-                      onSelect={setActiveTabIdx}
-                    >
-                      {
-                        // Only show the tabs when there is more than 1 assertion:
-                        <TabList
-                          className={`react-tabs__tab-list ${
-                            assertions.length === 1 ? "d-none" : ""
-                          }`}
-                        >
-                          {assertions.map((assertion, index) => (
-                            <Tab key={index}>
-                              <span className="m-3">
-                                {index + 1}
-                                {assertion.isPrimary &&
-                                  ` (${formatMessage("primary")})`}
-                              </span>
-                            </Tab>
-                          ))}
-                        </TabList>
-                      }
-                      {assertions.length
-                        ? assertions.map((assertion, index) => (
-                            <TabPanel key={index}>
-                              <GeoReferenceAssertionRow
-                                index={index}
-                                openAddPersonModal={openAddPersonModal}
-                                assertion={assertion}
-                              />
-                              {!readOnly && !isTemplate && (
-                                <div className="list-inline mb-3">
-                                  <FormikButton
-                                    className="list-inline-item btn btn-primary add-assertion-button"
-                                    onClick={addGeoReference}
-                                  >
-                                    <DinaMessage id="addAnotherAssertion" />
-                                  </FormikButton>
-                                  <FormikButton
-                                    className="list-inline-item btn btn-dark"
-                                    onClick={() => removeGeoReference(index)}
-                                  >
-                                    <DinaMessage id="removeAssertionLabel" />
-                                  </FormikButton>
-                                </div>
-                              )}
-                            </TabPanel>
-                          ))
-                        : null}
-                    </Tabs>
-                    {!assertions.length && !readOnly && !isTemplate && (
-                      <FormikButton
-                        className="btn btn-primary add-assertion-button"
-                        onClick={addGeoReference}
-                      >
-                        <DinaMessage id="addAssertion" />
-                      </FormikButton>
-                    )}
-                  </div>
-                );
-              }}
-            </FieldArray>
-          </FieldSet>
+          <GeoReferenceAssertionField
+            onChangeTabIndex={setGeoAssertionTabIdx}
+          />
         </div>
         <div className="col-md-6">
           <FieldSet
@@ -886,7 +778,9 @@ export function CollectingEventFormLayout({
                             const colEvent: Partial<CollectingEvent> =
                               formState;
                             const activeAssertion =
-                              colEvent.geoReferenceAssertions?.[activeTabIdx];
+                              colEvent.geoReferenceAssertions?.[
+                                geoAssertionTabIdx
+                              ];
 
                             const decimalLat =
                               activeAssertion?.dwcDecimalLatitude;
@@ -926,7 +820,7 @@ export function CollectingEventFormLayout({
                                   onClick={state => {
                                     const assertion =
                                       state.geoReferenceAssertions?.[
-                                        activeTabIdx
+                                        geoAssertionTabIdx
                                       ];
                                     const lat = assertion?.dwcDecimalLatitude;
                                     const lon = assertion?.dwcDecimalLongitude;

@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import {
   FieldSet,
   FieldWrapperProps,
@@ -6,39 +7,51 @@ import {
 } from "common-ui";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface TabbedArrayFieldProps<T> {
+  className?: string;
   sectionId: string;
   initialIndex?: number;
   name: string;
   legend: JSX.Element;
+  onChangeTabIndex?: (newIndex: number) => void;
   makeNewElement: (elements: T[]) => T;
-  renderTabPanel: (panelCtx: TabPanelCtx) => ReactNode;
+  renderTabPanel: (panelCtx: TabPanelCtx<T>) => ReactNode;
   renderTab: (element: T, index: number) => ReactNode;
+  renderAboveTabs?: () => ReactNode;
 }
 
-export interface TabPanelCtx {
+export interface TabPanelCtx<T> {
   /** Prefixed field name props for nesting inside an array field. */
   fieldProps: (fieldName: string) => FieldWrapperProps;
   /** Array element index. */
   index: number;
+
+  elements: T[];
 }
 
 export function TabbedArrayField<T>({
+  className,
   name,
   makeNewElement,
   sectionId,
   initialIndex = 0,
   legend,
+  onChangeTabIndex,
   renderTabPanel,
-  renderTab
+  renderTab,
+  renderAboveTabs
 }: TabbedArrayFieldProps<T>) {
   const { readOnly, isTemplate } = useDinaFormContext();
 
   const [activeTabIdx, setActiveTabIdx] = useState(initialIndex);
+
+  useEffect(() => {
+    onChangeTabIndex?.(activeTabIdx);
+  }, [activeTabIdx]);
 
   return (
     <div>
@@ -69,12 +82,17 @@ export function TabbedArrayField<T>({
               };
             }
 
-            return renderTabPanel({ fieldProps, index });
+            return renderTabPanel({ fieldProps, index, elements });
           }
 
           // Always shows the panel without tabs when it is a template
           return (
-            <FieldSet className={sectionId} id={sectionId} legend={legend}>
+            <FieldSet
+              className={classNames(sectionId, className)}
+              id={sectionId}
+              legend={legend}
+            >
+              {renderAboveTabs?.()}
               <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
                 {
                   // Only show the tabs when there is more than 1 assertion:

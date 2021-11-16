@@ -2,7 +2,6 @@ import {
   CheckBoxField,
   DateField,
   DinaFormSection,
-  FieldView,
   filterBy,
   FormikButton,
   NumberField,
@@ -12,9 +11,9 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
-import { PersistedResource } from "kitsu";
 import { get } from "lodash";
 import { useRef, useState } from "react";
+import { useAddPersonModal } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import {
@@ -25,15 +24,14 @@ import {
 export interface GeoReferenceAssertionRowProps {
   index: number;
   assertion: GeoReferenceAssertion;
-  openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  assertion,
-  openAddPersonModal
+  assertion
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
+  const { openAddPersonModal } = useAddPersonModal();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     assertion?.dwcGeoreferenceVerificationStatus ===
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
