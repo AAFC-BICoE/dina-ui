@@ -436,6 +436,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryDeterminationButton_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
+  projectAttachments: "Project Attachments",
   projectListTitle: "Project",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",

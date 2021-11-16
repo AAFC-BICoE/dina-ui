@@ -9,13 +9,14 @@ import {
   Query,
   SubmitButton,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  AutoSuggestTextField
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { AttachmentsField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 
@@ -84,7 +85,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
           )
         )
       }
-    : { name: "", type: "project" };
+    : { type: "project" };
 
   const onSubmit: DinaFormOnSubmit<ProjectFormValues> = async ({
     submittedValues
@@ -125,12 +126,12 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         />
         <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <ProjectFormLayout />
+      <ProjectFormLayout project={initialValues}/>
     </DinaForm>
   );
 }
 
-export function ProjectFormLayout() {
+export function ProjectFormLayout({project}) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
@@ -142,19 +143,19 @@ export function ProjectFormLayout() {
           name="name"
           label={formatMessage("field_projectName")}
         />
-        <TextField
+        <DateField
           className="col-md-6 startDate"
           name="startDate"
           label={formatMessage("field_startDate")}
         />
       </div>
       <div className="row">
-        <TextField
+        <AutoSuggestTextField
           className="col-md-6 status"
-          name="name"
+          name="status"
           label={formatMessage("field_projectStatus")}
         />
-        <TextField
+        <DateField
           className="col-md-6 endDate"
           name="endDate"
           label={formatMessage("field_endDate")}
@@ -174,6 +175,15 @@ export function ProjectFormLayout() {
           multiLines={true}
         />
       </div>
+      <AttachmentsField
+        name="attachment"
+        title={<DinaMessage id="projectAttachments" />}
+        id="project-attachments-section"
+        allowNewFieldName="attachmentsConfig.allowNew"
+        allowExistingFieldName="attachmentsConfig.allowExisting"
+        attachmentPath={`collection-api/project/${project?.id}/attachment`}
+        hideAddAttchmentBtn = {true}
+      />
       {readOnly && (
         <div className="row">
           <DateField name="createdOn" />
