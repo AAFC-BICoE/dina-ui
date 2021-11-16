@@ -426,14 +426,17 @@ export function MaterialSampleFormLayout() {
   const { locale, formatMessage } = useDinaIntl();
    const divRef = useRef<HTMLDivElement>(null);
 
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
 
-  const onMaterialSampleStateChanged = (_, _name, value) => {
+  const onMaterialSampleStateChanged = (form, _name, value) => {
     if (divRef.current) {
       if (value) {
         divRef.current.className = "";
+
       } else {
         divRef.current.className = divRef.current.className + " d-none";
+        form.setFieldValue("stateChangeRemarks", null);
+        form.setFieldValue("stateChangedOn", null);
       }
     }
   };
@@ -475,7 +478,10 @@ export function MaterialSampleFormLayout() {
         </div>
       </div>
       {!readOnly && (
-        <div ref={divRef}>
+        <div
+          ref={divRef}
+          className={!initialValues.materialSampleState ? "d-none" : ""}
+        >
           <FieldSet legend={<DinaMessage id="stateChangeMetaLegend" />}>
             <div className="row">
               <DateField

@@ -24,6 +24,9 @@ export function MaterialSampleStateWarning() {
 
 export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
   function renderAsReadOnly(value, formik) {
+    // Do not render anything if the state has empty value
+    if (!value) return <></>;
+
     const metaDate = formik.values.stateChangedOn;
     const metaRemarks = formik.values.stateChangeRemarks;
     const combinedMeta =
