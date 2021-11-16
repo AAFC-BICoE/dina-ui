@@ -23,6 +23,16 @@ export function MaterialSampleStateWarning() {
 }
 
 export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
+  function renderAsReadOnly(value, formik) {
+    const metaDate = formik.values.stateChangedOn;
+    const metaRemarks = formik.values.stateChangeRemarks;
+    const combinedMeta =
+      value +
+      `${metaDate ? " - " + metaDate : ""}` +
+      `${metaRemarks ? " - " + metaRemarks : ""}`;
+    return <>{combinedMeta}</>;
+  }
+
   return (
     <FieldWrapper
       name={"materialSampleState"}
@@ -30,20 +40,9 @@ export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
       removeLabel={removeLabel}
       removeLabelTag={true}
       className={"my-1"}
+      readOnlyRender={renderAsReadOnly}
     >
-      {({ formik, value }) => {
-        const metaDate = formik.values.materialSampleStateMetaDate;
-        const metaRemarks = formik.values.materialSampleStateMetaRemarks;
-        return (
-          <>
-            {value + metaDate
-              ? " - " + metaDate
-              : "" + metaRemarks
-              ? " - " + metaRemarks
-              : ""}
-          </>
-        );
-      }}
+      <></>
     </FieldWrapper>
   );
 }

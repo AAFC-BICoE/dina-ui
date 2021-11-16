@@ -423,15 +423,15 @@ export function MaterialSampleInfoFormLayout() {
 }
 
 export function MaterialSampleFormLayout() {
-  const { locale } = useDinaIntl();
-  const divRef = useRef<HTMLDivElement>(null);
+  const { locale, formatMessage } = useDinaIntl();
+   const divRef = useRef<HTMLDivElement>(null);
 
   const { readOnly } = useDinaFormContext();
 
   const onMaterialSampleStateChanged = (_, _name, value) => {
     if (divRef.current) {
       if (value) {
-        divRef.current.className = "row";
+        divRef.current.className = "";
       } else {
         divRef.current.className = divRef.current.className + " d-none";
       }
@@ -475,12 +475,22 @@ export function MaterialSampleFormLayout() {
         </div>
       </div>
       {!readOnly && (
-        <div className="d-none" ref={divRef}>
-          <DateField className="col-md-6" name="materialSampleStateMetaDate" />
-          <TextField
-            className="col-md-6"
-            name="materialSampleStateMetaRemarks"
-          />
+        <div ref={divRef}>
+          <FieldSet legend={<DinaMessage id="stateChangeMetaLegend" />}>
+            <div className="row">
+              <DateField
+                className="col-md-6"
+                name="stateChangedOn"
+                label={formatMessage("date")}
+              />
+              <TextField
+                className="col-md-6"
+                name="stateChangeRemarks"
+                multiLines={true}
+                label={formatMessage("additionalRemarks")}
+              />
+            </div>
+          </FieldSet>
         </div>
       )}
     </FieldSet>

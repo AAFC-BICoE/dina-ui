@@ -50,8 +50,8 @@ export interface MaterialSampleAttributes {
 
   association?: MaterialSampleAssociation;
 
-  materialSampleStateMetaDate?: string;
-  materialSampleStateMetaRemarks?: string;
+  stateChangedOn?: string;
+  stateChangeRemarks?: string;
 }
 
 export interface HostOrganism {
