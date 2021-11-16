@@ -1,0 +1,5 @@
+version: "3.7"
+
+services:
+  search-ws:
+    build: ../repos/dina-search-api/search-ws
