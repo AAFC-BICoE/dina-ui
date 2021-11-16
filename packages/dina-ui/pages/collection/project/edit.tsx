@@ -126,13 +126,13 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         />
         <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <ProjectFormLayout project={initialValues}/>
+      <ProjectFormLayout />
     </DinaForm>
   );
 }
 
-export function ProjectFormLayout({project}) {
-  const { readOnly } = useDinaFormContext();
+export function ProjectFormLayout() {
+  const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -181,7 +181,7 @@ export function ProjectFormLayout({project}) {
         id="project-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/project/${project?.id}/attachment`}
+        attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn = {true}
       />
       {readOnly && (
