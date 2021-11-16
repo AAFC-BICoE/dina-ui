@@ -1,6 +1,16 @@
 import { ProjectForm } from "../../../../pages/collection/project/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
+const mockGet = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "collection-api/333/attachment":
+    case "objectstore-api/metadata": 
+    case "objectstore-api/config/file-upload":
+    case "user-api/group":
+    case "[]":
+      return { data: [] };
+  }
+});
 
 const mockSave = jest.fn(async saves => {
   return saves.map(save => ({
@@ -9,8 +19,22 @@ const mockSave = jest.fn(async saves => {
   }));
 });
 
+const mockBulkGet = jest.fn<any, any>(async paths => {
+  if (paths.length === 0) {
+    return [];
+  }
+  return paths.map((path: string) => ({
+    id: path.replace(/^metadata\//, ""),
+    type: "metadata"
+  }));
+});
+
 const apiContext = {
-  save: mockSave
+  save: mockSave,
+  bulkGet: mockBulkGet,
+  apiClient: {
+    get: mockGet
+  }
 };
 
 const mockOnSaved = jest.fn();
