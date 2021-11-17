@@ -159,6 +159,7 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
+  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
 
   onSaved?: (id: string) => Promise<void>;
 
@@ -174,6 +175,7 @@ export interface MaterialSampleFormProps {
   enabledFields?: {
     materialSample: string[];
     collectingEvent: string[];
+    acquisitionEvent: string[];
   };
 
   attachmentsConfig?: {
@@ -187,6 +189,7 @@ export interface MaterialSampleFormProps {
 export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
+  acquisitionEventInitialValues,
   onSaved,
   materialSampleSaveHook,
   enabledFields,
@@ -221,6 +224,7 @@ export function MaterialSampleForm({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
       materialSample,
       collectingEventInitialValues,
+      acquisitionEventInitialValues,
       onSaved,
       isTemplate,
       enabledFields
@@ -230,6 +234,9 @@ export function MaterialSampleForm({
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
     enabledFields?.collectingEvent.includes("id")
+  );
+  const templateAttachesAcquisitionEvent = Boolean(
+    enabledFields?.acquisitionEvent.includes("id")
   );
 
   const mateirialSampleInternal = (
@@ -295,6 +302,7 @@ export function MaterialSampleForm({
                 nestedForm={nestedAcqEventForm}
                 resourceQuery={acqEventQuery}
                 setResourceId={setAcqEventId}
+                disableLinkerTab={templateAttachesAcquisitionEvent}
                 readOnlyLink="/collection/acquisition-event/view?id="
                 resourceId={acqEventId}
               />

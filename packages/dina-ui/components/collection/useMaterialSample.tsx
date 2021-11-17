@@ -137,6 +137,8 @@ export interface UseMaterialSampleSaveParams {
   materialSample?: InputResource<MaterialSample>;
   /** Initial values for creating a new Collecting Event with the Material Sample. */
   collectingEventInitialValues?: InputResource<CollectingEvent>;
+  /** Initial values for creating a new Collecting Event with the Material Sample. */
+  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
 
   onSaved?: (id: string) => Promise<void>;
 
@@ -168,6 +170,7 @@ export interface UseMaterialSampleSaveParams {
 export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
+  acquisitionEventInitialValues,
   onSaved,
   colEventFormRef: colEventFormRefProp,
   acquisitionEventFormRef: acquisitionEventFormRefProp,
@@ -494,10 +497,10 @@ export function useMaterialSampleSave({
         colEventFormRef.current.values
       );
 
-      const collectingEventWasEdited = !isEqual(
-        submittedCollectingEvent,
-        collectingEventInitialValues
-      );
+      const collectingEventWasEdited =
+        !submittedCollectingEvent.id ||
+        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+
       // Only send the save request if the Collecting Event was edited:
       const savedCollectingEvent = collectingEventWasEdited
         ? // Use the same save method as the Collecting Event page:
@@ -536,10 +539,9 @@ export function useMaterialSampleSave({
         acqEventFormRef.current.values
       );
 
-      const acqEventWasEdited = !isEqual(
-        submittedAcqEvent,
-        acqEventFormRef.current.initialValues
-      );
+      const acqEventWasEdited =
+        !submittedAcqEvent?.id ||
+        !isEqual(submittedAcqEvent, acqEventFormRef.current.initialValues);
 
       // Only send the save request if the Acq Event was edited:
       const [savedAcqEvent] = acqEventWasEdited
@@ -659,7 +661,7 @@ export function useMaterialSampleSave({
     innerRef: acqEventFormRef,
     initialValues: isTemplate
       ? acqEventTemplateInitialValues
-      : { type: "acquisition-event" },
+      : { type: "acquisition-event", ...acquisitionEventInitialValues },
     isTemplate,
     readOnly: isTemplate ? !!acqEventId : false,
     enabledFields: enabledFields?.acquisitionEvent
