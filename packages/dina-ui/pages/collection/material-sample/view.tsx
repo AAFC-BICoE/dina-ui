@@ -20,7 +20,8 @@ import {
   NotPubliclyReleasableWarning,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  MaterialSampleStateWarning
 } from "../../../components";
 import {
   AssociationsField,
@@ -129,6 +130,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               readOnly={true}
             >
               <NotPubliclyReleasableWarning />
+              <MaterialSampleStateWarning />
               {buttonBar}
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb

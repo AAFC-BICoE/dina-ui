@@ -12,7 +12,9 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse
+  withResponse,
+  DateField,
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
@@ -29,7 +31,8 @@ import {
   Nav,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  MaterialSampleStateReadOnlyRender
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -392,7 +395,24 @@ export function MaterialSampleInfoFormLayout() {
 }
 
 export function MaterialSampleFormLayout() {
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
+   const divRef = useRef<HTMLDivElement>(null);
+
+  const { readOnly, initialValues } = useDinaFormContext();
+
+  const onMaterialSampleStateChanged = (form, _name, value) => {
+    if (divRef.current) {
+      if (value) {
+        divRef.current.className = "";
+
+      } else {
+        divRef.current.className = divRef.current.className + " d-none";
+        form.setFieldValue("stateChangeRemarks", null);
+        form.setFieldValue("stateChangedOn", null);
+      }
+    }
+  };
+
   return (
     <FieldSet
       id="material-sample-section"
@@ -407,23 +427,50 @@ export function MaterialSampleFormLayout() {
             optionLabel={it => it.name}
             readOnlyLink="/collection/material-sample-type/view?id="
           />
-          <AutoSuggestTextField<Vocabulary>
-            name="materialSampleState"
-            query={() => ({
-              path: "collection-api/vocabulary/materialSampleState"
-            })}
-            suggestion={vocabElement =>
-              vocabElement?.vocabularyElements?.map(
-                it => it?.labels?.[locale] ?? ""
-              ) ?? ""
-            }
-            alwaysShowSuggestions={true}
-          />
+          {!readOnly ? (
+            <AutoSuggestTextField<Vocabulary>
+              name="materialSampleState"
+              query={() => ({
+                path: "collection-api/vocabulary/materialSampleState"
+              })}
+              suggestion={vocabElement =>
+                vocabElement?.vocabularyElements?.map(
+                  it => it?.labels?.[locale] ?? ""
+                ) ?? ""
+              }
+              alwaysShowSuggestions={true}
+              onChangeExternal={onMaterialSampleStateChanged}
+            />
+          ) : (
+            <MaterialSampleStateReadOnlyRender removeLabel={false} />
+          )}
         </div>
         <div className="col-md-6">
           <TextField name="materialSampleRemarks" multiLines={true} />
         </div>
       </div>
+      {!readOnly && (
+        <div
+          ref={divRef}
+          className={!initialValues.materialSampleState ? "d-none" : ""}
+        >
+          <FieldSet legend={<DinaMessage id="stateChangeMetaLegend" />}>
+            <div className="row">
+              <DateField
+                className="col-md-6"
+                name="stateChangedOn"
+                label={formatMessage("date")}
+              />
+              <TextField
+                className="col-md-6"
+                name="stateChangeRemarks"
+                multiLines={true}
+                label={formatMessage("additionalRemarks")}
+              />
+            </div>
+          </FieldSet>
+        </div>
+      )}
     </FieldSet>
   );
 }
