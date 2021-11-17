@@ -5,6 +5,8 @@ export * from "./collection/collecting-event/ParseVerbatimToRangeButton";
 export * from "./collection/material-sample/MaterialSampleBreadCrumb";
 export * from "./collection/material-sample/MaterialSampleFormNav";
 export * from "./collection/material-sample/ScheduledActionsField";
+export * from "./collection/MaterialSampleStateWarning";
+export * from "./collection/VocabularySelectField";
 export * from "./error/ErrorBoundaryPage";
 export * from "./group-select/GroupFieldView";
 export * from "./group-select/GroupSelectField";

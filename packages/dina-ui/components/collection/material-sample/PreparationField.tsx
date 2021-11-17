@@ -9,9 +9,8 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField } from "../..";
+import { AttachmentsField, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Person } from "../../../types/agent-api";
 import {
   MaterialSample,
   PreparationType,
@@ -110,13 +109,7 @@ export function PreparationField({
             suggestion={sample => sample?.preparationMethod ?? ""}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
-          <ResourceSelectField<Person>
-            {...fieldProps("preparedBy")}
-            filter={filterBy(["displayName"])}
-            model="agent-api/person"
-            optionLabel={person => person.displayName}
-            readOnlyLink="/person/view?id="
-          />
+          <PersonSelectField {...fieldProps("preparedBy")} />
           <DateField {...fieldProps("preparationDate")} />
         </div>
         <div className="col-md-6">

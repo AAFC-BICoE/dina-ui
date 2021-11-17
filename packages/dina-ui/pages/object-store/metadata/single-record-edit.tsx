@@ -1,12 +1,10 @@
 import {
-  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
-  filterBy,
   Query,
   ResourceSelectField,
   SelectField,
@@ -15,6 +13,7 @@ import {
   useApiClient,
   withResponse
 } from "common-ui";
+import { Field } from "formik";
 import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import {
@@ -22,7 +21,8 @@ import {
   Head,
   Nav,
   NotPubliclyReleasableWarning,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  PersonSelectField
 } from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
@@ -30,10 +30,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
   Metadata,
-  ObjectSubtype,
-  Person
+  ObjectSubtype
 } from "../../../types/objectstore-api";
-import { Field } from "formik";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -232,12 +230,9 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           <TextField className="col-md-6" name="acCaption" />
         </div>
         <div className="row">
-          <ResourceSelectField<Person>
+          <PersonSelectField
             className="col-md-6"
             name="dcCreator"
-            filter={filterBy(["displayName"])}
-            model="agent-api/person"
-            optionLabel={person => person.displayName}
             label={formatMessage("field_dcCreator.displayName")}
           />
           <SelectField

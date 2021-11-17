@@ -1,11 +1,8 @@
 import {
   AutoSuggestTextField,
   DateField,
-  DinaFormSection,
   FieldSet,
-  filterBy,
   FormikButton,
-  ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
   Tooltip,
@@ -16,7 +13,7 @@ import { clamp, get, isArray } from "lodash";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { CatalogueOfLifeNameField } from "..";
-import { Person } from "../../../../dina-ui/types/agent-api/resources/Person";
+import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -41,12 +38,14 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     typeStatusEvidence: true,
     determiner: true,
     determinedOn: true,
-    qualifier: true,
+    verbatimRemarks: true,
     scientificNameSource: true,
     scientificName: true,
     transcriberRemarks: true,
     isPrimary: true,
-    scientificNameDetails: true
+    scientificNameDetails: true,
+    isFileAs: true,
+    determinationRemarks: true
   };
 
 /** All fields of the Determination type. */
@@ -82,6 +81,17 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
     formik.setFieldValue(`${determinationsPath}[${index}].isPrimary`, true);
   }
 
+  /** Make this Assertion Filed As. */
+  function makeFiledAs(formik: FormikContextType<any>, index) {
+    const assertions: Determination[] =
+      get(formik.values, determinationsPath) ?? [];
+
+    assertions.forEach((_, idx) => {
+      formik.setFieldValue(`${determinationsPath}[${idx}].isFileAs`, false);
+    });
+    formik.setFieldValue(`${determinationsPath}[${index}].isFileAs`, true);
+  }
+
   return (
     <div>
       <FieldArray name="determination">
@@ -89,7 +99,10 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
           const determinations =
             (form.values.determination as Determination[]) ?? [];
           function addDetermination() {
-            push({ isPrimary: determinations?.length === 0 });
+            push({
+              isPrimary: determinations?.length === 0,
+              isFileAs: determinations?.length === 0
+            });
             setActiveTabIdx(determinations.length);
           }
 
@@ -136,6 +149,27 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       onClick={(_, formik) => makePrimary(formik, index)}
                     />
                     <Tooltip id="primaryDeterminationButton_tooltip" />
+
+                    <FormikButton
+                      className="btn btn-primary filed-as-button"
+                      buttonProps={ctx => {
+                        const isFileAs =
+                          get(
+                            ctx.values,
+                            `${determinationsPath}[${index}].` + "isFileAs"
+                          ) ?? false;
+                        return {
+                          disabled: isFileAs,
+                          children: isFileAs ? (
+                            <DinaMessage id="isFileAs" />
+                          ) : (
+                            <DinaMessage id="makeFiledAs" />
+                          )
+                        };
+                      }}
+                      onClick={(_, formik) => makeFiledAs(formik, index)}
+                    />
+                    <Tooltip id="isFileAsDeterminationButton_tooltip" />
                   </div>
                 )}
                 <div className="col-md-6">
@@ -160,10 +194,13 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     />
                     <TextField {...fieldProps("verbatimDate")} />
                     <TextField
+                      {...fieldProps("verbatimRemarks")}
+                      multiLines={true}
+                    />
+                    <TextField
                       {...fieldProps("transcriberRemarks")}
                       multiLines={true}
                     />
-                    <TextField {...fieldProps("qualifier")} multiLines={true} />
                   </FieldSet>
                 </div>
                 <div className="col-md-6">
@@ -209,25 +246,16 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       index={index}
                       isDetermination={true}
                     />
-                    <ResourceSelectField<Person>
+                    <PersonSelectField
                       {...fieldProps("determiner")}
                       label={formatMessage("determiningAgents")}
-                      readOnlyLink="/person/view?id="
-                      filter={filterBy(["displayName"])}
-                      model="agent-api/person"
-                      optionLabel={person => person.displayName}
                       isMulti={true}
-                      asyncOptions={[
-                        {
-                          label: <DinaMessage id="addNewPerson" />,
-                          getResource: openAddPersonModal
-                        }
-                      ]}
                     />
                     <DateField
                       {...fieldProps("determinedOn")}
                       label={formatMessage("determiningDate")}
                     />
+                    <TextField {...fieldProps("determinationRemarks")} />
                   </FieldSet>
                   <FieldSet
                     legend={<DinaMessage id="typeSpecimen" />}
@@ -280,8 +308,14 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                         <Tab key={index}>
                           <span className="m-3">
                             {index + 1}
-                            {determination.isPrimary &&
-                              ` (${formatMessage("primary")})`}
+                            {determination.isPrimary && determination.isFileAs
+                              ? ` (${formatMessage(
+                                  "primary"
+                                )} | ${formatMessage("isFileAs")})`
+                              : (determination.isFileAs &&
+                                  `(${formatMessage("isFileAs")})`) ||
+                                (determination.isPrimary &&
+                                  `(${formatMessage("primary")})`)}
                           </span>
                         </Tab>
                       ))}
@@ -328,24 +362,6 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                     <DinaMessage id="addDetermination" />
                   </FormikButton>
                 )}
-              </div>
-              <div className="row">
-                <DinaFormSection horizontal="flex">
-                  <AutoSuggestTextField
-                    name="filedAs"
-                    className="col-sm-6"
-                    alwaysShowSuggestions={true}
-                    placeholder={formatMessage(
-                      "typeAnythingOrPickAScientificName"
-                    )}
-                    suggestions={(_, formik) =>
-                      formik.values.determination?.flatMap(det => [
-                        det.verbatimScientificName,
-                        det.scientificName
-                      ]) ?? []
-                    }
-                  />
-                </DinaFormSection>
               </div>
             </FieldSet>
           );

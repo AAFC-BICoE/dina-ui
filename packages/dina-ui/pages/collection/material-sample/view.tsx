@@ -31,7 +31,8 @@ import {
   Nav,
   NotPubliclyReleasableWarning,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  MaterialSampleStateWarning
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
@@ -122,6 +123,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               readOnly={true}
             >
               <NotPubliclyReleasableWarning />
+              <MaterialSampleStateWarning />
               {buttonBar}
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb

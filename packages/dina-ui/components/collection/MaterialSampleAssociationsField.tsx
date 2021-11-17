@@ -16,6 +16,7 @@ import Link from "next/link";
 import React, { Fragment, MutableRefObject, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
+import { VocabularyReadOnlyView, VocabularySelectField } from "..";
 import {
   MaterialSample,
   MaterialSampleAssociation
@@ -81,7 +82,16 @@ export function MaterialSampleAssociationsField({
   const buttonProps = () => ({ disabled: isEditing, style: { width: "7rem" } });
 
   const associationColumns: Column[] = [
-    { accessor: "associationType", Header: formatMessage("associationType") },
+    {
+      accessor: "associationType",
+      Header: formatMessage("associationType"),
+      Cell: ({ original }) => (
+        <VocabularyReadOnlyView
+          value={original.associationType}
+          path="collection-api/vocabulary/associationType"
+        />
+      )
+    },
     {
       accessor: "associatedSample",
       Header: formatMessage("associatedMaterialSample"),
@@ -297,17 +307,9 @@ export function MaterialSampleAssociationSubForm({
       >
         <div className="row">
           <div className="col-sm-6" id="association">
-            <AutoSuggestTextField<Vocabulary>
+            <VocabularySelectField
               {...fieldProps("associationType")}
-              query={() => ({
-                path: "collection-api/vocabulary/associationType"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
-              alwaysShowSuggestions={true}
+              path="collection-api/vocabulary/associationType"
             />
           </div>
           <div className="col-sm-6">
