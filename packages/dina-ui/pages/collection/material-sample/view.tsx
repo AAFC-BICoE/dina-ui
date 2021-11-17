@@ -13,29 +13,27 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  CollectingEventFormLayout,
+  DeterminationField,
   OrganismStateField,
-  ORGANISM_FIELDS
-} from "../../../../dina-ui/components/collection/OrganismStateField";
-import { SamplesView } from "../../../../dina-ui/components/collection/SamplesView";
+  ORGANISM_FIELDS,
+  PreparationField,
+  PREPARATION_FIELDS,
+  SamplesView,
+  ScheduledActionsField,
+  useCollectingEventQuery,
+  useMaterialSampleQuery
+} from "../../../../dina-ui/components/collection";
 import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
   Nav,
   NotPubliclyReleasableWarning,
-  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection,
   MaterialSampleStateWarning
 } from "../../../components";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
-import {
-  PreparationField,
-  PREPARATION_FIELDS
-} from "../../../components/collection/PreparationField";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

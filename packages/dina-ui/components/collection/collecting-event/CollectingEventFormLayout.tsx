@@ -20,7 +20,7 @@ import { clamp } from "lodash";
 import { ChangeEvent, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import useSWR from "swr";
-import { GeographySearchBox, GeoReferenceAssertionRow } from ".";
+import { GeographySearchBox, GeoReferenceAssertionRow } from "..";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -28,25 +28,25 @@ import {
   ParseVerbatimToRangeButton,
   PersonSelectField,
   TagsAndRestrictionsSection
-} from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Vocabulary } from "../../types/collection-api";
+} from "../..";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Vocabulary } from "../../../types/collection-api";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
-} from "../../types/collection-api/resources/CollectingEvent";
+} from "../../../types/collection-api/resources/CollectingEvent";
 import {
   CoordinateSystemEnum,
   CoordinateSystemEnumPlaceHolder
-} from "../../types/collection-api/resources/CoordinateSystem";
+} from "../../../types/collection-api/resources/CoordinateSystem";
 import {
   geographicPlaceSourceUrl,
   SourceAdministrativeLevel
-} from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { AllowAttachmentsConfig } from "../object-store";
-import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
-import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
-import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
+} from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { AllowAttachmentsConfig } from "../../object-store";
+import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { CollectionMethodSelectField } from "../../resource-select-fields/resource-select-fields";
 import {
   nominatimAddressDetailSearch,
   NominatimAddressDetailSearchProps,

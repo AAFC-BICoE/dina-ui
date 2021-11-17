@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import ReactSwitch from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
+import { BLANK_PREPARATION } from "../../../../components/collection";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {

@@ -21,9 +21,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { OrganismStateField } from "../../../../dina-ui/components/collection/OrganismStateField";
-import { AssociationsField } from "../../../../dina-ui/components/collection/AssociationsField";
-import { ReactNode, useContext, useState, useRef } from "react";
+import { ReactNode, useContext, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   AttachmentsField,
@@ -34,22 +32,22 @@ import {
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
   Nav,
-  ScheduledActionsField,
   StorageLinkerField,
   TagsAndRestrictionsSection,
   MaterialSampleStateReadOnlyRender
 } from "../../../components";
 import {
   CollectingEventLinker,
-  SetDefaultSampleName
-} from "../../../components/collection";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
-import { PreparationField } from "../../../components/collection/PreparationField";
-import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
-import {
+  DeterminationField,
+  PreparationField,
+  ScheduledActionsField,
+  SetDefaultSampleName,
   useMaterialSampleQuery,
   useMaterialSampleSave
-} from "../../../components/collection/useMaterialSample";
+} from "../../../components/collection";
+import { AssociationsField } from "../../../components/collection/AssociationsField";
+import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
+import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -424,7 +422,7 @@ export function MaterialSampleInfoFormLayout() {
 
 export function MaterialSampleFormLayout() {
   const { locale, formatMessage } = useDinaIntl();
-   const divRef = useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const { readOnly, initialValues } = useDinaFormContext();
 
@@ -432,7 +430,6 @@ export function MaterialSampleFormLayout() {
     if (divRef.current) {
       if (value) {
         divRef.current.className = "";
-
       } else {
         divRef.current.className = divRef.current.className + " d-none";
         form.setFieldValue("stateChangeRemarks", null);
@@ -623,8 +620,14 @@ export function nextSampleInitialValues(
   originalSample: PersistedResource<MaterialSample>
 ) {
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
-  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
-    originalSample;
+  const {
+    id,
+    createdOn,
+    createdBy,
+    materialSampleName,
+    allowDuplicateName,
+    ...copiedValues
+  } = originalSample;
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);

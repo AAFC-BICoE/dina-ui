@@ -1,6 +1,6 @@
-import { DinaForm } from "../../../../common-ui/lib";
-import { MaterialSampleIdentifiersFormLayout } from "../../../pages/collection/material-sample/edit";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { DinaForm } from "common-ui";
+import { MaterialSampleIdentifiersFormLayout } from "../../../../pages/collection/material-sample/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SetDefaultSampleName } from "../SetDefaultSampleName";
 
 const mockGet = jest.fn<any, any>(async path => {

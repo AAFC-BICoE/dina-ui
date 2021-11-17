@@ -43,7 +43,7 @@ import { AttachmentsField } from "../../../../components";
 import {
   BLANK_PREPARATION,
   PreparationField
-} from "../../../../components/collection/PreparationField";
+} from "../../../../components/collection";
 import { MaterialSampleIdentifiersFormLayout } from "../edit";
 import {
   computeSuffix,
