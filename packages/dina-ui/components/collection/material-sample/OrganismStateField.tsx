@@ -1,8 +1,6 @@
-import { AutoSuggestTextField, FieldSet, filterBy, TextField } from "common-ui";
-import { InputResource } from "kitsu";
-import { Organism } from "packages/dina-ui/types/collection-api/resources/Organism";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { MaterialSample } from "../../types/collection-api";
+import { AutoSuggestTextField, FieldSet, TextField } from "common-ui";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { MaterialSample } from "../../../types/collection-api";
 
 /**
  * List of field names in the OrganismStateField component.

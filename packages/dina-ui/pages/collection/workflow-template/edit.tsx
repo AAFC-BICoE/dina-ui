@@ -14,20 +14,19 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, mapValues, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { HOSTORGANISM_FIELDS } from "../../../components/collection";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import {
-  GroupSelectField,
-  Head,
-  Nav,
-  SCHEDULEDACTION_FIELDS
-} from "../../../components";
-import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
-import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
-import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
-import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
+  DETERMINATION_FIELDS,
+  HOSTORGANISM_FIELDS,
+  ORGANISM_FIELDS,
+  PREPARATION_FIELDS,
+  SCHEDULEDACTION_FIELDS,
+  useMaterialSampleSave
+} from "../../../components/collection";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -40,7 +39,6 @@ import {
   MaterialSampleForm,
   MATERIALSAMPLE_FIELDSET_FIELDS
 } from "../material-sample/edit";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),

@@ -15,9 +15,9 @@ import { isEmpty } from "lodash";
 import { Fragment, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
-import { UserSelectField } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { MaterialSample, ScheduledAction } from "../../types/collection-api";
+import { UserSelectField } from "../..";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { MaterialSample, ScheduledAction } from "../../../types/collection-api";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<

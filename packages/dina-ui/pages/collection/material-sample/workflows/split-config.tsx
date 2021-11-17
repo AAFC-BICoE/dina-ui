@@ -3,14 +3,13 @@ import {
   ButtonBar,
   CheckBoxWithoutWrapper,
   DinaForm,
-  DinaFormSection,
   FieldSet,
   SelectField,
   SubmitButton,
   TextField,
   withResponse
 } from "common-ui";
-import { Field, FieldProps, FormikContextType, useFormikContext } from "formik";
+import { Field, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
@@ -19,7 +18,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
-import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection/useMaterialSample";
+import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection";
 import { Head } from "../../../../../dina-ui/components/head";
 import {
   BASE_NAME,

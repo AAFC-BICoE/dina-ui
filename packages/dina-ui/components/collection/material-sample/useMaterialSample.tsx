@@ -24,26 +24,30 @@ import {
   useRef,
   useState
 } from "react";
-import { useCollectingEventQuery, useCollectingEventSave } from ".";
+import {
+  BLANK_PREPARATION,
+  CollectingEventFormLayout,
+  DETERMINATION_FIELDS,
+  ORGANISM_FIELDS,
+  PREPARATION_FIELDS,
+  SCHEDULEDACTION_FIELDS,
+  useCollectingEventQuery,
+  useCollectingEventSave,
+  useDuplicateSampleNameDetection,
+  useLastUsedCollection
+} from "..";
 import {
   CollectingEvent,
   MaterialSample
-} from "../../../dina-ui/types/collection-api";
+} from "../../../../dina-ui/types/collection-api";
 import {
   ManagedAttributeValues,
-  Metadata,
   Person
-} from "../../../dina-ui/types/objectstore-api";
-import { CollectingEventFormLayout } from "../../components/collection";
-import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig } from "../object-store";
-import { HOSTORGANISM_FIELDS } from "./AssociationsField";
-import { DETERMINATION_FIELDS } from "./DeterminationField";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";
-import { ORGANISM_FIELDS } from "./OrganismStateField";
-import { BLANK_PREPARATION, PREPARATION_FIELDS } from "./PreparationField";
-import { SCHEDULEDACTION_FIELDS } from "./ScheduledActionsField";
-import { useLastUsedCollection } from "./useLastUsedCollection";
+} from "../../../../dina-ui/types/objectstore-api";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { AllowAttachmentsConfig } from "../../object-store";
+import { HOSTORGANISM_FIELDS } from "../AssociationsField";
+import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../MaterialSampleAssociationsField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -409,6 +413,8 @@ export function useMaterialSampleSave({
     });
   });
 
+  const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
+
   async function onSubmit({
     api: { save },
     formik,
@@ -539,14 +545,19 @@ export function useMaterialSampleSave({
 
     delete materialSampleInput.association;
 
-    const [savedMaterialSample] = await save(
-      [
-        {
-          resource: materialSampleInput,
-          type: "material-sample"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
+    // Save the MaterialSample:
+    const [savedMaterialSample] = await withDuplicateSampleNameCheck(
+      async () =>
+        await save(
+          [
+            {
+              resource: materialSampleInput,
+              type: "material-sample"
+            }
+          ],
+          { apiBaseUrl: "/collection-api" }
+        ),
+      formik
     );
 
     await onSaved?.(savedMaterialSample.id);

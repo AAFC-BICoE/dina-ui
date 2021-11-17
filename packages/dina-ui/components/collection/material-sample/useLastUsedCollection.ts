@@ -1,5 +1,5 @@
-import { useAccount, useQuery } from "../../../common-ui/lib";
-import { MaterialSample } from "../../types/collection-api";
+import { useAccount, useQuery } from "common-ui";
+import { MaterialSample } from "../../../types/collection-api";
 
 export function useLastUsedCollection() {
   const { username } = useAccount();
