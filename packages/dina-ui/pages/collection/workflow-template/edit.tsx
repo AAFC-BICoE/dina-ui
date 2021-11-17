@@ -243,23 +243,21 @@ export function WorkflowTemplateForm({
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
-          ? attachedColEventId
-            ? {
-                // When linking the template to an existing Col event, only set the ID here:
-                templateFields: {
-                  id: { enabled: true, defaultValue: attachedColEventId }
-                }
-              }
-            : {
-                // When making a template for a new Collecting Event, set all chosen fields here:
-                ...collectingEvtFormRef.current?.values?.attachmentsConfig,
-                templateFields: {
-                  ...getEnabledTemplateFieldsFromForm(
-                    collectingEvtFormRef.current?.values
-                  ),
-                  id: undefined
-                }
-              }
+          ? {
+              // When making a template for a new Collecting Event, set all chosen fields here:
+              ...(!attachedColEventId &&
+                collectingEvtFormRef.current?.values?.attachmentsConfig),
+              templateFields: attachedColEventId
+                ? {
+                    id: { enabled: true, defaultValue: attachedColEventId }
+                  }
+                : {
+                    ...getEnabledTemplateFieldsFromForm(
+                      collectingEvtFormRef.current?.values
+                    ),
+                    id: undefined
+                  }
+            }
           : undefined,
         ACQUISITION_EVENT: enableAcquisitionEvent
           ? {

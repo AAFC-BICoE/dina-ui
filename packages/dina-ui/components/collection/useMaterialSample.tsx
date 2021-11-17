@@ -430,7 +430,9 @@ export function useMaterialSampleSave({
   const acqEventFormRef =
     acquisitionEventFormRefProp ?? useRef<FormikProps<any>>(null);
   const [acqEventId, setAcqEventId] = useState<string | null | undefined>(
-    materialSample?.acquisitionEvent?.id
+    isTemplate
+      ? acqEventTemplateInitialValues?.id
+      : materialSample?.acquisitionEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(acqEventId);
 

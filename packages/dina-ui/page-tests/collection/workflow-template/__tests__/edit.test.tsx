@@ -721,6 +721,56 @@ describe("Workflow template edit page", () => {
     });
   });
 
+  it("Edits an existing action-definition: Can unlink an existing Acquisition Event.", async () => {
+    const { wrapper, acquisitionEventSwitch, submitForm } = await mountForm({
+      actionType: "ADD",
+      formTemplates: {
+        ACQUISITION_EVENT: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            id: {
+              enabled: true,
+              defaultValue: "987"
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+
+    expect(acquisitionEventSwitch().prop("checked")).toEqual(true);
+
+    expect(wrapper.find(".attached-resource-link").text()).toEqual(
+      "Attached: 987"
+    );
+
+    // Unlink the Collecting Event:
+    wrapper.find("button.detach-resource-button").simulate("click");
+
+    await submitForm();
+
+    // The template's link was removed:
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        ACQUISITION_EVENT: {
+          templateFields: {}
+        },
+        MATERIAL_SAMPLE: {
+          templateFields: {}
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
   it("Edits an existing action-definition: Can change the enabled and default values.", async () => {
     const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
       await mountForm({

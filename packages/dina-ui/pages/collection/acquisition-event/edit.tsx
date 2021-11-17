@@ -1,20 +1,21 @@
 import {
+  BackButton,
+  ButtonBar,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
   filterBy,
   ResourceSelectField,
+  SubmitButton,
   TextField,
   useQuery,
-  withResponse,
-  ButtonBar,
-  BackButton,
-  SubmitButton
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
+  Footer,
   GroupSelectField,
   Head,
   Nav,
@@ -57,6 +58,7 @@ export default function AcquisitionEventEditPage() {
           <AcquisitionEventForm onSaved={moveToViewPage} />
         )}
       </main>
+      <Footer />
     </div>
   );
 }

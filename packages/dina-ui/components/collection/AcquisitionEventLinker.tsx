@@ -11,6 +11,7 @@ export function AcquisitionEventLinker({
 }: AcquisitionEventLinkerProps) {
   return (
     <AcquisitionEventListLayout
+      briefColumns={true}
       onSelect={async event => await onAcquisitionEventSelect(event)}
       hideGroupFilter={true}
       hideTopPagination={true}

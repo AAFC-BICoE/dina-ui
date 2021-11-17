@@ -56,6 +56,7 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
+import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -279,7 +280,11 @@ export function MaterialSampleForm({
               legend={<DinaMessage id="acquisitionEvent" />}
             >
               <TabbedResourceLinker<AcquisitionEvent>
-                briefDetails={acqEvent => <>todo brief details {acqEvent.id}</>}
+                briefDetails={acqEvent => (
+                  <DinaForm initialValues={acqEvent} readOnly={true}>
+                    <AcquisitionEventFormLayout />
+                  </DinaForm>
+                )}
                 linkerTabContent={
                   <AcquisitionEventLinker
                     onAcquisitionEventSelect={acqEventToLink => {

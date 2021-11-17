@@ -61,7 +61,15 @@ export function AcquisitionEventListLayout({
       resourcePath: "agent-api/person",
       filter: filterBy(["displayName"]),
       optionLabel: (it: PersistedResource<Person>) => it.displayName
-    }
+    },
+    {
+      name: "externallyIsolatedBy",
+      type: "DROPDOWN",
+      resourcePath: "agent-api/person",
+      filter: filterBy(["displayName"]),
+      optionLabel: (it: PersistedResource<Person>) => it.displayName
+    },
+    "externallyIsolationRemarks"
   ];
 
   const TABLE_COLUMNS = [
@@ -83,7 +91,22 @@ export function AcquisitionEventListLayout({
       accessor: "receivedFrom",
       sortable: false
     },
-    ...(briefColumns ? [] : []),
+    ...(briefColumns
+      ? []
+      : [
+          {
+            Cell: ({ original: { externallyIsolatedBy: agent } }) =>
+              agent?.id ? (
+                <Link href={`/person/view?id=${agent.id}`}>
+                  {agent.displayName}
+                </Link>
+              ) : null,
+            accessor: "externallyIsolatedBy.displayName",
+            sortable: false
+          },
+          "externallyIsolationRemarks",
+          dateCell("externallyIsolatedOn")
+        ]),
     ...(onSelect
       ? [
           {

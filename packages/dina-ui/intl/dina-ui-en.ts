@@ -5,7 +5,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   acquisitionEvent: "Acquisition Event",
   acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
-  addAcquisitionEventTitle: "Add Acquisiion Event",
+  addAcquisitionEventTitle: "Add Acquisition Event",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
   addAnotherIdentifier: "Add Another Identifier",
