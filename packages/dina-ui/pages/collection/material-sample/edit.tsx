@@ -56,6 +56,7 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
+import ProjectSelectSection from "../../../components/project/ProjectSelectSection";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -241,6 +242,7 @@ export function MaterialSampleForm({
         )}
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+        <ProjectSelectSection resourcePath="collection-api/project"/> 
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
         <div className="data-components">
