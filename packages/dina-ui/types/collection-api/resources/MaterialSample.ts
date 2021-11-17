@@ -45,6 +45,7 @@ export interface MaterialSampleAttributes {
   tags?: string[];
 
   scheduledActions?: ScheduledAction[];
+  allowDuplicateName?: boolean;
 
   hostOrganism?: HostOrganism | null;
   associations?: MaterialSampleAssociation[];

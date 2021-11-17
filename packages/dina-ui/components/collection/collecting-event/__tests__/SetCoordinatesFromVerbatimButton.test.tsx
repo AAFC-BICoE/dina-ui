@@ -1,6 +1,6 @@
 import { DinaForm, NumberField } from "common-ui";
 import NumberFormat from "react-number-format";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
 
 describe("SetCoordinatesFromVerbatimButton component", () => {

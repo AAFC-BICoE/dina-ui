@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { MaterialSample } from "../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;

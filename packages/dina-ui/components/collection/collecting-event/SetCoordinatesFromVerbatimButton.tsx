@@ -2,7 +2,7 @@ import { FormikButton, useDinaFormContext } from "common-ui";
 import Coordinates from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { get } from "lodash";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ReactNode, useState } from "react";
 
 export interface SetCoordinatesFromVerbatimButtonProps {

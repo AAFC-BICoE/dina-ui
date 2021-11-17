@@ -9,7 +9,7 @@ import CoordinateParser from "coordinate-parser";
 import { FormikContextType } from "formik";
 import { ReactNode, useState } from "react";
 import useSWR from "swr";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 interface GeographySearchBoxProps {
   inputValue: string;

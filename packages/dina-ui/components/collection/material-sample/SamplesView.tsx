@@ -1,14 +1,19 @@
-import { LimitOffsetPageSpec } from "../../../common-ui/lib/api-client/operations-types";
-import { MaterialSample } from "../../../dina-ui/types/collection-api";
+import {
+  CommonMessage,
+  dateCell,
+  DeleteButton,
+  EditButton,
+  FieldSet,
+  LimitOffsetPageSpec
+} from "common-ui";
+import Link from "next/link";
 import { useState } from "react";
 import ReactTable from "react-table";
-import { CommonMessage } from "../../../common-ui/lib/intl/common-ui-intl";
-import Link from "next/link";
-import { dateCell } from "../../../common-ui/lib/table/date-cell";
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { FieldSet } from "../../../common-ui/lib";
-
-import { EditButton, DeleteButton } from "../../../common-ui";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];

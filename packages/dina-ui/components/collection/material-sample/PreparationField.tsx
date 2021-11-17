@@ -9,14 +9,14 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField, PersonSelectField } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { AttachmentsField, PersonSelectField } from "../..";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
   PreparationType,
   Vocabulary
-} from "../../types/collection-api";
-import { AllowAttachmentsConfig } from "../object-store";
+} from "../../../types/collection-api";
+import { AllowAttachmentsConfig } from "../../object-store";
 
 export interface PreparationFieldProps {
   className?: string;

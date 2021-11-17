@@ -2,30 +2,26 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
-  filterBy,
   FormikButton,
-  ResourceSelectField,
   TextField,
   TextFieldWithMultiplicationButton,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { FieldArray, FormikContextType } from "formik";
-import { clamp, get } from "lodash";
+import { clamp, get, isArray } from "lodash";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { CatalogueOfLifeNameField } from ".";
-import { Person } from "../../../dina-ui/types/agent-api/resources/Person";
-import { TypeStatusEnum } from "../../../dina-ui/types/collection-api/resources/TypeStatus";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { CatalogueOfLifeNameField } from "..";
+import { PersonSelectField } from "../..";
+import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSample,
   Vocabulary
-} from "../../types/collection-api";
-import { useAddPersonModal } from "../add-person/PersonForm";
-import { isArray } from "lodash";
-import { PersonSelectField } from "..";
+} from "../../../types/collection-api";
+import { useAddPersonModal } from "../../add-person/PersonForm";
 
 export interface DeterminationFieldProps {
   className?: string;

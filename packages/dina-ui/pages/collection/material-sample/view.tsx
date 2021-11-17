@@ -16,30 +16,28 @@ import {
   Footer,
   Head,
   MaterialSampleBreadCrumb,
+  MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
-  ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  MaterialSampleStateWarning
+  TagsAndRestrictionsSection
 } from "../../../components";
+import {
+  CollectingEventFormLayout,
+  DeterminationField,
+  OrganismStateField,
+  ORGANISM_FIELDS,
+  PreparationField,
+  PREPARATION_FIELDS,
+  SamplesView,
+  ScheduledActionsField,
+  useCollectingEventQuery,
+  useMaterialSampleQuery
+} from "../../../components/collection/";
 import {
   AssociationsField,
   HOSTORGANISM_FIELDS
 } from "../../../components/collection/AssociationsField";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
-import {
-  OrganismStateField,
-  ORGANISM_FIELDS
-} from "../../../components/collection/OrganismStateField";
-import {
-  PreparationField,
-  PREPARATION_FIELDS
-} from "../../../components/collection/PreparationField";
-import { SamplesView } from "../../../components/collection/SamplesView";
-import { useCollectingEventQuery } from "../../../components/collection/useCollectingEvent";
-import { useMaterialSampleQuery } from "../../../components/collection/useMaterialSample";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

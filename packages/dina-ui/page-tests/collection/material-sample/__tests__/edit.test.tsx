@@ -1,6 +1,6 @@
 import { KitsuResourceLink, PersistedResource } from "kitsu";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components/collection/PreparationField";
+import { BLANK_PREPARATION } from "../../../../components/collection";
 import {
   MaterialSampleForm,
   nextSampleInitialValues
@@ -91,6 +91,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/vocabulary/materialSampleState":
     case "collection-api/vocabulary/typeStatus":
     case "collection-api/storage-unit-type":
     case "collection-api/storage-unit":
@@ -102,12 +103,24 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn<any, any>(ops =>
-  ops.map(op => ({
-    ...op.resource,
-    id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
-  }))
-);
+const mockSave = jest.fn<any, any>(async saves => {
+  return saves.map(save => {
+    // Test duplicate name error:
+    if (
+      save.type === "material-sample" &&
+      save.resource.materialSampleName === "test-duplicate-name" &&
+      !save.resource.allowDuplicateName
+    ) {
+      throw new Error(
+        "Data integrity violation: could not execute statement; SQL [n/a]; constraint [material_sample_name_unique]; nested exception is org.hibernate.exception.ConstraintViolationException: could not execute statement"
+      );
+    }
+    return {
+      ...save.resource,
+      id: save.resource.id ?? "11111111-1111-1111-1111-111111111111"
+    };
+  });
+});
 
 const mockBulkGet = jest.fn<any, any>(async paths => {
   if (!paths.length) {
@@ -1098,5 +1111,51 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Submits a new Material Sample with a duplicate sample name: Shows an error", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".materialSampleName-field input")
+      .simulate("change", { target: { value: "test-duplicate-name" } });
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(true);
+
+    // You should not be able to submit the form until this error is resolved:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockOnSaved).toHaveBeenCalledTimes(0);
+
+    // Click the "allow" button:
+    wrapper.find("button.allow-duplicate-button").first().simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".materialSampleName-field input").hasClass("is-invalid")
+    ).toEqual(false);
+
+    // Submit the form with no errors:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Form submitted successfully:
+    expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
   });
 });

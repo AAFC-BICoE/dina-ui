@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { MaterialSample } from "../../../types/collection-api";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { MaterialSample } from "../../../../types/collection-api";
 import { MaterialSampleBreadCrumb } from "../MaterialSampleBreadCrumb";
 
 const materialSampleWithHierarchy: PersistedResource<MaterialSample> = {

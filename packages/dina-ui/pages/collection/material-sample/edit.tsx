@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  DateField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
@@ -12,14 +13,13 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse,
-  DateField,
-  useDinaFormContext
+  useDinaFormContext,
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useRef, useState } from "react";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -28,27 +28,25 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
+  MaterialSampleStateReadOnlyRender,
   Nav,
-  ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  MaterialSampleStateReadOnlyRender
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
+  DeterminationField,
+  ScheduledActionsField,
   SetDefaultSampleName,
-  TabbedResourceLinker
+  TabbedResourceLinker,
+  useMaterialSampleQuery,
+  useMaterialSampleSave
 } from "../../../components/collection";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
-import { DeterminationField } from "../../../components/collection/DeterminationField";
-import { OrganismStateField } from "../../../components/collection/OrganismStateField";
-import { PreparationField } from "../../../components/collection/PreparationField";
+import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
+import { PreparationField } from "../../../components/collection/material-sample/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
-import {
-  useMaterialSampleQuery,
-  useMaterialSampleSave
-} from "../../../components/collection/useMaterialSample";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -396,7 +394,7 @@ export function MaterialSampleInfoFormLayout() {
 
 export function MaterialSampleFormLayout() {
   const { locale, formatMessage } = useDinaIntl();
-   const divRef = useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const { readOnly, initialValues } = useDinaFormContext();
 
@@ -404,7 +402,6 @@ export function MaterialSampleFormLayout() {
     if (divRef.current) {
       if (value) {
         divRef.current.className = "";
-
       } else {
         divRef.current.className = divRef.current.className + " d-none";
         form.setFieldValue("stateChangeRemarks", null);
@@ -595,8 +592,14 @@ export function nextSampleInitialValues(
   originalSample: PersistedResource<MaterialSample>
 ) {
   // Use the copied sample as a base, omitting some fields that shouldn't be copied:
-  const { id, createdOn, createdBy, materialSampleName, ...copiedValues } =
-    originalSample;
+  const {
+    id,
+    createdOn,
+    createdBy,
+    materialSampleName,
+    allowDuplicateName,
+    ...copiedValues
+  } = originalSample;
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);

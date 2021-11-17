@@ -24,12 +24,14 @@ import {
   Nav,
   SCHEDULEDACTION_FIELDS
 } from "../../../components";
-import { HOSTORGANISM_FIELDS } from "../../../components/collection";
-import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
+import {
+  HOSTORGANISM_FIELDS,
+  ORGANISM_FIELDS,
+  PREPARATION_FIELDS,
+  useMaterialSampleSave
+} from "../../../components/collection";
+import { DETERMINATION_FIELDS } from "../../../components/collection/collecting-event/DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
-import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
-import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
-import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,

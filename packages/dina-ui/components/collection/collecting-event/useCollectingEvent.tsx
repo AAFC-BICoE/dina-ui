@@ -4,17 +4,17 @@ import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { compact, fromPairs, orderBy, toPairs } from "lodash";
 import { object, SchemaOf, string } from "yup";
-import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../types/collection-api";
-import { CoordinateSystemEnum } from "../../types/collection-api/resources/CoordinateSystem";
-import { SourceAdministrativeLevel } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import { SRSEnum } from "../../types/collection-api/resources/SRS";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api";
+import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
+import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
+import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import {
   ManagedAttributeValues,
   Metadata,
   Person
-} from "../../types/objectstore-api";
-import { AllowAttachmentsConfig } from "../object-store";
+} from "../../../types/objectstore-api";
+import { AllowAttachmentsConfig } from "../../object-store";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
