@@ -18,3 +18,4 @@ export * from "./material-sample/SetDefaultSampleName";
 export * from "./material-sample/useDuplicateSampleNameDetection";
 export * from "./material-sample/useLastUsedCollection";
 export * from "./material-sample/useMaterialSample";
+export * from "./TabbedResourceLinker";

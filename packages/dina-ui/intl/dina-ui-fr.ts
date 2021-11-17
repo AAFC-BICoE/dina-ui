@@ -50,7 +50,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachExisting: "Joindre l’existant",
   attachExistingObjects: "Joindre des objets existants",
   attachSelected: "Joindre la sélection",
-  attachedCollectingEvent: "Événement de collecte en annexe",
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
   baseNameLabel: "Nom de base",
@@ -67,7 +66,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEvent: "Événement de collecte",
   collectingEventAttachments: "Pièces jointes de l’événement de collecte",
   collectingEventDetails: "Détails de l'activité de collecte",
-  collectingEventDetailsPageLink: "Page des détails de l’événement de collecte",
   collectingEventListTitle: "Événement de collecte",
   collectingEventManagedAttributes:
     "Attributs gérés de l’événement de collecte",
