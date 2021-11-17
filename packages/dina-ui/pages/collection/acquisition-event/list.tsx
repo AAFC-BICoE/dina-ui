@@ -1,11 +1,11 @@
 import {
   ButtonBar,
   CreateButton,
+  dateCell,
   FilterAttribute,
   filterBy,
   FormikButton,
-  ListPageLayout,
-  dateCell
+  ListPageLayout
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -74,14 +74,17 @@ export function AcquisitionEventListLayout({
 
   const TABLE_COLUMNS = [
     {
-      Cell: ({ original: { id, receptionRemarks } }) => (
+      Cell: ({ original: { id } }) => (
         <Link href={`/collection/acquisition-event/view?id=${id}`}>
-          {receptionRemarks || id}
+          <a>
+            <DinaMessage id="detailsPageLink" />
+          </a>
         </Link>
       ),
-      accessor: "receptionRemarks"
+      accessor: "id",
+      sortable: false,
+      Header: <DinaMessage id="detailsPageLink" />
     },
-    dateCell("receivedDate"),
     {
       Cell: ({ original: { receivedFrom } }) => (
         <Link href={`/person/view?id=${receivedFrom?.id}`}>
@@ -91,6 +94,8 @@ export function AcquisitionEventListLayout({
       accessor: "receivedFrom",
       sortable: false
     },
+    dateCell("receivedDate"),
+    "receptionRemarks",
     ...(briefColumns
       ? []
       : [

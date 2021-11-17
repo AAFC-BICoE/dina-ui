@@ -119,7 +119,7 @@ export function AcquisitionEventFormLayout() {
 
   return (
     <div>
-      <FieldSet legend={<DinaMessage id="reception" />}>
+      <FieldSet legend={<DinaMessage id="reception" />} className="non-strip">
         <div className="row">
           <GroupSelectField
             className="col-sm-6"
@@ -149,7 +149,10 @@ export function AcquisitionEventFormLayout() {
           </div>
         </div>
       </FieldSet>
-      <FieldSet legend={<DinaMessage id="externalIsolation" />}>
+      <FieldSet
+        legend={<DinaMessage id="externalIsolation" />}
+        className="non-strip"
+      >
         <div className="row">
           <div className="col-sm-6">
             <ResourceSelectField<Person>
