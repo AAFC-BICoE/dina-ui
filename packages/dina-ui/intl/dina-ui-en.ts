@@ -2,7 +2,10 @@
  * English Object Store messages. A message must be set here in English before other languages.
  */
 export const DINAUI_MESSAGES_ENGLISH = {
+  acquisitionEvent: "Acquisition Event",
+  acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
+  addAcquisitionEventTitle: "Add Acquisition Event",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
   addAnotherIdentifier: "Add Another Identifier",
@@ -55,7 +58,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachExisting: "Attach Existing",
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
-  attachedCollectingEvent: "Attached Collecting Event",
   attachments: "Attachments",
   attributeLabel: "Attribute",
   baseNameLabel: "Base Name",
@@ -72,7 +74,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEvent: "Collecting Event",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
-  collectingEventDetailsPageLink: "Collecting Event Details Page",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
@@ -133,6 +134,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
+  editAcquisitionEventTitle: "Edit Acquisition Event",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
   editCollectionMethodTitle: "Edit Collection Method",
@@ -158,6 +160,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   endEventDateTime: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
+  externalIsolation: "External Isolation",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
   field_acDerivedFrom: "Derived From",
@@ -438,6 +441,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryDeterminationButton_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
   proceedToCreateMetadata: "Proceed to Create Metadata",
+  reception: "Reception",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",
   removeDeterminationLabel: "Remove this Determination",

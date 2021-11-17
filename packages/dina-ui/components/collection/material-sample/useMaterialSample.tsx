@@ -4,10 +4,11 @@ import {
   DinaFormSubmitParams,
   useApiClient,
   useModal,
-  useQuery
+  useQuery,
+  withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import {
   cloneDeep,
   compact,
@@ -37,6 +38,7 @@ import {
   useLastUsedCollection
 } from "..";
 import {
+  AcquisitionEvent,
   CollectingEvent,
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
@@ -45,6 +47,10 @@ import {
   Person
 } from "../../../../dina-ui/types/objectstore-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { HOSTORGANISM_FIELDS } from "../AssociationsField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../MaterialSampleAssociationsField";
@@ -58,6 +64,7 @@ export function useMaterialSampleQuery(id?: string | null) {
       include: [
         "collection",
         "collectingEvent",
+        "acquisitionEvent",
         "attachment",
         "preparationAttachment",
         "preparationType",
@@ -135,13 +142,19 @@ export interface UseMaterialSampleSaveParams {
   materialSample?: InputResource<MaterialSample>;
   /** Initial values for creating a new Collecting Event with the Material Sample. */
   collectingEventInitialValues?: InputResource<CollectingEvent>;
+  /** Initial values for creating a new Collecting Event with the Material Sample. */
+  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
 
   onSaved?: (id: string) => Promise<void>;
 
-  collectingEvtFormRef?: React.RefObject<FormikProps<any>>;
+  colEventFormRef?: React.RefObject<FormikProps<any>>;
+  acquisitionEventFormRef?: React.RefObject<FormikProps<any>>;
 
   isTemplate?: boolean;
 
+  acqEventTemplateInitialValues?: Partial<AcquisitionEvent> & {
+    templateCheckboxes?: Record<string, boolean | undefined>;
+  };
   colEventTemplateInitialValues?: Partial<CollectingEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
@@ -153,6 +166,7 @@ export interface UseMaterialSampleSaveParams {
   enabledFields?: {
     materialSample?: string[];
     collectingEvent?: string[];
+    acquisitionEvent?: string[];
   };
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
@@ -161,11 +175,14 @@ export interface UseMaterialSampleSaveParams {
 export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
+  acquisitionEventInitialValues,
   onSaved,
-  collectingEvtFormRef,
+  colEventFormRef: colEventFormRefProp,
+  acquisitionEventFormRef: acquisitionEventFormRefProp,
   isTemplate,
   enabledFields,
   collectingEventAttachmentsConfig,
+  acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
@@ -176,6 +193,12 @@ export function useMaterialSampleSave({
     isTemplate &&
     (!isEmpty(colEventTemplateInitialValues?.templateCheckboxes) ||
       colEventTemplateInitialValues?.id);
+
+  const hasAcquisitionEventTemplate =
+    isTemplate &&
+    (!isEmpty(acqEventTemplateInitialValues?.templateCheckboxes) ||
+      acqEventTemplateInitialValues?.id);
+
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(
@@ -244,6 +267,14 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState(
+    Boolean(
+      hasAcquisitionEventTemplate ||
+        materialSample?.acquisitionEvent ||
+        enabledFields?.acquisitionEvent?.length
+    )
+  );
+
   const [enablePreparations, setEnablePreparations] = useState(
     Boolean(
       hasPreparationsTemplate ||
@@ -283,7 +314,10 @@ export function useMaterialSampleSave({
     Boolean(
       hasDeterminationTemplate ||
         // Show the determination section if a field is set or the field is enabled:
-        materialSample?.determination?.some(det => !isEmpty(det)) ||
+        // Ignore the "isPrimary": field:
+        materialSample?.determination?.some(
+          ({ isPrimary, ...det }) => !isEmpty(det)
+        ) ||
         enabledFields?.materialSample?.some(enabledField =>
           enabledField.startsWith("determination[")
         )
@@ -325,6 +359,8 @@ export function useMaterialSampleSave({
   const dataComponentState = {
     enableCollectingEvent,
     setEnableCollectingEvent,
+    enableAcquisitionEvent,
+    setEnableAcquisitionEvent,
     enablePreparations,
     setEnablePreparations,
     enableOrganism,
@@ -381,16 +417,13 @@ export function useMaterialSampleSave({
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
-  const colEventFormRef =
-    collectingEvtFormRef ?? useRef<FormikProps<any>>(null);
-
+  const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
   const [colEventId, setColEventId] = useState<string | null | undefined>(
     isTemplate
       ? colEventTemplateInitialValues?.id
       : materialSample?.collectingEvent?.id
   );
   const colEventQuery = useCollectingEventQuery(colEventId);
-
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
@@ -399,9 +432,17 @@ export function useMaterialSampleSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
     fetchedCollectingEvent: colEventQuery.response?.data
   });
-
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
+
+  const acqEventFormRef =
+    acquisitionEventFormRefProp ?? useRef<FormikProps<any>>(null);
+  const [acqEventId, setAcqEventId] = useState<string | null | undefined>(
+    isTemplate
+      ? acqEventTemplateInitialValues?.id
+      : materialSample?.acquisitionEvent?.id
+  );
+  const acqEventQuery = useAcquisitionEvent(acqEventId);
 
   // Add zebra-striping effect to the form sections. Every second top-level fieldset should have a grey background.
   useLayoutEffect(() => {
@@ -452,9 +493,7 @@ export function useMaterialSampleSave({
       };
     } else if (colEventFormRef.current) {
       // Return if the Collecting Event sub-form has errors:
-      const colEventErrors = await (
-        colEventFormRef as any
-      ).current.validateForm();
+      const colEventErrors = await colEventFormRef.current.validateForm();
       if (!isEmpty(colEventErrors)) {
         formik.setErrors({ ...formik.errors, ...colEventErrors });
         return;
@@ -462,19 +501,19 @@ export function useMaterialSampleSave({
 
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
-        (colEventFormRef as any).current.values
+        colEventFormRef.current.values
       );
 
-      const collectingEventWasEdited = !isEqual(
-        submittedCollectingEvent,
-        collectingEventInitialValues
-      );
+      const collectingEventWasEdited =
+        !submittedCollectingEvent.id ||
+        !isEqual(submittedCollectingEvent, collectingEventInitialValues);
+
       // Only send the save request if the Collecting Event was edited:
       const savedCollectingEvent = collectingEventWasEdited
         ? // Use the same save method as the Collecting Event page:
           await saveCollectingEvent(
             submittedCollectingEvent,
-            (colEventFormRef as any).current
+            colEventFormRef.current
           )
         : submittedCollectingEvent;
 
@@ -485,6 +524,53 @@ export function useMaterialSampleSave({
       materialSampleInput.collectingEvent = {
         id: savedCollectingEvent.id,
         type: savedCollectingEvent.type
+      };
+    }
+
+    if (!enableAcquisitionEvent) {
+      // Unlink the AcquisitionEvent if its switch is unchecked:
+      materialSampleInput.acquisitionEvent = {
+        id: null,
+        type: "acquisition-event"
+      };
+    } else if (acqEventFormRef.current) {
+      // Return if the Acq Event sub-form has errors:
+      const acqEventErrors = await acqEventFormRef.current.validateForm();
+      if (!isEmpty(acqEventErrors)) {
+        formik.setErrors({ ...formik.errors, ...acqEventErrors });
+        return;
+      }
+
+      // Save the linked AcqEvent if included:
+      const submittedAcqEvent: PersistedResource<AcquisitionEvent> = cloneDeep(
+        acqEventFormRef.current.values
+      );
+
+      const acqEventWasEdited =
+        !submittedAcqEvent?.id ||
+        !isEqual(submittedAcqEvent, acqEventFormRef.current.initialValues);
+
+      // Only send the save request if the Acq Event was edited:
+      const [savedAcqEvent] = acqEventWasEdited
+        ? // Use the same save method as the Acq Event page:
+          await save<AcquisitionEvent>(
+            [
+              {
+                resource: submittedAcqEvent,
+                type: "acquisition-event"
+              }
+            ],
+            { apiBaseUrl: "/collection-api" }
+          )
+        : [submittedAcqEvent];
+
+      // Set the acqEventId here in case the next operation fails:
+      setAcqEventId(savedAcqEvent.id);
+
+      // Link the MaterialSample to the AcquisitionEvent:
+      materialSampleInput.acquisitionEvent = {
+        id: savedAcqEvent.id,
+        type: savedAcqEvent.type
       };
     }
 
@@ -583,12 +669,38 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
+  const acqEventProps = {
+    innerRef: acqEventFormRef,
+    initialValues: isTemplate
+      ? acqEventTemplateInitialValues
+      : { type: "acquisition-event", ...acquisitionEventInitialValues },
+    isTemplate,
+    readOnly: isTemplate ? !!acqEventId : false,
+    enabledFields: enabledFields?.acquisitionEvent
+  };
+
+  const nestedAcqEventForm = acqEventId ? (
+    withResponse(acqEventQuery, ({ data }) => (
+      <DinaForm {...acqEventProps} initialValues={data}>
+        <AcquisitionEventFormLayout />
+      </DinaForm>
+    ))
+  ) : (
+    <DinaForm {...acqEventProps}>
+      <AcquisitionEventFormLayout />
+    </DinaForm>
+  );
+
   return {
     initialValues,
     nestedCollectingEventForm,
+    nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
+    acqEventQuery,
+    acqEventId,
+    setAcqEventId,
     colEventQuery,
     onSubmit,
     loading

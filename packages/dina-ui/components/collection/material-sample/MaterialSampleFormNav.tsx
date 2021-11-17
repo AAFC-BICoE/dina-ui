@@ -47,6 +47,13 @@ export function MaterialSampleFormNav({
       setEnabled: dataComponentState.setEnableCollectingEvent
     },
     {
+      id: "acquisition-event-section",
+      msg: formatMessage("acquisitionEvent"),
+      className: "enable-acquisition-event",
+      disabled: !dataComponentState.enableAcquisitionEvent,
+      setEnabled: dataComponentState.setEnableAcquisitionEvent
+    },
+    {
       id: "preparations-section",
       msg: formatMessage("preparations"),
       className: "enable-catalogue-info",

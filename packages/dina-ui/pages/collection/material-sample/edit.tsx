@@ -2,27 +2,24 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  DateField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
   filterBy,
-  FormikButton,
   LoadingSpinner,
   ResourceSelectField,
   StringArrayField,
   SubmitButton,
   TextField,
-  withResponse,
-  DateField,
-  useDinaFormContext
+  useDinaFormContext,
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactNode, useContext, useRef, useState } from "react";
-import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -31,32 +28,36 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
+  MaterialSampleStateReadOnlyRender,
   Nav,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  MaterialSampleStateReadOnlyRender
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
   DeterminationField,
-  PreparationField,
   ScheduledActionsField,
   SetDefaultSampleName,
+  TabbedResourceLinker,
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection";
+import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
 import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
+import { PreparationField } from "../../../components/collection/material-sample/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  AcquisitionEvent,
   CollectingEvent,
   MaterialSample,
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
+import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -159,6 +160,7 @@ export default function MaterialSampleEditPage() {
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
+  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
 
   onSaved?: (id: string) => Promise<void>;
 
@@ -174,6 +176,7 @@ export interface MaterialSampleFormProps {
   enabledFields?: {
     materialSample: string[];
     collectingEvent: string[];
+    acquisitionEvent: string[];
   };
 
   attachmentsConfig?: {
@@ -187,6 +190,7 @@ export interface MaterialSampleFormProps {
 export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
+  acquisitionEventInitialValues,
   onSaved,
   materialSampleSaveHook,
   enabledFields,
@@ -205,10 +209,14 @@ export function MaterialSampleForm({
   const {
     initialValues,
     nestedCollectingEventForm,
+    nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
     colEventQuery,
+    acqEventQuery,
+    acqEventId,
+    setAcqEventId,
     onSubmit,
     loading
   } =
@@ -217,6 +225,7 @@ export function MaterialSampleForm({
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
       materialSample,
       collectingEventInitialValues,
+      acquisitionEventInitialValues,
       onSaved,
       isTemplate,
       enabledFields
@@ -226,6 +235,9 @@ export function MaterialSampleForm({
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
     enabledFields?.collectingEvent.includes("id")
+  );
+  const templateAttachesAcquisitionEvent = Boolean(
+    enabledFields?.acquisitionEvent.includes("id")
   );
 
   const mateirialSampleInternal = (
@@ -250,91 +262,51 @@ export function MaterialSampleForm({
               id="collecting-event-section"
               legend={<DinaMessage id="collectingEvent" />}
             >
-              <Tabs
-                // Re-initialize the form when the linked CollectingEvent changes:
-                key={colEventId}
-                // Prevent unmounting the form on tab switch to avoid losing the form state:
-                forceRenderTabPanel={true}
-              >
-                <TabList>
-                  <Tab>
-                    {colEventId ? (
-                      <DinaMessage id="attachedCollectingEvent" />
-                    ) : (
-                      <DinaMessage id="createNew" />
-                    )}
-                  </Tab>
-                  <Tab disabled={templateAttachesCollectingEvent}>
-                    <DinaMessage id="attachExisting" />
-                  </Tab>
-                </TabList>
-                <TabPanel>
-                  {
-                    // If there is already a linked CollectingEvent then wait for it to load first:
-                    colEventId
-                      ? withResponse(
-                          colEventQuery,
-                          ({ data: linkedColEvent }) => (
-                            <>
-                              <div className="mb-3 d-flex justify-content-end align-items-center">
-                                <Link
-                                  href={`/collection/collecting-event/view?id=${colEventId}`}
-                                >
-                                  <a target="_blank">
-                                    <DinaMessage id="collectingEventDetailsPageLink" />
-                                  </a>
-                                </Link>
-                                {
-                                  // Do not allow changing an attached Collecting Event from a template:
-                                  !templateAttachesCollectingEvent && (
-                                    <FormikButton
-                                      className="btn btn-danger detach-collecting-event-button ms-5"
-                                      onClick={() => setColEventId(null)}
-                                    >
-                                      <DinaMessage id="detachCollectingEvent" />
-                                    </FormikButton>
-                                  )
-                                }
-                              </div>
-                              {
-                                // In template mode or Workflow Run mode, only show a link to the linked Collecting Event:
-                                isTemplate ||
-                                templateAttachesCollectingEvent ? (
-                                  <div>
-                                    <div className="attached-collecting-event-link mb-3">
-                                      <DinaMessage id="attachedCollectingEvent" />
-                                      :{" "}
-                                      <Link
-                                        href={`/collection/collecting-event/view?id=${colEventId}`}
-                                      >
-                                        <a target="_blank">
-                                          {linkedColEvent.id}
-                                        </a>
-                                      </Link>
-                                    </div>
-                                    <CollectingEventBriefDetails
-                                      collectingEvent={linkedColEvent}
-                                    />
-                                  </div>
-                                ) : (
-                                  // In form mode, show the actual editable Collecting Event form:
-                                  nestedCollectingEventForm
-                                )
-                              }
-                            </>
-                          )
-                        )
-                      : nestedCollectingEventForm
-                  }
-                </TabPanel>
-                <TabPanel>
+              <TabbedResourceLinker<CollectingEvent>
+                briefDetails={colEvent => (
+                  <CollectingEventBriefDetails collectingEvent={colEvent} />
+                )}
+                linkerTabContent={
                   <CollectingEventLinker
                     onCollectingEventSelect={colEventToLink => {
                       setColEventId(colEventToLink.id);
                     }}
                   />
-                </TabPanel>
-              </Tabs>
+                }
+                nestedForm={nestedCollectingEventForm}
+                resourceQuery={colEventQuery}
+                setResourceId={setColEventId}
+                disableLinkerTab={templateAttachesCollectingEvent}
+                readOnlyLink="/collection/collecting-event/view?id="
+                resourceId={colEventId}
+              />
+            </FieldSet>
+          )}
+          {dataComponentState.enableAcquisitionEvent && (
+            <FieldSet
+              id="acquisition-event-section"
+              legend={<DinaMessage id="acquisitionEvent" />}
+            >
+              <TabbedResourceLinker<AcquisitionEvent>
+                briefDetails={acqEvent => (
+                  <DinaForm initialValues={acqEvent} readOnly={true}>
+                    <AcquisitionEventFormLayout />
+                  </DinaForm>
+                )}
+                linkerTabContent={
+                  <AcquisitionEventLinker
+                    onAcquisitionEventSelect={acqEventToLink => {
+                      setAcqEventId(acqEventToLink.id);
+                    }}
+                  />
+                }
+                nestedForm={nestedAcqEventForm}
+                resourceQuery={acqEventQuery}
+                setResourceId={setAcqEventId}
+                disableLinkerTab={templateAttachesAcquisitionEvent}
+                readOnlyLink="/collection/acquisition-event/view?id="
+                resourceId={acqEventId}
+              />
             </FieldSet>
           )}
           {dataComponentState.enablePreparations && (

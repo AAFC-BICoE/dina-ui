@@ -1,11 +1,12 @@
 import { KitsuResource } from "kitsu";
+import { AcquisitionEvent } from "..";
 import { CollectingEvent } from "./CollectingEvent";
 import { MaterialSample } from "./MaterialSample";
 
 /** Form template config and default values. */
 export interface FormTemplate<TFormValues> {
-  allowNew: boolean;
-  allowExisting: boolean;
+  allowNew?: boolean;
+  allowExisting?: boolean;
   templateFields: TemplateFields<TFormValues>;
 }
 
@@ -30,6 +31,7 @@ export interface PreparationProcessDefinitionAttributes {
   formTemplates: {
     COLLECTING_EVENT?: FormTemplate<CollectingEvent>;
     MATERIAL_SAMPLE?: FormTemplate<MaterialSample>;
+    ACQUISITION_EVENT?: FormTemplate<AcquisitionEvent>;
   };
 }
 
