@@ -21,7 +21,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useState } from "react";
+import { ReactNode, useContext, useRef, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import {
   AttachmentsField,
