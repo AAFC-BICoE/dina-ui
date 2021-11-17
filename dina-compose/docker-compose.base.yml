@@ -150,7 +150,7 @@ services:
           "spring.liquibase.password": "p",
           "spring.liquibase.liquibase-schema": "userapi",
           "keycloak.enabled": "true",
-          "keycloak.resource": "dina",
+          "keycloak.resource": "user-svc",
           "keycloak.credentials.secret": "120c0b7a-5ed2-4295-9a31-29c2fcbc714f",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
         }
