@@ -9,7 +9,6 @@ import {
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
-  ResourceSelectField,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
@@ -27,11 +26,10 @@ import {
   GroupSelectField,
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
-  TagsAndRestrictionsSection,
-  useAddPersonModal
+  PersonSelectField,
+  TagsAndRestrictionsSection
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { Person } from "../../types/agent-api/resources/Person";
 import { Vocabulary } from "../../types/collection-api";
 import {
   CollectingEvent,
@@ -46,7 +44,6 @@ import {
   SourceAdministrativeLevel
 } from "../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../object-store";
-import { AttachmentReadOnlySection } from "../object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesEditor } from "../object-store/managed-attributes/ManagedAttributesEditor";
 import { ManagedAttributesViewer } from "../object-store/managed-attributes/ManagedAttributesViewer";
 import { CollectionMethodSelectField } from "../resource-select-fields/resource-select-fields";
@@ -71,7 +68,6 @@ export function CollectingEventFormLayout({
   attachmentsConfig
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const { openAddPersonModal } = useAddPersonModal();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -419,20 +415,7 @@ export function CollectingEventFormLayout({
               })}
               suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
             />
-            <ResourceSelectField<Person>
-              name="collectors"
-              readOnlyLink="/person/view?id="
-              filter={filterBy(["displayName"])}
-              model="agent-api/person"
-              optionLabel={person => person.displayName}
-              isMulti={true}
-              asyncOptions={[
-                {
-                  label: <DinaMessage id="addNewPerson" />,
-                  getResource: openAddPersonModal
-                }
-              ]}
-            />
+            <PersonSelectField name="collectors" isMulti={true} />
             <TextField name="dwcRecordNumber" />
           </FieldSet>
         </div>
@@ -712,7 +695,6 @@ export function CollectingEventFormLayout({
                             <TabPanel key={index}>
                               <GeoReferenceAssertionRow
                                 index={index}
-                                openAddPersonModal={openAddPersonModal}
                                 assertion={assertion}
                               />
                               {!readOnly && !isTemplate && (

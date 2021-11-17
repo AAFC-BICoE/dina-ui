@@ -4,14 +4,12 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   FieldView,
-  filterBy,
   FormikButton,
-  ResourceSelectField,
   SelectField,
   SubmitButton,
+  useAccount,
   useQuery,
-  withResponse,
-  useAccount
+  withResponse
 } from "common-ui";
 import { FieldArray } from "formik";
 import { keys, last, omit, uniq } from "lodash";
@@ -21,6 +19,7 @@ import {
   GroupLabel,
   Head,
   Nav,
+  PersonSelectField,
   useAvailableGroupOptions
 } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -123,13 +122,7 @@ export function DinaUserForm({
       <div>
         <div className="row">
           <FieldView className="col-md-6" name="username" />
-          <ResourceSelectField<Person>
-            className="col-md-6"
-            name="agent"
-            filter={filterBy(["displayName"])}
-            model="agent-api/person"
-            optionLabel={person => person.displayName}
-          />
+          <PersonSelectField className="col-md-6" name="agent" />
         </div>
         <RolesPerGroupEditor
           initialRolesPerGroup={initialValues.rolesPerGroup}
