@@ -856,17 +856,20 @@ describe("Material Sample Edit Page", () => {
                 {
                   verbatimDeterminer: "test-agent-1",
                   verbatimScientificName: "test-name-1",
-                  isPrimary: true
+                  isPrimary: true,
+                  isFileAs: true
                 },
                 {
                   verbatimDeterminer: "test-agent-2",
                   verbatimScientificName: "test-name-2",
-                  isPrimary: false
+                  isPrimary: false,
+                  isFileAs: false
                 },
                 {
                   verbatimDeterminer: "test-agent-3",
                   verbatimScientificName: "test-name-3",
-                  isPrimary: false
+                  isPrimary: false,
+                  isFileAs: false
                 }
               ],
               type: "material-sample"

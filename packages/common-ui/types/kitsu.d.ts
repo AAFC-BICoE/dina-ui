@@ -111,8 +111,7 @@ declare module "kitsu" {
       : TData[P] extends KitsuResource | undefined
       ? PersistedResource<TData[P]> | undefined
       : TData[P];
-  } &
-    Required<KitsuResource>;
+  } & Required<KitsuResource>;
 
   /**
    * Used when creating or updating a resource.

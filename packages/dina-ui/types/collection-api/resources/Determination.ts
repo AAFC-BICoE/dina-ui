@@ -8,12 +8,14 @@ export interface Determination {
   typeStatusEvidence?: string;
   determiner?: (string | Person)[];
   determinedOn?: string;
-  qualifier?: string;
+  verbatimRemarks?: string;
   scientificNameSource?: ScientificNameSource;
   scientificName?: string;
   transcriberRemarks?: string;
   isPrimary?: boolean;
   scientificNameDetails?: ScientificNameSourceDetails;
+  isFileAs?: boolean;
+  determinationRemarks?: string;
 }
 
 export type ScientificNameSourceDetails = {
