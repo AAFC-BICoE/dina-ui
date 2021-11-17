@@ -25,7 +25,8 @@ import {
   NotPubliclyReleasableWarning,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  MaterialSampleStateWarning
 } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
@@ -124,6 +125,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               readOnly={true}
             >
               <NotPubliclyReleasableWarning />
+              <MaterialSampleStateWarning />
               {buttonBar}
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb
