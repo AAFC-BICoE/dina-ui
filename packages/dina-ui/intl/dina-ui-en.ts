@@ -3,7 +3,9 @@
  */
 export const DINAUI_MESSAGES_ENGLISH = {
   acquisitionEvent: "Acquisition Event",
+  acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
+  addAcquisitionEventTitle: "Add Acquisiion Event",
   addAnotherAssertion: "Add Another GeoReference",
   addAnotherDetermination: "Add Another Determination",
   addAnotherIdentifier: "Add Another Identifier",
@@ -129,6 +131,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
   duplicateFilesFound: "duplicate files found",
+  editAcquisitionEventTitle: "Edit Acquisition Event",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
   editCollectionMethodTitle: "Edit Collection Method",

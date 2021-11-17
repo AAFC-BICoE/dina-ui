@@ -37,11 +37,11 @@ import {
 } from "../../../dina-ui/types/objectstore-api";
 import { CollectingEventFormLayout } from "../../components/collection";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { AllowAttachmentsConfig } from "../object-store";
 import {
   AcquisitionEventFormLayout,
   useAcquisitionEvent
-} from "./AcquisitionEventForm";
+} from "../../pages/collection/acquisition-event/edit";
+import { AllowAttachmentsConfig } from "../object-store";
 import { HOSTORGANISM_FIELDS } from "./AssociationsField";
 import { DETERMINATION_FIELDS } from "./DeterminationField";
 import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "./MaterialSampleAssociationsField";

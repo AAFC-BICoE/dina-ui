@@ -23,10 +23,6 @@ import {
   TagsAndRestrictionsSection
 } from "../../../components";
 import {
-  AcquisitionEventFormLayout,
-  useAcquisitionEvent
-} from "../../../components/collection/AcquisitionEventForm";
-import {
   AssociationsField,
   HOSTORGANISM_FIELDS
 } from "../../../components/collection/AssociationsField";
@@ -46,6 +42,10 @@ import { useMaterialSampleQuery } from "../../../components/collection/useMateri
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
 import {
   MaterialSampleFormLayout,
