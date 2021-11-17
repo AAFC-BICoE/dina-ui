@@ -131,11 +131,11 @@ export function ViewPageLayout<T extends KitsuResource>({
               </ButtonBar>
               <h1 id="wb-cont">{title}</h1>
               {form(formProps)}
-              <Footer />
             </>
           );
         })}
       </main>
+      <Footer />
     </div>
   );
 }

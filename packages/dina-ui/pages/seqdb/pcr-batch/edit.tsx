@@ -21,6 +21,7 @@ import {
   GroupSelectField,
   Head,
   Nav,
+  PersonSelectField,
   useAddPersonModal
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -198,20 +199,10 @@ export function PcrBatchFormFields() {
         />
       </div>
       <div className="row">
-        <ResourceSelectField<Person>
+        <PersonSelectField
           className="col-md-6"
           name="experimenters"
-          readOnlyLink="/person/view?id="
-          filter={filterBy(["displayName"])}
-          model="agent-api/person"
-          optionLabel={person => person.displayName}
           isMulti={true}
-          asyncOptions={[
-            {
-              label: <DinaMessage id="addNewPerson" />,
-              getResource: openAddPersonModal as any
-            }
-          ]}
         />
         <ResourceSelectField<Region>
           className="col-md-6"

@@ -173,6 +173,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/managed-attribute/list">
+              <a>
+                <DinaMessage id="managedAttributeListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/collecting-event/list">
               <a>
                 <DinaMessage id="collectingEventListTitle" />
@@ -180,9 +187,9 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
-            <Link href="/collection/managed-attribute/list">
+            <Link href="/collection/acquisition-event/list">
               <a>
-                <DinaMessage id="managedAttributeListTitle" />
+                <DinaMessage id="acquisitionEventListTitle" />
               </a>
             </Link>
           </li>

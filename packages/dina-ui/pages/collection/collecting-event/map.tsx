@@ -1,7 +1,5 @@
-import React from "react";
-import { useMap, useGraphics, useGraphic, useEvent } from "esri-loader-hooks";
-import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
+import React from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { CollectingEventMap } from "../../../components/collection/event-map/CollectingEventMap";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";

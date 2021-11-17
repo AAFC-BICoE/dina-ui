@@ -7,11 +7,15 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { useField } from "formik";
+import { SetOptional } from "type-fest";
+import { useAddPersonModal } from "..";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
-import { useField } from "formik";
+import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { SetOptional } from "type-fest";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -34,11 +38,11 @@ export function CollectionSelectField(
   props: SetOptional<ResourceSelectFieldProps<Collection>, ProvidedProps>
 ) {
   const [{ value }] = useField(props.name);
-  const { roles, groupNames } = useAccount();
+  const { isAdmin, groupNames } = useAccount();
 
   const filter = filterBy(
     ["name"],
-    !roles.includes("dina-admin")
+    !isAdmin
       ? {
           extraFilters: [
             // Restrict the list to just the user's groups:
@@ -60,12 +64,11 @@ export function CollectionSelectField(
   return withResponse(collectionQuery, ({ data, meta }) => {
     // Disable this input when the collection set is the only one available:
     const collectionCannotBeChanged =
-      !roles.includes("dina-admin") &&
-      meta?.totalResourceCount === 1 &&
-      data[0].id === value?.id;
+      !isAdmin && meta?.totalResourceCount === 1 && data[0].id === value?.id;
 
     return (
       <ResourceSelectField<Collection>
+        key={String(isAdmin)}
         readOnlyLink="/collection/collection/view?id="
         filter={filter}
         model="collection-api/collection"
@@ -105,6 +108,38 @@ export function UserSelectField(
       // TODO allow filtering by group
       filter={() => ({})}
       pageSize={1000}
+      {...props}
+    />
+  );
+}
+
+export function PersonSelectField(
+  props: SetOptional<ResourceSelectFieldProps<Person>, ProvidedProps>
+) {
+  const { openAddPersonModal } = useAddPersonModal();
+
+  return (
+    <ResourceSelectField<Person>
+      // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
+      // but fallback to the regular RSQL search if that fails.
+      useCustomQuery={(searchQuery, querySpec) =>
+        useAutocompleteSearchButFallbackToRsqlApiSearch({
+          searchQuery,
+          querySpec,
+          indexName: "dina_agent_index",
+          searchField: "displayName"
+        })
+      }
+      readOnlyLink="/dina-user/view?id="
+      filter={filterBy(["displayName"])}
+      model="agent-api/person"
+      optionLabel={person => person.displayName}
+      asyncOptions={[
+        {
+          label: <DinaMessage id="addNewPerson" />,
+          getResource: openAddPersonModal
+        }
+      ]}
       {...props}
     />
   );

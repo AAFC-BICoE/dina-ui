@@ -1,28 +1,20 @@
 import {
   FilterParam,
-  GetParams,
   KitsuResource,
   KitsuResourceLink,
   PersistedResource
 } from "kitsu";
-import {
-  castArray,
-  compact,
-  debounce,
-  isEqual,
-  isUndefined,
-  keys,
-  omitBy
-} from "lodash";
-import React, { ComponentProps, useCallback, useEffect, useState } from "react";
+import { castArray, compact, isEqual, isUndefined, keys, omitBy } from "lodash";
+import React, { ComponentProps, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
-  StylesConfig,
-  components as reactSelectComponents
+  components as reactSelectComponents,
+  StylesConfig
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { useDebounce } from "use-debounce";
 import { SelectOption } from "../..";
-import { useQuery } from "../api-client/useQuery";
+import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
 
 /** ResourceSelect component props. */
@@ -53,23 +45,11 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** The JSONAPI "include" parameter. */
   include?: string;
 
-  /** The JSONAPI "sort" parameter. */
-  sort?: string;
-
   /** react-select styles prop. */
   styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
 
   /** Special dropdown options that can fetch an async value e.g. by creating a resource in a modal. */
   asyncOptions?: AsyncOption<TData>[];
-
-  /** Determines if the async options should be rendered before the search suggestions. */
-  asyncOptionsFirst?: boolean;
-
-  /**
-   * If the async options should always be displayed even after searching,
-   * this will even replace the "no options" message.
-   */
-  asyncOptionsAlwaysVisible?: boolean;
 
   isDisabled?: boolean;
 
@@ -82,6 +62,15 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Page limit. */
   pageSize?: number;
+
+  /** Use a different query hook instead of the REST API. */
+  useCustomQuery?: (
+    searchQuery: string,
+    querySpec: JsonApiQuerySpec
+  ) => {
+    loading?: boolean;
+    response?: { data: PersistedResource<TData>[] };
+  };
 }
 
 /**
@@ -90,7 +79,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
  */
 export interface AsyncOption<TData extends KitsuResource> {
   /** Option label. */
-  label: JSX.Element;
+  label: string | JSX.Element;
 
   /**
    * Function called to fetch the resource when the option is selected.
@@ -98,13 +87,6 @@ export interface AsyncOption<TData extends KitsuResource> {
    */
   getResource: () => Promise<PersistedResource<TData> | undefined>;
 }
-
-/** An option the user can select to set the relationship to null. */
-const NULL_OPTION = Object.seal({
-  label: "<none>",
-  resource: Object.seal({ id: null }),
-  value: null
-});
 
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
@@ -114,55 +96,47 @@ export function ResourceSelect<TData extends KitsuResource>({
   model,
   onChange: onChangeProp = () => undefined,
   optionLabel,
-  sort,
   styles,
   value,
   asyncOptions,
-  asyncOptionsFirst = true,
-  asyncOptionsAlwaysVisible = true,
   isDisabled,
   omitNullOption,
   invalid,
   selectProps,
-  pageSize
+  pageSize,
+  useCustomQuery
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
-  const [search, setSearch] = useState({
-    /** The user's typed input. */
-    input: "",
-    /** The actual search value, which is updated after a throttle to avoid excessive API requests. */
-    value: ""
-  });
+  /** The value of the input element. */
+  const [inputValue, setInputValue] = useState("");
 
-  /** Updates the actual search value passed to the API. */
-  const debouncedSearchUpdate = useCallback(
-    debounce(() => setSearch(({ input }) => ({ input, value: input })), 250),
-    []
-  );
-
-  useEffect(debouncedSearchUpdate, [search.input]);
+  /** The debounced input value passed to the fetcher. */
+  const [searchValue] = useDebounce(inputValue, 250);
 
   // Omit blank/null filters:
-  const filterParam = omitBy(filter(search.value), val =>
+  const filterParam = omitBy(filter(searchValue), val =>
     ["", undefined].includes(val as string)
-  ) as FilterParam;
+  );
 
-  const page = pageSize ? { limit: pageSize } : undefined;
+  // "6" is chosen here to give enough room for the main options, the <none> option, and the
+  const page = { limit: pageSize ?? 6 };
+  const sort = "-createdOn";
 
   // Omit undefined values from the GET params, which would otherwise cause an invalid request.
   // e.g. /api/region?include=undefined
-  const getParams = omitBy<GetParams>(
-    { filter: filterParam, include, sort, page },
-    val => isUndefined(val) || isEqual(val, {})
-  );
-
-  const { loading: queryIsLoading, response } = useQuery<TData[]>({
+  const querySpec: JsonApiQuerySpec = {
     path: model,
-    ...getParams
-  });
+    ...omitBy(
+      { filter: filterParam, include, page, sort },
+      val => isUndefined(val) || isEqual(val, {})
+    )
+  };
 
-  const isLoading = queryIsLoading || search.input !== search.value;
+  const { loading: queryIsLoading, response } =
+    useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
+
+  const isLoading = queryIsLoading || inputValue !== searchValue;
 
   // Build the list of options from the returned resources.
   const resourceOptions =
@@ -172,21 +146,31 @@ export function ResourceSelect<TData extends KitsuResource>({
       value: resource.id
     })) ?? [];
 
-  // Build the list of async options to attach to the top or bottom of the list.
-  const asyncOptionsList =
-    asyncOptions?.map(option => ({
-      ...option,
-      value: asyncOptionsAlwaysVisible ? search.input : null,
-      label: <strong>{option.label}</strong>
-    })) ?? [];
+  /** An option the user can select to set the relationship to null. */
+  const NULL_OPTION = Object.seal({
+    label: `<${formatMessage({ id: "none" })}>`,
+    resource: Object.seal({ id: null }),
+    value: null
+  });
 
-  // Only show the null option when in single-resource mode and when there is no search input value.
-  const options = [
-    ...(asyncOptionsFirst ? asyncOptionsList : []),
-    ...(!isMulti && !search.value && !omitNullOption ? [NULL_OPTION] : []),
-    ...resourceOptions,
-    ...(!asyncOptionsFirst ? asyncOptionsList : [])
-  ];
+  // Main options group.
+  const mainOptions = {
+    label: searchValue
+      ? formatMessage({ id: "dropdownSearchResults" })
+      : formatMessage({ id: "typeToSearchOrChooseFromNewest" }),
+    options: [
+      ...(!isMulti && !searchValue && !omitNullOption ? [NULL_OPTION] : []),
+      ...resourceOptions
+    ]
+  };
+
+  const actionOptions = asyncOptions && {
+    label: formatMessage({ id: "actions" }),
+    options: asyncOptions
+  };
+
+  // Show no options while loading: (react-select will show the "Loading..." text.)
+  const options = isLoading ? [] : compact([mainOptions, actionOptions]);
 
   async function onChange(newSelectedRaw) {
     const newSelected = castArray(newSelectedRaw);
@@ -255,6 +239,13 @@ export function ResourceSelect<TData extends KitsuResource>({
         borderColor: "rgb(148, 26, 37)",
         "&:hover": { borderColor: "rgb(148, 26, 37)" }
       })
+    }),
+    // Make the menu's height fit the resource options and the action options:
+    menuList: base => ({ ...base, maxHeight: "400px" }),
+    group: (base, gProps) => ({
+      ...base,
+      // Make Action options bold:
+      ...(gProps.label === actionOptions?.label ? { fontWeight: "bold" } : {})
     })
   };
 
@@ -262,16 +253,17 @@ export function ResourceSelect<TData extends KitsuResource>({
     <SortableSelect
       // react-select AsyncSelect props:
       isMulti={isMulti}
-      onInputChange={newVal =>
-        setSearch(current => ({ ...current, input: newVal }))
-      }
-      inputValue={search.input}
+      onInputChange={newVal => setInputValue(newVal)}
+      inputValue={inputValue}
       onChange={onChange}
       isLoading={isLoading}
       options={options}
       placeholder={formatMessage({ id: "typeHereToSearch" })}
+      loadingMessage={() => formatMessage({ id: "loadingText" })}
       styles={customStyle}
       value={selectValue}
+      // The filtering is already done at the API level:
+      filterOption={() => true}
       isDisabled={isDisabled}
       // react-sortable-hoc config:
       axis="xy"
