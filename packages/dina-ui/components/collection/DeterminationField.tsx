@@ -25,6 +25,7 @@ import {
 } from "../../types/collection-api";
 import { useAddPersonModal } from "../add-person/PersonForm";
 import { isArray } from "lodash";
+import { PersonSelectField } from "..";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -249,20 +250,10 @@ export function DeterminationField({ className }: DeterminationFieldProps) {
                       index={index}
                       isDetermination={true}
                     />
-                    <ResourceSelectField<Person>
+                    <PersonSelectField
                       {...fieldProps("determiner")}
                       label={formatMessage("determiningAgents")}
-                      readOnlyLink="/person/view?id="
-                      filter={filterBy(["displayName"])}
-                      model="agent-api/person"
-                      optionLabel={person => person.displayName}
                       isMulti={true}
-                      asyncOptions={[
-                        {
-                          label: <DinaMessage id="addNewPerson" />,
-                          getResource: openAddPersonModal
-                        }
-                      ]}
                     />
                     <DateField
                       {...fieldProps("determinedOn")}

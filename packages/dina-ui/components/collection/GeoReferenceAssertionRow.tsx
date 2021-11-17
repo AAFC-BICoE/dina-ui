@@ -15,6 +15,7 @@ import { connect, Field, FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
 import { useRef, useState } from "react";
+import { PersonSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/agent-api/resources/Person";
 import {
@@ -25,13 +26,11 @@ import {
 export interface GeoReferenceAssertionRowProps {
   index: number;
   assertion: GeoReferenceAssertion;
-  openAddPersonModal?: () => Promise<PersistedResource<Person> | undefined>;
 }
 
 export function GeoReferenceAssertionRow({
   index,
-  assertion,
-  openAddPersonModal
+  assertion
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
@@ -212,20 +211,10 @@ export function GeoReferenceAssertionRow({
           className={"literalGeoreferencedBy"}
           label={formatMessage("literalGeoreferencedByLabel")}
         />
-        <ResourceSelectField<Person>
+        <PersonSelectField
           name={commonRoot + "georeferencedBy"}
-          readOnlyLink="/person/view?id="
           label={formatMessage("georeferencedByLabel")}
-          filter={filterBy(["displayName"])}
-          model="agent-api/person"
-          optionLabel={person => person.displayName}
           isMulti={true}
-          asyncOptions={[
-            {
-              label: <DinaMessage id="addNewPerson" />,
-              getResource: openAddPersonModal as any
-            }
-          ]}
         />
         <TextField
           name={commonRoot + "dwcGeoreferenceProtocol"}
