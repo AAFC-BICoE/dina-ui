@@ -40,8 +40,8 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
     : null;
 
   return (
-    <KeycloakAccountProvider>
-      <ApiClientImplProvider>
+    <ApiClientImplProvider>
+      <KeycloakAccountProvider>
         <AuthenticatedApiClientProvider>
           <FileUploadProviderImpl>
             <DinaIntlProvider>
@@ -55,7 +55,7 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
             </DinaIntlProvider>
           </FileUploadProviderImpl>
         </AuthenticatedApiClientProvider>
-      </ApiClientImplProvider>
-    </KeycloakAccountProvider>
+      </KeycloakAccountProvider>
+    </ApiClientImplProvider>
   );
 }

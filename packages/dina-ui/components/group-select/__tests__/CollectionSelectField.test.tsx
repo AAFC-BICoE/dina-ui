@@ -69,7 +69,7 @@ describe("CollectionSelectField", () => {
       <DinaForm initialValues={{}}>
         <CollectionSelectField name="collection" />
       </DinaForm>,
-      { ...testCtx, accountContext: { roles: ["dina-admin"] } }
+      { ...testCtx, accountContext: { isAdmin: true } }
     );
 
     await new Promise(setImmediate);
@@ -79,7 +79,13 @@ describe("CollectionSelectField", () => {
     expect(wrapper.find(Select).prop("isDisabled")).toEqual(false);
     expect(mockGet.mock.calls).toEqual([
       ["collection-api/collection", { filter: { rsql: "" } }],
-      ["collection-api/collection", {}]
+      [
+        "collection-api/collection",
+        {
+          page: { limit: 6 },
+          sort: "-createdOn"
+        }
+      ]
     ]);
   });
 
@@ -97,7 +103,14 @@ describe("CollectionSelectField", () => {
     expect(wrapper.find(Select).prop("isDisabled")).toEqual(true);
     expect(mockGet.mock.calls).toEqual([
       ["collection-api/collection", { filter: { rsql: "group=in=(aafc)" } }],
-      ["collection-api/collection", { filter: { rsql: "group=in=(aafc)" } }]
+      [
+        "collection-api/collection",
+        {
+          filter: { rsql: "group=in=(aafc)" },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        }
+      ]
     ]);
   });
 
@@ -118,7 +131,14 @@ describe("CollectionSelectField", () => {
         "collection-api/collection",
         { filter: { rsql: "group=in=(aafc,cnc)" } }
       ],
-      ["collection-api/collection", { filter: { rsql: "group=in=(aafc,cnc)" } }]
+      [
+        "collection-api/collection",
+        {
+          filter: { rsql: "group=in=(aafc,cnc)" },
+          page: { limit: 6 },
+          sort: "-createdOn"
+        }
+      ]
     ]);
   });
 });

@@ -79,6 +79,7 @@ export function CreateMaterialSampleFromWorkflowForm({
   const {
     materialSampleInitialValues,
     collectingEventInitialValues,
+    acquisitionEventInitialValues,
     enabledFields
   } = useWorkflowMaterialSampleInitialValues(actionDefinition);
 
@@ -120,6 +121,7 @@ export function CreateMaterialSampleFromWorkflowForm({
       }
       materialSample={materialSampleInitialValues}
       collectingEventInitialValues={collectingEventInitialValues}
+      acquisitionEventInitialValues={acquisitionEventInitialValues}
       onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
       enabledFields={enabledFields}
       attachmentsConfig={{
@@ -160,6 +162,10 @@ function useWorkflowMaterialSampleInitialValues(
       "collecting-event",
       actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
     );
+    const acquisitionEvent = getInitialValuesFromTemplateFields(
+      "acquisition-event",
+      actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+    );
 
     if (collectingEvent.id) {
       materialSampleInitialValues.collectingEvent = {
@@ -169,10 +175,19 @@ function useWorkflowMaterialSampleInitialValues(
     } else {
       set(collectingEvent, "geoReferenceAssertions[0].isPrimary", true);
     }
+    if (acquisitionEvent.id) {
+      materialSampleInitialValues.acquisitionEvent = {
+        type: "acquisition-event",
+        id: acquisitionEvent.id
+      };
+    }
 
     const collectingEventInitialValues = collectingEvent.id
       ? undefined
       : collectingEvent;
+    const acquisitionEventInitialValues = acquisitionEvent.id
+      ? undefined
+      : acquisitionEvent;
 
     const enabledFields = {
       materialSample: [
@@ -188,11 +203,17 @@ function useWorkflowMaterialSampleInitialValues(
         toPairs(
           actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
         ).map(([key, val]) => (val?.enabled ? key : null))
+      ),
+      acquisitionEvent: compact(
+        toPairs(
+          actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+        ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
     return {
       materialSampleInitialValues,
       collectingEventInitialValues,
+      acquisitionEventInitialValues,
       enabledFields
     };
   }, [actionDefinition]);

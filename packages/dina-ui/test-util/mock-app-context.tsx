@@ -11,6 +11,7 @@ import { merge, noop } from "lodash";
 import { useMemo, useRef } from "react";
 import { DndProvider } from "react-dnd-cjs";
 import HTML5Backend from "react-dnd-html5-backend-cjs";
+import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
@@ -39,7 +40,8 @@ export function MockAppContextProvider({
       logout: noop,
       roles: ["user"],
       token: "test-token",
-      username: "test-user"
+      username: "test-user",
+      isAdmin: false
     }),
     []
   );
@@ -73,25 +75,30 @@ export function MockAppContextProvider({
   const modalWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
-    <AccountProvider
-      value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
+    <SWRConfig
+      // Reset SWR cache between tests.
+      value={{ provider: () => new Map() }}
     >
-      <ApiClientProvider
-        value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+      <AccountProvider
+        value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
       >
-        <FileUploadProviderImpl>
-          <DinaIntlProvider>
-            <DndProvider backend={HTML5Backend}>
-              <div ref={modalWrapperRef}>
-                <ModalProvider appElement={modalWrapperRef.current}>
-                  {children}
-                </ModalProvider>
-              </div>
-            </DndProvider>
-          </DinaIntlProvider>
-        </FileUploadProviderImpl>
-      </ApiClientProvider>
-    </AccountProvider>
+        <ApiClientProvider
+          value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+        >
+          <FileUploadProviderImpl>
+            <DinaIntlProvider>
+              <DndProvider backend={HTML5Backend}>
+                <div ref={modalWrapperRef}>
+                  <ModalProvider appElement={modalWrapperRef.current}>
+                    {children}
+                  </ModalProvider>
+                </div>
+              </DndProvider>
+            </DinaIntlProvider>
+          </FileUploadProviderImpl>
+        </ApiClientProvider>
+      </AccountProvider>
+    </SWRConfig>
   );
 }
 
