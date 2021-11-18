@@ -5,8 +5,8 @@ import {
   FormikButton,
   useDinaFormContext
 } from "common-ui";
-import { FieldArray } from "formik";
-import { clamp } from "lodash";
+import { FieldArray, useFormikContext } from "formik";
+import { clamp, get, isEmpty } from "lodash";
 import { ReactNode, useState, useEffect } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -104,7 +104,21 @@ export function TabbedArrayField<T>({
                     }`}
                   >
                     {elements.map((element, index) => (
-                      <Tab key={index}>{renderTab(element, index)}</Tab>
+                      <Tab key={index}>
+                        <TabErrorIndicator index={index} name={name}>
+                          {hasError => (
+                            <div>
+                              {renderTab(element, index)}
+                              {hasError && (
+                                <span style={{ color: "#dc3545" }}>
+                                  {" "}
+                                  ({<DinaMessage id="hasError" />})
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </TabErrorIndicator>
+                      </Tab>
                     ))}
                   </TabList>
                 }
@@ -163,4 +177,11 @@ export function TabbedArrayField<T>({
       </FieldArray>
     </div>
   );
+}
+
+function TabErrorIndicator({ name, index, children }) {
+  const { errors } = useFormikContext();
+  const hasError = !isEmpty(get(errors, `${name}[${index}]`));
+
+  return children(hasError);
 }

@@ -7,6 +7,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   actionType: "Action Type",
   addAcquisitionEventTitle: "Add Acquisition Event",
   addAnother: "Add Another {typeName}",
+  addAnotherIdentifier: "Add Another Identifier",
   addAssertion: "Add GeoReference",
   addAttachments: "Add Attachments",
   addAttributesTemplateTitle: "New Attributes Template",

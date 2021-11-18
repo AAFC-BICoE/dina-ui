@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
 import React from "react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { AssociatedMaterialSampleSearchBox } from "../AssociatedMaterialSampleSearchBox";
+import { AssociatedMaterialSampleSearchBoxField } from "../AssociatedMaterialSampleSearchBox";
 import { DinaForm } from "../DinaForm";
 
 const mockOnSubmit = jest.fn();
@@ -51,7 +51,7 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
-        <AssociatedMaterialSampleSearchBox name={"associatedSample"} />
+        <AssociatedMaterialSampleSearchBoxField name={"associatedSample"} />
       </DinaForm>,
       testCtx
     );

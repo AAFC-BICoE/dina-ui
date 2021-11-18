@@ -1,12 +1,12 @@
+import classNames from "classnames";
 import {
-  AssociatedMaterialSampleSearchBox,
+  AssociatedMaterialSampleSearchBoxField,
   TextField,
   useQuery,
   withResponse
 } from "common-ui";
 import Link from "next/link";
 import React from "react";
-import * as yup from "yup";
 import { VocabularyReadOnlyView, VocabularySelectField } from "..";
 import {
   MaterialSample,
@@ -46,7 +46,7 @@ export function MaterialSampleAssociationsField({
       makeNewElement={() => ({})}
       name={fieldName}
       sectionId="associations-section"
-      className={className}
+      className={classNames(className, "non-strip")}
       renderTab={(assoc, index) => {
         const hasName = Boolean(
           (assoc.associationType || assoc.associatedSample)?.trim()
@@ -91,7 +91,7 @@ function AssociationTabPanel({
         <div className="col-sm-6">
           <TextField {...fieldProps("remarks")} multiLines={true} />
         </div>
-        <AssociatedMaterialSampleSearchBox
+        <AssociatedMaterialSampleSearchBoxField
           {...fieldProps("associatedSample")}
         />
       </div>
