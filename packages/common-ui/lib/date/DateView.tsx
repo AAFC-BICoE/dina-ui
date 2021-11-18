@@ -1,3 +1,5 @@
+const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
+
 interface DateViewProps {
   date?: string | null;
 }
@@ -5,15 +7,13 @@ interface DateViewProps {
 /** Common way to display dates across the app. */
 export function DateView({ date: dateString }: DateViewProps) {
   if (dateString) {
-    const jsDate = new Date(dateString);
-    const compactLocaleString = jsDate.toLocaleString("en-CA");
-    const fullDateString = jsDate.toString();
+    const hasTime = !DATE_REGEX_NO_TIME.test(dateString);
 
-    return (
-      <div className="date-cell" title={fullDateString}>
-        {compactLocaleString}
-      </div>
-    );
+    const displayText = hasTime
+      ? new Date(dateString).toLocaleString("en-CA")
+      : dateString;
+
+    return <div className="date-cell">{displayText}</div>;
   }
 
   return null;

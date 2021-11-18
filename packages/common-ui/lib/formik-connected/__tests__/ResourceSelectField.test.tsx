@@ -50,7 +50,9 @@ const apiContext: any = {
 };
 
 // Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation((fn: any) => fn);
+jest.mock("use-debounce", () => ({
+  useDebounce: fn => [fn, { isPending: () => false }]
+}));
 
 describe("ResourceSelectField component", () => {
   it("Displays the Formik field's value.", () => {
@@ -115,10 +117,13 @@ describe("ResourceSelectField component", () => {
     expect(mockGet).lastCalledWith("test-api/group", {
       filter: {
         groupName: "Mat"
-      }
+      },
+      page: { limit: 6 },
+      sort: "-createdOn"
     });
 
-    const { onChange, options } = wrapper.find<any>(Select).props();
+    const options = wrapper.find<any>(Select).prop("options")[0].options;
+    const onChange = wrapper.find<any>(Select).prop("onChange");
 
     const groupToSelect = options[0];
 
