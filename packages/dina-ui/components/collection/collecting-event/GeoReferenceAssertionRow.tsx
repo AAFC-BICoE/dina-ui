@@ -4,6 +4,7 @@ import {
   DinaFormSection,
   FormikButton,
   TextField,
+  NumberField,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -163,23 +164,28 @@ export function GeoReferenceAssertionRow({
             />
           )}
         </Field>
-        <TextField
+        <NumberField
           name={commonRoot + "dwcDecimalLatitude"}
           customName="dwcDecimalLatitude"
           className={"dwcDecimalLatitude"}
           readOnly={georeferenceDisabled}
           onChangeExternal={updateReservedAssertion}
+          min={-90}
+          max={90}
         />
-        <TextField
+        <NumberField
           name={commonRoot + "dwcDecimalLongitude"}
           customName="dwcDecimalLongitude"
           readOnly={georeferenceDisabled}
           className={"dwcDecimalLongitude"}
           onChangeExternal={updateReservedAssertion}
+          min={-180}
+          max={180}
         />
-        <TextField
+        <NumberField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
           customName="dwcCoordinateUncertaintyInMeters"
+          isInteger={true}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
           onChangeExternal={updateReservedAssertion}

@@ -291,50 +291,9 @@ function useCollectingEventFormSchema() {
       );
     }
 
-    function decimal(label: string) {
-      return yup
-        .number()
-        .nullable()
-        .notRequired()
-        .typeError(formatMessage("mustBeValidDecimalValue"))
-        .label(label);
-    }
-
-    function integer(label: string) {
-      return yup
-        .number()
-        .integer()
-        .nullable()
-        .notRequired()
-        .typeError(formatMessage("mustBeValidIntegerValue"))
-        .label(label);
-    }
-
-    const geoAssertionFormSchema: yup.SchemaOf<
-      Pick<
-        GeoReferenceAssertion,
-        | "dwcDecimalLatitude"
-        | "dwcDecimalLongitude"
-        | "dwcCoordinateUncertaintyInMeters"
-      >
-    > = yup.object({
-      dwcDecimalLatitude: decimal(formatMessage("field_dwcDecimalLatitude"))
-        .min(-90)
-        .max(90),
-      dwcDecimalLongitude: decimal(formatMessage("field_dwcDecimalLongitude"))
-        .min(-180)
-        .max(180),
-      dwcCoordinateUncertaintyInMeters: integer(
-        formatMessage("field_dwcCoordinateUncertaintyInMeters")
-      )
-    });
-
     /** Form validation schema. */
     const collectingEventFormSchema: yup.SchemaOf<
-      Pick<
-        CollectingEvent,
-        "startEventDateTime" | "endEventDateTime" | "geoReferenceAssertions"
-      >
+      Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
     > = yup.object({
       startEventDateTime: yup
         .string()
@@ -349,8 +308,7 @@ function useCollectingEventFormSchema() {
         .test({
           test: val => (val ? isValidDatePrecision(val) : true),
           message: formatMessage("field_collectingEvent_endDateTimeError")
-        }),
-      geoReferenceAssertions: yup.array().of(geoAssertionFormSchema as any)
+        })
     });
 
     return collectingEventFormSchema;
