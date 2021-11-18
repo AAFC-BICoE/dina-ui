@@ -28,7 +28,6 @@ export function GeoReferenceAssertionRow({
   assertion
 }: GeoReferenceAssertionRowProps) {
   const { formatMessage } = useDinaIntl();
-  const { openAddPersonModal } = useAddPersonModal();
   const [georeferenceDisabled, setGeoreferenceDisabled] = useState(
     assertion?.dwcGeoreferenceVerificationStatus ===
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
