@@ -14,6 +14,7 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 export interface TabbedArrayFieldProps<T> {
   className?: string;
   sectionId: string;
+  typeName: string;
   initialIndex?: number;
   name: string;
   legend: JSX.Element;
@@ -36,6 +37,7 @@ export interface TabPanelCtx<T> {
 export function TabbedArrayField<T>({
   className,
   name,
+  typeName,
   makeNewElement,
   sectionId,
   initialIndex = 0,
@@ -124,13 +126,19 @@ export function TabbedArrayField<T>({
                                 className="list-inline-item btn btn-primary add-button"
                                 onClick={addElement}
                               >
-                                <DinaMessage id="add" />
+                                <DinaMessage
+                                  id="addAnother"
+                                  values={{ typeName }}
+                                />
                               </FormikButton>
                               <FormikButton
                                 className="list-inline-item btn btn-dark"
                                 onClick={() => removeElement(index)}
                               >
-                                <DinaMessage id="remove" />
+                                <DinaMessage
+                                  id="removeThisElement"
+                                  values={{ typeName }}
+                                />
                               </FormikButton>
                             </div>
                           )}
@@ -140,12 +148,14 @@ export function TabbedArrayField<T>({
                   : null}
               </Tabs>
               {!elements.length && !readOnly && !isTemplate && (
-                <FormikButton
-                  className="btn btn-primary add-button"
-                  onClick={addElement}
-                >
-                  <DinaMessage id="add" />
-                </FormikButton>
+                <div className="d-flex">
+                  <FormikButton
+                    className="btn btn-primary add-button"
+                    onClick={addElement}
+                  >
+                    <DinaMessage id="addNewElement" values={{ typeName }} />
+                  </FormikButton>
+                </div>
               )}
             </FieldSet>
           );

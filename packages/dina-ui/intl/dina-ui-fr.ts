@@ -417,7 +417,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Faites de cette affirmation le point de données principal lors de l’exportation. Une seule hypothèse peut servir d’hypothèse principale",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
   removeAssertionLabel: "Supprimer cette géoréférence",
-  removeComponentData: "Suppression des données de {composant}",
+  removeComponentData: "Suppression des données de {component}",
   removeDeterminationLabel: "Supprimer cette détermination",
   removeGroup: "Supprimer un groupe",
   removeFromParentStorageUnit: "Retirer de l’unité de stockage parent",

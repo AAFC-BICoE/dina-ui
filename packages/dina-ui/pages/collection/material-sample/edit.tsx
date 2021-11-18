@@ -1,3 +1,4 @@
+import * as yup from "yup";
 import {
   AutoSuggestTextField,
   BackButton,
@@ -374,6 +375,7 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
+      validationSchema={materialSampleSchema}
     >
       {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
@@ -611,3 +613,13 @@ export function nextSampleInitialValues(
 
   return initialValues;
 }
+
+/** Front-end validation. */
+const materialSampleSchema = yup.object({
+  associations: yup.array(
+    yup.object({
+      associatedSample: yup.string().required(),
+      associationType: yup.string().required()
+    })
+  )
+});

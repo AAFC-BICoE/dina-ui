@@ -88,6 +88,7 @@ export function DeterminationField() {
     <TabbedArrayField<Determination>
       legend={<DinaMessage id="determinations" />}
       name={determinationsPath}
+      typeName={formatMessage("determination")}
       sectionId="determination-section"
       initialIndex={initialIndex}
       makeNewElement={({ length }) => ({

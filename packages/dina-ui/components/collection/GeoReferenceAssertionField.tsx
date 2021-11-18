@@ -46,6 +46,7 @@ export function GeoReferenceAssertionField({
     <div ref={wrapperRef}>
       <TabbedArrayField<GeoReferenceAssertion>
         className="non-strip"
+        typeName={formatMessage("geoReferenceAssertion")}
         legend={<DinaMessage id="geoReferencingLegend" />}
         renderAboveTabs={() =>
           isTemplate && (

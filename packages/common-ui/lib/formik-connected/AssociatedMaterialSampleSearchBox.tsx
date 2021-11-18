@@ -8,17 +8,9 @@ import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 import { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 
-interface AssociatedMaterialSampleSearchBoxProps extends FieldWrapperProps {
-  showSearchAssociatedSampleInit?: boolean;
-}
-
-export function AssociatedMaterialSampleSearchBox(
-  props: AssociatedMaterialSampleSearchBoxProps
-) {
-  const { showSearchAssociatedSampleInit } = props;
-  const [showSearchAssociatedSample, setShowSearchAssociatedSample] = useState(
-    showSearchAssociatedSampleInit
-  );
+export function AssociatedMaterialSampleSearchBox(props: FieldWrapperProps) {
+  const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
+    useState(false);
 
   const listRef = useRef<HTMLDivElement>(null);
   const { formatMessage } = useDinaIntl();
