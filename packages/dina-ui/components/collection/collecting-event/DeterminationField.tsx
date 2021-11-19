@@ -21,11 +21,9 @@ import {
   MaterialSample,
   Vocabulary
 } from "../../../types/collection-api";
-import { useAddPersonModal } from "../../add-person/PersonForm";
 
 export interface DeterminationFieldProps {
   className?: string;
-  namePrefix?: string;
 }
 
 /** Type-safe object with all determination fields. */
@@ -53,7 +51,6 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
 export function DeterminationField({ className }: DeterminationFieldProps) {
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
-  const { openAddPersonModal } = useAddPersonModal();
   const { formatMessage, locale } = useDinaIntl();
   const determinationsPath = "determination";
 
