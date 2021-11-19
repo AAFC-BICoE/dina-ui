@@ -31,5 +31,14 @@ describe("DeterminationField component", () => {
     expect(mockOnSubmit).lastCalledWith({
       determination: [{ isPrimary: true }]
     });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    await new Promise(setImmediate);
+    wrapper.update();
   });
 });
