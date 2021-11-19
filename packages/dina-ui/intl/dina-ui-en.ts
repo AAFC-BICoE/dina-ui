@@ -435,6 +435,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparations: "Preparations",
   preparedBy: "Prepared By",
   previewAndCustomizeLabel: "Preview and Customize",
+  previewNotAvailable: "Preview Not Available",
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
