@@ -16,6 +16,7 @@ import {
   isEmpty,
   isEqual,
   pick,
+  pickBy,
   toPairs
 } from "lodash";
 import {
@@ -227,37 +228,30 @@ export function useMaterialSampleSave({
   const hasDeterminationTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+        (_, key) => key.startsWith("determination[0].")
       )
     );
 
   const hasScheduledActionsTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        SCHEDULEDACTION_FIELDS.map(fieldName => `scheduledAction.${fieldName}`)
+        (_, key) => key.startsWith("scheduledAction.")
       )
     );
 
   const hasAssociationsTemplate =
     isTemplate &&
-    (!isEmpty(
-      pick(
+    !isEmpty(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
-          fieldName => `association.${fieldName}`
-        )
+        (_, key) =>
+          key.startsWith("associations[0].") || key.startsWith("hostOrganism.")
       )
-    ) ||
-      !isEmpty(
-        pick(
-          materialSampleTemplateInitialValues?.templateCheckboxes,
-          HOSTORGANISM_FIELDS.map(fieldName => `hostOrganism.${fieldName}`)
-        )
-      ));
+    );
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
@@ -340,16 +334,11 @@ export function useMaterialSampleSave({
     Boolean(
       hasAssociationsTemplate ||
         materialSample?.associations?.length ||
-        HOSTORGANISM_FIELDS.some(
-          organismFieldName =>
-            materialSample?.hostOrganism?.[`${organismFieldName}`] ||
-            enabledFields?.materialSample?.includes(
-              `hostOrganism.${organismFieldName}`
-            )
-        ) ||
+        !isEmpty(materialSample?.hostOrganism) ||
+        !isEmpty(materialSample?.associations) ||
         enabledFields?.materialSample?.some(
           enabledField =>
-            enabledField.startsWith("association.") ||
+            enabledField.startsWith("associations[0].") ||
             enabledField.startsWith("hostOrganism.")
         )
     )
@@ -628,8 +617,6 @@ export function useMaterialSampleSave({
       materialSampleInput.associations = [];
       materialSampleInput.hostOrganism = null;
     }
-
-    delete materialSampleInput.association;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(

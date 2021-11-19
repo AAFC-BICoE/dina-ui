@@ -97,10 +97,10 @@ export function TabbedArrayField<T>({
               {renderAboveTabs?.()}
               <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
                 {
-                  // Only show the tabs when there is more than 1 assertion:
+                  // Only show the tabs when there is more than 1 element:
                   <TabList
                     className={`react-tabs__tab-list mb-0 ${
-                      elements.length === 1 ? "d-none" : ""
+                      elements.length <= 1 ? "d-none" : ""
                     }`}
                   >
                     {elements.map((element, index) => (
@@ -110,7 +110,7 @@ export function TabbedArrayField<T>({
                             <div>
                               {renderTab(element, index)}
                               {hasError && (
-                                <span style={{ color: "#dc3545" }}>
+                                <span className="text-danger">
                                   {" "}
                                   ({<DinaMessage id="hasError" />})
                                 </span>

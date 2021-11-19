@@ -2,6 +2,7 @@ import classNames from "classnames";
 import {
   AssociatedMaterialSampleSearchBoxField,
   TextField,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -82,7 +83,7 @@ function AssociationTabPanel({
   return (
     <div>
       <div className="row">
-        <div className="col-sm-6" id="association">
+        <div className="col-sm-6 association-type">
           <VocabularySelectField
             {...fieldProps("associationType")}
             path="collection-api/vocabulary/associationType"
@@ -91,6 +92,8 @@ function AssociationTabPanel({
         <div className="col-sm-6">
           <TextField {...fieldProps("remarks")} multiLines={true} />
         </div>
+      </div>
+      <div className="associated-sample">
         <AssociatedMaterialSampleSearchBoxField
           {...fieldProps("associatedSample")}
         />

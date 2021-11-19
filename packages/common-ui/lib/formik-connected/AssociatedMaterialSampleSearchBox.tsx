@@ -1,18 +1,20 @@
-import classNames from "classnames";
-import { PersistedResource } from "kitsu";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper, FieldWrapperProps, FieldWrapperRenderProps } from "..";
 import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
-import { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 
 export function AssociatedMaterialSampleSearchBoxField(
   props: FieldWrapperProps
 ) {
   return (
-    <FieldWrapper {...props} hideLabel={true} disableLabelClick={true}>
+    <FieldWrapper
+      readOnlyRender={value => value && <MaterialSampleLink id={value} />}
+      hideLabel={true}
+      disableLabelClick={true}
+      {...props}
+    >
       {fieldProps => <AssociatedMaterialSampleSearchBox {...fieldProps} />}
     </FieldWrapper>
   );
@@ -26,30 +28,7 @@ function AssociatedMaterialSampleSearchBox({
   const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
     useState(false);
 
-  const listRef = useRef<HTMLDivElement>(null);
   const { formatMessage } = useDinaIntl();
-
-  function onSearchClicked() {
-    setShowSearchAssociatedSample(true);
-  }
-
-  function onCloseClicked() {
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className + " d-none";
-    }
-    setShowSearchAssociatedSample(false);
-  }
-
-  function onAssociatedSampleSelected(
-    sample: PersistedResource<MaterialSample>
-  ) {
-    // Close the search result list box when a selection is made
-    // so that it is easier for user to see the Add button
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className + " d-none";
-    }
-    setValue(sample.id);
-  }
 
   /** Clear the input value */
   function removeEntry() {
@@ -62,20 +41,12 @@ function AssociatedMaterialSampleSearchBox({
       <label className="w-100">
         <strong>{formatMessage("associatedMaterialSample")}</strong>{" "}
       </label>
-      {!showSearchAssociatedSample ? (
-        <button
-          type="button"
-          className="btn btn-secondary mb-2 col-md-4 searchSample"
-          onClick={() => onSearchClicked()}
-        >
-          {formatMessage("search") + "..."}
-        </button>
-      ) : (
+      {value ? (
         <div>
           <div className="d-flex flex-column">
             <div className={"d-flex flex-row"}>
               <div
-                className="flex-md-grow-1 form-control associatedSampleInput"
+                className="flex-md-grow-1 form-control associated-sample-link"
                 style={{ backgroundColor: "#e9ecef" }}
               >
                 {value && <MaterialSampleLink id={value} />}
@@ -91,32 +62,40 @@ function AssociatedMaterialSampleSearchBox({
                 <RiDeleteBinLine size="1.8em" className="ms-auto" />
               </button>
             </div>
-            <div
-              ref={listRef}
-              className={classNames(
-                "p-2 mt-2",
-                !showSearchAssociatedSample && "d-none"
-              )}
-              style={{ borderStyle: "dashed" }}
-            >
-              <div className="mb-4">
-                <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
-                  {formatMessage("search")}
-                </span>
-                <button className="btn btn-dark" onClick={onCloseClicked}>
-                  {formatMessage("closeButtonText")}
-                </button>
-              </div>
-              <SampleListLayout
-                onSelect={onAssociatedSampleSelected}
-                classNames="btn btn-primary selectMaterialSample"
-                btnMsg={formatMessage("select")}
-                hideTopPagination={true}
-                hideGroupFilter={true}
-              />
-            </div>
           </div>
         </div>
+      ) : showSearchAssociatedSample ? (
+        <div
+          className="p-2 mt-2 associated-sample-search"
+          style={{ borderStyle: "dashed" }}
+        >
+          <div className="mb-4">
+            <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
+              {formatMessage("search")}
+            </span>
+            <button
+              className="btn btn-dark"
+              onClick={() => setShowSearchAssociatedSample(false)}
+            >
+              {formatMessage("closeButtonText")}
+            </button>
+          </div>
+          <SampleListLayout
+            onSelect={sample => setValue(sample.id)}
+            classNames="btn btn-primary selectMaterialSample"
+            btnMsg={formatMessage("select")}
+            hideTopPagination={true}
+            hideGroupFilter={true}
+          />
+        </div>
+      ) : (
+        <button
+          type="button"
+          className="btn btn-secondary mb-2 col-md-4 searchSample"
+          onClick={() => setShowSearchAssociatedSample(true)}
+        >
+          {formatMessage("search") + "..."}
+        </button>
       )}
     </div>
   );
