@@ -127,13 +127,19 @@ export function PersonSelectField(
           searchQuery,
           querySpec,
           indexName: "dina_agent_index",
-          searchField: "displayName"
+          searchField: "displayName",
+          additionalField: "data.attributes.aliases"
         })
       }
       readOnlyLink="/dina-user/view?id="
       filter={filterBy(["displayName"])}
       model="agent-api/person"
-      optionLabel={person => person.displayName}
+      // Show display name, and show aliases if any:
+      optionLabel={person =>
+        `${person.displayName}${
+          person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
+        }`
+      }
       asyncOptions={[
         {
           label: <DinaMessage id="addNewPerson" />,
