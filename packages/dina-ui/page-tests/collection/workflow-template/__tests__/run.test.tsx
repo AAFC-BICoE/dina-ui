@@ -1,11 +1,12 @@
 import { PersistedResource } from "kitsu";
+import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
-  CollectingEvent,
   AcquisitionEvent,
+  CollectingEvent,
   PreparationProcessDefinition
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
@@ -430,37 +431,14 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // All switches should be disabled:
-    expect(
-      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".enable-acquisition-event")
-        .find(ReactSwitch)
-        .prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".enable-scheduled-actions")
-        .find(ReactSwitch)
-        .prop("checked")
-    ).toEqual(false);
+    // Get the switches:
+    const switches = wrapper.find(".material-sample-nav").find(ReactSwitch);
+    expect(switches.length).not.toEqual(0);
+
+    // All switches should be unchecked:
+    expect(switches.map(node => node.prop("checked"))).toEqual(
+      switches.map(() => false)
+    );
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -576,6 +554,41 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       wrapper
         .find(".determination-section .verbatimScientificName-field input")
         .exists()
+    ).toEqual(true);
+  });
+
+  it("Renders the Material Sample form with only the Associations section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            "associations[0].associatedSample": {
+              enabled: true
+            },
+            "associations[0].associationType": {
+              defaultValue: "test default association type",
+              enabled: true
+            }
+          } as any
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the associations section should be enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+
+    // Renders the determination section:
+    expect(
+      wrapper.find(".association-type").find(CreatableSelect).exists()
     ).toEqual(true);
   });
 

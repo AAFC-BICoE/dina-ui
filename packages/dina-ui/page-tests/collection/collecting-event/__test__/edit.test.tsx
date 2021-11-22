@@ -203,7 +203,9 @@ describe("collecting-event edit page", () => {
       }
     });
 
-    wrapper.find("button.add-assertion-button").simulate("click");
+    wrapper
+      .find(".georeference-assertion-section button.add-button")
+      .simulate("click");
 
     wrapper
       .find(".dwcDecimalLatitude")
@@ -387,7 +389,10 @@ describe("collecting-event edit page", () => {
     ).toEqual(true);
 
     // Add a second assertion:
-    wrapper.find("button.add-assertion-button").at(0).simulate("click");
+    wrapper
+      .find(".georeference-assertion-section button.add-button")
+      .at(0)
+      .simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();

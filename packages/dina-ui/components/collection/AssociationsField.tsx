@@ -31,7 +31,10 @@ export function AssociationsField() {
       legend={<DinaMessage id="associationsLegend" />}
       id="associations-section"
     >
-      <FieldSet legend={<DinaMessage id="hostOrganismLegend" />}>
+      <FieldSet
+        legend={<DinaMessage id="hostOrganismLegend" />}
+        className="non-strip"
+      >
         <CatalogueOfLifeNameField
           name={"hostOrganism.name"}
           customName="name"
