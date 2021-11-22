@@ -67,6 +67,11 @@ describe("ProjectForm.", () => {
         {
           resource: {
             name: "test-project",
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },            
             multilingualDescription: {
               descriptions: [
                 {
@@ -85,6 +90,11 @@ describe("ProjectForm.", () => {
     expect(mockOnSaved).lastCalledWith({
       id: "123",
       name: "test-project",
+      relationships: {
+        attachment: {
+          data: []
+        }
+      },      
       multilingualDescription: {
         descriptions: [
           {
@@ -150,6 +160,11 @@ describe("ProjectForm.", () => {
               ]
             },
             name: "edited-name",
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
             type: "project"
           },
           type: "project"
@@ -172,6 +187,11 @@ describe("ProjectForm.", () => {
         ]
       },
       name: "edited-name",
+      relationships: {
+        attachment: {
+          data: []
+        }
+      },      
       type: "project"
     });
   });

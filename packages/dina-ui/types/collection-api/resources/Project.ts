@@ -9,6 +9,9 @@ export interface ProjectAttributes {
   endDate?: string;
   status?: string;
   multilingualDescription?: MultilingualDescription;
+  createdOn?: string;
+  createdBy?: string;
+  group?:string;  
 }
 
 export interface ProjectRelationships {

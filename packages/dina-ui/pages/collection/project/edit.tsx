@@ -16,7 +16,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { AttachmentsField, Head, Nav } from "../../../components";
+import { GroupSelectField, AttachmentsField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 
@@ -48,7 +48,11 @@ export default function ProjectEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            <Query<Project> query={{ path: `collection-api/project/${id}?include=attachment` }}>
+            <Query<Project>
+              query={{
+                path: `collection-api/project/${id}?include=attachment`
+              }}
+            >
               {({ loading, response }) => (
                 <div>
                   <LoadingSpinner loading={loading} />
@@ -90,6 +94,8 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
   const onSubmit: DinaFormOnSubmit<ProjectFormValues> = async ({
     submittedValues
   }) => {
+    (submittedValues as any).relationships = {};
+
     const input: InputResource<Project> = {
       ...submittedValues,
       // Convert the editable format to the stored format:
@@ -99,6 +105,18 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
         )
       }
     };
+
+    // Add attachments if they were selected:
+    (input as any).relationships.attachment = {
+      data:
+        input.attachment?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    
+    // Delete the 'attachment' attribute because it should stay in the relationships field:
+    delete input.attachment;
 
     const [savedProject] = await save<Project>(
       [
@@ -137,6 +155,14 @@ export function ProjectFormLayout() {
 
   return (
     <div>
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+          showAllGroups={true}
+        />
+      </div>      
       <div className="row">
         <TextField
           className="col-md-6 name"
