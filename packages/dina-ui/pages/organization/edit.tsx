@@ -4,11 +4,11 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   FieldView,
-  LoadingSpinner,
-  Query,
   SubmitButton,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Head, Nav } from "../../components";
@@ -33,6 +33,10 @@ export default function OrganizationEditPage() {
   const { formatMessage } = useDinaIntl();
   const title = id ? "editOrganizationTitle" : "addOrganizationTitle";
 
+  const query = useQuery<Organization>({
+    path: `agent-api/organization/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -43,21 +47,9 @@ export default function OrganizationEditPage() {
             <h1 id="wb-cont">
               <DinaMessage id="editOrganizationTitle" />
             </h1>
-            <Query<Organization>
-              query={{ path: `agent-api/organization/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <OrganizationForm
-                      organization={response.data}
-                      router={router}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <OrganizationForm organization={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

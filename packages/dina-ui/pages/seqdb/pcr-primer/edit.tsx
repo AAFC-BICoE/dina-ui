@@ -1,17 +1,17 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
-  LoadingSpinner,
   NumberField,
-  Query,
   ResourceSelectField,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -30,6 +30,11 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editPcrPrimerTitle" : "addPcrPrimerTitle";
 
+  const query = useQuery<PcrPrimer>({
+    include: "region",
+    path: `seqdb-api/pcr-primer/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -40,18 +45,9 @@ export function PcrPrimerEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editPcrPrimerTitle" />
             </h1>
-            <Query<PcrPrimer>
-              query={{ include: "region", path: `seqdb-api/pcr-primer/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <PcrPrimerForm primer={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <PcrPrimerForm primer={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

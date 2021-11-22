@@ -1,4 +1,4 @@
-import { ButtonBar, BackButton, LoadingSpinner, Query } from "common-ui";
+import { BackButton, ButtonBar, useQuery, withResponse } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav, PersonForm } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -27,6 +27,10 @@ export default function PersonEditPage() {
     </ButtonBar>
   );
 
+  const query = useQuery<Person>({
+    path: `agent-api/person/${id}?include=organizations`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -38,21 +42,9 @@ export default function PersonEditPage() {
             <h1 id="wb-cont">
               <DinaMessage id="editPersonTitle" />
             </h1>
-            <Query<Person>
-              query={{ path: `agent-api/person/${id}?include=organizations` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <PersonForm
-                      person={response.data}
-                      onSubmitSuccess={onSubmitSuccess}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <PersonForm person={data} onSubmitSuccess={onSubmitSuccess} />
+            ))}
           </div>
         ) : (
           <div>
