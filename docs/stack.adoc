@@ -10,8 +10,7 @@ This application is developed using these technologies:
 
 - https://nextjs.org/[Next.js]: Framework for building React-based applications.
 
-- https://getbootstrap.com/[Bootstrap]: CSS framework. We use
-the https://bootswatch.com/spacelab/[Bootswatch Spacelab theme].
+- https://getbootstrap.com/[Bootstrap]: CSS framework.
 
 - https://jestjs.io/[Jest]: Testing framework.
 
