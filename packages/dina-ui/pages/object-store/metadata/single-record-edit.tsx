@@ -261,8 +261,9 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           valuesPath="managedAttributeValues"
           managedAttributeApiPath="objectstore-api/managed-attribute"
           apiBaseUrl="/objectstore-api"
-          managedAttributeKeyField="id"
+          managedAttributeKeyField="key"
         />
+
       </FieldSet>
       {buttonBar}
     </DinaForm>
