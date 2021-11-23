@@ -25,6 +25,12 @@ input[id^="react-select"] {
   color: #333333 !important;
 }
 
+.fieldset-h2-adjustment {
+  font-size: 1.7rem !important;
+  margin-top: 15px !important;
+  margin-bottom: 10px !important;
+}
+
 .file-viewer-wrapper img {
   max-width: 100%;
   height: auto;
