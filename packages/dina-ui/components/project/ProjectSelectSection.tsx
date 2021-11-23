@@ -2,7 +2,13 @@ import { filterBy, ResourceSelectField, useDinaFormContext, DinaFormSection } fr
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { FaFolderOpen } from "react-icons/fa";
 
-export default function ProjectSelectSection ({resourcePath}) {
+export interface ProjectSelectSectionProps {
+  resourcePath?: string;
+} 
+
+export function ProjectSelectSection({
+  resourcePath
+}: ProjectSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
     <ProjectSelectField resourcePath={resourcePath} />
@@ -22,7 +28,7 @@ export default function ProjectSelectSection ({resourcePath}) {
 }
 
 export interface ProjectSelectFieldProps {
-  resourcePath: string,
+  resourcePath?: string,
   className?: string
 }
 
@@ -30,21 +36,38 @@ export function ProjectSelectField({
   resourcePath,
   className
 }: ProjectSelectFieldProps) {
+  const { readOnly } = useDinaFormContext();
   return (
-    <DinaFormSection horizontal={"flex"}>
+    <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
       <ResourceSelectField<Project>
-        name="project"
+        name="projects"
+        isMulti={true}
         readOnlyLink="/collection/project/view?id="
         filter={filterBy(["name"])}
-        model={resourcePath}
+        model={resourcePath as any}
         className={className}
         optionLabel={prj => prj.name}
-        readOnlyRender={(value, _) => (
-          <div className="card p-1 flex-row gap-1">
-            <FaFolderOpen className="mt-2" />
-            <span>{value}</span>
-          </div>
-        )}
+        hideLabel={readOnly}
+        removeLabel={readOnly}
+        readOnlyRender={(value, _) =>
+          Array.isArray(value) ? (
+            <div className="d-flex flex-row gap-1">
+              {" "}
+              {value.map((val, idx) => (
+                <div
+                  className="card p-1 d-flex flex-row align-items-center gap-1"
+                  style={{ background: "rgb(100, 100, 100)" }}
+                  key={idx}
+                >
+                  <FaFolderOpen />
+                  <span>{val.name}</span>
+                </div>
+              ))}{" "}
+            </div>
+          ) : (
+            <></>
+          )
+        }
       />
     </DinaFormSection>
   );

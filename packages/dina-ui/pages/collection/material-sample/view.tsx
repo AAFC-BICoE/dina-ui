@@ -25,7 +25,8 @@ import {
   NotPubliclyReleasableWarning,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  ProjectSelectSection
 } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
 import { DeterminationField } from "../../../components/collection/DeterminationField";
@@ -131,7 +132,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   disableLastLink={true}
                 />
               </h1>
-              <TagsAndRestrictionsSection />
+              <div className="d-flex flex-row gap-1">
+                <TagsAndRestrictionsSection />
+                <ProjectSelectSection />
+              </div>
               <MaterialSampleIdentifiersFormLayout />
               {materialSample.parentMaterialSample && (
                 <SamplesView

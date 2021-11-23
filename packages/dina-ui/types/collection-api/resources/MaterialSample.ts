@@ -9,6 +9,7 @@ import { HierarchyItem, StorageUnit } from "./StorageUnit";
 import { Determination } from "./Determination";
 import { Collection } from "./Collection";
 import { Organism } from "./Organism";
+import { Project } from "./Project";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -80,6 +81,7 @@ export interface MaterialSampleRelationships {
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
   storageUnit?: StorageUnit;
+  projects?: Project[];
 }
 
 export type MaterialSample = KitsuResource &

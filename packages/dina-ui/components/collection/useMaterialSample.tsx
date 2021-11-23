@@ -63,7 +63,8 @@ export function useMaterialSampleQuery(id?: string | null) {
         "hierarchy",
         "organism",
         "materialSampleChildren",
-        "parentMaterialSample"
+        "parentMaterialSample",
+        "projects"
       ].join(",")
     },
     {
@@ -538,6 +539,17 @@ export function useMaterialSampleSave({
     }
 
     delete materialSampleInput.association;
+
+    // Change project to relationship
+    (materialSampleInput as any).relationships.projects = {
+      data:
+        materialSampleInput.projects?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'projects' attribute because it should stay in the relationships field:
+    delete materialSampleInput.projects;    
 
     const [savedMaterialSample] = await save(
       [

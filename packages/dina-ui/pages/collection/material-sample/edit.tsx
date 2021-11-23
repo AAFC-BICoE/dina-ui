@@ -34,7 +34,8 @@ import {
   Nav,
   ScheduledActionsField,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  ProjectSelectSection
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -56,7 +57,7 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import ProjectSelectSection from "../../../components/project/ProjectSelectSection";
+
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
