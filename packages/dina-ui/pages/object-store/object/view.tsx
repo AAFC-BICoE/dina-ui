@@ -31,7 +31,6 @@ const OBJECT_DETAILS_PAGE_CSS = `
 
 export default function MetadataViewPage() {
   const router = useRouter();
-  const { formatMessage } = useDinaIntl();
 
   const id = String(router.query.id);
 
@@ -73,23 +72,23 @@ export default function MetadataViewPage() {
         <Nav />
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
+          {buttonBar}
           <div className="row">
             <div className="col-md-4">
               <MetadataFileView metadata={metadata} />
             </div>
             <div className="col-md-8">
               <div className="container">
-                {buttonBar}
                 <DinaForm initialValues={metadata} readOnly={true}>
                   <NotPubliclyReleasableWarning />
                   <TagsAndRestrictionsSection tagsFieldName="acTags" />
                   <MetadataDetails metadata={metadata} />
                   <ExifView objectUpload={metadata.objectUpload} />
                 </DinaForm>
-                {buttonBar}
               </div>
             </div>
           </div>
+          {buttonBar}
         </main>
         <Footer />
       </div>
