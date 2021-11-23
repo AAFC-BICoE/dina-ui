@@ -106,7 +106,7 @@ export function AcquisitionEventListLayout({
                   {agent.displayName}
                 </Link>
               ) : null,
-            accessor: "externallyIsolatedBy.displayName",
+            accessor: "externallyIsolatedBy",
             sortable: false
           },
           "externallyIsolationRemarks",

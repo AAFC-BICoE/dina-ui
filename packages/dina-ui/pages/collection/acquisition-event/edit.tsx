@@ -149,10 +149,7 @@ export function AcquisitionEventFormLayout() {
           </div>
         </div>
       </FieldSet>
-      <FieldSet
-        legend={<DinaMessage id="externalIsolation" />}
-        className="non-strip"
-      >
+      <FieldSet legend={<DinaMessage id="isolation" />} className="non-strip">
         <div className="row">
           <div className="col-sm-6">
             <ResourceSelectField<Person>
