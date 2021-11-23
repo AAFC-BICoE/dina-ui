@@ -52,7 +52,7 @@ export function ErrorViewer() {
   );
 
   return (
-    <div style={{ scrollMargin: "20px" }}>
+    <div>
       {errorMessages.length ? (
         <div className="alert alert-danger" role="status">
           {errorMessages.map((msg, idx) => (

@@ -9,10 +9,11 @@ import {
 import { cloneDeep } from "lodash";
 import {
   createContext,
-  Fragment,
   PropsWithChildren,
+  RefObject,
   useContext,
-  useMemo
+  useMemo,
+  useRef
 } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
@@ -70,6 +71,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 ) {
   const api = useApiClient();
   const account = useAccount();
+  const formErrorRef = useRef<HTMLDivElement>(null);
 
   const isNestedForm = !!useContext(DinaFormContext);
 
@@ -79,21 +81,31 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
     // Make a copy of the submitted values so the original can't be mutated in the passed onSubmit function:
     const submittedValuesCopy = cloneDeep(submittedValues);
-    await onSubmitProp?.({
-      submittedValues: submittedValuesCopy,
-      formik,
-      api,
-      account
-    });
+    try {
+      await onSubmitProp?.({
+        submittedValues: submittedValuesCopy,
+        formik,
+        api,
+        account
+      });
+    } catch (error) {
+      // Scroll to the error message:
+      formErrorRef.current?.scrollIntoView?.();
+      throw error;
+    }
   });
 
   const childrenInternal:
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
+      formikProps => (
+        <FormWrapper formErrorRef={formErrorRef}>
+          {childrenProp(formikProps)}
+        </FormWrapper>
+      )
     ) : (
-      <FormWrapper>{childrenProp}</FormWrapper>
+      <FormWrapper formErrorRef={formErrorRef}>{childrenProp}</FormWrapper>
     );
 
   // Clone the initialValues object so it isn't modified in the form:
@@ -126,7 +138,12 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 }
 
 /** Wraps the inner content with the Form + ErrorViewer components. */
-function FormWrapper({ children }: PropsWithChildren<{}>) {
+function FormWrapper({
+  children,
+  formErrorRef
+}: PropsWithChildren<{
+  formErrorRef?: RefObject<HTMLDivElement>;
+}>) {
   const { isNestedForm } = useDinaFormContext();
 
   // Disable enter to submit form in nested forms.
@@ -143,7 +160,9 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     <Wrapper
       onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
     >
-      <ErrorViewer />
+      <div ref={formErrorRef} style={{ scrollMargin: "20px" }}>
+        <ErrorViewer />
+      </div>
       {children}
     </Wrapper>
   );
