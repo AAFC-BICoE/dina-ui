@@ -2,8 +2,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   actionType: "Type d'action",
-  addAnotherAssertion: "Ajouter une autre géoréférence",
-  addAnotherDetermination: "Ajouter une autre détermination",
+  addAnother: "Ajouter un autre {typeName}",
   addAnotherIdentifier: "Ajouter un autre identifiant",
   addAssertion: "Ajouter une géoréférence",
   addAttachments: "Ajouter des pièces jointes",
@@ -416,9 +415,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   primaryButton_tooltip:
     "Faites de cette affirmation le point de données principal lors de l’exportation. Une seule hypothèse peut servir d’hypothèse principale",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
-  removeAssertionLabel: "Supprimer cette géoréférence",
-  removeComponentData: "Suppression des données de {composant}",
-  removeDeterminationLabel: "Supprimer cette détermination",
+  removeThisElement: "Supprimer cette {typeName}",
+  removeComponentData: "Suppression des données de {component}",
   removeGroup: "Supprimer un groupe",
   removeFromParentStorageUnit: "Retirer de l’unité de stockage parent",
   removeIdentifier: "Supprimer l’identifiant",

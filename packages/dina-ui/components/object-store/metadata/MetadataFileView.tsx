@@ -72,17 +72,19 @@ export function MetadataFileView({
           fileType={fileType}
           imgHeight={imgHeight}
           downloadLinks={downloadLinks}
+          shownTypeIndicator={
+            imgTypeText && (
+              <div className="shown-file-type">
+                <strong>
+                  <DinaMessage id="showing" />:
+                </strong>
+                {` ${formatMessage(imgTypeText)}`}
+              </div>
+            )
+          }
         />
       </div>
       <div className="container">
-        {imgTypeText && (
-          <div className="mb-3 shown-file-type">
-            <strong>
-              <DinaMessage id="showing" />:
-            </strong>
-            {` ${formatMessage(imgTypeText)}`}
-          </div>
-        )}
         <div className="mb-3 metadata-caption">
           <strong>
             <DinaMessage id="field_acCaption" />:

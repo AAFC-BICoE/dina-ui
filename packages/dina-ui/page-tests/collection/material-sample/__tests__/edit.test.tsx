@@ -844,12 +844,12 @@ describe("Material Sample Edit Page", () => {
     fillOutDetermination(1);
 
     // Enter the second determination:
-    wrapper.find("button.add-determination-button").simulate("click");
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(2);
 
     // Enter the third determination:
-    wrapper.find("button.add-determination-button").simulate("click");
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(3);
 

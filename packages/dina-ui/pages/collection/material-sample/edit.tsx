@@ -14,12 +14,14 @@ import {
   SubmitButton,
   TextField,
   useDinaFormContext,
+  useFieldLabels,
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode, useContext, useRef, useState } from "react";
+import * as yup from "yup";
 import {
   AttachmentsField,
   CollectionSelectField,
@@ -365,6 +367,8 @@ export function MaterialSampleForm({
     </div>
   );
 
+  const { materialSampleSchema } = useMaterialSampleSchema();
+
   return isTemplate ? (
     mateirialSampleInternal
   ) : loading ? (
@@ -374,6 +378,7 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
+      validationSchema={materialSampleSchema}
     >
       {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
@@ -610,4 +615,26 @@ export function nextSampleInitialValues(
   };
 
   return initialValues;
+}
+
+function useMaterialSampleSchema() {
+  const { getFieldLabel } = useFieldLabels();
+
+  /** Front-end validation. */
+  const materialSampleSchema = yup.object({
+    associations: yup.array(
+      yup.object({
+        associatedSample: yup
+          .string()
+          .required()
+          .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
+        associationType: yup
+          .string()
+          .required()
+          .label(getFieldLabel({ name: "associationType" }).fieldLabel)
+      })
+    )
+  });
+
+  return { materialSampleSchema };
 }

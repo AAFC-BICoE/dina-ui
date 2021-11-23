@@ -12,6 +12,7 @@
     "custom-event": "^1.0.1",
     "dataloader": "^2.0.0",
     "dompurify": "^2.3.3",
+    "flat": "^5.0.2",
     "formik": "^2.2.7",
     "handsontable": "6.2.2",
     "keycloak-js": "^15.0.2",
@@ -50,6 +51,7 @@
   },
   "devDependencies": {
     "@types/dompurify": "^2.3.1",
+    "@types/flat": "^5.0.2",
     "@types/lodash": "^4.14.175",
     "@types/react": "^17.0.30",
     "@types/react-autosuggest": "^10.1.4",
