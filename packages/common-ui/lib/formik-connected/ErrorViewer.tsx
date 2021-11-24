@@ -1,7 +1,7 @@
 import { flatten } from "flat";
 import { useFormikContext } from "formik";
 import { compact, toPairs } from "lodash";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
@@ -45,7 +45,13 @@ export function ErrorViewer() {
         }
       );
 
-      return compact([status, ...fieldErrors]);
+      const formError = status ? (
+        <div className="error-message" key="form-error">
+          {status}
+        </div>
+      ) : null;
+
+      return compact([formError, ...fieldErrors]);
     },
     // Update the form-level error message on form submit or when errors change:
     [isSubmitting, errors]
