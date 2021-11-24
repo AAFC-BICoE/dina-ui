@@ -237,6 +237,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               type: "material-sample"
@@ -327,6 +330,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               type: "material-sample"
@@ -402,6 +408,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                   data: []
                 },
                 preparationAttachment: {
+                  data: []
+                },
+                projects: {
                   data: []
                 }
               },

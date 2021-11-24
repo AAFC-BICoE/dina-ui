@@ -191,6 +191,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               organism: null,
@@ -267,6 +270,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               }
             },
@@ -335,6 +341,9 @@ describe("Material Sample Edit Page", () => {
                   ]
                 },
                 preparationAttachment: {
+                  data: []
+                },
+                projects: {
                   data: []
                 }
               }
@@ -445,7 +454,10 @@ describe("Material Sample Edit Page", () => {
                     }
                   ]
                 },
-                preparationAttachment: { data: [] }
+                preparationAttachment: { data: [] },
+                projects: {
+                  data: []
+                }
               }
             },
             type: "material-sample"
@@ -630,6 +642,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               storageUnit: {
@@ -737,7 +752,10 @@ describe("Material Sample Edit Page", () => {
               organism: null,
               relationships: {
                 attachment: { data: [] },
-                preparationAttachment: { data: [] }
+                preparationAttachment: { data: [] },
+                projects: {
+                  data: []
+                }
               },
               type: "material-sample"
             },
