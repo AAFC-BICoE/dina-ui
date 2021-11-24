@@ -65,9 +65,12 @@ describe("NumberField component", () => {
     expect(wrapper.find("input").prop("value")).toEqual("123.23");
 
     // Change the value to undefined.
-    wrapper.find(NumberFormat).prop("onValueChange")?.({
-      floatValue: undefined
-    } as any);
+    wrapper.find(NumberFormat).prop("onValueChange")?.(
+      {
+        floatValue: undefined
+      } as any,
+      null as any
+    );
     wrapper.update();
 
     // The input should become blank.
