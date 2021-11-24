@@ -22,7 +22,8 @@ export async function getManagedAttributesInUse(
     managedAttributeKeyField = "id",
     /** Prefix before the key when doing a Managed Attribute lookup e.g. COLLECTING_EVENT */
     keyPrefix = ""
-  } = {}
+  } = {},
+  useKeyInFilter
 ) {
   // Get all unique ManagedAttribute keys in the given value maps:
   const managedAttributeKeys = uniq(flatMap(managedAttributeMaps.map(keys)));
@@ -32,9 +33,14 @@ export async function getManagedAttributesInUse(
     ManagedAttribute,
     true
   >(
-    managedAttributeKeys.map(
-      key => `${managedAttributePath}/${keyPrefix ? keyPrefix + "." : ""}${key}`
-    ),
+    managedAttributeKeys.map(key => {
+      let queryUrl = `${managedAttributePath}/${
+        keyPrefix ? keyPrefix + "." : ""
+      }${key}`;
+      if (useKeyInFilter)
+        queryUrl = `${managedAttributePath}?filter[key]=${key}&page[limit]=1`;
+      return queryUrl;
+    }),
     { apiBaseUrl, returnNullForMissingResource: true }
   );
 

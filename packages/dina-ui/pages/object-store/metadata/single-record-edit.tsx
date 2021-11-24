@@ -262,6 +262,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           managedAttributeApiPath="objectstore-api/managed-attribute"
           apiBaseUrl="/objectstore-api"
           managedAttributeKeyField="key"
+          useKeyInFilter={true}
         />
 
       </FieldSet>
