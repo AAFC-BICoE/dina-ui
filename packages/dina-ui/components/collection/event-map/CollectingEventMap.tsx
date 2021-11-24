@@ -1,6 +1,6 @@
+import { useGraphic, useMap } from "esri-loader-hooks";
 import Head from "next/head";
 import React from "react";
-import { useMap, useGraphics, useGraphic, useEvent } from "esri-loader-hooks";
 
 // interfaces for map objects
 export interface EventMapSymbol {

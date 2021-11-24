@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  DeleteButton,
   DinaForm,
   DinaFormSection,
   DinaFormSubmitParams,
@@ -12,22 +13,16 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { get, mapValues, pick, set, toPairs } from "lodash";
+import { get, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { HOSTORGANISM_FIELDS } from "../../../components/collection";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import {
-  GroupSelectField,
-  Head,
-  Nav,
-  SCHEDULEDACTION_FIELDS
-} from "../../../components";
-import { DETERMINATION_FIELDS } from "../../../components/collection/DeterminationField";
-import { ORGANISM_FIELDS } from "../../../components/collection/OrganismStateField";
-import { PREPARATION_FIELDS } from "../../../components/collection/PreparationField";
-import { useMaterialSampleSave } from "../../../components/collection/useMaterialSample";
+  PREPARATION_FIELDS,
+  useMaterialSampleSave
+} from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -40,7 +35,6 @@ import {
   MaterialSampleForm,
   MATERIALSAMPLE_FIELDSET_FIELDS
 } from "../material-sample/edit";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
@@ -107,6 +101,7 @@ export function WorkflowTemplateForm({
   onSaved
 }: WorkflowTemplateFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
+  const acqEventFormRef = useRef<FormikProps<any>>(null);
 
   const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
 
@@ -119,12 +114,20 @@ export function WorkflowTemplateForm({
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
+  const acqEventTemplateInitialValues =
+    getTemplateInitialValuesFromSavedFormTemplate(
+      formTemplates?.ACQUISITION_EVENT
+    );
+
   const materialSampleTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
   if (!materialSampleTemplateInitialValues.determination?.length) {
     materialSampleTemplateInitialValues.determination = [{}];
+  }
+  if (!materialSampleTemplateInitialValues.associations?.length) {
+    materialSampleTemplateInitialValues.associations = [{}];
   }
 
   const initialValues: Partial<WorkflowFormValues> = {
@@ -134,13 +137,16 @@ export function WorkflowTemplateForm({
 
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
+    acqEventTemplateInitialValues,
     colEventTemplateInitialValues,
     materialSampleTemplateInitialValues,
-    collectingEvtFormRef
+    colEventFormRef: collectingEvtFormRef,
+    acquisitionEventFormRef: acqEventFormRef
   });
 
   const {
     colEventId: attachedColEventId,
+    acqEventId: attachedAcqEventId,
     dataComponentState: {
       enableCollectingEvent,
       enablePreparations,
@@ -148,7 +154,8 @@ export function WorkflowTemplateForm({
       enableDetermination,
       enableOrganism,
       enableScheduledActions,
-      enableAssociations
+      enableAssociations,
+      enableAcquisitionEvent
     }
   } = materialSampleSaveHook;
 
@@ -171,48 +178,35 @@ export function WorkflowTemplateForm({
       ...MATERIALSAMPLE_FIELDSET_FIELDS
     );
 
-    const preparationTemplateFields = enablePreparations
-      ? pick(enabledTemplateFields, ...PREPARATION_FIELDS)
-      : {};
+    const preparationTemplateFields =
+      enablePreparations && pick(enabledTemplateFields, ...PREPARATION_FIELDS);
 
-    const organismTemplateFields = enableOrganism
-      ? pick(
-          enabledTemplateFields,
-          ...ORGANISM_FIELDS.map(field => `organism.${field}`)
-        )
-      : {};
+    const organismTemplateFields =
+      enableOrganism &&
+      pickBy(enabledTemplateFields, (_, key) => key.startsWith("organism."));
 
-    const determinationTemplateFields = enableDetermination
-      ? pick(
-          enabledTemplateFields,
-          ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
-        )
-      : {};
+    const determinationTemplateFields =
+      enableDetermination &&
+      pickBy(enabledTemplateFields, (_, key) =>
+        key.startsWith("determination[0].")
+      );
 
-    const storageTemplateFields = enableStorage
-      ? pick(enabledTemplateFields, "storageUnit")
-      : {};
+    const storageTemplateFields =
+      enableStorage && pick(enabledTemplateFields, "storageUnit");
 
-    const scheduledActionsTemplateFields = enableScheduledActions
-      ? pick(
-          enabledTemplateFields,
-          ...SCHEDULEDACTION_FIELDS.map(field => `scheduledAction.${field}`)
-        )
-      : {};
+    const scheduledActionsTemplateFields =
+      enableScheduledActions &&
+      pickBy(enabledTemplateFields, (_, key) =>
+        key.startsWith("scheduledAction.")
+      );
 
     const associationTemplateFields = enableAssociations
-      ? {
-          ...pick(
-            enabledTemplateFields,
-            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
-          ),
-          ...pick(
-            enabledTemplateFields,
-            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
-              field => `association.${field}`
-            )
-          )
-        }
+      ? pickBy(
+          enabledTemplateFields,
+          (_, key) =>
+            key.startsWith("hostOrganism.") ||
+            key.startsWith("associations[0].")
+        )
       : {};
 
     // Construct the template definition to persist based on the form values:
@@ -234,23 +228,35 @@ export function WorkflowTemplateForm({
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
-          ? attachedColEventId
-            ? {
-                // When linking the template to an existing Col event, only set the ID here:
-                templateFields: {
-                  id: { enabled: true, defaultValue: attachedColEventId }
-                }
-              }
-            : {
-                // When making a template for a new Collecting Event, set all chosen fields here:
-                ...collectingEvtFormRef.current?.values?.attachmentsConfig,
-                templateFields: {
-                  ...getEnabledTemplateFieldsFromForm(
-                    collectingEvtFormRef.current?.values
-                  ),
-                  id: undefined
-                }
-              }
+          ? {
+              // When making a template for a new Collecting Event, set all chosen fields here:
+              ...(!attachedColEventId &&
+                collectingEvtFormRef.current?.values?.attachmentsConfig),
+              templateFields: attachedColEventId
+                ? {
+                    id: { enabled: true, defaultValue: attachedColEventId }
+                  }
+                : {
+                    ...getEnabledTemplateFieldsFromForm(
+                      collectingEvtFormRef.current?.values
+                    ),
+                    id: undefined
+                  }
+            }
+          : undefined,
+        ACQUISITION_EVENT: enableAcquisitionEvent
+          ? {
+              templateFields: attachedAcqEventId
+                ? {
+                    id: { enabled: true, defaultValue: attachedAcqEventId }
+                  }
+                : {
+                    ...getEnabledTemplateFieldsFromForm(
+                      acqEventFormRef.current?.values
+                    ),
+                    id: undefined
+                  }
+            }
           : undefined
       },
       type: "material-sample-action-definition"
@@ -274,10 +280,18 @@ export function WorkflowTemplateForm({
       <div className="container d-flex">
         <BackButton
           entityId={fetchedActionDefinition?.id}
+          className="me-auto"
           entityLink="/collection/workflow-template"
           byPassView={true}
         />
-        <SubmitButton className="ms-auto" />
+        <DeleteButton
+          id={fetchedActionDefinition?.id}
+          options={{ apiBaseUrl: "/collection-api" }}
+          postDeleteRedirect="/collection/workflow-template/list"
+          type="material-sample-action-definition"
+          className="me-5"
+        />
+        <SubmitButton />
       </div>
     </ButtonBar>
   );

@@ -1,5 +1,4 @@
 import { KitsuResource } from "kitsu";
-import lodash, { last } from "lodash";
 import Select from "react-select/base";
 import { ResourceSelect, ResourceSelectProps } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
@@ -47,7 +46,9 @@ const apiContext = {
 } as any;
 
 // Mock out the debounce function to avoid waiting during tests.
-jest.spyOn(lodash, "debounce").mockImplementation(fn => fn as any);
+jest.mock("use-debounce", () => ({
+  useDebounce: fn => [fn, { isPending: () => false }]
+}));
 
 describe("ResourceSelect component", () => {
   const DEFAULT_SELECT_PROPS: ResourceSelectProps<Todo> = {
@@ -83,10 +84,10 @@ describe("ResourceSelect component", () => {
 
     const options = (wrapper.find(Select).props() as any).options;
 
-    // There should be 4 options including the <none> option.
-    expect(options.length).toEqual(4);
-    expect(options.map(option => option.label)).toEqual([
-      "<none>",
+    // There should be 4 options including the <None> option.
+    expect(options[0].options.length).toEqual(4);
+    expect(options[0].options.map(option => option.label)).toEqual([
+      "<None>",
       "todo 1",
       "todo 2",
       "todo 3"
@@ -104,11 +105,11 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const selectProps = wrapper.find<any>(Select).props();
-    const { options, onChange } = selectProps;
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    const onChange = wrapper.find(Select).prop("onChange");
 
     // Select the third option (excluding the <none option>).
-    onChange(options[3]);
+    onChange(options[3], null as any);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({
@@ -133,9 +134,9 @@ describe("ResourceSelect component", () => {
     // Nothing should happen because no onChange prop was provided.
   });
 
-  it("Passes optional 'sort' and 'include' props for the JSONAPI GET request.", async () => {
+  it("Passes optional 'include' prop for the JSONAPI GET request.", async () => {
     const wrapper = mountWithContext(
-      <ResourceSelect {...DEFAULT_SELECT_PROPS} include="group" sort="name" />
+      <ResourceSelect {...DEFAULT_SELECT_PROPS} include="group" />
     );
 
     // Wait for the options to load.
@@ -144,8 +145,9 @@ describe("ResourceSelect component", () => {
 
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet).lastCalledWith("todo-api/todo", {
+      page: { limit: 6 },
       include: "group",
-      sort: "name"
+      sort: "-createdOn"
     });
   });
 
@@ -180,7 +182,7 @@ describe("ResourceSelect component", () => {
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate the select component's input change.
-    onInputChange("test filter value", { action: "input-change" });
+    onInputChange("test filter value", null as any);
 
     // Wait for the options to load.
     await new Promise(setImmediate);
@@ -192,27 +194,34 @@ describe("ResourceSelect component", () => {
     expect(mockGet).lastCalledWith("todo-api/todo", {
       filter: {
         description: "test filter value"
-      }
+      },
+      sort: "-createdOn",
+      page: { limit: 6 }
     });
 
     const { options } = wrapper.find(Select).props();
 
-    // The <none> option should be hidden when a search value is specified.
+    // The <None> option should be hidden when a search value is specified.
     expect(options).toEqual([
       {
-        label: "todo 1",
-        resource: { id: "1", name: "todo 1", type: "todo" },
-        value: "1"
-      },
-      {
-        label: "todo 2",
-        resource: { id: "2", name: "todo 2", type: "todo" },
-        value: "2"
-      },
-      {
-        label: "todo 3",
-        resource: { id: "3", name: "todo 3", type: "todo" },
-        value: "3"
+        label: "Search results",
+        options: [
+          {
+            label: "todo 1",
+            resource: { id: "1", name: "todo 1", type: "todo" },
+            value: "1"
+          },
+          {
+            label: "todo 2",
+            resource: { id: "2", name: "todo 2", type: "todo" },
+            value: "2"
+          },
+          {
+            label: "todo 3",
+            resource: { id: "3", name: "todo 3", type: "todo" },
+            value: "3"
+          }
+        ]
       }
     ]);
   });
@@ -241,7 +250,7 @@ describe("ResourceSelect component", () => {
     });
   });
 
-  it("Provides a <none> option to set the relationship as null.", async () => {
+  it("Provides a <None> option to set the relationship as null.", async () => {
     const mockOnChange = jest.fn();
 
     const wrapper = mountWithContext(
@@ -252,12 +261,13 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find<any>(Select).props();
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    const onChange = wrapper.find(Select).prop("onChange");
 
     const nullOption = options[0];
 
     expect(nullOption).toEqual({
-      label: "<none>",
+      label: "<None>",
       resource: {
         id: null
       },
@@ -265,24 +275,24 @@ describe("ResourceSelect component", () => {
     });
 
     // Select the null option.
-    onChange(nullOption);
+    onChange(nullOption, null as any);
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith({ id: null });
   });
 
-  it("Shows a <none> label when the <none> option is selected.", () => {
+  it("Shows a <None> label when the <None> option is selected.", () => {
     const wrapper = mountWithContext(
       <ResourceSelect {...DEFAULT_SELECT_PROPS} value={{ id: null }} />
     );
 
-    expect(wrapper.containsMatchingElement(<div>{"<none>"}</div>)).toEqual(
+    expect(wrapper.containsMatchingElement(<div>{"<None>"}</div>)).toEqual(
       true
     );
   });
 
-  it("Shows a '<none>' label in the select input when the passed value's id is null.", () => {
+  it("Shows a '<None>' label in the select input when the passed value's id is null.", () => {
     const nullOption = {
       id: null
     };
@@ -291,7 +301,7 @@ describe("ResourceSelect component", () => {
       <ResourceSelect {...DEFAULT_SELECT_PROPS} value={nullOption} />
     );
 
-    expect(wrapper.containsMatchingElement(<div>{"<none>"}</div>)).toEqual(
+    expect(wrapper.containsMatchingElement(<div>{"<None>"}</div>)).toEqual(
       true
     );
   });
@@ -311,10 +321,11 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options, onChange } = wrapper.find<any>(Select).props();
+    const options = wrapper.find<any>(Select).prop("options")[0].options;
+    const onChange = wrapper.find(Select).prop("onChange");
 
     // Select the second and third options.
-    onChange([options[1], options[2]]);
+    onChange([options[1], options[2]], null as any);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
     expect(mockOnChange).lastCalledWith([
@@ -369,10 +380,10 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const { options } = wrapper.find(Select).props();
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
 
     // Only the todos should be options.
-    expect((options as any[]).map(o => o.resource)).toEqual(MOCK_TODOS.data);
+    expect(options.map(o => o.resource)).toEqual(MOCK_TODOS.data);
   });
 
   it("Allows a callback options prop to show special options that call a function (single dropdown mode).", async () => {
@@ -381,7 +392,7 @@ describe("ResourceSelect component", () => {
     const mockOnChange = jest.fn();
 
     const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
-      label: <>My Callback Option</>,
+      label: "My Callback Option",
       getResource: mockGetResource
     };
 
@@ -389,8 +400,6 @@ describe("ResourceSelect component", () => {
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         asyncOptions={[TEST_CALLBACK_OPTION]}
-        asyncOptionsAlwaysVisible={false}
-        asyncOptionsFirst={false}
         onChange={mockOnChange}
       />
     );
@@ -399,13 +408,15 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const options = wrapper.find(Select).prop("options");
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
 
-    // There should be 5 options including the <none> option and the custom callback option:
-    expect(options.length).toEqual(5);
+    // There should be 5 options including the <None> option and the custom callback option:
+    expect(options.length).toEqual(4);
+    expect(asyncOptions.length).toEqual(1);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop<any>("onChange")(last(options));
+    wrapper.find(Select).prop<any>("onChange")(asyncOptions[0]);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -420,7 +431,7 @@ describe("ResourceSelect component", () => {
     const mockOnChange = jest.fn();
 
     const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
-      label: <>My Callback Option</>,
+      label: "My Callback Option",
       getResource: mockGetResource
     };
 
@@ -428,8 +439,6 @@ describe("ResourceSelect component", () => {
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         asyncOptions={[TEST_CALLBACK_OPTION]}
-        asyncOptionsAlwaysVisible={false}
-        asyncOptionsFirst={false}
         isMulti={true}
         onChange={mockOnChange}
       />
@@ -439,13 +448,15 @@ describe("ResourceSelect component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    const options = wrapper.find(Select).prop<any>("options");
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
 
     // There should be 4 options including the custom callback option:
-    expect(options.length).toEqual(4);
+    expect(options.length).toEqual(3);
+    expect(asyncOptions.length).toEqual(1);
 
     // Select the callback option, which should call the callback:
-    wrapper.find(Select).prop<any>("onChange")([options[0], last(options)]);
+    wrapper.find(Select).prop<any>("onChange")([options[0], asyncOptions[0]]);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -455,48 +466,13 @@ describe("ResourceSelect component", () => {
     expect(mockOnChange).lastCalledWith([options[0].resource, TEST_ASYNC_TODO]);
   });
 
-  it("Renders the async options first if the asyncOptionsFirst is enabled", async () => {
-    const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
-    const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
-
-    const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
-      label: <>asyncOption</>,
-      getResource: mockGetResource
-    };
-
-    const wrapper = mountWithContext(
-      <ResourceSelect<Todo>
-        {...DEFAULT_SELECT_PROPS}
-        asyncOptions={[TEST_CALLBACK_OPTION]}
-        asyncOptionsFirst={true}
-      />
-    );
-
-    // Wait for the options to load.
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // There should be 5 options including the custom callback option and the none option.
-    const options = wrapper.find(Select).prop<any>("options");
-    expect(options.length).toEqual(5);
-
-    // Select the first option, which should be the custom callback option.
-    wrapper.find(Select).prop<any>("onChange")(options[0]);
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // If the resource has been called, then the selected option was the async option.
-    expect(mockGetResource).toHaveBeenCalledTimes(1);
-  });
-
-  it("Always renders the async options, no matter what the search is, if the asyncOptionsAlwaysVisible is enabled.", async () => {
+  it("Always renders the async options, no matter what the search is", async () => {
     const TEST_ASYNC_TODO = { id: "100", type: "todo", name: "async todo" };
     const mockGetResource = jest.fn(async () => TEST_ASYNC_TODO);
     const mockOnChange = jest.fn();
 
     const TEST_CALLBACK_OPTION: AsyncOption<Todo> = {
-      label: <>asyncOption</>,
+      label: "asyncOption",
       getResource: mockGetResource
     };
 
@@ -504,7 +480,6 @@ describe("ResourceSelect component", () => {
       <ResourceSelect<Todo>
         {...DEFAULT_SELECT_PROPS}
         asyncOptions={[TEST_CALLBACK_OPTION]}
-        asyncOptionsAlwaysVisible={true}
         onChange={mockOnChange}
       />
     );
@@ -514,22 +489,22 @@ describe("ResourceSelect component", () => {
     wrapper.update();
 
     // There should be 5 options including the custom callback option and the none option.
-    const options = wrapper.find(Select).prop<any>("options");
-    expect(options.length).toEqual(5);
+    const options = wrapper.find(Select).prop<any>("options")[0].options;
+    const asyncOptions = wrapper.find(Select).prop<any>("options")[1].options;
+    expect(options.length).toEqual(4);
+    expect(asyncOptions.length).toEqual(1);
 
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate searching something that does not exist.
-    onInputChange("incorrect search with no matches", {
-      action: "input-change"
-    });
+    onInputChange("incorrect search with no matches", null as any);
 
     // Wait for the options to load after the search has been entered.
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Select the first option, which should be the custom callback option.
-    wrapper.find(Select).prop<any>("onChange")(options[0]);
+    // Select the last option, which should be the custom callback option.
+    wrapper.find(Select).prop<any>("onChange")(asyncOptions[0]);
 
     await new Promise(setImmediate);
     wrapper.update();

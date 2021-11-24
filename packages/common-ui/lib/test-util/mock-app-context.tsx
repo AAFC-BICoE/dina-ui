@@ -1,6 +1,7 @@
 import { mount } from "enzyme";
 import { merge, noop } from "lodash";
 import { useMemo, useRef } from "react";
+import { SWRConfig } from "swr";
 import { PartialDeep } from "type-fest";
 import { AccountContextI, AccountProvider } from "../account/AccountProvider";
 import {
@@ -23,7 +24,7 @@ interface MockAppContextProviderProps {
  */
 export function MockAppContextProvider({
   accountContext,
-  apiContext,
+  apiContext = { apiClient: { get: () => undefined as any } },
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -70,21 +71,26 @@ export function MockAppContextProvider({
   const modalWrapperRef = useRef<HTMLDivElement>(null);
 
   return (
-    <AccountProvider
-      value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
+    <SWRConfig
+      // Reset SWR cache between tests.
+      value={{ provider: () => new Map() }}
     >
-      <ApiClientProvider
-        value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+      <AccountProvider
+        value={{ ...DEFAULT_MOCK_ACCOUNT_CONTEXT, ...accountContext }}
       >
-        <CommonUIIntlProvider>
-          <div ref={modalWrapperRef}>
-            <ModalProvider appElement={modalWrapperRef.current}>
-              {children}
-            </ModalProvider>
-          </div>
-        </CommonUIIntlProvider>
-      </ApiClientProvider>
-    </AccountProvider>
+        <ApiClientProvider
+          value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
+        >
+          <CommonUIIntlProvider>
+            <div ref={modalWrapperRef}>
+              <ModalProvider appElement={modalWrapperRef.current}>
+                {children}
+              </ModalProvider>
+            </div>
+          </CommonUIIntlProvider>
+        </ApiClientProvider>
+      </AccountProvider>
+    </SWRConfig>
   );
 }
 

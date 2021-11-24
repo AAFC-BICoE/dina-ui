@@ -2,8 +2,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "./dina-ui-en";
 
 export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   actionType: "Type d'action",
-  addAnotherAssertion: "Ajouter une autre géoréférence",
-  addAnotherDetermination: "Ajouter une autre détermination",
+  addAnother: "Ajouter un autre {typeName}",
   addAnotherIdentifier: "Ajouter un autre identifiant",
   addAssertion: "Ajouter une géoréférence",
   addAttachments: "Ajouter des pièces jointes",
@@ -50,7 +49,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   attachExisting: "Joindre l’existant",
   attachExistingObjects: "Joindre des objets existants",
   attachSelected: "Joindre la sélection",
-  attachedCollectingEvent: "Événement de collecte en annexe",
   attachments: "Pièces jointes",
   attributeLabel: "Attribut",
   baseNameLabel: "Nom de base",
@@ -67,7 +65,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectingEvent: "Événement de collecte",
   collectingEventAttachments: "Pièces jointes de l’événement de collecte",
   collectingEventDetails: "Détails de l'activité de collecte",
-  collectingEventDetailsPageLink: "Page des détails de l’événement de collecte",
   collectingEventListTitle: "Événement de collecte",
   collectingEventManagedAttributes:
     "Attributs gérés de l’événement de collecte",
@@ -278,17 +275,17 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_publiclyReleasable: "Accessible au public",
   field_publiclyReleasable_tooltip:
     "Indique si l’objet peut être diffusé publiquement sur une page Web ou sur des portails de données ouvertes.",
-  field_qualifier: "Notes du transcripteur",
   field_remarks: "Remarques",
   field_startEventDateTime: "Date et heure de l'événement initial",
-  field_transcriberRemarks: "Verbatim - Remarques",
+  field_transcriberRemarks: "Notes du transcripteur",
   field_type: "Catégorie",
   field_typeStatus: "Type de statut",
   field_typeStatusEvidence: "Type de statut - Preuve",
-  field_verbatimScientificName: "Verbatim - Nom scientifique",
   field_verbatimDate: "Verbatim - Date",
   field_verbatimDeterminer: "Déterminant verbatim",
   field_verbatimEventDateTime: "Date et heure de l'événement textuel",
+  field_verbatimRemarks: "Verbatim - Remarques",
+  field_verbatimScientificName: "Verbatim - Nom scientifique",
   field_webpage: "Page Web",
   field_xmpMetadataDate: "Date d’application des métadonnées",
   field_xmpMetadataDate_tooltip:
@@ -418,9 +415,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   primaryButton_tooltip:
     "Faites de cette affirmation le point de données principal lors de l’exportation. Une seule hypothèse peut servir d’hypothèse principale",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
-  removeAssertionLabel: "Supprimer cette géoréférence",
-  removeComponentData: "Suppression des données de {composant}",
-  removeDeterminationLabel: "Supprimer cette détermination",
+  removeThisElement: "Supprimer cette {typeName}",
+  removeComponentData: "Suppression des données de {component}",
   removeGroup: "Supprimer un groupe",
   removeFromParentStorageUnit: "Retirer de l’unité de stockage parent",
   removeIdentifier: "Supprimer l’identifiant",

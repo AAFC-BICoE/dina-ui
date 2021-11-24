@@ -319,11 +319,14 @@ function NavCollectionDropdown() {
         <Dropdown.Item href="/collection/institution/list">
           <DinaMessage id="institutionListTitle" />
         </Dropdown.Item>
+        <Dropdown.Item href="/collection/material-sample/list">
+          <DinaMessage id="materialSampleListTitle" />
+        </Dropdown.Item>
         <Dropdown.Item href="/collection/collecting-event/list">
           <DinaMessage id="collectingEventListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/material-sample/list">
-          <DinaMessage id="materialSampleListTitle" />
+        <Dropdown.Item href="/collection/acquisition-event/list">
+          <DinaMessage id="acquisitionEventListTitle" />
         </Dropdown.Item>
         <Dropdown.Item href="/collection/material-sample-type/list">
           <DinaMessage id="materialSampleTypeListTitle" />

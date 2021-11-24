@@ -1,7 +1,7 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { useCollectingEventQuery } from "../../../components/collection";
-import { CollectingEventFormLayout } from "../../../components/collection/CollectingEventFormLayout";
+import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
 export default function CollectingEventDetailsPage() {

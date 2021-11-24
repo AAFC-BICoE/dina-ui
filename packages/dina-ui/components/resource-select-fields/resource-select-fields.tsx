@@ -7,11 +7,15 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { useField } from "formik";
+import { SetOptional } from "type-fest";
+import { useAddPersonModal } from "..";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Collection, Institution } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
-import { useField } from "formik";
+import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { SetOptional } from "type-fest";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -104,6 +108,38 @@ export function UserSelectField(
       // TODO allow filtering by group
       filter={() => ({})}
       pageSize={1000}
+      {...props}
+    />
+  );
+}
+
+export function PersonSelectField(
+  props: SetOptional<ResourceSelectFieldProps<Person>, ProvidedProps>
+) {
+  const { openAddPersonModal } = useAddPersonModal();
+
+  return (
+    <ResourceSelectField<Person>
+      // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
+      // but fallback to the regular RSQL search if that fails.
+      useCustomQuery={(searchQuery, querySpec) =>
+        useAutocompleteSearchButFallbackToRsqlApiSearch({
+          searchQuery,
+          querySpec,
+          indexName: "dina_agent_index",
+          searchField: "displayName"
+        })
+      }
+      readOnlyLink="/dina-user/view?id="
+      filter={filterBy(["displayName"])}
+      model="agent-api/person"
+      optionLabel={person => person.displayName}
+      asyncOptions={[
+        {
+          label: <DinaMessage id="addNewPerson" />,
+          getResource: openAddPersonModal
+        }
+      ]}
       {...props}
     />
   );
