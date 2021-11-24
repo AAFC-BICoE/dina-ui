@@ -13,25 +13,16 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { get, mapValues, pick, set, toPairs } from "lodash";
+import { get, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import {
-  GroupSelectField,
-  Head,
-  Nav,
-  SCHEDULEDACTION_FIELDS
-} from "../../../components";
-import {
-  HOSTORGANISM_FIELDS,
-  ORGANISM_FIELDS,
   PREPARATION_FIELDS,
   useMaterialSampleSave
 } from "../../../components/collection";
-import { DETERMINATION_FIELDS } from "../../../components/collection/collecting-event/DeterminationField";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../../../components/collection/MaterialSampleAssociationsField";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
@@ -135,6 +126,9 @@ export function WorkflowTemplateForm({
   if (!materialSampleTemplateInitialValues.determination?.length) {
     materialSampleTemplateInitialValues.determination = [{}];
   }
+  if (!materialSampleTemplateInitialValues.associations?.length) {
+    materialSampleTemplateInitialValues.associations = [{}];
+  }
 
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,
@@ -189,16 +183,12 @@ export function WorkflowTemplateForm({
 
     const organismTemplateFields =
       enableOrganism &&
-      pick(
-        enabledTemplateFields,
-        ...ORGANISM_FIELDS.map(field => `organism.${field}`)
-      );
+      pickBy(enabledTemplateFields, (_, key) => key.startsWith("organism."));
 
     const determinationTemplateFields =
       enableDetermination &&
-      pick(
-        enabledTemplateFields,
-        ...DETERMINATION_FIELDS.map(field => `determination[0].${field}`)
+      pickBy(enabledTemplateFields, (_, key) =>
+        key.startsWith("determination[0].")
       );
 
     const storageTemplateFields =
@@ -206,24 +196,17 @@ export function WorkflowTemplateForm({
 
     const scheduledActionsTemplateFields =
       enableScheduledActions &&
-      pick(
-        enabledTemplateFields,
-        ...SCHEDULEDACTION_FIELDS.map(field => `scheduledAction.${field}`)
+      pickBy(enabledTemplateFields, (_, key) =>
+        key.startsWith("scheduledAction.")
       );
 
     const associationTemplateFields = enableAssociations
-      ? {
-          ...pick(
-            enabledTemplateFields,
-            ...HOSTORGANISM_FIELDS.map(field => `hostOrganism.${field}`)
-          ),
-          ...pick(
-            enabledTemplateFields,
-            ...MATERIALSAMPLE_ASSOCIATION_FIELDS.map(
-              field => `association.${field}`
-            )
-          )
-        }
+      ? pickBy(
+          enabledTemplateFields,
+          (_, key) =>
+            key.startsWith("hostOrganism.") ||
+            key.startsWith("associations[0].")
+        )
       : {};
 
     // Construct the template definition to persist based on the form values:

@@ -18,6 +18,7 @@ import {
   Operation,
   SuccessfulOperation
 } from "./operations-types";
+import DataLoader from "dataloader";
 
 export interface BulkGetOptions<TReturnNull extends boolean = false> {
   apiBaseUrl?: string;
@@ -262,15 +263,23 @@ export class ApiClientImpl implements ApiClientI {
       return [];
     }
 
-    const getOperations = paths.map<Operation>(path => ({
-      op: "GET",
-      path
-    }));
+    // Use DataLoader to avoid requesting the same ID multiple times,
+    // which crnk-operations throws an error for:
+    const batchLoader = new DataLoader<string, SuccessfulOperation>(
+      async uniquePaths => {
+        const getOperations = uniquePaths.map<Operation>(path => ({
+          op: "GET",
+          path
+        }));
 
-    const responses = await this.doOperations(getOperations, {
-      apiBaseUrl,
-      returnNullForMissingResource
-    });
+        return await this.doOperations(getOperations, {
+          apiBaseUrl,
+          returnNullForMissingResource
+        });
+      }
+    );
+
+    const responses = await batchLoader.loadMany(paths);
 
     const resources: (TReturnNull extends true
       ? PersistedResource<T> | null

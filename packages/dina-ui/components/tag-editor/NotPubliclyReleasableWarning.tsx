@@ -24,6 +24,7 @@ export function NotPubliclyReleasableWarning() {
           className="flex-grow-1"
           multiLines={true}
           hideLabel={true}
+          removeBottomMargin={true}
         />
       )}
     </div>

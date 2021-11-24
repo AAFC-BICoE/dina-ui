@@ -20,7 +20,8 @@ import {
   Nav,
   NotPubliclyReleasableWarning,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  ProjectSelectSection
 } from "../../../components";
 import {
   CollectingEventFormLayout,
@@ -136,7 +137,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   disableLastLink={true}
                 />
               </h1>
-              <TagsAndRestrictionsSection />
+              <div className="d-flex flex-row gap-2">
+                <TagsAndRestrictionsSection />
+                <ProjectSelectSection />
+              </div>
               <MaterialSampleIdentifiersFormLayout />
               {materialSample.parentMaterialSample && (
                 <SamplesView

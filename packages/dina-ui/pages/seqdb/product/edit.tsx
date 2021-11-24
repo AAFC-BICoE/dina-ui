@@ -4,10 +4,10 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   LabelView,
-  LoadingSpinner,
-  Query,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -25,6 +25,10 @@ export function ProductEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editProductTitle" : "addProductTitle";
 
+  const query = useQuery<Product>({
+    path: `seqdb-api/product/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -35,16 +39,9 @@ export function ProductEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editProductTitle" />
             </h1>
-            <Query<Product> query={{ path: `seqdb-api/product/${id}` }}>
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ProductForm product={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ProductForm product={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

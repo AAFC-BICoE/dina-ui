@@ -1,26 +1,48 @@
-import { connect } from "formik";
+import { flatten } from "flat";
+import { useFormikContext } from "formik";
 import { compact, toPairs } from "lodash";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
-export const ErrorViewer = connect(function ErrorViewerInternal({
+export function ErrorViewer() {
   // "status" is the form-level error, and
   // "errors" are the field-level errors.
-  formik: { isSubmitting, errors, status }
-}) {
+  const { isSubmitting, errors, status } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
-  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  /** Start array indexes at 1 e.g. The user should see Determination 1 instead of Determination 0. */
+  function transformKey(key: string) {
+    const asInt = parseInt(key, 10);
+    if (!isNaN(asInt)) {
+      return String(asInt + 1);
+    }
+    return getFieldLabel({ name: key }).fieldLabel || key;
+  }
 
   /** A string of form-level and field-level error messages. */
   const errorMessages = useMemo(
     () => {
-      const fieldErrors = toPairs(errors).map(([field, error], index) =>
-        error ? (
-          <div className="error-message">
-            {index + 1} : {getFieldLabel({ name: field }).fieldLabel} - {error}
-          </div>
-        ) : null
+      const fieldErrors = toPairs(flatten(errors, { transformKey })).map(
+        ([field, error], index) => {
+          // Return null if the error is not renderable:
+          if (
+            !error ||
+            (typeof error !== "string" && typeof error !== "function")
+          ) {
+            return null;
+          }
+
+          // The error can be a renderable component:
+          const JSXError = typeof error === "function" && error;
+
+          const { fieldLabel } = getFieldLabel({ name: field });
+          return (
+            <div className="error-message" key={index}>
+              {index + 1} : {fieldLabel} - {JSXError ? <JSXError /> : error}
+            </div>
+          );
+        }
       );
 
       return compact([status, ...fieldErrors]);
@@ -29,15 +51,8 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
     [isSubmitting, errors]
   );
 
-  // When there is a new error, scroll to it:
-  useEffect(() => {
-    if (errorMessages.length) {
-      wrapperRef.current?.scrollIntoView?.();
-    }
-  }, [errorMessages]);
-
   return (
-    <div ref={wrapperRef} style={{ scrollMargin: "20px" }}>
+    <div style={{ scrollMargin: "20px" }}>
       {errorMessages.length ? (
         <div className="alert alert-danger" role="status">
           {errorMessages.map((msg, idx) => (
@@ -47,4 +62,4 @@ export const ErrorViewer = connect(function ErrorViewerInternal({
       ) : null}
     </div>
   );
-});
+}

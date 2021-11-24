@@ -230,6 +230,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               organism: null,
@@ -310,6 +313,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               }
             },
@@ -382,6 +388,9 @@ describe("Material Sample Edit Page", () => {
                   ]
                 },
                 preparationAttachment: {
+                  data: []
+                },
+                projects: {
                   data: []
                 }
               }
@@ -498,7 +507,10 @@ describe("Material Sample Edit Page", () => {
                     }
                   ]
                 },
-                preparationAttachment: { data: [] }
+                preparationAttachment: { data: [] },
+                projects: {
+                  data: []
+                }
               }
             },
             type: "material-sample"
@@ -678,6 +690,9 @@ describe("Material Sample Edit Page", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               storageUnit: {
@@ -795,7 +810,10 @@ describe("Material Sample Edit Page", () => {
               organism: null,
               relationships: {
                 attachment: { data: [] },
-                preparationAttachment: { data: [] }
+                preparationAttachment: { data: [] },
+                projects: {
+                  data: []
+                }
               },
               type: "material-sample"
             },
@@ -844,12 +862,12 @@ describe("Material Sample Edit Page", () => {
     fillOutDetermination(1);
 
     // Enter the second determination:
-    wrapper.find("button.add-determination-button").simulate("click");
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(2);
 
     // Enter the third determination:
-    wrapper.find("button.add-determination-button").simulate("click");
+    wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     fillOutDetermination(3);
 

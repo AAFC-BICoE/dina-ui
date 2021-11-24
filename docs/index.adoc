@@ -26,8 +26,6 @@ include::docker_build.adoc[]
 
 :leveloffset: 2
 
-include::query_component.adoc[]
-
 include::forms.adoc[]
 
 include::resource_select_field.adoc[]

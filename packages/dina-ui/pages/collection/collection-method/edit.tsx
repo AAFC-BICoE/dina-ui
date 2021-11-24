@@ -5,11 +5,11 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SubmitButton,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -37,6 +37,10 @@ export default function CollectionMethodEditPage() {
 
   const title = id ? "editCollectionMethodTitle" : "addCollectionMethodTitle";
 
+  const query = useQuery<CollectionMethod>({
+    path: `collection-api/collection-method/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -47,21 +51,12 @@ export default function CollectionMethodEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            <Query<CollectionMethod>
-              query={{ path: `collection-api/collection-method/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <CollectionMethodForm
-                      fetchedCollectionMethod={response.data}
-                      onSaved={goToViewPage}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            withResponse(query, ({ data }) => (
+              <CollectionMethodForm
+                fetchedCollectionMethod={data}
+                onSaved={goToViewPage}
+              />
+            ))
           ) : (
             <CollectionMethodForm onSaved={goToViewPage} />
           )}
