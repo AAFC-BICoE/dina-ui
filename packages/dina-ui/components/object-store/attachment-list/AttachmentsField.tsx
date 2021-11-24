@@ -18,6 +18,7 @@ import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Link from "next/link";
+import { uniqBy, isEqual } from "lodash";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -91,7 +92,12 @@ export function AttachmentsEditor({
   });
 
   async function addAttachedMetadatas(newIds: string[]) {
-    onChange([...value, ...newIds.map(it => ({ id: it, type: "metadata" }))]);
+    onChange(
+      uniqBy(
+        [...value, ...newIds.map(it => ({ id: it, type: "metadata" }))],
+        val => val.id
+      )
+    );
     closeModal();
   }
 
