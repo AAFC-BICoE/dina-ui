@@ -1,22 +1,27 @@
 import {
   ApiClientContext,
+  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SubmitButton,
   TextField,
   useDinaFormContext,
-  AutoSuggestTextField
+  useQuery,
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { GroupSelectField, AttachmentsField, Head, Nav } from "../../../components";
+import {
+  AttachmentsField,
+  GroupSelectField,
+  Head,
+  Nav
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
 
@@ -38,6 +43,10 @@ export default function ProjectEditPage() {
 
   const title = id ? "editProjectTitle" : "addProjectTitle";
 
+  const query = useQuery<Project>({
+    path: `collection-api/project/${id}?include=attachment`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -48,23 +57,9 @@ export default function ProjectEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            <Query<Project>
-              query={{
-                path: `collection-api/project/${id}?include=attachment`
-              }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ProjectForm
-                      fetchedProject={response.data}
-                      onSaved={goToViewPage}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            withResponse(query, ({ data }) => (
+              <ProjectForm fetchedProject={data} onSaved={goToViewPage} />
+            ))
           ) : (
             <ProjectForm onSaved={goToViewPage} />
           )}
@@ -114,7 +109,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
           type: it.type
         })) ?? []
     };
-    
+
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete input.attachment;
 
@@ -162,7 +157,7 @@ export function ProjectFormLayout() {
           className="col-md-6"
           showAllGroups={true}
         />
-      </div>      
+      </div>
       <div className="row">
         <TextField
           className="col-md-6 name"
@@ -208,7 +203,7 @@ export function ProjectFormLayout() {
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
-        hideAddAttchmentBtn = {true}
+        hideAddAttchmentBtn={true}
       />
     </div>
   );
