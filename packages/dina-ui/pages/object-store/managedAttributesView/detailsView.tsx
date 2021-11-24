@@ -5,12 +5,12 @@ import {
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SelectField,
   StringArrayField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
@@ -34,6 +34,10 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
+  const query = useQuery<ManagedAttribute>({
+    path: `objectstore-api/managed-attribute/${id}`
+  });
+
   return (
     <div>
       {/* <Head title="Managed Attribute Details" /> */}
@@ -45,23 +49,9 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <DinaMessage id="editManagedAttributeTitle" />
             </h1>
-            <Query<ManagedAttribute>
-              query={{
-                path: `objectstore-api/managed-attribute/${id}`
-              }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ManagedAttributeForm
-                      profile={response.data}
-                      router={router}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ManagedAttributeForm profile={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>
