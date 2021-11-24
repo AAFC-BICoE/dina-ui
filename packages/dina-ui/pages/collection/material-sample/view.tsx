@@ -132,7 +132,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   disableLastLink={true}
                 />
               </h1>
-              <div className="d-flex flex-row gap-1">
+              <div className="d-flex flex-row gap-2">
                 <TagsAndRestrictionsSection />
                 <ProjectSelectSection />
               </div>

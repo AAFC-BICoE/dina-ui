@@ -51,18 +51,16 @@ export function ProjectSelectField({
         removeLabel={readOnly}
         readOnlyRender={(value, _) =>
           Array.isArray(value) ? (
-            <div className="d-flex flex-row gap-1">
-              {" "}
+            <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
                 <div
-                  className="card p-1 d-flex flex-row align-items-center gap-1"
-                  style={{ background: "rgb(100, 100, 100)" }}
+                  className="card p-1 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
                   <FaFolderOpen />
                   <span>{val.name}</span>
                 </div>
-              ))}{" "}
+              ))}
             </div>
           ) : (
             <></>
