@@ -131,7 +131,7 @@ export function PersonSelectField(
           additionalField: "data.attributes.aliases"
         })
       }
-      readOnlyLink="/dina-user/view?id="
+      readOnlyLink="/person/view?id="
       filter={filterBy(["displayName"])}
       model="agent-api/person"
       // Show display name, and show aliases if any:
