@@ -69,3 +69,18 @@ export function ErrorViewer() {
     </div>
   );
 }
+
+/** Scrolls the user's browser to the error message. */
+export function scrollToError() {
+  setImmediate(() => {
+    // Scroll to error message:
+    const invalidField =
+      document?.querySelector?.(".is-invalid") ??
+      document?.querySelector?.(".error-message");
+    invalidField?.scrollIntoView?.({
+      behavior: "auto",
+      block: "center",
+      inline: "center"
+    });
+  });
+}

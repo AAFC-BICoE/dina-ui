@@ -1,5 +1,10 @@
 import { connect, FormikContextType } from "formik";
-import { FormikButton, LoadingSpinner, useDinaFormContext } from "..";
+import {
+  FormikButton,
+  LoadingSpinner,
+  scrollToError,
+  useDinaFormContext
+} from "..";
 import { CommonMessage } from "../intl/common-ui-intl";
 
 interface SubmitButtonProps {
@@ -30,7 +35,11 @@ export const SubmitButton = connect<SubmitButtonProps>(
     const resolvedButtonProps = {
       ...passedButtonProps,
       className: `btn ${className} ${hidePrimaryClass ? "" : "btn-primary"}`,
-      style: { width: "10rem", ...passedButtonProps?.style }
+      style: { width: "10rem", ...passedButtonProps?.style },
+      onClick: e => {
+        passedButtonProps?.onClick?.(e);
+        scrollToError();
+      }
     };
 
     return formik.isSubmitting ? (
