@@ -53,8 +53,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { HOSTORGANISM_FIELDS } from "../AssociationsField";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../MaterialSampleAssociationsField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -618,8 +616,6 @@ export function useMaterialSampleSave({
       materialSampleInput.associations = [];
       materialSampleInput.hostOrganism = null;
     }
-
-    delete materialSampleInput.associations;
 
     // Change project to relationship
     (materialSampleInput as any).relationships.projects = {
