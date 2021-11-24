@@ -3,25 +3,29 @@ import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const COLLECTING_EVENT_FILTER_ATTRIBUTES = ["createdBy"];
-const COLLECTING_EVENT_TABLE_COLUMNS = [
-  {
-    Cell: ({ original: { id, createdBy } }) => (
-      <Link href={`/collection/collecting-event/view?id=${id}`}>
-        {createdBy}
-      </Link>
-    ),
-    accessor: "createdBy",
-    sortable: false
-  },
-  "startEventDateTime",
-  "endEventDateTime",
-  "verbatimEventDateTime",
-  dateCell("createdOn")
-];
-
 export default function CollectingEventListPage() {
   const { formatMessage } = useDinaIntl();
+
+  const COLLECTING_EVENT_FILTER_ATTRIBUTES = ["createdBy"];
+  const COLLECTING_EVENT_TABLE_COLUMNS = [
+    {
+      Cell: ({ original: { id } }) => (
+        <Link href={`/collection/collecting-event/view?id=${id}`}>
+          <a>
+            <DinaMessage id="viewDetails" />
+          </a>
+        </Link>
+      ),
+      accessor: "id",
+      Header: <DinaMessage id="viewDetails" />,
+      sortable: false
+    },
+    "createdBy",
+    "startEventDateTime",
+    "endEventDateTime",
+    "verbatimEventDateTime",
+    dateCell("createdOn")
+  ];
 
   return (
     <div>
