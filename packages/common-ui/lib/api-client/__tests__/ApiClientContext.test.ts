@@ -183,6 +183,8 @@ const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
 apiClient.axios = { patch: mockPatch } as any;
 
 describe("API client context", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Provides an API client instance.", () => {
     expect(apiClient instanceof Kitsu).toEqual(true);
   });
@@ -497,6 +499,61 @@ Constraint violation: description size must be between 1 and 10`;
         type: "pcrPrimer"
       },
       null
+    ]);
+  });
+
+  it("bulkGet batches together the same ID to avoid sending duplicate find-one requests.", async () => {
+    mockPatch.mockImplementationOnce((_, operations) => ({
+      data: operations.map(op => {
+        const id = op.path.replace("primer/", "");
+
+        return {
+          data: {
+            attributes: { name: `primer ${id}` },
+            id,
+            type: "primer"
+          },
+          status: 200
+        };
+      })
+    }));
+
+    const response = await bulkGet(
+      // Has duplicates:
+      ["primer/100", "primer/100", "primer/200", "primer/200"],
+      { returnNullForMissingResource: true }
+    );
+
+    expect(response.length).toEqual(4);
+    expect(response.map(primer => primer?.id)).toEqual([
+      "100",
+      "100",
+      "200",
+      "200"
+    ]);
+
+    // Only 2 unique GET calls are made even though 4 paths were passed to bulkGet:
+    expect(mockPatch.mock.calls).toEqual([
+      [
+        "/operations",
+        [
+          {
+            op: "GET",
+            path: "primer/100"
+          },
+          {
+            op: "GET",
+            path: "primer/200"
+          }
+        ],
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
+          }
+        }
+      ]
     ]);
   });
 
