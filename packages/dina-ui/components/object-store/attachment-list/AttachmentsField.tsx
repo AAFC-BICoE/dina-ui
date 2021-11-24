@@ -29,6 +29,7 @@ export interface AttachmentsFieldProps {
   allowAttachmentsConfig?: AllowAttachmentsConfig;
   /** Attachment API path for the read-only view. */
   attachmentPath: string;
+  hideAddAttchmentBtn?: boolean;
 }
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
@@ -72,6 +73,7 @@ export function AttachmentsEditor({
   title,
   allowExistingFieldName,
   allowNewFieldName,
+  hideAddAttchmentBtn,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentsEditorProps) {
   const { isTemplate } = useDinaFormContext();
@@ -201,15 +203,24 @@ export function AttachmentsEditor({
                 />
               </div>
             ) : null}
-            <button
-              className="btn btn-primary add-attachments mb-3"
-              type="button"
-              onClick={openAttachmentsModal}
-              style={{ width: "10rem" }}
-              disabled={addingAttachmentsDisabled}
-            >
-              <DinaMessage id="addAttachments" />
-            </button>
+            {!hideAddAttchmentBtn ? (
+              <button
+                className="btn btn-primary add-attachments mb-3"
+                type="button"
+                onClick={openAttachmentsModal}
+                style={{ width: "10rem" }}
+                disabled={addingAttachmentsDisabled}
+              >
+                <DinaMessage id="addAttachments" />
+              </button>
+            ) : (
+              <>
+                <AttachmentSection
+                  allowAttachmentsConfig={allowAttachmentsConfig}
+                  afterMetadatasSaved={addAttachedMetadatas}
+                />
+              </>
+            )}
           </>
         )
       ) : (

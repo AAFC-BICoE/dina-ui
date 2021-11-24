@@ -23,6 +23,7 @@ export function TagsAndRestrictionsSection({
     <>
       <TagSelectField
         resourcePath={resourcePath}
+        className="mb-3"
         name={tagsFieldName}
         removeLabel={true}
         removeLabelTag={true}

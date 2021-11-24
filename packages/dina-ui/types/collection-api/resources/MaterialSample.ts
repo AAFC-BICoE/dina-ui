@@ -1,15 +1,16 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource, KitsuResourceLink } from "kitsu";
 import { JsonValue } from "type-fest";
-import { AcquisitionEvent } from "..";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
 import { Determination } from "./Determination";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
+import { Project } from "./Project";
 import { PreparationType } from "./PreparationType";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
+import { AcquisitionEvent } from "./AcquisitionEvent";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -83,6 +84,7 @@ export interface MaterialSampleRelationships {
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
   storageUnit?: StorageUnit;
+  projects?: Project[];
   acquisitionEvent?: AcquisitionEvent;
 }
 

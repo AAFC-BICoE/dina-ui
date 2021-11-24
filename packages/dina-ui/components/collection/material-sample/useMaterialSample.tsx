@@ -53,8 +53,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { HOSTORGANISM_FIELDS } from "../AssociationsField";
-import { MATERIALSAMPLE_ASSOCIATION_FIELDS } from "../MaterialSampleAssociationsField";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -75,7 +73,8 @@ export function useMaterialSampleQuery(id?: string | null) {
         "hierarchy",
         "organism",
         "materialSampleChildren",
-        "parentMaterialSample"
+        "parentMaterialSample",
+        "projects"
       ].join(",")
     },
     {
@@ -617,6 +616,17 @@ export function useMaterialSampleSave({
       materialSampleInput.associations = [];
       materialSampleInput.hostOrganism = null;
     }
+
+    // Change project to relationship
+    (materialSampleInput as any).relationships.projects = {
+      data:
+        materialSampleInput.projects?.map(it => ({
+          id: it.id,
+          type: it.type
+        })) ?? []
+    };
+    // Delete the 'projects' attribute because it should stay in the relationships field:
+    delete materialSampleInput.projects;    
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(
