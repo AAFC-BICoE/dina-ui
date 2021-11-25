@@ -33,7 +33,8 @@ import {
   MaterialSampleStateReadOnlyRender,
   Nav,
   StorageLinkerField,
-  TagsAndRestrictionsSection
+  TagsAndRestrictionsSection,
+  ProjectSelectSection
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -60,6 +61,7 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
+
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -256,6 +258,7 @@ export function MaterialSampleForm({
         )}
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+        <ProjectSelectSection resourcePath="collection-api/project"/> 
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
         <div className="data-components">

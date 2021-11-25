@@ -88,6 +88,63 @@ describe("AttachmentsField component", () => {
     });
   });
 
+  it("Prevents duplicate attachments from being attached.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+      >
+        <AttachmentsField
+          name="attachment"
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          attachmentPath={`collection-api/collecting-event/100/attachment`}
+        />
+      </DinaForm>,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Initially empty:
+    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(0);
+
+    // Add some attachments:
+    wrapper.find("button.add-attachments").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Simulate adding duplicates of 2 metadatas:
+    wrapper.find(AttachmentSection).prop("afterMetadatasSaved")([
+      "added-1",
+      "added-1",
+      "added-1",
+      "added-2",
+      "added-2",
+      "added-2"
+    ]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The 2 unique Metadatas should have been added:
+    expect(wrapper.find(".rt-tbody .rt-tr").length).toEqual(2);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockOnSubmit).lastCalledWith({
+      attachment: [
+        { id: "added-1", type: "metadata" },
+        { id: "added-2", type: "metadata" }
+      ]
+    });
+  });
+
   it("Removes selected Metadatas from the array.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm

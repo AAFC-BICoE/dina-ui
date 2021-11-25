@@ -4,7 +4,6 @@ export * from "./account/NavBarUserControl";
 export * from "./api-client/ApiClientContext";
 export * from "./api-client/client-side-join";
 export * from "./api-client/operations-types";
-export * from "./api-client/Query";
 export * from "./api-client/useQuery";
 export * from "./bulk-data-editor/BulkDataEditor";
 export * from "./bulk-data-editor/encode-resource-cell";

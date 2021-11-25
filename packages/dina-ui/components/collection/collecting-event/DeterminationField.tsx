@@ -23,7 +23,6 @@ import { TabbedArrayField } from "../TabbedArrayField";
 
 export interface DeterminationFieldProps {
   className?: string;
-  namePrefix?: string;
 }
 
 /** Type-safe object with all determination fields. */

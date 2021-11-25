@@ -1,15 +1,15 @@
 import {
-  ButtonBar,
   BackButton,
+  ButtonBar,
   DateField,
   DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { connect } from "formik";
 import { WithRouterProps } from "next/dist/client/with-router";
@@ -29,6 +29,10 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
 
   const title = id ? "editObjectSubtypeTitle" : "addObjectSubtypeTitle";
 
+  const query = useQuery<ObjectSubtype>({
+    path: `objectstore-api/object-subtype/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -39,21 +43,9 @@ export function ObjectSubtypeEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <DinaMessage id="editObjectSubtypeTitle" />
             </h1>
-            <Query<ObjectSubtype>
-              query={{ path: `objectstore-api/object-subtype/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ObjectSubtypeForm
-                      objectSubtype={response.data}
-                      router={router}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ObjectSubtypeForm objectSubtype={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

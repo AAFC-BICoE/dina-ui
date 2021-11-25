@@ -28,7 +28,7 @@ interface MockAppContextProviderProps {
  */
 export function MockAppContextProvider({
   accountContext,
-  apiContext,
+  apiContext = { apiClient: { get: () => undefined as any } },
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(

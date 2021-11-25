@@ -4,10 +4,10 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -35,6 +35,10 @@ export default function PreparationTypeEditPage() {
 
   const title = id ? "editPreparationTypeTitle" : "addPreparationTypeTitle";
 
+  const query = useQuery<PreparationType>({
+    path: `collection-api/preparation-type/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -45,21 +49,12 @@ export default function PreparationTypeEditPage() {
             <DinaMessage id={title} />
           </h1>
           {id ? (
-            <Query<PreparationType>
-              query={{ path: `collection-api/preparation-type/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <PreparationTypeForm
-                      fetchedPrepType={response.data}
-                      onSaved={goToViewPage}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            withResponse(query, ({ data }) => (
+              <PreparationTypeForm
+                fetchedPrepType={data}
+                onSaved={goToViewPage}
+              />
+            ))
           ) : (
             <PreparationTypeForm onSaved={goToViewPage} />
           )}
