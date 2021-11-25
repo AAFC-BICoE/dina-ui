@@ -197,19 +197,20 @@ export function CollectingEventFormLayout({
           addr.localname
         );
 
-      // fill in the state/province name if it is not yet filled up
+      // fill in the state/province name and placeType if it is not yet filled up
       if (
-        (addr.place_type === "province" || addr.place_type === "state") &&
-        !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
+        (addr.place_type === "province" || addr.place_type === "state") 
       ) {
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.name`,
-          addr.localname
-        );
-        formik.setFieldValue(
-          `${commonSrcDetailRoot}.stateProvince.placeType`,
-          addr.place_type
-        );
+        if (!formik.values[`${commonSrcDetailRoot}.stateProvince.name`])
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.name`,
+            addr.localname
+          );
+        if (!formik.values[`${commonSrcDetailRoot}.stateProvince.placeType`])
+          formik.setFieldValue(
+            `${commonSrcDetailRoot}.stateProvince.placeType`,
+            addr.place_type
+          );
       }
 
       detail = {};
