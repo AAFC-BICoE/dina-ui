@@ -170,10 +170,18 @@ export function ProjectFormLayout() {
         />
       </div>
       <div className="row">
-        <AutoSuggestTextField
+        <AutoSuggestTextField<Project>
           className="col-md-6 status"
           name="status"
           label={formatMessage("field_projectStatus")}
+          query={(searchValue, ctx) => ({
+            path: "collection-api/project",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `status==${searchValue}*`
+            }
+          })}
+          suggestion={project => project.status ?? ""}          
         />
         <DateField
           className="col-md-6 endDate"
