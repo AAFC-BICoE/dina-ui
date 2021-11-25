@@ -16,14 +16,14 @@ export async function getManagedAttributesInUse(
     | undefined
   )[],
   bulkGet: ApiClientI["bulkGet"],
+  useKeyInFilter: boolean,
   {
     apiBaseUrl = "/objectstore-api",
     managedAttributePath = "/managed-attribute",
     managedAttributeKeyField = "id",
     /** Prefix before the key when doing a Managed Attribute lookup e.g. COLLECTING_EVENT */
     keyPrefix = ""
-  } = {},
-  useKeyInFilter
+  } = {}
 ) {
   // Get all unique ManagedAttribute keys in the given value maps:
   const managedAttributeKeys = uniq(flatMap(managedAttributeMaps.map(keys)));

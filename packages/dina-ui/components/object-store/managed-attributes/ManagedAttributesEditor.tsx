@@ -63,12 +63,12 @@ export function ManagedAttributesEditor({
       const initialAttributes = await getManagedAttributesInUse(
         [managedAttributeValues],
         bulkGet,
+        useKeyInFilter as boolean,
         {
           apiBaseUrl,
           keyPrefix: managedAttributeComponent,
           managedAttributeKeyField
-        },
-        useKeyInFilter
+        }        
       );
       setEditableManagedAttributes(initialAttributes);
     })();
