@@ -48,7 +48,7 @@ export function ManagedAttributesEditor({
   managedAttributeKeyField = "key"
 }: ManagedAttributesEditorProps) {
   const { initialValues: formInitialValues } = useDinaFormContext();
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { openModal } = useModal();
 
@@ -63,12 +63,13 @@ export function ManagedAttributesEditor({
       const initialAttributes = await getManagedAttributesInUse(
         [managedAttributeValues],
         bulkGet,
+        apiClient,
         useKeyInFilter as boolean,
         {
           apiBaseUrl,
           keyPrefix: managedAttributeComponent,
           managedAttributeKeyField
-        }        
+        }
       );
       setEditableManagedAttributes(initialAttributes);
     })();

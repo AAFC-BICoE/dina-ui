@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { License, Metadata, Person } from "../../../../types/objectstore-api";
+import { License, ManagedAttribute, Metadata, Person } from "../../../../types/objectstore-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/single-record-edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import CreatableSelect from "react-select/creatable";
@@ -8,6 +8,8 @@ const mockGet = jest.fn(async path => {
   switch (path) {
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
+    case "objectstore-api/managed-attribute":
+         return { data: [TEST_MANAGED_ATTRIBUTE] };    
     case "objectstore-api/license":
       return { data: TEST_LICENSES };
     case "objectstore-api/license/open-government-license-canada":
@@ -83,6 +85,13 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "a360a695-bbff-4d58-9a07-b6d6c134b208": "test-managed-attribute-value"
   }
 };
+
+const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
+  type: "managed-attribute",
+  id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+  name: "test-managed-attribute",
+  managedAttributeType: "STRING"
+}
 
 const mockSave = jest.fn();
 
