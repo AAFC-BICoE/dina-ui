@@ -181,7 +181,8 @@ export function ProjectFormLayout() {
               rsql: `status==${searchValue}*`
             }
           })}
-          suggestion={project => project.status ?? ""}          
+          suggestion={project => project.status ?? ""}
+          alwaysShowSuggestions={true}
         />
         <DateField
           className="col-md-6 endDate"
