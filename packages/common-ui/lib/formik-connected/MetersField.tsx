@@ -81,20 +81,44 @@ math.createUnit("kilometres", "1 kilometer");
 const FEET_INCH_REGEX =
   /\s*([\d|\.]+)\s*(feet|foot|ft|pieds|pied|pd)\s*([\d|\.]+)\s*(inches|inch|in|pouces|pouce|po)\s*/i;
 
+/** Unabbreviates units e.g. "ft." to "ft" */
+function unAbbreviate(text: string) {
+  const UNIT_ABBREVIATION_REGEX = /[a-z]\./gi;
+  return text.replace(UNIT_ABBREVIATION_REGEX, matched => matched.charAt(0));
+}
+
+/** Converts apostrophes and quotes to feet and inches */
+function quotesToUnits(text: string) {
+  const NUMBER_WITH_APOSTROOPHE_REGEX = /\d\s*\'/gi;
+  const NUMBER_WITH_QUOTE_REGEX = /\d\s*\"/gi;
+
+  return text
+    .replace(NUMBER_WITH_APOSTROOPHE_REGEX, match =>
+      match.replace("'", " feet")
+    )
+    .replace(NUMBER_WITH_QUOTE_REGEX, match => match.replace('"', " inches"));
+}
+
 const NUMBERS_ONLY_REGEX = /^\s*([\d|\.]+)\s*$/;
 
 const CONTAINS_NUMBERS_REGEX = /([\d|\.]+)/;
 
 /** Returns a string if the conversion can be done, otherwise returns null. */
 export function toMeters(
-  text: string,
+  originalText: string,
   maxDecimalPlaces?: number
 ): string | null {
   // If the input is just a number:
-  const numberOnlyMatch = NUMBERS_ONLY_REGEX.exec(text);
+  const numberOnlyMatch = NUMBERS_ONLY_REGEX.exec(originalText);
   if (numberOnlyMatch) {
-    return toMeters(`${text} meters`, maxDecimalPlaces);
+    // Retain the original text:
+    return originalText;
   }
+
+  // Use regex to fix convdert the text to a format the mathjs parser understands:
+  const text = quotesToUnits(
+    unAbbreviate(accents.remove(originalText).toLowerCase())
+  );
 
   // Special case matcher for "x feet x inches" -formatted text:
   const feetInchMatch = FEET_INCH_REGEX.exec(text);
@@ -105,9 +129,7 @@ export function toMeters(
 
   try {
     // If the input is a number with a known distance unit:
-    const inMeters = math
-      .evaluate(accents.remove(text).toLowerCase())
-      .toNumber("m") as BigNumber;
+    const inMeters = math.evaluate(text).toNumber("m") as BigNumber;
     const decimalPlaces = math.bignumber(inMeters).decimalPlaces();
     return maxDecimalPlaces !== undefined
       ? inMeters.toFixed(clamp(decimalPlaces, maxDecimalPlaces))
