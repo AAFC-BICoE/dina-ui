@@ -54,9 +54,9 @@ export function ExistingObjectsAttacher({
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`}>
+          <a href={`/object-store/object/view?id=${id}`} target="_blank">
             {originalFilename}
-          </Link>
+          </a>
         ) : null,
       accessor: "originalFilename"
     },
