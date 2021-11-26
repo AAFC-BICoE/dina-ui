@@ -1,11 +1,11 @@
 import { useQuery, withResponse } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { COLLECTION_REVISION_ROW_CONFIG } from "packages/dina-ui/components/revisions/revision-row-configs/collection-revision-row-configs";
-import { CollectingEvent } from "packages/dina-ui/types/collection-api/resources/CollectingEvent";
 import { Footer, Head, Nav } from "../../../components";
+import { COLLECTION_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-row-configs/collection-revision-row-configs";
 import { RevisionsPageLayout } from "../../../components/revisions/RevisionsPageLayout";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 
 export default function CollectingEventRevisionListPage() {
   const { formatMessage } = useDinaIntl();

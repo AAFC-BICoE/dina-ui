@@ -1,5 +1,4 @@
 import { PersistedResource } from "kitsu";
-import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { Collection } from "./Collection";
 
 export interface MaterialSampleRunConfigMetadata {

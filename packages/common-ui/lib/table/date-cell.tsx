@@ -1,4 +1,4 @@
-import { DateView } from "common-ui";
+import { DateView } from "../date/DateView";
 import { get } from "lodash";
 
 /** Renders a date cell into a tabl in a user-friendly / readable format. */
