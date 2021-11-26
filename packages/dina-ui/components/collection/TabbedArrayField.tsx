@@ -87,6 +87,9 @@ export function TabbedArrayField<T>({
             return renderTabPanel({ fieldProps, index, elements });
           }
 
+          // Only show the tabs when there is more than 1 element:
+          const showTabs = elements.length > 1;
+
           // Always shows the panel without tabs when it is a template
           return (
             <FieldSet
@@ -97,27 +100,28 @@ export function TabbedArrayField<T>({
               {renderAboveTabs?.()}
               <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
                 {
-                  // Only show the tabs when there is more than 1 element:
                   <TabList
                     className={`react-tabs__tab-list mb-0 ${
-                      elements.length <= 1 ? "d-none" : ""
+                      showTabs ? "" : "d-none"
                     }`}
                   >
                     {elements.map((element, index) => (
                       <Tab key={index}>
-                        <TabErrorIndicator index={index} name={name}>
-                          {hasError => (
-                            <div>
-                              {renderTab(element, index)}
-                              {hasError && (
-                                <span className="text-danger">
-                                  {" "}
-                                  ({<DinaMessage id="hasError" />})
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </TabErrorIndicator>
+                        {showTabs ? (
+                          <TabErrorIndicator index={index} name={name}>
+                            {hasError => (
+                              <div>
+                                {renderTab(element, index)}
+                                {hasError && (
+                                  <span className="text-danger is-invalid">
+                                    {" "}
+                                    ({<DinaMessage id="hasError" />})
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </TabErrorIndicator>
+                        ) : null}
                       </Tab>
                     ))}
                   </TabList>

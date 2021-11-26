@@ -3,6 +3,8 @@ import Kitsu from "kitsu";
 import {
   ApiClientImpl,
   CustomDinaKitsu,
+  DoOperationsError,
+  getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
 import {
@@ -689,6 +691,61 @@ Constraint violation: description size must be between 1 and 10`;
           type: "articles"
         }
       ]
+    });
+  });
+
+  it("Gets the form-level error message from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      { status: 400, errors: [{ detail: "Error 1" }] },
+      { status: 400, errors: [{ detail: "Error 2" }] }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "Error 1\nError 2",
+      fieldErrors: {}
+    });
+  });
+
+  it("Gets the field-level error messages from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field1" }, detail: "Error 1" }]
+      },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field2" }, detail: "Error 2" }]
+      }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "\n",
+      fieldErrors: {
+        field1: "Error 1",
+        field2: "Error 2"
+      }
+    });
+  });
+
+  it("Gets both the form-level and field-level error messages from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      { status: 400, errors: [{ detail: "Form error" }] },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field1" }, detail: "Error 1" }]
+      },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field2" }, detail: "Error 2" }]
+      }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "Form error\n\n",
+      fieldErrors: {
+        field1: "Error 1",
+        field2: "Error 2"
+      }
     });
   });
 });
