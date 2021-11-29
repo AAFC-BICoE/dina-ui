@@ -2,6 +2,7 @@ export * from "./add-person/PersonForm";
 export * from "./add-person/PersonFormFields";
 export * from "./button-bar/nav/nav";
 export * from "./bulk-material-sample/MaterialSampleGenerationForm";
+export * from "./bulk-material-sample/MaterialSampleBulkNavigator";
 export * from "./collection/collecting-event/ParseVerbatimToRangeButton";
 export * from "./collection/material-sample/MaterialSampleBreadCrumb";
 export * from "./collection/material-sample/MaterialSampleFormNav";

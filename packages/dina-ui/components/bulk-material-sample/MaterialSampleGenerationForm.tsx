@@ -30,17 +30,17 @@ export function MaterialSampleGenerationForm({
   const onSubmit: DinaFormOnSubmit<GeneratorFormValues> = ({
     submittedValues
   }) => {
-    const samples = submittedValues.samples
-      .slice(0, submittedValues.numberToCreate)
-      .map<Partial<MaterialSample>>((sample, index) => ({
-        ...sample,
-        materialSampleName: generateName({
-          generationMode,
-          index,
-          formState: submittedValues
-        }),
-        collection: submittedValues.collection
-      }));
+    const samples = [...Array(Number(submittedValues.numberToCreate))].map<
+      Partial<MaterialSample>
+    >((_, index) => ({
+      materialSampleName: generateName({
+        generationMode,
+        index,
+        formState: submittedValues
+      }),
+      ...submittedValues.samples[index],
+      collection: submittedValues.collection
+    }));
 
     onGenerate(samples);
   };
@@ -110,7 +110,7 @@ interface GeneratorFieldsProps {
   generationMode: GenerationMode;
 }
 
-export function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
+function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map(mode => ({
     label: mode,
     value: mode
@@ -235,7 +235,7 @@ interface GenerateNameParams {
   formState: Partial<GeneratorFormValues>;
 }
 
-export function generateName(params: GenerateNameParams) {
+function generateName(params: GenerateNameParams) {
   const { formState, generationMode } = params;
 
   const generatedName = `${formState.baseName || ""}${
@@ -249,7 +249,7 @@ export function generateName(params: GenerateNameParams) {
   return generatedName;
 }
 
-export function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
+function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
   if (formState.increment === "NUMERICAL") {
     const start = formState.start ?? "001";
     const suffixLength = start.length;
