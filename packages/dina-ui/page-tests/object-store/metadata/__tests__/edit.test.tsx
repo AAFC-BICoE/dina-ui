@@ -35,7 +35,7 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
     id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
     managedAttributeValues: {
-      "a360a695-bbff-4d58-9a07-b6d6c134b208": "existingValue"
+      existing_attribute: "existingValue"
     },
     type: "metadata"
   },
@@ -88,7 +88,8 @@ const mockBulkGet = jest.fn(async paths => {
   if ((paths[0] as string).startsWith("/managed-attribute/")) {
     return paths.map(() => ({
       id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
-      name: "existing-attribute"
+      name: "Existing Attribute",
+      key: "existing_attribute"
     }));
   }
   if ((paths[0] as string).startsWith("/object-upload/")) {
@@ -100,11 +101,24 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path, params) => {
   if (path === "metadata") {
     return { data: TEST_METADATAS };
   } else if (path === "objectstore-api/license") {
     return { data: TEST_LICENSES };
+  } else if (
+    path === "objectstore-api/managed-attribute" &&
+    params?.filter?.key === "existing_attribute"
+  ) {
+    return {
+      data: [
+        {
+          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+          name: "Existing Attribute",
+          key: "existing_attribute"
+        }
+      ]
+    };
   } else if (path === "objectstore-api/config/default-values") {
     return {
       data: {
@@ -226,35 +240,38 @@ describe("Metadata bulk edit page", () => {
         id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
         managedAttributeType: "STRING",
         name: "SpecimenID",
+        key: "Specimen_ID",
         type: "managed-attribute"
       },
       {
         id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
         managedAttributeType: "STRING",
         name: "Type Status",
+        key: "type_status",
         type: "managed-attribute"
       },
       {
         id: "83748696-62b3-4db6-99cc-e4f546e7ecd7",
         managedAttributeType: "STRING",
         name: "Scientific Name",
+        key: "scientific_name",
         type: "managed-attribute"
       }
     ]);
 
     expect(columns).toEqual([
       {
-        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.Specimen_ID",
         source: ["Holotype", "Paratype", "Syntype"],
         title: "SpecimenID",
         type: "dropdown"
       },
       {
-        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.type_status",
         title: "Type Status"
       },
       {
-        data: "metadata.managedAttributeValues.83748696-62b3-4db6-99cc-e4f546e7ecd7",
+        data: "metadata.managedAttributeValues.scientific_name",
         title: "Scientific Name"
       }
     ]);
@@ -273,10 +290,11 @@ describe("Metadata bulk edit page", () => {
         .prop("value")
     ).toEqual([
       {
-        label: "existing-attribute",
+        label: "Existing Attribute",
         resource: {
           id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
-          name: "existing-attribute"
+          name: "Existing Attribute",
+          key: "existing_attribute"
         },
         value: "a360a695-bbff-4d58-9a07-b6d6c134b208"
       }
