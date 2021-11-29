@@ -14,6 +14,7 @@ import {
   useEffect,
   useMemo
 } from "react";
+import { useIntl } from "react-intl";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -70,6 +71,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 ) {
   const api = useApiClient();
   const account = useAccount();
+  const { formatMessage } = useIntl();
 
   const isNestedForm = !!useContext(DinaFormContext);
 
@@ -107,8 +109,12 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     if (initialValues.id && !readOnly) {
       const aLinks = document.querySelectorAll("a");
       aLinks?.forEach(alink => {
-        alink.setAttribute("target", "_blank");
-        alink.setAttribute("rel", "noreferrer noopener");
+        if (
+          !alink.text.startsWith(formatMessage({ id: "backToReadOnlyPage" }))
+        ) {
+          alink.setAttribute("target", "_blank");
+          alink.setAttribute("rel", "noreferrer noopener");
+        }
       });
     }
   }, [initialValues.id, readOnly]);
