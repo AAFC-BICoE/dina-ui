@@ -11,7 +11,7 @@ interface NumberSpinnerFieldProps extends LabelWrapperParams {
   step?: number;
 }
 
-export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
+export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
   const { min, max, size, step, onChangeExternal, name } = props;
 
   const customStyle = (
@@ -63,6 +63,7 @@ export default function NumberSpinnerField(props: NumberSpinnerFieldProps) {
               step={step ?? 1}
               onKeyDown={onKeyDown}
               onChange={e => onChangeInternal(e.target.value)}
+              onClick={e => (e.target as any).select()}
               value={value}
             />
           </>

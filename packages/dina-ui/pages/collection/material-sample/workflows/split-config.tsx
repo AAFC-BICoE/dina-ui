@@ -16,7 +16,7 @@ import { withRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
-import NumberSpinnerField from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
+import { NumberSpinnerField } from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection";
 import { Head } from "../../../../../dina-ui/components/head";
@@ -350,11 +350,7 @@ function SplitConfigFormFields({ generationMode }: SplitConfigFormProps) {
           <TextField name="baseName" />
         </div>
         {generationMode === "BATCH" && (
-          <TextField
-            name="suffix"
-            className="col-md-3"
-            label={<DinaMessage id="suffixOptional" />}
-          />
+          <TextField name="suffix" className="col-md-3" />
         )}
         {generationMode === "SERIES" && (
           <>
