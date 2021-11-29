@@ -66,7 +66,9 @@ import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
 export default function MaterialSampleEditPage() {
-  const router = useRouter();
+  const router = useRouter();  
+
+  const {  pathname  } = router;
 
   const id = router.query.id?.toString();
   const copyFromId = router.query.copyFromId?.toString();
@@ -120,7 +122,7 @@ export default function MaterialSampleEditPage() {
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav />
+      <Nav id={id} pathname={pathname} />
       <main className="container-fluid">
         {!id &&
           !!copyFromId &&

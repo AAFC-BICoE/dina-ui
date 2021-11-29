@@ -104,13 +104,14 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     [props.initialValues]
   );
 
-  //Ensure all edit pages' link does not navigate away to void unintentionaly data loss
+  //Ensure all edit pages' link open in new tab to void unintentionaly data loss
   useEffect(() => {
     if (initialValues.id && !readOnly) {
       const aLinks = document.querySelectorAll("a");
       aLinks?.forEach(alink => {
         if (
-          !alink.text.startsWith(formatMessage({ id: "backToReadOnlyPage" }))
+          !alink.text.startsWith(formatMessage({ id: "backToReadOnlyPage" })) && 
+          !alink.text.startsWith(formatMessage({ id: "cancelButtonText" }))
         ) {
           alink.setAttribute("target", "_blank");
           alink.setAttribute("rel", "noreferrer noopener");
