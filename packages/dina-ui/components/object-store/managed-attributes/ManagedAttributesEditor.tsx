@@ -20,7 +20,6 @@ import { getManagedAttributesInUse } from "./getManagedAttributesInUse";
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
   valuesPath: string;
-  valueFieldName?: string;
   apiBaseUrl: string;
   managedAttributeApiPath: string;
 
@@ -38,9 +37,8 @@ export interface ManagedAttributesEditorProps {
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
 export function ManagedAttributesEditor({
-  valuesPath = "managedAttributeValues",
+  valuesPath,
   managedAttributeApiPath,
-  valueFieldName,
   apiBaseUrl,
   managedAttributeComponent,
   managedAttributeKeyField = "key"
@@ -70,14 +68,6 @@ export function ManagedAttributesEditor({
       setEditableManagedAttributes(initialAttributes);
     })();
   }, []);
-
-  /** Gets the formik field path for a given Managed Attribute key. */
-  function fieldPath(managedAttributeKey: string) {
-    // Dot path to the attribute's form field:
-    return [valuesPath, managedAttributeKey, valueFieldName]
-      .filter(it => it) // Remove undefined
-      .join(".");
-  }
 
   return (
     <div className="mb-3 managed-attributes-editor">
@@ -155,7 +145,7 @@ export function ManagedAttributesEditor({
             className: `${attributeKey} col-sm-6`,
             key: attributeKey,
             label: attribute.name ?? attributeKey,
-            name: fieldPath(attributeKey)
+            name: `${valuesPath}.${attributeKey}`
           };
 
           if (

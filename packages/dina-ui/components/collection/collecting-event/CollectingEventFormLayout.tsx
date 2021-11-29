@@ -831,7 +831,7 @@ export function CollectingEventFormLayout({
           legend={<DinaMessage id="collectingEventManagedAttributes" />}
         >
           {readOnly ? (
-            <FastField name="managedAttributeValues">
+            <FastField name="managedAttributes">
               {({ field: { value } }) => (
                 <ManagedAttributesViewer
                   values={value}
@@ -847,8 +847,7 @@ export function CollectingEventFormLayout({
               enabledFields={null}
             >
               <ManagedAttributesEditor
-                valuesPath="managedAttributeValues"
-                valueFieldName="assignedValue"
+                valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"
                 apiBaseUrl="/collection-api"
                 managedAttributeComponent="COLLECTING_EVENT"

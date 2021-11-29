@@ -1,8 +1,8 @@
 import { InputResource } from "kitsu";
-import { SelectNavigation } from "packages/dina-ui/components/bulk-material-sample/SelectNavigation";
-import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
 import { ReactNode, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import { SelectNavigation } from "./SelectNavigation";
 
 export interface MaterialSampleBulkNavigatorProps {
   samples: InputResource<MaterialSample>[];

@@ -9,16 +9,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import {
-  cloneDeep,
-  compact,
-  fromPairs,
-  isEmpty,
-  isEqual,
-  pick,
-  pickBy,
-  toPairs
-} from "lodash";
+import { cloneDeep, compact, isEmpty, isEqual, pick, pickBy } from "lodash";
 import {
   Dispatch,
   SetStateAction,
@@ -29,10 +20,8 @@ import {
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
-  DETERMINATION_FIELDS,
   ORGANISM_FIELDS,
   PREPARATION_FIELDS,
-  SCHEDULEDACTION_FIELDS,
   useCollectingEventQuery,
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
@@ -43,10 +32,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
-import {
-  ManagedAttributeValues,
-  Person
-} from "../../../../dina-ui/types/objectstore-api";
+import { Person } from "../../../../dina-ui/types/objectstore-api";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
@@ -88,17 +74,6 @@ export function useMaterialSampleQuery(id?: string | null) {
         }
       ],
       onSuccess: async ({ data }) => {
-        if (data.managedAttributes) {
-          const managedAttributeValues: ManagedAttributeValues = {};
-          toPairs(data?.managedAttributes as any).map(
-            attr =>
-              (managedAttributeValues[attr[0]] = {
-                assignedValue: attr[1] as any
-              })
-          );
-          delete data?.managedAttributes;
-          data.managedAttributeValues = managedAttributeValues;
-        }
         if (data.determination) {
           // Retrieve determiner arrays on determination.
           for (const determination of data.determination) {
@@ -453,33 +428,68 @@ export function useMaterialSampleSave({
     (submittedValues as any).relationships = {};
 
     /** Input to submit to the back-end API. */
-    const { ...materialSampleInput } = submittedValues;
+    const materialSampleInput: InputResource<MaterialSample> & {
+      relationships: any;
+    } = {
+      ...submittedValues,
 
-    // Only persist the preparation fields if the preparations toggle is enabled:
-    if (!enablePreparations) {
-      Object.assign(materialSampleInput, BLANK_PREPARATION);
-    }
+      // Remove the values from sections that were toggled off:
+      ...(!enablePreparations && BLANK_PREPARATION),
+      ...(!enableOrganism && { organism: null }),
+      ...(!enableStorage && {
+        storageUnit: { id: null, type: "storage-unit" }
+      }),
+      ...(!enableCollectingEvent && {
+        collectingEvent: { id: null, type: "collecting-event" }
+      }),
+      ...(!enableAcquisitionEvent && {
+        acquisitionEvent: { id: null, type: "acquisition-event" }
+      }),
+      ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-    // Only persist the organism fields if toggle is enabled:
-    if (!enableOrganism) {
-      materialSampleInput.organism = null as any;
-    }
+      determination: enableDetermination
+        ? submittedValues.determination?.map(det => ({
+            ...det,
+            determiner: det.determiner?.map(determiner =>
+              typeof determiner === "string"
+                ? determiner
+                : String(determiner.id)
+            )
+          }))
+        : [],
 
-    // Only persist the storage link if the Storage toggle is enabled:
-    if (!enableStorage) {
-      materialSampleInput.storageUnit = {
-        id: null,
-        type: "storage-unit"
-      };
-    }
+      // One-to-many relationships go in the 'relationships' object:
+      relationships: {
+        attachment: {
+          data:
+            submittedValues.attachment?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        },
+        preparationAttachment: {
+          data:
+            submittedValues.preparationAttachment?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        },
+        projects: {
+          data:
+            submittedValues.projects?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        }
+      },
+      // Omit one-to-many relationships which are not serialized correctly by Kitsu:
+      attachment: undefined,
+      preparationAttachment: undefined,
+      projects: undefined
+    };
 
-    if (!enableCollectingEvent) {
-      // Unlink the CollectingEvent if its switch is unchecked:
-      materialSampleInput.collectingEvent = {
-        id: null,
-        type: "collecting-event"
-      };
-    } else if (colEventFormRef.current) {
+    // Save and link the Collecting Event if enabled:
+    if (enableCollectingEvent && colEventFormRef.current) {
       // Return if the Collecting Event sub-form has errors:
       const colEventErrors = await colEventFormRef.current.validateForm();
       if (!isEmpty(colEventErrors)) {
@@ -515,13 +525,8 @@ export function useMaterialSampleSave({
       };
     }
 
-    if (!enableAcquisitionEvent) {
-      // Unlink the AcquisitionEvent if its switch is unchecked:
-      materialSampleInput.acquisitionEvent = {
-        id: null,
-        type: "acquisition-event"
-      };
-    } else if (acqEventFormRef.current) {
+    // Save and link the Acquisition Event if enabled:
+    if (enableAcquisitionEvent && acqEventFormRef.current) {
       // Return if the Acq Event sub-form has errors:
       const acqEventErrors = await acqEventFormRef.current.validateForm();
       if (!isEmpty(acqEventErrors)) {
@@ -561,72 +566,6 @@ export function useMaterialSampleSave({
         type: savedAcqEvent.type
       };
     }
-
-    // Add attachments if they were selected:
-    (materialSampleInput as any).relationships.attachment = {
-      data:
-        materialSampleInput.attachment?.map(it => ({
-          id: it.id,
-          type: it.type
-        })) ?? []
-    };
-    // Delete the 'attachment' attribute because it should stay in the relationships field:
-    delete materialSampleInput.attachment;
-
-    (materialSampleInput as any).relationships.preparationAttachment = {
-      data:
-        materialSampleInput.preparationAttachment?.map(it => ({
-          id: it.id,
-          type: it.type
-        })) ?? []
-    };
-    // Delete the 'attachment' attribute because it should stay in the relationships field:
-    delete materialSampleInput.preparationAttachment;
-
-    // Shuffle the managedAttributesValue to managedAttribute
-    materialSampleInput.managedAttributes = {};
-
-    materialSampleInput.managedAttributes = fromPairs(
-      toPairs(materialSampleInput.managedAttributeValues).map(value => [
-        value[0],
-        value[1]?.assignedValue as string
-      ])
-    );
-
-    delete materialSampleInput.managedAttributeValues;
-
-    // Only persist determination when enabled
-    if (!enableDetermination) {
-      materialSampleInput.determination = [];
-    }
-
-    // convert determination determiner to list
-    if (materialSampleInput.determination) {
-      for (const determination of materialSampleInput.determination) {
-        const determinerRef = determination.determiner;
-        if (determinerRef && typeof determinerRef !== "string") {
-          determination.determiner = determinerRef.map(it =>
-            typeof it !== "string" ? it.id : (null as any)
-          );
-        }
-      }
-    }
-
-    if (!enableAssociations) {
-      materialSampleInput.associations = [];
-      materialSampleInput.hostOrganism = null;
-    }
-
-    // Change project to relationship
-    (materialSampleInput as any).relationships.projects = {
-      data:
-        materialSampleInput.projects?.map(it => ({
-          id: it.id,
-          type: it.type
-        })) ?? []
-    };
-    // Delete the 'projects' attribute because it should stay in the relationships field:
-    delete materialSampleInput.projects;    
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(

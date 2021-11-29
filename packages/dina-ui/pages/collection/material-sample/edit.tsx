@@ -349,8 +349,7 @@ export function MaterialSampleForm({
                 enabledFields={null}
               >
                 <ManagedAttributesEditor
-                  valuesPath="managedAttributeValues"
-                  valueFieldName="assignedValue"
+                  valuesPath="managedAttributes"
                   managedAttributeApiPath="collection-api/managed-attribute"
                   apiBaseUrl="/collection-api"
                   managedAttributeComponent="MATERIAL_SAMPLE"

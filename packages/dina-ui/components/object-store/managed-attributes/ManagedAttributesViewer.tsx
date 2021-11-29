@@ -8,13 +8,7 @@ export interface ManagedAttributesViewerProps {
    * Map of Managed Attributes values.
    * Key is Managed Attribute UUID and value is the Managed Attribute value object.
    */
-  values?: Record<
-    string,
-    | string
-    | null
-    | undefined
-    | { name?: string; value?: string; assignedValue?: string }
-  >;
+  values?: Record<string, string | null | undefined>;
 
   /** Function that returns the API find-one path given the Managed Attribute key or ID. */
   managedAttributeApiPath: (key: string) => string;
@@ -27,7 +21,7 @@ export function ManagedAttributesViewer({
   const managedAttributeValues = values
     ? toPairs(values).map(([key, mav]) => ({
         key,
-        value: typeof mav === "string" ? mav : mav?.value || mav?.assignedValue
+        value: mav
       }))
     : [];
 

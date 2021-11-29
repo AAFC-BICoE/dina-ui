@@ -206,7 +206,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
                 <div className="col-md-6">
-                  <FastField name="managedAttributeValues">
+                  <FastField name="managedAttributes">
                     {({ field: { value } }) => (
                       <ManagedAttributesViewer
                         values={value}

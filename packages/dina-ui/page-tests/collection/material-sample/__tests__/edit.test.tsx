@@ -189,7 +189,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -377,7 +376,6 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               determination: [],
               organism: null,
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: [
@@ -456,7 +454,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -496,7 +493,6 @@ describe("Material Sample Edit Page", () => {
               preparationAttachment: undefined,
               determination: [],
               hostOrganism: null,
-              managedAttributes: {},
               organism: null,
               relationships: {
                 attachment: {
@@ -678,7 +674,6 @@ describe("Material Sample Edit Page", () => {
               },
               determination: [],
               id: "333",
-              managedAttributes: {},
               materialSampleName: "test-ms",
               organism: null,
               // Preparations are not enabled, so the preparation fields are set to null:
@@ -766,8 +761,8 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          managedAttributeValues: {
-            testAttr: { assignedValue: "do the test" }
+          managedAttributes: {
+            testAttr: "do the test"
           }
         }}
         onSaved={mockOnSaved}
