@@ -4,6 +4,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 export interface ManagedAttributeAttributes {
   type: string;
   name: string;
+  key: string;
   managedAttributeType: string;
   acceptedValues?: string[] | null;
   createdBy?: string;

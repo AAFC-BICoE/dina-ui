@@ -26,11 +26,13 @@ const TEST_MANAGED_ATTRIBUTES: ManagedAttribute[] = [
   {
     managedAttributeType: "STRING",
     name: "managed-attribute-1",
+    key: "managed-attribute-1",
     type: "managed-attribute"
   },
   {
     managedAttributeType: "STRING",
     name: "managed-attribute-2",
+    key: "managed-attribute-2",
     type: "managed-attribute"
   }
 ];
@@ -127,6 +129,7 @@ describe("MetadataEditorAttributesControls component", () => {
           editableBuiltInAttributes: ["field-1"],
           editableManagedAttributes: [
             {
+              key: "managed-attribute-1",
               managedAttributeType: "STRING",
               name: "managed-attribute-1",
               type: "managed-attribute"
@@ -161,6 +164,7 @@ describe("MetadataEditorAttributesControls component", () => {
         .prop("value")
     ).toEqual([
       {
+        key: "managed-attribute-1",
         managedAttributeType: "STRING",
         name: "managed-attribute-1",
         type: "managed-attribute"
