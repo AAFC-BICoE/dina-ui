@@ -8,6 +8,7 @@ import {
   TextField
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
+import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
 import { useState } from "react";
@@ -18,7 +19,7 @@ import { CollectionSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 
 export interface MaterialSampleGenerationFormProps {
-  onGenerate: (samples: Partial<MaterialSample>[]) => void;
+  onGenerate: (samples: InputResource<MaterialSample>[]) => void;
 }
 
 export function MaterialSampleGenerationForm({
@@ -31,8 +32,9 @@ export function MaterialSampleGenerationForm({
     submittedValues
   }) => {
     const samples = [...Array(Number(submittedValues.numberToCreate))].map<
-      Partial<MaterialSample>
+      InputResource<MaterialSample>
     >((_, index) => ({
+      type: "material-sample",
       materialSampleName: generateName({
         generationMode,
         index,

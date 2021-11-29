@@ -62,7 +62,6 @@ import {
 } from "../../../types/collection-api";
 import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
 
-
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
 export default function MaterialSampleEditPage() {
@@ -189,6 +188,9 @@ export interface MaterialSampleFormProps {
   };
 
   buttonBar?: ReactNode;
+
+  /** Disables prefixing the sample name with the Collection code. */
+  disableAutoNamePrefix?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -199,6 +201,7 @@ export function MaterialSampleForm({
   materialSampleSaveHook,
   enabledFields,
   attachmentsConfig,
+  disableAutoNamePrefix,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -258,7 +261,7 @@ export function MaterialSampleForm({
         )}
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-        <ProjectSelectSection resourcePath="collection-api/project"/> 
+        <ProjectSelectSection resourcePath="collection-api/project" />
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
         <div className="data-components">
@@ -383,7 +386,7 @@ export function MaterialSampleForm({
       enabledFields={enabledFields?.materialSample}
       validationSchema={materialSampleSchema}
     >
-      {!initialValues.id && <SetDefaultSampleName />}
+      {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
       {mateirialSampleInternal}
       {buttonBar}

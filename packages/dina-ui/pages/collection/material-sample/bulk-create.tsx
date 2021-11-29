@@ -1,3 +1,4 @@
+import { InputResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
 import { ReactNode, useState } from "react";
 import {
@@ -7,6 +8,7 @@ import {
   Nav
 } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { MaterialSampleForm } from "./edit";
 
 export default function MaterialSampleBulkCreatePage() {
   const { formatMessage } = useDinaIntl();
@@ -14,7 +16,7 @@ export default function MaterialSampleBulkCreatePage() {
   const title = "createNewMaterialSamples";
 
   const [generatedSamples, setGeneratedSamples] = useState<
-    Partial<MaterialSample>[] | null
+    InputResource<MaterialSample>[] | null
   >(null);
 
   return (
@@ -26,9 +28,13 @@ export default function MaterialSampleBulkCreatePage() {
         {generatedSamples ? (
           <MaterialSampleBulkNavigator
             samples={generatedSamples}
-            renderOneSample={sample =>
-              `TODO sample form goes here: ${sample.materialSampleName}`
-            }
+            renderOneSample={sample => (
+              <MaterialSampleForm
+                materialSample={sample}
+                buttonBar={() => null}
+                disableAutoNamePrefix={true}
+              />
+            )}
           />
         ) : (
           <MaterialSampleGenerationForm onGenerate={setGeneratedSamples} />
