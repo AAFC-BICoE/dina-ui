@@ -1,4 +1,5 @@
 import { Form, Formik } from "formik";
+import { DoOperationsError } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ErrorViewer } from "../ErrorViewer";
 import { OnFormikSubmit, safeSubmit } from "../safeSubmit";
@@ -31,7 +32,7 @@ describe("safeSubmit function", () => {
     );
   });
 
-  it("Sets the form's error message if the submit function throws an error.", async () => {
+  it("Sets the form error message if the submit function throws an error.", async () => {
     const wrapper = getWrapper(() => {
       throw new Error("Test error message");
     });
@@ -43,5 +44,36 @@ describe("safeSubmit function", () => {
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
       "Test error message"
     );
+  });
+
+  it("Sets the form error message and the field errors..", async () => {
+    const wrapper = getWrapper(() => {
+      throw new DoOperationsError("Test error message", {
+        fieldA: "must be a number",
+        fieldB: "must be set"
+      });
+    });
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".error-message").map(node => node.text())).toEqual([
+      "Test error message",
+      "1 : Field A - must be a number",
+      "2 : Field B - must be set"
+    ]);
+  });
+
+  it("Sets no error message when none are thrown by the form submission.", async () => {
+    const wrapper = getWrapper(() => {
+      throw new DoOperationsError("", {});
+    });
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".error-message").map(node => node.text())).toEqual([]);
   });
 });
