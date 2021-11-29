@@ -77,7 +77,7 @@ export function AttachmentsEditor({
   hideAddAttchmentBtn,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentsEditorProps) {
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const { closeModal, openModal } = useModal();
 
@@ -177,7 +177,7 @@ export function AttachmentsEditor({
                           <Link
                             href={`/object-store/object/view?id=${metadata.id}`}
                           >
-                            <a target="_blank">
+                            <a target={readOnly ? "" : "_blank"}>
                               {metadata?.originalFilename ?? metadata.id}
                             </a>
                           </Link>

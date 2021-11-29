@@ -9,9 +9,9 @@ import {
 import { cloneDeep } from "lodash";
 import {
   createContext,
-  Fragment,
   PropsWithChildren,
   useContext,
+  useEffect,
   useMemo
 } from "react";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
@@ -73,7 +73,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 
   const isNestedForm = !!useContext(DinaFormContext);
 
-  const { children: childrenProp, onSubmit: onSubmitProp } = props;
+  const { children: childrenProp, onSubmit: onSubmitProp, readOnly } = props;
 
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
@@ -101,6 +101,18 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     () => cloneDeep(props.initialValues),
     [props.initialValues]
   );
+
+  //Ensure all edit pages' link does not navigate away to void unintentionaly data loss
+  useEffect(() => {
+    if (initialValues.id && !readOnly) {
+      const aLinks = document.querySelectorAll("a");
+      aLinks?.forEach(alink => {
+        alink.setAttribute("target", "_blank");
+        alink.setAttribute("rel", "noreferrer noopener");
+      });
+    }
+  }, [initialValues.id, readOnly]);
+  
 
   return (
     <DinaFormContext.Provider
