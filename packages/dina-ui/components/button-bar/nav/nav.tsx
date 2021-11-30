@@ -164,7 +164,7 @@ function menuDisplayControl() {
 }
 
 /** Object Store links. */
-function NavObjectStoreDropdown(shouldOpenInNewTab) {
+function NavObjectStoreDropdown({ shouldOpenInNewTab }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -215,7 +215,7 @@ function NavObjectStoreDropdown(shouldOpenInNewTab) {
 }
 
 /** Agents links. */
-function NavAgentsDropdown(shouldOpenInNewTab) {
+function NavAgentsDropdown({ shouldOpenInNewTab }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -241,7 +241,7 @@ function NavAgentsDropdown(shouldOpenInNewTab) {
 }
 
 /** Dina User links. */
-function NavDinaUserDropdown(shouldOpenInNewTab) {
+function NavDinaUserDropdown({ shouldOpenInNewTab }) {
   const { subject } = useAccount();
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
@@ -273,7 +273,7 @@ function NavDinaUserDropdown(shouldOpenInNewTab) {
 }
 
 /** Seqdb UI links. */
-function NavSeqDBDropdown(shouldOpenInNewTab) {
+function NavSeqDBDropdown({ shouldOpenInNewTab }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -327,7 +327,7 @@ function NavSeqDBDropdown(shouldOpenInNewTab) {
 }
 
 /** Collecting event links. */
-function NavCollectionDropdown(shouldOpenInNewTab) {
+function NavCollectionDropdown({ shouldOpenInNewTab }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -341,46 +341,82 @@ function NavCollectionDropdown(shouldOpenInNewTab) {
         <DinaMessage id="collectionSectionTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item  href="/collection/collection/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/collection/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="collectionListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/collection-method/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/collection-method/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="collectionMethodListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/project/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/project/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="projectListTitle" />
-        </Dropdown.Item>        
-        <Dropdown.Item href="/collection/institution/list" target={shouldOpenInNewTab? "_blank": ""}>
+        </Dropdown.Item>
+        <Dropdown.Item
+          href="/collection/institution/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="institutionListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/material-sample/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/material-sample/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="materialSampleListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/collecting-event/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/collecting-event/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="collectingEventListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/acquisition-event/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/acquisition-event/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="acquisitionEventListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/preparation-type/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/preparation-type/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="preparationTypeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/storage-unit-type/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/storage-unit-type/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="storageUnitTypeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/storage-unit/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/storage-unit/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="storageUnitListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/managed-attribute/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/managed-attribute/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="managedAttributeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/collection/workflow-template/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item
+          href="/collection/workflow-template/list"
+          target={shouldOpenInNewTab ? "_blank" : ""}
+        >
           <DinaMessage id="workflowTemplateListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           href="/collection/revisions-by-user"
           onKeyDown={onKeyDownLastItem}
-          target={shouldOpenInNewTab? "_blank": ""}
+          target={shouldOpenInNewTab ? "_blank" : ""}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
