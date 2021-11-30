@@ -9,6 +9,11 @@ import {
 } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
 
+export interface SangerPcrBatchStepProps {
+  pcrBatchId?: string;
+  onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+}
+
 export function SangerPcrBatchStep({
   pcrBatchId,
   onSaved
