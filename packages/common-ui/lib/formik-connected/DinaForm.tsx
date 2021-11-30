@@ -8,14 +8,9 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
-import {
-  createContext,
-  PropsWithChildren,
-  useContext,
-  useEffect,
-  useMemo
-} from "react";
 import { useIntl } from "react-intl";
+import { createContext, PropsWithChildren, useContext, useMemo } from "react";
+import { scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -82,12 +77,17 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
     // Make a copy of the submitted values so the original can't be mutated in the passed onSubmit function:
     const submittedValuesCopy = cloneDeep(submittedValues);
-    await onSubmitProp?.({
-      submittedValues: submittedValuesCopy,
-      formik,
-      api,
-      account
-    });
+    try {
+      await onSubmitProp?.({
+        submittedValues: submittedValuesCopy,
+        formik,
+        api,
+        account
+      });
+    } catch (error) {
+      scrollToError();
+      throw error;
+    }
   });
 
   const childrenInternal:
