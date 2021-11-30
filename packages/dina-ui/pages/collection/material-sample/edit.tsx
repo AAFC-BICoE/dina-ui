@@ -20,7 +20,8 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useRef, useState } from "react";
+import { ReactNode, useContext, useRef, useState, Ref } from "react";
+import { FormikProps } from "formik";
 import * as yup from "yup";
 import {
   AttachmentsField,
@@ -191,6 +192,8 @@ export interface MaterialSampleFormProps {
 
   /** Disables prefixing the sample name with the Collection code. */
   disableAutoNamePrefix?: boolean;
+
+  materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 }
 
 export function MaterialSampleForm({
@@ -202,6 +205,7 @@ export function MaterialSampleForm({
   enabledFields,
   attachmentsConfig,
   disableAutoNamePrefix,
+  materialSampleFormRef,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -380,6 +384,7 @@ export function MaterialSampleForm({
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
+      innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}

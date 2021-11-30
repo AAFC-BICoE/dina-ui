@@ -6,7 +6,10 @@ import { SelectNavigation } from "./SelectNavigation";
 
 export interface MaterialSampleBulkNavigatorProps {
   samples: InputResource<MaterialSample>[];
-  renderOneSample: (sample: InputResource<MaterialSample>) => ReactNode;
+  renderOneSample: (
+    sample: InputResource<MaterialSample>,
+    index: number
+  ) => ReactNode;
 }
 
 /**
@@ -32,7 +35,7 @@ export function MaterialSampleBulkNavigator({
         />
         {samples.map((sample, index) => (
           <div key={index} className={tabIndex !== index ? "d-none" : ""}>
-            {renderOneSample(sample)}
+            {renderOneSample(sample, index)}
           </div>
         ))}
       </div>
@@ -50,7 +53,7 @@ export function MaterialSampleBulkNavigator({
         ))}
       </TabList>
       {samples.map((sample, index) => (
-        <TabPanel key={index}>{renderOneSample(sample)}</TabPanel>
+        <TabPanel key={index}>{renderOneSample(sample, index)}</TabPanel>
       ))}
     </Tabs>
   );

@@ -3,6 +3,7 @@ import { cacheAdapterEnhancer } from "axios-extensions";
 import { FormikErrors } from "formik";
 import Kitsu, {
   GetParams,
+  InputResource,
   KitsuResource,
   KitsuResourceLink,
   PersistedResource
@@ -81,7 +82,7 @@ export interface ApiClientConfig {
 
 /** save function args. */
 export interface SaveArgs<T extends KitsuResource = KitsuResource> {
-  resource: T;
+  resource: T | InputResource<T>;
   type: string;
 }
 

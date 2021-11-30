@@ -61,7 +61,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
   type: "managed-attribute",
-  name: "testAttr"
+  name: "testAttr",
+  key: "test_attr"
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -762,7 +763,7 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           managedAttributes: {
-            testAttr: "do the test"
+            test_attr: "do the test"
           }
         }}
         onSaved={mockOnSaved}
@@ -796,7 +797,7 @@ describe("Material Sample Edit Page", () => {
               id: "333",
               hostOrganism: null,
               managedAttributes: {
-                testAttr: "do the test"
+                test_attr: "do the test"
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,

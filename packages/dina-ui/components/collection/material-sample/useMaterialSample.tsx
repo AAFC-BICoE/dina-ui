@@ -1,13 +1,15 @@
 import {
+  ApiClientI,
   AreYouSureModal,
   DinaForm,
   DinaFormSubmitParams,
+  SaveArgs,
   useApiClient,
   useModal,
   useQuery,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { FormikContextType, FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep, compact, isEmpty, isEqual, pick, pickBy } from "lodash";
 import {
@@ -162,6 +164,7 @@ export function useMaterialSampleSave({
   materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
   const { openModal } = useModal();
+  const { save } = useApiClient();
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -419,14 +422,10 @@ export function useMaterialSampleSave({
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
-  async function onSubmit({
-    api: { save },
-    formik,
-    submittedValues
-  }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
-    // Init relationships object for one-to-many relations:
-    (submittedValues as any).relationships = {};
-
+  async function prepareSampleSaveOperation(
+    submittedValues: InputResource<MaterialSample>,
+    formik: FormikContextType<InputResource<MaterialSample>>
+  ): Promise<SaveArgs<MaterialSample> | null> {
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> & {
       relationships: any;
@@ -494,7 +493,7 @@ export function useMaterialSampleSave({
       const colEventErrors = await colEventFormRef.current.validateForm();
       if (!isEmpty(colEventErrors)) {
         formik.setErrors({ ...formik.errors, ...colEventErrors });
-        return;
+        return null;
       }
 
       // Save the linked CollectingEvent if included:
@@ -531,7 +530,7 @@ export function useMaterialSampleSave({
       const acqEventErrors = await acqEventFormRef.current.validateForm();
       if (!isEmpty(acqEventErrors)) {
         formik.setErrors({ ...formik.errors, ...acqEventErrors });
-        return;
+        return null;
       }
 
       // Save the linked AcqEvent if included:
@@ -567,18 +566,34 @@ export function useMaterialSampleSave({
       };
     }
 
+    const saveOperation = {
+      resource: materialSampleInput,
+      type: "material-sample"
+    };
+
+    return saveOperation;
+  }
+
+  async function onSubmit({
+    submittedValues,
+    formik
+  }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
+    // In case of error, return early instead of saving to the back-end:
+    const materialSampleSaveOp = await prepareSampleSaveOperation(
+      submittedValues,
+      formik,
+      api
+    );
+    if (!materialSampleSaveOp) {
+      return;
+    }
+
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(
       async () =>
-        await save(
-          [
-            {
-              resource: materialSampleInput,
-              type: "material-sample"
-            }
-          ],
-          { apiBaseUrl: "/collection-api" }
-        ),
+        await save<MaterialSample>([materialSampleSaveOp], {
+          apiBaseUrl: "/collection-api"
+        }),
       formik
     );
 
@@ -605,7 +620,7 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
-  const acqEventProps = {
+  const acqEventFormProps = {
     innerRef: acqEventFormRef,
     initialValues: isTemplate
       ? acqEventTemplateInitialValues
@@ -617,12 +632,12 @@ export function useMaterialSampleSave({
 
   const nestedAcqEventForm = acqEventId ? (
     withResponse(acqEventQuery, ({ data }) => (
-      <DinaForm {...acqEventProps} initialValues={data}>
+      <DinaForm {...acqEventFormProps} initialValues={data}>
         <AcquisitionEventFormLayout />
       </DinaForm>
     ))
   ) : (
-    <DinaForm {...acqEventProps}>
+    <DinaForm {...acqEventFormProps}>
       <AcquisitionEventFormLayout />
     </DinaForm>
   );
@@ -639,6 +654,7 @@ export function useMaterialSampleSave({
     setAcqEventId,
     colEventQuery,
     onSubmit,
+    prepareSampleSaveOperation,
     loading
   };
 }
