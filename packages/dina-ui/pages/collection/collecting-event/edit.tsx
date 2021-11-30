@@ -26,10 +26,9 @@ interface CollectingEventFormProps {
 
 export default function CollectingEventEditPage() {
   const router = useRouter();
-  
-  const { pathname } = router;
-  const id = router.query.id?.toString();
-
+  const {
+    query: { id }
+  } = router;
   const { formatMessage } = useDinaIntl();
 
   const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle";
@@ -39,7 +38,7 @@ export default function CollectingEventEditPage() {
   return (
     <div>
       <Head title={formatMessage(title)} />
-      <Nav id={id} pathname={pathname} />
+      <Nav />
       <main className="container-fluid">
         {id ? (
           <div>

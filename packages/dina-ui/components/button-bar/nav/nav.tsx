@@ -1,7 +1,9 @@
 import {
   LanguageSelector,
   NavbarUserControl,
-  useAccount
+  useAccount,
+  useQuery,
+  withResponse
 } from "common-ui";
 import Link from "next/link";
 import React from "react";
@@ -10,14 +12,9 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext, useState } from "react";
 import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
 import Dropdown from "react-bootstrap/Dropdown";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 
-export interface NavProps {
-  id?: string;
-  pathname?: string;
-}
-
-
-export function Nav({ id, pathname }: NavProps) {
+export function Nav() {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const { locale } = useContext(intlContext);
@@ -27,8 +24,6 @@ export function Nav({ id, pathname }: NavProps) {
     Object.values(rolesPerGroup ?? {})
       ?.flatMap(it => it)
       ?.includes("collection-manager") || isAdmin;
-
-  let shouldOpenInNewTab = getOpenInNewTabForLink({ id, pathname });
 
   return (
     <>
@@ -96,26 +91,20 @@ export function Nav({ id, pathname }: NavProps) {
                 </Link>
               </li>
               <li className="list-inline-item my-auto">
-                <NavObjectStoreDropdown
-                  shouldOpenInNewTab={shouldOpenInNewTab}
-                />
+                <NavObjectStoreDropdown />
               </li>
               <li className="list-inline-item my-auto">
-                <NavAgentsDropdown shouldOpenInNewTab={shouldOpenInNewTab} />
+                <NavAgentsDropdown />
               </li>
               <li className="list-inline-item my-auto">
-                <NavSeqDBDropdown shouldOpenInNewTab={shouldOpenInNewTab} />
+                <NavSeqDBDropdown />
               </li>
               <li className="list-inline-item my-auto">
-                <NavCollectionDropdown
-                  shouldOpenInNewTab={shouldOpenInNewTab}
-                />
+                <NavCollectionDropdown />
               </li>
               {showUserNav && (
                 <li className="list-inline-item my-auto">
-                  <NavDinaUserDropdown
-                    shouldOpenInNewTab={shouldOpenInNewTab}
-                  />
+                  <NavDinaUserDropdown />
                 </li>
               )}
             </ul>
@@ -124,14 +113,6 @@ export function Nav({ id, pathname }: NavProps) {
       </header>
     </>
   );
-}
-
-function getOpenInNewTabForLink({ id, pathname }) {
-  let openInNewTab = false;
-  if (id && pathname?.lastIndexOf("edit") >= 0) {
-    openInNewTab = true;
-  }
-  return openInNewTab;
 }
 
 function menuDisplayControl() {
@@ -164,7 +145,7 @@ function menuDisplayControl() {
 }
 
 /** Object Store links. */
-function NavObjectStoreDropdown({ shouldOpenInNewTab }) {
+function NavObjectStoreDropdown() {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -178,34 +159,21 @@ function NavObjectStoreDropdown({ shouldOpenInNewTab }) {
         <DinaMessage id="objectStoreTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item
-          href="/object-store/upload"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/object-store/upload">
           <DinaMessage id="uploadPageTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/object-store/object/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/object-store/object/list">
           <DinaMessage id="objectListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/object-store/managedAttributesView/listView"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/object-store/managedAttributesView/listView">
           <DinaMessage id="managedAttributeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/object-store/object-subtype/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/object-store/object-subtype/list">
           <DinaMessage id="objectSubtypeListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           href="/object-store/revisions-by-user"
           onKeyDown={onKeyDownLastItem}
-          target={shouldOpenInNewTab ? "_blank" : ""}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
@@ -215,7 +183,7 @@ function NavObjectStoreDropdown({ shouldOpenInNewTab }) {
 }
 
 /** Agents links. */
-function NavAgentsDropdown({ shouldOpenInNewTab }) {
+function NavAgentsDropdown() {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -229,10 +197,10 @@ function NavAgentsDropdown({ shouldOpenInNewTab }) {
         <DinaMessage id="agentsSectionTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item href="/person/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/person/list">
           <DinaMessage id="personListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/organization/list" onKeyDown={onKeyDownLastItem} target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/organization/list" onKeyDown={onKeyDownLastItem}>
           <DinaMessage id="organizationListTitle" />
         </Dropdown.Item>
       </Dropdown.Menu>
@@ -241,7 +209,7 @@ function NavAgentsDropdown({ shouldOpenInNewTab }) {
 }
 
 /** Dina User links. */
-function NavDinaUserDropdown({ shouldOpenInNewTab }) {
+function NavDinaUserDropdown() {
   const { subject } = useAccount();
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
@@ -257,13 +225,12 @@ function NavDinaUserDropdown({ shouldOpenInNewTab }) {
         <DinaMessage id="dinaUserSectionTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item href="/dina-user/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/dina-user/list">
           <DinaMessage id="userListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           href={`/dina-user/view?id=${subject}`}
           onKeyDown={onKeyDownLastItem}
-          target={shouldOpenInNewTab? "_blank": ""}
         >
           <DinaMessage id="whoAmITitle" />
         </Dropdown.Item>
@@ -273,7 +240,7 @@ function NavDinaUserDropdown({ shouldOpenInNewTab }) {
 }
 
 /** Seqdb UI links. */
-function NavSeqDBDropdown({ shouldOpenInNewTab }) {
+function NavSeqDBDropdown() {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -287,37 +254,36 @@ function NavSeqDBDropdown({ shouldOpenInNewTab }) {
         <SeqdbMessage id="seqdbTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item href="/seqdb/workflow/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/workflow/list">
           <SeqdbMessage id="workflowListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/sanger-workflow/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/sanger-workflow/list">
           <SeqdbMessage id="sangerWorkflowListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/index-set/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/index-set/list">
           <SeqdbMessage id="indexSetListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/pcr-primer/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/pcr-primer/list">
           <SeqdbMessage id="pcrPrimerListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/pcr-profile/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/pcr-profile/list">
           <SeqdbMessage id="pcrProfileListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/pcr-batch/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/pcr-batch/list">
           <SeqdbMessage id="pcrBatchListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/product/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/product/list">
           <SeqdbMessage id="productListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/protocol/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/protocol/list">
           <SeqdbMessage id="protocolListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item href="/seqdb/region/list" target={shouldOpenInNewTab? "_blank": ""}>
+        <Dropdown.Item href="/seqdb/region/list">
           <SeqdbMessage id="regionListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           href="/seqdb/molecular-sample/list"
           onKeyDown={onKeyDownLastItem}
-          target={shouldOpenInNewTab? "_blank": ""}
         >
           <SeqdbMessage id="molecularSampleListTitle" />
         </Dropdown.Item>
@@ -327,7 +293,7 @@ function NavSeqDBDropdown({ shouldOpenInNewTab }) {
 }
 
 /** Collecting event links. */
-function NavCollectionDropdown({ shouldOpenInNewTab }) {
+function NavCollectionDropdown() {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
   return (
@@ -341,82 +307,45 @@ function NavCollectionDropdown({ shouldOpenInNewTab }) {
         <DinaMessage id="collectionSectionTitle" />
       </Dropdown.Toggle>
       <Dropdown.Menu>
-        <Dropdown.Item
-          href="/collection/collection/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/collection/list">
           <DinaMessage id="collectionListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/collection-method/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/collection-method/list">
           <DinaMessage id="collectionMethodListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/project/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/project/list">
           <DinaMessage id="projectListTitle" />
-        </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/institution/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        </Dropdown.Item>        
+        <Dropdown.Item href="/collection/institution/list">
           <DinaMessage id="institutionListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/material-sample/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/material-sample/list">
           <DinaMessage id="materialSampleListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/collecting-event/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/collecting-event/list">
           <DinaMessage id="collectingEventListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/acquisition-event/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/acquisition-event/list">
           <DinaMessage id="acquisitionEventListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/preparation-type/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/preparation-type/list">
           <DinaMessage id="preparationTypeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/storage-unit-type/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/storage-unit-type/list">
           <DinaMessage id="storageUnitTypeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/storage-unit/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/storage-unit/list">
           <DinaMessage id="storageUnitListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/managed-attribute/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/managed-attribute/list">
           <DinaMessage id="managedAttributeListTitle" />
         </Dropdown.Item>
-        <Dropdown.Item
-          href="/collection/workflow-template/list"
-          target={shouldOpenInNewTab ? "_blank" : ""}
-        >
+        <Dropdown.Item href="/collection/workflow-template/list">
           <DinaMessage id="workflowTemplateListTitle" />
         </Dropdown.Item>
         <Dropdown.Item
           href="/collection/revisions-by-user"
           onKeyDown={onKeyDownLastItem}
-          target={shouldOpenInNewTab ? "_blank" : ""}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
         </Dropdown.Item>
@@ -435,18 +364,18 @@ export function Footer() {
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>
-                  <a href="https://www.canada.ca/en/contact.html" target="_blank">
+                  <a href="https://www.canada.ca/en/contact.html">
                     <DinaMessage id="footerContactInfo" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.canada.ca/en/transparency/terms.html" target="_blank">
+                  <a href="https://www.canada.ca/en/transparency/terms.html">
                     <DinaMessage id="footerTermsAndConditions" />
                   </a>
                 </li>
                 <li>
-                  <a href="https://www.canada.ca/en/transparency/privacy.html" target="_blank">
-                    <DinaMessage id="footerPrivacy"/>
+                  <a href="https://www.canada.ca/en/transparency/privacy.html">
+                    <DinaMessage id="footerPrivacy" />
                   </a>
                 </li>
               </ul>
