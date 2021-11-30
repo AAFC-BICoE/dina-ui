@@ -17,7 +17,7 @@ export interface NavProps {
 }
 
 
-export function Nav({ id, pathname }) {
+export function Nav({ id, pathname }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
   const { locale } = useContext(intlContext);
