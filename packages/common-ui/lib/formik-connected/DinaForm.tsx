@@ -2,6 +2,7 @@ import {
   Form,
   Formik,
   FormikConfig,
+  FormikConsumer,
   FormikContextType,
   FormikProps,
   FormikValues
@@ -156,6 +157,15 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     }
   }
 
+  const PromptIfDirty = ({formik}) => {
+    const { formatMessage } = useIntl();
+    if (formik.dirty && formik.submitCount === 0) {
+      window.onbeforeunload = () => {
+        return formatMessage({ id: "possibleDataLossWarning" });
+      };
+    } else window.onbeforeunload = null;
+    return null;
+  };
   const Wrapper = isNestedForm ? "div" : Form;
 
   return (
@@ -163,6 +173,9 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
       onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
     >
       <ErrorViewer />
+      <FormikConsumer>
+        {formik => <PromptIfDirty formik={formik} />}
+      </FormikConsumer>
       {children}
     </Wrapper>
   );
