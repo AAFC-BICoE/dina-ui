@@ -27,12 +27,14 @@ export function MaterialSampleBulkNavigator({
   if (tooManySamplesForTabs) {
     return (
       <div>
-        <SelectNavigation
-          elements={samples}
-          value={tabIndex}
-          onChange={setTabIndex}
-          optionLabel={sample => sample.materialSampleName}
-        />
+        <div className="d-flex justify-content-center mb-3">
+          <SelectNavigation
+            elements={samples}
+            value={tabIndex}
+            onChange={setTabIndex}
+            optionLabel={sample => sample.materialSampleName}
+          />
+        </div>
         {samples.map((sample, index) => (
           <div key={index} className={tabIndex !== index ? "d-none" : ""}>
             {renderOneSample(sample, index)}

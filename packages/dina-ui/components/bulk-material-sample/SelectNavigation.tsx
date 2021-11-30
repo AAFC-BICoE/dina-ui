@@ -29,7 +29,7 @@ export function SelectNavigation<T>({
   return (
     <div className="d-flex" style={{ width: "30rem" }}>
       <button
-        className="btn btn-info leftArrow mb-2"
+        className="btn btn-info leftArrow mt-4"
         onClick={() => onChange(value - 1)}
         type="button"
         style={{ visibility: leftDisabled ? "hidden" : undefined }}
@@ -38,14 +38,17 @@ export function SelectNavigation<T>({
         <FaCaretLeft size="1.5em" />
       </button>
       <div className="flex-grow-1">
-        <Select
-          options={options}
-          onChange={newVal => onChange(newVal?.value ?? 0)}
-          value={selectValue}
-        />
+        <label className="w-100">
+          <div className="fw-bold">Navigation</div>
+          <Select
+            options={options}
+            onChange={newVal => onChange(newVal?.value ?? 0)}
+            value={selectValue}
+          />
+        </label>
       </div>
       <button
-        className="btn btn-info rightArrow mb-2"
+        className="btn btn-info rightArrow mt-4"
         onClick={() => onChange(value + 1)}
         type="button"
         style={{ visibility: rightDisabled ? "hidden" : undefined }}

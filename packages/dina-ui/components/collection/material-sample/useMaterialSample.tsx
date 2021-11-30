@@ -581,8 +581,7 @@ export function useMaterialSampleSave({
     // In case of error, return early instead of saving to the back-end:
     const materialSampleSaveOp = await prepareSampleSaveOperation(
       submittedValues,
-      formik,
-      api
+      formik
     );
     if (!materialSampleSaveOp) {
       return;

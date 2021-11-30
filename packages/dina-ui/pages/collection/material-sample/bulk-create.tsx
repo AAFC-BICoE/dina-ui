@@ -1,7 +1,10 @@
-import { ButtonBar, DinaForm, FormikButton } from "common-ui";
+import { ButtonBar, DinaForm, FormikButton, useApiClient } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
+import { compact } from "lodash";
+import { useRouter } from "next/router";
 import { useMemo, useRef, useState } from "react";
+import { Promisable } from "type-fest";
 import {
   Head,
   MaterialSampleBulkNavigator,
@@ -15,12 +18,17 @@ import { MaterialSampleForm } from "./edit";
 
 export default function MaterialSampleBulkCreatePage() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
 
   const title = "createNewMaterialSamples";
 
   const [generatedSamples, setGeneratedSamples] = useState<
     InputResource<MaterialSample>[] | null
   >(null);
+
+  async function moveToListPage() {
+    await router.push(`/collection/material-sample/list`);
+  }
 
   return (
     <div>
@@ -29,7 +37,10 @@ export default function MaterialSampleBulkCreatePage() {
       <main className="container">
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {generatedSamples ? (
-          <MaterialSampleBulkEditor samples={generatedSamples} />
+          <MaterialSampleBulkEditor
+            samples={generatedSamples}
+            onSaved={moveToListPage}
+          />
         ) : (
           <MaterialSampleGenerationForm onGenerate={setGeneratedSamples} />
         )}
@@ -40,10 +51,12 @@ export default function MaterialSampleBulkCreatePage() {
 
 interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
+  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
 }
 
 function MaterialSampleBulkEditor({
-  samples: samplesProp
+  samples: samplesProp,
+  onSaved
 }: MaterialSampleBulkEditorProps) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
@@ -55,6 +68,8 @@ function MaterialSampleBulkEditor({
   const sampleFormRefs = samples.map(() =>
     useRef<FormikProps<InputResource<MaterialSample>>>(null)
   );
+
+  const { save } = useApiClient();
 
   async function saveAll() {
     const saveOperations = await Promise.all(
@@ -76,7 +91,18 @@ function MaterialSampleBulkEditor({
       })
     );
 
-    // console.log({ saveOperations });
+    const validOperations = saveOperations.map(op => {
+      if (!op) {
+        throw new Error("Some material sample saves failed.");
+      }
+      return op;
+    });
+
+    const savedSamples = await save<MaterialSample>(validOperations, {
+      apiBaseUrl: "/collection-api"
+    });
+
+    await onSaved(savedSamples);
   }
 
   return (
