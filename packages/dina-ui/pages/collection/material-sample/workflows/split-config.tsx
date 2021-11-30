@@ -7,7 +7,8 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  withResponse
+  withResponse,
+  NumberSpinnerField
 } from "common-ui";
 import { Field, useFormikContext } from "formik";
 import { padStart, range } from "lodash";
@@ -16,7 +17,6 @@ import { withRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
-import { NumberSpinnerField } from "../../../../../common-ui/lib/formik-connected/NumberSpinnerField";
 import { Nav } from "../../../../../dina-ui/components/button-bar/nav/nav";
 import { useMaterialSampleQuery } from "../../../../../dina-ui/components/collection";
 import { Head } from "../../../../../dina-ui/components/head";

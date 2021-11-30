@@ -13,7 +13,6 @@ import { toPairs } from "lodash";
 import Link from "next/link";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
-import { CommonMessage } from "../../../../common-ui/lib/intl/common-ui-intl";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;

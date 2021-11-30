@@ -8,7 +8,7 @@ import {
   FormikButton,
   QueryTable,
   rsql
-} from "../../../common-ui/lib";
+} from "common-ui";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";

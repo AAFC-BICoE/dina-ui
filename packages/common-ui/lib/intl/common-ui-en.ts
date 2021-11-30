@@ -17,6 +17,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "Auto-fill Location Fields (This search box's value is not persisted)",
   backToList: "Back to list page",
   backToReadOnlyPage: "Back to read-only page",
+  bulkEdit: "Bulk Edit",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
   cancelButtonText: "Cancel",
   checkAll: "Check All",

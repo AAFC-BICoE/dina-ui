@@ -11,7 +11,7 @@ import { MaterialSampleRunActionResult } from "../../../../../dina-ui/types/coll
 import { SPLIT_CHILD_SAMPLE_RUN_ACTION_RESULT_KEY } from "./split-run";
 import { MaterialSampleRunConfig } from "../../../../../dina-ui/types/collection-api/resources/MaterialSampleRunConfig";
 import { SPLIT_CHILD_SAMPLE_RUN_CONFIG_KEY } from "./split-config";
-import { ButtonBar, DinaForm } from "../../../../../common-ui/lib";
+import { ButtonBar, DinaForm } from "common-ui";
 import { useRouter } from "next/router";
 
 export default function SplitRunActionResult() {

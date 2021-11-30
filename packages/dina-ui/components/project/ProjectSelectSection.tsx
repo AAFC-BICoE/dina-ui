@@ -1,10 +1,15 @@
-import { filterBy, ResourceSelectField, useDinaFormContext, DinaFormSection } from "../../../common-ui/lib"
+import {
+  filterBy,
+  ResourceSelectField,
+  useDinaFormContext,
+  DinaFormSection
+} from "common-ui";
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { FaFolderOpen } from "react-icons/fa";
 
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
-} 
+}
 
 export function ProjectSelectSection({
   resourcePath
@@ -28,8 +33,8 @@ export function ProjectSelectSection({
 }
 
 export interface ProjectSelectFieldProps {
-  resourcePath?: string,
-  className?: string
+  resourcePath?: string;
+  className?: string;
 }
 
 export function ProjectSelectField({

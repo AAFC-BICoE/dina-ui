@@ -1,11 +1,6 @@
+import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
-import {
-  ButtonBar,
-  DinaForm,
-  SubmitButton,
-  withResponse
-} from "../../../../common-ui/lib";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   PcrBatchForm,
@@ -13,11 +8,6 @@ import {
   usePcrBatchQuery
 } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
-
-export interface SangerPcrBatchStepProps {
-  pcrBatchId?: string;
-  onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
-}
 
 export function SangerPcrBatchStep({
   pcrBatchId,

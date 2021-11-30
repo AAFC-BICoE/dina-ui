@@ -140,6 +140,14 @@ export function SampleListLayout({
             }
           : undefined
       }
+      bulkEditPath={
+        showBulkActions
+          ? ids => ({
+              pathname: "/collection/material-sample/bulk-edit",
+              query: { ids: ids.join(",") }
+            })
+          : undefined
+      }
     />
   );
 }

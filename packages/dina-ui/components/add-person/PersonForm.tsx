@@ -6,9 +6,9 @@ import {
   SubmitButton,
   TextField,
   useModal,
-  StringArrayField
+  StringArrayField,
+  ResourceSelectField
 } from "common-ui";
-import { ResourceSelectField } from "common-ui/lib";
 import { PersistedResource } from "kitsu";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";

@@ -3,14 +3,14 @@ import {
   NavbarUserControl,
   useAccount,
   useQuery,
-  withResponse
+  withResponse,
+  intlContext
 } from "common-ui";
 import Link from "next/link";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext, useState } from "react";
-import { intlContext } from "../../../../common-ui/lib/intl/IntlSupport";
 import Dropdown from "react-bootstrap/Dropdown";
 import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 
@@ -315,7 +315,7 @@ function NavCollectionDropdown() {
         </Dropdown.Item>
         <Dropdown.Item href="/collection/project/list">
           <DinaMessage id="projectListTitle" />
-        </Dropdown.Item>        
+        </Dropdown.Item>
         <Dropdown.Item href="/collection/institution/list">
           <DinaMessage id="institutionListTitle" />
         </Dropdown.Item>

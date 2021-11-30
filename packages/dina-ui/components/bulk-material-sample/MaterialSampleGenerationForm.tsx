@@ -10,7 +10,7 @@ import {
 import { Field, FormikContextType } from "formik";
 import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
+import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";

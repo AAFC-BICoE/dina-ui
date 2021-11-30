@@ -1,18 +1,17 @@
 import {
-  ColumnDefinition,
-  ListPageLayout,
   ButtonBar,
-  CreateButton
+  ColumnDefinition,
+  CommonMessage,
+  ListPageLayout
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
-import { CommonMessage } from "common-ui/lib/intl/common-ui-intl";
-import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
   {

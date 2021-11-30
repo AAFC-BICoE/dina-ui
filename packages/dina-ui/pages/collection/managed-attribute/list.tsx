@@ -1,5 +1,5 @@
 import { ButtonBar, ColumnDefinition, ListPageLayout } from "common-ui";
-import { CommonMessage } from "common-ui/lib/intl/common-ui-intl";
+import { CommonMessage } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
