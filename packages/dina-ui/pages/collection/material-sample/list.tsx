@@ -23,6 +23,8 @@ export interface SampleListLayoutProps {
   btnMsg?: string;
   hideTopPagination?: boolean;
   hideGroupFilter?: boolean;
+
+  showBulkActions?: boolean;
 }
 
 export const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] =
@@ -57,7 +59,8 @@ export function SampleListLayout({
   classNames,
   btnMsg,
   hideTopPagination,
-  hideGroupFilter
+  hideGroupFilter,
+  showBulkActions
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -129,6 +132,14 @@ export function SampleListLayout({
           <></>
         )
       }
+      bulkDeleteButtonProps={
+        showBulkActions
+          ? {
+              typeName: "material-sample",
+              apiBaseUrl: "/collection-api"
+            }
+          : undefined
+      }
     />
   );
 }
@@ -152,7 +163,7 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <SampleListLayout />
+        <SampleListLayout showBulkActions={true} />
       </main>
       <Footer />
     </div>

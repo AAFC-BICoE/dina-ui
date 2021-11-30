@@ -106,7 +106,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   defaultValuesConfigs: "Configurations des valeurs par défaut ",
   deleteButtonText: "Supprimer",
   deleteConfig: "Supprimer la configuration",
-  deleteSelectedButtonText: "Supprimer les éléments sélectionnés",
   deleteThisAttributesTemplate: "Supprimer ce modèle",
   deleted: "Supprimé",
   deletedMetadata_tooltip: "ID de métadonnées supprimées : {id}",
@@ -139,7 +138,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editPreparationTypeTitle: "Modifier le type de préparation",
   editSelectedAttachmentMetadata:
     "Modifier les métadonnées de la pièce jointe sélectionnée",
-  editSelectedButtonText: "Modifier les éléments sélectionnés",
   editStorageUnitTitle: "Modifier l’unité de stockage",
   editStorageUnitTypeTitle: "Modifier le type de stockage",
   editWorkflowTemplateTitle: "Modifier le modèle de flux de travail",

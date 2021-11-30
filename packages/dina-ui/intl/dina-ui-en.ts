@@ -120,7 +120,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
   deleteConfig: "Delete Config",
-  deleteSelectedButtonText: "Delete Selected",
   deleteThisAttributesTemplate: "Delete This Template",
   deleted: "Deleted",
   deleteEmptyStorageWarning:
@@ -157,7 +156,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editPreparationTypeTitle: "Edit Preparation Type",
   editProjectTitle: " Edit Project",
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
-  editSelectedButtonText: "Edit Selected",
   editStorageUnitTitle: "Edit Storage Unit",
   editStorageUnitTypeTitle: "Edit Storage Type",
   editWorkflowTemplateTitle: "Edit Workflow Template",
