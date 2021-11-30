@@ -68,7 +68,7 @@ export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 export default function MaterialSampleEditPage() {
   const router = useRouter();  
 
-  const {  pathname  } = router;
+  const { pathname } = router;
 
   const id = router.query.id?.toString();
   const copyFromId = router.query.copyFromId?.toString();

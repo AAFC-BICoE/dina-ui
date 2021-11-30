@@ -26,10 +26,10 @@ interface CollectingEventFormProps {
 
 export default function CollectingEventEditPage() {
   const router = useRouter();
-  const {
-    pathname,
-    query: { id }
-  } = router;
+  
+  const { pathname } = router;
+  const id = router.query.id?.toString();
+
   const { formatMessage } = useDinaIntl();
 
   const title = id ? "editCollectingEventTitle" : "addCollectingEventTitle";
