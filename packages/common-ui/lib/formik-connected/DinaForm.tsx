@@ -142,7 +142,8 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
 
   const PromptIfDirty = ({formik}) => {
     const { formatMessage } = useIntl();
-    if (formik.dirty && formik.submitCount === 0) {
+    // only prompt if there is data change in edit or add pages
+    if (formik.dirty && formik.values.type && formik.submitCount === 0) {
       window.onbeforeunload = () => {
         return formatMessage({ id: "possibleDataLossWarning" });
       };
@@ -157,9 +158,13 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     >
       <ErrorViewer />
       <FormikConsumer>
-        {formik => <PromptIfDirty formik={formik} />}
+        {formik => (
+          <>
+            <PromptIfDirty formik={formik} />
+          </>
+        )}
       </FormikConsumer>
-      {children}
+      {children}      
     </Wrapper>
   );
 }
