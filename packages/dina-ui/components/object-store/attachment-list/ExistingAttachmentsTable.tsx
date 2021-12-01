@@ -11,6 +11,7 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
+import { thumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
 
@@ -53,6 +54,10 @@ export function ExistingAttachmentsTable({
       Header: CheckBoxHeader,
       sortable: false
     },
+    thumbnailCell({
+      bucketField: "metadata.bucket",
+      fileIdentifierField: "metadata.fileIdentifier"
+    }),
     {
       Cell: ({ original: { id, metadata } }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:
