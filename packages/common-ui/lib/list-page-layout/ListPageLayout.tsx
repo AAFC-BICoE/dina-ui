@@ -1,9 +1,10 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
 import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
-import { ReactNode } from "react";
+import { ComponentType, ReactNode } from "react";
 import { SortingRule } from "react-table";
 import {
+  CheckBoxFieldProps,
   DinaForm,
   FilterAttribute,
   MetaWithTotal,
@@ -25,7 +26,9 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
-  queryTableProps: QueryTableProps<TData>;
+  queryTableProps:
+    | QueryTableProps<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
@@ -35,6 +38,10 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   };
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
+}
+
+interface ListPageLayoutContext<TData extends KitsuResource> {
+  CheckBoxField: ComponentType<CheckBoxFieldProps<TData>>;
 }
 
 /**
@@ -109,6 +116,11 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
+  const resolvedQueryTableProps =
+    typeof queryTableProps === "function"
+      ? queryTableProps({ CheckBoxField })
+      : queryTableProps;
+
   const columns = [
     ...(showRowCheckboxes
       ? [
@@ -121,12 +133,12 @@ export function ListPageLayout<TData extends KitsuResource>({
           }
         ]
       : []),
-    ...queryTableProps.columns
+    ...resolvedQueryTableProps.columns
   ];
 
   async function onSuccess(response: KitsuResponse<TData[], MetaWithTotal>) {
     setAvailableSamples(response.data);
-    return queryTableProps.onSuccess?.(response);
+    return resolvedQueryTableProps.onSuccess?.(response);
   }
 
   const tableElement = (
@@ -136,7 +148,7 @@ export function ListPageLayout<TData extends KitsuResource>({
       filter={filterParam}
       onPageSizeChange={newSize => setDefaultPageSize(newSize)}
       onSortedChange={newSort => setStoredDefaultSort(newSort)}
-      {...queryTableProps}
+      {...resolvedQueryTableProps}
       columns={columns}
       onSuccess={onSuccess}
     />

@@ -47,6 +47,7 @@ export * from "./key-value-table/KeyValueTable";
 export * from "./LabelView";
 export * from "./list-page-layout/FilterForm";
 export * from "./list-page-layout/ListPageLayout";
+export * from "./list-page-layout/bulk-buttons";
 export * from "./loading-spinner/LoadingSpinner";
 export * from "./modal/AreYouSureModal";
 export * from "./modal/modal";

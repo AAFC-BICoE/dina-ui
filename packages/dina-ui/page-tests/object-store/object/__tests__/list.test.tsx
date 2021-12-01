@@ -1,13 +1,16 @@
-import { AreYouSureModal, DinaForm, QueryTable } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
-import { StoredObjectGallery } from "../../../../components/object-store";
-import MetadataListPage, {
+import {
+  AreYouSureModal,
   BulkDeleteButton,
-  MetadataListFormValues
-} from "../../../../pages/object-store/object/list";
+  BulkSelectableFormValues,
+  DinaForm,
+  QueryTable
+} from "common-ui";
+import { PersistedResource } from "kitsu";
+import { StoredObjectGallery } from "../../../../components/object-store";
+import MetadataListPage from "../../../../pages/object-store/object/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Metadata } from "../../../../types/objectstore-api";
+import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -138,7 +141,7 @@ describe("Metadata List Page", () => {
     });
 
     // Click the bulk edit button:
-    wrapper.find("button.metadata-bulk-edit-button").simulate("click");
+    wrapper.find("button.bulk-edit-button").simulate("click");
 
     // Router push should have been called with the 3 IDs.
     expect(mockPush).lastCalledWith({
@@ -176,9 +179,9 @@ describe("Metadata List Page", () => {
     wrapper.update();
 
     // Disabled initially because none are selected:
-    expect(
-      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
-    ).toEqual(true);
+    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
+      true
+    );
 
     // Select all 3 Metadatas to edit.
     wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
@@ -188,9 +191,9 @@ describe("Metadata List Page", () => {
     wrapper.update();
 
     // The button should now be enabled:
-    expect(
-      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
-    ).toEqual(false);
+    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
+      false
+    );
 
     // Deselect all 3 Metadatas.
     wrapper.find(".grouped-checkbox-header input").prop<any>("onClick")({
@@ -200,28 +203,28 @@ describe("Metadata List Page", () => {
     wrapper.update();
 
     // The button should now be disabled again:
-    expect(
-      wrapper.find("button.metadata-bulk-edit-button").prop("disabled")
-    ).toEqual(true);
+    expect(wrapper.find("button.bulk-edit-button").prop("disabled")).toEqual(
+      true
+    );
   });
 
   it("Lets you bulk-delete metadata.", async () => {
     const pageWrapper = mountWithAppContext(<MetadataListPage />, {
       apiContext
     });
-    expect(pageWrapper.find(BulkDeleteButton).exists());
+    expect(pageWrapper.find("bulk-delete-button").exists());
 
     // Pretend two metadatas are already selected:
     const buttonWrapper = mountWithAppContext(
-      <DinaForm<MetadataListFormValues>
+      <DinaForm<BulkSelectableFormValues>
         initialValues={{
-          selectedMetadatas: {
+          selectedResources: {
             "00000000-0000-0000-0000-000000000000": true,
             "11111111-1111-1111-1111-111111111111": true
           }
         }}
       >
-        <BulkDeleteButton />
+        <BulkDeleteButton typeName="metadata" apiBaseUrl="/objectstore-api" />
       </DinaForm>,
       { apiContext }
     );
