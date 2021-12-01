@@ -134,7 +134,7 @@ describe("MetersField component", () => {
     );
     // Shows the error message:
     expect(wrapper.find(".invalid-feedback").text()).toEqual(
-      "Invalid meters value."
+      "Invalid meters value"
     );
 
     wrapper.find("form").simulate("submit");

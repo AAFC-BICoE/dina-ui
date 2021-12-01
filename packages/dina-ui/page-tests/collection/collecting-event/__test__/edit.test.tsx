@@ -203,10 +203,6 @@ describe("collecting-event edit page", () => {
     });
 
     wrapper
-      .find(".georeference-assertion-section button.add-button")
-      .simulate("click");
-
-    wrapper
       .find(".dwcDecimalLatitude")
       .find("input")
       .simulate("change", { target: { value: "45.394728" } });
