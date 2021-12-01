@@ -80,11 +80,12 @@ export function MaterialSampleAssociationsField({
 }
 
 function AssociationTabPanel({
-  fieldProps
+  fieldProps,
+  index
 }: TabPanelCtx<MaterialSampleAssociation>) {
   const listRef = useRef<HTMLDivElement>(null);
   const formikCtx = useFormikContext<MaterialSample>();
-  const [showSearchBtn, setShowSearchBtn] = useState(formikCtx.values.associations?.[0].associatedSample ? false: true);
+  const [showSearchBtn, setShowSearchBtn] = useState(formikCtx.values.associations?.[index].associatedSample ? false: true);
 
   function onAssociatedSampleSelected(
     sample: PersistedResource<MaterialSample>    

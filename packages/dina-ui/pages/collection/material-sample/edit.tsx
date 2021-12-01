@@ -381,7 +381,9 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      validationSchema={materialSampleSchema}
+      validationSchema={
+        dataComponentState.enableAssociations ? materialSampleSchema : null
+      }
     >
       {!initialValues.id && <SetDefaultSampleName />}
       {buttonBar}
