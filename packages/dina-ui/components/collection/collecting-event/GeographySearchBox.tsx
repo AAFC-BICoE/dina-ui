@@ -43,13 +43,14 @@ export interface NominatumApiAddressDetailSearchResult {
 
 export interface NominatimAddressDetailSearchProps {
   urlValue: {};
-  updateAdminLevels: (detailResult, formik) => void;
+  updateAdminLevels: (detailResult, formik, stateProvinceName) => void;
   formik: FormikContextType<any>;
+  stateProvinceName: string | null;
 }
 export async function nominatimAddressDetailSearch(
   props: NominatimAddressDetailSearchProps
 ) {
-  const { urlValue, updateAdminLevels, formik } = props;
+  const { urlValue, updateAdminLevels, formik, stateProvinceName } = props;
   if (!Object.keys(urlValue)) {
     return null;
   }
@@ -74,7 +75,8 @@ export async function nominatimAddressDetailSearch(
     }
     updateAdminLevels(
       response as NominatumApiAddressDetailSearchResult,
-      formik
+      formik,
+      stateProvinceName
     );
   } catch (error) {
     console.error(error);
