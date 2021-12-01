@@ -24,14 +24,9 @@ export function AssociatedMaterialSampleSearchBoxField({
 
   return (
     <div>
-      <label className="w-100">
-        <strong>{formatMessage("associatedMaterialSample")}</strong>{" "}
-      </label>
       <div className="list-inline d-flex flex-row gap-2 pt-2">
           <FieldWrapper
             {...props}
-            removeLabel={true}
-            removeLabelTag={true}
             disableLabelClick={true}
           >
             {({ setValue, value }) => {
