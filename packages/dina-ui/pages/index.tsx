@@ -166,6 +166,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/project/list">
+              <a>
+                <DinaMessage id="projectListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/institution/list">
               <a>
                 <DinaMessage id="institutionListTitle" />
@@ -197,13 +204,6 @@ const Home: React.FunctionComponent = () => (
             <Link href="/collection/material-sample/list">
               <a>
                 <DinaMessage id="materialSampleListTitle" />
-              </a>
-            </Link>
-          </li>
-          <li>
-            <Link href="/collection/material-sample-type/list">
-              <a>
-                <DinaMessage id="materialSampleTypeListTitle" />
               </a>
             </Link>
           </li>

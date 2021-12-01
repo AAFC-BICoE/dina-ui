@@ -40,7 +40,7 @@ export function VocabularySelectField({
       )}
       {...labelWrapperProps}
     >
-      {({ setValue, value }) => {
+      {({ setValue, value, invalid }) => {
         const selectValue =
           value &&
           (Array.isArray(value) ? value.map(toOption) : toOption(value));
@@ -56,17 +56,28 @@ export function VocabularySelectField({
         }
 
         return (
-          <CreatableSelect<VocabularyOption, boolean>
-            isClearable={true}
-            options={vocabOptions}
-            isLoading={loading}
-            isMulti={isMulti}
-            onChange={setFormValue}
-            value={selectValue}
-            formatCreateLabel={inputValue => `Add "${inputValue}"`}
-            placeholder={formatMessage("selectOrType")}
-            {...selectProps}
-          />
+          <div className={invalid ? "is-invalid" : ""}>
+            <CreatableSelect<VocabularyOption, boolean>
+              isClearable={true}
+              options={vocabOptions}
+              isLoading={loading}
+              isMulti={isMulti}
+              onChange={setFormValue}
+              value={selectValue}
+              formatCreateLabel={inputValue => `Add "${inputValue}"`}
+              placeholder={formatMessage("selectOrType")}
+              styles={{
+                control: base => ({
+                  ...base,
+                  ...(invalid && {
+                    borderColor: "rgb(148, 26, 37)",
+                    "&:hover": { borderColor: "rgb(148, 26, 37)" }
+                  })
+                })
+              }}
+              {...selectProps}
+            />
+          </div>
         );
       }}
     </FieldWrapper>

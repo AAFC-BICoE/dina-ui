@@ -42,17 +42,9 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
     ...labelWrapperProps
   } = props;
 
-  const customStyle = {
-    placeholder: (provided, _) => ({
-      ...provided,
-      color: "rgb(87,120,94)"
-    }),
-    menu: base => ({ ...base, zIndex: 1050 })
-  };
-
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value, formik }) => {
+      {({ setValue, value, formik, invalid }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -77,18 +69,35 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             }
           : null;
 
+        const customStyle = {
+          placeholder: (provided, _) => ({
+            ...provided,
+            color: "rgb(87,120,94)"
+          }),
+          menu: base => ({ ...base, zIndex: 1050 }),
+          control: base => ({
+            ...base,
+            ...(invalid && {
+              borderColor: "rgb(148, 26, 37)",
+              "&:hover": { borderColor: "rgb(148, 26, 37)" }
+            })
+          })
+        };
+
         return (
-          <Select
-            isDisabled={disabled}
-            isMulti={isMulti}
-            options={options}
-            onChange={onChangeInternal}
-            value={selectedOption}
-            styles={customStyle}
-            isLoading={isLoading}
-            ref={forwardedRef as any}
-            {...selectProps}
-          />
+          <div className={invalid ? "is-invalid" : ""}>
+            <Select
+              isDisabled={disabled}
+              isMulti={isMulti}
+              options={options}
+              onChange={onChangeInternal}
+              value={selectedOption}
+              styles={customStyle}
+              isLoading={isLoading}
+              ref={forwardedRef as any}
+              {...selectProps}
+            />
+          </div>
         );
       }}
     </FieldWrapper>

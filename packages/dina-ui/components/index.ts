@@ -23,5 +23,7 @@ export * from "./storage/StorageLinker";
 export * from "./storage/StorageUnitBreadCrumb";
 export * from "./storage/StorageUnitChildrenViewer";
 export * from "./storage/StorageUnitForm";
+export * from "./table/thumbnail-cell";
 export * from "./tag-editor/NotPubliclyReleasableWarning";
 export * from "./tag-editor/TagsAndRestrictionsSection";
+export * from "./project/ProjectSelectSection";

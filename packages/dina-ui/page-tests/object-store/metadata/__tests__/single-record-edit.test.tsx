@@ -1,5 +1,10 @@
 import { PersistedResource } from "kitsu";
-import { License, Metadata, Person } from "../../../../types/objectstore-api";
+import {
+  License,
+  ManagedAttribute,
+  Metadata,
+  Person
+} from "../../../../types/objectstore-api";
 import MetadataEditPage from "../../../../pages/object-store/metadata/single-record-edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import CreatableSelect from "react-select/creatable";
@@ -8,6 +13,8 @@ const mockGet = jest.fn(async path => {
   switch (path) {
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
+    case "objectstore-api/managed-attribute":
+      return { data: [TEST_MANAGED_ATTRIBUTE] };
     case "objectstore-api/license":
       return { data: TEST_LICENSES };
     case "objectstore-api/license/open-government-license-canada":
@@ -80,8 +87,16 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
   managedAttributeValues: {
-    "a360a695-bbff-4d58-9a07-b6d6c134b208": "test-managed-attribute-value"
+    "test-managed-attribute": "test-managed-attribute-value"
   }
+};
+
+const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
+  type: "managed-attribute",
+  id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+  name: "test-managed-attribute",
+  key: "test-managed-attribute",
+  managedAttributeType: "STRING"
 };
 
 const mockSave = jest.fn();
@@ -142,10 +157,12 @@ describe("Metadata single record edit page.", () => {
       .last()
       .simulate("change", {
         target: {
-          name: "managedAttributeMap.values.39558b3c-02e9-476e-a9c8-7946f8bbff63.value",
           value: "new-managed-attribute-value"
         }
       });
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     wrapper.find("form").simulate("submit");
 
@@ -170,8 +187,7 @@ describe("Metadata single record edit page.", () => {
             fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",
             managedAttributeValues: {
-              "a360a695-bbff-4d58-9a07-b6d6c134b208":
-                "new-managed-attribute-value"
+              "test-managed-attribute": "new-managed-attribute-value"
             },
             originalFilename: "test-file.png",
             type: "metadata",

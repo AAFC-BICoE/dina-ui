@@ -18,6 +18,8 @@ import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Link from "next/link";
+import { uniqBy, isEqual } from "lodash";
+import { thumbnailCell } from "../..";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -29,6 +31,7 @@ export interface AttachmentsFieldProps {
   allowAttachmentsConfig?: AllowAttachmentsConfig;
   /** Attachment API path for the read-only view. */
   attachmentPath: string;
+  hideAddAttchmentBtn?: boolean;
 }
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
@@ -72,6 +75,7 @@ export function AttachmentsEditor({
   title,
   allowExistingFieldName,
   allowNewFieldName,
+  hideAddAttchmentBtn,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true }
 }: AttachmentsEditorProps) {
   const { isTemplate } = useDinaFormContext();
@@ -89,7 +93,12 @@ export function AttachmentsEditor({
   });
 
   async function addAttachedMetadatas(newIds: string[]) {
-    onChange([...value, ...newIds.map(it => ({ id: it, type: "metadata" }))]);
+    onChange(
+      uniqBy(
+        [...value, ...newIds.map(it => ({ id: it, type: "metadata" }))],
+        val => val.id
+      )
+    );
     closeModal();
   }
 
@@ -148,6 +157,10 @@ export function AttachmentsEditor({
               <div className="mb-3">
                 <ReactTable
                   columns={[
+                    thumbnailCell({
+                      bucketField: "bucket",
+                      fileIdentifierField: "fileIdentifier"
+                    }),
                     {
                       accessor: "originalFilename",
                       Header: <FieldHeader name="originalFilename" />,
@@ -201,15 +214,24 @@ export function AttachmentsEditor({
                 />
               </div>
             ) : null}
-            <button
-              className="btn btn-primary add-attachments mb-3"
-              type="button"
-              onClick={openAttachmentsModal}
-              style={{ width: "10rem" }}
-              disabled={addingAttachmentsDisabled}
-            >
-              <DinaMessage id="addAttachments" />
-            </button>
+            {!hideAddAttchmentBtn ? (
+              <button
+                className="btn btn-primary add-attachments mb-3"
+                type="button"
+                onClick={openAttachmentsModal}
+                style={{ width: "10rem" }}
+                disabled={addingAttachmentsDisabled}
+              >
+                <DinaMessage id="addAttachments" />
+              </button>
+            ) : (
+              <>
+                <AttachmentSection
+                  allowAttachmentsConfig={allowAttachmentsConfig}
+                  afterMetadatasSaved={addAttachedMetadatas}
+                />
+              </>
+            )}
           </>
         )
       ) : (

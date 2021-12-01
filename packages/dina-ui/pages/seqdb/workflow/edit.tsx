@@ -2,12 +2,11 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
-  LoadingSpinner,
-  Query,
   ResourceSelectField,
   SubmitButton,
   TextField,
-  useAccount
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -25,6 +24,11 @@ export function ChainEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editWorkflowTitle" : "addWorkflowTitle";
 
+  const query = useQuery<Chain>({
+    include: "chainTemplate",
+    path: `seqdb-api/chain/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -35,21 +39,9 @@ export function ChainEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editWorkflowTitle" />
             </h1>
-            <Query<Chain>
-              query={{
-                include: "chainTemplate",
-                path: `seqdb-api/chain/${id}`
-              }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ChainForm chain={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ChainForm chain={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

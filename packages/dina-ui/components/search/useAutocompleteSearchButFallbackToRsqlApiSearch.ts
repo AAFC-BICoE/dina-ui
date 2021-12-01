@@ -1,13 +1,12 @@
 import { JsonApiQuerySpec, useQuery } from "common-ui";
 import { KitsuResource } from "kitsu";
 import { useEffect } from "react";
-import { useAutocompleteSearch } from "./useSearch";
+import { AutocompleteSearchParams, useAutocompleteSearch } from "./useSearch";
 
-export interface UseAutocompleteSearchButFallbackToRsqlApiSearchProps {
+export interface UseAutocompleteSearchButFallbackToRsqlApiSearchProps
+  extends AutocompleteSearchParams {
   searchQuery: string;
   querySpec: JsonApiQuerySpec;
-  indexName: string;
-  searchField: string;
 }
 
 /**
@@ -19,6 +18,7 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   indexName,
   searchQuery,
   querySpec,
+  additionalField,
   searchField
 }: UseAutocompleteSearchButFallbackToRsqlApiSearchProps) {
   const {
@@ -28,7 +28,8 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     error: searchApiError
   } = useAutocompleteSearch<T>({
     indexName,
-    searchField
+    searchField,
+    additionalField
   });
 
   const searchApiFailed = searchResult?.length === 0 || searchApiError;

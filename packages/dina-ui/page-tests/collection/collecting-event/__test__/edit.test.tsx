@@ -145,7 +145,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
-              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               managedAttributes: {},
               publiclyReleasable: true, // Default value
@@ -201,6 +201,10 @@ describe("collecting-event edit page", () => {
         value: "From 2019,12,21 4pm to 2019,12,22 5pm"
       }
     });
+
+    wrapper
+      .find(".georeference-assertion-section button.add-button")
+      .simulate("click");
 
     wrapper
       .find(".dwcDecimalLatitude")
@@ -396,7 +400,10 @@ describe("collecting-event edit page", () => {
     ).toEqual(true);
 
     // Add a second assertion:
-    wrapper.find("button.add-assertion-button").at(0).simulate("click");
+    wrapper
+      .find(".georeference-assertion-section button.add-button")
+      .at(0)
+      .simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -412,6 +419,67 @@ describe("collecting-event edit page", () => {
     expect(assertionTabs.length).toEqual(2);
     expect(assertionTabs.at(0).text()).toEqual("1");
     expect(assertionTabs.at(1).text()).toEqual("2 (Primary)");
+  });
+
+  it("Removes the coordinate system if there are no coordinates set.", async () => {
+    mockPatch.mockReturnValueOnce({
+      data: [
+        {
+          data: {
+            attributes: {
+              startEventDateTime: "12/21/2019T16:00",
+              endEventDateTime: "12/22/2019T16:00",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
+            },
+            id: "1",
+            type: "collecting-event"
+          },
+          status: 201
+        }
+      ] as OperationsResponse
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Default value:
+    expect(
+      wrapper.find(".dwcVerbatimCoordinateSystem-field input").prop("value")
+    ).toEqual("decimal degrees");
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "POST",
+          path: "collecting-event",
+          value: {
+            attributes: expect.objectContaining({
+              dwcVerbatimCoordinateSystem: null
+            }),
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
+          }
+        }
+      ],
+      expect.anything()
+    );
   });
 });
 

@@ -4,18 +4,18 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SelectField,
   StringArrayField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
 import { useState } from "react";
-import { Footer, Head, Nav } from "../../../components";
+import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CollectionModuleType,
@@ -25,8 +25,6 @@ import {
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
-
-import { GroupSelectField } from "../../../components";
 
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
@@ -38,6 +36,10 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
+  const query = useQuery<ManagedAttribute>({
+    path: `collection-api/managed-attribute/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -48,21 +50,12 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <DinaMessage id="editManagedAttributeTitle" />
             </h1>
-            <Query<ManagedAttribute>
-              query={{ path: `collection-api/managed-attribute/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ManagedAttributeForm
-                      fetchedManagedAttribute={response.data}
-                      router={router}
-                    />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ManagedAttributeForm
+                fetchedManagedAttribute={data}
+                router={router}
+              />
+            ))}
           </div>
         ) : (
           <div>

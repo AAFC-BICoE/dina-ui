@@ -253,6 +253,16 @@ export function useCollectingEventSave({
 
     delete submittedValues.managedAttributeValues;
 
+    // Remove the coord system for new Collecting events with no coordinates specified:
+    if (
+      !submittedValues.id &&
+      !submittedValues.dwcVerbatimCoordinates?.trim?.() &&
+      !submittedValues.dwcVerbatimLatitude?.trim?.() &&
+      !submittedValues.dwcVerbatimLongitude?.trim?.()
+    ) {
+      submittedValues.dwcVerbatimCoordinateSystem = null;
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {

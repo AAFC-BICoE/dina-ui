@@ -1,16 +1,15 @@
 import { flatten } from "flat";
 import { useFormikContext } from "formik";
 import { compact, toPairs } from "lodash";
-import { useEffect, useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
 export function ErrorViewer() {
   // "status" is the form-level error, and
   // "errors" are the field-level errors.
-  const { isSubmitting, errors, status, isValidating } = useFormikContext();
+  const { isSubmitting, errors, status } = useFormikContext();
   const { getFieldLabel } = useFieldLabels();
-  const wrapperRef = useRef<HTMLDivElement>(null);
 
   /** Start array indexes at 1 e.g. The user should see Determination 1 instead of Determination 0. */
   function transformKey(key: string) {
@@ -46,21 +45,20 @@ export function ErrorViewer() {
         }
       );
 
-      return compact([status, ...fieldErrors]);
+      const formError = status ? (
+        <div className="error-message" key="form-error">
+          {status}
+        </div>
+      ) : null;
+
+      return compact([formError, ...fieldErrors]);
     },
     // Update the form-level error message on form submit or when errors change:
     [isSubmitting, errors]
   );
 
-  // When there is a new error after submit, scroll to it:
-  useEffect(() => {
-    if (errorMessages.length) {
-      wrapperRef.current?.scrollIntoView?.();
-    }
-  }, [isSubmitting, isValidating]);
-
   return (
-    <div ref={wrapperRef} style={{ scrollMargin: "20px" }}>
+    <div>
       {errorMessages.length ? (
         <div className="alert alert-danger" role="status">
           {errorMessages.map((msg, idx) => (
@@ -70,4 +68,19 @@ export function ErrorViewer() {
       ) : null}
     </div>
   );
+}
+
+/** Scrolls the user's browser to the error message. */
+export function scrollToError() {
+  setImmediate(() => {
+    // Scroll to error message:
+    const invalidField =
+      document?.querySelector?.(".is-invalid") ??
+      document?.querySelector?.(".error-message");
+    invalidField?.scrollIntoView?.({
+      behavior: "auto",
+      block: "center",
+      inline: "center"
+    });
+  });
 }

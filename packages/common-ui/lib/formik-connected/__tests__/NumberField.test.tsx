@@ -58,8 +58,23 @@ describe("NumberField component", () => {
   it("Shows a blank input when the formik value is undefined.", async () => {
     const wrapper = getWrapper({ initialValues: {} });
     expect(wrapper.find("input").prop("value")).toEqual("");
+  });
+
+  it("Shows a blank input when the formik value becomes blank.", async () => {
+    const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
+    expect(wrapper.find("input").prop("value")).toEqual(123.23);
+
+    // Change the value to undefined.
+    wrapper.find("input").simulate("change", { target: { value: "" } });
+    wrapper.update();
 
     // The input should become blank.
     expect(wrapper.find("input").prop("value")).toEqual("");
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    // Expect the correct value to have been submitted.
+    expect(mockOnSubmit).lastCalledWith({ testField: null });
   });
 });

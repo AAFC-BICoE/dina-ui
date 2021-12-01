@@ -1,6 +1,6 @@
 import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
-import { PreparationType } from "packages/dina-ui/types/collection-api/resources/PreparationType";
+import { PreparationType } from "../../../types/collection-api/resources/PreparationType";
 import { ViewPageLayout } from "../../../components";
 import { PreparationTypeFormLayout } from "./edit";
 

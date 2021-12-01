@@ -19,7 +19,12 @@ import { toPairs } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Component, useContext, useMemo, useState } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  thumbnailCell
+} from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -95,6 +100,10 @@ export default function MetadataListPage() {
       Header: CheckBoxHeader,
       sortable: false
     },
+    thumbnailCell({
+      bucketField: "bucket",
+      fileIdentifierField: "fileIdentifier"
+    }),
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
@@ -126,7 +135,11 @@ export default function MetadataListPage() {
           </button>
         </div>
       ),
-      Header: <div id="acPreviewLinksHeader">Preview Links</div>,
+      Header: (
+        <div id="acPreviewLinksHeader">
+          <DinaMessage id="viewPreviewButtonText" />
+        </div>
+      ),
       sortable: false
     }
   ];

@@ -23,6 +23,7 @@ export interface ManagedAttributesEditorProps {
   valueFieldName?: string;
   apiBaseUrl: string;
   managedAttributeApiPath: string;
+  useKeyInFilter?: boolean;
 
   /**
    * The target component of the managed attribute e.g. COLLECTING_EVENT.
@@ -43,10 +44,11 @@ export function ManagedAttributesEditor({
   valueFieldName,
   apiBaseUrl,
   managedAttributeComponent,
+  useKeyInFilter,
   managedAttributeKeyField = "key"
 }: ManagedAttributesEditorProps) {
   const { initialValues: formInitialValues } = useDinaFormContext();
-  const { bulkGet } = useApiClient();
+  const { bulkGet, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { openModal } = useModal();
 
@@ -61,6 +63,8 @@ export function ManagedAttributesEditor({
       const initialAttributes = await getManagedAttributesInUse(
         [managedAttributeValues],
         bulkGet,
+        apiClient,
+        useKeyInFilter as boolean,
         {
           apiBaseUrl,
           keyPrefix: managedAttributeComponent,

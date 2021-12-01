@@ -3,10 +3,10 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
-  LoadingSpinner,
-  Query,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -24,6 +24,8 @@ export function RegionEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editRegionTitle" : "addRegionTitle";
 
+  const query = useQuery<Region>({ path: `seqdb-api/region/${id}` });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -34,16 +36,9 @@ export function RegionEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editRegionTitle" />
             </h1>
-            <Query<Region> query={{ path: `seqdb-api/region/${id}` }}>
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <RegionForm region={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <RegionForm region={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

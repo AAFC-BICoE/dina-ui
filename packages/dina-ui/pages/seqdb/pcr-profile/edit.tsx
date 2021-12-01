@@ -4,11 +4,11 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   filterBy,
-  LoadingSpinner,
-  Query,
   ResourceSelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -27,6 +27,11 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editPcrProfileTitle" : "addPcrProfileTitle";
 
+  const query = useQuery<PcrProfile>({
+    include: "region",
+    path: `seqdb-api/thermocycler-profile/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -37,21 +42,9 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editPcrProfileTitle" />
             </h1>
-            <Query<PcrProfile>
-              query={{
-                include: "region",
-                path: `seqdb-api/thermocycler-profile/${id}`
-              }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <PcrProfileForm profile={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <PcrProfileForm profile={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

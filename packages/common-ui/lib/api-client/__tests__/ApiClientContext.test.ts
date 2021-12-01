@@ -3,6 +3,8 @@ import Kitsu from "kitsu";
 import {
   ApiClientImpl,
   CustomDinaKitsu,
+  DoOperationsError,
+  getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
 import {
@@ -183,6 +185,8 @@ const { apiClient, bulkGet, doOperations, save } = new ApiClientImpl({
 apiClient.axios = { patch: mockPatch } as any;
 
 describe("API client context", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Provides an API client instance.", () => {
     expect(apiClient instanceof Kitsu).toEqual(true);
   });
@@ -500,6 +504,61 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
   });
 
+  it("bulkGet batches together the same ID to avoid sending duplicate find-one requests.", async () => {
+    mockPatch.mockImplementationOnce((_, operations) => ({
+      data: operations.map(op => {
+        const id = op.path.replace("primer/", "");
+
+        return {
+          data: {
+            attributes: { name: `primer ${id}` },
+            id,
+            type: "primer"
+          },
+          status: 200
+        };
+      })
+    }));
+
+    const response = await bulkGet(
+      // Has duplicates:
+      ["primer/100", "primer/100", "primer/200", "primer/200"],
+      { returnNullForMissingResource: true }
+    );
+
+    expect(response.length).toEqual(4);
+    expect(response.map(primer => primer?.id)).toEqual([
+      "100",
+      "100",
+      "200",
+      "200"
+    ]);
+
+    // Only 2 unique GET calls are made even though 4 paths were passed to bulkGet:
+    expect(mockPatch.mock.calls).toEqual([
+      [
+        "/operations",
+        [
+          {
+            op: "GET",
+            path: "primer/100"
+          },
+          {
+            op: "GET",
+            path: "primer/200"
+          }
+        ],
+        {
+          headers: {
+            Accept: "application/json-patch+json",
+            "Content-Type": "application/json-patch+json",
+            "Crnk-Compact": "true"
+          }
+        }
+      ]
+    ]);
+  });
+
   it("Provides a function to improve the info shown from Axios errors.", () => {
     const axiosError = {
       isAxiosError: true,
@@ -632,6 +691,61 @@ Constraint violation: description size must be between 1 and 10`;
           type: "articles"
         }
       ]
+    });
+  });
+
+  it("Gets the form-level error message from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      { status: 400, errors: [{ detail: "Error 1" }] },
+      { status: 400, errors: [{ detail: "Error 2" }] }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "Error 1\nError 2",
+      fieldErrors: {}
+    });
+  });
+
+  it("Gets the field-level error messages from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field1" }, detail: "Error 1" }]
+      },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field2" }, detail: "Error 2" }]
+      }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "\n",
+      fieldErrors: {
+        field1: "Error 1",
+        field2: "Error 2"
+      }
+    });
+  });
+
+  it("Gets both the form-level and field-level error messages from a failed Operations response.", async () => {
+    const messages = getErrorMessages([
+      { status: 400, errors: [{ detail: "Form error" }] },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field1" }, detail: "Error 1" }]
+      },
+      {
+        status: 400,
+        errors: [{ source: { pointer: "field2" }, detail: "Error 2" }]
+      }
+    ]);
+
+    expect(messages).toEqual({
+      errorMessage: "Form error\n\n",
+      fieldErrors: {
+        field1: "Error 1",
+        field2: "Error 2"
+      }
     });
   });
 });

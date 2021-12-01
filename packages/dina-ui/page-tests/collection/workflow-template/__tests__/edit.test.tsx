@@ -1,6 +1,7 @@
 import { SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
+import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { StorageLinker } from "../../../../components";
 import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
@@ -116,6 +117,8 @@ async function mountForm(
     wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
   const acquisitionEventSwitch = () =>
     wrapper.find(".enable-acquisition-event").find(ReactSwitch);
+  const associationsSwitch = () =>
+    wrapper.find(".enable-associations").find(ReactSwitch);
 
   async function toggleDataComponent(
     switchElement: ReactWrapper<any>,
@@ -157,6 +160,9 @@ async function mountForm(
   async function toggleAcquisitionEvent(val: boolean) {
     await toggleDataComponent(acquisitionEventSwitch(), val);
   }
+  async function toggleAssociations(val: boolean) {
+    await toggleDataComponent(associationsSwitch(), val);
+  }
 
   async function fillOutRequiredFields() {
     // Set the name:
@@ -182,12 +188,14 @@ async function mountForm(
     toggleDeterminations,
     toggleScheduledActions,
     toggleAcquisitionEvent,
+    toggleAssociations,
     colEventSwitch,
     catalogSwitch,
     storageSwitch,
     scheduledActionsSwitch,
     determinationSwitch,
     acquisitionEventSwitch,
+    associationsSwitch,
     fillOutRequiredFields,
     submitForm
   };
@@ -197,21 +205,16 @@ describe("Workflow template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
-    const {
-      colEventSwitch,
-      catalogSwitch,
-      storageSwitch,
-      scheduledActionsSwitch,
-      determinationSwitch,
-      acquisitionEventSwitch
-    } = await mountForm();
-    // Switches are off by default:
-    expect(colEventSwitch().prop("checked")).toEqual(false);
-    expect(catalogSwitch().prop("checked")).toEqual(false);
-    expect(storageSwitch().prop("checked")).toEqual(false);
-    expect(scheduledActionsSwitch().prop("checked")).toEqual(false);
-    expect(determinationSwitch().prop("checked")).toEqual(false);
-    expect(acquisitionEventSwitch().prop("checked")).toEqual(false);
+    const { wrapper } = await mountForm();
+
+    // Get the switches:
+    const switches = wrapper.find(".material-sample-nav").find(ReactSwitch);
+    expect(switches.length).not.toEqual(0);
+
+    // All switches should be unchecked:
+    expect(switches.map(node => node.prop("checked"))).toEqual(
+      switches.map(() => false)
+    );
   });
 
   it("Submits a new action-definition: minimal form submission.", async () => {
@@ -416,6 +419,53 @@ describe("Workflow template edit page", () => {
           templateFields: {
             "determination[0].verbatimScientificName": {
               defaultValue: "test scientific name",
+              enabled: true
+            }
+          }
+        }
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      type: "material-sample-action-definition"
+    });
+  });
+
+  it("Submits a new action-definition: Only set Associations template fields.", async () => {
+    const { wrapper, toggleAssociations, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleAssociations(true);
+
+    wrapper
+      .find(".association-type input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".association-type")
+      .find(CreatableSelect)
+      .prop<any>("onChange")({
+      value: "test default association type"
+    });
+
+    wrapper
+      .find(".associated-sample input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          templateFields: {
+            "associations[0].associatedSample": {
+              enabled: true
+            },
+            "associations[0].associationType": {
+              defaultValue: "test default association type",
               enabled: true
             }
           }
