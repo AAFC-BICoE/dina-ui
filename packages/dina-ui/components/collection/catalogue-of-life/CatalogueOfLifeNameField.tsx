@@ -89,9 +89,14 @@ export function CatalogueOfLifeNameField({
         return value &&
           (searchInitiated || scientificNameSrceDetailUrlVal?.length > 0) ? (
           // When the field has a value of previous or current search result
-          <div className="card card-body">
-            <RenderAsReadonly value={value} form={formik} />
-            <div>
+          <div
+            className="d-flex flex-row"
+            style={{ border: "1px solid #F5F5F5" }}
+          >
+            <div className="col-md-6 mt-2 ">
+              <RenderAsReadonly value={value} form={formik} />
+            </div>
+            <div className="col-md-4 d-flex align-items-center">
               <button
                 type="button"
                 className="btn btn-danger remove-button"
