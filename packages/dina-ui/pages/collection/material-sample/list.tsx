@@ -64,6 +64,8 @@ export function SampleListLayout({
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
+    "materialSampleName",
+    "dwcOtherCatalogNumbers",
     "createdBy",
     "collection.name",
     "collection.code",

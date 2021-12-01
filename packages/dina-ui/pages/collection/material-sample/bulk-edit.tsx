@@ -54,7 +54,7 @@ export function ExistingMaterialSampleBulkEditor({
     false
   );
 
-  const errors = sampleQueries.map(query => query.error);
+  const errors = compact(sampleQueries.map(query => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -62,9 +62,9 @@ export function ExistingMaterialSampleBulkEditor({
 
   if (errors.length) {
     return (
-      <div>
+      <div className="alert alert-danger">
         {errors.map((error, index) => (
-          <div className="alert alert-danger" key={index}>
+          <div key={index}>
             {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
           </div>
         ))}
