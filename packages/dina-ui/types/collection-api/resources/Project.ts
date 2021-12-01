@@ -11,7 +11,7 @@ export interface ProjectAttributes {
   multilingualDescription?: MultilingualDescription;
   createdOn?: string;
   createdBy?: string;
-  group?:string;  
+  group?: string;
 }
 
 export interface ProjectRelationships {

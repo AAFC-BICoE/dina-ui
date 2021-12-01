@@ -32,7 +32,8 @@ export async function getManagedAttributesInUse(
 
   // Batch get all initial editable object store managed attributes
   const batchGetManagedAttributes = async () => {
-    let promises: Promise<KitsuResponse<ManagedAttribute[], undefined>>[] = [];
+    const promises: Promise<KitsuResponse<ManagedAttribute[], undefined>>[] =
+      [];
     const params = managedAttributeKeys.map(key => {
       return { filter: { key: `${key}` }, page: { limit: 1 } };
     });
@@ -60,7 +61,7 @@ export async function getManagedAttributesInUse(
         { apiBaseUrl, returnNullForMissingResource: true }
       );
 
-  return compact(newInitialEditableManagedAttributes).map(      
+  return compact(newInitialEditableManagedAttributes).map(
     // If the Managed Attribute is missing from the back-end then return a shallow copy with just the key field:
     (attr, index) =>
       attr ?? { [managedAttributeKeyField]: managedAttributeKeys[index] }

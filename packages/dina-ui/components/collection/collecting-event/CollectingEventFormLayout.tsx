@@ -161,7 +161,11 @@ export function CollectingEventFormLayout({
   }
 
   function updateAdminLevels(detailResults, formik, stateProvinceName) {
-    const geoNameParsed = parseGeoAdminLevels(detailResults as any, formik, stateProvinceName);
+    const geoNameParsed = parseGeoAdminLevels(
+      detailResults as any,
+      formik,
+      stateProvinceName
+    );
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
     setHideRemoveBtn(false);
@@ -208,14 +212,14 @@ export function CollectingEventFormLayout({
         addr.place_type === "state" ||
         stateProvinceName === addr.localname
       ) {
-          formik.setFieldValue(
-            `${commonSrcDetailRoot}.stateProvince.name`,
-            addr.localname
-          );
-          formik.setFieldValue(
-            `${commonSrcDetailRoot}.stateProvince.placeType`,
-            addr.place_type ?? addr.class
-          );
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.name`,
+          addr.localname
+        );
+        formik.setFieldValue(
+          `${commonSrcDetailRoot}.stateProvince.placeType`,
+          addr.place_type ?? addr.class
+        );
       }
 
       detail = {};
