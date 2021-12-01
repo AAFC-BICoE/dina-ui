@@ -94,7 +94,7 @@ export function CatalogueOfLifeNameField({
             <div>
               <button
                 type="button"
-                className="btn btn-dark remove-button"
+                className="btn btn-danger remove-button"
                 onClick={() => {
                   onChange?.(null, formik);
                   setValue(null);

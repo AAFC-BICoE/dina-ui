@@ -480,6 +480,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   scheduledActions: "Scheduled Actions",
   searchButton: "Search",
+  searchOnCOL: " Search on Catalogue of Life",
   searchPreviousTags: "Search previous tags",
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
