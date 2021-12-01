@@ -1,6 +1,6 @@
 import { AreYouSureModal, DinaForm, QueryTable } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
+import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage, {
   BulkDeleteButton,

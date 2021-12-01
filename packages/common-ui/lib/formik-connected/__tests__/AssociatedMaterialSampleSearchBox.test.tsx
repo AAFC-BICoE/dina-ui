@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api/resources/MaterialSample";
 import React from "react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { AssociatedMaterialSampleSearchBoxField } from "../AssociatedMaterialSampleSearchBox";
