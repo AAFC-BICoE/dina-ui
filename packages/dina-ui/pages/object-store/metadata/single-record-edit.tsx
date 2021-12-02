@@ -250,6 +250,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             filter={() => ({})}
             model="objectstore-api/license"
             optionLabel={license => license.titles[locale] ?? license.url}
+            removeDefaultSort={true}
           />
         </div>
       </FieldSet>

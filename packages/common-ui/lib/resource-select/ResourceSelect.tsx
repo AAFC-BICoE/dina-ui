@@ -71,6 +71,9 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
     loading?: boolean;
     response?: { data: PersistedResource<TData>[] };
   };
+
+  /* Remove the derault sort by createdOn */
+  removeDefaultSort?: boolean;
 }
 
 /**
@@ -104,7 +107,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   invalid,
   selectProps,
   pageSize,
-  useCustomQuery
+  useCustomQuery,
+  removeDefaultSort
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -121,7 +125,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
-  const sort = "-createdOn";
+  const sort = !removeDefaultSort ? "-createdOn" : undefined;
 
   // Omit undefined values from the GET params, which would otherwise cause an invalid request.
   // e.g. /api/region?include=undefined
