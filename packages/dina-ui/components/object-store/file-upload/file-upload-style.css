@@ -3,14 +3,11 @@
 */
 
 .dzu-submitButtonContainer {
-    align-self: flex-end !important;
-    margin: -2.35em 2em 1em 0em !important;
-  }
-  
-.dzu-inputLabelAddFiles {
-    align-self: flex-start;
-    margin: 2em 0em 0em 2em;
+  align-self: flex-end !important;
+  margin: -2.35em 2em 1em 0em !important;
 }
 
-  
-  
+.dzu-inputLabelAddFiles {
+  align-self: flex-start;
+  margin: 2em 0em 0em 2em;
+}

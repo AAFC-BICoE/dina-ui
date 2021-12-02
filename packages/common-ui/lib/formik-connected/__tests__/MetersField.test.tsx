@@ -100,12 +100,64 @@ describe("MetersField component", () => {
       .simulate("change", { target: { value: "5" } });
     wrapper.find(".length-field input").simulate("blur");
     expect(wrapper.find(".length-field input").prop("value")).toEqual("5");
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
 
     wrapper
       .find(".length-field input")
       .simulate("change", { target: { value: "1 ft" } });
     wrapper.find(".length-field input").simulate("blur");
     expect(wrapper.find(".length-field input").prop("value")).toEqual("0.30");
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+  });
+
+  it("Shows an error message on invalid input.", async () => {
+    const mockOnSubmit = jest.fn();
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+      >
+        <MetersField name="length" />
+      </DinaForm>
+    );
+
+    // Input an invalid value that can't be converted to meters:
+    wrapper
+      .find(".length-field input")
+      .simulate("change", { target: { value: "bad value" } });
+    wrapper.find(".length-field input").simulate("blur");
+    expect(wrapper.find(".length-field input").prop("value")).toEqual(
+      "bad value"
+    );
+    // Shows the error message:
+    expect(wrapper.find(".invalid-feedback").text()).toEqual(
+      "Invalid meters value"
+    );
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Validation fails so the form doesn't submit:
+    expect(mockOnSubmit).toHaveBeenCalledTimes(0);
+
+    // Change to a valid input:
+    wrapper
+      .find(".length-field input")
+      .simulate("change", { target: { value: "1ft" } });
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+
+    // Submit the form:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Validation fails so the form doesn't submit:
+    expect(mockOnSubmit).lastCalledWith({ length: "0.30" });
   });
 
   it("Does the unit conversion onSubmit.", async () => {

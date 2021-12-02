@@ -114,8 +114,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataset: "Dataset",
   datasetSearchTooltip: "For using a different Catalog of Life dataset.",
   decimalLatLong: "Decimal Lat/Long",
-  decimalLatitude: "Decimal Latitude",
-  decimalLongitude: "Decimal Longitude",
   defaultValuesConfig: "Default Values Config",
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
@@ -204,6 +202,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_displayName: "Display Name",
   field_dwcCountry: "Country",
   field_dwcCountryCode: "Country Code",
+  field_dwcDecimalLatitude: "Decimal Latitude",
+  field_dwcDecimalLongitude: "Decimal Longitude",
   field_dwcDegreeOfEstablishment: "Degree of Establishment",
   field_dwcDegreeOfEstablishment_tooltip:
     "The degree to which an Organism survives, reproduces, and expands its range at the given place and time.",
@@ -228,6 +228,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcRecordNumber: "Collector's Number",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
+  field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",
   field_dwcVerbatimCoordinateSystem_tooltip:
     "The coordinate format for the verbatimLatitude and verbatimLongitude or the verbatimCoordinates of the Location. Examples: decimal degrees, degrees decimal minutes, degrees minutes seconds, UTM",
@@ -408,6 +409,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
+  mustBeValidDecimalValue: "Must be a valid decimal value.",
+  mustBeValidIntegerValue: "Must be a valid integer value.",
   metersField_tooltip:
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",

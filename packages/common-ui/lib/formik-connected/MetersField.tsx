@@ -1,19 +1,51 @@
+import { FormikProps } from "formik";
 import { clamp, isEqual } from "lodash";
-import { all, create, MathJsStatic, BigNumber } from "mathjs";
+import { all, BigNumber, create, MathJsStatic } from "mathjs";
 import { ChangeEvent, useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import accents from "remove-accents";
+import * as yup from "yup";
 import { TextField, TextFieldProps } from "./TextField";
 
+const metersNumberSchema = yup.number().notRequired().nullable();
+
 export function MetersField(props: TextFieldProps) {
+  const { formatMessage } = useIntl();
+
+  /** Only allow numbers or blank values. (This should run after conversion from other units.) */
+  function validate(val: any) {
+    const valString = val?.toString?.()?.trim();
+    return !valString || metersNumberSchema.isValidSync(valString)
+      ? undefined
+      : formatMessage({ id: "invalidMetersValue" });
+  }
+
   return (
     <TextField
       {...props}
-      customInput={inputProps => <MetersFieldInternal {...inputProps} />}
+      validate={validate}
+      customInput={(inputProps, formik) => (
+        <MetersFieldInternal
+          {...inputProps}
+          validate={validate}
+          name={props.name}
+          formik={formik}
+        />
+      )}
     />
   );
 }
 
-function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
+function MetersFieldInternal({
+  name,
+  formik,
+  validate,
+  ...inputProps
+}: React.InputHTMLAttributes<any> & {
+  name: string;
+  formik: FormikProps<any>;
+  validate: (val: any) => string | void;
+}) {
   // The value that shows up in the input. Stores the non-meters value (e.g. feet) while the user is typing.
   const [inputVal, setInputVal] = useState("");
 
@@ -49,7 +81,15 @@ function MetersFieldInternal(inputProps: React.InputHTMLAttributes<any>) {
       value={inputVal}
       onChange={onChange}
       // On blur show the value as meters in the input:
-      onBlur={() => setInputVal(String(inputProps.value ?? ""))}
+      onBlur={() => {
+        const newInputVal = String(inputProps.value ?? "");
+        setInputVal(newInputVal);
+
+        const error = validate(newInputVal);
+        if (error) {
+          formik.setFieldError(name, error);
+        }
+      }}
       type="text"
     />
   );

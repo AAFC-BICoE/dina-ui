@@ -261,7 +261,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           managedAttributeKeyField="key"
           useKeyInFilter={true}
         />
-
       </FieldSet>
       {buttonBar}
     </DinaForm>

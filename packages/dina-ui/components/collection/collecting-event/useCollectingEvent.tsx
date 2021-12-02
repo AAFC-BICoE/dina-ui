@@ -3,7 +3,8 @@ import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { compact, orderBy } from "lodash";
-import { object, SchemaOf, string } from "yup";
+import { useMemo } from "react";
+import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api";
 import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
@@ -93,32 +94,8 @@ export function useCollectingEventSave({
   attachmentsConfig
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
+  const collectingEventFormSchema = useCollectingEventFormSchema();
   const { formatMessage } = useDinaIntl();
-
-  const datePrecision = [4, 6, 8, 12, 14, 17];
-  function isValidDatePrecision(value?: string) {
-    return Boolean(
-      value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
-    );
-  }
-
-  /** Form validation schema. */
-  const collectingEventFormSchema: SchemaOf<
-    Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
-  > = object({
-    startEventDateTime: string()
-      .nullable()
-      .test({
-        test: val => (val ? isValidDatePrecision(val) : true),
-        message: formatMessage("field_collectingEvent_startDateTimeError")
-      }),
-    endEventDateTime: string()
-      .nullable()
-      .test({
-        test: val => (val ? isValidDatePrecision(val) : true),
-        message: formatMessage("field_collectingEvent_endDateTimeError")
-      })
-  });
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
@@ -282,4 +259,39 @@ export function useCollectingEventSave({
     attachmentsConfig,
     collectingEventFormSchema
   };
+}
+
+function useCollectingEventFormSchema() {
+  const { formatMessage, locale } = useDinaIntl();
+
+  return useMemo(() => {
+    const datePrecision = [4, 6, 8, 12, 14, 17];
+    function isValidDatePrecision(value?: string) {
+      return Boolean(
+        value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
+      );
+    }
+
+    /** Form validation schema. */
+    const collectingEventFormSchema: yup.SchemaOf<
+      Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
+    > = yup.object({
+      startEventDateTime: yup
+        .string()
+        .nullable()
+        .test({
+          test: val => (val ? isValidDatePrecision(val) : true),
+          message: formatMessage("field_collectingEvent_startDateTimeError")
+        }),
+      endEventDateTime: yup
+        .string()
+        .nullable()
+        .test({
+          test: val => (val ? isValidDatePrecision(val) : true),
+          message: formatMessage("field_collectingEvent_endDateTimeError")
+        })
+    });
+
+    return collectingEventFormSchema;
+  }, [locale]);
 }

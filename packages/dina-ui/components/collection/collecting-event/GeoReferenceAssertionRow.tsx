@@ -3,8 +3,8 @@ import {
   DateField,
   DinaFormSection,
   FormikButton,
-  NumberField,
   TextField,
+  NumberField,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -33,7 +33,7 @@ export function GeoReferenceAssertionRow({
       GeoreferenceVerificationStatus.GEOREFERENCING_NOT_POSSIBLE
   );
 
-  const reservedAssertion = useRef(assertion);
+  const reservedAssertion = useRef({ ...assertion });
 
   const { isTemplate, readOnly } = useDinaFormContext();
 
@@ -166,25 +166,26 @@ export function GeoReferenceAssertionRow({
         </Field>
         <NumberField
           name={commonRoot + "dwcDecimalLatitude"}
-          label={formatMessage("decimalLatitude")}
+          customName="dwcDecimalLatitude"
           className={"dwcDecimalLatitude"}
-          // Can be null or a valid latitude number:
-          isAllowed={({ floatValue: val }) => isValidLatitudeOrBlank(val)}
           readOnly={georeferenceDisabled}
           onChangeExternal={updateReservedAssertion}
+          min={-90}
+          max={90}
         />
         <NumberField
           name={commonRoot + "dwcDecimalLongitude"}
-          label={formatMessage("decimalLongitude")}
+          customName="dwcDecimalLongitude"
           readOnly={georeferenceDisabled}
           className={"dwcDecimalLongitude"}
-          // Can be null or a valid longitude number:
-          isAllowed={({ floatValue: val }) => isValidLongitudeOrBlank(val)}
           onChangeExternal={updateReservedAssertion}
+          min={-180}
+          max={180}
         />
         <NumberField
           name={commonRoot + "dwcCoordinateUncertaintyInMeters"}
-          label={formatMessage("coordinateUncertaintyInMeters")}
+          customName="dwcCoordinateUncertaintyInMeters"
+          isInteger={true}
           readOnly={georeferenceDisabled}
           className={"dwcCoordinateUncertaintyInMeters"}
           onChangeExternal={updateReservedAssertion}
@@ -258,11 +259,3 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
     ) : null;
   }
 );
-
-export function isValidLatitudeOrBlank(val?: number) {
-  return !val || (val >= -90 && val <= 90);
-}
-
-export function isValidLongitudeOrBlank(val?: number) {
-  return !val || (val >= -180 && val <= 180);
-}
