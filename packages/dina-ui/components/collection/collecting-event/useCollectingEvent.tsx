@@ -3,17 +3,17 @@ import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
 import { compact, fromPairs, orderBy, toPairs } from "lodash";
-import { object, SchemaOf, string } from "yup";
+import { useMemo } from "react";
+import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CollectingEvent } from "../../../types/collection-api";
+import {
+  CollectingEvent,
+  GeoReferenceAssertion
+} from "../../../types/collection-api";
 import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
-import {
-  ManagedAttributeValues,
-  Metadata,
-  Person
-} from "../../../types/objectstore-api";
+import { ManagedAttributeValues, Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
@@ -110,32 +110,8 @@ export function useCollectingEventSave({
   attachmentsConfig
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
+  const collectingEventFormSchema = useCollectingEventFormSchema();
   const { formatMessage } = useDinaIntl();
-
-  const datePrecision = [4, 6, 8, 12, 14, 17];
-  function isValidDatePrecision(value?: string) {
-    return Boolean(
-      value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
-    );
-  }
-
-  /** Form validation schema. */
-  const collectingEventFormSchema: SchemaOf<
-    Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
-  > = object({
-    startEventDateTime: string()
-      .nullable()
-      .test({
-        test: val => (val ? isValidDatePrecision(val) : true),
-        message: formatMessage("field_collectingEvent_startDateTimeError")
-      }),
-    endEventDateTime: string()
-      .nullable()
-      .test({
-        test: val => (val ? isValidDatePrecision(val) : true),
-        message: formatMessage("field_collectingEvent_endDateTimeError")
-      })
-  });
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
@@ -277,6 +253,16 @@ export function useCollectingEventSave({
 
     delete submittedValues.managedAttributeValues;
 
+    // Remove the coord system for new Collecting events with no coordinates specified:
+    if (
+      !submittedValues.id &&
+      !submittedValues.dwcVerbatimCoordinates?.trim?.() &&
+      !submittedValues.dwcVerbatimLatitude?.trim?.() &&
+      !submittedValues.dwcVerbatimLongitude?.trim?.()
+    ) {
+      submittedValues.dwcVerbatimCoordinateSystem = null;
+    }
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
@@ -302,4 +288,39 @@ export function useCollectingEventSave({
     attachmentsConfig,
     collectingEventFormSchema
   };
+}
+
+function useCollectingEventFormSchema() {
+  const { formatMessage, locale } = useDinaIntl();
+
+  return useMemo(() => {
+    const datePrecision = [4, 6, 8, 12, 14, 17];
+    function isValidDatePrecision(value?: string) {
+      return Boolean(
+        value && datePrecision.includes(value.replace(/([^\d]+)/g, "").length)
+      );
+    }
+
+    /** Form validation schema. */
+    const collectingEventFormSchema: yup.SchemaOf<
+      Pick<CollectingEvent, "startEventDateTime" | "endEventDateTime">
+    > = yup.object({
+      startEventDateTime: yup
+        .string()
+        .nullable()
+        .test({
+          test: val => (val ? isValidDatePrecision(val) : true),
+          message: formatMessage("field_collectingEvent_startDateTimeError")
+        }),
+      endEventDateTime: yup
+        .string()
+        .nullable()
+        .test({
+          test: val => (val ? isValidDatePrecision(val) : true),
+          message: formatMessage("field_collectingEvent_endDateTimeError")
+        })
+    });
+
+    return collectingEventFormSchema;
+  }, [locale]);
 }

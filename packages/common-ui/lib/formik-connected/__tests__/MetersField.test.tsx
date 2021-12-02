@@ -13,10 +13,18 @@ describe("MetersField component", () => {
     expect(toMeters("1 Feet")).toEqual("0.3048");
     expect(toMeters("1 ft")).toEqual("0.3048");
     expect(toMeters("1 FT")).toEqual("0.3048");
+    expect(toMeters("1ft")).toEqual("0.3048");
+    expect(toMeters("1ft.")).toEqual("0.3048");
+    expect(toMeters("1'")).toEqual("0.3048");
     expect(toMeters("1 Inches")).toEqual("0.0254");
     expect(toMeters("1 in")).toEqual("0.0254");
+    expect(toMeters("1 in.")).toEqual("0.0254");
+    expect(toMeters("1in.")).toEqual("0.0254");
     expect(toMeters("4ft 3in")).toEqual("1.2954");
     expect(toMeters("4 ft 3 in")).toEqual("1.2954");
+    expect(toMeters("4 ft. 3 in.")).toEqual("1.2954");
+    expect(toMeters(`4'3"`)).toEqual("1.2954");
+    expect(toMeters("4' 3\"")).toEqual("1.2954");
     expect(toMeters("4 feet 3 inches")).toEqual("1.2954");
     expect(toMeters("4 Feet 3 Inches")).toEqual("1.2954");
     expect(toMeters("4 Pied 3 Pouce")).toEqual("1.2954");
@@ -43,6 +51,16 @@ describe("MetersField component", () => {
     expect(toMeters("1 pouces")).toEqual("0.0254");
     expect(toMeters("3pd 3po")).toEqual("0.9906");
 
+    // Works with decimals:
+    expect(toMeters(`0.1 feet 0.1 inches`)).toEqual("0.03302");
+    expect(toMeters(`0.1' 0.1"`)).toEqual("0.03302");
+    expect(toMeters(`.1 feet .1 inches`)).toEqual("0.03302");
+    expect(toMeters(`.1' .1"`)).toEqual("0.03302");
+    expect(toMeters(`.1'.1"`)).toEqual("0.03302");
+    expect(toMeters(`0.1'0.1"`)).toEqual("0.03302");
+
+    expect(toMeters('10"')).toEqual("0.254");
+
     // Accepts french units with the accent:
     expect(toMeters("1 kilomètre")).toEqual("1000");
 
@@ -61,6 +79,15 @@ describe("MetersField component", () => {
     expect(toMeters("4 feet 4 inches", 2)).toEqual("1.32");
   });
 
+  it("Returns number-only values as-is without changing the decimals.", () => {
+    expect(toMeters("0", 2)).toEqual("0");
+    expect(toMeters("12345", 2)).toEqual("12345");
+    expect(toMeters("0.30", 2)).toEqual("0.30");
+    expect(toMeters("0.300", 2)).toEqual("0.300");
+    expect(toMeters("0.0", 2)).toEqual("0.0");
+    expect(toMeters("0.0000", 2)).toEqual("0.0000");
+  });
+
   it("Does the unit conversion onBlur.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
@@ -73,12 +100,64 @@ describe("MetersField component", () => {
       .simulate("change", { target: { value: "5" } });
     wrapper.find(".length-field input").simulate("blur");
     expect(wrapper.find(".length-field input").prop("value")).toEqual("5");
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
 
     wrapper
       .find(".length-field input")
       .simulate("change", { target: { value: "1 ft" } });
     wrapper.find(".length-field input").simulate("blur");
     expect(wrapper.find(".length-field input").prop("value")).toEqual("0.30");
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+  });
+
+  it("Shows an error message on invalid input.", async () => {
+    const mockOnSubmit = jest.fn();
+
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{}}
+        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+      >
+        <MetersField name="length" />
+      </DinaForm>
+    );
+
+    // Input an invalid value that can't be converted to meters:
+    wrapper
+      .find(".length-field input")
+      .simulate("change", { target: { value: "bad value" } });
+    wrapper.find(".length-field input").simulate("blur");
+    expect(wrapper.find(".length-field input").prop("value")).toEqual(
+      "bad value"
+    );
+    // Shows the error message:
+    expect(wrapper.find(".invalid-feedback").text()).toEqual(
+      "Invalid meters value"
+    );
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Validation fails so the form doesn't submit:
+    expect(mockOnSubmit).toHaveBeenCalledTimes(0);
+
+    // Change to a valid input:
+    wrapper
+      .find(".length-field input")
+      .simulate("change", { target: { value: "1ft" } });
+    // No error message on valid input:
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
+
+    // Submit the form:
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Validation fails so the form doesn't submit:
+    expect(mockOnSubmit).lastCalledWith({ length: "0.30" });
   });
 
   it("Does the unit conversion onSubmit.", async () => {

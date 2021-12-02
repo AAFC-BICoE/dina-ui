@@ -1,8 +1,10 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, FieldSet, QueryTable } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { useCollectingEventQuery } from "../../../components/collection";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import { MATERIAL_SAMPLE_TABLE_COLUMNS } from "../material-sample/list";
 
 export default function CollectingEventDetailsPage() {
   return (
@@ -10,6 +12,15 @@ export default function CollectingEventDetailsPage() {
       form={props => (
         <DinaForm<CollectingEvent> {...props}>
           <CollectingEventFormLayout />
+          <FieldSet legend={<DinaMessage id="materialSamples" />}>
+            <QueryTable
+              path="collection-api/material-sample"
+              columns={MATERIAL_SAMPLE_TABLE_COLUMNS}
+              filter={{
+                rsql: `collectingEvent.uuid==${props.initialValues.id}`
+              }}
+            />
+          </FieldSet>
         </DinaForm>
       )}
       query={id => ({ path: `collection-api/collecting-event/${id}` })}

@@ -1,10 +1,13 @@
+## Warning: Run and develop DINA locally using [dina-dev](https://github.com/AAFC-BICoE/dina-dev) instead of directly through this UI repo.
+
 # dina-ui
 
 React based user interface for AAFC-DINA.
 
 ## Required
-* NodeJS
-* Yarn
+
+- NodeJS
+- Yarn
 
 ## Install the Package
 

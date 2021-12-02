@@ -22,7 +22,7 @@ export interface CollectingEventAttributes {
   dwcVerbatimLatitude?: string;
   dwcVerbatimLongitude?: string;
   dwcVerbatimCoordinates?: string;
-  dwcVerbatimCoordinateSystem?: string;
+  dwcVerbatimCoordinateSystem?: string | null;
   dwcVerbatimSRS?: string;
   dwcVerbatimElevation?: string;
   dwcVerbatimDepth?: string;

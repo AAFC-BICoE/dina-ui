@@ -167,12 +167,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     );
 
     // Lat/Lng fields are enabled:
-    expect(wrapper.find(".dwcDecimalLatitude input").prop("value")).toEqual(
-      "1"
-    );
-    expect(wrapper.find(".dwcDecimalLongitude input").prop("value")).toEqual(
-      "2"
-    );
+    expect(wrapper.find(".dwcDecimalLatitude input").prop("value")).toEqual(1);
+    expect(wrapper.find(".dwcDecimalLongitude input").prop("value")).toEqual(2);
 
     // Uncertainty field is disabled:
     expect(
@@ -185,12 +181,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     );
 
     // Edit the lat/lng:
-    wrapper.find(".dwcDecimalLatitude NumberFormat").prop<any>("onValueChange")(
-      { floatValue: 45.394728 }
-    );
     wrapper
-      .find(".dwcDecimalLongitude NumberFormat")
-      .prop<any>("onValueChange")({ floatValue: -75.701452 });
+      .find(".dwcDecimalLatitude input")
+      .simulate("change", { target: { value: "45.394728" } });
+    wrapper
+      .find(".dwcDecimalLongitude input")
+      .simulate("change", { target: { value: "-75.701452" } });
 
     // Submit
     wrapper.find("form").simulate("submit");
@@ -204,13 +200,14 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           {
             resource: {
               dwcOtherRecordNumbers: null,
+              dwcVerbatimCoordinateSystem: null,
               geoReferenceAssertions: [
                 {
                   georeferencedBy: undefined,
                   isPrimary: true,
                   // The added values:
-                  dwcDecimalLatitude: 45.394728,
-                  dwcDecimalLongitude: -75.701452
+                  dwcDecimalLatitude: "45.394728",
+                  dwcDecimalLongitude: "-75.701452"
                 }
               ],
               relationships: {

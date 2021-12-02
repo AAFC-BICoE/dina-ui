@@ -24,7 +24,8 @@ const config: Config.InitialOptions = {
     "^.+\\.tsx?$": ["babel-jest", { presets: ["next/babel"] }]
   },
   // Transform our local common-ui package
-  transformIgnorePatterns: [`/node_modules/(?!common-ui)`]
+  transformIgnorePatterns: [`/node_modules/(?!common-ui)`],
+  globalSetup: "./jest-global-setup.js"
 };
 
 export default config;

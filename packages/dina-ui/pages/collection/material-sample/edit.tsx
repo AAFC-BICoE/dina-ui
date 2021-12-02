@@ -62,7 +62,6 @@ import {
 } from "../../../types/collection-api";
 import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
 
-
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
 export default function MaterialSampleEditPage() {
@@ -258,7 +257,7 @@ export function MaterialSampleForm({
         )}
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-        <ProjectSelectSection resourcePath="collection-api/project"/> 
+        <ProjectSelectSection resourcePath="collection-api/project" />
         <MaterialSampleIdentifiersFormLayout />
         <MaterialSampleFormLayout />
         <div className="data-components">

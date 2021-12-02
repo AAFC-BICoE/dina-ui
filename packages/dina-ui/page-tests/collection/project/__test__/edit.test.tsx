@@ -4,7 +4,7 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/333/attachment":
-    case "objectstore-api/metadata": 
+    case "objectstore-api/metadata":
     case "objectstore-api/config/file-upload":
     case "user-api/group":
     case "[]":
@@ -43,10 +43,9 @@ describe("ProjectForm.", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Lets you add a new project", async () => {
-    const wrapper = mountWithAppContext(
-      <ProjectForm onSaved={mockOnSaved} />,
-      { apiContext }
-    );
+    const wrapper = mountWithAppContext(<ProjectForm onSaved={mockOnSaved} />, {
+      apiContext
+    });
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -71,7 +70,7 @@ describe("ProjectForm.", () => {
               attachment: {
                 data: []
               }
-            },            
+            },
             multilingualDescription: {
               descriptions: [
                 {
@@ -94,7 +93,7 @@ describe("ProjectForm.", () => {
         attachment: {
           data: []
         }
-      },      
+      },
       multilingualDescription: {
         descriptions: [
           {
@@ -191,7 +190,7 @@ describe("ProjectForm.", () => {
         attachment: {
           data: []
         }
-      },      
+      },
       type: "project"
     });
   });

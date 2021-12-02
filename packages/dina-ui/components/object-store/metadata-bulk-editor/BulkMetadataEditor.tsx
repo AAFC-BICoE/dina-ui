@@ -163,7 +163,9 @@ export function BulkMetadataEditor({
 
     const managedAttributesInUse = await getManagedAttributesInUse(
       metadatas.map(it => it.managedAttributeValues),
-      bulkGet
+      bulkGet,
+      apiClient,
+      true
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
 
@@ -471,7 +473,7 @@ export function managedAttributeColumns(
   editableManagedAttributes: ManagedAttribute[]
 ) {
   return editableManagedAttributes.map(attr => ({
-    data: `metadata.managedAttributeValues.${attr.id}`,
+    data: `metadata.managedAttributeValues.${attr.key}`,
     title: attr.name,
     ...(attr.acceptedValues?.length
       ? {

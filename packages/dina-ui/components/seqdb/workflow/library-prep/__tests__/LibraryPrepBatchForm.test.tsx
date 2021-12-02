@@ -1,5 +1,4 @@
 import { ResourceSelect } from "common-ui";
-import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../../../../test-util/mock-app-context";
 import { Chain, ChainStepTemplate } from "../../../../../types/seqdb-api";
 import { LibraryPrepBatchForm } from "../LibraryPrepBatchForm";
@@ -45,11 +44,8 @@ describe("Library Prep Batch form", () => {
 
     const wrapper = getWrapper();
     wrapper
-      .find(".totalLibraryYieldNm-field")
-      .find(NumberFormat)
-      .prop<any>("onValueChange")({
-      floatValue: 2.5
-    });
+      .find(".totalLibraryYieldNm-field input")
+      .simulate("change", { target: { value: "2.5" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -61,7 +57,7 @@ describe("Library Prep Batch form", () => {
         [
           {
             resource: {
-              totalLibraryYieldNm: 2.5
+              totalLibraryYieldNm: "2.5"
             },
             type: "library-prep-batch"
           }

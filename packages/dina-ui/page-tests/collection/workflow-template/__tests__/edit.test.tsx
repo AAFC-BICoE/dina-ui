@@ -278,17 +278,17 @@ describe("Workflow template edit page", () => {
 
     // Set default geo assertion lat/lng:
     wrapper
-      .find(".dwcDecimalLatitude.row input[type='checkbox']")
+      .find(".dwcDecimalLatitude input[type='checkbox']")
       .simulate("change", { target: { checked: true } });
     wrapper
-      .find(".dwcDecimalLongitude.row input[type='checkbox']")
+      .find(".dwcDecimalLongitude input[type='checkbox']")
       .simulate("change", { target: { checked: true } });
     wrapper
-      .find(".dwcDecimalLatitude.row NumberFormat")
-      .prop<any>("onValueChange")({ floatValue: 1 });
+      .find(".dwcDecimalLatitude input[type='text']")
+      .simulate("change", { target: { value: "1" } });
     wrapper
-      .find(".dwcDecimalLongitude.row NumberFormat")
-      .prop<any>("onValueChange")({ floatValue: 2 });
+      .find(".dwcDecimalLongitude input[type='text']")
+      .simulate("change", { target: { value: "2" } });
 
     // Only allow new attachments:
     wrapper
@@ -307,11 +307,11 @@ describe("Workflow template edit page", () => {
           allowNew: true,
           templateFields: {
             "geoReferenceAssertions[0].dwcDecimalLatitude": {
-              defaultValue: 1,
+              defaultValue: "1",
               enabled: true
             },
             "geoReferenceAssertions[0].dwcDecimalLongitude": {
-              defaultValue: 2,
+              defaultValue: "2",
               enabled: true
             },
             startEventDateTime: {

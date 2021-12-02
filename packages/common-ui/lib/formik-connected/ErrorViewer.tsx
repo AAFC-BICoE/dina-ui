@@ -1,7 +1,7 @@
 import { flatten } from "flat";
 import { useFormikContext } from "formik";
 import { compact, toPairs } from "lodash";
-import { useMemo, useRef } from "react";
+import { useMemo } from "react";
 import { useFieldLabels } from "../field-header/FieldHeader";
 
 /** Renders the Formik status as an error message. */
@@ -45,14 +45,20 @@ export function ErrorViewer() {
         }
       );
 
-      return compact([status, ...fieldErrors]);
+      const formError = status ? (
+        <div className="error-message" key="form-error">
+          {status}
+        </div>
+      ) : null;
+
+      return compact([formError, ...fieldErrors]);
     },
     // Update the form-level error message on form submit or when errors change:
     [isSubmitting, errors]
   );
 
   return (
-    <div style={{ scrollMargin: "20px" }}>
+    <div>
       {errorMessages.length ? (
         <div className="alert alert-danger" role="status">
           {errorMessages.map((msg, idx) => (
@@ -62,4 +68,19 @@ export function ErrorViewer() {
       ) : null}
     </div>
   );
+}
+
+/** Scrolls the user's browser to the error message. */
+export function scrollToError() {
+  setImmediate(() => {
+    // Scroll to error message:
+    const invalidField =
+      document?.querySelector?.(".is-invalid") ??
+      document?.querySelector?.(".error-message");
+    invalidField?.scrollIntoView?.({
+      behavior: "auto",
+      block: "center",
+      inline: "center"
+    });
+  });
 }

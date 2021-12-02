@@ -155,7 +155,6 @@ export function ProjectFormLayout() {
           name="group"
           enableStoredDefaultGroup={true}
           className="col-md-6"
-          showAllGroups={true}
         />
       </div>
       <div className="row">
