@@ -42,7 +42,9 @@ export function StorageSearchSelector({
       accessor: "name"
     },
     {
-      Cell: ({ original }) => <StorageUnitBreadCrumb storageUnit={original} />,
+      Cell: ({ original }) => (
+        <StorageUnitBreadCrumb storageUnit={original} readOnly={readOnly} />
+      ),
       accessor: "location",
       sortable: false
     },

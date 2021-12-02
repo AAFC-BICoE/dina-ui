@@ -34,7 +34,10 @@ export function AssignedStorage({
         <div>
           <div className="list-inline mb-3">
             <div className="storage-path list-inline-item">
-              <StorageUnitBreadCrumb storageUnit={storageUnit} />
+              <StorageUnitBreadCrumb
+                storageUnit={storageUnit}
+                readOnly={readOnly}
+              />
             </div>
             {storageUnit.storageUnitType?.isInseperable && (
               <div className="list-inline-item">

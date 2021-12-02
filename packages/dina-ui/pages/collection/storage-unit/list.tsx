@@ -21,7 +21,9 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
     accessor: "name"
   },
   {
-    Cell: ({ original }) => <StorageUnitBreadCrumb storageUnit={original} />,
+    Cell: ({ original }) => (
+      <StorageUnitBreadCrumb storageUnit={original} readOnly={true} />
+    ),
     accessor: "location",
     sortable: false
   },
