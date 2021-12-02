@@ -38,6 +38,14 @@ cd dina-compose
 The UI should be available at dina.traefik.me. Note: traefik.me and its subdomains use a DNS server to point to <127.0.0.1> (localhost).
 If you're running DINA in a Virtual Machine or remote machine you may need to change /etc/hosts or add forwarded ports (80->80) so dina.traefik.me and accounts.traefik.me point to your development machine.
 
+You can log in to the application with the following username/password combos:
+* cnc-cm:cnc-cm (User witn the collection-manager role in the CNC group)
+* cnc-student:cnc-student (User witn the student role in the CNC group)
+* cnc-staff:cnc-staff (User witn the staff role in the CNC group)
+* user:user
+* admin:admin
+* dina-admin:dina-admin (User witn the dina-admin role)
+
 To troubleshoot whether dina.traefik.me is running on your machine, start with running this from your host machine
 and dev machine:
 
