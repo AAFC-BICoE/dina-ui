@@ -7,7 +7,8 @@ import {
   FilterGroupModel,
   FormikButton,
   QueryTable,
-  rsql
+  rsql,
+  useDinaFormContext
 } from "../../../common-ui/lib";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
@@ -26,12 +27,15 @@ export function StorageSearchSelector({
   onChange
 }: StorageSearchSelectorProps) {
   const [filter, setFilter] = useState<FilterGroupModel | null>();
+  const { readOnly } = useDinaFormContext();
 
   const tableColumns: ColumnDefinition<StorageUnit>[] = [
     {
       Cell: ({ original }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
-          <a>{storageUnitDisplayName(original)}</a>
+          <a target={!readOnly ? "_blank" : ""}>
+            {storageUnitDisplayName(original)}
+          </a>
         </Link>
       ),
       width: 400,

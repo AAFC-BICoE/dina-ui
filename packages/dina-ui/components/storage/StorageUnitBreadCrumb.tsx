@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useDinaFormContext } from "../../../common-ui/lib/formik-connected/DinaForm";
 import { StorageUnit } from "../../types/collection-api";
 
 export interface StorageUnitBreadCrumbProps {
@@ -10,6 +11,7 @@ export function StorageUnitBreadCrumb({
   disableLastLink,
   storageUnit
 }: StorageUnitBreadCrumbProps) {
+  const { readOnly } = useDinaFormContext();
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??
       storageUnit.hierarchy?.slice(1) ??
@@ -36,7 +38,7 @@ export function StorageUnitBreadCrumb({
         <strong>
           {storageUnit.id && !disableLastLink ? (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-              <a>{unitDisplayName}</a>
+              <a target={!readOnly ? "_blank" : ""}>{unitDisplayName}</a>
             </Link>
           ) : (
             unitDisplayName
