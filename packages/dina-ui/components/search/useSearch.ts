@@ -18,15 +18,14 @@ export interface AutocompleteSearchResponse {
 
 export type AutocompleteSearchParams = Omit<DoSearchParams, "searchValue">;
 
-export function useAutocompleteSearch<T extends KitsuResource>({
-  indexName,
-  searchField
-}: AutocompleteSearchParams) {
+export function useAutocompleteSearch<T extends KitsuResource>(
+  doSearchParams: AutocompleteSearchParams
+) {
   const { apiClient } = useApiClient();
 
   return useDebouncedFetch({
     fetcher: searchValue =>
-      doSearch<T>(apiClient.axios, { indexName, searchField, searchValue }),
+      doSearch<T>(apiClient.axios, { ...doSearchParams, searchValue }),
     timeoutMs: 250
   });
 }
@@ -35,12 +34,13 @@ export interface DoSearchParams {
   searchField: string;
   indexName: string;
   searchValue?: string;
+  additionalField?: string;
 }
 
 /** Does the search against the search API. */
 export async function doSearch<T extends KitsuResource>(
   axios: Pick<AxiosInstance, "get">,
-  { indexName, searchField, searchValue }: DoSearchParams
+  { indexName, searchField, searchValue, additionalField = "" }: DoSearchParams
 ) {
   if (!searchValue) {
     return null;
@@ -52,7 +52,7 @@ export async function doSearch<T extends KitsuResource>(
       params: {
         prefix: searchValue,
         autoCompleteField: `data.attributes.${searchField}`,
-        additionalField: "",
+        additionalField,
         indexName
       }
     }

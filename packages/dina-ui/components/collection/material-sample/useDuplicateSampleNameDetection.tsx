@@ -14,11 +14,10 @@ export function useDuplicateSampleNameDetection() {
         error instanceof Error &&
         error.message.includes("material_sample_name_unique")
       ) {
-        // Replace the server's error message with a cusotm one on the UI:
-        formik.setFieldError(
-          "materialSampleName",
-          (<DuplicateSampleNameError />) as any
-        );
+        // Replace the server's error message with a custom one on the UI:
+        formik.setFieldError("materialSampleName", (() => (
+          <DuplicateSampleNameError />
+        )) as any);
         throw new Error("");
       } else {
         throw error;

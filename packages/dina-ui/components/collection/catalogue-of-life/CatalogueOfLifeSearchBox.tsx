@@ -80,14 +80,14 @@ export function CatalogueOfLifeSearchBox({
 
   const nameResults = searchResult?.result;
 
-  const onChangeInternal = value => {
+  const onInputChange = value => {
     setInputValue(value);
     // Will save the user entry if it is not the determination scientific name
     // use case is for association host organism
     if (!isDetermination) {
       setValue?.(value);
+      onChange?.(value, formik as any);
     }
-    onChange?.(value, formik as any);
   };
 
   return (
@@ -120,7 +120,7 @@ export function CatalogueOfLifeSearchBox({
             <input
               aria-label={formatMessage("colSearchLabel")}
               className="form-control col-search-input"
-              onChange={e => onChangeInternal(e.target.value)}
+              onChange={e => onInputChange(e.target.value)}
               onFocus={e => e.target.select()}
               onKeyDown={e => {
                 if (e.keyCode === 13) {

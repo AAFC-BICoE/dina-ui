@@ -28,21 +28,24 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 export function ResourceSelectField<TData extends KitsuResource>(
   resourceSelectFieldProps: ResourceSelectFieldProps<TData>
 ) {
-  const { name, onChange, ...resourceSelectProps } = resourceSelectFieldProps;
+  const { name, onChange, readOnlyRender, ...resourceSelectProps } =
+    resourceSelectFieldProps;
+
+  const defaultReadOnlyRender = (
+    value?: SingleOrArray<PersistedResource<TData> | null>
+  ) => (
+    <div className="read-only-view">
+      <ReadOnlyResourceLink
+        value={value}
+        resourceSelectFieldProps={resourceSelectFieldProps}
+      />
+    </div>
+  );
 
   return (
     <FieldWrapper
       {...resourceSelectFieldProps}
-      readOnlyRender={(
-        value?: SingleOrArray<PersistedResource<TData> | null>
-      ) => (
-        <div className="read-only-view">
-          <ReadOnlyResourceLink
-            value={value}
-            resourceSelectFieldProps={resourceSelectFieldProps}
-          />
-        </div>
-      )}
+      readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
     >
       {({ setValue, value, invalid }) => {
         function onChangeInternal(resource) {

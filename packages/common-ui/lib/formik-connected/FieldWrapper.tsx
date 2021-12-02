@@ -142,7 +142,7 @@ export function FieldWrapper({
   }
 
   const fieldWrapperInternal = (
-    <div className={valueClass} style={{ minHeight: "25px", cursor: "auto" }}>
+    <div className={valueClass} style={{ cursor: "auto" }}>
       <FastField name={name} shouldUpdate={shouldUpdate} validate={validate}>
         {({ field: { value }, form, meta: { error } }) => (
           <ErrorBoundary

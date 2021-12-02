@@ -65,7 +65,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   geoSuggest: "Geo-Suggest",
   geoSuggestTooltip:
     "This button shows some suggested geo-locations based on what you've typed into the field.",
+  hasError: "Has error",
   invalidDate: "Invalid Date",
+  invalidMetersValue: "Invalid meters value",
   jumpToPage: "jump to page",
   rowsPerPage: "rows per page",
   languageOfPage: "eng",

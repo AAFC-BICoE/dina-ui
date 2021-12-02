@@ -5,7 +5,8 @@ import {
   DinaFormOnSubmit,
   filterBy,
   LoadingSpinner,
-  Query,
+  useQuery,
+  withResponse,
   ResourceSelectField,
   SelectField,
   SubmitButton,
@@ -31,6 +32,11 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useSeqdbIntl();
   const title = id ? "editProtocolTitle" : "addProtocolTitle";
 
+  const query = useQuery<Protocol>({
+    include: "kit",
+    path: `seqdb-api/protocol/${id}`
+  });
+
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -41,18 +47,9 @@ export function ProtocolEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editProtocolTitle" />
             </h1>
-            <Query<Protocol>
-              query={{ include: "kit", path: `seqdb-api/protocol/${id}` }}
-            >
-              {({ loading, response }) => (
-                <div>
-                  <LoadingSpinner loading={loading} />
-                  {response && (
-                    <ProtocolForm protocol={response.data} router={router} />
-                  )}
-                </div>
-              )}
-            </Query>
+            {withResponse(query, ({ data }) => (
+              <ProtocolForm protocol={data} router={router} />
+            ))}
           </div>
         ) : (
           <div>

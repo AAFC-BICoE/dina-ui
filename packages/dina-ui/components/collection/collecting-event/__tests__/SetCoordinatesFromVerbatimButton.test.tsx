@@ -1,5 +1,4 @@
 import { DinaForm, NumberField } from "common-ui";
-import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SetCoordinatesFromVerbatimButton } from "../SetCoordinatesFromVerbatimButton";
 
@@ -34,16 +33,16 @@ describe("SetCoordinatesFromVerbatimButton component", () => {
 
     wrapper.update();
 
-    expect(
-      wrapper.find(".decimalLatitude-field").find(NumberFormat).prop("value")
-    ).toEqual(45.540278);
-    expect(
-      wrapper.find(".decimalLongitude-field").find(NumberFormat).prop("value")
-    ).toEqual(-129.675278);
+    expect(wrapper.find(".decimalLatitude-field input").prop("value")).toEqual(
+      45.540278
+    );
+    expect(wrapper.find(".decimalLongitude-field input").prop("value")).toEqual(
+      -129.675278
+    );
 
     expect(onClickCallback).lastCalledWith({
-      lat: 45.540278,
-      lon: -129.675278
+      lat: "45.540278",
+      lon: "-129.675278"
     });
   });
 });

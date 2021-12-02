@@ -1,4 +1,3 @@
-import NumberFormat from "react-number-format";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { NumberField } from "../NumberField";
@@ -32,25 +31,21 @@ describe("NumberField component", () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
     // Change the value.
-    wrapper.find(NumberFormat).prop<any>("onValueChange")({
-      floatValue: 456.78
-    });
+    wrapper.find("input").simulate("change", { target: { value: "456.78" } });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
     await new Promise(setImmediate);
 
     // Expect the correct value to have been submitted.
-    expect(mockOnSubmit).lastCalledWith({ testField: 456.78 });
+    expect(mockOnSubmit).lastCalledWith({ testField: "456.78" });
   });
 
   it("Sets the field value as null if the input is blank.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
 
-    // Change the value to undefined.
-    wrapper.find(NumberFormat).prop<any>("onValueChange")({
-      floatValue: undefined
-    });
+    // Change the value to blank.
+    wrapper.find("input").simulate("change", { target: { value: "" } });
 
     // Submit the form.
     wrapper.find("form").simulate("submit");
@@ -60,17 +55,26 @@ describe("NumberField component", () => {
     expect(mockOnSubmit).lastCalledWith({ testField: null });
   });
 
-  it("Shows a blank input when the formik value becomes undefined.", async () => {
+  it("Shows a blank input when the formik value is undefined.", async () => {
+    const wrapper = getWrapper({ initialValues: {} });
+    expect(wrapper.find("input").prop("value")).toEqual("");
+  });
+
+  it("Shows a blank input when the formik value becomes blank.", async () => {
     const wrapper = getWrapper({ initialValues: { testField: 123.23 } });
-    expect(wrapper.find("input").prop("value")).toEqual("123.23");
+    expect(wrapper.find("input").prop("value")).toEqual(123.23);
 
     // Change the value to undefined.
-    wrapper.find(NumberFormat).prop("onValueChange")?.({
-      floatValue: undefined
-    } as any);
+    wrapper.find("input").simulate("change", { target: { value: "" } });
     wrapper.update();
 
     // The input should become blank.
     expect(wrapper.find("input").prop("value")).toEqual("");
+
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+
+    // Expect the correct value to have been submitted.
+    expect(mockOnSubmit).lastCalledWith({ testField: null });
   });
 });

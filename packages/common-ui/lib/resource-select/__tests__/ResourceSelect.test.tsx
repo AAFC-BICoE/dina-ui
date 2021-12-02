@@ -182,7 +182,7 @@ describe("ResourceSelect component", () => {
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate the select component's input change.
-    onInputChange("test filter value", { action: "input-change" });
+    onInputChange("test filter value", null as any);
 
     // Wait for the options to load.
     await new Promise(setImmediate);
@@ -497,9 +497,7 @@ describe("ResourceSelect component", () => {
     const { onInputChange } = wrapper.find(Select).props();
 
     // Simulate searching something that does not exist.
-    onInputChange("incorrect search with no matches", {
-      action: "input-change"
-    });
+    onInputChange("incorrect search with no matches", null as any);
 
     // Wait for the options to load after the search has been entered.
     await new Promise(setImmediate);

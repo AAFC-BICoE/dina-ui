@@ -1,5 +1,4 @@
 import { OperationsResponse } from "common-ui";
-import NumberFormat from "react-number-format";
 import CollectingEventEditPage from "../../../../pages/collection/collecting-event/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Person } from "../../../../types/agent-api/resources/Person";
@@ -146,7 +145,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event",
           value: {
             attributes: {
-              dwcVerbatimCoordinateSystem: "decimal degrees",
+              dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               managedAttributes: {},
               publiclyReleasable: true, // Default value
@@ -203,16 +202,18 @@ describe("collecting-event edit page", () => {
       }
     });
 
-    wrapper.find("button.add-assertion-button").simulate("click");
-
     wrapper
       .find(".dwcDecimalLatitude")
-      .find(NumberFormat)
-      .prop<any>("onValueChange")({ floatValue: 45.394728 });
+      .find("input")
+      .simulate("change", { target: { value: "45.394728" } });
     wrapper
       .find(".dwcDecimalLongitude")
-      .find(NumberFormat)
-      .prop<any>("onValueChange")({ floatValue: -75.701452 });
+      .find("input")
+      .simulate("change", { target: { value: "-75.701452" } });
+    wrapper
+      .find(".dwcCoordinateUncertaintyInMeters")
+      .find("input")
+      .simulate("change", { target: { value: "5" } });
 
     wrapper.find("form").simulate("submit");
 
@@ -229,6 +230,14 @@ describe("collecting-event edit page", () => {
             path: "collecting-event",
             value: {
               attributes: expect.objectContaining({
+                geoReferenceAssertions: [
+                  {
+                    isPrimary: true,
+                    dwcCoordinateUncertaintyInMeters: "5",
+                    dwcDecimalLatitude: "45.394728",
+                    dwcDecimalLongitude: "-75.701452"
+                  }
+                ],
                 verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm"
               }),
               relationships: {
@@ -341,9 +350,9 @@ describe("collecting-event edit page", () => {
         {
           errors: [
             {
-              detail: "Start event datetime should not be blank",
+              detail: "Test Error Detail",
               status: "422",
-              title: "Constraint violation"
+              title: "Test Error Title"
             }
           ],
           status: 422
@@ -367,7 +376,7 @@ describe("collecting-event edit page", () => {
     await new Promise(setImmediate);
     wrapper.update();
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
-      "Constraint violation: Start event datetime should not be blank"
+      "Test Error Title: Test Error Detail"
     );
     expect(mockPush).toBeCalledTimes(0);
   });
@@ -387,7 +396,10 @@ describe("collecting-event edit page", () => {
     ).toEqual(true);
 
     // Add a second assertion:
-    wrapper.find("button.add-assertion-button").at(0).simulate("click");
+    wrapper
+      .find(".georeference-assertion-section button.add-button")
+      .at(0)
+      .simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -403,6 +415,67 @@ describe("collecting-event edit page", () => {
     expect(assertionTabs.length).toEqual(2);
     expect(assertionTabs.at(0).text()).toEqual("1");
     expect(assertionTabs.at(1).text()).toEqual("2 (Primary)");
+  });
+
+  it("Removes the coordinate system if there are no coordinates set.", async () => {
+    mockPatch.mockReturnValueOnce({
+      data: [
+        {
+          data: {
+            attributes: {
+              startEventDateTime: "12/21/2019T16:00",
+              endEventDateTime: "12/22/2019T16:00",
+              verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 4pm"
+            },
+            id: "1",
+            type: "collecting-event"
+          },
+          status: 201
+        }
+      ] as OperationsResponse
+    });
+
+    mockQuery = {};
+
+    const wrapper = mountWithAppContext(<CollectingEventEditPage />, {
+      apiContext
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Default value:
+    expect(
+      wrapper.find(".dwcVerbatimCoordinateSystem-field input").prop("value")
+    ).toEqual("decimal degrees");
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPatch).lastCalledWith(
+      "/collection-api/operations",
+      [
+        {
+          op: "POST",
+          path: "collecting-event",
+          value: {
+            attributes: expect.objectContaining({
+              dwcVerbatimCoordinateSystem: null
+            }),
+            relationships: {
+              attachment: {
+                data: []
+              }
+            },
+            id: "00000000-0000-0000-0000-000000000000",
+            type: "collecting-event"
+          }
+        }
+      ],
+      expect.anything()
+    );
   });
 });
 

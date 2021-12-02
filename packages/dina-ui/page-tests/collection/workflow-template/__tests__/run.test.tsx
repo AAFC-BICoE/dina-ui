@@ -1,11 +1,12 @@
 import { PersistedResource } from "kitsu";
+import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
-  CollectingEvent,
   AcquisitionEvent,
+  CollectingEvent,
   PreparationProcessDefinition
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
@@ -166,12 +167,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     );
 
     // Lat/Lng fields are enabled:
-    expect(wrapper.find(".dwcDecimalLatitude input").prop("value")).toEqual(
-      "1"
-    );
-    expect(wrapper.find(".dwcDecimalLongitude input").prop("value")).toEqual(
-      "2"
-    );
+    expect(wrapper.find(".dwcDecimalLatitude input").prop("value")).toEqual(1);
+    expect(wrapper.find(".dwcDecimalLongitude input").prop("value")).toEqual(2);
 
     // Uncertainty field is disabled:
     expect(
@@ -184,12 +181,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     );
 
     // Edit the lat/lng:
-    wrapper.find(".dwcDecimalLatitude NumberFormat").prop<any>("onValueChange")(
-      { floatValue: 45.394728 }
-    );
     wrapper
-      .find(".dwcDecimalLongitude NumberFormat")
-      .prop<any>("onValueChange")({ floatValue: -75.701452 });
+      .find(".dwcDecimalLatitude input")
+      .simulate("change", { target: { value: "45.394728" } });
+    wrapper
+      .find(".dwcDecimalLongitude input")
+      .simulate("change", { target: { value: "-75.701452" } });
 
     // Submit
     wrapper.find("form").simulate("submit");
@@ -203,13 +200,14 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           {
             resource: {
               dwcOtherRecordNumbers: null,
+              dwcVerbatimCoordinateSystem: null,
               geoReferenceAssertions: [
                 {
                   georeferencedBy: undefined,
                   isPrimary: true,
                   // The added values:
-                  dwcDecimalLatitude: 45.394728,
-                  dwcDecimalLongitude: -75.701452
+                  dwcDecimalLatitude: "45.394728",
+                  dwcDecimalLongitude: "-75.701452"
                 }
               ],
               relationships: {
@@ -254,6 +252,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                   data: []
                 },
                 preparationAttachment: {
+                  data: []
+                },
+                projects: {
                   data: []
                 }
               },
@@ -349,6 +350,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 },
                 preparationAttachment: {
                   data: []
+                },
+                projects: {
+                  data: []
                 }
               },
               type: "material-sample"
@@ -430,37 +434,14 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // All switches should be disabled:
-    expect(
-      wrapper.find(".enable-collecting-event").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".enable-acquisition-event")
-        .find(ReactSwitch)
-        .prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(".enable-scheduled-actions")
-        .find(ReactSwitch)
-        .prop("checked")
-    ).toEqual(false);
+    // Get the switches:
+    const switches = wrapper.find(".material-sample-nav").find(ReactSwitch);
+    expect(switches.length).not.toEqual(0);
+
+    // All switches should be unchecked:
+    expect(switches.map(node => node.prop("checked"))).toEqual(
+      switches.map(() => false)
+    );
 
     // Submit with only the name set:
     await wrapper.find("form").simulate("submit");
@@ -498,6 +479,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                   data: []
                 },
                 preparationAttachment: {
+                  data: []
+                },
+                projects: {
                   data: []
                 }
               },
@@ -576,6 +560,41 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       wrapper
         .find(".determination-section .verbatimScientificName-field input")
         .exists()
+    ).toEqual(true);
+  });
+
+  it("Renders the Material Sample form with only the Associations section enabled.", async () => {
+    const wrapper = await getWrapper({
+      id: "1",
+      actionType: "ADD",
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: true,
+          allowNew: true,
+          templateFields: {
+            "associations[0].associatedSample": {
+              enabled: true
+            },
+            "associations[0].associationType": {
+              defaultValue: "test default association type",
+              enabled: true
+            }
+          } as any
+        }
+      },
+      group: "test-group",
+      name: "test-definition",
+      type: "material-sample-action-definition"
+    });
+
+    // Only the associations section should be enabled:
+    expect(
+      wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
+    ).toEqual(true);
+
+    // Renders the determination section:
+    expect(
+      wrapper.find(".association-type").find(CreatableSelect).exists()
     ).toEqual(true);
   });
 

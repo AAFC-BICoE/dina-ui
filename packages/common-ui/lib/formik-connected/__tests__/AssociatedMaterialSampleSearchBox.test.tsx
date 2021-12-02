@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
 import React from "react";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { AssociatedMaterialSampleSearchBox } from "../AssociatedMaterialSampleSearchBox";
+import { AssociatedMaterialSampleSearchBoxField } from "../AssociatedMaterialSampleSearchBox";
 import { DinaForm } from "../DinaForm";
 
 const mockOnSubmit = jest.fn();
@@ -51,19 +51,29 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
         initialValues={{}}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
-        <AssociatedMaterialSampleSearchBox name={"associatedSample"} />
+        <AssociatedMaterialSampleSearchBoxField name={"associatedSample"} />
       </DinaForm>,
       testCtx
     );
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Search table not shown initially:
+    expect(wrapper.find(".associated-sample-search").exists()).toEqual(false);
+
     expect(wrapper.find("button.searchSample")).toBeTruthy();
+
     wrapper.find("button.searchSample").simulate("click");
+
+    // Search table is shown:
+    expect(wrapper.find(".associated-sample-search").exists()).toEqual(true);
 
     await new Promise(setImmediate);
     wrapper.update();
 
     /* click the search button will show the empty associated sample input */
-    expect(wrapper.find(".associatedSampleInput").length).toBe(1);
+    expect(wrapper.find(".associated-sample-link").exists()).toEqual(false);
 
     /* select one sample from search result list */
     wrapper.find("button.selectMaterialSample").simulate("click");
@@ -72,7 +82,27 @@ describe("AssociatedMaterialSampleSearchBox component", () => {
     wrapper.update();
 
     /* expected the selected sample is being populated to the sample input */
-    expect(wrapper.find(".associatedSampleInput").text()).toEqual(
+    expect(wrapper.find(".associated-sample-link").text()).toEqual(
+      "my-sample-name"
+    );
+  });
+
+  it("Renders with an existing value", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{ associatedSample: "1" }}
+        onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
+      >
+        <AssociatedMaterialSampleSearchBoxField name={"associatedSample"} />
+      </DinaForm>,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    /* expected the selected sample is being populated to the sample input */
+    expect(wrapper.find(".associated-sample-link").text()).toEqual(
       "my-sample-name"
     );
   });
