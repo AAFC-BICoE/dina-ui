@@ -68,7 +68,10 @@ export function MaterialSampleBulkEditor({
     <div>
       <DinaForm initialValues={{}}>
         <ButtonBar>
-          <FormikButton className="btn btn-primary ms-auto" onClick={saveAll}>
+          <FormikButton
+            className="btn btn-primary ms-auto bulk-save-button"
+            onClick={saveAll}
+          >
             <DinaMessage id="saveAll" />
           </FormikButton>
         </ButtonBar>

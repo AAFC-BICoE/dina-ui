@@ -30,7 +30,9 @@ const testCtx = {
 };
 
 describe("MaterialSampleGenerationForm", () => {
-  it("Generated the initial values for the new samples.", async () => {
+  beforeEach(jest.clearAllMocks);
+
+  it("Generates the initial values for the new samples.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
       testCtx

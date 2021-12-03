@@ -24,39 +24,49 @@ export function MaterialSampleBulkNavigator({
 
   const tooManySamplesForTabs = samples.length >= 10;
 
-  if (tooManySamplesForTabs) {
-    return (
-      <div>
-        <div className="d-flex justify-content-center mb-3">
-          <SelectNavigation
-            elements={samples}
-            value={tabIndex}
-            onChange={setTabIndex}
-            optionLabel={sample => sample.materialSampleName}
-          />
-        </div>
-        {samples.map((sample, index) => (
-          <div key={index} className={tabIndex !== index ? "d-none" : ""}>
-            {renderOneSample(sample, index)}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
-    <Tabs
-      // Prevent unmounting the form on tab switch to avoid losing the form state:
-      forceRenderTabPanel={true}
-    >
-      <TabList>
-        {samples.map((sample, index) => (
-          <Tab key={index}>{sample.materialSampleName || `#${index + 1}`}</Tab>
-        ))}
-      </TabList>
-      {samples.map((sample, index) => (
-        <TabPanel key={index}>{renderOneSample(sample, index)}</TabPanel>
-      ))}
-    </Tabs>
+    <div className="sample-bulk-navigator">
+      {tooManySamplesForTabs ? (
+        <div>
+          <div className="d-flex justify-content-center mb-3">
+            <SelectNavigation
+              elements={samples}
+              value={tabIndex}
+              onChange={setTabIndex}
+              optionLabel={sample => sample.materialSampleName}
+            />
+          </div>
+          {samples.map((sample, index) => (
+            <div key={index} className={tabIndex !== index ? "d-none" : ""}>
+              {renderOneSample(sample, index)}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <Tabs
+          // Prevent unmounting the form on tab switch to avoid losing the form state:
+          forceRenderTabPanel={true}
+        >
+          <TabList>
+            {samples.map((sample, index) => (
+              <Tab
+                className={`react-tabs__tab sample-tab-${index}`}
+                key={index}
+              >
+                {sample.materialSampleName || `#${index + 1}`}
+              </Tab>
+            ))}
+          </TabList>
+          {samples.map((sample, index) => (
+            <TabPanel
+              className={`react-tabs__tab-panel sample-tabpanel-${index}`}
+              key={index}
+            >
+              {renderOneSample(sample, index)}
+            </TabPanel>
+          ))}
+        </Tabs>
+      )}
+    </div>
   );
 }
