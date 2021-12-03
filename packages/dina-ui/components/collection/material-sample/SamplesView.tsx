@@ -59,7 +59,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             style={{ width: "5rem" }}
           />
           <Link
-            href={`/collection/material-sample/workflows/split-config?id=${id}`}
+            href={`/collection/material-sample/bulk-create?splitFromId=${id}`}
           >
             <a className="btn btn-info mx-2">
               <DinaMessage id="splitButton" />

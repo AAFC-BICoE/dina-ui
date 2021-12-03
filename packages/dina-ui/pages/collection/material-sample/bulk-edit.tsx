@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
-import { LoadingSpinner } from "common-ui";
-import { useMaterialSampleQuery } from "../../../components/collection";
-import { Head, MaterialSampleBulkEditor, Nav } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { compact } from "lodash";
-import { Promisable } from "type-fest";
 import { PersistedResource } from "kitsu";
+import { useRouter } from "next/router";
+import {
+  ExistingMaterialSampleBulkEditor,
+  Head,
+  Nav
+} from "../../../components";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
 export default function MaterialSampleBulkEditPage() {
@@ -16,8 +16,12 @@ export default function MaterialSampleBulkEditPage() {
 
   const title = "bulkEdit";
 
-  async function moveToListPage() {
-    await router.push(`/collection/material-sample/list`);
+  async function moveToListPage(samples: PersistedResource<MaterialSample>[]) {
+    const savedIds = samples.map(it => it.id).join(",");
+    await router.push({
+      pathname: "/collection/material-sample/bulk-result",
+      query: { ids: savedIds }
+    });
   }
 
   return (
@@ -35,48 +39,4 @@ export default function MaterialSampleBulkEditPage() {
       </main>
     </div>
   );
-}
-
-export interface ExistingMaterialSampleBulkEditorProps {
-  ids: string[];
-  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
-}
-
-export function ExistingMaterialSampleBulkEditor({
-  ids,
-  onSaved
-}: ExistingMaterialSampleBulkEditorProps) {
-  const sampleQueries = ids.map(id => useMaterialSampleQuery(id));
-
-  /** Whether any query is loading. */
-  const isLoading = sampleQueries.reduce(
-    (prev, current) => prev || current.loading,
-    false
-  );
-
-  const errors = compact(sampleQueries.map(query => query.error));
-
-  if (isLoading) {
-    return <LoadingSpinner loading={true} />;
-  }
-
-  if (errors.length) {
-    return (
-      <div className="alert alert-danger">
-        {errors.map((error, index) => (
-          <div key={index}>
-            {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  const samples = compact(sampleQueries.map(query => query.response?.data));
-
-  if (samples.length) {
-    return <MaterialSampleBulkEditor samples={samples} onSaved={onSaved} />;
-  }
-
-  return null;
 }

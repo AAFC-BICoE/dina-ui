@@ -75,9 +75,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         className="flex-grow-1"
       />
       <EditButton entityId={id} entityLink="collection/material-sample" />
-      <Link
-        href={`/collection/material-sample/workflows/split-config?id=${id}`}
-      >
+      <Link href={`/collection/material-sample/bulk-create?splitFromId=${id}`}>
         <a className="btn btn-info">
           <DinaMessage id="splitButton" />
         </a>

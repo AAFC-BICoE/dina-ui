@@ -1,4 +1,4 @@
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import {
@@ -14,14 +14,20 @@ export default function MaterialSampleBulkCreatePage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
+  const splitFromId = router.query.splitFromId?.toString();
+
   const title = "createNewMaterialSamples";
 
   const [generatedSamples, setGeneratedSamples] = useState<
     InputResource<MaterialSample>[] | null
   >(null);
 
-  async function moveToListPage() {
-    await router.push(`/collection/material-sample/list`);
+  async function moveToListPage(samples: PersistedResource<MaterialSample>[]) {
+    const ids = samples.map(it => it.id).join(",");
+    await router.push({
+      pathname: "/collection/material-sample/bulk-result",
+      query: { parentSampleId: splitFromId, ids }
+    });
   }
 
   return (
@@ -36,7 +42,10 @@ export default function MaterialSampleBulkCreatePage() {
             onSaved={moveToListPage}
           />
         ) : (
-          <MaterialSampleGenerationForm onGenerate={setGeneratedSamples} />
+          <MaterialSampleGenerationForm
+            onGenerate={setGeneratedSamples}
+            parentId={splitFromId}
+          />
         )}
       </main>
     </div>

@@ -507,6 +507,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   source: "Source",
   specifyParentContainer: "Please select parent container",
   splitButton: "Split",
+  splitFrom: "Split from",
   splitSampleActionMetadataLegend: "Action Metadata",
   splitSampleChildSamplesToCreateLabel: "Child Material Samples to create",
   splitSampleConfigLegend: "Configure Action: Split",

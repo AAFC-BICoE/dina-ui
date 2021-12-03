@@ -5,7 +5,10 @@ import {
   NumberSpinnerField,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery,
+  withResponse,
+  LoadingSpinner
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { InputResource } from "kitsu";
@@ -17,13 +20,16 @@ import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
 import { CollectionSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
+  parentId?: string;
 }
 
 export function MaterialSampleGenerationForm({
-  onGenerate
+  onGenerate,
+  parentId
 }: MaterialSampleGenerationFormProps) {
   const [generationMode, setGenerationMode] = useState<GenerationMode>("BATCH");
   const { formatMessage } = useDinaIntl();
@@ -35,33 +41,55 @@ export function MaterialSampleGenerationForm({
       InputResource<MaterialSample>
     >((_, index) => ({
       type: "material-sample",
+      parentMaterialSample: parentId
+        ? { id: parentId, type: "material-sample" }
+        : undefined,
       materialSampleName: generateName({
         generationMode,
         index,
         formState: submittedValues
       }),
-      ...submittedValues.samples[index],
-      collection: submittedValues.collection
+      collection: submittedValues.collection,
+      ...submittedValues.samples[index]
     }));
 
     onGenerate(samples);
   };
 
+  const parentQuery = useQuery<MaterialSample>(
+    { path: `collection-api/material-sample/${parentId}` },
+    { disabled: !parentId }
+  );
+
+  if (parentQuery.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
-    <DinaForm<Partial<GeneratorFormValues>>
+    <DinaForm<GeneratorFormValues>
       initialValues={{
         numberToCreate: 0,
         samples: [],
         increment: "NUMERICAL",
         suffix: "",
         start: "001",
-        baseName: "",
-        separator: ""
+        baseName: parentQuery.response?.data?.materialSampleName || "",
+        separator: "",
+        collection: undefined
       }}
       horizontal="flex"
       validationSchema={generatorFormSchema}
       onSubmit={onSubmit}
     >
+      {parentId &&
+        withResponse(parentQuery, ({ data: ms }) => (
+          <h2>
+            <DinaMessage id="splitFrom" />:{" "}
+            <Link href={`/collection/material-sample/view?id=${ms.id}`}>
+              <a target="_blank">{ms.materialSampleName}</a>
+            </Link>
+          </h2>
+        ))}
       <div style={{ width: "25rem" }}>
         <NumberSpinnerField
           name="numberToCreate"
@@ -118,13 +146,6 @@ function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
     value: mode
   }));
 
-  const suffixAndSeparatorFields = (
-    <>
-      <TextField name="suffix" className="col-md-3" />
-      <TextField name="separator" className="col-md-3" />
-    </>
-  );
-
   return (
     <div>
       <h4>
@@ -132,7 +153,12 @@ function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
       </h4>
       <div className="row">
         <CollectionSelectField className="col-sm-6" name="collection" />
-        {generationMode === "BATCH" && suffixAndSeparatorFields}
+        {generationMode === "BATCH" && (
+          <>
+            <TextField name="suffix" className="col-md-3" />
+            <TextField name="separator" className="col-md-3" />
+          </>
+        )}
         {generationMode === "SERIES" && (
           <>
             <SelectField
@@ -166,7 +192,9 @@ function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
       </div>
       <div className="row">
         <TextField className="col-sm-6" name="baseName" />
-        {generationMode === "SERIES" && suffixAndSeparatorFields}
+        {generationMode === "SERIES" && (
+          <TextField name="separator" className="col-md-3" />
+        )}
       </div>
     </div>
   );
