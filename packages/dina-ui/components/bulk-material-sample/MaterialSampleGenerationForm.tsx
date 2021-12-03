@@ -244,7 +244,7 @@ function PreviewAndCustomizeFields({ generationMode }: GeneratorFieldsProps) {
                   }}
                 >
                   <div className="me-3 fw-bold">{`#${index + 1}:`}</div>
-                  <div style={{ width: "20rem" }}>
+                  <div className="sample-name" style={{ width: "20rem" }}>
                     <TextField
                       name={`samples[${index}].materialSampleName`}
                       removeLabel={true}
@@ -299,8 +299,12 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
     return padStart(String(suffixNumber), computedSuffixLen, "0");
   } else {
     const start = formState.start || "A";
-    const sc = new SpreadSheetColumn();
-    return sc.fromInt(index + sc.fromStr(start)) as string;
+    try {
+      const sc = new SpreadSheetColumn();
+      return sc.fromInt(index + sc.fromStr(start)) as string;
+    } catch (error) {
+      return "";
+    }
   }
 }
 

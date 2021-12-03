@@ -66,7 +66,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   baseNameLabel: "Base Name",
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
-  bulkCreate: "Bulk Create",
+  bulkCreate: "Create Multiple New",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
   changedProperties: "Changes",
