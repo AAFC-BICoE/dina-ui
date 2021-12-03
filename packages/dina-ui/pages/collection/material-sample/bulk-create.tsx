@@ -38,6 +38,7 @@ export default function MaterialSampleBulkCreatePage() {
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {generatedSamples ? (
           <MaterialSampleBulkEditor
+            disableSampleNameField={true}
             samples={generatedSamples}
             onSaved={moveToListPage}
           />

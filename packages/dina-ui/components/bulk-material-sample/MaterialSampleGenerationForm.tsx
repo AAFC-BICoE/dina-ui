@@ -57,7 +57,10 @@ export function MaterialSampleGenerationForm({
   };
 
   const parentQuery = useQuery<MaterialSample>(
-    { path: `collection-api/material-sample/${parentId}` },
+    {
+      path: `collection-api/material-sample/${parentId}`,
+      include: "collection"
+    },
     { disabled: !parentId }
   );
 
@@ -75,7 +78,7 @@ export function MaterialSampleGenerationForm({
         start: "001",
         baseName: parentQuery.response?.data?.materialSampleName || "",
         separator: "",
-        collection: undefined
+        collection: parentQuery.response?.data?.collection
       }}
       horizontal="flex"
       validationSchema={generatorFormSchema}

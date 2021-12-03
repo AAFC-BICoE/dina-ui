@@ -193,6 +193,9 @@ export interface MaterialSampleFormProps {
   /** Disables prefixing the sample name with the Collection code. */
   disableAutoNamePrefix?: boolean;
 
+  /** Makes the sample name field (Primary ID) read-only. */
+  disableSampleNameField?: boolean;
+
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 }
 
@@ -206,6 +209,7 @@ export function MaterialSampleForm({
   attachmentsConfig,
   disableAutoNamePrefix,
   materialSampleFormRef,
+  disableSampleNameField,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -266,7 +270,9 @@ export function MaterialSampleForm({
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <ProjectSelectSection resourcePath="collection-api/project" />
-        <MaterialSampleIdentifiersFormLayout />
+        <MaterialSampleIdentifiersFormLayout
+          disableSampleNameField={disableSampleNameField}
+        />
         <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
@@ -487,7 +493,7 @@ export function MaterialSampleFormLayout() {
   );
 }
 export interface MaterialSampleIdentifiersFormLayoutProps {
-  disableSampleName?: boolean;
+  disableSampleNameField?: boolean;
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
@@ -509,7 +515,7 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
-  disableSampleName,
+  disableSampleNameField,
   className,
   namePrefix = "",
   sampleNamePlaceHolder
@@ -530,7 +536,7 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
-            readOnly={disableSampleName}
+            readOnly={disableSampleNameField}
             placeholder={sampleNamePlaceHolder}
           />
           <TextField name={`${namePrefix}barcode`} customName="barcode" />

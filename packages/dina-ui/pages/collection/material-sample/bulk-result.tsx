@@ -31,7 +31,7 @@ export default function MaterialSampleBulkResult() {
     <div>
       <Head title={formatMessage("workflowCompleteTitle")} />
       <Nav />
-      <main className="container-fluid ">
+      <main className="container ">
         <h1 id="wb-cont">
           <DinaMessage id="workflowCompleteTitle" />
         </h1>

@@ -12,10 +12,12 @@ import { useMaterialSampleSave } from "../collection";
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+  disableSampleNameField?: boolean;
 }
 
 export function MaterialSampleBulkEditor({
   samples: samplesProp,
+  disableSampleNameField,
   onSaved
 }: MaterialSampleBulkEditorProps) {
   // Make sure the samples list doesn't change during this component's lifecycle:
@@ -75,6 +77,7 @@ export function MaterialSampleBulkEditor({
         samples={samples}
         renderOneSample={(_, index) => (
           <MaterialSampleForm
+            disableSampleNameField={disableSampleNameField}
             materialSampleFormRef={sampleHooks[index].formRef}
             materialSampleSaveHook={sampleHooks[index].saveHook}
             buttonBar={() => null}
