@@ -12,10 +12,10 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  TextFieldWithRemoveButton,
-  useDinaFormContext
+  useDinaFormContext,
+  PlaceSelectField
 } from "common-ui";
-import { FastField, Field, FieldArray, FormikContextType } from "formik";
+import { FastField, Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
 import { GeographySearchBox } from "..";
@@ -68,6 +68,7 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
+  const placeSelectOptions = useRef<any[]>(new Array());
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
@@ -166,7 +167,16 @@ export function CollectingEventFormLayout({
       formik,
       stateProvinceName
     );
-    formik.setFieldValue("srcAdminLevels", geoNameParsed);
+    placeSelectOptions.current.length = 0;
+    const placeDropdownOptions = geoNameParsed.map(parsedName => ({
+      label: parsedName.name,
+      value: parsedName
+    }));
+
+    placeDropdownOptions.map(
+      (opt, idx) => (placeSelectOptions.current[idx] = opt)
+    );
+    formik.setFieldValue("srcAdminLevels", [geoNameParsed[0]]);
     setHideCustomPlace(false);
     setHideRemoveBtn(false);
   }
@@ -687,39 +697,12 @@ export function CollectingEventFormLayout({
                       {detailResultsIsLoading ? (
                         <LoadingSpinner loading={true} />
                       ) : (
-                        form.values.srcAdminLevels?.length > 0 && (
-                          <FieldArray name="srcAdminLevels">
-                            {({ remove }) => {
-                              const geoNames = form.values.srcAdminLevels;
-                              function removeItem(index: number) {
-                                remove(index);
-                              }
-                              return (
-                                <div className="pb-4">
-                                  {geoNames.map((_, idx) => (
-                                    <TextFieldWithRemoveButton
-                                      name={`srcAdminLevels[${idx}].name`}
-                                      templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
-                                      readOnly={true}
-                                      removeLabel={true}
-                                      removeBottomMargin={true}
-                                      removeItem={removeItem}
-                                      key={Math.random()}
-                                      index={idx}
-                                      hideCloseBtn={hideRemoveBtn}
-                                      inputProps={{
-                                        style: {
-                                          backgroundColor: `${
-                                            idx % 2 === 0 ? "#e9ecef" : "white"
-                                          }`
-                                        }
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                              );
-                            }}
-                          </FieldArray>
+                        form.values.srcAdminLevels?.length && (
+                          <PlaceSelectField
+                            name="srcAdminLevels"
+                            options={placeSelectOptions.current as any}
+                            isMulti={true}
+                          />
                         )
                       )}
                       <DinaFormSection horizontal={[3, 9]}>
