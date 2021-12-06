@@ -185,6 +185,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
+        groupSelectorName="bucket"
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
@@ -250,6 +251,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             filter={() => ({})}
             model="objectstore-api/license"
             optionLabel={license => license.titles[locale] ?? license.url}
+            removeDefaultSort={true}
           />
         </div>
       </FieldSet>
