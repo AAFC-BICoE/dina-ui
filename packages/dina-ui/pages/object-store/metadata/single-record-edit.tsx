@@ -185,6 +185,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
+        groupSelectorName="bucket"
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
