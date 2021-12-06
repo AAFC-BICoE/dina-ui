@@ -81,7 +81,10 @@ export default function MetadataViewPage() {
               <div className="container">
                 <DinaForm initialValues={metadata} readOnly={true}>
                   <NotPubliclyReleasableWarning />
-                  <TagsAndRestrictionsSection tagsFieldName="acTags" />
+                  <TagsAndRestrictionsSection
+                    tagsFieldName="acTags"
+                    groupSelectorName="bucket"
+                  />
                   <MetadataDetails metadata={metadata} />
                   <ExifView objectUpload={metadata.objectUpload} />
                 </DinaForm>
