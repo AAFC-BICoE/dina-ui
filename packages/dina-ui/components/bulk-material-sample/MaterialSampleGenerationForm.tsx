@@ -127,7 +127,9 @@ export function MaterialSampleGenerationForm({
           buttonProps={(form: FormikContextType<GeneratorFormValues>) => ({
             disabled: !form.values.numberToCreate
           })}
-        />
+        >
+          <DinaMessage id="next" />
+        </SubmitButton>
       </ButtonBar>
     </DinaForm>
   );
@@ -144,8 +146,10 @@ interface GeneratorFieldsProps {
 }
 
 function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
+  const { formatMessage } = useDinaIntl();
+
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map(mode => ({
-    label: mode,
+    label: formatMessage(mode),
     value: mode
   }));
 

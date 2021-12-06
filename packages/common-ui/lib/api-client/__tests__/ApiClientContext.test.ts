@@ -3,7 +3,6 @@ import Kitsu from "kitsu";
 import {
   ApiClientImpl,
   CustomDinaKitsu,
-  DoOperationsError,
   getErrorMessages,
   makeAxiosErrorMoreReadable
 } from "../ApiClientContext";
@@ -702,7 +701,19 @@ Constraint violation: description size must be between 1 and 10`;
 
     expect(messages).toEqual({
       errorMessage: "Error 1\nError 2",
-      fieldErrors: {}
+      fieldErrors: {},
+      individualErrors: [
+        {
+          errorMessage: "Error 1",
+          fieldErrors: {},
+          index: 0
+        },
+        {
+          errorMessage: "Error 2",
+          fieldErrors: {},
+          index: 1
+        }
+      ]
     });
   });
 
@@ -719,11 +730,27 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     expect(messages).toEqual({
-      errorMessage: "\n",
+      errorMessage: null,
       fieldErrors: {
         field1: "Error 1",
         field2: "Error 2"
-      }
+      },
+      individualErrors: [
+        {
+          errorMessage: null,
+          fieldErrors: {
+            field1: "Error 1"
+          },
+          index: 0
+        },
+        {
+          errorMessage: null,
+          fieldErrors: {
+            field2: "Error 2"
+          },
+          index: 1
+        }
+      ]
     });
   });
 
@@ -741,11 +768,32 @@ Constraint violation: description size must be between 1 and 10`;
     ]);
 
     expect(messages).toEqual({
-      errorMessage: "Form error\n\n",
+      errorMessage: "Form error",
       fieldErrors: {
         field1: "Error 1",
         field2: "Error 2"
-      }
+      },
+      individualErrors: [
+        {
+          errorMessage: "Form error",
+          fieldErrors: {},
+          index: 0
+        },
+        {
+          errorMessage: null,
+          fieldErrors: {
+            field1: "Error 1"
+          },
+          index: 1
+        },
+        {
+          errorMessage: null,
+          fieldErrors: {
+            field2: "Error 2"
+          },
+          index: 2
+        }
+      ]
     });
   });
 });

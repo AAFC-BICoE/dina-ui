@@ -196,7 +196,9 @@ export interface MaterialSampleFormProps {
   /** Makes the sample name field (Primary ID) read-only. */
   disableSampleNameField?: boolean;
 
-  materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
+  materialSampleFormRef?: Ref<FormikProps<
+    InputResource<MaterialSample>
+  > | null>;
 }
 
 export function MaterialSampleForm({
@@ -566,7 +568,7 @@ export function CollectingEventBriefDetails({
           <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
             <TextField name="startEventDateTime" />
             {collectingEvent.endEventDateTime && (
-              <TextField name="startEventDateTime" />
+              <TextField name="endEventDateTime" />
             )}
             <TextField name="verbatimEventDateTime" />
           </FieldSet>

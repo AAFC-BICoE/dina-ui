@@ -95,7 +95,6 @@ export function useCollectingEventSave({
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
-  const { formatMessage } = useDinaIntl();
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY

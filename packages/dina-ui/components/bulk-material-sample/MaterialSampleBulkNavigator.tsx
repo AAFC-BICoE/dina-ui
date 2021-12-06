@@ -1,15 +1,24 @@
+import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { ReactNode, useState } from "react";
+import { ReactNode, RefObject, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import { useMaterialSampleSave } from "../collection";
 import { SelectNavigation } from "./SelectNavigation";
+import { isEmpty, compact } from "lodash";
 
 export interface MaterialSampleBulkNavigatorProps {
-  samples: InputResource<MaterialSample>[];
+  samples: SampleWithHooks[];
   renderOneSample: (
     sample: InputResource<MaterialSample>,
     index: number
   ) => ReactNode;
+}
+
+export interface SampleWithHooks {
+  sample: InputResource<MaterialSample>;
+  saveHook: ReturnType<typeof useMaterialSampleSave>;
+  formRef: RefObject<FormikProps<InputResource<MaterialSample>> | null>;
 }
 
 /**
@@ -24,6 +33,14 @@ export function MaterialSampleBulkNavigator({
 
   const tooManySamplesForTabs = samples.length >= 10;
 
+  const tabsWithErrors = samples.reduce<number[]>(
+    (prev, { formRef }, index) =>
+      !!formRef.current?.status || !isEmpty(formRef.current?.errors)
+        ? [...prev, index]
+        : prev,
+    []
+  );
+
   return (
     <div className="sample-bulk-navigator">
       {tooManySamplesForTabs ? (
@@ -33,10 +50,11 @@ export function MaterialSampleBulkNavigator({
               elements={samples}
               value={tabIndex}
               onChange={setTabIndex}
-              optionLabel={sample => sample.materialSampleName}
+              optionLabel={({ sample }) => sample.materialSampleName}
+              invalidElements={tabsWithErrors}
             />
           </div>
-          {samples.map((sample, index) => (
+          {samples.map(({ sample }, index) => (
             <div key={index} className={tabIndex !== index ? "d-none" : ""}>
               {renderOneSample(sample, index)}
             </div>
@@ -48,16 +66,22 @@ export function MaterialSampleBulkNavigator({
           forceRenderTabPanel={true}
         >
           <TabList>
-            {samples.map((sample, index) => (
-              <Tab
-                className={`react-tabs__tab sample-tab-${index}`}
-                key={index}
-              >
-                {sample.materialSampleName || `#${index + 1}`}
-              </Tab>
-            ))}
+            {samples.map(({ sample }, index) => {
+              const tabHasError = tabsWithErrors.includes(index);
+
+              return (
+                <Tab
+                  className={`react-tabs__tab sample-tab-${index}`}
+                  key={index}
+                >
+                  <span className={tabHasError ? "text-danger is-invalid" : ""}>
+                    {sample.materialSampleName || `#${index + 1}`}
+                  </span>
+                </Tab>
+              );
+            })}
           </TabList>
-          {samples.map((sample, index) => (
+          {samples.map(({ sample }, index) => (
             <TabPanel
               className={`react-tabs__tab-panel sample-tabpanel-${index}`}
               key={index}

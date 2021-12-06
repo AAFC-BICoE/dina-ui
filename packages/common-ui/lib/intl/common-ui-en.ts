@@ -72,6 +72,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   invalidDate: "Invalid Date",
   invalidMetersValue: "Invalid meters value",
   jumpToPage: "jump to page",
+  navigation: "Navigation",
   rowsPerPage: "rows per page",
   languageOfPage: "eng",
   loadingText: "Loading...",

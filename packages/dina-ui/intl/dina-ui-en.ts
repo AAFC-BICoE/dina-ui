@@ -364,6 +364,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latLongAutoSetterButton: "Convert to Decimal Lat/Long",
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
+  LETTER: "Letter",
   literalGeoreferencedByLabel: "Georeferenced By",
   locationLabel: "Location",
   longitudeValidationError:
@@ -425,6 +426,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   notEditableWhenThereAreChildStorageUnits:
     "Not editable when there are child Storage Units.",
   notPubliclyReleasable: "Not Publicly Releasable",
+  NUMERICAL: "Numerical",
   objectListTitle: "Stored Objects",
   objectStoreDataUnavailable: "Object Store data unavailable",
   objectStoreDetailsTitle: "Object Store Details",

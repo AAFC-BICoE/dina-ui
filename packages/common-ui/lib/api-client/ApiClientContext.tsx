@@ -9,7 +9,7 @@ import Kitsu, {
   PersistedResource
 } from "kitsu";
 import { deserialise, error as kitsuError, query } from "kitsu-core";
-import { flatMap, fromPairs, isEmpty, keys, omit } from "lodash";
+import { compact, flatMap, fromPairs, isEmpty, keys, omit } from "lodash";
 import LRUCache from "lru-cache";
 import React, { PropsWithChildren, useContext, useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -193,11 +193,16 @@ export class ApiClientImpl implements ApiClientI {
 
     // Check for errors. At least one error means that the entire request's transaction was
     // cancelled.
-    const { errorMessage, fieldErrors } = getErrorMessages(responses);
+    const { errorMessage, fieldErrors, individualErrors } =
+      getErrorMessages(responses);
 
     // If there is an error message, throw it.
     if (errorMessage || !isEmpty(fieldErrors)) {
-      throw new DoOperationsError(errorMessage ?? "", fieldErrors);
+      throw new DoOperationsError(
+        errorMessage ?? "",
+        fieldErrors,
+        individualErrors
+      );
     }
 
     // Return the successful jsonpatch response.
@@ -299,60 +304,78 @@ export class ApiClientImpl implements ApiClientI {
   }
 }
 
+export interface OperationError {
+  index: number;
+  errorMessage: string | null;
+  fieldErrors: FormikErrors<any>;
+}
+
 /** Gets the error message as a string from the JSONAPI jsonpatch/operations response. */
 export function getErrorMessages(
   operationsResponse: OperationsResponse | BulkGetOperation[]
 ): {
   errorMessage: string | null;
   fieldErrors: FormikErrors<any>;
+  /** The error messages for each indivisual operation with the operation's index. */
+  individualErrors: OperationError[];
 } {
   // Filter down to just the error responses.
-  const errorResponses = operationsResponse.filter(
-    ({ status }) => !/2../.test(status.toString())
-  ) as FailedOperation[];
+  const errorResponses = operationsResponse
+    .map((res, index: number) => ({ index, response: res as FailedOperation }))
+    .filter(({ response }) => !/2../.test(response.status.toString()));
 
-  // Map the error responses to JsonApiErrors.
-  const jsonApiErrors = errorResponses
+  const individualErrors = errorResponses.map(({ response, index }) => {
+    // Map the error responses to JsonApiErrors.
     // Ignore any error responses without an 'errors' field.
-    .filter(response => response.errors)
-    .map(response => response.errors);
+    const jsonApiErrors = compact(response.errors);
 
-  // Convert the JsonApiErrors to an aggregated error string.
-  const errorMessage =
-    jsonApiErrors
-      .map(errors =>
-        errors
-          // Don't include field-level errors in the form-level error message:
-          .filter(error => !error.source?.pointer)
-          .map(({ title, detail }) =>
-            // The error message is the title + detail, but remove one if the other is missing
+    // Convert the JsonApiErrors to an aggregated error string.
+    const errorMessage =
+      jsonApiErrors
+        // Don't include field-level errors in the form-level error message:
+        .filter(error => !error.source?.pointer)
+        .map(
+          // The error message is the title + detail, but remove one if the other is missing
+          ({ title, detail }) =>
             [title, detail].filter(s => s?.trim()).join(": ")
-          )
-          .join("\n")
-      )
-      .join("\n") || null;
+        )
+        .join("\n") || null;
 
-  const fieldErrors = fromPairs(
-    flatMap(
-      jsonApiErrors.map(response =>
-        response
-          // Only include field-level errors in the fieldErrors:
-          .filter(error => error.source?.pointer && error.detail)
-          .map<[string, string]>(error => [
-            error.source?.pointer?.toString?.() ?? "",
-            error.detail ?? ""
-          ])
-      )
-    )
+    const fieldErrors = fromPairs(
+      jsonApiErrors
+        // Only include field-level errors in the fieldErrors:
+        .filter(error => error.source?.pointer && error.detail)
+        .map(error => [
+          error.source?.pointer?.toString?.() ?? "",
+          error.detail ?? ""
+        ])
+    );
+
+    return { index, errorMessage, fieldErrors };
+  });
+
+  const overallErrorMessage =
+    compact(individualErrors.map(it => it.errorMessage)).join("\n") || null;
+  const overallFieldErrors = individualErrors.reduce(
+    (total, curr) => ({ ...total, ...curr.fieldErrors }),
+    {}
   );
 
   // Return the error message if there is one, or null otherwise.
-  return { errorMessage, fieldErrors };
+  return {
+    errorMessage: overallErrorMessage,
+    fieldErrors: overallFieldErrors,
+    individualErrors
+  };
 }
 
 /** Error class thrown by doOperations function. */
 export class DoOperationsError extends Error {
-  constructor(public message: string, public fieldErrors: FormikErrors<any>) {
+  constructor(
+    public message: string,
+    public fieldErrors: FormikErrors<any> = {},
+    public individualErrors: OperationError[] = []
+  ) {
     super(message);
   }
 }
