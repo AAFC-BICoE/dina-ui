@@ -18,7 +18,7 @@ export interface MaterialSampleBulkNavigatorProps {
 export interface SampleWithHooks {
   sample: InputResource<MaterialSample>;
   saveHook: ReturnType<typeof useMaterialSampleSave>;
-  formRef: RefObject<FormikProps<InputResource<MaterialSample>> | null>;
+  formRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
 }
 
 /**

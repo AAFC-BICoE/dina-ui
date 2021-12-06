@@ -196,9 +196,7 @@ export interface MaterialSampleFormProps {
   /** Makes the sample name field (Primary ID) read-only. */
   disableSampleNameField?: boolean;
 
-  materialSampleFormRef?: Ref<FormikProps<
-    InputResource<MaterialSample>
-  > | null>;
+  materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 }
 
 export function MaterialSampleForm({
