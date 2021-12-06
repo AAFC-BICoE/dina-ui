@@ -22,11 +22,13 @@ export default function MaterialSampleBulkCreatePage() {
     InputResource<MaterialSample>[] | null
   >(null);
 
-  async function moveToListPage(samples: PersistedResource<MaterialSample>[]) {
+  async function moveToResultPage(
+    samples: PersistedResource<MaterialSample>[]
+  ) {
     const ids = samples.map(it => it.id).join(",");
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { parentSampleId: splitFromId, ids }
+      query: { parentSampleId: splitFromId, ids, actionType: "created" }
     });
   }
 
@@ -34,13 +36,13 @@ export default function MaterialSampleBulkCreatePage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className={generatedSamples ? "container-fluid" : "container"}>
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {generatedSamples ? (
           <MaterialSampleBulkEditor
             disableSampleNameField={true}
             samples={generatedSamples}
-            onSaved={moveToListPage}
+            onSaved={moveToResultPage}
           />
         ) : (
           <MaterialSampleGenerationForm

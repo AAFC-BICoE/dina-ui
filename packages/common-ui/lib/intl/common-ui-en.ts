@@ -40,6 +40,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   dropdownSearchResults: "Search results",
   editButtonText: "Edit",
   editableTable: "Editable Table",
+  edited: "edited",
   editSelectedButtonText: "Edit Selected",
   errorPageTitle: "Error",
   existing: "Existing",

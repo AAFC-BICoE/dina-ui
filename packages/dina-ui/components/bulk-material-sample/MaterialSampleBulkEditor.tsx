@@ -127,6 +127,7 @@ export function MaterialSampleBulkEditor({
           <FormikButton
             className="btn btn-primary ms-auto bulk-save-button"
             onClick={saveAll}
+            buttonProps={() => ({ style: { width: "10rem" } })}
           >
             <DinaMessage id="saveAll" />
           </FormikButton>

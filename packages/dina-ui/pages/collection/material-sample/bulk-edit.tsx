@@ -16,11 +16,13 @@ export default function MaterialSampleBulkEditPage() {
 
   const title = "bulkEdit";
 
-  async function moveToListPage(samples: PersistedResource<MaterialSample>[]) {
+  async function moveToResultPage(
+    samples: PersistedResource<MaterialSample>[]
+  ) {
     const savedIds = samples.map(it => it.id).join(",");
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { ids: savedIds }
+      query: { ids: savedIds, actionType: "edited" }
     });
   }
 
@@ -28,12 +30,12 @@ export default function MaterialSampleBulkEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {ids && (
           <ExistingMaterialSampleBulkEditor
             ids={ids}
-            onSaved={moveToListPage}
+            onSaved={moveToResultPage}
           />
         )}
       </main>

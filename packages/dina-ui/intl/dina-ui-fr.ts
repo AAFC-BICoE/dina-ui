@@ -58,7 +58,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   changedProperties: "Modifications",
   childMaterialSamples: "Sous-échantillons de matière",
-  childMaterialSamplesCreatedLabel: "Création d’échantillons de matière enfant",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
   colSearchLabel: "Recherche de nom",
@@ -523,7 +522,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Un problème est survenu lors de la tentative de lecture de la feuille de calcul téléchargée.",
   workbookUploadInstructions:
     "Faites glisser et déposez une feuille de calcul ici ou cliquez pour ouvrir la boîte de dialogue de navigation.",
-  workflowCompleteTitle: "Flux de travail achevé",
   workflowTemplateListTitle: "Modèles de flux de travail",
   workflowTemplateTitle: "Modèle de flux des travaux",
   year: "Année",

@@ -14,6 +14,8 @@ export default function MaterialSampleBulkResult() {
 
   const parentSampleId = router.query.parentSampleId?.toString?.();
   const ids = router.query.ids?.toString?.()?.split?.(",") ?? [];
+  const actionType =
+    router.query.actionType?.toString?.() === "edited" ? "edited" : "created";
 
   const parentSampleQuery = useQuery<MaterialSample>(
     {
@@ -29,12 +31,10 @@ export default function MaterialSampleBulkResult() {
 
   return (
     <div>
-      <Head title={formatMessage("workflowCompleteTitle")} />
+      <Head title={formatMessage("bulkOperationCompleteTitle")} />
       <Nav />
       <main className="container ">
-        <h1 id="wb-cont">
-          <DinaMessage id="workflowCompleteTitle" />
-        </h1>
+        <h1 id="wb-cont">{formatMessage("bulkOperationCompleteTitle")}</h1>
         <div>
           <h3>{formatMessage("results")}:</h3>
           {parentSampleId &&
@@ -60,7 +60,11 @@ export default function MaterialSampleBulkResult() {
             ({ data: samples }) => (
               <div>
                 <div className="fw-bold">
-                  {formatMessage("childMaterialSamplesCreatedLabel")}:
+                  <DinaMessage
+                    id="materialSamplesBulkFinishLabel"
+                    values={{ actionType: formatMessage(actionType) }}
+                  />
+                  :
                 </div>
                 {(samples as PersistedResource<MaterialSample>[]).map(
                   sample => (
