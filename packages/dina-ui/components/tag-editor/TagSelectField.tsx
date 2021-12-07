@@ -17,6 +17,7 @@ import { useDinaIntl } from "../../intl/dina-ui-intl";
 export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
   resourcePath?: string;
+  groupSelectorName?: string;
 }
 
 export interface TagSelectOption {
@@ -59,6 +60,7 @@ export function TagSelectField({
           onChange={setValue}
           invalid={invalid}
           resourcePath={resourcePath}
+          groupSelectorName={props.groupSelectorName}
         />
       )}
     </FieldWrapper>
@@ -71,6 +73,7 @@ interface TagSelectProps {
   resourcePath?: string;
   invalid?: boolean;
   tagsFieldName?: string;
+  groupSelectorName?: string;
 }
 
 /** Tag Select/Create field. */
@@ -79,6 +82,7 @@ function TagSelect({
   onChange,
   resourcePath,
   invalid,
+  groupSelectorName = "group",
   tagsFieldName = "tags"
 }: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
@@ -96,7 +100,7 @@ function TagSelect({
           extraFilters: [
             // Restrict the list to just the user's groups:
             {
-              selector: "group",
+              selector: groupSelectorName,
               comparison: "=in=",
               arguments: groupNames || []
             }
