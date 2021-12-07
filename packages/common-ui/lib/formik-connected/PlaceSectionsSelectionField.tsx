@@ -5,21 +5,18 @@ import ReactTable, { Column } from "react-table";
 import { ColumnDefinition } from "../table/QueryTable";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 import { FieldHeader } from "../field-header/FieldHeader";
-
-import { SingleOrArray } from "./ResourceSelectField";
-import { isArray } from "lodash";
 import { useFormikContext } from "formik";
 
 export interface PlaceSectionsSelectionFieldProps extends LabelWrapperParams {
   isDisabled?: boolean;
-  hideRemoveBtn?: boolean;
+  hideSelectionCheckBox?: boolean;
 }
 
 /** Formik-connected table for selecting sections from one search result. */
 export function PlaceSectionsSelectionField(
   placeSectionsSelectionFieldProps: PlaceSectionsSelectionFieldProps
 ) {
-  const { readOnlyRender, hideRemoveBtn, ...placeFieldProps } =
+  const { hideSelectionCheckBox, ...placeFieldProps } =
     placeSectionsSelectionFieldProps;
 
   const { values } = useFormikContext<any>();
@@ -46,7 +43,7 @@ export function PlaceSectionsSelectionField(
   const PLACE_SECTIONS_TABLE_COLUMNS: ColumnDefinition<SourceAdministrativeLevel>[] =
     [
       ...PLACE_SECTIONS_TABLE_READONLY_COLUMNS,
-      ...(!hideRemoveBtn
+      ...(!hideSelectionCheckBox
         ? [
             {
               Cell: ({ original: section }) => (
@@ -79,17 +76,15 @@ export function PlaceSectionsSelectionField(
   });
 
   const defaultReadOnlyRender = (
-    value?: SingleOrArray<SourceAdministrativeLevel | null>
+    value?: SourceAdministrativeLevel[] | null
   ) => (
     <div className="read-only-view">
-      {isArray(value)
-        ? value.map(val => (
-            <div key={val?.id ?? val?.name} className="mb-1">
-              {" "}
-              {val?.name ?? val?.id ?? val?.toString()}{" "}
-            </div>
-          ))
-        : value}
+      {value?.map(val => (
+        <div key={val?.id ?? val.shortId ?? val?.name} className="mb-1">
+          {" "}
+          {val?.name ?? val?.id ?? val?.toString()}{" "}
+        </div>
+      ))}
     </div>
   );
 
@@ -98,6 +93,7 @@ export function PlaceSectionsSelectionField(
       {...placeFieldProps}
       removeLabel={true}
       readOnlyRender={defaultReadOnlyRender}
+      key={displayData.map(data => data.shortId).join()}
     >
       {() => {
         return (
@@ -105,7 +101,6 @@ export function PlaceSectionsSelectionField(
             className="-striped"
             columns={mappedColumns}
             data={displayData}
-            manual={true}
             minRows={1}
             showPagination={false}
           />

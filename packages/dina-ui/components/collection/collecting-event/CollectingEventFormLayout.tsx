@@ -77,7 +77,7 @@ export function CollectingEventFormLayout({
 
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
-  const [hideRemoveBtn, setHideRemoveBtn] = useState(true);
+  const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
 
   const { isValidating: detailResultsIsLoading } = useSWR(
@@ -168,7 +168,7 @@ export function CollectingEventFormLayout({
     );
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
-    setHideRemoveBtn(false);
+    setHideSelectionCheckBox(false);
   }
 
   function parseGeoAdminLevels(
@@ -264,7 +264,7 @@ export function CollectingEventFormLayout({
 
     setCustomPlaceValue("");
     setHideCustomPlace(true);
-    setHideRemoveBtn(true);
+    setHideSelectionCheckBox(true);
   }
 
   /** Does a Places search using the given search string. */
@@ -696,7 +696,7 @@ export function CollectingEventFormLayout({
                         form.values.srcAdminLevels?.length && (
                           <PlaceSectionsSelectionField
                             name="srcAdminLevels"
-                            hideRemoveBtn={hideRemoveBtn}
+                            hideSelectionCheckBox={hideSelectionCheckBox}
                           />
                         )
                       )}
