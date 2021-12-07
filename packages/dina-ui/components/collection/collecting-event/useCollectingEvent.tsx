@@ -239,15 +239,17 @@ export function useCollectingEventSave({
               if (
                 sectionIds.filter(
                   id => id === srcAdminLevel.shortId?.toString()
-                )
+                ).length
               )
                 srcDetail.selectedGeographicPlace = srcAdminLevel;
             }
           } else {
             if (
               sectionIds.filter(id => id === srcAdminLevel.shortId?.toString())
-            )
+                .length
+            ) {
               srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
+            }
           }
         });
     }
