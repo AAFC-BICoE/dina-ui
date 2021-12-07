@@ -118,7 +118,7 @@ export function CatalogueOfLifeSearchBox({
           </label>
         )}
         <div className="flex-grow-1">
-        {isDetermination ? (
+          {isDetermination ? (
             <div className="input-group">
               <input
                 aria-label={formatMessage("colSearchLabel")}
@@ -160,7 +160,7 @@ export function CatalogueOfLifeSearchBox({
               />
               <button
                 onClick={doThrottledSearch}
-                className="btn btn-primary ms-auto mt-1 col-search-button"
+                className="btn btn-primary ms-auto mt-2 col-search-button"
                 type="button"
                 disabled={searchIsDisabled}
               >
