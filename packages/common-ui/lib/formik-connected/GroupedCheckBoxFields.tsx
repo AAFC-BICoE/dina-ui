@@ -11,15 +11,19 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
   fileHyperlinkId?: string;
 }
 
-export interface GroupedCheckBoxesParams {
+export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
   fieldName: string;
   detachTotalSelected?: boolean;
+  defaultAvailableItems?: TData[];
 }
 
-export function useGroupedCheckBoxes<TData extends KitsuResource>({
+export function useGroupedCheckBoxes<
+  TData extends KitsuResource & { shortId }
+>({
   fieldName,
-  detachTotalSelected
-}: GroupedCheckBoxesParams) {
+  detachTotalSelected,
+  defaultAvailableItems
+}: GroupedCheckBoxesParams<TData>) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
@@ -28,7 +32,9 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     resource,
     fileHyperlinkId
   }: CheckBoxFieldProps<TData>) {
-    const thisBoxFieldName = `${fieldName}[${resource.id}]`;
+    const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
+    const computedAvailabelItems =
+      (defaultAvailableItems as TData[]) ?? availableItems;
 
     return (
       <Field name={thisBoxFieldName}>
@@ -40,8 +46,8 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
             if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
 
-              const currentIndex = availableItems.indexOf(resource);
-              const lastIndex = availableItems.indexOf(
+              const currentIndex = computedAvailabelItems.indexOf(resource);
+              const lastIndex = computedAvailabelItems.indexOf(
                 lastCheckedItemRef.current
               );
 
@@ -49,7 +55,7 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
                 (a, b) => a - b
               );
 
-              const itemsToToggle = availableItems.slice(
+              const itemsToToggle = computedAvailabelItems.slice(
                 lowIndex,
                 highIndex + 1
               );
@@ -88,9 +94,14 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   const CheckAllCheckBox = connect(({ formik: { setFieldValue } }) => {
     function onCheckAllCheckBoxClick(e) {
       const { checked } = e.target;
+      const computedAvailabelItems =
+        (defaultAvailableItems as TData[]) ?? availableItems;
 
-      for (const item of availableItems) {
-        setFieldValue(`${fieldName}[${item.id}]`, checked || undefined);
+      for (const item of computedAvailabelItems) {
+        setFieldValue(
+          `${fieldName}[${item?.shortId ?? item.id}]`,
+          checked || undefined
+        );
       }
     }
 

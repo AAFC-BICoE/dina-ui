@@ -18,6 +18,8 @@ export type SourceAdministrativeLevel = {
   element?: string /* osm type */;
   placeType?: string /* place type or class type */;
   name?: string;
+  type?: string;
+  shortId?: number;
 };
 
 export type Country = {

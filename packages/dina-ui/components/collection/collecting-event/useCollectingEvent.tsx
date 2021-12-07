@@ -215,6 +215,10 @@ export function useCollectingEventSave({
     }
 
     if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
+      const sectionIds = toPairs(submittedValues.selectedSections)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+
       if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
       srcAdminLevels
         .filter(srcAdminLevel => srcAdminLevel)
@@ -232,14 +236,23 @@ export function useCollectingEventSave({
             if (!srcAdminLevel.id) {
               srcDetail.customGeographicPlace = srcAdminLevel.name;
             } else {
-              srcDetail.selectedGeographicPlace = srcAdminLevel;
+              if (
+                sectionIds.filter(
+                  id => id === srcAdminLevel.shortId?.toString()
+                )
+              )
+                srcDetail.selectedGeographicPlace = srcAdminLevel;
             }
           } else {
-            srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
+            if (
+              sectionIds.filter(id => id === srcAdminLevel.shortId?.toString())
+            )
+              srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
           }
         });
     }
     delete submittedValues.srcAdminLevels;
+    delete submittedValues.selectedSections;
 
     // Shuffle the managedAttributesValue to managedAttribute
     if (submittedValues.managedAttributeValues) {

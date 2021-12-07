@@ -13,7 +13,7 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   useDinaFormContext,
-  PlaceSelectField
+  PlaceSectionsSelectionField
 } from "common-ui";
 import { FastField, Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -68,7 +68,6 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
-  const placeSelectOptions = useRef<any[]>(new Array());
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
@@ -167,16 +166,7 @@ export function CollectingEventFormLayout({
       formik,
       stateProvinceName
     );
-    placeSelectOptions.current.length = 0;
-    const placeDropdownOptions = geoNameParsed.map(parsedName => ({
-      label: parsedName.name,
-      value: parsedName
-    }));
-
-    placeDropdownOptions.map(
-      (opt, idx) => (placeSelectOptions.current[idx] = opt)
-    );
-    formik.setFieldValue("srcAdminLevels", [geoNameParsed[0]]);
+    formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
     setHideRemoveBtn(false);
   }
@@ -243,6 +233,8 @@ export function CollectingEventFormLayout({
     formik.setFieldValue("geographicPlaceNameSource", null);
 
     formik.setFieldValue("srcAdminLevels", null);
+
+    formik.setFieldValue("selectedSections", null);
 
     if (isTemplate) {
       // Uncheck the templateCheckboxes in this form section:
@@ -322,7 +314,11 @@ export function CollectingEventFormLayout({
     // Add user entered custom place in front
     const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
     customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
+    customPlaceAsInSrcAdmnLevel.type = "place-section";
+    customPlaceAsInSrcAdmnLevel.shortId = 0;
+
     const srcAdminLevels = form.values.srcAdminLevels;
+    srcAdminLevels.map(lev => (lev.shortId = lev.shortId + 1));
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
     form.setFieldValue("srcAdminLevels", srcAdminLevels);
     setHideCustomPlace(true);
@@ -698,10 +694,9 @@ export function CollectingEventFormLayout({
                         <LoadingSpinner loading={true} />
                       ) : (
                         form.values.srcAdminLevels?.length && (
-                          <PlaceSelectField
+                          <PlaceSectionsSelectionField
                             name="srcAdminLevels"
-                            options={placeSelectOptions.current as any}
-                            isMulti={true}
+                            hideRemoveBtn={hideRemoveBtn}
                           />
                         )
                       )}
