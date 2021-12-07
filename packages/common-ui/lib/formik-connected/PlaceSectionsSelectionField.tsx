@@ -93,6 +93,7 @@ export function PlaceSectionsSelectionField(
       {...placeFieldProps}
       removeLabel={true}
       readOnlyRender={defaultReadOnlyRender}
+      disableLabelClick={true}
       key={displayData.map(data => data.shortId).join()}
     >
       {() => {

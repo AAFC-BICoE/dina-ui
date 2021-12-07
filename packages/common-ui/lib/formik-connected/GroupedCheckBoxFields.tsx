@@ -17,9 +17,9 @@ export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
   defaultAvailableItems?: TData[];
 }
 
-export function useGroupedCheckBoxes<
-  TData extends KitsuResource & { shortId?: number }
->({
+export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
+
+export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
   detachTotalSelected,
   defaultAvailableItems
@@ -50,18 +50,19 @@ export function useGroupedCheckBoxes<
               const lastIndex = computedAvailabelItems.indexOf(
                 lastCheckedItemRef.current
               );
-
               const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
                 (a, b) => a - b
               );
-
               const itemsToToggle = computedAvailabelItems.slice(
                 lowIndex,
                 highIndex + 1
               );
 
               for (const item of itemsToToggle) {
-                setFieldValue(`${fieldName}[${item.id}]`, checked);
+                setFieldValue(
+                  `${fieldName}[${item.shortId ?? item.id}]`,
+                  checked
+                );
               }
             }
             lastCheckedItemRef.current = resource;
