@@ -12,10 +12,12 @@ import { TagSelectField } from "./TagSelectField";
 export interface TagsAndRestrictionsSection {
   resourcePath?: string;
   tagsFieldName?: string;
+  groupSelectorName?: string;
 }
 
 export function TagsAndRestrictionsSection({
   resourcePath,
+  groupSelectorName = "group",
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
   const { readOnly } = useDinaFormContext();
@@ -27,6 +29,7 @@ export function TagsAndRestrictionsSection({
         name={tagsFieldName}
         removeLabel={true}
         removeLabelTag={true}
+        groupSelectorName={groupSelectorName}
       />
     </>
   ) : (
@@ -36,6 +39,7 @@ export function TagsAndRestrictionsSection({
           resourcePath={resourcePath}
           className="col-sm-6"
           name={tagsFieldName}
+          groupSelectorName={groupSelectorName}
           label={
             <span>
               <AiFillTags /> <DinaMessage id="tags" />
