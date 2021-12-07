@@ -629,7 +629,7 @@ export function useMaterialSampleSave({
         })) ?? []
     };
     // Delete the 'projects' attribute because it should stay in the relationships field:
-    delete materialSampleInput.projects;    
+    delete materialSampleInput.projects;
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(

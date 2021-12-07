@@ -62,8 +62,8 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
           }
 
           return (
-            <div className="d-flex">
-              <div className="mx-auto">
+            <div className="d-flex w-100 h-100">
+              <div className="mx-auto my-auto">
                 <input
                   aria-labelledby={`select-column-header ${fileHyperlinkId}`}
                   checked={value || false}
