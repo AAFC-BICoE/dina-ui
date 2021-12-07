@@ -18,7 +18,7 @@ export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
 }
 
 export function useGroupedCheckBoxes<
-  TData extends KitsuResource & { shortId }
+  TData extends KitsuResource & { shortId?: number }
 >({
   fieldName,
   detachTotalSelected,
