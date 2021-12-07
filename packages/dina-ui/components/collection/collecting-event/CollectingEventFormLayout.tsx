@@ -318,9 +318,17 @@ export function CollectingEventFormLayout({
     customPlaceAsInSrcAdmnLevel.shortId = 0;
 
     const srcAdminLevels = form.values.srcAdminLevels;
-    srcAdminLevels.map(lev => (lev.shortId = lev.shortId + 1));
+
+    srcAdminLevels.map(lev => {
+      lev.shortId = lev.shortId + 1;
+    });
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
     form.setFieldValue("srcAdminLevels", srcAdminLevels);
+
+    // Make the custom place selected by default
+    const selectedSections = form.values.selectedSections;
+    selectedSections.unshift(true);
+
     setHideCustomPlace(true);
   };
 
