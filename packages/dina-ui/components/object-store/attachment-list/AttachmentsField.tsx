@@ -19,6 +19,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import Link from "next/link";
 import { uniqBy, isEqual } from "lodash";
+import { thumbnailCell } from "../..";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -156,6 +157,10 @@ export function AttachmentsEditor({
               <div className="mb-3">
                 <ReactTable
                   columns={[
+                    thumbnailCell({
+                      bucketField: "bucket",
+                      fileIdentifierField: "fileIdentifier"
+                    }),
                     {
                       accessor: "originalFilename",
                       Header: <FieldHeader name="originalFilename" />,

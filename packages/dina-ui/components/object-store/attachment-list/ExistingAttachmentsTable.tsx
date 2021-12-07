@@ -13,7 +13,7 @@ import { toPairs } from "lodash";
 import Link from "next/link";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
-import { CommonMessage } from "../../../../common-ui/lib/intl/common-ui-intl";
+import { thumbnailCell } from "../..";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;
@@ -56,6 +56,10 @@ export function ExistingAttachmentsTable({
       Header: CheckBoxHeader,
       sortable: false
     },
+    thumbnailCell({
+      bucketField: "metadata.bucket",
+      fileIdentifierField: "metadata.fileIdentifier"
+    }),
     {
       Cell: ({ original: { id, metadata } }) => {
         // When this Metadata has been deleted, show a "deleted" message in this cell:

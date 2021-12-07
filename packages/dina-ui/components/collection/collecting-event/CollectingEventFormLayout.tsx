@@ -109,9 +109,11 @@ export function CollectingEventFormLayout({
       `${commonSrcDetailRoot}.country.name`,
       result?.address?.country || null
     );
+
+    const stateProvinceName = result?.address?.state || null;
     formik.setFieldValue(
       `${commonSrcDetailRoot}.stateProvince.name`,
-      result?.address?.state || null
+      stateProvinceName
     );
     formik.setFieldValue(
       `${commonSrcDetailRoot}.stateProvince.id`,
@@ -151,14 +153,19 @@ export function CollectingEventFormLayout({
         class: result.category
       },
       updateAdminLevels,
-      formik
+      formik,
+      stateProvinceName
     };
 
     setSelectedSearchResult(detailSearchProps);
   }
 
-  function updateAdminLevels(detailResults, formik) {
-    const geoNameParsed = parseGeoAdminLevels(detailResults as any, formik);
+  function updateAdminLevels(detailResults, formik, stateProvinceName) {
+    const geoNameParsed = parseGeoAdminLevels(
+      detailResults as any,
+      formik,
+      stateProvinceName
+    );
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
     setHideRemoveBtn(false);
@@ -166,7 +173,8 @@ export function CollectingEventFormLayout({
 
   function parseGeoAdminLevels(
     detailResults: NominatumApiAddressDetailSearchResult | null,
-    formik
+    formik,
+    stateProvinceName
   ) {
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
@@ -197,10 +205,12 @@ export function CollectingEventFormLayout({
           addr.localname
         );
 
-      // fill in the state/province name if it is not yet filled up
+      // fill in the state/province name and placeType if it is not yet filled up
+      // use name match if this result has empty/null state province placeType
       if (
-        (addr.place_type === "province" || addr.place_type === "state") &&
-        !formik.values[`${commonSrcDetailRoot}.stateProvince.name`]
+        addr.place_type === "province" ||
+        addr.place_type === "state" ||
+        stateProvinceName === addr.localname
       ) {
         formik.setFieldValue(
           `${commonSrcDetailRoot}.stateProvince.name`,
@@ -208,7 +218,7 @@ export function CollectingEventFormLayout({
         );
         formik.setFieldValue(
           `${commonSrcDetailRoot}.stateProvince.placeType`,
-          addr.place_type
+          addr.place_type ?? addr.class
         );
       }
 
