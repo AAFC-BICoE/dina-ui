@@ -1,4 +1,9 @@
-import { ButtonBar, ColumnDefinition, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  descriptionCell,
+  ListPageLayout
+} from "common-ui";
 import { CommonMessage } from "common-ui/lib/intl/common-ui-intl";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
@@ -63,7 +68,8 @@ export default function ManagedAttributesListPage() {
         <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
       ),
       accessor: "acceptedValues"
-    }
+    },
+    descriptionCell("multilingualDescription")
   ];
 
   return (

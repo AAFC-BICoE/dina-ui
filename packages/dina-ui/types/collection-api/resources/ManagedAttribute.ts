@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { MultilingualDescription } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export interface ManagedAttributeAttributes<TComponent = string> {
@@ -10,6 +11,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   group?: string;
   createdBy?: string;
   createdOn?: string;
+  multilingualDescription?: MultilingualDescription;
 }
 
 export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
