@@ -43,10 +43,9 @@ export function importCsvMessages({
         }
       }
 
-      if (newMessages) {
-        const newMessagesArray = toPairs(newMessages);
-        newMessages = fromPairs(newMessagesArray.sort());
-      }
+      // Sort the entries before write to file
+      const newMessagesArray = toPairs(newMessages);
+      newMessages = fromPairs(newMessagesArray.sort());
 
       // Parse the Typescript message file:
       const srcCode = readFile(file);
