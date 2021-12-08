@@ -33,7 +33,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
     fileHyperlinkId
   }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
-    const computedAvailabelItems =
+    const computedAvailableItems =
       (defaultAvailableItems as TData[]) ?? availableItems;
 
     return (
@@ -46,14 +46,14 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
             if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
 
-              const currentIndex = computedAvailabelItems.indexOf(resource);
-              const lastIndex = computedAvailabelItems.indexOf(
+              const currentIndex = computedAvailableItems.indexOf(resource);
+              const lastIndex = computedAvailableItems.indexOf(
                 lastCheckedItemRef.current
               );
               const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
                 (a, b) => a - b
               );
-              const itemsToToggle = computedAvailabelItems.slice(
+              const itemsToToggle = computedAvailableItems.slice(
                 lowIndex,
                 highIndex + 1
               );
@@ -95,10 +95,10 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   const CheckAllCheckBox = connect(({ formik: { setFieldValue } }) => {
     function onCheckAllCheckBoxClick(e) {
       const { checked } = e.target;
-      const computedAvailabelItems =
+      const computedAvailableItems =
         (defaultAvailableItems as TData[]) ?? availableItems;
 
-      for (const item of computedAvailabelItems) {
+      for (const item of computedAvailableItems) {
         setFieldValue(
           `${fieldName}[${item?.shortId ?? item.id}]`,
           checked || undefined
