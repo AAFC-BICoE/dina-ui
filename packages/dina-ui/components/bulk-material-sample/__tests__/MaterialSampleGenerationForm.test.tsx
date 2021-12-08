@@ -93,6 +93,7 @@ describe("MaterialSampleGenerationForm", () => {
       samples: expectedNames.map(name => ({
         collection: { id: "100", name: "test-collection", type: "collection" },
         materialSampleName: name,
+        publiclyReleasable: true,
         type: "material-sample"
       })),
       submittedValues: {
@@ -200,6 +201,7 @@ describe("MaterialSampleGenerationForm", () => {
           type: "collection"
         }),
         parentMaterialSample: { id: "test-parent-id", type: "material-sample" },
+        publiclyReleasable: true,
         materialSampleName: name,
         type: "material-sample"
       }))

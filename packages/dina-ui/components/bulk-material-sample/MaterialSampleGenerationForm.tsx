@@ -64,6 +64,7 @@ export function MaterialSampleGenerationForm({
         formState: submittedValues
       }),
       collection: submittedValues.collection,
+      publiclyReleasable: true,
       ...submittedValues.samples[index]
     }));
 
