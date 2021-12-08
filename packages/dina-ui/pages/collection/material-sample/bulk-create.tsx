@@ -1,26 +1,29 @@
-import { InputResource, PersistedResource } from "kitsu";
-import { useRouter } from "next/router";
+import { PersistedResource } from "kitsu";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
 import { useState } from "react";
 import {
   Head,
   MaterialSampleBulkEditor,
   MaterialSampleGenerationForm,
+  MaterialSampleGenerationFormSubmission,
   Nav
 } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api/resources/MaterialSample";
 
-export default function MaterialSampleBulkCreatePage() {
+export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
+
+  const [mode, setMode] = useState<"GENERATE" | "EDIT">("GENERATE");
+  const [lastSubmission, setLastSubmission] =
+    useState<MaterialSampleGenerationFormSubmission>();
 
   const splitFromId = router.query.splitFromId?.toString();
 
   const title = "createNewMaterialSamples";
 
-  const [generatedSamples, setGeneratedSamples] = useState<
-    InputResource<MaterialSample>[] | null
-  >(null);
+  const generatedSamples = lastSubmission?.samples;
 
   async function moveToResultPage(
     samples: PersistedResource<MaterialSample>[]
@@ -32,25 +35,36 @@ export default function MaterialSampleBulkCreatePage() {
     });
   }
 
+  function onGenerate(submission: MaterialSampleGenerationFormSubmission) {
+    setLastSubmission(submission);
+    setMode("EDIT");
+  }
+
   return (
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
       <main className={generatedSamples ? "container-fluid" : "container"}>
         <h1 id="wb-cont">{formatMessage(title)}</h1>
-        {generatedSamples ? (
+        {mode === "EDIT" && generatedSamples && (
           <MaterialSampleBulkEditor
             disableSampleNameField={true}
             samples={generatedSamples}
             onSaved={moveToResultPage}
+            onPreviousClick={() => setMode("GENERATE")}
           />
-        ) : (
+        )}
+        {mode === "GENERATE" && (
           <MaterialSampleGenerationForm
-            onGenerate={setGeneratedSamples}
+            onGenerate={onGenerate}
             parentId={splitFromId}
+            initialValues={lastSubmission?.submittedValues}
+            initialMode={lastSubmission?.generationMode}
           />
         )}
       </main>
     </div>
   );
 }
+
+export default withRouter(MaterialSampleBulkCreatePage);

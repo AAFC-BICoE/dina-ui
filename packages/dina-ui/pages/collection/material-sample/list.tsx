@@ -168,7 +168,7 @@ export default function MaterialSampleListPage() {
         <ButtonBar>
           <CreateButton entityLink="/collection/material-sample" />
           <Link href={`/collection/material-sample/bulk-create`}>
-            <a className="btn btn-info">
+            <a className="btn btn-primary">
               <DinaMessage id="bulkCreate" />
             </a>
           </Link>

@@ -1,4 +1,5 @@
 import {
+  BackToListButton,
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
@@ -24,15 +25,27 @@ import { MaterialSample } from "../../types/collection-api/resources/MaterialSam
 import { useLastUsedCollection } from "../collection";
 
 export interface MaterialSampleGenerationFormProps {
-  onGenerate: (samples: InputResource<MaterialSample>[]) => void;
+  onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
   parentId?: string;
+  initialValues?: GeneratorFormValues;
+  initialMode?: GenerationMode;
+}
+
+export interface MaterialSampleGenerationFormSubmission {
+  samples: InputResource<MaterialSample>[];
+  submittedValues: GeneratorFormValues;
+  generationMode: GenerationMode;
 }
 
 export function MaterialSampleGenerationForm({
   onGenerate,
-  parentId
+  parentId,
+  initialValues,
+  initialMode
 }: MaterialSampleGenerationFormProps) {
-  const [generationMode, setGenerationMode] = useState<GenerationMode>("BATCH");
+  const [generationMode, setGenerationMode] = useState<GenerationMode>(
+    initialMode || "BATCH"
+  );
   const { formatMessage } = useDinaIntl();
 
   const onSubmit: DinaFormOnSubmit<GeneratorFormValues> = ({
@@ -54,7 +67,7 @@ export function MaterialSampleGenerationForm({
       ...submittedValues.samples[index]
     }));
 
-    onGenerate(samples);
+    onGenerate({ samples, submittedValues, generationMode });
   };
 
   const parentQuery = useQuery<MaterialSample>(
@@ -74,18 +87,20 @@ export function MaterialSampleGenerationForm({
 
   return (
     <DinaForm<GeneratorFormValues>
-      initialValues={{
-        numberToCreate: 0,
-        samples: [],
-        increment: "NUMERICAL",
-        suffix: "",
-        start: "001",
-        baseName: parentQuery.response?.data?.materialSampleName || "",
-        separator: "",
-        collection:
-          parentQuery.response?.data?.collection ||
-          collectionQuery.lastUsedCollection
-      }}
+      initialValues={
+        initialValues || {
+          numberToCreate: 0,
+          samples: [],
+          increment: "NUMERICAL",
+          suffix: "",
+          start: "001",
+          baseName: parentQuery.response?.data?.materialSampleName || "",
+          separator: "",
+          collection:
+            parentQuery.response?.data?.collection ||
+            collectionQuery.lastUsedCollection
+        }
+      }
       horizontal="flex"
       validationSchema={generatorFormSchema}
       onSubmit={onSubmit}
@@ -128,8 +143,13 @@ export function MaterialSampleGenerationForm({
         </TabPanel>
       </Tabs>
       <ButtonBar>
-        <SubmitButton
+        <BackToListButton
           className="ms-auto"
+          entityLink="/collection/material-sample"
+        >
+          <DinaMessage id="cancelButtonText" />
+        </BackToListButton>
+        <SubmitButton
           buttonProps={(form: FormikContextType<GeneratorFormValues>) => ({
             disabled: !form.values.numberToCreate
           })}

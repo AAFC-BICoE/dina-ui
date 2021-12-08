@@ -36,6 +36,9 @@ export default function MaterialSampleBulkEditPage() {
           <ExistingMaterialSampleBulkEditor
             ids={ids}
             onSaved={moveToResultPage}
+            onPreviousClick={() =>
+              router.push("/collection/material-sample/list")
+            }
           />
         )}
       </main>

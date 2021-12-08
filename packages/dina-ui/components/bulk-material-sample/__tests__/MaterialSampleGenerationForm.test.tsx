@@ -88,13 +88,28 @@ describe("MaterialSampleGenerationForm", () => {
     wrapper.update();
 
     // Sample initialValues are created with the expected names and the linked collection:
-    expect(mockOnGenerate).lastCalledWith(
-      expectedNames.map(name => ({
+    expect(mockOnGenerate).lastCalledWith({
+      generationMode: "SERIES",
+      samples: expectedNames.map(name => ({
         collection: { id: "100", name: "test-collection", type: "collection" },
         materialSampleName: name,
         type: "material-sample"
-      }))
-    );
+      })),
+      submittedValues: {
+        baseName: "my-sample",
+        collection: {
+          id: "100",
+          name: "test-collection",
+          type: "collection"
+        },
+        increment: "NUMERICAL",
+        numberToCreate: "5",
+        samples: [],
+        separator: "-",
+        start: "00001",
+        suffix: ""
+      }
+    });
   });
 
   it("Generates split samples from a parent sample.", async () => {
@@ -162,8 +177,24 @@ describe("MaterialSampleGenerationForm", () => {
     wrapper.update();
 
     // Sample initialValues are created with the expected names and the linked collection and parent sample:
-    expect(mockOnGenerate).lastCalledWith(
-      expectedNames.map(name => ({
+    expect(mockOnGenerate).lastCalledWith({
+      generationMode: "SERIES",
+      submittedValues: {
+        baseName: "test-sample",
+        collection: {
+          code: "TC",
+          id: "test-collection-id",
+          name: "test-collection",
+          type: "collection"
+        },
+        increment: "LETTER",
+        numberToCreate: "5",
+        samples: [],
+        separator: "-",
+        start: "AA",
+        suffix: ""
+      },
+      samples: expectedNames.map(name => ({
         collection: expect.objectContaining({
           id: "test-collection-id",
           type: "collection"
@@ -172,6 +203,6 @@ describe("MaterialSampleGenerationForm", () => {
         materialSampleName: name,
         type: "material-sample"
       }))
-    );
+    });
   });
 });

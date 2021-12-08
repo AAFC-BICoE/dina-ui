@@ -3,8 +3,7 @@ import {
   DinaForm,
   DoOperationsError,
   FormikButton,
-  useApiClient,
-  SaveArgs
+  useApiClient
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -20,12 +19,14 @@ export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   disableSampleNameField?: boolean;
+  onPreviousClick?: () => void;
 }
 
 export function MaterialSampleBulkEditor({
   samples: samplesProp,
   disableSampleNameField,
-  onSaved
+  onSaved,
+  onPreviousClick
 }: MaterialSampleBulkEditorProps) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
@@ -123,9 +124,18 @@ export function MaterialSampleBulkEditor({
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar>
+        <ButtonBar className="justify-content-end">
+          {onPreviousClick && (
+            <FormikButton
+              className="btn btn-primary previous-button"
+              onClick={onPreviousClick}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <DinaMessage id="previous" />
+            </FormikButton>
+          )}
           <FormikButton
-            className="btn btn-primary ms-auto bulk-save-button"
+            className="btn btn-primary bulk-save-button"
             onClick={saveAll}
             buttonProps={() => ({ style: { width: "10rem" } })}
           >

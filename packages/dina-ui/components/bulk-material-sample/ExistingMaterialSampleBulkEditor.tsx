@@ -9,11 +9,13 @@ import { useMaterialSampleQuery } from "../collection";
 export interface ExistingMaterialSampleBulkEditorProps {
   ids: string[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+  onPreviousClick?: () => void;
 }
 
 export function ExistingMaterialSampleBulkEditor({
   ids,
-  onSaved
+  onSaved,
+  onPreviousClick
 }: ExistingMaterialSampleBulkEditorProps) {
   const sampleQueries = ids.map(id => useMaterialSampleQuery(id));
 
@@ -44,7 +46,13 @@ export function ExistingMaterialSampleBulkEditor({
   const samples = compact(sampleQueries.map(query => query.response?.data));
 
   if (samples.length) {
-    return <MaterialSampleBulkEditor samples={samples} onSaved={onSaved} />;
+    return (
+      <MaterialSampleBulkEditor
+        samples={samples}
+        onSaved={onSaved}
+        onPreviousClick={onPreviousClick}
+      />
+    );
   }
 
   return null;
