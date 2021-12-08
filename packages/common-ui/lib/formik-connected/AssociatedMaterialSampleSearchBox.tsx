@@ -86,6 +86,7 @@ function AssociatedMaterialSampleSearchBox({
             btnMsg={formatMessage("select")}
             hideTopPagination={true}
             hideGroupFilter={true}
+            openLinkInNewTab={true}
           />
         </div>
       ) : (

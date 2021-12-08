@@ -4,11 +4,13 @@ import { StorageUnit } from "../../types/collection-api";
 export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
   storageUnit: StorageUnit;
+  readOnly?: boolean;
 }
 
 export function StorageUnitBreadCrumb({
   disableLastLink,
-  storageUnit
+  storageUnit,
+  readOnly
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??
@@ -26,7 +28,7 @@ export function StorageUnitBreadCrumb({
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
-            <a>
+            <a target={!readOnly ? "_blank" : ""}>
               {node.typeName} {node.name}
             </a>
           </Link>
@@ -36,7 +38,7 @@ export function StorageUnitBreadCrumb({
         <strong>
           {storageUnit.id && !disableLastLink ? (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-              <a>{unitDisplayName}</a>
+              <a target={!readOnly ? "_blank" : ""}>{unitDisplayName}</a>
             </Link>
           ) : (
             unitDisplayName
