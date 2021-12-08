@@ -41,6 +41,7 @@ export function AttachmentReadOnlySection({
           attachmentPath={attachmentPath}
           onMetadatasEdited={() => setLastSave(Date.now())}
           detachTotalSelected={detachTotalSelected}
+          readOnly={true}
         />
       )}
     </FieldSet>

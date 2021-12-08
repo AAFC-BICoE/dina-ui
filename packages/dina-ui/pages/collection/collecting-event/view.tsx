@@ -4,7 +4,7 @@ import { useCollectingEventQuery } from "../../../components/collection";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
-import { MATERIAL_SAMPLE_TABLE_COLUMNS } from "../material-sample/list";
+import { getColumnDefinition } from "../material-sample/list";
 
 export default function CollectingEventDetailsPage() {
   return (
@@ -15,7 +15,7 @@ export default function CollectingEventDetailsPage() {
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
             <QueryTable
               path="collection-api/material-sample"
-              columns={MATERIAL_SAMPLE_TABLE_COLUMNS}
+              columns={getColumnDefinition({ openLinkInNewTab: false })}
               filter={{
                 rsql: `collectingEvent.uuid==${props.initialValues.id}`
               }}
