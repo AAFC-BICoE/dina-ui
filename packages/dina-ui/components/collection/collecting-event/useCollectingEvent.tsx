@@ -15,6 +15,7 @@ import { SourceAdministrativeLevel } from "../../../types/collection-api/resourc
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { ManagedAttributeValues, Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { omit } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -241,14 +242,19 @@ export function useCollectingEventSave({
                   id => id === srcAdminLevel.shortId?.toString()
                 ).length
               )
-                srcDetail.selectedGeographicPlace = srcAdminLevel;
+                srcDetail.selectedGeographicPlace = omit(srcAdminLevel, [
+                  "shortId",
+                  "type"
+                ]);
             }
           } else {
             if (
               sectionIds.filter(id => id === srcAdminLevel.shortId?.toString())
                 .length
             ) {
-              srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
+              srcDetail.higherGeographicPlaces?.push(
+                omit(srcAdminLevel, ["shortId", "type"])
+              );
             }
           }
         });
