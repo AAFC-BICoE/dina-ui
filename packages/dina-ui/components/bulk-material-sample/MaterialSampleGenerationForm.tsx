@@ -2,25 +2,26 @@ import {
   ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
+  LoadingSpinner,
   NumberSpinnerField,
   SelectField,
   SubmitButton,
   TextField,
   useQuery,
-  withResponse,
-  LoadingSpinner
+  withResponse
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
-import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import Link from "next/link";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
 import { CollectionSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import Link from "next/link";
+import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import { useLastUsedCollection } from "../collection";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
@@ -64,7 +65,10 @@ export function MaterialSampleGenerationForm({
     { disabled: !parentId }
   );
 
-  if (parentQuery.loading) {
+  // Default to use the last used collection:
+  const collectionQuery = useLastUsedCollection();
+
+  if (parentQuery.loading || collectionQuery.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -78,7 +82,9 @@ export function MaterialSampleGenerationForm({
         start: "001",
         baseName: parentQuery.response?.data?.materialSampleName || "",
         separator: "",
-        collection: parentQuery.response?.data?.collection
+        collection:
+          parentQuery.response?.data?.collection ||
+          collectionQuery.lastUsedCollection
       }}
       horizontal="flex"
       validationSchema={generatorFormSchema}
