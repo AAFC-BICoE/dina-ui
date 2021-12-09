@@ -38,6 +38,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   detach: "Detach",
   done: "Done",
   dropdownSearchResults: "Search results",
+  editAll: "Edit All",
   editButtonText: "Edit",
   editableTable: "Editable Table",
   edited: "edited",

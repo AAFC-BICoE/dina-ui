@@ -10,7 +10,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator, SampleWithHooks } from "..";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
@@ -31,15 +31,64 @@ export function MaterialSampleBulkEditor({
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
 
-  const sampleHooks = samples.map<SampleWithHooks>(sample => ({
+  const sampleHooks = samples.map<SampleWithHooks>((sample, index) => ({
+    key: `sample-${index}`,
     sample,
     saveHook: useMaterialSampleSave({ materialSample: sample }),
     formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
   }));
 
-  const { save } = useApiClient();
+  const { bulkEditTab } = useBulkEditTab();
 
+  const { saveAll } = useBulkSampleSave({ sampleHooks, onSaved });
+
+  return (
+    <div>
+      <DinaForm initialValues={{}}>
+        <ButtonBar className="justify-content-end">
+          {onPreviousClick && (
+            <FormikButton
+              className="btn btn-primary previous-button"
+              onClick={onPreviousClick}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <DinaMessage id="previous" />
+            </FormikButton>
+          )}
+          <FormikButton
+            className="btn btn-primary bulk-save-button"
+            onClick={saveAll}
+            buttonProps={() => ({ style: { width: "10rem" } })}
+          >
+            <DinaMessage id="saveAll" />
+          </FormikButton>
+        </ButtonBar>
+      </DinaForm>
+      <MaterialSampleBulkNavigator
+        samples={sampleHooks}
+        extraTabs={[bulkEditTab]}
+        renderOneSample={(_sample, index) => (
+          <MaterialSampleForm
+            disableSampleNameField={disableSampleNameField}
+            materialSampleFormRef={sampleHooks[index].formRef}
+            materialSampleSaveHook={sampleHooks[index].saveHook}
+            buttonBar={() => null}
+            disableAutoNamePrefix={true}
+          />
+        )}
+      />
+    </div>
+  );
+}
+
+interface BulkSampleSaveParams {
+  sampleHooks: SampleWithHooks[];
+  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+}
+
+function useBulkSampleSave({ sampleHooks, onSaved }: BulkSampleSaveParams) {
   const [_error, setError] = useState<unknown | null>(null);
+  const { save } = useApiClient();
 
   async function saveAll() {
     setError(null);
@@ -121,40 +170,35 @@ export function MaterialSampleBulkEditor({
     }
   }
 
-  return (
-    <div>
-      <DinaForm initialValues={{}}>
-        <ButtonBar className="justify-content-end">
-          {onPreviousClick && (
-            <FormikButton
-              className="btn btn-primary previous-button"
-              onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "10rem" } })}
-            >
-              <DinaMessage id="previous" />
-            </FormikButton>
-          )}
-          <FormikButton
-            className="btn btn-primary bulk-save-button"
-            onClick={saveAll}
-            buttonProps={() => ({ style: { width: "10rem" } })}
-          >
-            <DinaMessage id="saveAll" />
-          </FormikButton>
-        </ButtonBar>
-      </DinaForm>
-      <MaterialSampleBulkNavigator
-        samples={sampleHooks}
-        renderOneSample={(_sample, index) => (
-          <MaterialSampleForm
-            disableSampleNameField={disableSampleNameField}
-            materialSampleFormRef={sampleHooks[index].formRef}
-            materialSampleSaveHook={sampleHooks[index].saveHook}
-            buttonBar={() => null}
-            disableAutoNamePrefix={true}
-          />
-        )}
+  return { saveAll };
+}
+
+function useBulkEditTab() {
+  const { formatMessage } = useDinaIntl();
+
+  const bulkEditSample = {
+    type: "material-sample" as const,
+    publiclyReleasable: true
+  };
+  const bulkEditSampleHook = useMaterialSampleSave({
+    materialSample: bulkEditSample
+  });
+  const bulkEditFormRef = useRef<FormikProps<any>>(null);
+
+  const bulkEditTab = {
+    key: "OVERWRITE_VALUES",
+    title: formatMessage("editAll"),
+    content: (
+      <MaterialSampleForm
+        buttonBar={() => null}
+        materialSampleFormRef={bulkEditFormRef}
+        materialSampleSaveHook={bulkEditSampleHook}
+        materialSample={bulkEditSample}
+        disableAutoNamePrefix={true}
+        disableSampleNameField={true}
       />
-    </div>
-  );
+    )
+  };
+
+  return { bulkEditTab };
 }

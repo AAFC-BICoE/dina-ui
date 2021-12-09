@@ -13,9 +13,18 @@ export interface MaterialSampleBulkNavigatorProps {
     sample: InputResource<MaterialSample>,
     index: number
   ) => ReactNode;
+
+  extraTabs?: BulkNavigatorTab[];
+}
+
+export interface BulkNavigatorTab {
+  key: string;
+  title: ReactNode;
+  content: ReactNode;
 }
 
 export interface SampleWithHooks {
+  key: string;
   sample: InputResource<MaterialSample>;
   saveHook: ReturnType<typeof useMaterialSampleSave>;
   formRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
@@ -27,16 +36,22 @@ export interface SampleWithHooks {
  */
 export function MaterialSampleBulkNavigator({
   samples,
-  renderOneSample
+  renderOneSample,
+  extraTabs = []
 }: MaterialSampleBulkNavigatorProps) {
-  const [tabIndex, setTabIndex] = useState(0);
+  const [selectedElement, setSelectedElement] = useState<
+    BulkNavigatorTab | SampleWithHooks
+  >(extraTabs[0] || samples[0]);
 
   const tooManySamplesForTabs = samples.length >= 10;
 
-  const tabsWithErrors = samples.reduce<number[]>(
-    (prev, { formRef }, index) =>
-      !!formRef.current?.status || !isEmpty(formRef.current?.errors)
-        ? [...prev, index]
+  const tabElements = [...extraTabs, ...samples];
+
+  const tabsWithErrors = samples.reduce(
+    (prev, sample) =>
+      !!sample.formRef.current?.status ||
+      !isEmpty(sample.formRef.current?.errors)
+        ? [...prev, sample]
         : prev,
     []
   );
@@ -46,17 +61,30 @@ export function MaterialSampleBulkNavigator({
       {tooManySamplesForTabs ? (
         <div>
           <div className="d-flex justify-content-center mb-3">
-            <SelectNavigation
-              elements={samples}
-              value={tabIndex}
-              onChange={setTabIndex}
-              optionLabel={({ sample }) => sample.materialSampleName}
+            <SelectNavigation<BulkNavigatorTab | SampleWithHooks>
+              elements={tabElements}
+              value={selectedElement}
+              onChange={setSelectedElement}
+              optionLabel={(element: any) =>
+                element.title || element.sample?.materialSampleName
+              }
               invalidElements={tabsWithErrors}
             />
           </div>
-          {samples.map(({ sample }, index) => (
-            <div key={index} className={tabIndex !== index ? "d-none" : ""}>
-              {renderOneSample(sample, index)}
+          {extraTabs.map((element, index) => (
+            <div
+              key={index}
+              className={selectedElement.key !== element.key ? "d-none" : ""}
+            >
+              {element.content}
+            </div>
+          ))}
+          {samples.map((element, index) => (
+            <div
+              key={index}
+              className={selectedElement.key !== element.key ? "d-none" : ""}
+            >
+              {renderOneSample(element.sample, index)}
             </div>
           ))}
         </div>
@@ -66,8 +94,13 @@ export function MaterialSampleBulkNavigator({
           forceRenderTabPanel={true}
         >
           <TabList>
-            {samples.map(({ sample }, index) => {
-              const tabHasError = tabsWithErrors.includes(index);
+            {extraTabs.map((extraTab, index) => (
+              <Tab key={index}>
+                <span className="fw-bold">{extraTab.title}</span>
+              </Tab>
+            ))}
+            {samples.map((sample, index) => {
+              const tabHasError = tabsWithErrors.includes(sample);
 
               return (
                 <Tab
@@ -75,12 +108,15 @@ export function MaterialSampleBulkNavigator({
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {sample.materialSampleName || `#${index + 1}`}
+                    {sample.sample.materialSampleName || `#${index + 1}`}
                   </span>
                 </Tab>
               );
             })}
           </TabList>
+          {extraTabs.map((extraTab, index) => (
+            <TabPanel key={index}>{extraTab.content}</TabPanel>
+          ))}
           {samples.map(({ sample }, index) => (
             <TabPanel
               className={`react-tabs__tab-panel sample-tabpanel-${index}`}
