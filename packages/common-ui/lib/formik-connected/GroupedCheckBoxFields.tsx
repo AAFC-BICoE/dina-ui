@@ -11,15 +11,19 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
   fileHyperlinkId?: string;
 }
 
-export interface GroupedCheckBoxesParams {
+export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
   fieldName: string;
   detachTotalSelected?: boolean;
+  defaultAvailableItems?: TData[];
 }
 
-export function useGroupedCheckBoxes<TData extends KitsuResource>({
+export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
+
+export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
-  detachTotalSelected
-}: GroupedCheckBoxesParams) {
+  detachTotalSelected,
+  defaultAvailableItems
+}: GroupedCheckBoxesParams<TData>) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
   const { formatMessage } = useIntl();
@@ -28,7 +32,9 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
     resource,
     fileHyperlinkId
   }: CheckBoxFieldProps<TData>) {
-    const thisBoxFieldName = `${fieldName}[${resource.id}]`;
+    const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
+    const computedAvailableItems =
+      (defaultAvailableItems as TData[]) ?? availableItems;
 
     return (
       <Field name={thisBoxFieldName}>
@@ -40,22 +46,23 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
             if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
 
-              const currentIndex = availableItems.indexOf(resource);
-              const lastIndex = availableItems.indexOf(
+              const currentIndex = computedAvailableItems.indexOf(resource);
+              const lastIndex = computedAvailableItems.indexOf(
                 lastCheckedItemRef.current
               );
-
               const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
                 (a, b) => a - b
               );
-
-              const itemsToToggle = availableItems.slice(
+              const itemsToToggle = computedAvailableItems.slice(
                 lowIndex,
                 highIndex + 1
               );
 
               for (const item of itemsToToggle) {
-                setFieldValue(`${fieldName}[${item.id}]`, checked);
+                setFieldValue(
+                  `${fieldName}[${item.shortId ?? item.id}]`,
+                  checked
+                );
               }
             }
             lastCheckedItemRef.current = resource;
@@ -88,9 +95,14 @@ export function useGroupedCheckBoxes<TData extends KitsuResource>({
   const CheckAllCheckBox = connect(({ formik: { setFieldValue } }) => {
     function onCheckAllCheckBoxClick(e) {
       const { checked } = e.target;
+      const computedAvailableItems =
+        (defaultAvailableItems as TData[]) ?? availableItems;
 
-      for (const item of availableItems) {
-        setFieldValue(`${fieldName}[${item.id}]`, checked || undefined);
+      for (const item of computedAvailableItems) {
+        setFieldValue(
+          `${fieldName}[${item?.shortId ?? item.id}]`,
+          checked || undefined
+        );
       }
     }
 

@@ -15,6 +15,7 @@ import { SourceAdministrativeLevel } from "../../../types/collection-api/resourc
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { ManagedAttributeValues, Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { omit } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -215,6 +216,10 @@ export function useCollectingEventSave({
     }
 
     if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
+      const sectionIds = toPairs(submittedValues.selectedSections)
+        .filter(pair => pair[1])
+        .map(pair => pair[0]);
+
       if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
       srcAdminLevels
         .filter(srcAdminLevel => srcAdminLevel)
@@ -232,14 +237,30 @@ export function useCollectingEventSave({
             if (!srcAdminLevel.id) {
               srcDetail.customGeographicPlace = srcAdminLevel.name;
             } else {
-              srcDetail.selectedGeographicPlace = srcAdminLevel;
+              if (
+                sectionIds.filter(
+                  id => id === srcAdminLevel.shortId?.toString()
+                ).length
+              )
+                srcDetail.selectedGeographicPlace = omit(srcAdminLevel, [
+                  "shortId",
+                  "type"
+                ]);
             }
           } else {
-            srcDetail.higherGeographicPlaces?.push(srcAdminLevel);
+            if (
+              sectionIds.filter(id => id === srcAdminLevel.shortId?.toString())
+                .length
+            ) {
+              srcDetail.higherGeographicPlaces?.push(
+                omit(srcAdminLevel, ["shortId", "type"])
+              );
+            }
           }
         });
     }
     delete submittedValues.srcAdminLevels;
+    delete submittedValues.selectedSections;
 
     // Shuffle the managedAttributesValue to managedAttribute
     if (submittedValues.managedAttributeValues) {
