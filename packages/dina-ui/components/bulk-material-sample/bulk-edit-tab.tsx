@@ -33,7 +33,7 @@ export function useBulkEditTab() {
     content: (
       <BulkEditContext.Provider value={{}}>
         <MaterialSampleForm
-          buttonBar={() => null}
+          buttonBar={null}
           materialSampleFormRef={bulkEditFormRef}
           materialSampleSaveHook={bulkEditSampleHook}
           materialSample={initialValues}
@@ -45,27 +45,29 @@ export function useBulkEditTab() {
     )
   };
 
-  async function withOverrides(baseSample: InputResource<MaterialSample>) {
+  /** Returns a sample with the overridden values. */
+  async function withBulkEditOverrides(
+    baseSample: InputResource<MaterialSample>
+  ) {
     const formik = bulkEditFormRef.current;
     // Shouldn't happen, but check for type safety:
     if (!formik) {
       throw new Error("Missing Formik ref for Bulk Edit Tab");
     }
-    const bulkEditSample = await bulkEditSampleHook.prepareSampleSaveOperation(
+
+    /** Sample input including blank/empty fields. */
+    const bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
       formik.values,
       formik
     );
 
-    const overrides = omitBy(
-      bulkEditSample?.resource,
-      isBlankResourceAttribute
-    );
+    /** Sample override object with only the non-empty fields. */
+    const overrides = omitBy(bulkEditSample, isBlankResourceAttribute);
 
-    // tslint:disable-next-line
-    console.log(baseSample, overrides);
+    return { ...baseSample, ...overrides };
   }
 
-  return { bulkEditTab, withOverrides };
+  return { bulkEditTab, withBulkEditOverrides };
 }
 
 /**

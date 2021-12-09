@@ -10,26 +10,27 @@ export interface MaterialSampleNavProps {
   >["dataComponentState"];
 }
 
-const ScrollSpyNav =
-  process.env.NODE_ENV === "test"
-    ? ("div" as any)
-    : dynamic(
-        async () => {
-          const NavClass = await import("react-scrollspy-nav");
+const renderNav = process.env.NODE_ENV !== "test";
 
-          // Put the "active" class on the list-group-item instead of the <a> tag:
-          class MyNavClass extends NavClass.default {
-            getNavLinkElement(sectionID) {
-              return super
-                .getNavLinkElement(sectionID)
-                ?.closest(".list-group-item");
-            }
+const ScrollSpyNav = renderNav
+  ? dynamic(
+      async () => {
+        const NavClass = await import("react-scrollspy-nav");
+
+        // Put the "active" class on the list-group-item instead of the <a> tag:
+        class MyNavClass extends NavClass.default {
+          getNavLinkElement(sectionID) {
+            return super
+              .getNavLinkElement(sectionID)
+              ?.closest(".list-group-item");
           }
+        }
 
-          return MyNavClass as any;
-        },
-        { ssr: false }
-      );
+        return MyNavClass as any;
+      },
+      { ssr: false }
+    )
+  : "div";
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
@@ -109,13 +110,17 @@ export function MaterialSampleFormNav({
     <div className="sticky-md-top material-sample-nav">
       <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
       <ScrollSpyNav
-        key={scrollTargets.filter(it => !it.disabled).length}
-        scrollTargetIds={scrollTargets
-          .filter(it => !it.disabled)
-          .map(it => it.id)}
-        activeNavClass="active"
-        offset={-20}
-        scrollDuration="100"
+        {...(renderNav
+          ? {
+              key: scrollTargets.filter(it => !it.disabled).length,
+              scrollTargetIds: scrollTargets
+                .filter(it => !it.disabled)
+                .map(it => it.id),
+              activeNavClass: "active",
+              offset: -20,
+              scrollDuration: "100"
+            }
+          : {})}
       >
         <nav className="card card-body">
           <label className="mb-2 text-uppercase">

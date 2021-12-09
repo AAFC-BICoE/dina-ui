@@ -39,9 +39,13 @@ export function MaterialSampleBulkEditor({
     formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
   }));
 
-  const { bulkEditTab, withOverrides } = useBulkEditTab();
+  const { bulkEditTab, withBulkEditOverrides } = useBulkEditTab();
 
-  const { saveAll } = useBulkSampleSave({ sampleHooks, onSaved });
+  const { saveAll } = useBulkSampleSave({
+    sampleHooks,
+    onSaved,
+    preProcessSample: withBulkEditOverrides
+  });
 
   return (
     <div>
@@ -73,7 +77,7 @@ export function MaterialSampleBulkEditor({
             disableSampleNameField={disableSampleNameField}
             materialSampleFormRef={sampleHooks[index].formRef}
             materialSampleSaveHook={sampleHooks[index].saveHook}
-            buttonBar={() => null}
+            buttonBar={null}
             disableAutoNamePrefix={true}
           />
         )}
@@ -85,9 +89,16 @@ export function MaterialSampleBulkEditor({
 interface BulkSampleSaveParams {
   sampleHooks: SampleWithHooks[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+  preProcessSample?: (
+    sample: InputResource<MaterialSample>
+  ) => Promise<InputResource<MaterialSample>>;
 }
 
-function useBulkSampleSave({ sampleHooks, onSaved }: BulkSampleSaveParams) {
+function useBulkSampleSave({
+  sampleHooks,
+  onSaved,
+  preProcessSample
+}: BulkSampleSaveParams) {
   const [_error, setError] = useState<unknown | null>(null);
   const { save } = useApiClient();
 
@@ -119,10 +130,11 @@ function useBulkSampleSave({ sampleHooks, onSaved }: BulkSampleSaveParams) {
           // TODO get rid of this try/catch when we can save
           // the Col Event + Acq event + material sample all at once.
           try {
-            return await saveHook.prepareSampleSaveOperation(
-              formik.values,
-              formik
-            );
+            return await saveHook.prepareSampleSaveOperation({
+              submittedValues: formik.values,
+              formik,
+              preProcessSample
+            });
           } catch (error) {
             if (error instanceof DoOperationsError) {
               // In case of an error involving the intermediary Collecting or Acquisition Event.

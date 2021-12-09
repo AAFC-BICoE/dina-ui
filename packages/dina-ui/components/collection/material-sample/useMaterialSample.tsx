@@ -148,6 +148,14 @@ export interface UseMaterialSampleSaveParams {
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 }
 
+export interface PrepareSampleSaveOperationParams {
+  submittedValues: any;
+  formik: FormikContextType<InputResource<MaterialSample>>;
+  preProcessSample?: (
+    sample: InputResource<MaterialSample>
+  ) => Promise<InputResource<MaterialSample>>;
+}
+
 export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
@@ -421,14 +429,12 @@ export function useMaterialSampleSave({
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
-  async function prepareSampleSaveOperation(
+  async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>,
     formik: FormikContextType<InputResource<MaterialSample>>
-  ): Promise<SaveArgs<MaterialSample> | null> {
+  ): Promise<InputResource<MaterialSample> | null> {
     /** Input to submit to the back-end API. */
-    const materialSampleInput: InputResource<MaterialSample> & {
-      relationships: any;
-    } = {
+    const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
@@ -454,36 +460,7 @@ export function useMaterialSampleSave({
                 : String(determiner.id)
             )
           }))
-        : [],
-
-      // One-to-many relationships go in the 'relationships' object:
-      relationships: {
-        attachment: {
-          data:
-            submittedValues.attachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        preparationAttachment: {
-          data:
-            submittedValues.preparationAttachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        projects: {
-          data:
-            submittedValues.projects?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        }
-      },
-      // Omit one-to-many relationships which are not serialized correctly by Kitsu:
-      attachment: undefined,
-      preparationAttachment: undefined,
-      projects: undefined
+        : []
     };
 
     // Save and link the Collecting Event if enabled:
@@ -565,8 +542,66 @@ export function useMaterialSampleSave({
       };
     }
 
+    return materialSampleInput;
+  }
+
+  async function prepareSampleSaveOperation({
+    formik,
+    submittedValues,
+    preProcessSample
+  }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample> | null> {
+    const materialSampleInput = await prepareSampleInput(
+      submittedValues,
+      formik
+    );
+
+    if (!materialSampleInput) {
+      return null;
+    }
+
+    const msPreprocessed =
+      (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
+
+    /** Input to submit to the back-end API. */
+    const msInputWithRelationships: InputResource<MaterialSample> & {
+      relationships: any;
+    } = {
+      ...msPreprocessed,
+
+      // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
+      // Explicitly declare these fields as relationships here before saving:
+      // One-to-many relationships go in the 'relationships' object:
+      relationships: {
+        attachment: {
+          data:
+            msPreprocessed.attachment?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        },
+        preparationAttachment: {
+          data:
+            msPreprocessed.preparationAttachment?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        },
+        projects: {
+          data:
+            msPreprocessed.projects?.map(it => ({
+              id: it.id,
+              type: it.type
+            })) ?? []
+        }
+      },
+      // Set the attributes to undefined after they've been moved to "relationships":
+      attachment: undefined,
+      preparationAttachment: undefined,
+      projects: undefined
+    };
+
     const saveOperation = {
-      resource: materialSampleInput,
+      resource: msInputWithRelationships,
       type: "material-sample"
     };
 
@@ -578,10 +613,10 @@ export function useMaterialSampleSave({
     formik
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
-    const materialSampleSaveOp = await prepareSampleSaveOperation(
+    const materialSampleSaveOp = await prepareSampleSaveOperation({
       submittedValues,
       formik
-    );
+    });
     if (!materialSampleSaveOp) {
       return;
     }
@@ -652,6 +687,7 @@ export function useMaterialSampleSave({
     setAcqEventId,
     colEventQuery,
     onSubmit,
+    prepareSampleInput,
     prepareSampleSaveOperation,
     loading
   };
