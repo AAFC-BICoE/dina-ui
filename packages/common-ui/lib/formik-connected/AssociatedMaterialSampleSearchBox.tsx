@@ -1,6 +1,6 @@
-import React  from "react";
+import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { FieldWrapper} from "..";
+import { FieldWrapper } from "..";
 import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
@@ -20,63 +20,68 @@ export function AssociatedMaterialSampleSearchBoxField({
         ""
       );
     }
-  }  
+  }
+
+  function defaultReadOnlyRender(value) {
+    return value && <MaterialSampleLink id={value} />;
+  }
 
   return (
     <div>
       <div className="list-inline d-flex flex-row gap-2 pt-2">
-          <FieldWrapper
-            {...props}
-            disableLabelClick={true}
-          >
-            {({ setValue, value }) => {
-              /** Clear the input value */
-              function removeEntry() {
-                setValue(null);
-                if (listRef.current) {
-                  listRef.current.className =
-                    listRef.current.className.replaceAll("d-none", "");
-                }
+        <FieldWrapper
+          {...props}
+          disableLabelClick={true}
+          readOnlyRender={(value, _) => defaultReadOnlyRender(value)}
+        >
+          {({ setValue, value }) => {
+            /** Clear the input value */
+            function removeEntry() {
+              setValue(null);
+              if (listRef.current) {
+                listRef.current.className =
+                  listRef.current.className.replaceAll("d-none", "");
               }
-              return (
-                <>
-                  <div className={"row mb-2"}>
-                    {showSearchBtn ? (
-                      <button
-                        type="button"
-                        className="btn btn-secondary form-control mx-2 searchSample"
-                        onClick={() => onSearchClicked()}
+            }
+            return (
+              <>
+                <div className={"row mb-2"}>
+                  {showSearchBtn ? (
+                    <button
+                      type="button"
+                      className="btn btn-secondary form-control mx-2 searchSample"
+                      onClick={() => onSearchClicked()}
+                    >
+                      {formatMessage("search") + "..."}
+                    </button>
+                  ) : (
+                    <div className="d-flex flex-row">
+                      <div
+                        className="form-control associated-sample-link "
+                        style={{
+                          backgroundColor: "#e9ecef",
+                          minWidth: "100px"
+                        }}
                       >
-                        {formatMessage("search") + "..."}
-                      </button>
-                    ) : (
-                      <div className="d-flex flex-row">
-                        <div
-                          className="form-control associated-sample-link "
-                          style={{
-                            backgroundColor: "#e9ecef",
-                            minWidth: "100px"
-                          }}
-                        >
-                          {value && <MaterialSampleLink id={value} />}
-                        </div>
-                        <button
-                          className="btn"
-                          onClick={removeEntry}
-                          type="button"
-                          style={{
-                            cursor: "pointer"
-                          }}
-                        >
-                          <RiDeleteBinLine size="1.8em" className="ms-auto" />
-                        </button>
+                        {defaultReadOnlyRender(value)}
                       </div>
-                    )}
-                  </div>
-                </>
-              );
-            }}
-          </FieldWrapper>
+                      <button
+                        className="btn"
+                        onClick={removeEntry}
+                        type="button"
+                        style={{
+                          cursor: "pointer"
+                        }}
+                      >
+                        <RiDeleteBinLine size="1.8em" className="ms-auto" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+          }}
+        </FieldWrapper>
       </div>
     </div>
   );

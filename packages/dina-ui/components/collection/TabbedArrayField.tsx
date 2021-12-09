@@ -149,15 +149,17 @@ export function TabbedArrayField<T>({
                                   values={{ typeName }}
                                 />
                               </FormikButton>
-                              <FormikButton
-                                className="list-inline-item btn btn-dark"
-                                onClick={() => removeElement(index)}
-                              >
-                                <DinaMessage
-                                  id="removeThisElement"
-                                  values={{ typeName }}
-                                />
-                              </FormikButton>
+                              {index > 0 && (
+                                <FormikButton
+                                  className="list-inline-item btn btn-dark"
+                                  onClick={() => removeElement(index)}
+                                >
+                                  <DinaMessage
+                                    id="removeThisElement"
+                                    values={{ typeName }}
+                                  />
+                                </FormikButton>
+                              )}
                             </div>
                           )}
                         </div>
