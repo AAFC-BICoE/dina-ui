@@ -10,10 +10,11 @@ import { InputResource, PersistedResource } from "kitsu";
 import { useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator, SampleWithHooks } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
+import { useBulkEditTab } from "./bulk-edit-tab";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -38,7 +39,7 @@ export function MaterialSampleBulkEditor({
     formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
   }));
 
-  const { bulkEditTab } = useBulkEditTab();
+  const { bulkEditTab, withOverrides } = useBulkEditTab();
 
   const { saveAll } = useBulkSampleSave({ sampleHooks, onSaved });
 
@@ -171,34 +172,4 @@ function useBulkSampleSave({ sampleHooks, onSaved }: BulkSampleSaveParams) {
   }
 
   return { saveAll };
-}
-
-function useBulkEditTab() {
-  const { formatMessage } = useDinaIntl();
-
-  const bulkEditSample = {
-    type: "material-sample" as const,
-    publiclyReleasable: true
-  };
-  const bulkEditSampleHook = useMaterialSampleSave({
-    materialSample: bulkEditSample
-  });
-  const bulkEditFormRef = useRef<FormikProps<any>>(null);
-
-  const bulkEditTab = {
-    key: "OVERWRITE_VALUES",
-    title: formatMessage("editAll"),
-    content: (
-      <MaterialSampleForm
-        buttonBar={() => null}
-        materialSampleFormRef={bulkEditFormRef}
-        materialSampleSaveHook={bulkEditSampleHook}
-        materialSample={bulkEditSample}
-        disableAutoNamePrefix={true}
-        disableSampleNameField={true}
-      />
-    )
-  };
-
-  return { bulkEditTab };
 }

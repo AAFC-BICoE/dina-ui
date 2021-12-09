@@ -196,6 +196,8 @@ export interface MaterialSampleFormProps {
   /** Makes the sample name field (Primary ID) read-only. */
   disableSampleNameField?: boolean;
 
+  omitGroupField?: boolean;
+
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 }
 
@@ -210,6 +212,7 @@ export function MaterialSampleForm({
   disableAutoNamePrefix,
   materialSampleFormRef,
   disableSampleNameField,
+  omitGroupField,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -267,7 +270,13 @@ export function MaterialSampleForm({
             materialSample={materialSample as any}
           />
         )}
-        {!isTemplate && <MaterialSampleInfoFormLayout />}
+        {!isTemplate && !omitGroupField && (
+          <div className="row">
+            <div className="col-md-6">
+              <GroupSelectField name="group" enableStoredDefaultGroup={true} />
+            </div>
+          </div>
+        )}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <ProjectSelectSection resourcePath="collection-api/project" />
         <MaterialSampleIdentifiersFormLayout
@@ -401,15 +410,6 @@ export function MaterialSampleForm({
       {mateirialSampleInternal}
       {buttonBar}
     </DinaForm>
-  );
-}
-export function MaterialSampleInfoFormLayout() {
-  return (
-    <div className="row">
-      <div className="col-md-6">
-        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-      </div>
-    </div>
   );
 }
 

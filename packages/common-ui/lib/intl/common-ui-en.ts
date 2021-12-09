@@ -37,6 +37,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   destroyedLabel: "Destroyed",
   detach: "Detach",
   done: "Done",
+  dontChangeValues: "Don't Change Values",
   dropdownSearchResults: "Search results",
   editAll: "Edit All",
   editButtonText: "Edit",

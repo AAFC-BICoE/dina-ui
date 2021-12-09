@@ -29,7 +29,7 @@ export interface MaterialSampleAttributes {
 
   managedAttributes?: ManagedAttributeValues;
 
-  determination?: Determination[];
+  determination?: Determination[] | null;
   hierarchy?: HierarchyItem[];
 
   barcode?: string;
