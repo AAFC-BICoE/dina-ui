@@ -65,6 +65,8 @@ export function MaterialSampleGenerationForm({
       }),
       collection: submittedValues.collection,
       publiclyReleasable: true,
+      // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
+      allowDuplicateName: generationMode === "BATCH",
       ...submittedValues.samples[index]
     }));
 
