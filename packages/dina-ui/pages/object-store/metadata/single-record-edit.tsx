@@ -40,14 +40,13 @@ interface SingleMetadataFormProps {
 }
 
 export default function MetadataEditPage() {
-  const router = useRouter();
+  const router = useRouter();  
+
+  const id = router.query.id?.toString();
+  
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
-
-  const {
-    query: { id }
-  } = router;
-
+  
   const query = useQuery<Metadata>(
     {
       path: `objectstore-api/metadata/${id}`,
@@ -185,6 +184,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
+        groupSelectorName="bucket"
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
@@ -250,6 +250,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             filter={() => ({})}
             model="objectstore-api/license"
             optionLabel={license => license.titles[locale] ?? license.url}
+            removeDefaultSort={true}
           />
         </div>
       </FieldSet>
