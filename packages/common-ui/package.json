@@ -14,7 +14,7 @@
     "dompurify": "^2.3.3",
     "flat": "^5.0.2",
     "formik": "^2.2.7",
-    "handsontable": "11.0.1",
+    "handsontable": "6.2.2",
     "keycloak-js": "^15.0.2",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
