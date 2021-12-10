@@ -6,7 +6,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     add: "Ajouter",
     AND: "ET",
     attached: "Joint",
-    checkAll: "Vérifier tout",
+    checkAll: "Cocher tout",
     collapse: "Réduire",
     created: "Créé",
     date: "Date",
