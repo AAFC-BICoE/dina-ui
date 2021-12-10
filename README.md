@@ -1,5 +1,29 @@
 # Dina dev repo
 
+Development environment setup for the DINA repositories.
+
+## Prerequisites
+
+To run the DINA containers you will at least need:
+
+* [Visual Studio Code](https://code.visualstudio.com/). Install this on your host machine, not inside a remote or
+  virtual machine.
+* A Linux operating system.
+  * When running a dev environment in a Virtual machine you could run
+  [Ubuntu Server](https://ubuntu.com/download/server).
+  * When running on a Windows host machine you could use [WSL2](https://docs.microsoft.com/en-us/windows/wsl/about).
+  * You can avoid running a slow IDE inside your virtual machine by running VS Code on your host machine instead
+  and connecting to the dev environment using
+  [VS Code Remote](https://code.visualstudio.com/docs/remote/remote-overview)
+* [Docker](https://github.com/docker/docker-install)
+* [Docker compose](https://docs.docker.com/compose/install/)
+
+For development and running tests from your IDE you will need:
+
+* [Node.js](https://nodejs.org/en/)
+* Yarn (package manager): Run `npm install -g yarn@latest` after installing Node.js
+* Maven (Java build tool): Run `sudo apt install maven`
+
 ## Initial Repo Setup:
 
 1. Clone the repo:
