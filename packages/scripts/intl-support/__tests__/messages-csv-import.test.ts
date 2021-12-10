@@ -67,8 +67,8 @@ describe("Csv intl messages export", () => {
           'import { MOCK_UI_MESSAGES_BASE } from "./MOCK-ui-en";\n' +
           "\n" +
           "export const MOCK_UI_MESSAGES: Partial<typeof MOCK_UI_MESSAGES_BASE> = {\n" +
-          '  "hello": "hello",\n' +
-          '  "goodbye": "goodbye"\n' +
+          '  "goodbye": "goodbye",\n' +
+          '  "hello": "hello"\n' +
           "};\n"
       ],
       [
@@ -86,10 +86,10 @@ describe("Csv intl messages export", () => {
           'import { MOCK_UI_MESSAGES_BASE } from "./MOCK-ui-en";\n' +
           "\n" +
           "export const MOCK_UI_MESSAGES: Partial<typeof MOCK_UI_MESSAGES_BASE> = {\n" +
-          '  "yes": "YES",\n' +
-          '  "no": "NO",\n' +
+          '  "NO": "NO",\n' +
           '  "YES": "YES",\n' +
-          '  "NO": "NO"\n' +
+          '  "no": "NO",\n' +
+          '  "yes": "YES"\n' +
           "};\n"
       ],
       [
