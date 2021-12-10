@@ -23,6 +23,7 @@ import {
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
+import { fromPairs, toPairs } from "lodash";
 
 interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
@@ -73,9 +74,19 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
   const id = profile?.id;
 
-  const initialValues: Partial<ManagedAttribute> = profile || {
-    type: "managed-attribute"
-  };
+  const initialValues: Partial<ManagedAttribute> = profile
+    ? {
+        ...profile,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          profile.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
+      }
+    : {
+        type: "managed-attribute"
+      };
 
   const acceptedValueLen = profile?.acceptedValues?.length;
 
@@ -119,6 +130,13 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       submittedValues.acceptedValues = null;
     }
 
+    // Convert the editable format to the stored format:
+    submittedValues.multilingualDescription = {
+      descriptions: toPairs(submittedValues.multilingualDescription).map(
+        ([lang, desc]) => ({ lang, desc })
+      )
+    };
+
     await save(
       [
         {
@@ -157,8 +175,6 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
-      <TextField name="description.en" multiLines={true} />
-      <TextField name="description.fr" multiLines={true} />
       <div className="row">
         <SelectField
           className="col-md-6"
@@ -168,8 +184,31 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
         />
       </div>
       {type === "PICKLIST" && <StringArrayField name="acceptedValues" />}
-      {id && <DateField showTime={true} name="createdOn" disabled={true} />}
-      {id && <TextField name="createdBy" readOnly={true} />}
+      <div className="row">
+        <TextField
+          className="col-md-6 english-description"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+        <TextField
+          className="col-md-6 french-description"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
+      </div>
+      {id && (
+        <div className="row">
+          <DateField
+            showTime={true}
+            className="col-md-6"
+            name="createdOn"
+            disabled={true}
+          />
+          <TextField name="createdBy" className="col-md-6" readOnly={true} />
+        </div>
+      )}
     </DinaForm>
   );
 }
