@@ -89,14 +89,10 @@ export function AssociatedMaterialSampleSearchBoxField({
 
 export function MaterialSampleSearchHelper({
   listRef,
-  onAssociatedSampleSelected
+  onAssociatedSampleSelected,
+  onCloseClicked
 }) {
   const { formatMessage } = useDinaIntl();
-  function onCloseClicked() {
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className + " d-none";
-    }
-  }
   return (
     <div
       ref={listRef}

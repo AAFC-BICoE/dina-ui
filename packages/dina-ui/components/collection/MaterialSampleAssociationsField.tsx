@@ -85,12 +85,21 @@ function AssociationTabPanel({
 }: TabPanelCtx<MaterialSampleAssociation>) {
   const listRef = useRef<HTMLDivElement>(null);
   const formikCtx = useFormikContext<MaterialSample>();
-  const [showSearchBtn, setShowSearchBtn] = useState(formikCtx.values.associations?.[index].associatedSample ? false: true);
+  const [showSearchBtn, setShowSearchBtn] = useState(
+    formikCtx.values.associations?.[index].associatedSample ? false : true
+  );
+
+  function onCloseClicked() {
+    if (listRef.current) {
+      listRef.current.className = listRef.current.className + " d-none";
+    }
+  }
 
   function onAssociatedSampleSelected(
-    sample: PersistedResource<MaterialSample>    
+    sample: PersistedResource<MaterialSample>
   ) {
     formikCtx.setFieldValue(fieldProps("associatedSample").name, sample.id);
+    onCloseClicked();
     setShowSearchBtn(false);
   }
   return (
@@ -118,6 +127,7 @@ function AssociationTabPanel({
       <MaterialSampleSearchHelper
         listRef={listRef}
         onAssociatedSampleSelected={onAssociatedSampleSelected}
+        onCloseClicked={onCloseClicked}
       />
     </div>
   );
