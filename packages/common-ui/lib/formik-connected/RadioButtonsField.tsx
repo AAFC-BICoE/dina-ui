@@ -10,7 +10,7 @@ export function RadioButtonsField<T = any>({
   ...props
 }: RadioFieldProps<T>) {
   return (
-    <FieldWrapper {...props}>
+    <FieldWrapper disableLabelClick={true} {...props}>
       {({ value, setValue }) => (
         <div>
           {options.map((option, index) => (
