@@ -3,6 +3,7 @@ import { MaterialSample } from "../../../types/collection-api";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { useBulkEditTab } from "../bulk-edit-tab";
 import Switch from "react-switch";
+import { ResourceSelect } from "common-ui";
 
 const mockSubmitOverride = jest.fn();
 
@@ -156,6 +157,60 @@ describe("Material sample bulk edit tab", () => {
       collectingEvent: {
         id: "11111111-1111-1111-1111-111111111111",
         type: "collecting-event"
+      }
+    });
+  });
+
+  it("Combines amnaged attribute values from the original and the bulk override.", async () => {
+    const wrapper = mountWithAppContext(
+      <BulkEditTab
+        baseSample={{
+          type: "material-sample",
+          materialSampleName: "test-sample",
+          managedAttributes: {
+            a: "value A",
+            b: "value B"
+          }
+        }}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Override values for attributes B and C:
+    wrapper
+      .find(".managed-attributes-editor")
+      .find(ResourceSelect)
+      .prop<any>("onChange")([
+      { key: "b", managedAttributeType: "STRING" },
+      { key: "c", managedAttributeType: "STRING" }
+    ]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".b-field input")
+      .simulate("change", { target: { value: "new-b-value" } });
+    wrapper
+      .find(".c-field input")
+      .simulate("change", { target: { value: "new-c-value" } });
+
+    wrapper.find("button.get-overrides").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSubmitOverride).lastCalledWith({
+      // Keeps the name and type:
+      type: "material-sample",
+      materialSampleName: "test-sample",
+      managedAttributes: {
+        a: "value A",
+        b: "new-b-value",
+        c: "new-c-value"
       }
     });
   });

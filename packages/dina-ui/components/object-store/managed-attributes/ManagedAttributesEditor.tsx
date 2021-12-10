@@ -146,7 +146,7 @@ export function ManagedAttributesEditor({
           const attributeKey = get(attribute, managedAttributeKeyField);
 
           const props = {
-            className: `${attributeKey} col-sm-6`,
+            className: `${attributeKey} ${attributeKey}-field col-sm-6`,
             key: attributeKey,
             label: attribute.name ?? attributeKey,
             name: `${valuesPath}.${attributeKey}`

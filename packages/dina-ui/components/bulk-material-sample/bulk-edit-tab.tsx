@@ -1,6 +1,6 @@
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { isArray, omitBy } from "lodash";
+import { isArray, omitBy, isEmpty } from "lodash";
 import { createContext, useContext, useRef } from "react";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
@@ -18,7 +18,7 @@ export function useBulkEditTab() {
   const { formatMessage } = useDinaIntl();
 
   const initialValues: InputResource<MaterialSample> = {
-    type: "material-sample" as const,
+    type: "material-sample",
     determination: []
   };
   const bulkEditSampleHook = useMaterialSampleSave({
@@ -64,7 +64,21 @@ export function useBulkEditTab() {
     /** Sample override object with only the non-empty fields. */
     const overrides = omitBy(bulkEditSample, isBlankResourceAttribute);
 
-    return { ...baseSample, ...overrides };
+    // Combine the managed attributes dictionaries:
+    const newManagedAttributes = {
+      ...baseSample.managedAttributes,
+      ...bulkEditSample?.managedAttributes
+    };
+
+    const newSample: InputResource<MaterialSample> = {
+      ...baseSample,
+      ...overrides,
+      ...(!isEmpty(newManagedAttributes) && {
+        managedAttributes: newManagedAttributes
+      })
+    };
+
+    return newSample;
   }
 
   return { bulkEditTab, withBulkEditOverrides };
