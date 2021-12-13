@@ -184,7 +184,9 @@ export function FieldWrapper({
       {isTemplate && (
         <CheckBoxWithoutWrapper
           name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
-          className="col-sm-1 templateCheckBox"
+          className={`col-sm-1 templateCheckBox ${
+            horizontal === "flex" && "mt-2"
+          }`}
         />
       )}
       {removeLabelTag ? (
@@ -197,6 +199,24 @@ export function FieldWrapper({
 
           {fieldWrapperInternal}
         </>
+      ) : isTemplate && horizontal === "flex" ? (
+        <div className={`col-sm-10`}>
+          <label
+            className={classNames(
+              `${name}-field`,
+              customName && `${customName}-field`,
+              "d-flex gap-2 align-items-center"
+            )}
+            htmlFor={disableLabelClick ? "none" : undefined}
+          >
+            {!removeLabel && (
+              <div className={classNames(labelClass, !horizontal && "mb-2")}>
+                {!hideLabel && <strong>{fieldLabel}</strong>}
+              </div>
+            )}
+            {fieldWrapperInternal}
+          </label>
+        </div>
       ) : (
         <label
           className={classNames(

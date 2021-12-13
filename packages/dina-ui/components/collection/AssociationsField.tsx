@@ -35,16 +35,22 @@ export function AssociationsField() {
         legend={<DinaMessage id="hostOrganismLegend" />}
         className="non-strip"
       >
-        <CatalogueOfLifeNameField
-          name={"hostOrganism.name"}
-          customName="name"
-          isDetermination={false}
-        />
-        <TextField
-          multiLines={true}
-          name="hostOrganism.remarks"
-          customName="remarks"
-        />
+        <div className="row">
+          <div className="col-md-6">
+            <CatalogueOfLifeNameField
+              name={"hostOrganism.name"}
+              customName="name"
+              isDetermination={false}
+            />
+          </div>
+          <div className="col-md-6">
+            <TextField
+              multiLines={true}
+              name="hostOrganism.remarks"
+              customName="remarks"
+            />
+          </div>
+        </div>
       </FieldSet>
       <MaterialSampleAssociationsField />
     </FieldSet>

@@ -33,7 +33,7 @@ export function ExistingAttachmentsTable({
   onDetachMetadataIds,
   onMetadatasEdited,
   detachTotalSelected,
-  readOnly 
+  readOnly
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,

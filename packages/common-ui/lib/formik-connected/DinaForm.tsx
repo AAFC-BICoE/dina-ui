@@ -140,7 +140,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     }
   }
 
-  const PromptIfDirty = ({formik}) => {
+  const PromptIfDirty = ({ formik }) => {
     const { formatMessage } = useIntl();
     // only prompt if there is data change in edit or add pages
     if (formik.dirty && formik.values.type && formik.submitCount === 0) {
@@ -164,7 +164,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
           </>
         )}
       </FormikConsumer>
-      {children}      
+      {children}
     </Wrapper>
   );
 }

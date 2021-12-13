@@ -109,37 +109,65 @@ export function CatalogueOfLifeSearchBox({
         </div>
       </div> */}
       <div className="d-flex align-items-center mb-3">
-        <label className="pt-2 d-flex align-items-center">
-          <strong>
-            <DinaMessage id="colSearchLabel" />
-          </strong>
-          <Tooltip id="colSearchBoxTooltip" />
-        </label>
+        {isDetermination && (
+          <label className="pt-2 d-flex align-items-center">
+            <strong>
+              <DinaMessage id="colSearchLabel" />
+            </strong>
+            <Tooltip id="colSearchBoxTooltip" />
+          </label>
+        )}
         <div className="flex-grow-1">
-          <div className="input-group">
-            <input
-              aria-label={formatMessage("colSearchLabel")}
-              className="form-control col-search-input"
-              onChange={e => onInputChange(e.target.value)}
-              onFocus={e => e.target.select()}
-              onKeyDown={e => {
-                if (e.keyCode === 13) {
-                  e.preventDefault();
-                  doThrottledSearch(inputValue);
-                }
-              }}
-              value={inputValue}
-            />
-            <button
-              style={{ width: "10rem" }}
-              onClick={doThrottledSearch}
-              className="btn btn-primary ms-auto col-search-button"
-              type="button"
-              disabled={searchIsDisabled}
-            >
-              <DinaMessage id="searchButton" />
-            </button>
-          </div>
+          {isDetermination ? (
+            <div className="input-group">
+              <input
+                aria-label={formatMessage("colSearchLabel")}
+                className="form-control col-search-input"
+                onChange={e => onInputChange(e.target.value)}
+                onFocus={e => e.target.select()}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                    doThrottledSearch(inputValue);
+                  }
+                }}
+                value={inputValue}
+              />
+              <button
+                style={{ width: "10rem" }}
+                onClick={doThrottledSearch}
+                className="btn btn-primary ms-auto col-search-button"
+                type="button"
+                disabled={searchIsDisabled}
+              >
+                <DinaMessage id="searchButton" />
+              </button>
+            </div>
+          ) : (
+            <div>
+              <input
+                aria-label={formatMessage("colSearchLabel")}
+                className="form-control col-search-input"
+                onChange={e => onInputChange(e.target.value)}
+                onFocus={e => e.target.select()}
+                onKeyDown={e => {
+                  if (e.keyCode === 13) {
+                    e.preventDefault();
+                    doThrottledSearch(inputValue);
+                  }
+                }}
+                value={inputValue}
+              />
+              <button
+                onClick={doThrottledSearch}
+                className="btn btn-primary ms-auto mt-2 col-search-button"
+                type="button"
+                disabled={searchIsDisabled}
+              >
+                <DinaMessage id="searchOnCOL" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
       {isDetermination && (
