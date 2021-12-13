@@ -401,7 +401,10 @@ export function useMaterialSampleSave({
         }),
     determination: materialSample?.determination?.length
       ? materialSample?.determination
-      : [{ isPrimary: true, isFileAs: true }]
+      : [{ isPrimary: true, isFileAs: true }],
+    associations: materialSample?.associations?.length
+      ? materialSample?.associations
+      : [{}]
   };
 
   /** Used to get the values of the nested CollectingEvent form. */

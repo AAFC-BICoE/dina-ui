@@ -6,6 +6,7 @@ import {
 } from "../../../common-ui/lib";
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { FaFolderOpen } from "react-icons/fa";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
@@ -19,15 +20,16 @@ export function ProjectSelectSection({
     <ProjectSelectField resourcePath={resourcePath} />
   ) : (
     <div className="row">
-      <div className="col-md-6">
-        <div className="d-flex flex-row gap-1 align-items-center">
-          <FaFolderOpen className="mb-3" />
-          <ProjectSelectField
-            resourcePath={resourcePath}
-            className="flex-grow-1"
-          />
+      <DinaFormSection horizontal="flex">
+        <div className="col-md-6">
+          <div className="d-flex flex-row gap-1">
+            <ProjectSelectField
+              resourcePath={resourcePath}
+              className="flex-grow-1 mb-2"
+            />
+          </div>
         </div>
-      </div>
+      </DinaFormSection>
     </div>
   );
 }
@@ -54,6 +56,11 @@ export function ProjectSelectField({
         optionLabel={prj => prj.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
+        label={
+          <span>
+            <FaFolderOpen /> <DinaMessage id="projects" />
+          </span>
+        }
         readOnlyRender={(value, _) =>
           Array.isArray(value) ? (
             <div className="d-flex flex-row gap-2">
