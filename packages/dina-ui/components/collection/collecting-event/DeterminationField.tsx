@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { get, isArray } from "lodash";
-import { CatalogueOfLifeNameField } from "..";
+import { GlobalNamesField } from "..";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -181,7 +181,7 @@ export function DeterminationField() {
               legend={<DinaMessage id="determination" />}
               className="non-strip"
             >
-              <CatalogueOfLifeNameField
+              <GlobalNamesField
                 {...fieldProps("scientificName")}
                 scientificNameSourceField={
                   fieldProps("scientificNameSource").name

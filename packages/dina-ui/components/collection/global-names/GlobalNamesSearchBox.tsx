@@ -72,7 +72,6 @@ export function GlobalNamesSearchBox({
     timeoutMs: 1000,
     initSearchValue
   });
-  const nameResults = searchResult;
 
   const onInputChange = value => {
     setInputValue(value);
@@ -191,9 +190,9 @@ export function GlobalNamesSearchBox({
         </Field>
       )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
-      {!!nameResults && (
+      {!!searchResult && (
         <div className="list-group">
-          {nameResults.map((result, idx) => {
+          {searchResult.map((result, idx) => {
             const link = document.createElement("a");
             link.setAttribute("href", result.bestResult?.outlink);
             link.setAttribute("target", "_blank");
@@ -236,7 +235,7 @@ export function GlobalNamesSearchBox({
           })}
         </div>
       )}
-      {!searchResult?.length && (
+      {searchResult?.length === 1 && searchResult[0].matchType === "NoMatch" && (
         <p>
           <DinaMessage id="noResultsFound" />
         </p>

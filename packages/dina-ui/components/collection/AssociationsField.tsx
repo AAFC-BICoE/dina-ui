@@ -1,5 +1,5 @@
 import { FieldSet, TextField } from "common-ui";
-import { CatalogueOfLifeNameField } from ".";
+import { GlobalNamesField } from ".";
 import { HostOrganism } from "../../../dina-ui/types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import {
@@ -37,7 +37,7 @@ export function AssociationsField() {
       >
         <div className="row">
           <div className="col-md-6">
-            <CatalogueOfLifeNameField
+            <GlobalNamesField
               name={"hostOrganism.name"}
               customName="name"
               isDetermination={false}
