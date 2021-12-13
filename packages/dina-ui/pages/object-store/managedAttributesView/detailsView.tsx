@@ -132,9 +132,9 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
 
     // Convert the editable format to the stored format:
     submittedValues.multilingualDescription = {
-      descriptions: toPairs(submittedValues.multilingualDescription).map(
-        ([lang, desc]) => ({ lang, desc })
-      )
+      descriptions: toPairs(submittedValues.multilingualDescription)
+        .map(([lang, desc]) => ({ lang, desc }))
+        .filter(it => it.desc)
     };
 
     await save(
