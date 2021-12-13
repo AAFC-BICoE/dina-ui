@@ -2,6 +2,7 @@ import { Person } from "../../agent-api/resources/Person";
 
 export interface Determination {
   verbatimScientificName?: string;
+  scientificNameInput?: string;
   verbatimDeterminer?: string;
   verbatimDate?: string;
   typeStatus?: string;

@@ -170,19 +170,33 @@ export function GlobalNamesSearchBox({
             const verbatimScientificName =
               materialSample.determination?.[index ?? 0]
                 ?.verbatimScientificName;
+            const scientificNameInput =
+              materialSample.determination?.[index ?? 0]?.scientificNameInput;
+            const hasScientificNameInput = !!scientificNameInput;
             const hasVerbatimScientificName = !!verbatimScientificName;
             return (
-              hasVerbatimScientificName && (
+              (hasVerbatimScientificName || hasScientificNameInput) && (
                 <div className="d-flex align-items-center mb-3">
                   <div className="pe-3">
                     <DinaMessage id="search" />:
                   </div>
-                  <FormikButton
-                    className="btn btn-link"
-                    onClick={() => doThrottledSearch(verbatimScientificName)}
-                  >
-                    <DinaMessage id="field_verbatimScientificName" />
-                  </FormikButton>
+                  {hasVerbatimScientificName && (
+                    <FormikButton
+                      className="btn btn-link"
+                      onClick={() => doThrottledSearch(verbatimScientificName)}
+                    >
+                      <DinaMessage id="field_verbatimScientificName" />
+                    </FormikButton>
+                  )}
+
+                  {hasScientificNameInput && (
+                    <FormikButton
+                      className="mx-2 btn btn-link"
+                      onClick={() => doThrottledSearch(scientificNameInput)}
+                    >
+                      <DinaMessage id="field_scientificNameInput" />
+                    </FormikButton>
+                  )}
                 </div>
               )
             );
@@ -192,47 +206,63 @@ export function GlobalNamesSearchBox({
       {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!searchResult && (
         <div className="list-group">
-          {searchResult.map((result, idx) => {
-            const link = document.createElement("a");
-            link.setAttribute("href", result.bestResult?.outlink);
-            link.setAttribute("target", "_blank");
-            link.setAttribute("rel", "noopener");
+          {searchResult
+            .filter(result => result.matchType !== "NoMatch")
+            .map((result, idx) => {
+              const link = document.createElement("a");
+              link.setAttribute("href", result.bestResult?.outlink);
+              link.setAttribute("target", "_blank");
+              link.setAttribute("rel", "noopener");
 
-            link.innerHTML =
-              result.bestResult?.matchedCanonicalFull ??
-              result.bestResult?.matchedCanonicalSimple;
+              const paths = result.bestResult?.classificationPath.split("|");
+              const ranks = result.bestResult?.classificationRanks.split("|");
 
-            // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
-            const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
-              ADD_ATTR: ["target", "rel"]
-            });
+              const familyIdx = ranks.findIndex(path => path === "family");
+              const familyRank =
+                familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
-            const detail: ScientificNameSourceDetails = {};
-            detail.labelHtml = link.innerHTML ?? "";
-            detail.sourceUrl = link.href;
-            detail.recordedOn = dateSupplier();
+              let displayText = result.bestResult?.currentName;
+              inputValue
+                .split(" ")
+                .map(
+                  val =>
+                    (displayText = displayText.replace(val, `<b>${val}</b>`))
+                );
 
-            // Use detail to populate source details fields, result.label to populate the searchbox bound field
-            const resultArray = [detail, link.innerHTML];
+              if (familyRank)
+                link.innerHTML = familyRank.toUpperCase() + displayText;
 
-            return (
-              <div
-                key={result.inputId ?? idx}
-                className="list-group-item list-group-item-action d-flex"
-              >
-                <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
-                  <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
-                </div>
-                <FormikButton
-                  className="btn btn-primary col-name-select-button"
-                  buttonProps={() => ({ style: { width: "8rem" } })}
-                  onClick={() => onSelect?.(resultArray)}
+              // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
+              const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
+                ADD_ATTR: ["target", "rel"]
+              });
+
+              const detail: ScientificNameSourceDetails = {};
+              detail.labelHtml = link.innerHTML ?? "";
+              detail.sourceUrl = link.href;
+              detail.recordedOn = dateSupplier();
+
+              // Use detail to populate source details fields, result.label to populate the searchbox bound field
+              const resultArray = [detail, link.innerHTML];
+
+              return (
+                <div
+                  key={result.inputId ?? idx}
+                  className="list-group-item list-group-item-action d-flex"
                 >
-                  <DinaMessage id="select" />
-                </FormikButton>
-              </div>
-            );
-          })}
+                  <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
+                    <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
+                  </div>
+                  <FormikButton
+                    className="btn btn-primary col-name-select-button"
+                    buttonProps={() => ({ style: { width: "8rem" } })}
+                    onClick={() => onSelect?.(resultArray)}
+                  >
+                    <DinaMessage id="select" />
+                  </FormikButton>
+                </div>
+              );
+            })}
         </div>
       )}
       {searchResult?.length === 1 && searchResult[0].matchType === "NoMatch" && (

@@ -302,6 +302,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
   field_remarks: "Remarks",
+  field_scientificNameInput: "Scientific Name",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
   field_transcriberRemarks: "Transcriber's Notes",

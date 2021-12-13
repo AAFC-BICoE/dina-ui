@@ -42,7 +42,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     isPrimary: true,
     scientificNameDetails: true,
     isFileAs: true,
-    determinationRemarks: true
+    determinationRemarks: true,
+    scientificNameInput: true
   };
 
 /** All fields of the Determination type. */
@@ -175,12 +176,40 @@ export function DeterminationField() {
                 multiLines={true}
               />
             </FieldSet>
+            <FieldSet
+              legend={<DinaMessage id="typeSpecimen" />}
+              className="non-strip"
+            >
+              <AutoSuggestTextField<Vocabulary>
+                {...fieldProps("typeStatus")}
+                query={() => ({
+                  path: "collection-api/vocabulary/typeStatus"
+                })}
+                suggestion={(vocabElement, searchValue) =>
+                  vocabElement?.vocabularyElements
+                    ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                    .filter(it =>
+                      it?.name
+                        ?.toLowerCase?.()
+                        ?.includes(searchValue?.toLowerCase?.())
+                    )
+                    .map(it => it?.labels?.[locale] ?? "")
+                }
+                alwaysShowSuggestions={true}
+              />
+              <TextField
+                {...fieldProps("typeStatusEvidence")}
+                multiLines={true}
+              />
+            </FieldSet>
           </div>
           <div className="col-md-6">
             <FieldSet
               legend={<DinaMessage id="determination" />}
               className="non-strip"
             >
+              <TextField {...fieldProps("scientificNameInput")} />
+              <hr />
               <GlobalNamesField
                 {...fieldProps("scientificName")}
                 scientificNameSourceField={
@@ -224,31 +253,8 @@ export function DeterminationField() {
                 {...fieldProps("determinedOn")}
                 label={formatMessage("determiningDate")}
               />
-              <TextField {...fieldProps("determinationRemarks")} />
-            </FieldSet>
-            <FieldSet
-              legend={<DinaMessage id="typeSpecimen" />}
-              className="non-strip"
-            >
-              <AutoSuggestTextField<Vocabulary>
-                {...fieldProps("typeStatus")}
-                query={() => ({
-                  path: "collection-api/vocabulary/typeStatus"
-                })}
-                suggestion={(vocabElement, searchValue) =>
-                  vocabElement?.vocabularyElements
-                    ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                    .filter(it =>
-                      it?.name
-                        ?.toLowerCase?.()
-                        ?.includes(searchValue?.toLowerCase?.())
-                    )
-                    .map(it => it?.labels?.[locale] ?? "")
-                }
-                alwaysShowSuggestions={true}
-              />
               <TextField
-                {...fieldProps("typeStatusEvidence")}
+                {...fieldProps("determinationRemarks")}
                 multiLines={true}
               />
             </FieldSet>
