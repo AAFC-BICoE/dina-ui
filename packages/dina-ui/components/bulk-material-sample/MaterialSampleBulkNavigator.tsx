@@ -39,13 +39,13 @@ export function MaterialSampleBulkNavigator({
   renderOneSample,
   extraTabs = []
 }: MaterialSampleBulkNavigatorProps) {
+  const tabElements = [...extraTabs, ...samples];
+
   const [selectedElement, setSelectedElement] = useState<
     BulkNavigatorTab | SampleWithHooks
-  >(extraTabs[0] || samples[0]);
+  >(tabElements[0]);
 
   const tooManySamplesForTabs = samples.length >= 10;
-
-  const tabElements = [...extraTabs, ...samples];
 
   const tabsWithErrors = samples.reduce(
     (prev, sample) =>
@@ -92,6 +92,10 @@ export function MaterialSampleBulkNavigator({
         <Tabs
           // Prevent unmounting the form on tab switch to avoid losing the form state:
           forceRenderTabPanel={true}
+          selectedIndex={tabElements.findIndex(
+            element => element.key === selectedElement.key
+          )}
+          onSelect={index => setSelectedElement(tabElements[index])}
         >
           <TabList>
             {extraTabs.map((extraTab, index) => (

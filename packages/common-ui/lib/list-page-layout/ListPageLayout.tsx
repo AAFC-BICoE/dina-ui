@@ -159,7 +159,7 @@ export function ListPageLayout<TData extends KitsuResource>({
     <DinaForm<BulkSelectableFormValues>
       initialValues={{ selectedResources: {} }}
     >
-      <div className="d-flex justify-content-end">
+      <div className="d-flex gap-3 justify-content-end">
         {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
         {bulkDeleteButtonProps && (
           <BulkDeleteButton {...bulkDeleteButtonProps} />

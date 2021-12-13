@@ -83,6 +83,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   logoutBtn: "Logout",
   max: "Max",
   min: "Min",
+  multipleValuesFound: "Multiple Values Found",
   name: "Name",
   next: "Next",
   no: "No",
@@ -92,6 +93,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   oneValuePerLine: "One value per line",
   oneValuePerLineTooltip:
     "Write one value per line. Press enter while typing in the field to add a new line.",
+  overrideAll: "Override All",
   page: "Page",
   previous: "Previous",
   queryTable: "Query Table",

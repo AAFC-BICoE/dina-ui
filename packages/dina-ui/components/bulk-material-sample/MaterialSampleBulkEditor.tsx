@@ -39,7 +39,9 @@ export function MaterialSampleBulkEditor({
     formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
   }));
 
-  const { bulkEditTab, withBulkEditOverrides } = useBulkEditTab();
+  const { bulkEditTab, withBulkEditOverrides } = useBulkEditTab({
+    sampleHooks
+  });
 
   const { saveAll } = useBulkSampleSave({
     sampleHooks,
@@ -50,14 +52,14 @@ export function MaterialSampleBulkEditor({
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="justify-content-end">
+        <ButtonBar className="justify-content-end gap-4">
           {onPreviousClick && (
             <FormikButton
               className="btn btn-primary previous-button"
               onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "10rem" } })}
+              buttonProps={() => ({ style: { width: "13rem" } })}
             >
-              <DinaMessage id="previous" />
+              <DinaMessage id="goToThePreviousStep" />
             </FormikButton>
           )}
           <FormikButton

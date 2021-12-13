@@ -2,19 +2,26 @@ import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isArray, omitBy, isEmpty } from "lodash";
 import { createContext, useContext, useRef } from "react";
+import { SampleWithHooks } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 
-export const BulkEditContext = createContext<{} | null>(null);
+export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(
+  null
+);
+
+export interface BulkEditTabContextI {
+  sampleHooks: SampleWithHooks[];
+}
 
 /** When the Component is inside the bulk editor's "Edit All" tab. */
 export function useBulkEditTabContext() {
-  return useContext(BulkEditContext);
+  return useContext(BulkEditTabContext);
 }
 
-export function useBulkEditTab() {
+export function useBulkEditTab(ctx: BulkEditTabContextI) {
   const { formatMessage } = useDinaIntl();
 
   const initialValues: InputResource<MaterialSample> = {
@@ -31,7 +38,7 @@ export function useBulkEditTab() {
     key: "OVERWRITE_VALUES",
     title: formatMessage("editAll"),
     content: (
-      <BulkEditContext.Provider value={{}}>
+      <BulkEditTabContext.Provider value={ctx}>
         <MaterialSampleForm
           buttonBar={null}
           materialSampleFormRef={bulkEditFormRef}
@@ -41,7 +48,7 @@ export function useBulkEditTab() {
           disableSampleNameField={true}
           omitGroupField={true}
         />
-      </BulkEditContext.Provider>
+      </BulkEditTabContext.Provider>
     )
   };
 
@@ -62,12 +69,17 @@ export function useBulkEditTab() {
     );
 
     /** Sample override object with only the non-empty fields. */
-    const overrides = omitBy(bulkEditSample, isBlankResourceAttribute);
+    const overrides = withoutBlankFields(bulkEditSample);
 
     // Combine the managed attributes dictionaries:
     const newManagedAttributes = {
-      ...baseSample.managedAttributes,
-      ...bulkEditSample?.managedAttributes
+      ...withoutBlankFields(baseSample.managedAttributes),
+      ...withoutBlankFields(bulkEditSample?.managedAttributes)
+    } as { [x: string]: string };
+
+    const newOrganism = {
+      ...withoutBlankFields(baseSample.organism),
+      ...withoutBlankFields(bulkEditSample?.organism)
     };
 
     const newSample: InputResource<MaterialSample> = {
@@ -75,6 +87,9 @@ export function useBulkEditTab() {
       ...overrides,
       ...(!isEmpty(newManagedAttributes) && {
         managedAttributes: newManagedAttributes
+      }),
+      ...(!isEmpty(newOrganism) && {
+        organism: newOrganism
       })
     };
 
@@ -88,7 +103,7 @@ export function useBulkEditTab() {
  * Checks whether an API resource's attribute is blank.
  * This is used to check which of the Bulk Edit tab's values were deliberately edited.
  */
-function isBlankResourceAttribute(value: any) {
+export function isBlankResourceAttribute(value: any) {
   // "blank" means something different depending on the type:
   switch (typeof value) {
     case "string":
@@ -101,4 +116,8 @@ function isBlankResourceAttribute(value: any) {
     default:
       return false;
   }
+}
+
+function withoutBlankFields<T>(original: T): Partial<T> {
+  return omitBy(original, isBlankResourceAttribute) as Partial<T>;
 }
