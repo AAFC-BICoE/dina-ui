@@ -23,17 +23,21 @@ export interface SampleListLayoutProps {
   btnMsg?: string;
   hideTopPagination?: boolean;
   hideGroupFilter?: boolean;
+  openLinkInNewTab?: boolean;
 }
 
-export const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] =
-  [
+export const getColumnDefinition = ({ openLinkInNewTab }) => {
+  return [
     {
       Cell: ({
         original: { id, materialSampleName, dwcOtherCatalogNumbers }
       }) => (
-        <Link href={`/collection/material-sample/view?id=${id}`}>
+        <a
+          href={`/collection/material-sample/view?id=${id}`}
+          target={openLinkInNewTab ? "_blank" : ""}
+        >
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </Link>
+        </a>
       ),
       accessor: "materialSampleName"
     },
@@ -51,13 +55,15 @@ export const MATERIAL_SAMPLE_TABLE_COLUMNS: ColumnDefinition<MaterialSample>[] =
     "createdBy",
     dateCell("createdOn")
   ];
+};
 
 export function SampleListLayout({
   onSelect,
   classNames,
   btnMsg,
   hideTopPagination,
-  hideGroupFilter
+  hideGroupFilter,
+  openLinkInNewTab
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -78,7 +84,7 @@ export function SampleListLayout({
   ];
 
   const columns = [
-    ...MATERIAL_SAMPLE_TABLE_COLUMNS,
+    ...getColumnDefinition({ openLinkInNewTab }),
     ...(onSelect
       ? [
           {
@@ -147,7 +153,7 @@ export default function MaterialSampleListPage() {
         <ButtonBar>
           <CreateButton entityLink="/collection/material-sample" />
         </ButtonBar>
-        <SampleListLayout />
+        <SampleListLayout openLinkInNewTab={false} />
       </main>
       <Footer />
     </div>

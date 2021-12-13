@@ -94,6 +94,7 @@ export function StorageUnitFormFields() {
               storageUnit={storageUnit}
               // Don't have the page link to itself:
               disableLastLink={true}
+              readOnly={readOnly}
             />
           </h2>
         )}

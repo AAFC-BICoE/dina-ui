@@ -4,6 +4,7 @@ import {
   FieldWrapper,
   SubmitButton,
   useApiClient,
+  useDinaFormContext,
   useModal
 } from "common-ui";
 import { useField } from "formik";
@@ -31,6 +32,7 @@ export function StorageLinker({
   value
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
+  const { readOnly } = useDinaFormContext();
 
   const formId = useField<string | undefined>("id")[0].value;
   const formType = useField<string | undefined>("type")[0].value;
@@ -94,7 +96,10 @@ export function StorageLinker({
         )}
         {!value?.id && (
           <TabPanel>
-            <BrowseStorageTree onSelect={changeStorageAndResetTab} />
+            <BrowseStorageTree
+              onSelect={changeStorageAndResetTab}
+              readOnly={readOnly}
+            />
           </TabPanel>
         )}
         {!value?.id && (

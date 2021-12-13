@@ -23,6 +23,7 @@ import {
 
 export interface BrowseStorageTreeProps {
   onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
+  readOnly?: boolean;
 }
 
 /** Hierarchy of nodes UI to search for and find a Storage Unit. */
@@ -42,7 +43,12 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
         )}
         {":"}
       </div>
-      <StorageTreeList {...props} filter={filter} showPathInName={isFiltered} />
+      <StorageTreeList
+        {...props}
+        filter={filter}
+        showPathInName={isFiltered}
+        readOnly={props.readOnly}
+      />
     </div>
   );
 }
@@ -57,6 +63,8 @@ export interface StorageTreeListProps {
 
   /** Show the hierarchy path in the name. (Top-level only). */
   showPathInName?: boolean;
+
+  readOnly?: boolean;
 }
 
 export function StorageTreeList({
@@ -64,7 +72,8 @@ export function StorageTreeList({
   parentId,
   disabled,
   filter,
-  showPathInName
+  showPathInName,
+  readOnly
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
@@ -122,6 +131,7 @@ export function StorageTreeList({
                   storageUnit={unit}
                   onSelect={onSelect}
                   disabled={disabled}
+                  readOnly={readOnly}
                 />
               </div>
             ))}
@@ -148,13 +158,16 @@ interface StorageUnitCollapserProps {
 
   /** Show the hierarchy path in the name. (This collapser only). */
   showPathInName?: boolean;
+
+  readOnly?: boolean;
 }
 
 function StorageUnitCollapser({
   storageUnit,
   onSelect,
   disabled,
-  showPathInName
+  showPathInName,
+  readOnly
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -190,7 +203,10 @@ function StorageUnitCollapser({
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
           {showPathInName ? (
-            <StorageUnitBreadCrumb storageUnit={storageUnit} />
+            <StorageUnitBreadCrumb
+              storageUnit={storageUnit}
+              readOnly={readOnly}
+            />
           ) : (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
               <a className="storage-unit-name" target="_blank">

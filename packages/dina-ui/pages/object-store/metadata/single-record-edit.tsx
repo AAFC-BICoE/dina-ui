@@ -41,12 +41,11 @@ interface SingleMetadataFormProps {
 
 export default function MetadataEditPage() {
   const router = useRouter();
+
+  const id = router.query.id?.toString();
+
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
-
-  const {
-    query: { id }
-  } = router;
 
   const query = useQuery<Metadata>(
     {

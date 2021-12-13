@@ -2,11 +2,13 @@ import {
   Form,
   Formik,
   FormikConfig,
+  FormikConsumer,
   FormikContextType,
   FormikProps,
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
+import { useIntl } from "react-intl";
 import { createContext, PropsWithChildren, useContext, useMemo } from "react";
 import { scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
@@ -65,10 +67,11 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 ) {
   const api = useApiClient();
   const account = useAccount();
+  const { formatMessage } = useIntl();
 
   const isNestedForm = !!useContext(DinaFormContext);
 
-  const { children: childrenProp, onSubmit: onSubmitProp } = props;
+  const { children: childrenProp, onSubmit: onSubmitProp, readOnly } = props;
 
   /** Wrapped onSubmit prop with erorr handling and API/Account params. */
   const onSubmitInternal = safeSubmit(async (submittedValues, formik) => {
@@ -137,6 +140,16 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     }
   }
 
+  const PromptIfDirty = ({ formik }) => {
+    const { formatMessage } = useIntl();
+    // only prompt if there is data change in edit or add pages
+    if (formik.dirty && formik.values.type && formik.submitCount === 0) {
+      window.onbeforeunload = () => {
+        return formatMessage({ id: "possibleDataLossWarning" });
+      };
+    } else window.onbeforeunload = null;
+    return null;
+  };
   const Wrapper = isNestedForm ? "div" : Form;
 
   return (
@@ -144,6 +157,13 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
       onKeyDown={isNestedForm ? disableEnterToSubmitOuterForm : undefined}
     >
       <ErrorViewer />
+      <FormikConsumer>
+        {formik => (
+          <>
+            <PromptIfDirty formik={formik} />
+          </>
+        )}
+      </FormikConsumer>
       {children}
     </Wrapper>
   );

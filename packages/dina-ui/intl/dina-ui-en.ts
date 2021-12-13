@@ -441,6 +441,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   parentMaterialSample: " Parent Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
   personListTitle: "Persons",
+  possibleDataLossWarning:
+    "You have unsaved data, are you sure you want to leave the page?",
   preparation: "Preparation",
   preparationProtocols: "Preparation Protocols",
   preparationData: "Preparation Data",
