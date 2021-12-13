@@ -1,18 +1,23 @@
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isArray, omitBy, isEmpty } from "lodash";
-import { createContext, useContext, useRef } from "react";
+import { createContext, useContext, useRef, RefObject } from "react";
 import { SampleWithHooks } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 
+export interface BulkEditTabContextI {
+  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
+  sampleHooks: SampleWithHooks[];
+}
+
 export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(
   null
 );
 
-export interface BulkEditTabContextI {
+export interface UseBulkEditTabParams {
   sampleHooks: SampleWithHooks[];
 }
 
@@ -21,7 +26,7 @@ export function useBulkEditTabContext() {
   return useContext(BulkEditTabContext);
 }
 
-export function useBulkEditTab(ctx: BulkEditTabContextI) {
+export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
   const initialValues: InputResource<MaterialSample> = {
@@ -34,10 +39,15 @@ export function useBulkEditTab(ctx: BulkEditTabContextI) {
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
+  const ctx: BulkEditTabContextI = {
+    sampleHooks,
+    bulkEditFormRef
+  };
+
   const bulkEditTab = {
-    key: "OVERWRITE_VALUES",
+    key: "EDIT_ALL",
     title: formatMessage("editAll"),
-    content: (
+    content: () => (
       <BulkEditTabContext.Provider value={ctx}>
         <MaterialSampleForm
           buttonBar={null}

@@ -19,7 +19,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
 
   return (
     <div>
-      {bulkEditTab.content}
+      {bulkEditTab.content()}
       <button
         className="get-overrides"
         type="button"
@@ -159,7 +159,14 @@ describe("Material sample bulk edit tab", () => {
       collectingEvent: {
         id: "11111111-1111-1111-1111-111111111111",
         type: "collecting-event"
-      }
+      },
+      // Sets the default determination because it's enabled and there are no values set in the other tabs:
+      determination: [
+        {
+          isFileAs: true,
+          isPrimary: true
+        }
+      ]
     });
   });
 

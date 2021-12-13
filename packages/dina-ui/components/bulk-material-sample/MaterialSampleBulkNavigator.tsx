@@ -20,7 +20,7 @@ export interface MaterialSampleBulkNavigatorProps {
 export interface BulkNavigatorTab {
   key: string;
   title: ReactNode;
-  content: ReactNode;
+  content: () => ReactNode;
 }
 
 export interface SampleWithHooks {
@@ -76,7 +76,7 @@ export function MaterialSampleBulkNavigator({
               key={index}
               className={selectedElement.key !== element.key ? "d-none" : ""}
             >
-              {element.content}
+              {element.content()}
             </div>
           ))}
           {samples.map((element, index) => (
@@ -99,7 +99,10 @@ export function MaterialSampleBulkNavigator({
         >
           <TabList>
             {extraTabs.map((extraTab, index) => (
-              <Tab key={index}>
+              <Tab
+                className={`react-tabs__tab tab-${extraTab.key}`}
+                key={index}
+              >
                 <span className="fw-bold">{extraTab.title}</span>
               </Tab>
             ))}
@@ -119,7 +122,12 @@ export function MaterialSampleBulkNavigator({
             })}
           </TabList>
           {extraTabs.map((extraTab, index) => (
-            <TabPanel key={index}>{extraTab.content}</TabPanel>
+            <TabPanel
+              className={`react-tabs__tab-panel tabpanel-${extraTab.key}`}
+              key={index}
+            >
+              {extraTab.content()}
+            </TabPanel>
           ))}
           {samples.map(({ sample }, index) => (
             <TabPanel

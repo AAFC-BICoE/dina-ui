@@ -3,6 +3,10 @@ import dynamic from "next/dynamic";
 import Switch from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleSave } from "./useMaterialSample";
+import { FastField } from "formik";
+import { InputResource } from "kitsu";
+import { MaterialSample } from "../../../types/collection-api";
+import { useBulkEditTabContext } from "../..";
 
 export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
@@ -73,7 +77,8 @@ export function MaterialSampleFormNav({
       msg: formatMessage("determination"),
       className: "enable-determination",
       disabled: !dataComponentState.enableDetermination,
-      setEnabled: dataComponentState.setEnableDetermination
+      setEnabled: dataComponentState.setEnableDetermination,
+      customSwitch: DeterminationSwitch
     },
     {
       id: "associations-section",
@@ -131,6 +136,8 @@ export function MaterialSampleFormNav({
           <div className="list-group">
             {scrollTargets.map(section => {
               const Tag = section.disabled ? "div" : "a";
+              const SwitchComponent = section.customSwitch ?? Switch;
+
               return (
                 <div
                   className={classNames(
@@ -147,7 +154,7 @@ export function MaterialSampleFormNav({
                     {section.msg}
                   </Tag>
                   {section.setEnabled && (
-                    <Switch
+                    <SwitchComponent
                       checked={!section.disabled}
                       onChange={dataComponentState.dataComponentToggler(
                         section.setEnabled,
@@ -162,5 +169,28 @@ export function MaterialSampleFormNav({
         </nav>
       </ScrollSpyNav>
     </div>
+  );
+}
+
+/** The determinations switch adds an initial determination if there isn't one already. */
+function DeterminationSwitch(props) {
+  const bulkTabCtx = useBulkEditTabContext();
+
+  return (
+    <FastField name="determination">
+      {({ form: { values, setFieldValue } }) => (
+        <Switch
+          {...props}
+          onChange={newVal => {
+            props.onChange?.(newVal);
+            if (!bulkTabCtx && newVal && !values.determination?.length) {
+              setFieldValue("determination", [
+                { isPrimary: true, isFileAs: true }
+              ]);
+            }
+          }}
+        />
+      )}
+    </FastField>
   );
 }

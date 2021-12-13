@@ -375,18 +375,13 @@ export function useMaterialSampleSave({
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
   const initialValues: InputResource<MaterialSample> = {
-    ...(materialSample
-      ? { ...materialSample }
-      : {
-          type: "material-sample",
-          managedAttributes: {},
-          // Defaults to the last Collection used to create a Material Sample:
-          collection: lastUsedCollection,
-          publiclyReleasable: true
-        }),
-    determination: materialSample?.determination || [
-      { isPrimary: true, isFileAs: true }
-    ]
+    ...(materialSample || {
+      type: "material-sample",
+      managedAttributes: {},
+      // Defaults to the last Collection used to create a Material Sample:
+      collection: lastUsedCollection,
+      publiclyReleasable: true
+    })
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
