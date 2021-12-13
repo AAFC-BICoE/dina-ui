@@ -22,7 +22,7 @@ describe("CatalogueOfLifeNameField component", () => {
         initialValues={{ scientificName: "", scientificNameSource: null }}
         onSubmit={({ submittedValues }) => mockOnSubmit(submittedValues)}
       >
-        <GlobalNamesField
+        <CatalogueOfLifeNameField
           name="scientificName"
           scientificNameSourceField="scientificNameSource"
           onChange={mockOnChange}
