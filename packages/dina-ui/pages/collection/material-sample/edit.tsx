@@ -630,6 +630,7 @@ function useMaterialSampleSchema() {
       yup.object({
         associatedSample: yup
           .string()
+          .nullable()
           .required()
           .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
         associationType: yup

@@ -2,7 +2,7 @@ import {
   ColumnDefinition,
   ListPageLayout,
   ButtonBar,
-  CreateButton
+  descriptionCell
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
@@ -25,19 +25,7 @@ const ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] = [
     accessor: "name"
   },
   "createdBy",
-  {
-    Cell: ({ original: { description } }) =>
-      description?.en && description?.fr ? (
-        <>
-          en : {description?.en} | fr : {description?.fr}
-        </>
-      ) : description?.en ? (
-        description.en
-      ) : (
-        description.fr
-      ),
-    accessor: "description"
-  },
+  descriptionCell("multilingualDescription"),
   {
     Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
       const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
