@@ -1,12 +1,10 @@
 import classNames from "classnames";
+import { FastField } from "formik";
 import dynamic from "next/dynamic";
 import Switch from "react-switch";
+import { useBulkEditTabContext } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleSave } from "./useMaterialSample";
-import { FastField } from "formik";
-import { InputResource } from "kitsu";
-import { MaterialSample } from "../../../types/collection-api";
-import { useBulkEditTabContext } from "../..";
 
 export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
@@ -85,7 +83,8 @@ export function MaterialSampleFormNav({
       msg: formatMessage("associationsLegend"),
       className: "enable-associations",
       disabled: !dataComponentState.enableAssociations,
-      setEnabled: dataComponentState.setEnableAssociations
+      setEnabled: dataComponentState.setEnableAssociations,
+      customSwitch: AssociationsSwitch
     },
     {
       id: "storage-section",
@@ -187,6 +186,27 @@ function DeterminationSwitch(props) {
               setFieldValue("determination", [
                 { isPrimary: true, isFileAs: true }
               ]);
+            }
+          }}
+        />
+      )}
+    </FastField>
+  );
+}
+
+/** The associations switch adds an initial association if there isn't one already. */
+function AssociationsSwitch(props) {
+  const bulkTabCtx = useBulkEditTabContext();
+
+  return (
+    <FastField name="associations">
+      {({ form: { values, setFieldValue } }) => (
+        <Switch
+          {...props}
+          onChange={newVal => {
+            props.onChange?.(newVal);
+            if (!bulkTabCtx && newVal && !values.associations?.length) {
+              setFieldValue("associations", [{}]);
             }
           }}
         />

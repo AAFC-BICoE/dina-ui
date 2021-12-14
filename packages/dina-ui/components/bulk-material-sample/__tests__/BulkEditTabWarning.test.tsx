@@ -221,7 +221,7 @@ describe("BulkEditTabWarning", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  });
+  }, 20000);
 
   it("Keeps the original multiple values if you decide not to click the Override All button.", async () => {
     const wrapper = mountWithAppContext(

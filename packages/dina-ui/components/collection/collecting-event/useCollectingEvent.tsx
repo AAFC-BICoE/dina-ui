@@ -12,7 +12,7 @@ import { SourceAdministrativeLevel } from "../../../types/collection-api/resourc
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { omit } from "lodash";
+import { omit, toPairs } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
