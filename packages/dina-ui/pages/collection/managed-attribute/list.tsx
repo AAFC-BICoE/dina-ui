@@ -1,5 +1,10 @@
-import { ButtonBar, ColumnDefinition, ListPageLayout } from "common-ui";
-import { CommonMessage } from "common-ui";
+import {
+  ButtonBar,
+  ColumnDefinition,
+  CommonMessage,
+  descriptionCell,
+  ListPageLayout
+} from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
@@ -63,7 +68,8 @@ export default function ManagedAttributesListPage() {
         <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
       ),
       accessor: "acceptedValues"
-    }
+    },
+    descriptionCell("multilingualDescription")
   ];
 
   return (

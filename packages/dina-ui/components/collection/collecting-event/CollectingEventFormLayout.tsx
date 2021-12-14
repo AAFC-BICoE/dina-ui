@@ -12,10 +12,10 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  TextFieldWithRemoveButton,
-  useDinaFormContext
+  useDinaFormContext,
+  PlaceSectionsSelectionField
 } from "common-ui";
-import { FastField, Field, FieldArray, FormikContextType } from "formik";
+import { FastField, Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
 import { GeographySearchBox } from "..";
@@ -77,7 +77,7 @@ export function CollectingEventFormLayout({
 
   const [customPlaceValue, setCustomPlaceValue] = useState<string>("");
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
-  const [hideRemoveBtn, setHideRemoveBtn] = useState(true);
+  const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
 
   const { isValidating: detailResultsIsLoading } = useSWR(
@@ -168,7 +168,7 @@ export function CollectingEventFormLayout({
     );
     formik.setFieldValue("srcAdminLevels", geoNameParsed);
     setHideCustomPlace(false);
-    setHideRemoveBtn(false);
+    setHideSelectionCheckBox(false);
   }
 
   function parseGeoAdminLevels(
@@ -234,6 +234,8 @@ export function CollectingEventFormLayout({
 
     formik.setFieldValue("srcAdminLevels", null);
 
+    formik.setFieldValue("selectedSections", null);
+
     if (isTemplate) {
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
@@ -262,7 +264,7 @@ export function CollectingEventFormLayout({
 
     setCustomPlaceValue("");
     setHideCustomPlace(true);
-    setHideRemoveBtn(true);
+    setHideSelectionCheckBox(true);
   }
 
   /** Does a Places search using the given search string. */
@@ -312,9 +314,21 @@ export function CollectingEventFormLayout({
     // Add user entered custom place in front
     const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
     customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
+    customPlaceAsInSrcAdmnLevel.type = "place-section";
+    customPlaceAsInSrcAdmnLevel.shortId = 0;
+
     const srcAdminLevels = form.values.srcAdminLevels;
+
+    srcAdminLevels.map(lev => {
+      lev.shortId = lev.shortId + 1;
+    });
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
     form.setFieldValue("srcAdminLevels", srcAdminLevels);
+
+    // Make the custom place selected by default
+    const selectedSections = form.values.selectedSections;
+    selectedSections.unshift(true);
+
     setHideCustomPlace(true);
   };
 
@@ -687,39 +701,11 @@ export function CollectingEventFormLayout({
                       {detailResultsIsLoading ? (
                         <LoadingSpinner loading={true} />
                       ) : (
-                        form.values.srcAdminLevels?.length > 0 && (
-                          <FieldArray name="srcAdminLevels">
-                            {({ remove }) => {
-                              const geoNames = form.values.srcAdminLevels;
-                              function removeItem(index: number) {
-                                remove(index);
-                              }
-                              return (
-                                <div className="pb-4">
-                                  {geoNames.map((_, idx) => (
-                                    <TextFieldWithRemoveButton
-                                      name={`srcAdminLevels[${idx}].name`}
-                                      templateCheckboxFieldName={`srcAdminLevels[${idx}]`}
-                                      readOnly={true}
-                                      removeLabel={true}
-                                      removeBottomMargin={true}
-                                      removeItem={removeItem}
-                                      key={Math.random()}
-                                      index={idx}
-                                      hideCloseBtn={hideRemoveBtn}
-                                      inputProps={{
-                                        style: {
-                                          backgroundColor: `${
-                                            idx % 2 === 0 ? "#e9ecef" : "white"
-                                          }`
-                                        }
-                                      }}
-                                    />
-                                  ))}
-                                </div>
-                              );
-                            }}
-                          </FieldArray>
+                        form.values.srcAdminLevels?.length && (
+                          <PlaceSectionsSelectionField
+                            name="srcAdminLevels"
+                            hideSelectionCheckBox={hideSelectionCheckBox}
+                          />
                         )
                       )}
                       <DinaFormSection horizontal={[3, 9]}>

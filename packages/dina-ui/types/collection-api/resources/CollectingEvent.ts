@@ -58,6 +58,8 @@ export interface CollectingEventAttributes {
 
   managedAttributeValues?: ManagedAttributeValues;
   managedAttributes?: JsonValue;
+
+  selectedSections?: string[];
 }
 
 export enum GeographicPlaceNameSource {

@@ -1,4 +1,3 @@
-// tslint:disable: no-string-literal
 import {
   ButtonBar,
   DateField,
@@ -25,6 +24,7 @@ import {
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/collection-api/resources/ManagedAttribute";
+import { fromPairs, toPairs } from "lodash";
 
 interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: ManagedAttribute;
@@ -62,7 +62,6 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
             <h1>
               <DinaMessage id="addManagedAttributeTitle" />
             </h1>
-            <br />
             <ManagedAttributeForm router={router} />
           </div>
         )}
@@ -80,9 +79,17 @@ function ManagedAttributeForm({
 
   const id = fetchedManagedAttribute?.id;
 
-  const initialValues: Partial<ManagedAttribute> = fetchedManagedAttribute || {
-    type: "managed-attribute"
-  };
+  const initialValues: Partial<ManagedAttribute> = fetchedManagedAttribute
+    ? {
+        ...fetchedManagedAttribute,
+        // Convert multilingualDescription to editable Dictionary format:
+        multilingualDescription: fromPairs<string | undefined>(
+          fetchedManagedAttribute.multilingualDescription?.descriptions?.map(
+            ({ desc, lang }) => [lang ?? "", desc ?? ""]
+          )
+        )
+      }
+    : { type: "managed-attribute" };
 
   const [type, setType] = useState(
     fetchedManagedAttribute
@@ -125,6 +132,13 @@ function ManagedAttributeForm({
     ) {
       submittedValues.acceptedValues = null;
     }
+
+    // Convert the editable format to the stored format:
+    submittedValues.multilingualDescription = {
+      descriptions: toPairs(submittedValues.multilingualDescription).map(
+        ([lang, desc]) => ({ lang, desc })
+      )
+    };
 
     await save(
       [
@@ -186,6 +200,20 @@ function ManagedAttributeForm({
           </div>
         </div>
       )}
+      <div className="row">
+        <TextField
+          className="col-md-6 english-description"
+          name="multilingualDescription.en"
+          label={formatMessage("field_description.en")}
+          multiLines={true}
+        />
+        <TextField
+          className="col-md-6 french-description"
+          name="multilingualDescription.fr"
+          label={formatMessage("field_description.fr")}
+          multiLines={true}
+        />
+      </div>
       {id && (
         <div className="row">
           <DateField
