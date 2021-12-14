@@ -84,32 +84,8 @@ export function GlobalNamesSearchBox({
   };
 
   return (
-    <div className="card card-body border">
-      {/* Hide this for now for the demo */}
-      {/* <div className="d-flex align-items-center mb-3">
-        <label className="pt-2 d-flex align-items-center">
-          <strong>
-            <DinaMessage id="dataset" />
-          </strong>
-          <Tooltip id="datasetSearchTooltip" />
-        </label>
-        <div className="flex-grow-1">
-          <ColDataSetDropdown
-            onChange={setDataSet}
-            value={dataSet}
-            fetchJson={fetchJson}
-          />
-        </div>
-      </div> */}
+    <div className="card card-body">
       <div className="d-flex align-items-center mb-3">
-        {isDetermination && (
-          <label className="pt-2 d-flex align-items-center">
-            <strong>
-              <DinaMessage id="colSearchLabel" />
-            </strong>
-            <Tooltip id="colSearchBoxTooltip" />
-          </label>
-        )}
         <div className="flex-grow-1">
           {isDetermination ? (
             <div className="input-group">
@@ -129,7 +105,7 @@ export function GlobalNamesSearchBox({
               <button
                 style={{ width: "10rem" }}
                 onClick={doThrottledSearch}
-                className="btn btn-primary ms-auto col-search-button"
+                className="btn btn-primary mx-2 col-search-button"
                 type="button"
                 disabled={searchIsDisabled}
               >
@@ -177,12 +153,10 @@ export function GlobalNamesSearchBox({
             return (
               (hasVerbatimScientificName || hasScientificNameInput) && (
                 <div className="d-flex align-items-center mb-3">
-                  <div className="pe-3">
-                    <DinaMessage id="search" />:
-                  </div>
                   {hasVerbatimScientificName && (
                     <FormikButton
                       className="btn btn-link"
+                      buttonProps={() => ({ style: { marginLeft: "-10px" } })}
                       onClick={() => doThrottledSearch(verbatimScientificName)}
                     >
                       <DinaMessage id="field_verbatimScientificName" />
@@ -191,7 +165,12 @@ export function GlobalNamesSearchBox({
 
                   {hasScientificNameInput && (
                     <FormikButton
-                      className="mx-2 btn btn-link"
+                      className={`btn btn-link`}
+                      buttonProps={() =>
+                        !hasVerbatimScientificName
+                          ? { style: { marginLeft: "-10px" } }
+                          : {}
+                      }
                       onClick={() => doThrottledSearch(scientificNameInput)}
                     >
                       <DinaMessage id="field_scientificNameInput" />

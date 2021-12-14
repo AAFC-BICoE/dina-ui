@@ -486,6 +486,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
   scheduledActions: "Scheduled Actions",
+  scientificNameSearch: "Scientific Name Search",
   searchButton: "Search",
   searchOnCOL: " Search on Catalogue of Life",
   searchPreviousTags: "Search previous tags",

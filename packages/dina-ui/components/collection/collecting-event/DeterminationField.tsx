@@ -20,6 +20,7 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import { TabbedArrayField } from "../TabbedArrayField";
+import { useState } from "react";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -52,6 +53,7 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export function DeterminationField() {
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
+  const [hideScientificNameInput, setHideScientificNameInput] = useState(false);
 
   const initialIndex = Math.max(
     0,
@@ -208,10 +210,15 @@ export function DeterminationField() {
               legend={<DinaMessage id="determination" />}
               className="non-strip"
             >
-              <TextField {...fieldProps("scientificNameInput")} />
-              <hr />
+              {!hideScientificNameInput && (
+                <>
+                  <TextField {...fieldProps("scientificNameInput")} />
+                  <hr />
+                </>
+              )}
               <GlobalNamesField
                 {...fieldProps("scientificName")}
+                label={formatMessage("scientificNameSearch")}
                 scientificNameSourceField={
                   fieldProps("scientificNameSource").name
                 }
@@ -240,6 +247,17 @@ export function DeterminationField() {
                       ? newValue[0].recordedOn
                       : null
                   );
+                  // If selected a result from search , set text input value to null and hide it
+                  // If a search value is removed, show the text input value
+                  if (newValue) {
+                    formik.setFieldValue(
+                      fieldProps("scientificNameInput").name,
+                      null
+                    );
+                    setHideScientificNameInput(true);
+                  } else {
+                    setHideScientificNameInput(false);
+                  }
                 }}
                 index={index}
                 isDetermination={true}
