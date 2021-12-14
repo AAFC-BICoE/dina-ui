@@ -19,11 +19,17 @@ export function BulkEditTabWarning({
   children
 }: PropsWithChildren<BulkEditTabWarningProps>) {
   const bulkEditCtx = useBulkEditTabContext();
-  const [override, setOverride] = useState(false);
+  const [manualOverride, setManualOverride] = useState(false);
 
   if (bulkEditCtx) {
+    const override =
+      manualOverride ||
+      !isBlankResourceAttribute(
+        get(bulkEditCtx.bulkEditFormRef.current?.values, fieldName)
+      );
+
     function overrideValues() {
-      setOverride(true);
+      setManualOverride(true);
       if (bulkEditCtx) {
         setDefaultValue?.(bulkEditCtx);
       }

@@ -611,6 +611,9 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // All Override All buttons should be gone now:
+    expect(wrapper.find("button.override-all-button").exists()).toEqual(false);
+
     // Click the "Save All" button without overriding anything:
     wrapper.find("button.bulk-save-button").simulate("click");
     await new Promise(setImmediate);
