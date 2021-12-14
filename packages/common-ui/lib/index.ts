@@ -64,6 +64,7 @@ export * from "./tooltip/Tooltip";
 export * from "./util/rsql";
 export * from "./util/serialize";
 export * from "./util/useThrottledFetch";
+export * from "./util/resourceDifference";
 export * from "./button-bar/BackToListButton";
 export * from "./button-bar/ButtonBar";
 export * from "./button-bar/BackButton";

@@ -247,13 +247,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               determination: [],
               organism: null,
               relationships: {
-                attachment: {
-                  data: []
-                },
                 preparationAttachment: {
-                  data: []
-                },
-                projects: {
                   data: []
                 }
               },
@@ -343,13 +337,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               determination: [],
               organism: null,
               relationships: {
-                attachment: {
-                  data: []
-                },
                 preparationAttachment: {
-                  data: []
-                },
-                projects: {
                   data: []
                 }
               },
@@ -447,7 +435,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Only the material sample is saved, and it's linked to the existing Collecting Event ID from the template:
+    // Only the material sample is saved:
     expect(mockSave.mock.calls).toEqual([
       [
         [
@@ -472,13 +460,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               determination: [],
 
               relationships: {
-                attachment: {
-                  data: []
-                },
                 preparationAttachment: {
-                  data: []
-                },
-                projects: {
                   data: []
                 }
               },

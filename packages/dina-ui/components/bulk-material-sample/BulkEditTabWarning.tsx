@@ -61,8 +61,8 @@ export function BulkEditTabWarning({
     return hasNoValues || override || hasSameValues ? (
       <>{children}</>
     ) : (
-      <div className="multiple-values-warning">
-        <div className="d-flex justify-content-center">
+      <div className="multiple-values-warning mb-3">
+        <div className="d-flex justify-content-center mb-2">
           <DinaMessage id="multipleValuesFound" />
         </div>
         <div className="d-flex justify-content-center">

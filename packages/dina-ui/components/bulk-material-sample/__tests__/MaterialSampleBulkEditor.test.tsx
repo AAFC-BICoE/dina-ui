@@ -1,17 +1,15 @@
-import { InputResource } from "kitsu";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { MaterialSample } from "../../../types/collection-api";
-import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import ReactSwitch from "react-switch";
 import Cleave from "cleave.js/react";
-import {
-  DoOperationsError,
-  MaterialSampleSearchHelper,
-  ResourceSelect
-} from "common-ui";
-import Switch from "react-switch";
+import { DoOperationsError, MaterialSampleSearchHelper } from "common-ui";
+import { InputResource } from "kitsu";
+import CreatableSelect from "react-select/creatable";
+import { default as ReactSwitch, default as Switch } from "react-switch";
 import { AttachmentsEditor } from "../..";
-import CreatableSelect, { CreatableProps } from "react-select/creatable";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import {
+  blankMaterialSample,
+  MaterialSample
+} from "../../../types/collection-api";
+import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -110,6 +108,7 @@ const TEST_NEW_SAMPLES: InputResource<MaterialSample>[] = [
  */
 const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
   {
+    ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
@@ -128,8 +127,18 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
       { actionType: "my-action-type", remarks: "initial action" }
     ]
   },
-  { id: "2", type: "material-sample", materialSampleName: "MS2" },
-  { id: "3", type: "material-sample", materialSampleName: "MS3" }
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    materialSampleName: "MS2"
+  },
+  {
+    ...blankMaterialSample(),
+    id: "3",
+    type: "material-sample",
+    materialSampleName: "MS3"
+  }
 ];
 
 describe("MaterialSampleBulkEditor", () => {
@@ -490,91 +499,29 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             // The first sample's warnable values are not touched:
-            resource: expect.objectContaining({
-              associations: [
-                {
-                  associatedSample: "500",
-                  remarks: "initial remarks"
-                }
-              ],
-              determination: [
-                {
-                  determiner: undefined,
-                  isFileAs: true,
-                  isPrimary: true,
-                  verbatimScientificName: "initial determination 1"
-                },
-                {
-                  determiner: undefined,
-                  verbatimScientificName: "initial determination 2"
-                }
-              ],
+            resource: {
               id: "1",
-              materialSampleName: "MS1",
-              relationships: expect.objectContaining({
-                attachment: {
-                  data: [
-                    {
-                      id: "initial-attachment-1",
-                      type: "metadata"
-                    }
-                  ]
-                },
-                preparationAttachment: {
-                  data: [
-                    {
-                      id: "initial-attachment-2",
-                      type: "metadata"
-                    }
-                  ]
-                }
-              }),
-              scheduledActions: [
-                {
-                  actionType: "my-action-type",
-                  remarks: "initial action"
-                }
-              ],
+              relationships: {},
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
             // The warnable fields were not overridden:
-            resource: expect.objectContaining({
-              associations: [],
-              determination: [],
+            resource: {
               id: "2",
-              materialSampleName: "MS2",
-              relationships: expect.objectContaining({
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                }
-              }),
+              relationships: {},
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
             // The warnable fields were not overridden:
-            resource: expect.objectContaining({
-              associations: [],
-              determination: [],
+            resource: {
               id: "3",
-              materialSampleName: "MS3",
-              relationships: expect.objectContaining({
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                }
-              }),
+              relationships: {},
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           }
         ],
@@ -676,10 +623,9 @@ describe("MaterialSampleBulkEditor", () => {
         [
           ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
             type: "material-sample",
-            resource: expect.objectContaining({
-              ...sample,
-              attachment: undefined,
-              preparationAttachment: undefined,
+            resource: {
+              id: sample.id,
+              type: sample.type,
               associations: [
                 {
                   associatedSample: "new-sample-assoc",
@@ -696,7 +642,7 @@ describe("MaterialSampleBulkEditor", () => {
               scheduledActions: [
                 { actionType: "new-action-type", date: expect.anything() }
               ],
-              relationships: expect.objectContaining({
+              relationships: {
                 attachment: {
                   data: [{ id: "new-attachment-id", type: "metadata" }]
                 },
@@ -705,8 +651,8 @@ describe("MaterialSampleBulkEditor", () => {
                     { id: "new-preparation-attachment-id", type: "metadata" }
                   ]
                 }
-              })
-            })
+              }
+            }
           }))
         ],
         { apiBaseUrl: "/collection-api" }

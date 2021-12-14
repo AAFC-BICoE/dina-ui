@@ -1,6 +1,5 @@
-import { KitsuResourceLink, PersistedResource } from "kitsu";
+import { InputResource, KitsuResourceLink } from "kitsu";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components/collection";
 import {
   MaterialSampleForm,
   nextSampleInitialValues
@@ -8,6 +7,7 @@ import {
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
+  blankMaterialSample,
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
@@ -40,7 +40,7 @@ function testAcquisitionEvent(): Partial<AcquisitionEvent> {
   };
 }
 
-function testMaterialSample(): PersistedResource<MaterialSample> {
+function testMaterialSample(): InputResource<MaterialSample> {
   return {
     id: "1",
     type: "material-sample",
@@ -54,7 +54,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
       id: "1",
       type: "acquisition-event"
     },
-    attachment: [{ id: "attach-1", type: "metadata" }]
+    attachment: [{ id: "attach-1", type: "metadata" }],
+    ...blankMaterialSample()
   };
 }
 
@@ -228,19 +229,8 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               determination: [],
               publiclyReleasable: true, // Default value
-              relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
-              },
+              relationships: {},
               organism: null,
-              collection: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -311,17 +301,7 @@ describe("Material Sample Edit Page", () => {
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
-              relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
-              }
+              relationships: {}
             },
             type: "material-sample"
           }
@@ -359,44 +339,15 @@ describe("Material Sample Edit Page", () => {
 
     expect(mockSave.mock.calls).toEqual([
       [
-        // Edits existing material-sample:
+        // Edits existing material-sample
+        // And only includes the updated field:
         [
           {
             resource: {
               id: "1",
-              acquisitionEvent: {
-                id: "1",
-                type: "acquisition-event"
-              },
-              associations: [],
               type: "material-sample",
-              group: "test group",
               materialSampleName: "test-material-sample-id",
-              collectingEvent: { id: "1", type: "collecting-event" },
-              storageUnit: { id: null, type: "storage-unit" },
-
-              // Preparations are not enabled, so the preparation fields are set to null:
-              ...BLANK_PREPARATION,
-              preparationAttachment: undefined,
-              hostOrganism: null,
-              determination: [],
-              organism: null,
-              relationships: {
-                attachment: {
-                  data: [
-                    {
-                      id: "attach-1",
-                      type: "metadata"
-                    }
-                  ]
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
-              }
+              relationships: {}
             },
             type: "material-sample"
           }
@@ -478,41 +429,13 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              acquisitionEvent: {
-                id: "1",
-                type: "acquisition-event"
-              },
-              associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
-              storageUnit: { id: null, type: "storage-unit" },
-              materialSampleName: "my-sample-name",
-              group: "test group",
               id: "1",
               type: "material-sample",
-
-              // Preparations are not enabled, so the preparation fields are set to null:
-              ...BLANK_PREPARATION,
-              preparationAttachment: undefined,
-              determination: [],
-              hostOrganism: null,
-              organism: null,
-              relationships: {
-                attachment: {
-                  data: [
-                    {
-                      id: "attach-1",
-                      type: "metadata"
-                    }
-                  ]
-                },
-                preparationAttachment: { data: [] },
-                projects: {
-                  data: []
-                }
-              }
+              relationships: {}
             },
             type: "material-sample"
           }
@@ -633,7 +556,7 @@ describe("Material Sample Edit Page", () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
-          type: "material-sample",
+          ...testMaterialSample(),
           id: "333",
           materialSampleName: "test-ms",
           associations: [{ associatedSample: "1", associationType: "host" }]
@@ -663,42 +586,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
-              associations: [
-                {
-                  associatedSample: "1",
-                  associationType: "host"
-                }
-              ],
-              collectingEvent: {
-                id: null,
-                type: "collecting-event"
-              },
-              determination: [],
               id: "333",
-              materialSampleName: "test-ms",
-              organism: null,
-              // Preparations are not enabled, so the preparation fields are set to null:
-              ...BLANK_PREPARATION,
-              preparationAttachment: undefined,
-              relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
-              },
-              storageUnit: {
-                id: null,
-                type: "storage-unit"
-              },
+              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -763,7 +652,7 @@ describe("Material Sample Edit Page", () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
-          type: "material-sample",
+          ...testMaterialSample(),
           id: "333",
           materialSampleName: "test-ms",
           managedAttributes: {
@@ -788,33 +677,8 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
-              associations: [],
-              collectingEvent: {
-                id: null,
-                type: "collecting-event"
-              },
-              storageUnit: { id: null, type: "storage-unit" },
               id: "333",
-              hostOrganism: null,
-              managedAttributes: {
-                test_attr: "do the test"
-              },
-              materialSampleName: "test-ms",
-              ...BLANK_PREPARATION,
-              preparationAttachment: undefined,
-              determination: [],
-              organism: null,
-              relationships: {
-                attachment: { data: [] },
-                preparationAttachment: { data: [] },
-                projects: {
-                  data: []
-                }
-              },
+              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"
@@ -1117,12 +981,15 @@ describe("Material Sample Edit Page", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
+              id: "1",
+              type: "material-sample",
               acquisitionEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "acquisition-event"
-              }
-            }),
+              },
+              relationships: {}
+            },
             type: "material-sample"
           }
         ],

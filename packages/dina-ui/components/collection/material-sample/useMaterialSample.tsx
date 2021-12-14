@@ -2,6 +2,7 @@ import {
   AreYouSureModal,
   DinaForm,
   DinaFormSubmitParams,
+  resourceDifference,
   SaveArgs,
   useApiClient,
   useModal,
@@ -449,11 +450,13 @@ export function useMaterialSampleSave({
       determination: enableDetermination
         ? submittedValues.determination?.map(det => ({
             ...det,
-            determiner: det.determiner?.map(determiner =>
-              typeof determiner === "string"
-                ? determiner
-                : String(determiner.id)
-            )
+            ...(!!det.determiner && {
+              determiner: det.determiner.map(determiner =>
+                typeof determiner === "string"
+                  ? determiner
+                  : String(determiner.id)
+              )
+            })
           }))
         : []
     };
@@ -557,37 +560,42 @@ export function useMaterialSampleSave({
     const msPreprocessed =
       (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
 
+    // Only submit the changed values to the back-end:
+    const msDiff = initialValues.id
+      ? resourceDifference({
+          original: initialValues,
+          updated: msPreprocessed
+        })
+      : msPreprocessed;
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
-      ...msPreprocessed,
+      ...msDiff,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
       relationships: {
-        attachment: {
-          data:
-            msPreprocessed.attachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        preparationAttachment: {
-          data:
-            msPreprocessed.preparationAttachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        projects: {
-          data:
-            msPreprocessed.projects?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        }
+        ...(msDiff.attachment && {
+          attachment: {
+            data: msDiff.attachment.map(({ id, type }) => ({ id, type }))
+          }
+        }),
+        ...(msDiff.preparationAttachment && {
+          preparationAttachment: {
+            data: msDiff.preparationAttachment.map(({ id, type }) => ({
+              id,
+              type
+            }))
+          }
+        }),
+        ...(msDiff.projects && {
+          projects: {
+            data: msDiff.projects.map(({ id, type }) => ({ id, type }))
+          }
+        })
       },
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,

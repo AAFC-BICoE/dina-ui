@@ -1,7 +1,10 @@
 import { InputResource } from "kitsu";
 import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  blankMaterialSample,
+  MaterialSample
+} from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -42,6 +45,7 @@ const mockOnSaved = jest.fn();
 
 const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
   {
+    ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
@@ -55,6 +59,7 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     ]
   },
   {
+    ...blankMaterialSample(),
     id: "2",
     type: "material-sample",
     materialSampleName: "MS2",
@@ -66,6 +71,7 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     ]
   },
   {
+    ...blankMaterialSample(),
     id: "3",
     type: "material-sample",
     materialSampleName: "MS3",
@@ -75,6 +81,7 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
 
 const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
   {
+    ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
@@ -82,6 +89,7 @@ const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     determination: []
   },
   {
+    ...blankMaterialSample(),
     id: "2",
     type: "material-sample",
     materialSampleName: "MS2",
@@ -89,6 +97,7 @@ const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     determination: null
   },
   {
+    ...blankMaterialSample(),
     id: "3",
     type: "material-sample",
     materialSampleName: "MS3",
@@ -98,6 +107,7 @@ const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
 
 const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
   {
+    ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
@@ -108,6 +118,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     ]
   },
   {
+    ...blankMaterialSample(),
     id: "2",
     type: "material-sample",
     materialSampleName: "MS2",
@@ -118,6 +129,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     ]
   },
   {
+    ...blankMaterialSample(),
     id: "3",
     type: "material-sample",
     materialSampleName: "MS3",
@@ -259,7 +271,11 @@ describe("BulkEditTabWarning", () => {
       [
         // Keeps the original values:
         SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map(sample => ({
-          resource: expect.objectContaining(sample),
+          resource: {
+            id: sample.id,
+            type: sample.type,
+            relationships: {}
+          },
           type: "material-sample"
         })),
         { apiBaseUrl: "/collection-api" }
@@ -307,16 +323,18 @@ describe("BulkEditTabWarning", () => {
     expect(mockSave.mock.calls).toEqual([
       [
         SAMPLES_WITHOUT_DETERMINATIONS.map(sample => ({
-          resource: expect.objectContaining({
-            ...sample,
+          resource: {
+            id: sample.id,
+            type: sample.type,
             determination: [
               {
                 isPrimary: true,
                 isFileAs: true,
                 verbatimScientificName: "test-name-override"
               }
-            ]
-          }),
+            ],
+            relationships: {}
+          },
           type: "material-sample"
         })),
         { apiBaseUrl: "/collection-api" }
@@ -366,8 +384,9 @@ describe("BulkEditTabWarning", () => {
     expect(mockSave.mock.calls).toEqual([
       [
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
-          resource: expect.objectContaining({
-            ...sample,
+          resource: {
+            id: sample.id,
+            type: sample.type,
             determination: [
               {
                 isPrimary: true,
@@ -375,8 +394,9 @@ describe("BulkEditTabWarning", () => {
                 verbatimScientificName: "first name override"
               },
               { verbatimScientificName: "second name" }
-            ]
-          }),
+            ],
+            relationships: {}
+          },
           type: "material-sample"
         })),
         { apiBaseUrl: "/collection-api" }
