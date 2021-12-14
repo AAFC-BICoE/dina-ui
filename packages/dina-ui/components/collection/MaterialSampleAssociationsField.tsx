@@ -9,7 +9,11 @@ import {
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
-import { VocabularyReadOnlyView, VocabularySelectField } from "..";
+import {
+  BulkEditTabWarning,
+  VocabularyReadOnlyView,
+  VocabularySelectField
+} from "..";
 import {
   MaterialSample,
   MaterialSampleAssociation
@@ -36,6 +40,18 @@ export function MaterialSampleAssociationsField({
       name={fieldName}
       sectionId="associations-section"
       className={classNames(className, "non-strip")}
+      // Wrap in the bulk edit tab warning in case this is bulk edit mode:
+      wrapContent={content => (
+        <BulkEditTabWarning
+          fieldName={fieldName}
+          setDefaultValue={ctx =>
+            // Auto-create the first association:
+            ctx.bulkEditFormRef?.current?.setFieldValue(fieldName, [{}])
+          }
+        >
+          {content}
+        </BulkEditTabWarning>
+      )}
       renderTab={(assoc, index) => {
         const hasName = Boolean(
           (assoc.associationType || assoc.associatedSample)?.trim()

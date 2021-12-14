@@ -4,7 +4,14 @@ import { MaterialSample } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 import ReactSwitch from "react-switch";
 import Cleave from "cleave.js/react";
-import { DoOperationsError } from "common-ui";
+import {
+  DoOperationsError,
+  MaterialSampleSearchHelper,
+  ResourceSelect
+} from "common-ui";
+import Switch from "react-switch";
+import { AttachmentsEditor } from "../..";
+import CreatableSelect, { CreatableProps } from "react-select/creatable";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -17,9 +24,48 @@ const mockGet = jest.fn<any, any>(async path => {
           code: "TC"
         }
       };
+    case "collection-api/material-sample/500":
+      return {
+        data: {
+          id: "500",
+          type: "material-sample",
+          materialSampleName: "material-sample-500"
+        }
+      };
     case "collection-api/collection":
+    case "objectstore-api/metadata":
+    case "agent-api/person":
+    case "collection-api/vocabulary/typeStatus":
+    case "collection-api/vocabulary/degreeOfEstablishment":
+    case "collection-api/preparation-type":
+    case "collection-api/material-sample":
+    case "collection-api/managed-attribute":
+    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/material-sample-type":
+    case "collection-api/project":
+    case "user-api/group":
+    case "collection-api/vocabulary/associationType":
       return { data: [] };
   }
+});
+
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
+  return paths.map(path => {
+    switch (path) {
+      case "metadata/initial-attachment-1":
+        return {
+          type: "metadata",
+          id: "initial-attachment-1",
+          originalFileName: "initial-attachment-1"
+        };
+      case "metadata/initial-attachment-2":
+        return {
+          type: "metadata",
+          id: "initial-attachment-2",
+          originalFileName: "initial-attachment-2"
+        };
+    }
+  });
 });
 
 const mockSave = jest.fn(ops =>
@@ -30,7 +76,11 @@ const mockSave = jest.fn(ops =>
 );
 
 const testCtx = {
-  apiContext: { apiClient: { get: mockGet }, save: mockSave }
+  apiContext: {
+    apiClient: { get: mockGet },
+    save: mockSave,
+    bulkGet: mockBulkGet
+  }
 };
 
 const mockOnSaved = jest.fn();
@@ -52,6 +102,34 @@ const TEST_NEW_SAMPLES: InputResource<MaterialSample>[] = [
     materialSampleName: "MS3",
     collection: { id: "1", type: "collection" }
   }
+];
+
+/**
+ * These samples have different values on the array fields so they will
+ * cause the "Override All" warning box to appear.
+ */
+const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
+  {
+    id: "1",
+    type: "material-sample",
+    materialSampleName: "MS1",
+    determination: [
+      {
+        isPrimary: true,
+        isFileAs: true,
+        verbatimScientificName: "initial determination 1"
+      },
+      { verbatimScientificName: "initial determination 2" }
+    ],
+    associations: [{ associatedSample: "500", remarks: "initial remarks" }],
+    attachment: [{ id: "initial-attachment-1", type: "metadata" }],
+    preparationAttachment: [{ id: "initial-attachment-2", type: "metadata" }],
+    scheduledActions: [
+      { actionType: "my-action-type", remarks: "initial action" }
+    ]
+  },
+  { id: "2", type: "material-sample", materialSampleName: "MS2" },
+  { id: "3", type: "material-sample", materialSampleName: "MS3" }
 ];
 
 describe("MaterialSampleBulkEditor", () => {
@@ -144,7 +222,7 @@ describe("MaterialSampleBulkEditor", () => {
       "11111",
       "11111"
     ]);
-  });
+  }, 20000);
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
@@ -196,7 +274,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-  });
+  }, 20000);
 
   it("Shows an error indicator when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
@@ -277,7 +355,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-  });
+  }, 20000);
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
@@ -334,5 +412,305 @@ describe("MaterialSampleBulkEditor", () => {
         .first()
         .text()
     ).toContain("Invalid barcode");
-  });
+  }, 20000);
+
+  it("Doesn't override the values when the Override All button is not clicked.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable all the sections with the "Override All" warning boxes:
+    [
+      ".enable-determination",
+      ".enable-catalogue-info",
+      ".enable-associations",
+      ".enable-scheduled-actions"
+    ].forEach(selector =>
+      wrapper
+        .find(`.tabpanel-EDIT_ALL ${selector}`)
+        .find(Switch)
+        .prop<any>("onChange")(true)
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Shows the warnings:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL .determination-section .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #material-sample-attachments-section .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #preparation-protocols-section .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #associations-section .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #scheduled-actions-section .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+
+    // Click the "Save All" button without overriding anything:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            // The first sample's warnable values are not touched:
+            resource: expect.objectContaining({
+              associations: [
+                {
+                  associatedSample: "500",
+                  remarks: "initial remarks"
+                }
+              ],
+              determination: [
+                {
+                  determiner: undefined,
+                  isFileAs: true,
+                  isPrimary: true,
+                  verbatimScientificName: "initial determination 1"
+                },
+                {
+                  determiner: undefined,
+                  verbatimScientificName: "initial determination 2"
+                }
+              ],
+              id: "1",
+              materialSampleName: "MS1",
+              relationships: expect.objectContaining({
+                attachment: {
+                  data: [
+                    {
+                      id: "initial-attachment-1",
+                      type: "metadata"
+                    }
+                  ]
+                },
+                preparationAttachment: {
+                  data: [
+                    {
+                      id: "initial-attachment-2",
+                      type: "metadata"
+                    }
+                  ]
+                }
+              }),
+              scheduledActions: [
+                {
+                  actionType: "my-action-type",
+                  remarks: "initial action"
+                }
+              ],
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            // The warnable fields were not overridden:
+            resource: expect.objectContaining({
+              associations: [],
+              determination: [],
+              id: "2",
+              materialSampleName: "MS2",
+              relationships: expect.objectContaining({
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            // The warnable fields were not overridden:
+            resource: expect.objectContaining({
+              associations: [],
+              determination: [],
+              id: "3",
+              materialSampleName: "MS3",
+              relationships: expect.objectContaining({
+                attachment: {
+                  data: []
+                },
+                preparationAttachment: {
+                  data: []
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  }, 20000);
+
+  it("Overrides the values when the Override All buttons are clicked.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_ARRAY_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable all the sections with the "Override All" warning boxes:
+    [
+      ".enable-determination",
+      ".enable-catalogue-info",
+      ".enable-associations",
+      ".enable-scheduled-actions"
+    ].forEach(selector =>
+      wrapper
+        .find(`.tabpanel-EDIT_ALL ${selector}`)
+        .find(Switch)
+        .prop<any>("onChange")(true)
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Click the Override All buttons:
+    for (const section of [
+      ".determination-section",
+      "#material-sample-attachments-section",
+      "#preparation-protocols-section",
+      "#associations-section",
+      "#scheduled-actions-section"
+    ]) {
+      wrapper.find(`${section} button.override-all-button`).simulate("click");
+      await new Promise(setImmediate);
+      wrapper.update();
+    }
+
+    // Set the override values.
+    // Leaving the fields empty after clicking Override All
+    wrapper
+      .find(
+        ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
+      )
+      .simulate("change", { target: { value: "new-scientific-name" } });
+    wrapper
+      .find(".tabpanel-EDIT_ALL #material-sample-attachments-section")
+      .find(AttachmentsEditor)
+      .prop("onChange")([{ id: "new-attachment-id", type: "metadata" }]);
+    wrapper
+      .find(".tabpanel-EDIT_ALL #preparation-protocols-section")
+      .find(AttachmentsEditor)
+      .prop("onChange")([
+      { id: "new-preparation-attachment-id", type: "metadata" }
+    ]);
+    wrapper
+      .find(".tabpanel-EDIT_ALL .associations-section")
+      .find(MaterialSampleSearchHelper)
+      .prop("onAssociatedSampleSelected")({
+      id: "new-sample-assoc",
+      type: "material-sample"
+    });
+    wrapper
+      .find(".tabpanel-EDIT_ALL .associations-section .associationType-field")
+      .find(CreatableSelect)
+      .prop<any>("onChange")({ value: "has_host" });
+    wrapper
+      .find(
+        ".tabpanel-EDIT_ALL #scheduled-actions-section .actionType-field input"
+      )
+      .simulate("change", { target: { value: "new-action-type" } });
+    wrapper
+      .find(".tabpanel-EDIT_ALL #scheduled-actions-section button.save-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Click the "Save All" button without overriding anything:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the material samples:
+    // The warnable fields are overridden with the default/empty values:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
+            type: "material-sample",
+            resource: expect.objectContaining({
+              ...sample,
+              attachment: undefined,
+              preparationAttachment: undefined,
+              associations: [
+                {
+                  associatedSample: "new-sample-assoc",
+                  associationType: "has_host"
+                }
+              ],
+              determination: [
+                {
+                  isFileAs: true,
+                  isPrimary: true,
+                  verbatimScientificName: "new-scientific-name"
+                }
+              ],
+              scheduledActions: [
+                { actionType: "new-action-type", date: expect.anything() }
+              ],
+              relationships: expect.objectContaining({
+                attachment: {
+                  data: [{ id: "new-attachment-id", type: "metadata" }]
+                },
+                preparationAttachment: {
+                  data: [
+                    { id: "new-preparation-attachment-id", type: "metadata" }
+                  ]
+                }
+              })
+            })
+          }))
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  }, 20000);
 });

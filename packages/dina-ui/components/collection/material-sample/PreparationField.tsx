@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField, PersonSelectField } from "../..";
+import { AttachmentsField, BulkEditTabWarning, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -67,6 +67,8 @@ export function PreparationField({
       customName: fieldName
     };
   }
+
+  const attachmentsField = "preparationAttachment";
 
   return (
     <FieldSet
@@ -131,13 +133,19 @@ export function PreparationField({
       </div>
       <div>
         <AttachmentsField
-          {...fieldProps("preparationAttachment")}
+          {...fieldProps(attachmentsField)}
           title={<DinaMessage id="preparationProtocols" />}
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"
           id="preparation-protocols-section"
           allowAttachmentsConfig={attachmentsConfig}
           attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
+          // Wrap in the bulk edit tab warning in case this is bulk edit mode:
+          wrapContent={content => (
+            <BulkEditTabWarning fieldName={attachmentsField}>
+              {content}
+            </BulkEditTabWarning>
+          )}
         />
       </div>
     </FieldSet>

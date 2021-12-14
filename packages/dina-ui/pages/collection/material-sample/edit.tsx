@@ -35,7 +35,8 @@ import {
   Nav,
   StorageLinkerField,
   TagsAndRestrictionsSection,
-  ProjectSelectSection
+  ProjectSelectSection,
+  BulkEditTabWarning
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -258,6 +259,8 @@ export function MaterialSampleForm({
     enabledFields?.acquisitionEvent.includes("id")
   );
 
+  const attachmentsField = "attachment";
+
   const mateirialSampleInternal = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
@@ -356,7 +359,13 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           {dataComponentState.enableScheduledActions && (
-            <ScheduledActionsField />
+            <ScheduledActionsField
+              wrapContent={content => (
+                <BulkEditTabWarning fieldName="scheduledActions">
+                  {content}
+                </BulkEditTabWarning>
+              )}
+            />
           )}
           {!isTemplate && (
             <FieldSet
@@ -378,13 +387,18 @@ export function MaterialSampleForm({
             </FieldSet>
           )}
           <AttachmentsField
-            name="attachment"
+            name={attachmentsField}
             title={<DinaMessage id="materialSampleAttachments" />}
             id="material-sample-attachments-section"
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"
             allowAttachmentsConfig={attachmentsConfig?.materialSample}
             attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+            wrapContent={content => (
+              <BulkEditTabWarning fieldName={attachmentsField}>
+                {content}
+              </BulkEditTabWarning>
+            )}
           />
         </div>
       </div>

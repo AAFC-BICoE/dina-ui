@@ -1,9 +1,9 @@
-import { InputResource } from "kitsu";
-import { MaterialSample } from "../../../types/collection-api";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { useBulkEditTab } from "../bulk-edit-tab";
-import Switch from "react-switch";
 import { ResourceSelect } from "common-ui";
+import { InputResource } from "kitsu";
+import Switch from "react-switch";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { MaterialSample } from "../../../types/collection-api";
+import { useBulkEditTab } from "../bulk-edit-tab";
 
 const mockSubmitOverride = jest.fn();
 
@@ -160,6 +160,8 @@ describe("Material sample bulk edit tab", () => {
         id: "11111111-1111-1111-1111-111111111111",
         type: "collecting-event"
       },
+      // Sets the default association because it's enabled and there are no values set in the other tabs:
+      associations: [{}],
       // Sets the default determination because it's enabled and there are no values set in the other tabs:
       determination: [
         {

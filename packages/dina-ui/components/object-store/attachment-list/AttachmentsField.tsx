@@ -11,15 +11,15 @@ import {
 } from "common-ui";
 import { FastField } from "formik";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { uniqBy } from "lodash";
+import Link from "next/link";
 import { ReactNode } from "react";
 import ReactTable from "react-table";
 import { AllowAttachmentsConfig, AttachmentSection } from "..";
-import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
+import { thumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import Link from "next/link";
-import { uniqBy, isEqual } from "lodash";
-import { thumbnailCell } from "../..";
+import { AttachmentReadOnlySection } from "./AttachmentReadOnlySection";
 
 export interface AttachmentsFieldProps {
   name: string;
@@ -32,6 +32,7 @@ export interface AttachmentsFieldProps {
   /** Attachment API path for the read-only view. */
   attachmentPath: string;
   hideAddAttchmentBtn?: boolean;
+  wrapContent?: (content: ReactNode) => ReactNode;
 }
 
 export function AttachmentsField(props: AttachmentsFieldProps) {
@@ -76,7 +77,8 @@ export function AttachmentsEditor({
   allowExistingFieldName,
   allowNewFieldName,
   hideAddAttchmentBtn,
-  allowAttachmentsConfig = { allowExisting: true, allowNew: true }
+  allowAttachmentsConfig = { allowExisting: true, allowNew: true },
+  wrapContent = content => content
 }: AttachmentsEditorProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -149,90 +151,92 @@ export function AttachmentsEditor({
       {loading ? (
         <LoadingSpinner loading={true} />
       ) : !isTemplate ? (
-        objectStoreError ? (
-          <DinaMessage id="objectStoreDataUnavailable" />
-        ) : (
-          <>
-            {value.length ? (
-              <div className="mb-3">
-                <ReactTable
-                  columns={[
-                    thumbnailCell({
-                      bucketField: "bucket",
-                      fileIdentifierField: "fileIdentifier"
-                    }),
-                    {
-                      accessor: "originalFilename",
-                      Header: <FieldHeader name="originalFilename" />,
-                      Cell: ({ original: metadata }) => {
-                        // When this Metadata has been deleted, show a "deleted" message in this cell:
-                        if (Object.keys(metadata).length === 2) {
+        wrapContent(
+          objectStoreError ? (
+            <DinaMessage id="objectStoreDataUnavailable" />
+          ) : (
+            <>
+              {value.length ? (
+                <div className="mb-3">
+                  <ReactTable
+                    columns={[
+                      thumbnailCell({
+                        bucketField: "bucket",
+                        fileIdentifierField: "fileIdentifier"
+                      }),
+                      {
+                        accessor: "originalFilename",
+                        Header: <FieldHeader name="originalFilename" />,
+                        Cell: ({ original: metadata }) => {
+                          // When this Metadata has been deleted, show a "deleted" message in this cell:
+                          if (Object.keys(metadata).length === 2) {
+                            return (
+                              <div>
+                                {`<${formatMessage("deleted")}>`}
+                                <Tooltip
+                                  id="deletedMetadata_tooltip"
+                                  intlValues={{ id: metadata.id }}
+                                />
+                              </div>
+                            );
+                          }
+
                           return (
-                            <div>
-                              {`<${formatMessage("deleted")}>`}
-                              <Tooltip
-                                id="deletedMetadata_tooltip"
-                                intlValues={{ id: metadata.id }}
-                              />
-                            </div>
+                            <Link
+                              href={`/object-store/object/view?id=${metadata.id}`}
+                            >
+                              <a target={readOnly ? "" : "_blank"}>
+                                {metadata?.originalFilename ?? metadata.id}
+                              </a>
+                            </Link>
                           );
                         }
-
-                        return (
-                          <Link
-                            href={`/object-store/object/view?id=${metadata.id}`}
+                      },
+                      ...["acCaption", "xmpMetadataDate", "acTags"].map(
+                        accessor => ({
+                          accessor,
+                          Header: <FieldHeader name={accessor} />
+                        })
+                      ),
+                      {
+                        Header: <FieldHeader name={formatMessage("remove")} />,
+                        Cell: ({ original: { id: mId } }) => (
+                          <button
+                            className="btn btn-dark remove-attachment"
+                            onClick={() => removeMetadata(mId)}
+                            type="button"
                           >
-                            <a target={readOnly ? "" : "_blank"}>
-                              {metadata?.originalFilename ?? metadata.id}
-                            </a>
-                          </Link>
-                        );
+                            <DinaMessage id="remove" />
+                          </button>
+                        )
                       }
-                    },
-                    ...["acCaption", "xmpMetadataDate", "acTags"].map(
-                      accessor => ({
-                        accessor,
-                        Header: <FieldHeader name={accessor} />
-                      })
-                    ),
-                    {
-                      Header: <FieldHeader name={formatMessage("remove")} />,
-                      Cell: ({ original: { id: mId } }) => (
-                        <button
-                          className="btn btn-dark remove-attachment"
-                          onClick={() => removeMetadata(mId)}
-                          type="button"
-                        >
-                          <DinaMessage id="remove" />
-                        </button>
-                      )
-                    }
-                  ]}
-                  data={metadatas ?? []}
-                  minRows={metadatas?.length ?? 0}
-                  showPagination={false}
-                />
-              </div>
-            ) : null}
-            {!hideAddAttchmentBtn ? (
-              <button
-                className="btn btn-primary add-attachments mb-3"
-                type="button"
-                onClick={openAttachmentsModal}
-                style={{ width: "10rem" }}
-                disabled={addingAttachmentsDisabled}
-              >
-                <DinaMessage id="addAttachments" />
-              </button>
-            ) : (
-              <>
-                <AttachmentSection
-                  allowAttachmentsConfig={allowAttachmentsConfig}
-                  afterMetadatasSaved={addAttachedMetadatas}
-                />
-              </>
-            )}
-          </>
+                    ]}
+                    data={metadatas ?? []}
+                    minRows={metadatas?.length ?? 0}
+                    showPagination={false}
+                  />
+                </div>
+              ) : null}
+              {!hideAddAttchmentBtn ? (
+                <button
+                  className="btn btn-primary add-attachments mb-3"
+                  type="button"
+                  onClick={openAttachmentsModal}
+                  style={{ width: "10rem" }}
+                  disabled={addingAttachmentsDisabled}
+                >
+                  <DinaMessage id="addAttachments" />
+                </button>
+              ) : (
+                <>
+                  <AttachmentSection
+                    allowAttachmentsConfig={allowAttachmentsConfig}
+                    afterMetadatasSaved={addAttachedMetadatas}
+                  />
+                </>
+              )}
+            </>
+          )
         )
       ) : (
         <>

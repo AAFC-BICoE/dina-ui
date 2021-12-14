@@ -12,7 +12,7 @@ import {
 } from "common-ui";
 import { FastField, FormikContextType } from "formik";
 import { isEmpty } from "lodash";
-import { Fragment, useState } from "react";
+import { Fragment, ReactNode, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
@@ -42,12 +42,14 @@ export const scheduledActionSchema = yup.object({
 export interface ScheduledActionsFieldProps {
   className?: string;
   defaultDate?: string;
+  wrapContent?: (content: ReactNode) => ReactNode;
 }
 
 export function ScheduledActionsField({
   className,
   // The default date is today:
-  defaultDate = new Date().toISOString().slice(0, 10)
+  defaultDate = new Date().toISOString().slice(0, 10),
+  wrapContent = content => content
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
@@ -150,52 +152,56 @@ export function ScheduledActionsField({
             id="scheduled-actions-section"
             legend={<DinaMessage id="scheduledActions" />}
           >
-            {hasActions && (
-              <ReactTable
-                columns={actionColumns}
-                defaultSorted={[{ id: "date", desc: true }]}
-                data={scheduledActions}
-                minRows={scheduledActions.length}
-                showPagination={false}
-                className="-striped mb-2"
-                // Implement the edit feature:
-                ExpanderComponent={() => null}
-                expanded={
-                  typeof actionToEdit === "object"
-                    ? { [actionToEdit?.viewIndex ?? -1]: true }
-                    : undefined
-                }
-                SubComponent={row => (
-                  <div className="m-2">
-                    <ScheduledActionSubForm
-                      actionToEdit={row.original}
-                      defaultDate={defaultDate}
-                      onSaveAction={saveAction}
-                      onCancelClick={
-                        hasActions ? () => setActionToEdit(null) : undefined
-                      }
-                    />
-                  </div>
+            {wrapContent(
+              <>
+                {hasActions && (
+                  <ReactTable
+                    columns={actionColumns}
+                    defaultSorted={[{ id: "date", desc: true }]}
+                    data={scheduledActions}
+                    minRows={scheduledActions.length}
+                    showPagination={false}
+                    className="-striped mb-2"
+                    // Implement the edit feature:
+                    ExpanderComponent={() => null}
+                    expanded={
+                      typeof actionToEdit === "object"
+                        ? { [actionToEdit?.viewIndex ?? -1]: true }
+                        : undefined
+                    }
+                    SubComponent={row => (
+                      <div className="m-2">
+                        <ScheduledActionSubForm
+                          actionToEdit={row.original}
+                          defaultDate={defaultDate}
+                          onSaveAction={saveAction}
+                          onCancelClick={
+                            hasActions ? () => setActionToEdit(null) : undefined
+                          }
+                        />
+                      </div>
+                    )}
+                    sortable={false}
+                  />
                 )}
-                sortable={false}
-              />
-            )}
-            {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
-              <ScheduledActionSubForm
-                defaultDate={defaultDate}
-                onSaveAction={saveAction}
-                onCancelClick={
-                  hasActions ? () => setActionToEdit(null) : undefined
-                }
-              />
-            ) : (
-              <FormikButton
-                className="btn btn-primary mb-3 add-new-button"
-                buttonProps={() => ({ style: { width: "10rem" } })}
-                onClick={() => setActionToEdit("NEW")}
-              >
-                <DinaMessage id="addNew" />
-              </FormikButton>
+                {readOnly ? null : !hasActions || actionToEdit === "NEW" ? (
+                  <ScheduledActionSubForm
+                    defaultDate={defaultDate}
+                    onSaveAction={saveAction}
+                    onCancelClick={
+                      hasActions ? () => setActionToEdit(null) : undefined
+                    }
+                  />
+                ) : (
+                  <FormikButton
+                    className="btn btn-primary mb-3 add-new-button"
+                    buttonProps={() => ({ style: { width: "10rem" } })}
+                    onClick={() => setActionToEdit("NEW")}
+                  >
+                    <DinaMessage id="addNew" />
+                  </FormikButton>
+                )}
+              </>
             )}
           </FieldSet>
         );
