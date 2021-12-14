@@ -2,20 +2,17 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
 import { PersistedResource } from "kitsu";
-import { compact, fromPairs, orderBy, toPairs } from "lodash";
+import { compact, orderBy } from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  CollectingEvent,
-  GeoReferenceAssertion
-} from "../../../types/collection-api";
+import { CollectingEvent } from "../../../types/collection-api";
 import { CoordinateSystemEnum } from "../../../types/collection-api/resources/CoordinateSystem";
 import { SourceAdministrativeLevel } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
-import { ManagedAttributeValues, Person } from "../../../types/objectstore-api";
+import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { omit } from "lodash";
+import { omit, toPairs } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -80,19 +77,6 @@ export function useCollectingEventQuery(id?: string | null) {
             (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         data.srcAdminLevels = srcAdminLevels;
-
-        // parse managedAttributes to editor formats
-        if (data.managedAttributes) {
-          const managedAttributeValues: ManagedAttributeValues = {};
-          toPairs(data?.managedAttributes as any).map(
-            attr =>
-              (managedAttributeValues[attr[0]] = {
-                assignedValue: attr[1] as any
-              })
-          );
-          delete data?.managedAttributes;
-          data.managedAttributeValues = managedAttributeValues;
-        }
       }
     }
   );
@@ -112,7 +96,6 @@ export function useCollectingEventSave({
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
-  const { formatMessage } = useDinaIntl();
 
   const [defaultVerbatimCoordSys] = useLocalStorage<string | null | undefined>(
     DEFAULT_VERBATIM_COORDSYS_KEY
@@ -141,7 +124,6 @@ export function useCollectingEventSave({
         dwcVerbatimCoordinateSystem:
           defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
         dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-        managedAttributeValues: {},
         publiclyReleasable: true
       };
 
@@ -261,18 +243,6 @@ export function useCollectingEventSave({
     }
     delete submittedValues.srcAdminLevels;
     delete submittedValues.selectedSections;
-
-    // Shuffle the managedAttributesValue to managedAttribute
-    if (submittedValues.managedAttributeValues) {
-      submittedValues.managedAttributes = fromPairs(
-        toPairs(submittedValues.managedAttributeValues).map(value => [
-          value[0],
-          value[1].assignedValue as string
-        ])
-      );
-    }
-
-    delete submittedValues.managedAttributeValues;
 
     // Remove the coord system for new Collecting events with no coordinates specified:
     if (

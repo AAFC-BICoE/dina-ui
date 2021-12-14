@@ -61,7 +61,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
   type: "managed-attribute",
-  name: "testAttr"
+  name: "testAttr",
+  key: "test_attr"
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -191,7 +192,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -379,7 +379,6 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               determination: [],
               organism: null,
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: [
@@ -458,7 +457,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -498,7 +496,6 @@ describe("Material Sample Edit Page", () => {
               preparationAttachment: undefined,
               determination: [],
               hostOrganism: null,
-              managedAttributes: {},
               organism: null,
               relationships: {
                 attachment: {
@@ -680,7 +677,6 @@ describe("Material Sample Edit Page", () => {
               },
               determination: [],
               id: "333",
-              managedAttributes: {},
               materialSampleName: "test-ms",
               organism: null,
               // Preparations are not enabled, so the preparation fields are set to null:
@@ -768,8 +764,8 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          managedAttributeValues: {
-            testAttr: { assignedValue: "do the test" }
+          managedAttributes: {
+            test_attr: "do the test"
           }
         }}
         onSaved={mockOnSaved}
@@ -803,7 +799,7 @@ describe("Material Sample Edit Page", () => {
               id: "333",
               hostOrganism: null,
               managedAttributes: {
-                testAttr: "do the test"
+                test_attr: "do the test"
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,

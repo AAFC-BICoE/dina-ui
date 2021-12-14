@@ -13,24 +13,10 @@ import { VocabularyReadOnlyView, VocabularySelectField } from "..";
 import {
   MaterialSample,
   MaterialSampleAssociation
-} from "../../../dina-ui/types/collection-api/resources/MaterialSample";
+} from "../../types/collection-api/resources/MaterialSample";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
-
-/** Type-safe object with all MaterialSampleAssociation fields. */
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT: Required<
-  Record<keyof MaterialSampleAssociation, true>
-> = {
-  associatedSample: true,
-  associationType: true,
-  remarks: true
-};
-
-/** All fields of the MaterialSampleAssociation type. */
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS = Object.keys(
-  MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
-);
 
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;

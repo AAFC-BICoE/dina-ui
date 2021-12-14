@@ -69,7 +69,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   changedProperties: "Modifications",
   childMaterialSamples: "Sous-échantillons de matière",
-  childMaterialSamplesCreatedLabel: "Création d’échantillons de matière enfant",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",
   colSearchLabel: "Recherche de nom",
@@ -120,7 +119,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   deleteConfig: "Supprimer la configuration",
   deleteEmptyStorageWarning:
     "L'espace d'entreposage {storageName} est vide. Souhaitez-vous supprimer ce contenant d'entreposage définitivement?",
-  deleteSelectedButtonText: "Supprimer les éléments sélectionnés",
   deleteThisAttributesTemplate: "Supprimer ce modèle",
   deleted: "Supprimé",
   deletedMetadata_tooltip: "ID de métadonnées supprimées : {id}",
@@ -156,7 +154,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editProjectTitle: "Modifier Projet",
   editSelectedAttachmentMetadata:
     "Modifier les métadonnées de la pièce jointe sélectionnée",
-  editSelectedButtonText: "Modifier les éléments sélectionnés",
   editStorageUnitTitle: "Modifier l’unité de stockage",
   editStorageUnitTypeTitle: "Modifier le type de stockage",
   editWorkflowTemplateTitle: "Modifier le modèle de flux de travail",
@@ -535,7 +532,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitType: "Type d’unité de stockage",
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
-  suffixOptional: "Suffixe (facultatif)",
   switchToActionType: 'Passer à "{actionType}".',
   tags: "Étiquettes",
   templateNameMandatoryErrorMsg:
@@ -579,7 +575,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Un problème est survenu lors de la tentative de lecture de la feuille de calcul téléchargée.",
   workbookUploadInstructions:
     "Faites glisser et déposez une feuille de calcul ici ou cliquez pour ouvrir la boîte de dialogue de navigation.",
-  workflowCompleteTitle: "Flux de travail achevé",
   workflowTemplateListTitle: "Modèles de flux de travail",
   workflowTemplateTitle: "Modèle de flux des travaux",
   year: "Année",

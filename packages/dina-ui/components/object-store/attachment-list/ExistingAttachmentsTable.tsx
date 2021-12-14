@@ -11,9 +11,9 @@ import {
 import { FormikContextType } from "formik";
 import { toPairs } from "lodash";
 import Link from "next/link";
+import { thumbnailCell } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useBulkMetadataEditModal } from "./useBulkMetadataEditModal";
-import { thumbnailCell } from "../..";
 
 export interface ExistingAttachmentsTableProps {
   attachmentPath: string;

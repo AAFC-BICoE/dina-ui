@@ -54,11 +54,11 @@ export function ErrorViewer() {
       return compact([formError, ...fieldErrors]);
     },
     // Update the form-level error message on form submit or when errors change:
-    [isSubmitting, errors]
+    [isSubmitting, errors, status]
   );
 
   return (
-    <div>
+    <div className="error-viewer">
       {errorMessages.length ? (
         <div className="alert alert-danger" role="status">
           {errorMessages.map((msg, idx) => (

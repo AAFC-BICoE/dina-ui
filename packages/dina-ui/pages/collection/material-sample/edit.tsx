@@ -20,7 +20,8 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { padStart } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useRef, useState } from "react";
+import { ReactNode, useContext, useRef, useState, Ref } from "react";
+import { FormikProps } from "formik";
 import * as yup from "yup";
 import {
   AttachmentsField,
@@ -188,6 +189,14 @@ export interface MaterialSampleFormProps {
   };
 
   buttonBar?: ReactNode;
+
+  /** Disables prefixing the sample name with the Collection code. */
+  disableAutoNamePrefix?: boolean;
+
+  /** Makes the sample name field (Primary ID) read-only. */
+  disableSampleNameField?: boolean;
+
+  materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 }
 
 export function MaterialSampleForm({
@@ -198,6 +207,9 @@ export function MaterialSampleForm({
   materialSampleSaveHook,
   enabledFields,
   attachmentsConfig,
+  disableAutoNamePrefix,
+  materialSampleFormRef,
+  disableSampleNameField,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -258,7 +270,9 @@ export function MaterialSampleForm({
         {!isTemplate && <MaterialSampleInfoFormLayout />}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <ProjectSelectSection resourcePath="collection-api/project" />
-        <MaterialSampleIdentifiersFormLayout />
+        <MaterialSampleIdentifiersFormLayout
+          disableSampleNameField={disableSampleNameField}
+        />
         <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
@@ -345,8 +359,7 @@ export function MaterialSampleForm({
                 enabledFields={null}
               >
                 <ManagedAttributesEditor
-                  valuesPath="managedAttributeValues"
-                  valueFieldName="assignedValue"
+                  valuesPath="managedAttributes"
                   managedAttributeApiPath="collection-api/managed-attribute"
                   apiBaseUrl="/collection-api"
                   managedAttributeComponent="MATERIAL_SAMPLE"
@@ -377,6 +390,7 @@ export function MaterialSampleForm({
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
+      innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
@@ -384,7 +398,7 @@ export function MaterialSampleForm({
         dataComponentState.enableAssociations ? materialSampleSchema : null
       }
     >
-      {!initialValues.id && <SetDefaultSampleName />}
+      {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
       {mateirialSampleInternal}
       {buttonBar}
@@ -481,7 +495,7 @@ export function MaterialSampleFormLayout() {
   );
 }
 export interface MaterialSampleIdentifiersFormLayoutProps {
-  disableSampleName?: boolean;
+  disableSampleNameField?: boolean;
   hideOtherCatalogNumbers?: boolean;
   className?: string;
   namePrefix?: string;
@@ -503,7 +517,7 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
-  disableSampleName,
+  disableSampleNameField,
   className,
   namePrefix = "",
   sampleNamePlaceHolder
@@ -524,7 +538,7 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}materialSampleName`}
             customName="materialSampleName"
             className="materialSampleName"
-            readOnly={disableSampleName}
+            readOnly={disableSampleNameField}
             placeholder={sampleNamePlaceHolder}
           />
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
@@ -554,7 +568,7 @@ export function CollectingEventBriefDetails({
           <FieldSet legend={<DinaMessage id="collectingDateLegend" />}>
             <TextField name="startEventDateTime" />
             {collectingEvent.endEventDateTime && (
-              <TextField name="startEventDateTime" />
+              <TextField name="endEventDateTime" />
             )}
             <TextField name="verbatimEventDateTime" />
           </FieldSet>

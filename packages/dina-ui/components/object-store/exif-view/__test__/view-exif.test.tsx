@@ -1,6 +1,6 @@
 import { AccountContextI } from "common-ui";
 import { noop } from "lodash";
-import { ObjectUpload } from "packages/dina-ui/types/objectstore-api/resources/ObjectUpload";
+import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ExifView } from "../ExifView";
 

@@ -6,14 +6,8 @@ export interface ManagedAttributeMapAttributes {
 }
 
 export type ManagedAttributeValues = {
-  [managedAttributeId: string]: ManagedAttributeValue;
+  [managedAttributeId: string]: string;
 };
-
-export interface ManagedAttributeValue {
-  name?: string;
-  value?: string;
-  assignedValue?: string;
-}
 
 export interface ManagedAttributeMapRelationships {
   metadata?: Metadata;
