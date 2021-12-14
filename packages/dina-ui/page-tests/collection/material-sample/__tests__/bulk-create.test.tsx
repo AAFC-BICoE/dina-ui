@@ -32,6 +32,8 @@ const testCtx = {
 };
 
 describe("MaterialSampleBulkCreatePage", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Can click the 'previous' button to go back to the previous step", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkCreatePage router={mockRouter as any} />,
@@ -84,5 +86,7 @@ describe("MaterialSampleBulkCreatePage", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );
-  });
+    // This test sometimes takes longer than the default max 5 seconds, so set max to 20 seconds.
+    // Maybe see if this is possible to speed up.
+  }, 20000);
 });
