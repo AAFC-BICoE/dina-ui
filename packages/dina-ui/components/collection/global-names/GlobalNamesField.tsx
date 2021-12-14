@@ -32,56 +32,8 @@ export function GlobalNamesField({
 }: GlobalNamesFieldProps) {
   const [searchInitiated, setSearchInitiated] = useState(false);
 
-  const getFieldValue = (form, fieldName) => {
-    return form?.getFieldValue
-      ? form?.getFieldValue(fieldName as any)
-      : form?.getFieldMeta
-      ? form?.getFieldMeta(fieldName as any).value
-      : null;
-  };
-
-  const RenderAsReadonly = ({ value, form }) => {
-    const scientificNameDetailSrcUrl = getFieldValue(
-      form,
-      scientificNameDetailsSrcUrlField
-    );
-    const scientificNameDetailLabelHtml = getFieldValue(
-      form,
-      scientificNameDetailsLabelHtmlField
-    );
-    const scientificNameVal = getFieldValue(form, scientificNameSourceField);
-
-    const link = document.createElement("a");
-    link.setAttribute("href", scientificNameDetailSrcUrl);
-    link.setAttribute("target", "_blank");
-    link.setAttribute("rel", "noopener");
-
-    link.innerHTML = scientificNameDetailLabelHtml;
-
-    const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
-      ADD_ATTR: ["target", "rel"]
-    });
-
-    const isFromSrcDetailsUrl = scientificNameDetailSrcUrl?.length > 0;
-
-    return (
-      <GlobalNamesReadOnly
-        value={isFromSrcDetailsUrl ? safeHtmlLink : value}
-        scientificNameSource={scientificNameSourceField && scientificNameVal}
-        isFromSrcDetailsUrl={isFromSrcDetailsUrl}
-      />
-    );
-  };
   return (
-    <FieldWrapper
-      {...fieldWrapperProps}
-      disableLabelClick={true}
-      readOnlyRender={(value, form) => (
-        <div className="card card-body">
-          <RenderAsReadonly value={value} form={form} />
-        </div>
-      )}
-    >
+    <FieldWrapper {...fieldWrapperProps} disableLabelClick={true}>
       {({ formik, setValue, value }) => {
         const scientificNameSrceDetailUrlVal = formik.getFieldMeta(
           scientificNameDetailsSrcUrlField as any
@@ -94,7 +46,17 @@ export function GlobalNamesField({
             style={{ border: "1px solid #F5F5F5" }}
           >
             <div className="col-md-6 mt-2 ">
-              <RenderAsReadonly value={value} form={formik} />
+              <RenderAsReadonly
+                value={value}
+                form={formik}
+                scientificNameDetailsLabelHtmlField={
+                  scientificNameDetailsLabelHtmlField
+                }
+                scientificNameDetailsSrcUrlField={
+                  scientificNameDetailsSrcUrlField
+                }
+                scientificNameSourceField={scientificNameSourceField}
+              />
             </div>
             <div className="col-md-4 d-flex align-items-center">
               <button
@@ -133,7 +95,7 @@ export function GlobalNamesField({
   );
 }
 
-function GlobalNamesReadOnly({
+export function GlobalNamesReadOnly({
   value,
   scientificNameSource,
   isFromSrcDetailsUrl
@@ -149,7 +111,7 @@ function GlobalNamesReadOnly({
       ) : (
         <p> {value} </p>
       )}
-      {scientificNameSource && (
+      {isFromSrcDetailsUrl && scientificNameSource && (
         <p>
           <strong>
             <DinaMessage id="source" />:{" "}
@@ -158,5 +120,52 @@ function GlobalNamesReadOnly({
         </p>
       )}
     </div>
+  );
+}
+
+export function getFieldValue(form, fieldName) {
+  return form?.getFieldValue
+    ? form?.getFieldValue(fieldName as any)
+    : form?.getFieldMeta
+    ? form?.getFieldMeta(fieldName as any).value
+    : null;
+}
+
+export function RenderAsReadonly({
+  value,
+  form,
+  scientificNameDetailsSrcUrlField,
+  scientificNameDetailsLabelHtmlField,
+  scientificNameSourceField
+}) {
+  const scientificNameDetailSrcUrl = getFieldValue(
+    form,
+    scientificNameDetailsSrcUrlField
+  );
+  const scientificNameDetailLabelHtml = getFieldValue(
+    form,
+    scientificNameDetailsLabelHtmlField
+  );
+  const scientificNameVal = getFieldValue(form, scientificNameSourceField);
+
+  const link = document.createElement("a");
+  link.setAttribute("href", scientificNameDetailSrcUrl);
+  link.setAttribute("target", "_blank");
+  link.setAttribute("rel", "noopener");
+
+  link.innerHTML = scientificNameDetailLabelHtml;
+
+  const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
+    ADD_ATTR: ["target", "rel"]
+  });
+
+  const isFromSrcDetailsUrl = scientificNameDetailSrcUrl?.length > 0;
+
+  return (
+    <GlobalNamesReadOnly
+      value={isFromSrcDetailsUrl ? safeHtmlLink : value}
+      scientificNameSource={scientificNameSourceField && scientificNameVal}
+      isFromSrcDetailsUrl={isFromSrcDetailsUrl}
+    />
   );
 }

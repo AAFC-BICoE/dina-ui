@@ -146,12 +146,12 @@ export function GlobalNamesSearchBox({
             const verbatimScientificName =
               materialSample.determination?.[index ?? 0]
                 ?.verbatimScientificName;
-            const scientificNameInput =
-              materialSample.determination?.[index ?? 0]?.scientificNameInput;
-            const hasScientificNameInput = !!scientificNameInput;
+            const scientificName =
+              materialSample.determination?.[index ?? 0]?.scientificName;
+            const hasScientificName = !!scientificName;
             const hasVerbatimScientificName = !!verbatimScientificName;
             return (
-              (hasVerbatimScientificName || hasScientificNameInput) && (
+              (hasVerbatimScientificName || hasScientificName) && (
                 <div className="d-flex align-items-center mb-3">
                   {hasVerbatimScientificName && (
                     <FormikButton
@@ -163,7 +163,7 @@ export function GlobalNamesSearchBox({
                     </FormikButton>
                   )}
 
-                  {hasScientificNameInput && (
+                  {hasScientificName && (
                     <FormikButton
                       className={`btn btn-link`}
                       buttonProps={() =>
@@ -171,7 +171,7 @@ export function GlobalNamesSearchBox({
                           ? { style: { marginLeft: "-10px" } }
                           : {}
                       }
-                      onClick={() => doThrottledSearch(scientificNameInput)}
+                      onClick={() => doThrottledSearch(scientificName)}
                     >
                       <DinaMessage id="field_scientificNameInput" />
                     </FormikButton>
@@ -222,7 +222,7 @@ export function GlobalNamesSearchBox({
               detail.recordedOn = dateSupplier();
 
               // Use detail to populate source details fields, result.label to populate the searchbox bound field
-              const resultArray = [detail, link.innerHTML];
+              const resultArray = [detail, result.bestResult?.currentName];
 
               return (
                 <div

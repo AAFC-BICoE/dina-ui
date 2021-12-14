@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { get, isArray } from "lodash";
-import { GlobalNamesField } from "..";
+import { GlobalNamesField, RenderAsReadonly } from "..";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -43,8 +43,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     isPrimary: true,
     scientificNameDetails: true,
     isFileAs: true,
-    determinationRemarks: true,
-    scientificNameInput: true
+    determinationRemarks: true
   };
 
 /** All fields of the Determination type. */
@@ -212,56 +211,90 @@ export function DeterminationField() {
             >
               {!hideScientificNameInput && (
                 <>
-                  <TextField {...fieldProps("scientificNameInput")} />
-                  <hr />
+                  <TextField
+                    {...fieldProps("scientificName")}
+                    readOnlyRender={(value, form) => (
+                      <RenderAsReadonly
+                        value={value}
+                        form={form}
+                        scientificNameDetailsLabelHtmlField={
+                          fieldProps("scientificNameDetails.labelHtml").name
+                        }
+                        scientificNameDetailsSrcUrlField={
+                          fieldProps("scientificNameDetails.sourceUrl").name
+                        }
+                        scientificNameSourceField={
+                          fieldProps("scientificNameSource").name
+                        }
+                      />
+                    )}
+                    onChangeExternal={form => {
+                      form.setFieldValue(
+                        fieldProps("scientificNameSource").name,
+                        "COLPLUS"
+                      );
+                    }}
+                  />
+                  {!readOnly && <hr />}
                 </>
               )}
-              <GlobalNamesField
-                {...fieldProps("scientificName")}
-                label={formatMessage("scientificNameSearch")}
-                scientificNameSourceField={
-                  fieldProps("scientificNameSource").name
-                }
-                scientificNameDetailsSrcUrlField={
-                  fieldProps("scientificNameDetails.sourceUrl").name
-                }
-                scientificNameDetailsLabelHtmlField={
-                  fieldProps("scientificNameDetails.labelHtml").name
-                }
-                onChange={(newValue, formik) => {
-                  formik.setFieldValue(
-                    fieldProps("scientificNameSource").name,
-                    newValue ? "COLPLUS" : null
-                  );
-                  formik.setFieldValue(
-                    fieldProps("scientificNameDetails.labelHtml").name,
-                    newValue && isArray(newValue) ? newValue[0].labelHtml : null
-                  );
-                  formik.setFieldValue(
-                    fieldProps("scientificNameDetails.sourceUrl").name,
-                    newValue && isArray(newValue) ? newValue[0].sourceUrl : null
-                  );
-                  formik.setFieldValue(
-                    fieldProps("scientificNameDetails.recordedOn").name,
-                    newValue && isArray(newValue)
-                      ? newValue[0].recordedOn
-                      : null
-                  );
-                  // If selected a result from search , set text input value to null and hide it
-                  // If a search value is removed, show the text input value
-                  if (newValue) {
-                    formik.setFieldValue(
-                      fieldProps("scientificNameInput").name,
-                      null
-                    );
-                    setHideScientificNameInput(true);
-                  } else {
-                    setHideScientificNameInput(false);
+
+              {!readOnly && (
+                <GlobalNamesField
+                  {...fieldProps("scientificNameInput")}
+                  label={
+                    readOnly
+                      ? formatMessage("field_scientificNameInput")
+                      : formatMessage("scientificNameSearch")
                   }
-                }}
-                index={index}
-                isDetermination={true}
-              />
+                  scientificNameSourceField={
+                    fieldProps("scientificNameSource").name
+                  }
+                  scientificNameDetailsSrcUrlField={
+                    fieldProps("scientificNameDetails.sourceUrl").name
+                  }
+                  scientificNameDetailsLabelHtmlField={
+                    fieldProps("scientificNameDetails.labelHtml").name
+                  }
+                  onChange={(newValue, formik) => {
+                    formik.setFieldValue(
+                      fieldProps("scientificNameSource").name,
+                      newValue ? "COLPLUS" : null
+                    );
+                    formik.setFieldValue(
+                      fieldProps("scientificNameDetails.labelHtml").name,
+                      newValue && isArray(newValue)
+                        ? newValue[0].labelHtml
+                        : null
+                    );
+                    formik.setFieldValue(
+                      fieldProps("scientificNameDetails.sourceUrl").name,
+                      newValue && isArray(newValue)
+                        ? newValue[0].sourceUrl
+                        : null
+                    );
+                    formik.setFieldValue(
+                      fieldProps("scientificNameDetails.recordedOn").name,
+                      newValue && isArray(newValue)
+                        ? newValue[0].recordedOn
+                        : null
+                    );
+                    // If selected a result from search , set text input value to null and hide it
+                    // If a search value is removed, show the text input value
+                    if (newValue) {
+                      formik.setFieldValue(
+                        fieldProps("scientificName").name,
+                        newValue?.[1]
+                      );
+                      setHideScientificNameInput(true);
+                    } else {
+                      setHideScientificNameInput(false);
+                    }
+                  }}
+                  index={index}
+                  isDetermination={true}
+                />
+              )}
               <PersonSelectField
                 {...fieldProps("determiner")}
                 label={formatMessage("determiningAgents")}
