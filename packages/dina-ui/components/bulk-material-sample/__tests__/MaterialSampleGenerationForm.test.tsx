@@ -32,7 +32,7 @@ const testCtx = {
 describe("MaterialSampleGenerationForm", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Generates the initial values for the new samples.", async () => {
+  it("Generates the initial values for the new samples in series mode.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
       testCtx
@@ -91,6 +91,7 @@ describe("MaterialSampleGenerationForm", () => {
     expect(mockOnGenerate).lastCalledWith({
       generationMode: "SERIES",
       samples: expectedNames.map(name => ({
+        allowDuplicateName: false,
         collection: { id: "100", name: "test-collection", type: "collection" },
         materialSampleName: name,
         publiclyReleasable: true,
@@ -113,7 +114,89 @@ describe("MaterialSampleGenerationForm", () => {
     });
   });
 
-  it("Generates split samples from a parent sample.", async () => {
+  it("Generates the initial values for the new samples in batch mode.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleGenerationForm onGenerate={mockOnGenerate} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Use batch mode:
+    wrapper.find("li.batch-tab").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Fill out the form:
+    wrapper
+      .find(".collection-field")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "100",
+      name: "test-collection",
+      type: "collection"
+    });
+    wrapper
+      .find(".numberToCreate-field input")
+      .simulate("change", { target: { value: "5" } });
+    wrapper
+      .find(".baseName-field input")
+      .simulate("change", { target: { value: "my-sample" } });
+    wrapper
+      .find(".separator-field input")
+      .simulate("change", { target: { value: "-" } });
+    wrapper
+      .find(".suffix-field input")
+      .simulate("change", { target: { value: "my-suffix" } });
+
+    const expectedNames = [
+      "my-sample-my-suffix",
+      "my-sample-my-suffix",
+      "my-sample-my-suffix",
+      "my-sample-my-suffix",
+      "my-sample-my-suffix"
+    ];
+
+    // The default names should be in the placeholders:
+    expect(
+      wrapper.find(".sample-name input").map(node => node.prop("placeholder"))
+    ).toEqual(expectedNames);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Sample initialValues are created with the expected names and the linked collection:
+    expect(mockOnGenerate).lastCalledWith({
+      generationMode: "BATCH",
+      samples: expectedNames.map(name => ({
+        allowDuplicateName: true,
+        collection: { id: "100", name: "test-collection", type: "collection" },
+        materialSampleName: name,
+        publiclyReleasable: true,
+        type: "material-sample"
+      })),
+      submittedValues: {
+        baseName: "my-sample",
+        collection: {
+          id: "100",
+          name: "test-collection",
+          type: "collection"
+        },
+        increment: "NUMERICAL",
+        numberToCreate: "5",
+        samples: [],
+        separator: "-",
+        start: "001",
+        suffix: "my-suffix"
+      }
+    });
+  });
+
+  it("Generates split samples from a parent sample in series mode.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleGenerationForm
         parentId={"test-parent-id"}
@@ -196,6 +279,7 @@ describe("MaterialSampleGenerationForm", () => {
         suffix: ""
       },
       samples: expectedNames.map(name => ({
+        allowDuplicateName: false,
         collection: expect.objectContaining({
           id: "test-collection-id",
           type: "collection"
