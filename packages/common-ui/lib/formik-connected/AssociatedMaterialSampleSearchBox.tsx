@@ -1,26 +1,19 @@
+import classNames from "classnames";
+import { FastField } from "formik";
 import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper } from "..";
 import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
-import classNames from "classnames";
 
 export function AssociatedMaterialSampleSearchBoxField({
   showSearchBtn,
-  listRef,
+  onSearchClicked,
+  onRemoveEntry,
   props
 }) {
   const { formatMessage } = useDinaIntl();
-
-  function onSearchClicked() {
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className.replace(
-        "d-none",
-        ""
-      );
-    }
-  }
 
   function defaultReadOnlyRender(value) {
     return value && <MaterialSampleLink id={value} />;
@@ -34,18 +27,17 @@ export function AssociatedMaterialSampleSearchBoxField({
           disableLabelClick={true}
           readOnlyRender={(value, _) => defaultReadOnlyRender(value)}
         >
-          {({ setValue, value }) => {
+          {({ setValue, value, invalid }) => {
             /** Clear the input value */
             function removeEntry() {
               setValue(null);
-              if (listRef.current) {
-                listRef.current.className =
-                  listRef.current.className.replaceAll("d-none", "");
-              }
+              onRemoveEntry();
             }
             return (
               <>
-                <div className={"row mb-2"}>
+                <div
+                  className={classNames("row mb-2", invalid && "is-invalid")}
+                >
                   {showSearchBtn ? (
                     <button
                       type="button"
@@ -88,17 +80,15 @@ export function AssociatedMaterialSampleSearchBoxField({
 }
 
 export function MaterialSampleSearchHelper({
-  listRef,
+  showSearch,
+  fieldName,
   onAssociatedSampleSelected,
   onCloseClicked
 }) {
   const { formatMessage } = useDinaIntl();
-  return (
-    <div
-      ref={listRef}
-      className={classNames("p-2 mt-2 d-none")}
-      style={{ borderStyle: "dashed" }}
-    >
+
+  return showSearch ? (
+    <div className="p-2 mt-2" style={{ borderStyle: "dashed" }}>
       <div className="mb-4">
         <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
           {formatMessage("search")}
@@ -107,13 +97,18 @@ export function MaterialSampleSearchHelper({
           {formatMessage("closeButtonText")}
         </button>
       </div>
-      <SampleListLayout
-        onSelect={onAssociatedSampleSelected}
-        classNames="btn btn-primary associated-sample-search"
-        btnMsg={formatMessage("select")}
-        hideTopPagination={true}
-        hideGroupFilter={true}
-      />
+      {/** The table is expensive to render, so avoid unnecessary re-renders with FastField. */}
+      <FastField name={fieldName}>
+        {() => (
+          <SampleListLayout
+            onSelect={onAssociatedSampleSelected}
+            classNames="btn btn-primary associated-sample-search"
+            btnMsg={formatMessage("select")}
+            hideTopPagination={true}
+            hideGroupFilter={true}
+          />
+        )}
+      </FastField>
     </div>
-  );
+  ) : null;
 }

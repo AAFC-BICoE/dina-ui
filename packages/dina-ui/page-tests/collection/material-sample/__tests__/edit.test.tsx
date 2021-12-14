@@ -1180,7 +1180,7 @@ describe("Material Sample Edit Page", () => {
   });
 
   it("Add the associated sample selected from search result list to a new association  .", async () => {
-    //Mount a new material sample with no values
+    // Mount a new material sample with no values
     const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
       testCtx
@@ -1208,18 +1208,21 @@ describe("Material Sample Edit Page", () => {
     // Click the search button to find from a material sample list
     wrapper.find("button.searchSample").simulate("click");
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // Search table is shown:
     expect(wrapper.find(".associated-sample-search").exists()).toEqual(true);
 
-    // Select one sample from search result list 
+    // Select one sample from search result list
     wrapper.find("button.associated-sample-search").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Expect the selected sample being populated to the sample input     
+    // Expect the selected sample being populated to the sample input
     expect(wrapper.find(".associated-sample-link").text()).toEqual(
       "my-sample-name"
     );
-  }); 
+  });
 });
