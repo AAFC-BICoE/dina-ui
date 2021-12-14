@@ -98,7 +98,12 @@ export function TabbedArrayField<T>({
               legend={legend}
             >
               {renderAboveTabs?.()}
-              <Tabs selectedIndex={activeTabIdx} onSelect={setActiveTabIdx}>
+              <Tabs
+                selectedIndex={activeTabIdx}
+                onSelect={setActiveTabIdx}
+                // Prevent bug where old values are shown in inputs after removing an element:
+                key={elements.length}
+              >
                 {
                   <TabList
                     className={`react-tabs__tab-list mb-0 ${
@@ -149,15 +154,17 @@ export function TabbedArrayField<T>({
                                   values={{ typeName }}
                                 />
                               </FormikButton>
-                              <FormikButton
-                                className="list-inline-item btn btn-dark"
-                                onClick={() => removeElement(index)}
-                              >
-                                <DinaMessage
-                                  id="removeThisElement"
-                                  values={{ typeName }}
-                                />
-                              </FormikButton>
+                              {elements.length > 1 && (
+                                <FormikButton
+                                  className="list-inline-item btn btn-dark"
+                                  onClick={() => removeElement(index)}
+                                >
+                                  <DinaMessage
+                                    id="removeThisElement"
+                                    values={{ typeName }}
+                                  />
+                                </FormikButton>
+                              )}
                             </div>
                           )}
                         </div>

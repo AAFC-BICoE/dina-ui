@@ -394,7 +394,9 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      validationSchema={materialSampleSchema}
+      validationSchema={
+        dataComponentState.enableAssociations ? materialSampleSchema : null
+      }
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
@@ -642,6 +644,7 @@ function useMaterialSampleSchema() {
       yup.object({
         associatedSample: yup
           .string()
+          .nullable()
           .required()
           .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
         associationType: yup

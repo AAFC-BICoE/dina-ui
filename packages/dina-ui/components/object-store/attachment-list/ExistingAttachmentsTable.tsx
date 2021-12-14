@@ -20,6 +20,7 @@ export interface ExistingAttachmentsTableProps {
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited?: () => void | Promise<void>;
   detachTotalSelected?: boolean;
+  readOnly?: boolean;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -31,7 +32,8 @@ export function ExistingAttachmentsTable({
   attachmentPath,
   onDetachMetadataIds,
   onMetadatasEdited,
-  detachTotalSelected
+  detachTotalSelected,
+  readOnly
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,
@@ -71,9 +73,12 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.originalFilename ? (
-          <Link href={`/object-store/object/view?id=${id}`}>
+          <a
+            href={`/object-store/object/view?id=${id}`}
+            target={readOnly ? "" : "_blank"}
+          >
             {metadata?.originalFilename}
-          </Link>
+          </a>
         ) : null;
       },
       accessor: "metadata.originalFilename",

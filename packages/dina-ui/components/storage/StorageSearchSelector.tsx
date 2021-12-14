@@ -1,14 +1,15 @@
-import { PersistedResource } from "kitsu";
-import Link from "next/link";
-import { useState } from "react";
-import { Promisable } from "type-fest";
 import {
   ColumnDefinition,
   FilterGroupModel,
   FormikButton,
   QueryTable,
-  rsql
+  rsql,
+  useDinaFormContext
 } from "common-ui";
+import { PersistedResource } from "kitsu";
+import Link from "next/link";
+import { useState } from "react";
+import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
@@ -26,19 +27,24 @@ export function StorageSearchSelector({
   onChange
 }: StorageSearchSelectorProps) {
   const [filter, setFilter] = useState<FilterGroupModel | null>();
+  const { readOnly } = useDinaFormContext();
 
   const tableColumns: ColumnDefinition<StorageUnit>[] = [
     {
       Cell: ({ original }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
-          <a>{storageUnitDisplayName(original)}</a>
+          <a target={!readOnly ? "_blank" : ""}>
+            {storageUnitDisplayName(original)}
+          </a>
         </Link>
       ),
       width: 400,
       accessor: "name"
     },
     {
-      Cell: ({ original }) => <StorageUnitBreadCrumb storageUnit={original} />,
+      Cell: ({ original }) => (
+        <StorageUnitBreadCrumb storageUnit={original} readOnly={readOnly} />
+      ),
       accessor: "location",
       sortable: false
     },

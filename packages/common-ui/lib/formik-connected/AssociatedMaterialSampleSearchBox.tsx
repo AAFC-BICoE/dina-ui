@@ -1,102 +1,114 @@
-import React, { useState } from "react";
+import classNames from "classnames";
+import { FastField } from "formik";
+import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { FieldWrapper, FieldWrapperProps, FieldWrapperRenderProps } from "..";
+import { FieldWrapper } from "..";
 import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 
-export function AssociatedMaterialSampleSearchBoxField(
-  props: FieldWrapperProps
-) {
-  return (
-    <FieldWrapper
-      readOnlyRender={value => value && <MaterialSampleLink id={value} />}
-      hideLabel={true}
-      disableLabelClick={true}
-      {...props}
-    >
-      {fieldProps => <AssociatedMaterialSampleSearchBox {...fieldProps} />}
-    </FieldWrapper>
-  );
-}
-
-function AssociatedMaterialSampleSearchBox({
-  invalid,
-  setValue,
-  value
-}: FieldWrapperRenderProps) {
-  const [showSearchAssociatedSample, setShowSearchAssociatedSample] =
-    useState(false);
-
+export function AssociatedMaterialSampleSearchBoxField({
+  showSearchBtn,
+  onSearchClicked,
+  onRemoveEntry,
+  props
+}) {
   const { formatMessage } = useDinaIntl();
 
-  /** Clear the input value */
-  function removeEntry() {
-    setValue(undefined);
-    setShowSearchAssociatedSample(false);
+  function defaultReadOnlyRender(value) {
+    return value && <MaterialSampleLink id={value} />;
   }
 
   return (
-    <div className={invalid ? "is-invalid" : ""}>
-      <label className="w-100">
-        <strong>{formatMessage("associatedMaterialSample")}</strong>{" "}
-      </label>
-      {value ? (
-        <div>
-          <div className="d-flex flex-column">
-            <div className={"d-flex flex-row"}>
-              <div
-                className="flex-md-grow-1 form-control associated-sample-link"
-                style={{ backgroundColor: "#e9ecef" }}
-              >
-                {value && <MaterialSampleLink id={value} />}
-              </div>
-              <button
-                className="btn mb-2"
-                onClick={removeEntry}
-                type="button"
-                style={{
-                  cursor: "pointer"
-                }}
-              >
-                <RiDeleteBinLine size="1.8em" className="ms-auto" />
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : showSearchAssociatedSample ? (
-        <div
-          className="p-2 mt-2 associated-sample-search"
-          style={{ borderStyle: "dashed" }}
+    <div>
+      <div className="list-inline d-flex flex-row gap-2 pt-2">
+        <FieldWrapper
+          {...props}
+          disableLabelClick={true}
+          readOnlyRender={(value, _) => defaultReadOnlyRender(value)}
         >
-          <div className="mb-4">
-            <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
-              {formatMessage("search")}
-            </span>
-            <button
-              className="btn btn-dark"
-              onClick={() => setShowSearchAssociatedSample(false)}
-            >
-              {formatMessage("closeButtonText")}
-            </button>
-          </div>
+          {({ setValue, value, invalid }) => {
+            /** Clear the input value */
+            function removeEntry() {
+              setValue(null);
+              onRemoveEntry();
+            }
+            return (
+              <>
+                <div
+                  className={classNames("row mb-2", invalid && "is-invalid")}
+                >
+                  {showSearchBtn ? (
+                    <button
+                      type="button"
+                      className="btn btn-secondary form-control mx-2 searchSample"
+                      onClick={() => onSearchClicked()}
+                    >
+                      {formatMessage("search") + "..."}
+                    </button>
+                  ) : (
+                    <div className="d-flex flex-row">
+                      <div
+                        className="form-control associated-sample-link "
+                        style={{
+                          backgroundColor: "#e9ecef",
+                          minWidth: "100px"
+                        }}
+                      >
+                        {defaultReadOnlyRender(value)}
+                      </div>
+                      <button
+                        className="btn"
+                        onClick={removeEntry}
+                        type="button"
+                        style={{
+                          cursor: "pointer"
+                        }}
+                      >
+                        <RiDeleteBinLine size="1.8em" className="ms-auto" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            );
+          }}
+        </FieldWrapper>
+      </div>
+    </div>
+  );
+}
+
+export function MaterialSampleSearchHelper({
+  showSearch,
+  fieldName,
+  onAssociatedSampleSelected,
+  onCloseClicked
+}) {
+  const { formatMessage } = useDinaIntl();
+
+  return showSearch ? (
+    <div className="p-2 mt-2" style={{ borderStyle: "dashed" }}>
+      <div className="mb-4">
+        <span className="me-2 fw-bold" style={{ fontSize: "1.2em" }}>
+          {formatMessage("search")}
+        </span>
+        <button className="btn btn-dark" type="button" onClick={onCloseClicked}>
+          {formatMessage("closeButtonText")}
+        </button>
+      </div>
+      {/** The table is expensive to render, so avoid unnecessary re-renders with FastField. */}
+      <FastField name={fieldName}>
+        {() => (
           <SampleListLayout
-            onSelect={sample => setValue(sample.id)}
-            classNames="btn btn-primary selectMaterialSample"
+            onSelect={onAssociatedSampleSelected}
+            classNames="btn btn-primary associated-sample-search"
             btnMsg={formatMessage("select")}
             hideTopPagination={true}
             hideGroupFilter={true}
           />
-        </div>
-      ) : (
-        <button
-          type="button"
-          className="btn btn-secondary mb-2 col-md-4 searchSample"
-          onClick={() => setShowSearchAssociatedSample(true)}
-        >
-          {formatMessage("search") + "..."}
-        </button>
-      )}
+        )}
+      </FastField>
     </div>
-  );
+  ) : null;
 }
