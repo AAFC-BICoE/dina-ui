@@ -1,10 +1,10 @@
+import Cleave from "cleave.js/react";
+import { DoOperationsError } from "common-ui";
 import { InputResource } from "kitsu";
+import ReactSwitch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import ReactSwitch from "react-switch";
-import Cleave from "cleave.js/react";
-import { DoOperationsError } from "common-ui";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -144,7 +144,7 @@ describe("MaterialSampleBulkEditor", () => {
       "11111",
       "11111"
     ]);
-  });
+  }, 20000);
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
@@ -196,7 +196,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-  });
+  }, 20000);
 
   it("Shows an error indicator when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
@@ -277,7 +277,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
-  });
+  }, 20000);
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
@@ -334,5 +334,5 @@ describe("MaterialSampleBulkEditor", () => {
         .first()
         .text()
     ).toContain("Invalid barcode");
-  });
+  }, 20000);
 });

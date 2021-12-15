@@ -1,6 +1,6 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { ResourceSelect } from "common-ui";
+import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
 
@@ -70,5 +70,5 @@ describe("MaterialSampleBulkCreatePage", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );
-  });
+  }, 20000);
 });
