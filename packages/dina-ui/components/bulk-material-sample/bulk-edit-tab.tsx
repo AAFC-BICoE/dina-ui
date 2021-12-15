@@ -57,6 +57,9 @@ export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
           disableAutoNamePrefix={true}
           disableSampleNameField={true}
           omitGroupField={true}
+          // Disable the nav's Are You Sure prompt when removing components,
+          // because you aren't actually deleting data.
+          disableNavRemovePrompt={true}
         />
       </BulkEditTabContext.Provider>
     )
