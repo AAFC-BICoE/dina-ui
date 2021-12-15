@@ -346,31 +346,7 @@ export function useMaterialSampleSave({
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
-    setEnableAssociations,
-    /** Wraps the useState setter with an AreYouSure modal when setting to false. */
-    dataComponentToggler(
-      setBoolean: Dispatch<SetStateAction<boolean>>,
-      componentName: string
-    ) {
-      return function toggleDataComponent(enabled: boolean) {
-        if (!enabled) {
-          // When removing data, ask the user for confirmation first:
-          openModal(
-            <AreYouSureModal
-              actionMessage={
-                <DinaMessage
-                  id="removeComponentData"
-                  values={{ component: componentName }}
-                />
-              }
-              onYesButtonClicked={() => setBoolean(enabled)}
-            />
-          );
-        } else {
-          setBoolean(enabled);
-        }
-      };
-    }
+    setEnableAssociations
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();

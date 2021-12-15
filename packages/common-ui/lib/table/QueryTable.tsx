@@ -1,6 +1,6 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { isPlainObject } from "lodash";
-import React, { useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import {
@@ -69,6 +69,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
     | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
 
   hideTopPagination?: boolean;
+
+  topRightCorner?: ReactNode;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -92,7 +94,8 @@ export function QueryTable<TData extends KitsuResource>({
   onSortedChange,
   path,
   hideTopPagination,
-  reactTableProps
+  reactTableProps,
+  topRightCorner
 }: QueryTableProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -203,34 +206,41 @@ export function QueryTable<TData extends KitsuResource>({
       role="search"
       aria-label={formatMessage({ id: "queryTable" })}
     >
-      {!omitPaging && (
-        <span>
-          <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-        </span>
-      )}
-      {resolvedReactTableProps?.sortable !== false && (
-        <span className="mx-3">
-          <Tooltip
-            id="queryTableMultiSortExplanation"
-            setVisible={setVisible}
-            visible={visible}
-            visibleElement={
-              <a
-                href="#"
-                aria-describedby={"queryTableMultiSortExplanation"}
-                onKeyUp={e =>
-                  e.key === "Escape" ? setVisible(false) : setVisible(true)
-                }
-                onMouseOver={() => setVisible(true)}
-                onMouseOut={() => setVisible(false)}
-                onBlur={() => setVisible(false)}
-              >
-                <CommonMessage id="queryTableMultiSortTooltipTitle" />
-              </a>
-            }
-          />
-        </span>
-      )}
+      <div className="d-flex align-items-end mb-1">
+        {!omitPaging && (
+          <>
+            <span>
+              <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+            </span>
+            {resolvedReactTableProps?.sortable !== false && (
+              <span className="mx-3">
+                <Tooltip
+                  id="queryTableMultiSortExplanation"
+                  setVisible={setVisible}
+                  visible={visible}
+                  visibleElement={
+                    <a
+                      href="#"
+                      aria-describedby={"queryTableMultiSortExplanation"}
+                      onKeyUp={e =>
+                        e.key === "Escape"
+                          ? setVisible(false)
+                          : setVisible(true)
+                      }
+                      onMouseOver={() => setVisible(true)}
+                      onMouseOut={() => setVisible(false)}
+                      onBlur={() => setVisible(false)}
+                    >
+                      <CommonMessage id="queryTableMultiSortTooltipTitle" />
+                    </a>
+                  }
+                />
+              </span>
+            )}
+          </>
+        )}
+        {topRightCorner && <div className="ms-auto">{topRightCorner}</div>}
+      </div>
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input

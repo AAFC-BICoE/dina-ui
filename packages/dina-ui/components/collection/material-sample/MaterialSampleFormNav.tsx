@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { FastField } from "formik";
 import dynamic from "next/dynamic";
+import { AreYouSureModal, useModal } from "common-ui";
 import Switch from "react-switch";
 import { useBulkEditTabContext } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -10,6 +11,7 @@ export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
+  disableRemovePrompt?: boolean;
 }
 
 const renderNav = process.env.NODE_ENV !== "test";
@@ -36,9 +38,11 @@ const ScrollSpyNav = renderNav
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
-  dataComponentState
+  dataComponentState,
+  disableRemovePrompt
 }: MaterialSampleNavProps) {
   const { formatMessage } = useDinaIntl();
+  const { openModal } = useModal();
 
   const scrollTargets = [
     { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
@@ -137,6 +141,25 @@ export function MaterialSampleFormNav({
               const Tag = section.disabled ? "div" : "a";
               const SwitchComponent = section.customSwitch ?? Switch;
 
+              function toggle(newVal: boolean) {
+                if (!newVal && !disableRemovePrompt) {
+                  // When removing data, ask the user for confirmation first:
+                  openModal(
+                    <AreYouSureModal
+                      actionMessage={
+                        <DinaMessage
+                          id="removeComponentData"
+                          values={{ component: section.msg }}
+                        />
+                      }
+                      onYesButtonClicked={() => section.setEnabled?.(newVal)}
+                    />
+                  );
+                } else {
+                  section.setEnabled?.(newVal);
+                }
+              }
+
               return (
                 <div
                   className={classNames(
@@ -155,10 +178,7 @@ export function MaterialSampleFormNav({
                   {section.setEnabled && (
                     <SwitchComponent
                       checked={!section.disabled}
-                      onChange={dataComponentState.dataComponentToggler(
-                        section.setEnabled,
-                        section.msg
-                      )}
+                      onChange={toggle}
                     />
                   )}
                 </div>

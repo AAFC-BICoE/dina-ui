@@ -200,6 +200,9 @@ export interface MaterialSampleFormProps {
   omitGroupField?: boolean;
 
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
+
+  /** Disables the "Are You Sure" prompt in the nav when removing a data component. */
+  disableNavRemovePrompt?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -214,6 +217,7 @@ export function MaterialSampleForm({
   materialSampleFormRef,
   disableSampleNameField,
   omitGroupField,
+  disableNavRemovePrompt,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -264,7 +268,10 @@ export function MaterialSampleForm({
   const mateirialSampleInternal = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
-        <MaterialSampleFormNav dataComponentState={dataComponentState} />
+        <MaterialSampleFormNav
+          dataComponentState={dataComponentState}
+          disableRemovePrompt={disableNavRemovePrompt}
+        />
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && materialSample && (

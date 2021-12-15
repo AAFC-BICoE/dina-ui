@@ -46,20 +46,17 @@ export function AreYouSureModal({
               </p>
             </div>
           </main>
-          <div className="row">
-            <div className="col-md-3">
-              <SubmitButton className="form-control yes-button">
-                <CommonMessage id="yes" />
-              </SubmitButton>
-            </div>
-            <div className="offset-md-6 col-md-3">
-              <FormikButton
-                className="btn btn-dark form-control no-button"
-                onClick={closeModal}
-              >
-                <CommonMessage id="no" />
-              </FormikButton>
-            </div>
+          <div className="d-flex gap-3 justify-content-center">
+            <FormikButton
+              className="btn btn-dark no-button"
+              onClick={closeModal}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <CommonMessage id="no" />
+            </FormikButton>
+            <SubmitButton className="yes-button">
+              <CommonMessage id="yes" />
+            </SubmitButton>
           </div>
         </DinaForm>
       </div>
