@@ -11,13 +11,17 @@ import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collectio
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GlobalNamesSearchResult } from "./global-names-search-result-type";
 
+export type Selection =
+  | string
+  | boolean
+  | ScientificNameSourceDetails
+  | undefined;
+
 export interface GlobalNamesSearchBoxProps {
   /** Optionally mock out the HTTP fetch for testing. */
   fetchJson?: (url: string) => Promise<any>;
 
-  onSelect?: (
-    selection: (string | ScientificNameSourceDetails | undefined)[]
-  ) => void;
+  onSelect?: (selection: Selection[]) => void;
 
   /** The determination index within the material sample. */
   index?: number;
@@ -200,7 +204,7 @@ export function GlobalNamesSearchBox({
               const familyRank =
                 familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
-              let displayText = result.bestResult?.currentName;
+              let displayText = result.bestResult?.matchedName;
               inputValue
                 .split(" ")
                 .map(
@@ -220,9 +224,17 @@ export function GlobalNamesSearchBox({
               detail.labelHtml = link.innerHTML ?? "";
               detail.sourceUrl = link.href;
               detail.recordedOn = dateSupplier();
+              detail.classificationPath = result.bestResult?.classificationPath;
+              detail.classificationRanks =
+                result.bestResult?.classificationRanks;
 
               // Use detail to populate source details fields, result.label to populate the searchbox bound field
-              const resultArray = [detail, result.bestResult?.currentName];
+              const resultArray = [
+                detail,
+                result.bestResult?.matchedName,
+                result.bestResult.isSynonym,
+                result.bestResult?.currentName
+              ];
 
               return (
                 <div

@@ -22,6 +22,8 @@ export type ScientificNameSourceDetails = {
   labelHtml?: string;
   sourceUrl?: string;
   recordedOn?: string;
+  classificationPath?: string;
+  classificationRanks?: string;
 };
 
 export enum ScientificNameSource {

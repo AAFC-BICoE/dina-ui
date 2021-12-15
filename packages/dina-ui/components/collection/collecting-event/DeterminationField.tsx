@@ -209,6 +209,8 @@ export function DeterminationField() {
               legend={<DinaMessage id="determination" />}
               className="non-strip"
             >
+              {/* determination scientifica name is used for display both edit and readonly, 
+              globalnamesearch is a helper and availabe when in edit page */}
               {!hideScientificNameInput && (
                 <>
                   <TextField
@@ -217,21 +219,19 @@ export function DeterminationField() {
                       <RenderAsReadonly
                         value={value}
                         form={form}
-                        scientificNameDetailsLabelHtmlField={
-                          fieldProps("scientificNameDetails.labelHtml").name
-                        }
-                        scientificNameDetailsSrcUrlField={
-                          fieldProps("scientificNameDetails.sourceUrl").name
+                        scientificNameDetailsField={
+                          fieldProps("scientificNameDetails").name
                         }
                         scientificNameSourceField={
                           fieldProps("scientificNameSource").name
                         }
+                        // here to continue, missing issynonym and currentName
                       />
                     )}
                     onChangeExternal={form => {
                       form.setFieldValue(
                         fieldProps("scientificNameSource").name,
-                        "COLPLUS"
+                        "GNA"
                       );
                     }}
                   />
@@ -247,19 +247,19 @@ export function DeterminationField() {
                       ? formatMessage("field_scientificNameInput")
                       : formatMessage("scientificNameSearch")
                   }
+                  scientificNameDetailsField={
+                    fieldProps("scientificNameDetails").name
+                  }
                   scientificNameSourceField={
                     fieldProps("scientificNameSource").name
                   }
                   scientificNameDetailsSrcUrlField={
                     fieldProps("scientificNameDetails.sourceUrl").name
                   }
-                  scientificNameDetailsLabelHtmlField={
-                    fieldProps("scientificNameDetails.labelHtml").name
-                  }
                   onChange={(newValue, formik) => {
                     formik.setFieldValue(
                       fieldProps("scientificNameSource").name,
-                      newValue ? "COLPLUS" : null
+                      newValue ? "GNA" : null
                     );
                     formik.setFieldValue(
                       fieldProps("scientificNameDetails.labelHtml").name,
@@ -279,6 +279,20 @@ export function DeterminationField() {
                         ? newValue[0].recordedOn
                         : null
                     );
+                    formik.setFieldValue(
+                      fieldProps("scientificNameDetails.classificationPath")
+                        .name,
+                      newValue && isArray(newValue)
+                        ? newValue[0].classificationPath
+                        : null
+                    );
+                    formik.setFieldValue(
+                      fieldProps("scientificNameDetails.classificationRanks")
+                        .name,
+                      newValue && isArray(newValue)
+                        ? newValue[0].classificationRanks
+                        : null
+                    );
                     // If selected a result from search , set text input value to null and hide it
                     // If a search value is removed, show the text input value
                     if (newValue) {
@@ -286,6 +300,7 @@ export function DeterminationField() {
                         fieldProps("scientificName").name,
                         newValue?.[1]
                       );
+                      // here need to set the synonym field as well
                       setHideScientificNameInput(true);
                     } else {
                       setHideScientificNameInput(false);

@@ -13,8 +13,7 @@ export interface GlobalNamesFieldProps extends FieldWrapperProps {
   index?: number;
   isDetermination?: boolean;
   scientificNameDetailsSrcUrlField?: string;
-  scientificNameDetailsLabelHtmlField?: string;
-
+  scientificNameDetailsField?: string;
   /** Mock this out in tests so it gives a predictable value. */
   dateSupplier?: () => string;
 }
@@ -26,7 +25,7 @@ export function GlobalNamesField({
   index,
   isDetermination,
   scientificNameDetailsSrcUrlField,
-  scientificNameDetailsLabelHtmlField,
+  scientificNameDetailsField,
   dateSupplier,
   ...fieldWrapperProps
 }: GlobalNamesFieldProps) {
@@ -49,13 +48,7 @@ export function GlobalNamesField({
               <RenderAsReadonly
                 value={value}
                 form={formik}
-                scientificNameDetailsLabelHtmlField={
-                  scientificNameDetailsLabelHtmlField
-                }
-                scientificNameDetailsSrcUrlField={
-                  scientificNameDetailsSrcUrlField
-                }
-                scientificNameSourceField={scientificNameSourceField}
+                scientificNameDetailsField={scientificNameDetailsField}
               />
             </div>
             <div className="col-md-4 d-flex align-items-center">
@@ -95,30 +88,25 @@ export function GlobalNamesField({
   );
 }
 
-export function GlobalNamesReadOnly({
-  value,
-  scientificNameSource,
-  isFromSrcDetailsUrl
-}) {
-  const sanitizedHtml = DOMPurify.sanitize(value, {
+export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
+  const link = document.createElement("a");
+  link.setAttribute("href", scientificNameDetails.sourceUrl);
+  link.setAttribute("target", "_blank");
+  link.setAttribute("rel", "noopener");
+
+  // this will need to be replaced with currentName's label html if any to show as synonym if exists
+  link.innerHTML = scientificNameDetails.labelHtml;
+
+  const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
     ADD_ATTR: ["target", "rel"]
   });
 
   return (
     <div style={{ whiteSpace: "pre-wrap" }}>
-      {isFromSrcDetailsUrl ? (
-        <p dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
-      ) : (
-        <p> {value} </p>
-      )}
-      {isFromSrcDetailsUrl && scientificNameSource && (
-        <p>
-          <strong>
-            <DinaMessage id="source" />:{" "}
-          </strong>
-          {scientificNameSource}
-        </p>
-      )}
+      <p> {value} </p>
+      {scientificNameDetails.hasSynonym ? safeHtmlLink : null}
+      {scientificNameDetails.classificationPath}
+      {scientificNameDetails.classificationRanks}
     </div>
   );
 }
@@ -131,41 +119,12 @@ export function getFieldValue(form, fieldName) {
     : null;
 }
 
-export function RenderAsReadonly({
-  value,
-  form,
-  scientificNameDetailsSrcUrlField,
-  scientificNameDetailsLabelHtmlField,
-  scientificNameSourceField
-}) {
-  const scientificNameDetailSrcUrl = getFieldValue(
-    form,
-    scientificNameDetailsSrcUrlField
-  );
-  const scientificNameDetailLabelHtml = getFieldValue(
-    form,
-    scientificNameDetailsLabelHtmlField
-  );
-  const scientificNameVal = getFieldValue(form, scientificNameSourceField);
-
-  const link = document.createElement("a");
-  link.setAttribute("href", scientificNameDetailSrcUrl);
-  link.setAttribute("target", "_blank");
-  link.setAttribute("rel", "noopener");
-
-  link.innerHTML = scientificNameDetailLabelHtml;
-
-  const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
-    ADD_ATTR: ["target", "rel"]
-  });
-
-  const isFromSrcDetailsUrl = scientificNameDetailSrcUrl?.length > 0;
-
+export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
+  const scientificNameDetails = getFieldValue(form, scientificNameDetailsField);
   return (
     <GlobalNamesReadOnly
-      value={isFromSrcDetailsUrl ? safeHtmlLink : value}
-      scientificNameSource={scientificNameSourceField && scientificNameVal}
-      isFromSrcDetailsUrl={isFromSrcDetailsUrl}
+      value={value}
+      scientificNameDetails={scientificNameDetails}
     />
   );
 }
