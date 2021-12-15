@@ -172,6 +172,9 @@ describe("BulkEditTabWarning", () => {
     wrapper
       .find(".determination-section button.override-all-button")
       .simulate("click");
+    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Override the name in the new determination:
     wrapper

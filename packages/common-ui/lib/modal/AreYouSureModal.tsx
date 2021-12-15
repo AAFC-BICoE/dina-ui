@@ -33,7 +33,7 @@ export function AreYouSureModal({
   }
 
   return (
-    <div className="modal-content">
+    <div className="modal-content are-you-sure-modal">
       <div className="modal-header">
         <h1 style={{ border: "none" }}>{actionMessage}</h1>
       </div>
