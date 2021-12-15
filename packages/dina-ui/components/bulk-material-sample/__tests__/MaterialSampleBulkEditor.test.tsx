@@ -591,14 +591,14 @@ describe("MaterialSampleBulkEditor", () => {
       { id: "new-preparation-attachment-id", type: "metadata" }
     ]);
     wrapper
-      .find(".tabpanel-EDIT_ALL .associations-section")
+      .find(".tabpanel-EDIT_ALL #associations-section")
       .find(MaterialSampleSearchHelper)
       .prop("onAssociatedSampleSelected")({
       id: "new-sample-assoc",
       type: "material-sample"
     });
     wrapper
-      .find(".tabpanel-EDIT_ALL .associations-section .associationType-field")
+      .find(".tabpanel-EDIT_ALL #associations-section .associationType-field")
       .find(CreatableSelect)
       .prop<any>("onChange")({ value: "has_host" });
     wrapper

@@ -1,13 +1,14 @@
 import {
   AreYouSureModal,
+  BulkEditTabContextI,
   FormikButton,
+  useBulkEditTabContext,
+  useBulkEditTabField,
   useFieldLabels,
   useModal
 } from "common-ui";
 import { PropsWithChildren, useEffect, useState } from "react";
-import { BulkEditTabContextI, useBulkEditTabContext } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { useBulkEditTabField } from "./useBulkEditTabField";
 
 export interface BulkEditTabWarningProps {
   fieldName: string;

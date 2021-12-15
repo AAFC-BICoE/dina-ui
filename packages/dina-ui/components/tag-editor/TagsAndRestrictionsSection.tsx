@@ -3,11 +3,11 @@ import {
   InverseToggleField,
   RadioButtonsField,
   TextField,
+  useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
 import { Field } from "formik";
 import { AiFillTags } from "react-icons/ai";
-import { useBulkEditTabContext } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
 

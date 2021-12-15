@@ -1,30 +1,18 @@
+import {
+  BulkEditTabContext,
+  BulkEditTabContextI,
+  UseBulkEditTabParams,
+  withoutBlankFields
+} from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { isArray, omitBy, isEmpty } from "lodash";
-import { createContext, useContext, useRef, RefObject } from "react";
-import { BulkNavigatorTab, SampleWithHooks } from "..";
+import { isEmpty } from "lodash";
+import { useRef } from "react";
+import { BulkNavigatorTab } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
-
-export interface BulkEditTabContextI {
-  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
-  sampleHooks: SampleWithHooks[];
-}
-
-export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(
-  null
-);
-
-export interface UseBulkEditTabParams {
-  sampleHooks: SampleWithHooks[];
-}
-
-/** When the Component is inside the bulk editor's "Edit All" tab. */
-export function useBulkEditTabContext() {
-  return useContext(BulkEditTabContext);
-}
 
 export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
@@ -111,27 +99,4 @@ export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
   }
 
   return { bulkEditTab, withBulkEditOverrides };
-}
-
-/**
- * Checks whether an API resource's attribute is blank.
- * This is used to check which of the Bulk Edit tab's values were deliberately edited.
- */
-export function isBlankResourceAttribute(value: any) {
-  // "blank" means something different depending on the type:
-  switch (typeof value) {
-    case "string":
-      // Empty string:
-      return !value.trim();
-    case "object":
-    case "undefined":
-      // empty object or empty array:
-      return isArray(value) ? !value.join() : !value?.id;
-    default:
-      return false;
-  }
-}
-
-function withoutBlankFields<T>(original: T): Partial<T> {
-  return omitBy(original, isBlankResourceAttribute) as Partial<T>;
 }

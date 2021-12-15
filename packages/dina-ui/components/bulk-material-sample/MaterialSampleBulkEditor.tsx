@@ -3,13 +3,14 @@ import {
   DinaForm,
   DoOperationsError,
   FormikButton,
+  SampleWithHooks,
   useApiClient
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
-import { MaterialSampleBulkNavigator, SampleWithHooks } from "..";
+import { MaterialSampleBulkNavigator } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";

@@ -1,11 +1,10 @@
-import { FormikProps } from "formik";
+import { SampleWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
-import { ReactNode, RefObject, useState } from "react";
+import { isEmpty } from "lodash";
+import { ReactNode, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { useMaterialSampleSave } from "../collection";
 import { SelectNavigation } from "./SelectNavigation";
-import { isEmpty } from "lodash";
 
 export interface MaterialSampleBulkNavigatorProps {
   samples: SampleWithHooks[];
@@ -22,13 +21,6 @@ export interface BulkNavigatorTab {
   key: string;
   title: ReactNode;
   content: (isSelected: boolean) => ReactNode;
-}
-
-export interface SampleWithHooks {
-  key: string;
-  sample: InputResource<MaterialSample>;
-  saveHook: ReturnType<typeof useMaterialSampleSave>;
-  formRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
 }
 
 /**

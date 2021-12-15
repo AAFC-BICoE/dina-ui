@@ -1,5 +1,5 @@
+import { isBlankResourceAttribute, useBulkEditTabContext } from "common-ui";
 import { get, isEqual } from "lodash";
-import { isBlankResourceAttribute, useBulkEditTabContext } from "..";
 
 export interface UseBulkEditTabFieldParams {
   fieldName: string;

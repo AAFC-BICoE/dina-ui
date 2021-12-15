@@ -1,9 +1,8 @@
 import classNames from "classnames";
+import { AreYouSureModal, useBulkEditTabContext, useModal } from "common-ui";
 import { FastField } from "formik";
 import dynamic from "next/dynamic";
-import { AreYouSureModal, useModal } from "common-ui";
 import Switch from "react-switch";
-import { useBulkEditTabContext } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useMaterialSampleSave } from "./useMaterialSample";
 
