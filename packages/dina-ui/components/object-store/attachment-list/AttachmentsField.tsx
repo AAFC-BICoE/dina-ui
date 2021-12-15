@@ -45,7 +45,7 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
       title={props.title}
     />
   ) : (
-    <FastField name={props.name}>
+    <FastField name={props.name} key={props.id}>
       {({ field: { value }, form }) => {
         const metadatas =
           (value as ResourceIdentifierObject[] | undefined) ?? [];

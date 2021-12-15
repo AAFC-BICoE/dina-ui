@@ -43,10 +43,12 @@ export function BulkEditTabWarning({
 
     // Set the initial value based on the tab values:
     useEffect(() => {
-      if (hasNoValues) {
-        setDefaultValue?.(bulkEditCtx);
-      } else if (hasSameValues) {
-        bulkEditFormRef?.current?.setFieldValue(fieldName, commonValue);
+      if (!hasBulkEditValue) {
+        if (hasNoValues) {
+          setDefaultValue?.(bulkEditCtx);
+        } else if (hasSameValues) {
+          bulkEditFormRef?.current?.setFieldValue(fieldName, commonValue);
+        }
       }
     }, []);
 

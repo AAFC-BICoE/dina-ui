@@ -16,16 +16,18 @@ export const ORGANISM_FIELDS = [
 export interface OrganismStateFieldProps {
   className?: string;
   namePrefix?: string;
+  id?: string;
 }
 
 export function OrganismStateField({
   className,
-  namePrefix = ""
+  namePrefix = "",
+  id = "organism-state-section"
 }: OrganismStateFieldProps) {
   return (
     <FieldSet
       className={className}
-      id="organism-state-section"
+      id={id}
       legend={<DinaMessage id="organismState" />}
     >
       <div className="row">

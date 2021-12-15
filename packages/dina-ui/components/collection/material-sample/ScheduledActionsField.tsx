@@ -43,13 +43,15 @@ export interface ScheduledActionsFieldProps {
   className?: string;
   defaultDate?: string;
   wrapContent?: (content: ReactNode) => ReactNode;
+  id?: string;
 }
 
 export function ScheduledActionsField({
   className,
   // The default date is today:
   defaultDate = new Date().toISOString().slice(0, 10),
-  wrapContent = content => content
+  wrapContent = content => content,
+  id = "scheduled-actions-section"
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
@@ -126,33 +128,36 @@ export function ScheduledActionsField({
   ];
 
   return (
-    <FastField name={fieldName} key={JSON.stringify(actionToEdit)}>
-      {({ field: { value }, form }) => {
-        const scheduledActions = (value ?? []) as ScheduledAction[];
+    <FieldSet
+      className={className}
+      id={id}
+      legend={<DinaMessage id="scheduledActions" />}
+    >
+      {wrapContent(
+        <FastField name={fieldName} key={JSON.stringify(actionToEdit)}>
+          {({ field: { value }, form }) => {
+            const scheduledActions = (value ?? []) as ScheduledAction[];
 
-        const hasActions = !!scheduledActions.length;
+            const hasActions = !!scheduledActions.length;
 
-        async function saveAction(savedAction: ScheduledAction) {
-          if (actionToEdit === "NEW" || !actionToEdit) {
-            form.setFieldValue(fieldName, [...scheduledActions, savedAction]);
-          } else {
-            form.setFieldValue(
-              fieldName,
-              scheduledActions.map((action, index) =>
-                index === actionToEdit?.index ? savedAction : action
-              )
-            );
-          }
-          setActionToEdit(null);
-        }
+            async function saveAction(savedAction: ScheduledAction) {
+              if (actionToEdit === "NEW" || !actionToEdit) {
+                form.setFieldValue(fieldName, [
+                  ...scheduledActions,
+                  savedAction
+                ]);
+              } else {
+                form.setFieldValue(
+                  fieldName,
+                  scheduledActions.map((action, index) =>
+                    index === actionToEdit?.index ? savedAction : action
+                  )
+                );
+              }
+              setActionToEdit(null);
+            }
 
-        return (
-          <FieldSet
-            className={className}
-            id="scheduled-actions-section"
-            legend={<DinaMessage id="scheduledActions" />}
-          >
-            {wrapContent(
+            return (
               <>
                 {hasActions && (
                   <ReactTable
@@ -202,11 +207,11 @@ export function ScheduledActionsField({
                   </FormikButton>
                 )}
               </>
-            )}
-          </FieldSet>
-        );
-      }}
-    </FastField>
+            );
+          }}
+        </FastField>
+      )}
+    </FieldSet>
   );
 }
 

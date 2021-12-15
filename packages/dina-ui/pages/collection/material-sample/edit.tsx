@@ -18,7 +18,7 @@ import {
   withResponse
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
-import { padStart } from "lodash";
+import { padStart, mapValues } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode, useContext, useRef, useState, Ref } from "react";
 import { FormikProps } from "formik";
@@ -203,6 +203,12 @@ export interface MaterialSampleFormProps {
 
   /** Disables the "Are You Sure" prompt in the nav when removing a data component. */
   disableNavRemovePrompt?: boolean;
+
+  /**
+   * Removes the html tag IDs from hidden tabs.
+   * This needs to be done for off-screen forms in the bulk editor.
+   */
+  isOffScreen?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -218,6 +224,7 @@ export function MaterialSampleForm({
   disableSampleNameField,
   omitGroupField,
   disableNavRemovePrompt,
+  isOffScreen,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -265,13 +272,33 @@ export function MaterialSampleForm({
 
   const attachmentsField = "attachment";
 
+  /** Set IDs to blank when this component is off-screen. */
+  const navIds = mapValues(
+    {
+      identifiers: "identifiers-section",
+      colEvent: "collecting-event-section",
+      acqEvent: "acquisition-event-section",
+      preparation: "preparations-section",
+      organism: "organism-state-section",
+      determination: "determination-section",
+      associations: "associations-section",
+      storage: "storage-section",
+      ScheduledActions: "scheduled-actions-section",
+      managedAttributes: "managedAttributes-section",
+      attachments: "material-sample-attachments-section"
+    },
+    id => (isOffScreen ? "" : id)
+  );
+
   const mateirialSampleInternal = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
-        <MaterialSampleFormNav
-          dataComponentState={dataComponentState}
-          disableRemovePrompt={disableNavRemovePrompt}
-        />
+        {!isOffScreen && (
+          <MaterialSampleFormNav
+            dataComponentState={dataComponentState}
+            disableRemovePrompt={disableNavRemovePrompt}
+          />
+        )}
       </div>
       <div className="flex-grow-1 container-fluid">
         {!isTemplate && materialSample && (
@@ -290,13 +317,14 @@ export function MaterialSampleForm({
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <ProjectSelectSection resourcePath="collection-api/project" />
         <MaterialSampleIdentifiersFormLayout
+          id={navIds.identifiers}
           disableSampleNameField={disableSampleNameField}
         />
         <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
             <FieldSet
-              id="collecting-event-section"
+              id={navIds.colEvent}
               legend={<DinaMessage id="collectingEvent" />}
             >
               <TabbedResourceLinker<CollectingEvent>
@@ -321,7 +349,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableAcquisitionEvent && (
             <FieldSet
-              id="acquisition-event-section"
+              id={navIds.acqEvent}
               legend={<DinaMessage id="acquisitionEvent" />}
             >
               <TabbedResourceLinker<AcquisitionEvent>
@@ -348,18 +376,22 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enablePreparations && (
             <PreparationField
+              id={navIds.preparation}
               // Use the same attachments config for preparations as the Material Sample:
               attachmentsConfig={attachmentsConfig?.materialSample}
             />
           )}
-          {dataComponentState.enableOrganism && <OrganismStateField />}
-          {dataComponentState.enableDetermination && <DeterminationField />}
-          {dataComponentState.enableAssociations && <AssociationsField />}
+          {dataComponentState.enableOrganism && (
+            <OrganismStateField id={navIds.organism} />
+          )}
+          {dataComponentState.enableDetermination && (
+            <DeterminationField id={navIds.determination} />
+          )}
+          {dataComponentState.enableAssociations && (
+            <AssociationsField id={navIds.associations} />
+          )}
           {dataComponentState.enableStorage && (
-            <FieldSet
-              id="storage-section"
-              legend={<DinaMessage id="storage" />}
-            >
+            <FieldSet id={navIds.storage} legend={<DinaMessage id="storage" />}>
               <div className="card card-body mb-3">
                 <StorageLinkerField name="storageUnit" removeLabelTag={true} />
               </div>
@@ -367,6 +399,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableScheduledActions && (
             <ScheduledActionsField
+              id={navIds.ScheduledActions}
               wrapContent={content => (
                 <BulkEditTabWarning fieldName="scheduledActions">
                   {content}
@@ -377,7 +410,7 @@ export function MaterialSampleForm({
           {!isTemplate && (
             <FieldSet
               legend={<DinaMessage id="managedAttributeListTitle" />}
-              id="managedAttributes-section"
+              id={navIds.managedAttributes}
             >
               <DinaFormSection
                 // Disabled the template's restrictions for this section:
@@ -396,7 +429,7 @@ export function MaterialSampleForm({
           <AttachmentsField
             name={attachmentsField}
             title={<DinaMessage id="materialSampleAttachments" />}
-            id="material-sample-attachments-section"
+            id={navIds.attachments}
             allowNewFieldName="attachmentsConfig.allowNew"
             allowExistingFieldName="attachmentsConfig.allowExisting"
             allowAttachmentsConfig={attachmentsConfig?.materialSample}
@@ -436,7 +469,7 @@ export function MaterialSampleForm({
   );
 }
 
-export function MaterialSampleFormLayout() {
+export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
   const { locale, formatMessage } = useDinaIntl();
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -455,10 +488,7 @@ export function MaterialSampleFormLayout() {
   };
 
   return (
-    <FieldSet
-      id="material-sample-section"
-      legend={<DinaMessage id="materialSample" />}
-    >
+    <FieldSet id={id} legend={<DinaMessage id="materialSample" />}>
       <div className="row">
         <div className="col-md-6">
           <ResourceSelectField<MaterialSampleType>
@@ -521,6 +551,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
+  id?: string;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -541,11 +572,12 @@ export function MaterialSampleIdentifiersFormLayout({
   disableSampleNameField,
   className,
   namePrefix = "",
-  sampleNamePlaceHolder
+  sampleNamePlaceHolder,
+  id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
   return (
     <FieldSet
-      id="identifiers-section"
+      id={id}
       legend={<DinaMessage id="identifiers" />}
       className={className}
     >

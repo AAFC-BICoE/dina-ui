@@ -410,7 +410,8 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
     ).toEqual(false);
 
-    // Shows the error message at the top of the form:
+    // Shows the error message at the top of the form in that tab:
+    wrapper.find("li.sample-tab-1").simulate("click");
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Invalid barcode");

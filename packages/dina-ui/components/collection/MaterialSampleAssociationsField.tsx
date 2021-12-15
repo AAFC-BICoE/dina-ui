@@ -38,7 +38,7 @@ export function MaterialSampleAssociationsField({
       typeName={formatMessage("association")}
       makeNewElement={() => ({})}
       name={fieldName}
-      sectionId="associations-section"
+      sectionId="associations-tabs"
       className={classNames(className, "non-strip")}
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={content => (

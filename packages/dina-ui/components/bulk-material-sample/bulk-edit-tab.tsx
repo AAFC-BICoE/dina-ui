@@ -2,7 +2,7 @@ import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isArray, omitBy, isEmpty } from "lodash";
 import { createContext, useContext, useRef, RefObject } from "react";
-import { SampleWithHooks } from "..";
+import { BulkNavigatorTab, SampleWithHooks } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
@@ -44,10 +44,10 @@ export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
     bulkEditFormRef
   };
 
-  const bulkEditTab = {
+  const bulkEditTab: BulkNavigatorTab = {
     key: "EDIT_ALL",
     title: formatMessage("editAll"),
-    content: () => (
+    content: isSelected => (
       <BulkEditTabContext.Provider value={ctx}>
         <MaterialSampleForm
           buttonBar={null}
@@ -57,6 +57,7 @@ export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
           disableAutoNamePrefix={true}
           disableSampleNameField={true}
           omitGroupField={true}
+          isOffScreen={!isSelected}
           // Disable the nav's Are You Sure prompt when removing components,
           // because you aren't actually deleting data.
           disableNavRemovePrompt={true}

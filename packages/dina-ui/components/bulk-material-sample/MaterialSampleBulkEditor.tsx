@@ -74,13 +74,14 @@ export function MaterialSampleBulkEditor({
       <MaterialSampleBulkNavigator
         samples={sampleHooks}
         extraTabs={[bulkEditTab]}
-        renderOneSample={(_sample, index) => (
+        renderOneSample={(_sample, index, isSelected) => (
           <MaterialSampleForm
             disableSampleNameField={disableSampleNameField}
             materialSampleFormRef={sampleHooks[index].formRef}
             materialSampleSaveHook={sampleHooks[index].saveHook}
             buttonBar={null}
             disableAutoNamePrefix={true}
+            isOffScreen={!isSelected}
           />
         )}
       />

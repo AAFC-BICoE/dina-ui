@@ -48,7 +48,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
 /** All fields of the Determination type. */
 export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
-export function DeterminationField() {
+export function DeterminationField({ id = "determination-section" }) {
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
 
@@ -88,7 +88,7 @@ export function DeterminationField() {
       legend={<DinaMessage id="determinations" />}
       name={determinationsPath}
       typeName={formatMessage("determination")}
-      sectionId="determination-section"
+      sectionId={id}
       initialIndex={initialIndex}
       makeNewElement={({ length }) => ({
         isPrimary: length === 0,

@@ -5,13 +5,14 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 import { SelectNavigation } from "./SelectNavigation";
-import { isEmpty, compact } from "lodash";
+import { isEmpty } from "lodash";
 
 export interface MaterialSampleBulkNavigatorProps {
   samples: SampleWithHooks[];
   renderOneSample: (
     sample: InputResource<MaterialSample>,
-    index: number
+    index: number,
+    isSelected: boolean
   ) => ReactNode;
 
   extraTabs?: BulkNavigatorTab[];
@@ -20,7 +21,7 @@ export interface MaterialSampleBulkNavigatorProps {
 export interface BulkNavigatorTab {
   key: string;
   title: ReactNode;
-  content: () => ReactNode;
+  content: (isSelected: boolean) => ReactNode;
 }
 
 export interface SampleWithHooks {
@@ -56,6 +57,10 @@ export function MaterialSampleBulkNavigator({
     []
   );
 
+  function isSelected(key: string) {
+    return selectedElement.key === key;
+  }
+
   return (
     <div className="sample-bulk-navigator">
       {tooManySamplesForTabs ? (
@@ -71,12 +76,12 @@ export function MaterialSampleBulkNavigator({
               invalidElements={tabsWithErrors}
             />
           </div>
-          {extraTabs.map((element, index) => (
+          {extraTabs.map((extraTab, index) => (
             <div
               key={index}
-              className={selectedElement.key !== element.key ? "d-none" : ""}
+              className={isSelected(extraTab.key) ? "" : "d-none"}
             >
-              {element.content()}
+              {extraTab.content(isSelected(extraTab.key))}
             </div>
           ))}
           {samples.map((element, index) => (
@@ -84,7 +89,7 @@ export function MaterialSampleBulkNavigator({
               key={index}
               className={selectedElement.key !== element.key ? "d-none" : ""}
             >
-              {renderOneSample(element.sample, index)}
+              {renderOneSample(element.sample, index, isSelected(element.key))}
             </div>
           ))}
         </div>
@@ -108,7 +113,6 @@ export function MaterialSampleBulkNavigator({
             ))}
             {samples.map((sample, index) => {
               const tabHasError = tabsWithErrors.includes(sample);
-
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
@@ -126,15 +130,15 @@ export function MaterialSampleBulkNavigator({
               className={`react-tabs__tab-panel tabpanel-${extraTab.key}`}
               key={index}
             >
-              {extraTab.content()}
+              {extraTab.content(isSelected(extraTab.key))}
             </TabPanel>
           ))}
-          {samples.map(({ sample }, index) => (
+          {samples.map((tab, index) => (
             <TabPanel
               className={`react-tabs__tab-panel sample-tabpanel-${index}`}
               key={index}
             >
-              {renderOneSample(sample, index)}
+              {renderOneSample(tab.sample, index, isSelected(tab.key))}
             </TabPanel>
           ))}
         </Tabs>

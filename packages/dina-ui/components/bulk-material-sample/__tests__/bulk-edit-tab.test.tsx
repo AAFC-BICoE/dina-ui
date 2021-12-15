@@ -19,7 +19,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
 
   return (
     <div>
-      {bulkEditTab.content()}
+      {bulkEditTab.content(true)}
       <button
         className="get-overrides"
         type="button"

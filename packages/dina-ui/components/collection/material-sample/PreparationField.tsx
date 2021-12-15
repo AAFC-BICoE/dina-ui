@@ -22,6 +22,7 @@ export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
   attachmentsConfig?: AllowAttachmentsConfig;
+  id?: string;
 }
 
 /**
@@ -54,7 +55,8 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  attachmentsConfig = { allowExisting: true, allowNew: true }
+  attachmentsConfig = { allowExisting: true, allowNew: true },
+  id = "preparations-section"
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
   const { initialValues } = useDinaFormContext();
@@ -73,7 +75,7 @@ export function PreparationField({
   return (
     <FieldSet
       className={className}
-      id="preparations-section"
+      id={id}
       legend={<DinaMessage id="preparations" />}
     >
       <div className="row">
