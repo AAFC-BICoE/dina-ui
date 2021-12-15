@@ -1,6 +1,6 @@
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { ResourceSelect } from "common-ui";
+import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -86,7 +86,5 @@ describe("MaterialSampleBulkCreatePage", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );
-    // This test sometimes takes longer than the default max 5 seconds, so set max to 20 seconds.
-    // Maybe see if this is possible to speed up.
   }, 20000);
 });
