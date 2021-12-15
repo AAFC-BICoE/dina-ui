@@ -1,12 +1,13 @@
-import { FormikButton } from "common-ui";
-import { PropsWithChildren, useState, useEffect } from "react";
 import {
-  useBulkEditTabContext,
-  isBlankResourceAttribute,
-  BulkEditTabContextI
-} from "..";
+  AreYouSureModal,
+  FormikButton,
+  useFieldLabels,
+  useModal
+} from "common-ui";
+import { PropsWithChildren, useEffect, useState } from "react";
+import { BulkEditTabContextI, useBulkEditTabContext } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { get, isEqual } from "lodash";
+import { useBulkEditTabField } from "./useBulkEditTabField";
 
 export interface BulkEditTabWarningProps {
   fieldName: string;
@@ -19,14 +20,17 @@ export function BulkEditTabWarning({
   children
 }: PropsWithChildren<BulkEditTabWarningProps>) {
   const bulkEditCtx = useBulkEditTabContext();
+  const bulkField = useBulkEditTabField({ fieldName });
+  const { openModal } = useModal();
+  const { getFieldLabel } = useFieldLabels();
+
   const [manualOverride, setManualOverride] = useState(false);
 
-  if (bulkEditCtx) {
-    const override =
-      manualOverride ||
-      !isBlankResourceAttribute(
-        get(bulkEditCtx.bulkEditFormRef.current?.values, fieldName)
-      );
+  if (bulkEditCtx && bulkField) {
+    const { hasBulkEditValue, hasNoValues, hasSameValues, commonValue } =
+      bulkField;
+
+    const override = manualOverride || hasBulkEditValue;
 
     function overrideValues() {
       setManualOverride(true);
@@ -35,34 +39,20 @@ export function BulkEditTabWarning({
       }
     }
 
-    const { sampleHooks, bulkEditFormRef } = bulkEditCtx;
-
-    const formStates = sampleHooks.map(
-      sample => sample.formRef?.current?.values
-    );
-
-    const hasNoValues = formStates.every(form =>
-      isBlankResourceAttribute(get(form, fieldName))
-    );
-
-    const hasDifferentValues = !formStates.every(form =>
-      isEqual(
-        get(form, fieldName),
-        get(sampleHooks[0].formRef?.current?.values, fieldName)
-      )
-    );
-
-    const hasSameValues = !hasDifferentValues;
+    const { bulkEditFormRef } = bulkEditCtx;
 
     // Set the initial value based on the tab values:
     useEffect(() => {
       if (hasNoValues) {
         setDefaultValue?.(bulkEditCtx);
       } else if (hasSameValues) {
-        const commonValue = get(formStates[0], fieldName);
         bulkEditFormRef?.current?.setFieldValue(fieldName, commonValue);
       }
     }, []);
+
+    const singularFieldLabel = getFieldLabel({ name: fieldName })
+      // Make the field name singular:
+      .fieldLabel.replace(/s$/, "");
 
     return hasNoValues || override || hasSameValues ? (
       <>{children}</>
@@ -74,7 +64,25 @@ export function BulkEditTabWarning({
         <div className="d-flex justify-content-center">
           <FormikButton
             className="btn btn-primary override-all-button"
-            onClick={overrideValues}
+            onClick={() =>
+              openModal(
+                <AreYouSureModal
+                  actionMessage={
+                    <DinaMessage
+                      id="overrideAllConfirmationTitle"
+                      values={{ fieldName: singularFieldLabel }}
+                    />
+                  }
+                  messageBody={
+                    <DinaMessage
+                      id="overrideAllConfirmation"
+                      values={{ fieldName: singularFieldLabel }}
+                    />
+                  }
+                  onYesButtonClicked={overrideValues}
+                />
+              )
+            }
           >
             <DinaMessage id="overrideAll" />
           </FormikButton>
