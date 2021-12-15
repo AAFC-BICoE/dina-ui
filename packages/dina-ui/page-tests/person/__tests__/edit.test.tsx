@@ -1,5 +1,5 @@
 import { OperationsResponse } from "common-ui";
-import { Organization } from "packages/dina-ui/types/agent-api/resources/Organization";
+import { Organization } from "../../../types/agent-api/resources/Organization";
 import PersonEditPage from "../../../pages/person/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/agent-api/resources/Person";

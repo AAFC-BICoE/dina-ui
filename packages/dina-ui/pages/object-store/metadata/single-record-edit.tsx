@@ -40,13 +40,13 @@ interface SingleMetadataFormProps {
 }
 
 export default function MetadataEditPage() {
-  const router = useRouter();  
+  const router = useRouter();
 
   const id = router.query.id?.toString();
-  
+
   const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
-  
+
   const query = useQuery<Metadata>(
     {
       path: `objectstore-api/metadata/${id}`,

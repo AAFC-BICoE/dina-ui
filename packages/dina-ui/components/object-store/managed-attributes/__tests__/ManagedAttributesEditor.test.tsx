@@ -1,6 +1,5 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { ManagedAttributeValues } from "../../../../types/objectstore-api";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 
 const EXAMPLE_MA_1 = {
@@ -44,18 +43,17 @@ const apiContext = {
   bulkGet: mockBulkGet
 };
 
-const exampleValues: ManagedAttributeValues = {
-  example_attribute_1: { assignedValue: "example-value-1" },
-  example_attribute_2: { assignedValue: "example-value-2" }
+const exampleValues = {
+  example_attribute_1: "example-value-1",
+  example_attribute_2: "example-value-2"
 };
 
 describe("ManagedAttributesEditor component", () => {
   it("Renders the current values.", async () => {
     const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{ managedAttributeValues: exampleValues }}>
+      <DinaForm initialValues={{ managedAttributes: exampleValues }}>
         <ManagedAttributesEditor
-          valuesPath="managedAttributeValues"
-          valueFieldName="assignedValue"
+          valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           apiBaseUrl="/collection-api"
           managedAttributeComponent="COLLECTING_EVENT"
@@ -93,12 +91,11 @@ describe("ManagedAttributesEditor component", () => {
 
     const wrapper = mountWithAppContext(
       <DinaForm
-        initialValues={{ managedAttributeValues: exampleValues }}
+        initialValues={{ managedAttributes: exampleValues }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <ManagedAttributesEditor
-          valuesPath="managedAttributeValues"
-          valueFieldName="assignedValue"
+          valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           apiBaseUrl="/collection-api"
           managedAttributeComponent="COLLECTING_EVENT"
@@ -133,10 +130,8 @@ describe("ManagedAttributesEditor component", () => {
     wrapper.update();
 
     expect(mockSubmit).lastCalledWith({
-      managedAttributeValues: {
-        example_attribute_1: {
-          assignedValue: "example-value-1"
-        }
+      managedAttributes: {
+        example_attribute_1: "example-value-1"
       }
     });
   });

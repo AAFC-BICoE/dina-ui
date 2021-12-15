@@ -3,7 +3,7 @@ import {
   FormikButton,
   useDinaFormContext,
   SelectOption
-} from "../../../common-ui/lib";
+} from "common-ui";
 import React, { useState } from "react";
 import { FieldArray } from "formik";
 import { clamp } from "lodash";

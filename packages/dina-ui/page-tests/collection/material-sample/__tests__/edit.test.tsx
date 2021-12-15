@@ -61,7 +61,8 @@ function testMaterialSample(): PersistedResource<MaterialSample> {
 const TEST_MANAGED_ATTRIBUTE = {
   id: "1",
   type: "managed-attribute",
-  name: "testAttr"
+  name: "testAttr",
+  key: "test_attr"
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -77,6 +78,8 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/acquisition-event":
       // Populate the linker table:
       return { data: [testAcquisitionEvent()] };
+    case "collection-api/material-sample/1":
+      return { data: testMaterialSample() };
     case "collection-api/material-sample":
       return {
         data: [
@@ -189,7 +192,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -377,7 +379,6 @@ describe("Material Sample Edit Page", () => {
               hostOrganism: null,
               determination: [],
               organism: null,
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: [
@@ -456,7 +457,6 @@ describe("Material Sample Edit Page", () => {
                   isPrimary: true
                 }
               ],
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -496,7 +496,6 @@ describe("Material Sample Edit Page", () => {
               preparationAttachment: undefined,
               determination: [],
               hostOrganism: null,
-              managedAttributes: {},
               organism: null,
               relationships: {
                 attachment: {
@@ -678,7 +677,6 @@ describe("Material Sample Edit Page", () => {
               },
               determination: [],
               id: "333",
-              managedAttributes: {},
               materialSampleName: "test-ms",
               organism: null,
               // Preparations are not enabled, so the preparation fields are set to null:
@@ -766,8 +764,8 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          managedAttributeValues: {
-            testAttr: { assignedValue: "do the test" }
+          managedAttributes: {
+            test_attr: "do the test"
           }
         }}
         onSaved={mockOnSaved}
@@ -801,7 +799,7 @@ describe("Material Sample Edit Page", () => {
               id: "333",
               hostOrganism: null,
               managedAttributes: {
-                testAttr: "do the test"
+                test_attr: "do the test"
               },
               materialSampleName: "test-ms",
               ...BLANK_PREPARATION,
@@ -1175,5 +1173,52 @@ describe("Material Sample Edit Page", () => {
 
     // Form submitted successfully:
     expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
+  });
+
+  it("Add the associated sample selected from search result list to a new association  .", async () => {
+    // Mount a new material sample with no values
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm onSaved={mockOnSaved} />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable association:
+    wrapper
+      .find(".enable-associations")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Add a new association
+    wrapper.find("button.add-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find("button.searchSample")).toBeTruthy();
+
+    // Click the search button to find from a material sample list
+    wrapper.find("button.searchSample").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Search table is shown:
+    expect(wrapper.find(".associated-sample-search").exists()).toEqual(true);
+
+    // Select one sample from search result list
+    wrapper.find("button.associated-sample-search").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Expect the selected sample being populated to the sample input
+    expect(wrapper.find(".associated-sample-link").text()).toEqual(
+      "my-sample-name"
+    );
   });
 });

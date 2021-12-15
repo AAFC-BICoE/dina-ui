@@ -53,8 +53,8 @@ export function FilterForm({
   return (
     <DinaForm initialValues={filterForm} onSubmit={onFilterFormSubmitInternal}>
       {formikProps => (
-        <div className="mb-3" translate={undefined}>
-          <div className="mb-3">
+        <div className="d-flex gap-3 flex-wrap mb-3" translate={undefined}>
+          <div>
             <strong>
               <CommonMessage id="filterRecordsTitle" />
             </strong>
@@ -63,10 +63,8 @@ export function FilterForm({
               name="filterBuilderModel"
             />
           </div>
-          <div className="d-inline-block">
-            {children && children(formikProps)}
-          </div>
-          <div className="d-inline-block ps-3 list-inline">
+          <div>{children && children(formikProps)}</div>
+          <div className="align-end ps-3 d-flex gap-2 align-items-center">
             <SubmitButton className="list-inline-item">
               <CommonMessage id="filterSubmitButtonText" />
             </SubmitButton>
@@ -75,7 +73,7 @@ export function FilterForm({
               type="button"
               onClick={() => resetFilterForm(formikProps)}
             >
-              <CommonMessage id="resetButtonText" />
+              <CommonMessage id="resetFilters" />
             </button>
           </div>
         </div>

@@ -20,7 +20,7 @@ export function useBulkGet<TData extends KitsuResource>({
   const { bulkGet } = useApiClient();
 
   async function fetchResources(): Promise<
-    (TData | KitsuResource)[] | undefined
+    PersistedResource<TData | KitsuResource>[] | undefined
   > {
     if (disabled) {
       return undefined;

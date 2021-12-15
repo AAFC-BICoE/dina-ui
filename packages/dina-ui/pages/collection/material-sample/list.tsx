@@ -23,6 +23,7 @@ export interface SampleListLayoutProps {
   btnMsg?: string;
   hideTopPagination?: boolean;
   hideGroupFilter?: boolean;
+  showBulkActions?: boolean;
   openLinkInNewTab?: boolean;
 }
 
@@ -63,10 +64,13 @@ export function SampleListLayout({
   btnMsg,
   hideTopPagination,
   hideGroupFilter,
+  showBulkActions,
   openLinkInNewTab
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
+    "materialSampleName",
+    "dwcOtherCatalogNumbers",
     "createdBy",
     "collection.name",
     "collection.code",
@@ -135,6 +139,22 @@ export function SampleListLayout({
           <></>
         )
       }
+      bulkDeleteButtonProps={
+        showBulkActions
+          ? {
+              typeName: "material-sample",
+              apiBaseUrl: "/collection-api"
+            }
+          : undefined
+      }
+      bulkEditPath={
+        showBulkActions
+          ? ids => ({
+              pathname: "/collection/material-sample/bulk-edit",
+              query: { ids: ids.join(",") }
+            })
+          : undefined
+      }
     />
   );
 }
@@ -152,8 +172,13 @@ export default function MaterialSampleListPage() {
         </h1>
         <ButtonBar>
           <CreateButton entityLink="/collection/material-sample" />
+          <Link href={`/collection/material-sample/bulk-create`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="bulkCreate" />
+            </a>
+          </Link>
         </ButtonBar>
-        <SampleListLayout openLinkInNewTab={false} />
+        <SampleListLayout showBulkActions={true} openLinkInNewTab={false} />
       </main>
       <Footer />
     </div>
