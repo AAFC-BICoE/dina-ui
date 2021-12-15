@@ -1,6 +1,6 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
 import { isArray } from "lodash";
 import DOMPurify from "dompurify";
@@ -89,6 +89,8 @@ export function GlobalNamesField({
 }
 
 export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
+  const [showMore, setShowMore] = useState(false);
+  const { formatMessage } = useDinaIntl();
   const link = document.createElement("a");
   link.setAttribute("href", scientificNameDetails.sourceUrl);
   link.setAttribute("target", "_blank");
@@ -101,12 +103,49 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
     ADD_ATTR: ["target", "rel"]
   });
 
+  const paths = scientificNameDetails.classificationPath.split("|");
+  const ranks = scientificNameDetails.classificationRanks.split("|");
+
+  const familyIdx = ranks.findIndex(path => path === "family");
+  const familyRank = familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
+
+  const kingdomIdx = ranks.findIndex(path => path === "kingdom");
+  const kingdomRank = kingdomIdx >= 0 ? paths[kingdomIdx] : undefined;
+
+  const initTaxonTree = (
+    <span>
+      {" "}
+      {kingdomRank ? <b>Kingdom: </b> : undefined} {kingdomRank}
+      {familyRank ? <b> &gt;Family: </b> : undefined} {familyRank}
+    </span>
+  );
+
+  const fullTaxonTree = (
+    <>
+      {paths.map((path, idx) => {
+        let boldText = (
+          <span>
+            <b>{ranks[idx]} :</b> <span>{path}</span>{" "}
+          </span>
+        );
+        if (idx !== path.length - 1) {
+          boldText = <span> {boldText} &gt;</span>;
+        }
+        return boldText;
+      })}
+    </>
+  );
+
   return (
-    <div style={{ whiteSpace: "pre-wrap" }}>
-      <p> {value} </p>
-      {scientificNameDetails.hasSynonym ? safeHtmlLink : null}
-      {scientificNameDetails.classificationPath}
-      {scientificNameDetails.classificationRanks}
+    <div style={{ whiteSpace: "pre-wrap" }} className="d=flex flex-row">
+      <span> {value} </span>
+      <span>{scientificNameDetails.hasSynonym ? safeHtmlLink : null} </span>
+      <div>
+        {showMore ? fullTaxonTree : initTaxonTree}
+        <a className="btn btn-link pw-2" onClick={() => setShowMore(!showMore)}>
+          {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
+        </a>
+      </div>
     </div>
   );
 }

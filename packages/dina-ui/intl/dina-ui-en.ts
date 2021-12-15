@@ -502,6 +502,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   showing: "Showing",
   showingFilteredStorageUnits: "Showing Filtered Storage Units",
   showingTopLevelStorageUnits: "Showing Top Level Storage Units",
+  showLess: " Show Less",
+  showMore: "Show More",
   skipToMainContent: "Skip to Main Content",
   skipToAboutThisApplication: 'Skip to "About this site"',
   skipToBasicHtmlVersion: "Switch to basic HTML version",
