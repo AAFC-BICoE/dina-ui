@@ -1,5 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { FieldWrapper, LabelWrapperParams, SelectOption } from "common-ui";
+import { FieldWrapper, FieldWrapperProps, SelectOption } from "common-ui";
 import Select, { StylesConfig } from "react-select";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { DefaultValuesConfig } from "./model-types";
@@ -123,7 +123,7 @@ export function DefaultValuesConfigSelect({
 
 /** Formik-connected DefaultValuesConfig Select Field. */
 export function DefaultValuesConfigSelectField(
-  props: LabelWrapperParams & {
+  props: FieldWrapperProps & {
     allowBlank?: boolean;
     styles?: Partial<StylesConfig<SelectOption<any>, boolean>>;
   }

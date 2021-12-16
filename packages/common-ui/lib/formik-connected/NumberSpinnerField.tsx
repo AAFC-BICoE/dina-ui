@@ -1,8 +1,8 @@
 import { FormikProps } from "formik";
 import React from "react";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 
-interface NumberSpinnerFieldProps extends LabelWrapperParams {
+interface NumberSpinnerFieldProps extends FieldWrapperProps {
   onChangeExternal?: (formik: FormikProps<any>, name, newValue) => void;
   min?: number;
   max: number;

@@ -83,6 +83,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   logoutBtn: "Logout",
   max: "Max",
   min: "Min",
+  multipleValues: "Multiple Values",
   multipleValuesFound: "Multiple Values Found",
   name: "Name",
   next: "Next",

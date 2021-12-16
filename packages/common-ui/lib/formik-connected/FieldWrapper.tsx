@@ -1,14 +1,15 @@
 import classNames from "classnames";
-import { FastField, FormikProps } from "formik";
+import { FastField, FastFieldProps, FormikProps } from "formik";
 import { isArray } from "lodash";
-import { ReactNode, useMemo } from "react";
+import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { ReadOnlyValue } from "./FieldView";
 
-export interface LabelWrapperParams {
+export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */
   className?: string;
 
@@ -35,6 +36,8 @@ export interface LabelWrapperParams {
   /** Remove the label. */
   removeLabel?: boolean;
 
+  removeLabelTag?: boolean;
+
   /** Disables how clicking a label clicks the inner element. */
   disableLabelClick?: boolean;
 
@@ -59,22 +62,20 @@ export interface LabelWrapperParams {
   templateCheckboxFieldName?: string;
 
   /** Override FastField's default shouldComponentUpdate */
-  shouldUpdate?: (nextProps: LabelWrapperParams, props: {}) => boolean;
+  shouldUpdate?: (nextProps: FieldWrapperProps, props: {}) => boolean;
 
   validate?: (value: any) => string | void;
-}
-
-export interface FieldWrapperProps extends LabelWrapperParams {
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
-  removeLabelTag?: boolean;
 }
 
 export interface FieldWrapperRenderProps {
   invalid: boolean;
   value: any;
   setValue: (newValue: any) => void;
+  placeholder?: string;
+  defaultValue?: any;
   formik: FormikProps<any>;
 }
 
@@ -85,29 +86,10 @@ export interface FieldWrapperRenderProps {
  * This component also wraps the field in a div with the className `${fieldName}-field` for testing purposes.
  * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
-export function FieldWrapper({
-  className,
-  disableLabelClick,
-  hideLabel = false,
-  name,
-  label,
-  children,
-  customName,
-  link,
-  readOnlyRender,
-  removeBottomMargin,
-  removeLabel,
-  tooltipImage,
-  tooltipImageAlt,
-  tooltipLink,
-  tooltipLinkText,
-  templateCheckboxFieldName,
-  removeLabelTag,
-  shouldUpdate,
-  validate
-}: FieldWrapperProps) {
-  const { horizontal, readOnly, isTemplate, enabledFields } =
-    useDinaFormContext();
+export function FieldWrapper(props: FieldWrapperProps) {
+  const { name, templateCheckboxFieldName, shouldUpdate, validate } = props;
+
+  const { enabledFields } = useDinaFormContext();
 
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
   const disabledByFormTemplate = useMemo(
@@ -117,6 +99,58 @@ export function FieldWrapper({
         : false,
     [enabledFields]
   );
+
+  if (disabledByFormTemplate) {
+    return null;
+  }
+
+  return (
+    <FastField name={name} shouldUpdate={shouldUpdate} validate={validate}>
+      {fastFieldProps => (
+        <LabelWrapper fieldWrapperProps={props} fastFieldProps={fastFieldProps}>
+          <FormikConnectedField
+            fastFieldProps={fastFieldProps}
+            fieldWrapperProps={props}
+          />
+        </LabelWrapper>
+      )}
+    </FastField>
+  );
+}
+
+interface FieldWrapperInternalProps {
+  fastFieldProps: FastFieldProps<any>;
+  fieldWrapperProps: FieldWrapperProps;
+}
+
+/** Wraps a field with a label and flex layout */
+function LabelWrapper({
+  fieldWrapperProps: {
+    className,
+    customName,
+    disableLabelClick,
+    hideLabel = false,
+    label,
+    name,
+    removeBottomMargin,
+    removeLabel,
+    removeLabelTag,
+    tooltipImage,
+    templateCheckboxFieldName,
+    tooltipImageAlt,
+    tooltipLink,
+    tooltipLinkText
+  },
+  fastFieldProps: {
+    field: { value }
+  },
+  children
+}: PropsWithChildren<FieldWrapperInternalProps>) {
+  const { horizontal, isTemplate } = useDinaFormContext();
+  const bulkTab = useBulkEditTabFieldIndicators({
+    fieldName: name,
+    currentValue: value
+  });
 
   const fieldLabel = label ?? (
     <FieldHeader
@@ -137,50 +171,14 @@ export function FieldWrapper({
       : (horizontal || []).map(col => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
-  if (disabledByFormTemplate) {
-    return null;
-  }
-
-  const fieldWrapperInternal = (
-    <div className={valueClass} style={{ cursor: "auto" }}>
-      <FastField name={name} shouldUpdate={shouldUpdate} validate={validate}>
-        {({ field: { value }, form, meta: { error } }) => (
-          <ErrorBoundary
-            // The error boundary is just for render errors
-            // so an error thrown in a form field's render function kills just that field,
-            // not the whole page.
-            FallbackComponent={({ error: renderError }) => (
-              <div className="alert alert-danger" role="alert">
-                <pre className="mb-0">{renderError.message}</pre>
-              </div>
-            )}
-          >
-            {readOnly || !children
-              ? readOnlyRender?.(value, form) ?? (
-                  <ReadOnlyValue link={link} value={value} />
-                )
-              : typeof children === "function"
-              ? children?.({
-                  invalid: Boolean(error),
-                  value,
-                  setValue: newValue => {
-                    // Remove the error message when the user edits the field:
-                    form.setFieldError(name, undefined);
-                    form.setFieldValue(name, newValue);
-                    form.setFieldTouched(name);
-                  },
-                  formik: form
-                })
-              : children}
-            {error && <div className="invalid-feedback">{error}</div>}
-          </ErrorBoundary>
-        )}
-      </FastField>
-    </div>
-  );
-
   return (
-    <div className={classNames(className, { row: isTemplate })}>
+    <div
+      className={classNames(
+        className,
+        isTemplate && "row",
+        bulkTab?.bulkEditClasses
+      )}
+    >
       {isTemplate && (
         <CheckBoxWithoutWrapper
           name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
@@ -197,7 +195,9 @@ export function FieldWrapper({
             </div>
           )}
 
-          {fieldWrapperInternal}
+          <div className={valueClass} style={{ cursor: "auto" }}>
+            {children}
+          </div>
         </>
       ) : isTemplate && horizontal === "flex" ? (
         <div className={`col-sm-10`}>
@@ -214,7 +214,9 @@ export function FieldWrapper({
                 {!hideLabel && <strong>{fieldLabel}</strong>}
               </div>
             )}
-            {fieldWrapperInternal}
+            <div className={valueClass} style={{ cursor: "auto" }}>
+              {children}
+            </div>
           </label>
         </div>
       ) : (
@@ -236,9 +238,67 @@ export function FieldWrapper({
               {!hideLabel && <strong>{fieldLabel}</strong>}
             </div>
           )}
-          {fieldWrapperInternal}
+          <div className={valueClass} style={{ cursor: "auto" }}>
+            {children}
+          </div>
         </label>
       )}
     </div>
+  );
+}
+
+/** A user input connected to Formik state. */
+function FormikConnectedField({
+  fastFieldProps: {
+    form,
+    field: { name, value },
+    meta: { error }
+  },
+  fieldWrapperProps: { readOnlyRender, link, children }
+}: FieldWrapperInternalProps) {
+  const { readOnly } = useDinaFormContext();
+  const bulkTab = useBulkEditTabFieldIndicators({
+    fieldName: name,
+    currentValue: value
+  });
+
+  function setValue(newValue: any) {
+    // Remove the error message when the user edits the field:
+    form.setFieldError(name, undefined);
+    form.setFieldValue(name, newValue);
+    form.setFieldTouched(name);
+  }
+
+  const renderProps: FieldWrapperRenderProps = {
+    invalid: Boolean(error),
+    value,
+    setValue,
+    formik: form,
+
+    // Only used within the bulk editor's "Edit All" tab:
+    defaultValue: bulkTab?.defaultValue,
+    placeholder: bulkTab?.placeholder
+  };
+
+  return (
+    <ErrorBoundary
+      // The error boundary is just for render errors
+      // so an error thrown in a form field's render function kills just that field,
+      // not the whole page.
+      FallbackComponent={({ error: renderError }) => (
+        <div className="alert alert-danger" role="alert">
+          <pre className="mb-0">{renderError.message}</pre>
+        </div>
+      )}
+    >
+      {readOnly || !children
+        ? readOnlyRender?.(value, form) ?? (
+            <ReadOnlyValue link={link} value={value} />
+          )
+        : typeof children === "function"
+        ? children?.(renderProps)
+        : children}
+      {error && <div className="invalid-feedback">{error}</div>}
+    </ErrorBoundary>
   );
 }

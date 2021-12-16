@@ -37,11 +37,14 @@ export function MaterialSampleBulkEditor({
     key: `sample-${index}`,
     sample,
     saveHook: useMaterialSampleSave({ materialSample: sample }),
-    formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
+    formRef: useRef(null)
   }));
 
+  const [initialized, setInitialized] = useState(false);
+
   const { bulkEditTab, withBulkEditOverrides } = useBulkEditTab({
-    sampleHooks
+    sampleHooks,
+    hideBulkEditTab: !initialized
   });
 
   const { saveAll } = useBulkSampleSave({
@@ -78,7 +81,14 @@ export function MaterialSampleBulkEditor({
         renderOneSample={(_sample, index, isSelected) => (
           <MaterialSampleForm
             disableSampleNameField={disableSampleNameField}
-            materialSampleFormRef={sampleHooks[index].formRef}
+            materialSampleFormRef={form => {
+              const isLastRefSetter =
+                sampleHooks.filter(it => !it.formRef.current).length === 1;
+              sampleHooks[index].formRef.current = form;
+              if (isLastRefSetter && form) {
+                setInitialized(true);
+              }
+            }}
             materialSampleSaveHook={sampleHooks[index].saveHook}
             buttonBar={null}
             disableAutoNamePrefix={true}

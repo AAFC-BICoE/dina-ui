@@ -30,3 +30,26 @@ input[id^="react-select"] {
   margin-top: 15px !important;
   margin-bottom: 10px !important;
 }
+
+/*  */
+.has-multiple-values :placeholder-shown,
+.has-multiple-values .placeholder-text,
+.has-multiple-values .react-select__placeholder {
+  color: rgb(87, 120, 94);
+  font-style: italic;
+}
+
+/* HIghlight the Edit All tab's bulk-edited fields in green. */
+.has-bulk-edit-value label {
+  color: rgb(0, 110, 0);
+}
+.has-bulk-edit-value input[type="text"],
+.has-bulk-edit-value input[type="text"]:focus,
+.has-bulk-edit-value input[type="search"],
+.has-bulk-edit-value input[type="search"]:focus,
+.has-bulk-edit-value textarea,
+.has-bulk-edit-value textarea:focus,
+.has-bulk-edit-value .react-select__control {
+  border-color: green;
+  background-color: rgb(175, 255, 175);
+}

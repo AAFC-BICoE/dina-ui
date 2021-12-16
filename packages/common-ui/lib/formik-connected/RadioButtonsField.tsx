@@ -11,8 +11,11 @@ export function RadioButtonsField<T = any>({
 }: RadioFieldProps<T>) {
   return (
     <FieldWrapper disableLabelClick={true} {...props}>
-      {({ value, setValue }) => (
+      {({ defaultValue, value = defaultValue, setValue, placeholder }) => (
         <div>
+          {placeholder && (
+            <span className="placeholder-text">{placeholder}</span>
+          )}
           {options.map((option, index) => (
             <div className="form-check" key={index}>
               <label className="form-check-label">

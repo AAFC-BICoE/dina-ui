@@ -284,7 +284,7 @@ describe("BulkEditTabWarning", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  });
+  }, 20000);
 
   it("Lets you set the values without a warning when there are no determinations in the samples.", async () => {
     const wrapper = mountWithAppContext(
@@ -343,7 +343,7 @@ describe("BulkEditTabWarning", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  });
+  }, 20000);
 
   it("Shows the common value when all samples have the same determinations.", async () => {
     const wrapper = mountWithAppContext(
@@ -405,5 +405,5 @@ describe("BulkEditTabWarning", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  });
+  }, 20000);
 });

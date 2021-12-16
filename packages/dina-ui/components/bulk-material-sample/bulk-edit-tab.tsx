@@ -1,7 +1,7 @@
 import {
   BulkEditTabContext,
   BulkEditTabContextI,
-  UseBulkEditTabParams,
+  SampleWithHooks,
   withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
@@ -14,7 +14,15 @@ import { MaterialSampleForm } from "../../pages/collection/material-sample/edit"
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 
-export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
+export interface UseBulkEditTabParams {
+  sampleHooks: SampleWithHooks[];
+  hideBulkEditTab?: boolean;
+}
+
+export function useBulkEditTab({
+  hideBulkEditTab,
+  sampleHooks
+}: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
   const initialValues: InputResource<MaterialSample> = {
@@ -35,23 +43,24 @@ export function useBulkEditTab({ sampleHooks }: UseBulkEditTabParams) {
   const bulkEditTab: BulkNavigatorTab = {
     key: "EDIT_ALL",
     title: formatMessage("editAll"),
-    content: isSelected => (
-      <BulkEditTabContext.Provider value={ctx}>
-        <MaterialSampleForm
-          buttonBar={null}
-          materialSampleFormRef={bulkEditFormRef}
-          materialSampleSaveHook={bulkEditSampleHook}
-          materialSample={initialValues}
-          disableAutoNamePrefix={true}
-          disableSampleNameField={true}
-          omitGroupField={true}
-          isOffScreen={!isSelected}
-          // Disable the nav's Are You Sure prompt when removing components,
-          // because you aren't actually deleting data.
-          disableNavRemovePrompt={true}
-        />
-      </BulkEditTabContext.Provider>
-    )
+    content: isSelected =>
+      hideBulkEditTab ? null : (
+        <BulkEditTabContext.Provider value={ctx}>
+          <MaterialSampleForm
+            buttonBar={null}
+            materialSampleFormRef={bulkEditFormRef}
+            materialSampleSaveHook={bulkEditSampleHook}
+            materialSample={initialValues}
+            disableAutoNamePrefix={true}
+            disableSampleNameField={true}
+            omitGroupField={true}
+            isOffScreen={!isSelected}
+            // Disable the nav's Are You Sure prompt when removing components,
+            // because you aren't actually deleting data.
+            disableNavRemovePrompt={true}
+          />
+        </BulkEditTabContext.Provider>
+      )
   };
 
   /** Returns a sample with the overridden values. */

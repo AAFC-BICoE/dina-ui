@@ -169,7 +169,8 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           }
           inputProps={{
             ...(inputProps as InputProps<any>),
-            placeholder: formatMessage({ id: "typeHereToSearch" })
+            placeholder: formatMessage({ id: "typeHereToSearch" }),
+            autoComplete: "off"
           }}
           theme={{
             suggestionsList: "list-group",

@@ -3,11 +3,11 @@ import { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
 import TextareaAutosize, {
   TextareaAutosizeProps
 } from "react-textarea-autosize";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import classnames from "classnames";
 import React from "react";
 
-export interface TextFieldProps extends LabelWrapperParams {
+export interface TextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
   multiLines?: boolean;
   inputProps?: InputHTMLAttributes<any> | TextareaHTMLAttributes<any>;
@@ -35,31 +35,21 @@ export function TextField(props: TextFieldProps) {
     readOnly,
     multiLines,
     inputProps: inputPropsExternal,
-    placeholder,
     customInput,
     onChangeExternal,
     numberOnly,
     letterOnly,
     noSpace,
-    ...labelWrapperProps
+    ...fieldWrapperProps
   } = props;
 
   return (
-    <FieldWrapper {...labelWrapperProps}>
-      {({ formik, setValue, value, invalid }) => {
+    <FieldWrapper {...fieldWrapperProps}>
+      {({ formik, setValue, value, invalid, ...renderProps }) => {
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
         }
-
-        const inputPropsInternal: InputHTMLAttributes<any> = {
-          ...inputPropsExternal,
-          placeholder,
-          className: classnames("form-control", { "is-invalid": invalid }),
-          onChange: event => onChangeInternal(event.target.value),
-          value: value || "",
-          readOnly
-        };
 
         const onKeyDown = e => {
           const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
@@ -74,6 +64,15 @@ export function TextField(props: TextFieldProps) {
           ) {
             e.preventDefault();
           }
+        };
+
+        const inputPropsInternal: InputHTMLAttributes<HTMLInputElement> = {
+          ...inputPropsExternal,
+          placeholder: renderProps.placeholder || fieldWrapperProps.placeholder,
+          className: classnames("form-control", { "is-invalid": invalid }),
+          onChange: event => onChangeInternal(event.target.value),
+          value: value || renderProps.defaultValue || "",
+          readOnly
         };
 
         // The default Field component's inner text input needs to be replaced with our own

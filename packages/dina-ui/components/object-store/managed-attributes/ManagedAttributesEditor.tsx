@@ -6,6 +6,7 @@ import {
   SelectField,
   TextField,
   useApiClient,
+  useBulkEditTabContext,
   useDinaFormContext,
   useModal
 } from "common-ui";
@@ -50,7 +51,11 @@ export function ManagedAttributesEditor({
   const { formatMessage } = useDinaIntl();
   const { openModal } = useModal();
 
-  const managedAttributeValues = get(formInitialValues, valuesPath);
+  const bulkCtx = useBulkEditTabContext();
+
+  const managedAttributeValues = bulkCtx?.sampleHooks.map(sample =>
+    get(sample.formRef.current?.values, valuesPath)
+  ) || [get(formInitialValues, valuesPath)];
 
   const [editableManagedAttributes, setEditableManagedAttributes] = useState<
     PersistedResource<ManagedAttribute>[]
@@ -59,7 +64,7 @@ export function ManagedAttributesEditor({
   useEffect(() => {
     (async () => {
       const initialAttributes = await getManagedAttributesInUse(
-        [managedAttributeValues],
+        managedAttributeValues,
         bulkGet,
         apiClient,
         useKeyInFilter as boolean,
