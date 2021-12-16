@@ -1,6 +1,7 @@
 import Cleave from "cleave.js/react";
 import { DoOperationsError, MaterialSampleSearchHelper } from "common-ui";
 import { InputResource } from "kitsu";
+import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { default as ReactSwitch, default as Switch } from "react-switch";
 import { AttachmentsEditor } from "../..";
@@ -10,7 +11,6 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
-import Select from "react-select";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -62,6 +62,33 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "metadata",
           id: "initial-attachment-2",
           originalFileName: "initial-attachment-2"
+        };
+      case "/managed-attribute/MATERIAL_SAMPLE.m1":
+        return {
+          type: "managed-attribute",
+          id: "1",
+          key: "m1",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 1"
+        };
+      case "/managed-attribute/MATERIAL_SAMPLE.m2":
+        return {
+          type: "managed-attribute",
+          id: "2",
+          key: "m2",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 2"
+        };
+      case "/managed-attribute/MATERIAL_SAMPLE.m3":
+        return {
+          type: "managed-attribute",
+          id: "3",
+          key: "m3",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          name: "Managed Attribute 3"
         };
     }
   });
@@ -178,6 +205,28 @@ const TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[] = [
   barcode: "test barcode",
   materialSampleState: "test-ms-state"
 }));
+
+const TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES: InputResource<MaterialSample>[] =
+  [
+    {
+      ...blankMaterialSample(),
+      id: "1",
+      type: "material-sample",
+      managedAttributes: {
+        m1: "m1 initial value",
+        m3: "common m3 value"
+      }
+    },
+    {
+      ...blankMaterialSample(),
+      id: "2",
+      type: "material-sample",
+      managedAttributes: {
+        m2: "m2 initial value",
+        m3: "common m3 value"
+      }
+    }
+  ];
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
@@ -916,5 +965,59 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .tags-field")
         .exists()
     ).toEqual(true);
+  }, 20000);
+
+  it("Shows the managed attributes for all edited samples.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // All Managed Attributes from all samples are shown in the bulk edit UI:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL .editable-attribute-menu .react-select__multi-value__label"
+        )
+        .map(node => node.text())
+    ).toEqual([
+      "Managed Attribute 1",
+      "Managed Attribute 3",
+      "Managed Attribute 2"
+    ]);
+
+    // m1 and m2 have multiple values, so show a blank input with a placeholder:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .managedAttributes_m1-field input")
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .managedAttributes_m2-field input")
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .managedAttributes_m1-field input")
+        .prop("placeholder")
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .managedAttributes_m2-field input")
+        .prop("placeholder")
+    ).toEqual("Multiple Values");
+    // m3 has a common value so show the common value in the input:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .managedAttributes_m3-field input")
+        .prop("value")
+    ).toEqual("common m3 value");
   }, 20000);
 });

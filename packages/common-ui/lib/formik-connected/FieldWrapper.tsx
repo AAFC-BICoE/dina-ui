@@ -171,6 +171,12 @@ function LabelWrapper({
       : (horizontal || []).map(col => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
+  // Replace dots and square brackets with underscores so the classes are selectable in tests and CSS:
+  // e.g. organism.lifeStage-field -> organism_lifeStage-field
+  const fieldNameClasses = [name, customName].map(
+    it => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
+  );
+
   return (
     <div
       className={classNames(
@@ -203,8 +209,7 @@ function LabelWrapper({
         <div className={`col-sm-10`}>
           <label
             className={classNames(
-              `${name}-field`,
-              customName && `${customName}-field`,
+              ...fieldNameClasses,
               "d-flex gap-2 align-items-center"
             )}
             htmlFor={disableLabelClick ? "none" : undefined}
@@ -222,8 +227,7 @@ function LabelWrapper({
       ) : (
         <label
           className={classNames(
-            `${name}-field`,
-            customName && `${customName}-field`,
+            ...fieldNameClasses,
             horizontal === "flex" && "d-flex gap-2",
             horizontal ? "align-items-center" : "mb-2",
             (horizontal === true || isArray(horizontal)) && "row",
