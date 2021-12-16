@@ -126,16 +126,18 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
     <div>
       <span style={{ fontSize: "1.5rem" }}> {value} </span>
       <span>{scientificNameDetails?.hasSynonym ? safeHtmlLink : null} </span>
-      <div className="mt-1">
-        {showMore ? fullTaxonTree : initTaxonTree}
-        <a
-          role="button"
-          className="btn-link"
-          onClick={() => setShowMore(!showMore)}
-        >
-          {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
-        </a>
-      </div>
+      {paths?.length && ranks?.length && (
+        <div className="mt-1">
+          {showMore ? fullTaxonTree : initTaxonTree}
+          <a
+            role="button"
+            className="btn-link"
+            onClick={() => setShowMore(!showMore)}
+          >
+            {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
@@ -193,14 +195,16 @@ export function SelectedScientificNameView(
         />
       </div>
       <div className="my-2">
-        <a
-          target="_blank"
-          type="button"
-          href={`${scientificNameSrceDetailUrlVal}`}
-          className="btn btn-info me-2 view-button "
-        >
-          <DinaMessage id="viewDetailButtonLabel" />
-        </a>
+        {scientificNameSrceDetailUrlVal && (
+          <a
+            target="_blank"
+            type="button"
+            href={`${scientificNameSrceDetailUrlVal}`}
+            className="btn btn-info me-2 view-button "
+          >
+            <DinaMessage id="viewDetailButtonLabel" />
+          </a>
+        )}
         {searchInitiated && (
           <button
             type="button"
