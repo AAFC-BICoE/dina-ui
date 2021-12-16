@@ -11,7 +11,12 @@ export function RadioButtonsField<T = any>({
 }: RadioFieldProps<T>) {
   return (
     <FieldWrapper disableLabelClick={true} {...props}>
-      {({ defaultValue, value = defaultValue, setValue, placeholder }) => (
+      {({
+        defaultValue,
+        value = defaultValue ?? null,
+        setValue,
+        placeholder
+      }) => (
         <div>
           {placeholder && (
             <span className="placeholder-text">{placeholder}</span>
