@@ -2,7 +2,7 @@ import { useDinaFormContext } from "common-ui";
 import { useFormikContext } from "formik";
 import { MdVpnLock } from "react-icons/md";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { TextField } from "../../../common-ui/lib/formik-connected/TextField";
+import { TextField } from "common-ui";
 
 export function NotPubliclyReleasableWarning() {
   const { readOnly } = useDinaFormContext();

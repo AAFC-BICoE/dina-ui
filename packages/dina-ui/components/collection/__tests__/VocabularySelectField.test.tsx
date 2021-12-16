@@ -1,5 +1,5 @@
 import CreatableSelect from "react-select/creatable";
-import { DinaForm } from "../../../../common-ui/lib";
+import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { VocabularySelectField } from "../VocabularySelectField";
 

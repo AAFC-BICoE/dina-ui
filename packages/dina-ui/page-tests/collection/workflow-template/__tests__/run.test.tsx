@@ -246,7 +246,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparationAttachment: undefined,
               determination: [],
               organism: null,
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -343,7 +342,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               preparationAttachment: undefined,
               determination: [],
               organism: null,
-              managedAttributes: {},
               relationships: {
                 attachment: {
                   data: []
@@ -466,7 +464,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-              managedAttributes: {},
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,

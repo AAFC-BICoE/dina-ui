@@ -13,7 +13,9 @@ describe("ErrorViewer component", () => {
       </Formik>
     );
 
-    expect(wrapper.find(ErrorViewer).html()).toEqual("<div></div>");
+    expect(wrapper.find(ErrorViewer).html()).toEqual(
+      `<div class="error-viewer"></div>`
+    );
   });
 
   it("Renders the formik status as an error message.", async () => {

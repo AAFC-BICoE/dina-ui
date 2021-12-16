@@ -75,9 +75,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         className="flex-grow-1"
       />
       <EditButton entityId={id} entityLink="collection/material-sample" />
-      <Link
-        href={`/collection/material-sample/workflows/split-config?id=${id}`}
-      >
+      <Link href={`/collection/material-sample/bulk-create?splitFromId=${id}`}>
         <a className="btn btn-info">
           <DinaMessage id="splitButton" />
         </a>
@@ -206,7 +204,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
                 <div className="col-md-6">
-                  <FastField name="managedAttributeValues">
+                  <FastField name="managedAttributes">
                     {({ field: { value } }) => (
                       <ManagedAttributesViewer
                         values={value}

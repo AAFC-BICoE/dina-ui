@@ -3,21 +3,19 @@ import {
   ButtonBar,
   SubmitButton,
   useQuery,
-  withResponse,
-  DinaForm
+  withResponse
 } from "common-ui";
 import { InputResource, KitsuResource, PersistedResource } from "kitsu";
-import { compact, isNil, set, toPairs, pick } from "lodash";
+import { compact, isNil, pick, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 import { Head, Nav } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   PreparationProcessDefinition,
   TemplateFields
 } from "../../../types/collection-api";
 import { MaterialSampleForm } from "../material-sample/edit";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export default function CreateMaterialSampleFromWorkflowPage() {
   const router = useRouter();
@@ -91,7 +89,8 @@ export function CreateMaterialSampleFromWorkflowForm({
     return routeString === "newRun" ? moveToNewRunPage : moveToSampleViewPage;
   }
 
-  const [onSaveString, setOnSaveString] = useState("viewSample");
+  const [onSaveString, setOnSaveString] =
+    useState<RoutingButtonStrings>("viewSample");
 
   return (
     <MaterialSampleForm
@@ -122,7 +121,7 @@ export function CreateMaterialSampleFromWorkflowForm({
       materialSample={materialSampleInitialValues}
       collectingEventInitialValues={collectingEventInitialValues}
       acquisitionEventInitialValues={acquisitionEventInitialValues}
-      onSaved={selectOnSaved(onSaveString as RoutingButtonStrings)}
+      onSaved={selectOnSaved(onSaveString)}
       enabledFields={enabledFields}
       attachmentsConfig={{
         collectingEvent: pick(
