@@ -373,10 +373,24 @@ describe("BulkEditTabWarning", () => {
       ).length
     ).toEqual(2);
 
+    // The green bulk-override indicator is not shown before changing any values:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .determination-section .has-bulk-edit-value")
+        .exists()
+    ).toEqual(false);
+
     // Override the name in the first determination:
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
       .simulate("change", { target: { value: "first name override" } });
+
+    // The green bulk-override indicator is now shown:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .verbatimScientificName .has-bulk-edit-value")
+        .exists()
+    ).toEqual(true);
 
     wrapper.find("button.bulk-save-button").simulate("click");
 

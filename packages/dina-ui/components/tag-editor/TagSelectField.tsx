@@ -54,7 +54,13 @@ export function TagSelectField({
         )
       }
     >
-      {({ value, setValue, invalid, placeholder }) => (
+      {({
+        defaultValue,
+        value = defaultValue,
+        setValue,
+        invalid,
+        placeholder
+      }) => (
         <TagSelect
           value={value}
           onChange={setValue}

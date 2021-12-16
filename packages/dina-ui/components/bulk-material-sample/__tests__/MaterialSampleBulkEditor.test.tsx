@@ -10,6 +10,7 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import Select from "react-select";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -140,6 +141,43 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     materialSampleName: "MS3"
   }
 ];
+
+/** Simple flat fields are the same. */
+const TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[] =
+  [
+    {
+      ...blankMaterialSample(),
+      id: "1",
+      type: "material-sample",
+      publiclyReleasable: true
+    },
+    {
+      ...blankMaterialSample(),
+      id: "2",
+      type: "material-sample",
+      tags: ["tag1"],
+      collection: { id: "c1", type: "collection" },
+      projects: [{ id: "p1", type: "project", name: "project 1" }],
+      publiclyReleasable: false,
+      barcode: "test barcode",
+      materialSampleState: "test-ms-state"
+    }
+  ];
+
+const TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[] = [
+  "1",
+  "2"
+].map(id => ({
+  ...blankMaterialSample(),
+  id,
+  type: "material-sample",
+  tags: ["tag1"],
+  collection: { id: "c1", type: "collection" },
+  projects: [{ id: "p1", type: "project", name: "project 1" }],
+  publiclyReleasable: false,
+  barcode: "test barcode",
+  materialSampleState: "test-ms-state"
+}));
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
@@ -663,5 +701,220 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  }, 20000);
+
+  it("Shows the Multiple Values placeholder in bulk editable fields", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".has-multiple-values .tags-field div.react-select__placeholder")
+        .text()
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(
+          ".has-multiple-values .collection-field div.react-select__placeholder"
+        )
+        .text()
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(
+          ".has-multiple-values .projects-field div.react-select__placeholder"
+        )
+        .text()
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(
+          ".has-multiple-values .publiclyReleasable-field .placeholder-text"
+        )
+        .text()
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(".has-multiple-values .barcode-field input")
+        .prop("placeholder")
+    ).toEqual("Multiple Values");
+    expect(
+      wrapper
+        .find(".has-multiple-values .materialSampleState-field input")
+        .prop("placeholder")
+    ).toEqual("Multiple Values");
+
+    // Blank values should be rendered into these fields so the placeholder is visible:
+    expect(
+      wrapper
+        .find(".has-multiple-values .tags-field")
+        .find(CreatableSelect)
+        .prop("value")
+    ).toEqual([]);
+    expect(
+      wrapper
+        .find(".has-multiple-values .collection-field")
+        .find(Select)
+        .prop("value")
+    ).toEqual(null);
+    expect(
+      wrapper
+        .find(".has-multiple-values .materialSampleState-field input")
+        .prop("value")
+    ).toEqual("");
+  }, 20000);
+
+  it("Shows the common value when multiple fields have the same value.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The common values are displayed in the UI:
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .tags-field")
+        .find(CreatableSelect)
+        .prop("value")
+    ).toEqual([
+      {
+        label: "tag1",
+        value: "tag1"
+      }
+    ]);
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .collection-field")
+        .find(Select)
+        .prop("value")
+    ).toEqual({
+      label: "c1",
+      resource: {
+        id: "c1",
+        type: "collection"
+      },
+      value: "c1"
+    });
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .projects-field")
+        .find(Select)
+        .prop("value")
+    ).toEqual([
+      {
+        label: "project 1",
+        resource: {
+          id: "p1",
+          name: "project 1",
+          type: "project"
+        },
+        value: "p1"
+      }
+    ]);
+
+    expect(
+      wrapper
+        .find(".publiclyReleasable-field label")
+        // The field is inverted (Not Publicly Releasable) so false -> true:
+        .findWhere(node => node.text().includes("True"))
+        .find("input")
+        .prop("checked")
+    ).toEqual(true);
+
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("test barcode");
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .materialSampleState-field input")
+        .prop("value")
+    ).toEqual("test-ms-state");
+
+    // Set the barcode to the same value to update the form state
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "test barcode" } });
+
+    // Click the "Save All" button without overriding anything:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the material samples:
+    // The common values displayed in the UI are not re-updated:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  }, 20000);
+
+  it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "edited-barcode-1" } });
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
+        .exists()
+    ).toEqual(true);
+
+    wrapper
+      .find(".tabpanel-EDIT_ALL .tags-field")
+      .find(CreatableSelect)
+      .prop<any>("onChange")([{ value: "tag1" }]);
+    wrapper.update();
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .tags-field")
+        .exists()
+    ).toEqual(true);
   }, 20000);
 });
