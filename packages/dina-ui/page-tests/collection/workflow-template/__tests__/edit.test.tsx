@@ -1012,7 +1012,7 @@ describe("Workflow template edit page", () => {
       name: "test-config",
       type: "material-sample-action-definition"
     });
-  });
+  }, 20000);
 
   it("Edits an existing action-definition: Splits the Identifiers and Preparation subforms correctly", async () => {
     const { wrapper, submitForm } = await mountForm({

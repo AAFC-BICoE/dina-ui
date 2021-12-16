@@ -20,12 +20,6 @@ export function useBulkEditTabField({
 
   const { sampleHooks, bulkEditFormRef } = bulkEditCtx;
 
-  const hasBulkEditValue = !isBlankResourceAttribute(
-    currentValue !== undefined
-      ? currentValue
-      : get(bulkEditFormRef.current?.values, fieldName)
-  );
-
   const formStates = sampleHooks.map(sample => sample.formRef.current?.values);
 
   const hasNoValues = formStates.every(form =>
@@ -43,6 +37,15 @@ export function useBulkEditTabField({
 
   const commonValue =
     hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined;
+
+  const bulkEditValue =
+    currentValue !== undefined
+      ? currentValue
+      : get(bulkEditFormRef.current?.values, fieldName);
+
+  const hasBulkEditValue =
+    !isBlankResourceAttribute(bulkEditValue) &&
+    !isEqual(bulkEditValue, commonValue);
 
   return {
     hasNoValues,

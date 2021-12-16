@@ -57,6 +57,8 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   alwaysShowSuggestions,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
+  const { formatMessage } = useIntl();
+
   return (
     <TextField
       {...textFieldProps}
@@ -66,6 +68,10 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           suggestion={suggestion}
           suggestions={suggestions}
           {...inputProps}
+          placeholder={
+            inputProps.placeholder || formatMessage({ id: "typeHereToSearch" })
+          }
+          autoComplete="off"
           onSuggestionSelected={onSuggestionSelected}
           alwaysShowSuggestions={alwaysShowSuggestions}
           id={textFieldProps.name}
@@ -87,7 +93,6 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formik = useFormikContext<any>();
-  const { formatMessage } = useIntl();
 
   const [searchValue, setSearchValue] = useState("");
   const [debouncedSearchValue] = timeoutMs
@@ -167,11 +172,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           shouldRenderSuggestions={
             alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
           }
-          inputProps={{
-            ...(inputProps as InputProps<any>),
-            placeholder: formatMessage({ id: "typeHereToSearch" }),
-            autoComplete: "off"
-          }}
+          inputProps={inputProps as InputProps<any>}
           theme={{
             suggestionsList: "list-group",
             suggestion: "list-group-item",
