@@ -27,5 +27,6 @@ export type ScientificNameSourceDetails = {
 };
 
 export enum ScientificNameSource {
-  COLPLUS = "COLPLUS"
+  COLPLUS = "COLPLUS",
+  GNA = "GNA"
 }

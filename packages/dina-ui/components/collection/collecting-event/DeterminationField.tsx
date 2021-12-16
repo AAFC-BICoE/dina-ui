@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { FormikContextType } from "formik";
 import { get, isArray } from "lodash";
-import { GlobalNamesField, RenderAsReadonly } from "..";
+import { GlobalNamesField, SelectedScientificNameView } from "..";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -215,16 +215,23 @@ export function DeterminationField() {
                 <>
                   <TextField
                     {...fieldProps("scientificName")}
-                    readOnlyRender={(value, form) => (
-                      <RenderAsReadonly
-                        value={value}
-                        form={form}
-                        scientificNameDetailsField={
-                          fieldProps("scientificNameDetails").name
-                        }
-                        // here to continue, missing issynonym and currentName
-                      />
-                    )}
+                    readOnlyRender={(value, form) => {
+                      const scientificNameSrceDetailUrlVal = form.getFieldMeta(
+                        fieldProps("scientificNameDetails.sourceUrl").name
+                      ).value as string;
+                      return (
+                        <SelectedScientificNameView
+                          value={value}
+                          formik={form}
+                          scientificNameDetailsField={
+                            fieldProps("scientificNameDetails").name
+                          }
+                          scientificNameSrceDetailUrlVal={
+                            scientificNameSrceDetailUrlVal
+                          }
+                        />
+                      );
+                    }}
                     onChangeExternal={form => {
                       form.setFieldValue(
                         fieldProps("scientificNameSource").name,
@@ -240,7 +247,7 @@ export function DeterminationField() {
                 <GlobalNamesField
                   {...fieldProps("scientificNameInput")}
                   label={
-                    readOnly
+                    hideScientificNameInput
                       ? formatMessage("field_scientificNameInput")
                       : formatMessage("scientificNameSearch")
                   }

@@ -1,10 +1,12 @@
 import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { FormikProps } from "formik";
+
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useState } from "react";
 import { isArray } from "lodash";
 import DOMPurify from "dompurify";
 import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
+import { Dispatch, SetStateAction } from "react";
 export interface GlobalNamesFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -37,31 +39,18 @@ export function GlobalNamesField({
         const scientificNameSrceDetailUrlVal = formik.getFieldMeta(
           scientificNameDetailsSrcUrlField as any
         ).value as string;
-        return value &&
-          (searchInitiated || scientificNameSrceDetailUrlVal?.length > 0) ? (
-          // When the field has a value of previous or current search result
-          <div style={{ border: "1px solid #F5F5F5" }}>
-            <div className="mt-2 ">
-              <RenderAsReadonly
-                value={value}
-                form={formik}
-                scientificNameDetailsField={scientificNameDetailsField}
-              />
-            </div>
-            <div className="mb-2 mx-1">
-              <button
-                type="button"
-                className="btn btn-danger remove-button"
-                onClick={() => {
-                  onChange?.(null, formik);
-                  setValue(null);
-                  setSearchInitiated(false);
-                }}
-              >
-                <DinaMessage id="remove" />
-              </button>
-            </div>
-          </div>
+
+        return value && scientificNameSrceDetailUrlVal?.length > 0 ? (
+          <SelectedScientificNameView
+            value={value}
+            formik={formik}
+            scientificNameDetailsField={scientificNameDetailsField as any}
+            scientificNameSrceDetailUrlVal={scientificNameSrceDetailUrlVal}
+            onChange={onChange as any}
+            setSearchInitiated={setSearchInitiated}
+            searchInitiated={searchInitiated}
+            setValue={setValue}
+          />
         ) : (
           <GlobalNamesSearchBox
             fetchJson={fetchJson}
@@ -121,12 +110,12 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
     <>
       {paths?.map((path, idx) => {
         let boldText = (
-          <span>
-            <b>{ranks?.[idx]} :</b> <span>{path}</span>{" "}
-          </span>
+          <>
+            <b>{ranks?.[idx]} :</b> <>{path}</>{" "}
+          </>
         );
         if (idx !== path.length - 1) {
-          boldText = <span> {boldText} &gt;</span>;
+          boldText = <> {boldText} &gt;</>;
         }
         return boldText;
       })}
@@ -134,10 +123,10 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
   );
 
   return (
-    <div style={{ whiteSpace: "pre-wrap" }}>
+    <div>
       <span style={{ fontSize: "1.5rem" }}> {value} </span>
       <span>{scientificNameDetails?.hasSynonym ? safeHtmlLink : null} </span>
-      <div className="mt-1 mx-1">
+      <div className="mt-1">
         {showMore ? fullTaxonTree : initTaxonTree}
         <a
           role="button"
@@ -166,5 +155,66 @@ export function RenderAsReadonly({ value, form, scientificNameDetailsField }) {
       value={value}
       scientificNameDetails={scientificNameDetails}
     />
+  );
+}
+
+export interface SelectedScientificNameViewProps {
+  value: string;
+  formik: FormikProps<any>;
+  scientificNameDetailsField: string;
+  scientificNameSrceDetailUrlVal: string;
+  searchInitiated?: boolean;
+  onChange?: (selection: string | null, formik: FormikProps<any>) => void;
+  setValue?: (newValue: any) => void;
+  setSearchInitiated?: Dispatch<SetStateAction<boolean>>;
+}
+
+export function SelectedScientificNameView(
+  props: SelectedScientificNameViewProps
+) {
+  const {
+    value,
+    formik,
+    scientificNameDetailsField,
+    scientificNameSrceDetailUrlVal,
+    searchInitiated,
+    onChange,
+    setValue,
+    setSearchInitiated
+  } = props;
+
+  return (
+    <div style={{ border: "1px solid #F5F5F5" }}>
+      <div className="mt-2">
+        <RenderAsReadonly
+          value={value}
+          form={formik}
+          scientificNameDetailsField={scientificNameDetailsField}
+        />
+      </div>
+      <div className="my-2">
+        <a
+          target="_blank"
+          type="button"
+          href={`${scientificNameSrceDetailUrlVal}`}
+          className="btn btn-info me-2 view-button "
+        >
+          <DinaMessage id="viewDetailButtonLabel" />
+        </a>
+        {searchInitiated && (
+          <button
+            type="button"
+            className="btn btn-danger remove-button"
+            onClick={() => {
+              onChange?.(null, formik);
+              setValue?.(null);
+              setSearchInitiated?.(false);
+            }}
+          >
+            <DinaMessage id="remove" />
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
