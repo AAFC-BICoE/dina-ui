@@ -27,6 +27,7 @@ export function useBulkEditTab({
 
   const initialValues: InputResource<MaterialSample> = {
     type: "material-sample",
+    publiclyReleasable: null,
     determination: []
   };
   const bulkEditSampleHook = useMaterialSampleSave({

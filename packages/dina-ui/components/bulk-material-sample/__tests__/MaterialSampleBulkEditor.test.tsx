@@ -1020,4 +1020,40 @@ describe("MaterialSampleBulkEditor", () => {
         .prop("value")
     ).toEqual("common m3 value");
   }, 20000);
+
+  it("Doesn't show the has-bulk-edit-value classname in nested forms.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable the collecting event section:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Edit a collecting event field:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
+      .simulate("change", { target: { value: "test locality bulk edit" } });
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
+        .prop("value")
+    ).toEqual("test locality bulk edit");
+    // The has-bulk-edit-value indicator doesn't appear:
+    expect(
+      wrapper.find(".has-bulk-edit-value .dwcVerbatimLocality-field").exists()
+    ).toEqual(false);
+  });
 });

@@ -52,12 +52,13 @@ export function TagsAndRestrictionsSection({
         />
         <div className="col-sm-6">
           {isInBulkEditTab ? (
-            <RadioButtonsField<boolean | undefined>
+            <RadioButtonsField<boolean | null>
               name="publiclyReleasable"
               label={<DinaMessage id="notPubliclyReleasable" />}
               options={[
+                // null values are ignored when bulk editing:
                 {
-                  value: undefined,
+                  value: null,
                   label: <DinaMessage id="dontChangeValues" />
                 },
                 // True and false are reversed to show "publiclyReleasable" as "notPubliclyReleasable".
