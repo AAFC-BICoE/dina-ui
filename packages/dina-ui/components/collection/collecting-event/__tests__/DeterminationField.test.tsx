@@ -19,7 +19,7 @@ describe("DeterminationField component", () => {
 
     // Input some text:
     wrapper
-      .find(".col-search-input")
+      .find(".global-name-input")
       .simulate("change", { target: { value: "test-name" } });
 
     wrapper.find("form").simulate("submit");
