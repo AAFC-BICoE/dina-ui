@@ -40,18 +40,15 @@ export function GlobalNamesField({
         return value &&
           (searchInitiated || scientificNameSrceDetailUrlVal?.length > 0) ? (
           // When the field has a value of previous or current search result
-          <div
-            className="d-flex flex-row"
-            style={{ border: "1px solid #F5F5F5" }}
-          >
-            <div className="col-md-6 mt-2 ">
+          <div style={{ border: "1px solid #F5F5F5" }}>
+            <div className="mt-2 ">
               <RenderAsReadonly
                 value={value}
                 form={formik}
                 scientificNameDetailsField={scientificNameDetailsField}
               />
             </div>
-            <div className="col-md-4 d-flex align-items-center">
+            <div className="mb-2 mx-1">
               <button
                 type="button"
                 className="btn btn-danger remove-button"
@@ -92,24 +89,24 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
   const [showMore, setShowMore] = useState(false);
   const { formatMessage } = useDinaIntl();
   const link = document.createElement("a");
-  link.setAttribute("href", scientificNameDetails.sourceUrl);
+  link.setAttribute("href", scientificNameDetails?.sourceUrl);
   link.setAttribute("target", "_blank");
   link.setAttribute("rel", "noopener");
 
   // this will need to be replaced with currentName's label html if any to show as synonym if exists
-  link.innerHTML = scientificNameDetails.labelHtml;
+  link.innerHTML = scientificNameDetails?.labelHtml;
 
   const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
     ADD_ATTR: ["target", "rel"]
   });
 
-  const paths = scientificNameDetails.classificationPath.split("|");
-  const ranks = scientificNameDetails.classificationRanks.split("|");
+  const paths = scientificNameDetails?.classificationPath?.split("|");
+  const ranks = scientificNameDetails?.classificationRanks?.split("|");
 
-  const familyIdx = ranks.findIndex(path => path === "family");
+  const familyIdx = ranks?.findIndex(path => path === "family");
   const familyRank = familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
-  const kingdomIdx = ranks.findIndex(path => path === "kingdom");
+  const kingdomIdx = ranks?.findIndex(path => path === "kingdom");
   const kingdomRank = kingdomIdx >= 0 ? paths[kingdomIdx] : undefined;
 
   const initTaxonTree = (
@@ -122,10 +119,10 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
 
   const fullTaxonTree = (
     <>
-      {paths.map((path, idx) => {
+      {paths?.map((path, idx) => {
         let boldText = (
           <span>
-            <b>{ranks[idx]} :</b> <span>{path}</span>{" "}
+            <b>{ranks?.[idx]} :</b> <span>{path}</span>{" "}
           </span>
         );
         if (idx !== path.length - 1) {
@@ -137,12 +134,16 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
   );
 
   return (
-    <div style={{ whiteSpace: "pre-wrap" }} className="d=flex flex-row">
-      <span> {value} </span>
-      <span>{scientificNameDetails.hasSynonym ? safeHtmlLink : null} </span>
-      <div>
+    <div style={{ whiteSpace: "pre-wrap" }}>
+      <span style={{ fontSize: "1.5rem" }}> {value} </span>
+      <span>{scientificNameDetails?.hasSynonym ? safeHtmlLink : null} </span>
+      <div className="mt-1 mx-1">
         {showMore ? fullTaxonTree : initTaxonTree}
-        <a className="btn btn-link pw-2" onClick={() => setShowMore(!showMore)}>
+        <a
+          role="button"
+          className="btn-link"
+          onClick={() => setShowMore(!showMore)}
+        >
           {showMore ? formatMessage("showLess") : formatMessage("showMore")}{" "}
         </a>
       </div>

@@ -222,9 +222,6 @@ export function DeterminationField() {
                         scientificNameDetailsField={
                           fieldProps("scientificNameDetails").name
                         }
-                        scientificNameSourceField={
-                          fieldProps("scientificNameSource").name
-                        }
                         // here to continue, missing issynonym and currentName
                       />
                     )}
@@ -262,36 +259,8 @@ export function DeterminationField() {
                       newValue ? "GNA" : null
                     );
                     formik.setFieldValue(
-                      fieldProps("scientificNameDetails.labelHtml").name,
-                      newValue && isArray(newValue)
-                        ? newValue[0].labelHtml
-                        : null
-                    );
-                    formik.setFieldValue(
-                      fieldProps("scientificNameDetails.sourceUrl").name,
-                      newValue && isArray(newValue)
-                        ? newValue[0].sourceUrl
-                        : null
-                    );
-                    formik.setFieldValue(
-                      fieldProps("scientificNameDetails.recordedOn").name,
-                      newValue && isArray(newValue)
-                        ? newValue[0].recordedOn
-                        : null
-                    );
-                    formik.setFieldValue(
-                      fieldProps("scientificNameDetails.classificationPath")
-                        .name,
-                      newValue && isArray(newValue)
-                        ? newValue[0].classificationPath
-                        : null
-                    );
-                    formik.setFieldValue(
-                      fieldProps("scientificNameDetails.classificationRanks")
-                        .name,
-                      newValue && isArray(newValue)
-                        ? newValue[0].classificationRanks
-                        : null
+                      fieldProps("scientificNameDetails").name,
+                      newValue && isArray(newValue) ? newValue[0] : null
                     );
                     // If selected a result from search , set text input value to null and hide it
                     // If a search value is removed, show the text input value
