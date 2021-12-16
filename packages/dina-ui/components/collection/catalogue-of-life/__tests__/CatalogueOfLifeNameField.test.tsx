@@ -1,4 +1,4 @@
-import { DinaForm } from "../../../../../common-ui/lib";
+import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { CatalogueOfLifeNameField } from "../CatalogueOfLifeNameField";
 import { NameUsageSearchResult } from "../nameusage-types";

@@ -1,11 +1,6 @@
+import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
-import {
-  ButtonBar,
-  DinaForm,
-  SubmitButton,
-  withResponse
-} from "../../../../common-ui/lib";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   PcrBatchForm,

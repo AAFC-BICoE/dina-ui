@@ -1,7 +1,3 @@
-import { PersistedResource } from "kitsu";
-import Link from "next/link";
-import { useState } from "react";
-import { Promisable } from "type-fest";
 import {
   ColumnDefinition,
   FilterGroupModel,
@@ -9,7 +5,11 @@ import {
   QueryTable,
   rsql,
   useDinaFormContext
-} from "../../../common-ui/lib";
+} from "common-ui";
+import { PersistedResource } from "kitsu";
+import Link from "next/link";
+import { useState } from "react";
+import { Promisable } from "type-fest";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";

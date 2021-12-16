@@ -1,11 +1,11 @@
 import {
+  DinaFormSection,
   filterBy,
   ResourceSelectField,
-  useDinaFormContext,
-  DinaFormSection
-} from "../../../common-ui/lib";
-import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
+  useDinaFormContext
+} from "common-ui";
 import { FaFolderOpen } from "react-icons/fa";
+import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ProjectSelectSectionProps {

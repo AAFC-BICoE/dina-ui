@@ -1,24 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  ApiClientContext,
-  AreYouSureModal,
   ColumnDefinition,
   dateCell,
   DinaForm,
   FilterAttribute,
   filterBy,
-  FormikButton,
   ListPageLayout,
   SplitPagePanel,
-  useAccount,
-  useGroupedCheckBoxes,
-  useModal
+  useGroupedCheckBoxes
 } from "common-ui";
-import { FormikContextType } from "formik";
-import { toPairs } from "lodash";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { Component, useContext, useMemo, useState } from "react";
+import { Component, PropsWithChildren, useMemo, useState } from "react";
 import {
   GroupSelectField,
   Head,
@@ -37,12 +29,6 @@ type MetadataListLayoutType = "TABLE" | "GALLERY";
 const LIST_LAYOUT_STORAGE_KEY = "metadata-list-layout";
 
 const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
-
-/** Values of the Formik form that wraps the metadata list */
-export interface MetadataListFormValues {
-  /** Tracks which metadata IDs are selected. */
-  selectedMetadatas: Record<string, boolean>;
-}
 
 export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
   "originalFilename",
@@ -68,15 +54,6 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
-  const { groupNames } = useAccount();
-
-  const {
-    CheckBoxField,
-    CheckBoxHeader,
-    setAvailableItems: setAvailableMetadatas
-  } = useGroupedCheckBoxes({
-    fieldName: "selectedMetadatas"
-  });
 
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
@@ -89,17 +66,6 @@ export default function MetadataListPage() {
     : [12, 0];
 
   const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
-    {
-      Cell: ({ original: metadata }) => (
-        <CheckBoxField
-          key={metadata.id}
-          resource={metadata}
-          fileHyperlinkId={`file-name-${metadata.id}`}
-        />
-      ),
-      Header: CheckBoxHeader,
-      sortable: false
-    },
     thumbnailCell({
       bucketField: "bucket",
       fileIdentifierField: "fileIdentifier"
@@ -210,7 +176,7 @@ export default function MetadataListPage() {
                   </div>
                 )}
                 id="metadata-list"
-                queryTableProps={{
+                queryTableProps={({ CheckBoxField }) => ({
                   columns: METADATA_TABLE_COLUMNS,
                   // Include the Agents from the Agent API in the Metadatas:
                   joinSpecs: [
@@ -228,7 +194,6 @@ export default function MetadataListPage() {
                       path: metadata => `person/${metadata.dcCreator.id}`
                     }
                   ],
-                  onSuccess: res => setAvailableMetadatas(res.data),
                   path: "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
                   reactTableProps: ({ response }) => {
                     TBodyGallery.innerComponent = (
@@ -258,10 +223,15 @@ export default function MetadataListPage() {
                       }
                     };
                   }
+                })}
+                bulkDeleteButtonProps={{
+                  typeName: "metadata",
+                  apiBaseUrl: "/objectstore-api"
                 }}
-                wrapTable={children => (
-                  <MetadataListWrapper>{children}</MetadataListWrapper>
-                )}
+                bulkEditPath={ids => ({
+                  pathname: "/object-store/metadata/edit",
+                  query: { metadataIds: ids.join(",") }
+                })}
               />
             </SplitPagePanel>
           </div>
@@ -296,51 +266,6 @@ export default function MetadataListPage() {
   );
 }
 
-/** Common button props for the bulk edit/delete buttons */
-function bulkButtonProps(ctx: FormikContextType<MetadataListFormValues>) {
-  return {
-    // Disable the button if none are selected:
-    disabled: !Object.values(ctx.values.selectedMetadatas).reduce(
-      (a, b) => a || b,
-      false
-    )
-  };
-}
-
-/**
- * Adds additional controls around the metadata table.
- */
-function MetadataListWrapper({ children }) {
-  const router = useRouter();
-
-  return (
-    <DinaForm<MetadataListFormValues> initialValues={{ selectedMetadatas: {} }}>
-      <div style={{ height: "1rem" }}>
-        <div className="float-end">
-          <BulkDeleteButton />
-          <FormikButton
-            buttonProps={bulkButtonProps}
-            className="btn btn-primary ms-2 metadata-bulk-edit-button"
-            onClick={async (values: MetadataListFormValues) => {
-              const metadataIds = toPairs(values.selectedMetadatas)
-                .filter(pair => pair[1])
-                .map(pair => pair[0]);
-
-              await router.push({
-                pathname: "/object-store/metadata/edit",
-                query: { metadataIds: metadataIds.join(",") }
-              });
-            }}
-          >
-            <DinaMessage id="editSelectedButtonText" />
-          </FormikButton>
-        </div>
-      </div>
-      {children}
-    </DinaForm>
-  );
-}
-
 function ListLayoutSelector({ value = "TABLE", onChange }) {
   const items = [
     {
@@ -368,50 +293,5 @@ function ListLayoutSelector({ value = "TABLE", onChange }) {
         </div>
       ))}
     </div>
-  );
-}
-
-export function BulkDeleteButton() {
-  const router = useRouter();
-  const { openModal } = useModal();
-  const { doOperations } = useContext(ApiClientContext);
-
-  return (
-    <FormikButton
-      buttonProps={bulkButtonProps}
-      className="btn btn-danger metadata-bulk-delete-button"
-      onClick={(values: MetadataListFormValues) => {
-        const metadataIds = toPairs(values.selectedMetadatas)
-          .filter(pair => pair[1])
-          .map(pair => pair[0]);
-
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <span>
-                <DinaMessage id="deleteSelectedButtonText" /> (
-                {metadataIds.length})
-              </span>
-            }
-            onYesButtonClicked={async () => {
-              await doOperations(
-                metadataIds.map(id => ({
-                  op: "DELETE",
-                  path: `metadata/${id}`
-                })),
-                {
-                  apiBaseUrl: "/objectstore-api"
-                }
-              );
-
-              // Refresh the page:
-              await router.reload();
-            }}
-          />
-        );
-      }}
-    >
-      <DinaMessage id="deleteSelectedButtonText" />
-    </FormikButton>
   );
 }

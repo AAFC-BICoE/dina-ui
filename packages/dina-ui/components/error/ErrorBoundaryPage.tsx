@@ -2,7 +2,7 @@ import { ErrorBoundary, FallbackProps } from "react-error-boundary";
 import { PropsWithChildren } from "react";
 import { Head, Nav } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { CommonMessage } from "common-ui/lib/intl/common-ui-intl";
+import { CommonMessage } from "common-ui";
 import { Footer } from "../button-bar/nav/nav";
 
 /** Catches errors in render methods and displays a fallback error message. */

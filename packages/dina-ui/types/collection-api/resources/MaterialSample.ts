@@ -15,7 +15,6 @@ import { AcquisitionEvent } from "./AcquisitionEvent";
 export interface MaterialSampleAttributes {
   type: "material-sample";
 
-  // attributes to be added by the back-end:
   materialSampleName?: string;
 
   group?: string;
@@ -28,8 +27,7 @@ export interface MaterialSampleAttributes {
   description?: string;
   dwcDegreeOfEstablishment?: string | null;
 
-  managedAttributeValues?: ManagedAttributeValues;
-  managedAttributes?: JsonValue;
+  managedAttributes?: ManagedAttributeValues;
 
   determination?: Determination[];
   hierarchy?: HierarchyItem[];
@@ -39,7 +37,7 @@ export interface MaterialSampleAttributes {
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  organism?: Organism;
+  organism?: Organism | null;
   publiclyReleasable?: boolean;
   notPubliclyReleasableReason?: string;
   materialSampleChildren?: Partial<MaterialSample>[];

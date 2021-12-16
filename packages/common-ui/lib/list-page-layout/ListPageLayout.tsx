@@ -1,20 +1,47 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { FormikProps } from "formik";
-import { FilterParam, KitsuResource } from "kitsu";
-import { ReactNode } from "react";
+import { FilterParam, KitsuResource, KitsuResponse } from "kitsu";
+import { ComponentType, ReactNode } from "react";
 import { SortingRule } from "react-table";
-import { FilterAttribute, QueryTable, QueryTableProps } from "..";
+import {
+  CheckBoxFieldProps,
+  DinaForm,
+  FilterAttribute,
+  MetaWithTotal,
+  QueryTable,
+  QueryTableProps,
+  useGroupedCheckBoxes
+} from "..";
 import { rsql } from "../filter-builder/rsql";
+import {
+  BulkDeleteButton,
+  BulkDeleteButtonProps,
+  BulkEditButton
+} from "./bulk-buttons";
 import { FilterForm } from "./FilterForm";
 
-interface ListPageLayoutProps<TData extends KitsuResource> {
+export interface ListPageLayoutProps<TData extends KitsuResource> {
   additionalFilters?: FilterParam | ((filterForm: any) => FilterParam);
   defaultSort?: SortingRule[];
   filterAttributes?: FilterAttribute[];
   filterFormchildren?: (formik: FormikProps<any>) => React.ReactElement;
   id: string;
-  queryTableProps: QueryTableProps<TData>;
+  queryTableProps:
+    | QueryTableProps<TData>
+    | ((context: ListPageLayoutContext<TData>) => QueryTableProps<TData>);
   wrapTable?: (children: ReactNode) => ReactNode;
+
+  /** Adds the bulk edit button and the row checkboxes. */
+  bulkEditPath?: (ids: string[]) => {
+    pathname: string;
+    query: Record<string, string>;
+  };
+  /** Adds the bulk delete button and the row checkboxes. */
+  bulkDeleteButtonProps?: BulkDeleteButtonProps;
+}
+
+interface ListPageLayoutContext<TData extends KitsuResource> {
+  CheckBoxField: ComponentType<CheckBoxFieldProps<TData>>;
 }
 
 /**
@@ -28,7 +55,9 @@ export function ListPageLayout<TData extends KitsuResource>({
   filterFormchildren,
   id,
   queryTableProps,
-  wrapTable = children => children
+  wrapTable = children => children,
+  bulkDeleteButtonProps,
+  bulkEditPath
 }: ListPageLayoutProps<TData>) {
   const tablePageSizeKey = `${id}_tablePageSize`;
   const tableSortKey = `${id}_tableSort`;
@@ -77,6 +106,71 @@ export function ListPageLayout<TData extends KitsuResource>({
     ...(combinedRsql && { rsql: combinedRsql })
   };
 
+  const {
+    CheckBoxField,
+    CheckBoxHeader,
+    setAvailableItems: setAvailableSamples
+  } = useGroupedCheckBoxes({
+    fieldName: "selectedResources"
+  });
+
+  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+
+  const resolvedQueryTableProps =
+    typeof queryTableProps === "function"
+      ? queryTableProps({ CheckBoxField })
+      : queryTableProps;
+
+  const columns = [
+    ...(showRowCheckboxes
+      ? [
+          {
+            Cell: ({ original: resource }) => (
+              <CheckBoxField key={resource.id} resource={resource} />
+            ),
+            Header: CheckBoxHeader,
+            sortable: false
+          }
+        ]
+      : []),
+    ...resolvedQueryTableProps.columns
+  ];
+
+  async function onSuccess(response: KitsuResponse<TData[], MetaWithTotal>) {
+    setAvailableSamples(response.data);
+    return resolvedQueryTableProps.onSuccess?.(response);
+  }
+
+  const tableElement = (
+    <QueryTable<TData>
+      defaultPageSize={defaultPageSize ?? undefined}
+      defaultSort={defaultSort ?? undefined}
+      filter={filterParam}
+      onPageSizeChange={newSize => setDefaultPageSize(newSize)}
+      onSortedChange={newSort => setStoredDefaultSort(newSort)}
+      {...resolvedQueryTableProps}
+      columns={columns}
+      onSuccess={onSuccess}
+    />
+  );
+
+  /** Wrap the table in a form when checkboxes are enabled. */
+  const tableWrappedInForm = showRowCheckboxes ? (
+    <DinaForm<BulkSelectableFormValues>
+      initialValues={{ selectedResources: {} }}
+    >
+      <div className="d-flex justify-content-end">
+        {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+        {bulkDeleteButtonProps && (
+          <BulkDeleteButton {...bulkDeleteButtonProps} />
+        )}
+      </div>
+      {tableElement}
+    </DinaForm>
+  ) : (
+    tableElement
+  );
+
   return (
     <div>
       {filterAttributes && (
@@ -84,16 +178,11 @@ export function ListPageLayout<TData extends KitsuResource>({
           {filterFormchildren}
         </FilterForm>
       )}
-      {wrapTable(
-        <QueryTable<TData>
-          defaultPageSize={defaultPageSize ?? undefined}
-          defaultSort={defaultSort ?? undefined}
-          filter={filterParam}
-          onPageSizeChange={newSize => setDefaultPageSize(newSize)}
-          onSortedChange={newSort => setStoredDefaultSort(newSort)}
-          {...queryTableProps}
-        />
-      )}
+      {wrapTable(tableWrappedInForm)}
     </div>
   );
+}
+
+export interface BulkSelectableFormValues {
+  selectedResources: Record<string, boolean>;
 }

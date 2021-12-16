@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { DinaForm } from "../../../../common-ui/lib";
+import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";

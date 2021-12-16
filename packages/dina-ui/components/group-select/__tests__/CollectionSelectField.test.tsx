@@ -1,4 +1,4 @@
-import { DinaForm } from "../../../../common-ui/lib";
+import { DinaForm } from "common-ui";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { CollectionSelectField } from "../../resource-select-fields/resource-select-fields";
 import Select from "react-select/base";

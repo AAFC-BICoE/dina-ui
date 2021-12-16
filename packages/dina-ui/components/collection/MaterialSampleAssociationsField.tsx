@@ -13,24 +13,10 @@ import { VocabularyReadOnlyView, VocabularySelectField } from "..";
 import {
   MaterialSample,
   MaterialSampleAssociation
-} from "../../../dina-ui/types/collection-api/resources/MaterialSample";
+} from "../../types/collection-api/resources/MaterialSample";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
-
-/** Type-safe object with all MaterialSampleAssociation fields. */
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT: Required<
-  Record<keyof MaterialSampleAssociation, true>
-> = {
-  associatedSample: true,
-  associationType: true,
-  remarks: true
-};
-
-/** All fields of the MaterialSampleAssociation type. */
-export const MATERIALSAMPLE_ASSOCIATION_FIELDS = Object.keys(
-  MATERIALSAMPLE_ASSOCIATION_FIELDS_OBJECT
-);
 
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
@@ -83,23 +69,24 @@ function AssociationTabPanel({
   fieldProps,
   index
 }: TabPanelCtx<MaterialSampleAssociation>) {
-  const listRef = useRef<HTMLDivElement>(null);
+  const [showSearch, setShowSearch] = useState(false);
   const formikCtx = useFormikContext<MaterialSample>();
   const [showSearchBtn, setShowSearchBtn] = useState(
     formikCtx.values.associations?.[index].associatedSample ? false : true
   );
 
-  function onCloseClicked() {
-    if (listRef.current) {
-      listRef.current.className = listRef.current.className + " d-none";
-    }
+  function resetSearchState() {
+    setShowSearch(false);
+    setShowSearchBtn(true);
   }
 
   function onAssociatedSampleSelected(
     sample: PersistedResource<MaterialSample>
   ) {
-    formikCtx.setFieldValue(fieldProps("associatedSample").name, sample.id);
-    onCloseClicked();
+    const fieldName = fieldProps("associatedSample").name;
+    formikCtx.setFieldValue(fieldName, sample.id);
+    formikCtx.setFieldError(fieldName, undefined);
+    resetSearchState();
     setShowSearchBtn(false);
   }
   return (
@@ -115,7 +102,8 @@ function AssociationTabPanel({
           <div className="associated-sample">
             <AssociatedMaterialSampleSearchBoxField
               showSearchBtn={showSearchBtn}
-              listRef={listRef}
+              onRemoveEntry={resetSearchState}
+              onSearchClicked={() => setShowSearch(true)}
               props={fieldProps("associatedSample")}
             />
           </div>
@@ -125,9 +113,10 @@ function AssociationTabPanel({
         </div>
       </div>
       <MaterialSampleSearchHelper
-        listRef={listRef}
+        fieldName={fieldProps("associatedSample").name}
+        showSearch={showSearch}
         onAssociatedSampleSelected={onAssociatedSampleSelected}
-        onCloseClicked={onCloseClicked}
+        onCloseClicked={resetSearchState}
       />
     </div>
   );
