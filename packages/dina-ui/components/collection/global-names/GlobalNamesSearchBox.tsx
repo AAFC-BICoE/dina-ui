@@ -94,8 +94,8 @@ export function GlobalNamesSearchBox({
           {isDetermination ? (
             <div className="input-group">
               <input
-                aria-label={formatMessage("colSearchLabel")}
-                className="form-control col-search-input"
+                aria-label={formatMessage("globalNameSearchLabel")}
+                className="form-control global-name-input"
                 onChange={e => onInputChange(e.target.value)}
                 onFocus={e => e.target.select()}
                 onKeyDown={e => {
@@ -109,7 +109,7 @@ export function GlobalNamesSearchBox({
               <button
                 style={{ width: "10rem" }}
                 onClick={doThrottledSearch}
-                className="btn btn-primary mx-2 col-search-button"
+                className="btn btn-primary mx-2 global-name-search-button"
                 type="button"
                 disabled={searchIsDisabled}
               >
@@ -120,7 +120,7 @@ export function GlobalNamesSearchBox({
             <div>
               <input
                 aria-label={formatMessage("colSearchLabel")}
-                className="form-control col-search-input"
+                className="form-control global-name-input"
                 onChange={e => onInputChange(e.target.value)}
                 onFocus={e => e.target.select()}
                 onKeyDown={e => {
@@ -133,7 +133,7 @@ export function GlobalNamesSearchBox({
               />
               <button
                 onClick={doThrottledSearch}
-                className="btn btn-primary ms-auto mt-2 col-search-button"
+                className="btn btn-primary ms-auto mt-2 global-name-search-button"
                 type="button"
                 disabled={searchIsDisabled}
               >
@@ -207,6 +207,7 @@ export function GlobalNamesSearchBox({
               let displayText = result.bestResult?.matchedName;
               inputValue
                 .split(" ")
+                .filter(val => !!val?.length)
                 .map(
                   val =>
                     (displayText = displayText.replace(val, `<b>${val}</b>`))
@@ -241,11 +242,11 @@ export function GlobalNamesSearchBox({
                   key={result.inputId ?? idx}
                   className="list-group-item list-group-item-action d-flex"
                 >
-                  <div className="flex-grow-1 d-flex align-items-center col-search-result-label">
+                  <div className="flex-grow-1 d-flex align-items-center gn-search-result-label">
                     <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
                   </div>
                   <FormikButton
-                    className="btn btn-primary col-name-select-button"
+                    className="btn btn-primary global-name-select-button"
                     buttonProps={() => ({ style: { width: "8rem" } })}
                     onClick={() => onSelect?.(resultArray)}
                   >

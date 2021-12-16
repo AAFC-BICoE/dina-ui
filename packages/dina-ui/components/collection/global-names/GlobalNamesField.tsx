@@ -36,16 +36,16 @@ export function GlobalNamesField({
   return (
     <FieldWrapper {...fieldWrapperProps} disableLabelClick={true}>
       {({ formik, setValue, value }) => {
-        const scientificNameSrceDetailUrlVal = formik.getFieldMeta(
+        const scientificNameSrcDetailUrlVal = formik.getFieldMeta(
           scientificNameDetailsSrcUrlField as any
         ).value as string;
 
-        return value && scientificNameSrceDetailUrlVal?.length > 0 ? (
+        return value && scientificNameSrcDetailUrlVal?.length > 0 ? (
           <SelectedScientificNameView
             value={value}
             formik={formik}
             scientificNameDetailsField={scientificNameDetailsField as any}
-            scientificNameSrceDetailUrlVal={scientificNameSrceDetailUrlVal}
+            scientificNameSrcDetailUrlVal={scientificNameSrcDetailUrlVal}
             onChange={onChange as any}
             setSearchInitiated={setSearchInitiated}
             searchInitiated={searchInitiated}
@@ -164,7 +164,7 @@ export interface SelectedScientificNameViewProps {
   value: string;
   formik: FormikProps<any>;
   scientificNameDetailsField: string;
-  scientificNameSrceDetailUrlVal: string;
+  scientificNameSrcDetailUrlVal: string;
   searchInitiated?: boolean;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
   setValue?: (newValue: any) => void;
@@ -178,7 +178,7 @@ export function SelectedScientificNameView(
     value,
     formik,
     scientificNameDetailsField,
-    scientificNameSrceDetailUrlVal,
+    scientificNameSrcDetailUrlVal,
     searchInitiated,
     onChange,
     setValue,
@@ -195,11 +195,11 @@ export function SelectedScientificNameView(
         />
       </div>
       <div className="my-2">
-        {scientificNameSrceDetailUrlVal && (
+        {scientificNameSrcDetailUrlVal && (
           <a
             target="_blank"
             type="button"
-            href={`${scientificNameSrceDetailUrlVal}`}
+            href={`${scientificNameSrcDetailUrlVal}`}
             className="btn btn-info me-2 view-button "
           >
             <DinaMessage id="viewDetailButtonLabel" />

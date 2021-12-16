@@ -3,7 +3,7 @@ export interface GlobalNamesSearchResult {
   input: string;
   matchType: string;
   bestResult: BestResult;
-  dataSourceNum: number;
+  dataSourcesNum: number;
   curation: string;
 }
 

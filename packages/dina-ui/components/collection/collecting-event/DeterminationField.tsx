@@ -216,7 +216,7 @@ export function DeterminationField() {
                   <TextField
                     {...fieldProps("scientificName")}
                     readOnlyRender={(value, form) => {
-                      const scientificNameSrceDetailUrlVal = form.getFieldMeta(
+                      const scientificNameSrcDetailUrlVal = form.getFieldMeta(
                         fieldProps("scientificNameDetails.sourceUrl").name
                       ).value as string;
                       return (
@@ -226,8 +226,8 @@ export function DeterminationField() {
                           scientificNameDetailsField={
                             fieldProps("scientificNameDetails").name
                           }
-                          scientificNameSrceDetailUrlVal={
-                            scientificNameSrceDetailUrlVal
+                          scientificNameSrcDetailUrlVal={
+                            scientificNameSrcDetailUrlVal
                           }
                         />
                       );

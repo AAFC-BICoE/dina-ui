@@ -341,6 +341,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     'Search by place name (e.g. "Ottawa" or WGS84 coordinates (e.g. "40.123, -74.123"))',
   georeferencedByLabel: "Georeferenced By (agent)",
   georeferencedDateLabel: "Georeferenced Date",
+  globalNameSearchLabel: "Global Name Search",
   governmentOfCanada: "Government of Canada",
   governmentOfCanadaSymbol: "Symbol of the Government of Canada",
   goToThePreviousStep: "Go to the previous step",
