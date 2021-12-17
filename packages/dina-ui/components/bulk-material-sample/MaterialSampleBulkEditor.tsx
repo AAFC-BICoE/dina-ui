@@ -4,8 +4,8 @@ import {
   DoOperationsError,
   FormikButton,
   SampleWithHooks,
-  useApiClient,
-  SaveArgs
+  SaveArgs,
+  useApiClient
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -132,7 +132,7 @@ function useBulkSampleSave({
         formRef.current?.setErrors({});
       }
 
-      const saveOperations: (SaveArgs<MaterialSample> | null)[] = [];
+      const saveOperations: SaveArgs<MaterialSample>[] = [];
       for (let index = 0; index < sampleHooks.length; index++) {
         const { formRef, sample, saveHook } = sampleHooks[index];
         const formik = formRef.current;
@@ -154,7 +154,6 @@ function useBulkSampleSave({
         try {
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
-            formik,
             preProcessSample: async original => {
               try {
                 return (await preProcessSample?.(original)) ?? original;
@@ -194,14 +193,7 @@ function useBulkSampleSave({
         }
       }
 
-      const validOperations = saveOperations.map(op => {
-        if (!op) {
-          throw new Error("Some material sample saves failed.");
-        }
-        return op;
-      });
-
-      const savedSamples = await save<MaterialSample>(validOperations, {
+      const savedSamples = await save<MaterialSample>(saveOperations, {
         apiBaseUrl: "/collection-api"
       });
 

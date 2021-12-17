@@ -76,8 +76,7 @@ export function useBulkEditTab({
 
     /** Sample input including blank/empty fields. */
     const bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
-      formik.values,
-      formik
+      formik.values
     );
 
     /** Sample override object with only the non-empty fields. */

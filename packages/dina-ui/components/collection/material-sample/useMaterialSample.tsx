@@ -1,16 +1,24 @@
 import {
   DinaForm,
   DinaFormSubmitParams,
+  DoOperationsError,
   resourceDifference,
   SaveArgs,
   useApiClient,
-  useModal,
   useQuery,
   withResponse
 } from "common-ui";
-import { FormikContextType, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, compact, isEmpty, isEqual, pick, pickBy } from "lodash";
+import {
+  cloneDeep,
+  compact,
+  isEmpty,
+  isEqual,
+  mapKeys,
+  pick,
+  pickBy
+} from "lodash";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
@@ -143,7 +151,6 @@ export interface UseMaterialSampleSaveParams {
 
 export interface PrepareSampleSaveOperationParams {
   submittedValues: any;
-  formik: FormikContextType<InputResource<MaterialSample>>;
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
@@ -163,7 +170,6 @@ export function useMaterialSampleSave({
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues
 }: UseMaterialSampleSaveParams) {
-  const { openModal } = useModal();
   const { save } = useApiClient();
 
   // For editing existing templates:
@@ -394,9 +400,8 @@ export function useMaterialSampleSave({
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
   async function prepareSampleInput(
-    submittedValues: InputResource<MaterialSample>,
-    formik: FormikContextType<InputResource<MaterialSample>>
-  ): Promise<InputResource<MaterialSample> | null> {
+    submittedValues: InputResource<MaterialSample>
+  ): Promise<InputResource<MaterialSample>> {
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
@@ -431,13 +436,6 @@ export function useMaterialSampleSave({
 
     // Save and link the Collecting Event if enabled:
     if (enableCollectingEvent && colEventFormRef.current) {
-      // Return if the Collecting Event sub-form has errors:
-      const colEventErrors = await colEventFormRef.current.validateForm();
-      if (!isEmpty(colEventErrors)) {
-        formik.setErrors({ ...formik.errors, ...colEventErrors });
-        return null;
-      }
-
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
         colEventFormRef.current.values
@@ -447,34 +445,46 @@ export function useMaterialSampleSave({
         !submittedCollectingEvent.id ||
         !isEqual(submittedCollectingEvent, collectingEventInitialValues);
 
-      // Only send the save request if the Collecting Event was edited:
-      const savedCollectingEvent = collectingEventWasEdited
-        ? // Use the same save method as the Collecting Event page:
-          await saveCollectingEvent(
-            submittedCollectingEvent,
-            colEventFormRef.current
-          )
-        : submittedCollectingEvent;
+      try {
+        // Throw if the Collecting Event sub-form has errors:
+        const colEventErrors = await colEventFormRef.current.validateForm();
+        if (!isEmpty(colEventErrors)) {
+          throw new DoOperationsError("", colEventErrors);
+        }
 
-      // Set the ColEventId here in case the next operation fails:
-      setColEventId(savedCollectingEvent.id);
+        // Only send the save request if the Collecting Event was edited:
+        const savedCollectingEvent = collectingEventWasEdited
+          ? // Use the same save method as the Collecting Event page:
+            await saveCollectingEvent(
+              submittedCollectingEvent,
+              colEventFormRef.current
+            )
+          : submittedCollectingEvent;
 
-      // Link the MaterialSample to the CollectingEvent:
-      materialSampleInput.collectingEvent = {
-        id: savedCollectingEvent.id,
-        type: savedCollectingEvent.type
-      };
+        // Set the ColEventId here in case the next operation fails:
+        setColEventId(savedCollectingEvent.id);
+
+        // Link the MaterialSample to the CollectingEvent:
+        materialSampleInput.collectingEvent = {
+          id: savedCollectingEvent.id,
+          type: savedCollectingEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          colEventFormRef.current.setStatus(error.message);
+          colEventFormRef.current.setErrors(error.fieldErrors);
+          throw new DoOperationsError(
+            error.message,
+            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+          );
+        }
+        throw error;
+      }
     }
 
     // Save and link the Acquisition Event if enabled:
     if (enableAcquisitionEvent && acqEventFormRef.current) {
-      // Return if the Acq Event sub-form has errors:
-      const acqEventErrors = await acqEventFormRef.current.validateForm();
-      if (!isEmpty(acqEventErrors)) {
-        formik.setErrors({ ...formik.errors, ...acqEventErrors });
-        return null;
-      }
-
       // Save the linked AcqEvent if included:
       const submittedAcqEvent: PersistedResource<AcquisitionEvent> = cloneDeep(
         acqEventFormRef.current.values
@@ -484,46 +494,60 @@ export function useMaterialSampleSave({
         !submittedAcqEvent?.id ||
         !isEqual(submittedAcqEvent, acqEventFormRef.current.initialValues);
 
-      // Only send the save request if the Acq Event was edited:
-      const [savedAcqEvent] = acqEventWasEdited
-        ? // Use the same save method as the Acq Event page:
-          await save<AcquisitionEvent>(
-            [
-              {
-                resource: submittedAcqEvent,
-                type: "acquisition-event"
-              }
-            ],
-            { apiBaseUrl: "/collection-api" }
-          )
-        : [submittedAcqEvent];
+      try {
+        // Throw if the Acq Event sub-form has errors:
+        const acqEventErrors = await acqEventFormRef.current.validateForm();
+        if (!isEmpty(acqEventErrors)) {
+          throw new DoOperationsError("", acqEventErrors);
+        }
 
-      // Set the acqEventId here in case the next operation fails:
-      setAcqEventId(savedAcqEvent.id);
+        // Only send the save request if the Acq Event was edited:
+        const [savedAcqEvent] = acqEventWasEdited
+          ? // Use the same save method as the Acq Event page:
+            await save<AcquisitionEvent>(
+              [
+                {
+                  resource: submittedAcqEvent,
+                  type: "acquisition-event"
+                }
+              ],
+              { apiBaseUrl: "/collection-api" }
+            )
+          : [submittedAcqEvent];
 
-      // Link the MaterialSample to the AcquisitionEvent:
-      materialSampleInput.acquisitionEvent = {
-        id: savedAcqEvent.id,
-        type: savedAcqEvent.type
-      };
+        // Set the acqEventId here in case the next operation fails:
+        setAcqEventId(savedAcqEvent.id);
+
+        // Link the MaterialSample to the AcquisitionEvent:
+        materialSampleInput.acquisitionEvent = {
+          id: savedAcqEvent.id,
+          type: savedAcqEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          acqEventFormRef.current.setStatus(error.message);
+          acqEventFormRef.current.setErrors(error.fieldErrors);
+          throw new DoOperationsError(
+            error.message,
+            mapKeys(
+              error.fieldErrors,
+              (_, field) => `acquisitionEvent.${field}`
+            )
+          );
+        }
+        throw error;
+      }
     }
 
     return materialSampleInput;
   }
 
   async function prepareSampleSaveOperation({
-    formik,
     submittedValues,
     preProcessSample
-  }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample> | null> {
-    const materialSampleInput = await prepareSampleInput(
-      submittedValues,
-      formik
-    );
-
-    if (!materialSampleInput) {
-      return null;
-    }
+  }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
+    const materialSampleInput = await prepareSampleInput(submittedValues);
 
     const msPreprocessed =
       (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
@@ -585,12 +609,8 @@ export function useMaterialSampleSave({
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
     const materialSampleSaveOp = await prepareSampleSaveOperation({
-      submittedValues,
-      formik
+      submittedValues
     });
-    if (!materialSampleSaveOp) {
-      return;
-    }
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(

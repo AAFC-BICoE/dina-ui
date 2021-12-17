@@ -374,7 +374,9 @@ export class DoOperationsError extends Error {
   constructor(
     public message: string,
     public fieldErrors: FormikErrors<any> = {},
-    public individualErrors: OperationError[] = []
+    public individualErrors: OperationError[] = [
+      { errorMessage: message, fieldErrors, index: 0 }
+    ]
   ) {
     super(message);
   }
