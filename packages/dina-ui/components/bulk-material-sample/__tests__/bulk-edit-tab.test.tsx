@@ -13,7 +13,7 @@ interface BulkEditTabProps {
 
 /** Test component to test the Bulk Edit Tab in isolation. */
 function BulkEditTab({ baseSample }: BulkEditTabProps) {
-  const { bulkEditTab, getOverrideFunction } = useBulkEditTab({
+  const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
     sampleHooks: []
   });
 
@@ -25,7 +25,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
         type="button"
         onClick={async () => {
           mockSubmitOverride(
-            await getOverrideFunction()(
+            await sampleBulkOverrider()(
               baseSample || { type: "material-sample" }
             )
           );

@@ -116,7 +116,7 @@ export function useBulkEditTab({
 
   return {
     bulkEditTab,
-    getOverrideFunction: sampleBulkOverrider,
+    sampleBulkOverrider,
     bulkEditFormRef
   };
 }
