@@ -12,7 +12,7 @@ import { InputResource, PersistedResource } from "kitsu";
 import { RefObject, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator } from "..";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
@@ -120,6 +120,7 @@ function useBulkSampleSave({
 }: BulkSampleSaveParams) {
   const [_error, setError] = useState<unknown | null>(null);
   const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   async function saveAll() {
     setError(null);
@@ -141,11 +142,6 @@ function useBulkSampleSave({
         if (!formik) {
           throw new Error(
             `Missing Formik ref for sample ${sample.materialSampleName}`
-          );
-        }
-        if (!saveHook) {
-          throw new Error(
-            `Missing Save Hook for sample ${sample.materialSampleName}`
           );
         }
 
@@ -214,9 +210,7 @@ function useBulkSampleSave({
         }
       }
       setError(error);
-      throw new Error(
-        `Bulk submission error: Check the tabs with a red label.`
-      );
+      throw new Error(formatMessage("bulkSubmissionErrorInfo"));
     }
   }
 

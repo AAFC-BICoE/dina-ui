@@ -370,6 +370,11 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
+    expect(
+      wrapper
+        .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
+        .exists()
+    ).toEqual(true);
   }, 20000);
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -454,6 +459,11 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
     ).toContain("Start Event Date Time");
+    expect(
+      wrapper
+        .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
+        .exists()
+    ).toEqual(true);
   }, 20000);
 
   it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
@@ -538,6 +548,11 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
     ).toContain("Start Event Date Time");
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
+        .exists()
+    ).toEqual(true);
   }, 20000);
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {

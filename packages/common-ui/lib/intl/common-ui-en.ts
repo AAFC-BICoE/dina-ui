@@ -19,6 +19,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   backToReadOnlyPage: "Back to read-only page",
   bulkEdit: "Bulk Edit",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
+  bulkSubmissionErrorInfo:
+    "Bulk submission error: Check the tabs with a red label.",
   cancelButtonText: "Cancel",
   checkAll: "Check All",
   checkAllTooltipMessage:
