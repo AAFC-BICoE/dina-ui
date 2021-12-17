@@ -555,6 +555,71 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual(true);
   }, 20000);
 
+  it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
+    const mockSaveForBadBarcode = jest.fn(async () => {
+      throw new DoOperationsError("", { barcode: "Invalid Barcode" }, [
+        {
+          errorMessage: "",
+          fieldErrors: { barcode: "Invalid Barcode" },
+          index: 0
+        }
+      ]);
+    });
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      {
+        ...testCtx,
+        apiContext: {
+          ...testCtx.apiContext,
+          // Test save error: The second sample has an error on the barcode field:
+          save: mockSaveForBadBarcode
+        }
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Use the Edit All tab:
+    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+
+    // Edit the barcode:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "bad barcode" } });
+
+    // Click the "Save All" button:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The bulk edit tab is given the red text, and the other tabs are unaffected:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .barcode-field .invalid-feedback")
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".sample-tabpanel-0 .barcode-field .invalid-feedback")
+        .exists()
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(".sample-tabpanel-1 .barcode-field .invalid-feedback")
+        .exists()
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(".sample-tabpanel-2 .barcode-field .invalid-feedback")
+        .exists()
+    ).toEqual(false);
+  }, 20000);
+
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor

@@ -3,6 +3,7 @@ import {
   DinaForm,
   DoOperationsError,
   FormikButton,
+  getBulkEditTabFieldInfo,
   SampleWithHooks,
   SaveArgs,
   useApiClient
@@ -17,6 +18,7 @@ import { MaterialSampleForm } from "../../pages/collection/material-sample/edit"
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 import { useBulkEditTab } from "./bulk-edit-tab";
+import { pickBy, keys, pick, omit } from "lodash";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -118,14 +120,15 @@ function useBulkSampleSave({
   preProcessSample,
   bulkEditFormRef
 }: BulkSampleSaveParams) {
+  // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
   async function saveAll() {
     setError(null);
-    bulkEditFormRef?.current?.setStatus(null);
-    bulkEditFormRef?.current?.setErrors({});
+    bulkEditFormRef.current?.setStatus(null);
+    bulkEditFormRef.current?.setErrors({});
     try {
       // First clear all tab errors:
       for (const { formRef } of sampleHooks) {
@@ -208,6 +211,25 @@ function useBulkSampleSave({
             formik.setErrors(opError.fieldErrors);
           }
         }
+        // Any errored field that was edited in the Edit All tab should
+        // get the red indicator in the Edit All tab.
+        const badBulkEditedFields = keys(
+          pickBy(
+            error.fieldErrors,
+            (_, fieldName) =>
+              getBulkEditTabFieldInfo(bulkEditFormRef, sampleHooks, fieldName)
+                .hasBulkEditValue
+          )
+        );
+        bulkEditFormRef.current?.setErrors({
+          ...bulkEditFormRef.current?.errors,
+          ...pick(error.fieldErrors, badBulkEditedFields)
+        });
+        // Don't show the bulk edited fields' errors in the individual sample tabs
+        // because the user can't fix them there:
+        sampleHooks
+          .map(it => it.formRef?.current)
+          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

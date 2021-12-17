@@ -1,7 +1,15 @@
-import { isBlankResourceAttribute, useBulkEditTabContext } from "common-ui";
-import { compact, get, isEqual } from "lodash";
-import { useIntl } from "react-intl";
 import classNames from "classnames";
+import {
+  isBlankResourceAttribute,
+  SampleWithHooks,
+  useBulkEditTabContext
+} from "common-ui";
+import { FormikProps } from "formik";
+import { InputResource } from "kitsu";
+import { get, isEqual } from "lodash";
+import { RefObject } from "react";
+import { useIntl } from "react-intl";
+import type { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 
 export interface UseBulkEditTabFieldParams {
   fieldName: string;
@@ -18,8 +26,20 @@ export function useBulkEditTabField({
     return null;
   }
 
-  const { sampleHooks, bulkEditFormRef } = bulkEditCtx;
+  return getBulkEditTabFieldInfo(
+    bulkEditCtx.bulkEditFormRef,
+    bulkEditCtx.sampleHooks,
+    fieldName,
+    currentValue
+  );
+}
 
+export function getBulkEditTabFieldInfo(
+  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>,
+  sampleHooks: SampleWithHooks[],
+  fieldName: string,
+  currentValue?: any
+) {
   const formStates = sampleHooks.map(sample => sample.formRef.current?.values);
 
   const hasNoValues = formStates.every(form =>
