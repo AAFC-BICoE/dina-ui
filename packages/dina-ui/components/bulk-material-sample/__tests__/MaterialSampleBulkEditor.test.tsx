@@ -1223,4 +1223,87 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.find(".has-bulk-edit-value .dwcVerbatimLocality-field").exists()
     ).toEqual(false);
   });
+
+  it("Creates and links a common Collecting Event to all samples", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable the collecting event section:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Edit a collecting event field:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
+      .simulate("change", { target: { value: "test locality" } });
+
+    // Save All:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Save the collecting event, then save the 2 material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              dwcVerbatimLocality: "test locality",
+              type: "collecting-event"
+            }),
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              collectingEvent: {
+                id: "11111",
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              collectingEvent: {
+                id: "11111",
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              collectingEvent: {
+                id: "11111",
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
 });

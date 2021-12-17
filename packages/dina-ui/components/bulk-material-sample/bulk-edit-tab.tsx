@@ -64,48 +64,59 @@ export function useBulkEditTab({
       )
   };
 
-  /** Returns a sample with the overridden values. */
-  async function withBulkEditOverrides(
-    baseSample: InputResource<MaterialSample>
-  ) {
-    const formik = bulkEditFormRef.current;
-    // Shouldn't happen, but check for type safety:
-    if (!formik) {
-      throw new Error("Missing Formik ref for Bulk Edit Tab");
-    }
-
+  function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
-    const bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
-      formik.values
-    );
+    let bulkEditSample: InputResource<MaterialSample> | undefined;
 
-    /** Sample override object with only the non-empty fields. */
-    const overrides = withoutBlankFields(bulkEditSample);
+    /** Returns a sample with the overridden values. */
+    return async function withBulkEditOverrides(
+      baseSample: InputResource<MaterialSample>
+    ) {
+      const formik = bulkEditFormRef.current;
+      // Shouldn't happen, but check for type safety:
+      if (!formik) {
+        throw new Error("Missing Formik ref for Bulk Edit Tab");
+      }
 
-    // Combine the managed attributes dictionaries:
-    const newManagedAttributes = {
-      ...withoutBlankFields(baseSample.managedAttributes),
-      ...withoutBlankFields(bulkEditSample?.managedAttributes)
+      // Initialize the bulk values once to make sure the same object is used each time.
+      if (!bulkEditSample) {
+        bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
+          formik.values
+        );
+      }
+
+      /** Sample override object with only the non-empty fields. */
+      const overrides = withoutBlankFields(bulkEditSample);
+
+      // Combine the managed attributes dictionaries:
+      const newManagedAttributes = {
+        ...withoutBlankFields(baseSample.managedAttributes),
+        ...withoutBlankFields(bulkEditSample?.managedAttributes)
+      };
+
+      const newOrganism = {
+        ...withoutBlankFields(baseSample.organism),
+        ...withoutBlankFields(bulkEditSample?.organism)
+      };
+
+      const newSample: InputResource<MaterialSample> = {
+        ...baseSample,
+        ...overrides,
+        ...(!isEmpty(newManagedAttributes) && {
+          managedAttributes: newManagedAttributes
+        }),
+        ...(!isEmpty(newOrganism) && {
+          organism: newOrganism
+        })
+      };
+
+      return newSample;
     };
-
-    const newOrganism = {
-      ...withoutBlankFields(baseSample.organism),
-      ...withoutBlankFields(bulkEditSample?.organism)
-    };
-
-    const newSample: InputResource<MaterialSample> = {
-      ...baseSample,
-      ...overrides,
-      ...(!isEmpty(newManagedAttributes) && {
-        managedAttributes: newManagedAttributes
-      }),
-      ...(!isEmpty(newOrganism) && {
-        organism: newOrganism
-      })
-    };
-
-    return newSample;
   }
 
-  return { bulkEditTab, withBulkEditOverrides, bulkEditFormRef };
+  return {
+    bulkEditTab,
+    getOverrideFunction: sampleBulkOverrider,
+    bulkEditFormRef
+  };
 }

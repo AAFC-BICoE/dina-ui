@@ -45,16 +45,15 @@ export function MaterialSampleBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab, withBulkEditOverrides, bulkEditFormRef } =
-    useBulkEditTab({
-      sampleHooks,
-      hideBulkEditTab: !initialized
-    });
+  const { bulkEditTab, getOverrideFunction, bulkEditFormRef } = useBulkEditTab({
+    sampleHooks,
+    hideBulkEditTab: !initialized
+  });
 
   const { saveAll } = useBulkSampleSave({
     sampleHooks,
     onSaved,
-    preProcessSample: withBulkEditOverrides,
+    preProcessSample: getOverrideFunction(),
     bulkEditFormRef
   });
 

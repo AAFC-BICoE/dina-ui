@@ -71,7 +71,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           placeholder={
             inputProps.placeholder || formatMessage({ id: "typeHereToSearch" })
           }
-          autoComplete="off"
+          autoComplete="none"
           onSuggestionSelected={onSuggestionSelected}
           alwaysShowSuggestions={alwaysShowSuggestions}
           id={textFieldProps.name}
