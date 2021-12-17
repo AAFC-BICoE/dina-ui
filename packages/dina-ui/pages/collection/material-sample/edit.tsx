@@ -13,6 +13,7 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useBulkEditTabContext,
   useDinaFormContext,
   useFieldLabels,
   withResponse
@@ -261,6 +262,9 @@ export function MaterialSampleForm({
       enabledFields
     });
 
+  const isInBulkEditTab = !!useBulkEditTabContext();
+  const { formatMessage } = useDinaIntl();
+
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -327,6 +331,17 @@ export function MaterialSampleForm({
               id={navIds.colEvent}
               legend={<DinaMessage id="collectingEvent" />}
             >
+              {isInBulkEditTab && (
+                <div className="alert alert-warning">
+                  <DinaMessage
+                    id="bulkEditResourceLinkerWarning"
+                    values={{
+                      typeName: formatMessage("materialSample"),
+                      fieldName: formatMessage("collectingEvent")
+                    }}
+                  />
+                </div>
+              )}
               <TabbedResourceLinker<CollectingEvent>
                 briefDetails={colEvent => (
                   <CollectingEventBriefDetails collectingEvent={colEvent} />
@@ -352,6 +367,17 @@ export function MaterialSampleForm({
               id={navIds.acqEvent}
               legend={<DinaMessage id="acquisitionEvent" />}
             >
+              {isInBulkEditTab && (
+                <div className="alert alert-warning">
+                  <DinaMessage
+                    id="bulkEditResourceLinkerWarning"
+                    values={{
+                      typeName: formatMessage("materialSample"),
+                      fieldName: formatMessage("acquisitionEvent")
+                    }}
+                  />
+                </div>
+              )}
               <TabbedResourceLinker<AcquisitionEvent>
                 briefDetails={acqEvent => (
                   <DinaForm initialValues={acqEvent} readOnly={true}>

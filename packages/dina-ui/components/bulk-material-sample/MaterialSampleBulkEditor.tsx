@@ -4,11 +4,12 @@ import {
   DoOperationsError,
   FormikButton,
   SampleWithHooks,
-  useApiClient
+  useApiClient,
+  SaveArgs
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { useMemo, useRef, useState } from "react";
+import { RefObject, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
@@ -42,15 +43,17 @@ export function MaterialSampleBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
-  const { bulkEditTab, withBulkEditOverrides } = useBulkEditTab({
-    sampleHooks,
-    hideBulkEditTab: !initialized
-  });
+  const { bulkEditTab, withBulkEditOverrides, bulkEditFormRef } =
+    useBulkEditTab({
+      sampleHooks,
+      hideBulkEditTab: !initialized
+    });
 
   const { saveAll } = useBulkSampleSave({
     sampleHooks,
     onSaved,
-    preProcessSample: withBulkEditOverrides
+    preProcessSample: withBulkEditOverrides,
+    bulkEditFormRef
   });
 
   return (
@@ -106,18 +109,22 @@ interface BulkSampleSaveParams {
   preProcessSample?: (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
+  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
 }
 
 function useBulkSampleSave({
   sampleHooks,
   onSaved,
-  preProcessSample
+  preProcessSample,
+  bulkEditFormRef
 }: BulkSampleSaveParams) {
   const [_error, setError] = useState<unknown | null>(null);
   const { save } = useApiClient();
 
   async function saveAll() {
     setError(null);
+    bulkEditFormRef?.current?.setStatus(null);
+    bulkEditFormRef?.current?.setErrors({});
     try {
       // First clear all tab errors:
       for (const { formRef } of sampleHooks) {
@@ -125,47 +132,67 @@ function useBulkSampleSave({
         formRef.current?.setErrors({});
       }
 
-      const saveOperations = await Promise.all(
-        sampleHooks.map(async ({ formRef, sample, saveHook }, index) => {
-          const formik = formRef.current;
+      const saveOperations: (SaveArgs<MaterialSample> | null)[] = [];
+      for (let index = 0; index < sampleHooks.length; index++) {
+        const { formRef, sample, saveHook } = sampleHooks[index];
+        const formik = formRef.current;
 
-          // These two errors shouldn't happen:
-          if (!formik) {
-            throw new Error(
-              `Missing Formik ref for sample ${sample.materialSampleName}`
-            );
-          }
-          if (!saveHook) {
-            throw new Error(
-              `Missing Save Hook for sample ${sample.materialSampleName}`
-            );
-          }
+        // These two errors shouldn't happen:
+        if (!formik) {
+          throw new Error(
+            `Missing Formik ref for sample ${sample.materialSampleName}`
+          );
+        }
+        if (!saveHook) {
+          throw new Error(
+            `Missing Save Hook for sample ${sample.materialSampleName}`
+          );
+        }
 
-          // TODO get rid of this try/catch when we can save
-          // the Col Event + Acq event + material sample all at once.
-          try {
-            return await saveHook.prepareSampleSaveOperation({
-              submittedValues: formik.values,
-              formik,
-              preProcessSample
-            });
-          } catch (error) {
-            if (error instanceof DoOperationsError) {
-              // In case of an error involving the intermediary Collecting or Acquisition Event.
-              // Rethrow the same error but with the tab's index:
-              throw new DoOperationsError(
-                error.message,
-                error.fieldErrors,
-                error.individualErrors.map(operationError => ({
-                  ...operationError,
-                  index
-                }))
-              );
+        // TODO get rid of these try/catches when we can save
+        // the Col Event + Acq event + material sample all at once.
+        try {
+          const saveOp = await saveHook.prepareSampleSaveOperation({
+            submittedValues: formik.values,
+            formik,
+            preProcessSample: async original => {
+              try {
+                return (await preProcessSample?.(original)) ?? original;
+              } catch (error: unknown) {
+                if (error instanceof DoOperationsError) {
+                  // Re-throw as Edit All tab error:
+                  throw new DoOperationsError(
+                    error.message,
+                    error.fieldErrors,
+                    error.individualErrors.map(opError => ({
+                      ...opError,
+                      index: "EDIT_ALL"
+                    }))
+                  );
+                }
+                throw error;
+              }
             }
-            throw error;
+          });
+          saveOperations.push(saveOp);
+        } catch (error: unknown) {
+          if (error instanceof DoOperationsError) {
+            // Rethrow the error with the tab's index:
+            throw new DoOperationsError(
+              error.message,
+              error.fieldErrors,
+              error.individualErrors.map(operationError => ({
+                ...operationError,
+                index:
+                  typeof operationError.index === "number"
+                    ? index
+                    : operationError.index
+              }))
+            );
           }
-        })
-      );
+          throw error;
+        }
+      }
 
       const validOperations = saveOperations.map(op => {
         if (!op) {
@@ -183,7 +210,11 @@ function useBulkSampleSave({
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {
         for (const opError of error.individualErrors) {
-          const formik = sampleHooks[opError.index].formRef.current;
+          const formik =
+            typeof opError.index === "number"
+              ? sampleHooks[opError.index].formRef.current
+              : bulkEditFormRef.current;
+
           if (formik) {
             formik.setStatus(opError.errorMessage);
             formik.setErrors(opError.fieldErrors);

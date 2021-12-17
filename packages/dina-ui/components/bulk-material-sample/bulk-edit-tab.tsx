@@ -41,6 +41,7 @@ export function useBulkEditTab({
   };
 
   const bulkEditTab: BulkNavigatorTab = {
+    formRef: bulkEditFormRef,
     key: "EDIT_ALL",
     title: formatMessage("editAll"),
     content: isSelected =>
@@ -86,7 +87,7 @@ export function useBulkEditTab({
     const newManagedAttributes = {
       ...withoutBlankFields(baseSample.managedAttributes),
       ...withoutBlankFields(bulkEditSample?.managedAttributes)
-    } as { [x: string]: string };
+    };
 
     const newOrganism = {
       ...withoutBlankFields(baseSample.organism),
@@ -107,5 +108,5 @@ export function useBulkEditTab({
     return newSample;
   }
 
-  return { bulkEditTab, withBulkEditOverrides };
+  return { bulkEditTab, withBulkEditOverrides, bulkEditFormRef };
 }

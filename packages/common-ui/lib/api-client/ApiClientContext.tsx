@@ -305,7 +305,7 @@ export class ApiClientImpl implements ApiClientI {
 }
 
 export interface OperationError {
-  index: number;
+  index: number | string;
   errorMessage: string | null;
   fieldErrors: FormikErrors<any>;
 }

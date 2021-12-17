@@ -1,7 +1,9 @@
+import classNames from "classnames";
 import { SampleWithHooks } from "common-ui";
+import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
-import { ReactNode, useState } from "react";
+import { ReactNode, RefObject, useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { SelectNavigation } from "./SelectNavigation";
@@ -21,6 +23,7 @@ export interface BulkNavigatorTab {
   key: string;
   title: ReactNode;
   content: (isSelected: boolean) => ReactNode;
+  formRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
 }
 
 /**
@@ -40,13 +43,10 @@ export function MaterialSampleBulkNavigator({
 
   const tooManySamplesForTabs = samples.length >= 10;
 
-  const tabsWithErrors = samples.reduce(
-    (prev, sample) =>
+  const tabsWithErrors = [...samples, ...extraTabs].filter(
+    sample =>
       !!sample.formRef.current?.status ||
       !isEmpty(sample.formRef.current?.errors)
-        ? [...prev, sample]
-        : prev,
-    []
   );
 
   function isSelected(key: string) {
@@ -95,14 +95,25 @@ export function MaterialSampleBulkNavigator({
           onSelect={index => setSelectedElement(tabElements[index])}
         >
           <TabList>
-            {extraTabs.map((extraTab, index) => (
-              <Tab
-                className={`react-tabs__tab tab-${extraTab.key}`}
-                key={index}
-              >
-                <span className="fw-bold">{extraTab.title}</span>
-              </Tab>
-            ))}
+            {extraTabs.map((extraTab, index) => {
+              const tabHasError = tabsWithErrors.includes(extraTab);
+
+              return (
+                <Tab
+                  className={`react-tabs__tab tab-${extraTab.key}`}
+                  key={index}
+                >
+                  <span
+                    className={classNames(
+                      "fw-bold",
+                      tabHasError && "text-danger is-invalid"
+                    )}
+                  >
+                    {extraTab.title}
+                  </span>
+                </Tab>
+              );
+            })}
             {samples.map((sample, index) => {
               const tabHasError = tabsWithErrors.includes(sample);
               return (

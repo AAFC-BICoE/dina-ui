@@ -19,6 +19,6 @@ export function isBlankResourceAttribute(value: any) {
   }
 }
 
-export function withoutBlankFields<T>(original: T): Partial<T> {
-  return omitBy(original, isBlankResourceAttribute) as Partial<T>;
+export function withoutBlankFields<T>(original: T): { [P in keyof T]: T[P] } {
+  return omitBy(original, isBlankResourceAttribute) as { [P in keyof T]: T[P] };
 }

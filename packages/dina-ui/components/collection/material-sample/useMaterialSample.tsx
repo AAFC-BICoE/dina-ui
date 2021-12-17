@@ -1,5 +1,4 @@
 import {
-  AreYouSureModal,
   DinaForm,
   DinaFormSubmitParams,
   resourceDifference,
@@ -12,13 +11,7 @@ import {
 import { FormikContextType, FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { cloneDeep, compact, isEmpty, isEqual, pick, pickBy } from "lodash";
-import {
-  Dispatch,
-  SetStateAction,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -35,7 +28,6 @@ import {
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
   useAcquisitionEvent

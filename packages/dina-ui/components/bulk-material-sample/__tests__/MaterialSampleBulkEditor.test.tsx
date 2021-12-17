@@ -372,7 +372,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toContain("Start Event Date Time");
   }, 20000);
 
-  it("Shows an error indicator when there is a Collecting Event SERVER-SIDE validation error.", async () => {
+  it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
       throw new DoOperationsError(
         "",
@@ -436,7 +436,10 @@ describe("MaterialSampleBulkEditor", () => {
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The tab with the error is given the red text, and the other 2 tabs are unaffected:
+    // The tab with the error is given the red text, and the other tabs are unaffected:
+    expect(
+      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
     ).toEqual(false);
@@ -450,6 +453,90 @@ describe("MaterialSampleBulkEditor", () => {
     // Shows the error message:
     expect(
       wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
+    ).toContain("Start Event Date Time");
+  }, 20000);
+
+  it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
+    const mockSaveForBadColEvent = jest.fn(async () => {
+      throw new DoOperationsError(
+        "",
+        { startEventDateTime: "Invalid Collecting Event" },
+        [
+          {
+            errorMessage: "",
+            fieldErrors: { startEventDateTime: "Invalid Collecting Event" },
+            index: 0
+          }
+        ]
+      );
+    });
+
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      {
+        ...testCtx,
+        apiContext: {
+          ...testCtx.apiContext,
+          // Test save error: The second sample has an error on the barcode field:
+          save: mockSaveForBadColEvent
+        }
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Use the Edit All tab:
+    wrapper.find("li.tab-EDIT_ALL").simulate("click");
+
+    // Enable the collecting event section:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Click the "Save All" button:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The collecting event was saved separately.
+    // TODO let the Collecting Event be saved along with the Material Sample in one transaction.
+    expect(mockSaveForBadColEvent).lastCalledWith(
+      [
+        {
+          resource: expect.objectContaining({
+            type: "collecting-event"
+          }),
+          type: "collecting-event"
+        }
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+
+    // The tab with the error is given the red text, and the other tabs are unaffected:
+    expect(
+      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
+    ).toEqual(true);
+    expect(
+      wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
+    ).toEqual(false);
+    expect(
+      wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
+    ).toEqual(false);
+    expect(
+      wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
+    ).toEqual(false);
+
+    // Shows the error message:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
     ).toContain("Start Event Date Time");
   }, 20000);
 
