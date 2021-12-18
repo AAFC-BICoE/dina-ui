@@ -45,6 +45,7 @@ import {
   ScheduledActionsField,
   SetDefaultSampleName,
   TabbedResourceLinker,
+  useCollectingEventQuery,
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection";
@@ -63,7 +64,10 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "../acquisition-event/edit";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -244,8 +248,6 @@ export function MaterialSampleForm({
     dataComponentState,
     colEventId,
     setColEventId,
-    colEventQuery,
-    acqEventQuery,
     acqEventId,
     setAcqEventId,
     onSubmit,
@@ -354,11 +356,12 @@ export function MaterialSampleForm({
                   />
                 }
                 nestedForm={nestedCollectingEventForm}
-                resourceQuery={colEventQuery}
+                useResourceQuery={useCollectingEventQuery}
                 setResourceId={setColEventId}
                 disableLinkerTab={templateAttachesCollectingEvent}
                 readOnlyLink="/collection/collecting-event/view?id="
                 resourceId={colEventId}
+                fieldName="collectingEvent"
               />
             </FieldSet>
           )}
@@ -392,11 +395,12 @@ export function MaterialSampleForm({
                   />
                 }
                 nestedForm={nestedAcqEventForm}
-                resourceQuery={acqEventQuery}
+                useResourceQuery={useAcquisitionEvent}
                 setResourceId={setAcqEventId}
                 disableLinkerTab={templateAttachesAcquisitionEvent}
                 readOnlyLink="/collection/acquisition-event/view?id="
                 resourceId={acqEventId}
+                fieldName="acquisitionEvent"
               />
             </FieldSet>
           )}

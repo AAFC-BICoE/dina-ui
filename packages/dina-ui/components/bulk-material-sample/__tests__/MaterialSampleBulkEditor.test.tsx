@@ -12,6 +12,12 @@ import {
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 
+const TEST_COLLECTING_EVENT = {
+  id: "col-event-1",
+  type: "collecting-event",
+  dwcVerbatimLocality: "test initial locality"
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collection/1":
@@ -31,7 +37,11 @@ const mockGet = jest.fn<any, any>(async path => {
           materialSampleName: "material-sample-500"
         }
       };
+    case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod":
+      return { data: TEST_COLLECTING_EVENT };
     case "collection-api/collection":
+    case "collection-api/collection-method":
+    case "collection-api/collecting-event":
     case "objectstore-api/metadata":
     case "agent-api/person":
     case "collection-api/vocabulary/typeStatus":
@@ -44,6 +54,8 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/project":
     case "user-api/group":
     case "collection-api/vocabulary/associationType":
+    case "collection-api/vocabulary/srs":
+    case "collection-api/vocabulary/coordinateSystem":
       return { data: [] };
   }
 });
@@ -227,6 +239,21 @@ const TEST_SAMPLES_DIFFERENT_MANAGED_ATTRIBUTES: InputResource<MaterialSample>[]
       }
     }
   ];
+
+const TEST_SAMPLES_SAME_COLLECTING_EVENT: InputResource<MaterialSample>[] = [
+  {
+    ...blankMaterialSample(),
+    id: "1",
+    type: "material-sample",
+    collectingEvent: TEST_COLLECTING_EVENT
+  },
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    collectingEvent: TEST_COLLECTING_EVENT
+  }
+];
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
@@ -1222,7 +1249,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".has-bulk-edit-value .dwcVerbatimLocality-field").exists()
     ).toEqual(false);
-  });
+  }, 20000);
 
   it("Creates and links a common Collecting Event to all samples", async () => {
     const wrapper = mountWithAppContext(
@@ -1305,5 +1332,86 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  });
+  }, 20000);
+
+  it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_COLLECTING_EVENT}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable the collecting event section:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
+        .prop("value")
+    ).toEqual("test initial locality");
+
+    // Edit the common collecting event:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
+      .simulate("change", { target: { value: "bulk edited locality" } });
+
+    // Save All:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Save the collecting event, then save the 2 material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              dwcVerbatimLocality: "bulk edited locality",
+              type: "collecting-event"
+            }),
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              collectingEvent: {
+                id: "col-event-1",
+                type: "collecting-event"
+              },
+              id: "1",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              collectingEvent: {
+                id: "col-event-1",
+                type: "collecting-event"
+              },
+              id: "2",
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  }, 20000);
 });

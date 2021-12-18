@@ -349,7 +349,7 @@ export function useMaterialSampleSave({
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
-  const initialValues: InputResource<MaterialSample> = {
+  const msInitialValues: InputResource<MaterialSample> = {
     ...(materialSample || {
       type: "material-sample",
       managedAttributes: {},
@@ -553,9 +553,9 @@ export function useMaterialSampleSave({
       (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
 
     // Only submit the changed values to the back-end:
-    const msDiff = initialValues.id
+    const msDiff = msInitialValues.id
       ? resourceDifference({
-          original: initialValues,
+          original: msInitialValues,
           updated: msPreprocessed
         })
       : msPreprocessed;
@@ -626,12 +626,15 @@ export function useMaterialSampleSave({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   const nestedCollectingEventForm = (
+    initialValues?: PersistedResource<CollectingEvent>
+  ) => (
     <DinaForm
       innerRef={colEventFormRef}
       initialValues={
-        isTemplate
+        initialValues ??
+        (isTemplate
           ? colEventTemplateInitialValues
-          : collectingEventInitialValues
+          : collectingEventInitialValues)
       }
       validationSchema={collectingEventFormSchema}
       isTemplate={isTemplate}
@@ -644,39 +647,43 @@ export function useMaterialSampleSave({
     </DinaForm>
   );
 
-  const acqEventFormProps = {
-    innerRef: acqEventFormRef,
-    initialValues: isTemplate
-      ? acqEventTemplateInitialValues
-      : { type: "acquisition-event", ...acquisitionEventInitialValues },
-    isTemplate,
-    readOnly: isTemplate ? !!acqEventId : false,
-    enabledFields: enabledFields?.acquisitionEvent
-  };
+  const nestedAcqEventForm = (
+    initialValues?: PersistedResource<AcquisitionEvent>
+  ) => {
+    const acqEventFormProps = {
+      innerRef: acqEventFormRef,
+      initialValues:
+        initialValues ??
+        (isTemplate
+          ? acqEventTemplateInitialValues
+          : { type: "acquisition-event", ...acquisitionEventInitialValues }),
+      isTemplate,
+      readOnly: isTemplate ? !!acqEventId : false,
+      enabledFields: enabledFields?.acquisitionEvent
+    };
 
-  const nestedAcqEventForm = acqEventId ? (
-    withResponse(acqEventQuery, ({ data }) => (
-      <DinaForm {...acqEventFormProps} initialValues={data}>
+    return acqEventId ? (
+      withResponse(acqEventQuery, ({ data }) => (
+        <DinaForm {...acqEventFormProps} initialValues={data}>
+          <AcquisitionEventFormLayout />
+        </DinaForm>
+      ))
+    ) : (
+      <DinaForm {...acqEventFormProps}>
         <AcquisitionEventFormLayout />
       </DinaForm>
-    ))
-  ) : (
-    <DinaForm {...acqEventFormProps}>
-      <AcquisitionEventFormLayout />
-    </DinaForm>
-  );
+    );
+  };
 
   return {
-    initialValues,
+    initialValues: msInitialValues,
     nestedCollectingEventForm,
     nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
-    acqEventQuery,
     acqEventId,
     setAcqEventId,
-    colEventQuery,
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
