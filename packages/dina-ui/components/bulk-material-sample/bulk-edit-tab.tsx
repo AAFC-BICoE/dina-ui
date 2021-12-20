@@ -99,6 +99,11 @@ export function useBulkEditTab({
         ...withoutBlankFields(bulkEditSample?.organism)
       };
 
+      const newHostOrganism = {
+        ...withoutBlankFields(baseSample.hostOrganism),
+        ...withoutBlankFields(bulkEditSample?.hostOrganism)
+      };
+
       const newSample: InputResource<MaterialSample> = {
         ...baseSample,
         ...overrides,
@@ -107,6 +112,9 @@ export function useBulkEditTab({
         }),
         ...(!isEmpty(newOrganism) && {
           organism: newOrganism
+        }),
+        ...(!isEmpty(newHostOrganism) && {
+          hostOrganism: newHostOrganism
         })
       };
 

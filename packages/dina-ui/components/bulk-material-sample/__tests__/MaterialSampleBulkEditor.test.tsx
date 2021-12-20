@@ -309,6 +309,34 @@ const TEST_SAMPLES_SAME_STORAGE_UNIT: InputResource<MaterialSample>[] = [
   }
 ];
 
+const TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM: InputResource<MaterialSample>[] =
+  [
+    {
+      ...blankMaterialSample(),
+      id: "1",
+      type: "material-sample",
+      materialSampleName: "sample 1",
+      organism: {
+        lifeStage: "test lifestage"
+      },
+      hostOrganism: {
+        name: "test host organism"
+      }
+    },
+    {
+      ...blankMaterialSample(),
+      id: "2",
+      type: "material-sample",
+      materialSampleName: "sample 2",
+      organism: {
+        lifeStage: "test lifestage"
+      },
+      hostOrganism: {
+        name: "test host organism"
+      }
+    }
+  ];
+
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
 
@@ -1181,7 +1209,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Ignores the common value if the field is re-edited to the same value.", async () => {
+  it("Ignores the submitted value if the field is re-edited to the common value.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1431,6 +1459,16 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // The collecting event section has the green legend to indicate a bulk edit:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #collecting-event-section legend .has-bulk-edit-value .field-label"
+        )
+        .at(0)
+        .exists()
+    ).toEqual(true);
+
     // Edit a collecting event field:
     wrapper
       .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
@@ -1514,6 +1552,16 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // The collecting event section has the green legend to indicate a bulk edit:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #collecting-event-section legend .has-bulk-edit-value .field-label"
+        )
+        .at(0)
+        .exists()
+    ).toEqual(true);
+
     expect(
       wrapper
         .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
@@ -1547,25 +1595,27 @@ describe("MaterialSampleBulkEditor", () => {
       [
         [
           {
-            resource: expect.objectContaining({
+            resource: {
               collectingEvent: {
                 id: "col-event-1",
                 type: "collecting-event"
               },
+              relationships: {},
               id: "1",
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           },
           {
-            resource: expect.objectContaining({
+            resource: {
               collectingEvent: {
                 id: "col-event-1",
                 type: "collecting-event"
               },
+              relationships: {},
               id: "2",
               type: "material-sample"
-            }),
+            },
             type: "material-sample"
           }
         ],
@@ -1643,6 +1693,86 @@ describe("MaterialSampleBulkEditor", () => {
                 id: "C",
                 type: "storage-unit"
               },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Edits the nested organism and hostOrganism fields.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable organism and host organism fields:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-organism-state")
+      .find(Switch)
+      .prop<any>("onChange")(true);
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-associations")
+      .find(Switch)
+      .prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".tabpanel-EDIT_ALL .substrate-field input")
+      .simulate("change", { target: { value: "bulk-edit-substrate" } });
+    wrapper
+      .find(".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea")
+      .simulate("change", { target: { value: "bulk-edit-remarks" } });
+
+    // Save the samples:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the new material samples with the new storage unit:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              associations: [{}],
+              id: "1",
+              organism: {
+                lifeStage: "test lifestage",
+                substrate: "bulk-edit-substrate"
+              },
+              hostOrganism: {
+                name: "test host organism",
+                remarks: "bulk-edit-remarks"
+              },
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              associations: [{}],
+              id: "2",
+              organism: {
+                lifeStage: "test lifestage",
+                substrate: "bulk-edit-substrate"
+              },
+              hostOrganism: {
+                name: "test host organism",
+                remarks: "bulk-edit-remarks"
+              },
+              relationships: {},
               type: "material-sample"
             },
             type: "material-sample"

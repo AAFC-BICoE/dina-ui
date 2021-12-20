@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import {
   FieldSet,
   QueryState,
@@ -24,7 +25,7 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   fieldName: string;
   targetType: string;
   /** FieldSet id */
-  id: string;
+  fieldSetId: string;
   /** FieldSet legend */
   legend: JSX.Element;
 }
@@ -41,7 +42,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   briefDetails,
   fieldName,
   targetType,
-  id,
+  fieldSetId,
   legend
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate } = useDinaFormContext();
@@ -60,7 +61,20 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   const resourceQuery = useResourceQuery(resourceId);
 
   return (
-    <FieldSet id={id} legend={legend}>
+    <FieldSet
+      id={fieldSetId}
+      legend={
+        <div
+          className={classNames(
+            bulkCtx?.bulkEditClasses,
+            // Always show the green outline in bulk edit mode:
+            bulkCtx && "has-bulk-edit-value"
+          )}
+        >
+          <div className="field-label">{legend}</div>
+        </div>
+      }
+    >
       {bulkCtx?.placeholder && (
         <div className={bulkCtx?.bulkEditClasses}>
           <div className="alert alert-secondary placeholder-text">

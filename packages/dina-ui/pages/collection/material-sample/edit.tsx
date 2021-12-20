@@ -319,15 +319,15 @@ export function MaterialSampleForm({
         )}
         <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
         <ProjectSelectSection resourcePath="collection-api/project" />
-        <MaterialSampleIdentifiersFormLayout
-          id={navIds.identifiers}
-          disableSampleNameField={disableSampleNameField}
-        />
-        <MaterialSampleFormLayout />
         <div className="data-components">
+          <MaterialSampleIdentifiersFormLayout
+            id={navIds.identifiers}
+            disableSampleNameField={disableSampleNameField}
+          />
+          <MaterialSampleFormLayout />
           {dataComponentState.enableCollectingEvent && (
             <TabbedResourceLinker<CollectingEvent>
-              id={navIds.colEvent}
+              fieldSetId={navIds.colEvent}
               legend={<DinaMessage id="collectingEvent" />}
               briefDetails={colEvent => (
                 <CollectingEventBriefDetails collectingEvent={colEvent} />
@@ -351,7 +351,7 @@ export function MaterialSampleForm({
           )}
           {dataComponentState.enableAcquisitionEvent && (
             <TabbedResourceLinker<AcquisitionEvent>
-              id={navIds.acqEvent}
+              fieldSetId={navIds.acqEvent}
               legend={<DinaMessage id="acquisitionEvent" />}
               briefDetails={acqEvent => (
                 <DinaForm initialValues={acqEvent} readOnly={true}>
