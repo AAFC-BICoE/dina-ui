@@ -13,19 +13,19 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useBulkEditTabContext,
   useDinaFormContext,
   useFieldLabels,
   withResponse
 } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
-import { padStart, mapValues } from "lodash";
-import { useRouter } from "next/router";
-import { ReactNode, useContext, useRef, useState, Ref } from "react";
 import { FormikProps } from "formik";
+import { InputResource, PersistedResource } from "kitsu";
+import { mapValues, padStart } from "lodash";
+import { useRouter } from "next/router";
+import { ReactNode, Ref, useContext, useRef, useState } from "react";
 import * as yup from "yup";
 import {
   AttachmentsField,
+  BulkEditTabWarning,
   CollectionSelectField,
   Footer,
   GroupSelectField,
@@ -34,10 +34,9 @@ import {
   MaterialSampleFormNav,
   MaterialSampleStateReadOnlyRender,
   Nav,
-  StorageLinkerField,
-  TagsAndRestrictionsSection,
   ProjectSelectSection,
-  BulkEditTabWarning
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
@@ -264,9 +263,6 @@ export function MaterialSampleForm({
       enabledFields
     });
 
-  const isInBulkEditTab = !!useBulkEditTabContext();
-  const { formatMessage } = useDinaIntl();
-
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
@@ -329,80 +325,54 @@ export function MaterialSampleForm({
         <MaterialSampleFormLayout />
         <div className="data-components">
           {dataComponentState.enableCollectingEvent && (
-            <FieldSet
+            <TabbedResourceLinker<CollectingEvent>
               id={navIds.colEvent}
               legend={<DinaMessage id="collectingEvent" />}
-            >
-              {isInBulkEditTab && (
-                <div className="alert alert-warning">
-                  <DinaMessage
-                    id="bulkEditResourceLinkerWarning"
-                    values={{
-                      typeName: formatMessage("materialSample"),
-                      fieldName: formatMessage("collectingEvent")
-                    }}
-                  />
-                </div>
+              briefDetails={colEvent => (
+                <CollectingEventBriefDetails collectingEvent={colEvent} />
               )}
-              <TabbedResourceLinker<CollectingEvent>
-                briefDetails={colEvent => (
-                  <CollectingEventBriefDetails collectingEvent={colEvent} />
-                )}
-                linkerTabContent={
-                  <CollectingEventLinker
-                    onCollectingEventSelect={colEventToLink => {
-                      setColEventId(colEventToLink.id);
-                    }}
-                  />
-                }
-                nestedForm={nestedCollectingEventForm}
-                useResourceQuery={useCollectingEventQuery}
-                setResourceId={setColEventId}
-                disableLinkerTab={templateAttachesCollectingEvent}
-                readOnlyLink="/collection/collecting-event/view?id="
-                resourceId={colEventId}
-                fieldName="collectingEvent"
-              />
-            </FieldSet>
+              linkerTabContent={
+                <CollectingEventLinker
+                  onCollectingEventSelect={colEventToLink => {
+                    setColEventId(colEventToLink.id);
+                  }}
+                />
+              }
+              nestedForm={nestedCollectingEventForm}
+              useResourceQuery={useCollectingEventQuery}
+              setResourceId={setColEventId}
+              disableLinkerTab={templateAttachesCollectingEvent}
+              readOnlyLink="/collection/collecting-event/view?id="
+              resourceId={colEventId}
+              fieldName="collectingEvent"
+              targetType="materialSample"
+            />
           )}
           {dataComponentState.enableAcquisitionEvent && (
-            <FieldSet
+            <TabbedResourceLinker<AcquisitionEvent>
               id={navIds.acqEvent}
               legend={<DinaMessage id="acquisitionEvent" />}
-            >
-              {isInBulkEditTab && (
-                <div className="alert alert-warning">
-                  <DinaMessage
-                    id="bulkEditResourceLinkerWarning"
-                    values={{
-                      typeName: formatMessage("materialSample"),
-                      fieldName: formatMessage("acquisitionEvent")
-                    }}
-                  />
-                </div>
+              briefDetails={acqEvent => (
+                <DinaForm initialValues={acqEvent} readOnly={true}>
+                  <AcquisitionEventFormLayout />
+                </DinaForm>
               )}
-              <TabbedResourceLinker<AcquisitionEvent>
-                briefDetails={acqEvent => (
-                  <DinaForm initialValues={acqEvent} readOnly={true}>
-                    <AcquisitionEventFormLayout />
-                  </DinaForm>
-                )}
-                linkerTabContent={
-                  <AcquisitionEventLinker
-                    onAcquisitionEventSelect={acqEventToLink => {
-                      setAcqEventId(acqEventToLink.id);
-                    }}
-                  />
-                }
-                nestedForm={nestedAcqEventForm}
-                useResourceQuery={useAcquisitionEvent}
-                setResourceId={setAcqEventId}
-                disableLinkerTab={templateAttachesAcquisitionEvent}
-                readOnlyLink="/collection/acquisition-event/view?id="
-                resourceId={acqEventId}
-                fieldName="acquisitionEvent"
-              />
-            </FieldSet>
+              linkerTabContent={
+                <AcquisitionEventLinker
+                  onAcquisitionEventSelect={acqEventToLink => {
+                    setAcqEventId(acqEventToLink.id);
+                  }}
+                />
+              }
+              nestedForm={nestedAcqEventForm}
+              useResourceQuery={useAcquisitionEvent}
+              setResourceId={setAcqEventId}
+              disableLinkerTab={templateAttachesAcquisitionEvent}
+              readOnlyLink="/collection/acquisition-event/view?id="
+              resourceId={acqEventId}
+              fieldName="acquisitionEvent"
+              targetType="materialSample"
+            />
           )}
           {dataComponentState.enablePreparations && (
             <PreparationField

@@ -1,7 +1,9 @@
 import {
+  FieldSet,
   QueryState,
   useBulkEditTabFieldIndicators,
   useDinaFormContext,
+  useFieldLabels,
   withResponse
 } from "common-ui";
 import { KitsuResource, PersistedResource } from "kitsu";
@@ -20,6 +22,11 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   linkerTabContent: ReactNode;
   briefDetails: (resource: PersistedResource<T>) => ReactNode;
   fieldName: string;
+  targetType: string;
+  /** FieldSet id */
+  id: string;
+  /** FieldSet legend */
+  legend: JSX.Element;
 }
 
 /** Tabbed view for a nested form where you can either add/edit a resource or link an existing one. */
@@ -32,11 +39,19 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   nestedForm,
   linkerTabContent,
   briefDetails,
-  fieldName
+  fieldName,
+  targetType,
+  id,
+  legend
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate } = useDinaFormContext();
 
-  const bulkCtx = useBulkEditTabFieldIndicators({ fieldName });
+  const bulkCtx = useBulkEditTabFieldIndicators({
+    fieldName,
+    currentValue: resourceIdProp ? { id: resourceIdProp } : undefined
+  });
+  const isInBulkEditTab = !!bulkCtx;
+  const { getFieldLabel } = useFieldLabels();
 
   // In bulk edit mode, show the common value if there is one instead of a new linked resource:
   const defaultValue = bulkCtx?.defaultValue;
@@ -45,10 +60,23 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   const resourceQuery = useResourceQuery(resourceId);
 
   return (
-    <div>
+    <FieldSet id={id} legend={legend}>
       {bulkCtx?.placeholder && (
-        <div className="alert-alert-secondary placeholder-text">
-          {bulkCtx?.placeholder}
+        <div className={bulkCtx?.bulkEditClasses}>
+          <div className="alert alert-secondary placeholder-text">
+            {bulkCtx?.placeholder}
+          </div>
+        </div>
+      )}
+      {isInBulkEditTab && (
+        <div className="alert alert-warning">
+          <DinaMessage
+            id="bulkEditResourceLinkerWarning"
+            values={{
+              targetType: getFieldLabel({ name: targetType }).fieldLabel,
+              fieldName: getFieldLabel({ name: fieldName }).fieldLabel
+            }}
+          />
         </div>
       )}
       <Tabs
@@ -124,6 +152,6 @@ export function TabbedResourceLinker<T extends KitsuResource>({
         </TabPanel>
         <TabPanel>{linkerTabContent}</TabPanel>
       </Tabs>
-    </div>
+    </FieldSet>
   );
 }

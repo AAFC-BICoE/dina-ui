@@ -68,7 +68,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
   bulkEditResourceLinkerWarning:
-    "This {fieldName} will be linked to all {typeName}s.",
+    "This {fieldName} will be linked to all {targetType}s.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
