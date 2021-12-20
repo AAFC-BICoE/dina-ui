@@ -24,6 +24,8 @@ export type ScientificNameSourceDetails = {
   recordedOn?: string;
   classificationPath?: string;
   classificationRanks?: string;
+  isSynonym?: boolean;
+  currentName?: string;
 };
 
 export enum ScientificNameSource {

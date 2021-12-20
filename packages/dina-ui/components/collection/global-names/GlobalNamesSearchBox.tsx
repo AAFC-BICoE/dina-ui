@@ -228,14 +228,11 @@ export function GlobalNamesSearchBox({
               detail.classificationPath = result.bestResult?.classificationPath;
               detail.classificationRanks =
                 result.bestResult?.classificationRanks;
+              detail.isSynonym = result.bestResult.isSynonym;
+              detail.currentName = result.bestResult.currentName;
 
               // Use detail to populate source details fields, result.label to populate the searchbox bound field
-              const resultArray = [
-                detail,
-                result.bestResult?.matchedName,
-                result.bestResult.isSynonym,
-                result.bestResult?.currentName
-              ];
+              const resultArray = [detail, result.bestResult?.matchedName];
 
               return (
                 <div

@@ -7,6 +7,7 @@ import { isArray } from "lodash";
 import DOMPurify from "dompurify";
 import { GlobalNamesSearchBox } from "../global-names/GlobalNamesSearchBox";
 import { Dispatch, SetStateAction } from "react";
+import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api";
 export interface GlobalNamesFieldProps extends FieldWrapperProps {
   scientificNameSourceField?: string;
   onChange?: (selection: string | null, formik: FormikProps<any>) => void;
@@ -73,30 +74,43 @@ export function GlobalNamesField({
     </FieldWrapper>
   );
 }
+interface GlobalNamesReadOnlyProps {
+  value: string;
+  scientificNameDetails: ScientificNameSourceDetails;
+}
 
-export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
+export function GlobalNamesReadOnly({
+  value,
+  scientificNameDetails
+}: GlobalNamesReadOnlyProps) {
   const [showMore, setShowMore] = useState(false);
   const { formatMessage } = useDinaIntl();
-  const link = document.createElement("a");
-  link.setAttribute("href", scientificNameDetails?.sourceUrl);
-  link.setAttribute("target", "_blank");
-  link.setAttribute("rel", "noopener");
 
-  // this will need to be replaced with currentName's label html if any to show as synonym if exists
-  link.innerHTML = scientificNameDetails?.labelHtml;
+  let safeHtmlLink: string = "";
 
-  const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {
-    ADD_ATTR: ["target", "rel"]
-  });
+  if (scientificNameDetails?.isSynonym) {
+    const link = document.createElement("a");
+    link.setAttribute("href", scientificNameDetails.sourceUrl as string);
+    link.setAttribute("target", "_blank");
+    link.setAttribute("rel", "noopener");
+
+    link.innerHTML = scientificNameDetails.currentName as string;
+
+    safeHtmlLink = DOMPurify.sanitize(link.outerHTML, {
+      ADD_ATTR: ["target", "rel"]
+    });
+  }
 
   const paths = scientificNameDetails?.classificationPath?.split("|");
   const ranks = scientificNameDetails?.classificationRanks?.split("|");
 
   const familyIdx = ranks?.findIndex(path => path === "family");
-  const familyRank = familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
-
   const kingdomIdx = ranks?.findIndex(path => path === "kingdom");
-  const kingdomRank = kingdomIdx >= 0 ? paths[kingdomIdx] : undefined;
+
+  const kingdomRank =
+    kingdomIdx && kingdomIdx >= 0 ? paths?.[kingdomIdx] : undefined;
+  const familyRank =
+    familyIdx && familyIdx >= 0 ? paths?.[familyIdx] + ": " : undefined;
 
   const initTaxonTree = (
     <span>
@@ -109,12 +123,17 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
   const fullTaxonTree = (
     <>
       {paths?.map((path, idx) => {
-        let boldText = (
+        let boldText = ranks?.[idx] && (
           <>
-            <b>{ranks?.[idx]} :</b> <>{path}</>{" "}
+            <b>
+              {" "}
+              {ranks[idx].charAt(0)?.toUpperCase() + ranks[idx].substring(1)} :
+            </b>{" "}
+            <>{path}</> ){" "}
           </>
         );
-        if (idx !== path.length - 1) {
+
+        if (idx !== path.length - 1 && boldText) {
           boldText = <> {boldText} &gt;</>;
         }
         return boldText;
@@ -125,7 +144,12 @@ export function GlobalNamesReadOnly({ value, scientificNameDetails }) {
   return (
     <div>
       <span style={{ fontSize: "1.5rem" }}> {value} </span>
-      <span>{scientificNameDetails?.hasSynonym ? safeHtmlLink : null} </span>
+      {scientificNameDetails?.isSynonym && (
+        <div className="flex-grow-1 d-flex align-items-center">
+          <span className="me-2">Synonym of: </span>{" "}
+          <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
+        </div>
+      )}
       {paths?.length && ranks?.length && (
         <div className="mt-1">
           {showMore ? fullTaxonTree : initTaxonTree}
