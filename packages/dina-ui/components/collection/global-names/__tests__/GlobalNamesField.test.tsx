@@ -58,14 +58,14 @@ describe("GlobalNamesField component", () => {
             labelHtml: "MONODONTIDAE: Monodon Linnaeus, 1758",
             recordedOn: "2021-12-16",
             sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
+            currentName: "Monodon Linnaeus, 1758",
+            isSynonym: false,
             classificationPath:
               "Biota|Animalia|Chordata|Mammalia|Theria|Eutheria|Cetacea|Odontoceti|Monodontidae|Monodon",
             classificationRanks:
               "unranked|kingdom|phylum|class|subclass|infraclass|order|suborder|family|genus"
           },
-          expect.anything(),
-          false,
-          "Monodon Linnaeus, 1758"
+          expect.anything()
         ],
         expect.anything()
       ]
