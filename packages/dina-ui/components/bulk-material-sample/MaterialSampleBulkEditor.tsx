@@ -1,4 +1,5 @@
 import {
+  BulkEditTabContextI,
   ButtonBar,
   DinaForm,
   DoOperationsError,
@@ -8,10 +9,9 @@ import {
   SaveArgs,
   useApiClient
 } from "common-ui";
-import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
-import { RefObject, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -51,10 +51,9 @@ export function MaterialSampleBulkEditor({
   });
 
   const { saveAll } = useBulkSampleSave({
-    sampleHooks,
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditFormRef
+    bulkEditCtx: { sampleHooks, bulkEditFormRef }
   });
 
   return (
@@ -105,24 +104,24 @@ export function MaterialSampleBulkEditor({
 }
 
 interface BulkSampleSaveParams {
-  sampleHooks: SampleWithHooks[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   samplePreProcessor?: () => (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
+  bulkEditCtx: BulkEditTabContextI;
 }
 
 function useBulkSampleSave({
-  sampleHooks,
   onSaved,
   samplePreProcessor,
-  bulkEditFormRef
+  bulkEditCtx
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
   const [_error, setError] = useState<unknown | null>(null);
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
+
+  const { bulkEditFormRef, sampleHooks } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -218,7 +217,7 @@ function useBulkSampleSave({
           pickBy(
             error.fieldErrors,
             (_, fieldName) =>
-              getBulkEditTabFieldInfo(bulkEditFormRef, sampleHooks, fieldName)
+              getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
                 .hasBulkEditValue
           )
         );

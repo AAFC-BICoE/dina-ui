@@ -45,7 +45,7 @@ export function TextField(props: TextFieldProps) {
 
   return (
     <FieldWrapper {...fieldWrapperProps}>
-      {({ formik, setValue, value, invalid, ...renderProps }) => {
+      {({ formik, setValue, value, invalid, placeholder }) => {
         function onChangeInternal(newValue: string) {
           setValue(newValue);
           onChangeExternal?.(formik, props.name, newValue);
@@ -68,10 +68,10 @@ export function TextField(props: TextFieldProps) {
 
         const inputPropsInternal: InputHTMLAttributes<HTMLInputElement> = {
           ...inputPropsExternal,
-          placeholder: renderProps.placeholder || fieldWrapperProps.placeholder,
+          placeholder: placeholder || fieldWrapperProps.placeholder,
           className: classnames("form-control", { "is-invalid": invalid }),
           onChange: event => onChangeInternal(event.target.value),
-          value: value || renderProps.defaultValue || "",
+          value: value || "",
           readOnly
         };
 

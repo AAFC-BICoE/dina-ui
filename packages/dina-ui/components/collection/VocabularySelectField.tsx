@@ -40,13 +40,7 @@ export function VocabularySelectField({
       )}
       {...labelWrapperProps}
     >
-      {({
-        setValue,
-        defaultValue,
-        value = defaultValue,
-        invalid,
-        placeholder
-      }) => {
+      {({ setValue, value, invalid, placeholder }) => {
         const selectValue =
           value &&
           (Array.isArray(value) ? value.map(toOption) : toOption(value));

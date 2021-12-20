@@ -11,12 +11,7 @@ export function RadioButtonsField<T = any>({
 }: RadioFieldProps<T>) {
   return (
     <FieldWrapper disableLabelClick={true} {...props}>
-      {({
-        defaultValue,
-        value = defaultValue ?? null,
-        setValue,
-        placeholder
-      }) => (
+      {({ value, setValue, placeholder }) => (
         <div>
           {placeholder && (
             <span className="placeholder-text">{placeholder}</span>
@@ -27,7 +22,7 @@ export function RadioButtonsField<T = any>({
                 <input
                   className="form-check-input"
                   type="radio"
-                  checked={value === option.value}
+                  checked={(value ?? null) === option.value}
                   onChange={() => setValue(option.value)}
                 />
                 {option.label}

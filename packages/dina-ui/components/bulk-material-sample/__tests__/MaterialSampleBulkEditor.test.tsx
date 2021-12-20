@@ -18,17 +18,17 @@ const TEST_COLLECTING_EVENT = {
   dwcVerbatimLocality: "test initial locality"
 };
 
+const TEST_COLLECTION_1 = {
+  id: "1",
+  type: "collection",
+  name: "test-collection",
+  code: "TC"
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collection/1":
-      return {
-        data: {
-          id: "1",
-          type: "collection",
-          name: "test-collection",
-          code: "TC"
-        }
-      };
+      return { data: TEST_COLLECTION_1 };
     case "collection-api/material-sample/500":
       return {
         data: {
@@ -1147,7 +1147,16 @@ describe("MaterialSampleBulkEditor", () => {
     // Manually enter the default value:
     wrapper
       .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "temporary edit" } });
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
       .simulate("change", { target: { value: "test barcode" } });
+    // Don't show the green indicator if the field is back to its initial value:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
+        .exists()
+    ).toEqual(false);
     // Has the default common value:
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
@@ -1157,7 +1166,7 @@ describe("MaterialSampleBulkEditor", () => {
     wrapper.find("li.sample-tab-0").simulate("click");
     wrapper
       .find(".sample-tabpanel-0 .barcode-field input")
-      .simulate("change", { target: { value: "edited-barcode-1" } });
+      .simulate("change", { target: { value: "edited-barcode" } });
 
     // Save All:
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -1171,7 +1180,7 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
-              barcode: "edited-barcode-1",
+              barcode: "edited-barcode",
               relationships: {},
               type: "material-sample"
             },
@@ -1189,6 +1198,34 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  }, 20000);
+
+  it("Renders blank values as the common value if there is a common value.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Has the default common value:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("test barcode");
+
+    // Manually erase the default value:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "" } });
+
+    // Shows the default common value:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("test barcode");
   }, 20000);
 
   it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {

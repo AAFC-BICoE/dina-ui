@@ -47,7 +47,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
       {...resourceSelectFieldProps}
       readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
     >
-      {({ setValue, value, invalid, placeholder, defaultValue }) => {
+      {({ setValue, value, invalid, placeholder }) => {
         function onChangeInternal(resource) {
           setValue(resource);
           onChange?.(resource);
@@ -59,7 +59,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
               {...resourceSelectProps}
               invalid={invalid}
               onChange={onChangeInternal}
-              value={value ?? defaultValue}
+              value={value}
               placeholder={placeholder}
             />
           </div>

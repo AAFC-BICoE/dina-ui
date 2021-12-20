@@ -44,14 +44,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({
-        setValue,
-        defaultValue,
-        value = defaultValue,
-        formik,
-        invalid,
-        placeholder
-      }) => {
+      {({ setValue, value, formik, invalid, placeholder }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {

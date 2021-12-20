@@ -3,6 +3,7 @@ import { FastField, FastFieldProps, FormikProps } from "formik";
 import { isArray } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { isBlankResourceAttribute } from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
@@ -75,6 +76,8 @@ export interface FieldWrapperRenderProps {
   value: any;
   setValue: (newValue: any) => void;
   placeholder?: string;
+
+  /** A value to render when there is no value stored in form state. */
   defaultValue?: any;
   formik: FormikProps<any>;
 }
@@ -255,7 +258,7 @@ function LabelWrapper({
 function FormikConnectedField({
   fastFieldProps: {
     form,
-    field: { name, value },
+    field: { name, value: formikValue },
     meta: { error }
   },
   fieldWrapperProps: { readOnlyRender, link, children }
@@ -263,7 +266,7 @@ function FormikConnectedField({
   const { readOnly } = useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
-    currentValue: value
+    currentValue: formikValue
   });
 
   function setValue(input: any) {
@@ -276,6 +279,12 @@ function FormikConnectedField({
 
     form.setFieldValue(name, newValue);
   }
+
+  // In the bulk edit tab, show the default value when the value is blank:
+  const value =
+    bulkTab && isBlankResourceAttribute(formikValue)
+      ? bulkTab?.defaultValue
+      : formikValue;
 
   const renderProps: FieldWrapperRenderProps = {
     invalid: Boolean(error),

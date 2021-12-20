@@ -1,45 +1,36 @@
 import classNames from "classnames";
-import {
-  isBlankResourceAttribute,
-  SampleWithHooks,
-  useBulkEditTabContext
-} from "common-ui";
-import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { isBlankResourceAttribute, useBulkEditTabContext } from "common-ui";
 import { get, isEqual } from "lodash";
-import { RefObject } from "react";
 import { useIntl } from "react-intl";
-import type { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
+import { BulkEditTabContextI } from "./bulk-context";
 
 export interface UseBulkEditTabFieldParams {
   fieldName: string;
   currentValue?: any;
 }
 
-export function useBulkEditTabField({
-  fieldName,
-  currentValue
-}: UseBulkEditTabFieldParams) {
+export function useBulkEditTabField(params: UseBulkEditTabFieldParams) {
   const bulkEditCtx = useBulkEditTabContext();
 
   if (!bulkEditCtx) {
     return null;
   }
 
-  return getBulkEditTabFieldInfo(
-    bulkEditCtx.bulkEditFormRef,
-    bulkEditCtx.sampleHooks,
-    fieldName,
-    currentValue
-  );
+  return getBulkEditTabFieldInfo({ bulkEditCtx, ...params });
 }
 
-export function getBulkEditTabFieldInfo(
-  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>,
-  sampleHooks: SampleWithHooks[],
-  fieldName: string,
-  currentValue?: any
-) {
+export interface BulkEditTabFieldInfoParams {
+  bulkEditCtx: BulkEditTabContextI;
+  fieldName: string;
+  currentValue?: any;
+}
+
+export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
+  const {
+    bulkEditCtx: { bulkEditFormRef, sampleHooks },
+    fieldName
+  } = params;
+
   const formStates = sampleHooks.map(sample => sample.formRef.current?.values);
 
   const hasNoValues = formStates.every(form =>
@@ -59,8 +50,8 @@ export function getBulkEditTabFieldInfo(
     hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined;
 
   const bulkEditValue =
-    currentValue !== undefined
-      ? currentValue
+    "currentValue" in params
+      ? params.currentValue
       : get(bulkEditFormRef.current?.values, fieldName);
 
   const hasBulkEditValue =
@@ -94,8 +85,7 @@ export function useBulkEditTabFieldIndicators({
       ? formatMessage({ id: "multipleValues" })
       : undefined;
 
-    const defaultValue =
-      hasSameValues && !hasBulkEditValue ? commonValue : undefined;
+    const defaultValue = hasSameValues ? commonValue : undefined;
 
     const bulkEditClasses = classNames(
       hasBulkEditValue && "has-bulk-edit-value",
