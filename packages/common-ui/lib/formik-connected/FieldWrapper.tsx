@@ -266,11 +266,15 @@ function FormikConnectedField({
     currentValue: value
   });
 
-  function setValue(newValue: any) {
+  function setValue(input: any) {
     // Remove the error message when the user edits the field:
     form.setFieldError(name, undefined);
+    form.setFieldTouched(name, true);
+
+    // When the input equals the bulk edit default/common value, set to undefined instead:
+    const newValue = input === bulkTab?.defaultValue ? undefined : input;
+
     form.setFieldValue(name, newValue);
-    form.setFieldTouched(name);
   }
 
   const renderProps: FieldWrapperRenderProps = {

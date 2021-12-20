@@ -10,6 +10,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
+import { keys, omit, pick, pickBy } from "lodash";
 import { RefObject, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import { MaterialSampleBulkNavigator } from "..";
@@ -18,7 +19,6 @@ import { MaterialSampleForm } from "../../pages/collection/material-sample/edit"
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
 import { useBulkEditTab } from "./bulk-edit-tab";
-import { pickBy, keys, pick, omit } from "lodash";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -53,7 +53,7 @@ export function MaterialSampleBulkEditor({
   const { saveAll } = useBulkSampleSave({
     sampleHooks,
     onSaved,
-    preProcessSample: sampleBulkOverrider(),
+    samplePreProcessor: sampleBulkOverrider,
     bulkEditFormRef
   });
 
@@ -107,7 +107,7 @@ export function MaterialSampleBulkEditor({
 interface BulkSampleSaveParams {
   sampleHooks: SampleWithHooks[];
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
-  preProcessSample?: (
+  samplePreProcessor?: () => (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
   bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
@@ -116,7 +116,7 @@ interface BulkSampleSaveParams {
 function useBulkSampleSave({
   sampleHooks,
   onSaved,
-  preProcessSample,
+  samplePreProcessor,
   bulkEditFormRef
 }: BulkSampleSaveParams) {
   // Force re-render when there is a bulk submission error:
@@ -134,6 +134,8 @@ function useBulkSampleSave({
         formRef.current?.setStatus(null);
         formRef.current?.setErrors({});
       }
+
+      const preProcessSample = samplePreProcessor?.();
 
       const saveOperations: SaveArgs<MaterialSample>[] = [];
       for (let index = 0; index < sampleHooks.length; index++) {

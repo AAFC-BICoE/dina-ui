@@ -1101,14 +1101,77 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the material samples:
-    // The common values displayed in the UI are not re-updated:
+    // The first sample has the edited barcode, the second sample is unaffected:
     expect(mockSave.mock.calls).toEqual([
       [
         [
           {
             resource: {
               id: "1",
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              relationships: {},
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  }, 20000);
+
+  it("Ignores the common value if the field is re-edited to the same value.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Has the default common value:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("test barcode");
+
+    // Manually enter the default value:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .barcode-field input")
+      .simulate("change", { target: { value: "test barcode" } });
+    // Has the default common value:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("test barcode");
+
+    // Edit the first sample's barcode:
+    wrapper.find("li.sample-tab-0").simulate("click");
+    wrapper
+      .find(".sample-tabpanel-0 .barcode-field input")
+      .simulate("change", { target: { value: "edited-barcode-1" } });
+
+    // Save All:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Save the collecting event, then save the 2 material samples:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              barcode: "edited-barcode-1",
               relationships: {},
               type: "material-sample"
             },
