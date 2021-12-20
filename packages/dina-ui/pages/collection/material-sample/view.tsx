@@ -5,6 +5,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
+  FieldSpy,
   withResponse
 } from "common-ui";
 import { FastField, Field } from "formik";
@@ -204,8 +205,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
                 <div className="col-md-6">
-                  <FastField name="managedAttributes">
-                    {({ field: { value } }) => (
+                  <FieldSpy fieldName="managedAttributes">
+                    {value => (
                       <ManagedAttributesViewer
                         values={value}
                         managedAttributeApiPath={key =>
@@ -213,7 +214,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                         }
                       />
                     )}
-                  </FastField>
+                  </FieldSpy>
                 </div>
               </FieldSet>
               <div className="mb-3">

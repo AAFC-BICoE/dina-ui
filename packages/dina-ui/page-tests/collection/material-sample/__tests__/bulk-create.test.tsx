@@ -86,5 +86,5 @@ describe("MaterialSampleBulkCreatePage", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );
-  }, 20000);
+  });
 });

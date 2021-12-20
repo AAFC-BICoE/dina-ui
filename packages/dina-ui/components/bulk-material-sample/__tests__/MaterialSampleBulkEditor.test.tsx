@@ -1,6 +1,6 @@
 import Cleave from "cleave.js/react";
 import { DoOperationsError, MaterialSampleSearchHelper } from "common-ui";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
 import { default as ReactSwitch, default as Switch } from "react-switch";
@@ -8,7 +8,8 @@ import { AttachmentsEditor } from "../..";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
-  MaterialSample
+  MaterialSample,
+  StorageUnit
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
 
@@ -25,7 +26,35 @@ const TEST_COLLECTION_1 = {
   code: "TC"
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const TEST_STORAGE_UNIT: PersistedResource<StorageUnit> = {
+  id: "su-1",
+  type: "storage-unit",
+  name: "storage unit 1",
+  group: "test-group",
+  storageUnitType: {
+    id: "storage-type-1",
+    type: "storage-unit-type",
+    name: "Box",
+    group: "test-group"
+  }
+};
+
+const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
+  id => ({
+    id,
+    type: "storage-unit",
+    group: "test-group",
+    name: `storage unit ${id}`,
+    storageUnitType: {
+      id: "storage-type-1",
+      type: "storage-unit-type",
+      name: "Box",
+      group: "test-group"
+    }
+  })
+);
+
+const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/collection/1":
       return { data: TEST_COLLECTION_1 };
@@ -39,6 +68,16 @@ const mockGet = jest.fn<any, any>(async path => {
       };
     case "collection-api/collecting-event/col-event-1?include=collectors,attachment,collectionMethod":
       return { data: TEST_COLLECTING_EVENT };
+    case "collection-api/storage-unit":
+      if (params?.filter?.rsql === "parentStorageUnit.uuid==su-1") {
+        return { data: [TEST_STORAGE_UNIT], meta: { totalResourceCount: 1 } };
+      }
+      return { data: TEST_STORAGE_UNITS, meta: { totalResourceCount: 3 } };
+    case "collection-api/storage-unit/su-1":
+      return { data: TEST_STORAGE_UNIT };
+    case "collection-api/storage-unit/C":
+      return { data: TEST_STORAGE_UNITS[2] };
+    case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
     case "collection-api/collecting-event":
@@ -255,6 +294,21 @@ const TEST_SAMPLES_SAME_COLLECTING_EVENT: InputResource<MaterialSample>[] = [
   }
 ];
 
+const TEST_SAMPLES_SAME_STORAGE_UNIT: InputResource<MaterialSample>[] = [
+  {
+    ...blankMaterialSample(),
+    id: "1",
+    type: "material-sample",
+    storageUnit: TEST_STORAGE_UNIT
+  },
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    storageUnit: TEST_STORAGE_UNIT
+  }
+];
+
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
 
@@ -345,7 +399,7 @@ describe("MaterialSampleBulkEditor", () => {
       "11111",
       "11111"
     ]);
-  }, 20000);
+  });
 
   it("Shows an error indicator when there is a Collecting Event CLIENT-SIDE validation error.", async () => {
     const wrapper = mountWithAppContext(
@@ -402,7 +456,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
         .exists()
     ).toEqual(true);
-  }, 20000);
+  });
 
   it("Shows an error indicator on the individual sample tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
@@ -491,7 +545,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
         .exists()
     ).toEqual(true);
-  }, 20000);
+  });
 
   it("Shows an error indicator on the Edit All tab when there is a Collecting Event SERVER-SIDE validation error.", async () => {
     const mockSaveForBadColEvent = jest.fn(async () => {
@@ -580,7 +634,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
         .exists()
     ).toEqual(true);
-  }, 20000);
+  });
 
   it("Shows an error indicator on the Edit All tab when a bulk-edited causes a server-side field error.", async () => {
     const mockSaveForBadBarcode = jest.fn(async () => {
@@ -645,7 +699,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".sample-tabpanel-2 .barcode-field .invalid-feedback")
         .exists()
     ).toEqual(false);
-  }, 20000);
+  });
 
   it("Shows an error indicator on form submit error when the Material Sample save API call fails.", async () => {
     const wrapper = mountWithAppContext(
@@ -703,7 +757,7 @@ describe("MaterialSampleBulkEditor", () => {
         .first()
         .text()
     ).toContain("Invalid barcode");
-  }, 20000);
+  });
 
   it("Doesn't override the values when the Override All button is not clicked.", async () => {
     const wrapper = mountWithAppContext(
@@ -810,7 +864,7 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
 
   it("Overrides the values when the Override All buttons are clicked.", async () => {
     const wrapper = mountWithAppContext(
@@ -944,7 +998,7 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
 
   it("Shows the Multiple Values placeholder in bulk editable fields", async () => {
     const wrapper = mountWithAppContext(
@@ -1013,7 +1067,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".has-multiple-values .materialSampleState-field input")
         .prop("value")
     ).toEqual("");
-  }, 20000);
+  });
 
   it("Shows the common value when multiple fields have the same value.", async () => {
     const wrapper = mountWithAppContext(
@@ -1125,7 +1179,7 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
 
   it("Ignores the common value if the field is re-edited to the same value.", async () => {
     const wrapper = mountWithAppContext(
@@ -1198,9 +1252,9 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
 
-  it("Renders blank values as the common value if there is a common value.", async () => {
+  it("Renders blank values without the has-bulk-edit-value indicator when there is a common field value.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1222,11 +1276,16 @@ describe("MaterialSampleBulkEditor", () => {
       .find(".tabpanel-EDIT_ALL .barcode-field input")
       .simulate("change", { target: { value: "" } });
 
-    // Shows the default common value:
+    // Shows the blank input without the green indicator:
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
-    ).toEqual("test barcode");
-  }, 20000);
+    ).toEqual("");
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .barcode-field")
+        .exists()
+    ).toEqual(false);
+  });
 
   it("Adds the has-bulk-edit-value classname when the field is edited.", async () => {
     const wrapper = mountWithAppContext(
@@ -1259,7 +1318,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".tabpanel-EDIT_ALL .has-bulk-edit-value .tags-field")
         .exists()
     ).toEqual(true);
-  }, 20000);
+  });
 
   it("Shows the managed attributes for all edited samples.", async () => {
     const wrapper = mountWithAppContext(
@@ -1313,7 +1372,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".tabpanel-EDIT_ALL .managedAttributes_m3-field input")
         .prop("value")
     ).toEqual("common m3 value");
-  }, 20000);
+  });
 
   it("Doesn't show the has-bulk-edit-value classname in nested forms.", async () => {
     const wrapper = mountWithAppContext(
@@ -1349,7 +1408,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper.find(".has-bulk-edit-value .dwcVerbatimLocality-field").exists()
     ).toEqual(false);
-  }, 20000);
+  });
 
   it("Creates and links a common Collecting Event to all samples", async () => {
     const wrapper = mountWithAppContext(
@@ -1432,7 +1491,7 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
 
   it("Shows the common Collecting Event when all samples are linked to the same one.", async () => {
     const wrapper = mountWithAppContext(
@@ -1513,5 +1572,84 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
-  }, 20000);
+  });
+
+  it("Lets you bulk reassign the linked storage", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_STORAGE_UNIT}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-storage")
+      .find(Switch)
+      .prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".tabpanel-EDIT_ALL button.remove-storage").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Assign a different storage unit:
+    wrapper
+      .find(".tabpanel-EDIT_ALL button.select-storage")
+      .last()
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Green indicator shows up:
+    expect(
+      wrapper.find(".has-bulk-edit-value .storageUnit-field").exists()
+    ).toEqual(true);
+    // New linked storage unit is indicated:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .storageUnit-field .storage-path").text()
+    ).toEqual("Box storage unit C");
+
+    // Save the samples with the new storage unit:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the new material samples with the new storage unit:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              id: "1",
+              relationships: {},
+              storageUnit: {
+                id: "C",
+                type: "storage-unit"
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          },
+          {
+            resource: {
+              id: "2",
+              relationships: {},
+              storageUnit: {
+                id: "C",
+                type: "storage-unit"
+              },
+              type: "material-sample"
+            },
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
 });

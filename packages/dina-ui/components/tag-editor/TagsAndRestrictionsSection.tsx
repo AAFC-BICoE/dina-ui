@@ -1,5 +1,6 @@
 import {
   DinaFormSection,
+  FieldSpy,
   InverseToggleField,
   RadioButtonsField,
   TextField,
@@ -32,7 +33,6 @@ export function TagsAndRestrictionsSection({
         className="mb-3"
         name={tagsFieldName}
         removeLabel={true}
-        removeLabelTag={true}
         groupSelectorName={groupSelectorName}
       />
     </>
@@ -73,8 +73,8 @@ export function TagsAndRestrictionsSection({
             />
           )}
           <DinaFormSection horizontal={false}>
-            <Field name="publiclyReleasable">
-              {({ field: { value: pr } }) =>
+            <FieldSpy fieldName="publiclyReleasable">
+              {pr =>
                 pr === false ? (
                   <TextField
                     name="notPubliclyReleasableReason"
@@ -83,7 +83,7 @@ export function TagsAndRestrictionsSection({
                   />
                 ) : null
               }
-            </Field>
+            </FieldSpy>
           </DinaFormSection>
         </div>
       </DinaFormSection>

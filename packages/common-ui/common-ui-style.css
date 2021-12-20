@@ -48,7 +48,7 @@ input[id^="react-select"] {
 }
 
 /* HIghlight the Edit All tab's bulk-edited fields in green. */
-.has-bulk-edit-value label {
+.has-bulk-edit-value .field-label {
   color: rgb(0, 110, 0);
 }
 .has-bulk-edit-value input[type="text"],

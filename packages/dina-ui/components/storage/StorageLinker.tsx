@@ -24,12 +24,14 @@ export interface StorageLinkerProps {
   onChange?: (
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) => Promisable<void>;
+  placeholder?: string;
 }
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
   onChange: onChangeProp,
-  value
+  value,
+  placeholder
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -56,82 +58,89 @@ export function StorageLinker({
     setActiveTab(0);
   }
 
-  return value?.id ? (
-    <AssignedStorage
-      value={value}
-      contentId={formId}
-      onChange={changeStorageAndResetTab}
-    />
-  ) : (
-    <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
-      <TabList className="react-tabs__tab-list mb-0">
-        {!value?.id && (
-          <Tab>
-            <DinaMessage id="searchStorage" />
-          </Tab>
-        )}
-        {!value?.id && (
-          <Tab>
-            <DinaMessage id="browseStorageTree" />
-          </Tab>
-        )}
-        {!value?.id && (
-          <Tab>
-            <DinaMessage id="createStorage" />
-          </Tab>
-        )}
-      </TabList>
-      <div
-        className="card-body border-top-0"
-        style={{
-          border: "1px solid rgb(170, 170, 170)",
-          height: "60rem",
-          overflowY: "scroll"
-        }}
-      >
-        {!value?.id && (
-          <TabPanel>
-            <StorageSearchSelector onChange={changeStorageAndResetTab} />
-          </TabPanel>
-        )}
-        {!value?.id && (
-          <TabPanel>
-            <BrowseStorageTree
-              onSelect={changeStorageAndResetTab}
-              readOnly={readOnly}
-            />
-          </TabPanel>
-        )}
-        {!value?.id && (
-          <TabPanel>
-            <StorageUnitForm
-              onSaved={changeStorageAndResetTab}
-              buttonBar={
-                <ButtonBar>
-                  <SubmitButton className="ms-auto">
-                    <DinaMessage id="createAndAssign" />
-                  </SubmitButton>
-                </ButtonBar>
-              }
-            />
-          </TabPanel>
-        )}
-      </div>
-    </Tabs>
+  return (
+    <div>
+      {placeholder && (
+        <div className="alert alert-secondary placeholder-text">
+          {placeholder}
+        </div>
+      )}
+      {value?.id ? (
+        <AssignedStorage
+          value={value}
+          contentId={formId}
+          onChange={changeStorageAndResetTab}
+        />
+      ) : (
+        <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
+          <TabList className="react-tabs__tab-list mb-0">
+            {!value?.id && (
+              <Tab>
+                <DinaMessage id="searchStorage" />
+              </Tab>
+            )}
+            {!value?.id && (
+              <Tab>
+                <DinaMessage id="browseStorageTree" />
+              </Tab>
+            )}
+            {!value?.id && (
+              <Tab>
+                <DinaMessage id="createStorage" />
+              </Tab>
+            )}
+          </TabList>
+          <div
+            className="card-body border-top-0"
+            style={{
+              border: "1px solid rgb(170, 170, 170)",
+              height: "60rem",
+              overflowY: "scroll"
+            }}
+          >
+            {!value?.id && (
+              <TabPanel>
+                <StorageSearchSelector onChange={changeStorageAndResetTab} />
+              </TabPanel>
+            )}
+            {!value?.id && (
+              <TabPanel>
+                <BrowseStorageTree
+                  onSelect={changeStorageAndResetTab}
+                  readOnly={readOnly}
+                />
+              </TabPanel>
+            )}
+            {!value?.id && (
+              <TabPanel>
+                <StorageUnitForm
+                  onSaved={changeStorageAndResetTab}
+                  buttonBar={
+                    <ButtonBar>
+                      <SubmitButton className="ms-auto">
+                        <DinaMessage id="createAndAssign" />
+                      </SubmitButton>
+                    </ButtonBar>
+                  }
+                />
+              </TabPanel>
+            )}
+          </div>
+        </Tabs>
+      )}
+    </div>
   );
 }
 
 export interface StorageLinkerFieldProps {
   name: string;
   customName?: string;
-  removeLabelTag?: boolean;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
 export function StorageLinkerField({
   name,
-  customName,
-  removeLabelTag
+  customName
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
   return (
@@ -142,10 +151,13 @@ export function StorageLinkerField({
       )}
       disableLabelClick={true}
       customName={customName}
-      removeLabelTag={removeLabelTag}
     >
-      {({ value, setValue }) => (
-        <StorageLinker value={value} onChange={setValue} />
+      {({ value, setValue, placeholder }) => (
+        <StorageLinker
+          value={value}
+          onChange={setValue}
+          placeholder={placeholder}
+        />
       )}
     </FieldWrapper>
   );

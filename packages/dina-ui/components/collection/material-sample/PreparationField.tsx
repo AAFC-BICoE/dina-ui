@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  FieldSpy,
   filterBy,
   ResourceSelectField,
   TextField,
@@ -80,8 +81,8 @@ export function PreparationField({
     >
       <div className="row">
         <div className="col-md-6">
-          <Field name={`${namePrefix}preparationType`}>
-            {({ form: { values } }) => (
+          <FieldSpy fieldName="group">
+            {group => (
               <ResourceSelectField<PreparationType>
                 {...fieldProps("preparationType")}
                 model="collection-api/preparation-type"
@@ -89,17 +90,17 @@ export function PreparationField({
                 readOnlyLink="/collection/preparation-type/view?id="
                 className="preparation-type"
                 filter={input =>
-                  values.group
+                  group
                     ? {
                         ...filterBy(["name"])(input),
-                        group: { EQ: `${values.group}` }
+                        group: { EQ: `${group}` }
                       }
                     : { ...filterBy(["name"])(input) }
                 }
-                key={values.group}
+                key={group}
               />
             )}
-          </Field>
+          </FieldSpy>
           <AutoSuggestTextField<MaterialSample>
             {...fieldProps("preparationMethod")}
             query={(search, ctx) => ({

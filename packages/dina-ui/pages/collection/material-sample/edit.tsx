@@ -7,6 +7,7 @@ import {
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -393,7 +394,7 @@ export function MaterialSampleForm({
           {dataComponentState.enableStorage && (
             <FieldSet id={navIds.storage} legend={<DinaMessage id="storage" />}>
               <div className="card card-body mb-3">
-                <StorageLinkerField name="storageUnit" removeLabelTag={true} />
+                <StorageLinkerField name="storageUnit" />
               </div>
             </FieldSet>
           )}
@@ -471,19 +472,13 @@ export function MaterialSampleForm({
 
 export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
   const { locale, formatMessage } = useDinaIntl();
-  const divRef = useRef<HTMLDivElement>(null);
 
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
 
   const onMaterialSampleStateChanged = (form, _name, value) => {
-    if (divRef.current) {
-      if (value) {
-        divRef.current.className = "";
-      } else {
-        divRef.current.className = divRef.current.className + " d-none";
-        form.setFieldValue("stateChangeRemarks", null);
-        form.setFieldValue("stateChangedOn", null);
-      }
+    if (value === "") {
+      form.setFieldValue("stateChangeRemarks", null);
+      form.setFieldValue("stateChangedOn", null);
     }
   };
 
@@ -521,26 +516,25 @@ export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
         </div>
       </div>
       {!readOnly && (
-        <div
-          ref={divRef}
-          className={!initialValues.materialSampleState ? "d-none" : ""}
-        >
-          <FieldSet legend={<DinaMessage id="stateChangeMetaLegend" />}>
-            <div className="row">
-              <DateField
-                className="col-md-6"
-                name="stateChangedOn"
-                label={formatMessage("date")}
-              />
-              <TextField
-                className="col-md-6"
-                name="stateChangeRemarks"
-                multiLines={true}
-                label={formatMessage("additionalRemarks")}
-              />
-            </div>
-          </FieldSet>
-        </div>
+        <FieldSpy fieldName="materialSampleState">
+          {materialSampleState =>
+            materialSampleState ? (
+              <div className="row">
+                <DateField
+                  className="col-md-6"
+                  name="stateChangedOn"
+                  label={formatMessage("date")}
+                />
+                <TextField
+                  className="col-md-6"
+                  name="stateChangeRemarks"
+                  multiLines={true}
+                  label={formatMessage("additionalRemarks")}
+                />
+              </div>
+            ) : null
+          }
+        </FieldSpy>
       )}
     </FieldSet>
   );

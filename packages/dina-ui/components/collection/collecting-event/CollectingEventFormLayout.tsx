@@ -13,7 +13,8 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   useDinaFormContext,
-  PlaceSectionsSelectionField
+  PlaceSectionsSelectionField,
+  FieldSpy
 } from "common-ui";
 import { FastField, Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -827,8 +828,8 @@ export function CollectingEventFormLayout({
           legend={<DinaMessage id="collectingEventManagedAttributes" />}
         >
           {readOnly ? (
-            <FastField name="managedAttributes">
-              {({ field: { value } }) => (
+            <FieldSpy fieldName="managedAttributes">
+              {value => (
                 <ManagedAttributesViewer
                   values={value}
                   managedAttributeApiPath={key =>
@@ -836,7 +837,7 @@ export function CollectingEventFormLayout({
                   }
                 />
               )}
-            </FastField>
+            </FieldSpy>
           ) : (
             <DinaFormSection
               // Disabled the template's restrictions for this section:

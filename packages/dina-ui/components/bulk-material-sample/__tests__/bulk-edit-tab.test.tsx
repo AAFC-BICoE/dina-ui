@@ -170,7 +170,7 @@ describe("Material sample bulk edit tab", () => {
         }
       ]
     });
-  }, 20000);
+  });
 
   it("Combines managed attribute values from the original and the bulk override.", async () => {
     const wrapper = mountWithAppContext(

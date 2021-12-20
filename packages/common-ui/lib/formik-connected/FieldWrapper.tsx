@@ -37,8 +37,6 @@ export interface FieldWrapperProps {
   /** Remove the label. */
   removeLabel?: boolean;
 
-  removeLabelTag?: boolean;
-
   /** Disables how clicking a label clicks the inner element. */
   disableLabelClick?: boolean;
 
@@ -78,7 +76,6 @@ export interface FieldWrapperRenderProps {
   placeholder?: string;
 
   /** A value to render when there is no value stored in form state. */
-  defaultValue?: any;
   formik: FormikProps<any>;
 }
 
@@ -137,7 +134,6 @@ function LabelWrapper({
     name,
     removeBottomMargin,
     removeLabel,
-    removeLabelTag,
     tooltipImage,
     templateCheckboxFieldName,
     tooltipImageAlt,
@@ -196,19 +192,7 @@ function LabelWrapper({
           }`}
         />
       )}
-      {removeLabelTag ? (
-        <>
-          {!removeLabel && (
-            <div className={classNames(labelClass, !horizontal && "mb-2")}>
-              {!hideLabel && <strong>{fieldLabel}</strong>}
-            </div>
-          )}
-
-          <div className={valueClass} style={{ cursor: "auto" }}>
-            {children}
-          </div>
-        </>
-      ) : isTemplate && horizontal === "flex" ? (
+      {isTemplate && horizontal === "flex" ? (
         <div className={`col-sm-10`}>
           <label
             className={classNames(
@@ -218,7 +202,13 @@ function LabelWrapper({
             htmlFor={disableLabelClick ? "none" : undefined}
           >
             {!removeLabel && (
-              <div className={classNames(labelClass, !horizontal && "mb-2")}>
+              <div
+                className={classNames(
+                  "field-label",
+                  labelClass,
+                  !horizontal && "mb-2"
+                )}
+              >
                 {!hideLabel && <strong>{fieldLabel}</strong>}
               </div>
             )}
@@ -241,7 +231,13 @@ function LabelWrapper({
           htmlFor={disableLabelClick ? "none" : undefined}
         >
           {!removeLabel && (
-            <div className={classNames(labelClass, !horizontal && "mb-2")}>
+            <div
+              className={classNames(
+                "field-label",
+                labelClass,
+                !horizontal && "mb-2"
+              )}
+            >
               {!hideLabel && <strong>{fieldLabel}</strong>}
             </div>
           )}
@@ -280,11 +276,9 @@ function FormikConnectedField({
     form.setFieldValue(name, newValue);
   }
 
-  // In the bulk edit tab, show the default value when the value is blank:
+  // In the bulk edit tab, show the default value when the value is undefined:
   const value =
-    bulkTab && isBlankResourceAttribute(formikValue)
-      ? bulkTab?.defaultValue
-      : formikValue;
+    bulkTab && formikValue === undefined ? bulkTab?.defaultValue : formikValue;
 
   const renderProps: FieldWrapperRenderProps = {
     invalid: Boolean(error),
@@ -293,7 +287,6 @@ function FormikConnectedField({
     formik: form,
 
     // Only used within the bulk editor's "Edit All" tab:
-    defaultValue: bulkTab?.defaultValue,
     placeholder: bulkTab?.placeholder
   };
 
