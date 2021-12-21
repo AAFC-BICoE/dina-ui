@@ -62,6 +62,8 @@ fieldset.has-bulk-edit-value .card {
   input[type="text"]:not(.react-select__input, .search-input),
 .has-bulk-edit-value
   input[type="text"]:focus:not(.react-select__input, .search-input),
+.has-bulk-edit-value input:not(.react-select__input, .search-input),
+.has-bulk-edit-value input:focus:not(.react-select__input, .search-input),
 .has-bulk-edit-value input[type="search"],
 .has-bulk-edit-value input[type="search"]:focus,
 .has-bulk-edit-value textarea,
