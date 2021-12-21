@@ -78,7 +78,8 @@ export function AttachmentsEditor({
   allowNewFieldName,
   hideAddAttchmentBtn,
   allowAttachmentsConfig = { allowExisting: true, allowNew: true },
-  wrapContent = content => content
+  wrapContent = content => content,
+  name
 }: AttachmentsEditorProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -147,6 +148,7 @@ export function AttachmentsEditor({
           {title ?? "Attachments"} {!isTemplate ? `(${value.length})` : ""}
         </>
       }
+      fieldName={name}
     >
       {loading ? (
         <LoadingSpinner loading={true} />

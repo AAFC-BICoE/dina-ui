@@ -3,7 +3,6 @@ import { FastField, FastFieldProps, FormikProps } from "formik";
 import { isArray } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { isBlankResourceAttribute } from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";

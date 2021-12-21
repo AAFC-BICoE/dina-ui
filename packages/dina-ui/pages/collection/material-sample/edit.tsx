@@ -392,10 +392,12 @@ export function MaterialSampleForm({
             <AssociationsField id={navIds.associations} />
           )}
           {dataComponentState.enableStorage && (
-            <FieldSet id={navIds.storage} legend={<DinaMessage id="storage" />}>
-              <div className="card card-body mb-3">
-                <StorageLinkerField name="storageUnit" />
-              </div>
+            <FieldSet
+              id={navIds.storage}
+              legend={<DinaMessage id="storage" />}
+              fieldName="storageUnit"
+            >
+              <StorageLinkerField name="storageUnit" hideLabel={true} />
             </FieldSet>
           )}
           {dataComponentState.enableScheduledActions && (

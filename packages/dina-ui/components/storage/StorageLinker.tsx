@@ -135,12 +135,14 @@ export function StorageLinker({
 export interface StorageLinkerFieldProps {
   name: string;
   customName?: string;
+  hideLabel?: boolean;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
 export function StorageLinkerField({
   name,
-  customName
+  customName,
+  hideLabel
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
   return (
@@ -151,6 +153,7 @@ export function StorageLinkerField({
       )}
       disableLabelClick={true}
       customName={customName}
+      hideLabel={hideLabel}
     >
       {({ value, setValue, placeholder }) => (
         <StorageLinker

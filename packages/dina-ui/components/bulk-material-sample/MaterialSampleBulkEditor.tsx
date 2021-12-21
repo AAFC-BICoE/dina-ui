@@ -62,7 +62,7 @@ export function MaterialSampleBulkEditor({
         <ButtonBar className="justify-content-end gap-4">
           {onPreviousClick && (
             <FormikButton
-              className="btn btn-primary previous-button"
+              className="btn btn-outline-secondary previous-button"
               onClick={onPreviousClick}
               buttonProps={() => ({ style: { width: "13rem" } })}
             >

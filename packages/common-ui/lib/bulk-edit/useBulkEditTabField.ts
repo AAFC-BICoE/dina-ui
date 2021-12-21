@@ -70,11 +70,10 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
 /**
  * Gets the data to show indicators in the bulk edit tab's fields.
  */
-export function useBulkEditTabFieldIndicators({
-  fieldName,
-  currentValue
-}: UseBulkEditTabFieldParams) {
-  const field = useBulkEditTabField({ fieldName, currentValue });
+export function useBulkEditTabFieldIndicators(
+  params: UseBulkEditTabFieldParams
+) {
+  const field = useBulkEditTabField(params);
   const { formatMessage } = useIntl();
 
   if (field) {

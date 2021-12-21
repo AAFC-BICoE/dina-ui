@@ -132,6 +132,7 @@ export function ScheduledActionsField({
       className={className}
       id={id}
       legend={<DinaMessage id="scheduledActions" />}
+      fieldName={fieldName}
     >
       {wrapContent(
         <FastField name={fieldName} key={JSON.stringify(actionToEdit)}>

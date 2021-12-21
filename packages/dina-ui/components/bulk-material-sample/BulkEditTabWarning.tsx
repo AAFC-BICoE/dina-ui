@@ -27,9 +27,29 @@ export function BulkEditTabWarning({
 
   const [manualOverride, setManualOverride] = useState(false);
 
-  if (bulkEditCtx && bulkField) {
+  // Set the initial value based on the tab values:
+  useEffect(() => {
+    if (!bulkField || !bulkEditCtx) {
+      return;
+    }
+
     const { hasBulkEditValue, hasNoValues, hasSameValues, commonValue } =
       bulkField;
+
+    if (!hasBulkEditValue) {
+      if (hasNoValues) {
+        setDefaultValue?.(bulkEditCtx);
+      } else if (hasSameValues) {
+        bulkEditCtx.bulkEditFormRef?.current?.setFieldValue(
+          fieldName,
+          commonValue
+        );
+      }
+    }
+  }, []);
+
+  if (bulkEditCtx && bulkField) {
+    const { hasBulkEditValue, hasNoValues, hasSameValues } = bulkField;
 
     const override = manualOverride || hasBulkEditValue;
 
@@ -39,19 +59,6 @@ export function BulkEditTabWarning({
         setDefaultValue?.(bulkEditCtx);
       }
     }
-
-    const { bulkEditFormRef } = bulkEditCtx;
-
-    // Set the initial value based on the tab values:
-    useEffect(() => {
-      if (!hasBulkEditValue) {
-        if (hasNoValues) {
-          setDefaultValue?.(bulkEditCtx);
-        } else if (hasSameValues) {
-          bulkEditFormRef?.current?.setFieldValue(fieldName, commonValue);
-        }
-      }
-    }, []);
 
     const singularFieldLabel = getFieldLabel({ name: fieldName })
       // Make the field name singular:

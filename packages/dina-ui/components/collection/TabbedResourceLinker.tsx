@@ -63,17 +63,9 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   return (
     <FieldSet
       id={fieldSetId}
-      legend={
-        <div
-          className={classNames(
-            bulkCtx?.bulkEditClasses,
-            // Always show the green outline in bulk edit mode:
-            bulkCtx && "has-bulk-edit-value"
-          )}
-        >
-          <div className="field-label">{legend}</div>
-        </div>
-      }
+      // Always show the green outline in bulk edit mode:
+      className={classNames(bulkCtx && "has-bulk-edit-value")}
+      legend={<div className="field-label">{legend}</div>}
     >
       {bulkCtx?.placeholder && (
         <div className={bulkCtx?.bulkEditClasses}>

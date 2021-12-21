@@ -97,6 +97,7 @@ export function TabbedArrayField<T>({
             className={classNames(sectionId, className)}
             id={sectionId}
             legend={legend}
+            fieldName={name}
           >
             {wrapContent(
               <>
