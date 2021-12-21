@@ -20,6 +20,7 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import { TabbedArrayField } from "../TabbedArrayField";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -166,6 +167,16 @@ export function DeterminationField() {
                 suggestion={sample =>
                   sample.determination?.map(det => det?.verbatimDeterminer) ??
                   []
+                }
+                useCustomQuery={(searchQuery, querySpec) =>
+                  useAutocompleteSearchButFallbackToRsqlApiSearch<MaterialSample>(
+                    {
+                      searchQuery,
+                      querySpec,
+                      indexName: "dina_material_sample_index",
+                      searchField: "verbatimDeterminer"
+                    }
+                  )
                 }
               />
               <TextField {...fieldProps("verbatimDate")} />
