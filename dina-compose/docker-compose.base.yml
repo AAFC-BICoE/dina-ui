@@ -80,7 +80,9 @@ services:
           "minio.secretKey": "minio123",
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
-          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "rabbitmq.host": "rabbitmq",
+          "messaging.isProducer": "true"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
@@ -133,7 +135,9 @@ services:
           "spring.liquibase.password": "p",
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
-          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "rabbitmq.host": "rabbitmq",
+          "messaging.isProducer": "true"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
