@@ -924,7 +924,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the Override All buttons:
     for (const section of [
-      ".determination-section",
+      "#determination-section",
       "#material-sample-attachments-section",
       "#preparation-protocols-section",
       "#associations-section",
@@ -936,8 +936,44 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.update();
     }
 
-    // Set the override values.
-    // Leaving the fields empty after clicking Override All
+    // Determinations section opens with an initial value, so it ahs the green indicator on the fieldset:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#determination-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    // The other overidable sections don't have an initial value,
+    // so they don't initially show the green indicator on the fieldset:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#preparation-protocols-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#associations-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(false);
+    // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs"
+        )
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#scheduled-actions-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(false);
+
+    // Set the override values:
     wrapper
       .find(
         ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
@@ -975,6 +1011,35 @@ describe("MaterialSampleBulkEditor", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // All overridable fieldsets should now have the green bulk edited indicator:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#determination-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#preparation-protocols-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs"
+        )
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL fieldset#scheduled-actions-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
 
     // All Override All buttons should be gone now:
     expect(wrapper.find("button.override-all-button").exists()).toEqual(false);
@@ -1402,7 +1467,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual("common m3 value");
   });
 
-  it("Doesn't show the has-bulk-edit-value classname in nested forms.", async () => {
+  it("Shows the has-bulk-edit-value classname for linked resources with nested forms.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1423,19 +1488,12 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit a collecting event field:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
-      .simulate("change", { target: { value: "test locality bulk edit" } });
+    // The has-bulk-edit-value indicator appears:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .dwcVerbatimLocality-field input")
-        .prop("value")
-    ).toEqual("test locality bulk edit");
-    // The has-bulk-edit-value indicator doesn't appear:
-    expect(
-      wrapper.find(".has-bulk-edit-value .dwcVerbatimLocality-field").exists()
-    ).toEqual(false);
+        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
   });
 
   it("Creates and links a common Collecting Event to all samples", async () => {
@@ -1462,11 +1520,8 @@ describe("MaterialSampleBulkEditor", () => {
     // The collecting event section has the green legend to indicate a bulk edit:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #collecting-event-section legend .has-bulk-edit-value .field-label"
-        )
-        .at(0)
-        .exists()
+        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
+        .hasClass("has-bulk-edit-value")
     ).toEqual(true);
 
     // Edit a collecting event field:
@@ -1552,14 +1607,11 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The collecting event section has the green legend to indicate a bulk edit:
+    // The collecting event section has no green background to indicate a bulk edit:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL #collecting-event-section legend .has-bulk-edit-value .field-label"
-        )
-        .at(0)
-        .exists()
+        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
+        .hasClass("has-bulk-edit-value")
     ).toEqual(true);
 
     expect(

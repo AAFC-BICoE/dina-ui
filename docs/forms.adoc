@@ -8,7 +8,7 @@ These inputs should be easily re-usable throughout the app.
 Example form that on submit either shows a success alert or an error message:
 [source,tsx]
 ----
-import { DinaForm, ErrorViewer, SubmitButton, TextField } from "../components";
+import { DinaForm, SubmitButton, TextField } from "../components";
 
 export default function ExampleFormPage() {
   const onSubmit: DinaFormOnSubmit = async ({
@@ -36,6 +36,29 @@ export default function ExampleFormPage() {
       <DinaForm initialValues={{}} onSubmit={onSubmit}>
         <TextField name="name" />
         <TextField name="description" />
+        <SubmitButton />
+      </DinaForm>
+    </div>
+  );
+}
+----
+
+== Getting a Field value from the form.
+
+Sometimes you will want to get a field's value in one component without re-rendering the surrounding component. You can listen to a Field's state using FieldSpy:
+
+[source,tsx]
+----
+import { DinaForm, SubmitButton, TextField, FieldSpy } from "common-ui";
+
+export default function ExampleFormPage() {
+  return (
+    <div className="card card-body" style={{ width: "1000px" }}>
+      <DinaForm initialValues={{}} onSubmit={onSubmit}>
+        <TextField name="name" />
+        <FieldSpy fieldName="name">
+          {value => `Your name is ${value}`}
+        </FieldSpy>
         <SubmitButton />
       </DinaForm>
     </div>

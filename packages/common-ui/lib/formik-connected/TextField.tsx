@@ -63,16 +63,23 @@ export function TextField(props: TextFieldProps) {
             (noSpace && e.code === "Space")
           ) {
             e.preventDefault();
+          } else {
+            inputPropsExternal?.onKeyDown?.(e);
           }
         };
 
         const inputPropsInternal: InputHTMLAttributes<HTMLInputElement> = {
           ...inputPropsExternal,
           placeholder: placeholder || fieldWrapperProps.placeholder,
-          className: classnames("form-control", { "is-invalid": invalid }),
+          className: classnames(
+            "form-control",
+            { "is-invalid": invalid },
+            inputPropsExternal?.className
+          ),
           onChange: event => onChangeInternal(event.target.value),
           value: value || "",
-          readOnly
+          readOnly,
+          onKeyDown
         };
 
         // The default Field component's inner text input needs to be replaced with our own
@@ -86,7 +93,7 @@ export function TextField(props: TextFieldProps) {
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (
-            <input type="text" {...inputPropsInternal} onKeyDown={onKeyDown} />
+            <input type="text" {...inputPropsInternal} />
           ))
         );
       }}
