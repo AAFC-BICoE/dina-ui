@@ -174,7 +174,7 @@ export function DeterminationField() {
                       searchQuery,
                       querySpec,
                       indexName: "dina_material_sample_index",
-                      searchField: "verbatimDeterminer"
+                      searchField: "determination.verbatimDeterminer"
                     }
                   )
                 }
