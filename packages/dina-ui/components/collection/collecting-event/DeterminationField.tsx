@@ -168,6 +168,7 @@ export function DeterminationField() {
                   sample.determination?.map(det => det?.verbatimDeterminer) ??
                   []
                 }
+                alwaysShowSuggestions={true}
                 useCustomQuery={(searchQuery, querySpec) =>
                   useAutocompleteSearchButFallbackToRsqlApiSearch<MaterialSample>(
                     {

@@ -114,7 +114,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
     );
   });
 
-  it("Falls back to the RSQL filter API when the search API returns empty.", async () => {
+  it("Falls back to the RSQL filter API with disabled query when the search API returns empty hits.", async () => {
     const wrapper = mountWithAppContext(<TestPersonSearchComponent />, {
       apiContext: {
         apiClient: {
@@ -144,10 +144,8 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       sort: "-createdOn"
     });
 
-    expect(wrapper.find(".person-list li").length).toEqual(1);
-    expect(wrapper.find(".person-list li").first().text()).toEqual(
-      "Person from Agent API"
-    );
+    // The rsql api is called as a disabled query so no field is populated with data
+    expect(wrapper.find(".person-list li").length).toEqual(0);
   });
 
   it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
