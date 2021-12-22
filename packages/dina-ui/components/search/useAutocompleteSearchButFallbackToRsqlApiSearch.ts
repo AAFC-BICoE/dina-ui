@@ -31,9 +31,11 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     searchField,
     additionalField
   });
+  // When search result has empty array of hits, it should be considered as normal
+  const searchApiFailed = !searchResult || searchApiError;
   const searchApiIsDown = !!sessionStorage.getItem("searchApiDown");
 
-  const fallbackToRsqlApi = searchApiError || !searchQuery || searchApiIsDown;
+  const fallbackToRsqlApi = searchApiFailed || !searchQuery || searchApiIsDown;
 
   // Use the API query with RSQL as a fallback if Search API returns empty:
   const { loading: apiLoading, response: apiResponse } = useQuery<T[]>(
