@@ -213,8 +213,7 @@ export function GlobalNamesSearchBox({
                     (displayText = displayText.replace(val, `<b>${val}</b>`))
                 );
 
-              if (familyRank)
-                link.innerHTML = familyRank.toUpperCase() + displayText;
+              if (familyRank) link.innerHTML = familyRank + displayText;
 
               // Use DOMPurify to sanitize against XSS when using dangerouslySetInnerHTML:
               const safeHtmlLink: string = DOMPurify.sanitize(link.outerHTML, {

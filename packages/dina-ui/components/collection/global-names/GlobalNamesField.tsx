@@ -129,7 +129,7 @@ export function GlobalNamesReadOnly({
               {" "}
               {ranks[idx].charAt(0)?.toUpperCase() + ranks[idx].substring(1)} :
             </b>{" "}
-            <>{path}</> ){" "}
+            <>{path}</>{" "}
           </>
         );
 
