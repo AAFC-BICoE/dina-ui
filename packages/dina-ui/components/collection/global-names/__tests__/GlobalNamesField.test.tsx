@@ -46,7 +46,7 @@ describe("GlobalNamesField component", () => {
 
     expect(
       wrapper.find(".gn-search-result-label").map(node => node.text())
-    ).toEqual(["MONODONTIDAE: Monodon Linnaeus, 1758"]);
+    ).toEqual(["Monodontidae: Monodon Linnaeus, 1758"]);
 
     wrapper.find(".global-name-select-button").at(1).simulate("click");
 
@@ -55,7 +55,7 @@ describe("GlobalNamesField component", () => {
       [
         [
           {
-            labelHtml: "MONODONTIDAE: Monodon Linnaeus, 1758",
+            labelHtml: "Monodontidae: Monodon Linnaeus, 1758",
             recordedOn: "2021-12-16",
             sourceUrl: "https://www.catalogueoflife.org/data/taxon/63DDW",
             currentName: "Monodon Linnaeus, 1758",
