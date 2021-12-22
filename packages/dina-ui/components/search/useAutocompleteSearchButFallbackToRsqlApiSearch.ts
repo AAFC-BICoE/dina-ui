@@ -31,11 +31,9 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     searchField,
     additionalField
   });
-
-  const searchApiFailed = searchResult?.length === 0 || searchApiError;
   const searchApiIsDown = !!sessionStorage.getItem("searchApiDown");
 
-  const fallbackToRsqlApi = searchApiFailed || !searchQuery || searchApiIsDown;
+  const fallbackToRsqlApi = searchApiError || !searchQuery || searchApiIsDown;
 
   // Use the API query with RSQL as a fallback if Search API returns empty:
   const { loading: apiLoading, response: apiResponse } = useQuery<T[]>(
