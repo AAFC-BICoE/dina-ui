@@ -3,20 +3,20 @@ import {
   CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   filterBy,
   FormattedTextField,
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
+  PlaceSectionsSelectionField,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext,
-  PlaceSectionsSelectionField,
-  FieldSpy
+  useDinaFormContext
 } from "common-ui";
-import { FastField, Field, FormikContextType } from "formik";
+import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
 import { GeographySearchBox } from "..";
@@ -827,10 +827,10 @@ export function CollectingEventFormLayout({
           legend={<DinaMessage id="collectingEventManagedAttributes" />}
         >
           {readOnly ? (
-            <FieldSpy fieldName="managedAttributes">
+            <FieldSpy<Record<string, string>> fieldName="managedAttributes">
               {value => (
                 <ManagedAttributesViewer
-                  values={value}
+                  values={value ?? {}}
                   managedAttributeApiPath={key =>
                     `collection-api/managed-attribute/collecting_event.${key}`
                   }

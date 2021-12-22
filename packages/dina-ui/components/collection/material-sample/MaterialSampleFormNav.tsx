@@ -5,10 +5,13 @@ import {
   useBulkEditTabContext,
   useModal
 } from "common-ui";
-import { FastField } from "formik";
 import dynamic from "next/dynamic";
 import Switch from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  Determination,
+  MaterialSampleAssociation
+} from "../../../types/collection-api";
 import { useMaterialSampleSave } from "./useMaterialSample";
 
 export interface MaterialSampleNavProps {
@@ -200,7 +203,7 @@ function DeterminationSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FieldSpy fieldName="determination">
+    <FieldSpy<Determination[]> fieldName="determination">
       {(determination, { form: { setFieldValue } }) => (
         <Switch
           {...props}
@@ -223,7 +226,7 @@ function AssociationsSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FieldSpy fieldName="associations">
+    <FieldSpy<MaterialSampleAssociation[]> fieldName="associations">
       {(associations, { form: { setFieldValue } }) => (
         <Switch
           {...props}

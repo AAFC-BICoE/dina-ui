@@ -81,7 +81,7 @@ export function PreparationField({
     >
       <div className="row">
         <div className="col-md-6">
-          <FieldSpy fieldName="group">
+          <FieldSpy<string> fieldName="group">
             {group => (
               <ResourceSelectField<PreparationType>
                 {...fieldProps("preparationType")}

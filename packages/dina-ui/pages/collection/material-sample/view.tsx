@@ -205,10 +205,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
                 <div className="col-md-6">
-                  <FieldSpy fieldName="managedAttributes">
+                  <FieldSpy<
+                    Record<string, string>
+                  > fieldName="managedAttributes">
                     {value => (
                       <ManagedAttributesViewer
-                        values={value}
+                        values={value ?? {}}
                         managedAttributeApiPath={key =>
                           `collection-api/managed-attribute/material_sample.${key}`
                         }

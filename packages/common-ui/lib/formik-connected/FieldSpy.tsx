@@ -3,9 +3,12 @@ import { get, isEqual } from "lodash";
 import { ReactNode } from "react";
 import { isBlankResourceAttribute, useBulkEditTabFieldIndicators } from "..";
 
-export interface FieldSpyProps {
+export interface FieldSpyProps<T> {
   fieldName: string;
-  children: (value: any, fieldProps: FieldSpyRenderProps) => ReactNode;
+  children: (
+    value: T | null | undefined,
+    fieldProps: FieldSpyRenderProps
+  ) => ReactNode;
   validate?: (value: any) => string | void;
 }
 
@@ -17,7 +20,11 @@ export interface FieldSpyRenderProps extends FastFieldProps {
  * Renders the value (or bulk edit common/default value).
  * Re-renders on value update or when the parent component renders.
  */
-export function FieldSpy({ fieldName, children, validate }: FieldSpyProps) {
+export function FieldSpy<T = unknown>({
+  fieldName,
+  children,
+  validate
+}: FieldSpyProps<T>) {
   function shouldRender(next, prev) {
     const formStateChanged = ["values", "errors", "touched"].some(
       formikStateField =>
@@ -43,17 +50,20 @@ export function FieldSpy({ fieldName, children, validate }: FieldSpyProps) {
   );
 }
 
-interface FieldSpyInternalProps {
+interface FieldSpyInternalProps<T> {
   fastFieldProps: FastFieldProps;
   fieldName: string;
-  children: (value: any, fieldProps: FieldSpyRenderProps) => ReactNode;
+  children: (
+    value: T | null | undefined,
+    fieldProps: FieldSpyRenderProps
+  ) => ReactNode;
 }
 
-function FieldSpyInternal({
+function FieldSpyInternal<T>({
   fastFieldProps,
   fieldName,
   children
-}: FieldSpyInternalProps) {
+}: FieldSpyInternalProps<T>) {
   const formikValue = fastFieldProps.field.value;
 
   const bulkContext = useBulkEditTabFieldIndicators({
