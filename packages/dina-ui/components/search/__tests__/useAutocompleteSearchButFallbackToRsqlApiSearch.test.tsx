@@ -106,7 +106,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
         prefix: "test-query"
       }
     });
-    expect(mockAgentApiGet).toHaveBeenCalledTimes(0);
+    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
 
     expect(wrapper.find(".person-list li").length).toEqual(1);
     expect(wrapper.find(".person-list li").first().text()).toEqual(
