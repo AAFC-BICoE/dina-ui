@@ -5,6 +5,7 @@ import {
   DinaForm,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   FormikButton,
   OnFormikSubmit,
   TextField,
@@ -135,8 +136,8 @@ export function ScheduledActionsField({
       fieldName={fieldName}
     >
       {wrapContent(
-        <FastField name={fieldName} key={JSON.stringify(actionToEdit)}>
-          {({ field: { value }, form }) => {
+        <FieldSpy fieldName={fieldName}>
+          {(value, { form }) => {
             const scheduledActions = (value ?? []) as ScheduledAction[];
 
             const hasActions = !!scheduledActions.length;
@@ -210,7 +211,7 @@ export function ScheduledActionsField({
               </>
             );
           }}
-        </FastField>
+        </FieldSpy>
       )}
     </FieldSet>
   );

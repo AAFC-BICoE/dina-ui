@@ -1,5 +1,10 @@
 import classNames from "classnames";
-import { AreYouSureModal, useBulkEditTabContext, useModal } from "common-ui";
+import {
+  AreYouSureModal,
+  FieldSpy,
+  useBulkEditTabContext,
+  useModal
+} from "common-ui";
 import { FastField } from "formik";
 import dynamic from "next/dynamic";
 import Switch from "react-switch";
@@ -195,13 +200,13 @@ function DeterminationSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FastField name="determination">
-      {({ form: { values, setFieldValue } }) => (
+    <FieldSpy fieldName="determination">
+      {(determination, { form: { setFieldValue } }) => (
         <Switch
           {...props}
           onChange={newVal => {
             props.onChange?.(newVal);
-            if (!bulkTabCtx && newVal && !values.determination?.length) {
+            if (!bulkTabCtx && newVal && !determination?.length) {
               setFieldValue("determination", [
                 { isPrimary: true, isFileAs: true }
               ]);
@@ -209,7 +214,7 @@ function DeterminationSwitch(props) {
           }}
         />
       )}
-    </FastField>
+    </FieldSpy>
   );
 }
 
@@ -218,18 +223,18 @@ function AssociationsSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FastField name="associations">
-      {({ form: { values, setFieldValue } }) => (
+    <FieldSpy fieldName="associations">
+      {(associations, { form: { setFieldValue } }) => (
         <Switch
           {...props}
           onChange={newVal => {
             props.onChange?.(newVal);
-            if (!bulkTabCtx && newVal && !values.associations?.length) {
+            if (!bulkTabCtx && newVal && !associations?.length) {
               setFieldValue("associations", [{}]);
             }
           }}
         />
       )}
-    </FastField>
+    </FieldSpy>
   );
 }

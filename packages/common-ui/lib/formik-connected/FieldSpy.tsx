@@ -6,6 +6,7 @@ import { isBlankResourceAttribute, useBulkEditTabFieldIndicators } from "..";
 export interface FieldSpyProps {
   fieldName: string;
   children: (value: any, fieldProps: FieldSpyRenderProps) => ReactNode;
+  validate?: (value: any) => string | void;
 }
 
 export interface FieldSpyRenderProps extends FastFieldProps {
@@ -16,20 +17,23 @@ export interface FieldSpyRenderProps extends FastFieldProps {
  * Renders the value (or bulk edit common/default value).
  * Re-renders on value update or when the parent component renders.
  */
-export function FieldSpy({ fieldName, children }: FieldSpyProps) {
+export function FieldSpy({ fieldName, children, validate }: FieldSpyProps) {
   function shouldRender(next, prev) {
-    const valueChanged = !isEqual(
-      get(prev.formik.values, fieldName),
-      get(next.formik.values, fieldName)
+    const formStateChanged = ["values", "errors", "touched"].some(
+      formikStateField =>
+        !isEqual(
+          get(prev.formik[formikStateField], fieldName),
+          get(next.formik[formikStateField], fieldName)
+        )
     );
 
     const isRenderFromParent = next.children !== prev.children;
 
-    return valueChanged || isRenderFromParent;
+    return formStateChanged || isRenderFromParent;
   }
 
   return (
-    <FastField name={fieldName} shouldUpdate={shouldRender}>
+    <FastField name={fieldName} shouldUpdate={shouldRender} validate={validate}>
       {(fastFieldProps: FastFieldProps) => (
         <FieldSpyInternal fastFieldProps={fastFieldProps} fieldName={fieldName}>
           {children}

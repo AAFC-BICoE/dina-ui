@@ -612,7 +612,6 @@ export function CollectingEventFormLayout({
                         ]
                       : undefined
                   })}
-                  shouldUpdate={() => true}
                 />
               )}
             </Field>

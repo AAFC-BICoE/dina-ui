@@ -2,6 +2,7 @@ import {
   CheckBoxWithoutWrapper,
   FieldHeader,
   FieldSet,
+  FieldSpy,
   LoadingSpinner,
   Tooltip,
   useBulkGet,
@@ -9,7 +10,6 @@ import {
   useModal,
   useQuery
 } from "common-ui";
-import { FastField } from "formik";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { uniqBy } from "lodash";
 import Link from "next/link";
@@ -45,8 +45,8 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
       title={props.title}
     />
   ) : (
-    <FastField name={props.name} key={props.id}>
-      {({ field: { value }, form }) => {
+    <FieldSpy fieldName={props.name}>
+      {(value, { form }) => {
         const metadatas =
           (value as ResourceIdentifierObject[] | undefined) ?? [];
 
@@ -60,7 +60,7 @@ export function AttachmentsField(props: AttachmentsFieldProps) {
           />
         );
       }}
-    </FastField>
+    </FieldSpy>
   );
 }
 

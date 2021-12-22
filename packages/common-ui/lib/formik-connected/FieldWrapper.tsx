@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { FastField, FastFieldProps, FormikProps } from "formik";
+import { FastFieldProps, FormikProps } from "formik";
 import { isArray } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -7,6 +7,7 @@ import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField"
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
+import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
 
 export interface FieldWrapperProps {
@@ -59,9 +60,6 @@ export interface FieldWrapperProps {
    */
   templateCheckboxFieldName?: string;
 
-  /** Override FastField's default shouldComponentUpdate */
-  shouldUpdate?: (nextProps: FieldWrapperProps, props: {}) => boolean;
-
   validate?: (value: any) => string | void;
   children?:
     | JSX.Element
@@ -86,7 +84,7 @@ export interface FieldWrapperRenderProps {
  * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
 export function FieldWrapper(props: FieldWrapperProps) {
-  const { name, templateCheckboxFieldName, shouldUpdate, validate } = props;
+  const { name, templateCheckboxFieldName, validate } = props;
 
   const { enabledFields } = useDinaFormContext();
 
@@ -104,8 +102,8 @@ export function FieldWrapper(props: FieldWrapperProps) {
   }
 
   return (
-    <FastField name={name} shouldUpdate={shouldUpdate} validate={validate}>
-      {fastFieldProps => (
+    <FieldSpy fieldName={name} validate={validate}>
+      {(_value, fastFieldProps) => (
         <LabelWrapper fieldWrapperProps={props} fastFieldProps={fastFieldProps}>
           <FormikConnectedField
             fastFieldProps={fastFieldProps}
@@ -113,7 +111,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
           />
         </LabelWrapper>
       )}
-    </FastField>
+    </FieldSpy>
   );
 }
 

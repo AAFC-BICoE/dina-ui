@@ -1,6 +1,6 @@
-import { FastField } from "formik";
 import React, { ChangeEvent } from "react";
 import { useIntl } from "react-intl";
+import { FieldSpy } from "..";
 
 export interface CheckBoxWithoutWrapperProps {
   onClickIncludeAll?: (e, form, id) => void;
@@ -38,8 +38,8 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
   const { formatMessage } = useIntl();
 
   return (
-    <FastField {...props}>
-      {({ form, field: { value, name } }) => {
+    <FieldSpy fieldName={props.name}>
+      {(value, { form, field: { name } }) => {
         function onChange(event: ChangeEvent<HTMLInputElement>) {
           form.setFieldValue(name, event.target.checked);
           onClickIncludeAll?.(event, form, id);
@@ -80,6 +80,6 @@ export function CheckBoxWithoutWrapper(props: CheckBoxWithoutWrapperProps) {
           />
         );
       }}
-    </FastField>
+    </FieldSpy>
   );
 }
