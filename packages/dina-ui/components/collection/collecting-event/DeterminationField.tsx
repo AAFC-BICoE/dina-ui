@@ -233,10 +233,24 @@ export function DeterminationField() {
                       );
                     }}
                     onChangeExternal={form => {
-                      form.setFieldValue(
-                        fieldProps("scientificNameSource").name,
-                        "GNA"
-                      );
+                      if (
+                        form.values[`${fieldProps("scientificName").name}`]
+                          ?.length > 0
+                      ) {
+                        form.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          "GNA"
+                        );
+                      } else {
+                        form.setFieldValue(
+                          fieldProps("scientificNameSource").name,
+                          null
+                        );
+                        form.setFieldValue(
+                          fieldProps("scientificNameDetails").name,
+                          null
+                        );
+                      }
                     }}
                   />
                   {!readOnly && <hr />}
