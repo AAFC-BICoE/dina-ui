@@ -343,6 +343,9 @@ function NavCollectionDropdown() {
         <Dropdown.Item href="/collection/workflow-template/list">
           <DinaMessage id="workflowTemplateListTitle" />
         </Dropdown.Item>
+        <Dropdown.Item href="/collection/extension/list">
+          <DinaMessage id="extensionListTitle" />
+        </Dropdown.Item>
         <Dropdown.Item
           href="/collection/revisions-by-user"
           onKeyDown={onKeyDownLastItem}
