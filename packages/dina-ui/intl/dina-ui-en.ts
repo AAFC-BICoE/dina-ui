@@ -162,6 +162,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   endEventDateTime: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
+  extensionListTitle: " Field Extensions",
   isolation: "Isolation",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
@@ -498,6 +499,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   searchPreviousTags: "Search previous tags",
   searchResults: "Search Results ({resultSize})",
   searchStorage: "Search Storage",
+  selectAnExtenstion: "Select an extension",
   selectCollectorGroupLabel:
     "Select a collector group to pre-poplulate 'Collectors' field",
   selectGroup: "Select Group",
@@ -549,6 +551,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   to: "To",
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
+  totalExtenstionFieldsCount: "Total fields for this extension",
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
