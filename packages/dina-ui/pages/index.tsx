@@ -229,16 +229,23 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
-            <Link href="/collection/revisions-by-user">
+            <Link href="/collection/workflow-template/list">
               <a>
-                <DinaMessage id="revisionsByUserPageTitle" />
+                <DinaMessage id="workflowTemplateListTitle" />
               </a>
             </Link>
           </li>
           <li>
-            <Link href="/collection/workflow-template/list">
+            <Link href="/collection/extension/list">
               <a>
-                <DinaMessage id="workflowTemplateListTitle" />
+                <DinaMessage id="extensionListTitle" />
+              </a>
+            </Link>
+          </li>
+          <li>
+            <Link href="/collection/revisions-by-user">
+              <a>
+                <DinaMessage id="revisionsByUserPageTitle" />
               </a>
             </Link>
           </li>

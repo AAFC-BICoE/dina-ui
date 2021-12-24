@@ -129,7 +129,8 @@ export function ListPageLayout<TData extends KitsuResource>({
               <CheckBoxField key={resource.id} resource={resource} />
             ),
             Header: CheckBoxHeader,
-            sortable: false
+            sortable: false,
+            width: 200
           }
         ]
       : []),

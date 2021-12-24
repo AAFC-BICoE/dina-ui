@@ -25,6 +25,7 @@ import {
   GlobalNamesField,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -183,6 +184,17 @@ export function DeterminationField() {
                   suggestion={sample =>
                     sample.determination?.map(det => det?.verbatimDeterminer) ??
                     []
+                  }
+                  alwaysShowSuggestions={true}
+                  useCustomQuery={(searchQuery, querySpec) =>
+                    useAutocompleteSearchButFallbackToRsqlApiSearch<MaterialSample>(
+                      {
+                        searchQuery,
+                        querySpec,
+                        indexName: "dina_material_sample_index",
+                        searchField: "determination.verbatimDeterminer"
+                      }
+                    )
                   }
                 />
                 <TextField {...fieldProps("verbatimDate")} />
