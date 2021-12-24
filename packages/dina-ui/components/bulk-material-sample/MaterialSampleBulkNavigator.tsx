@@ -3,20 +3,23 @@ import { SampleWithHooks } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
-import { ReactNode, RefObject, useState } from "react";
+import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { SelectNavigation } from "./SelectNavigation";
 
 export interface MaterialSampleBulkNavigatorProps {
   samples: SampleWithHooks[];
-  renderOneSample: (
-    sample: InputResource<MaterialSample>,
-    index: number,
-    isSelected: boolean
-  ) => ReactNode;
-
+  renderOneSample: (sampleRenderProps: SampleRenderProps) => ReactNode;
+  selectedTab: BulkNavigatorTab | SampleWithHooks;
+  onSelectTab: (newSelected: SampleWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
+}
+
+export interface SampleRenderProps {
+  sample: InputResource<MaterialSample>;
+  index: number;
+  isSelected: boolean;
 }
 
 export interface BulkNavigatorTab {
@@ -31,15 +34,13 @@ export interface BulkNavigatorTab {
  * 10 or more samples: Shows dropdown navigator with arrow buttons.
  */
 export function MaterialSampleBulkNavigator({
+  selectedTab,
+  onSelectTab,
   samples,
   renderOneSample,
   extraTabs = []
 }: MaterialSampleBulkNavigatorProps) {
   const tabElements = [...extraTabs, ...samples];
-
-  const [selectedElement, setSelectedElement] = useState<
-    BulkNavigatorTab | SampleWithHooks
-  >(tabElements[0]);
 
   const tooManySamplesForTabs = samples.length >= 10;
 
@@ -50,7 +51,7 @@ export function MaterialSampleBulkNavigator({
   );
 
   function isSelected(key: string) {
-    return selectedElement.key === key;
+    return selectedTab.key === key;
   }
 
   return (
@@ -60,8 +61,8 @@ export function MaterialSampleBulkNavigator({
           <div className="d-flex justify-content-center mb-3">
             <SelectNavigation<BulkNavigatorTab | SampleWithHooks>
               elements={tabElements}
-              value={selectedElement}
-              onChange={setSelectedElement}
+              value={selectedTab}
+              onChange={onSelectTab}
               optionLabel={(element: any) =>
                 element.title || element.sample?.materialSampleName
               }
@@ -79,9 +80,13 @@ export function MaterialSampleBulkNavigator({
           {samples.map((element, index) => (
             <div
               key={index}
-              className={selectedElement.key !== element.key ? "d-none" : ""}
+              className={selectedTab.key !== element.key ? "d-none" : ""}
             >
-              {renderOneSample(element.sample, index, isSelected(element.key))}
+              {renderOneSample({
+                sample: element.sample,
+                index,
+                isSelected: isSelected(element.key)
+              })}
             </div>
           ))}
         </div>
@@ -90,9 +95,9 @@ export function MaterialSampleBulkNavigator({
           // Prevent unmounting the form on tab switch to avoid losing the form state:
           forceRenderTabPanel={true}
           selectedIndex={tabElements.findIndex(
-            element => element.key === selectedElement.key
+            element => element.key === selectedTab.key
           )}
-          onSelect={index => setSelectedElement(tabElements[index])}
+          onSelect={index => onSelectTab(tabElements[index])}
         >
           <TabList>
             {extraTabs.map((extraTab, index) => {
@@ -141,7 +146,11 @@ export function MaterialSampleBulkNavigator({
               className={`react-tabs__tab-panel sample-tabpanel-${index}`}
               key={index}
             >
-              {renderOneSample(tab.sample, index, isSelected(tab.key))}
+              {renderOneSample({
+                sample: tab.sample,
+                index,
+                isSelected: isSelected(tab.key)
+              })}
             </TabPanel>
           ))}
         </Tabs>

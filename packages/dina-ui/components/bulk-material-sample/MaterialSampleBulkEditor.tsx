@@ -11,9 +11,9 @@ import {
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { Promisable } from "type-fest";
-import { MaterialSampleBulkNavigator } from "..";
+import { BulkNavigatorTab, MaterialSampleBulkNavigator } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
@@ -36,12 +36,23 @@ export function MaterialSampleBulkEditor({
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
 
-  const sampleHooks = samples.map<SampleWithHooks>((sample, index) => ({
-    key: `sample-${index}`,
-    sample,
-    saveHook: useMaterialSampleSave({ materialSample: sample }),
-    formRef: useRef(null)
-  }));
+  const [selectedTab, setSelectedTab] = useState<
+    BulkNavigatorTab | SampleWithHooks
+  >();
+
+  const sampleHooks = samples.map<SampleWithHooks>((sample, index) => {
+    const key = `sample-${index}`;
+    return {
+      key,
+      sample,
+      saveHook: useMaterialSampleSave({
+        materialSample: sample,
+        // Reduce the off-screen tabs rendering for better performance:
+        reduceRendering: key !== selectedTab?.key
+      }),
+      formRef: useRef(null)
+    };
+  });
 
   const [initialized, setInitialized] = useState(false);
 
@@ -49,6 +60,11 @@ export function MaterialSampleBulkEditor({
     sampleHooks,
     hideBulkEditTab: !initialized
   });
+
+  useEffect(() => {
+    // Set the initial tab to the Edit All tab:
+    setSelectedTab(bulkEditTab);
+  }, []);
 
   const { saveAll } = useBulkSampleSave({
     onSaved,
@@ -78,27 +94,32 @@ export function MaterialSampleBulkEditor({
           </FormikButton>
         </ButtonBar>
       </DinaForm>
-      <MaterialSampleBulkNavigator
-        samples={sampleHooks}
-        extraTabs={[bulkEditTab]}
-        renderOneSample={(_sample, index, isSelected) => (
-          <MaterialSampleForm
-            disableSampleNameField={disableSampleNameField}
-            materialSampleFormRef={form => {
-              const isLastRefSetter =
-                sampleHooks.filter(it => !it.formRef.current).length === 1;
-              sampleHooks[index].formRef.current = form;
-              if (isLastRefSetter && form) {
-                setInitialized(true);
-              }
-            }}
-            materialSampleSaveHook={sampleHooks[index].saveHook}
-            buttonBar={null}
-            disableAutoNamePrefix={true}
-            isOffScreen={!isSelected}
-          />
-        )}
-      />
+      {selectedTab && (
+        <MaterialSampleBulkNavigator
+          selectedTab={selectedTab}
+          onSelectTab={setSelectedTab}
+          samples={sampleHooks}
+          extraTabs={[bulkEditTab]}
+          renderOneSample={({ index, isSelected }) => (
+            <MaterialSampleForm
+              disableSampleNameField={disableSampleNameField}
+              materialSampleFormRef={form => {
+                const isLastRefSetter =
+                  sampleHooks.filter(it => !it.formRef.current).length === 1;
+                sampleHooks[index].formRef.current = form;
+                if (isLastRefSetter && form) {
+                  setInitialized(true);
+                }
+              }}
+              materialSampleSaveHook={sampleHooks[index].saveHook}
+              buttonBar={null}
+              disableAutoNamePrefix={true}
+              isOffScreen={!isSelected}
+              reduceRendering={!isSelected}
+            />
+          )}
+        />
+      )}
     </div>
   );
 }

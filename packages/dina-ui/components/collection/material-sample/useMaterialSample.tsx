@@ -1,5 +1,6 @@
 import {
   DinaForm,
+  DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
   resourceDifference,
@@ -19,7 +20,7 @@ import {
   pick,
   pickBy
 } from "lodash";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, ComponentProps } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -147,6 +148,9 @@ export interface UseMaterialSampleSaveParams {
   };
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  /** Reduces the rendering to improve performance when bulk editing many material samples. */
+  reduceRendering?: boolean;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -168,7 +172,8 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  reduceRendering
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -625,32 +630,36 @@ export function useMaterialSampleSave({
   }
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  const nestedCollectingEventForm = (
+  function nestedCollectingEventForm(
     initialValues?: PersistedResource<CollectingEvent>
-  ) => (
-    <DinaForm
-      innerRef={colEventFormRef}
-      initialValues={
+  ) {
+    const colEventFormProps: DinaFormProps<any> = {
+      innerRef: colEventFormRef,
+      initialValues:
         initialValues ??
         (isTemplate
           ? colEventTemplateInitialValues
-          : collectingEventInitialValues)
-      }
-      validationSchema={collectingEventFormSchema}
-      isTemplate={isTemplate}
-      readOnly={isTemplate ? !!colEventId : false}
-      enabledFields={enabledFields?.collectingEvent}
-    >
-      <CollectingEventFormLayout
-        attachmentsConfig={collectingEventAttachmentsConfig}
-      />
-    </DinaForm>
-  );
+          : collectingEventInitialValues),
+      validationSchema: collectingEventFormSchema,
+      isTemplate,
+      readOnly: isTemplate ? !!colEventId : false,
+      enabledFields: enabledFields?.collectingEvent,
+      children: reduceRendering ? (
+        <div />
+      ) : (
+        <CollectingEventFormLayout
+          attachmentsConfig={collectingEventAttachmentsConfig}
+        />
+      )
+    };
 
-  const nestedAcqEventForm = (
+    return <DinaForm {...colEventFormProps} />;
+  }
+
+  function nestedAcqEventForm(
     initialValues?: PersistedResource<AcquisitionEvent>
-  ) => {
-    const acqEventFormProps = {
+  ) {
+    const acqEventFormProps: DinaFormProps<any> = {
       innerRef: acqEventFormRef,
       initialValues:
         initialValues ??
@@ -659,21 +668,18 @@ export function useMaterialSampleSave({
           : { type: "acquisition-event", ...acquisitionEventInitialValues }),
       isTemplate,
       readOnly: isTemplate ? !!acqEventId : false,
-      enabledFields: enabledFields?.acquisitionEvent
+      enabledFields: enabledFields?.acquisitionEvent,
+      children: reduceRendering ? <div /> : <AcquisitionEventFormLayout />
     };
 
     return acqEventId ? (
       withResponse(acqEventQuery, ({ data }) => (
-        <DinaForm {...acqEventFormProps} initialValues={data}>
-          <AcquisitionEventFormLayout />
-        </DinaForm>
+        <DinaForm {...acqEventFormProps} initialValues={data} />
       ))
     ) : (
-      <DinaForm {...acqEventFormProps}>
-        <AcquisitionEventFormLayout />
-      </DinaForm>
+      <DinaForm {...acqEventFormProps} />
     );
-  };
+  }
 
   return {
     initialValues: msInitialValues,

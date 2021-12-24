@@ -25,7 +25,7 @@ export function SelectNavigation<T extends { key: string }>({
 
   const selectedIndex = options.findIndex(it => it.value.key === value.key);
 
-  const selectValue = options.find(option => option.value === value);
+  const selectValue = options.find(option => option.value.key === value.key);
 
   const leftDisabled = selectedIndex <= 0;
   const rightDisabled = selectedIndex >= elements.length - 1;
