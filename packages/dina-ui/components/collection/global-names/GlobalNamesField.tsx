@@ -1,4 +1,4 @@
-import { FieldWrapper, FieldWrapperProps } from "common-ui";
+import { FieldWrapper, FieldWrapperProps, useDinaFormContext } from "common-ui";
 import { FormikProps } from "formik";
 
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -41,7 +41,11 @@ export function GlobalNamesField({
           scientificNameDetailsSrcUrlField as any
         ).value as string;
 
-        return value && scientificNameSrcDetailUrlVal?.length > 0 ? (
+        const scientificNameSrcDetailVal = formik.getFieldMeta(
+          scientificNameDetailsField as any
+        ).value as string;
+
+        return scientificNameSrcDetailVal && scientificNameSrcDetailUrlVal ? (
           <SelectedScientificNameView
             value={value}
             formik={formik}
@@ -209,6 +213,12 @@ export function SelectedScientificNameView(
     setSearchInitiated
   } = props;
 
+  const scientificNameDetails = getFieldValue(
+    formik,
+    scientificNameDetailsField
+  );
+  const { readOnly } = useDinaFormContext();
+
   return (
     <div style={{ border: "1px solid #F5F5F5" }}>
       <div className="mt-2">
@@ -229,7 +239,7 @@ export function SelectedScientificNameView(
             <DinaMessage id="viewDetailButtonLabel" />
           </a>
         )}
-        {searchInitiated && (
+        {(searchInitiated || scientificNameDetails) && !readOnly && (
           <button
             type="button"
             className="btn btn-danger remove-button"

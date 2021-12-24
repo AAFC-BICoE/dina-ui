@@ -25,6 +25,7 @@ describe("GlobalNamesField component", () => {
         <GlobalNamesField
           name="scientificName"
           scientificNameSourceField="scientificNameSource"
+          scientificNameDetailsField="scientificNameDetails"
           onChange={mockOnChange}
           fetchJson={mockFetchJson}
           dateSupplier={() => "2021-12-16"}
