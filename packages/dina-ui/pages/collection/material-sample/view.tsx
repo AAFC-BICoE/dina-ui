@@ -80,12 +80,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <DinaMessage id="splitButton" />
         </a>
       </Link>
-      {/* Uncomment if we need copy + create next
       <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
         <a className="btn btn-info">
-          <DinaMessage id="copyAndCreateNextSample" />
+          <DinaMessage id="duplicate" />
         </a>
-      </Link> */}
+      </Link>
       <DeleteButton
         className="ms-5"
         id={id}
