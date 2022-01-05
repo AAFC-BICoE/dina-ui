@@ -101,6 +101,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/associationType":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/acquisition-event":
       return { data: [] };
   }
 });
@@ -147,6 +148,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 3"
         };
+      case "collection/1":
+        return TEST_COLLECTION_1;
     }
   });
 });
@@ -1889,5 +1892,130 @@ describe("MaterialSampleBulkEditor", () => {
         )
         .exists()
     ).toEqual(false);
+  });
+
+  it("Allows adding NEW nested Collecting and Acquisition Events in the individual sample tabs.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Edit the first sample only:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
+    // Enable the collecting event section:
+    wrapper
+      .find(".sample-tabpanel-0 .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+    // Enable the acquisition event section:
+    wrapper
+      .find(".sample-tabpanel-0 .enable-acquisition-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(
+        ".sample-tabpanel-0 #collecting-event-section .dwcVerbatimLocality-field input"
+      )
+      .simulate("change", { target: { value: "test locality" } });
+    wrapper
+      .find(
+        ".sample-tabpanel-0 #acquisition-event-section .receptionRemarks-field textarea"
+      )
+      .simulate("change", { target: { value: "test remarks" } });
+
+    // Save the samples:
+    wrapper.find("button.bulk-save-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the new material samples with the new storage unit:
+    expect(mockSave.mock.calls).toEqual([
+      // Creates the new Col Event:
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              type: "collecting-event",
+              dwcVerbatimLocality: "test locality"
+            }),
+            type: "collecting-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      // Creates the new Acq Event:
+      [
+        [
+          {
+            resource: {
+              receptionRemarks: "test remarks",
+              type: "acquisition-event"
+            },
+            type: "acquisition-event"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          // Creates the first sample with the attached events:
+          {
+            resource: expect.objectContaining({
+              acquisitionEvent: {
+                id: "11111",
+                type: "acquisition-event"
+              },
+              collectingEvent: {
+                id: "11111",
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          // Creates the next 2 samples without the attached events:
+          {
+            resource: expect.objectContaining({
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          },
+          {
+            resource: expect.objectContaining({
+              acquisitionEvent: {
+                id: null,
+                type: "acquisition-event"
+              },
+              collectingEvent: {
+                id: null,
+                type: "collecting-event"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
   });
 });
