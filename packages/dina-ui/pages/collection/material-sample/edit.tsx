@@ -76,6 +76,7 @@ export default function MaterialSampleEditPage() {
 
   const id = router.query.id?.toString();
   const copyFromId = router.query.copyFromId?.toString();
+  const lastCreatedId = router.query.lastCreatedId?.toString();
 
   const { formatMessage } = useDinaIntl();
 
@@ -90,7 +91,9 @@ export default function MaterialSampleEditPage() {
   }
 
   async function moveToNextSamplePage(savedId: string) {
-    await router.push(`/collection/material-sample/edit?copyFromId=${savedId}`);
+    await router.push(
+      `/collection/material-sample/edit?copyFromId=${savedId}&lastCreatedId=${savedId}`
+    );
   }
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
@@ -129,14 +132,14 @@ export default function MaterialSampleEditPage() {
       <Nav />
       <main className="container-fluid">
         {!id &&
-          !!copyFromId &&
+          !!lastCreatedId &&
           withResponse(copyFromQuery, ({ data: originalSample }) => (
             <SaveAndCopyToNextSuccessAlert
-              id={copyFromId}
+              id={lastCreatedId}
               displayName={
                 !!originalSample.materialSampleName?.length
                   ? originalSample.materialSampleName
-                  : copyFromId
+                  : lastCreatedId
               }
               entityPath={"collection/material-sample"}
             />
@@ -155,6 +158,7 @@ export default function MaterialSampleEditPage() {
               <MaterialSampleForm
                 {...sampleFormProps}
                 materialSample={initialValues}
+                disableAutoNamePrefix={true}
               />
             );
           })

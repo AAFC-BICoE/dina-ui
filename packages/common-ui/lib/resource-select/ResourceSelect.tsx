@@ -69,7 +69,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
     response?: { data: PersistedResource<TData>[] };
   };
 
-  /* Remove the derault sort by createdOn */
+  /* Remove the default sort by createdOn */
   removeDefaultSort?: boolean;
 
   placeholder?: string;

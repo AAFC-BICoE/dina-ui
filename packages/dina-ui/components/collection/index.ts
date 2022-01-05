@@ -1,4 +1,6 @@
 export * from "./AssociationsField";
+export * from "./global-names/GlobalNamesField";
+export * from "./global-names/GlobalNamesSearchBox";
 export * from "./catalogue-of-life/CatalogueOfLifeNameField";
 export * from "./catalogue-of-life/CatalogueOfLifeSearchBox";
 export * from "./collecting-event/CollectingEventFormLayout";

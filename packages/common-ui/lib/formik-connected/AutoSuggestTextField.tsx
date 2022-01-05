@@ -42,6 +42,15 @@ interface AutoSuggestConfig<T extends KitsuResource> {
   timeoutMs?: number;
   /** Show the suggestions even when the input is blank. */
   alwaysShowSuggestions?: boolean;
+
+  /** Use a different query hook instead of the REST API. */
+  useCustomQuery?: (
+    searchQuery: string,
+    querySpec: JsonApiQuerySpec
+  ) => {
+    loading?: boolean;
+    response?: { data: PersistedResource<T>[] };
+  };
 }
 
 /**
@@ -54,6 +63,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   suggestions,
   onSuggestionSelected,
   timeoutMs,
+  useCustomQuery,
   alwaysShowSuggestions,
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
@@ -64,6 +74,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
       {...textFieldProps}
       customInput={inputProps => (
         <AutoSuggestTextFieldInternal
+          useCustomQuery={useCustomQuery}
           query={query}
           suggestion={suggestion}
           suggestions={suggestions}
@@ -90,6 +101,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   id,
   timeoutMs = 250,
   alwaysShowSuggestions,
+  useCustomQuery,
   ...inputProps
 }: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formik = useFormikContext<any>();
@@ -99,19 +111,20 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     ? useDebounce(searchValue, timeoutMs)
     : [searchValue];
 
-  const { loading, response } = useQuery<T[]>(
-    {
-      path: "",
-      // Default newest first:
-      sort: "-createdOn",
-      ...query?.(debouncedSearchValue, formik)
-    },
-    {
+  const querySpec: JsonApiQuerySpec = {
+    path: "",
+    // Default newest first:
+    sort: "-createdOn",
+    ...query?.(debouncedSearchValue, formik)
+  };
+
+  const { loading, response } =
+    useCustomQuery?.(searchValue, querySpec) ??
+    useQuery<T[]>(querySpec, {
       // Don't show results when the search is empty:
       disabled:
         !query || (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
-    }
-  );
+    });
 
   const allSuggestions = compact([
     ...(suggestions?.(searchValue, formik) || []),

@@ -52,8 +52,6 @@ export interface DinaFormContextI {
    * Whether this DinaForm is nested in another DinaForm. Nested forms are bad so avoid this.
    */
   isNestedForm?: boolean;
-
-  isTemplateRun?: boolean;
 }
 
 export type DinaFormOnSubmit<TValues = any> = (
