@@ -19,6 +19,12 @@ const TEST_COLLECTING_EVENT = {
   dwcVerbatimLocality: "test initial locality"
 };
 
+const TEST_ACQUISITION_EVENT = {
+  id: "acq-event-1",
+  type: "acquisition-event",
+  receptionRemarks: "test reception remarks"
+};
+
 const TEST_COLLECTION_1 = {
   id: "1",
   type: "collection",
@@ -294,6 +300,23 @@ const TEST_SAMPLES_SAME_COLLECTING_EVENT: InputResource<MaterialSample>[] = [
   }
 ];
 
+const TEST_SAMPLES_SAME_COL_AND_ACQ_EVENTS: InputResource<MaterialSample>[] = [
+  {
+    ...blankMaterialSample(),
+    id: "1",
+    type: "material-sample",
+    collectingEvent: TEST_COLLECTING_EVENT,
+    acquisitionEvent: TEST_ACQUISITION_EVENT
+  },
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    collectingEvent: TEST_COLLECTING_EVENT,
+    acquisitionEvent: TEST_ACQUISITION_EVENT
+  }
+];
+
 const TEST_SAMPLES_SAME_STORAGE_UNIT: InputResource<MaterialSample>[] = [
   {
     ...blankMaterialSample(),
@@ -441,11 +464,11 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the second sample:
-    wrapper.find("li.sample-tab-1").simulate("click");
+    // Go the the bulk edit tab:
+    wrapper.find("li.tab-EDIT_ALL").simulate("click");
     // Enable the collecting event section:
     wrapper
-      .find(".sample-tabpanel-1 .enable-collecting-event")
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
       .find(ReactSwitch)
       .prop<any>("onChange")(true);
 
@@ -454,7 +477,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Put an invalid value in startEventDateTime. This is validated locally by yup:
     wrapper
-      .find(".sample-tabpanel-1 .startEventDateTime-field")
+      .find(".tabpanel-EDIT_ALL .startEventDateTime-field")
       .find(Cleave)
       .prop<any>("onChange")({ target: { value: "11111" } });
 
@@ -464,24 +487,27 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The tab with the error is given the red text, and the other 2 tabs are unaffected:
+    // The tab with the error is given the red text, and the other 3 tabs are unaffected:
+    expect(
+      wrapper.find("li.tab-EDIT_ALL .text-danger.is-invalid").exists()
+    ).toEqual(true);
     expect(
       wrapper.find("li.sample-tab-0 .text-danger.is-invalid").exists()
     ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-1 .text-danger.is-invalid").exists()
-    ).toEqual(true);
+    ).toEqual(false);
     expect(
       wrapper.find("li.sample-tab-2 .text-danger.is-invalid").exists()
     ).toEqual(false);
 
     // Shows the error message:
     expect(
-      wrapper.find(".sample-tabpanel-1 .error-viewer").first().text()
+      wrapper.find(".tabpanel-EDIT_ALL .error-viewer").first().text()
     ).toContain("Start Event Date Time");
     expect(
       wrapper
-        .find(".sample-tabpanel-1 .startEventDateTime-field .invalid-feedback")
+        .find(".tabpanel-EDIT_ALL .startEventDateTime-field .invalid-feedback")
         .exists()
     ).toEqual(true);
   });
@@ -1833,5 +1859,35 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Disables the nested Collecting event and Acquisition Events forms in the individual sample tabs.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_SAMPLES_SAME_COL_AND_ACQ_EVENTS}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The individual sample tab has read-only Col and Acq Event forms (no input elements):
+    wrapper.find("li.sample-tab-0").simulate("click");
+    expect(
+      wrapper
+        .find(
+          ".sample-tabpanel-0 #collecting-event-section .dwcVerbatimLocality-field input"
+        )
+        .exists()
+    ).toEqual(false);
+    expect(
+      wrapper
+        .find(
+          ".sample-tabpanel-0 #acquisition-event-section .receptionRemarks-field input"
+        )
+        .exists()
+    ).toEqual(false);
   });
 });

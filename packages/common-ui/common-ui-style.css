@@ -53,19 +53,23 @@ input[id^="react-select"] {
 }
 fieldset.has-bulk-edit-value,
 .has-bulk-edit-value fieldset,
-fieldset.has-bulk-edit-value .card {
+fieldset.has-bulk-edit-value .card,
+.has-bulk-edit-value .react-tabs__tab--selected {
   border-color: green !important;
   background-color: rgb(220, 255, 220) !important;
 }
 
+/** Bulk-edited inputs should have a light green background and dark green border. */
 .has-bulk-edit-value
-  input[type="text"]:not(.react-select__input, .search-input),
+  input[type="text"]:not([readonly]):not(.react-select__input, .search-input),
 .has-bulk-edit-value
-  input[type="text"]:focus:not(.react-select__input, .search-input),
-.has-bulk-edit-value input:not(.react-select__input, .search-input),
-.has-bulk-edit-value input:focus:not(.react-select__input, .search-input),
-.has-bulk-edit-value input[type="search"],
-.has-bulk-edit-value input[type="search"]:focus,
+  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input),
+.has-bulk-edit-value
+  input:not(.react-select__input, .search-input):not([readonly]),
+.has-bulk-edit-value
+  input:focus:not(.react-select__input, .search-input):not([readonly]),
+.has-bulk-edit-value input[type="search"]:not([readonly]),
+.has-bulk-edit-value input[type="search"]:focus:not([readonly]),
 .has-bulk-edit-value textarea,
 .has-bulk-edit-value textarea:focus,
 .has-bulk-edit-value .associated-sample-link,

@@ -151,6 +151,9 @@ export interface UseMaterialSampleSaveParams {
 
   /** Reduces the rendering to improve performance when bulk editing many material samples. */
   reduceRendering?: boolean;
+
+  /** Disable the nested Collecting Event and Acquisition Event forms. */
+  disableNestedFormEdits?: boolean;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -173,7 +176,8 @@ export function useMaterialSampleSave({
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  reduceRendering
+  reduceRendering,
+  disableNestedFormEdits
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -631,18 +635,21 @@ export function useMaterialSampleSave({
 
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   function nestedCollectingEventForm(
-    initialValues?: PersistedResource<CollectingEvent>
+    colEvent?: PersistedResource<CollectingEvent>
   ) {
+    const initialValues =
+      colEvent ??
+      (isTemplate
+        ? colEventTemplateInitialValues
+        : collectingEventInitialValues);
+
     const colEventFormProps: DinaFormProps<any> = {
       innerRef: colEventFormRef,
-      initialValues:
-        initialValues ??
-        (isTemplate
-          ? colEventTemplateInitialValues
-          : collectingEventInitialValues),
+      initialValues,
       validationSchema: collectingEventFormSchema,
       isTemplate,
-      readOnly: isTemplate ? !!colEventId : false,
+      // In bulk-edit and workflow run, disable editing existing Col events:
+      readOnly: disableNestedFormEdits || isTemplate ? !!colEventId : false,
       enabledFields: enabledFields?.collectingEvent,
       children: reduceRendering ? (
         <div />
@@ -656,18 +663,19 @@ export function useMaterialSampleSave({
     return <DinaForm {...colEventFormProps} />;
   }
 
-  function nestedAcqEventForm(
-    initialValues?: PersistedResource<AcquisitionEvent>
-  ) {
+  function nestedAcqEventForm(acqEvent?: PersistedResource<AcquisitionEvent>) {
+    const initialValues =
+      acqEvent ??
+      (isTemplate
+        ? acqEventTemplateInitialValues
+        : { type: "acquisition-event", ...acquisitionEventInitialValues });
+
     const acqEventFormProps: DinaFormProps<any> = {
       innerRef: acqEventFormRef,
-      initialValues:
-        initialValues ??
-        (isTemplate
-          ? acqEventTemplateInitialValues
-          : { type: "acquisition-event", ...acquisitionEventInitialValues }),
+      initialValues,
       isTemplate,
-      readOnly: isTemplate ? !!acqEventId : false,
+      // In bulk-edit and workflow run, disable editing existing Acq events:
+      readOnly: disableNestedFormEdits || isTemplate ? !!acqEventId : false,
       enabledFields: enabledFields?.acquisitionEvent,
       children: reduceRendering ? <div /> : <AcquisitionEventFormLayout />
     };

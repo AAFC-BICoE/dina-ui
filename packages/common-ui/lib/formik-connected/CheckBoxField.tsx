@@ -21,18 +21,7 @@ const checkboxProps = {
 export function CheckBoxField(props: CheckBoxProps) {
   const { onCheckBoxClick, disabled, type } = props;
   return (
-    <FieldWrapper
-      {...props}
-      readOnlyRender={value => (
-        <input
-          {...checkboxProps}
-          checked={value || false}
-          value={value || false}
-          disabled={true}
-          type={type}
-        />
-      )}
-    >
+    <FieldWrapper {...props} readOnlyRender={value => String(!!value)}>
       {({ setValue, value, formik }) => {
         function onChange(event: ChangeEvent<HTMLInputElement>) {
           setValue(event.target.checked);
