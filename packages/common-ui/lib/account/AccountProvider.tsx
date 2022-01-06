@@ -31,7 +31,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   return (
     <SSRKeycloakProvider
       // Loading the config from /keycloak.json, which is served by Caddy.
-      keycloakConfig={"/keycloak.json" as any}
+      keycloakConfig={"/api/keycloak-json" as any}
       // Server-side rendering config omitted because we aren't using server-side rendering.
       persistor={Persistors.Cookies({})}
       initConfig={{

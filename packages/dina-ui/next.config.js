@@ -14,4 +14,7 @@ const appVersion = `${require("./package.json").version}${
 
 module.exports = withTM({
   env: { UI_APP_VERSION: appVersion },
+  experimental: {
+    outputStandalone: true,
+  },
 });
