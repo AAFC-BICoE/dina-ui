@@ -30,10 +30,17 @@ services:
     environment:
       ELASTIC_SERVER_URL: http://elasticsearch-dina:9200
       INDEX_CREATE_CMD: ./create-index.sh
+      DINA_INDEX_DECLARATIONS: AGENT MATERIAL_SAMPLE STORAGE OBJECT_STORE
       DINA_DOCUMENT_INDEX_NAME: dina_document_index
-      DINA_AGENT_INDEX_NAME: dina_agent_index
+      DINA_AGENT_INDEX_NAME: dina_agent_index      
+      DINA_MATERIAL_SAMPLE_INDEX_NAME: dina_material_sample_index
+      DINA_STORAGE_INDEX_NAME: dina_storage_index
+      DINA_OBJECT_STORE_INDEX_NAME: dina_object_store_index
       DINA_DOCUMENT_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/default-document-index/dina_document_index_settings.json
       DINA_AGENT_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/agent-index/dina_agent_index_settings.json
+      DINA_MATERIAL_SAMPLE_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/collection-index/dina_material_sample_index_settings.json
+      DINA_STORAGE_INDEX_SETTINGS_FILE: usr/share/elastic-configurator/settings/storage-index/dina_storage_index_settings.json
+      DINA_OBJECT_STORE_INDEX_SETTINGS_FILE: /usr/share/elastic-configurator/settings/object-store-index/object_store_index_settings.json
     volumes:
       - ./elastic-configurator-settings:/usr/share/elastic-configurator/settings
     depends_on:
