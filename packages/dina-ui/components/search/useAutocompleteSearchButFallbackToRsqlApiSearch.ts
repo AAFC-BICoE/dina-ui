@@ -31,8 +31,8 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     searchField,
     additionalField
   });
-
-  const searchApiFailed = searchResult?.length === 0 || searchApiError;
+  // When search result has empty array of hits, it should be considered as normal
+  const searchApiFailed = !searchResult || searchApiError;
   const searchApiIsDown = !!sessionStorage.getItem("searchApiDown");
 
   const fallbackToRsqlApi = searchApiFailed || !searchQuery || searchApiIsDown;

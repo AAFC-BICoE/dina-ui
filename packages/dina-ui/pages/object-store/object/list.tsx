@@ -2,15 +2,13 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   ColumnDefinition,
   dateCell,
-  DinaForm,
   FilterAttribute,
   filterBy,
   ListPageLayout,
-  SplitPagePanel,
-  useGroupedCheckBoxes
+  SplitPagePanel
 } from "common-ui";
 import Link from "next/link";
-import { Component, PropsWithChildren, useMemo, useState } from "react";
+import { Component, useMemo, useState } from "react";
 import {
   GroupSelectField,
   Head,
@@ -79,6 +77,7 @@ export default function MetadataListPage() {
         ) : null,
       accessor: "originalFilename"
     },
+    "acCaption",
     dateCell("acDigitizationDate"),
     dateCell("xmpMetadataDate"),
     {
@@ -106,7 +105,8 @@ export default function MetadataListPage() {
           <DinaMessage id="viewPreviewButtonText" />
         </div>
       ),
-      sortable: false
+      sortable: false,
+      width: 200
     }
   ];
 
