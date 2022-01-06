@@ -1,8 +1,6 @@
 // SSR polyfills:
 require("setimmediate");
-CustomEvent = require("custom-event");
-const LocalStorage = require("node-localstorage").LocalStorage;
-localStorage = new LocalStorage("./scratch");
+const path = require("path");
 
 // Next.js plugins:
 const withTM = require("next-transpile-modules")(["common-ui", "kitsu"]);
@@ -16,5 +14,7 @@ module.exports = withTM({
   env: { UI_APP_VERSION: appVersion },
   experimental: {
     outputStandalone: true,
+    // this includes files from the monorepo base two directories up
+    outputFileTracingRoot: path.join(__dirname, "../../"),
   },
 });
