@@ -636,6 +636,8 @@ export function useMaterialSampleSave({
     await onSaved?.(savedMaterialSample.id);
   }
 
+  // In bulk edit mode, show green labels and green inputs for changed fields in
+  // the nested Collection Event and Acquisition Event forms.
   const nestedFormClassName = showChangedIndicatorsInNestedForms
     ? "show-changed-indicators"
     : "";
