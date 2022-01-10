@@ -965,41 +965,57 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.update();
     }
 
-    // Determinations section opens with an initial value, so it ahs the green indicator on the fieldset:
+    // Determinations section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#determination-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("changed-field")
     ).toEqual(true);
     // The other overidable sections don't have an initial value,
     // so they don't initially show the green indicator on the fieldset:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("changed-field")
     ).toEqual(false);
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#preparation-protocols-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#preparation-protocols-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("changed-field")
     ).toEqual(false);
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#associations-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#associations-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("changed-field")
     ).toEqual(false);
     // Associations list section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs"
+          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs .legend-wrapper"
         )
-        .hasClass("has-bulk-edit-value")
+        .first()
+        .hasClass("changed-field")
     ).toEqual(true);
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#scheduled-actions-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("changed-field")
     ).toEqual(false);
 
     // Set the override values:
@@ -1044,29 +1060,42 @@ describe("MaterialSampleBulkEditor", () => {
     // All overridable fieldsets should now have the green bulk edited indicator:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#determination-section")
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section")
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#preparation-protocols-section")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
+        )
+        .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs"
+          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
         )
+        .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#scheduled-actions-section")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#preparation-protocols-section .legend-wrapper"
+        )
+        .first()
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs .legend-wrapper"
+        )
+        .first()
+        .hasClass("has-bulk-edit-value")
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-section .legend-wrapper"
+        )
+        .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
 
@@ -1520,8 +1549,12 @@ describe("MaterialSampleBulkEditor", () => {
     // The has-bulk-edit-value indicator appears:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+        )
+        .first()
+        .find(".has-bulk-edit-value .field-label")
+        .exists()
     ).toEqual(true);
   });
 
@@ -1549,8 +1582,12 @@ describe("MaterialSampleBulkEditor", () => {
     // The collecting event section has the green legend to indicate a bulk edit:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+        )
+        .first()
+        .find(".has-bulk-edit-value .field-label")
+        .exists()
     ).toEqual(true);
 
     // Edit a collecting event field:
@@ -1636,11 +1673,15 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The collecting event section has no green background to indicate a bulk edit:
+    // The collecting event section has a green legend to indicate a bulk edit (event without setting a new Collecting Event):
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#collecting-event-section")
-        .hasClass("has-bulk-edit-value")
+        .find(
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+        )
+        .first()
+        .find(".has-bulk-edit-value .field-label")
+        .exists()
     ).toEqual(true);
 
     expect(

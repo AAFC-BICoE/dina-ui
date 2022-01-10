@@ -32,6 +32,7 @@ export function FieldSet({
       <>
         <div
           className={classNames(
+            "legend-wrapper",
             fieldSpyProps?.bulkContext?.bulkEditClasses,
             fieldSpyProps?.isChanged && "changed-field"
           )}
