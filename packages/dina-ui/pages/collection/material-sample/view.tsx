@@ -194,7 +194,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
-                  <StorageLinkerField name="storageUnit" />
+                  <StorageLinkerField
+                    name="storageUnit"
+                    targetType="material-sample"
+                  />
                 </div>
               )}
               {!!materialSample?.scheduledActions?.length && (

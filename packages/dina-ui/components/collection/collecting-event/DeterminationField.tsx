@@ -105,6 +105,7 @@ export function DeterminationField({ id = "determination-section" }) {
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={content => (
         <BulkEditTabWarning
+          targetType="material-sample"
           fieldName={determinationsPath}
           setDefaultValue={ctx =>
             // Auto-create the first determination:

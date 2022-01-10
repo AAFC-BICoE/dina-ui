@@ -5,19 +5,22 @@ import {
   useBulkEditTabContext,
   useBulkEditTabField,
   useFieldLabels,
-  useModal
+  useModal,
+  FieldSpy
 } from "common-ui";
 import { PropsWithChildren, useEffect, useState } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface BulkEditTabWarningProps {
   fieldName: string;
+  targetType: string;
   setDefaultValue?: (ctx: BulkEditTabContextI) => void;
 }
 
 export function BulkEditTabWarning({
   fieldName,
   setDefaultValue,
+  targetType,
   children
 }: PropsWithChildren<BulkEditTabWarningProps>) {
   const bulkEditCtx = useBulkEditTabContext();
@@ -65,7 +68,24 @@ export function BulkEditTabWarning({
       .fieldLabel.replace(/s$/, "");
 
     return hasNoValues || override || hasSameValues ? (
-      <>{children}</>
+      <div>
+        <FieldSpy fieldName={fieldName}>
+          {(_, { bulkContext }) =>
+            bulkContext?.hasBulkEditValue ? (
+              <div className="alert alert-warning">
+                <DinaMessage
+                  id="bulkEditResourceSetWarningMulti"
+                  values={{
+                    targetType: getFieldLabel({ name: targetType }).fieldLabel,
+                    fieldName: getFieldLabel({ name: fieldName }).fieldLabel
+                  }}
+                />
+              </div>
+            ) : null
+          }
+        </FieldSpy>
+        <div>{children}</div>
+      </div>
     ) : (
       <div className="multiple-values-warning mb-3">
         <div className="d-flex justify-content-center mb-2">

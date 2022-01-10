@@ -14,6 +14,7 @@ export interface FieldSpyProps<T> {
 
 export interface FieldSpyRenderProps extends FastFieldProps {
   bulkContext: ReturnType<typeof useBulkEditTabFieldIndicators>;
+  isChanged: boolean;
 }
 
 /**
@@ -65,16 +66,22 @@ function FieldSpyInternal<T>({
   children
 }: FieldSpyInternalProps<T>) {
   const formikValue = fastFieldProps.field.value;
+  const { initialValue } = fastFieldProps.meta;
 
   const bulkContext = useBulkEditTabFieldIndicators({
     fieldName,
     currentValue: formikValue
   });
 
+  const isChanged = !isEqual(
+    isBlankResourceAttribute(formikValue) ? null : formikValue,
+    isBlankResourceAttribute(initialValue) ? null : initialValue
+  );
+
   const value =
     bulkContext && isBlankResourceAttribute(formikValue)
       ? bulkContext?.defaultValue
       : formikValue;
 
-  return <>{children(value, { ...fastFieldProps, bulkContext })}</>;
+  return <>{children(value, { ...fastFieldProps, bulkContext, isChanged })}</>;
 }

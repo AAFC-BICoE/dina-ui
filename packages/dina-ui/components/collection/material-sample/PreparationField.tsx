@@ -145,7 +145,10 @@ export function PreparationField({
           attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
           // Wrap in the bulk edit tab warning in case this is bulk edit mode:
           wrapContent={content => (
-            <BulkEditTabWarning fieldName={attachmentsField}>
+            <BulkEditTabWarning
+              targetType="material-sample"
+              fieldName={attachmentsField}
+            >
               {content}
             </BulkEditTabWarning>
           )}

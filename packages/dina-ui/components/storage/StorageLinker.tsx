@@ -1,10 +1,12 @@
 import {
   AreYouSureModal,
   ButtonBar,
+  FieldSpy,
   FieldWrapper,
   SubmitButton,
   useApiClient,
   useDinaFormContext,
+  useFieldLabels,
   useModal
 } from "common-ui";
 import { useField } from "formik";
@@ -134,6 +136,7 @@ export function StorageLinker({
 
 export interface StorageLinkerFieldProps {
   name: string;
+  targetType: string;
   customName?: string;
   hideLabel?: boolean;
 }
@@ -142,9 +145,13 @@ export interface StorageLinkerFieldProps {
 export function StorageLinkerField({
   name,
   customName,
-  hideLabel
+  hideLabel,
+  targetType
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
+
+  const { getFieldLabel } = useFieldLabels();
+
   return (
     <FieldWrapper
       name={name}
@@ -156,11 +163,31 @@ export function StorageLinkerField({
       hideLabel={hideLabel}
     >
       {({ value, setValue, placeholder }) => (
-        <StorageLinker
-          value={value}
-          onChange={setValue}
-          placeholder={placeholder}
-        />
+        <div>
+          <FieldSpy fieldName={name}>
+            {(_, { bulkContext }) => (
+              <div>
+                {bulkContext?.hasBulkEditValue ? (
+                  <div className="alert alert-warning">
+                    <DinaMessage
+                      id="bulkEditResourceLinkerWarningSingle"
+                      values={{
+                        targetType: getFieldLabel({ name: targetType })
+                          .fieldLabel,
+                        fieldName: getFieldLabel({ name }).fieldLabel
+                      }}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </FieldSpy>
+          <StorageLinker
+            value={value}
+            onChange={setValue}
+            placeholder={placeholder}
+          />
+        </div>
       )}
     </FieldWrapper>
   );

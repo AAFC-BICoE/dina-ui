@@ -63,9 +63,11 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   return (
     <FieldSet
       id={fieldSetId}
-      // Always show the green outline in bulk edit mode:
-      className={classNames(bulkCtx && "has-bulk-edit-value")}
-      legend={<div className="field-label">{legend}</div>}
+      legend={
+        <div className={classNames(bulkCtx && "has-bulk-edit-value")}>
+          <div className="field-label">{legend}</div>
+        </div>
+      }
     >
       {bulkCtx?.placeholder && (
         <div className={bulkCtx?.bulkEditClasses}>
@@ -77,7 +79,7 @@ export function TabbedResourceLinker<T extends KitsuResource>({
       {isInBulkEditTab && (
         <div className="alert alert-warning">
           <DinaMessage
-            id="bulkEditResourceLinkerWarning"
+            id="bulkEditResourceLinkerWarningSingle"
             values={{
               targetType: getFieldLabel({ name: targetType }).fieldLabel,
               fieldName: getFieldLabel({ name: fieldName }).fieldLabel

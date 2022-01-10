@@ -37,12 +37,16 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     isBlankResourceAttribute(get(form, fieldName))
   );
 
-  const hasMultipleValues = !formStates.every(form =>
-    isEqual(
-      get(form, fieldName),
-      get(sampleHooks[0].formRef.current?.values, fieldName)
-    )
-  );
+  const hasMultipleValues = !formStates.every(form => {
+    const bulkValue = get(form, fieldName);
+    const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);
+
+    // Treat different types of blank values the same e.g. null, "", empty array:
+    return isEqual(
+      isBlankResourceAttribute(bulkValue) ? null : bulkValue,
+      isBlankResourceAttribute(sampleValue) ? null : sampleValue
+    );
+  });
 
   const hasSameValues = !hasMultipleValues;
 
@@ -91,7 +95,7 @@ export function useBulkEditTabFieldIndicators(
       hasMultipleValues && "has-multiple-values"
     );
 
-    return { placeholder, defaultValue, bulkEditClasses };
+    return { placeholder, defaultValue, bulkEditClasses, hasBulkEditValue };
   }
 
   return null;

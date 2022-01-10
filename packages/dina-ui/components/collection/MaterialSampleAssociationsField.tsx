@@ -43,6 +43,7 @@ export function MaterialSampleAssociationsField({
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={content => (
         <BulkEditTabWarning
+          targetType="material-sample"
           fieldName={fieldName}
           setDefaultValue={ctx =>
             // Auto-create the first association:

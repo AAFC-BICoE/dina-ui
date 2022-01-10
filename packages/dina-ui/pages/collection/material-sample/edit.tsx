@@ -22,7 +22,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, Ref, useContext, useRef, useState } from "react";
+import { ReactNode, Ref, useContext, useState } from "react";
 import * as yup from "yup";
 import {
   AttachmentsField,
@@ -423,14 +423,21 @@ export function MaterialSampleForm({
                   legend={<DinaMessage id="storage" />}
                   fieldName="storageUnit"
                 >
-                  <StorageLinkerField name="storageUnit" hideLabel={true} />
+                  <StorageLinkerField
+                    name="storageUnit"
+                    hideLabel={true}
+                    targetType="material-sample"
+                  />
                 </FieldSet>
               )}
               {dataComponentState.enableScheduledActions && (
                 <ScheduledActionsField
                   id={navIds.ScheduledActions}
                   wrapContent={content => (
-                    <BulkEditTabWarning fieldName="scheduledActions">
+                    <BulkEditTabWarning
+                      targetType="material-sample"
+                      fieldName="scheduledActions"
+                    >
                       {content}
                     </BulkEditTabWarning>
                   )}
@@ -464,7 +471,10 @@ export function MaterialSampleForm({
                 allowAttachmentsConfig={attachmentsConfig?.materialSample}
                 attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
                 wrapContent={content => (
-                  <BulkEditTabWarning fieldName={attachmentsField}>
+                  <BulkEditTabWarning
+                    targetType="material-sample"
+                    fieldName={attachmentsField}
+                  >
                     {content}
                   </BulkEditTabWarning>
                 )}

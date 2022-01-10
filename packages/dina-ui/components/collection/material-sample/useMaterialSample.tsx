@@ -154,6 +154,8 @@ export interface UseMaterialSampleSaveParams {
 
   /** Disable the nested Collecting Event and Acquisition Event forms. */
   disableNestedFormEdits?: boolean;
+
+  showChangedIndicatorsInNestedForms?: boolean;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -177,7 +179,8 @@ export function useMaterialSampleSave({
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
   reduceRendering,
-  disableNestedFormEdits
+  disableNestedFormEdits,
+  showChangedIndicatorsInNestedForms
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -633,6 +636,10 @@ export function useMaterialSampleSave({
     await onSaved?.(savedMaterialSample.id);
   }
 
+  const nestedFormClassName = showChangedIndicatorsInNestedForms
+    ? "show-changed-indicators"
+    : "";
+
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
   function nestedCollectingEventForm(
     colEvent?: PersistedResource<CollectingEvent>
@@ -654,9 +661,11 @@ export function useMaterialSampleSave({
       children: reduceRendering ? (
         <div />
       ) : (
-        <CollectingEventFormLayout
-          attachmentsConfig={collectingEventAttachmentsConfig}
-        />
+        <div className={nestedFormClassName}>
+          <CollectingEventFormLayout
+            attachmentsConfig={collectingEventAttachmentsConfig}
+          />
+        </div>
       )
     };
 
@@ -677,7 +686,13 @@ export function useMaterialSampleSave({
       // In bulk-edit and workflow run, disable editing existing Acq events:
       readOnly: disableNestedFormEdits || isTemplate ? !!acqEventId : false,
       enabledFields: enabledFields?.acquisitionEvent,
-      children: reduceRendering ? <div /> : <AcquisitionEventFormLayout />
+      children: reduceRendering ? (
+        <div />
+      ) : (
+        <div className={nestedFormClassName}>
+          <AcquisitionEventFormLayout />
+        </div>
+      )
     };
 
     return acqEventId ? (

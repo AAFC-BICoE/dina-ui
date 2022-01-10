@@ -30,7 +30,8 @@ export function useBulkEditTab({
     determination: []
   };
   const bulkEditSampleHook = useMaterialSampleSave({
-    materialSample: initialValues
+    materialSample: initialValues,
+    showChangedIndicatorsInNestedForms: true
   });
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);

@@ -650,6 +650,7 @@ export function CollectingEventFormLayout({
         </div>
         <div className="col-md-6">
           <FieldSet
+            fieldName="geographicPlaceNameSourceDetail"
             legend={<DinaMessage id="toponymyLegend" />}
             className="non-strip"
           >
@@ -700,14 +701,12 @@ export function CollectingEventFormLayout({
                       )}
                       {detailResultsIsLoading ? (
                         <LoadingSpinner loading={true} />
-                      ) : (
-                        form.values.srcAdminLevels?.length && (
-                          <PlaceSectionsSelectionField
-                            name="srcAdminLevels"
-                            hideSelectionCheckBox={hideSelectionCheckBox}
-                          />
-                        )
-                      )}
+                      ) : form.values.srcAdminLevels?.length ? (
+                        <PlaceSectionsSelectionField
+                          name="srcAdminLevels"
+                          hideSelectionCheckBox={hideSelectionCheckBox}
+                        />
+                      ) : null}
                       <DinaFormSection horizontal={[3, 9]}>
                         <TextField
                           name={`${commonSrcDetailRoot}.stateProvince.name`}

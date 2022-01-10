@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FastFieldProps, FormikProps } from "formik";
-import { isArray } from "lodash";
+import { isArray, isEqual } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
@@ -9,6 +9,8 @@ import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
+import { isBlankResourceAttribute } from "../util/isBlankResourceAttribute";
+import { FieldSpyRenderProps } from "..";
 
 export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */
@@ -103,10 +105,10 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
   return (
     <FieldSpy fieldName={name} validate={validate}>
-      {(_value, fastFieldProps) => (
-        <LabelWrapper fieldWrapperProps={props} fastFieldProps={fastFieldProps}>
+      {(_value, fieldSpyProps) => (
+        <LabelWrapper fieldWrapperProps={props} fieldSpyProps={fieldSpyProps}>
           <FormikConnectedField
-            fastFieldProps={fastFieldProps}
+            fieldSpyProps={fieldSpyProps}
             fieldWrapperProps={props}
           />
         </LabelWrapper>
@@ -116,7 +118,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
 }
 
 interface FieldWrapperInternalProps {
-  fastFieldProps: FastFieldProps<any>;
+  fieldSpyProps: FieldSpyRenderProps;
   fieldWrapperProps: FieldWrapperProps;
 }
 
@@ -137,8 +139,9 @@ function LabelWrapper({
     tooltipLink,
     tooltipLinkText
   },
-  fastFieldProps: {
-    field: { value }
+  fieldSpyProps: {
+    field: { value },
+    isChanged
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
@@ -178,7 +181,8 @@ function LabelWrapper({
       className={classNames(
         className,
         isTemplate && "row",
-        bulkTab?.bulkEditClasses
+        bulkTab?.bulkEditClasses,
+        isChanged && "changed-field"
       )}
     >
       {isTemplate && (
@@ -249,7 +253,7 @@ function LabelWrapper({
 
 /** A user input connected to Formik state. */
 function FormikConnectedField({
-  fastFieldProps: {
+  fieldSpyProps: {
     form,
     field: { name, value: formikValue },
     meta: { error }

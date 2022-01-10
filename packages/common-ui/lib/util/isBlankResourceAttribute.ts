@@ -1,4 +1,4 @@
-import { isArray, omitBy } from "lodash";
+import { isArray, omitBy, isEmpty } from "lodash";
 
 /**
  * Checks whether an API resource's attribute is blank.
@@ -13,7 +13,11 @@ export function isBlankResourceAttribute(value: any) {
     case "object":
     case "undefined":
       // empty object or empty array:
-      return isArray(value) ? !value.join() : !value?.id;
+      if (value?.id === null) {
+        return true;
+      }
+
+      return isEmpty(value);
     default:
       return false;
   }
