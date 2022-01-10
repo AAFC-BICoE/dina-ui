@@ -590,16 +590,6 @@ export function useMaterialSampleSave({
       return;
     }
 
-    const data = await useGenerateSequence({
-      collectionId: submittedValues.collection?.id as any,
-      amount: 1,
-      save
-    });
-
-    if (!data.result?.lowReservedID || !data.result.highReservedID) {
-      return;
-    }
-
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(
       async () =>
@@ -608,6 +598,17 @@ export function useMaterialSampleSave({
         }),
       formik
     );
+
+    if (submittedValues.collection?.id) {
+      const data = await useGenerateSequence({
+        collectionId: submittedValues.collection?.id as any,
+        amount: 1,
+        save
+      });
+      if (!data.result?.lowReservedID || !data.result.highReservedID) {
+        return;
+      }
+    }
 
     await onSaved?.(savedMaterialSample.id);
   }
