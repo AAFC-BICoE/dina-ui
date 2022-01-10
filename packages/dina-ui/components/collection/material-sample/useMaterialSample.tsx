@@ -40,6 +40,7 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -586,6 +587,16 @@ export function useMaterialSampleSave({
       formik
     );
     if (!materialSampleSaveOp) {
+      return;
+    }
+
+    const data = await useGenerateSequence({
+      collectionId: submittedValues.collection?.id as any,
+      amount: 1,
+      save
+    });
+
+    if (!data.result?.lowReservedID || !data.result.highReservedID) {
       return;
     }
 
