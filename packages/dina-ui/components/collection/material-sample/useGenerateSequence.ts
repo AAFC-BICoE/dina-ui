@@ -33,7 +33,7 @@ export async function useGenerateSequence({
         type: "collection-sequence-generator"
       }
     ],
-    { apiBaseUrl: "/collection-api" }
+    { apiBaseUrl: "/collection-api", overridePatchOperation: true }
   );
 
   return response?.[0];
