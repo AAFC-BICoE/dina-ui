@@ -1,0 +1,22 @@
+= Api Proxying
+
+We use a reverse proxy in Next.js to route requests to certain URLs to back-end REST APIs.
+
+See the source file ../packages/dina-ui/pages/api/[\...api-proxy].ts to find the list
+of mappings from URLs to REST APIs.
+
+Example:
+
+[source,tsx]
+----
+/** Proxy the UI application paths to the REST APIs. */
+const API_PROXY_REWRITES = [
+  {
+    // The base URL that the browser sends a request to:
+    source: "/api/objectstore-api",
+    // The back-end API address that the Next.js server sends a request to:
+    destination: `http://${process.env.OBJECTSTORE_API_ADDRESS}/api/v1`
+  },
+  ...
+];
+----

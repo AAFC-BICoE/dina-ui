@@ -33,7 +33,9 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
 /** Proxy the UI application paths to the REST APIs. */
 const API_PROXY_REWRITES = [
   {
+    // The base URL that the browser sends a request to:
     source: "/api/objectstore-api",
+    // The back-end API address that the Next.js server sends a request to:
     destination: `http://${process.env.OBJECTSTORE_API_ADDRESS}/api/v1`
   },
   {
