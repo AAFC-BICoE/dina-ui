@@ -53,22 +53,28 @@ export function MaterialSampleGenerationForm({
   }) => {
     const samples = [...Array(Number(submittedValues.numberToCreate))].map<
       InputResource<MaterialSample>
-    >((_, index) => ({
-      type: "material-sample",
-      parentMaterialSample: parentId
-        ? { id: parentId, type: "material-sample" }
-        : undefined,
-      materialSampleName: generateName({
-        generationMode,
-        index,
-        formState: submittedValues
-      }),
-      collection: submittedValues.collection,
-      publiclyReleasable: true,
-      // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
-      allowDuplicateName: generationMode === "BATCH",
-      ...submittedValues.samples[index]
-    }));
+    >((_, index) => {
+      const sample = submittedValues.samples[index];
+
+      return {
+        type: "material-sample",
+        parentMaterialSample: parentId
+          ? { id: parentId, type: "material-sample" }
+          : undefined,
+        collection: submittedValues.collection,
+        publiclyReleasable: true,
+        // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
+        allowDuplicateName: generationMode === "BATCH",
+        ...sample,
+        materialSampleName:
+          sample?.materialSampleName?.trim?.() ||
+          generateName({
+            generationMode,
+            index,
+            formState: submittedValues
+          })
+      };
+    });
 
     onGenerate({ samples, submittedValues, generationMode });
   };
@@ -344,7 +350,11 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
 const generatorFormSchema = yup.object({
   collection: yup.mixed().required(),
   numberToCreate: yup.number().required(),
-  samples: yup.array(yup.object()).required(),
+  samples: yup
+    .array(
+      yup.object({ materialSampleName: yup.string().nullable() }).nullable()
+    )
+    .required(),
   baseName: yup.string(),
   separator: yup.string(),
   // Batch mode:

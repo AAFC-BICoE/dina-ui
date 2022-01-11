@@ -20,10 +20,7 @@ import { useBulkGet } from "./useBulkGet";
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
-  value?:
-    | PersistedResource<TData>
-    | PersistedResource<TData>[]
-    | KitsuResourceLink;
+  value?: ResourceSelectValue<TData>;
 
   /** Function called when an option is selected. */
   onChange?: (
@@ -74,7 +71,14 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /* Remove the default sort by createdOn */
   removeDefaultSort?: boolean;
+
+  placeholder?: string;
 }
+
+type ResourceSelectValue<TData extends KitsuResource> =
+  | PersistedResource<TData>
+  | PersistedResource<TData>[]
+  | KitsuResourceLink;
 
 /**
  * Special dropdown option that can fetch an async value.
@@ -108,7 +112,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   selectProps,
   pageSize,
   useCustomQuery,
-  removeDefaultSort
+  removeDefaultSort,
+  placeholder
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -262,9 +267,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChange={onChange}
       isLoading={isLoading}
       options={options}
-      placeholder={formatMessage({ id: "typeHereToSearch" })}
+      placeholder={placeholder ?? formatMessage({ id: "typeHereToSearch" })}
       loadingMessage={() => formatMessage({ id: "loadingText" })}
       styles={customStyle}
+      classNamePrefix="react-select"
       value={selectValue}
       // The filtering is already done at the API level:
       filterOption={() => true}

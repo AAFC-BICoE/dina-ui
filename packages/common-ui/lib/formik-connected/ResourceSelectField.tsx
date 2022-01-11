@@ -5,7 +5,7 @@ import { Fragment } from "react";
 import {
   FieldWrapper,
   isShallowReference,
-  LabelWrapperParams,
+  FieldWrapperProps,
   ResourceSelect,
   ResourceSelectProps,
   useBulkGet
@@ -16,7 +16,7 @@ export type SingleOrArray<T> = T | T[];
 
 export interface ResourceSelectFieldProps<TData extends KitsuResource>
   extends Omit<ResourceSelectProps<TData>, "value">,
-    LabelWrapperParams {
+    FieldWrapperProps {
   onChange?: (value?: SingleOrArray<PersistedResource<TData>>) => void;
   isDisabled?: boolean;
 
@@ -47,7 +47,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
       {...resourceSelectFieldProps}
       readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
     >
-      {({ setValue, value, invalid }) => {
+      {({ setValue, value, invalid, placeholder }) => {
         function onChangeInternal(resource) {
           setValue(resource);
           onChange?.(resource);
@@ -60,6 +60,7 @@ export function ResourceSelectField<TData extends KitsuResource>(
               invalid={invalid}
               onChange={onChangeInternal}
               value={value}
+              placeholder={placeholder}
             />
           </div>
         );

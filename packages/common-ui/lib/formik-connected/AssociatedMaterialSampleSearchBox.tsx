@@ -50,10 +50,7 @@ export function AssociatedMaterialSampleSearchBoxField({
                     <div className="d-flex flex-row">
                       <div
                         className="form-control associated-sample-link "
-                        style={{
-                          backgroundColor: "#e9ecef",
-                          minWidth: "100px"
-                        }}
+                        style={{ minWidth: "100px" }}
                       >
                         {defaultReadOnlyRender(value)}
                       </div>

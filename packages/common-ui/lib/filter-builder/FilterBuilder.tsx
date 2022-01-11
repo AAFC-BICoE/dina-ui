@@ -81,14 +81,16 @@ export class FilterBuilder extends React.Component<
    */
   public render() {
     return (
-      <FilterBuilderContextProvider
-        filterAttributes={this.props.filterAttributes}
-      >
-        {this.renderFilter({
-          model: this.state.model,
-          parent: this.state.model
-        })}
-      </FilterBuilderContextProvider>
+      <div className="filter-builder">
+        <FilterBuilderContextProvider
+          filterAttributes={this.props.filterAttributes}
+        >
+          {this.renderFilter({
+            model: this.state.model,
+            parent: this.state.model
+          })}
+        </FilterBuilderContextProvider>
+      </div>
     );
   }
 

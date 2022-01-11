@@ -33,33 +33,30 @@ export function AreYouSureModal({
   }
 
   return (
-    <div className="modal-content">
+    <div className="modal-content are-you-sure-modal">
       <div className="modal-header">
         <h1 style={{ border: "none" }}>{actionMessage}</h1>
       </div>
       <div className="modal-body">
         <DinaForm initialValues={{}} onSubmit={onYesClickInternal}>
           <main>
-            <div className="message-body">
+            <div className="message-body text-center">
               <p style={{ fontSize: "x-large" }}>
                 {messageBody ?? <CommonMessage id="areYouSure" />}
               </p>
             </div>
           </main>
-          <div className="row">
-            <div className="col-md-3">
-              <SubmitButton className="form-control yes-button">
-                <CommonMessage id="yes" />
-              </SubmitButton>
-            </div>
-            <div className="offset-md-6 col-md-3">
-              <FormikButton
-                className="btn btn-dark form-control no-button"
-                onClick={closeModal}
-              >
-                <CommonMessage id="no" />
-              </FormikButton>
-            </div>
+          <div className="d-flex gap-3 justify-content-center">
+            <FormikButton
+              className="btn btn-dark no-button"
+              onClick={closeModal}
+              buttonProps={() => ({ style: { width: "10rem" } })}
+            >
+              <CommonMessage id="no" />
+            </FormikButton>
+            <SubmitButton className="yes-button">
+              <CommonMessage id="yes" />
+            </SubmitButton>
           </div>
         </DinaForm>
       </div>

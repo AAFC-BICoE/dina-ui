@@ -1,4 +1,4 @@
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import React from "react";
 import ReactTable, { Column } from "react-table";
@@ -7,7 +7,7 @@ import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { useFormikContext } from "formik";
 
-export interface PlaceSectionsSelectionFieldProps extends LabelWrapperParams {
+export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
   hideSelectionCheckBox?: boolean;
 }

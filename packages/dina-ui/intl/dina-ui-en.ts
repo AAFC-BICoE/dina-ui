@@ -69,6 +69,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
+  bulkEditResourceLinkerWarningSingle:
+    "This {fieldName} will be linked to all {targetType}s.",
+  bulkEditResourceLinkerWarningMulti:
+    "This {fieldName} will be linked to all {targetType}s.",
+  bulkEditResourceSetWarningMulti:
+    "These {fieldName} will be set on all {targetType}s.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -115,6 +121,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataset: "Dataset",
   datasetSearchTooltip: "For using a different Catalog of Life dataset.",
   decimalLatLong: "Decimal Lat/Long",
+  defaultValues: "Default Values",
   defaultValuesConfig: "Default Values Config",
   defaultValuesConfigs: "Default Values Configs",
   deleteButtonText: "Delete",
@@ -181,6 +188,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_acTags: "Tags",
   field_acceptedValues: "Accepted Values",
   field_aliases: "Aliases",
+  field_attachment: "Attachments",
   field_attributesTemplate: "Set Attributes Template",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
@@ -200,6 +208,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_description: "Description",
   "field_description.en": "English Description",
   "field_description.fr": "French Description",
+  field_determination: "Determinations",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
   field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
@@ -445,6 +454,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
   otherContents: "Other Contents",
+  overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: " Parent Sample",
   parentSampleNotFoundLabel: " Parent sample not found",

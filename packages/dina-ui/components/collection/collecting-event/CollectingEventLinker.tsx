@@ -96,14 +96,12 @@ export function CollectingEventLinker({
   }
 
   /** Pressing enter on the search inputs should submit the filter form, not the outer Catalogued Object form. */
-  const nestedFormInputProps = {
-    onKeyDown(e) {
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        filterFormRef.current?.submitForm();
-      }
+  function onKeyDown(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      filterFormRef.current?.submitForm();
     }
-  };
+  }
 
   return (
     <div>
@@ -123,12 +121,18 @@ export function CollectingEventLinker({
               <TextField
                 name="createdBy"
                 className="col-md-3"
-                inputProps={nestedFormInputProps}
+                inputProps={{
+                  onKeyDown,
+                  className: "col-md-3 search-input"
+                }}
               />
               <TextField
                 name="location"
                 className="col-md-3"
-                inputProps={nestedFormInputProps}
+                inputProps={{
+                  onKeyDown,
+                  className: "col-md-3 search-input"
+                }}
               />
               {/* Commented out due to filtering issue (https://redmine.biodiversity.agr.gc.ca/issues/22300) */}
               {/* <DateField

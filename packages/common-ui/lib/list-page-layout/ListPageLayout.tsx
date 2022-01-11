@@ -150,6 +150,14 @@ export function ListPageLayout<TData extends KitsuResource>({
       onPageSizeChange={newSize => setDefaultPageSize(newSize)}
       onSortedChange={newSort => setStoredDefaultSort(newSort)}
       {...resolvedQueryTableProps}
+      topRightCorner={
+        <div className="d-flex gap-3">
+          {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+          {bulkDeleteButtonProps && (
+            <BulkDeleteButton {...bulkDeleteButtonProps} />
+          )}
+        </div>
+      }
       columns={columns}
       onSuccess={onSuccess}
     />
@@ -160,12 +168,6 @@ export function ListPageLayout<TData extends KitsuResource>({
     <DinaForm<BulkSelectableFormValues>
       initialValues={{ selectedResources: {} }}
     >
-      <div className="d-flex justify-content-end">
-        {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
-        {bulkDeleteButtonProps && (
-          <BulkDeleteButton {...bulkDeleteButtonProps} />
-        )}
-      </div>
       {tableElement}
     </DinaForm>
   ) : (

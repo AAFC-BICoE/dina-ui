@@ -1,8 +1,8 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient, useQuery } from "common-ui";
 import { FormikContextType } from "formik";
-import { PersistedResource } from "kitsu";
-import { compact, orderBy } from "lodash";
+import { InputResource, PersistedResource } from "kitsu";
+import { compact, omit, orderBy, toPairs } from "lodash";
 import { useMemo } from "react";
 import * as yup from "yup";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -12,7 +12,6 @@ import { SourceAdministrativeLevel } from "../../../types/collection-api/resourc
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { omit, toPairs } from "lodash";
 
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
@@ -105,27 +104,28 @@ export function useCollectingEventSave({
     DEFAULT_VERBATIM_SRS_KEY
   );
 
-  const collectingEventInitialValues = fetchedCollectingEvent
-    ? {
-        ...fetchedCollectingEvent,
-        geoReferenceAssertions:
-          fetchedCollectingEvent.geoReferenceAssertions ?? [],
-        srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
-      }
-    : {
-        type: "collecting-event",
-        collectors: [],
-        collectorGroups: [],
-        geoReferenceAssertions: [
-          {
-            isPrimary: true
-          }
-        ],
-        dwcVerbatimCoordinateSystem:
-          defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
-        dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-        publiclyReleasable: true
-      };
+  const collectingEventInitialValues: Partial<CollectingEvent> =
+    fetchedCollectingEvent
+      ? {
+          ...fetchedCollectingEvent,
+          geoReferenceAssertions:
+            fetchedCollectingEvent.geoReferenceAssertions ?? [],
+          srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
+        }
+      : {
+          type: "collecting-event",
+          collectors: [],
+          collectorGroups: [],
+          geoReferenceAssertions: [
+            {
+              isPrimary: true
+            }
+          ],
+          dwcVerbatimCoordinateSystem:
+            defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
+          dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
+          publiclyReleasable: true
+        };
 
   async function saveCollectingEvent(
     submittedValues: CollectingEvent,

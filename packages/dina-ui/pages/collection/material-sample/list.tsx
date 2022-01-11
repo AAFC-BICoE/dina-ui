@@ -3,6 +3,7 @@ import {
   ColumnDefinition,
   CreateButton,
   dateCell,
+  DeleteButton,
   FilterAttribute,
   filterBy,
   ListPageLayout,
@@ -16,6 +17,7 @@ import {
   MaterialSample,
   MaterialSampleType
 } from "../../../types/collection-api";
+import { useState } from "react";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
@@ -87,6 +89,8 @@ export function SampleListLayout({
     }
   ];
 
+  const [queryKey, setQueryKey] = useState("");
+
   const columns = [
     ...getColumnDefinition({ openLinkInNewTab }),
     ...(onSelect
@@ -107,7 +111,33 @@ export function SampleListLayout({
             sortable: false
           }
         ]
-      : [])
+      : [
+          {
+            Cell: ({ original: sample }) => (
+              <div className="d-flex">
+                <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+                  <a className="btn btn-link">
+                    <DinaMessage id="view" />
+                  </a>
+                </Link>
+                <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
+                  <a className="btn btn-link">
+                    <DinaMessage id="editButtonText" />
+                  </a>
+                </Link>
+                <DeleteButton
+                  replaceClassName="btn btn-link"
+                  type="material-sample"
+                  id={sample.id}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  onDeleted={() => setQueryKey(String(Math.random()))}
+                />
+              </div>
+            ),
+            Header: "",
+            sortable: false
+          }
+        ])
   ];
 
   return (
@@ -122,7 +152,8 @@ export function SampleListLayout({
         columns,
         path: "collection-api/material-sample",
         include: "collection,materialSampleType",
-        hideTopPagination
+        hideTopPagination,
+        deps: [queryKey]
       }}
       filterFormchildren={({ submitForm }) =>
         !hideGroupFilter ? (

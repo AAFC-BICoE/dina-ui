@@ -3,15 +3,15 @@ import Select from "react-select";
 
 export interface SelectNavigationProps<T> {
   /** The array index. */
-  value: number;
-  onChange: (newVal: number) => void;
+  value: T;
+  onChange: (newVal: T) => void;
   elements: T[];
   optionLabel: (element: T) => string | undefined;
-  invalidElements?: number[];
+  invalidElements?: T[];
 }
 
 /** Select menu with arrow button navigation. */
-export function SelectNavigation<T>({
+export function SelectNavigation<T extends { key: string }>({
   elements,
   value,
   onChange,
@@ -20,13 +20,15 @@ export function SelectNavigation<T>({
 }: SelectNavigationProps<T>) {
   const options = elements.map((element, index) => ({
     label: optionLabel(element) ?? index,
-    value: index
+    value: element
   }));
 
-  const selectValue = options.find(option => option.value === value);
+  const selectedIndex = options.findIndex(it => it.value.key === value.key);
 
-  const leftDisabled = value <= 0;
-  const rightDisabled = value >= elements.length - 1;
+  const selectValue = options.find(option => option.value.key === value.key);
+
+  const leftDisabled = selectedIndex <= 0;
+  const rightDisabled = selectedIndex >= elements.length - 1;
 
   const invalid = !!invalidElements?.length;
 
@@ -55,7 +57,7 @@ export function SelectNavigation<T>({
     <div className="d-flex" style={{ width: "30rem" }}>
       <button
         className="btn btn-info leftArrow mt-4"
-        onClick={() => onChange(value - 1)}
+        onClick={() => onChange(options[selectedIndex - 1].value)}
         type="button"
         style={{ visibility: leftDisabled ? "hidden" : undefined }}
         disabled={leftDisabled}
@@ -67,7 +69,7 @@ export function SelectNavigation<T>({
           <div className="fw-bold">Navigation</div>
           <Select
             options={options}
-            onChange={newVal => onChange(newVal?.value ?? 0)}
+            onChange={newVal => newVal?.value && onChange(newVal?.value)}
             value={selectValue}
             styles={customStyle}
           />
@@ -75,7 +77,7 @@ export function SelectNavigation<T>({
       </div>
       <button
         className="btn btn-info rightArrow mt-4"
-        onClick={() => onChange(value + 1)}
+        onClick={() => onChange(options[selectedIndex + 1].value)}
         type="button"
         style={{ visibility: rightDisabled ? "hidden" : undefined }}
         disabled={rightDisabled}
