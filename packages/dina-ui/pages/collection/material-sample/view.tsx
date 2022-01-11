@@ -5,6 +5,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
+  FieldSpy,
   withResponse
 } from "common-ui";
 import { FastField, Field } from "formik";
@@ -193,7 +194,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
-                  <StorageLinkerField name="storageUnit" />
+                  <StorageLinkerField
+                    name="storageUnit"
+                    targetType="material-sample"
+                  />
                 </div>
               )}
               {!!materialSample?.scheduledActions?.length && (
@@ -203,16 +207,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 legend={<DinaMessage id="materialSampleManagedAttributes" />}
               >
                 <div className="col-md-6">
-                  <FastField name="managedAttributes">
-                    {({ field: { value } }) => (
+                  <FieldSpy<
+                    Record<string, string>
+                  > fieldName="managedAttributes">
+                    {value => (
                       <ManagedAttributesViewer
-                        values={value}
+                        values={value ?? {}}
                         managedAttributeApiPath={key =>
                           `collection-api/managed-attribute/material_sample.${key}`
                         }
                       />
                     )}
-                  </FastField>
+                  </FieldSpy>
                 </div>
               </FieldSet>
               <div className="mb-3">

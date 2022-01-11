@@ -14,8 +14,9 @@ const config: Config.InitialOptions = {
   ],
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    // Mocks CSS imports to prevent throwing an error during tests.
-    "\\.css$": "identity-obj-proxy"
+    // Mocks CSS/SCSS imports to prevent throwing an error during tests.
+    "\\.css$": "identity-obj-proxy",
+    "\\.scss$": "identity-obj-proxy"
   },
   setupFiles: ["<rootDir>/jest.setup.js"],
   testPathIgnorePatterns: ["/.next/", "/node_modules/"],

@@ -2,6 +2,13 @@ import { ResourceSelect } from "common-ui";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
+// Mock out the dynamic component, which should only be rendered in the browser
+jest.mock("next/dynamic", () => () => {
+  return function MockDynamicComponent() {
+    return <div>Mock dynamic component</div>;
+  };
+});
+
 const mockPush = jest.fn();
 
 const mockRouter = { push: mockPush, query: {} };
@@ -9,6 +16,13 @@ const mockRouter = { push: mockPush, query: {} };
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collection":
+    case "collection-api/material-sample":
+    case "objectstore-api/metadata":
+    case "collection-api/managed-attribute":
+    case "collection-api/material-sample-type":
+    case "collection-api/project":
+    case "collection-api/vocabulary/materialSampleState":
+    case "user-api/group":
       return { data: [] };
   }
 });
@@ -18,6 +32,8 @@ const testCtx = {
 };
 
 describe("MaterialSampleBulkCreatePage", () => {
+  beforeEach(jest.clearAllMocks);
+
   it("Can click the 'previous' button to go back to the previous step", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkCreatePage router={mockRouter as any} />,
@@ -44,7 +60,7 @@ describe("MaterialSampleBulkCreatePage", () => {
     });
     wrapper
       .find(".numberToCreate-field input")
-      .simulate("change", { target: { value: "5" } });
+      .simulate("change", { target: { value: 5 } });
     wrapper
       .find(".baseName-field input")
       .simulate("change", { target: { value: "my-sample" } });
@@ -70,5 +86,5 @@ describe("MaterialSampleBulkCreatePage", () => {
     expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
       "my-sample"
     );
-  }, 20000);
+  });
 });

@@ -1,6 +1,6 @@
-import { LabelWrapperParams } from "./formik-connected/FieldWrapper";
+import { FieldWrapperProps } from "./formik-connected/FieldWrapper";
 /** Renders the label field */
-export function LabelView(props: LabelWrapperParams) {
+export function LabelView(props: FieldWrapperProps) {
   const { className, label } = props;
   return (
     <div className={className}>

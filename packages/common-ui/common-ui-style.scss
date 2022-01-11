@@ -1,0 +1,78 @@
+/*
+* CSS classes for elements that common across multiple pages and/or styled in JS files (i.e. styled after the CSS file loaded)
+*/
+
+/*
+ * Changes the default color of the badge to dark grey. 
+ * Currently there is no background color that is applied.
+ */
+.badge {
+  background-color: #333333;
+}
+
+/*
+* Fixes WCAG contrast issue for react-select input elements
+* Not sure if why this works...perhaps padding the element renders it sufficiently for a contrast calculation.
+*/
+input[id^="react-select"] {
+  padding: 1px !important;
+}
+
+/*
+* Fixes WCAG contrast issue for placeholder text in various textfields
+*/
+.css-1wa3eu0-placeholder {
+  color: #333333 !important;
+}
+
+.fieldset-h2-adjustment {
+  font-size: 1.7rem !important;
+  margin-top: 15px !important;
+  margin-bottom: 10px !important;
+}
+
+.modal-header {
+  justify-content: center;
+}
+
+/* Give the "Multiple Values" placeholders an italic font. */
+.has-multiple-values {
+  :placeholder-shown,
+  .placeholder-text,
+  .react-select__placeholder {
+    color: rgb(87, 120, 94);
+    font-style: italic;
+  }
+}
+
+.associated-sample-link {
+  background-color: #e9ecef;
+}
+
+/* Highlight the Edit All tab's bulk-edited fields in green. */
+.has-bulk-edit-value .field-label,
+.show-changed-indicators .changed-field .field-label {
+  color: rgb(0, 110, 0);
+}
+
+/** Bulk-edited inputs should have a light green background and dark green border. */
+.has-bulk-edit-value,
+.show-changed-indicators .changed-field {
+  input[type="text"]:not([readonly]):not(.react-select__input, .search-input),
+  input[type="text"]:not([readonly]):focus:not(.react-select__input, .search-input),
+  input[type="text"]:not(.react-select__input, .search-input):not([readonly]),
+  input[type="text"]:focus:not(.react-select__input, .search-input):not([readonly]),
+  input[type="search"]:not([readonly]),
+  input[type="search"]:focus:not([readonly]),
+  textarea,
+  textarea:focus,
+  .associated-sample-link,
+  .react-select__control {
+    border-color: green;
+    background-color: rgb(175, 255, 175) !important;
+  }
+}
+
+.has-bulk-edit-value input[type="checkbox"] {
+  color: rgb(175, 255, 175) !important;
+}

@@ -132,6 +132,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                     doSearch();
                   }
                 }}
+                autoComplete="none"
               />
               <button
                 className="storage-tree-search btn btn-primary"

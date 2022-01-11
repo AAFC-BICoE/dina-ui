@@ -1,11 +1,11 @@
 import { isDate, isNumber } from "lodash";
 import moment from "moment";
 import Link from "next/link";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { Fragment } from "react";
 
 /** Renders the label and value of a field from Formik context. */
-export function FieldView(props: LabelWrapperParams) {
+export function FieldView(props: FieldWrapperProps) {
   return <FieldWrapper {...props} />;
 }
 

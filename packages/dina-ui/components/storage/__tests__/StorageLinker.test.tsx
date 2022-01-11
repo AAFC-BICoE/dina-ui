@@ -34,7 +34,7 @@ describe("StorageLinker", () => {
           storageUnit: { id: "A", type: "storage-unit", name: "A" }
         }}
       >
-        <StorageLinkerField name="storageUnit" />
+        <StorageLinkerField name="storageUnit" targetType="material-sample" />
       </DinaForm>,
       testCtx
     );
@@ -72,7 +72,7 @@ describe("StorageLinker", () => {
           storageUnit: { id: "A", type: "storage-unit", name: "A" }
         }}
       >
-        <StorageLinkerField name="storageUnit" />
+        <StorageLinkerField name="storageUnit" targetType="material-sample" />
       </DinaForm>,
       testCtx
     );

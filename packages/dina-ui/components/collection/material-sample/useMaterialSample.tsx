@@ -1,23 +1,26 @@
 import {
-  AreYouSureModal,
   DinaForm,
+  DinaFormProps,
   DinaFormSubmitParams,
+  DoOperationsError,
+  resourceDifference,
   SaveArgs,
   useApiClient,
-  useModal,
   useQuery,
   withResponse
 } from "common-ui";
-import { FormikContextType, FormikProps } from "formik";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { cloneDeep, compact, isEmpty, isEqual, pick, pickBy } from "lodash";
 import {
-  Dispatch,
-  SetStateAction,
-  useLayoutEffect,
-  useRef,
-  useState
-} from "react";
+  cloneDeep,
+  compact,
+  isEmpty,
+  isEqual,
+  mapKeys,
+  pick,
+  pickBy
+} from "lodash";
+import { useLayoutEffect, useRef, useState, ComponentProps } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -34,7 +37,6 @@ import {
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
   useAcquisitionEvent
@@ -147,6 +149,21 @@ export interface UseMaterialSampleSaveParams {
   };
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
+
+  /** Reduces the rendering to improve performance when bulk editing many material samples. */
+  reduceRendering?: boolean;
+
+  /** Disable the nested Collecting Event and Acquisition Event forms. */
+  disableNestedFormEdits?: boolean;
+
+  showChangedIndicatorsInNestedForms?: boolean;
+}
+
+export interface PrepareSampleSaveOperationParams {
+  submittedValues: any;
+  preProcessSample?: (
+    sample: InputResource<MaterialSample>
+  ) => Promise<InputResource<MaterialSample>>;
 }
 
 export function useMaterialSampleSave({
@@ -161,9 +178,11 @@ export function useMaterialSampleSave({
   collectingEventAttachmentsConfig,
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
-  materialSampleTemplateInitialValues
+  materialSampleTemplateInitialValues,
+  reduceRendering,
+  disableNestedFormEdits,
+  showChangedIndicatorsInNestedForms
 }: UseMaterialSampleSaveParams) {
-  const { openModal } = useModal();
   const { save } = useApiClient();
 
   // For editing existing templates:
@@ -338,51 +357,19 @@ export function useMaterialSampleSave({
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
-    setEnableAssociations,
-    /** Wraps the useState setter with an AreYouSure modal when setting to false. */
-    dataComponentToggler(
-      setBoolean: Dispatch<SetStateAction<boolean>>,
-      componentName: string
-    ) {
-      return function toggleDataComponent(enabled: boolean) {
-        if (!enabled) {
-          // When removing data, ask the user for confirmation first:
-          openModal(
-            <AreYouSureModal
-              actionMessage={
-                <DinaMessage
-                  id="removeComponentData"
-                  values={{ component: componentName }}
-                />
-              }
-              onYesButtonClicked={() => setBoolean(enabled)}
-            />
-          );
-        } else {
-          setBoolean(enabled);
-        }
-      };
-    }
+    setEnableAssociations
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
-  const initialValues: InputResource<MaterialSample> = {
-    ...(materialSample
-      ? { ...materialSample }
-      : {
-          type: "material-sample",
-          managedAttributes: {},
-          // Defaults to the last Collection used to create a Material Sample:
-          collection: lastUsedCollection,
-          publiclyReleasable: true
-        }),
-    determination: materialSample?.determination?.length
-      ? materialSample?.determination
-      : [{ isPrimary: true, isFileAs: true }],
-    associations: materialSample?.associations?.length
-      ? materialSample?.associations
-      : [{}]
+  const msInitialValues: InputResource<MaterialSample> = {
+    ...(materialSample || {
+      type: "material-sample",
+      managedAttributes: {},
+      // Defaults to the last Collection used to create a Material Sample:
+      collection: lastUsedCollection,
+      publiclyReleasable: true
+    })
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
@@ -419,20 +406,17 @@ export function useMaterialSampleSave({
       ".data-components fieldset:not(.d-none, .non-strip)"
     );
     dataComponents?.forEach((element, index) => {
-      element.style.backgroundColor = index % 2 === 0 ? "#f3f3f3" : "";
+      element.style.backgroundColor = index % 2 === 1 ? "#f3f3f3" : "";
     });
   });
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
-  async function prepareSampleSaveOperation(
-    submittedValues: InputResource<MaterialSample>,
-    formik: FormikContextType<InputResource<MaterialSample>>
-  ): Promise<SaveArgs<MaterialSample> | null> {
+  async function prepareSampleInput(
+    submittedValues: InputResource<MaterialSample>
+  ): Promise<InputResource<MaterialSample>> {
     /** Input to submit to the back-end API. */
-    const materialSampleInput: InputResource<MaterialSample> & {
-      relationships: any;
-    } = {
+    const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
@@ -452,53 +436,19 @@ export function useMaterialSampleSave({
       determination: enableDetermination
         ? submittedValues.determination?.map(det => ({
             ...det,
-            determiner: det.determiner?.map(determiner =>
-              typeof determiner === "string"
-                ? determiner
-                : String(determiner.id)
-            )
+            ...(!!det.determiner && {
+              determiner: det.determiner.map(determiner =>
+                typeof determiner === "string"
+                  ? determiner
+                  : String(determiner.id)
+              )
+            })
           }))
-        : [],
-
-      // One-to-many relationships go in the 'relationships' object:
-      relationships: {
-        attachment: {
-          data:
-            submittedValues.attachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        preparationAttachment: {
-          data:
-            submittedValues.preparationAttachment?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        },
-        projects: {
-          data:
-            submittedValues.projects?.map(it => ({
-              id: it.id,
-              type: it.type
-            })) ?? []
-        }
-      },
-      // Omit one-to-many relationships which are not serialized correctly by Kitsu:
-      attachment: undefined,
-      preparationAttachment: undefined,
-      projects: undefined
+        : []
     };
 
     // Save and link the Collecting Event if enabled:
     if (enableCollectingEvent && colEventFormRef.current) {
-      // Return if the Collecting Event sub-form has errors:
-      const colEventErrors = await colEventFormRef.current.validateForm();
-      if (!isEmpty(colEventErrors)) {
-        formik.setErrors({ ...formik.errors, ...colEventErrors });
-        return null;
-      }
-
       // Save the linked CollectingEvent if included:
       const submittedCollectingEvent = cloneDeep(
         colEventFormRef.current.values
@@ -508,34 +458,46 @@ export function useMaterialSampleSave({
         !submittedCollectingEvent.id ||
         !isEqual(submittedCollectingEvent, collectingEventInitialValues);
 
-      // Only send the save request if the Collecting Event was edited:
-      const savedCollectingEvent = collectingEventWasEdited
-        ? // Use the same save method as the Collecting Event page:
-          await saveCollectingEvent(
-            submittedCollectingEvent,
-            colEventFormRef.current
-          )
-        : submittedCollectingEvent;
+      try {
+        // Throw if the Collecting Event sub-form has errors:
+        const colEventErrors = await colEventFormRef.current.validateForm();
+        if (!isEmpty(colEventErrors)) {
+          throw new DoOperationsError("", colEventErrors);
+        }
 
-      // Set the ColEventId here in case the next operation fails:
-      setColEventId(savedCollectingEvent.id);
+        // Only send the save request if the Collecting Event was edited:
+        const savedCollectingEvent = collectingEventWasEdited
+          ? // Use the same save method as the Collecting Event page:
+            await saveCollectingEvent(
+              submittedCollectingEvent,
+              colEventFormRef.current
+            )
+          : submittedCollectingEvent;
 
-      // Link the MaterialSample to the CollectingEvent:
-      materialSampleInput.collectingEvent = {
-        id: savedCollectingEvent.id,
-        type: savedCollectingEvent.type
-      };
+        // Set the ColEventId here in case the next operation fails:
+        setColEventId(savedCollectingEvent.id);
+
+        // Link the MaterialSample to the CollectingEvent:
+        materialSampleInput.collectingEvent = {
+          id: savedCollectingEvent.id,
+          type: savedCollectingEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          colEventFormRef.current.setStatus(error.message);
+          colEventFormRef.current.setErrors(error.fieldErrors);
+          throw new DoOperationsError(
+            error.message,
+            mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)
+          );
+        }
+        throw error;
+      }
     }
 
     // Save and link the Acquisition Event if enabled:
     if (enableAcquisitionEvent && acqEventFormRef.current) {
-      // Return if the Acq Event sub-form has errors:
-      const acqEventErrors = await acqEventFormRef.current.validateForm();
-      if (!isEmpty(acqEventErrors)) {
-        formik.setErrors({ ...formik.errors, ...acqEventErrors });
-        return null;
-      }
-
       // Save the linked AcqEvent if included:
       const submittedAcqEvent: PersistedResource<AcquisitionEvent> = cloneDeep(
         acqEventFormRef.current.values
@@ -545,32 +507,109 @@ export function useMaterialSampleSave({
         !submittedAcqEvent?.id ||
         !isEqual(submittedAcqEvent, acqEventFormRef.current.initialValues);
 
-      // Only send the save request if the Acq Event was edited:
-      const [savedAcqEvent] = acqEventWasEdited
-        ? // Use the same save method as the Acq Event page:
-          await save<AcquisitionEvent>(
-            [
-              {
-                resource: submittedAcqEvent,
-                type: "acquisition-event"
-              }
-            ],
-            { apiBaseUrl: "/collection-api" }
-          )
-        : [submittedAcqEvent];
+      try {
+        // Throw if the Acq Event sub-form has errors:
+        const acqEventErrors = await acqEventFormRef.current.validateForm();
+        if (!isEmpty(acqEventErrors)) {
+          throw new DoOperationsError("", acqEventErrors);
+        }
 
-      // Set the acqEventId here in case the next operation fails:
-      setAcqEventId(savedAcqEvent.id);
+        // Only send the save request if the Acq Event was edited:
+        const [savedAcqEvent] = acqEventWasEdited
+          ? // Use the same save method as the Acq Event page:
+            await save<AcquisitionEvent>(
+              [
+                {
+                  resource: submittedAcqEvent,
+                  type: "acquisition-event"
+                }
+              ],
+              { apiBaseUrl: "/collection-api" }
+            )
+          : [submittedAcqEvent];
 
-      // Link the MaterialSample to the AcquisitionEvent:
-      materialSampleInput.acquisitionEvent = {
-        id: savedAcqEvent.id,
-        type: savedAcqEvent.type
-      };
+        // Set the acqEventId here in case the next operation fails:
+        setAcqEventId(savedAcqEvent.id);
+
+        // Link the MaterialSample to the AcquisitionEvent:
+        materialSampleInput.acquisitionEvent = {
+          id: savedAcqEvent.id,
+          type: savedAcqEvent.type
+        };
+      } catch (error: unknown) {
+        if (error instanceof DoOperationsError) {
+          // Put the error messages into both form states:
+          acqEventFormRef.current.setStatus(error.message);
+          acqEventFormRef.current.setErrors(error.fieldErrors);
+          throw new DoOperationsError(
+            error.message,
+            mapKeys(
+              error.fieldErrors,
+              (_, field) => `acquisitionEvent.${field}`
+            )
+          );
+        }
+        throw error;
+      }
     }
 
+    return materialSampleInput;
+  }
+
+  async function prepareSampleSaveOperation({
+    submittedValues,
+    preProcessSample
+  }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
+    const materialSampleInput = await prepareSampleInput(submittedValues);
+
+    const msPreprocessed =
+      (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
+
+    // Only submit the changed values to the back-end:
+    const msDiff = msInitialValues.id
+      ? resourceDifference({
+          original: msInitialValues,
+          updated: msPreprocessed
+        })
+      : msPreprocessed;
+
+    /** Input to submit to the back-end API. */
+    const msInputWithRelationships: InputResource<MaterialSample> & {
+      relationships: any;
+    } = {
+      ...msDiff,
+
+      // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
+      // Explicitly declare these fields as relationships here before saving:
+      // One-to-many relationships go in the 'relationships' object:
+      relationships: {
+        ...(msDiff.attachment && {
+          attachment: {
+            data: msDiff.attachment.map(({ id, type }) => ({ id, type }))
+          }
+        }),
+        ...(msDiff.preparationAttachment && {
+          preparationAttachment: {
+            data: msDiff.preparationAttachment.map(({ id, type }) => ({
+              id,
+              type
+            }))
+          }
+        }),
+        ...(msDiff.projects && {
+          projects: {
+            data: msDiff.projects.map(({ id, type }) => ({ id, type }))
+          }
+        })
+      },
+      // Set the attributes to undefined after they've been moved to "relationships":
+      attachment: undefined,
+      preparationAttachment: undefined,
+      projects: undefined
+    };
+
     const saveOperation = {
-      resource: materialSampleInput,
+      resource: msInputWithRelationships,
       type: "material-sample"
     };
 
@@ -582,13 +621,9 @@ export function useMaterialSampleSave({
     formik
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
-    const materialSampleSaveOp = await prepareSampleSaveOperation(
-      submittedValues,
-      formik
-    );
-    if (!materialSampleSaveOp) {
-      return;
-    }
+    const materialSampleSaveOp = await prepareSampleSaveOperation({
+      submittedValues
+    });
 
     // Save the MaterialSample:
     const [savedMaterialSample] = await withDuplicateSampleNameCheck(
@@ -613,60 +648,87 @@ export function useMaterialSampleSave({
     await onSaved?.(savedMaterialSample.id);
   }
 
+  // In bulk edit mode, show green labels and green inputs for changed fields in
+  // the nested Collection Event and Acquisition Event forms.
+  const nestedFormClassName = showChangedIndicatorsInNestedForms
+    ? "show-changed-indicators"
+    : "";
+
   /** Re-use the CollectingEvent form layout from the Collecting Event edit page. */
-  const nestedCollectingEventForm = (
-    <DinaForm
-      innerRef={colEventFormRef}
-      initialValues={
-        isTemplate
-          ? colEventTemplateInitialValues
-          : collectingEventInitialValues
-      }
-      validationSchema={collectingEventFormSchema}
-      isTemplate={isTemplate}
-      readOnly={isTemplate ? !!colEventId : false}
-      enabledFields={enabledFields?.collectingEvent}
-    >
-      <CollectingEventFormLayout
-        attachmentsConfig={collectingEventAttachmentsConfig}
-      />
-    </DinaForm>
-  );
+  function nestedCollectingEventForm(
+    colEvent?: PersistedResource<CollectingEvent>
+  ) {
+    const initialValues =
+      colEvent ??
+      (isTemplate
+        ? colEventTemplateInitialValues
+        : collectingEventInitialValues);
 
-  const acqEventFormProps = {
-    innerRef: acqEventFormRef,
-    initialValues: isTemplate
-      ? acqEventTemplateInitialValues
-      : { type: "acquisition-event", ...acquisitionEventInitialValues },
-    isTemplate,
-    readOnly: isTemplate ? !!acqEventId : false,
-    enabledFields: enabledFields?.acquisitionEvent
-  };
+    const colEventFormProps: DinaFormProps<any> = {
+      innerRef: colEventFormRef,
+      initialValues,
+      validationSchema: collectingEventFormSchema,
+      isTemplate,
+      // In bulk-edit and workflow run, disable editing existing Col events:
+      readOnly: disableNestedFormEdits || isTemplate ? !!colEventId : false,
+      enabledFields: enabledFields?.collectingEvent,
+      children: reduceRendering ? (
+        <div />
+      ) : (
+        <div className={nestedFormClassName}>
+          <CollectingEventFormLayout
+            attachmentsConfig={collectingEventAttachmentsConfig}
+          />
+        </div>
+      )
+    };
 
-  const nestedAcqEventForm = acqEventId ? (
-    withResponse(acqEventQuery, ({ data }) => (
-      <DinaForm {...acqEventFormProps} initialValues={data}>
-        <AcquisitionEventFormLayout />
-      </DinaForm>
-    ))
-  ) : (
-    <DinaForm {...acqEventFormProps}>
-      <AcquisitionEventFormLayout />
-    </DinaForm>
-  );
+    return <DinaForm {...colEventFormProps} />;
+  }
+
+  function nestedAcqEventForm(acqEvent?: PersistedResource<AcquisitionEvent>) {
+    const initialValues =
+      acqEvent ??
+      (isTemplate
+        ? acqEventTemplateInitialValues
+        : { type: "acquisition-event", ...acquisitionEventInitialValues });
+
+    const acqEventFormProps: DinaFormProps<any> = {
+      innerRef: acqEventFormRef,
+      initialValues,
+      isTemplate,
+      // In bulk-edit and workflow run, disable editing existing Acq events:
+      readOnly: disableNestedFormEdits || isTemplate ? !!acqEventId : false,
+      enabledFields: enabledFields?.acquisitionEvent,
+      children: reduceRendering ? (
+        <div />
+      ) : (
+        <div className={nestedFormClassName}>
+          <AcquisitionEventFormLayout />
+        </div>
+      )
+    };
+
+    return acqEventId ? (
+      withResponse(acqEventQuery, ({ data }) => (
+        <DinaForm {...acqEventFormProps} initialValues={data} />
+      ))
+    ) : (
+      <DinaForm {...acqEventFormProps} />
+    );
+  }
 
   return {
-    initialValues,
+    initialValues: msInitialValues,
     nestedCollectingEventForm,
     nestedAcqEventForm,
     dataComponentState,
     colEventId,
     setColEventId,
-    acqEventQuery,
     acqEventId,
     setAcqEventId,
-    colEventQuery,
     onSubmit,
+    prepareSampleInput,
     prepareSampleSaveOperation,
     loading
   };
