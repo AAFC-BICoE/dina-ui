@@ -137,6 +137,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
+  view: "View",
   viewDetails: "View Details",
   warning: "Warning",
   yes: "Yes"
