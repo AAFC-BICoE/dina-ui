@@ -1,8 +1,8 @@
 import classnames from "classnames";
 import Cleave from "cleave.js/react";
 import { InputHTMLAttributes } from "react";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
-export interface FormattedTextFieldProps extends LabelWrapperParams {
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
+export interface FormattedTextFieldProps extends FieldWrapperProps {
   readOnly?: boolean;
   initialValue?: string;
   multiLines?: boolean;

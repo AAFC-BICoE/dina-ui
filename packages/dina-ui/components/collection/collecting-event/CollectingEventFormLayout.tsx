@@ -3,19 +3,20 @@ import {
   CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   filterBy,
   FormattedTextField,
   FormikButton,
   LoadingSpinner,
   NominatumApiSearchResult,
   NumberRangeFields,
+  PlaceSectionsSelectionField,
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext,
-  PlaceSectionsSelectionField
+  useDinaFormContext
 } from "common-ui";
-import { FastField, Field, FormikContextType } from "formik";
+import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
 import { GeographySearchBox } from "..";
@@ -611,7 +612,6 @@ export function CollectingEventFormLayout({
                         ]
                       : undefined
                   })}
-                  shouldUpdate={() => true}
                 />
               )}
             </Field>
@@ -650,6 +650,7 @@ export function CollectingEventFormLayout({
         </div>
         <div className="col-md-6">
           <FieldSet
+            fieldName="geographicPlaceNameSourceDetail"
             legend={<DinaMessage id="toponymyLegend" />}
             className="non-strip"
           >
@@ -700,14 +701,12 @@ export function CollectingEventFormLayout({
                       )}
                       {detailResultsIsLoading ? (
                         <LoadingSpinner loading={true} />
-                      ) : (
-                        form.values.srcAdminLevels?.length && (
-                          <PlaceSectionsSelectionField
-                            name="srcAdminLevels"
-                            hideSelectionCheckBox={hideSelectionCheckBox}
-                          />
-                        )
-                      )}
+                      ) : form.values.srcAdminLevels?.length ? (
+                        <PlaceSectionsSelectionField
+                          name="srcAdminLevels"
+                          hideSelectionCheckBox={hideSelectionCheckBox}
+                        />
+                      ) : null}
                       <DinaFormSection horizontal={[3, 9]}>
                         <TextField
                           name={`${commonSrcDetailRoot}.stateProvince.name`}
@@ -827,16 +826,16 @@ export function CollectingEventFormLayout({
           legend={<DinaMessage id="collectingEventManagedAttributes" />}
         >
           {readOnly ? (
-            <FastField name="managedAttributes">
-              {({ field: { value } }) => (
+            <FieldSpy<Record<string, string>> fieldName="managedAttributes">
+              {value => (
                 <ManagedAttributesViewer
-                  values={value}
+                  values={value ?? {}}
                   managedAttributeApiPath={key =>
                     `collection-api/managed-attribute/collecting_event.${key}`
                   }
                 />
               )}
-            </FastField>
+            </FieldSpy>
           ) : (
             <DinaFormSection
               // Disabled the template's restrictions for this section:

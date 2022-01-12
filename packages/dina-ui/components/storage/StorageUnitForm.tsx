@@ -118,7 +118,7 @@ export function StorageUnitFormFields() {
         />
         <TextField className="col-md-6" name="name" />
       </div>
-      <StorageLinkerField name="parentStorageUnit" />
+      <StorageLinkerField name="parentStorageUnit" targetType="storage-unit" />
       {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
       {readOnly && (
         <div className="row">

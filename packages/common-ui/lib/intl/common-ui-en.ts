@@ -19,6 +19,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   backToReadOnlyPage: "Back to read-only page",
   bulkEdit: "Bulk Edit",
   bulkEditorValidationError: "Invalid value on row {row}: {value}",
+  bulkSubmissionErrorInfo:
+    "Bulk submission error: Check the tabs with a red label.",
   cancelButtonText: "Cancel",
   checkAll: "Check All",
   checkAllTooltipMessage:
@@ -37,7 +39,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   destroyedLabel: "Destroyed",
   detach: "Detach",
   done: "Done",
+  dontChangeValues: "Don't Change Values",
   dropdownSearchResults: "Search results",
+  editAll: "Edit All",
   editButtonText: "Edit",
   editSelectedButtonText: "Edit Selected",
   editableTable: "Editable Table",
@@ -79,6 +83,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   logoutBtn: "Logout",
   max: "Max",
   min: "Min",
+  multipleValues: "Multiple Values",
+  multipleValuesFound: "Multiple Values Found",
   name: "Name",
   navigation: "Navigation",
   next: "Next",
@@ -89,6 +95,10 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   oneValuePerLine: "One value per line",
   oneValuePerLineTooltip:
     "Write one value per line. Press enter while typing in the field to add a new line.",
+  overrideAll: "Override All",
+  overrideAllConfirmationTitle: "Override All {fieldName}s?",
+  overrideAllConfirmation:
+    "This will REMOVE ALL {fieldName}s for ALL Material Samples.",
   page: "Page",
   previous: "Previous",
   queryTable: "Query Table",
@@ -127,6 +137,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   uiAppVersion: "UI Application Version: {version}",
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
+  view: "View",
   viewDetails: "View Details",
   warning: "Warning",
   yes: "Yes"

@@ -1,11 +1,11 @@
-import { FieldWrapper, LabelWrapperParams, useQuery } from "common-ui";
+import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
 import { castArray } from "lodash";
 import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Vocabulary, VocabularyElement } from "../../types/collection-api";
 
-export interface VocabularySelectFieldProps extends LabelWrapperParams {
+export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
   isMulti?: boolean;
   selectProps?: Partial<
@@ -40,7 +40,7 @@ export function VocabularySelectField({
       )}
       {...labelWrapperProps}
     >
-      {({ setValue, value, invalid }) => {
+      {({ setValue, value, invalid, placeholder }) => {
         const selectValue =
           value &&
           (Array.isArray(value) ? value.map(toOption) : toOption(value));
@@ -65,7 +65,7 @@ export function VocabularySelectField({
               onChange={setFormValue}
               value={selectValue}
               formatCreateLabel={inputValue => `Add "${inputValue}"`}
-              placeholder={formatMessage("selectOrType")}
+              placeholder={placeholder ?? formatMessage("selectOrType")}
               styles={{
                 control: base => ({
                   ...base,
@@ -75,6 +75,7 @@ export function VocabularySelectField({
                   })
                 })
               }}
+              classNamePrefix="react-select"
               {...selectProps}
             />
           </div>

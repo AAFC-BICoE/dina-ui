@@ -1,41 +1,55 @@
 import classNames from "classnames";
+import {
+  AreYouSureModal,
+  FieldSpy,
+  useBulkEditTabContext,
+  useModal
+} from "common-ui";
 import dynamic from "next/dynamic";
 import Switch from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  Determination,
+  MaterialSampleAssociation
+} from "../../../types/collection-api";
 import { useMaterialSampleSave } from "./useMaterialSample";
 
 export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
+  disableRemovePrompt?: boolean;
 }
 
-const ScrollSpyNav =
-  process.env.NODE_ENV === "test"
-    ? ("div" as any)
-    : dynamic(
-        async () => {
-          const NavClass = await import("react-scrollspy-nav");
+const renderNav = process.env.NODE_ENV !== "test";
 
-          // Put the "active" class on the list-group-item instead of the <a> tag:
-          class MyNavClass extends NavClass.default {
-            getNavLinkElement(sectionID) {
-              return super
-                .getNavLinkElement(sectionID)
-                ?.closest(".list-group-item");
-            }
+const ScrollSpyNav = renderNav
+  ? dynamic(
+      async () => {
+        const NavClass = await import("react-scrollspy-nav");
+
+        // Put the "active" class on the list-group-item instead of the <a> tag:
+        class MyNavClass extends NavClass.default {
+          getNavLinkElement(sectionID) {
+            return super
+              .getNavLinkElement(sectionID)
+              ?.closest(".list-group-item");
           }
+        }
 
-          return MyNavClass as any;
-        },
-        { ssr: false }
-      );
+        return MyNavClass as any;
+      },
+      { ssr: false }
+    )
+  : "div";
 
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
-  dataComponentState
+  dataComponentState,
+  disableRemovePrompt
 }: MaterialSampleNavProps) {
   const { formatMessage } = useDinaIntl();
+  const { openModal } = useModal();
 
   const scrollTargets = [
     { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
@@ -72,14 +86,16 @@ export function MaterialSampleFormNav({
       msg: formatMessage("determination"),
       className: "enable-determination",
       disabled: !dataComponentState.enableDetermination,
-      setEnabled: dataComponentState.setEnableDetermination
+      setEnabled: dataComponentState.setEnableDetermination,
+      customSwitch: DeterminationSwitch
     },
     {
       id: "associations-section",
       msg: formatMessage("associationsLegend"),
       className: "enable-associations",
       disabled: !dataComponentState.enableAssociations,
-      setEnabled: dataComponentState.setEnableAssociations
+      setEnabled: dataComponentState.setEnableAssociations,
+      customSwitch: AssociationsSwitch
     },
     {
       id: "storage-section",
@@ -109,13 +125,17 @@ export function MaterialSampleFormNav({
     <div className="sticky-md-top material-sample-nav">
       <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
       <ScrollSpyNav
-        key={scrollTargets.filter(it => !it.disabled).length}
-        scrollTargetIds={scrollTargets
-          .filter(it => !it.disabled)
-          .map(it => it.id)}
-        activeNavClass="active"
-        offset={-20}
-        scrollDuration="100"
+        {...(renderNav
+          ? {
+              key: scrollTargets.filter(it => !it.disabled).length,
+              scrollTargetIds: scrollTargets
+                .filter(it => !it.disabled)
+                .map(it => it.id),
+              activeNavClass: "active",
+              offset: -20,
+              scrollDuration: "100"
+            }
+          : {})}
       >
         <nav className="card card-body">
           <label className="mb-2 text-uppercase">
@@ -126,6 +146,27 @@ export function MaterialSampleFormNav({
           <div className="list-group">
             {scrollTargets.map(section => {
               const Tag = section.disabled ? "div" : "a";
+              const SwitchComponent = section.customSwitch ?? Switch;
+
+              function toggle(newVal: boolean) {
+                if (!newVal && !disableRemovePrompt) {
+                  // When removing data, ask the user for confirmation first:
+                  openModal(
+                    <AreYouSureModal
+                      actionMessage={
+                        <DinaMessage
+                          id="removeComponentData"
+                          values={{ component: section.msg }}
+                        />
+                      }
+                      onYesButtonClicked={() => section.setEnabled?.(newVal)}
+                    />
+                  );
+                } else {
+                  section.setEnabled?.(newVal);
+                }
+              }
+
               return (
                 <div
                   className={classNames(
@@ -142,12 +183,9 @@ export function MaterialSampleFormNav({
                     {section.msg}
                   </Tag>
                   {section.setEnabled && (
-                    <Switch
+                    <SwitchComponent
                       checked={!section.disabled}
-                      onChange={dataComponentState.dataComponentToggler(
-                        section.setEnabled,
-                        section.msg
-                      )}
+                      onChange={toggle}
                     />
                   )}
                 </div>
@@ -157,5 +195,49 @@ export function MaterialSampleFormNav({
         </nav>
       </ScrollSpyNav>
     </div>
+  );
+}
+
+/** The determinations switch adds an initial determination if there isn't one already. */
+function DeterminationSwitch(props) {
+  const bulkTabCtx = useBulkEditTabContext();
+
+  return (
+    <FieldSpy<Determination[]> fieldName="determination">
+      {(determination, { form: { setFieldValue } }) => (
+        <Switch
+          {...props}
+          onChange={newVal => {
+            props.onChange?.(newVal);
+            if (!bulkTabCtx && newVal && !determination?.length) {
+              setFieldValue("determination", [
+                { isPrimary: true, isFileAs: true }
+              ]);
+            }
+          }}
+        />
+      )}
+    </FieldSpy>
+  );
+}
+
+/** The associations switch adds an initial association if there isn't one already. */
+function AssociationsSwitch(props) {
+  const bulkTabCtx = useBulkEditTabContext();
+
+  return (
+    <FieldSpy<MaterialSampleAssociation[]> fieldName="associations">
+      {(associations, { form: { setFieldValue } }) => (
+        <Switch
+          {...props}
+          onChange={newVal => {
+            props.onChange?.(newVal);
+            if (!bulkTabCtx && newVal && !associations?.length) {
+              setFieldValue("associations", [{}]);
+            }
+          }}
+        />
+      )}
+    </FieldSpy>
   );
 }

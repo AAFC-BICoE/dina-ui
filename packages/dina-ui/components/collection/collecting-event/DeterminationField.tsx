@@ -8,9 +8,10 @@ import {
   Tooltip,
   useDinaFormContext
 } from "common-ui";
-import { FormikContextType } from "formik";
+import { FormikContextType, useFormikContext } from "formik";
 import { get, isArray } from "lodash";
-import { PersonSelectField } from "../..";
+import { useState } from "react";
+import { BulkEditTabWarning, PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -18,14 +19,12 @@ import {
   MaterialSample,
   Vocabulary
 } from "../../../types/collection-api";
-import { useFormikContext } from "formik";
-import { TabbedArrayField } from "../TabbedArrayField";
-import { useState } from "react";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import {
   GlobalNamesField,
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
+import { TabbedArrayField } from "../TabbedArrayField";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -54,7 +53,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
 /** All fields of the Determination type. */
 export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 
-export function DeterminationField() {
+export function DeterminationField({ id = "determination-section" }) {
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
   const form = useFormikContext<MaterialSample>();
@@ -97,12 +96,30 @@ export function DeterminationField() {
       legend={<DinaMessage id="determinations" />}
       name={determinationsPath}
       typeName={formatMessage("determination")}
-      sectionId="determination-section"
+      sectionId={id}
       initialIndex={initialIndex}
       makeNewElement={({ length }) => ({
         isPrimary: length === 0,
         isFileAs: length === 0
       })}
+      // Wrap in the bulk edit tab warning in case this is bulk edit mode:
+      wrapContent={content => (
+        <BulkEditTabWarning
+          targetType="material-sample"
+          fieldName={determinationsPath}
+          setDefaultValue={ctx =>
+            // Auto-create the first determination:
+            ctx.bulkEditFormRef?.current?.setFieldValue(determinationsPath, [
+              {
+                isPrimary: true,
+                isFileAs: true
+              }
+            ])
+          }
+        >
+          {content}
+        </BulkEditTabWarning>
+      )}
       renderTab={(det, index) => (
         <span className="m-3">
           {index + 1}

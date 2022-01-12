@@ -153,16 +153,19 @@ export function GeoReferenceAssertionRow({
           </div>
         )}
         <Field name={commonRoot + "dwcGeoreferenceVerificationStatus"}>
-          {() => (
-            <CheckBoxField
-              name={commonRoot + "dwcGeoreferenceVerificationStatus"}
-              onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-              disabled={readOnly}
-              customName="dwcGeoreferenceVerificationStatus"
-              type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
-              hideLabel={readOnly && !georeferenceDisabled ? true : false}
-            />
-          )}
+          {() =>
+            readOnly && !georeferenceDisabled ? (
+              <></>
+            ) : (
+              <CheckBoxField
+                name={commonRoot + "dwcGeoreferenceVerificationStatus"}
+                onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                disabled={readOnly}
+                customName="dwcGeoreferenceVerificationStatus"
+                type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
+              />
+            )
+          }
         </Field>
         <NumberField
           name={commonRoot + "dwcDecimalLatitude"}
