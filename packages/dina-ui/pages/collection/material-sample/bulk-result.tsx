@@ -72,7 +72,9 @@ export default function MaterialSampleBulkResult() {
                       <Link
                         href={`/collection/material-sample/view?id=${sample.id}`}
                       >
-                        <a target="_blank">{sample.materialSampleName}</a>
+                        <a target="_blank">
+                          {sample.materialSampleName || sample.id}
+                        </a>
                       </Link>
                     </div>
                   )

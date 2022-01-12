@@ -50,7 +50,12 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
         isOpen={!!modals.length}
         className="Modal__Bootstrap modal-dialog"
         // Make sure the modal is in front of the Bootstrap nav bar:
-        style={{ overlay: { zIndex: 1040 } }}
+        style={{
+          overlay: {
+            zIndex: 1040,
+            backgroundColor: "rgba(150, 150, 150, 0.75)"
+          }
+        }}
         // Not sure why WCAG error occurs since title of window does exist
         // General text added but better to pass in title of window
         contentLabel={"Popup dialog window"}

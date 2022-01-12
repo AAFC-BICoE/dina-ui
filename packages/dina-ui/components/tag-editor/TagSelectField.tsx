@@ -54,13 +54,14 @@ export function TagSelectField({
         )
       }
     >
-      {({ value, setValue, invalid }) => (
+      {({ value, setValue, invalid, placeholder }) => (
         <TagSelect
           value={value}
           onChange={setValue}
           invalid={invalid}
           resourcePath={resourcePath}
           groupSelectorName={props.groupSelectorName}
+          placeholder={placeholder}
         />
       )}
     </FieldWrapper>
@@ -74,6 +75,7 @@ interface TagSelectProps {
   invalid?: boolean;
   tagsFieldName?: string;
   groupSelectorName?: string;
+  placeholder?: string;
 }
 
 /** Tag Select/Create field. */
@@ -83,7 +85,8 @@ function TagSelect({
   resourcePath,
   invalid,
   groupSelectorName = "group",
-  tagsFieldName = "tags"
+  tagsFieldName = "tags",
+  placeholder
 }: TagSelectProps) {
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames } = useAccount();
@@ -174,11 +177,14 @@ function TagSelect({
       ]}
       // Select config:
       styles={customStyle}
+      classNamePrefix="react-select"
       isMulti={true}
       isLoading={loading}
       allowCreateWhileLoading={true}
       isClearable={true}
-      placeholder={formatMessage("typeNewTagOrSearchPreviousTags")}
+      placeholder={
+        placeholder || formatMessage("typeNewTagOrSearchPreviousTags")
+      }
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
       formatCreateLabel={input => `${formatMessage("add")} "${input}"`}
       // react-sortable-hoc config:

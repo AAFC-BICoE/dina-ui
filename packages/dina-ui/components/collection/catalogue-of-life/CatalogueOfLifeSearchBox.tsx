@@ -122,7 +122,7 @@ export function CatalogueOfLifeSearchBox({
             <div className="input-group">
               <input
                 aria-label={formatMessage("colSearchLabel")}
-                className="form-control col-search-input"
+                className="form-control col-search-input search-input"
                 onChange={e => onInputChange(e.target.value)}
                 onFocus={e => e.target.select()}
                 onKeyDown={e => {

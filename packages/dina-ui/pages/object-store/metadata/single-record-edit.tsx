@@ -217,8 +217,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
                 })}
                 model="objectstore-api/object-subtype"
                 optionLabel={ost => ost.acSubtype}
-                // Force re-render when the dcType changes:
-                shouldUpdate={() => true}
               />
             )}
           </Field>

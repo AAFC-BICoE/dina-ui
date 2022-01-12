@@ -46,11 +46,11 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   indexI5: "Indice i5",
   indexI7: "Indice i7",
   indexSetListTitle: "Ensembles d’indices",
-  indexSetViewTitle: "L'ensemble d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
+  indexSetViewTitle: "L'ensemble d’indices",
   molecularSample: "Échantillon moléculaire",
-  molecularSampleViewTitle: "Échantillon moléculaire",
   molecularSampleListTitle: "Échantillons moléculaires",
+  molecularSampleViewTitle: "Échantillon moléculaire",
   notShearedStatus: "Sans cisaillement",
   notSizeSelectedStatus: "Sans sélection de taille",
   pcrBatch: "Lot PCR",
@@ -80,18 +80,18 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
     "Supprimer les détails sur le cisaillement sélectionnés",
   removeSizeSelectionDetailsButtonText:
     "Supprimer les détails sur la sélection de taille sélectionnés",
-  sampleSelectionInstructions:
-    "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
   sampleGridInstructions:
     "Faites glisser et déposez des échantillons entre la liste d'échantillons et la grille, ou placez automatiquement les échantillons dans la grille en sélectionnant une option « Remplir par » puis en cliquant sur le bouton « Déplacer tout ».",
+  sampleSelectionInstructions:
+    "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
   sampleSelectionTitle: "Sélection d’échantillons",
   sangerWorkflow: "Flux de travail Sanger",
   sangerWorkflowListTitle: "Flux de travail Sanger",
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
   selectButtonText: "Sélectionner",
-  selectedSamplesTitle: "Échantillons sélectionnés",
   selectSamples: "Sélectionner échantillons moléculaires",
+  selectedSamplesTitle: "Échantillons sélectionnés",
   seqdbTitle: "Base de données des séquences (fr)",
   shearedStatus: "Cisaillé",
   shearingLabel: "Cisaillement",

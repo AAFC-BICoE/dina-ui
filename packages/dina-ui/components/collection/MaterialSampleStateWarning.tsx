@@ -41,7 +41,6 @@ export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
       name={"materialSampleState"}
       disableLabelClick={true}
       removeLabel={removeLabel}
-      removeLabelTag={true}
       className={"my-1"}
       readOnlyRender={renderAsReadOnly}
     >

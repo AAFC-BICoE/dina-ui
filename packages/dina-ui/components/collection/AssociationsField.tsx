@@ -1,5 +1,5 @@
 import { FieldSet, TextField } from "common-ui";
-import { CatalogueOfLifeNameField } from ".";
+import { CatalogueOfLifeNameField, GlobalNamesField } from ".";
 import { HostOrganism } from "../../../dina-ui/types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSampleAssociationsField } from "./MaterialSampleAssociationsField";
@@ -14,12 +14,9 @@ export const HOSTORGANISM_FIELDS_OBJECT: Required<
 
 export const HOSTORGANISM_FIELDS = Object.keys(HOSTORGANISM_FIELDS_OBJECT);
 
-export function AssociationsField() {
+export function AssociationsField({ id = "associations-section" }) {
   return (
-    <FieldSet
-      legend={<DinaMessage id="associationsLegend" />}
-      id="associations-section"
-    >
+    <FieldSet legend={<DinaMessage id="associationsLegend" />} id={id}>
       <FieldSet
         legend={<DinaMessage id="hostOrganismLegend" />}
         className="non-strip"
