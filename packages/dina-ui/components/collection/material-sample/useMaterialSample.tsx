@@ -646,7 +646,8 @@ export function useMaterialSampleSave({
       }).then(async data => {
         if (data.result?.lowReservedID && data.result.highReservedID) {
           const prefix = materialSampleSaveOp.resource.collection
-            ? (materialSampleSaveOp.resource.collection as Collection).name
+            ? (materialSampleSaveOp.resource.collection as Collection).code ??
+              (materialSampleSaveOp.resource.collection as Collection).name
             : "";
           materialSampleSaveOp.resource.materialSampleName =
             (prefix as any) + data.result?.lowReservedID;
