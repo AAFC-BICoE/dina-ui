@@ -51,6 +51,8 @@ export interface MaterialSampleAttributes {
 
   stateChangedOn?: string;
   stateChangeRemarks?: string;
+
+  useNextSequence?: boolean;
 }
 
 export interface HostOrganism {

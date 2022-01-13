@@ -320,6 +320,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_type: "Type",
   field_typeStatus: "Type Status",
   field_typeStatusEvidence: "Type Status Evidence",
+  field_useNextSequence: "Use Next Sequence",
   field_verbatimDate: "Verbatim Date",
   field_verbatimDeterminer: "Verbatim Determiner",
   field_verbatimEventDateTime: "Verbatim Event Date Time",

@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormContext,
@@ -14,11 +15,12 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useApiClient,
   useDinaFormContext,
   useFieldLabels,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { FormikProps, useField } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
@@ -341,6 +343,7 @@ export function MaterialSampleForm({
               <MaterialSampleIdentifiersFormLayout
                 id={navIds.identifiers}
                 disableSampleNameField={disableSampleNameField}
+                collectionId={initialValues?.collection?.id as string}
               />
               <MaterialSampleFormLayout />
             </>
@@ -585,6 +588,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
+  collectionId: string;
   id?: string;
 }
 
@@ -609,6 +613,11 @@ export function MaterialSampleIdentifiersFormLayout({
   sampleNamePlaceHolder,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const { save } = useApiClient();
+  const [{ value }] = useField("collection");
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
+
   return (
     <FieldSet
       id={id}
@@ -621,13 +630,31 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}collection`}
             customName="collection"
           />
-          <TextField
-            name={`${namePrefix}materialSampleName`}
-            customName="materialSampleName"
-            className="materialSampleName"
-            readOnly={disableSampleNameField}
-            placeholder={sampleNamePlaceHolder}
-          />
+          <div className="d-flex">
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              className={`flex-grow-1`}
+              inputProps={{ disabled: primaryIdDisabled }}
+            />
+            {!readOnly && (
+              <CheckBoxField
+                onCheckBoxClick={event =>
+                  setPrimaryIdDisabled(event.target.checked)
+                }
+                name="useNextSequence"
+                className="ms-2 mt-1 align-items-center"
+                /* only enabled when add new sample and collection is selected*/
+                disabled={initialValues.id || !value?.id}
+                overridecheckboxProps={{
+                  style: {
+                    height: "30px",
+                    width: "30px"
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">

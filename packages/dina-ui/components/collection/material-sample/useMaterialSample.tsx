@@ -34,6 +34,7 @@ import {
 import {
   AcquisitionEvent,
   CollectingEvent,
+  Collection,
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
@@ -625,27 +626,36 @@ export function useMaterialSampleSave({
       submittedValues
     });
 
-    // Save the MaterialSample:
-    const [savedMaterialSample] = await withDuplicateSampleNameCheck(
-      async () =>
-        await save<MaterialSample>([materialSampleSaveOp], {
-          apiBaseUrl: "/collection-api"
-        }),
-      formik
-    );
+    async function saveToBackend() {
+      delete materialSampleSaveOp.resource.useNextSequence;
+      const [savedMaterialSample] = await withDuplicateSampleNameCheck(
+        async () =>
+          save<MaterialSample>([materialSampleSaveOp], {
+            apiBaseUrl: "/collection-api"
+          }),
+        formik
+      );
+      await onSaved?.(savedMaterialSample?.id);
+    }
 
-    if (submittedValues.collection?.id) {
-      const data = await useGenerateSequence({
+    if (submittedValues.collection?.id && submittedValues.useNextSequence) {
+      useGenerateSequence({
         collectionId: submittedValues.collection?.id as any,
         amount: 1,
         save
+      }).then(async data => {
+        if (data.result?.lowReservedID && data.result.highReservedID) {
+          const prefix = materialSampleSaveOp.resource.collection
+            ? (materialSampleSaveOp.resource.collection as Collection).name
+            : "";
+          materialSampleSaveOp.resource.materialSampleName =
+            (prefix as any) + data.result?.lowReservedID;
+        }
+        saveToBackend();
       });
-      if (!data.result?.lowReservedID || !data.result.highReservedID) {
-        return;
-      }
+    } else {
+      saveToBackend();
     }
-
-    await onSaved?.(savedMaterialSample.id);
   }
 
   // In bulk edit mode, show green labels and green inputs for changed fields in
