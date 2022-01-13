@@ -588,7 +588,6 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
-  collectionId: string;
   id?: string;
 }
 
@@ -607,13 +606,10 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
-  disableSampleNameField,
   className,
   namePrefix = "",
-  sampleNamePlaceHolder,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
-  const { save } = useApiClient();
   const [{ value }] = useField("collection");
   const { readOnly, initialValues } = useDinaFormContext();
   const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
@@ -643,7 +639,7 @@ export function MaterialSampleIdentifiersFormLayout({
                 }
                 name="useNextSequence"
                 className="ms-2 mt-1 align-items-center"
-                /* only enabled when add new sample and collection is selected*/
+                // only enabled when add new sample and collection is selected
                 disabled={initialValues.id || !value?.id}
                 overridecheckboxProps={{
                   style: {
