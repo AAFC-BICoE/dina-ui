@@ -630,7 +630,7 @@ export function useMaterialSampleSave({
       delete materialSampleSaveOp.resource.useNextSequence;
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
         async () =>
-          save<MaterialSample>([materialSampleSaveOp], {
+          await save<MaterialSample>([materialSampleSaveOp], {
             apiBaseUrl: "/collection-api"
           }),
         formik
@@ -651,10 +651,10 @@ export function useMaterialSampleSave({
           materialSampleSaveOp.resource.materialSampleName =
             (prefix as any) + data.result?.lowReservedID;
         }
-        saveToBackend();
+        await saveToBackend();
       });
     } else {
-      saveToBackend();
+      await saveToBackend();
     }
   }
 
