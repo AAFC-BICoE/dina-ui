@@ -343,7 +343,6 @@ export function MaterialSampleForm({
               <MaterialSampleIdentifiersFormLayout
                 id={navIds.identifiers}
                 disableSampleNameField={disableSampleNameField}
-                collectionId={initialValues?.collection?.id as string}
               />
               <MaterialSampleFormLayout />
             </>
@@ -606,8 +605,10 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
 
 /** Fields layout re-useable between view and edit pages. */
 export function MaterialSampleIdentifiersFormLayout({
+  disableSampleNameField,
   className,
   namePrefix = "",
+  sampleNamePlaceHolder,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
   const [{ value }] = useField("collection");
@@ -629,8 +630,11 @@ export function MaterialSampleIdentifiersFormLayout({
           <div className="d-flex">
             <TextField
               name={`${namePrefix}materialSampleName`}
-              className={`flex-grow-1`}
               inputProps={{ disabled: primaryIdDisabled }}
+              customName="materialSampleName"
+              className="materialSampleName flex-grow-1"
+              readOnly={disableSampleNameField}
+              placeholder={sampleNamePlaceHolder}
             />
             {!readOnly && (
               <CheckBoxField
