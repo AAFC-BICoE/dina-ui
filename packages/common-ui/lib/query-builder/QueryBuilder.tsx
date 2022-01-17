@@ -1,4 +1,8 @@
-import { useApiClient } from "..";
+import { useMemo } from "react";
+import useSWR from "swr";
+import { DinaForm, useApiClient } from "..";
+import { QueryRow } from "./QueryRow";
+import { v4 as uuidv4 } from "uuid";
 
 export function QueryBuilder() {
   const { apiClient } = useApiClient();
@@ -18,13 +22,33 @@ export function QueryBuilder() {
           key.lastIndexOf(".")
         );
         result.push({
-          name: fieldNameLabel,
           label: fieldNameLabel,
+          value: fieldNameLabel,
           type: resp.data?.[key]
         });
       });
+
+    return result;
   }
 
-  fetchQueryFieldsByIndex("dina_material_sample_index");
-  return <></>;
+  // Invalidate the query cache on query change, don't use SWR's built-in cache:
+  const cacheId = useMemo(() => uuidv4(), []);
+
+  const {
+    data,
+    error,
+    isValidating: loading
+  } = useSWR(["dina_material_sample_index", cacheId], fetchQueryFieldsByIndex, {
+    shouldRetryOnError: true,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false
+  });
+
+  if (loading || error) return <></>;
+
+  return (
+    <DinaForm initialValues={{}}>
+      <QueryRow queryRowProps={data} />
+    </DinaForm>
+  );
 }
