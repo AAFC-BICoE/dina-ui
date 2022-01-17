@@ -2,7 +2,7 @@ import { useState } from "react";
 import {
   DateField,
   NumberField,
-  QueryLogicSwitch,
+  QueryLogicSwitchField,
   SelectField,
   TextField
 } from "..";
@@ -82,7 +82,7 @@ export function QueryRow({ queryRowProps }) {
     }
   }
 
-  const queryRowOptions = queryRowProps.map(prop => ({
+  const queryRowOptions = queryRowProps?.map(prop => ({
     label: prop.label,
     value: prop.value + "(" + prop.type + ")"
   }));
@@ -103,7 +103,7 @@ export function QueryRow({ queryRowProps }) {
 
   return (
     <div className="d-flex">
-      <QueryLogicSwitch name="compungLogic" removeLabel={true} />
+      <QueryLogicSwitchField name="queryLogicSwitch" removeLabel={true} />
       <SelectField
         name={"fieldName"}
         options={queryRowOptions}

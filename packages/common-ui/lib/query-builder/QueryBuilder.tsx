@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import useSWR from "swr";
-import { DinaForm, useApiClient } from "..";
+import { DinaForm, SubmitButton, useApiClient } from "..";
 import { QueryRow } from "./QueryRow";
 import { v4 as uuidv4 } from "uuid";
 
@@ -49,6 +49,7 @@ export function QueryBuilder() {
   return (
     <DinaForm initialValues={{}}>
       <QueryRow queryRowProps={data} />
+      <SubmitButton className="ms-auto" />
     </DinaForm>
   );
 }

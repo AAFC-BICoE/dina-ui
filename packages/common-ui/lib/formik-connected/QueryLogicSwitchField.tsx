@@ -1,32 +1,44 @@
 import { useIntl } from "react-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FieldWrapper } from "../formik-connected/FieldWrapper";
 
-export function QueryLogicSwitch(queryLogicSwitchProps) {
+export function QueryLogicSwitchField(queryLogicSwitchProps) {
   const { formatMessage } = useIntl();
   const [backClassName, setBackClassName] = useState({
     and: "selected-logic",
     or: "not-selected-logic"
   });
 
-  function onSwitchClicked(name) {
-    switch (name) {
-      case "and":
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function onSwitchClicked(logicName, fieldName, formik) {
+    switch (logicName) {
+      case "and": {
+        if (inputRef && inputRef.current) {
+          formik.setFieldValue(fieldName, "and");
+        }
         return setBackClassName({
           and: "selected-logic",
           or: "not-selected-logic"
         });
+      }
 
-      case "or":
+      case "or": {
+        if (inputRef && inputRef.current) {
+          formik.setFieldValue(fieldName, "or");
+          inputRef.current.value = "or";
+        }
         return setBackClassName({
           or: "selected-logic",
           and: "not-selected-logic"
         });
+      }
     }
   }
+
   return (
     <FieldWrapper {...queryLogicSwitchProps}>
-      {() => (
+      {({ formik, value }) => (
         <div
           className="d-flex me-2"
           style={{
@@ -48,8 +60,10 @@ export function QueryLogicSwitch(queryLogicSwitchProps) {
         `}
           </style>
           <span
-            className={`${backClassName.and} pt-1 px-3`}
-            onClick={() => onSwitchClicked("and")}
+            className={`${backClassName.and} pt-1 px-3 andSpan`}
+            onClick={() =>
+              onSwitchClicked("and", queryLogicSwitchProps.name, formik)
+            }
             style={{
               borderRadius: "4px 0 0 4px",
               borderRight: "1px",
@@ -59,8 +73,10 @@ export function QueryLogicSwitch(queryLogicSwitchProps) {
             {formatMessage({ id: "AND" })}
           </span>
           <span
-            className={`${backClassName.or} pt-1 px-3`}
-            onClick={() => onSwitchClicked("or")}
+            className={`${backClassName.or} pt-1 px-3 orSpan`}
+            onClick={() =>
+              onSwitchClicked("or", queryLogicSwitchProps.name, formik)
+            }
             style={{
               borderRadius: "0 4px 4px 0",
               cursor: "pointer"
@@ -68,6 +84,12 @@ export function QueryLogicSwitch(queryLogicSwitchProps) {
           >
             {formatMessage({ id: "OR" })}
           </span>
+          <input
+            name={queryLogicSwitchProps.name}
+            value={value}
+            type="hidden"
+            ref={inputRef}
+          />
         </div>
       )}
     </FieldWrapper>
