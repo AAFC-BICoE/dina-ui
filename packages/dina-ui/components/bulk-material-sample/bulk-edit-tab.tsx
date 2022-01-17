@@ -17,11 +17,13 @@ import { useMaterialSampleSave } from "../collection";
 export interface UseBulkEditTabParams {
   sampleHooks: SampleWithHooks[];
   hideBulkEditTab?: boolean;
+  hideUseSequence?: boolean;
 }
 
 export function useBulkEditTab({
   hideBulkEditTab,
-  sampleHooks
+  sampleHooks,
+  hideUseSequence
 }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
@@ -50,6 +52,7 @@ export function useBulkEditTab({
         <BulkEditTabContext.Provider value={ctx}>
           <MaterialSampleForm
             buttonBar={null}
+            hideUseSequence={hideUseSequence}
             materialSampleFormRef={bulkEditFormRef}
             materialSampleSaveHook={bulkEditSampleHook}
             materialSample={initialValues}

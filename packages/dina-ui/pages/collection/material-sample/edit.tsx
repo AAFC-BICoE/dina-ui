@@ -223,6 +223,9 @@ export interface MaterialSampleFormProps {
 
   /** Reduces the rendering to improve performance when bulk editing many material samples. */
   reduceRendering?: boolean;
+
+  /** Hide the use next identifer checkbox, e.g when create multiple new samples */
+  hideUseSequence?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -240,6 +243,7 @@ export function MaterialSampleForm({
   disableNavRemovePrompt,
   isOffScreen,
   reduceRendering,
+  hideUseSequence,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -343,6 +347,7 @@ export function MaterialSampleForm({
               <MaterialSampleIdentifiersFormLayout
                 id={navIds.identifiers}
                 disableSampleNameField={disableSampleNameField}
+                hideUseSequence={hideUseSequence}
               />
               <MaterialSampleFormLayout />
             </>
@@ -588,6 +593,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
   id?: string;
+  hideUseSequence?: boolean;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -609,6 +615,7 @@ export function MaterialSampleIdentifiersFormLayout({
   className,
   namePrefix = "",
   sampleNamePlaceHolder,
+  hideUseSequence,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
   const [{ value }] = useField("collection");
@@ -636,7 +643,7 @@ export function MaterialSampleIdentifiersFormLayout({
               readOnly={disableSampleNameField}
               placeholder={sampleNamePlaceHolder}
             />
-            {!readOnly && (
+            {!readOnly && !hideUseSequence && (
               <CheckBoxField
                 onCheckBoxClick={event =>
                   setPrimaryIdDisabled(event.target.checked)
