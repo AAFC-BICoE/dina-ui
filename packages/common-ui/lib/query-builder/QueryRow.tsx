@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { DateField, NumberField, SelectField, TextField } from "..";
+import {
+  DateField,
+  NumberField,
+  QueryLogicSwitch,
+  SelectField,
+  TextField
+} from "..";
 
 interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
@@ -97,23 +103,30 @@ export function QueryRow({ queryRowProps }) {
 
   return (
     <div className="d-flex">
+      <QueryLogicSwitch name="compungLogic" removeLabel={true} />
       <SelectField
         name={"fieldName"}
         options={queryRowOptions}
         onChange={onSelectionChange}
         className="flex-grow-1 me-2"
+        removeLabel={true}
       />
-      {visibility.text && <TextField name="matchValue" className="me-2" />}
+      {visibility.text && (
+        <TextField name="matchValue" className="me-2" removeLabel={true} />
+      )}
       {/* <TextField name="start"></TextField>
     <TextField name="end"></TextField>
     <DateField name="startDate"></DateField>
     <DateField name="endDate"></DateField> */}
-      {visibility.date && <DateField name="date" className="me-2" />}
+      {visibility.date && (
+        <DateField name="date" className="me-2" removeLabel={true} />
+      )}
       {visibility.text && (
         <SelectField
           name="matchType"
           options={queryRowMatchOptions}
           className="me-2"
+          removeLabel={true}
         />
       )}
       {visibility.boolean && (
@@ -121,9 +134,12 @@ export function QueryRow({ queryRowProps }) {
           name="boolean"
           options={queryRowBooleanOptions}
           className="me-2"
+          removeLabel={true}
         />
       )}
-      {visibility.number && <NumberField name="number" className="me-2" />}
+      {visibility.number && (
+        <NumberField name="number" className="me-2" removeLabel={true} />
+      )}
     </div>
   );
 }

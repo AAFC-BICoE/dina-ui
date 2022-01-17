@@ -28,18 +28,6 @@ import "../components/button-bar/nav/wet-beow-bootstrap-4.css";
 import "../components/button-bar/nav/wet-beow-override.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  gql
-} from "@apollo/client";
-
-const client = new ApolloClient({
-  uri: "server url",
-  cache: new InMemoryCache()
-});
 
 /**
  * App component that wraps every page component.
@@ -55,19 +43,17 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
     <ApiClientImplProvider>
       <KeycloakAccountProvider>
         <AuthenticatedApiClientProvider>
-          <ApolloProvider client={client}>
-            <FileUploadProviderImpl>
-              <DinaIntlProvider>
-                <ErrorBoundaryPage>
-                  <DndProvider backend={HTML5Backend}>
-                    <ModalProvider appElement={appElement}>
-                      <Component {...pageProps} />
-                    </ModalProvider>
-                  </DndProvider>
-                </ErrorBoundaryPage>
-              </DinaIntlProvider>
-            </FileUploadProviderImpl>
-          </ApolloProvider>
+          <FileUploadProviderImpl>
+            <DinaIntlProvider>
+              <ErrorBoundaryPage>
+                <DndProvider backend={HTML5Backend}>
+                  <ModalProvider appElement={appElement}>
+                    <Component {...pageProps} />
+                  </ModalProvider>
+                </DndProvider>
+              </ErrorBoundaryPage>
+            </DinaIntlProvider>
+          </FileUploadProviderImpl>
         </AuthenticatedApiClientProvider>
       </KeycloakAccountProvider>
     </ApiClientImplProvider>
