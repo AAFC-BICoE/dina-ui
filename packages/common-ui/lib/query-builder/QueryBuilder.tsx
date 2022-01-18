@@ -49,18 +49,17 @@ export function QueryBuilder() {
   if (loading || error) return <></>;
 
   return (
-    <DinaForm initialValues={{ fieldName: "materialSampleName" }}>
+    <DinaForm initialValues={{}}>
       <FieldArray name={"queryRows"}>
         {fieldArrayProps => {
-          const elements =
-            fieldArrayProps.form.getFieldMeta("queryRows").value || [];
-          const elementsLen = isArray(elements) ? elements?.length : 1;
+          const elements: [] = fieldArrayProps.form.values.queryRows;
 
           function addRow() {
             fieldArrayProps.push(
               <QueryRow
+                name={fieldArrayProps.name}
                 esIndexMapping={data as any}
-                index={elementsLen}
+                index={elements?.length ?? 0}
                 removeRow={removeRow}
                 addRow={addRow}
               />
@@ -71,24 +70,26 @@ export function QueryBuilder() {
             fieldArrayProps.remove(index);
           }
 
-          return fieldArrayProps.form.values.queryRows?.length > 0 ? (
-            fieldArrayProps.form.values.queryRows?.map((_, index) => (
-              <QueryRow
-                key={index}
-                index={index}
-                addRow={addRow}
-                removeRow={removeRow}
-                esIndexMapping={data as any}
-              />
-            ))
-          ) : (
-            <QueryRow
-              index={0}
-              addRow={addRow}
-              removeRow={removeRow}
-              esIndexMapping={data as any}
-            />
-          );
+          /* Making sure there is a single row present as default*/
+          if (
+            !fieldArrayProps.form.getFieldMeta("queryRows").value ||
+            !isArray(fieldArrayProps.form.getFieldMeta("queryRows").value)
+          ) {
+            addRow();
+          }
+
+          return elements?.length > 0
+            ? elements?.map((_, index) => (
+                <QueryRow
+                  name={fieldArrayProps.name}
+                  key={index}
+                  index={index}
+                  addRow={addRow}
+                  removeRow={removeRow}
+                  esIndexMapping={data as any}
+                />
+              ))
+            : null;
         }}
       </FieldArray>
       <SubmitButton className="ms-auto" />

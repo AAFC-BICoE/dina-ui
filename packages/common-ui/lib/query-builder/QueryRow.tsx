@@ -12,6 +12,7 @@ interface QueryRowProps {
   index: number;
   addRow?: () => void;
   removeRow?: (index) => void;
+  name: string;
 }
 
 export interface ESIndexMapping {
@@ -47,7 +48,7 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { esIndexMapping, index, addRow, removeRow } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
   const initVisibility = {
     text: false,
     date: false,
@@ -81,31 +82,48 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     value: prop.value + "(" + prop.type + ")"
   }));
 
+  function fieldProps(fieldName: string, idx: number) {
+    return {
+      name: `${name}[${idx}].${fieldName}`
+    };
+  }
+
   return (
     <div className="d-flex">
       {index > 0 && (
-        <QueryLogicSwitchField name="compoundQueryType" removeLabel={true} />
+        <QueryLogicSwitchField
+          name={fieldProps("compoundQueryType", index).name}
+          removeLabel={true}
+        />
       )}
       <SelectField
-        name={"fieldName"}
+        name={fieldProps("fieldName", index).name}
         options={queryRowOptions}
         onChange={onSelectionChange}
         className="flex-grow-1 me-2"
         removeLabel={true}
       />
       {visibility.text && (
-        <TextField name="matchValue" className="me-2" removeLabel={true} />
+        <TextField
+          name={fieldProps("matchValue", index).name}
+          className="me-2"
+          removeLabel={true}
+        />
       )}
       {/* <TextField name="start"></TextField>
     <TextField name="end"></TextField>
     <DateField name="startDate"></DateField>
     <DateField name="endDate"></DateField> */}
       {visibility.date && (
-        <DateField name="date" className="me-2" removeLabel={true} />
+        <DateField
+          name={fieldProps("date", index).name}
+          className="me-2"
+          removeLabel={true}
+        />
       )}
       {visibility.text && (
         <SelectField
-          name="matchType"
+          name={fieldProps("matchType", index).name}
           options={queryRowMatchOptions}
           className="me-2"
           removeLabel={true}
@@ -113,14 +131,18 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       )}
       {visibility.boolean && (
         <SelectField
-          name="boolean"
+          name={fieldProps("boolean", index).name}
           options={queryRowBooleanOptions}
           className="me-2"
           removeLabel={true}
         />
       )}
       {visibility.number && (
-        <NumberField name="number" className="me-2" removeLabel={true} />
+        <NumberField
+          name={fieldProps("number", index).name}
+          className="me-2"
+          removeLabel={true}
+        />
       )}
 
       {index === 0 ? (
