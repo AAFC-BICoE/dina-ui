@@ -6,9 +6,12 @@ import {
   SelectField,
   TextField
 } from "..";
-
+import { FaPlus, FaMinus } from "react-icons/fa";
 interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
+  index: number;
+  addRow?: () => void;
+  removeRow?: (index) => void;
 }
 
 export interface ESIndexMapping {
@@ -20,90 +23,69 @@ export interface ESIndexMapping {
 interface QueryRowExportProps {
   fieldName: string;
   queryType: string;
-  fieldValue?: string;
+  matchValue?: string;
   fieldRangeStart?: string;
   fieldRangeEnd?: string;
-  queryMatchType?: string;
+  matchType?: string;
   compoundQueryType?: string;
+  number?: string;
+  date?: string;
 }
 
-export function QueryRow({ queryRowProps }) {
-  const [visibility, setVisibility] = useState({
+type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
+type queryRowBooleanType = "TRUE" | "FALSE";
+
+const queryRowMatchOptions = [
+  { label: "PARTIAL_MATCH", value: "PARTIAL_MATCH" },
+  { label: "EXACT_MATCH", value: "EXACT_MATCH" },
+  { label: "BLANK_FIELD", value: "BLANK_FIELD" }
+];
+
+const queryRowBooleanOptions = [
+  { label: "TRUE", value: "TRUE" },
+  { label: "FALSE", value: "FALSE" }
+];
+
+export function QueryRow(queryRowProps: QueryRowProps) {
+  const { esIndexMapping, index, addRow, removeRow } = queryRowProps;
+  const initVisibility = {
     text: false,
     date: false,
     boolean: false,
     number: false,
     numberRange: false,
     dateRange: false
-  });
+  };
+
+  const [visibility, setVisibility] = useState(initVisibility);
 
   function onSelectionChange(value, _) {
     const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
     switch (type) {
       case "text":
-        return setVisibility({
-          text: true,
-          date: false,
-          numberRange: false,
-          dateRange: false,
-          boolean: false,
-          number: false
-        });
+        return setVisibility({ ...initVisibility, text: true });
 
       case "date":
-        return setVisibility({
-          text: false,
-          date: true,
-          numberRange: false,
-          dateRange: false,
-          boolean: false,
-          number: false
-        });
+        return setVisibility({ ...initVisibility, date: true });
 
       case "boolean":
-        return setVisibility({
-          text: false,
-          date: false,
-          numberRange: false,
-          dateRange: false,
-          boolean: true,
-          number: false
-        });
+        return setVisibility({ ...initVisibility, boolean: true });
 
       case "long":
-        return setVisibility({
-          text: false,
-          date: false,
-          numberRange: false,
-          dateRange: false,
-          boolean: false,
-          number: true
-        });
+        return setVisibility({ ...initVisibility, number: true });
     }
   }
 
-  const queryRowOptions = queryRowProps?.map(prop => ({
+  const queryRowOptions = esIndexMapping?.map(prop => ({
     label: prop.label,
     value: prop.value + "(" + prop.type + ")"
   }));
 
-  type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-  type queryRowBooleanType = "TRUE" | "FALSE";
-
-  const queryRowMatchOptions = [
-    { label: "PARTIAL_MATCH", value: "PARTIAL_MATCH" },
-    { label: "EXACT_MATCH", value: "EXACT_MATCH" },
-    { label: "BLANK_FIELD", value: "BLANK_FIELD" }
-  ];
-
-  const queryRowBooleanOptions = [
-    { label: "TRUE", value: "TRUE" },
-    { label: "FALSE", value: "FALSE" }
-  ];
-
   return (
     <div className="d-flex">
-      <QueryLogicSwitchField name="queryLogicSwitch" removeLabel={true} />
+      {index > 0 && (
+        <QueryLogicSwitchField name="compoundQueryType" removeLabel={true} />
+      )}
       <SelectField
         name={"fieldName"}
         options={queryRowOptions}
@@ -139,6 +121,20 @@ export function QueryRow({ queryRowProps }) {
       )}
       {visibility.number && (
         <NumberField name="number" className="me-2" removeLabel={true} />
+      )}
+
+      {index === 0 ? (
+        <FaPlus
+          onClick={addRow as any}
+          size="2em"
+          style={{ cursor: "pointer" }}
+        />
+      ) : (
+        <FaMinus
+          onClick={removeRow as any}
+          size="2em"
+          style={{ cursor: "pointer" }}
+        />
       )}
     </div>
   );

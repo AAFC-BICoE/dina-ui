@@ -3,6 +3,8 @@ import useSWR from "swr";
 import { DinaForm, SubmitButton, useApiClient } from "..";
 import { QueryRow } from "./QueryRow";
 import { v4 as uuidv4 } from "uuid";
+import { FieldArray } from "formik";
+import { isArray } from "lodash";
 
 export function QueryBuilder() {
   const { apiClient } = useApiClient();
@@ -47,8 +49,48 @@ export function QueryBuilder() {
   if (loading || error) return <></>;
 
   return (
-    <DinaForm initialValues={{}}>
-      <QueryRow queryRowProps={data} />
+    <DinaForm initialValues={{ fieldName: "materialSampleName" }}>
+      <FieldArray name={"queryRows"}>
+        {fieldArrayProps => {
+          const elements =
+            fieldArrayProps.form.getFieldMeta("queryRows").value || [];
+          const elementsLen = isArray(elements) ? elements?.length : 1;
+
+          function addRow() {
+            fieldArrayProps.push(
+              <QueryRow
+                esIndexMapping={data as any}
+                index={elementsLen}
+                removeRow={removeRow}
+                addRow={addRow}
+              />
+            );
+          }
+
+          function removeRow(index: number) {
+            fieldArrayProps.remove(index);
+          }
+
+          return fieldArrayProps.form.values.queryRows?.length > 0 ? (
+            fieldArrayProps.form.values.queryRows?.map((_, index) => (
+              <QueryRow
+                key={index}
+                index={index}
+                addRow={addRow}
+                removeRow={removeRow}
+                esIndexMapping={data as any}
+              />
+            ))
+          ) : (
+            <QueryRow
+              index={0}
+              addRow={addRow}
+              removeRow={removeRow}
+              esIndexMapping={data as any}
+            />
+          );
+        }}
+      </FieldArray>
       <SubmitButton className="ms-auto" />
     </DinaForm>
   );
