@@ -18,9 +18,9 @@ import { RevisionRowConfig } from "../revision-row-config";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
-    name: ({ id }) => (
-      <Link href={`/collection/collecting-event/view?id=${id}`}>
-        <a>{id}</a>
+    name: ms => (
+      <Link href={`/collection/collecting-event/view?id=${ms.id}`}>
+        <a>{ms.materialSampleName}</a>
       </Link>
     ),
     customValueCells: {

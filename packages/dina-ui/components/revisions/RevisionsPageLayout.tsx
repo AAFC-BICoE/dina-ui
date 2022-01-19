@@ -48,7 +48,10 @@ export function RevisionsPageLayout({
               if (ResourceName) {
                 return <ResourceName {...snapshot.state} />;
               } else {
-                return snapshot.instanceId;
+                return (
+                  // Try the "name" field, otherwise render the instance ID:
+                  snapshot.state.name?.toString?.() || snapshot.instanceId
+                );
               }
             },
             accessor: "resourceName",
