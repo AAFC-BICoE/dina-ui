@@ -7,7 +7,7 @@ import {
   TextField
 } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
-interface QueryRowProps {
+export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
   addRow?: () => void;
@@ -21,9 +21,8 @@ export interface ESIndexMapping {
   type: string;
 }
 
-interface QueryRowExportProps {
+export interface QueryRowExportProps {
   fieldName: string;
-  queryType: string;
   matchValue?: string;
   fieldRangeStart?: string;
   fieldRangeEnd?: string;
@@ -31,20 +30,20 @@ interface QueryRowExportProps {
   compoundQueryType?: string;
   number?: string;
   date?: string;
+  boolean?: string;
 }
 
 type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
 type queryRowBooleanType = "TRUE" | "FALSE";
 
 const queryRowMatchOptions = [
-  { label: "PARTIAL_MATCH", value: "PARTIAL_MATCH" },
-  { label: "EXACT_MATCH", value: "EXACT_MATCH" },
-  { label: "BLANK_FIELD", value: "BLANK_FIELD" }
+  { label: "PARTIAL_MATCH", value: "match" },
+  { label: "EXACT_MATCH", value: "term" }
 ];
 
 const queryRowBooleanOptions = [
-  { label: "TRUE", value: "TRUE" },
-  { label: "FALSE", value: "FALSE" }
+  { label: "TRUE", value: "true" },
+  { label: "FALSE", value: "false" }
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
