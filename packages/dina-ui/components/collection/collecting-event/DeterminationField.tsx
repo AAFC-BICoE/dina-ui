@@ -98,10 +98,7 @@ export function DeterminationField({ id = "determination-section" }) {
       typeName={formatMessage("determination")}
       sectionId={id}
       initialIndex={initialIndex}
-      makeNewElement={({ length }) => ({
-        isPrimary: length === 0,
-        isFileAs: length === 0
-      })}
+      makeNewElement={() => ({})}
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={content => (
         <BulkEditTabWarning
@@ -110,10 +107,7 @@ export function DeterminationField({ id = "determination-section" }) {
           setDefaultValue={ctx =>
             // Auto-create the first determination:
             ctx.bulkEditFormRef?.current?.setFieldValue(determinationsPath, [
-              {
-                isPrimary: true,
-                isFileAs: true
-              }
+              {}
             ])
           }
         >

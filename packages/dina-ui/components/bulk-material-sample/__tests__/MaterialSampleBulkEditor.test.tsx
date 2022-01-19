@@ -1125,8 +1125,6 @@ describe("MaterialSampleBulkEditor", () => {
               ],
               determination: [
                 {
-                  isFileAs: true,
-                  isPrimary: true,
                   verbatimScientificName: "new-scientific-name"
                 }
               ],

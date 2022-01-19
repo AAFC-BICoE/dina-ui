@@ -210,9 +210,7 @@ function DeterminationSwitch(props) {
           onChange={newVal => {
             props.onChange?.(newVal);
             if (!bulkTabCtx && newVal && !determination?.length) {
-              setFieldValue("determination", [
-                { isPrimary: true, isFileAs: true }
-              ]);
+              setFieldValue("determination", [{}]);
             }
           }}
         />
