@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import useSWR from "swr";
 import { DinaForm, SubmitButton, useApiClient } from "..";
-import { QueryRow, QueryRowExportProps } from "./QueryRow";
+import { QueryRow } from "./QueryRow";
 import { v4 as uuidv4 } from "uuid";
 import { FieldArray } from "formik";
 import { isArray } from "lodash";
-import Bodybuilder from "bodybuilder";
+import { transformQueryToDSL } from "../util/transformToDSL";
 
 export function QueryBuilder() {
   const { apiClient } = useApiClient();
@@ -50,87 +50,8 @@ export function QueryBuilder() {
   if (loading || error) return <></>;
 
   function onSubmit(props) {
-    const { submittedValues, formik } = props;
-    transformQueryBuilderToDSL(submittedValues.queryRows);
-  }
-
-  function transformQueryBuilderToDSL(
-    exportedQueryRows: QueryRowExportProps[]
-  ) {
-    let builder = Bodybuilder();
-
-    exportedQueryRows.map((queryRow, idx) => {
-      if (queryRow.boolean) {
-        // search will be built as filter
-        if (queryRow.compoundQueryType === "and") {
-          builder = builder.andFilter(
-            "term",
-            queryRow.fieldName,
-            queryRow.boolean
-          );
-        } else if (queryRow.compoundQueryType === "or") {
-          builder = builder.orFilter(
-            "term",
-            queryRow.fieldName,
-            queryRow.boolean
-          );
-        } else if (idx === 0) {
-          builder = builder.filter(
-            "term",
-            queryRow.fieldName,
-            queryRow.boolean
-          );
-        }
-      } else if (queryRow.date) {
-        // search will be built as filter
-        if (queryRow.compoundQueryType === "and") {
-          builder = builder.andFilter(
-            "term",
-            queryRow.fieldName,
-            queryRow.date
-          );
-        } else if (queryRow.compoundQueryType === "or") {
-          builder.orFilter("term", queryRow.fieldName, queryRow.date);
-        } else if (idx === 0) {
-          builder.filter("term", queryRow.fieldName, queryRow.date);
-        }
-      } else if (queryRow.number) {
-        // search will be built as filter
-        if (queryRow.compoundQueryType === "and") {
-          builder = builder.andFilter(
-            "term",
-            queryRow.fieldName,
-            queryRow.number
-          );
-        } else if (queryRow.compoundQueryType === "or") {
-          builder.orFilter("term", queryRow.fieldName, queryRow.number);
-        } else if (idx === 0) {
-          builder.filter("term", queryRow.fieldName, queryRow.number);
-        }
-      } else if (queryRow.matchValue) {
-        // string search will be built as query
-        if (queryRow.compoundQueryType === "and") {
-          builder = builder.andQuery(
-            queryRow.matchType as string,
-            queryRow.fieldName,
-            queryRow.matchValue
-          );
-        } else if (queryRow.compoundQueryType === "or") {
-          builder.orQuery(
-            queryRow.matchType as string,
-            queryRow.fieldName,
-            queryRow.matchValue
-          );
-        } else if (idx === 0) {
-          builder.query(
-            queryRow.matchType as string,
-            queryRow.fieldName,
-            queryRow.matchValue
-          );
-        }
-      }
-    });
-    const DSLquery = builder.build();
+    const { submittedValues } = props;
+    transformQueryToDSL(submittedValues.queryRows);
   }
 
   return (
