@@ -27,6 +27,7 @@ export default function PreparationTypeDetailsPage() {
       entityLink="/collection/preparation-type"
       type="preparation-type"
       apiBaseUrl="/collection-api"
+      showRevisionsLink={true}
     />
   );
 }

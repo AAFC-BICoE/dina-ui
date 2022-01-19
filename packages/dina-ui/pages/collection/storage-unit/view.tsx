@@ -23,6 +23,7 @@ export default function StorageUnitDetailsPage() {
       apiBaseUrl="/collection-api"
       editButton={formProps => <StorageEditButton {...formProps} />}
       deleteButton={() => null}
+      showRevisionsLink={true}
     />
   );
 }
