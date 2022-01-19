@@ -2,9 +2,9 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
-  FormikButton,
   TextField,
   TextFieldWithMultiplicationButton,
+  ToggleField,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -135,47 +135,25 @@ export function DeterminationField({ id = "determination-section" }) {
         return (
           <div className="row">
             {!readOnly && !isTemplate && (
-              <div className="mb-3">
-                <FormikButton
-                  className="btn btn-primary primary-determinationtion-button"
-                  buttonProps={ctx => {
-                    const isPrimary =
-                      get(
-                        ctx.values,
-                        `${determinationsPath}[${index}].` + "isPrimary"
-                      ) ?? false;
-                    return {
-                      disabled: isPrimary,
-                      children: isPrimary ? (
-                        <DinaMessage id="primary" />
-                      ) : (
-                        <DinaMessage id="makePrimary" />
-                      )
-                    };
+              <div className="d-flex gap-4">
+                <ToggleField
+                  className="primary-determination-button"
+                  {...fieldProps("isPrimary")}
+                  onChangeExternal={(checked, formik) => {
+                    if (checked) {
+                      makePrimary(formik, index);
+                    }
                   }}
-                  onClick={(_, formik) => makePrimary(formik, index)}
                 />
-                <Tooltip id="primaryDeterminationButton_tooltip" />
-                <FormikButton
-                  className="btn btn-primary filed-as-button"
-                  buttonProps={ctx => {
-                    const isFileAs =
-                      get(
-                        ctx.values,
-                        `${determinationsPath}[${index}].` + "isFileAs"
-                      ) ?? false;
-                    return {
-                      disabled: isFileAs,
-                      children: isFileAs ? (
-                        <DinaMessage id="isFileAs" />
-                      ) : (
-                        <DinaMessage id="makeFiledAs" />
-                      )
-                    };
+                <ToggleField
+                  className="filed-as-button"
+                  {...fieldProps("isFileAs")}
+                  onChangeExternal={(checked, formik) => {
+                    if (checked) {
+                      makeFiledAs(formik, index);
+                    }
                   }}
-                  onClick={(_, formik) => makeFiledAs(formik, index)}
                 />
-                <Tooltip id="isFileAsDeterminationButton_tooltip" />
               </div>
             )}
             <div className="col-md-6">
