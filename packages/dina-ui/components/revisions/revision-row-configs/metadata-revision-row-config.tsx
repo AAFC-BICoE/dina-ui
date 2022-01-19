@@ -22,8 +22,10 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
         relation && (
           <ReferenceLink<Person>
             baseApiPath="agent-api"
-            instanceId={{ typeName: "person", cdoId: relation.id }}
-            link={({ displayName }) => <span>{displayName}</span>}
+            type="person"
+            reference={relation}
+            name={person => person.displayName}
+            href="/person/view?id="
           />
         )
       );
@@ -34,8 +36,10 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
         relation && (
           <ReferenceLink<Person>
             baseApiPath="agent-api"
-            instanceId={{ typeName: "person", cdoId: relation.id }}
-            link={({ displayName }) => <span>{displayName}</span>}
+            type="person"
+            reference={{ typeName: "person", cdoId: relation.cdoId }}
+            name={person => person.displayName}
+            href="/person/view?id="
           />
         )
       );
@@ -43,8 +47,10 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
     // Show the entire value of the metadata map in a key-value table:
     managedAttributeMap: ({ original: { value } }) => (
       <ManagedAttributesViewer
-        managedAttributeApiPath={key => `/managed-attribute/${key}`}
-        values={value?.values}
+        managedAttributeApiPath={key =>
+          `objectstore-api/managed-attribute/${key}`
+        }
+        values={value}
       />
     )
   }

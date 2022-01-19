@@ -73,17 +73,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         entityId={id}
         entityLink="/collection/material-sample"
         byPassView={true}
-        className="flex-grow-1"
+        className="me-auto"
       />
       <EditButton entityId={id} entityLink="collection/material-sample" />
       <Link href={`/collection/material-sample/bulk-create?splitFromId=${id}`}>
-        <a className="btn btn-info">
+        <a className="btn btn-primary">
           <DinaMessage id="splitButton" />
         </a>
       </Link>
       <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
-        <a className="btn btn-info">
+        <a className="btn btn-primary">
           <DinaMessage id="duplicate" />
+        </a>
+      </Link>
+      <Link href={`/collection/material-sample/revisions?id=${id}`}>
+        <a className="btn btn-info ms-5">
+          <DinaMessage id="revisionsButtonText" />
         </a>
       </Link>
       <DeleteButton

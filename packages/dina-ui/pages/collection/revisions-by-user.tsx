@@ -1,4 +1,4 @@
-import { COLLECTION_REVISION_ROW_CONFIG } from "../../components/revisions/revision-row-configs/collection-revision-row-configs";
+import { COLLECTION_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
 import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
 
 export default function CollectionRevisionByUserPage() {

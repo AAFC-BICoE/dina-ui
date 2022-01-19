@@ -1,4 +1,4 @@
-import { OBJECT_STORE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-row-configs/objectstore-revision-row-configs";
+import { OBJECT_STORE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
 import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
 
 export default function ObjectStoreRevisionByUserPage() {

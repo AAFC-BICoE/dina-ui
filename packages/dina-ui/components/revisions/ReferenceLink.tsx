@@ -1,16 +1,21 @@
 import { useQuery, withResponse } from "common-ui";
-import { KitsuResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
+import Link from "next/link";
 import { AuditToEntityReference } from "../../types/objectstore-api";
 
 export interface ReferenceLinkProps<TResource extends KitsuResource> {
   /** Base API path of the linked resource. */
   baseApiPath: string;
+  type: string;
 
   /** JaVers instanceId e.g. metadata/7c4a69aa-80ac-45e9-b5c8-a16e27c99ffe */
-  instanceId: AuditToEntityReference;
+  reference: AuditToEntityReference;
 
-  /** JSX Element showing the name and linking to the resource's details page. */
-  link: (dto: TResource) => JSX.Element;
+  /** Function returning the name of the resource. */
+  name: (dto: PersistedResource<TResource>) => string | JSX.Element;
+
+  /** Link to the resource details page. */
+  href?: string;
 }
 
 /**
@@ -19,12 +24,28 @@ export interface ReferenceLinkProps<TResource extends KitsuResource> {
  */
 export function ReferenceLink<TResource extends KitsuResource>({
   baseApiPath,
-  link,
-  instanceId: { cdoId, typeName }
+  name,
+  href,
+  reference,
+  type
 }: ReferenceLinkProps<TResource>) {
-  const q = useQuery<TResource>({
-    path: `${baseApiPath}/${typeName}/${cdoId}`
-  });
+  const id = reference.id || reference.cdoId;
 
-  return withResponse(q, res => link(res.data as TResource));
+  const q = useQuery<TResource>(
+    { path: `${baseApiPath}/${type}/${id}` },
+    { disabled: !id || !type }
+  );
+
+  return withResponse(q, res => {
+    const content =
+      name(res.data as PersistedResource<TResource>) || res.data.id;
+
+    return href ? (
+      <Link href={`${href}${res.data.id}`}>
+        <a>{content}</a>
+      </Link>
+    ) : (
+      <>{content}</>
+    );
+  });
 }
