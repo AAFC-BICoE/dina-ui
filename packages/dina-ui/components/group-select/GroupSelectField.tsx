@@ -87,7 +87,7 @@ export function GroupSelectField(groupSelectFieldProps: GroupSelectFieldProps) {
         selectFieldProps.onChange?.(newValue, formik);
       }}
       options={options}
-      selectProps={{ isDisabled: hasOnlyOneOption }}
+      selectProps={{ isDisabled: hasOnlyOneOption, isClearable: true }}
     />
   );
 }
