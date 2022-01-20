@@ -19,7 +19,7 @@ import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
-import { CollectionSelectField } from "..";
+import { CollectionSelectField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useLastUsedCollection } from "../collection";
@@ -61,6 +61,7 @@ export function MaterialSampleGenerationForm({
         parentMaterialSample: parentId
           ? { id: parentId, type: "material-sample" }
           : undefined,
+        group: submittedValues.group,
         collection: submittedValues.collection,
         publiclyReleasable: true,
         // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
@@ -95,7 +96,7 @@ export function MaterialSampleGenerationForm({
   }
 
   return (
-    <DinaForm<GeneratorFormValues>
+    <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
         initialValues || {
           numberToCreate: 0,
@@ -123,6 +124,13 @@ export function MaterialSampleGenerationForm({
             </Link>
           </h2>
         ))}
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          className="col-sm-6"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
       <div style={{ width: "25rem" }}>
         <NumberSpinnerField
           name="numberToCreate"
@@ -348,6 +356,7 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
 }
 
 const generatorFormSchema = yup.object({
+  group: yup.string().required(),
   collection: yup.mixed().required(),
   numberToCreate: yup.number().required(),
   samples: yup
