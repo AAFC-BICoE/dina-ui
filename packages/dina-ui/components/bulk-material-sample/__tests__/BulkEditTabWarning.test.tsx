@@ -197,8 +197,6 @@ describe("BulkEditTabWarning", () => {
             resource: expect.objectContaining({
               determination: [
                 {
-                  isPrimary: true,
-                  isFileAs: true,
                   verbatimScientificName: "test-name-override"
                 }
               ],
@@ -210,8 +208,6 @@ describe("BulkEditTabWarning", () => {
             resource: expect.objectContaining({
               determination: [
                 {
-                  isPrimary: true,
-                  isFileAs: true,
                   verbatimScientificName: "test-name-override"
                 }
               ],
@@ -223,8 +219,6 @@ describe("BulkEditTabWarning", () => {
             resource: expect.objectContaining({
               determination: [
                 {
-                  isPrimary: true,
-                  isFileAs: true,
                   verbatimScientificName: "test-name-override"
                 }
               ],
@@ -331,8 +325,6 @@ describe("BulkEditTabWarning", () => {
             type: sample.type,
             determination: [
               {
-                isPrimary: true,
-                isFileAs: true,
                 verbatimScientificName: "test-name-override"
               }
             ],

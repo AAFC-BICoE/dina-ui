@@ -163,12 +163,7 @@ describe("Material sample bulk edit tab", () => {
       // Sets the default association because it's enabled and there are no values set in the other tabs:
       associations: [{}],
       // Sets the default determination because it's enabled and there are no values set in the other tabs:
-      determination: [
-        {
-          isFileAs: true,
-          isPrimary: true
-        }
-      ]
+      determination: [{}]
     });
   });
 

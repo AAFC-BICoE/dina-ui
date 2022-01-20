@@ -94,6 +94,7 @@ export function CreateMaterialSampleFromWorkflowForm({
 
   return (
     <MaterialSampleForm
+      enableStoredDefaultGroup={true}
       buttonBar={
         <ButtonBar className="d-flex">
           <BackButton
