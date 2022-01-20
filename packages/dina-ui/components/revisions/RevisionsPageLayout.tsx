@@ -51,10 +51,11 @@ export function RevisionsPageLayout({
               if (ResourceName) {
                 return <ResourceName {...snapshot.state} />;
               } else {
-                return (
-                  // Try the "name" field, otherwise render the instance ID:
-                  snapshot.state.name?.toString?.() || snapshot.instanceId
-                );
+                // Try the "name" field, otherwise render the instance ID:
+                const name =
+                  snapshot.state.name?.toString?.() || snapshot.instanceId;
+
+                return <span title={name}>{name}</span>;
               }
             },
             accessor: "resourceName",

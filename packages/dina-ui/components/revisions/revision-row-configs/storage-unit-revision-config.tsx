@@ -1,9 +1,15 @@
 import { StorageUnit, StorageUnitType } from "../../../types/collection-api";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import Link from "next/link";
 
 export const STORAGE_UNIT_REVISION_ROW_CONFIG: RevisionRowConfig<StorageUnit> =
   {
+    name: ({ id, name }) => (
+      <Link href={`/collection/storage-unit/view?id=${id}`}>
+        <a>{name || id}</a>
+      </Link>
+    ),
     customValueCells: {
       storageUnitType: ({ original: { value } }) => (
         <ReferenceLink<StorageUnitType>
