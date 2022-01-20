@@ -494,8 +494,6 @@ export function MaterialSampleForm({
     </div>
   );
 
-  const { materialSampleSchema } = useMaterialSampleSchema();
-
   return isTemplate ? (
     mateirialSampleInternal
   ) : loading ? (
@@ -506,9 +504,6 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      validationSchema={
-        dataComponentState.enableAssociations ? materialSampleSchema : null
-      }
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
@@ -755,27 +750,4 @@ export function nextSampleInitialValues(
   };
 
   return initialValues;
-}
-
-function useMaterialSampleSchema() {
-  const { getFieldLabel } = useFieldLabels();
-
-  /** Front-end validation. */
-  const materialSampleSchema = yup.object({
-    associations: yup.array(
-      yup.object({
-        associatedSample: yup
-          .string()
-          .nullable()
-          .required()
-          .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
-        associationType: yup
-          .string()
-          .required()
-          .label(getFieldLabel({ name: "associationType" }).fieldLabel)
-      })
-    )
-  });
-
-  return { materialSampleSchema };
 }
