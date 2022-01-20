@@ -30,7 +30,7 @@ export interface QueryRowExportProps {
   compoundQueryType?: string;
   number?: string;
   date?: string;
-  boolean?: string;
+  boolean?: string | boolean;
 }
 
 type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
@@ -93,13 +93,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         <QueryLogicSwitchField
           name={fieldProps("compoundQueryType", index).name}
           removeLabel={true}
+          className={"compoundQueryType" + index}
         />
       )}
       <SelectField
         name={fieldProps("fieldName", index).name}
         options={queryRowOptions}
         onChange={onSelectionChange}
-        className="flex-grow-1 me-2"
+        className={`flex-grow-1 me-2 `}
         removeLabel={true}
       />
       {visibility.text && (

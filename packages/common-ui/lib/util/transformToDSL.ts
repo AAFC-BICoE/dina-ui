@@ -4,6 +4,14 @@ import Bodybuilder from "bodybuilder";
 export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
   let builder = Bodybuilder();
 
+  // Remove the type from value before submit to elastic search
+  exportedQueryRows.map(queryRow => {
+    queryRow.fieldName = queryRow.fieldName.substring(
+      0,
+      queryRow.fieldName.indexOf("(")
+    );
+  });
+
   exportedQueryRows.map((queryRow, idx) => {
     if (queryRow.boolean) {
       // search will be built as filter
