@@ -5,6 +5,7 @@ import {
   FieldSet,
   FormikButton,
   QueryTable,
+  stringArrayCell,
   TextField
 } from "common-ui";
 import { FormikContextType, FormikProps } from "formik";
@@ -36,6 +37,7 @@ export function CollectingEventLinker({
   const filterFormRef = useRef<FormikProps<any>>(null);
 
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
+    stringArrayCell("dwcOtherRecordNumbers"),
     "createdBy",
     {
       Cell: ({ original: { dwcVerbatimLocality } }) => (

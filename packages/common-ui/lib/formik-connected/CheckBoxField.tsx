@@ -6,6 +6,7 @@ export interface CheckBoxProps extends FieldWrapperProps {
   onCheckBoxClick?: OnFormikSubmit<ChangeEvent<HTMLInputElement>>;
   disabled?: boolean;
   type?: string;
+  overridecheckboxProps?: any;
 }
 
 const checkboxProps = {
@@ -31,6 +32,7 @@ export function CheckBoxField(props: CheckBoxProps) {
         return (
           <input
             {...checkboxProps}
+            {...props.overridecheckboxProps}
             checked={value || false}
             onChange={onChange}
             value={value || false}
