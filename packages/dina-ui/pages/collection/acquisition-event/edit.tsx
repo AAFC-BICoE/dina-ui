@@ -108,7 +108,7 @@ export function useAcquisitionEvent(id?: string | null) {
   return useQuery<AcquisitionEvent>(
     {
       path: `collection-api/acquisition-event/${id}`,
-      include: "receivedFrom,externallyIsolatedBy"
+      include: "receivedFrom,isolatedBy"
     },
     { disabled: !id }
   );
@@ -153,7 +153,7 @@ export function AcquisitionEventFormLayout() {
         <div className="row">
           <div className="col-sm-6">
             <ResourceSelectField<Person>
-              name="externallyIsolatedBy"
+              name="isolatedBy"
               readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
@@ -165,10 +165,10 @@ export function AcquisitionEventFormLayout() {
                 }
               ]}
             />
-            <DateField name="externallyIsolatedOn" />
+            <DateField name="isolatedOn" />
           </div>
           <TextField
-            name="externallyIsolationRemarks"
+            name="isolationRemarks"
             className="col-sm-6"
             multiLines={true}
           />

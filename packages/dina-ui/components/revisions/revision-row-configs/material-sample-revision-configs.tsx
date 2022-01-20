@@ -33,8 +33,6 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           values={value}
         />
       ),
-      // Date Fields:
-      createdOn: ({ original: { value } }) => <DateView date={value} />,
 
       // Try to render object / array fields visually instead of the default JSON:
       attachment: ({ original: { value } }) => (

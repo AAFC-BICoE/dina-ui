@@ -15,7 +15,7 @@ Example from dina-ui/pages/collection/material-sample/revisions.tsx:
 
 [source,tsx]
 ----
-import { COLLECTION_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
 import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
 
 export default () => (
@@ -29,7 +29,7 @@ export default () => (
     // The JSONAPI resource "type"
     resourceType="material-sample"
     // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
-    revisionRowConfigsByType={COLLECTION_REVISION_ROW_CONFIG}
+    revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
     // The field on the resource that gives the name. Usuallu this field is called "name"
     nameField="materialSampleName"
   />
@@ -50,7 +50,7 @@ Example from dina-ui/pages/collection/revisions-by-user.tsx:
 
 [source,tsx]
 ----
-import { COLLECTION_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
 import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
 
 export default function CollectionRevisionByUserPage() {
@@ -59,7 +59,7 @@ export default function CollectionRevisionByUserPage() {
       // The API route to the Javers snapshot list
       snapshotPath="collection-api/audit-snapshot"
       // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
-      revisionRowConfigsByType={COLLECTION_REVISION_ROW_CONFIG}
+      revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
     />
   );
 }
@@ -91,12 +91,12 @@ import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/mate
 import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
 
 /** Custom revision row behavior for Object Store Resources. */
-export const OBJECT_STORE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   metadata: METADATA_REVISION_ROW_CONFIG
 };
 
 /** Custom revision row behavior for Object Store Resources. */
-export const COLLECTION_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
   "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG
 };

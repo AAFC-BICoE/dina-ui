@@ -14,8 +14,6 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
       </Link>
     ),
     customValueCells: {
-      // Date Fields:
-      createdOn: ({ original: { value } }) => <DateView date={value} />,
       // Link to the collector:
       collectors: ({ original: { value: relation } }) => {
         return relation?.map((rel, index) => (

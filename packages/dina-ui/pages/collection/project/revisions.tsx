@@ -1,4 +1,4 @@
-import { COLLECTION_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
 import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
 
 export default () => (
@@ -8,6 +8,6 @@ export default () => (
     queryPath="collection-api/project"
     resourceType="project"
     // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
-    revisionRowConfigsByType={COLLECTION_REVISION_ROW_CONFIG}
+    revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
   />
 );

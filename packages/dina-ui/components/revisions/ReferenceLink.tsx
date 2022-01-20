@@ -12,7 +12,7 @@ export interface ReferenceLinkProps<TResource extends KitsuResource> {
   reference: AuditToEntityReference;
 
   /** Function returning the name of the resource. */
-  name: (dto: PersistedResource<TResource>) => string | JSX.Element;
+  name: (dto: PersistedResource<TResource>) => string | JSX.Element | undefined;
 
   /** Link to the resource details page. */
   href?: string;

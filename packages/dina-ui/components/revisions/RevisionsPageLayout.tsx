@@ -1,6 +1,7 @@
 import {
   ColumnDefinition,
   dateCell,
+  DateView,
   KeyValueTable,
   ListPageLayout,
   useQuery,
@@ -13,7 +14,9 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { AuditSnapshot } from "../../types/objectstore-api";
+import { ReferenceLink } from "./ReferenceLink";
 import { RevisionRowConfigsByType } from "./revision-row-config";
+import { DinaUser } from "../../types/user-api";
 
 interface RevisionsPageLayoutProps {
   /** Audit snapshot path, including the base API path. */
@@ -105,9 +108,13 @@ export function RevisionsPageLayout({
                   </h4>
                   <KeyValueTable
                     data={changed}
-                    customValueCells={
-                      revisionRowConfigsByType?.[type]?.customValueCells
-                    }
+                    customValueCells={{
+                      // createdOn is on almost every DTO, so handle it automatically here:
+                      createdOn: ({ original: { value } }) => (
+                        <DateView date={value} />
+                      ),
+                      ...revisionRowConfigsByType?.[type]?.customValueCells
+                    }}
                     tableClassName="no-hover-highlight"
                   />
                 </div>
