@@ -44,7 +44,7 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className={generatedSamples ? "container-fluid" : "container"}>
+      <main className={mode === "EDIT" ? "container-fluid" : "container"}>
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {mode === "EDIT" && generatedSamples && (
           <MaterialSampleBulkEditor

@@ -100,7 +100,8 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
-  const sampleFormProps = {
+  const sampleFormProps: Partial<MaterialSampleFormProps> = {
+    enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
         <BackButton
@@ -208,8 +209,6 @@ export interface MaterialSampleFormProps {
   /** Makes the sample name field (Primary ID) read-only. */
   disableSampleNameField?: boolean;
 
-  omitGroupField?: boolean;
-
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 
   /** Disables the "Are You Sure" prompt in the nav when removing a data component. */
@@ -226,6 +225,8 @@ export interface MaterialSampleFormProps {
 
   /** Hide the use next identifer checkbox, e.g when create multiple new samples */
   hideUseSequence?: boolean;
+  /** Sets a default group from local storage when the group is not already set. */
+  enableStoredDefaultGroup?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -239,11 +240,11 @@ export function MaterialSampleForm({
   disableAutoNamePrefix,
   materialSampleFormRef,
   disableSampleNameField,
-  omitGroupField,
   disableNavRemovePrompt,
   isOffScreen,
   reduceRendering,
   hideUseSequence,
+  enableStoredDefaultGroup,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -327,12 +328,12 @@ export function MaterialSampleForm({
                 materialSample={materialSample as any}
               />
             )}
-            {!isTemplate && !omitGroupField && (
+            {!isTemplate && (
               <div className="row">
                 <div className="col-md-6">
                   <GroupSelectField
                     name="group"
-                    enableStoredDefaultGroup={true}
+                    enableStoredDefaultGroup={enableStoredDefaultGroup}
                   />
                 </div>
               </div>

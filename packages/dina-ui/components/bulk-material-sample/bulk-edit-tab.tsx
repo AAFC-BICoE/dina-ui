@@ -58,7 +58,6 @@ export function useBulkEditTab({
             materialSample={initialValues}
             disableAutoNamePrefix={true}
             disableSampleNameField={true}
-            omitGroupField={true}
             isOffScreen={!isSelected}
             // Disable the nav's Are You Sure prompt when removing components,
             // because you aren't actually deleting data.
