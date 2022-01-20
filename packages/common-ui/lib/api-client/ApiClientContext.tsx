@@ -42,6 +42,8 @@ export interface DoOperationsOptions {
 
   /** Return null for missing resource instead of throwing an Error. */
   returnNullForMissingResource?: boolean;
+
+  overridePatchOperation?: boolean;
 }
 
 /** Api client interface. */
@@ -225,8 +227,14 @@ export class ApiClientImpl implements ApiClientI {
 
     // Create the jsonpatch operations objects.
     const saveOperations = serialized.map<Operation>(jsonapiResource => ({
-      op: jsonapiResource.id ? "PATCH" : "POST",
-      path: jsonapiResource.id
+      op: options?.overridePatchOperation
+        ? "POST"
+        : jsonapiResource.id
+        ? "PATCH"
+        : "POST",
+      path: options?.overridePatchOperation
+        ? jsonapiResource.type
+        : jsonapiResource.id
         ? `${jsonapiResource.type}/${jsonapiResource.id}`
         : jsonapiResource.type,
       value: {

@@ -60,7 +60,8 @@ export function MaterialSampleBulkEditor({
 
   const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
     sampleHooks,
-    hideBulkEditTab: !initialized
+    hideBulkEditTab: !initialized,
+    hideUseSequence: true
   });
 
   useEffect(() => {
@@ -104,6 +105,7 @@ export function MaterialSampleBulkEditor({
           extraTabs={[bulkEditTab]}
           renderOneSample={({ index, isSelected }) => (
             <MaterialSampleForm
+              hideUseSequence={true}
               disableSampleNameField={disableSampleNameField}
               materialSampleFormRef={form => {
                 const isLastRefSetter =
