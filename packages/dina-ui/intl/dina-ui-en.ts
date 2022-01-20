@@ -276,6 +276,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_givenNames_tooltip: "First and all middle names",
   field_isInseperable: "Keep Contents Together",
   field_isInseperable_tooltip: "Contents are inseparable",
+  field_isFileAs_tooltip:
+    "Make this determination the filed as. Only one determination can be filed as",
+  field_isPrimary_tooltip:
+    "Make this determination the primary data point when exported. Only one determination can be primary",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",
@@ -367,8 +371,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFileAs: "Filed As",
-  isFileAsDeterminationButton_tooltip:
-    "Make this determination the filed as. Only one determination can be filed as",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",
@@ -474,8 +476,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
-  primaryDeterminationButton_tooltip:
-    "Make this determination the primary data point when exported. Only one determination can be primary",
   primaryId: "Primary ID",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   projectAttachments: "Project Attachments",

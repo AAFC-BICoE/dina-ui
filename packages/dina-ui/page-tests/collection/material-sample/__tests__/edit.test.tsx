@@ -750,21 +750,15 @@ describe("Material Sample Edit Page", () => {
               determination: [
                 {
                   verbatimDeterminer: "test-agent-1",
-                  verbatimScientificName: "test-name-1",
-                  isPrimary: true,
-                  isFileAs: true
+                  verbatimScientificName: "test-name-1"
                 },
                 {
                   verbatimDeterminer: "test-agent-2",
-                  verbatimScientificName: "test-name-2",
-                  isPrimary: false,
-                  isFileAs: false
+                  verbatimScientificName: "test-name-2"
                 },
                 {
                   verbatimDeterminer: "test-agent-3",
-                  verbatimScientificName: "test-name-3",
-                  isPrimary: false,
-                  isFileAs: false
+                  verbatimScientificName: "test-name-3"
                 }
               ],
               type: "material-sample"
