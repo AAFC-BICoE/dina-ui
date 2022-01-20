@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormContext,
@@ -14,11 +15,12 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useApiClient,
   useDinaFormContext,
   useFieldLabels,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { FormikProps, useField } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
@@ -221,6 +223,8 @@ export interface MaterialSampleFormProps {
   /** Reduces the rendering to improve performance when bulk editing many material samples. */
   reduceRendering?: boolean;
 
+  /** Hide the use next identifer checkbox, e.g when create multiple new samples */
+  hideUseSequence?: boolean;
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
 }
@@ -239,6 +243,7 @@ export function MaterialSampleForm({
   disableNavRemovePrompt,
   isOffScreen,
   reduceRendering,
+  hideUseSequence,
   enableStoredDefaultGroup,
   buttonBar = (
     <ButtonBar>
@@ -343,6 +348,7 @@ export function MaterialSampleForm({
               <MaterialSampleIdentifiersFormLayout
                 id={navIds.identifiers}
                 disableSampleNameField={disableSampleNameField}
+                hideUseSequence={hideUseSequence}
               />
               <MaterialSampleFormLayout />
             </>
@@ -588,6 +594,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
   id?: string;
+  hideUseSequence?: boolean;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -609,8 +616,13 @@ export function MaterialSampleIdentifiersFormLayout({
   className,
   namePrefix = "",
   sampleNamePlaceHolder,
+  hideUseSequence,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const [{ value }] = useField("collection");
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
+
   return (
     <FieldSet
       id={id}
@@ -623,13 +635,34 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}collection`}
             customName="collection"
           />
-          <TextField
-            name={`${namePrefix}materialSampleName`}
-            customName="materialSampleName"
-            className="materialSampleName"
-            readOnly={disableSampleNameField}
-            placeholder={sampleNamePlaceHolder}
-          />
+          <div className="d-flex">
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              inputProps={{ disabled: primaryIdDisabled }}
+              customName="materialSampleName"
+              className="materialSampleName flex-grow-1"
+              readOnly={disableSampleNameField}
+              placeholder={sampleNamePlaceHolder}
+            />
+            {!readOnly && !hideUseSequence && (
+              <CheckBoxField
+                onCheckBoxClick={event =>
+                  setPrimaryIdDisabled(event.target.checked)
+                }
+                name="useNextSequence"
+                className="ms-2 mt-1 align-items-center"
+                // only enabled when add new sample and collection is selected
+                disabled={initialValues.id || !value?.id}
+                overridecheckboxProps={{
+                  style: {
+                    height: "30px",
+                    width: "30px"
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">
