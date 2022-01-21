@@ -1,0 +1,122 @@
+import Select from "react-select";
+import React from "react";
+import { DinaForm, QueryBuilder } from "../..";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
+import { useSWRConfig } from "swr";
+import DatePicker from "react-datepicker";
+
+const TEST_SEARCH_DATE =
+  "Fri Jan 21 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
+
+/** Mock resources returned by elastic search mapping from api. */
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    "data.id.type": "text",
+    "data.attributes.createdOn.type": "date",
+    "meta.moduleVersion.type": "text",
+    "data.attributes.allowDuplicateName.type": "boolean"
+  }
+};
+
+const mockSearchApiGet = jest.fn(async () => {
+  return MOCK_INDEX_MAPPING_RESP;
+});
+
+const apiContext = {
+  apiClient: {
+    axios: { get: mockSearchApiGet } as any
+  }
+} as any;
+
+describe("QueryBuilder component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("Displays the Query builder with one Query Row by default.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ name: "queryRows" }}>
+        <QueryBuilder indexName="testIndex" />
+      </DinaForm>,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Default row should be present
+    expect(wrapper.find(".compoundQueryType0").length).toBe(0);
+
+    expect(
+      wrapper.find("SelectField[name='queryRows[0].fieldName']").length
+    ).toEqual(1);
+    expect(
+      wrapper
+        .find("SelectField[name='queryRows[0].fieldName']")
+        .find(Select)
+        .prop("options")
+    ).toEqual([
+      {
+        label: "createdOn",
+        value: "createdOn(date)"
+      },
+      {
+        label: "allowDuplicateName",
+        value: "allowDuplicateName(boolean)"
+      }
+    ]);
+  });
+  it("Query builder UI is able to aggretate first level queries", async () => {
+    const wrapper = mountWithAppContext(
+      <QueryBuilder indexName="testIndex" />,
+      { apiContext }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Expect the boolean dropdown to be visible
+    expect(wrapper.find(".compoundQueryType0").length).toBe(0);
+
+    // select first row to a date field
+    wrapper
+      .find("SelectField[name='queryRows[0].fieldName']")
+      .find(Select)
+      .prop<any>("onChange")({ value: "createdOn(date)" });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find("DateField[name='queryRows[0].date']").length).toEqual(
+      1
+    );
+    // set date value
+    wrapper
+      .find("DateField[name='queryRows[0].date']")
+      .find(DatePicker)
+      .prop<any>("onChange")(new Date(TEST_SEARCH_DATE));
+
+    // select second row to a boolean field
+    wrapper
+      .find("SelectField[name='queryRows[1].fieldName']")
+      .find(Select)
+      .prop<any>("onChange")({ value: "allowDuplicateName(boolean)" });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find("SelectField[name='queryRows[1].boolean']").length
+    ).toEqual(1);
+
+    // set boolean value
+    wrapper
+      .find("SelectField[name='queryRows[1].boolean']")
+      .find(Select)
+      .prop<any>("onChange")("true");
+  });
+});

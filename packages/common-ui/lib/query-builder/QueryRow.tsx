@@ -150,12 +150,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           onClick={addRow as any}
           size="2em"
           style={{ cursor: "pointer" }}
+          name={fieldProps("addRow", index).name}
         />
       ) : (
         <FaMinus
           onClick={removeRow as any}
           size="2em"
           style={{ cursor: "pointer" }}
+          name={fieldProps("removeRow", index).name}
         />
       )}
     </div>

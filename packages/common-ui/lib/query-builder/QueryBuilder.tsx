@@ -7,15 +7,15 @@ import { FieldArray } from "formik";
 import { isArray } from "lodash";
 import { transformQueryToDSL } from "../util/transformToDSL";
 
-export function QueryBuilder() {
+export function QueryBuilder({ indexName }) {
   const { apiClient } = useApiClient();
 
-  async function fetchQueryFieldsByIndex(indexName) {
+  async function fetchQueryFieldsByIndex(searchIndexName) {
     const resp = await apiClient.axios.get("search-api/search/mapping", {
-      params: { indexName }
+      params: { indexName: searchIndexName }
     });
 
-    const result: [{}] = [{}];
+    const result: {}[] = [];
 
     Object.keys(resp.data)
       .filter(key => key.includes("data.attributes."))
@@ -30,7 +30,16 @@ export function QueryBuilder() {
           type: resp.data?.[key]
         });
       });
+    return result;
+  }
 
+  async function searchES(queryDSL) {
+    const resp = await apiClient.axios.get(
+      `http://elasticsearch.traefik.me/${indexName}/_search`,
+      { params: queryDSL }
+    );
+
+    const result: [{}] = resp.data;
     return result;
   }
 
@@ -41,7 +50,7 @@ export function QueryBuilder() {
     data,
     error,
     isValidating: loading
-  } = useSWR(["dina_material_sample_index", cacheId], fetchQueryFieldsByIndex, {
+  } = useSWR([indexName, cacheId], fetchQueryFieldsByIndex, {
     shouldRetryOnError: true,
     revalidateOnFocus: false,
     revalidateOnReconnect: false
@@ -49,10 +58,10 @@ export function QueryBuilder() {
 
   if (loading || error) return <></>;
 
-  function onSubmit(props) {
-    const { submittedValues } = props;
-    transformQueryToDSL(submittedValues.queryRows);
-  }
+  const onSubmit = ({ submittedValues }) => {
+    const queryDSL = transformQueryToDSL(submittedValues.queryRows);
+    const resp = searchES(queryDSL);
+  };
 
   return (
     <DinaForm initialValues={{}} onSubmit={onSubmit}>
