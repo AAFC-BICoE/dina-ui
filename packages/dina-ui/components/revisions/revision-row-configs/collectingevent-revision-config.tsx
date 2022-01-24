@@ -1,6 +1,9 @@
 import { DateView, KeyValueTable } from "common-ui";
 import Link from "next/link";
-import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
+import {
+  CollectionMethod,
+  CollectingEvent
+} from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
@@ -28,6 +31,15 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           </div>
         ));
       },
+      collectionMethod: ({ original: { value } }) => (
+        <ReferenceLink<CollectionMethod>
+          baseApiPath="collection-api"
+          type="collection-method"
+          reference={value}
+          name={({ name }) => name}
+          href="/collection/collection-method/view?id="
+        />
+      ),
       attachment: ({ original: { value } }) => (
         <div>
           {value?.map(

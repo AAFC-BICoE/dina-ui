@@ -15,3 +15,4 @@ export * from "./resources/PreparationType";
 export * from "./resources/StorageUnit";
 export * from "./resources/StorageUnitType";
 export * from "./resources/VocabularyElement";
+export * from "./resources/CollectionMethod";

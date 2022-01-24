@@ -4,11 +4,12 @@ import {
   DateView,
   KeyValueTable,
   ListPageLayout,
+  useFieldLabels,
   useQuery,
   withResponse
 } from "common-ui";
 import { KitsuResource } from "kitsu";
-import { get, pick, omit } from "lodash";
+import { get, pick, startCase } from "lodash";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "..";
@@ -38,6 +39,8 @@ export function RevisionsPageLayout({
   author,
   instanceId
 }: RevisionsPageLayoutProps) {
+  const { getFieldLabel } = useFieldLabels();
+
   const REVISION_TABLE_COLUMNS: ColumnDefinition<KitsuResource>[] = [
     ...// Only show resourceName column when not searching by instanceId:
     (instanceId
@@ -60,6 +63,15 @@ export function RevisionsPageLayout({
             },
             accessor: "resourceName",
             className: "resource-name-cell"
+          },
+          {
+            Cell: ({ original }) => {
+              const snapshot: AuditSnapshot = original;
+              const [type] = snapshot.instanceId.split("/");
+              return typeof type === "string" ? startCase(type) : "";
+            },
+            accessor: "resourceType",
+            className: "resource-type-cell"
           }
         ]),
     "version",
@@ -68,7 +80,9 @@ export function RevisionsPageLayout({
     {
       Cell: ({ original: { changedProperties } }) => (
         <div style={{ whiteSpace: "normal" }}>
-          {changedProperties?.join(", ")}
+          {changedProperties
+            ?.map(fieldName => getFieldLabel({ name: fieldName }).fieldLabel)
+            ?.join(", ")}
         </div>
       ),
       accessor: "changedProperties"

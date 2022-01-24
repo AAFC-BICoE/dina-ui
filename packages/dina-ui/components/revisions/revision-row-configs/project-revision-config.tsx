@@ -1,8 +1,9 @@
+import { allLangsDescriptionCell } from "common-ui";
+import Link from "next/link";
 import { Project } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
-import Link from "next/link";
 
 export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
   name: ({ id, name }) => (
@@ -28,6 +29,8 @@ export const PROJECT_REVISION_ROW_CONFIG: RevisionRowConfig<Project> = {
             )
         )}
       </div>
-    )
+    ),
+    multilingualDescription: allLangsDescriptionCell("multilingualDescription")
+      .Cell
   }
 };

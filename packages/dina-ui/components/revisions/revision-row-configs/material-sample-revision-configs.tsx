@@ -211,6 +211,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           </div>
         )),
       hostOrganism: ({ original: { value } }) => <KeyValueTable data={value} />,
+      organism: ({ original: { value } }) => <KeyValueTable data={value} />,
       // Don't render this one because it isn't an editable field:
       materialSampleChildren: () => <></>
     }
