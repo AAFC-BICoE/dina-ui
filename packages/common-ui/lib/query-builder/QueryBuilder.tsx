@@ -24,9 +24,15 @@ export function QueryBuilder({ indexName }) {
           "data.attributes.".length,
           key.lastIndexOf(".")
         );
+
+        const fieldValue = key.substring(
+          0,
+          key.indexOf(fieldNameLabel) + fieldNameLabel.length
+        );
+
         result.push({
           label: fieldNameLabel,
-          value: fieldNameLabel,
+          value: fieldValue,
           type: resp.data?.[key]
         });
       });
@@ -34,13 +40,14 @@ export function QueryBuilder({ indexName }) {
   }
 
   async function searchES(queryDSL) {
-    const resp = await apiClient.axios.get(
-      `http://elasticsearch.traefik.me/${indexName}/_search`,
-      { params: queryDSL }
-    );
-
-    const result: [{}] = resp.data;
-    return result;
+    const query = { ...queryDSL };
+    const resp = await apiClient.axios.get(`es/${indexName}/_search`, {
+      params: {
+        source: query,
+        source_content_type: "application/json"
+      }
+    });
+    return resp.data?.hits.hits.map(hit => hit._source?.data);
   }
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
@@ -60,7 +67,7 @@ export function QueryBuilder({ indexName }) {
 
   const onSubmit = ({ submittedValues }) => {
     const queryDSL = transformQueryToDSL(submittedValues.queryRows);
-    const resp = searchES(queryDSL);
+    return searchES(queryDSL);
   };
 
   return (
