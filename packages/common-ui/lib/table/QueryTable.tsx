@@ -1,6 +1,6 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { isPlainObject } from "lodash";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import {
@@ -198,6 +198,22 @@ export function QueryTable<TData extends KitsuResource>({
   const shouldShowPagination = !!displayData?.length;
 
   const [visible, setVisible] = useState(false);
+
+  // Auto set aria label for react table using part of path
+  let ariaLabel = path
+    .substring(path.lastIndexOf("/") ? path.lastIndexOf("/") + 1 : 0)
+    .replaceAll("-", " ");
+
+  ariaLabel = ariaLabel.endsWith("s") ? ariaLabel + "es" : ariaLabel + "s";
+
+  useEffect(() => {
+    const reactTableDivs = document?.querySelectorAll<any>(
+      "div.rt-table[role='grid']"
+    );
+    reactTableDivs?.forEach(element => {
+      element.setAttribute("aria-label", ariaLabel);
+    });
+  });
 
   return (
     <div

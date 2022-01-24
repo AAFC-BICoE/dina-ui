@@ -27,7 +27,7 @@ export function Nav() {
 
   return (
     <>
-      <div id="wb-tphp" className="d-flex flex-column align-items-center">
+      <nav id="wb-tphp" className="d-flex flex-column align-items-center">
         <a className="wb-link-inv wb-sl" href="#wb-cont">
           <DinaMessage id="skipToMainContent" />
         </a>
@@ -37,7 +37,7 @@ export function Nav() {
         <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
           <DinaMessage id="skipToBasicHtmlVersion" />
         </a>
-      </div>
+      </nav>
 
       <header className="py-3">
         <div id="wb-bnr" className="container">
@@ -80,7 +80,7 @@ export function Nav() {
             </section>
           </div>
         </div>
-        <div className="app-bar">
+        <nav className="app-bar">
           <div className="container">
             <ul className="list-inline d-flex m-0">
               <li className="list-inline-item me-4">
@@ -109,7 +109,7 @@ export function Nav() {
               )}
             </ul>
           </div>
-        </div>
+        </nav>
       </header>
     </>
   );
