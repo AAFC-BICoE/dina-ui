@@ -71,6 +71,8 @@ export interface QueryTableProps<TData extends KitsuResource> {
   hideTopPagination?: boolean;
 
   topRightCorner?: ReactNode;
+
+  ariaLabel?: string;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -95,7 +97,8 @@ export function QueryTable<TData extends KitsuResource>({
   path,
   hideTopPagination,
   reactTableProps,
-  topRightCorner
+  topRightCorner,
+  ariaLabel
 }: QueryTableProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -200,18 +203,20 @@ export function QueryTable<TData extends KitsuResource>({
   const [visible, setVisible] = useState(false);
 
   // Auto set aria label for react table using part of path
-  let ariaLabel = path
+  let autoAriaLabel = path
     .substring(path.lastIndexOf("/") ? path.lastIndexOf("/") + 1 : 0)
     .replaceAll("-", " ");
 
-  ariaLabel = ariaLabel.endsWith("s") ? ariaLabel + "es" : ariaLabel + "s";
+  autoAriaLabel = autoAriaLabel.endsWith("s")
+    ? autoAriaLabel + "es"
+    : autoAriaLabel + "s";
 
   useEffect(() => {
     const reactTableDivs = document?.querySelectorAll<any>(
       "div.rt-table[role='grid']"
     );
     reactTableDivs?.forEach(element => {
-      element.setAttribute("aria-label", ariaLabel);
+      element.setAttribute("aria-label", ariaLabel ?? autoAriaLabel);
     });
   });
 
