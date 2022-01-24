@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { allLangsDescriptionCell } from "packages/common-ui/lib";
+import { allLangsDescriptionCell } from "common-ui";
 import { PreparationType } from "../../../types/collection-api";
 import { RevisionRowConfig } from "../revision-row-config";
 
