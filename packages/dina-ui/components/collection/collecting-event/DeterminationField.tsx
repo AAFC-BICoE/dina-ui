@@ -1,6 +1,7 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
   TextField,
   TextFieldWithMultiplicationButton,
@@ -19,6 +20,7 @@ import {
   MaterialSample,
   Vocabulary
 } from "../../../types/collection-api";
+import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import {
   GlobalNamesField,
@@ -47,7 +49,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     isPrimary: true,
     scientificNameDetails: true,
     isFileAs: true,
-    determinationRemarks: true
+    determinationRemarks: true,
+    managedAttributes: true
   };
 
 /** All fields of the Determination type. */
@@ -336,6 +339,21 @@ export function DeterminationField({ id = "determination-section" }) {
                 <TextField
                   {...fieldProps("determinationRemarks")}
                   multiLines={true}
+                />
+              </FieldSet>
+              <FieldSet
+                legend={<DinaMessage id="determinationManagedAttributes" />}
+                // Disabled the template's restrictions for this section:
+                enabledFields={null}
+                className="non-strip"
+              >
+                <ManagedAttributesEditor
+                  valuesPath={fieldProps("managedAttributes").name}
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  apiBaseUrl="/collection-api"
+                  managedAttributeComponent="DETERMINATION"
+                  managedAttributeKeyField="key"
+                  attributeSelectorWidth={12}
                 />
               </FieldSet>
             </div>
