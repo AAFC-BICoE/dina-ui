@@ -19,6 +19,18 @@ export function Nav() {
   const { formatMessage } = useDinaIntl();
   const { locale } = useContext(intlContext);
 
+  // Generate accessible message for Government of Canada Logo.
+  const logoSpan =
+    locale === "en" ? (
+      <span className="wb-inv" property="name">
+        Government of Canada / <span lang="fr">Gouvernement du Canada</span>
+      </span>
+    ) : (
+      <span className="wb-inv" property="name">
+        Gouvernement du Canada / <span lang="en">Government of Canada</span>
+      </span>
+    );
+
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showUserNav =
     Object.values(rolesPerGroup ?? {})
@@ -48,15 +60,11 @@ export function Nav() {
               typeof="GovernmentOrganization"
             >
               <img
-                src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/sig-blk-en.svg"
-                alt={formatMessage("governmentOfCanada")}
+                src={"/static/images/canadaLogo_" + locale + ".svg"}
                 property="logo"
+                alt=""
               />
-              <span className="wb-inv" property="name">
-                <span lang={locale}>
-                  <DinaMessage id="governmentOfCanada" />
-                </span>
-              </span>
+              {logoSpan}
               <meta property="areaServed" typeof="Country" content="Canada" />
             </div>
             <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
