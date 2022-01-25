@@ -59,20 +59,31 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   const [visibility, setVisibility] = useState(initVisibility);
 
-  function onSelectionChange(value, _) {
+  function onSelectionChange(value, formik, idx) {
     const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+    const initState = {
+      ...formik.values?.queryRows?.[`${idx}`],
+      matchValue: null,
+      matchType: null,
+      date: null,
+      boolean: null,
+      number: null,
+      fieldName: value
+    };
+    formik.setFieldValue(`queryRows[${idx}]`, initState);
     switch (type) {
-      case "text":
+      case "text": {
         return setVisibility({ ...initVisibility, text: true });
-
-      case "date":
+      }
+      case "date": {
         return setVisibility({ ...initVisibility, date: true });
-
-      case "boolean":
+      }
+      case "boolean": {
         return setVisibility({ ...initVisibility, boolean: true });
-
-      case "long":
+      }
+      case "long": {
         return setVisibility({ ...initVisibility, number: true });
+      }
     }
   }
 
@@ -99,7 +110,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       <SelectField
         name={fieldProps("fieldName", index).name}
         options={queryRowOptions}
-        onChange={onSelectionChange}
+        onChange={(value, formik) => onSelectionChange(value, formik, index)}
         className={`flex-grow-1 me-2 `}
         removeLabel={true}
       />
