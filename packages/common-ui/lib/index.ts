@@ -85,3 +85,4 @@ export * from "./text-field-with-multiplication-button/TextFieldWithMultiplicati
 export * from "./formik-connected/PlaceSectionsSelectionField";
 export * from "./query-builder/QueryBuilder";
 export * from "./formik-connected/QueryLogicSwitchField";
+export * from "./query-page/QueryPage";

@@ -1,11 +1,10 @@
 import { useMemo } from "react";
 import useSWR from "swr";
-import { DinaForm, SubmitButton, useApiClient } from "..";
+import { useApiClient } from "..";
 import { QueryRow } from "./QueryRow";
 import { v4 as uuidv4 } from "uuid";
 import { FieldArray } from "formik";
 import { isArray } from "lodash";
-import { transformQueryToDSL } from "../util/transformToDSL";
 
 export function QueryBuilder({ indexName }) {
   const { apiClient } = useApiClient();
@@ -14,7 +13,6 @@ export function QueryBuilder({ indexName }) {
     const resp = await apiClient.axios.get("search-api/search/mapping", {
       params: { indexName: searchIndexName }
     });
-
     const result: {}[] = [];
 
     Object.keys(resp.data)
@@ -39,17 +37,6 @@ export function QueryBuilder({ indexName }) {
     return result;
   }
 
-  async function searchES(queryDSL) {
-    const query = { ...queryDSL };
-    const resp = await apiClient.axios.get(`es/${indexName}/_search`, {
-      params: {
-        source: query,
-        source_content_type: "application/json"
-      }
-    });
-    return resp.data?.hits.hits.map(hit => hit._source?.data);
-  }
-
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
 
@@ -65,63 +52,55 @@ export function QueryBuilder({ indexName }) {
 
   if (loading || error) return <></>;
 
-  const onSubmit = ({ submittedValues }) => {
-    const queryDSL = transformQueryToDSL(submittedValues.queryRows);
-    return searchES(queryDSL);
-  };
-
   return (
-    <DinaForm initialValues={{}} onSubmit={onSubmit}>
-      <FieldArray name={"queryRows"}>
-        {fieldArrayProps => {
-          const elements: [] = fieldArrayProps.form.values.queryRows;
+    <FieldArray name={"queryRows"}>
+      {fieldArrayProps => {
+        const elements: [] = fieldArrayProps.form.values.queryRows;
 
-          function addRow() {
-            fieldArrayProps.push(
+        function addRow() {
+          fieldArrayProps.push(
+            <QueryRow
+              name={fieldArrayProps.name}
+              esIndexMapping={data as any}
+              index={elements?.length ?? 0}
+              removeRow={removeRow}
+              addRow={addRow}
+            />
+          );
+          // initialize the logic switch value to be "and"//
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${
+              elements?.length ?? 0
+            }].compoundQueryType`,
+            "and"
+          );
+        }
+
+        function removeRow(index: number) {
+          fieldArrayProps.remove(index);
+        }
+
+        /* Making sure there is a single row present as default*/
+        if (
+          !fieldArrayProps.form.getFieldMeta("queryRows").value ||
+          !isArray(fieldArrayProps.form.getFieldMeta("queryRows").value)
+        ) {
+          addRow();
+        }
+
+        return elements?.length > 0
+          ? elements?.map((_, index) => (
               <QueryRow
                 name={fieldArrayProps.name}
-                esIndexMapping={data as any}
-                index={elements?.length ?? 0}
-                removeRow={removeRow}
+                key={index}
+                index={index}
                 addRow={addRow}
+                removeRow={removeRow}
+                esIndexMapping={data as any}
               />
-            );
-            // initialize the logic switch value to be "and"//
-            fieldArrayProps.form.setFieldValue(
-              `${fieldArrayProps.name}[${
-                elements?.length ?? 0
-              }].compoundQueryType`,
-              "and"
-            );
-          }
-
-          function removeRow(index: number) {
-            fieldArrayProps.remove(index);
-          }
-
-          /* Making sure there is a single row present as default*/
-          if (
-            !fieldArrayProps.form.getFieldMeta("queryRows").value ||
-            !isArray(fieldArrayProps.form.getFieldMeta("queryRows").value)
-          ) {
-            addRow();
-          }
-
-          return elements?.length > 0
-            ? elements?.map((_, index) => (
-                <QueryRow
-                  name={fieldArrayProps.name}
-                  key={index}
-                  index={index}
-                  addRow={addRow}
-                  removeRow={removeRow}
-                  esIndexMapping={data as any}
-                />
-              ))
-            : null;
-        }}
-      </FieldArray>
-      <SubmitButton className="ms-auto" />
-    </DinaForm>
+            ))
+          : null;
+      }}
+    </FieldArray>
   );
 }

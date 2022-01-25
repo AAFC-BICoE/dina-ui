@@ -30,7 +30,7 @@ export interface QueryRowExportProps {
   compoundQueryType?: string;
   number?: string;
   date?: string;
-  boolean?: string | boolean;
+  boolean?: string;
 }
 
 type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";

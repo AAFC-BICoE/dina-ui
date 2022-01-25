@@ -2,7 +2,6 @@ import Select from "react-select";
 import React from "react";
 import { DinaForm, QueryBuilder } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { useSWRConfig } from "swr";
 import DatePicker from "react-datepicker";
 
 const TEST_SEARCH_DATE =
@@ -58,17 +57,19 @@ describe("QueryBuilder component", () => {
     ).toEqual([
       {
         label: "createdOn",
-        value: "createdOn(date)"
+        value: "data.attributes.createdOn(date)"
       },
       {
         label: "allowDuplicateName",
-        value: "allowDuplicateName(boolean)"
+        value: "data.attributes.allowDuplicateName(boolean)"
       }
     ]);
   });
-  it("Query builder UI is able to aggretate first level queries", async () => {
+  it("Query builder can be used to add rows to aggretate level queries", async () => {
     const wrapper = mountWithAppContext(
-      <QueryBuilder indexName="testIndex" />,
+      <DinaForm initialValues={{}}>
+        <QueryBuilder indexName="testIndex" />
+      </DinaForm>,
       { apiContext }
     );
 
