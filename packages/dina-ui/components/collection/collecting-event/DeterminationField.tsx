@@ -341,21 +341,23 @@ export function DeterminationField({ id = "determination-section" }) {
                   multiLines={true}
                 />
               </FieldSet>
-              <FieldSet
-                legend={<DinaMessage id="determinationManagedAttributes" />}
-                // Disabled the template's restrictions for this section:
-                enabledFields={null}
-                className="non-strip"
-              >
-                <ManagedAttributesEditor
-                  valuesPath={fieldProps("managedAttributes").name}
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  apiBaseUrl="/collection-api"
-                  managedAttributeComponent="DETERMINATION"
-                  managedAttributeKeyField="key"
-                  attributeSelectorWidth={12}
-                />
-              </FieldSet>
+              {!isTemplate && (
+                <FieldSet
+                  legend={<DinaMessage id="determinationManagedAttributes" />}
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                  className="non-strip"
+                >
+                  <ManagedAttributesEditor
+                    valuesPath={fieldProps("managedAttributes").name}
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    apiBaseUrl="/collection-api"
+                    managedAttributeComponent="DETERMINATION"
+                    managedAttributeKeyField="key"
+                    attributeSelectorWidth={12}
+                  />
+                </FieldSet>
+              )}
             </div>
           </div>
         );
