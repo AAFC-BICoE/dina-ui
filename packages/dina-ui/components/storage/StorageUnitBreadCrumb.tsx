@@ -5,14 +5,12 @@ export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
   hideThisUnit?: boolean;
   storageUnit: StorageUnit;
-  readOnly?: boolean;
 }
 
 export function StorageUnitBreadCrumb({
   disableLastLink,
   hideThisUnit,
-  storageUnit,
-  readOnly
+  storageUnit
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??

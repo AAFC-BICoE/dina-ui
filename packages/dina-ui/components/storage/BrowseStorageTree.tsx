@@ -166,8 +166,7 @@ function StorageUnitCollapser({
   storageUnit,
   onSelect,
   disabled,
-  showPathInName,
-  readOnly
+  showPathInName
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -203,10 +202,7 @@ function StorageUnitCollapser({
       <div className="flex-grow-1">
         <div className="d-flex flex-row align-items-center gap-2 mb-3">
           {showPathInName ? (
-            <StorageUnitBreadCrumb
-              storageUnit={storageUnit}
-              readOnly={readOnly}
-            />
+            <StorageUnitBreadCrumb storageUnit={storageUnit} />
           ) : (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
               <a className="storage-unit-name">

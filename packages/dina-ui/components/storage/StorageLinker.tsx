@@ -68,11 +68,7 @@ export function StorageLinker({
         </div>
       )}
       {value?.id ? (
-        <AssignedStorage
-          value={value}
-          contentId={formId}
-          onChange={changeStorageAndResetTab}
-        />
+        <AssignedStorage value={value} onChange={changeStorageAndResetTab} />
       ) : (
         <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
           <TabList className="react-tabs__tab-list mb-0">
@@ -156,7 +152,7 @@ export function StorageLinkerField({
     <FieldWrapper
       name={name}
       readOnlyRender={value => (
-        <AssignedStorage readOnly={true} value={value} contentId={formId} />
+        <AssignedStorage readOnly={true} value={value} />
       )}
       disableLabelClick={true}
       customName={customName}

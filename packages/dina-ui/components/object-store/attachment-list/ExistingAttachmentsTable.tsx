@@ -20,7 +20,6 @@ export interface ExistingAttachmentsTableProps {
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited?: () => void | Promise<void>;
   detachTotalSelected?: boolean;
-  readOnly?: boolean;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -32,8 +31,7 @@ export function ExistingAttachmentsTable({
   attachmentPath,
   onDetachMetadataIds,
   onMetadatasEdited,
-  detachTotalSelected,
-  readOnly
+  detachTotalSelected
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,

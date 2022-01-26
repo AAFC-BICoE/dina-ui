@@ -43,7 +43,6 @@ export function StorageSearchSelector({
       Cell: ({ original }) => (
         <StorageUnitBreadCrumb
           storageUnit={original}
-          readOnly={readOnly}
           // Do not repeat the unit name because it's in the "name" column:
           hideThisUnit={true}
         />

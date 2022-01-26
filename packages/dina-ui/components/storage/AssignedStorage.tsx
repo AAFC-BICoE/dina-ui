@@ -1,15 +1,12 @@
 import { FormikButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { Promisable } from "type-fest";
-import { StorageUnitContents } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { useStorageUnit } from "../../pages/collection/storage-unit/edit";
 import { StorageUnit } from "../../types/collection-api";
 import { StorageUnitBreadCrumb } from "./StorageUnitBreadCrumb";
 
 export interface AssignedStorageProps {
-  /** ID of the stored object. */
-  contentId?: string;
   readOnly?: boolean;
   value?: PersistedResource<StorageUnit>;
   onChange?: (
@@ -20,7 +17,6 @@ export interface AssignedStorageProps {
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
 export function AssignedStorage({
-  contentId,
   onChange,
   readOnly,
   value,
@@ -34,10 +30,7 @@ export function AssignedStorage({
         <div>
           <div className="list-inline mb-3">
             <div className="storage-path list-inline-item">
-              <StorageUnitBreadCrumb
-                storageUnit={storageUnit}
-                readOnly={readOnly}
-              />
+              <StorageUnitBreadCrumb storageUnit={storageUnit} />
             </div>
             {storageUnit.storageUnitType?.isInseperable && (
               <div className="list-inline-item">

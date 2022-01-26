@@ -114,7 +114,6 @@ export function StorageUnitFormFields() {
               storageUnit={form.values}
               // Don't show this storage unit in the breadcrumb:
               hideThisUnit={true}
-              readOnly={readOnly}
             />
           )}
         />
