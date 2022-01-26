@@ -3,12 +3,14 @@ import { StorageUnit } from "../../types/collection-api";
 
 export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
+  hideThisUnit?: boolean;
   storageUnit: StorageUnit;
   readOnly?: boolean;
 }
 
 export function StorageUnitBreadCrumb({
   disableLastLink,
+  hideThisUnit,
   storageUnit,
   readOnly
 }: StorageUnitBreadCrumbProps) {
@@ -34,17 +36,19 @@ export function StorageUnitBreadCrumb({
           </Link>
         </li>
       ))}
-      <li className="breadcrumb-item">
-        <strong>
-          {storageUnit.id && !disableLastLink ? (
-            <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-              <a target={!readOnly ? "_blank" : ""}>{unitDisplayName}</a>
-            </Link>
-          ) : (
-            unitDisplayName
-          )}
-        </strong>
-      </li>
+      {!hideThisUnit && (
+        <li className="breadcrumb-item">
+          <strong>
+            {storageUnit.id && !disableLastLink ? (
+              <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
+                <a target={!readOnly ? "_blank" : ""}>{unitDisplayName}</a>
+              </Link>
+            ) : (
+              unitDisplayName
+            )}
+          </strong>
+        </li>
+      )}
     </ol>
   );
 }

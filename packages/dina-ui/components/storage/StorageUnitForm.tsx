@@ -4,13 +4,13 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  FieldWrapper,
   filterBy,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { Field } from "formik";
 import { PersistedResource } from "kitsu";
 import * as yup from "yup";
 import {
@@ -87,18 +87,6 @@ export function StorageUnitFormFields() {
 
   return (
     <div>
-      <Field>
-        {({ form: { values: storageUnit } }) => (
-          <h2>
-            <StorageUnitBreadCrumb
-              storageUnit={storageUnit}
-              // Don't have the page link to itself:
-              disableLastLink={true}
-              readOnly={readOnly}
-            />
-          </h2>
-        )}
-      </Field>
       <div className="row">
         <GroupSelectField
           name="group"
@@ -118,7 +106,24 @@ export function StorageUnitFormFields() {
         />
         <TextField className="col-md-6" name="name" />
       </div>
-      <StorageLinkerField name="parentStorageUnit" targetType="storage-unit" />
+      {readOnly ? (
+        <FieldWrapper
+          name="location"
+          readOnlyRender={(_, form) => (
+            <StorageUnitBreadCrumb
+              storageUnit={form.values}
+              // Don't show this storage unit in the breadcrumb:
+              hideThisUnit={true}
+              readOnly={readOnly}
+            />
+          )}
+        />
+      ) : (
+        <StorageLinkerField
+          name="parentStorageUnit"
+          targetType="storage-unit"
+        />
+      )}
       {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
       {readOnly && (
         <div className="row">
