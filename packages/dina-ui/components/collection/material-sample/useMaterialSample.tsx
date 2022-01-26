@@ -613,8 +613,9 @@ export function useMaterialSampleSave({
     if (
       msInputWithRelationships.associations?.length === 1 &&
       Object.keys(msInputWithRelationships.associations[0]).length === 0
-    )
-      msInputWithRelationships.associations = [];
+    ) {
+      delete msInputWithRelationships.associations;
+    }
 
     const saveOperation = {
       resource: msInputWithRelationships,

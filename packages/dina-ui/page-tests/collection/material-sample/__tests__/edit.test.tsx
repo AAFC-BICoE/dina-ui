@@ -588,7 +588,6 @@ describe("Material Sample Edit Page", () => {
             resource: {
               id: "333",
               relationships: {},
-              associations: [],
               attachment: undefined,
               preparationAttachment: undefined,
               projects: undefined,

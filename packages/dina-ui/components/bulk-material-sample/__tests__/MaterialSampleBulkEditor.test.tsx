@@ -1875,7 +1875,6 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              associations: [],
               preparationAttachment: undefined,
               projects: undefined,
               attachment: undefined,
@@ -1895,7 +1894,6 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: {
-              associations: [],
               preparationAttachment: undefined,
               projects: undefined,
               attachment: undefined,
