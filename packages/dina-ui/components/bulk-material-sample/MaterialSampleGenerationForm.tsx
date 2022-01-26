@@ -120,7 +120,7 @@ export function MaterialSampleGenerationForm({
           <h2>
             <DinaMessage id="splitFrom" />:{" "}
             <Link href={`/collection/material-sample/view?id=${ms.id}`}>
-              <a target="_blank">{ms.materialSampleName}</a>
+              <a>{ms.materialSampleName}</a>
             </Link>
           </h2>
         ))}

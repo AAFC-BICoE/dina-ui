@@ -736,7 +736,6 @@ export function CollectingEventFormLayout({
                           {detail.sourceUrl && (
                             <a
                               href={`${detail.sourceUrl}`}
-                              target="_blank"
                               className="btn btn-info"
                             >
                               <DinaMessage id="viewDetailButtonLabel" />

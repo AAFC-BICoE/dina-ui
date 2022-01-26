@@ -30,7 +30,6 @@ export default function IndexSetViewPage() {
       apiBaseUrl="/seqdb-api"
       mainClass="container-fluid"
       editButton={() => null}
-      deleteButton={() => null}
     />
   );
 }

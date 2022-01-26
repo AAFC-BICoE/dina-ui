@@ -53,8 +53,6 @@ export function CatalogueOfLifeNameField({
 
     const link = document.createElement("a");
     link.setAttribute("href", scientificNameDetailSrcUrl);
-    link.setAttribute("target", "_blank");
-    link.setAttribute("rel", "noopener");
 
     link.innerHTML = scientificNameDetailLabelHtml;
 

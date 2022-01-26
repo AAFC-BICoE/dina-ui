@@ -194,8 +194,6 @@ export function GlobalNamesSearchBox({
             .map((result, idx) => {
               const link = document.createElement("a");
               link.setAttribute("href", result.bestResult?.outlink);
-              link.setAttribute("target", "_blank");
-              link.setAttribute("rel", "noopener");
 
               const paths = result.bestResult?.classificationPath.split("|");
               const ranks = result.bestResult?.classificationRanks.split("|");
