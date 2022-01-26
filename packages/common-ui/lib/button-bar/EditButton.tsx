@@ -42,7 +42,7 @@ export function EditButton({
     <Link href={`/${entityLink}/edit?id=${entityId}`}>
       <a
         className={classNames("btn btn-primary", { disabled }, className)}
-        style={{ width: "10rem", ...style }}
+        style={{ width: "6rem", ...style }}
         onMouseOver={onMouseOver}
         onMouseOut={onMouseOut}
         onBlur={onBlur}

@@ -41,7 +41,12 @@ export function StorageSearchSelector({
     },
     {
       Cell: ({ original }) => (
-        <StorageUnitBreadCrumb storageUnit={original} readOnly={readOnly} />
+        <StorageUnitBreadCrumb
+          storageUnit={original}
+          readOnly={readOnly}
+          // Do not repeat the unit name because it's in the "name" column:
+          hideThisUnit={true}
+        />
       ),
       accessor: "location",
       sortable: false
@@ -54,11 +59,11 @@ export function StorageSearchSelector({
             await onChange({ id: original.id, type: original.type })
           }
         >
-          <DinaMessage id="assignToStorage" />
+          <DinaMessage id="select" />
         </FormikButton>
       ),
       width: 250,
-      accessor: "assignToStorage",
+      accessor: "select",
       sortable: false
     }
   ];

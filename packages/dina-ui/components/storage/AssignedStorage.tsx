@@ -53,15 +53,6 @@ export function AssignedStorage({
               <DinaMessage id="removeFromParentStorageUnit" />
             </FormikButton>
           )}
-          <div>
-            <label>
-              <DinaMessage id="otherContents" />
-            </label>
-            <StorageUnitContents
-              storageId={storageUnit.id}
-              excludeContentId={contentId}
-            />
-          </div>
         </div>
       ))}
     </div>

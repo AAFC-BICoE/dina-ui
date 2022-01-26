@@ -106,7 +106,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           return (
             <>
               <Head title={title} />
-              <ButtonBar>
+              <ButtonBar className="gap-2">
                 <BackButton
                   entityId={id}
                   className="me-auto"
@@ -125,9 +125,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                   </Link>
                 )}
                 {canDelete &&
-                  (deleteButton?.(formProps) ?? (
+                  (deleteButton ? (
+                    deleteButton(formProps)
+                  ) : (
                     <DeleteButton
-                      className="ms-5"
                       id={id}
                       options={{ apiBaseUrl }}
                       postDeleteRedirect={`${entityLink}/list`}

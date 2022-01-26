@@ -83,6 +83,7 @@ export function DeleteButton({
       className={
         replaceClassName ?? `btn btn-danger delete-button ${className}`
       }
+      style={{ width: "6rem" }}
       disabled={disabled}
       onClick={() =>
         openModal(
