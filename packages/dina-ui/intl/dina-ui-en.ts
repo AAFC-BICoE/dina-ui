@@ -137,6 +137,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
   determination: "Determination",
+  determinationManagedAttributes: "Determination Managed Attributes",
   determinations: "Determinations",
   determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",

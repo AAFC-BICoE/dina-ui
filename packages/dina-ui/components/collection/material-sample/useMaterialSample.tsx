@@ -445,7 +445,10 @@ export function useMaterialSampleSave({
               )
             })
           }))
-        : []
+        : [],
+
+      // Remove the scheduledAction field from the workflow template:
+      ...{ scheduledAction: undefined }
     };
 
     // Save and link the Collecting Event if enabled:
