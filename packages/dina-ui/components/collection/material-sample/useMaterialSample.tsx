@@ -420,6 +420,12 @@ export function useMaterialSampleSave({
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
+      // associated sample is allowed to be left unfilled, set it to empty array
+      ...(submittedValues.associations?.length === 1 &&
+      submittedValues.associations.keys?.length === 0
+        ? { associations: [] }
+        : { associations: submittedValues.associations }),
+
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
       ...(!enableOrganism && { organism: null }),
