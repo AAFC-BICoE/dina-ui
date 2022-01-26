@@ -184,6 +184,7 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ sortable: false }}
         defaultPageSize={10000}
         onSuccess={res => setAvailableMetadatas(res.data)}
+        ariaLabel="Existing attachments"
       />
     </DinaForm>
   );
