@@ -53,7 +53,7 @@ export function CollectingEventLinker({
           <Link
             href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
           >
-            <a target="_blank" className="flex-grow-1 my-auto">
+            <a className="flex-grow-1 my-auto">
               <DinaMessage id="viewDetails" />
             </a>
           </Link>

@@ -73,10 +73,7 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.originalFilename ? (
-          <a
-            href={`/object-store/object/view?id=${id}`}
-            target={readOnly ? "" : "_blank"}
-          >
+          <a href={`/object-store/object/view?id=${id}`}>
             {metadata?.originalFilename}
           </a>
         ) : null;

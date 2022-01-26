@@ -205,8 +205,6 @@ export function CatalogueOfLifeSearchBox({
               "href",
               `https://data.catalogueoflife.org/dataset/${dataSet.key}/name/${result.name?.id}`
             );
-            link.setAttribute("target", "_blank");
-            link.setAttribute("rel", "noopener");
 
             link.innerHTML = result.labelHtml ?? String(result);
 

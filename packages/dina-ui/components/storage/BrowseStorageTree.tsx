@@ -209,7 +209,7 @@ function StorageUnitCollapser({
             />
           ) : (
             <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-              <a className="storage-unit-name" target="_blank">
+              <a className="storage-unit-name">
                 {storageUnitDisplayName(storageUnit)}
               </a>
             </Link>

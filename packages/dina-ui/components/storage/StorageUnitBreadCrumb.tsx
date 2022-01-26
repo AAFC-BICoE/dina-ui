@@ -30,7 +30,7 @@ export function StorageUnitBreadCrumb({
       {parentPath.map(node => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
-            <a target={!readOnly ? "_blank" : ""}>
+            <a>
               {node.typeName} {node.name}
             </a>
           </Link>
@@ -41,7 +41,7 @@ export function StorageUnitBreadCrumb({
           <strong>
             {storageUnit.id && !disableLastLink ? (
               <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-                <a target={!readOnly ? "_blank" : ""}>{unitDisplayName}</a>
+                <a>{unitDisplayName}</a>
               </Link>
             ) : (
               unitDisplayName

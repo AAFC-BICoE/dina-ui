@@ -68,7 +68,6 @@ export function Nav() {
                   <a
                     className="btn btn-info"
                     href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-                    target="_blank"
                   >
                     <DinaMessage id="feedbackButtonText" />
                   </a>
