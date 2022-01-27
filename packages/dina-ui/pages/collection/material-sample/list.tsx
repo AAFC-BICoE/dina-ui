@@ -1,12 +1,12 @@
 import {
   ButtonBar,
-  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
   FilterAttribute,
   filterBy,
   ListPageLayout,
+  QueryPage,
   stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -192,7 +192,37 @@ export function SampleListLayout({
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-
+  const [queryKey, setQueryKey] = useState("");
+  const columns = [
+    ...getColumnDefinition({ openLinkInNewTab: false }),
+    ...[
+      {
+        Cell: ({ original: sample }) => (
+          <div className="d-flex">
+            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="view" />
+              </a>
+            </Link>
+            <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+            <DeleteButton
+              replaceClassName="btn btn-link"
+              type="material-sample"
+              id={sample.id}
+              options={{ apiBaseUrl: "/collection-api" }}
+              onDeleted={() => setQueryKey(String(Math.random()))}
+            />
+          </div>
+        ),
+        Header: "",
+        sortable: false
+      }
+    ]
+  ];
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -209,7 +239,7 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <SampleListLayout showBulkActions={true} openLinkInNewTab={false} />
+        <QueryPage indexName={"dina_material_sample_index"} columns={columns} />
       </main>
       <Footer />
     </div>
