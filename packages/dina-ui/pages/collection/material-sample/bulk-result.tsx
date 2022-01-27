@@ -47,7 +47,7 @@ export default function MaterialSampleBulkResult() {
                   <Link
                     href={`/collection/material-sample/view?id=${parentSampleId}`}
                   >
-                    <a target="_blank">{parentSample.materialSampleName}</a>
+                    <a>{parentSample.materialSampleName}</a>
                   </Link>
                 </div>
               </div>
@@ -72,9 +72,7 @@ export default function MaterialSampleBulkResult() {
                       <Link
                         href={`/collection/material-sample/view?id=${sample.id}`}
                       >
-                        <a target="_blank">
-                          {sample.materialSampleName || sample.id}
-                        </a>
+                        <a>{sample.materialSampleName || sample.id}</a>
                       </Link>
                     </div>
                   )

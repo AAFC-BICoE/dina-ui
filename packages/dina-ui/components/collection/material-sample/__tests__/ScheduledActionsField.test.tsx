@@ -50,7 +50,7 @@ describe("ScheduledActionsField", () => {
     wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "remarks-1" } });
-    wrapper.find("button.save-button").simulate("click");
+    wrapper.find("button.add-button").simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper.find("form").simulate("submit");
@@ -85,7 +85,7 @@ describe("ScheduledActionsField", () => {
     wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "remarks-2" } });
-    wrapper.find("button.save-button").simulate("click");
+    wrapper.find("button.add-button").simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper.find("form").simulate("submit");
@@ -118,7 +118,7 @@ describe("ScheduledActionsField", () => {
     wrapper
       .find(".remarks-field textarea")
       .simulate("change", { target: { value: "edited-remarks-1" } });
-    wrapper.find("button.save-button").simulate("click");
+    wrapper.find("button.add-button").simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper.find("form").simulate("submit");

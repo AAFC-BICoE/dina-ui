@@ -15,7 +15,7 @@ export function NavbarUserControl() {
             <span className="me-2 my-auto">
               <CommonMessage id="loggedInAsUser" />{" "}
               <Link href={`/dina-user/view?id=${subject}`}>
-                <a target="_blank">{username}</a>
+                <a>{username}</a>
               </Link>
             </span>
           )}

@@ -744,7 +744,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
   });
 
-  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+  it("Renders the Material Sample form with only the Scheduled Action section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
       actionType: "ADD",
@@ -754,6 +754,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           allowNew: false,
           templateFields: {
             ...({
+              "scheduledAction.actionType": {
+                defaultValue: "default-action-type",
+                enabled: true
+              },
               "scheduledAction.remarks": {
                 defaultValue: "default-remarks",
                 enabled: true
@@ -786,5 +790,66 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         .find("#scheduled-actions-section .remarks-field textarea")
         .prop("value")
     ).toEqual("default-remarks");
+
+    // Add the first scheduled action with the default value:
+    wrapper
+      .find("#scheduled-actions-section button.add-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Add the second scheduled action with the default value:
+    wrapper
+      .find("#scheduled-actions-section button.add-new-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper
+      .find("#scheduled-actions-section button.add-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // There should be 2 rows:
+    expect(
+      wrapper.find("#scheduled-actions-section .rt-tbody .rt-tr").length
+    ).toEqual(2);
+
+    // Submit the form:
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Submits the sample with the 2 scheduled actions:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              // Singular scheduledAction field from the template should not be included.
+              // This should prove the bug fix for https://redmine.biodiversity.agr.gc.ca/issues/26308
+              scheduledAction: undefined,
+              // Both scheduledActions are made with the default values:
+              scheduledActions: [
+                {
+                  actionType: "default-action-type",
+                  remarks: "default-remarks"
+                },
+                {
+                  actionType: "default-action-type",
+                  remarks: "default-remarks"
+                }
+              ],
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
   });
 });

@@ -33,7 +33,6 @@ export default function OrganizationDetailsPage() {
       type="organization"
       apiBaseUrl="/agent-api"
       nameField={["names[0].name", "names[1].name"]}
-      deleteButton={() => null}
     />
   );
 }

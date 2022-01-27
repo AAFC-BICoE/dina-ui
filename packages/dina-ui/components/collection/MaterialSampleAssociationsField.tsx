@@ -153,7 +153,7 @@ export function MaterialSampleLink({ id, disableLink = false }) {
       name
     ) : (
       <Link href={`/collection/material-sample/view?id=${id}`}>
-        <a target="_blank">{name}</a>
+        <a>{name}</a>
       </Link>
     );
   });
