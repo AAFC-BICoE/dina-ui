@@ -8,7 +8,7 @@ export function NavbarUserControl() {
     useAccount();
 
   return (
-    <div className="d-flex">
+    <div className="d-flex align-items-center">
       {initialized && authenticated ? (
         <>
           {username && (
@@ -21,7 +21,7 @@ export function NavbarUserControl() {
           )}
           <button
             type="button"
-            className="btn btn-dark logout-button"
+            className="btn btn-dark logout-button my-auto"
             onClick={() => logout()}
           >
             <CommonMessage id="logoutBtn" />

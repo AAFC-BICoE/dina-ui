@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
 import Container from "react-bootstrap/Container";
@@ -16,7 +16,6 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 export function Nav() {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
-  const { subject } = useAccount();
   const { locale } = useContext(intlContext);
 
   // Editable if current user is dina-admin, or a collection manager of any group:
@@ -80,124 +79,20 @@ export function Nav() {
             </section>
           </div>
         </div>
-        <Navbar className="app-bar" expand="lg">
+        <Navbar className="app-bar" expand="sm">
           <Container>
             <Navbar.Brand href="/" className="app-name">
               <DinaMessage id="appTitle" />
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-              <ReactNav className="me-auto">
-                <NavDropdown title={formatMessage("objectStoreTitle")}>
-                  <NavDropdown.Item href="/object-store/upload">
-                    <DinaMessage id="uploadPageTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/object-store/object/list">
-                    <DinaMessage id="objectListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/object-store/managedAttributesView/listView">
-                    <DinaMessage id="managedAttributeListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/object-store/object-subtype/list">
-                    <DinaMessage id="objectSubtypeListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/object-store/revisions-by-user">
-                    <DinaMessage id="revisionsByUserPageTitle" />
-                  </NavDropdown.Item>
-                </NavDropdown>
-                <NavDropdown title={formatMessage("agentsSectionTitle")}>
-                  <NavDropdown.Item href="/person/list">
-                    <DinaMessage id="personListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/organization/list">
-                    <DinaMessage id="organizationListTitle" />
-                  </NavDropdown.Item>
-                </NavDropdown>
-                <NavDropdown title={formatMessage("seqdbTitle")}>
-                  <NavDropdown.Item href="/seqdb/workflow/list">
-                    <SeqdbMessage id="workflowListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/sanger-workflow/list">
-                    <SeqdbMessage id="sangerWorkflowListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/index-set/list">
-                    <SeqdbMessage id="indexSetListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/pcr-primer/list">
-                    <SeqdbMessage id="pcrPrimerListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/pcr-profile/list">
-                    <SeqdbMessage id="pcrProfileListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/pcr-batch/list">
-                    <SeqdbMessage id="pcrBatchListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/product/list">
-                    <SeqdbMessage id="productListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/protocol/list">
-                    <SeqdbMessage id="protocolListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/region/list">
-                    <SeqdbMessage id="regionListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/seqdb/molecular-sample/list">
-                    <SeqdbMessage id="molecularSampleListTitle" />
-                  </NavDropdown.Item>
-                </NavDropdown>
-                <NavDropdown title={formatMessage("collectionSectionTitle")}>
-                  <NavDropdown.Item href="/collection/collection/list">
-                    <DinaMessage id="collectionListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/collection-method/list">
-                    <DinaMessage id="collectionMethodListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/project/list">
-                    <DinaMessage id="projectListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/institution/list">
-                    <DinaMessage id="institutionListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/material-sample/list">
-                    <DinaMessage id="materialSampleListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/collecting-event/list">
-                    <DinaMessage id="collectingEventListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/acquisition-event/list">
-                    <DinaMessage id="acquisitionEventListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/preparation-type/list">
-                    <DinaMessage id="preparationTypeListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/storage-unit-type/list">
-                    <DinaMessage id="storageUnitTypeListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/storage-unit/list">
-                    <DinaMessage id="storageUnitListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/managed-attribute/list">
-                    <DinaMessage id="managedAttributeListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/workflow-template/list">
-                    <DinaMessage id="workflowTemplateListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/extension/list">
-                    <DinaMessage id="extensionListTitle" />
-                  </NavDropdown.Item>
-                  <NavDropdown.Item href="/collection/revisions-by-user">
-                    <DinaMessage id="revisionsByUserPageTitle" />
-                  </NavDropdown.Item>
-                </NavDropdown>
+              <ReactNav className="">
+                <NavObjectStoreDropdown formatMessage={formatMessage} />
+                <NavAgentDropdown formatMessage={formatMessage} />
+                <NavSequenceDropdown formatMessage={formatMessage} />
+                <NavCollectionDropdown formatMessage={formatMessage} />
                 {showUserNav && (
-                  <NavDropdown title={formatMessage("dinaUserSectionTitle")}>
-                    <NavDropdown.Item href="/dina-user/list">
-                      <DinaMessage id="userListTitle" />
-                    </NavDropdown.Item>
-                    <NavDropdown.Item href={`/dina-user/view?id=${subject}`}>
-                      <DinaMessage id="whoAmITitle" />
-                    </NavDropdown.Item>
-                  </NavDropdown>
+                  <NavDinaUserDropdown formatMessage={formatMessage} />
                 )}
               </ReactNav>
             </Navbar.Collapse>
@@ -205,6 +100,221 @@ export function Nav() {
         </Navbar>
       </header>
     </>
+  );
+}
+function menuDisplayControl() {
+  const [show, setShow] = useState(false);
+  const showDropdown = () => {
+    setShow(true);
+  };
+  const hideDropdown = () => {
+    setShow(false);
+  };
+  function onKeyDown(e) {
+    if (
+      e.key === "ArrowDown" ||
+      e.key === "ArrowUp" ||
+      e.key === "Space" ||
+      e.key === " " ||
+      e.key === "Enter"
+    ) {
+      showDropdown();
+    } else if (e.key === "Escape" || (e.shiftKey && e.key === "Tab")) {
+      hideDropdown();
+    }
+  }
+  function onKeyDownLastItem(e) {
+    if (!e.shiftKey && e.key === "Tab") {
+      hideDropdown();
+    }
+  }
+  return { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem };
+}
+
+function NavObjectStoreDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  return (
+    <NavDropdown
+      title={formatMessage("objectStoreTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <NavDropdown.Item href="/object-store/upload">
+        <DinaMessage id="uploadPageTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/object-store/object/list">
+        <DinaMessage id="objectListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/object-store/managedAttributesView/listView">
+        <DinaMessage id="managedAttributeListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/object-store/object-subtype/list">
+        <DinaMessage id="objectSubtypeListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item
+        href="/object-store/revisions-by-user"
+        onKeyDown={onKeyDownLastItem}
+      >
+        <DinaMessage id="revisionsByUserPageTitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
+  );
+}
+
+function NavAgentDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  return (
+    <NavDropdown
+      title={formatMessage("agentsSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <NavDropdown.Item href="/person/list">
+        <DinaMessage id="personListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/organization/list" onKeyDown={onKeyDownLastItem}>
+        <DinaMessage id="organizationListTitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
+  );
+}
+
+function NavSequenceDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  return (
+    <NavDropdown
+      title={formatMessage("seqdbTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <NavDropdown.Item href="/seqdb/workflow/list">
+        <SeqdbMessage id="workflowListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/sanger-workflow/list">
+        <SeqdbMessage id="sangerWorkflowListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/index-set/list">
+        <SeqdbMessage id="indexSetListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/pcr-primer/list">
+        <SeqdbMessage id="pcrPrimerListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/pcr-profile/list">
+        <SeqdbMessage id="pcrProfileListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/pcr-batch/list">
+        <SeqdbMessage id="pcrBatchListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/product/list">
+        <SeqdbMessage id="productListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/protocol/list">
+        <SeqdbMessage id="protocolListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/seqdb/region/list">
+        <SeqdbMessage id="regionListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item
+        href="/seqdb/molecular-sample/list"
+        onKeyDown={onKeyDownLastItem}
+      >
+        <SeqdbMessage id="molecularSampleListTitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
+  );
+}
+
+function NavCollectionDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  return (
+    <NavDropdown
+      title={formatMessage("collectionSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <NavDropdown.Item href="/collection/collection/list">
+        <DinaMessage id="collectionListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/collection-method/list">
+        <DinaMessage id="collectionMethodListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/project/list">
+        <DinaMessage id="projectListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/institution/list">
+        <DinaMessage id="institutionListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/material-sample/list">
+        <DinaMessage id="materialSampleListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/collecting-event/list">
+        <DinaMessage id="collectingEventListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/acquisition-event/list">
+        <DinaMessage id="acquisitionEventListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/preparation-type/list">
+        <DinaMessage id="preparationTypeListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/storage-unit-type/list">
+        <DinaMessage id="storageUnitTypeListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/storage-unit/list">
+        <DinaMessage id="storageUnitListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/managed-attribute/list">
+        <DinaMessage id="managedAttributeListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/workflow-template/list">
+        <DinaMessage id="workflowTemplateListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/extension/list">
+        <DinaMessage id="extensionListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item
+        href="/collection/revisions-by-user"
+        onKeyDown={onKeyDownLastItem}
+      >
+        <DinaMessage id="revisionsByUserPageTitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
+  );
+}
+
+function NavDinaUserDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+  const { subject } = useAccount();
+  return (
+    <NavDropdown
+      title={formatMessage("dinaUserSectionTitle")}
+      onMouseOver={showDropdown}
+      onKeyDown={onKeyDown}
+      onMouseLeave={hideDropdown}
+      show={show}
+    >
+      <NavDropdown.Item href="/dina-user/list">
+        <DinaMessage id="userListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item
+        href={`/dina-user/view?id=${subject}`}
+        onKeyDown={onKeyDownLastItem}
+      >
+        <DinaMessage id="whoAmITitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
   );
 }
 

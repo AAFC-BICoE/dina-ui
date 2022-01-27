@@ -24,8 +24,8 @@ a.nav-link.dropdown-toggle:focus,
 .navbar-light .navbar-nav .nav-link:hover,
 .navbar-light .navbar-nav .nav-link.active,
 .navbar-light .navbar-nav .show > .nav-link {
-  color: #e0e0e0;
+  color: #fff;
 }
 button.navbar-toggler {
-  background-color: #e0e0e0;
+  background-color: #fff;
 }
