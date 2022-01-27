@@ -251,7 +251,6 @@ export function GeographySearchBox({
                 <div className="col-md-4">
                   <a
                     href={`https://www.openstreetmap.org/${place.osm_type}/${place.osm_id}`}
-                    target="_blank"
                     className="btn btn-info"
                   >
                     <DinaMessage id="viewDetailButtonLabel" />

@@ -210,7 +210,10 @@ export function StorageUnitContents({
   ];
 
   return (
-    <div className="p-2 mb-3" style={{ borderStyle: "dotted" }}>
+    <div
+      className="p-2 mb-3"
+      style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
+    >
       <div className="mb-3">
         <strong>
           <DinaMessage id="materialSamples" />

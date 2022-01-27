@@ -29,7 +29,7 @@ export interface ViewPageLayoutProps<T extends KitsuResource> {
   apiBaseUrl: string;
 
   /** The field on the resource to use as the page title. */
-  nameField?: string | string[];
+  nameField?: string | string[] | ((resource: PersistedResource<T>) => string);
 
   /** main tag class, defaults to "container" */
   mainClass?: string;
@@ -79,8 +79,10 @@ export function ViewPageLayout<T extends KitsuResource>({
       <Nav />
       <main className={mainClass}>
         {withResponse(resourceQuery, ({ data }) => {
+          const resource = data as PersistedResource<T>;
+
           const formProps = {
-            initialValues: data as PersistedResource<T>,
+            initialValues: resource,
             readOnly: true
           };
 
@@ -93,14 +95,18 @@ export function ViewPageLayout<T extends KitsuResource>({
 
           const nameFields = castArray(nameField);
           const title = [...nameFields, "id"].reduce(
-            (lastValue, currentField) => lastValue || get(data, currentField),
+            (lastValue, currentField) =>
+              lastValue ||
+              (typeof currentField === "function"
+                ? currentField(resource)
+                : get(data, currentField)),
             ""
           );
 
           return (
             <>
               <Head title={title} />
-              <ButtonBar>
+              <ButtonBar className="gap-2">
                 <BackButton
                   entityId={id}
                   className="me-auto"
@@ -119,9 +125,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                   </Link>
                 )}
                 {canDelete &&
-                  (deleteButton?.(formProps) ?? (
+                  (deleteButton ? (
+                    deleteButton(formProps)
+                  ) : (
                     <DeleteButton
-                      className="ms-5"
                       id={id}
                       options={{ apiBaseUrl }}
                       postDeleteRedirect={`${entityLink}/list`}

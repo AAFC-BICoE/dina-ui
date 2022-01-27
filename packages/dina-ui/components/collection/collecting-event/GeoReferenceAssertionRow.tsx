@@ -253,7 +253,6 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
       <div className="mb-3">
         <a
           href={`/collection/collecting-event/map?mlat=${lat}&mlon=${lon}`}
-          target="_blank"
           className="btn btn-info"
         >
           <DinaMessage id="viewOnMap" />
