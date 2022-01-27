@@ -8,7 +8,7 @@ export interface ManagedAttributesViewerProps {
    * Map of Managed Attributes values.
    * Key is Managed Attribute UUID and value is the Managed Attribute value object.
    */
-  values?: Record<string, string | null | undefined>;
+  values?: Record<string, string | null | undefined> | null;
 
   /** Function that returns the API find-one path given the Managed Attribute key or ID. */
   managedAttributeApiPath: (key: string) => string;

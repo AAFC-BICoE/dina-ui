@@ -8,7 +8,8 @@ import {
   TextField,
   useApiClient,
   useBulkEditTabContext,
-  useModal
+  useModal,
+  useDinaFormContext
 } from "common-ui";
 import { Field } from "formik";
 import { PersistedResource } from "kitsu";
@@ -17,6 +18,7 @@ import { useEffect, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { getManagedAttributesInUse } from "./getManagedAttributesInUse";
+import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -35,6 +37,9 @@ export interface ManagedAttributesEditorProps {
    * e.g. "id".
    */
   managedAttributeKeyField?: string;
+
+  /** Bootstrap column width of the "Managed Attributes In Use selector. e.g. 6 or 12. */
+  attributeSelectorWidth?: number;
 }
 
 /** Set of fields inside a Formik form to edit Managed Attributes. */
@@ -44,11 +49,13 @@ export function ManagedAttributesEditor({
   apiBaseUrl,
   managedAttributeComponent,
   useKeyInFilter,
-  managedAttributeKeyField = "key"
+  managedAttributeKeyField = "key",
+  attributeSelectorWidth = 6
 }: ManagedAttributesEditorProps) {
   const { bulkGet, apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { openModal } = useModal();
+  const { readOnly } = useDinaFormContext();
 
   const bulkCtx = useBulkEditTabContext();
 
@@ -79,10 +86,21 @@ export function ManagedAttributesEditor({
           })();
         }, []);
 
+        if (readOnly) {
+          return (
+            <ManagedAttributesViewer
+              values={currentValue}
+              managedAttributeApiPath={id => `${managedAttributeApiPath}/${id}`}
+            />
+          );
+        }
+
         return (
           <div className="mb-3 managed-attributes-editor">
             <div className="row">
-              <label className="editable-attribute-menu col-sm-6 mb-3">
+              <label
+                className={`editable-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+              >
                 <strong>
                   <DinaMessage id="field_editableManagedAttributes" />
                 </strong>

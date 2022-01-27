@@ -22,7 +22,7 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
   },
   {
     Cell: ({ original }) => (
-      <StorageUnitBreadCrumb storageUnit={original} readOnly={true} />
+      <StorageUnitBreadCrumb storageUnit={original} hideThisUnit={true} />
     ),
     accessor: "location",
     sortable: false

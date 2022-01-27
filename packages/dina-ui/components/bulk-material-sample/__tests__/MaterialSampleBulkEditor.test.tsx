@@ -1051,7 +1051,7 @@ describe("MaterialSampleBulkEditor", () => {
       )
       .simulate("change", { target: { value: "new-action-type" } });
     wrapper
-      .find(".tabpanel-EDIT_ALL #scheduled-actions-section button.save-button")
+      .find(".tabpanel-EDIT_ALL #scheduled-actions-section button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
