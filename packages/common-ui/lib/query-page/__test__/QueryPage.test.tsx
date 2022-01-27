@@ -2,6 +2,7 @@ import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { QueryPage } from "../QueryPage";
 import DatePicker from "react-datepicker";
+import { ColumnDefinition } from "../../table/QueryTable";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
@@ -28,11 +29,24 @@ const apiContext = {
     axios: { get: mockGet } as any
   }
 } as any;
+
+const TEST_COLUMNS: ColumnDefinition<any>[] = [
+  { accessor: "materialSampleName" },
+  { accessor: "collection.name" },
+  { accessor: "dwcOtherCatalogNumbers" },
+  { accessor: "materialSampleType.name" },
+  "createdBy",
+  { accessor: "createdOn" },
+  { Header: "", sortable: false }
+];
 describe("QueryPage component", () => {
   it("Query Page is able to aggretate first level queries", async () => {
-    const wrapper = mountWithAppContext(<QueryPage indexName="testIndex" />, {
-      apiContext
-    });
+    const wrapper = mountWithAppContext(
+      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      {
+        apiContext
+      }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();

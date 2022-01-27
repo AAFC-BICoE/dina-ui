@@ -6,7 +6,7 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
 
   // Remove the type from value before submit to elastic search
   exportedQueryRows.map(queryRow => {
-    queryRow.fieldName = queryRow.fieldName.substring(
+    queryRow.fieldName = queryRow.fieldName?.substring(
       0,
       queryRow.fieldName.indexOf("(")
     );
