@@ -165,7 +165,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         />
       ) : (
         <FaMinus
-          onClick={removeRow as any}
+          onClick={() => removeRow?.(index)}
           size="2em"
           style={{ cursor: "pointer" }}
           name={fieldProps("removeRow", index).name}

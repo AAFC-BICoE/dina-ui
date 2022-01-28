@@ -62,8 +62,8 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   return (
-    <DinaForm initialValues={{}} onSubmit={onSubmit}>
-      <QueryBuilder indexName={indexName} />
+    <DinaForm initialValues={{ queryRows: [{}] }} onSubmit={onSubmit}>
+      <QueryBuilder indexName={indexName} name="queryRows" />
       <SubmitButton className="ms-auto">
         {formatMessage({ id: "search" })}
       </SubmitButton>

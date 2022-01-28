@@ -34,8 +34,8 @@ describe("QueryBuilder component", () => {
 
   it("Displays the Query builder with one Query Row by default.", async () => {
     const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{ name: "queryRows" }}>
-        <QueryBuilder indexName="testIndex" />
+      <DinaForm initialValues={{ queryRows: [{}] }}>
+        <QueryBuilder indexName="testIndex" name={"queryRows"} />
       </DinaForm>,
       { apiContext }
     );
@@ -67,8 +67,8 @@ describe("QueryBuilder component", () => {
   });
   it("Query builder can be used to add rows to aggretate level queries", async () => {
     const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{}}>
-        <QueryBuilder indexName="testIndex" />
+      <DinaForm initialValues={{ queryRows: [{}] }}>
+        <QueryBuilder indexName="testIndex" name="queryRows" />
       </DinaForm>,
       { apiContext }
     );

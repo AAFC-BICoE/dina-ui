@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import useSWR from "swr";
-import { useApiClient } from "..";
+import { FieldWrapperProps, useApiClient } from "..";
 import { QueryRow } from "./QueryRow";
 import { v4 as uuidv4 } from "uuid";
 import { FieldArray } from "formik";
-import { isArray } from "lodash";
 
-export function QueryBuilder({ indexName }) {
+interface QueryBuilderProps extends FieldWrapperProps {
+  indexName: string;
+}
+export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
@@ -53,7 +55,7 @@ export function QueryBuilder({ indexName }) {
   if (loading || error) return <></>;
 
   return (
-    <FieldArray name={"queryRows"}>
+    <FieldArray name={name}>
       {fieldArrayProps => {
         const elements: [] = fieldArrayProps.form.values.queryRows;
 
@@ -76,16 +78,8 @@ export function QueryBuilder({ indexName }) {
           );
         }
 
-        function removeRow(index: number) {
+        function removeRow(index) {
           fieldArrayProps.remove(index);
-        }
-
-        /* Making sure there is a single row present as default*/
-        if (
-          !fieldArrayProps.form.getFieldMeta("queryRows").value ||
-          !isArray(fieldArrayProps.form.getFieldMeta("queryRows").value)
-        ) {
-          addRow();
         }
 
         return elements?.length > 0
