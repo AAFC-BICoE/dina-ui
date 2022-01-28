@@ -62,7 +62,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   function onSelectionChange(value, formik, idx) {
     const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
     const initState = {
-      ...formik.values?.queryRows?.[`${idx}`],
+      ...formik.values?.[`${name}`]?.[`${idx}`],
       matchValue: null,
       matchType: null,
       date: null,
@@ -70,7 +70,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       number: null,
       fieldName: value
     };
-    formik.setFieldValue(`queryRows[${idx}]`, initState);
+    formik.setFieldValue(`${name}[${idx}]`, initState);
     switch (type) {
       case "text": {
         return setVisibility({ ...initVisibility, text: true });
