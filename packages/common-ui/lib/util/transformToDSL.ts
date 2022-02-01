@@ -12,17 +12,17 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
     );
   });
 
-  function buildQuery(bldr, curRow, firstRow, onlyOneRow) {
+  function buildQuery(curRow, firstRow, onlyOneRow) {
     const rowToBuild = firstRow ?? curRow;
     if (onlyOneRow) {
       if (rowToBuild.matchValue) {
-        bldr = bldr.query(
+        builder.query(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
           rowToBuild.matchValue
         );
       } else {
-        bldr = bldr.filter(
+        builder.filter(
           "term",
           rowToBuild.fieldName,
           rowToBuild.boolean ?? rowToBuild.number ?? rowToBuild.date
@@ -30,13 +30,13 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
       }
     } else if (curRow.compoundQueryType === "and") {
       if (rowToBuild.matchValue) {
-        bldr = bldr.andQuery(
+        builder.andQuery(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
           rowToBuild.matchValue
         );
       } else {
-        bldr = bldr.andFilter(
+        builder.andFilter(
           "term",
           rowToBuild.fieldName,
           rowToBuild.boolean ?? rowToBuild.number ?? rowToBuild.date
@@ -44,13 +44,13 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
       }
     } else if (curRow.compoundQueryType === "or") {
       if (rowToBuild.matchValue) {
-        bldr = bldr.orQuery(
+        builder.orFilter(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
           rowToBuild.matchValue
         );
       } else {
-        bldr = bldr.orFilter(
+        builder.orFilter(
           "term",
           rowToBuild.fieldName,
           rowToBuild.boolean ?? rowToBuild.number ?? rowToBuild.date
@@ -60,11 +60,10 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
   }
 
   exportedQueryRows.map((queryRow, idx) => {
-    if (exportedQueryRows.length === 1)
-      buildQuery(builder, queryRow, queryRow, true);
+    if (exportedQueryRows.length === 1) buildQuery(queryRow, queryRow, true);
     else {
-      if (idx === 1) buildQuery(builder, queryRow, exportedQueryRows[0], false);
-      if (idx !== 0) buildQuery(builder, queryRow, null, false);
+      if (idx === 1) buildQuery(queryRow, exportedQueryRows[0], false);
+      if (idx !== 0) buildQuery(queryRow, null, false);
     }
   });
 
