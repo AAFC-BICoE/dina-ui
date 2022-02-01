@@ -6,6 +6,7 @@ export * from "./resources/Determination";
 export * from "./resources/GeographicPlaceNameSourceDetail";
 export * from "./resources/GeoReferenceAssertion";
 export * from "./resources/Institution";
+export * from "./resources/ManagedAttributeView";
 export * from "./resources/MaterialSample";
 export * from "./resources/MaterialSampleRunConfig";
 export * from "./resources/MaterialSampleType";

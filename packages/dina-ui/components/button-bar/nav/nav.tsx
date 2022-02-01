@@ -344,6 +344,9 @@ function NavCollectionDropdown() {
         <Dropdown.Item href="/collection/storage-unit/list">
           <DinaMessage id="storageUnitListTitle" />
         </Dropdown.Item>
+        <Dropdown.Item href="/collection/managed-attributes-view/list">
+          <DinaMessage id="managedAttributesViews" />
+        </Dropdown.Item>
         <Dropdown.Item href="/collection/managed-attribute/list">
           <DinaMessage id="managedAttributeListTitle" />
         </Dropdown.Item>
