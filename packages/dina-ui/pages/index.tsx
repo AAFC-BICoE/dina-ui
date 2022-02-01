@@ -255,7 +255,7 @@ const Home: React.FunctionComponent = () => (
         </h2>
         <ul>
           <li>
-            <Link href="/loan-transaction/transaction">
+            <Link href="/loan-transaction/transaction/list">
               <a>
                 <DinaMessage id="transactions" />
               </a>

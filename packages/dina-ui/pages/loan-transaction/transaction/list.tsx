@@ -19,7 +19,7 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "transactionStatus",
   "purposeOfTransaction",
   {
-    name: "dateOpen",
+    name: "dateOpened",
     type: "DATE"
   },
   {
@@ -45,7 +45,7 @@ const TABLE_COLUMNS = [
   stringArrayCell("otherIdentifiers"),
   "transactionStatus",
   "purposeOfTransaction",
-  dateCell("dateOpen"),
+  dateCell("dateOpened"),
   dateCell("dateClosed"),
   dateCell("dateDue")
 ];

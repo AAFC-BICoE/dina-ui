@@ -11,7 +11,7 @@ export interface TransactionAttributes {
   transactionStatus?: string;
   purposeOfTransaction?: string;
 
-  dateOpen?: string;
+  dateOpened?: string;
   dateClosed?: string;
   dateDue?: string;
 }
