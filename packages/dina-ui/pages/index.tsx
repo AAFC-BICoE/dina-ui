@@ -250,6 +250,18 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
         </ul>
+        <h2>
+          <DinaMessage id="loanTransactionsSectionTitle" />
+        </h2>
+        <ul>
+          <li>
+            <Link href="/loan-transaction/transaction">
+              <a>
+                <DinaMessage id="transactions" />
+              </a>
+            </Link>
+          </li>
+        </ul>
       </div>
     </main>
     <Footer />

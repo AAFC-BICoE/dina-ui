@@ -109,6 +109,9 @@ export function Nav() {
               <li className="list-inline-item my-auto">
                 <NavCollectionDropdown />
               </li>
+              <li className="list-inline-item my-auto">
+                <NavTransactionsDropdown />
+              </li>
               {showUserNav && (
                 <li className="list-inline-item my-auto">
                   <NavDinaUserDropdown />
@@ -358,6 +361,32 @@ function NavCollectionDropdown() {
           onKeyDown={onKeyDownLastItem}
         >
           <DinaMessage id="revisionsByUserPageTitle" />
+        </Dropdown.Item>
+      </Dropdown.Menu>
+    </Dropdown>
+  );
+}
+
+function NavTransactionsDropdown() {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+
+  return (
+    <Dropdown
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <Dropdown.Toggle className="nav-link" href="#">
+        <DinaMessage id="loanTransactionsSectionTitle" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu>
+        <Dropdown.Item
+          href="/loan-transaction/transaction/list"
+          onKeyDown={onKeyDownLastItem}
+        >
+          <DinaMessage id="transactions" />
         </Dropdown.Item>
       </Dropdown.Menu>
     </Dropdown>

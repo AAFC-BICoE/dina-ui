@@ -44,6 +44,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addScheduledAction: "Add Scheduled Action",
   addStorageUnitTitle: "Add Storage Unit",
   addStorageUnitTypeTitle: "Add Storage Unit Type",
+  addTransactionTitle: "Create Transaction",
   additionalRemarks: "Additional Remarks",
   agentsSectionTitle: "Agents",
   allowDuplicate: "Allow Duplicate",
@@ -165,6 +166,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editStorageUnitTitle: "Edit Storage Unit",
   editStorageUnitTypeTitle: "Edit Storage Type",
+  editTransactionTitle: "Edit Transaction",
   editWorkflowTemplateTitle: "Edit Workflow Template",
   elevationInMeters: "Elevation in Meters",
   enableDateRangeLabel: "Enable Date Range",
@@ -381,6 +383,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
+  loanTransactionsSectionTitle: "Loans and Transactions",
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
@@ -566,6 +569,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   tooltipDefaultLinkMessage: "Click here to learn more.",
   toponymyLegend: "Current Geographic Place",
   totalExtenstionFieldsCount: "Total fields for this extension",
+  transactions: "Transactions",
   typeAnythingOrPickAScientificName: "Type anything or pick a Scientific Name",
   typeNewTagOrSearchPreviousTags: "Type New Tag or Search Previous Tags",
   typeSpecimen: "Type Specimen",
