@@ -122,10 +122,16 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <DinaForm initialValues={{ queryRows: [{}] }} onSubmit={onSubmit}>
-      <QueryBuilder indexName={indexName} name="queryRows" />
-      <SubmitButton className="ms-auto">
+      <label
+        style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
+      >
+        {" "}
         {formatMessage({ id: "search" })}
-      </SubmitButton>
+      </label>
+      <QueryBuilder indexName={indexName} name="queryRows" />
+      <div className="d-flex justify-content-end mb-3">
+        <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+      </div>
 
       <div
         className="query-table-wrapper"

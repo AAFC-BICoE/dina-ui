@@ -107,13 +107,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           className={"compoundQueryType" + index}
         />
       )}
-      <SelectField
-        name={fieldProps("fieldName", index).name}
-        options={queryRowOptions}
-        onChange={(value, formik) => onSelectionChange(value, formik, index)}
-        className={`flex-grow-1 me-2 `}
-        removeLabel={true}
-      />
+      <div style={{ width: index > 0 ? "59%" : "66%" }}>
+        <SelectField
+          name={fieldProps("fieldName", index).name}
+          options={queryRowOptions}
+          onChange={(value, formik) => onSelectionChange(value, formik, index)}
+          className={`flex-grow-1 me-2 `}
+          removeLabel={true}
+        />
+      </div>
       {visibility.text && (
         <TextField
           name={fieldProps("matchValue", index).name}
@@ -121,10 +123,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           removeLabel={true}
         />
       )}
-      {/* <TextField name="start"></TextField>
-    <TextField name="end"></TextField>
-    <DateField name="startDate"></DateField>
-    <DateField name="endDate"></DateField> */}
       {visibility.date && (
         <DateField
           name={fieldProps("date", index).name}
