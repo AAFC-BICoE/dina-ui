@@ -60,6 +60,7 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
   }
 
   exportedQueryRows.map((queryRow, idx) => {
+    if (!queryRow.fieldName) return;
     if (exportedQueryRows.length === 1) buildQuery(queryRow, queryRow, true);
     else {
       if (idx === 1) buildQuery(queryRow, exportedQueryRows[0], false);
