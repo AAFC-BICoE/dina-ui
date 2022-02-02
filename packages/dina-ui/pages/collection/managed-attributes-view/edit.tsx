@@ -25,7 +25,8 @@ import {
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GiMove } from "react-icons/gi";
-import { FileUploadProviderImpl } from "packages/dina-ui/components/object-store/file-upload/FileUploadProvider";
+import { SortableElement, SortableContainer } from "react-sortable-hoc";
+import { PropsWithChildren } from "react";
 
 export interface CustomManagedAttributesViewFormProps {
   fetchedView?: ManagedAttributesView;
@@ -135,7 +136,7 @@ export function CustomManagedAttributesViewForm({
             <>
               <hr />
               <FieldArray name="keys">
-                {({ push, remove, form }) => (
+                {({ push, remove, form, move }) => (
                   <div>
                     <div className="mb-4" style={{ maxWidth: "30rem" }}>
                       <ResourceSelect<ManagedAttribute>
@@ -159,37 +160,25 @@ export function CustomManagedAttributesViewForm({
                         omitNullOption={true}
                       />
                     </div>
-                    <div className="row">
+                    <div>
                       <FieldSpy<string[]> fieldName="keys">
-                        {keys =>
-                          keys?.map((key, index) => (
-                            <div className="col-sm-6 mb-4" key={key}>
-                              <div className="card card-body">
-                                <label htmlFor="none">
-                                  <div className="mb-2 d-flex align-items-center">
-                                    <div className="me-auto">
-                                      <strong>{key}</strong>
-                                    </div>
-                                    <div className="d-flex align-items-center gap-2">
-                                      <FormikButton
-                                        className="btn"
-                                        onClick={() => remove(index)}
-                                      >
-                                        <RiDeleteBinLine size="1.8em" />
-                                      </FormikButton>
-                                      <GiMove size="1.8em" />
-                                    </div>
-                                  </div>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    disabled={true}
-                                  />
-                                </label>
-                              </div>
-                            </div>
-                          ))
-                        }
+                        {keys => (
+                          <SortableAttributesViewList
+                            axis="xy"
+                            onSortEnd={sortEnd =>
+                              move(sortEnd.oldIndex, sortEnd.newIndex)
+                            }
+                          >
+                            {keys?.map((key, index) => (
+                              <SortableAttributesViewItem
+                                key={key}
+                                attributeKey={key}
+                                onRemoveClick={() => remove(index)}
+                                index={index}
+                              />
+                            ))}
+                          </SortableAttributesViewList>
+                        )}
                       </FieldSpy>
                     </div>
                   </div>
@@ -202,3 +191,41 @@ export function CustomManagedAttributesViewForm({
     </DinaForm>
   );
 }
+
+function AttributesViewList({ children }: PropsWithChildren<{}>) {
+  return <div className="row">{children}</div>;
+}
+
+interface AttributesViewItemProps {
+  attributeKey: string;
+  onRemoveClick: () => void;
+}
+
+function AttributesViewItem({
+  attributeKey,
+  onRemoveClick
+}: AttributesViewItemProps) {
+  return (
+    <div className="col-sm-6 mb-4" style={{ cursor: "grab" }}>
+      <div className="card card-body">
+        <label htmlFor="none" style={{ cursor: "grab" }}>
+          <div className="mb-2 d-flex align-items-center">
+            <div className="me-auto">
+              <strong>{attributeKey}</strong>
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <FormikButton className="btn" onClick={() => onRemoveClick()}>
+                <RiDeleteBinLine size="1.8em" />
+              </FormikButton>
+              <GiMove size="1.8em" />
+            </div>
+          </div>
+          <input type="text" className="form-control" disabled={true} />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+const SortableAttributesViewItem = SortableElement(AttributesViewItem);
+const SortableAttributesViewList = SortableContainer(AttributesViewList);
