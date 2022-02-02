@@ -54,9 +54,3 @@ route /api/search-api/* {
 	uri replace /api/search-api/ /
 	reverse_proxy {$SEARCH_API_ADDRESS}
 } 
-
-# Proxy to the elastic API:
-route /api/es/* {
-	uri replace /api/es/ /
-	reverse_proxy {$ELASTIC_SEARCH_ADDRESS}
-} 
