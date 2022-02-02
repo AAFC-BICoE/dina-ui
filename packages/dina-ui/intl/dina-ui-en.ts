@@ -144,6 +144,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaUserSectionTitle: "Users",
+  dragDropInstructionsHeader: "To rearrange the attribute order:",
+  dragDropKeyboardInstructions:
+    "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
+  dragDropMouseInstructions: "Drag and drop the attribute to its new position.",
+  withAMouse: "With a mouse",
+  withAKeyboard: "With a keyboard",
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",

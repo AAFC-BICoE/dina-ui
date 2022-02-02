@@ -161,6 +161,29 @@ export function CustomManagedAttributesViewForm({
                         omitNullOption={true}
                       />
                     </div>
+                    {form.values.attributeUuids?.length >= 2 && (
+                      <div>
+                        <div className="alert alert-warning d-flex flex-column gap-2">
+                          <div>
+                            <strong>
+                              <DinaMessage id="dragDropInstructionsHeader" />
+                            </strong>
+                          </div>
+                          <div>
+                            <strong>
+                              <DinaMessage id="withAMouse" />:
+                            </strong>{" "}
+                            <DinaMessage id="dragDropMouseInstructions" />
+                          </div>
+                          <div>
+                            <strong>
+                              <DinaMessage id="withAKeyboard" />:
+                            </strong>{" "}
+                            <DinaMessage id="dragDropKeyboardInstructions" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     <div>
                       <FieldSpy<string[]> fieldName="attributeUuids">
                         {uuids => (
