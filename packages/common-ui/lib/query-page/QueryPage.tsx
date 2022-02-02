@@ -13,10 +13,12 @@ import { transformQueryToDSL } from "../util/transformToDSL";
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
   indexName: string;
+  initData?: TData[];
 }
 export function QueryPage<TData extends KitsuResource>({
   indexName,
-  columns
+  columns,
+  initData
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -71,7 +73,7 @@ export function QueryPage<TData extends KitsuResource>({
       <ReactTable
         className="-striped"
         columns={mappedColumns}
-        data={searchResults}
+        data={searchResults ?? initData}
         minRows={1}
       />
     </DinaForm>

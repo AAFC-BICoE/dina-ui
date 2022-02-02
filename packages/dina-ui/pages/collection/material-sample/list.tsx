@@ -7,7 +7,9 @@ import {
   filterBy,
   ListPageLayout,
   QueryPage,
-  stringArrayCell
+  stringArrayCell,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -193,6 +195,14 @@ export function SampleListLayout({
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
   const [queryKey, setQueryKey] = useState("");
+  const queryState = useQuery<MaterialSample[]>(
+    {
+      path: "collection-api/material-sample",
+      include: "collection,materialSampleType"
+    },
+    {}
+  );
+  const { error, loading, response } = queryState;
   const columns = [
     ...getColumnDefinition({ openLinkInNewTab: false }),
     ...[
@@ -239,7 +249,13 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <QueryPage indexName={"dina_material_sample_index"} columns={columns} />
+        {withResponse({ loading, error, response }, () => (
+          <QueryPage
+            indexName={"dina_material_sample_index"}
+            columns={columns}
+            initData={response?.data}
+          />
+        ))}
       </main>
       <Footer />
     </div>
