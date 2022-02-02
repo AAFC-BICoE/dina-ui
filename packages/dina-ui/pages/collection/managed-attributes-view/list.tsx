@@ -19,7 +19,7 @@ const TABLE_COLUMNS = [
     ),
     accessor: "name"
   },
-  stringArrayCell("attributeUuids")
+  stringArrayCell("attributeKeys")
 ];
 
 export default function ManagedAttributesViewListPage() {

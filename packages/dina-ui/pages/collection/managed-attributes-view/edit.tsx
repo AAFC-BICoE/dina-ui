@@ -31,7 +31,7 @@ import { ManagedAttribute } from "../../../types/objectstore-api";
 
 export interface CustomManagedAttributesViewFormProps {
   fetchedView?: ManagedAttributesView;
-  onSaved: (project: PersistedResource<ManagedAttributesView>) => Promise<void>;
+  onSaved: (data: PersistedResource<ManagedAttributesView>) => Promise<void>;
 }
 
 export default function CustomManagedAttributesViewPage() {
@@ -42,12 +42,8 @@ export default function CustomManagedAttributesViewPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  async function goToViewPage(
-    project: PersistedResource<ManagedAttributesView>
-  ) {
-    await router.push(
-      `/collection/managed-attributes-view/view?id=${project.id}`
-    );
+  async function goToViewPage(data: PersistedResource<ManagedAttributesView>) {
+    await router.push(`/collection/managed-attributes-view/view?id=${data.id}`);
   }
 
   const title = id
@@ -94,7 +90,7 @@ export function CustomManagedAttributesViewForm({
 
   const onSubmit: DinaFormOnSubmit<InputResource<ManagedAttributesView>> =
     async ({ submittedValues }) => {
-      const [savedProject] = await save<ManagedAttributesView>(
+      const [savedView] = await save<ManagedAttributesView>(
         [
           {
             resource: submittedValues,
@@ -105,7 +101,7 @@ export function CustomManagedAttributesViewForm({
           apiBaseUrl: "/collection-api"
         }
       );
-      await onSaved(savedProject);
+      await onSaved(savedView);
     };
 
   const ATTRIBUTE_COMPONENT_OPTIONS: {
@@ -127,7 +123,7 @@ export function CustomManagedAttributesViewForm({
             className="col-md-6"
             name="managedAttributeComponent"
             options={ATTRIBUTE_COMPONENT_OPTIONS}
-            onChange={(_, form) => form.setFieldValue("attributeUuids", [])}
+            onChange={(_, form) => form.setFieldValue("attributeKeys", [])}
           />
         </div>
       </DinaFormSection>
@@ -136,7 +132,7 @@ export function CustomManagedAttributesViewForm({
           managedAttributeComponent ? (
             <>
               <hr />
-              <FieldArray name="attributeUuids">
+              <FieldArray name="attributeKeys">
                 {({ push, remove, form, move }) => (
                   <div>
                     <div className="mb-4" style={{ maxWidth: "30rem" }}>
@@ -151,9 +147,9 @@ export function CustomManagedAttributesViewForm({
                         onChange={ma => {
                           if (
                             !Array.isArray(ma) &&
-                            !form.values.attributeUuids?.includes?.(ma.id)
+                            !form.values.attributeKeys?.includes?.(ma.key)
                           ) {
-                            push(ma.id);
+                            push(ma.key);
                           }
                         }}
                         optionLabel={ma => ma.name}
@@ -161,7 +157,7 @@ export function CustomManagedAttributesViewForm({
                         omitNullOption={true}
                       />
                     </div>
-                    {form.values.attributeUuids?.length >= 2 && (
+                    {form.values.attributeKeys?.length >= 2 && (
                       <div>
                         <div className="alert alert-warning d-flex flex-column gap-2">
                           <div>
@@ -185,8 +181,8 @@ export function CustomManagedAttributesViewForm({
                       </div>
                     )}
                     <div>
-                      <FieldSpy<string[]> fieldName="attributeUuids">
-                        {uuids => (
+                      <FieldSpy<string[]> fieldName="attributeKeys">
+                        {keys => (
                           <SortableAttributesViewList
                             axis="xy"
                             onSortEnd={sortEnd =>
@@ -202,10 +198,10 @@ export function CustomManagedAttributesViewForm({
                                 background-color: rgb(222, 235, 255);
                               }
                             `}</style>
-                            {uuids?.map((id, index) => (
+                            {keys?.map((key, index) => (
                               <SortableAttributesViewItem
-                                key={id}
-                                attributeId={id}
+                                key={key}
+                                attributeKey={key}
                                 onRemoveClick={() => remove(index)}
                                 index={index}
                               />
@@ -232,12 +228,12 @@ function AttributesViewList({ children }: PropsWithChildren<{}>) {
 }
 
 interface AttributesViewItemProps {
-  attributeId: string;
+  attributeKey: string;
   onRemoveClick: () => void;
 }
 
 function AttributesViewItem({
-  attributeId,
+  attributeKey,
   onRemoveClick
 }: AttributesViewItemProps) {
   return (
@@ -255,12 +251,18 @@ function AttributesViewItem({
         <div className="mb-2 d-flex align-items-center">
           <div className="me-auto">
             <strong>
-              <ManagedAttributeName
-                managedAttributeKey={attributeId}
-                managedAttributeApiPath={id =>
-                  `collection-api/managed-attribute/${id}`
+              <FieldSpy<string> fieldName="managedAttributeComponent">
+                {managedAttributeComponent =>
+                  managedAttributeComponent ? (
+                    <ManagedAttributeName
+                      managedAttributeKey={attributeKey}
+                      managedAttributeApiPath={key =>
+                        `collection-api/managed-attribute/${managedAttributeComponent}.${key}`
+                      }
+                    />
+                  ) : null
                 }
-              />
+              </FieldSpy>
             </strong>
           </div>
           <div className="d-flex align-items-center gap-2">

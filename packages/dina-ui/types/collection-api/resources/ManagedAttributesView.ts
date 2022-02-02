@@ -5,8 +5,9 @@ export interface ManagedAttributesViewAttributes {
   type: "managed-attributes-view";
 
   name?: string;
+  group?: string;
   managedAttributeComponent?: CollectionModuleType;
-  attributeUuids?: string[];
+  attributeKeys?: string[];
 }
 
 export type ManagedAttributesView = KitsuResource &
