@@ -48,7 +48,6 @@ export default function PersonDetailsPage() {
       entityLink="/person"
       type="person"
       apiBaseUrl="/agent-api"
-      deleteButton={() => null}
       nameField="displayName"
     />
   );

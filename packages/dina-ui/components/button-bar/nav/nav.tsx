@@ -19,6 +19,18 @@ export function Nav() {
   const { formatMessage } = useDinaIntl();
   const { locale } = useContext(intlContext);
 
+  // Generate accessible message for Government of Canada Logo.
+  const logoSpan =
+    locale === "en" ? (
+      <span className="wb-inv" property="name">
+        Government of Canada / <span lang="fr">Gouvernement du Canada</span>
+      </span>
+    ) : (
+      <span className="wb-inv" property="name">
+        Gouvernement du Canada / <span lang="en">Government of Canada</span>
+      </span>
+    );
+
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showUserNav =
     Object.values(rolesPerGroup ?? {})
@@ -27,7 +39,7 @@ export function Nav() {
 
   return (
     <>
-      <div id="wb-tphp" className="d-flex flex-column align-items-center">
+      <nav id="wb-tphp" className="d-flex flex-column align-items-center">
         <a className="wb-link-inv wb-sl" href="#wb-cont">
           <DinaMessage id="skipToMainContent" />
         </a>
@@ -37,7 +49,7 @@ export function Nav() {
         <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
           <DinaMessage id="skipToBasicHtmlVersion" />
         </a>
-      </div>
+      </nav>
 
       <header className="py-3">
         <div id="wb-bnr" className="container">
@@ -48,15 +60,11 @@ export function Nav() {
               typeof="GovernmentOrganization"
             >
               <img
-                src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/sig-blk-en.svg"
-                alt={formatMessage("governmentOfCanada")}
+                src={"/static/images/canadaLogo_" + locale + ".svg"}
                 property="logo"
+                alt=""
               />
-              <span className="wb-inv" property="name">
-                <span lang={locale}>
-                  <DinaMessage id="governmentOfCanada" />
-                </span>
-              </span>
+              {logoSpan}
               <meta property="areaServed" typeof="Country" content="Canada" />
             </div>
             <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
@@ -68,7 +76,6 @@ export function Nav() {
                   <a
                     className="btn btn-info"
                     href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-                    target="_blank"
                   >
                     <DinaMessage id="feedbackButtonText" />
                   </a>
@@ -80,7 +87,7 @@ export function Nav() {
             </section>
           </div>
         </div>
-        <div className="app-bar">
+        <nav className="app-bar">
           <div className="container">
             <ul className="list-inline d-flex m-0">
               <li className="list-inline-item me-4">
@@ -109,7 +116,7 @@ export function Nav() {
               )}
             </ul>
           </div>
-        </div>
+        </nav>
       </header>
     </>
   );

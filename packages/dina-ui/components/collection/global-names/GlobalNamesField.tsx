@@ -95,8 +95,6 @@ export function GlobalNamesReadOnly({
   if (scientificNameDetails?.isSynonym) {
     const link = document.createElement("a");
     link.setAttribute("href", scientificNameDetails.sourceUrl as string);
-    link.setAttribute("target", "_blank");
-    link.setAttribute("rel", "noopener");
 
     link.innerHTML = scientificNameDetails.currentName as string;
 
@@ -231,7 +229,6 @@ export function SelectedScientificNameView(
       <div className="my-2">
         {scientificNameSrcDetailUrlVal && (
           <a
-            target="_blank"
             type="button"
             href={`${scientificNameSrcDetailUrlVal}`}
             className="btn btn-info me-2 view-button "

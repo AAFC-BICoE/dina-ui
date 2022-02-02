@@ -187,9 +187,7 @@ export function AttachmentsEditor({
                             <Link
                               href={`/object-store/object/view?id=${metadata.id}`}
                             >
-                              <a target={readOnly ? "" : "_blank"}>
-                                {metadata?.originalFilename ?? metadata.id}
-                              </a>
+                              <a>{metadata?.originalFilename ?? metadata.id}</a>
                             </Link>
                           );
                         }
