@@ -254,6 +254,14 @@ export default function MaterialSampleListPage() {
             indexName={"dina_material_sample_index"}
             columns={columns}
             initData={response?.data}
+            bulkDeleteButtonProps={{
+              typeName: "material-sample",
+              apiBaseUrl: "/collection-api"
+            }}
+            bulkEditPath={ids => ({
+              pathname: "/collection/material-sample/bulk-edit",
+              query: { ids: ids.join(",") }
+            })}
           />
         ))}
       </main>
