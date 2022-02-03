@@ -1907,6 +1907,7 @@ describe("MaterialSampleBulkEditor", () => {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
               },
+              associations: [],
               relationships: {},
               type: "material-sample"
             },
