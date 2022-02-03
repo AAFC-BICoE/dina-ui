@@ -1,4 +1,5 @@
 import { ResourceSelect } from "common-ui";
+import { ErrorBoundaryPage } from "../../../components";
 import Select from "react-select";
 import ManagedAttributesViewEditPage, {
   ManagedAttributesViewForm,
@@ -12,8 +13,9 @@ import {
 
 const mockPush = jest.fn();
 
+const mockQueryStringParams = { id: "123" };
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "123" }, push: mockPush })
+  useRouter: () => ({ query: mockQueryStringParams, push: mockPush })
 }));
 
 // Test an existing CustomView:
@@ -31,6 +33,14 @@ const TEST_CUSTOM_VIEW: CustomView = {
     type: "managed-attributes-view"
   })
 };
+// Test an existing CustomView:
+const TEST_BAD_CUSTOM_VIEW: CustomView = {
+  type: "custom-view",
+  name: "My Custom View",
+  viewConfiguration: {
+    type: "wrong-type"
+  }
+};
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -40,6 +50,8 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: { id: "2", key: "attribute_2", name: "Attribute 2" } };
     case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
       return { data: { id: "3", key: "attribute_3", name: "Attribute 3" } };
+    case "collection-api/custom-view/bad-custom-view":
+      return { data: TEST_BAD_CUSTOM_VIEW };
     case "collection-api/custom-view/123":
       return { data: TEST_CUSTOM_VIEW };
     case "user-api/group":
@@ -65,7 +77,10 @@ const testCtx = {
 };
 
 describe("ManagedAttributesViewEditPage", () => {
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    mockQueryStringParams.id = "123";
+    jest.clearAllMocks();
+  });
 
   it("Lets you submit a custom-view for managed attributes", async () => {
     const mockOnSaved = jest.fn();
@@ -157,8 +172,6 @@ describe("ManagedAttributesViewEditPage", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-    await new Promise(setImmediate);
-    wrapper.update();
 
     // Existing Custom View saved:
     expect(mockSave).lastCalledWith(
@@ -187,6 +200,24 @@ describe("ManagedAttributesViewEditPage", () => {
 
     expect(mockPush).lastCalledWith(
       "/collection/managed-attributes-view/view?id=123"
+    );
+  });
+
+  it("Throws an error if you try to load a custom-view that is not for a Managed Attribute View", async () => {
+    mockQueryStringParams.id = "bad-custom-view";
+
+    const wrapper = mountWithAppContext(
+      <ManagedAttributesViewEditPage />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Bad error message but this should not happen in prod unless an invalid link is followed.
+    // The error is displayed instead of allowing you to edit a non-managed-attribute custom-view in this page.
+    expect(wrapper.find(".alert.alert-danger").text()).toEqual(
+      "ValidationError: type must be one of the following values: managed-attributes-view"
     );
   });
 });

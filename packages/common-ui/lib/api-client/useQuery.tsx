@@ -126,11 +126,12 @@ export function withResponse<
     return <LoadingSpinner loading={true} />;
   }
   if (error) {
-    return (
-      <div className="alert alert-danger">
-        {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
-      </div>
-    );
+    const message =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : error?.errors?.map(e => e.detail).join("\n") ?? String(error);
+
+    return <div className="alert alert-danger">{message}</div>;
   }
   if (response) {
     return responseRenderer(response);
