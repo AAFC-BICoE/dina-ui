@@ -23,7 +23,9 @@ const { FormattedMessage, IntlProvider, useIntl } = getIntlSupport<
   // Even though Seqdb messages are included in the dina-ui messsages obejcts,
   // use DinaMessage/useDinaIntl for dina-specific messages and use SeqdbMessage/useSeqdbIntl for Seqdb-specific
   // messages to keep the intl messages organized by DINA module.
-  typeof COMMON_UI_MESSAGES_ENGLISH & typeof DINAUI_MESSAGES_ENGLISH
+  typeof COMMON_UI_MESSAGES_ENGLISH &
+    typeof DINAUI_MESSAGES_ENGLISH &
+    typeof SEQDB_MESSAGES_ENGLISH
 >({
   defaultMessages: en,
   translations: { en, fr }
