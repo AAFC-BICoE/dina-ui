@@ -612,6 +612,14 @@ export function useMaterialSampleSave({
       projects: undefined
     };
 
+    // delete the association if associated sample is left unfilled
+    if (
+      msInputWithRelationships.associations?.length === 1 &&
+      !msInputWithRelationships.associations[0].associatedSample
+    ) {
+      msInputWithRelationships.associations = [];
+    }
+
     const saveOperation = {
       resource: msInputWithRelationships,
       type: "material-sample"
