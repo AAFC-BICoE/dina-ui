@@ -18,6 +18,7 @@ export default function AcquisitionEventDetailsPage() {
       entityLink="/collection/acquisition-event"
       type="acquisition-event"
       apiBaseUrl="/collection-api"
+      showRevisionsLink={true}
     />
   );
 }

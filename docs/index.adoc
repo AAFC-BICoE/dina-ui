@@ -14,6 +14,8 @@ include::getting_started.adoc[]
 
 include::react_component_types.adoc[]
 
+include::audit_revisions_ui.adoc[]
+
 include::running_tests.adoc[]
 
 include::versioning.adoc[]

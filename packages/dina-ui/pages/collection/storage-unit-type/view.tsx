@@ -15,6 +15,7 @@ export default function StorageUnitTypeDetailsPage() {
       entityLink="/collection/storage-unit-type"
       type="storage-unit-type"
       apiBaseUrl="/collection-api"
+      showRevisionsLink={true}
     />
   );
 }

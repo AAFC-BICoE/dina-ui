@@ -1,16 +1,15 @@
 import classNames from "classnames";
-import { FastFieldProps, FormikProps } from "formik";
-import { isArray, isEqual } from "lodash";
+import { FormikProps } from "formik";
+import { isArray } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { FieldSpyRenderProps } from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
-import { isBlankResourceAttribute } from "../util/isBlankResourceAttribute";
-import { FieldSpyRenderProps } from "..";
 
 export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */

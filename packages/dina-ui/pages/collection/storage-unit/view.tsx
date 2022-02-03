@@ -23,6 +23,7 @@ export default function StorageUnitDetailsPage() {
       type="storage-unit"
       apiBaseUrl="/collection-api"
       editButton={formProps => <StorageEditButton {...formProps} />}
+      showRevisionsLink={true}
       nameField={unit => storageUnitDisplayName(unit)}
     />
   );
