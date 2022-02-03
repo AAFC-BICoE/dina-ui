@@ -10,10 +10,10 @@ const TEST_SEARCH_DATE =
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    "data.id.type": "text",
-    "data.attributes.createdOn.type": "date",
-    "meta.moduleVersion.type": "text",
-    "data.attributes.allowDuplicateName.type": "boolean"
+    "data.id.": "text",
+    "data.attributes.createdOn": "date",
+    "meta.moduleVersion": "text",
+    "data.attributes.allowDuplicateName": "boolean"
   }
 };
 

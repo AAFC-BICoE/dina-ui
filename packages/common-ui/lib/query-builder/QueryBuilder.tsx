@@ -15,24 +15,16 @@ export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
       params: { indexName: searchIndexName }
     });
+
     const result: {}[] = [];
 
     Object.keys(resp.data)
       .filter(key => key.includes("data.attributes."))
       .map(key => {
-        const fieldNameLabel = key.substring(
-          "data.attributes.".length,
-          key.lastIndexOf(".")
-        );
-
-        const fieldValue = key.substring(
-          0,
-          key.indexOf(fieldNameLabel) + fieldNameLabel.length
-        );
-
+        const fieldNameLabel = key.substring("data.attributes.".length);
         result.push({
           label: fieldNameLabel,
-          value: fieldValue,
+          value: key,
           type: resp.data?.[key]
         });
       });
