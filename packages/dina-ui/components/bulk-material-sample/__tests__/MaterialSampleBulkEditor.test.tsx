@@ -1879,6 +1879,7 @@ describe("MaterialSampleBulkEditor", () => {
               projects: undefined,
               attachment: undefined,
               id: "1",
+              associations: [],
               organism: {
                 lifeStage: "test lifestage",
                 substrate: "bulk-edit-substrate"
