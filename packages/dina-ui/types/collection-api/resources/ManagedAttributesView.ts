@@ -1,14 +1,17 @@
-import { KitsuResource } from "kitsu";
-import { CollectionModuleType } from "./ManagedAttribute";
+import * as yup from "yup";
 
-export interface ManagedAttributesViewAttributes {
-  type: "managed-attributes-view";
+const allowedTypenames = ["managed-attributes-view"] as const;
 
-  name?: string;
-  group?: string;
-  managedAttributeComponent?: CollectionModuleType;
-  attributeKeys?: string[];
-}
+export const managedAttributesViewSchema = yup.object({
+  managedAttributeComponent: yup.string(),
+  attributeKeys: yup.array(yup.string().required()),
+  // String literal field:
+  type: yup
+    .mixed<typeof allowedTypenames[number]>()
+    .oneOf([...allowedTypenames])
+    .required()
+});
 
-export type ManagedAttributesView = KitsuResource &
-  ManagedAttributesViewAttributes;
+export type ManagedAttributesView = yup.InferType<
+  typeof managedAttributesViewSchema
+>;

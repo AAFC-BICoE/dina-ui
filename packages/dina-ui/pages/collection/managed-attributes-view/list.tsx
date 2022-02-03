@@ -1,6 +1,7 @@
 import {
   ButtonBar,
   CreateButton,
+  dateCell,
   FilterAttribute,
   ListPageLayout,
   stringArrayCell
@@ -8,6 +9,7 @@ import {
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { CustomView } from "../../../types/collection-api";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = ["name"];
 const TABLE_COLUMNS = [
@@ -19,7 +21,9 @@ const TABLE_COLUMNS = [
     ),
     accessor: "name"
   },
-  stringArrayCell("attributeKeys")
+  stringArrayCell("viewConfiguration.attributeKeys"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function ManagedAttributesViewListPage() {
@@ -36,18 +40,19 @@ export default function ManagedAttributesViewListPage() {
         <ButtonBar>
           <CreateButton entityLink="/collection/managed-attributes-view" />
         </ButtonBar>
-        <ListPageLayout
+        <ListPageLayout<CustomView>
           filterAttributes={FILTER_ATTRIBUTES}
           id="managed-attributes-view-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "collection-api/managed-attributes-view",
+            path: "collection-api/custom-view",
             defaultSort: [
               {
                 id: "name",
                 desc: false
               }
-            ]
+            ],
+            filter: { "viewConfiguration.type": "managed-attributes-view" }
           }}
         />
       </main>

@@ -1,4 +1,6 @@
 import {
+  BackButton,
+  ButtonBar,
   DinaForm,
   DinaFormOnSubmit,
   DinaFormSection,
@@ -7,8 +9,10 @@ import {
   FormikButton,
   ResourceSelect,
   SelectField,
+  SubmitButton,
   TextField,
   useApiClient,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -18,31 +22,58 @@ import { useRouter } from "next/router";
 import { PropsWithChildren } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
-import { Head, Nav } from "../../../components";
+import {
+  SortableContainer,
+  SortableElement,
+  SortEnd
+} from "react-sortable-hoc";
+import * as yup from "yup";
+import { GroupSelectField, Head, Nav } from "../../../components";
 import { ManagedAttributeName } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttributesView } from "../../../types/collection-api";
+import {
+  CustomView,
+  ManagedAttributesView,
+  managedAttributesViewSchema
+} from "../../../types/collection-api";
 import {
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS
 } from "../../../types/collection-api/resources/ManagedAttribute";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 
-export interface CustomManagedAttributesViewFormProps {
-  fetchedView?: ManagedAttributesView;
-  onSaved: (data: PersistedResource<ManagedAttributesView>) => Promise<void>;
+export interface ManagedAttributesViewFormProps {
+  fetchedView?: CustomView;
+  onSaved: (data: PersistedResource<CustomView>) => Promise<void>;
 }
 
-export default function CustomManagedAttributesViewPage() {
+/**
+ * Validate the JSON field on the front-end because it's unstructured JSON on the back-end.
+ */
+const customViewSchema = yup.object({
+  viewConfiguration: managedAttributesViewSchema
+});
+
+export function useManagedAttributesView(id?: string) {
+  return useQuery<CustomView>(
+    { path: `collection-api/custom-view/${id}` },
+    {
+      onSuccess: async ({ data: fetchedView }) => {
+        // Throw an error if the wrong type of Custom View
+        managedAttributesViewSchema.validateSync(fetchedView.viewConfiguration);
+      },
+      disabled: !id
+    }
+  );
+}
+
+export default function ManagedAttributesViewPage() {
   const router = useRouter();
 
-  const {
-    query: { id }
-  } = router;
+  const id = router.query.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
-  async function goToViewPage(data: PersistedResource<ManagedAttributesView>) {
+  async function goToViewPage(data: PersistedResource<CustomView>) {
     await router.push(`/collection/managed-attributes-view/view?id=${data.id}`);
   }
 
@@ -50,9 +81,7 @@ export default function CustomManagedAttributesViewPage() {
     ? "editManagedAttributesViewTitle"
     : "addManagedAttributesViewTitle";
 
-  const query = useQuery<ManagedAttributesView>({
-    path: `collection-api/managed-attributes-view/${id}`
-  });
+  const query = useManagedAttributesView(id);
 
   return (
     <div>
@@ -65,13 +94,13 @@ export default function CustomManagedAttributesViewPage() {
           </h1>
           {id ? (
             withResponse(query, ({ data }) => (
-              <CustomManagedAttributesViewForm
+              <ManagedAttributesViewForm
                 fetchedView={data}
                 onSaved={goToViewPage}
               />
             ))
           ) : (
-            <CustomManagedAttributesViewForm onSaved={goToViewPage} />
+            <ManagedAttributesViewForm onSaved={goToViewPage} />
           )}
         </div>
       </main>
@@ -79,30 +108,64 @@ export default function CustomManagedAttributesViewPage() {
   );
 }
 
-export function CustomManagedAttributesViewForm({
+export function ManagedAttributesViewForm({
   onSaved,
   fetchedView
-}: CustomManagedAttributesViewFormProps) {
+}: ManagedAttributesViewFormProps) {
   const { save } = useApiClient();
-  const { formatMessage } = useDinaIntl();
 
-  const initialValues = fetchedView ?? { type: "managed-attributes-view" };
+  const initialViewConfiguration: Partial<ManagedAttributesView> = {
+    type: "managed-attributes-view",
+    attributeKeys: []
+  };
 
-  const onSubmit: DinaFormOnSubmit<InputResource<ManagedAttributesView>> =
-    async ({ submittedValues }) => {
-      const [savedView] = await save<ManagedAttributesView>(
-        [
-          {
-            resource: submittedValues,
-            type: "managed-attributes-view"
-          }
-        ],
+  const initialValues = fetchedView ?? {
+    type: "custom-view",
+    restrictToCreatedBy: true,
+    viewConfiguration: initialViewConfiguration
+  };
+
+  const onSubmit: DinaFormOnSubmit<InputResource<CustomView>> = async ({
+    submittedValues
+  }) => {
+    const [savedView] = await save<CustomView>(
+      [
         {
-          apiBaseUrl: "/collection-api"
+          resource: submittedValues,
+          type: "custom-view"
         }
-      );
-      await onSaved(savedView);
-    };
+      ],
+      { apiBaseUrl: "/collection-api" }
+    );
+    await onSaved(savedView);
+  };
+
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={fetchedView?.id}
+        entityLink="/collection/managed-attributes-view"
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  );
+
+  return (
+    <DinaForm
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={customViewSchema}
+    >
+      {buttonBar}
+      <ManagedAttributesViewFormLayout />
+      {buttonBar}
+    </DinaForm>
+  );
+}
+
+export function ManagedAttributesViewFormLayout() {
+  const { formatMessage } = useDinaIntl();
+  const { readOnly } = useDinaFormContext();
 
   const ATTRIBUTE_COMPONENT_OPTIONS: {
     label: string;
@@ -113,7 +176,14 @@ export function CustomManagedAttributesViewForm({
   }));
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <div>
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+        />
+      </div>
       <DinaFormSection horizontal="flex">
         <div className="row">
           <TextField name="name" className="col-sm-6" />
@@ -121,103 +191,130 @@ export function CustomManagedAttributesViewForm({
         <div className="row">
           <SelectField
             className="col-md-6"
-            name="managedAttributeComponent"
+            name="viewConfiguration.managedAttributeComponent"
+            customName="managedAttributeComponent"
             options={ATTRIBUTE_COMPONENT_OPTIONS}
-            onChange={(_, form) => form.setFieldValue("attributeKeys", [])}
+            readOnlyRender={value =>
+              ATTRIBUTE_COMPONENT_OPTIONS.find(option => option.value === value)
+                ?.label
+            }
+            onChange={(_, form) =>
+              form.setFieldValue("viewConfiguration.attributeKeys", [])
+            }
           />
         </div>
       </DinaFormSection>
-      <FieldSpy<string> fieldName="managedAttributeComponent">
+      <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
         {managedAttributeComponent =>
           managedAttributeComponent ? (
             <>
               <hr />
-              <FieldArray name="attributeKeys">
-                {({ push, remove, form, move }) => (
-                  <div>
-                    <div className="mb-4" style={{ maxWidth: "30rem" }}>
-                      <ResourceSelect<ManagedAttribute>
-                        filter={input => ({
-                          ...filterBy(["name"])(input),
-                          ...(managedAttributeComponent
-                            ? { managedAttributeComponent }
-                            : {})
-                        })}
-                        model="collection-api/managed-attribute"
-                        onChange={ma => {
-                          if (
-                            !Array.isArray(ma) &&
-                            !form.values.attributeKeys?.includes?.(ma.key)
-                          ) {
-                            push(ma.key);
-                          }
-                        }}
-                        optionLabel={ma => ma.name}
-                        placeholder={formatMessage("addManagedAttribute")}
-                        omitNullOption={true}
-                      />
-                    </div>
-                    {form.values.attributeKeys?.length >= 2 && (
-                      <div>
-                        <div className="alert alert-warning d-flex flex-column gap-2">
-                          <div>
-                            <strong>
-                              <DinaMessage id="dragDropInstructionsHeader" />
-                            </strong>
-                          </div>
-                          <div>
-                            <strong>
-                              <DinaMessage id="withAMouse" />:
-                            </strong>{" "}
-                            <DinaMessage id="dragDropMouseInstructions" />
-                          </div>
-                          <div>
-                            <strong>
-                              <DinaMessage id="withAKeyboard" />:
-                            </strong>{" "}
-                            <DinaMessage id="dragDropKeyboardInstructions" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+              <FieldArray name="viewConfiguration.attributeKeys">
+                {({ push, remove, form, move }) => {
+                  function onSortStart(_, event: unknown) {
+                    if (event instanceof MouseEvent) {
+                      document.body.style.cursor = "grabbing";
+                    }
+                  }
+                  function onSortEnd(se: SortEnd) {
+                    document.body.style.cursor = "default";
+                    move(se.oldIndex, se.newIndex);
+                  }
+
+                  return (
                     <div>
-                      <FieldSpy<string[]> fieldName="attributeKeys">
-                        {keys => (
-                          <SortableAttributesViewList
-                            axis="xy"
-                            onSortEnd={sortEnd =>
-                              move(sortEnd.oldIndex, sortEnd.newIndex)
-                            }
-                            // "distance" is needed to allow clicking the Remove button:
-                            distance={1}
-                            helperClass="sortable-lifted"
-                          >
-                            {/* Give the lifted drag/drop item a blue background. */}
-                            <style>{`
+                      {!readOnly && (
+                        <div className="mb-4" style={{ maxWidth: "30rem" }}>
+                          <ResourceSelect<ManagedAttribute>
+                            filter={input => ({
+                              ...filterBy(["name"])(input),
+                              ...(managedAttributeComponent
+                                ? { managedAttributeComponent }
+                                : {})
+                            })}
+                            model="collection-api/managed-attribute"
+                            onChange={ma => {
+                              if (
+                                !Array.isArray(ma) &&
+                                !form.values.viewConfiguration?.attributeKeys?.includes?.(
+                                  ma.key
+                                )
+                              ) {
+                                push(ma.key);
+                              }
+                            }}
+                            optionLabel={ma => ma.name}
+                            placeholder={formatMessage("addManagedAttribute")}
+                            omitNullOption={true}
+                          />
+                        </div>
+                      )}
+                      {!readOnly &&
+                        form.values.viewConfiguration?.attributeKeys?.length >=
+                          2 && (
+                          <div>
+                            <div className="alert alert-warning d-flex flex-column gap-2">
+                              <div>
+                                <strong>
+                                  <DinaMessage id="dragDropInstructionsHeader" />
+                                </strong>
+                              </div>
+                              <div>
+                                <strong>
+                                  <DinaMessage id="withAMouse" />:
+                                </strong>{" "}
+                                <DinaMessage id="dragDropMouseInstructions" />
+                              </div>
+                              <div>
+                                <strong>
+                                  <DinaMessage id="withAKeyboard" />:
+                                </strong>{" "}
+                                <DinaMessage id="dragDropKeyboardInstructions" />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      <div>
+                        <FieldSpy<
+                          string[]
+                        > fieldName="viewConfiguration.attributeKeys">
+                          {keys => (
+                            <SortableAttributesViewList
+                              axis="xy"
+                              onSortStart={onSortStart}
+                              onSortEnd={onSortEnd}
+                              // "distance" is needed to allow clicking the Remove button:
+                              distance={1}
+                              helperClass="sortable-lifted"
+                            >
+                              {/* Give the lifted drag/drop item a blue background. */}
+                              <style>{`
                               .form-control.sortable-lifted {
                                 background-color: rgb(222, 235, 255);
                               }
                             `}</style>
-                            {keys?.map((key, index) => (
-                              <SortableAttributesViewItem
-                                key={key}
-                                attributeKey={key}
-                                onRemoveClick={() => remove(index)}
-                                index={index}
-                              />
-                            ))}
-                          </SortableAttributesViewList>
-                        )}
-                      </FieldSpy>
+                              {keys?.map((key, index) => (
+                                <SortableAttributesViewItem
+                                  disabled={readOnly}
+                                  key={key}
+                                  attributeKey={key}
+                                  onRemoveClick={() => remove(index)}
+                                  index={index}
+                                />
+                              ))}
+                            </SortableAttributesViewList>
+                          )}
+                        </FieldSpy>
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                }}
               </FieldArray>
             </>
           ) : null
         }
       </FieldSpy>
-    </DinaForm>
+    </div>
   );
 }
 
@@ -236,22 +333,25 @@ function AttributesViewItem({
   attributeKey,
   onRemoveClick
 }: AttributesViewItemProps) {
+  const { readOnly } = useDinaFormContext();
+  const cursor = readOnly ? undefined : "grab";
+
   return (
     <div
       // form-control adds the blue focus ring around the div:
       className="card card-body mb-4 form-control"
       style={{
-        cursor: "grab",
+        cursor,
         maxWidth: "49.2%"
       }}
       // Makes the div focusable and keyboard navigatable:
-      tabIndex={0}
+      tabIndex={readOnly ? undefined : 0}
     >
-      <label htmlFor="none" style={{ cursor: "grab" }}>
+      <label htmlFor="none" style={{ cursor }}>
         <div className="mb-2 d-flex align-items-center">
           <div className="me-auto">
             <strong>
-              <FieldSpy<string> fieldName="managedAttributeComponent">
+              <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
                 {managedAttributeComponent =>
                   managedAttributeComponent ? (
                     <ManagedAttributeName
@@ -265,12 +365,14 @@ function AttributesViewItem({
               </FieldSpy>
             </strong>
           </div>
-          <div className="d-flex align-items-center gap-2">
-            <FormikButton className="btn" onClick={() => onRemoveClick()}>
-              <RiDeleteBinLine size="1.8em" />
-            </FormikButton>
-            <GiMove size="1.8em" />
-          </div>
+          {!readOnly && (
+            <div className="d-flex align-items-center gap-2">
+              <FormikButton className="btn" onClick={() => onRemoveClick()}>
+                <RiDeleteBinLine size="1.8em" />
+              </FormikButton>
+              <GiMove size="1.8em" />
+            </div>
+          )}
         </div>
         <input type="text" className="form-control" disabled={true} />
       </label>
