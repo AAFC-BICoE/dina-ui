@@ -21,12 +21,14 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
+const mockPost = jest.fn(() => null);
+
 const TEST_SEARCH_DATE =
   "Tue Jan 25 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
 const apiContext = {
   apiClient: {
-    axios: { get: mockGet } as any
+    axios: { get: mockGet, post: mockPost } as any
   }
 } as any;
 
@@ -102,37 +104,38 @@ describe("QueryPage component", () => {
             indexName: "testIndex"
           }
         }
-      ],
-      [
-        "es/testIndex/_search",
-        {
-          params: {
-            source: {
-              query: {
-                bool: {
-                  filter: {
-                    bool: {
-                      must: [
-                        {
-                          term: {
-                            createdOn: "2022-01-25"
-                          }
-                        },
-                        {
-                          term: {
-                            allowDuplicateName: "true"
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            },
-            source_content_type: "application/json"
-          }
-        }
       ]
     ]);
+
+    expect(mockPost).lastCalledWith(
+      "search-api/search/text",
+      {
+        query: {
+          bool: {
+            filter: {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      createdOn: "2022-01-25"
+                    }
+                  },
+                  {
+                    term: {
+                      allowDuplicateName: "true"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        params: {
+          indexName: "testIndex"
+        }
+      }
+    );
   });
 });
