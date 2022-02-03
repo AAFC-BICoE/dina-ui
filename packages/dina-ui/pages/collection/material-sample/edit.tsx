@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormContext,
@@ -14,11 +15,12 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useApiClient,
   useDinaFormContext,
   useFieldLabels,
   withResponse
 } from "common-ui";
-import { FormikProps } from "formik";
+import { FormikProps, useField } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
@@ -98,7 +100,8 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
-  const sampleFormProps = {
+  const sampleFormProps: Partial<MaterialSampleFormProps> = {
+    enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
         <BackButton
@@ -206,8 +209,6 @@ export interface MaterialSampleFormProps {
   /** Makes the sample name field (Primary ID) read-only. */
   disableSampleNameField?: boolean;
 
-  omitGroupField?: boolean;
-
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
 
   /** Disables the "Are You Sure" prompt in the nav when removing a data component. */
@@ -221,6 +222,11 @@ export interface MaterialSampleFormProps {
 
   /** Reduces the rendering to improve performance when bulk editing many material samples. */
   reduceRendering?: boolean;
+
+  /** Hide the use next identifer checkbox, e.g when create multiple new samples */
+  hideUseSequence?: boolean;
+  /** Sets a default group from local storage when the group is not already set. */
+  enableStoredDefaultGroup?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -234,10 +240,11 @@ export function MaterialSampleForm({
   disableAutoNamePrefix,
   materialSampleFormRef,
   disableSampleNameField,
-  omitGroupField,
   disableNavRemovePrompt,
   isOffScreen,
   reduceRendering,
+  hideUseSequence,
+  enableStoredDefaultGroup,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -321,12 +328,12 @@ export function MaterialSampleForm({
                 materialSample={materialSample as any}
               />
             )}
-            {!isTemplate && !omitGroupField && (
+            {!isTemplate && (
               <div className="row">
                 <div className="col-md-6">
                   <GroupSelectField
                     name="group"
-                    enableStoredDefaultGroup={true}
+                    enableStoredDefaultGroup={enableStoredDefaultGroup}
                   />
                 </div>
               </div>
@@ -341,6 +348,7 @@ export function MaterialSampleForm({
               <MaterialSampleIdentifiersFormLayout
                 id={navIds.identifiers}
                 disableSampleNameField={disableSampleNameField}
+                hideUseSequence={hideUseSequence}
               />
               <MaterialSampleFormLayout />
             </>
@@ -486,8 +494,6 @@ export function MaterialSampleForm({
     </div>
   );
 
-  const { materialSampleSchema } = useMaterialSampleSchema();
-
   return isTemplate ? (
     mateirialSampleInternal
   ) : loading ? (
@@ -498,9 +504,6 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      validationSchema={
-        dataComponentState.enableAssociations ? materialSampleSchema : null
-      }
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
@@ -586,6 +589,7 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
   id?: string;
+  hideUseSequence?: boolean;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -607,8 +611,13 @@ export function MaterialSampleIdentifiersFormLayout({
   className,
   namePrefix = "",
   sampleNamePlaceHolder,
+  hideUseSequence,
   id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const [{ value }] = useField("collection");
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
+
   return (
     <FieldSet
       id={id}
@@ -621,13 +630,34 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}collection`}
             customName="collection"
           />
-          <TextField
-            name={`${namePrefix}materialSampleName`}
-            customName="materialSampleName"
-            className="materialSampleName"
-            readOnly={disableSampleNameField}
-            placeholder={sampleNamePlaceHolder}
-          />
+          <div className="d-flex">
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              inputProps={{ disabled: primaryIdDisabled }}
+              customName="materialSampleName"
+              className="materialSampleName flex-grow-1"
+              readOnly={disableSampleNameField}
+              placeholder={sampleNamePlaceHolder}
+            />
+            {!readOnly && !hideUseSequence && (
+              <CheckBoxField
+                onCheckBoxClick={event =>
+                  setPrimaryIdDisabled(event.target.checked)
+                }
+                name="useNextSequence"
+                className="ms-2 mt-1 align-items-center"
+                // only enabled when add new sample and collection is selected
+                disabled={initialValues.id || !value?.id}
+                overridecheckboxProps={{
+                  style: {
+                    height: "30px",
+                    width: "30px"
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">
@@ -720,27 +750,4 @@ export function nextSampleInitialValues(
   };
 
   return initialValues;
-}
-
-function useMaterialSampleSchema() {
-  const { getFieldLabel } = useFieldLabels();
-
-  /** Front-end validation. */
-  const materialSampleSchema = yup.object({
-    associations: yup.array(
-      yup.object({
-        associatedSample: yup
-          .string()
-          .nullable()
-          .required()
-          .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
-        associationType: yup
-          .string()
-          .required()
-          .label(getFieldLabel({ name: "associationType" }).fieldLabel)
-      })
-    )
-  });
-
-  return { materialSampleSchema };
 }

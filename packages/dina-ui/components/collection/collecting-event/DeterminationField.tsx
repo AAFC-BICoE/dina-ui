@@ -1,10 +1,11 @@
 import {
   AutoSuggestTextField,
   DateField,
+  DinaFormSection,
   FieldSet,
-  FormikButton,
   TextField,
   TextFieldWithMultiplicationButton,
+  ToggleField,
   Tooltip,
   useDinaFormContext
 } from "common-ui";
@@ -19,6 +20,7 @@ import {
   MaterialSample,
   Vocabulary
 } from "../../../types/collection-api";
+import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import {
   GlobalNamesField,
@@ -47,7 +49,8 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     isPrimary: true,
     scientificNameDetails: true,
     isFileAs: true,
-    determinationRemarks: true
+    determinationRemarks: true,
+    managedAttributes: true
   };
 
 /** All fields of the Determination type. */
@@ -98,10 +101,7 @@ export function DeterminationField({ id = "determination-section" }) {
       typeName={formatMessage("determination")}
       sectionId={id}
       initialIndex={initialIndex}
-      makeNewElement={({ length }) => ({
-        isPrimary: length === 0,
-        isFileAs: length === 0
-      })}
+      makeNewElement={() => ({})}
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
       wrapContent={content => (
         <BulkEditTabWarning
@@ -110,10 +110,7 @@ export function DeterminationField({ id = "determination-section" }) {
           setDefaultValue={ctx =>
             // Auto-create the first determination:
             ctx.bulkEditFormRef?.current?.setFieldValue(determinationsPath, [
-              {
-                isPrimary: true,
-                isFileAs: true
-              }
+              {}
             ])
           }
         >
@@ -141,47 +138,25 @@ export function DeterminationField({ id = "determination-section" }) {
         return (
           <div className="row">
             {!readOnly && !isTemplate && (
-              <div className="mb-3">
-                <FormikButton
-                  className="btn btn-primary primary-determinationtion-button"
-                  buttonProps={ctx => {
-                    const isPrimary =
-                      get(
-                        ctx.values,
-                        `${determinationsPath}[${index}].` + "isPrimary"
-                      ) ?? false;
-                    return {
-                      disabled: isPrimary,
-                      children: isPrimary ? (
-                        <DinaMessage id="primary" />
-                      ) : (
-                        <DinaMessage id="makePrimary" />
-                      )
-                    };
+              <div className="d-flex gap-4">
+                <ToggleField
+                  className="primary-determination-button"
+                  {...fieldProps("isPrimary")}
+                  onChangeExternal={(checked, formik) => {
+                    if (checked) {
+                      makePrimary(formik, index);
+                    }
                   }}
-                  onClick={(_, formik) => makePrimary(formik, index)}
                 />
-                <Tooltip id="primaryDeterminationButton_tooltip" />
-                <FormikButton
-                  className="btn btn-primary filed-as-button"
-                  buttonProps={ctx => {
-                    const isFileAs =
-                      get(
-                        ctx.values,
-                        `${determinationsPath}[${index}].` + "isFileAs"
-                      ) ?? false;
-                    return {
-                      disabled: isFileAs,
-                      children: isFileAs ? (
-                        <DinaMessage id="isFileAs" />
-                      ) : (
-                        <DinaMessage id="makeFiledAs" />
-                      )
-                    };
+                <ToggleField
+                  className="filed-as-button"
+                  {...fieldProps("isFileAs")}
+                  onChangeExternal={(checked, formik) => {
+                    if (checked) {
+                      makeFiledAs(formik, index);
+                    }
                   }}
-                  onClick={(_, formik) => makeFiledAs(formik, index)}
                 />
-                <Tooltip id="isFileAsDeterminationButton_tooltip" />
               </div>
             )}
             <div className="col-md-6">
@@ -366,6 +341,23 @@ export function DeterminationField({ id = "determination-section" }) {
                   multiLines={true}
                 />
               </FieldSet>
+              {!isTemplate && (
+                <FieldSet
+                  legend={<DinaMessage id="determinationManagedAttributes" />}
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                  className="non-strip"
+                >
+                  <ManagedAttributesEditor
+                    valuesPath={fieldProps("managedAttributes").name}
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    apiBaseUrl="/collection-api"
+                    managedAttributeComponent="DETERMINATION"
+                    managedAttributeKeyField="key"
+                    attributeSelectorWidth={12}
+                  />
+                </FieldSet>
+              )}
             </div>
           </div>
         );

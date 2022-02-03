@@ -2,6 +2,7 @@ import { DinaForm, EditButton, Tooltip } from "common-ui";
 import { useState } from "react";
 import {
   ResourceFormProps,
+  storageUnitDisplayName,
   StorageUnitFormFields,
   ViewPageLayout
 } from "../../../components";
@@ -16,14 +17,14 @@ export default function StorageUnitDetailsPage() {
         </DinaForm>
       )}
       query={id => ({
-        path: `collection-api/storage-unit/${id}?include=storageUnitChildren`
+        path: `collection-api/storage-unit/${id}?include=storageUnitChildren,storageUnitType`
       })}
       entityLink="/collection/storage-unit"
       type="storage-unit"
       apiBaseUrl="/collection-api"
       editButton={formProps => <StorageEditButton {...formProps} />}
-      deleteButton={() => null}
       showRevisionsLink={true}
+      nameField={unit => storageUnitDisplayName(unit)}
     />
   );
 }

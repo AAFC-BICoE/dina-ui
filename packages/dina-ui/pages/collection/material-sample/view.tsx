@@ -165,7 +165,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       <Link
                         href={`/collection/collecting-event/view?id=${colEvent.id}`}
                       >
-                        <a target="_blank">
+                        <a>
                           <DinaMessage id="detailsPageLink" />
                         </a>
                       </Link>
@@ -184,7 +184,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       <Link
                         href={`/collection/acquisition-event/view?id=${acqEvent.id}`}
                       >
-                        <a target="_blank">
+                        <a>
                           <DinaMessage id="detailsPageLink" />
                         </a>
                       </Link>

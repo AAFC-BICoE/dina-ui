@@ -333,7 +333,7 @@ export function ScheduledActionSubForm({
           {!isTemplate && (
             <div className="d-flex justify-content-center gap-2">
               <FormikButton
-                className="btn btn-primary mb-3 save-button"
+                className="btn btn-primary mb-3 add-button"
                 buttonProps={() => ({ style: { width: "10rem" } })}
                 onClick={submitAction}
               >

@@ -1,4 +1,6 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
 import { MaterialSampleBulkCreatePage } from "../../../../pages/collection/material-sample/bulk-create";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
@@ -33,6 +35,12 @@ const testCtx = {
 
 describe("MaterialSampleBulkCreatePage", () => {
   beforeEach(jest.clearAllMocks);
+
+  beforeEach(() => {
+    // Set the deault group selection:
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
+    jest.clearAllMocks();
+  });
 
   it("Can click the 'previous' button to go back to the previous step", async () => {
     const wrapper = mountWithAppContext(

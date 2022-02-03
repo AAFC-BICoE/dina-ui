@@ -51,7 +51,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   allowNew: "Autoriser le nouveau",
   appTitle: "DINA",
   assignContentsToNewStorage: "Assigner le contenu au nouveau stockage",
-  assignToStorage: "Assigner au stockage",
   assignedStorage: "Stockage assigné",
   assignedTo: "Attribué à",
   associatedAgent: "Agent associé",
@@ -271,8 +270,12 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Nom(s) de famille, y compris les noms de famille composés",
   field_givenNames: "Prénoms",
   field_givenNames_tooltip: "Prénom et tous les seconds prénoms",
+  field_isFileAs_tooltip:
+    'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
   field_isInseperable: "Garder les contenus ensemble",
   field_isInseperable_tooltip: "Les contenus sont inséparables",
+  field_isPrimary_tooltip:
+    "Faire de cette détermination le point de données principal lors de l'exportation. Une seule détermination peut être principale. ",
   field_license: "Licence",
   field_managedAttributeComponent: "Type de composant des données cibles",
   field_managedAttributeCreatedBy: "Créé par",
@@ -363,8 +366,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   institution: "Établissement",
   institutionListTitle: "Établissements",
   isFileAs: "Classé en tant que",
-  isFileAsDeterminationButton_tooltip:
-    'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
   isolation: "Isolation",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageDescriptionEnglish: "Anglais",
@@ -453,7 +454,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   organizationListTitle: "Organisations",
   originalFile: "Fichier original",
   originalMaterialSampleLabel: "Échantillon de matière original",
-  otherContents: "Autres contenants",
   parentCollectionLabel: "Collection mère",
   parentMaterialSample: "Échantillon d'origine",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
@@ -472,8 +472,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   primary: "Principal",
   primaryButton_tooltip:
     "Faites de cette affirmation le point de données principal lors de l’exportation. Une seule hypothèse peut servir d’hypothèse principale",
-  primaryDeterminationButton_tooltip:
-    "Faire de cette détermination le point de données principal lors de l'exportation. Une seule détermination peut être principale. ",
   primaryId: "No d'identification principal",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
   projectAttachments: "Pièces jointes liées au projet",

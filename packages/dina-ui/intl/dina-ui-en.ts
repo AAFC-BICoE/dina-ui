@@ -51,7 +51,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   allowNew: "Allow New",
   appTitle: "DINA",
   assignContentsToNewStorage: "Assign Contents to New Storage",
-  assignToStorage: "Assign to Storage",
   assignedStorage: "Assigned Storage",
   assignedTo: "Assigned To",
   associatedAgent: "Associated Agent",
@@ -137,6 +136,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detachSelectedButtonText: "Detach Selected",
   detailsPageLink: "Details Page",
   determination: "Determination",
+  determinationManagedAttributes: "Determination Managed Attributes",
   determinations: "Determinations",
   determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",
@@ -276,6 +276,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_givenNames_tooltip: "First and all middle names",
   field_isInseperable: "Keep Contents Together",
   field_isInseperable_tooltip: "Contents are inseparable",
+  field_isFileAs_tooltip:
+    "Make this determination the filed as. Only one determination can be filed as",
+  field_isPrimary_tooltip:
+    "Make this determination the primary data point when exported. Only one determination can be primary",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",
@@ -320,6 +324,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_type: "Type",
   field_typeStatus: "Type Status",
   field_typeStatusEvidence: "Type Status Evidence",
+  field_useNextSequence: "Use Next Available Identifier",
   field_verbatimDate: "Verbatim Date",
   field_verbatimDeterminer: "Verbatim Determiner",
   field_verbatimEventDateTime: "Verbatim Event Date Time",
@@ -366,8 +371,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFileAs: "Filed As",
-  isFileAsDeterminationButton_tooltip:
-    "Make this determination the filed as. Only one determination can be filed as",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",
@@ -453,7 +456,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
-  otherContents: "Other Contents",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: " Parent Sample",
@@ -473,8 +475,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primary: "Primary",
   primaryButton_tooltip:
     "Make this assertion the primary data point when exported. Only one assertion can be primary",
-  primaryDeterminationButton_tooltip:
-    "Make this determination the primary data point when exported. Only one determination can be primary",
   primaryId: "Primary ID",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   projectAttachments: "Project Attachments",

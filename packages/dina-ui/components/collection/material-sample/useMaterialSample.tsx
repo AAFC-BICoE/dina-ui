@@ -34,6 +34,7 @@ import {
 import {
   AcquisitionEvent,
   CollectingEvent,
+  Collection,
   MaterialSample
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
@@ -42,6 +43,7 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -443,7 +445,10 @@ export function useMaterialSampleSave({
               )
             })
           }))
-        : []
+        : [],
+
+      // Remove the scheduledAction field from the workflow template:
+      ...{ scheduledAction: undefined }
     };
 
     // Save and link the Collecting Event if enabled:
@@ -624,16 +629,37 @@ export function useMaterialSampleSave({
       submittedValues
     });
 
-    // Save the MaterialSample:
-    const [savedMaterialSample] = await withDuplicateSampleNameCheck(
-      async () =>
-        await save<MaterialSample>([materialSampleSaveOp], {
-          apiBaseUrl: "/collection-api"
-        }),
-      formik
-    );
+    async function saveToBackend() {
+      delete materialSampleSaveOp.resource.useNextSequence;
+      const [savedMaterialSample] = await withDuplicateSampleNameCheck(
+        async () =>
+          await save<MaterialSample>([materialSampleSaveOp], {
+            apiBaseUrl: "/collection-api"
+          }),
+        formik
+      );
+      await onSaved?.(savedMaterialSample?.id);
+    }
 
-    await onSaved?.(savedMaterialSample.id);
+    if (submittedValues.collection?.id && submittedValues.useNextSequence) {
+      useGenerateSequence({
+        collectionId: submittedValues.collection?.id as any,
+        amount: 1,
+        save
+      }).then(async data => {
+        if (data.result?.lowReservedID && data.result.highReservedID) {
+          const prefix = materialSampleSaveOp.resource.collection
+            ? (materialSampleSaveOp.resource.collection as Collection).code ??
+              (materialSampleSaveOp.resource.collection as Collection).name
+            : "";
+          materialSampleSaveOp.resource.materialSampleName =
+            (prefix as any) + data.result?.lowReservedID;
+        }
+        await saveToBackend();
+      });
+    } else {
+      await saveToBackend();
+    }
   }
 
   // In bulk edit mode, show green labels and green inputs for changed fields in
