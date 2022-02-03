@@ -1,5 +1,6 @@
-import { DinaForm, EditButton, Tooltip } from "common-ui";
-import { useState } from "react";
+import { DeleteButton, DinaForm, EditButton } from "common-ui";
+import { PersistedResource } from "kitsu";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {
   ResourceFormProps,
   storageUnitDisplayName,
@@ -17,45 +18,43 @@ export default function StorageUnitDetailsPage() {
         </DinaForm>
       )}
       query={id => ({
-        path: `collection-api/storage-unit/${id}?include=storageUnitChildren,storageUnitType`
+        path: `collection-api/storage-unit/${id}?include=parentStorageUnit,storageUnitChildren,storageUnitType,hierarchy`
       })}
       entityLink="/collection/storage-unit"
       type="storage-unit"
       apiBaseUrl="/collection-api"
       editButton={formProps => <StorageEditButton {...formProps} />}
+      deleteButton={formProps =>
+        hasChildren(formProps.initialValues) ? null : (
+          <DeleteButton
+            id={formProps.initialValues.id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/storage-unit/list"
+            type="storage-unit"
+          />
+        )
+      }
       showRevisionsLink={true}
       nameField={unit => storageUnitDisplayName(unit)}
     />
   );
 }
 
+function hasChildren(unit: PersistedResource<StorageUnit>) {
+  const children = unit.storageUnitChildren;
+  return !!children?.length;
+}
+
 function StorageEditButton({ initialValues }: ResourceFormProps<StorageUnit>) {
-  const children = initialValues.storageUnitChildren;
-  const hasChildren = !!children?.length;
-
-  const [visible, setVisible] = useState(false);
-
-  const editButton = (
+  return hasChildren(initialValues) ? (
+    <div className="alert alert-warning m-0">
+      <DinaMessage id="notEditableWhenThereAreChildStorageUnits" />
+    </div>
+  ) : (
     <EditButton
       entityId={initialValues.id}
       entityLink="collection/storage-unit"
-      disabled={hasChildren}
-      onKeyUp={e => (e.key === "Escape" ? setVisible(false) : setVisible(true))}
-      onMouseOver={() => setVisible(true)}
-      onMouseOut={() => setVisible(false)}
-      onBlur={() => setVisible(false)}
-      ariaDescribedBy={"notEditableWhenThereAreChildStorageUnits"}
+      ariaDescribedBy="notEditableWhenThereAreChildStorageUnits"
     />
-  );
-
-  return hasChildren ? (
-    <Tooltip
-      visibleElement={editButton}
-      setVisible={setVisible}
-      visible={visible}
-      id="notEditableWhenThereAreChildStorageUnits"
-    />
-  ) : (
-    editButton
   );
 }
