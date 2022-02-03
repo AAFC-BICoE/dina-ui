@@ -550,6 +550,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   status: "Status",
   storage: "Storage",
   storageUnitListTitle: "Storage Units",
+  storageUnitName: "Storage Unit Name",
   storageUnitType: "Storage Unit Type",
   storageUnitTypeListTitle: "Storage Unit Types",
   storagesCreatedByMe: "Storages Created By Me",
