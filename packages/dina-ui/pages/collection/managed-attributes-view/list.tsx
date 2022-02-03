@@ -16,7 +16,7 @@ const TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
       <Link href={`/collection/managed-attributes-view/view?id=${id}`}>
-        {name}
+        <a className="managed-attributes-view-link">{name}</a>
       </Link>
     ),
     accessor: "name"
@@ -46,12 +46,6 @@ export default function ManagedAttributesViewListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "collection-api/custom-view",
-            defaultSort: [
-              {
-                id: "name",
-                desc: false
-              }
-            ],
             filter: { "viewConfiguration.type": "managed-attributes-view" }
           }}
         />

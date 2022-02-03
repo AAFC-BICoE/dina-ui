@@ -11,7 +11,6 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse
@@ -67,7 +66,7 @@ export function useManagedAttributesView(id?: string) {
   );
 }
 
-export default function ManagedAttributesViewPage() {
+export default function ManagedAttributesViewEditPage() {
   const router = useRouter();
 
   const id = router.query.id?.toString?.();
@@ -112,8 +111,6 @@ export function ManagedAttributesViewForm({
   onSaved,
   fetchedView
 }: ManagedAttributesViewFormProps) {
-  const { save } = useApiClient();
-
   const initialViewConfiguration: Partial<ManagedAttributesView> = {
     type: "managed-attributes-view",
     attributeKeys: []
@@ -126,7 +123,8 @@ export function ManagedAttributesViewForm({
   };
 
   const onSubmit: DinaFormOnSubmit<InputResource<CustomView>> = async ({
-    submittedValues
+    submittedValues,
+    api: { save }
   }) => {
     const [savedView] = await save<CustomView>(
       [
@@ -224,7 +222,10 @@ export function ManagedAttributesViewFormLayout() {
                   return (
                     <div>
                       {!readOnly && (
-                        <div className="mb-4" style={{ maxWidth: "30rem" }}>
+                        <div
+                          className="managed-attributes-select mb-4"
+                          style={{ maxWidth: "30rem" }}
+                        >
                           <ResourceSelect<ManagedAttribute>
                             filter={input => ({
                               ...filterBy(["name"])(input),
@@ -381,4 +382,4 @@ function AttributesViewItem({
 }
 
 const SortableAttributesViewItem = SortableElement(AttributesViewItem);
-const SortableAttributesViewList = SortableContainer(AttributesViewList);
+export const SortableAttributesViewList = SortableContainer(AttributesViewList);
