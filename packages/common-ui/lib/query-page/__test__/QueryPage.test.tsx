@@ -16,7 +16,7 @@ const MOCK_INDEX_MAPPING_RESP = {
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "search-api/search/mapping":
+    case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
   }
 });
@@ -98,7 +98,7 @@ describe("QueryPage component", () => {
 
     expect(mockGet.mock.calls).toEqual([
       [
-        "search-api/search/mapping",
+        "search-api/search-ws/mapping",
         {
           params: {
             indexName: "testIndex"
@@ -108,7 +108,7 @@ describe("QueryPage component", () => {
     ]);
 
     expect(mockPost).lastCalledWith(
-      "search-api/search/text",
+      "search-api/search-ws/search",
       {
         query: {
           bool: {

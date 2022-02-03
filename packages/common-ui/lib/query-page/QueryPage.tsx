@@ -101,11 +101,15 @@ export function QueryPage<TData extends KitsuResource>({
 
   async function searchES(queryDSL) {
     const query = { ...queryDSL };
-    const resp = await apiClient.axios.post(`search-api/search/text`, query, {
-      params: {
-        indexName
+    const resp = await apiClient.axios.post(
+      `search-api/search-ws/search`,
+      query,
+      {
+        params: {
+          indexName
+        }
       }
-    });
+    );
     return resp?.data?.hits.hits.map(hit => hit._source?.data);
   }
 
