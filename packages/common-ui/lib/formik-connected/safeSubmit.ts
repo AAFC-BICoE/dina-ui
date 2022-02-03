@@ -21,7 +21,15 @@ export function safeSubmit(submitfn: OnFormikSubmit): OnFormikSubmit {
         formik.setStatus(error.message);
       }
       if (error instanceof DoOperationsError) {
-        formik.setErrors(error.fieldErrors);
+        // Set the new field errors:
+        formik.setErrors({});
+        for (const field of Object.keys(error.fieldErrors)) {
+          formik.setFieldError(
+            field,
+            // Formik should accept either a string or a nested errors object here:
+            error.fieldErrors[field] as any
+          );
+        }
       }
     }
     formik.setSubmitting(false);

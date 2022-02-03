@@ -19,6 +19,7 @@ import {
   StorageUnitBreadCrumb,
   StorageUnitChildrenViewer
 } from "..";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../types/collection-api";
 
 export const storageUnitFormSchema = yup.object({
@@ -84,6 +85,7 @@ export function StorageUnitForm({
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <div>
@@ -104,7 +106,11 @@ export function StorageUnitFormFields() {
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <TextField className="col-md-6" name="name" />
+        <TextField
+          className="col-md-6"
+          name="name"
+          label={formatMessage("storageUnitName")}
+        />
       </div>
       {readOnly ? (
         <FieldWrapper

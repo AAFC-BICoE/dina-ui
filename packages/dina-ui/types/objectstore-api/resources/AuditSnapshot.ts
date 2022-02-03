@@ -13,7 +13,9 @@ export interface AuditSnapshotAttributes {
 export type AuditSnapshot = KitsuResource & AuditSnapshotAttributes;
 
 /** Shallow reference format provided by Javers. */
-export interface AuditToEntityReference {
-  typeName: string;
-  cdoId: string;
-}
+export type AuditToEntityReference = {
+  typeName?: string;
+  type?: string;
+  id?: string;
+  cdoId?: string;
+};

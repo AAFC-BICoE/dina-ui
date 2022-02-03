@@ -34,6 +34,7 @@ export default function StorageUnitDetailsPage() {
           />
         )
       }
+      showRevisionsLink={true}
       nameField={unit => storageUnitDisplayName(unit)}
     />
   );
