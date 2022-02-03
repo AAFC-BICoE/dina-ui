@@ -609,12 +609,12 @@ export function useMaterialSampleSave({
       projects: undefined
     };
 
-    // associated sample is allowed to be left unfilled, set it to empty array
+    // delete the association if associated sample is left unfilled
     if (
       msInputWithRelationships.associations?.length === 1 &&
-      Object.keys(msInputWithRelationships.associations[0]).length === 0
+      !msInputWithRelationships.associations[0].associatedSample
     ) {
-      delete msInputWithRelationships.associations;
+      msInputWithRelationships.associations = [];
     }
 
     const saveOperation = {
