@@ -1,14 +1,15 @@
 import * as yup from "yup";
 
-const allowedTypenames = ["managed-attributes-view"] as const;
+/** Yup needs this as an array even though it's a single string literal. */
+const typeNameArray = ["managed-attributes-view"] as const;
 
 export const managedAttributesViewSchema = yup.object({
   managedAttributeComponent: yup.string(),
   attributeKeys: yup.array(yup.string().required()),
   // String literal field:
   type: yup
-    .mixed<typeof allowedTypenames[number]>()
-    .oneOf([...allowedTypenames])
+    .mixed<typeof typeNameArray[number]>()
+    .oneOf([...typeNameArray])
     .required()
 });
 

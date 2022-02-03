@@ -1,33 +1,76 @@
 import {
   ButtonBar,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   FilterAttribute,
   ListPageLayout,
-  stringArrayCell
+  stringArrayCell,
+  useBulkGet,
+  withResponse
 } from "common-ui";
 import Link from "next/link";
+import { ManagedAttribute } from "packages/dina-ui/types/objectstore-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CustomView } from "../../../types/collection-api";
+import {
+  CustomView,
+  managedAttributesViewSchema
+} from "../../../types/collection-api";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = ["name"];
-const TABLE_COLUMNS = [
-  {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/collection/managed-attributes-view/view?id=${id}`}>
-        <a className="managed-attributes-view-link">{name}</a>
-      </Link>
-    ),
-    accessor: "name"
-  },
-  stringArrayCell("viewConfiguration.attributeKeys"),
-  "createdBy",
-  dateCell("createdOn")
-];
+
+/** Renders the list of managed attribute names on a CustomView. */
+function ManagedAttributeNames({ customView }: { customView: CustomView }) {
+  const viewConfig = customView.viewConfiguration;
+
+  const keys =
+    (managedAttributesViewSchema.isValidSync(viewConfig) &&
+      viewConfig.attributeKeys) ||
+    [];
+
+  const ids =
+    (managedAttributesViewSchema.isValidSync(viewConfig) &&
+      keys.map(key => `${viewConfig.managedAttributeComponent}.${key}`)) ||
+    [];
+
+  const { data } = useBulkGet<ManagedAttribute>({
+    ids,
+    listPath: `collection-api/managed-attribute`
+  });
+
+  // Render either the names or keys, whichever is available:
+  return (
+    <>
+      {(data?.map?.((ma: any) => ma.name || ma.key || ma.id) || keys).join(
+        ", "
+      )}
+    </>
+  );
+}
 
 export default function ManagedAttributesViewListPage() {
   const { formatMessage } = useDinaIntl();
+
+  const TABLE_COLUMNS: ColumnDefinition<CustomView>[] = [
+    {
+      Cell: ({ original: { id, name } }) => (
+        <Link href={`/collection/managed-attributes-view/view?id=${id}`}>
+          <a className="managed-attributes-view-link">{name}</a>
+        </Link>
+      ),
+      accessor: "name"
+    },
+    {
+      Cell: ({ original: customView }) => {
+        return <ManagedAttributeNames customView={customView} />;
+      },
+      accessor: "viewConfiguration.attributeKeys",
+      Header: formatMessage("managedAttributes")
+    },
+    "createdBy",
+    dateCell("createdOn")
+  ];
 
   return (
     <div>

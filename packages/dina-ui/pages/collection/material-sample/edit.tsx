@@ -453,7 +453,7 @@ export function MaterialSampleForm({
               )}
               {!isTemplate && (
                 <FieldSet
-                  legend={<DinaMessage id="managedAttributeListTitle" />}
+                  legend={<DinaMessage id="managedAttributes" />}
                   id={navIds.managedAttributes}
                 >
                   <DinaFormSection

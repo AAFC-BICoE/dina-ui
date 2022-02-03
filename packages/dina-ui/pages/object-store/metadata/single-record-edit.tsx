@@ -252,7 +252,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           />
         </div>
       </FieldSet>
-      <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
+      <FieldSet legend={<DinaMessage id="managedAttributes" />}>
         <ManagedAttributesEditor
           valuesPath="managedAttributeValues"
           managedAttributeApiPath="objectstore-api/managed-attribute"

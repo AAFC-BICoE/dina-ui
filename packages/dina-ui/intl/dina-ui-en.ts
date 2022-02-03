@@ -396,7 +396,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   makeFiledAs: "Make Filed As",
   makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
-  managedAttributeListTitle: "Managed Attributes",
+  managedAttributes: "Managed Attributes",
   managedAttributesViews: "Managed Attributes View",
   managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",

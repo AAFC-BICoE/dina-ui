@@ -173,7 +173,7 @@ function NavObjectStoreDropdown() {
           <DinaMessage id="objectListTitle" />
         </Dropdown.Item>
         <Dropdown.Item href="/object-store/managedAttributesView/listView">
-          <DinaMessage id="managedAttributeListTitle" />
+          <DinaMessage id="managedAttributes" />
         </Dropdown.Item>
         <Dropdown.Item href="/object-store/object-subtype/list">
           <DinaMessage id="objectSubtypeListTitle" />
@@ -348,7 +348,7 @@ function NavCollectionDropdown() {
           <DinaMessage id="managedAttributesViews" />
         </Dropdown.Item>
         <Dropdown.Item href="/collection/managed-attribute/list">
-          <DinaMessage id="managedAttributeListTitle" />
+          <DinaMessage id="managedAttributes" />
         </Dropdown.Item>
         <Dropdown.Item href="/collection/workflow-template/list">
           <DinaMessage id="workflowTemplateListTitle" />
