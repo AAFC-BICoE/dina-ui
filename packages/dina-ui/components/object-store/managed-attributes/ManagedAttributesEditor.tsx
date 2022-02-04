@@ -3,6 +3,7 @@ import {
   FieldSetProps,
   FieldSpy,
   filterBy,
+  FormikButton,
   NumberField,
   ResourceSelect,
   SelectField,
@@ -23,6 +24,7 @@ import {
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
 import { ManagedAttributesViewSelect } from "./ManagedAttributesViewSelect";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -162,6 +164,7 @@ export function ManagedAttributesEditor({
                     />
                   </label>
                 </div>
+                {!!visibleAttributes.length && <hr />}
                 <div className="row">
                   {visibleAttributes.map(attribute => {
                     const attributeKey = get(
@@ -169,10 +172,11 @@ export function ManagedAttributesEditor({
                       managedAttributeKeyField
                     );
 
+                    const attributePath = `${valuesPath}.${attributeKey}`;
                     const props = {
                       removeBottomMargin: true,
                       removeLabel: true,
-                      name: `${valuesPath}.${attributeKey}`
+                      name: attributePath
                     };
 
                     const isSelectAttr = !!(
@@ -189,8 +193,22 @@ export function ManagedAttributesEditor({
                         className={`${attributeKey} ${attributeKey}-field col-sm-6 mb-3`}
                         htmlFor="none"
                       >
-                        <div className="mb-2">
-                          <strong>{attribute.name ?? attributeKey}</strong>
+                        <div className="mb-2 d-flex align-items-center">
+                          <strong className="me-auto">
+                            {attribute.name ?? attributeKey}
+                          </strong>
+                          <FormikButton
+                            className="btn remove-attribute"
+                            onClick={(_, form) => {
+                              // Delete the value and hide the managed attribute:
+                              form.setFieldValue(attributePath, undefined);
+                              setVisibleAttributeKeys(current =>
+                                current.filter(it => it !== attributeKey)
+                              );
+                            }}
+                          >
+                            <RiDeleteBinLine size="1.8em" />
+                          </FormikButton>
                         </div>
                         {isSelectAttr ? (
                           <SelectField
