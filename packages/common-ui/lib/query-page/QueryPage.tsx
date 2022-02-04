@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { useState, ReactNode } from "react";
+import { useState, useMemo } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -19,6 +19,10 @@ import { Tooltip } from "../tooltip/Tooltip";
 import { MetaWithTotal } from "../api-client/operations-types";
 import { QueryState } from "../api-client/useQuery";
 import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
+import { ESIndexMapping } from "../query-builder/QueryRow";
+import useSWR from "swr";
+import { v4 as uuidv4 } from "uuid";
+import moment from "moment";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -115,23 +119,76 @@ export function QueryPage<TData extends KitsuResource>({
 
   const onSubmit = ({ submittedValues }) => {
     const queryDSL = transformQueryToDSL(submittedValues.queryRows);
-    searchES(queryDSL).then(data => {
-      setAvailableSamples(data);
-      setSearchResults(data);
+    // No search when query has no content in it
+    if (!Object.keys(queryDSL).length) return;
+    searchES(queryDSL).then(result => {
+      setAvailableSamples(result);
+      setSearchResults(result);
     });
   };
 
   const totalCount = searchResults?.length ?? initData?.length;
 
+  async function fetchQueryFieldsByIndex(searchIndexName) {
+    const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
+      params: { indexName: searchIndexName }
+    });
+
+    const result: ESIndexMapping[] = [];
+
+    Object.keys(resp.data)
+      .filter(key => key.includes("data.attributes."))
+      .map(key => {
+        const fieldNameLabel = key.substring("data.attributes.".length);
+        result.push({
+          label: fieldNameLabel,
+          value: key,
+          type: resp.data?.[key]
+        });
+      });
+    return result;
+  }
+
+  // Invalidate the query cache on query change, don't use SWR's built-in cache:
+  const cacheId = useMemo(() => uuidv4(), []);
+
+  const {
+    data,
+    error,
+    isValidating: loading
+  } = useSWR<ESIndexMapping[], any>(
+    [indexName, cacheId],
+    fetchQueryFieldsByIndex,
+    {
+      shouldRetryOnError: true,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
+
+  if (loading || error) return <></>;
+
   return (
-    <DinaForm initialValues={{ queryRows: [{}] }} onSubmit={onSubmit}>
+    <DinaForm
+      initialValues={{
+        queryRows: [
+          {
+            fieldName: data?.[0].value + "(" + data?.[0].type + ")",
+            matchType: "match",
+            boolean: "true",
+            date: moment().format()
+          }
+        ]
+      }}
+      onSubmit={onSubmit}
+    >
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
         {" "}
         {formatMessage({ id: "search" })}
       </label>
-      <QueryBuilder indexName={indexName} name="queryRows" />
+      <QueryBuilder name="queryRows" esIndexMapping={data} />
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>

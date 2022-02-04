@@ -89,7 +89,7 @@ describe("QueryPage component", () => {
     wrapper
       .find("SelectField[name='queryRows[1].boolean']")
       .find(Select)
-      .prop<any>("onChange")({ value: "true" });
+      .prop<any>("onChange")({ value: "false" });
 
     wrapper.find("form").simulate("submit");
 
@@ -122,7 +122,7 @@ describe("QueryPage component", () => {
                   },
                   {
                     term: {
-                      allowDuplicateName: "true"
+                      allowDuplicateName: "false"
                     }
                   }
                 ]

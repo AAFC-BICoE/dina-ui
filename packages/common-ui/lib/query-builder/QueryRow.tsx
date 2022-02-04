@@ -7,6 +7,7 @@ import {
   TextField
 } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
+import moment from "moment";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
@@ -56,21 +57,37 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     numberRange: false,
     dateRange: false
   };
+  const fieldType = esIndexMapping?.[0].type;
+  const visibilityOverridden =
+    fieldType === "boolean"
+      ? { boolean: true }
+      : fieldType === "number"
+      ? { number: true }
+      : fieldType === "date"
+      ? { date: true }
+      : { text: true };
+  const [visibility, setVisibility] = useState({
+    ...initVisibility,
+    ...visibilityOverridden
+  });
 
-  const [visibility, setVisibility] = useState(initVisibility);
+  const initState = {
+    matchValue: null,
+    matchType: "match",
+    date: moment().format("YYYY-MM-DD"),
+    boolean: "true",
+    number: null
+  };
 
   function onSelectionChange(value, formik, idx) {
     const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
-    const initState = {
+    const state = {
       ...formik.values?.[`${name}`]?.[`${idx}`],
-      matchValue: null,
-      matchType: null,
-      date: null,
-      boolean: null,
-      number: null,
+      ...initState,
       fieldName: value
     };
-    formik.setFieldValue(`${name}[${idx}]`, initState);
+
+    formik.setFieldValue(`${name}[${idx}]`, state);
     switch (type) {
       case "text": {
         return setVisibility({ ...initVisibility, text: true });

@@ -1,51 +1,12 @@
-import { useMemo } from "react";
-import useSWR from "swr";
 import { FieldWrapperProps, useApiClient } from "..";
-import { QueryRow } from "./QueryRow";
-import { v4 as uuidv4 } from "uuid";
+import { ESIndexMapping, QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
+import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
-  indexName: string;
+  esIndexMapping?: ESIndexMapping[];
 }
-export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
-  const { apiClient } = useApiClient();
-
-  async function fetchQueryFieldsByIndex(searchIndexName) {
-    const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-      params: { indexName: searchIndexName }
-    });
-
-    const result: {}[] = [];
-
-    Object.keys(resp.data)
-      .filter(key => key.includes("data.attributes."))
-      .map(key => {
-        const fieldNameLabel = key.substring("data.attributes.".length);
-        result.push({
-          label: fieldNameLabel,
-          value: key,
-          type: resp.data?.[key]
-        });
-      });
-    return result;
-  }
-
-  // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), []);
-
-  const {
-    data,
-    error,
-    isValidating: loading
-  } = useSWR([indexName, cacheId], fetchQueryFieldsByIndex, {
-    shouldRetryOnError: true,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false
-  });
-
-  if (loading || error) return <></>;
-
+export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
   return (
     <FieldArray name={name}>
       {fieldArrayProps => {
@@ -55,7 +16,7 @@ export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
           fieldArrayProps.push(
             <QueryRow
               name={fieldArrayProps.name}
-              esIndexMapping={data as any}
+              esIndexMapping={esIndexMapping as any}
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
@@ -67,6 +28,25 @@ export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
               elements?.length ?? 0
             }].compoundQueryType`,
             "and"
+          );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
+            esIndexMapping?.[0].label
+          );
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,
+            "match"
+          );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].boolean`,
+            "true"
+          );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].date`,
+            moment().format()
           );
         }
 
@@ -82,7 +62,7 @@ export function QueryBuilder({ indexName, name }: QueryBuilderProps) {
                 index={index}
                 addRow={addRow}
                 removeRow={removeRow}
-                esIndexMapping={data as any}
+                esIndexMapping={esIndexMapping as any}
               />
             ))
           : null;
