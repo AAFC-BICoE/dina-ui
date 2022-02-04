@@ -1,5 +1,4 @@
 import {
-  BackButton,
   ButtonBar,
   DateField,
   DinaForm,
@@ -9,13 +8,11 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useApiClient,
-  useQuery,
-  withResponse
+  useAccount
 } from "common-ui";
 import { Field } from "formik";
 import { keys } from "lodash";
-import { NextRouter, useRouter } from "next/router";
+import { useRouter } from "next/router";
 import {
   Footer,
   Head,
@@ -23,95 +20,38 @@ import {
   NotPubliclyReleasableWarning,
   PersonSelectField,
   TagsAndRestrictionsSection
-} from "../../../components";
-import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+} from "../../components";
+import { ManagedAttributesEditor } from "../../components/object-store/managed-attributes/ManagedAttributesEditor";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { License, ObjectSubtype } from "../../types/objectstore-api";
 import {
-  License,
-  Metadata,
-  ObjectSubtype
-} from "../../../types/objectstore-api";
+  DCTYPE_OPTIONS,
+  ORIENTATION_OPTIONS
+} from "./metadata/single-record-edit";
 
-interface SingleMetadataFormProps {
-  /** Existing Metadata is required, no new ones are added with this form. */
-  metadata: Metadata;
-  router: NextRouter;
-}
-
-export default function MetadataEditPage() {
-  const router = useRouter();
-
-  const id = router.query.id?.toString();
-
+export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
-  const { apiClient } = useApiClient();
-
-  const query = useQuery<Metadata>(
-    {
-      path: `objectstore-api/metadata/${id}`,
-      include: "dcCreator,derivatives"
-    },
-    {
-      joinSpecs: [
-        // Join to persons api:
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ],
-      onSuccess: async ({ data: metadata }) => {
-        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
-        if (metadata.xmpRightsWebStatement) {
-          const url = metadata.xmpRightsWebStatement;
-          (metadata as any).license = (
-            await apiClient.get<License[]>("objectstore-api/license", {
-              filter: { url }
-            })
-          ).data[0];
-        }
-      }
-    }
-  );
-
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")} />
+      <Head title={formatMessage("inputExternalResourceTitle")} />
       <Nav />
       <main className="container">
-        {id && (
-          <div>
-            <h1 id="wb-cont">
-              <DinaMessage id="editMetadataTitle" />
-            </h1>
-            {withResponse(query, ({ data }) => (
-              <SingleMetadataForm metadata={data} router={router} />
-            ))}
-          </div>
-        )}
+        <div>
+          <h1 id="wb-cont">
+            <DinaMessage id="inputExternalResourceTitle" />
+          </h1>
+          <SingleMetadataForm />
+        </div>
       </main>
       <Footer />
     </div>
   );
 }
 
-function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
+function SingleMetadataForm() {
   const { formatMessage, locale } = useDinaIntl();
-  const { id } = router.query;
-
-  const initialValues = {
-    ...metadata,
-    // Convert the string to an object for the dropdown:
-    acSubtype: metadata.acSubtype
-      ? {
-          id: "id-unavailable",
-          type: "object-subtype",
-          acSubtype: metadata.acSubtype
-        }
-      : null
-  };
+  const router = useRouter();
+  const { groupNames } = useAccount();
 
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
@@ -143,7 +83,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     const metadataEdit = {
       ...metadataValues,
       // Convert the object back to a string:
-      acSubtype: acSubtype?.acSubtype ?? null
+      acSubtype: acSubtype?.acSubtype ?? null,
+      bucket: groupNames?.[0]
     };
 
     // Remove blank managed attribute values from the map:
@@ -154,7 +95,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       }
     }
 
-    await save(
+    const savedMeta = await save(
       [
         {
           resource: metadataEdit,
@@ -164,23 +105,19 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-store/object/view?id=${id}`);
+    await router.push(`/object-store/object/view?id=${savedMeta[0].id}`);
   };
 
   const buttonBar = (
     <ButtonBar>
-      <BackButton entityId={id as string} entityLink="/object-store/object" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <DinaForm initialValues={{}} onSubmit={onSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
-      <div className="mb-3">
-        <MetadataFileView metadata={metadata} imgHeight="15rem" />
-      </div>
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
@@ -193,6 +130,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
             name="originalFilename"
             readOnly={true}
           />
+          <TextField className="col-md-6" name="resourceExternalURI" />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
@@ -265,24 +203,3 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     </DinaForm>
   );
 }
-
-export const DCTYPE_OPTIONS = [
-  { label: "Image", value: "IMAGE" },
-  { label: "Moving Image", value: "MOVING_IMAGE" },
-  { label: "Sound", value: "SOUND" },
-  { label: "Text", value: "TEXT" },
-  { label: "Dataset", value: "DATASET" },
-  { label: "Undetermined", value: "UNDETERMINED" }
-];
-
-export const ORIENTATION_OPTIONS = [
-  { label: "1 - Normal", value: 1 },
-  { label: "3 - Rotated 180 degrees", value: 3 },
-  { label: "6 - Rotated 90 degrees CW", value: 6 },
-  { label: "8 - Rotated 90 degrees CCW", value: 8 },
-  { label: "2 - Flipped", value: 2 },
-  { label: "4 - Rotated 180 degrees + Flipped", value: 4 },
-  { label: "5 - Rotated 90 degrees CW + Flipped", value: 5 },
-  { label: "7 - Rotated 90 degrees CCW + Flipped", value: 7 },
-  { label: "Undetermined", value: null }
-];
