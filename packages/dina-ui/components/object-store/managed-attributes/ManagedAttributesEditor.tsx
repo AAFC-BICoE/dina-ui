@@ -63,7 +63,7 @@ export function ManagedAttributesEditor({
   return (
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {currentValue => {
-        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(() => {
+        function getAttributeKeysInUse() {
           const managedAttributeMaps = bulkCtx?.sampleHooks.map(sample =>
             get(sample.formRef.current?.values, valuesPath)
           ) || [currentValue];
@@ -74,7 +74,11 @@ export function ManagedAttributesEditor({
           );
 
           return initialVisibleKeys;
-        });
+        }
+
+        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
+          getAttributeKeysInUse
+        );
 
         /** Put the Custom View into the dropdown and update the visible attribute keys.  */
         function updateCustomView(newView?: PersistedResource<CustomView>) {
@@ -88,6 +92,8 @@ export function ManagedAttributesEditor({
             if (newKeys) {
               setVisibleAttributeKeys(newKeys);
             }
+          } else {
+            setVisibleAttributeKeys(getAttributeKeysInUse());
           }
         }
 
@@ -113,17 +119,19 @@ export function ManagedAttributesEditor({
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
             {...fieldSetProps}
-            wrapLegend={legend => (
-              <div className="row">
-                <div className="col-sm-6">{legend}</div>
-                <div className="col-sm-6">
-                  <ManagedAttributesViewSelect
-                    value={customView}
-                    onChange={updateCustomView}
-                  />
+            {...(!readOnly && {
+              wrapLegend: legend => (
+                <div className="row">
+                  <div className="col-sm-6">{legend}</div>
+                  <div className="col-sm-6">
+                    <ManagedAttributesViewSelect
+                      value={customView}
+                      onChange={updateCustomView}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
+              )
+            })}
           >
             {readOnly ? (
               <ManagedAttributesViewer
@@ -162,38 +170,52 @@ export function ManagedAttributesEditor({
                     );
 
                     const props = {
-                      className: `${attributeKey} ${attributeKey}-field col-sm-6`,
-                      key: attributeKey,
-                      label: attribute.name ?? attributeKey,
+                      removeBottomMargin: true,
+                      removeLabel: true,
                       name: `${valuesPath}.${attributeKey}`
                     };
 
-                    if (
+                    const isSelectAttr = !!(
                       attribute.managedAttributeType === "STRING" &&
                       attribute.acceptedValues?.length
-                    ) {
-                      return (
-                        <SelectField
-                          {...props}
-                          options={[
-                            { label: `<${formatMessage("none")}>`, value: "" },
-                            ...attribute.acceptedValues.map(value => ({
-                              label: value,
-                              value
-                            }))
-                          ]}
-                        />
-                      );
-                    } else if (attribute.managedAttributeType === "INTEGER") {
-                      return <NumberField {...props} />;
-                    } else {
-                      return (
-                        <TextField
-                          {...props}
-                          inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-                        />
-                      );
-                    }
+                    );
+
+                    const isIntegerAttr =
+                      attribute.managedAttributeType === "INTEGER";
+
+                    return (
+                      <label
+                        key={attributeKey}
+                        className={`${attributeKey} ${attributeKey}-field col-sm-6 mb-3`}
+                        htmlFor="none"
+                      >
+                        <div className="mb-2">
+                          <strong>{attribute.name ?? attributeKey}</strong>
+                        </div>
+                        {isSelectAttr ? (
+                          <SelectField
+                            {...props}
+                            options={[
+                              {
+                                label: `<${formatMessage("none")}>`,
+                                value: ""
+                              },
+                              ...(attribute.acceptedValues?.map(value => ({
+                                label: value,
+                                value
+                              })) ?? [])
+                            ]}
+                          />
+                        ) : isIntegerAttr ? (
+                          <NumberField {...props} />
+                        ) : (
+                          <TextField
+                            {...props}
+                            inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
+                          />
+                        )}
+                      </label>
+                    );
                   })}
                 </div>
               </div>

@@ -275,7 +275,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
   field_visibleManagedAttributes_tooltip:
-    "Adding or removing an attribute from this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
+    "Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
   field_email: "Email",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",

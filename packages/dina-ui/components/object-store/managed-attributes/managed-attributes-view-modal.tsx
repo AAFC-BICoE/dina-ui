@@ -52,6 +52,12 @@ function EditManagedAttributesView({
   const query = useManagedAttributesView(id);
 
   return withResponse(query, ({ data }) => (
-    <ManagedAttributesViewForm fetchedView={data} onSaved={onSaved} />
+    <ManagedAttributesViewForm
+      fetchedView={data}
+      onSaved={onSaved}
+      // Don't allow changing the component inside the modal.
+      // This should probably not be changed at all after creation.
+      disabledAttributeComponent={true}
+    />
   ));
 }

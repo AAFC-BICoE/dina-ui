@@ -1,9 +1,15 @@
-import { FieldSpy, filterBy, FormikButton, ResourceSelect } from "common-ui";
+import {
+  FieldSpy,
+  filterBy,
+  FormikButton,
+  ResourceSelect,
+  Tooltip
+} from "common-ui";
 import { PersistedResource } from "kitsu";
+import { useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CustomView } from "../../../types/collection-api";
 import { useManagedAttributesViewEditModal } from "./managed-attributes-view-modal";
-import { useState } from "react";
 
 export interface ManagedAttributesViewSelectProps {
   onChange: (newValue: PersistedResource<CustomView>) => void;
@@ -27,6 +33,7 @@ export function ManagedAttributesViewSelect({
           <strong>
             <DinaMessage id="customView" />
           </strong>
+          <Tooltip id="field_visibleManagedAttributes_tooltip" />
         </div>
         <FieldSpy<string> fieldName="group">
           {group => (
@@ -52,7 +59,7 @@ export function ManagedAttributesViewSelect({
           )}
         </FieldSpy>
       </label>
-      {value && (
+      {value?.id && (
         <FormikButton
           className="btn btn-outline-secondary"
           // Open the custom view's editor modal, then

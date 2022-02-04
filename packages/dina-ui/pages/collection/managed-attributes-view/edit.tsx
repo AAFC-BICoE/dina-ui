@@ -43,6 +43,8 @@ import { ManagedAttribute } from "../../../types/objectstore-api";
 
 export interface ManagedAttributesViewFormProps {
   fetchedView?: CustomView;
+  /** Disable the attribute component field. */
+  disabledAttributeComponent?: boolean;
   onSaved: (data: PersistedResource<CustomView>) => Promise<void>;
 }
 
@@ -109,7 +111,8 @@ export default function ManagedAttributesViewEditPage() {
 
 export function ManagedAttributesViewForm({
   onSaved,
-  fetchedView
+  fetchedView,
+  disabledAttributeComponent
 }: ManagedAttributesViewFormProps) {
   const initialViewConfiguration: Partial<ManagedAttributesView> = {
     type: "managed-attributes-view",
@@ -155,13 +158,21 @@ export function ManagedAttributesViewForm({
       validationSchema={customViewSchema}
     >
       {buttonBar}
-      <ManagedAttributesViewFormLayout />
+      <ManagedAttributesViewFormLayout
+        disabledAttributeComponent={disabledAttributeComponent}
+      />
       {buttonBar}
     </DinaForm>
   );
 }
 
-export function ManagedAttributesViewFormLayout() {
+export interface ManagedAttributesViewFormLayoutProps {
+  disabledAttributeComponent?: boolean;
+}
+
+export function ManagedAttributesViewFormLayout({
+  disabledAttributeComponent
+}: ManagedAttributesViewFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
 
@@ -186,21 +197,24 @@ export function ManagedAttributesViewFormLayout() {
         <div className="row">
           <TextField name="name" className="col-sm-6" />
         </div>
-        <div className="row">
-          <SelectField
-            className="col-md-6"
-            name="viewConfiguration.managedAttributeComponent"
-            customName="managedAttributeComponent"
-            options={ATTRIBUTE_COMPONENT_OPTIONS}
-            readOnlyRender={value =>
-              ATTRIBUTE_COMPONENT_OPTIONS.find(option => option.value === value)
-                ?.label
-            }
-            onChange={(_, form) =>
-              form.setFieldValue("viewConfiguration.attributeKeys", [])
-            }
-          />
-        </div>
+        {!disabledAttributeComponent && (
+          <div className="row">
+            <SelectField
+              className="col-md-6"
+              name="viewConfiguration.managedAttributeComponent"
+              customName="managedAttributeComponent"
+              options={ATTRIBUTE_COMPONENT_OPTIONS}
+              readOnlyRender={value =>
+                ATTRIBUTE_COMPONENT_OPTIONS.find(
+                  option => option.value === value
+                )?.label
+              }
+              onChange={(_, form) =>
+                form.setFieldValue("viewConfiguration.attributeKeys", [])
+              }
+            />
+          </div>
+        )}
       </DinaFormSection>
       <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
         {managedAttributeComponent =>
