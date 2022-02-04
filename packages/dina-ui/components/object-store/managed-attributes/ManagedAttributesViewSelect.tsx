@@ -12,12 +12,18 @@ import { CustomView } from "../../../types/collection-api";
 import { useManagedAttributesViewEditModal } from "./managed-attributes-view-modal";
 
 export interface ManagedAttributesViewSelectProps {
+  /**
+   * The managed attribute component e.g. MATERIAL_SAMPLE.
+   * Passed as a filter to the custom-view query.
+   */
+  managedAttributeComponent: string;
   onChange: (newValue: PersistedResource<CustomView>) => void;
   value?: PersistedResource<CustomView>;
 }
 
 /** Selector for Managed Attributes Views. Has a button to edit the View in a modal. */
 export function ManagedAttributesViewSelect({
+  managedAttributeComponent,
   value,
   onChange
 }: ManagedAttributesViewSelectProps) {
@@ -41,6 +47,8 @@ export function ManagedAttributesViewSelect({
               filter={input => ({
                 // Filter by "managed-attributes-view" to omit unrelated custom-view records:
                 "viewConfiguration.type": "managed-attributes-view",
+                "viewConfiguration.managedAttributeComponent":
+                  managedAttributeComponent,
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
                 // Filter by the form's group:

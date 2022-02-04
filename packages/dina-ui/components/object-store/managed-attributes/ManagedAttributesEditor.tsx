@@ -35,7 +35,7 @@ export interface ManagedAttributesEditorProps {
   /**
    * The target component of the managed attribute e.g. COLLECTING_EVENT.
    */
-  managedAttributeComponent?: string;
+  managedAttributeComponent: string;
 
   /**
    * The key field on the ManagedAttribute to use as the key in the managed attribute map.
@@ -47,6 +47,11 @@ export interface ManagedAttributesEditorProps {
   attributeSelectorWidth?: number;
 
   fieldSetProps?: Partial<FieldSetProps>;
+
+  /**
+   * Shows the dropdown to select a custom-view for Managed Attributes.
+   */
+  showCustomViewDropdown?: boolean;
 }
 
 export function ManagedAttributesEditor({
@@ -55,7 +60,8 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   managedAttributeKeyField = "key",
   attributeSelectorWidth = 6,
-  fieldSetProps
+  fieldSetProps,
+  showCustomViewDropdown
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly } = useDinaFormContext();
@@ -121,19 +127,21 @@ export function ManagedAttributesEditor({
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
             {...fieldSetProps}
-            {...(!readOnly && {
-              wrapLegend: legend => (
-                <div className="row">
-                  <div className="col-sm-6">{legend}</div>
-                  <div className="col-sm-6">
-                    <ManagedAttributesViewSelect
-                      value={customView}
-                      onChange={updateCustomView}
-                    />
+            {...(!readOnly &&
+              showCustomViewDropdown && {
+                wrapLegend: legend => (
+                  <div className="row">
+                    <div className="col-sm-6">{legend}</div>
+                    <div className="col-sm-6">
+                      <ManagedAttributesViewSelect
+                        managedAttributeComponent={managedAttributeComponent}
+                        value={customView}
+                        onChange={updateCustomView}
+                      />
+                    </div>
                   </div>
-                </div>
-              )
-            })}
+                )
+              })}
           >
             {readOnly ? (
               <ManagedAttributesViewer

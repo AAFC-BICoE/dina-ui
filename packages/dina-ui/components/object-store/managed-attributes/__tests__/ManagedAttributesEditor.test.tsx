@@ -21,9 +21,9 @@ const EXAMPLE_MA_2 = {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map(path => {
     switch (path) {
-      case "/managed-attribute/COLLECTING_EVENT.example_attribute_1":
+      case "managed-attribute/COLLECTING_EVENT.example_attribute_1":
         return EXAMPLE_MA_1;
-      case "/managed-attribute/COLLECTING_EVENT.example_attribute_2":
+      case "managed-attribute/COLLECTING_EVENT.example_attribute_2":
         return EXAMPLE_MA_2;
     }
   })
@@ -68,8 +68,8 @@ describe("ManagedAttributesEditor component", () => {
     expect(mockBulkGet.mock.calls).toEqual([
       [
         [
-          "/managed-attribute/COLLECTING_EVENT.example_attribute_1",
-          "/managed-attribute/COLLECTING_EVENT.example_attribute_2"
+          "managed-attribute/COLLECTING_EVENT.example_attribute_1",
+          "managed-attribute/COLLECTING_EVENT.example_attribute_2"
         ],
         {
           apiBaseUrl: "/collection-api",
@@ -85,7 +85,7 @@ describe("ManagedAttributesEditor component", () => {
     );
   });
 
-  it("Lets you remove a managed attribute value by removing it from the dropdown menu.", async () => {
+  it("Lets you hide a managed attribute value by removing it from the dropdown menu.", async () => {
     const mockSubmit = jest.fn();
 
     const wrapper = mountWithAppContext(
@@ -106,6 +106,9 @@ describe("ManagedAttributesEditor component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Attribute 2 exists
+    expect(wrapper.find(".example_attribute_2 input").exists()).toEqual(true);
+
     // Remove attribute 2:
     wrapper
       .find(".visible-attribute-menu")
@@ -115,22 +118,17 @@ describe("ManagedAttributesEditor component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Confirm "yes":
-    wrapper.find(".modal-body form").simulate("submit");
-
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
+    // attribute 2 is hidden, not removed:
+    expect(wrapper.find(".example_attribute_2 input").exists()).toEqual(false);
 
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
     wrapper.update();
 
+    // The data should be unchanged, because the attribute was hidden, not deleted:
     expect(mockSubmit).lastCalledWith({
-      managedAttributes: {
-        example_attribute_1: "example-value-1"
-      }
+      managedAttributes: exampleValues
     });
   });
 });
