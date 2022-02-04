@@ -20,14 +20,14 @@ import {
   NotPubliclyReleasableWarning,
   PersonSelectField,
   TagsAndRestrictionsSection
-} from "../../components";
-import { ManagedAttributesEditor } from "../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { License, ObjectSubtype } from "../../types/objectstore-api";
+} from "../../../components";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { License, ObjectSubtype } from "../../../types/objectstore-api";
 import {
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
-} from "./metadata/single-record-edit";
+} from "../metadata/single-record-edit";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -105,7 +105,9 @@ function SingleMetadataForm() {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-store/object/view?id=${savedMeta[0].id}`);
+    await router.push(
+      `/object-store/object/external-resource-view?id=${savedMeta[0].id}`
+    );
   };
 
   const buttonBar = (
@@ -125,17 +127,14 @@ function SingleMetadataForm() {
       />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
-          <TextField
-            className="col-md-6"
-            name="originalFilename"
-            readOnly={true}
-          />
+          <TextField className="col-md-6" name="fileExtension" />
           <TextField className="col-md-6" name="resourceExternalURI" />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
             showTime={true}
           />
+          <TextField className="col-md-6" name="dcFormat" />
         </div>
         <div className="row">
           <SelectField

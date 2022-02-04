@@ -56,10 +56,8 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadataId, setPreviewMetadataId] = useState<string | null>(
-    null
-  );
-  const [tableSectionWidth, previewSectionWidth] = previewMetadataId
+  const [previewMetadata, setPreviewMetadata] = useState<Metadata | null>(null);
+  const [tableSectionWidth, previewSectionWidth] = previewMetadata?.id
     ? [8, 4]
     : [12, 0];
 
@@ -93,7 +91,7 @@ export default function MetadataListPage() {
         <div className="d-flex h-100">
           <button
             className="btn btn-info m-auto preview-button"
-            onClick={() => setPreviewMetadataId(original.id)}
+            onClick={() => setPreviewMetadata(original)}
             type="button"
           >
             <DinaMessage id="viewPreviewButtonText" />
@@ -200,8 +198,8 @@ export default function MetadataListPage() {
                       <StoredObjectGallery
                         CheckBoxField={CheckBoxField}
                         metadatas={response?.data ?? []}
-                        previewMetadataId={previewMetadataId}
-                        onSelectPreviewMetadataId={setPreviewMetadataId}
+                        previewMetadataId={previewMetadata?.id as any}
+                        onSelectPreviewMetadata={setPreviewMetadata}
                       />
                     );
 
@@ -214,7 +212,7 @@ export default function MetadataListPage() {
                           return {
                             style: {
                               background:
-                                metadata.id === previewMetadataId &&
+                                metadata.id === previewMetadata?.id &&
                                 HIGHLIGHT_COLOR
                             }
                           };
@@ -237,11 +235,15 @@ export default function MetadataListPage() {
           </div>
           <div className={`preview-section col-${previewSectionWidth}`}>
             <SplitPagePanel>
-              {previewMetadataId && (
+              {previewMetadata?.id && (
                 <>
                   <div style={{ height: "2.5rem" }}>
                     <Link
-                      href={`/object-store/object/view?id=${previewMetadataId}`}
+                      href={`/object-store/object/${
+                        previewMetadata.resourceExternalURI
+                          ? "external-resource-view"
+                          : "view"
+                      }?id=${previewMetadata.id}`}
                     >
                       <a>
                         <DinaMessage id="detailsPageLink" />
@@ -250,12 +252,12 @@ export default function MetadataListPage() {
                     <button
                       className="btn btn-dark float-end preview-button"
                       type="button"
-                      onClick={() => setPreviewMetadataId(null)}
+                      onClick={() => setPreviewMetadata(null)}
                     >
                       <DinaMessage id="closePreviewButtonText" />
                     </button>
                   </div>
-                  <MetadataPreview metadataId={previewMetadataId} />
+                  <MetadataPreview metadataId={previewMetadata?.id} />
                 </>
               )}
             </SplitPagePanel>

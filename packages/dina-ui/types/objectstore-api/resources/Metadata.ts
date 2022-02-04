@@ -33,6 +33,8 @@ export interface MetadataAttributes {
 
   acHashFunction?: string;
   acHashValue?: string;
+
+  resourceExternalURI?: string;
 }
 
 export interface MetadataRelationships {
