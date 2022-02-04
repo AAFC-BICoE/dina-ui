@@ -1485,7 +1485,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL .editable-attribute-menu .react-select__multi-value__label"
+          ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
         )
         .map(node => node.text())
     ).toEqual([

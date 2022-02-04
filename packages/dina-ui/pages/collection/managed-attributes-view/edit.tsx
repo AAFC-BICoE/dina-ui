@@ -292,6 +292,7 @@ export function ManagedAttributesViewFormLayout() {
                               <style>{`
                               .form-control.sortable-lifted {
                                 background-color: rgb(222, 235, 255);
+                                z-index: 1100;
                               }
                             `}</style>
                               {keys?.map((key, index) => (

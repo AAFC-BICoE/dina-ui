@@ -117,6 +117,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createStorage: "Create Storage",
   createWorkflowTemplateTitle: "Create Workflow Template",
   customPlaceName: "Custom Place Name",
+  customView: "Custom View",
   dataComponents: "Data Components",
   dataEntryLabel: "Data Entry",
   dataset: "Dataset",
@@ -272,7 +273,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
-  field_editableManagedAttributes: "Managed Attributes In Use",
+  field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
+  field_visibleManagedAttributes_tooltip:
+    "Adding or removing an attribute from this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
   field_email: "Email",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",

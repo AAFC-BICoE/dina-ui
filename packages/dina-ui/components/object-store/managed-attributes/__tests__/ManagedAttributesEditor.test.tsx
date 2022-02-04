@@ -108,7 +108,7 @@ describe("ManagedAttributesEditor component", () => {
 
     // Remove attribute 2:
     wrapper
-      .find(".editable-attribute-menu")
+      .find(".visible-attribute-menu")
       .find<any>(ResourceSelect)
       .prop("onChange")([EXAMPLE_MA_1]);
 

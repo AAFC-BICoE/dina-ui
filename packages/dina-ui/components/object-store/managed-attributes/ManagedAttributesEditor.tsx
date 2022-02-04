@@ -1,5 +1,4 @@
 import {
-  AreYouSureModal,
   FieldSet,
   FieldSetProps,
   FieldSpy,
@@ -8,25 +7,22 @@ import {
   ResourceSelect,
   SelectField,
   TextField,
+  Tooltip,
   useBulkEditTabContext,
   useBulkGet,
-  useDinaFormContext,
-  useModal
+  useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import {
-  castArray,
-  compact,
-  flatMap,
-  flatMapDeep,
-  get,
-  keys,
-  uniq
-} from "lodash";
-import { useState, useRef } from "react";
+import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
+import { useRef, useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  CustomView,
+  managedAttributesViewSchema
+} from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
+import { ManagedAttributesViewSelect } from "./ManagedAttributesViewSelect";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -63,6 +59,7 @@ export function ManagedAttributesEditor({
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
+  const [customView, setCustomView] = useState<PersistedResource<CustomView>>();
   return (
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {currentValue => {
@@ -78,6 +75,21 @@ export function ManagedAttributesEditor({
 
           return initialVisibleKeys;
         });
+
+        /** Put the Custom View into the dropdown and update the visible attribute keys.  */
+        function updateCustomView(newView?: PersistedResource<CustomView>) {
+          setCustomView(newView);
+
+          if (
+            newView?.id &&
+            managedAttributesViewSchema.isValidSync(newView.viewConfiguration)
+          ) {
+            const newKeys = newView.viewConfiguration.attributeKeys;
+            if (newKeys) {
+              setVisibleAttributeKeys(newKeys);
+            }
+          }
+        }
 
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
         const { dataWithNullForMissing: fetchedAttributes, loading } =
@@ -101,6 +113,17 @@ export function ManagedAttributesEditor({
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
             {...fieldSetProps}
+            wrapLegend={legend => (
+              <div className="row">
+                <div className="col-sm-6">{legend}</div>
+                <div className="col-sm-6">
+                  <ManagedAttributesViewSelect
+                    value={customView}
+                    onChange={updateCustomView}
+                  />
+                </div>
+              </div>
+            )}
           >
             {readOnly ? (
               <ManagedAttributesViewer
@@ -113,13 +136,15 @@ export function ManagedAttributesEditor({
               <div className="mb-3 managed-attributes-editor">
                 <div className="row">
                   <label
-                    className={`editable-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
                   >
-                    <strong>
-                      <DinaMessage id="field_editableManagedAttributes" />
-                    </strong>
+                    <div className="mb-2">
+                      <strong>
+                        <DinaMessage id="field_visibleManagedAttributes" />
+                      </strong>
+                      <Tooltip id="field_visibleManagedAttributes_tooltip" />
+                    </div>
                     <ManagedAttributeMultiSelect
-                      valuesPath={valuesPath}
                       managedAttributeApiPath={managedAttributeApiPath}
                       managedAttributeComponent={managedAttributeComponent}
                       managedAttributeKeyField={managedAttributeKeyField}
@@ -181,7 +206,6 @@ export function ManagedAttributesEditor({
 }
 
 export interface ManagedAttributeMultiSelectProps {
-  valuesPath: string;
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
   managedAttributeKeyField: string;
@@ -191,8 +215,8 @@ export interface ManagedAttributeMultiSelectProps {
   loading?: boolean;
 }
 
+/** Select input to set the visible Managed Attributes. */
 export function ManagedAttributeMultiSelect({
-  valuesPath,
   managedAttributeComponent,
   managedAttributeApiPath,
   managedAttributeKeyField: keyField,
@@ -200,64 +224,30 @@ export function ManagedAttributeMultiSelect({
   visibleAttributes,
   loading
 }: ManagedAttributeMultiSelectProps) {
-  const { openModal } = useModal();
+  /** Call onChange with the new keys (string array) */
+  function onChangeInternal(
+    newValues:
+      | PersistedResource<ManagedAttribute>
+      | PersistedResource<ManagedAttribute>[]
+  ) {
+    const newAttributes = castArray(newValues);
+    const newKeys = newAttributes.map(it => get(it, keyField));
+    onChange(newKeys);
+  }
 
   return (
-    <FieldSpy fieldName={valuesPath}>
-      {(_, { form: { setFieldValue } }) => (
-        <ResourceSelect<ManagedAttribute>
-          filter={input => ({
-            ...filterBy(["name"])(input),
-            ...(managedAttributeComponent ? { managedAttributeComponent } : {})
-          })}
-          model={managedAttributeApiPath}
-          optionLabel={attribute => managedAttributeLabel(attribute, keyField)}
-          isMulti={true}
-          isLoading={loading}
-          onChange={(newValues, actionMeta) => {
-            const newAttributes = castArray(newValues);
-
-            const newKeys = newAttributes.map(it => get(it, keyField));
-
-            const removedAttributes = flatMapDeep(
-              compact([
-                actionMeta?.removedValue?.resource,
-                ...(actionMeta?.removedValues?.map(it => it.resource) ?? [])
-              ])
-            );
-
-            if (removedAttributes.length) {
-              openModal(
-                <AreYouSureModal
-                  actionMessage={
-                    <DinaMessage
-                      id="removeManagedAttributeValue"
-                      values={{
-                        attributeNames: removedAttributes
-                          .map(it => managedAttributeLabel(it, keyField))
-                          .join(", ")
-                      }}
-                    />
-                  }
-                  onYesButtonClicked={() => {
-                    for (const removedAttribute of removedAttributes) {
-                      // Remove the managed attribute value from the value map:
-                      const attributeKey = get(removedAttribute, keyField);
-                      setFieldValue(`${valuesPath}.${attributeKey}`, undefined);
-                    }
-                    // Update the visibile attributes list:
-                    onChange(newKeys);
-                  }}
-                />
-              );
-            } else {
-              onChange(newKeys);
-            }
-          }}
-          value={visibleAttributes}
-        />
-      )}
-    </FieldSpy>
+    <ResourceSelect<ManagedAttribute>
+      filter={input => ({
+        ...filterBy(["name"])(input),
+        ...(managedAttributeComponent ? { managedAttributeComponent } : {})
+      })}
+      model={managedAttributeApiPath}
+      optionLabel={attribute => managedAttributeLabel(attribute, keyField)}
+      isMulti={true}
+      isLoading={loading}
+      onChange={onChangeInternal}
+      value={visibleAttributes}
+    />
   );
 }
 
