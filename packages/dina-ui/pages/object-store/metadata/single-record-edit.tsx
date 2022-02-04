@@ -256,7 +256,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         <ManagedAttributesEditor
           valuesPath="managedAttributeValues"
           managedAttributeApiPath="objectstore-api/managed-attribute"
-          apiBaseUrl="/objectstore-api"
           managedAttributeKeyField="key"
           useKeyInFilter={true}
         />

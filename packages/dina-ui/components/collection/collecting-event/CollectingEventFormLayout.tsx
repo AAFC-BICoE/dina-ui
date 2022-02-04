@@ -843,7 +843,6 @@ export function CollectingEventFormLayout({
               <ManagedAttributesEditor
                 valuesPath="managedAttributes"
                 managedAttributeApiPath="collection-api/managed-attribute"
-                apiBaseUrl="/collection-api"
                 managedAttributeComponent="COLLECTING_EVENT"
                 managedAttributeKeyField="key"
               />

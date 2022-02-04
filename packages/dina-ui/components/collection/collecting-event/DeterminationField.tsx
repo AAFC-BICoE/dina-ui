@@ -351,7 +351,6 @@ export function DeterminationField({ id = "determination-section" }) {
                   <ManagedAttributesEditor
                     valuesPath={fieldProps("managedAttributes").name}
                     managedAttributeApiPath="collection-api/managed-attribute"
-                    apiBaseUrl="/collection-api"
                     managedAttributeComponent="DETERMINATION"
                     managedAttributeKeyField="key"
                     attributeSelectorWidth={12}

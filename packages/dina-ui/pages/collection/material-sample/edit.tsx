@@ -463,7 +463,6 @@ export function MaterialSampleForm({
                     <ManagedAttributesEditor
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"
-                      apiBaseUrl="/collection-api"
                       managedAttributeComponent="MATERIAL_SAMPLE"
                       managedAttributeKeyField="key"
                     />

@@ -6,24 +6,29 @@ import {
   ResourceSelect,
   SelectField,
   TextField,
-  useApiClient,
   useBulkEditTabContext,
-  useModal,
-  useDinaFormContext
+  useBulkGet,
+  useDinaFormContext,
+  useModal
 } from "common-ui";
-import { Field } from "formik";
 import { PersistedResource } from "kitsu";
-import { castArray, get } from "lodash";
-import { useEffect, useState } from "react";
+import {
+  castArray,
+  compact,
+  flatMap,
+  flatMapDeep,
+  get,
+  keys,
+  uniq
+} from "lodash";
+import { useState, useRef } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
-import { getManagedAttributesInUse } from "./getManagedAttributesInUse";
 import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
   valuesPath: string;
-  apiBaseUrl: string;
   managedAttributeApiPath: string;
   useKeyInFilter?: boolean;
 
@@ -42,60 +47,57 @@ export interface ManagedAttributesEditorProps {
   attributeSelectorWidth?: number;
 }
 
-/** Set of fields inside a Formik form to edit Managed Attributes. */
 export function ManagedAttributesEditor({
   valuesPath,
   managedAttributeApiPath,
-  apiBaseUrl,
   managedAttributeComponent,
-  useKeyInFilter,
   managedAttributeKeyField = "key",
   attributeSelectorWidth = 6
 }: ManagedAttributesEditorProps) {
-  const { bulkGet, apiClient } = useApiClient();
-  const { formatMessage } = useDinaIntl();
-  const { openModal } = useModal();
-  const { readOnly } = useDinaFormContext();
-
   const bulkCtx = useBulkEditTabContext();
+  const { readOnly } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {currentValue => {
-        const managedAttributeValues = bulkCtx?.sampleHooks.map(sample =>
-          get(sample.formRef.current?.values, valuesPath)
-        ) || [currentValue];
+        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(() => {
+          const managedAttributeMaps = bulkCtx?.sampleHooks.map(sample =>
+            get(sample.formRef.current?.values, valuesPath)
+          ) || [currentValue];
 
-        const [editableManagedAttributes, setEditableManagedAttributes] =
-          useState<PersistedResource<ManagedAttribute>[]>([]);
-
-        useEffect(() => {
-          (async () => {
-            const initialAttributes = await getManagedAttributesInUse(
-              managedAttributeValues,
-              bulkGet,
-              apiClient,
-              useKeyInFilter as boolean,
-              {
-                apiBaseUrl,
-                keyPrefix: managedAttributeComponent,
-                managedAttributeKeyField
-              }
-            );
-            setEditableManagedAttributes(initialAttributes);
-          })();
-        }, []);
-
-        if (readOnly) {
-          return (
-            <ManagedAttributesViewer
-              values={currentValue}
-              managedAttributeApiPath={id => `${managedAttributeApiPath}/${id}`}
-            />
+          // Get all unique ManagedAttribute keys in the given value maps:
+          const initialVisibleKeys = uniq(
+            flatMap(managedAttributeMaps.map(keys))
           );
+
+          return initialVisibleKeys;
+        });
+
+        // Fetch the attributes, but omit any that are missing e.g. were deleted.
+        const { dataWithNullForMissing: fetchedAttributes, loading } =
+          useBulkGet<ManagedAttribute>({
+            ids: visibleAttributeKeys.map(
+              key => `${managedAttributeComponent}.${key}`
+            ),
+            listPath: managedAttributeApiPath
+          });
+
+        const lastFetchedAttributes = useRef<
+          PersistedResource<ManagedAttribute>[]
+        >([]);
+        if (fetchedAttributes) {
+          lastFetchedAttributes.current = compact(fetchedAttributes);
         }
 
-        return (
+        const visibleAttributes = lastFetchedAttributes.current;
+
+        return readOnly ? (
+          <ManagedAttributesViewer
+            values={currentValue}
+            managedAttributeApiPath={id => `${managedAttributeApiPath}/${id}`}
+          />
+        ) : (
           <div className="mb-3 managed-attributes-editor">
             <div className="row">
               <label
@@ -104,71 +106,18 @@ export function ManagedAttributesEditor({
                 <strong>
                   <DinaMessage id="field_editableManagedAttributes" />
                 </strong>
-                <Field>
-                  {({ form: { setFieldValue } }) => (
-                    <ResourceSelect<ManagedAttribute>
-                      filter={input => ({
-                        ...filterBy(["name"])(input),
-                        ...(managedAttributeComponent
-                          ? { managedAttributeComponent }
-                          : {})
-                      })}
-                      model={managedAttributeApiPath}
-                      optionLabel={attribute =>
-                        attribute.name ??
-                        get(attribute, managedAttributeKeyField)
-                      }
-                      isMulti={true}
-                      onChange={selectedValues => {
-                        const newList = castArray(selectedValues);
-                        if (newList.length < editableManagedAttributes.length) {
-                          const removedAttributes =
-                            editableManagedAttributes.filter(
-                              attr => !newList.includes(attr)
-                            );
-                          if (removedAttributes.length) {
-                            openModal(
-                              <AreYouSureModal
-                                actionMessage={
-                                  <DinaMessage
-                                    id="removeManagedAttributeValue"
-                                    values={{
-                                      attributeNames: removedAttributes
-                                        .map(it => it.name)
-                                        .join(", ")
-                                    }}
-                                  />
-                                }
-                                onYesButtonClicked={() => {
-                                  for (const removedAttribute of removedAttributes) {
-                                    // Remove the managed attribute value from the value map:
-                                    const attributeKey = get(
-                                      removedAttribute,
-                                      managedAttributeKeyField
-                                    );
-                                    setFieldValue(
-                                      `${valuesPath}.${attributeKey}`,
-                                      undefined
-                                    );
-                                  }
-                                  // Update the visibile attributes list:
-                                  setEditableManagedAttributes(newList);
-                                }}
-                              />
-                            );
-                          }
-                        } else {
-                          setEditableManagedAttributes(newList);
-                        }
-                      }}
-                      value={editableManagedAttributes}
-                    />
-                  )}
-                </Field>
+                <ManagedAttributeMultiSelect
+                  valuesPath={valuesPath}
+                  managedAttributeApiPath={managedAttributeApiPath}
+                  managedAttributeComponent={managedAttributeComponent}
+                  managedAttributeKeyField={managedAttributeKeyField}
+                  onChange={setVisibleAttributeKeys}
+                  visibleAttributes={visibleAttributes}
+                />
               </label>
             </div>
             <div className="row">
-              {editableManagedAttributes.map(attribute => {
+              {visibleAttributes.map(attribute => {
                 const attributeKey = get(attribute, managedAttributeKeyField);
 
                 const props = {
@@ -210,5 +159,89 @@ export function ManagedAttributesEditor({
         );
       }}
     </FieldSpy>
+  );
+}
+
+export interface ManagedAttributeMultiSelectProps {
+  valuesPath: string;
+  managedAttributeComponent?: string;
+  managedAttributeApiPath: string;
+  managedAttributeKeyField: string;
+
+  onChange: (newValue: string[]) => void;
+  visibleAttributes: PersistedResource<ManagedAttribute>[];
+}
+
+export function ManagedAttributeMultiSelect({
+  valuesPath,
+  managedAttributeComponent,
+  managedAttributeApiPath,
+  managedAttributeKeyField: keyField,
+  onChange,
+  visibleAttributes
+}: ManagedAttributeMultiSelectProps) {
+  const { openModal } = useModal();
+
+  return (
+    <FieldSpy fieldName={valuesPath}>
+      {(_, { form: { setFieldValue } }) => (
+        <ResourceSelect<ManagedAttribute>
+          filter={input => ({
+            ...filterBy(["name"])(input),
+            ...(managedAttributeComponent ? { managedAttributeComponent } : {})
+          })}
+          model={managedAttributeApiPath}
+          optionLabel={attribute => managedAttributeLabel(attribute, keyField)}
+          isMulti={true}
+          onChange={(newValues, actionMeta) => {
+            const newAttributes = castArray(newValues);
+
+            const newKeys = newAttributes.map(it => get(it, keyField));
+
+            const removedAttributes = flatMapDeep(
+              compact([
+                actionMeta?.removedValue?.resource,
+                ...(actionMeta?.removedValues?.map(it => it.resource) ?? [])
+              ])
+            );
+
+            if (removedAttributes.length) {
+              openModal(
+                <AreYouSureModal
+                  actionMessage={
+                    <DinaMessage
+                      id="removeManagedAttributeValue"
+                      values={{
+                        attributeNames: removedAttributes
+                          .map(it => managedAttributeLabel(it, keyField))
+                          .join(", ")
+                      }}
+                    />
+                  }
+                  onYesButtonClicked={() => {
+                    for (const removedAttribute of removedAttributes) {
+                      // Remove the managed attribute value from the value map:
+                      const attributeKey = get(removedAttribute, keyField);
+                      setFieldValue(`${valuesPath}.${attributeKey}`, undefined);
+                    }
+                    // Update the visibile attributes list:
+                    onChange(newKeys);
+                  }}
+                />
+              );
+            } else {
+              onChange(newKeys);
+            }
+          }}
+          value={visibleAttributes}
+        />
+      )}
+    </FieldSpy>
+  );
+}
+
+function managedAttributeLabel(attribute: ManagedAttribute, keyField: string) {
+  return (
+    get(attribute, "name") || get(attribute, keyField) || get(attribute, "id")
   );
 }
