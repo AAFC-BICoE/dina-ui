@@ -63,13 +63,13 @@ export function AcquisitionEventListLayout({
       optionLabel: (it: PersistedResource<Person>) => it.displayName
     },
     {
-      name: "externallyIsolatedBy",
+      name: "isolatedBy",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
       filter: filterBy(["displayName"]),
       optionLabel: (it: PersistedResource<Person>) => it.displayName
     },
-    "externallyIsolationRemarks"
+    "isolationRemarks"
   ];
 
   const TABLE_COLUMNS = [
@@ -100,17 +100,17 @@ export function AcquisitionEventListLayout({
       ? []
       : [
           {
-            Cell: ({ original: { externallyIsolatedBy: agent } }) =>
+            Cell: ({ original: { isolatedBy: agent } }) =>
               agent?.id ? (
                 <Link href={`/person/view?id=${agent.id}`}>
                   {agent.displayName}
                 </Link>
               ) : null,
-            accessor: "externallyIsolatedBy",
+            accessor: "isolatedBy",
             sortable: false
           },
-          "externallyIsolationRemarks",
-          dateCell("externallyIsolatedOn")
+          "isolationRemarks",
+          dateCell("isolatedOn")
         ]),
     ...(onSelect
       ? [
@@ -148,14 +148,14 @@ export function AcquisitionEventListLayout({
           },
           {
             apiBaseUrl: "/agent-api",
-            idField: "externallyIsolatedBy.id",
-            joinField: "externallyIsolatedBy",
+            idField: "isolatedBy.id",
+            joinField: "isolatedBy",
             path: (acqEvent: AcquisitionEvent) =>
-              `person/${acqEvent.externallyIsolatedBy?.id}`
+              `person/${acqEvent.isolatedBy?.id}`
           }
         ],
         path: "collection-api/acquisition-event",
-        include: "receivedFrom,externallyIsolatedBy",
+        include: "receivedFrom,isolatedBy",
         hideTopPagination
       }}
       {...(hideGroupFilter

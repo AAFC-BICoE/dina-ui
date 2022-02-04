@@ -1,0 +1,108 @@
+= Audit / Revisions UI
+
+The "revisions" pages show edit history of specific records and user activity.
+
+Audit records are fetched from the back-end which is implemented using http://google.ca[Javers].
+See https://github.com/AAFC-BICoE/dina-base-api/blob/master/docs/auditing.adoc[the DINA back-and auditing docs].
+
+== Adding audit support for one Resource Type
+
+For tracking changes to a single record. This page should be linked to from the record's details page.
+
+You can re-use the RevisionsPage component to create a revisions page for the specified resource:
+
+Example from dina-ui/pages/collection/material-sample/revisions.tsx:
+
+[source,tsx]
+----
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../../components/revisions/revision-modules";
+import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout";
+
+export default () => (
+  <RevisionsPage
+    // The API route to the Javers snapshot list
+    auditSnapshotPath="collection-api/audit-snapshot"
+    // URL to the details page
+    detailsPageLink="/collection/material-sample/view?id="
+    // Query for the current state of the record
+    queryPath="collection-api/material-sample"
+    // The JSONAPI resource "type"
+    resourceType="material-sample"
+    // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
+    revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
+    // The field on the resource that gives the name. Usuallu this field is called "name"
+    nameField="materialSampleName"
+  />
+);
+----
+
+== Adding audit support for a user's edits across a DINA module
+
+For tracking all changes to any record by a user. This page should be linked to from the main UI navigation.
+
+There is a separate "revisions-by-user" page per DINA module (Collection, Object Store, Agent, etc.) because the
+back-end is a separate application for each DINA module. There is no way to retrieve a user's activity across all
+multiple back-ends in one query.
+
+You can re-use the RevisionsByUserPage component to create a revisions page for the specified DINA module:
+
+Example from dina-ui/pages/collection/revisions-by-user.tsx:
+
+[source,tsx]
+----
+import { COLLECTION_MODULE_REVISION_ROW_CONFIG } from "../../components/revisions/revision-modules";
+import RevisionsByUserPage from "../../components/revision-by-user/CommonRevisionsByUserPage";
+
+export default function CollectionRevisionByUserPage() {
+  return (
+    <RevisionsByUserPage
+      // The API route to the Javers snapshot list
+      snapshotPath="collection-api/audit-snapshot"
+      // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
+      revisionRowConfigsByType={COLLECTION_MODULE_REVISION_ROW_CONFIG}
+    />
+  );
+}
+----
+
+== Configuring how audit data is displayed in the "Show Changes" section.
+
+The back-end provides historical data as unstructured JSON (in the "state" field), so the UI might not always
+be able to show a good looking UI based on the data it's given because the data schema is unknown.
+Simple string or number fields are easily rendered as-is, but the last-resort fallback for an unknown object structure
+is to show stringified JSON in the UI. The Revision UI components are written in a way that unstructured data
+is displayed generically by looping through the key-value pairs of the given JSON, but specific field names
+can be manually overwritten in the code to improve the way that the UI displays those fields.
+
+All edited fields will be rendered generically in the Revisions UI, but to manually register fields to be
+rendered in a specific way, go to:
+
+dina-ui/components/revisions/revision-modules.ts
+
+and add your typename into the map for the correct DINA module.
+
+For examples of types added:
+
+[source,tsx]
+----
+import { RevisionRowConfigsByType } from "./revision-row-config";
+import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-row-config";
+import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-row-configs";
+import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-row-config";
+
+/** Custom revision row behavior for Object Store Resources. */
+export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  metadata: METADATA_REVISION_ROW_CONFIG
+};
+
+/** Custom revision row behavior for Object Store Resources. */
+export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
+  "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG
+};
+----
+
+* In the Object Store module, mappings have been added for the "metadata" type.
+* In the Collection module, mappings have been added for the "collecting-event" and "material-sample" types.
+
+See the implementation of MATERIAL_SAMPLE_REVISION_ROW_CONFIG for examples of field renderers.

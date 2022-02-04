@@ -29,6 +29,7 @@ export default function ProjectDetailsPage() {
       entityLink="/collection/project"
       type="project"
       apiBaseUrl="/collection-api"
+      showRevisionsLink={true}
     />
   );
 }

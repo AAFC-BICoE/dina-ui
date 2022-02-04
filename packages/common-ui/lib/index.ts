@@ -62,6 +62,7 @@ export * from "./table/QueryTable";
 export * from "./table/date-cell";
 export * from "./table/description-cell";
 export * from "./table/stringArray-cell";
+export * from "./table/all-lang-descriptions-cell";
 export * from "./text-field-with-coord-buttons/TextFieldWithCoordButtons";
 export * from "./tooltip/Tooltip";
 export * from "./util/rsql";

@@ -27,6 +27,7 @@ export default function CollectionMethodDetailsPage() {
       entityLink="/collection/collection-method"
       type="collection-method"
       apiBaseUrl="/collection-api"
+      showRevisionsLink={true}
     />
   );
 }
