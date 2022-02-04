@@ -117,76 +117,86 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   }
 
   return (
-    <div className="d-flex">
-      {index > 0 && (
-        <QueryLogicSwitchField
-          name={fieldProps("compoundQueryType", index).name}
-          removeLabel={true}
-          className={"compoundQueryType" + index}
-        />
-      )}
-      <div style={{ width: index > 0 ? "59%" : "66%" }}>
-        <SelectField
-          name={fieldProps("fieldName", index).name}
-          options={queryRowOptions}
-          onChange={(value, formik) => onSelectionChange(value, formik, index)}
-          className={`flex-grow-1 me-2 `}
-          removeLabel={true}
-        />
+    <div className="row">
+      <div className="col-md-6 d-flex">
+        {index > 0 && (
+          <div style={{ width: index > 0 ? "13%" : "100%" }}>
+            <QueryLogicSwitchField
+              name={fieldProps("compoundQueryType", index).name}
+              removeLabel={true}
+              className={"compoundQueryType" + index}
+            />
+          </div>
+        )}
+        <div style={{ width: index > 0 ? "87%" : "100%" }}>
+          <SelectField
+            name={fieldProps("fieldName", index).name}
+            options={queryRowOptions}
+            onChange={(value, formik) =>
+              onSelectionChange(value, formik, index)
+            }
+            className={`flex-grow-1 me-2 ps-0`}
+            removeLabel={true}
+          />
+        </div>
       </div>
-      {visibility.text && (
-        <TextField
-          name={fieldProps("matchValue", index).name}
-          className="me-2"
-          removeLabel={true}
-        />
-      )}
-      {visibility.date && (
-        <DateField
-          name={fieldProps("date", index).name}
-          className="me-2"
-          removeLabel={true}
-        />
-      )}
-      {visibility.text && (
-        <SelectField
-          name={fieldProps("matchType", index).name}
-          options={queryRowMatchOptions}
-          className="me-2"
-          removeLabel={true}
-        />
-      )}
-      {visibility.boolean && (
-        <SelectField
-          name={fieldProps("boolean", index).name}
-          options={queryRowBooleanOptions}
-          className="me-2"
-          removeLabel={true}
-        />
-      )}
-      {visibility.number && (
-        <NumberField
-          name={fieldProps("number", index).name}
-          className="me-2"
-          removeLabel={true}
-        />
-      )}
+      <div className="col-md-6">
+        <div className="d-flex">
+          {visibility.text && (
+            <TextField
+              name={fieldProps("matchValue", index).name}
+              className="me-2"
+              removeLabel={true}
+            />
+          )}
+          {visibility.date && (
+            <DateField
+              name={fieldProps("date", index).name}
+              className="me-2"
+              removeLabel={true}
+            />
+          )}
+          {visibility.text && (
+            <SelectField
+              name={fieldProps("matchType", index).name}
+              options={queryRowMatchOptions}
+              className="me-2"
+              removeLabel={true}
+            />
+          )}
+          {visibility.boolean && (
+            <SelectField
+              name={fieldProps("boolean", index).name}
+              options={queryRowBooleanOptions}
+              className="me-2"
+              removeLabel={true}
+            />
+          )}
+          {visibility.number && (
+            <NumberField
+              name={fieldProps("number", index).name}
+              className="me-2"
+              removeLabel={true}
+            />
+          )}
 
-      {index === 0 ? (
-        <FaPlus
-          onClick={addRow as any}
-          size="2em"
-          style={{ cursor: "pointer" }}
-          name={fieldProps("addRow", index).name}
-        />
-      ) : (
-        <FaMinus
-          onClick={() => removeRow?.(index)}
-          size="2em"
-          style={{ cursor: "pointer" }}
-          name={fieldProps("removeRow", index).name}
-        />
-      )}
+          {index === 0 ? (
+            <FaPlus
+              onClick={addRow as any}
+              size="2em"
+              style={{ cursor: "pointer" }}
+              name={fieldProps("addRow", index).name}
+            />
+          ) : (
+            <FaMinus
+              onClick={() => removeRow?.(index)}
+              size="2em"
+              style={{ cursor: "pointer" }}
+              name={fieldProps("removeRow", index).name}
+            />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
