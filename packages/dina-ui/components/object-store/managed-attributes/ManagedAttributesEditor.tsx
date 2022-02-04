@@ -1,5 +1,7 @@
 import {
   AreYouSureModal,
+  FieldSet,
+  FieldSetProps,
   FieldSpy,
   filterBy,
   NumberField,
@@ -45,6 +47,8 @@ export interface ManagedAttributesEditorProps {
 
   /** Bootstrap column width of the "Managed Attributes In Use selector. e.g. 6 or 12. */
   attributeSelectorWidth?: number;
+
+  fieldSetProps?: Partial<FieldSetProps>;
 }
 
 export function ManagedAttributesEditor({
@@ -52,7 +56,8 @@ export function ManagedAttributesEditor({
   managedAttributeApiPath,
   managedAttributeComponent,
   managedAttributeKeyField = "key",
-  attributeSelectorWidth = 6
+  attributeSelectorWidth = 6,
+  fieldSetProps
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly } = useDinaFormContext();
@@ -92,70 +97,83 @@ export function ManagedAttributesEditor({
 
         const visibleAttributes = lastFetchedAttributes.current;
 
-        return readOnly ? (
-          <ManagedAttributesViewer
-            values={currentValue}
-            managedAttributeApiPath={id => `${managedAttributeApiPath}/${id}`}
-          />
-        ) : (
-          <div className="mb-3 managed-attributes-editor">
-            <div className="row">
-              <label
-                className={`editable-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-              >
-                <strong>
-                  <DinaMessage id="field_editableManagedAttributes" />
-                </strong>
-                <ManagedAttributeMultiSelect
-                  valuesPath={valuesPath}
-                  managedAttributeApiPath={managedAttributeApiPath}
-                  managedAttributeComponent={managedAttributeComponent}
-                  managedAttributeKeyField={managedAttributeKeyField}
-                  onChange={setVisibleAttributeKeys}
-                  visibleAttributes={visibleAttributes}
-                />
-              </label>
-            </div>
-            <div className="row">
-              {visibleAttributes.map(attribute => {
-                const attributeKey = get(attribute, managedAttributeKeyField);
-
-                const props = {
-                  className: `${attributeKey} ${attributeKey}-field col-sm-6`,
-                  key: attributeKey,
-                  label: attribute.name ?? attributeKey,
-                  name: `${valuesPath}.${attributeKey}`
-                };
-
-                if (
-                  attribute.managedAttributeType === "STRING" &&
-                  attribute.acceptedValues?.length
-                ) {
-                  return (
-                    <SelectField
-                      {...props}
-                      options={[
-                        { label: `<${formatMessage("none")}>`, value: "" },
-                        ...attribute.acceptedValues.map(value => ({
-                          label: value,
-                          value
-                        }))
-                      ]}
-                    />
-                  );
-                } else if (attribute.managedAttributeType === "INTEGER") {
-                  return <NumberField {...props} />;
-                } else {
-                  return (
-                    <TextField
-                      {...props}
-                      inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-                    />
-                  );
+        return (
+          <FieldSet
+            legend={<DinaMessage id="managedAttributes" />}
+            {...fieldSetProps}
+          >
+            {readOnly ? (
+              <ManagedAttributesViewer
+                values={currentValue}
+                managedAttributeApiPath={id =>
+                  `${managedAttributeApiPath}/${id}`
                 }
-              })}
-            </div>
-          </div>
+              />
+            ) : (
+              <div className="mb-3 managed-attributes-editor">
+                <div className="row">
+                  <label
+                    className={`editable-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+                  >
+                    <strong>
+                      <DinaMessage id="field_editableManagedAttributes" />
+                    </strong>
+                    <ManagedAttributeMultiSelect
+                      valuesPath={valuesPath}
+                      managedAttributeApiPath={managedAttributeApiPath}
+                      managedAttributeComponent={managedAttributeComponent}
+                      managedAttributeKeyField={managedAttributeKeyField}
+                      onChange={setVisibleAttributeKeys}
+                      visibleAttributes={visibleAttributes}
+                      loading={loading}
+                    />
+                  </label>
+                </div>
+                <div className="row">
+                  {visibleAttributes.map(attribute => {
+                    const attributeKey = get(
+                      attribute,
+                      managedAttributeKeyField
+                    );
+
+                    const props = {
+                      className: `${attributeKey} ${attributeKey}-field col-sm-6`,
+                      key: attributeKey,
+                      label: attribute.name ?? attributeKey,
+                      name: `${valuesPath}.${attributeKey}`
+                    };
+
+                    if (
+                      attribute.managedAttributeType === "STRING" &&
+                      attribute.acceptedValues?.length
+                    ) {
+                      return (
+                        <SelectField
+                          {...props}
+                          options={[
+                            { label: `<${formatMessage("none")}>`, value: "" },
+                            ...attribute.acceptedValues.map(value => ({
+                              label: value,
+                              value
+                            }))
+                          ]}
+                        />
+                      );
+                    } else if (attribute.managedAttributeType === "INTEGER") {
+                      return <NumberField {...props} />;
+                    } else {
+                      return (
+                        <TextField
+                          {...props}
+                          inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
+                        />
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            )}
+          </FieldSet>
         );
       }}
     </FieldSpy>
@@ -170,6 +188,7 @@ export interface ManagedAttributeMultiSelectProps {
 
   onChange: (newValue: string[]) => void;
   visibleAttributes: PersistedResource<ManagedAttribute>[];
+  loading?: boolean;
 }
 
 export function ManagedAttributeMultiSelect({
@@ -178,7 +197,8 @@ export function ManagedAttributeMultiSelect({
   managedAttributeApiPath,
   managedAttributeKeyField: keyField,
   onChange,
-  visibleAttributes
+  visibleAttributes,
+  loading
 }: ManagedAttributeMultiSelectProps) {
   const { openModal } = useModal();
 
@@ -193,6 +213,7 @@ export function ManagedAttributeMultiSelect({
           model={managedAttributeApiPath}
           optionLabel={attribute => managedAttributeLabel(attribute, keyField)}
           isMulti={true}
+          isLoading={loading}
           onChange={(newValues, actionMeta) => {
             const newAttributes = castArray(newValues);
 

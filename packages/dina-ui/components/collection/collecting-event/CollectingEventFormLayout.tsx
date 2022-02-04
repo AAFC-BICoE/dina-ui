@@ -821,34 +821,20 @@ export function CollectingEventFormLayout({
       </div>
 
       {!isTemplate && (
-        <FieldSet
-          legend={<DinaMessage id="collectingEventManagedAttributes" />}
+        <DinaFormSection
+          // Disabled the template's restrictions for this section:
+          enabledFields={null}
         >
-          {readOnly ? (
-            <FieldSpy<Record<string, string>> fieldName="managedAttributes">
-              {value => (
-                <ManagedAttributesViewer
-                  values={value ?? {}}
-                  managedAttributeApiPath={key =>
-                    `collection-api/managed-attribute/collecting_event.${key}`
-                  }
-                />
-              )}
-            </FieldSpy>
-          ) : (
-            <DinaFormSection
-              // Disabled the template's restrictions for this section:
-              enabledFields={null}
-            >
-              <ManagedAttributesEditor
-                valuesPath="managedAttributes"
-                managedAttributeApiPath="collection-api/managed-attribute"
-                managedAttributeComponent="COLLECTING_EVENT"
-                managedAttributeKeyField="key"
-              />
-            </DinaFormSection>
-          )}
-        </FieldSet>
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="COLLECTING_EVENT"
+            managedAttributeKeyField="key"
+            fieldSetProps={{
+              legend: <DinaMessage id="collectingEventManagedAttributes" />
+            }}
+          />
+        </DinaFormSection>
       )}
       <div className="mb-3">
         <AttachmentsField

@@ -75,6 +75,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   removeDefaultSort?: boolean;
 
   placeholder?: string;
+
+  isLoading?: boolean;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -115,7 +117,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   pageSize,
   useCustomQuery,
   removeDefaultSort,
-  placeholder
+  placeholder,
+  isLoading: loadingProp
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -147,7 +150,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const { loading: queryIsLoading, response } =
     useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
-  const isLoading = queryIsLoading || inputValue !== searchValue;
+  const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
 
   // Build the list of options from the returned resources.
   const resourceOptions =
