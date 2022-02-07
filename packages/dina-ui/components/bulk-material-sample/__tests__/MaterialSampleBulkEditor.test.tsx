@@ -895,7 +895,11 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "1",
               relationships: {},
-              type: "material-sample"
+              type: "material-sample",
+              associations: undefined,
+              attachment: undefined,
+              preparationAttachment: undefined,
+              projects: undefined
             },
             type: "material-sample"
           },
@@ -904,7 +908,10 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "2",
               relationships: {},
-              type: "material-sample"
+              type: "material-sample",
+              attachment: undefined,
+              preparationAttachment: undefined,
+              projects: undefined
             },
             type: "material-sample"
           },
@@ -913,7 +920,10 @@ describe("MaterialSampleBulkEditor", () => {
             resource: {
               id: "3",
               relationships: {},
-              type: "material-sample"
+              type: "material-sample",
+              attachment: undefined,
+              preparationAttachment: undefined,
+              projects: undefined
             },
             type: "material-sample"
           }
@@ -1865,8 +1875,11 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              associations: [{}],
+              preparationAttachment: undefined,
+              projects: undefined,
+              attachment: undefined,
               id: "1",
+              associations: [],
               organism: {
                 lifeStage: "test lifestage",
                 substrate: "bulk-edit-substrate"
@@ -1882,7 +1895,9 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: {
-              associations: [{}],
+              preparationAttachment: undefined,
+              projects: undefined,
+              attachment: undefined,
               id: "2",
               organism: {
                 lifeStage: "test lifestage",
@@ -1892,6 +1907,7 @@ describe("MaterialSampleBulkEditor", () => {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
               },
+              associations: [],
               relationships: {},
               type: "material-sample"
             },

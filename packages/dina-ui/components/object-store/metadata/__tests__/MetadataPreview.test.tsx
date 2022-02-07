@@ -13,8 +13,23 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata"
 };
 
+const mockBulkGet = jest.fn(async paths =>
+  paths.map(path => {
+    switch (path) {
+      case "object-upload/cf99c285-0353-4fed-a15d-ac963e0514f3":
+        return {
+          id: "cf99c285-0353-4fed-a15d-ac963e0514f3",
+          type: "object-upload",
+          exif: {
+            Flash: "Flash did not fire"
+          }
+        };
+    }
+  })
+);
+
 const mockGet = jest.fn(async () => ({ data: TEST_METADATA }));
-const apiContext: any = { apiClient: { get: mockGet } };
+const apiContext: any = { apiClient: { get: mockGet }, bulkGet: mockBulkGet };
 
 describe("MetadataPreview component", () => {
   it("Renders the metadata preview", async () => {
@@ -30,5 +45,8 @@ describe("MetadataPreview component", () => {
     expect(wrapper.find("a.metadata-edit-link").prop("href")).toEqual(
       "/object-store/metadata/single-record-edit?id=232eda40-dc97-4255-91c4-f30485e2c707"
     );
+
+    // Shows the EXIF data:
+    expect(wrapper.contains("Flash did not fire")).toEqual(true);
   });
 });

@@ -28,6 +28,7 @@ export default function InstitutionDetailsPage() {
       type="institution"
       apiBaseUrl="/collection-api"
       isRestricted={true}
+      showRevisionsLink={true}
     />
   );
 }

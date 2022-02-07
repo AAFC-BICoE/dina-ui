@@ -1,10 +1,4 @@
-import {
-  DateView,
-  FieldHeader,
-  useApiClient,
-  useCollapser,
-  useQuery
-} from "common-ui";
+import { DateView, FieldHeader, useCollapser, useQuery } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { get } from "lodash";
 import { ReactNode } from "react";
@@ -20,8 +14,6 @@ export interface MetadataDetailsProps {
 }
 
 export function useMetadataQuery(id?: string) {
-  const { apiClient } = useApiClient();
-
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
       include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
@@ -40,17 +32,14 @@ export function useMetadataQuery(id?: string) {
           idField: "dcCreator",
           joinField: "dcCreator",
           path: metadata => `person/${metadata.dcCreator.id}`
+        },
+        {
+          apiBaseUrl: "/objectstore-api",
+          idField: "fileIdentifier",
+          joinField: "objectUpload",
+          path: metadata => `object-upload/${metadata.fileIdentifier}`
         }
-      ],
-      onSuccess: async ({ data: metadata }) => {
-        const objectUploadResp = await apiClient.get<ObjectUpload>(
-          "objectstore-api/object-upload",
-          {
-            filter: { fileIdentifier: `${metadata.fileIdentifier}` }
-          }
-        );
-        metadata.objectUpload = objectUploadResp?.data?.[0];
-      }
+      ]
     }
   );
 

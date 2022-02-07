@@ -31,6 +31,7 @@ export default function CollectionDetailsPage() {
       type="collection"
       apiBaseUrl="/collection-api"
       isRestricted={true}
+      showRevisionsLink={true}
     />
   );
 }
