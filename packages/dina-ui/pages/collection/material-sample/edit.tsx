@@ -463,6 +463,7 @@ export function MaterialSampleForm({
                     fieldSetProps={{
                       id: navIds.managedAttributes
                     }}
+                    showCustomViewDropdown={true}
                   />
                 </DinaFormSection>
               )}

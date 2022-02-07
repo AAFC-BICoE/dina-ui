@@ -33,7 +33,7 @@ export function ManagedAttributesViewSelect({
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
   return (
-    <div className="d-flex gap-2 align-items-end">
+    <div className="managed-attributes-view-select d-flex gap-2 align-items-end">
       <label style={{ width: "20rem", marginTop: "15px" }}>
         <div className="mb-2">
           <strong>
