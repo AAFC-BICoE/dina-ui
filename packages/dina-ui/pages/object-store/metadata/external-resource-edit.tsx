@@ -8,11 +8,14 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useAccount
+  useAccount,
+  useApiClient,
+  useQuery,
+  withResponse
 } from "common-ui";
+import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
 import { keys } from "lodash";
-import { useRouter } from "next/router";
 import {
   Footer,
   Head,
@@ -23,7 +26,11 @@ import {
 } from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { License, ObjectSubtype } from "../../../types/objectstore-api";
+import {
+  License,
+  Metadata,
+  ObjectSubtype
+} from "../../../types/objectstore-api";
 import {
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
@@ -31,28 +38,94 @@ import {
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
+
+  const id = router.query.id?.toString();
+
+  const { apiClient } = useApiClient();
+
+  const query = useQuery<Metadata>(
+    {
+      path: `objectstore-api/metadata/${id}`
+    },
+    {
+      joinSpecs: [
+        // Join to persons api:
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `person/${metadata.dcCreator.id}`
+        }
+      ],
+      onSuccess: async ({ data: metadata }) => {
+        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
+        if (metadata.xmpRightsWebStatement) {
+          const url = metadata.xmpRightsWebStatement;
+          (metadata as any).license = (
+            await apiClient.get<License[]>("objectstore-api/license", {
+              filter: { url }
+            })
+          ).data[0];
+        }
+      }
+    }
+  );
+
   return (
     <div>
       <Head title={formatMessage("inputExternalResourceTitle")} />
       <Nav />
       <main className="container">
-        <div>
-          <h1 id="wb-cont">
-            <DinaMessage id="inputExternalResourceTitle" />
-          </h1>
-          <SingleMetadataForm />
-        </div>
+        {id ? (
+          <div>
+            <h1 id="wb-cont">
+              <DinaMessage id="inputExternalResourceTitle" />
+            </h1>
+            {withResponse(query, ({ data }) => (
+              <ExternalResourceMetatdataForm metadata={data} router={router} />
+            ))}
+          </div>
+        ) : (
+          <div>
+            <h1 id="wb-cont">
+              <DinaMessage id="inputExternalResourceTitle" />
+            </h1>
+            <ExternalResourceMetatdataForm router={router} />
+          </div>
+        )}
       </main>
       <Footer />
     </div>
   );
 }
 
-function SingleMetadataForm() {
+interface ExternalResourceMetatdataProps {
+  /** Existing Metadata is required, no new ones are added with this form. */
+  metadata?: Metadata;
+  router: NextRouter;
+}
+
+function ExternalResourceMetatdataForm({
+  router,
+  metadata
+}: ExternalResourceMetatdataProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const router = useRouter();
   const { groupNames } = useAccount();
 
+  const initialValues = metadata
+    ? {
+        ...metadata,
+        // Convert the string to an object for the dropdown:
+        acSubtype: metadata?.acSubtype
+          ? {
+              id: "id-unavailable",
+              type: "object-subtype",
+              acSubtype: metadata?.acSubtype
+            }
+          : null
+      }
+    : {};
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { apiClient, save }
@@ -117,7 +190,7 @@ function SingleMetadataForm() {
   );
 
   return (
-    <DinaForm initialValues={{}} onSubmit={onSubmit}>
+    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <TagsAndRestrictionsSection
