@@ -31,11 +31,9 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
     switch (path) {
       case "person/6e80e42a-bcf6-4062-9db3-946e0f26458f":
         return {
-          data: {
-            id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
-            type: "person",
-            displayName: "Mat Poff"
-          }
+          id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
+          type: "person",
+          displayName: "Mat Poff"
         };
       case "managed-attribute/test_managed_attribute":
         return {

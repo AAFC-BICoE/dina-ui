@@ -76,12 +76,12 @@ describe("ManagedAttributesEditor component", () => {
         }
       ]
     ]);
-    expect(wrapper.find(".example_attribute_1 input").prop("value")).toEqual(
-      "example-value-1"
-    );
-    expect(wrapper.find(".example_attribute_2 input").prop("value")).toEqual(
-      "example-value-2"
-    );
+    expect(
+      wrapper.find(".example_attribute_1-field input").prop("value")
+    ).toEqual("example-value-1");
+    expect(
+      wrapper.find(".example_attribute_2-field input").prop("value")
+    ).toEqual("example-value-2");
   });
 
   it("Lets you visually hide a managed attribute value by removing it from the dropdown menu.", async () => {
@@ -105,7 +105,9 @@ describe("ManagedAttributesEditor component", () => {
     wrapper.update();
 
     // Attribute 2 exists
-    expect(wrapper.find(".example_attribute_2 input").exists()).toEqual(true);
+    expect(wrapper.find(".example_attribute_2-field input").exists()).toEqual(
+      true
+    );
 
     // Remove attribute 2:
     wrapper
@@ -117,7 +119,9 @@ describe("ManagedAttributesEditor component", () => {
     wrapper.update();
 
     // attribute 2 is hidden, not removed:
-    expect(wrapper.find(".example_attribute_2 input").exists()).toEqual(false);
+    expect(wrapper.find(".example_attribute_2-field input").exists()).toEqual(
+      false
+    );
 
     wrapper.find("form").simulate("submit");
 
