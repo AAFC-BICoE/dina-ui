@@ -49,18 +49,29 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
               </a>
             </Link>
           </div>
-          <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
+          <Link
+            href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata.resourceExternalURI}`}
+          >
             <a className="btn btn-info metadata-revisions-link">
               <DinaMessage id="revisionsButtonText" />
             </a>
           </Link>
-          <MetadataFileView metadata={metadata} />
-          <NotPubliclyReleasableWarning />
-          <div className="px-3">
-            <TagsAndRestrictionsSection tagsFieldName="acTags" />
-          </div>
-          <MetadataDetails metadata={metadata} />
-          <ExifView objectUpload={metadata.objectUpload} />
+          {metadata.fileIdentifier && (
+            <>
+              <MetadataFileView metadata={metadata} />
+              <NotPubliclyReleasableWarning />
+              <div className="px-3">
+                <TagsAndRestrictionsSection tagsFieldName="acTags" />
+              </div>
+            </>
+          )}
+          <MetadataDetails
+            metadata={metadata}
+            isExternalResource={!!metadata.resourceExternalURI}
+          />
+          {metadata.fileIdentifier && (
+            <ExifView objectUpload={metadata.objectUpload} />
+          )}
         </DinaForm>
       </div>
     );

@@ -36,7 +36,9 @@ export default function ExternalResourceMetadataViewPage() {
             <DinaMessage id="editButtonText" />
           </a>
         </Link>
-        <Link href={`/object-store/metadata/revisions?id=${id}`}>
+        <Link
+          href={`/object-store/metadata/revisions?id=${id}&isExternalResourceMetadata=true`}
+        >
           <a className="btn btn-info">
             <DinaMessage id="revisionsButtonText" />
           </a>
