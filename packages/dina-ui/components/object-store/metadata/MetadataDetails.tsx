@@ -11,7 +11,6 @@ import { ManagedAttributesViewer } from "../managed-attributes/ManagedAttributes
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
-  isExternalResource?: boolean;
 }
 
 export function useMetadataQuery(id?: string) {
@@ -51,12 +50,9 @@ export function useMetadataQuery(id?: string) {
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
-export function MetadataDetails({
-  metadata,
-  isExternalResource
-}: MetadataDetailsProps) {
+export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage } = useDinaIntl();
-
+  const isExternalResource = !!metadata.resourceExternalURI;
   return (
     <div>
       {isExternalResource ? (

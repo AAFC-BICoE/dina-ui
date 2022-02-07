@@ -65,10 +65,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
               </div>
             </>
           )}
-          <MetadataDetails
-            metadata={metadata}
-            isExternalResource={!!metadata.resourceExternalURI}
-          />
+          <MetadataDetails metadata={metadata} />
           {metadata.fileIdentifier && (
             <ExifView objectUpload={metadata.objectUpload} />
           )}
