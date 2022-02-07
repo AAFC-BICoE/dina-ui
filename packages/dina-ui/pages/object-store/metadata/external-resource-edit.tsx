@@ -137,7 +137,7 @@ function ExternalResourceMetatdataForm({
       ...metadataValues,
       // Convert the object back to a string:
       acSubtype: acSubtype?.acSubtype ?? null,
-      bucket: groupNames?.[0]
+      bucket: metadataValues.bucket ?? groupNames?.[0]
     };
 
     // Remove blank managed attribute values from the map:
