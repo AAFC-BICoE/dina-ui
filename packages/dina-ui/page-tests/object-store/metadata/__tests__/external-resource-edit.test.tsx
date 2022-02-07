@@ -86,6 +86,11 @@ describe("Metadata external resource edit page.", () => {
   });
 
   it("Lets you add a new external resource metadata.", async () => {
+    mockUseRouter.mockReturnValue({
+      push: () => undefined,
+      query: { id: undefined }
+    });
+
     const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
@@ -114,7 +119,7 @@ describe("Metadata external resource edit page.", () => {
       .first()
       .simulate("change", {
         target: {
-          value: "JPEG"
+          value: "jpeg"
         }
       });
 
@@ -123,7 +128,7 @@ describe("Metadata external resource edit page.", () => {
       .first()
       .simulate("change", {
         target: {
-          value: "jpg"
+          value: ".jpg"
         }
       });
 
@@ -155,8 +160,8 @@ describe("Metadata external resource edit page.", () => {
         {
           resource: {
             bucket: "aafc",
-            dcFormat: "JPEG",
-            fileExtension: "jpg",
+            dcFormat: "jpeg",
+            fileExtension: ".jpg",
             acSubtype: null,
             acCaption: "test caption",
             resourceExternalURI: "http://agr.gc.ca"

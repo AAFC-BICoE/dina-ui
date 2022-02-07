@@ -7,29 +7,14 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { Footer, Head, Nav } from "../../../components";
 import {
-  Footer,
-  Head,
-  Nav,
-  NotPubliclyReleasableWarning,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import {
-  ExifView,
   MetadataDetails,
   useMetadataQuery
 } from "../../../components/object-store";
-import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
-const OBJECT_DETAILS_PAGE_CSS = `
-  .file-viewer-wrapper img {
-    max-width: 100%;
-    height: auto;
-  }
-`;
-
-export default function MetadataViewPage() {
+export default function ExternalResourceMetadataViewPage() {
   const router = useRouter();
 
   const id = String(router.query.id);
@@ -70,7 +55,6 @@ export default function MetadataViewPage() {
       <div>
         <Head title={metadata.originalFilename} />
         <Nav />
-        <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
           {buttonBar}
           <div className="container">

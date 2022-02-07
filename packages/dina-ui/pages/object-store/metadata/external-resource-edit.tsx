@@ -151,7 +151,7 @@ function ExternalResourceMetatdataForm({
     );
 
     await router.push(
-      `/object-store/object/external-resource-view?id=${savedMeta[0].id}`
+      `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
     );
   };
 
