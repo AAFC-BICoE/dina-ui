@@ -84,7 +84,7 @@ describe("ManagedAttributesEditor component", () => {
     );
   });
 
-  it("Lets you hide a managed attribute value by removing it from the dropdown menu.", async () => {
+  it("Lets you visually hide a managed attribute value by removing it from the dropdown menu.", async () => {
     const mockSubmit = jest.fn();
 
     const wrapper = mountWithAppContext(

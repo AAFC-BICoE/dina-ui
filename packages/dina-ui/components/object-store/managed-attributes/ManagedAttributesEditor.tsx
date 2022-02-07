@@ -187,7 +187,7 @@ export function ManagedAttributesEditor({
                     return (
                       <label
                         key={attributeKey}
-                        className={`${attributeKey} ${attributeKey}-field col-sm-6 mb-3`}
+                        className={`${attributeKey}-field col-sm-6 mb-3`}
                         htmlFor="none"
                       >
                         <div className="mb-2 d-flex align-items-center">
