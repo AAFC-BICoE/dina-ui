@@ -73,23 +73,10 @@ export default function MetadataViewPage() {
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
           {buttonBar}
-          <div className="row">
-            <div className="col-md-4">
-              <MetadataFileView metadata={metadata} />
-            </div>
-            <div className="col-md-8">
-              <div className="container">
-                <DinaForm initialValues={metadata} readOnly={true}>
-                  <NotPubliclyReleasableWarning />
-                  <TagsAndRestrictionsSection
-                    tagsFieldName="acTags"
-                    groupSelectorName="bucket"
-                  />
-                  <MetadataDetails metadata={metadata} />
-                  <ExifView objectUpload={metadata.objectUpload} />
-                </DinaForm>
-              </div>
-            </div>
+          <div className="container">
+            <DinaForm initialValues={metadata} readOnly={true}>
+              <MetadataDetails metadata={metadata} isExternalResource={true} />
+            </DinaForm>
           </div>
           {buttonBar}
         </main>

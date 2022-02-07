@@ -16,25 +16,14 @@ import {
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
 import { keys } from "lodash";
-import {
-  Footer,
-  Head,
-  Nav,
-  NotPubliclyReleasableWarning,
-  PersonSelectField,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
+import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import {
-  DCTYPE_OPTIONS,
-  ORIENTATION_OPTIONS
-} from "../metadata/single-record-edit";
+import { DCTYPE_OPTIONS } from "../metadata/single-record-edit";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -49,15 +38,6 @@ export default function ExternalResourceMetadataPage() {
       path: `objectstore-api/metadata/${id}`
     },
     {
-      joinSpecs: [
-        // Join to persons api:
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ],
       onSuccess: async ({ data: metadata }) => {
         // Get the License resource based on the Metadata's xmpRightsWebStatement field:
         if (metadata.xmpRightsWebStatement) {
@@ -191,13 +171,7 @@ function ExternalResourceMetatdataForm({
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <NotPubliclyReleasableWarning />
       {buttonBar}
-      <TagsAndRestrictionsSection
-        resourcePath="objectstore-api/metadata"
-        tagsFieldName="acTags"
-        groupSelectorName="bucket"
-      />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
           <TextField className="col-md-6" name="fileExtension" />
@@ -234,20 +208,6 @@ function ExternalResourceMetatdataForm({
         <div className="row">
           <TextField className="col-md-6" name="acCaption" />
         </div>
-        <div className="row">
-          <PersonSelectField
-            className="col-md-6"
-            name="dcCreator"
-            label={formatMessage("field_dcCreator.displayName")}
-          />
-          <SelectField
-            className="col-md-6"
-            name="orientation"
-            options={ORIENTATION_OPTIONS}
-            tooltipImage="/static/images/orientationDiagram.jpg"
-            tooltipImageAlt="field_orientation_tooltipAlt"
-          />
-        </div>
       </FieldSet>
       <FieldSet legend={<DinaMessage id="metadataRightsDetailsLabel" />}>
         <div className="row">
@@ -261,15 +221,6 @@ function ExternalResourceMetatdataForm({
             removeDefaultSort={true}
           />
         </div>
-      </FieldSet>
-      <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
-        <ManagedAttributesEditor
-          valuesPath="managedAttributeValues"
-          managedAttributeApiPath="objectstore-api/managed-attribute"
-          apiBaseUrl="/objectstore-api"
-          managedAttributeKeyField="key"
-          useKeyInFilter={true}
-        />
       </FieldSet>
       {buttonBar}
     </DinaForm>

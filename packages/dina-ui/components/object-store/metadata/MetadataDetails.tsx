@@ -11,6 +11,7 @@ import { ManagedAttributesViewer } from "../managed-attributes/ManagedAttributes
 
 export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
+  isExternalResource?: boolean;
 }
 
 export function useMetadataQuery(id?: string) {
@@ -50,66 +51,94 @@ export function useMetadataQuery(id?: string) {
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
  * Tha ManagedAttributeMap must b included with the passed Metadata.
  */
-export function MetadataDetails({ metadata }: MetadataDetailsProps) {
+export function MetadataDetails({
+  metadata,
+  isExternalResource
+}: MetadataDetailsProps) {
   const { formatMessage } = useDinaIntl();
 
   return (
     <div>
-      <MetadataAttributeGroup
-        metadata={metadata}
-        fields={[
-          { name: "group", value: <GroupLabel groupName={metadata.group} /> },
-          {
-            name: "createdDate",
-            value: <DateView date={metadata.createdDate} />
-          },
-          {
-            name: "xmpMetadataDate",
-            value: <DateView date={metadata.xmpMetadataDate} />
-          },
-          "acMetadataCreator.displayName",
-          "acSubtype"
-        ]}
-        title={formatMessage("metadataUploadDetailsLabel")}
-      />
-      <CollapsableSection
-        collapserId="managed-attributes"
-        title={formatMessage("metadataManagedAttributesLabel")}
-      >
-        <ManagedAttributesViewer
-          values={metadata.managedAttributeValues}
-          managedAttributeApiPath={id =>
-            `objectstore-api/managed-attribute/${id}`
-          }
-        />
-      </CollapsableSection>
-      <MetadataAttributeGroup
-        metadata={metadata}
-        fields={[
-          "originalFilename",
-          {
-            name: "acDigitizationDate",
-            value: <DateView date={metadata.acDigitizationDate} />
-          },
-          "fileExtension",
-          "dcCreator.displayName",
-          "dcType",
-          "dcFormat",
-          "acCaption",
-          "orientation"
-        ]}
-        title={formatMessage("metadataMediaDetailsLabel")}
-      />
-      <MetadataAttributeGroup
-        metadata={metadata}
-        fields={["dcRights", "xmpRightsWebStatement"]}
-        title={formatMessage("metadataRightsDetailsLabel")}
-      />
-      <MetadataAttributeGroup
-        metadata={metadata}
-        fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
-        title={formatMessage("metadataFileStorageDetailsLabel")}
-      />
+      {isExternalResource ? (
+        <>
+          <MetadataAttributeGroup
+            metadata={metadata}
+            fields={[
+              {
+                name: "group",
+                value: <GroupLabel groupName={metadata.group} />
+              },
+              "dcType",
+              "dcFormat",
+              "acCaption",
+              "acSubtype",
+              "resourceExternalURI"
+            ]}
+            title={formatMessage("metadataMediaDetailsLabel")}
+          />
+        </>
+      ) : (
+        <>
+          <MetadataAttributeGroup
+            metadata={metadata}
+            fields={[
+              {
+                name: "group",
+                value: <GroupLabel groupName={metadata.group} />
+              },
+              {
+                name: "createdDate",
+                value: <DateView date={metadata.createdDate} />
+              },
+              {
+                name: "xmpMetadataDate",
+                value: <DateView date={metadata.xmpMetadataDate} />
+              },
+              "acMetadataCreator.displayName",
+              "acSubtype"
+            ]}
+            title={formatMessage("metadataUploadDetailsLabel")}
+          />
+          <CollapsableSection
+            collapserId="managed-attributes"
+            title={formatMessage("metadataManagedAttributesLabel")}
+          >
+            <ManagedAttributesViewer
+              values={metadata.managedAttributeValues}
+              managedAttributeApiPath={id =>
+                `objectstore-api/managed-attribute/${id}`
+              }
+            />
+          </CollapsableSection>
+          <MetadataAttributeGroup
+            metadata={metadata}
+            fields={[
+              "originalFilename",
+              {
+                name: "acDigitizationDate",
+                value: <DateView date={metadata.acDigitizationDate} />
+              },
+              "fileExtension",
+              "dcCreator.displayName",
+              "dcType",
+              "dcFormat",
+              "acCaption",
+              "orientation"
+            ]}
+            title={formatMessage("metadataMediaDetailsLabel")}
+          />
+          <MetadataAttributeGroup
+            metadata={metadata}
+            fields={["dcRights", "xmpRightsWebStatement"]}
+            title={formatMessage("metadataRightsDetailsLabel")}
+          />
+          <MetadataAttributeGroup
+            metadata={metadata}
+            fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+            title={formatMessage("metadataFileStorageDetailsLabel")}
+          />
+        </>
+      )}
     </div>
   );
 }
