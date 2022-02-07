@@ -29,7 +29,7 @@ export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  const id = router.query.id?.toString();
+  const id = router?.query.id?.toString();
 
   const { apiClient } = useApiClient();
 
@@ -90,7 +90,7 @@ function ExternalResourceMetatdataForm({
   router,
   metadata
 }: ExternalResourceMetatdataProps) {
-  const { formatMessage, locale } = useDinaIntl();
+  const { locale } = useDinaIntl();
   const { groupNames } = useAccount();
 
   const initialValues = metadata
@@ -139,14 +139,6 @@ function ExternalResourceMetatdataForm({
       acSubtype: acSubtype?.acSubtype ?? null,
       bucket: metadataValues.bucket ?? groupNames?.[0]
     };
-
-    // Remove blank managed attribute values from the map:
-    const blankValues: any[] = ["", null];
-    for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
-      if (blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])) {
-        delete metadataEdit?.managedAttributeValues?.[maKey];
-      }
-    }
 
     const savedMeta = await save(
       [

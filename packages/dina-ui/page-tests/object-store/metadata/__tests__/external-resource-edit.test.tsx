@@ -9,6 +9,8 @@ import ExternalResourceMetadataPage from "../../../../pages/object-store/metadat
 
 const mockGet = jest.fn(async path => {
   switch (path) {
+    case "objectstore-api/metadata/undefined":
+      return {};
     case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
       return { data: TEST_METADATA };
     case "objectstore-api/license":
@@ -59,7 +61,8 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
-  resourceExternalURI: "http://agr.gc.ca "
+  resourceExternalURI: "http://agr.gc.ca ",
+  acCaption: "test caption"
 };
 
 const mockSave = jest.fn();
@@ -80,6 +83,92 @@ jest.mock("next/router", () => ({
 describe("Metadata external resource edit page.", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("Lets you add a new external resource metadata.", async () => {
+    const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
+      apiContext
+    });
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".dcFormat-field input").first().prop("value")
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(".fileExtension-field input").first().prop("value")
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(".resourceExternalURI-field input").first().prop("value")
+    ).toBeFalsy();
+
+    expect(
+      wrapper.find(".acCaption-field input").first().prop("value")
+    ).toBeFalsy();
+
+    // Set values:
+    wrapper
+      .find(".dcFormat-field input")
+      .first()
+      .simulate("change", {
+        target: {
+          value: "JPEG"
+        }
+      });
+
+    wrapper
+      .find(".fileExtension-field input")
+      .first()
+      .simulate("change", {
+        target: {
+          value: "jpg"
+        }
+      });
+
+    wrapper
+      .find(".resourceExternalURI-field input")
+      .first()
+      .simulate("change", {
+        target: {
+          value: "http://agr.gc.ca"
+        }
+      });
+
+    wrapper
+      .find(".acCaption-field input")
+      .first()
+      .simulate("change", {
+        target: {
+          value: "test caption"
+        }
+      });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave).toBeCalledWith(
+      [
+        {
+          resource: {
+            bucket: "aafc",
+            dcFormat: "JPEG",
+            fileExtension: "jpg",
+            acSubtype: null,
+            acCaption: "test caption",
+            resourceExternalURI: "http://agr.gc.ca"
+          },
+          type: "metadata"
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
+  });
+
+  it("Lets you edit an existing external resource metadata.", async () => {
     mockSave.mockImplementation(args => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
       push: () => undefined,
@@ -87,9 +176,6 @@ describe("Metadata external resource edit page.", () => {
         id: "25f81de5-bbee-430c-b5fa-71986b70e612"
       }
     });
-  });
-
-  it("Lets you edit the Metadata.", async () => {
     const wrapper = mountWithAppContext(<ExternalResourceMetadataPage />, {
       apiContext
     });
@@ -138,7 +224,8 @@ describe("Metadata external resource edit page.", () => {
             resourceExternalURI: "http://agr.gc.ca ",
             xmpRightsUsageTerms: "",
             xmpRightsWebStatement:
-              "https://open.canada.ca/en/open-government-licence-canada"
+              "https://open.canada.ca/en/open-government-licence-canada",
+            acCaption: "test caption"
           },
           type: "metadata"
         }
