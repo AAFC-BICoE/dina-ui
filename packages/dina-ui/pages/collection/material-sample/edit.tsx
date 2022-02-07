@@ -461,7 +461,10 @@ export function MaterialSampleForm({
                     managedAttributeApiPath="collection-api/managed-attribute"
                     managedAttributeComponent="MATERIAL_SAMPLE"
                     fieldSetProps={{
-                      id: navIds.managedAttributes
+                      id: navIds.managedAttributes,
+                      legend: (
+                        <DinaMessage id="materialSampleManagedAttributes" />
+                      )
                     }}
                     showCustomViewDropdown={true}
                   />

@@ -7,7 +7,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CustomView } from "../../../types/collection-api";
 import { useManagedAttributesViewEditModal } from "./managed-attributes-view-modal";
 
@@ -28,7 +28,8 @@ export function ManagedAttributesViewSelect({
   onChange
 }: ManagedAttributesViewSelectProps) {
   const { openManagedAttributesViewEditModal } =
-    useManagedAttributesViewEditModal();
+    useManagedAttributesViewEditModal(managedAttributeComponent);
+  const { formatMessage } = useDinaIntl();
 
   const [lastUpdate, setLastUpdate] = useState(Date.now());
 
@@ -65,17 +66,27 @@ export function ManagedAttributesViewSelect({
               value={value}
               // Refresh the query whenever the custom view is changed.
               key={lastUpdate}
+              asyncOptions={[
+                {
+                  label: formatMessage("createCustomView"),
+                  // Open the modal for creating a new custom view:
+                  getResource: () =>
+                    new Promise(resolve => {
+                      openManagedAttributesViewEditModal(null, resolve);
+                    })
+                }
+              ]}
             />
           )}
         </FieldSpy>
       </label>
       {value?.id && (
         <FormikButton
-          className="btn btn-outline-secondary"
+          className="btn btn-outline-secondary custom-view-edit-button"
           // Open the custom view's editor modal, then
           onClick={() => openManagedAttributesViewEditModal(value.id, onChange)}
         >
-          <DinaMessage id="editButtonText" />
+          <DinaMessage id="editThisCustomView" />
         </FormikButton>
       )}
     </div>

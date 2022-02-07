@@ -5,18 +5,16 @@ import {
   dateCell,
   FilterAttribute,
   ListPageLayout,
-  stringArrayCell,
-  useBulkGet,
-  withResponse
+  useBulkGet
 } from "common-ui";
 import Link from "next/link";
-import { ManagedAttribute } from "packages/dina-ui/types/objectstore-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
+import { ManagedAttribute } from "../../../types/objectstore-api";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = ["name"];
 

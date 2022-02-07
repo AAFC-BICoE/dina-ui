@@ -45,7 +45,6 @@ import {
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
   nominatimAddressDetailSearch,
@@ -832,6 +831,7 @@ export function CollectingEventFormLayout({
             fieldSetProps={{
               legend: <DinaMessage id="collectingEventManagedAttributes" />
             }}
+            showCustomViewDropdown={true}
           />
         </DinaFormSection>
       )}

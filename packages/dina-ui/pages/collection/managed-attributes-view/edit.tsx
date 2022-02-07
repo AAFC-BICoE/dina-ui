@@ -42,7 +42,9 @@ import {
 import { ManagedAttribute } from "../../../types/objectstore-api";
 
 export interface ManagedAttributesViewFormProps {
-  fetchedView?: CustomView;
+  data?: InputResource<CustomView>;
+  /** Default component in the form's initialValues. */
+  defaultManagedAttributeComponent?: string;
   /** Disable the attribute component field. */
   disabledAttributeComponent?: boolean;
   onSaved: (data: PersistedResource<CustomView>) => Promise<void>;
@@ -95,10 +97,7 @@ export default function ManagedAttributesViewEditPage() {
           </h1>
           {id ? (
             withResponse(query, ({ data }) => (
-              <ManagedAttributesViewForm
-                fetchedView={data}
-                onSaved={goToViewPage}
-              />
+              <ManagedAttributesViewForm data={data} onSaved={goToViewPage} />
             ))
           ) : (
             <ManagedAttributesViewForm onSaved={goToViewPage} />
@@ -111,15 +110,17 @@ export default function ManagedAttributesViewEditPage() {
 
 export function ManagedAttributesViewForm({
   onSaved,
-  fetchedView,
-  disabledAttributeComponent
+  data,
+  disabledAttributeComponent,
+  defaultManagedAttributeComponent
 }: ManagedAttributesViewFormProps) {
   const initialViewConfiguration: Partial<ManagedAttributesView> = {
     type: "managed-attributes-view",
-    attributeKeys: []
+    attributeKeys: [],
+    managedAttributeComponent: defaultManagedAttributeComponent
   };
 
-  const initialValues = fetchedView ?? {
+  const initialValues = data ?? {
     type: "custom-view",
     restrictToCreatedBy: true,
     viewConfiguration: initialViewConfiguration
@@ -144,7 +145,7 @@ export function ManagedAttributesViewForm({
   const buttonBar = (
     <ButtonBar>
       <BackButton
-        entityId={fetchedView?.id}
+        entityId={data?.id}
         entityLink="/collection/managed-attributes-view"
       />
       <SubmitButton className="ms-auto" />
@@ -152,17 +153,19 @@ export function ManagedAttributesViewForm({
   );
 
   return (
-    <DinaForm
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validationSchema={customViewSchema}
-    >
-      {buttonBar}
-      <ManagedAttributesViewFormLayout
-        disabledAttributeComponent={disabledAttributeComponent}
-      />
-      {buttonBar}
-    </DinaForm>
+    <div className="managed-attributes-view-form">
+      <DinaForm
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validationSchema={customViewSchema}
+      >
+        {buttonBar}
+        <ManagedAttributesViewFormLayout
+          disabledAttributeComponent={disabledAttributeComponent}
+        />
+        {buttonBar}
+      </DinaForm>
+    </div>
   );
 }
 
@@ -197,24 +200,22 @@ export function ManagedAttributesViewFormLayout({
         <div className="row">
           <TextField name="name" className="col-sm-6" />
         </div>
-        {!disabledAttributeComponent && (
-          <div className="row">
-            <SelectField
-              className="col-md-6"
-              name="viewConfiguration.managedAttributeComponent"
-              customName="managedAttributeComponent"
-              options={ATTRIBUTE_COMPONENT_OPTIONS}
-              readOnlyRender={value =>
-                ATTRIBUTE_COMPONENT_OPTIONS.find(
-                  option => option.value === value
-                )?.label
-              }
-              onChange={(_, form) =>
-                form.setFieldValue("viewConfiguration.attributeKeys", [])
-              }
-            />
-          </div>
-        )}
+        <div className="row">
+          <SelectField
+            className="col-md-6"
+            disabled={disabledAttributeComponent}
+            name="viewConfiguration.managedAttributeComponent"
+            customName="managedAttributeComponent"
+            options={ATTRIBUTE_COMPONENT_OPTIONS}
+            readOnlyRender={value =>
+              ATTRIBUTE_COMPONENT_OPTIONS.find(option => option.value === value)
+                ?.label
+            }
+            onChange={(_, form) =>
+              form.setFieldValue("viewConfiguration.attributeKeys", [])
+            }
+          />
+        </div>
       </DinaFormSection>
       <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
         {managedAttributeComponent =>
@@ -383,7 +384,10 @@ function AttributesViewItem({
           </div>
           {!readOnly && (
             <div className="d-flex align-items-center gap-2">
-              <FormikButton className="btn" onClick={() => onRemoveClick()}>
+              <FormikButton
+                className="btn remove-attribute"
+                onClick={() => onRemoveClick()}
+              >
                 <RiDeleteBinLine size="1.8em" />
               </FormikButton>
               <GiMove size="1.8em" />

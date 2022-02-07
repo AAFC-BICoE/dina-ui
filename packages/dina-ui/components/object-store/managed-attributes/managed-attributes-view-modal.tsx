@@ -2,16 +2,20 @@ import { useModal, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   ManagedAttributesViewForm,
+  ManagedAttributesViewFormProps,
   useManagedAttributesView
 } from "../../../pages/collection/managed-attributes-view/edit";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CustomView } from "../../../types/collection-api";
 
-export function useManagedAttributesViewEditModal() {
+export function useManagedAttributesViewEditModal(
+  /** Default component to use in the modal form. */
+  defaultManagedAttributeComponent?: string
+) {
   const { closeModal, openModal } = useModal();
 
   function openManagedAttributesViewEditModal(
-    id: string,
+    id: string | null,
     onSaved: (customView: PersistedResource<CustomView>) => void
   ) {
     async function finishModal(customView: PersistedResource<CustomView>) {
@@ -28,7 +32,11 @@ export function useManagedAttributesViewEditModal() {
           </h2>
         </div>
         <div className="modal-body">
-          <EditManagedAttributesView id={id} onSaved={finishModal} />
+          <EditManagedAttributesView
+            id={id}
+            onSaved={finishModal}
+            defaultManagedAttributeComponent={defaultManagedAttributeComponent}
+          />
         </div>
         <div className="modal-footer">
           <button className="btn btn-dark" onClick={() => closeModal()}>
@@ -44,20 +52,30 @@ export function useManagedAttributesViewEditModal() {
 
 function EditManagedAttributesView({
   id,
-  onSaved
+  onSaved,
+  defaultManagedAttributeComponent
 }: {
-  id: string;
+  id: string | null;
   onSaved: (customView: PersistedResource<CustomView>) => Promise<void>;
+  defaultManagedAttributeComponent?: string;
 }) {
-  const query = useManagedAttributesView(id);
+  const query = useManagedAttributesView(id ?? undefined);
 
-  return withResponse(query, ({ data }) => (
+  const formProps: ManagedAttributesViewFormProps = {
+    onSaved,
+    // Don't allow changing the component inside the modal.
+    // This should probably not be changed at all after creation.
+    disabledAttributeComponent: true
+  };
+
+  return id ? (
+    withResponse(query, ({ data }) => (
+      <ManagedAttributesViewForm {...formProps} data={data} />
+    ))
+  ) : (
     <ManagedAttributesViewForm
-      fetchedView={data}
-      onSaved={onSaved}
-      // Don't allow changing the component inside the modal.
-      // This should probably not be changed at all after creation.
-      disabledAttributeComponent={true}
+      {...formProps}
+      defaultManagedAttributeComponent={defaultManagedAttributeComponent}
     />
-  ));
+  );
 }
