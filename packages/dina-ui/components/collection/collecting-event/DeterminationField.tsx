@@ -346,7 +346,6 @@ export function DeterminationField({ id = "determination-section" }) {
                   valuesPath={fieldProps("managedAttributes").name}
                   managedAttributeApiPath="collection-api/managed-attribute"
                   managedAttributeComponent="DETERMINATION"
-                  managedAttributeKeyField="key"
                   attributeSelectorWidth={12}
                   fieldSetProps={{
                     legend: <DinaMessage id="determinationManagedAttributes" />,

@@ -16,7 +16,7 @@ export interface ManagedAttributesViewSelectProps {
    * The managed attribute component e.g. MATERIAL_SAMPLE.
    * Passed as a filter to the custom-view query.
    */
-  managedAttributeComponent: string;
+  managedAttributeComponent?: string;
   onChange: (newValue: PersistedResource<CustomView>) => void;
   value?: PersistedResource<CustomView>;
 }
@@ -47,8 +47,10 @@ export function ManagedAttributesViewSelect({
               filter={input => ({
                 // Filter by "managed-attributes-view" to omit unrelated custom-view records:
                 "viewConfiguration.type": "managed-attributes-view",
-                "viewConfiguration.managedAttributeComponent":
-                  managedAttributeComponent,
+                ...(managedAttributeComponent && {
+                  "viewConfiguration.managedAttributeComponent":
+                    managedAttributeComponent
+                }),
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
                 // Filter by the form's group:

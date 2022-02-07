@@ -56,7 +56,6 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          managedAttributeKeyField="key"
         />
       </DinaForm>,
       { apiContext }
@@ -97,7 +96,6 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          managedAttributeKeyField="key"
         />
       </DinaForm>,
       { apiContext }

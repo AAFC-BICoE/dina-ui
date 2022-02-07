@@ -829,7 +829,6 @@ export function CollectingEventFormLayout({
             valuesPath="managedAttributes"
             managedAttributeApiPath="collection-api/managed-attribute"
             managedAttributeComponent="COLLECTING_EVENT"
-            managedAttributeKeyField="key"
             fieldSetProps={{
               legend: <DinaMessage id="collectingEventManagedAttributes" />
             }}

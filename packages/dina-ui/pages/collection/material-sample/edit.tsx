@@ -460,7 +460,6 @@ export function MaterialSampleForm({
                     valuesPath="managedAttributes"
                     managedAttributeApiPath="collection-api/managed-attribute"
                     managedAttributeComponent="MATERIAL_SAMPLE"
-                    managedAttributeKeyField="key"
                     fieldSetProps={{
                       id: navIds.managedAttributes
                     }}

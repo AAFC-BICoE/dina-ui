@@ -30,18 +30,11 @@ export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
   valuesPath: string;
   managedAttributeApiPath: string;
-  useKeyInFilter?: boolean;
 
   /**
    * The target component of the managed attribute e.g. COLLECTING_EVENT.
    */
-  managedAttributeComponent: string;
-
-  /**
-   * The key field on the ManagedAttribute to use as the key in the managed attribute map.
-   * e.g. "id".
-   */
-  managedAttributeKeyField?: string;
+  managedAttributeComponent?: string;
 
   /** Bootstrap column width of the "Managed Attributes In Use selector. e.g. 6 or 12. */
   attributeSelectorWidth?: number;
@@ -58,7 +51,6 @@ export function ManagedAttributesEditor({
   valuesPath,
   managedAttributeApiPath,
   managedAttributeComponent,
-  managedAttributeKeyField = "key",
   attributeSelectorWidth = 6,
   fieldSetProps,
   showCustomViewDropdown
@@ -108,8 +100,9 @@ export function ManagedAttributesEditor({
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
         const { dataWithNullForMissing: fetchedAttributes, loading } =
           useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map(
-              key => `${managedAttributeComponent}.${key}`
+            ids: visibleAttributeKeys.map(key =>
+              // Use the component prefix if needed by the back-end:
+              compact([managedAttributeComponent, key]).join(".")
             ),
             listPath: managedAttributeApiPath
           });
@@ -165,7 +158,6 @@ export function ManagedAttributesEditor({
                     <ManagedAttributeMultiSelect
                       managedAttributeApiPath={managedAttributeApiPath}
                       managedAttributeComponent={managedAttributeComponent}
-                      managedAttributeKeyField={managedAttributeKeyField}
                       onChange={setVisibleAttributeKeys}
                       visibleAttributes={visibleAttributes}
                       loading={loading}
@@ -175,10 +167,7 @@ export function ManagedAttributesEditor({
                 {!!visibleAttributes.length && <hr />}
                 <div className="row">
                   {visibleAttributes.map(attribute => {
-                    const attributeKey = get(
-                      attribute,
-                      managedAttributeKeyField
-                    );
+                    const attributeKey = attribute.key;
 
                     const attributePath = `${valuesPath}.${attributeKey}`;
                     const props = {
@@ -256,7 +245,6 @@ export function ManagedAttributesEditor({
 export interface ManagedAttributeMultiSelectProps {
   managedAttributeComponent?: string;
   managedAttributeApiPath: string;
-  managedAttributeKeyField: string;
 
   onChange: (newValue: string[]) => void;
   visibleAttributes: PersistedResource<ManagedAttribute>[];
@@ -267,7 +255,6 @@ export interface ManagedAttributeMultiSelectProps {
 export function ManagedAttributeMultiSelect({
   managedAttributeComponent,
   managedAttributeApiPath,
-  managedAttributeKeyField: keyField,
   onChange,
   visibleAttributes,
   loading
@@ -279,7 +266,7 @@ export function ManagedAttributeMultiSelect({
       | PersistedResource<ManagedAttribute>[]
   ) {
     const newAttributes = castArray(newValues);
-    const newKeys = newAttributes.map(it => get(it, keyField));
+    const newKeys = newAttributes.map(it => get(it, "key"));
     onChange(newKeys);
   }
 
@@ -290,7 +277,7 @@ export function ManagedAttributeMultiSelect({
         ...(managedAttributeComponent ? { managedAttributeComponent } : {})
       })}
       model={managedAttributeApiPath}
-      optionLabel={attribute => managedAttributeLabel(attribute, keyField)}
+      optionLabel={attribute => managedAttributeLabel(attribute)}
       isMulti={true}
       isLoading={loading}
       onChange={onChangeInternal}
@@ -299,8 +286,11 @@ export function ManagedAttributeMultiSelect({
   );
 }
 
-function managedAttributeLabel(attribute: ManagedAttribute, keyField: string) {
+function managedAttributeLabel(attribute: ManagedAttribute) {
   return (
-    get(attribute, "name") || get(attribute, keyField) || get(attribute, "id")
+    get(attribute, "name") ||
+    get(attribute, "key") ||
+    get(attribute, "id") ||
+    ""
   );
 }
