@@ -16,6 +16,7 @@ export default function MaterialSampleTypeDetailsPage() {
       type="material-sample-type"
       apiBaseUrl="/collection-api"
       isRestricted={true}
+      showRevisionsLink={true}
     />
   );
 }

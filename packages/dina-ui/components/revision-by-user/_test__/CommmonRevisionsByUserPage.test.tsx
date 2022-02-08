@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { OBJECT_STORE_REVISION_ROW_CONFIG } from "../../revisions/revision-row-configs/objectstore-revision-row-configs";
+import { OBJECT_STORE_MODULE_REVISION_ROW_CONFIG } from "../../revisions/revision-modules";
 import RevisionsByUserPage, {
   AuthorFilterForm
 } from "../CommonRevisionsByUserPage";
@@ -44,7 +44,7 @@ describe("MetadataRevisionListPage", () => {
     const wrapper = mountWithAppContext(
       <RevisionsByUserPage
         snapshotPath="objectstore-api/audit-snapshot"
-        revisionRowConfigsByType={OBJECT_STORE_REVISION_ROW_CONFIG}
+        revisionRowConfigsByType={OBJECT_STORE_MODULE_REVISION_ROW_CONFIG}
       />,
       {
         apiContext: { apiClient: { get: mockGet } as any }

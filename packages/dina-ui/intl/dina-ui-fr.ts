@@ -262,9 +262,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_email: "Courriel",
   field_endDate: "Date de fin",
   field_endEventDateTime: "Date et heure de l'événement final",
-  field_externallyIsolatedBy: "Isolé par",
-  field_externallyIsolatedOn: "Isolé le ",
-  field_externallyIsolationRemarks: "Isolation - remarques",
+  field_isolatedBy: "Isolé par",
+  field_isolatedOn: "Isolé le ",
+  field_isolationRemarks: "Isolation - remarques",
   field_familyNames: "Noms de famille",
   field_familyNames_tooltip:
     "Nom(s) de famille, y compris les noms de famille composés",

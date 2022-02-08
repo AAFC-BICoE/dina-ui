@@ -45,6 +45,8 @@ export function ReadOnlyValue({ value, link }: ReadOnlyValueProps) {
         moment(value).format()
       ) : isNumber(value) ? (
         value.toString()
+      ) : value ? (
+        JSON.stringify(value)
       ) : null}
     </div>
   );

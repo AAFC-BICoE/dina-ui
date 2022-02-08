@@ -88,8 +88,8 @@ export function MetadataFileView({
         <div className="mb-3 metadata-caption">
           <strong>
             <DinaMessage id="field_acCaption" />:
-          </strong>
-          {` ${metadata.acCaption}`}
+          </strong>{" "}
+          {metadata.acCaption}
         </div>
       </div>
     </div>
