@@ -15,15 +15,24 @@ import {
 } from "common-ui";
 import { NextRouter, useRouter } from "next/router";
 import { Field } from "formik";
-import { keys } from "lodash";
-import { Footer, Head, Nav } from "../../../components";
+import {
+  Footer,
+  Head,
+  Nav,
+  NotPubliclyReleasableWarning,
+  PersonSelectField,
+  TagsAndRestrictionsSection
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import { DCTYPE_OPTIONS } from "../metadata/single-record-edit";
+import {
+  DCTYPE_OPTIONS,
+  ORIENTATION_OPTIONS
+} from "../metadata/single-record-edit";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -163,25 +172,27 @@ function ExternalResourceMetatdataForm({
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+      <NotPubliclyReleasableWarning />
       {buttonBar}
+      <TagsAndRestrictionsSection
+        resourcePath="objectstore-api/metadata"
+        tagsFieldName="acTags"
+        groupSelectorName="bucket"
+      />
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
-          <TextField
-            className="col-md-6"
-            name="fileExtension"
-            label={formatMessage("metadataFileExtensionLabel")}
-          />
           <TextField
             className="col-md-6"
             name="resourceExternalURL"
             label={formatMessage("metadataResourceExternalURLLabel")}
           />
+          <TextField className="col-md-6" name="dcFormat" />
+          <TextField className="col-md-6" name="acCaption" />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
             showTime={true}
           />
-          <TextField className="col-md-6" name="dcFormat" />
         </div>
         <div className="row">
           <SelectField
@@ -206,7 +217,23 @@ function ExternalResourceMetatdataForm({
           </Field>
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="acCaption" />
+          <TextField
+            className="col-md-6"
+            name="fileExtension"
+            label={formatMessage("metadataFileExtensionLabel")}
+          />
+          <PersonSelectField
+            className="col-md-6"
+            name="dcCreator"
+            label={formatMessage("field_dcCreator.displayName")}
+          />
+          <SelectField
+            className="col-md-6"
+            name="orientation"
+            options={ORIENTATION_OPTIONS}
+            tooltipImage="/static/images/orientationDiagram.jpg"
+            tooltipImageAlt="field_orientation_tooltipAlt"
+          />
         </div>
       </FieldSet>
       <FieldSet legend={<DinaMessage id="metadataRightsDetailsLabel" />}>

@@ -411,6 +411,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
   metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
+  metadataExternalResourceDetailsLabel: "External Resource Details",
   metadataFileExtensionLabel: "File Extension",
   metadataFileIdentifierLabel: "File Identifier",
   metadataFileStorageDetailsLabel: "File Storage",

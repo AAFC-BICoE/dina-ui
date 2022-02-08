@@ -55,85 +55,72 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const isExternalResource = !!metadata.resourceExternalURL;
   return (
     <div>
-      {isExternalResource ? (
-        <>
-          <MetadataAttributeGroup
-            metadata={metadata}
-            fields={[
-              {
-                name: "group",
-                value: <GroupLabel groupName={metadata.group} />
-              },
-              "dcType",
-              "dcFormat",
-              "acCaption",
-              "acSubtype",
-              "resourceExternalURL"
-            ]}
-            title={formatMessage("metadataMediaDetailsLabel")}
+      <MetadataAttributeGroup
+        metadata={metadata}
+        fields={[
+          {
+            name: "group",
+            value: <GroupLabel groupName={metadata.group} />
+          },
+          {
+            name: "createdDate",
+            value: <DateView date={metadata.createdDate} />
+          },
+          {
+            name: "xmpMetadataDate",
+            value: <DateView date={metadata.xmpMetadataDate} />
+          },
+          "acMetadataCreator.displayName",
+          "acSubtype"
+        ]}
+        title={
+          isExternalResource
+            ? formatMessage("metadataExternalResourceDetailsLabel")
+            : formatMessage("metadataUploadDetailsLabel")
+        }
+      />
+      {!isExternalResource && (
+        <CollapsableSection
+          collapserId="managed-attributes"
+          title={formatMessage("metadataManagedAttributesLabel")}
+        >
+          <ManagedAttributesViewer
+            values={metadata.managedAttributeValues}
+            managedAttributeApiPath={id =>
+              `objectstore-api/managed-attribute/${id}`
+            }
           />
-        </>
-      ) : (
-        <>
-          <MetadataAttributeGroup
-            metadata={metadata}
-            fields={[
-              {
-                name: "group",
-                value: <GroupLabel groupName={metadata.group} />
-              },
-              {
-                name: "createdDate",
-                value: <DateView date={metadata.createdDate} />
-              },
-              {
-                name: "xmpMetadataDate",
-                value: <DateView date={metadata.xmpMetadataDate} />
-              },
-              "acMetadataCreator.displayName",
-              "acSubtype"
-            ]}
-            title={formatMessage("metadataUploadDetailsLabel")}
-          />
-          <CollapsableSection
-            collapserId="managed-attributes"
-            title={formatMessage("metadataManagedAttributesLabel")}
-          >
-            <ManagedAttributesViewer
-              values={metadata.managedAttributeValues}
-              managedAttributeApiPath={id =>
-                `objectstore-api/managed-attribute/${id}`
-              }
-            />
-          </CollapsableSection>
-          <MetadataAttributeGroup
-            metadata={metadata}
-            fields={[
-              "originalFilename",
-              {
-                name: "acDigitizationDate",
-                value: <DateView date={metadata.acDigitizationDate} />
-              },
-              "fileExtension",
-              "dcCreator.displayName",
-              "dcType",
-              "dcFormat",
-              "acCaption",
-              "orientation"
-            ]}
-            title={formatMessage("metadataMediaDetailsLabel")}
-          />
-          <MetadataAttributeGroup
-            metadata={metadata}
-            fields={["dcRights", "xmpRightsWebStatement"]}
-            title={formatMessage("metadataRightsDetailsLabel")}
-          />
-          <MetadataAttributeGroup
-            metadata={metadata}
-            fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
-            title={formatMessage("metadataFileStorageDetailsLabel")}
-          />
-        </>
+        </CollapsableSection>
+      )}
+      <MetadataAttributeGroup
+        metadata={metadata}
+        fields={[
+          ...(isExternalResource ? ["resourceExternalURL"] : []),
+          "dcFormat",
+          "acCaption",
+          {
+            name: "acDigitizationDate",
+            value: <DateView date={metadata.acDigitizationDate} />
+          },
+          "dcType",
+          ...(!isExternalResource ? ["originalFilename"] : []),
+          "fileExtension",
+          "dcCreator.displayName",
+          "orientation"
+        ]}
+        title={formatMessage("metadataMediaDetailsLabel")}
+      />
+      <MetadataAttributeGroup
+        metadata={metadata}
+        fields={["dcRights", "xmpRightsWebStatement"]}
+        title={formatMessage("metadataRightsDetailsLabel")}
+      />
+      {!isExternalResource && (
+        <MetadataAttributeGroup
+          metadata={metadata}
+          fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+          title={formatMessage("metadataFileStorageDetailsLabel")}
+        />
       )}
     </div>
   );
