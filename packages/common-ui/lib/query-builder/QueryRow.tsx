@@ -115,7 +115,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       name: `${name}[${idx}].${fieldName}`
     };
   }
-
   return (
     <div className="row">
       <div className="col-md-6 d-flex">
@@ -145,14 +144,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           {visibility.text && (
             <TextField
               name={fieldProps("matchValue", index).name}
-              className="me-2"
+              className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
           {visibility.date && (
             <DateField
               name={fieldProps("date", index).name}
-              className="me-2"
+              className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
@@ -160,7 +159,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             <SelectField
               name={fieldProps("matchType", index).name}
               options={queryRowMatchOptions}
-              className="me-2"
+              className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
@@ -168,14 +167,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             <SelectField
               name={fieldProps("boolean", index).name}
               options={queryRowBooleanOptions}
-              className="me-2"
+              className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
           {visibility.number && (
             <NumberField
               name={fieldProps("number", index).name}
-              className="me-2"
+              className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
