@@ -68,7 +68,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
               "dcFormat",
               "acCaption",
               "acSubtype",
-              "resourceExternalURI"
+              "resourceExternalURL"
             ]}
             title={formatMessage("metadataMediaDetailsLabel")}
           />
