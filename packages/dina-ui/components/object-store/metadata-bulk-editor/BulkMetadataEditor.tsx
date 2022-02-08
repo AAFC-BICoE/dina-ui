@@ -43,7 +43,10 @@ export interface BulkMetadataEditorProps {
   objectUploadIds?: string[];
   group?: string;
   defaultValuesConfig?: number;
-  afterMetadatasSaved: (metadataIds: string[]) => Promise<void>;
+  afterMetadatasSaved: (
+    metadataIds: string[],
+    isExternalResource?: boolean
+  ) => Promise<void>;
 }
 
 /** Editable row data */
@@ -73,6 +76,8 @@ export function BulkMetadataEditor({
   ] = useState<ManagedAttribute[]>([]);
 
   const { locale } = useDinaIntl();
+
+  const [loadedMetadata, setLoadedMetadata] = useState<Metadata[]>([]);
 
   const { storedDefaultValuesConfigs } = useStoredDefaultValuesConfigs();
 
@@ -105,7 +110,6 @@ export function BulkMetadataEditor({
           ]
         }
       );
-
       metadatas.push(...existingMetadatas);
 
       // When adding new Metadatas based on existing ObjectUploads:
@@ -200,7 +204,7 @@ export function BulkMetadataEditor({
         }
       )
     );
-
+    if (metadatas.length === 1) setLoadedMetadata(metadatas);
     return newTableData;
   }
 
@@ -303,7 +307,14 @@ export function BulkMetadataEditor({
       // When editing existing Metadatas:
       await save(editedMetadatas, { apiBaseUrl: "/objectstore-api" });
 
-      await afterMetadatasSaved(metadataIds);
+      // Ensure if when bulk edit 1 metadata, pass on the isExternalResource info
+      // to be directed to the respective external resource view page for single metadata case
+      await afterMetadatasSaved(
+        metadataIds,
+        loadedMetadata.length === 1
+          ? !!loadedMetadata[0].resourceExternalURL
+          : false
+      );
     } else if (objectUploadIds) {
       // When adding new Metadatas based on existing ObjectUploads:
       // Create the Metadatas:

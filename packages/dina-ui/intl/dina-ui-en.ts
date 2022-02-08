@@ -173,7 +173,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
   editExternalResourceTitle: "Edit External Resource",
-  externalResourceListTitle: "External Resource",
+  externalResourceListTitle: "External Resources",
   extensionListTitle: " Field Extensions",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
