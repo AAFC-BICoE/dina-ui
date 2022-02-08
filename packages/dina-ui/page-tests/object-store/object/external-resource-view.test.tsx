@@ -12,7 +12,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
-  resourceExternalURI: "http://agr.gc.ca",
+  resourceExternalURL: "http://agr.gc.ca",
   acCaption: "test caption"
 };
 

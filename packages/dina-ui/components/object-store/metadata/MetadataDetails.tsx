@@ -52,7 +52,7 @@ export function useMetadataQuery(id?: string) {
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage } = useDinaIntl();
-  const isExternalResource = !!metadata.resourceExternalURI;
+  const isExternalResource = !!metadata.resourceExternalURL;
   return (
     <div>
       {isExternalResource ? (

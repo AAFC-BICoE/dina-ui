@@ -240,7 +240,7 @@ export default function MetadataListPage() {
                   <div style={{ height: "2.5rem" }}>
                     <Link
                       href={`/object-store/object/${
-                        previewMetadata.resourceExternalURI
+                        previewMetadata.resourceExternalURL
                           ? "external-resource-view"
                           : "view"
                       }?id=${previewMetadata.id}`}

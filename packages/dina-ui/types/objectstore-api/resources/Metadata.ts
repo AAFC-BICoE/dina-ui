@@ -34,7 +34,7 @@ export interface MetadataAttributes {
   acHashFunction?: string;
   acHashValue?: string;
 
-  resourceExternalURI?: string;
+  resourceExternalURL?: string;
 }
 
 export interface MetadataRelationships {

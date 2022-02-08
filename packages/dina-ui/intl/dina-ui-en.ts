@@ -426,6 +426,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataMediaDetailsLabel: "Media",
   metadataObjectTypeLabel: "Stored Object Type",
   metadataPageLink: "Details Page",
+  metadataResourceExternalURLLabel: "Resource External URL",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",

@@ -61,7 +61,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
     "https://open.canada.ca/en/open-government-licence-canada",
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
-  resourceExternalURI: "http://agr.gc.ca ",
+  resourceExternalURL: "http://agr.gc.ca ",
   acCaption: "test caption"
 };
 
@@ -106,7 +106,7 @@ describe("Metadata external resource edit page.", () => {
     ).toBeFalsy();
 
     expect(
-      wrapper.find(".resourceExternalURI-field input").first().prop("value")
+      wrapper.find(".resourceExternalURL-field input").first().prop("value")
     ).toBeFalsy();
 
     expect(
@@ -133,7 +133,7 @@ describe("Metadata external resource edit page.", () => {
       });
 
     wrapper
-      .find(".resourceExternalURI-field input")
+      .find(".resourceExternalURL-field input")
       .first()
       .simulate("change", {
         target: {
@@ -164,7 +164,7 @@ describe("Metadata external resource edit page.", () => {
             fileExtension: ".jpg",
             acSubtype: null,
             acCaption: "test caption",
-            resourceExternalURI: "http://agr.gc.ca"
+            resourceExternalURL: "http://agr.gc.ca"
           },
           type: "metadata"
         }
@@ -226,7 +226,7 @@ describe("Metadata external resource edit page.", () => {
             dcType: "MOVING_IMAGE",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",
             type: "metadata",
-            resourceExternalURI: "http://agr.gc.ca ",
+            resourceExternalURL: "http://agr.gc.ca ",
             xmpRightsUsageTerms: "",
             xmpRightsWebStatement:
               "https://open.canada.ca/en/open-government-licence-canada",

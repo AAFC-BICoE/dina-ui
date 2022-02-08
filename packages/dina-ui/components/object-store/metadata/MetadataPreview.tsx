@@ -39,7 +39,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           <div className="metadata-edit-link">
             <Link
               href={`/object-store/metadata/${
-                metadata.resourceExternalURI
+                metadata.resourceExternalURL
                   ? "external-resource-edit"
                   : "single-record-edit"
               }?id=${metadataId}`}
@@ -50,7 +50,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
             </Link>
           </div>
           <Link
-            href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata.resourceExternalURI}`}
+            href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata.resourceExternalURL}`}
           >
             <a className="btn btn-info metadata-revisions-link">
               <DinaMessage id="revisionsButtonText" />

@@ -90,7 +90,7 @@ function ExternalResourceMetatdataForm({
   router,
   metadata
 }: ExternalResourceMetatdataProps) {
-  const { locale } = useDinaIntl();
+  const { locale, formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
 
   const initialValues = metadata
@@ -166,8 +166,16 @@ function ExternalResourceMetatdataForm({
       {buttonBar}
       <FieldSet legend={<DinaMessage id="metadataMediaDetailsLabel" />}>
         <div className="row">
-          <TextField className="col-md-6" name="fileExtension" />
-          <TextField className="col-md-6" name="resourceExternalURI" />
+          <TextField
+            className="col-md-6"
+            name="fileExtension"
+            label={formatMessage("metadataFileExtensionLabel")}
+          />
+          <TextField
+            className="col-md-6"
+            name="resourceExternalURL"
+            label={formatMessage("metadataResourceExternalURLLabel")}
+          />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
