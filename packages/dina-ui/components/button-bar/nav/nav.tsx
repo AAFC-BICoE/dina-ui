@@ -153,7 +153,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
         <DinaMessage id="uploadPageTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/metadata/external-resource-edit">
-        <DinaMessage id="externalResourceTitle" />
+        <DinaMessage id="externalResourceListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object/list">
         <DinaMessage id="objectListTitle" />

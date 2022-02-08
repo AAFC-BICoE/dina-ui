@@ -54,13 +54,13 @@ export default function ExternalResourceMetadataPage() {
 
   return (
     <div>
-      <Head title={formatMessage("inputExternalResourceTitle")} />
+      <Head title={formatMessage("externalResourceListTitle")} />
       <Nav />
       <main className="container">
         {id ? (
           <div>
             <h1 id="wb-cont">
-              <DinaMessage id="inputExternalResourceTitle" />
+              <DinaMessage id="editExternalResourceTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
               <ExternalResourceMetatdataForm metadata={data} router={router} />
@@ -69,7 +69,7 @@ export default function ExternalResourceMetadataPage() {
         ) : (
           <div>
             <h1 id="wb-cont">
-              <DinaMessage id="inputExternalResourceTitle" />
+              <DinaMessage id="addExternalResourceTitle" />
             </h1>
             <ExternalResourceMetatdataForm router={router} />
           </div>
