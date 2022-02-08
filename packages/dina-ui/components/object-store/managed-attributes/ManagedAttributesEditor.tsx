@@ -219,10 +219,7 @@ export function ManagedAttributesEditor({
                       ) : isIntegerAttr ? (
                         <NumberField {...props} />
                       ) : (
-                        <TextField
-                          {...props}
-                          inputProps={{ type: "search" }} // Adds the 'X' clear button in the text input.
-                        />
+                        <TextField {...props} />
                       )}
                     </label>
                   );

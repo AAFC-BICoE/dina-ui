@@ -456,18 +456,22 @@ export function MaterialSampleForm({
                   // Disabled the template's restrictions for this section:
                   enabledFields={null}
                 >
-                  <ManagedAttributesEditor
-                    valuesPath="managedAttributes"
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    managedAttributeComponent="MATERIAL_SAMPLE"
-                    fieldSetProps={{
-                      id: navIds.managedAttributes,
-                      legend: (
-                        <DinaMessage id="materialSampleManagedAttributes" />
-                      )
-                    }}
-                    showCustomViewDropdown={true}
-                  />
+                  <div className="row">
+                    <div className="col-md-6">
+                      <ManagedAttributesEditor
+                        valuesPath="managedAttributes"
+                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeComponent="MATERIAL_SAMPLE"
+                        fieldSetProps={{
+                          id: navIds.managedAttributes,
+                          legend: (
+                            <DinaMessage id="materialSampleManagedAttributes" />
+                          )
+                        }}
+                        showCustomViewDropdown={true}
+                      />
+                    </div>
+                  </div>
                 </DinaFormSection>
               )}
               <AttachmentsField

@@ -202,9 +202,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}
-              <FieldSet
-                legend={<DinaMessage id="materialSampleManagedAttributes" />}
-              >
+              <div className="row">
                 <div className="col-md-6">
                   <ManagedAttributesEditor
                     fieldSetProps={{
@@ -218,7 +216,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     showCustomViewDropdown={true}
                   />
                 </div>
-              </FieldSet>
+              </div>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (

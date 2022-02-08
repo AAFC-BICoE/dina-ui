@@ -352,6 +352,7 @@ export function DeterminationField({ id = "determination-section" }) {
                     enabledFields: null,
                     className: "non-strip"
                   }}
+                  showCustomViewDropdown={true}
                 />
               )}
             </div>

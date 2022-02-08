@@ -176,7 +176,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editSelectedAttachmentMetadata: "Edit Selected Attachment Metadata",
   editStorageUnitTitle: "Edit Storage Unit",
   editStorageUnitTypeTitle: "Edit Storage Type",
-  editThisCustomView: "Edit Custom View",
+  editThisCustomView: "Edit This Custom View",
   editWorkflowTemplateTitle: "Edit Workflow Template",
   elevationInMeters: "Elevation in Meters",
   enableDateRangeLabel: "Enable Date Range",
