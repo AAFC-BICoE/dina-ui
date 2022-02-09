@@ -381,6 +381,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
+  load: "Load",
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",
@@ -499,6 +500,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
   runWorkflow: "Run Workflow",
+  save: "Save",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
