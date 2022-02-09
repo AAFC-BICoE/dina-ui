@@ -20,7 +20,7 @@ import {
   pick,
   pickBy
 } from "lodash";
-import { useLayoutEffect, useRef, useState, ComponentProps } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -79,24 +79,27 @@ export function useMaterialSampleQuery(id?: string | null) {
         }
       ],
       onSuccess: async ({ data }) => {
-        if (data.determination) {
-          // Retrieve determiner arrays on determination.
-          for (const determination of data.determination) {
-            if (determination.determiner) {
-              determination.determiner = compact(
-                await bulkGet<Person, true>(
-                  determination.determiner.map(
-                    (personId: string) => `/person/${personId}`
-                  ),
-                  {
-                    apiBaseUrl: "/agent-api",
-                    returnNullForMissingResource: true
-                  }
-                )
-              );
+        for (const organism of data.organism ?? []) {
+          if (organism.determination) {
+            // Retrieve determiner arrays on determination.
+            for (const determination of organism.determination) {
+              if (determination.determiner) {
+                determination.determiner = compact(
+                  await bulkGet<Person, true>(
+                    determination.determiner.map(
+                      (personId: string) => `/person/${personId}`
+                    ),
+                    {
+                      apiBaseUrl: "/agent-api",
+                      returnNullForMissingResource: true
+                    }
+                  )
+                );
+              }
             }
           }
         }
+
         if (data.materialSampleChildren) {
           data.materialSampleChildren = compact(
             await bulkGet<MaterialSample, true>(
@@ -278,16 +281,12 @@ export function useMaterialSampleSave({
     )
   );
 
-  const [enableOrganism, setEnableOrganism] = useState(
+  const [enableOrganisms, setEnableOrganisms] = useState(
     Boolean(
       hasOrganismTemplate ||
-        // Show the organism section if a field is set or the field is enabled:
-        ORGANISM_FIELDS.some(
-          organismFieldName =>
-            materialSample?.organism?.[`${organismFieldName}`] ||
-            enabledFields?.materialSample?.includes(
-              `organism.${organismFieldName}`
-            )
+        materialSample?.organism?.length ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("organism[")
         )
     )
   );
@@ -298,20 +297,6 @@ export function useMaterialSampleSave({
       hasStorageTemplate ||
         materialSample?.storageUnit?.id ||
         enabledFields?.materialSample?.includes("storageUnit")
-    )
-  );
-
-  const [enableDetermination, setEnableDetermination] = useState(
-    Boolean(
-      hasDeterminationTemplate ||
-        // Show the determination section if a field is set or the field is enabled:
-        // Ignore the "isPrimary": field:
-        materialSample?.determination?.some(
-          ({ isPrimary, ...det }) => !isEmpty(det)
-        ) ||
-        enabledFields?.materialSample?.some(enabledField =>
-          enabledField.startsWith("determination[")
-        )
     )
   );
 
@@ -349,12 +334,10 @@ export function useMaterialSampleSave({
     setEnableAcquisitionEvent,
     enablePreparations,
     setEnablePreparations,
-    enableOrganism,
-    setEnableOrganism,
+    enableOrganisms,
+    setEnableOrganisms,
     enableStorage,
     setEnableStorage,
-    enableDetermination,
-    setEnableDetermination,
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
@@ -420,9 +403,12 @@ export function useMaterialSampleSave({
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
+      // This value is not submitted to the back-end:
+      organismsQuantity: undefined,
+
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
-      ...(!enableOrganism && { organism: null }),
+      ...(!enableOrganisms && { organism: [] }),
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),
@@ -433,19 +419,6 @@ export function useMaterialSampleSave({
         acquisitionEvent: { id: null, type: "acquisition-event" }
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
-
-      determination: enableDetermination
-        ? submittedValues.determination?.map(det => ({
-            ...det,
-            ...(!!det.determiner && {
-              determiner: det.determiner.map(determiner =>
-                typeof determiner === "string"
-                  ? determiner
-                  : String(determiner.id)
-              )
-            })
-          }))
-        : [],
 
       // Remove the scheduledAction field from the workflow template:
       ...{ scheduledAction: undefined }

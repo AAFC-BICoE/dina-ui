@@ -123,8 +123,9 @@ export function WorkflowTemplateForm({
     getTemplateInitialValuesFromSavedFormTemplate(
       formTemplates?.MATERIAL_SAMPLE
     );
-  if (!materialSampleTemplateInitialValues.determination?.length) {
-    materialSampleTemplateInitialValues.determination = [{}];
+
+  if (!materialSampleTemplateInitialValues.organism?.length) {
+    materialSampleTemplateInitialValues.organism = [{}];
   }
   if (!materialSampleTemplateInitialValues.associations?.length) {
     materialSampleTemplateInitialValues.associations = [{}];
@@ -151,8 +152,7 @@ export function WorkflowTemplateForm({
       enableCollectingEvent,
       enablePreparations,
       enableStorage,
-      enableDetermination,
-      enableOrganism,
+      enableOrganisms,
       enableScheduledActions,
       enableAssociations,
       enableAcquisitionEvent
@@ -181,15 +181,9 @@ export function WorkflowTemplateForm({
     const preparationTemplateFields =
       enablePreparations && pick(enabledTemplateFields, ...PREPARATION_FIELDS);
 
-    const organismTemplateFields =
-      enableOrganism &&
-      pickBy(enabledTemplateFields, (_, key) => key.startsWith("organism."));
-
-    const determinationTemplateFields =
-      enableDetermination &&
-      pickBy(enabledTemplateFields, (_, key) =>
-        key.startsWith("determination[0].")
-      );
+    const organismsTemplateFields =
+      enableOrganisms &&
+      pickBy(enabledTemplateFields, (_, key) => key.startsWith("organism[0]."));
 
     const storageTemplateFields =
       enableStorage && pick(enabledTemplateFields, "storageUnit");
@@ -220,8 +214,7 @@ export function WorkflowTemplateForm({
             ...identifierTemplateFields,
             ...materialSampleFieldsetTemplateFields,
             ...preparationTemplateFields,
-            ...organismTemplateFields,
-            ...determinationTemplateFields,
+            ...organismsTemplateFields,
             ...storageTemplateFields,
             ...scheduledActionsTemplateFields,
             ...associationTemplateFields

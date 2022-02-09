@@ -158,7 +158,7 @@ export function TabbedArrayField<T>({
                                     values={{ typeName }}
                                   />
                                 </FormikButton>
-                                {elements.length > 1 && (
+                                {elements.length >= 1 && (
                                   <FormikButton
                                     className="list-inline-item btn btn-dark"
                                     onClick={() => removeElement(index)}

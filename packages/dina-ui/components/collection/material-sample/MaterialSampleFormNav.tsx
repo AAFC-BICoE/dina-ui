@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import Switch from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  Determination,
+  Organism,
   MaterialSampleAssociation
 } from "../../../types/collection-api";
 import { useMaterialSampleSave } from "./useMaterialSample";
@@ -75,19 +75,12 @@ export function MaterialSampleFormNav({
       setEnabled: dataComponentState.setEnablePreparations
     },
     {
-      id: "organism-state-section",
-      msg: formatMessage("organismState"),
-      className: "enable-organism-state",
-      disabled: !dataComponentState.enableOrganism,
-      setEnabled: dataComponentState.setEnableOrganism
-    },
-    {
-      id: "determination-section",
-      msg: formatMessage("determination"),
-      className: "enable-determination",
-      disabled: !dataComponentState.enableDetermination,
-      setEnabled: dataComponentState.setEnableDetermination,
-      customSwitch: DeterminationSwitch
+      id: "organisms-section",
+      msg: formatMessage("organisms"),
+      className: "enable-organisms",
+      disabled: !dataComponentState.enableOrganisms,
+      setEnabled: dataComponentState.setEnableOrganisms,
+      customSwitch: OrganismsSwitch
     },
     {
       id: "associations-section",
@@ -198,19 +191,20 @@ export function MaterialSampleFormNav({
   );
 }
 
-/** The determinations switch adds an initial determination if there isn't one already. */
-function DeterminationSwitch(props) {
+/** The organisms switch adds an initial organism if there isn't one already. */
+function OrganismsSwitch(props) {
   const bulkTabCtx = useBulkEditTabContext();
 
   return (
-    <FieldSpy<Determination[]> fieldName="determination">
-      {(determination, { form: { setFieldValue } }) => (
+    <FieldSpy<Organism[]> fieldName="organism">
+      {(organism, { form: { setFieldValue } }) => (
         <Switch
           {...props}
           onChange={newVal => {
             props.onChange?.(newVal);
-            if (!bulkTabCtx && newVal && !determination?.length) {
-              setFieldValue("determination", [{}]);
+            if (!bulkTabCtx && newVal && !organism?.length) {
+              setFieldValue("organism", [{}]);
+              setFieldValue("organismsQuantity", 1);
             }
           }}
         />

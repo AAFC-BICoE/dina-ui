@@ -200,13 +200,17 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
-    determination: [
+    organism: [
       {
-        isPrimary: true,
-        isFileAs: true,
-        verbatimScientificName: "initial determination 1"
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "initial determination 1"
+          }
+        ]
       },
-      { verbatimScientificName: "initial determination 2" }
+      { determination: [{ verbatimScientificName: "initial determination 2" }] }
     ],
     associations: [{ associatedSample: "500", remarks: "initial remarks" }],
     attachment: [{ id: "initial-attachment-1", type: "metadata" }],
@@ -335,33 +339,26 @@ const TEST_SAMPLES_SAME_STORAGE_UNIT: InputResource<MaterialSample>[] = [
   }
 ];
 
-const TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM: InputResource<MaterialSample>[] =
-  [
-    {
-      ...blankMaterialSample(),
-      id: "1",
-      type: "material-sample",
-      materialSampleName: "sample 1",
-      organism: {
-        lifeStage: "test lifestage"
-      },
-      hostOrganism: {
-        name: "test host organism"
-      }
-    },
-    {
-      ...blankMaterialSample(),
-      id: "2",
-      type: "material-sample",
-      materialSampleName: "sample 2",
-      organism: {
-        lifeStage: "test lifestage"
-      },
-      hostOrganism: {
-        name: "test host organism"
-      }
+const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
+  {
+    ...blankMaterialSample(),
+    id: "1",
+    type: "material-sample",
+    materialSampleName: "sample 1",
+    hostOrganism: {
+      name: "test host organism"
     }
-  ];
+  },
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    materialSampleName: "sample 2",
+    hostOrganism: {
+      name: "test host organism"
+    }
+  }
+];
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
@@ -1833,11 +1830,11 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Edits the nested organism and hostOrganism fields.", async () => {
+  it("Edits the nested hostOrganism field.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
-        samples={TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM}
+        samples={TEST_SAMPLES_SAME_HOST_ORGANISM}
       />,
       testCtx
     );
@@ -1845,11 +1842,7 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable organism and host organism fields:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organism-state")
-      .find(Switch)
-      .prop<any>("onChange")(true);
+    // Enable host organism fields:
     wrapper
       .find(".tabpanel-EDIT_ALL .enable-associations")
       .find(Switch)
@@ -1857,9 +1850,6 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .substrate-field input")
-      .simulate("change", { target: { value: "bulk-edit-substrate" } });
     wrapper
       .find(".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea")
       .simulate("change", { target: { value: "bulk-edit-remarks" } });
@@ -1880,10 +1870,6 @@ describe("MaterialSampleBulkEditor", () => {
               attachment: undefined,
               id: "1",
               associations: [],
-              organism: {
-                lifeStage: "test lifestage",
-                substrate: "bulk-edit-substrate"
-              },
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
@@ -1899,10 +1885,6 @@ describe("MaterialSampleBulkEditor", () => {
               projects: undefined,
               attachment: undefined,
               id: "2",
-              organism: {
-                lifeStage: "test lifestage",
-                substrate: "bulk-edit-substrate"
-              },
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"

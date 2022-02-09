@@ -50,11 +50,15 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: [
+    organism: [
       {
-        isPrimary: true,
-        isFileAs: true,
-        verbatimScientificName: "test-name-existing"
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "test-name-existing"
+          }
+        ]
       }
     ]
   },
@@ -64,9 +68,13 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: [
+    organism: [
       {
-        verbatimDeterminer: "this-should-be-overridden"
+        determination: [
+          {
+            verbatimDeterminer: "this-should-be-overridden"
+          }
+        ]
       }
     ]
   },
@@ -79,14 +87,14 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
   }
 ];
 
-const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
+const SAMPLES_WITHOUT_ORGANISMS: InputResource<MaterialSample>[] = [
   {
     ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: []
+    organism: []
   },
   {
     ...blankMaterialSample(),
@@ -94,7 +102,7 @@ const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: null
+    organism: null
   },
   {
     ...blankMaterialSample(),
@@ -112,9 +120,17 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   },
   {
@@ -123,9 +139,17 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   },
   {
@@ -134,9 +158,17 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS3",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   }
 ];
@@ -158,7 +190,7 @@ describe("BulkEditTabWarning", () => {
 
     // Enable the determination:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -167,10 +199,10 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(true);
     wrapper
-      .find(".determination-section button.override-all-button")
+      .find(".organisms-section button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);
@@ -195,9 +227,11 @@ describe("BulkEditTabWarning", () => {
         [
           {
             resource: expect.objectContaining({
-              determination: [
+              organism: [
                 {
-                  verbatimScientificName: "test-name-override"
+                  determination: [
+                    { verbatimScientificName: "test-name-override" }
+                  ]
                 }
               ],
               type: "material-sample"
@@ -206,9 +240,11 @@ describe("BulkEditTabWarning", () => {
           },
           {
             resource: expect.objectContaining({
-              determination: [
+              organism: [
                 {
-                  verbatimScientificName: "test-name-override"
+                  determination: [
+                    { verbatimScientificName: "test-name-override" }
+                  ]
                 }
               ],
               type: "material-sample"
@@ -217,9 +253,11 @@ describe("BulkEditTabWarning", () => {
           },
           {
             resource: expect.objectContaining({
-              determination: [
+              organism: [
                 {
-                  verbatimScientificName: "test-name-override"
+                  determination: [
+                    { verbatimScientificName: "test-name-override" }
+                  ]
                 }
               ],
               type: "material-sample"
@@ -280,11 +318,11 @@ describe("BulkEditTabWarning", () => {
     ]);
   });
 
-  it("Lets you set the values without a warning when there are no determinations in the samples.", async () => {
+  it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
-        samples={SAMPLES_WITHOUT_DETERMINATIONS}
+        samples={SAMPLES_WITHOUT_ORGANISMS}
       />,
       testCtx
     );
@@ -292,9 +330,9 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable the determination:
+    // Enable the organisms:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -303,10 +341,13 @@ describe("BulkEditTabWarning", () => {
 
     // There is no override button:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(false);
 
     // Override the name in the new determination:
+    wrapper.find(".determination-section button.add-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
       .simulate("change", { target: { value: "test-name-override" } });
@@ -319,13 +360,15 @@ describe("BulkEditTabWarning", () => {
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
       [
-        SAMPLES_WITHOUT_DETERMINATIONS.map(sample => ({
+        SAMPLES_WITHOUT_ORGANISMS.map(sample => ({
           resource: {
             id: sample.id,
             type: sample.type,
-            determination: [
+            organism: [
               {
-                verbatimScientificName: "test-name-override"
+                determination: [
+                  { verbatimScientificName: "test-name-override" }
+                ]
               }
             ],
             relationships: {}

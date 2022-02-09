@@ -29,7 +29,6 @@ export interface MaterialSampleAttributes {
 
   managedAttributes?: ManagedAttributeValues;
 
-  determination?: Determination[] | null;
   hierarchy?: HierarchyItem[];
 
   barcode?: string;
@@ -37,7 +36,11 @@ export interface MaterialSampleAttributes {
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  organism?: Organism | null;
+  organism?: Organism[] | null;
+
+  // Client-side only field:
+  organismsQuantity?: number;
+
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
   materialSampleChildren?: Partial<MaterialSample>[];
@@ -93,8 +96,7 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
     ...BLANK_PREPARATION,
     associations: [],
     hostOrganism: null,
-    determination: [],
-    organism: null
+    organism: []
   };
 }
 

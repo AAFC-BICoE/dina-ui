@@ -162,8 +162,8 @@ describe("Material sample bulk edit tab", () => {
       },
       // Sets the default association because it's enabled and there are no values set in the other tabs:
       associations: [{}],
-      // Sets the default determination because it's enabled and there are no values set in the other tabs:
-      determination: [{}]
+      // Sets the default organism because it's enabled and there are no values set in the other tabs:
+      organism: [{}]
     });
   });
 
@@ -217,57 +217,6 @@ describe("Material sample bulk edit tab", () => {
         a: "value A",
         b: "new-b-value",
         c: "new-c-value"
-      }
-    });
-  });
-
-  it("Combines organism values from the original and the bulk override.", async () => {
-    const wrapper = mountWithAppContext(
-      <BulkEditTab
-        baseSample={{
-          type: "material-sample",
-          materialSampleName: "test-sample",
-          organism: {
-            lifeStage: "initial lifestage",
-            remarks: "initial remarks"
-          }
-        }}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Override values for attributes B and C:
-    wrapper.find(".enable-organism-state").find(Switch).prop<any>("onChange")(
-      true
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Leave lifestage blank:
-    wrapper
-      .find(".lifeStage-field input")
-      .simulate("change", { target: { value: "" } });
-    // Leave remarks blank
-    wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "test override remarks" } });
-
-    wrapper.find("button.get-overrides").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockSubmitOverride).lastCalledWith({
-      // Keeps the name and type:
-      type: "material-sample",
-      materialSampleName: "test-sample",
-      organism: {
-        lifeStage: "initial lifestage",
-        remarks: "test override remarks"
       }
     });
   });

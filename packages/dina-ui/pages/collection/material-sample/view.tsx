@@ -110,12 +110,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           fieldName => !isEmpty(materialSample[fieldName])
         );
 
-        const hasOrganism = ORGANISM_FIELDS.some(
-          fieldName => materialSample.organism?.[fieldName]
-        );
-
-        const hasDetermination = materialSample?.determination?.some(
-          det => !isEmpty(det)
+        const hasOrganism = materialSample?.organism?.some(
+          org => !isEmpty(org)
         );
 
         /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
@@ -195,7 +191,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               ))}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismStateField />}
-              {hasDetermination && <DeterminationField />}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">

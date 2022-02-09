@@ -1,5 +1,5 @@
-import { AutoSuggestTextField, FieldSet, TextField } from "common-ui";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { AutoSuggestTextField, TextField } from "common-ui";
+import { DeterminationField } from "..";
 import { MaterialSample } from "../../../types/collection-api";
 
 /**
@@ -9,74 +9,58 @@ import { MaterialSample } from "../../../types/collection-api";
 export const ORGANISM_FIELDS = [
   "lifeStage",
   "sex",
-  "substrate",
-  "remarks"
+  "remarks",
+  "determination"
 ] as const;
 
 export interface OrganismStateFieldProps {
-  className?: string;
   namePrefix?: string;
   id?: string;
 }
 
 export function OrganismStateField({
-  className,
   namePrefix = "",
   id = "organism-state-section"
 }: OrganismStateFieldProps) {
+  /** Applies name prefix to field props */
+  function fieldProps(fieldName: typeof ORGANISM_FIELDS[number]) {
+    return {
+      name: `${namePrefix}${fieldName}`,
+      // Don't use the prefix for the labels and tooltips:
+      customName: fieldName
+    };
+  }
+
   return (
-    <FieldSet
-      className={className}
-      id={id}
-      legend={<DinaMessage id="organismState" />}
-    >
-      <div className="row">
+    <div id={id}>
+      <div className="row mx-0">
         <div className="col-md-6">
-          <div className="row">
-            <div className="col-md-6">
-              <AutoSuggestTextField<MaterialSample>
-                name={`${namePrefix}organism.lifeStage`}
-                customName="lifeStage"
-                query={(_, _ctx) => ({
-                  path: "collection-api/material-sample",
-                  include: "organism"
-                })}
-                suggestion={matSample => matSample.organism?.lifeStage}
-                alwaysShowSuggestions={true}
-              />
-            </div>
-            <div className="col-md-6">
-              <AutoSuggestTextField<MaterialSample>
-                name={`${namePrefix}organism.sex`}
-                customName="sex"
-                query={(_, _ctx) => ({
-                  path: "collection-api/material-sample",
-                  include: "organism"
-                })}
-                suggestion={matSample => matSample.organism?.sex}
-                alwaysShowSuggestions={true}
-              />
-            </div>
-          </div>
           <AutoSuggestTextField<MaterialSample>
-            name={`${namePrefix}organism.substrate`}
-            customName="substrate"
+            {...fieldProps("lifeStage")}
             query={(_, _ctx) => ({
               path: "collection-api/material-sample",
               include: "organism"
             })}
-            suggestion={matSample => matSample.organism?.substrate ?? ""}
+            suggestion={matSample =>
+              matSample.organism?.map(it => it.lifeStage)
+            }
+            alwaysShowSuggestions={true}
+          />
+          <AutoSuggestTextField<MaterialSample>
+            {...fieldProps("sex")}
+            query={(_, _ctx) => ({
+              path: "collection-api/material-sample",
+              include: "organism"
+            })}
+            suggestion={matSample => matSample.organism?.map(it => it.sex)}
             alwaysShowSuggestions={true}
           />
         </div>
         <div className="col-md-6">
-          <TextField
-            name={`${namePrefix}organism.remarks`}
-            customName="remarks"
-            multiLines={true}
-          />
+          <TextField {...fieldProps("remarks")} multiLines={true} />
         </div>
       </div>
-    </FieldSet>
+      <DeterminationField {...fieldProps("determination")} />
+    </div>
   );
 }

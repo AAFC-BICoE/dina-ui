@@ -500,15 +500,19 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.find("#storage-section").exists()).toEqual(true);
   });
 
-  it("Renders an existing Material Sample with the Determinations section enabled.", async () => {
+  it("Renders an existing Material Sample with the Organisms section enabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          determination: [
-            { verbatimScientificName: "test verbatim scientific name" }
+          organism: [
+            {
+              determination: [
+                { verbatimScientificName: "test verbatim scientific name" }
+              ]
+            }
           ]
         }}
         onSaved={mockOnSaved}
@@ -521,9 +525,9 @@ describe("Material Sample Edit Page", () => {
 
     // Determinations are enabled:
     expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#determination-section").exists()).toEqual(true);
+    expect(wrapper.find("#organisms-section").exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Assoication section enabled.", async () => {
