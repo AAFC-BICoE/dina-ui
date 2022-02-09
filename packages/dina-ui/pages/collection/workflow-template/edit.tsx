@@ -125,7 +125,7 @@ export function WorkflowTemplateForm({
     );
 
   if (!materialSampleTemplateInitialValues.organism?.length) {
-    materialSampleTemplateInitialValues.organism = [{}];
+    materialSampleTemplateInitialValues.organism = [{ determination: [{}] }];
   }
   if (!materialSampleTemplateInitialValues.associations?.length) {
     materialSampleTemplateInitialValues.associations = [{}];

@@ -227,10 +227,9 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
-              determination: [],
+              organism: [],
               publiclyReleasable: true, // Default value
               relationships: {},
-              organism: null,
               type: "material-sample"
             },
             type: "material-sample"
@@ -296,8 +295,7 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
-              determination: [],
-              organism: null,
+              organism: [],
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
@@ -527,7 +525,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#organisms-section").exists()).toEqual(true);
+    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Assoication section enabled.", async () => {
@@ -615,7 +613,8 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           preparationAttachment: [], // This empty array should be treated as a blank value.
-          attachment: []
+          attachment: [],
+          organism: []
         }}
         onSaved={mockOnSaved}
       />,
@@ -639,10 +638,7 @@ describe("Material Sample Edit Page", () => {
       wrapper.find(".enable-catalogue-info").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
-      wrapper.find(".enable-organism-state").find(ReactSwitch).prop("checked")
-    ).toEqual(false);
-    expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(false);
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
@@ -712,10 +708,12 @@ describe("Material Sample Edit Page", () => {
       .simulate("change", { target: { value: "test-material-sample-id" } });
 
     // Enable Collecting Event and catalogue info form sections:
-    wrapper.find(".enable-determination").find(Switch).prop<any>("onChange")(
-      true
-    );
+    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
 
+    wrapper.find(".determination-section button.add-button").simulate("click");
+    await new Promise(setImmediate);
     wrapper.update();
 
     function fillOutDetermination(num: number) {
@@ -753,19 +751,23 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: expect.objectContaining({
-              // The 3 determinations are added:
-              determination: [
+              organism: [
                 {
-                  verbatimDeterminer: "test-agent-1",
-                  verbatimScientificName: "test-name-1"
-                },
-                {
-                  verbatimDeterminer: "test-agent-2",
-                  verbatimScientificName: "test-name-2"
-                },
-                {
-                  verbatimDeterminer: "test-agent-3",
-                  verbatimScientificName: "test-name-3"
+                  // The 3 determinations are added:
+                  determination: [
+                    {
+                      verbatimDeterminer: "test-agent-1",
+                      verbatimScientificName: "test-name-1"
+                    },
+                    {
+                      verbatimDeterminer: "test-agent-2",
+                      verbatimScientificName: "test-name-2"
+                    },
+                    {
+                      verbatimDeterminer: "test-agent-3",
+                      verbatimScientificName: "test-name-3"
+                    }
+                  ]
                 }
               ],
               type: "material-sample"

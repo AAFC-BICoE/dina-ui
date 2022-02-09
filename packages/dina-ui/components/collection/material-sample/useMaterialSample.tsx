@@ -209,30 +209,18 @@ export function useMaterialSampleSave({
       )
     );
 
-  const hasOrganismTemplate =
+  const hasOrganismsTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ORGANISM_FIELDS.map(
-          organismFieldName => `organism.${organismFieldName}`
-        )
+        (_, key) => key.startsWith("organism[0].")
       )
     );
 
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
-
-  // For editing existing templates:
-  const hasDeterminationTemplate =
-    isTemplate &&
-    !isEmpty(
-      pickBy(
-        materialSampleTemplateInitialValues?.templateCheckboxes,
-        (_, key) => key.startsWith("determination[0].")
-      )
-    );
 
   const hasScheduledActionsTemplate =
     isTemplate &&
@@ -283,10 +271,10 @@ export function useMaterialSampleSave({
 
   const [enableOrganisms, setEnableOrganisms] = useState(
     Boolean(
-      hasOrganismTemplate ||
+      hasOrganismsTemplate ||
         materialSample?.organism?.length ||
         enabledFields?.materialSample?.some(enabledField =>
-          enabledField.startsWith("organism[")
+          enabledField.startsWith("organism[0].")
         )
     )
   );

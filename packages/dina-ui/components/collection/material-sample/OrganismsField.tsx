@@ -1,4 +1,10 @@
-import { FieldSet, FormikButton, NumberField, useFieldLabels } from "common-ui";
+import {
+  FieldSet,
+  FormikButton,
+  NumberField,
+  useDinaFormContext,
+  useFieldLabels
+} from "common-ui";
 import { FieldArray } from "formik";
 import { get } from "lodash";
 import { useState } from "react";
@@ -14,6 +20,8 @@ export interface OrganismsFieldProps {
 }
 
 export function OrganismsField({ name }: OrganismsFieldProps) {
+  const { isTemplate } = useDinaFormContext();
+
   return (
     <FieldSet
       className="organisms-section"
@@ -45,9 +53,14 @@ export function OrganismsField({ name }: OrganismsFieldProps) {
 
             return (
               <div>
-                <div className="row">
-                  <NumberField name="organismsQuantity" className="col-sm-6" />
-                </div>
+                {!isTemplate && (
+                  <div className="row">
+                    <NumberField
+                      name="organismsQuantity"
+                      className="col-sm-6"
+                    />
+                  </div>
+                )}
                 <OrganismsTable
                   namePrefix={name}
                   organisms={organisms}
@@ -78,6 +91,7 @@ function OrganismsTable({
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
+  const { isTemplate } = useDinaFormContext();
 
   const [expanded, setExpanded] = useState<Record<number, boolean>>({
     0: organismsQuantity === 1
@@ -86,6 +100,14 @@ function OrganismsTable({
   function handleRemoveClick(index: number) {
     setExpanded({});
     onRemoveClick(index);
+  }
+
+  function onExpandedChange(newExpanded: Record<number, boolean>) {
+    // Disable expand change in template mode:
+    if (isTemplate) {
+      return;
+    }
+    setExpanded(newExpanded);
   }
 
   const tableColumns: Column<Organism>[] = [
@@ -107,12 +129,16 @@ function OrganismsTable({
     {
       Header: "",
       Cell: ({ index }) => (
-        <FormikButton
-          className="btn btn-dark"
-          onClick={() => handleRemoveClick(index)}
-        >
-          <DinaMessage id="removeOrganism" />
-        </FormikButton>
+        <>
+          {!isTemplate && (
+            <FormikButton
+              className="btn btn-dark"
+              onClick={() => handleRemoveClick(index)}
+            >
+              <DinaMessage id="removeOrganism" />
+            </FormikButton>
+          )}
+        </>
       )
     }
   ];
@@ -129,7 +155,7 @@ function OrganismsTable({
       sortable={false}
       minRows={organismsQuantity}
       expanded={expanded}
-      onExpandedChange={newExpanded => setExpanded(newExpanded)}
+      onExpandedChange={onExpandedChange}
       SubComponent={row => {
         const isOdd = (row.index + 1) % 2 === 1;
 
@@ -138,7 +164,7 @@ function OrganismsTable({
 
         return (
           <div style={{ backgroundColor }}>
-            <OrganismStateField namePrefix={`${namePrefix}[${row.index}]`} />
+            <OrganismStateField namePrefix={`${namePrefix}[${row.index}].`} />
           </div>
         );
       }}
