@@ -6,17 +6,33 @@ import { useSavedSearchModal } from "./useSavedSearchModal";
 
 export interface SavedSearchProps {
   loadSavedSearch: (savedSearchName) => void;
-  saveSearch: (value: JsonValue) => void;
+  saveSearch: (
+    value: JsonValue,
+    isDefault: boolean,
+    searchName: string
+  ) => void;
   deleteSavedSearch: (savedSearchName?: string) => void;
   onChange?: (e) => void;
   value: JsonValue;
+  savedSearchNames?: string[];
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const { loadSavedSearch, deleteSavedSearch, onChange, value, saveSearch } =
-    props;
+  const {
+    loadSavedSearch,
+    deleteSavedSearch,
+    onChange,
+    value,
+    saveSearch,
+    savedSearchNames
+  } = props;
   const { formatMessage } = useDinaIntl();
-  const savedSearchNamesOptions = [{}];
+  const savedSearchNamesOptions: {}[] = [{}];
+
+  savedSearchNames?.map(name =>
+    savedSearchNamesOptions.push({ label: name, value: name })
+  );
+
   const [selectedSearch, setSelectedSearch] = useState("");
 
   const { openSavedSearchModal } = useSavedSearchModal();

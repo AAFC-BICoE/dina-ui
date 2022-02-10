@@ -23,6 +23,12 @@ import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
+import { SavedSearch } from "./SavedSearch";
+import { FieldWrapper } from "../formik-connected/FieldWrapper";
+import { JsonObject, JsonValue } from "type-fest";
+import { useAccount } from "..";
+import useLocalStorage from "@rehooks/local-storage";
+import { get } from "lodash";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -52,8 +58,17 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
   const [searchResults, setSearchResults] = useState<TData[]>();
-  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+  const [initSavedSearchValues, setInitSavedSearchValues] = useState<
+    JsonObject[]
+  >([]);
+  const { username } = useAccount();
+  const SAVED_SEARCHES = "saved-searches";
+  const [savedSearches, setSavedSearches] =
+    useLocalStorage<Map<string, JsonValue>>(SAVED_SEARCHES);
+  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
   const [visible, setVisible] = useState(false);
+
+  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
   const resolvedReactTableProps = { sortable: true, ...reactTableProps };
 
@@ -168,18 +183,65 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
+  function loadSavedSearch(savedSearchName) {
+    setInitSavedSearchValues(
+      savedSearches ? savedSearches[username as any]?.[savedSearchName] : [{}]
+    );
+  }
+
+  function saveSearch(value, isDefault, searchName) {
+    let newSavedSearches;
+    if (savedSearches && Object.keys(savedSearches)?.length > 0) {
+      savedSearches[username as any][`${isDefault ? "default" : searchName}`] =
+        value;
+    } else {
+      newSavedSearches = {
+        [`${username}`]: { [`${isDefault ? "default" : searchName}`]: value }
+      };
+    }
+    setSavedSearches(
+      savedSearches ?? (newSavedSearches as Map<string, JsonValue>)
+    );
+  }
+
+  function deleteSavedSearch(savedSearchName?: string) {
+    // todo
+  }
+
+  function onChange(e) {
+    // todo
+  }
+
+  const savedEsIndexMapping =
+    initSavedSearchValues && initSavedSearchValues.length > 0
+      ? (initSavedSearchValues as any).filter(initVal =>
+          get(initVal, "props.esIndexMapping")
+        )?.[0]?.props?.esIndexMapping
+      : undefined;
+
   return (
     <DinaForm
-      initialValues={{
-        queryRows: [
-          {
-            fieldName: data?.[0].value + "(" + data?.[0].type + ")",
-            matchType: "match",
-            boolean: "true",
-            date: moment().format()
-          }
-        ]
-      }}
+      key={
+        initSavedSearchValues
+          ? initSavedSearchValues.join()
+          : data
+          ? data.join()
+          : uuidv4()
+      }
+      initialValues={
+        initSavedSearchValues && initSavedSearchValues.length > 0
+          ? { queryRows: initSavedSearchValues }
+          : {
+              queryRows: [
+                {
+                  fieldName: data?.[0].value + "(" + data?.[0].type + ")",
+                  matchType: "match",
+                  boolean: "true",
+                  date: moment().format()
+                }
+              ]
+            }
+      }
       onSubmit={onSubmit}
     >
       <label
@@ -188,10 +250,29 @@ export function QueryPage<TData extends KitsuResource>({
         {" "}
         {formatMessage({ id: "search" })}
       </label>
-      <QueryBuilder name="queryRows" esIndexMapping={data} />
+      <QueryBuilder
+        name="queryRows"
+        esIndexMapping={savedEsIndexMapping ?? data}
+      />
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>
+
+      <FieldWrapper name="queryRows" hideLabel={true}>
+        {({ value }) => (
+          <SavedSearch
+            loadSavedSearch={loadSavedSearch}
+            value={value}
+            deleteSavedSearch={deleteSavedSearch}
+            saveSearch={saveSearch}
+            savedSearchNames={
+              savedSearches?.[username as any]
+                ? Object.keys(savedSearches?.[username as any])
+                : []
+            }
+          />
+        )}
+      </FieldWrapper>
 
       <div
         className="query-table-wrapper"
@@ -241,7 +322,8 @@ export function QueryPage<TData extends KitsuResource>({
         <ReactTable
           className="-striped"
           columns={mappedColumns}
-          data={searchResults ?? initData}
+          // data={searchResults ?? initData}
+          data={searchResults}
           minRows={1}
         />
       </div>
