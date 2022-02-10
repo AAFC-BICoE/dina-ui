@@ -3,6 +3,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
+  OperationError,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -35,7 +36,8 @@ import {
   AcquisitionEvent,
   CollectingEvent,
   Collection,
-  MaterialSample
+  MaterialSample,
+  Organism
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import {
@@ -538,39 +540,48 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    const msDiffWithOrganisms = await saveAndAttachOrganisms(msDiff);
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
-      ...msDiff,
+      ...msDiffWithOrganisms,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
       relationships: {
-        ...(msDiff.attachment && {
+        ...(msDiffWithOrganisms.attachment && {
           attachment: {
-            data: msDiff.attachment.map(({ id, type }) => ({ id, type }))
+            data: msDiffWithOrganisms.attachment.map(it =>
+              pick(it, "id", "type")
+            )
           }
         }),
-        ...(msDiff.preparationAttachment && {
+        ...(msDiffWithOrganisms.preparationAttachment && {
           preparationAttachment: {
-            data: msDiff.preparationAttachment.map(({ id, type }) => ({
-              id,
-              type
-            }))
+            data: msDiffWithOrganisms.preparationAttachment.map(it =>
+              pick(it, "id", "type")
+            )
           }
         }),
-        ...(msDiff.projects && {
+        ...(msDiffWithOrganisms.projects && {
           projects: {
-            data: msDiff.projects.map(({ id, type }) => ({ id, type }))
+            data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
+          }
+        }),
+        ...(msDiffWithOrganisms.organism && {
+          organism: {
+            data: msDiffWithOrganisms.organism.map(it => pick(it, "id", "type"))
           }
         })
       },
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
       preparationAttachment: undefined,
-      projects: undefined
+      projects: undefined,
+      organism: undefined
     };
 
     // delete the association if associated sample is left unfilled
@@ -587,6 +598,59 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
+  }
+
+  /**
+   * Saves and attaches them to the sample with the ID.
+   * Does not modify the sample input, just returns a new sample input.
+   */
+  async function saveAndAttachOrganisms(
+    sample: InputResource<MaterialSample>
+  ): Promise<InputResource<MaterialSample>> {
+    if (!sample.organism?.length) {
+      return sample;
+    }
+
+    const preparedOrganisms: Organism[] = sample.organism?.map(org => ({
+      ...org,
+      // Default to the sample's group:
+      group: sample.group,
+      type: "organism"
+    }));
+
+    const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
+      resource => ({
+        resource,
+        type: "organism"
+      })
+    );
+
+    try {
+      const savedOrganisms = await save<Organism>(organismSaveArgs, {
+        apiBaseUrl: "/collection-api"
+      });
+      return { ...sample, organism: savedOrganisms };
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>(err => ({
+          fieldErrors: mapKeys(
+            err.fieldErrors,
+            (_, field) => `organism[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
+    }
   }
 
   async function onSubmit({

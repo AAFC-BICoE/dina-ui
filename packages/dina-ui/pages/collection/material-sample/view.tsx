@@ -22,7 +22,8 @@ import {
   NotPubliclyReleasableWarning,
   StorageLinkerField,
   TagsAndRestrictionsSection,
-  ProjectSelectSection
+  ProjectSelectSection,
+  OrganismsField
 } from "../../../components";
 import {
   CollectingEventFormLayout,
@@ -190,7 +191,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               ))}
               {hasPreparations && <PreparationField />}
-              {hasOrganism && <OrganismStateField />}
+              {hasOrganism && <OrganismsField name="organism" />}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">

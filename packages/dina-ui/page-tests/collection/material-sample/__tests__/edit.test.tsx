@@ -227,9 +227,8 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
-              organism: [],
               publiclyReleasable: true, // Default value
-              relationships: {},
+              relationships: { organism: { data: [] } },
               type: "material-sample"
             },
             type: "material-sample"
@@ -295,11 +294,12 @@ describe("Material Sample Edit Page", () => {
               materialSampleName: "test-material-sample-id",
               hostOrganism: null,
               managedAttributes: {},
-              organism: [],
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
-              relationships: {}
+              relationships: {
+                organism: { data: [] }
+              }
             },
             type: "material-sample"
           }
@@ -507,6 +507,7 @@ describe("Material Sample Edit Page", () => {
           materialSampleName: "test-ms",
           organism: [
             {
+              type: "organism",
               determination: [
                 { verbatimScientificName: "test verbatim scientific name" }
               ]
@@ -747,29 +748,47 @@ describe("Material Sample Edit Page", () => {
 
     // Saves the Material Sample:
     expect(mockSave.mock.calls).toEqual([
+      // First submits the organism in one transaction:
+      [
+        [
+          {
+            resource: {
+              determination: [
+                {
+                  verbatimDeterminer: "test-agent-1",
+                  verbatimScientificName: "test-name-1"
+                },
+                {
+                  verbatimDeterminer: "test-agent-2",
+                  verbatimScientificName: "test-name-2"
+                },
+                {
+                  verbatimDeterminer: "test-agent-3",
+                  verbatimScientificName: "test-name-3"
+                }
+              ],
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      // Submits the sample with the linked organism:
       [
         [
           {
             resource: expect.objectContaining({
-              organism: [
-                {
-                  // The 3 determinations are added:
-                  determination: [
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
                     {
-                      verbatimDeterminer: "test-agent-1",
-                      verbatimScientificName: "test-name-1"
-                    },
-                    {
-                      verbatimDeterminer: "test-agent-2",
-                      verbatimScientificName: "test-name-2"
-                    },
-                    {
-                      verbatimDeterminer: "test-agent-3",
-                      verbatimScientificName: "test-name-3"
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "organism"
                     }
                   ]
                 }
-              ],
+              }),
               type: "material-sample"
             }),
             type: "material-sample"

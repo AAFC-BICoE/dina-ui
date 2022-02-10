@@ -52,6 +52,8 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     collection: { id: "1", type: "collection" },
     organism: [
       {
+        id: "organism-1",
+        type: "organism",
         determination: [
           {
             isPrimary: true,
@@ -70,6 +72,8 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     collection: { id: "1", type: "collection" },
     organism: [
       {
+        id: "organism-1",
+        type: "organism",
         determination: [
           {
             verbatimDeterminer: "this-should-be-overridden"
@@ -122,6 +126,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     collection: { id: "1", type: "collection" },
     organism: [
       {
+        type: "organism",
         determination: [
           {
             isPrimary: true,
@@ -141,6 +146,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     collection: { id: "1", type: "collection" },
     organism: [
       {
+        type: "organism",
         determination: [
           {
             isPrimary: true,
@@ -160,6 +166,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     collection: { id: "1", type: "collection" },
     organism: [
       {
+        type: "organism",
         determination: [
           {
             isPrimary: true,
@@ -226,45 +233,52 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "test-name-override" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the new material samples with the new common determination:
     expect(mockSave.mock.calls).toEqual([
+      // Creates the same organism 3 times, 1 for each of the 3 samples:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      // Saves the 3 samples (with linked organisms) in one transaction:
       [
         [
           {
             resource: expect.objectContaining({
-              organism: [
-                {
-                  determination: [
-                    { verbatimScientificName: "test-name-override" }
-                  ]
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
           },
           {
             resource: expect.objectContaining({
-              organism: [
-                {
-                  determination: [
-                    { verbatimScientificName: "test-name-override" }
-                  ]
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
           },
           {
             resource: expect.objectContaining({
-              organism: [
-                {
-                  determination: [
-                    { verbatimScientificName: "test-name-override" }
-                  ]
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
@@ -362,21 +376,30 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "test-name-override" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
+      // 3 copies of the organism are saved, 1 for each sample:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         SAMPLES_WITHOUT_ORGANISMS.map(sample => ({
           resource: {
             id: sample.id,
             type: sample.type,
-            organism: [
-              {
-                determination: [
-                  { verbatimScientificName: "test-name-override" }
-                ]
+            relationships: {
+              organism: {
+                data: [{ id: "11111", type: "organism" }]
               }
-            ],
-            relationships: {}
+            }
           },
           type: "material-sample"
         })),
@@ -397,7 +420,7 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable the determination:
+    // Enable the organisms:
     wrapper
       .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
@@ -406,7 +429,7 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The 2 common determinations are shown in the Edit All tab:
+    // The 2 common organisms are shown in the Edit All tab:
     expect(
       wrapper.find(
         ".tabpanel-EDIT_ALL .determination-section li.react-tabs__tab"
@@ -437,26 +460,45 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [
+          {
+            isFileAs: true,
+            isPrimary: true,
+            verbatimScientificName: "first name override"
+          },
+          { verbatimScientificName: "second name" }
+        ],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
+      // The new organism is saved 3 times, once per sample:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      // The samples are saved in their own transaction:
       [
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
           resource: {
             id: sample.id,
             type: sample.type,
-            organism: [
-              {
-                determination: [
+            // Organisms are saved in the relationships field:
+            organism: undefined,
+            relationships: {
+              organism: {
+                data: [
                   {
-                    isPrimary: true,
-                    isFileAs: true,
-                    verbatimScientificName: "first name override"
-                  },
-                  { verbatimScientificName: "second name" }
+                    id: "11111",
+                    type: "organism"
+                  }
                 ]
               }
-            ],
-            relationships: {}
+            }
           },
           type: "material-sample"
         })),

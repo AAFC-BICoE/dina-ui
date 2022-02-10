@@ -1,8 +1,13 @@
+import { KitsuResource } from "kitsu";
 import { Determination } from "..";
 
-export interface Organism {
+export interface OrganismAttributes {
+  type: "organism";
+  group?: string;
   lifeStage?: string | null;
   sex?: string | null;
   remarks?: string | null;
   determination?: Determination[] | null;
 }
+
+export type Organism = KitsuResource & OrganismAttributes;

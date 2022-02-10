@@ -202,6 +202,7 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     materialSampleName: "MS1",
     organism: [
       {
+        type: "organism",
         determination: [
           {
             isPrimary: true,
@@ -210,7 +211,10 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
           }
         ]
       },
-      { determination: [{ verbatimScientificName: "initial determination 2" }] }
+      {
+        type: "organism",
+        determination: [{ verbatimScientificName: "initial determination 2" }]
+      }
     ],
     associations: [{ associatedSample: "500", remarks: "initial remarks" }],
     attachment: [{ id: "initial-attachment-1", type: "metadata" }],

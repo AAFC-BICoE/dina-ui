@@ -179,7 +179,7 @@ export function TabbedArrayField<T>({
                 {!elements.length && !readOnly && !isTemplate && (
                   <div className="d-flex">
                     <FormikButton
-                      className="btn btn-primary add-button"
+                      className="btn btn-primary mb-2 add-button"
                       onClick={addElement}
                     >
                       <DinaMessage id="addNewElement" values={{ typeName }} />
