@@ -221,13 +221,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <DinaForm
-      key={
-        initSavedSearchValues
-          ? initSavedSearchValues.join()
-          : data
-          ? data.join()
-          : uuidv4()
-      }
+      key={uuidv4()}
       initialValues={
         initSavedSearchValues && initSavedSearchValues.length > 0
           ? { queryRows: initSavedSearchValues }

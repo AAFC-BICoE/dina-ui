@@ -1,5 +1,5 @@
 import { DinaForm, TextField, useModal } from "common-ui";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { JsonValue } from "type-fest";
 import { FormikButton } from "../formik-connected/FormikButton";
 

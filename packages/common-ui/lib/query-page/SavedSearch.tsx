@@ -1,4 +1,4 @@
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { useState } from "react";
 import Select from "react-select";
 import { JsonValue } from "type-fest";
