@@ -208,7 +208,12 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Override the name in the new determination:
+    // Add a determination and override its name:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
       .simulate("change", { target: { value: "test-name-override" } });
@@ -284,7 +289,7 @@ describe("BulkEditTabWarning", () => {
 
     // Enable the determination:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -293,7 +298,7 @@ describe("BulkEditTabWarning", () => {
 
     // The Override button is there:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(true);
 
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -380,7 +385,7 @@ describe("BulkEditTabWarning", () => {
     ]);
   });
 
-  it("Shows the common value when all samples have the same determinations.", async () => {
+  it("Shows the common value when all samples have the same organisms and determinations.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -394,7 +399,7 @@ describe("BulkEditTabWarning", () => {
 
     // Enable the determination:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -439,13 +444,17 @@ describe("BulkEditTabWarning", () => {
           resource: {
             id: sample.id,
             type: sample.type,
-            determination: [
+            organism: [
               {
-                isPrimary: true,
-                isFileAs: true,
-                verbatimScientificName: "first name override"
-              },
-              { verbatimScientificName: "second name" }
+                determination: [
+                  {
+                    isPrimary: true,
+                    isFileAs: true,
+                    verbatimScientificName: "first name override"
+                  },
+                  { verbatimScientificName: "second name" }
+                ]
+              }
             ],
             relationships: {}
           },

@@ -18,6 +18,7 @@ export interface OrganismStateFieldProps {
   id?: string;
 }
 
+/** Form section for a single organism. */
 export function OrganismStateField({
   namePrefix = "",
   id = "organism-state-section"

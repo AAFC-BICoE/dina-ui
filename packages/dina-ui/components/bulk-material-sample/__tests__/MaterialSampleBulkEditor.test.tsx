@@ -827,7 +827,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Enable all the sections with the "Override All" warning boxes:
     [
-      ".enable-determination",
+      ".enable-organisms",
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
@@ -844,9 +844,7 @@ describe("MaterialSampleBulkEditor", () => {
     // Shows the warnings:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL .determination-section .multiple-values-warning"
-        )
+        .find(".tabpanel-EDIT_ALL .organisms-section .multiple-values-warning")
         .exists()
     ).toEqual(true);
     expect(
@@ -944,7 +942,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Enable all the sections with the "Override All" warning boxes:
     [
-      ".enable-determination",
+      ".enable-organisms",
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
@@ -960,7 +958,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the Override All buttons:
     for (const section of [
-      "#determination-section",
+      ".organisms-section",
       "#material-sample-attachments-section",
       "#preparation-protocols-section",
       "#associations-section",
@@ -972,12 +970,10 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.update();
     }
 
-    // Determinations section opens with an initial value, so it has the green indicator on the fieldset:
+    // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
-        )
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
         .first()
         .hasClass("changed-field")
     ).toEqual(true);
@@ -1026,6 +1022,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual(false);
 
     // Set the override values:
+    wrapper.find(".determination-section button.add-button").simulate("click");
     wrapper
       .find(
         ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
@@ -1067,9 +1064,7 @@ describe("MaterialSampleBulkEditor", () => {
     // All overridable fieldsets should now have the green bulk edited indicator:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
-        )
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
         .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
@@ -1130,9 +1125,13 @@ describe("MaterialSampleBulkEditor", () => {
                   associationType: "has_host"
                 }
               ],
-              determination: [
+              organism: [
                 {
-                  verbatimScientificName: "new-scientific-name"
+                  determination: [
+                    {
+                      verbatimScientificName: "new-scientific-name"
+                    }
+                  ]
                 }
               ],
               scheduledActions: [

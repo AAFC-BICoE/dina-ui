@@ -294,7 +294,7 @@ export function MaterialSampleForm({
       colEvent: "collecting-event-section",
       acqEvent: "acquisition-event-section",
       preparation: "preparations-section",
-      organism: "organism-state-section",
+      organism: "organisms-section",
       associations: "associations-section",
       storage: "storage-section",
       ScheduledActions: "scheduled-actions-section",
@@ -412,7 +412,7 @@ export function MaterialSampleForm({
                 />
               )}
               {dataComponentState.enableOrganisms && (
-                <OrganismsField name="organism" />
+                <OrganismsField id={navIds.organism} name="organism" />
               )}
               {dataComponentState.enableAssociations && (
                 <AssociationsField id={navIds.associations} />

@@ -17,13 +17,16 @@ import { Organism } from "../../../types/collection-api/resources/Organism";
 export interface OrganismsFieldProps {
   /** Organism array field name. */
   name: string;
+  /** FieldSet id */
+  id?: string;
 }
 
-export function OrganismsField({ name }: OrganismsFieldProps) {
+export function OrganismsField({ name, id }: OrganismsFieldProps) {
   const { isTemplate } = useDinaFormContext();
 
   return (
     <FieldSet
+      id={id}
       className="organisms-section"
       fieldName={name}
       legend={<DinaMessage id="organism" />}
@@ -33,10 +36,8 @@ export function OrganismsField({ name }: OrganismsFieldProps) {
         fieldName={name}
         setDefaultValue={ctx => {
           // Auto-create the first organism:
-          ctx.bulkEditFormRef?.current?.setFieldValue("organismsQuantity", [
-            [{}]
-          ]);
-          ctx.bulkEditFormRef?.current?.setFieldValue(name, [[{}]]);
+          ctx.bulkEditFormRef?.current?.setFieldValue("organismsQuantity", 1);
+          ctx.bulkEditFormRef?.current?.setFieldValue(name, [{}]);
         }}
       >
         <FieldArray name={name}>
