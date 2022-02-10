@@ -1,19 +1,25 @@
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { useState } from "react";
 import Select from "react-select";
+import { JsonValue } from "type-fest";
+import { useSavedSearchModal } from "./useSavedSearchModal";
 
 export interface SavedSearchProps {
   loadSavedSearch: (savedSearchName) => void;
-  saveSearch: (JsonObject) => void;
+  saveSearch: (value: JsonValue) => void;
   deleteSavedSearch: (savedSearchName?: string) => void;
   onChange?: (e) => void;
+  value: JsonValue;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const { loadSavedSearch, saveSearch, deleteSavedSearch, onChange } = props;
+  const { loadSavedSearch, deleteSavedSearch, onChange, value, saveSearch } =
+    props;
   const { formatMessage } = useDinaIntl();
   const savedSearchNamesOptions = [{}];
   const [selectedSearch, setSelectedSearch] = useState("");
+
+  const { openSavedSearchModal } = useSavedSearchModal();
 
   function onSelectedSavedSearchChanged(e) {
     setSelectedSearch(e.value);
@@ -34,7 +40,10 @@ export function SavedSearch(props: SavedSearchProps) {
       >
         {formatMessage("load")}
       </button>
-      <button className="btn btn-secondary" onClick={saveSearch}>
+      <button
+        className="btn btn-secondary"
+        onClick={() => openSavedSearchModal({ value, saveSearch })}
+      >
         {formatMessage("save")}
       </button>
       <button
