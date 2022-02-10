@@ -244,11 +244,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              organism: [],
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -333,11 +331,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              organism: [],
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -454,12 +450,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              organism: [],
 
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },

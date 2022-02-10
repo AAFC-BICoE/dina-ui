@@ -13,6 +13,7 @@ import { OrganismStateField } from "..";
 import { BulkEditTabWarning } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
+import { SortableContainer, SortableElement } from "react-sortable-hoc";
 
 export interface OrganismsFieldProps {
   /** Organism array field name. */
@@ -92,11 +93,19 @@ function OrganismsTable({
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly, initialValues } = useDinaFormContext();
 
-  const [expanded, setExpanded] = useState<Record<number, boolean>>({
-    0: organismsQuantity === 1
-  });
+  const initialLength = Number(get(initialValues, namePrefix)?.length) || 1;
+
+  const allExpandedInitially = [...new Array(initialLength)].reduce<
+    Record<number, boolean>
+  >((prev, _, index) => ({ ...prev, [index]: true }), {});
+
+  const initialExpanded: Record<number, boolean> = readOnly
+    ? allExpandedInitially
+    : { 0: organismsQuantity === 1 };
+
+  const [expanded, setExpanded] = useState(initialExpanded);
 
   function handleRemoveClick(index: number) {
     setExpanded({});
@@ -131,7 +140,7 @@ function OrganismsTable({
       Header: "",
       Cell: ({ index }) => (
         <>
-          {!isTemplate && (
+          {!isTemplate && !readOnly && (
             <FormikButton
               className="btn btn-dark"
               onClick={() => handleRemoveClick(index)}
@@ -146,7 +155,7 @@ function OrganismsTable({
 
   /** Only show up to the organismsQuantity number */
   const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
-    (_, index) => organisms[index] || {}
+    (_, index) => organisms[index] || { type: "organism" }
   );
 
   return (
@@ -156,6 +165,7 @@ function OrganismsTable({
       sortable={false}
       minRows={organismsQuantity}
       expanded={expanded}
+      // TbodyComponent={TbodyComponent}
       onExpandedChange={onExpandedChange}
       SubComponent={row => {
         const isOdd = (row.index + 1) % 2 === 1;
@@ -173,3 +183,22 @@ function OrganismsTable({
     />
   );
 }
+
+// function TbodyComponent(props) {
+//   return <SortableTBody axis="y" {...props} />;
+// }
+
+// const SortableTBody = SortableContainer(({ children, ...bodyProps }) => {
+//   const [rows, otherChildren] = children;
+
+//   return (
+//     <div {...bodyProps} className="rt-tbody">
+//       {rows.map((row, index) => (
+//         <SortableTRow {...row.props} index={index} />
+//       ))}
+//       {otherChildren}
+//     </div>
+//   );
+// });
+
+// const SortableTRow = SortableElement(({ children }) => <>{children}</>);

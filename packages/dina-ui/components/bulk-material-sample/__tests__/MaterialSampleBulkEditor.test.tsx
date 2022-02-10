@@ -202,6 +202,7 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     materialSampleName: "MS1",
     organism: [
       {
+        id: "organism-1",
         type: "organism",
         determination: [
           {
@@ -212,6 +213,7 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
         ]
       },
       {
+        id: "organism-2",
         type: "organism",
         determination: [{ verbatimScientificName: "initial determination 2" }]
       }
@@ -1113,9 +1115,21 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "new-scientific-name" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the material samples:
     // The warnable fields are overridden with the default/empty values:
     expect(mockSave.mock.calls).toEqual([
+      // Creates the same organism 3 times, 1 for each of the 3 samples:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         [
           ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
@@ -1129,15 +1143,6 @@ describe("MaterialSampleBulkEditor", () => {
                   associationType: "has_host"
                 }
               ],
-              organism: [
-                {
-                  determination: [
-                    {
-                      verbatimScientificName: "new-scientific-name"
-                    }
-                  ]
-                }
-              ],
               scheduledActions: [
                 { actionType: "new-action-type", date: expect.anything() }
               ],
@@ -1149,6 +1154,9 @@ describe("MaterialSampleBulkEditor", () => {
                   data: [
                     { id: "new-preparation-attachment-id", type: "metadata" }
                   ]
+                },
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
               }
             }
