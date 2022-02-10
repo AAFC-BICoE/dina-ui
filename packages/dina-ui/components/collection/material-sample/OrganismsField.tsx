@@ -13,7 +13,13 @@ import { OrganismStateField } from "..";
 import { BulkEditTabWarning } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
-import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import {
+  SortableContainer,
+  SortableElement,
+  SortableHandle,
+  SortEnd
+} from "react-sortable-hoc";
+import { MdDragHandle } from "react-icons/md";
 
 export interface OrganismsFieldProps {
   /** Organism array field name. */
@@ -42,7 +48,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
         }}
       >
         <FieldArray name={name}>
-          {({ form, remove }) => {
+          {({ form, remove, move }) => {
             const organismsQuantity =
               Number(form.values.organismsQuantity) || 1;
             const organisms: (Organism | null | undefined)[] =
@@ -68,6 +74,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                   organisms={organisms}
                   organismsQuantity={organismsQuantity}
                   onRemoveClick={removeOrganism}
+                  onRowMove={move}
                 />
               </div>
             );
@@ -83,13 +90,15 @@ interface OrganismsTableProps {
   organisms: (Organism | null | undefined)[];
   namePrefix: string;
   onRemoveClick: (index: number) => void;
+  onRowMove: (from: number, to: number) => void;
 }
 
 function OrganismsTable({
   organismsQuantity,
   organisms,
   namePrefix,
-  onRemoveClick
+  onRemoveClick,
+  onRowMove
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
@@ -120,7 +129,24 @@ function OrganismsTable({
     setExpanded(newExpanded);
   }
 
+  function onSortStart(_, event: unknown) {
+    setExpanded({});
+    if (event instanceof MouseEvent) {
+      document.body.style.cursor = "grabbing";
+    }
+  }
+
+  function onSortEnd(se: SortEnd) {
+    document.body.style.cursor = "default";
+    onRowMove(se.oldIndex, se.newIndex);
+  }
+
   const tableColumns: Column<Organism>[] = [
+    {
+      Header: "Sort",
+      Cell: () => <RowSortHandle />,
+      width: 60
+    },
     {
       id: "determination",
       accessor: o => {
@@ -159,46 +185,88 @@ function OrganismsTable({
   );
 
   return (
-    <ReactTable
-      columns={tableColumns}
-      data={visibleTableData}
-      sortable={false}
-      minRows={organismsQuantity}
-      expanded={expanded}
-      // TbodyComponent={TbodyComponent}
-      onExpandedChange={onExpandedChange}
-      SubComponent={row => {
-        const isOdd = (row.index + 1) % 2 === 1;
+    <>
+      <style>{`
+        .rt-expandable, .rt-th:first-child {
+          min-width: 12rem !important;
+        }
+      `}</style>
+      <ReactTable
+        columns={tableColumns}
+        data={visibleTableData}
+        sortable={false}
+        minRows={organismsQuantity}
+        ExpanderComponent={({ isExpanded }) => (
+          <button
+            className="btn btn-light"
+            style={{ pointerEvents: "none", backgroundColor: "inherit" }}
+          >
+            <span>
+              <strong>
+                <DinaMessage id="showHide" />
+              </strong>
+            </span>
+            <span className={`rt-expander ${isExpanded ? "-open" : false}`}>
+              •
+            </span>
+          </button>
+        )}
+        expanded={expanded}
+        TbodyComponent={TbodyComponent}
+        getTbodyProps={() => ({ onSortStart, onSortEnd })}
+        onExpandedChange={onExpandedChange}
+        SubComponent={row => {
+          const isOdd = (row.index + 1) % 2 === 1;
 
-        // Add zebra striping to the subcomponent background:
-        const backgroundColor = isOdd ? "rgba(0,0,0,0.03)" : undefined;
+          // Add zebra striping to the subcomponent background:
+          const backgroundColor = isOdd ? "rgba(0,0,0,0.03)" : undefined;
 
-        return (
-          <div style={{ backgroundColor }}>
-            <OrganismStateField namePrefix={`${namePrefix}[${row.index}].`} />
-          </div>
-        );
-      }}
-      className="-striped"
+          return (
+            <div style={{ backgroundColor }}>
+              <OrganismStateField namePrefix={`${namePrefix}[${row.index}].`} />
+            </div>
+          );
+        }}
+        className="-striped"
+      />
+    </>
+  );
+}
+
+function TbodyComponent(props) {
+  return (
+    <SortableTBody
+      onSortStart={props.onSortStart}
+      onSortEnd={props.onSortEnd}
+      helperClass="d-flex"
+      useDragHandle={true}
+      axis="y"
+      {...props}
     />
   );
 }
 
-// function TbodyComponent(props) {
-//   return <SortableTBody axis="y" {...props} />;
-// }
+const SortableTBody = SortableContainer(({ children, ...bodyProps }) => {
+  const [rows, otherChildren] = children;
+  const { readOnly } = useDinaFormContext();
 
-// const SortableTBody = SortableContainer(({ children, ...bodyProps }) => {
-//   const [rows, otherChildren] = children;
+  return (
+    <div {...bodyProps} className="rt-tbody">
+      {rows.map((row, index) => (
+        <SortableTRow
+          key={row.key}
+          {...row.props}
+          disabled={readOnly}
+          index={index}
+        />
+      ))}
+      {otherChildren}
+    </div>
+  );
+});
 
-//   return (
-//     <div {...bodyProps} className="rt-tbody">
-//       {rows.map((row, index) => (
-//         <SortableTRow {...row.props} index={index} />
-//       ))}
-//       {otherChildren}
-//     </div>
-//   );
-// });
+const SortableTRow = SortableElement(({ children }) => <>{children}</>);
 
-// const SortableTRow = SortableElement(({ children }) => <>{children}</>);
+const RowSortHandle = SortableHandle(() => (
+  <MdDragHandle cursor="grab" size="3em" />
+));

@@ -336,14 +336,18 @@ export function useMaterialSampleSave({
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
+  const defaultValues: InputResource<MaterialSample> = {
+    type: "material-sample",
+    managedAttributes: {},
+    // Defaults to the last Collection used to create a Material Sample:
+    collection: lastUsedCollection,
+    publiclyReleasable: true
+  };
+
   const msInitialValues: InputResource<MaterialSample> = {
-    ...(materialSample || {
-      type: "material-sample",
-      managedAttributes: {},
-      // Defaults to the last Collection used to create a Material Sample:
-      collection: lastUsedCollection,
-      publiclyReleasable: true
-    })
+    ...(materialSample || defaultValues),
+    // Client-side-only field organismsQuantity:
+    organismsQuantity: materialSample?.organism?.length
   };
 
   /** Used to get the values of the nested CollectingEvent form. */
