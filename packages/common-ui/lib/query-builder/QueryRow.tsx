@@ -119,7 +119,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     <div className="row">
       <div className="col-md-6 d-flex">
         {index > 0 && (
-          <div style={{ width: index > 0 ? "13%" : "100%" }}>
+          <div style={{ width: index > 0 ? "8%" : "100%" }}>
             <QueryLogicSwitchField
               name={fieldProps("compoundQueryType", index).name}
               removeLabel={true}
@@ -127,7 +127,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           </div>
         )}
-        <div style={{ width: index > 0 ? "87%" : "100%" }}>
+        <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
             name={fieldProps("fieldName", index).name}
             options={queryRowOptions}

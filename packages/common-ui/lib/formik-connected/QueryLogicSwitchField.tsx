@@ -45,7 +45,7 @@ export function QueryLogicSwitchField(queryLogicSwitchProps) {
             height: "2.2em",
             borderColor: "#DCDCDC",
             borderStyle: "solid",
-            borderWidth: "1px",
+            borderWidth: "0px",
             borderRadius: "4px"
           }}
         >
@@ -72,8 +72,9 @@ export function QueryLogicSwitchField(queryLogicSwitchProps) {
           >
             {formatMessage({ id: "AND" })}
           </span>
+          {/* Hide tempararily before we get more understanding how we like to proceed */}
           <span
-            className={`${backClassName.or} pt-1 px-3 orSpan`}
+            className={`${backClassName.or} pt-1 px-3 orSpan d-none`}
             onClick={() =>
               onSwitchClicked("or", queryLogicSwitchProps.name, formik)
             }

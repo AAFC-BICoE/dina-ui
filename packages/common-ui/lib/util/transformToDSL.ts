@@ -23,34 +23,36 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
         ? rowToBuild.boolean
         : rowToBuild.type === "number"
         ? rowToBuild.number
-        : rowToBuild.date;
+        : rowToBuild.type === "date"
+        ? rowToBuild.date
+        : null;
 
     if (onlyOneRow) {
-      if (rowToBuild.matchValue) {
+      if (rowToBuild.type === "text") {
         builder.query(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
-          rowToBuild.matchValue
+          rowToBuild.matchValue ?? ""
         );
       } else {
         builder.filter("term", rowToBuild.fieldName, value);
       }
     } else if (curRow.compoundQueryType === "and") {
-      if (rowToBuild.matchValue) {
+      if (rowToBuild.type === "text") {
         builder.andQuery(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
-          rowToBuild.matchValue
+          rowToBuild.matchValue ?? ""
         );
       } else {
         builder.andFilter("term", rowToBuild.fieldName, value);
       }
     } else if (curRow.compoundQueryType === "or") {
-      if (rowToBuild.matchValue) {
+      if (rowToBuild.type === "text") {
         builder.orFilter(
           rowToBuild.matchType as string,
           rowToBuild.fieldName,
-          rowToBuild.matchValue
+          rowToBuild.matchValue ?? ""
         );
       } else {
         builder.orFilter("term", rowToBuild.fieldName, value);
@@ -67,7 +69,7 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
         ((queryRow.type === "boolean" && queryRow.boolean) ||
           (queryRow.type === "number" && queryRow.number) ||
           (queryRow.type === "date" && queryRow.date) ||
-          queryRow.matchValue)
+          (queryRow.type === "text" && queryRow.matchType))
     )
     .map((queryRow, idx) => {
       if (exportedQueryRows.length === 1) buildQuery(queryRow, queryRow, true);

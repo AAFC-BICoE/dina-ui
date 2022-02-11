@@ -66,7 +66,9 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: searchResults?.isFromSearch ? [] : initData
+    defaultAvailableItems: searchResults?.isFromSearch
+      ? searchResults?.results
+      : initData
   });
 
   const combinedColumns = [
