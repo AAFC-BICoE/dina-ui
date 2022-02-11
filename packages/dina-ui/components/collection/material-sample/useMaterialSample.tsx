@@ -19,13 +19,13 @@ import {
   isEqual,
   mapKeys,
   pick,
-  pickBy
+  pickBy,
+  slice
 } from "lodash";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
-  ORGANISM_FIELDS,
   PREPARATION_FIELDS,
   useCollectingEventQuery,
   useCollectingEventSave,
@@ -82,7 +82,7 @@ export function useMaterialSampleQuery(id?: string | null) {
       ],
       onSuccess: async ({ data }) => {
         for (const organism of data.organism ?? []) {
-          if (organism.determination) {
+          if (organism?.determination) {
             // Retrieve determiner arrays on determination.
             for (const determination of organism.determination) {
               if (determination.determiner) {
@@ -397,9 +397,6 @@ export function useMaterialSampleSave({
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
-      // This value is not submitted to the back-end:
-      organismsQuantity: undefined,
-
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
       ...(!enableOrganisms && { organism: [] }),
@@ -544,13 +541,19 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
-    const msDiffWithOrganisms = await saveAndAttachOrganisms(msDiff);
+    const msDiffWithOrganisms = await saveAndAttachOrganisms(msDiff, {
+      group: msPreprocessed.group,
+      organismsQuantity: msPreprocessed.organismsQuantity
+    });
 
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
       ...msDiffWithOrganisms,
+
+      // This value is not submitted to the back-end:
+      organismsQuantity: undefined,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
@@ -609,16 +612,24 @@ export function useMaterialSampleSave({
    * Does not modify the sample input, just returns a new sample input.
    */
   async function saveAndAttachOrganisms(
-    sample: InputResource<MaterialSample>
+    sample: InputResource<MaterialSample>,
+    {
+      group,
+      organismsQuantity = sample.organism?.length
+    }: { group: string | undefined; organismsQuantity: number | undefined }
   ): Promise<InputResource<MaterialSample>> {
     if (!sample.organism?.length) {
       return sample;
     }
 
-    const preparedOrganisms: Organism[] = sample.organism?.map(org => ({
+    const preparedOrganisms: Organism[] = slice(
+      sample.organism,
+      0,
+      organismsQuantity
+    ).map(org => ({
       ...org,
       // Default to the sample's group:
-      group: sample.group,
+      group,
       type: "organism"
     }));
 

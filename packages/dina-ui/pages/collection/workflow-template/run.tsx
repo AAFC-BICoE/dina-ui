@@ -152,13 +152,23 @@ function useWorkflowMaterialSampleInitialValues(
 
     /* If no template entrry for determination or there is only one determination, make it primary
      * same as georeference assertion */
-    for (const organism of materialSampleInitialValues.organism ?? []) {
-      if (!organism.determination) {
-        organism.determination = [{ isPrimary: true }];
-      } else if (organism.determination.length === 1) {
-        organism.determination[0].isPrimary = true;
-      }
-    }
+    materialSampleInitialValues.organism =
+      materialSampleInitialValues.organism?.map(org => {
+        if (!org?.determination?.length) {
+          return {
+            ...org,
+            type: "organism",
+            determination: [{ isPrimary: true }]
+          };
+        } else if (org?.determination.length === 1) {
+          return {
+            ...org,
+            type: "organism",
+            determination: [{ ...org.determination[0], isPrimary: true }]
+          };
+        }
+        return org;
+      });
 
     const collectingEvent = getInitialValuesFromTemplateFields(
       "collecting-event",

@@ -704,15 +704,22 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Set the group:
+    wrapper.find(".group-field Select").prop<any>("onChange")({
+      label: "group",
+      value: "test group"
+    });
+
     wrapper
       .find(".materialSampleName-field input")
       .simulate("change", { target: { value: "test-material-sample-id" } });
 
-    // Enable Collecting Event and catalogue info form sections:
+    // Enable the Organisms form section:
     wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Add a determination:
     wrapper.find(".determination-section button.add-button").simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
@@ -767,6 +774,8 @@ describe("Material Sample Edit Page", () => {
                   verbatimScientificName: "test-name-3"
                 }
               ],
+              // The organism should get the same group as the Material Sample:
+              group: "test group",
               type: "organism"
             },
             type: "organism"
@@ -779,6 +788,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: expect.objectContaining({
+              group: "test group",
               relationships: expect.objectContaining({
                 organism: {
                   data: [
@@ -1111,5 +1121,186 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.find(".associated-sample-link").text()).toEqual(
       "my-sample-name"
     );
+  });
+
+  it("Lets you add an organism to an existing Material Sample", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Enable the Organisms form section:
+    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Add 1 new organism:
+    wrapper
+      .find(".organismsQuantity-field input")
+      .simulate("change", { target: { value: 1 } });
+
+    wrapper
+      .find(".lifeStage-field input")
+      .at(0)
+      .simulate("change", { target: { value: "test lifestage" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      // Separate transaction to add the organism:
+      [
+        [
+          {
+            resource: {
+              // The group is copied from the sample:
+              group: "test-group",
+              lifeStage: "test lifestage",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      // Submits the sample:
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
+                    {
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "organism"
+                    }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Removed linked organisms when you decrease the Organism Quantity and then submit.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 3 organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-3",
+              lifeStage: "lifestage 3",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
+
+    // Expand all organism sections:
+    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+
+    // Edit the 3rd organism and leave the 2nd one alone to make sure new and old data is being removed:
+    wrapper
+      .find(".lifeStage-field input")
+      .at(2)
+      .simulate("change", { target: { value: "this should be removed" } });
+
+    // Reduce the organisms to 1:
+    wrapper
+      .find(".organismsQuantity-field input")
+      .simulate("change", { target: { value: "1" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          // Only the first organism is kept:
+          {
+            resource: {
+              id: "organism-1",
+              group: "test-group",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
+                    {
+                      id: "organism-1",
+                      type: "organism"
+                    }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
   });
 });

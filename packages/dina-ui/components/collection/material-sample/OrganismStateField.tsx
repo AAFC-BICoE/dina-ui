@@ -43,7 +43,7 @@ export function OrganismStateField({
               include: "organism"
             })}
             suggestion={matSample =>
-              matSample.organism?.map(it => it.lifeStage)
+              matSample.organism?.map(it => it?.lifeStage)
             }
             alwaysShowSuggestions={true}
           />
@@ -53,7 +53,7 @@ export function OrganismStateField({
               path: "collection-api/material-sample",
               include: "organism"
             })}
-            suggestion={matSample => matSample.organism?.map(it => it.sex)}
+            suggestion={matSample => matSample.organism?.map(it => it?.sex)}
             alwaysShowSuggestions={true}
           />
         </div>

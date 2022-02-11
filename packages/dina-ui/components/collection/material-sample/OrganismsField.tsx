@@ -20,6 +20,7 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import { MdDragHandle } from "react-icons/md";
+import classNames from "classnames";
 
 export interface OrganismsFieldProps {
   /** Organism array field name. */
@@ -142,11 +143,15 @@ function OrganismsTable({
   }
 
   const tableColumns: Column<Organism>[] = [
-    {
-      Header: "Sort",
-      Cell: () => <RowSortHandle />,
-      width: 60
-    },
+    ...(readOnly
+      ? []
+      : [
+          {
+            Header: "Sort",
+            Cell: () => <RowSortHandle />,
+            width: 60
+          }
+        ]),
     {
       id: "determination",
       accessor: o => {
@@ -198,7 +203,10 @@ function OrganismsTable({
         minRows={organismsQuantity}
         ExpanderComponent={({ isExpanded }) => (
           <button
-            className="btn btn-light"
+            className={classNames(
+              "btn btn-light expand-organism",
+              `${isExpanded ? "is" : "not"}-expanded`
+            )}
             style={{ pointerEvents: "none", backgroundColor: "inherit" }}
           >
             <span>

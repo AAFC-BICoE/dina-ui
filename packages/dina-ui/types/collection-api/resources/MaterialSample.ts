@@ -36,7 +36,7 @@ export interface MaterialSampleAttributes {
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  organism?: Organism[] | null;
+  organism?: (Organism | null | undefined)[] | null;
 
   // Client-side only field:
   organismsQuantity?: number;
