@@ -1397,4 +1397,65 @@ describe("Material Sample Edit Page", () => {
       ]
     ]);
   });
+
+  it("Lets you remove all organisms by setting the quantity to 0.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 2 organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Initially has 1 organism:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(1);
+
+    wrapper
+      .find(".organismsQuantity-field input")
+      .simulate("change", { target: { value: "0" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample with no organisms:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              relationships: expect.objectContaining({
+                organism: {
+                  data: []
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
 });

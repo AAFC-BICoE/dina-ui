@@ -541,10 +541,12 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
-    const msDiffWithOrganisms = await saveAndAttachOrganisms(msDiff, {
-      group: msPreprocessed.group,
-      organismsQuantity: msPreprocessed.organismsQuantity
-    });
+    const organismsWereChanged =
+      !!msDiff.organism || msDiff.organismsQuantity !== undefined;
+
+    const msDiffWithOrganisms = organismsWereChanged
+      ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
+      : msDiff;
 
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
@@ -612,24 +614,17 @@ export function useMaterialSampleSave({
    * Does not modify the sample input, just returns a new sample input.
    */
   async function saveAndAttachOrganisms(
-    sample: InputResource<MaterialSample>,
-    {
-      group,
-      organismsQuantity = sample.organism?.length ?? 0
-    }: { group: string | undefined; organismsQuantity: number | undefined }
-  ): Promise<InputResource<MaterialSample>> {
-    if (!sample.organism?.length) {
-      return sample;
-    }
-
-    const preparedOrganisms: Organism[] = range(0, organismsQuantity).map(
-      index => ({
-        ...sample.organism?.[index],
-        // Default to the sample's group:
-        group,
-        type: "organism"
-      })
-    );
+    sample: InputResource<MaterialSample>
+  ): Promise<PersistedResource<Organism>[]> {
+    const preparedOrganisms: Organism[] = range(
+      0,
+      sample.organismsQuantity
+    ).map(index => ({
+      ...sample.organism?.[index],
+      // Default to the sample's group:
+      group: sample.group,
+      type: "organism"
+    }));
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
       resource => ({
@@ -639,10 +634,14 @@ export function useMaterialSampleSave({
     );
 
     try {
+      // Don't call the API with an empty Save array:
+      if (!organismSaveArgs.length) {
+        return [];
+      }
       const savedOrganisms = await save<Organism>(organismSaveArgs, {
         apiBaseUrl: "/collection-api"
       });
-      return { ...sample, organism: savedOrganisms };
+      return savedOrganisms;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
         const newErrors = error.individualErrors.map<OperationError>(err => ({

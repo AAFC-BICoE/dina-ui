@@ -31,7 +31,9 @@ const TEST_SAMPLE_WITH_ORGANISMS: PersistedResource<MaterialSample> = {
       id: "org-1",
       type: "organism",
       lifeStage: "test lifestage 1",
-      determination: [{ verbatimScientificName: "test scientific name 1" }]
+      determination: [
+        { isPrimary: true, verbatimScientificName: "test scientific name 1" }
+      ]
     },
     { id: "org-2", type: "organism", lifeStage: "test lifestage 2" }
   ]
@@ -113,6 +115,11 @@ describe("Material Sample View Page", () => {
     // Check the second lifeStage field:
     expect(wrapper.find(".lifeStage-field .field-view").at(1).text()).toEqual(
       "test lifestage 2"
+    );
+
+    // Renders the primary determination name when present:
+    expect(wrapper.find(".organism-determination-cell").first().text()).toEqual(
+      "test scientific name 1"
     );
   });
 });

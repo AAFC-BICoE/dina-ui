@@ -55,7 +55,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
 
             const organismsQuantity = readOnly
               ? organisms.length
-              : Number(form.values.organismsQuantity) || 1;
+              : Number(form.values.organismsQuantity ?? 1);
 
             function removeOrganism(index: number) {
               remove(index);
@@ -72,13 +72,20 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                     />
                   </div>
                 )}
-                <OrganismsTable
-                  namePrefix={name}
-                  organisms={organisms}
-                  organismsQuantity={organismsQuantity}
-                  onRemoveClick={removeOrganism}
-                  onRowMove={move}
-                />
+                {
+                  // Render the table for more than one, otherwise render a single organism field set:
+                  organismsQuantity > 1 ? (
+                    <OrganismsTable
+                      namePrefix={name}
+                      organisms={organisms}
+                      organismsQuantity={organismsQuantity}
+                      onRemoveClick={removeOrganism}
+                      onRowMove={move}
+                    />
+                  ) : organismsQuantity === 1 ? (
+                    <OrganismStateField namePrefix={`${name}[0].`} />
+                  ) : null
+                }
               </div>
             );
           }}
@@ -156,12 +163,12 @@ function OrganismsTable({
         ]),
     {
       id: "determination",
-      accessor: o => {
+      Cell: ({ original: o }) => {
         const primaryDet = o?.determination?.find(it => it.isPrimary);
         const { scientificName, verbatimScientificName } = primaryDet ?? {};
 
         const cellText = verbatimScientificName || scientificName;
-        return cellText;
+        return <span className="organism-determination-cell">{cellText}</span>;
       },
       Header: formatMessage("determinationPrimary")
     },
