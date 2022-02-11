@@ -51,7 +51,10 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
-  const [searchResults, setSearchResults] = useState<TData[]>();
+  const [searchResults, setSearchResults] = useState<{
+    results?: TData[];
+    isFromSearch?: boolean;
+  }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
   const [visible, setVisible] = useState(false);
 
@@ -63,7 +66,7 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: initData
+    defaultAvailableItems: searchResults?.isFromSearch ? [] : initData
   });
 
   const combinedColumns = [
@@ -122,16 +125,16 @@ export function QueryPage<TData extends KitsuResource>({
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
-      const processedResult = result.map(rslt => ({
+      const processedResult = result?.map(rslt => ({
         id: rslt.id,
         type: rslt.type,
         ...rslt.attributes
       }));
       setAvailableSamples(processedResult);
-      setSearchResults(processedResult);
+      setSearchResults({ results: processedResult, isFromSearch: true });
     });
   };
-  const totalCount = searchResults?.length ?? initData?.length;
+  const totalCount = searchResults?.results?.length ?? initData?.length;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
@@ -245,7 +248,7 @@ export function QueryPage<TData extends KitsuResource>({
         <ReactTable
           className="-striped"
           columns={mappedColumns}
-          data={searchResults ?? initData}
+          data={searchResults?.results ?? initData}
           minRows={1}
         />
       </div>
