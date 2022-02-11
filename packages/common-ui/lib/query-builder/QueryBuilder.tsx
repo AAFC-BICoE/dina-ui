@@ -20,6 +20,7 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
+              form={fieldArrayProps.form}
             />
           );
           // initialize the logic switch value to be "and"//
@@ -28,25 +29,6 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
               elements?.length ?? 0
             }].compoundQueryType`,
             "and"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
-            esIndexMapping?.[0].label
-          );
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,
-            "match"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].boolean`,
-            "true"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].date`,
-            moment().format()
           );
         }
 
@@ -63,6 +45,7 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
                 addRow={addRow}
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
+                form={fieldArrayProps.form}
               />
             ))
           : null;

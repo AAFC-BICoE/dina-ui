@@ -81,6 +81,13 @@ export function QueryPage<TData extends KitsuResource>({
     defaultAvailableItems: initData
   });
 
+  const savedEsIndexMapping =
+    initSavedSearchValues && initSavedSearchValues.length > 0
+      ? (initSavedSearchValues as any).filter(initVal =>
+          get(initVal, "props.esIndexMapping")
+        )?.[0]?.props?.esIndexMapping
+      : undefined;
+
   const combinedColumns = [
     ...(showRowCheckboxes
       ? [
@@ -177,7 +184,8 @@ export function QueryPage<TData extends KitsuResource>({
     {
       shouldRetryOnError: true,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false
+      revalidateOnReconnect: false,
+      suspense: !!savedEsIndexMapping
     }
   );
 
@@ -212,13 +220,6 @@ export function QueryPage<TData extends KitsuResource>({
     // todo
   }
 
-  const savedEsIndexMapping =
-    initSavedSearchValues && initSavedSearchValues.length > 0
-      ? (initSavedSearchValues as any).filter(initVal =>
-          get(initVal, "props.esIndexMapping")
-        )?.[0]?.props?.esIndexMapping
-      : undefined;
-
   return (
     <DinaForm
       key={uuidv4()}
@@ -226,14 +227,7 @@ export function QueryPage<TData extends KitsuResource>({
         initSavedSearchValues && initSavedSearchValues.length > 0
           ? { queryRows: initSavedSearchValues }
           : {
-              queryRows: [
-                {
-                  fieldName: data?.[0].value + "(" + data?.[0].type + ")",
-                  matchType: "match",
-                  boolean: "true",
-                  date: moment().format()
-                }
-              ]
+              queryRows: [{}]
             }
       }
       onSubmit={onSubmit}

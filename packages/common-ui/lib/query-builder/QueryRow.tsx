@@ -8,12 +8,14 @@ import {
 } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
+import { FormikContextType } from "formik";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
   addRow?: () => void;
   removeRow?: (index) => void;
   name: string;
+  form?: FormikContextType<QueryRowExportProps>;
 }
 
 export interface ESIndexMapping {
@@ -49,7 +51,8 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name, form } =
+    queryRowProps;
   const initVisibility = {
     text: false,
     date: false,
@@ -58,7 +61,11 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     numberRange: false,
     dateRange: false
   };
-  const fieldType = esIndexMapping?.[0]?.type;
+  const fieldName = form?.values?.[`${name}`]?.[`${index}`]?.fieldName;
+  const fieldType = fieldName?.substring(
+    fieldName?.lastIndexOf("(") + 1,
+    fieldName?.lastIndexOf(")")
+  );
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }
@@ -110,9 +117,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     value: prop.value + "(" + prop.type + ")"
   }));
 
-  function fieldProps(fieldName: string, idx: number) {
+  function fieldProps(fldName: string, idx: number) {
     return {
-      name: `${name}[${idx}].${fieldName}`
+      name: `${name}[${idx}].${fldName}`
     };
   }
   return (
