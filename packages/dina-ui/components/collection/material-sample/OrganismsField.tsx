@@ -5,8 +5,8 @@ import {
   useDinaFormContext,
   useFieldLabels
 } from "common-ui";
-import { FieldArray } from "formik";
-import { get } from "lodash";
+import { FieldArray, useFormikContext } from "formik";
+import { get, isEmpty } from "lodash";
 import { useState } from "react";
 import ReactTable, { Column } from "react-table";
 import { OrganismStateField } from "..";
@@ -30,14 +30,14 @@ export interface OrganismsFieldProps {
 }
 
 export function OrganismsField({ name, id }: OrganismsFieldProps) {
-  const { isTemplate } = useDinaFormContext();
+  const { isTemplate, readOnly } = useDinaFormContext();
 
   return (
     <FieldSet
       id={id}
       className="organisms-section"
       fieldName={name}
-      legend={<DinaMessage id="organism" />}
+      legend={<DinaMessage id="organisms" />}
     >
       <BulkEditTabWarning
         targetType="material-sample"
@@ -50,10 +50,11 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
       >
         <FieldArray name={name}>
           {({ form, remove, move }) => {
-            const organismsQuantity =
-              Number(form.values.organismsQuantity) || 1;
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
+
+            const organismsQuantity =
+              Number(form.values.organismsQuantity) || (organisms.length ?? 1);
 
             function removeOrganism(index: number) {
               remove(index);
@@ -62,7 +63,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
 
             return (
               <div>
-                {!isTemplate && (
+                {!isTemplate && !readOnly && (
                   <div className="row">
                     <NumberField
                       name="organismsQuantity"
@@ -201,24 +202,7 @@ function OrganismsTable({
         data={visibleTableData}
         sortable={false}
         minRows={organismsQuantity}
-        ExpanderComponent={({ isExpanded }) => (
-          <button
-            className={classNames(
-              "btn btn-light expand-organism",
-              `${isExpanded ? "is" : "not"}-expanded`
-            )}
-            style={{ pointerEvents: "none", backgroundColor: "inherit" }}
-          >
-            <span>
-              <strong>
-                <DinaMessage id="showHide" />
-              </strong>
-            </span>
-            <span className={`rt-expander ${isExpanded ? "-open" : false}`}>
-              •
-            </span>
-          </button>
-        )}
+        ExpanderComponent={OrganismExpanderComponent}
         expanded={expanded}
         TbodyComponent={TbodyComponent}
         getTbodyProps={() => ({ onSortStart, onSortEnd })}
@@ -230,7 +214,7 @@ function OrganismsTable({
           const backgroundColor = isOdd ? "rgba(0,0,0,0.03)" : undefined;
 
           return (
-            <div style={{ backgroundColor }}>
+            <div className={isOdd ? "-odd" : ""} style={{ backgroundColor }}>
               <OrganismStateField namePrefix={`${namePrefix}[${row.index}].`} />
             </div>
           );
@@ -238,6 +222,39 @@ function OrganismsTable({
         className="-striped"
       />
     </>
+  );
+}
+
+function OrganismExpanderComponent({ isExpanded, index }) {
+  const { errors } = useFormikContext();
+
+  const prefix = `organism[${index}]`;
+
+  const hasError =
+    !isEmpty(get(errors, prefix)) ||
+    Object.keys(errors).some(key => key.startsWith(prefix));
+
+  return (
+    <button
+      className={classNames(
+        "btn btn-light expand-organism",
+        `${isExpanded ? "is" : "not"}-expanded`
+      )}
+      style={{ pointerEvents: "none", backgroundColor: "inherit" }}
+      type="button"
+    >
+      <div>
+        <strong>
+          <DinaMessage id="showHide" />
+        </strong>
+        <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
+      </div>
+      {hasError && (
+        <div className="text-danger is-invalid">
+          ({<DinaMessage id="hasError" />})
+        </div>
+      )}
+    </button>
   );
 }
 

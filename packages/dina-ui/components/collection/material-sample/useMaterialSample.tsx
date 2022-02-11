@@ -20,7 +20,7 @@ import {
   mapKeys,
   pick,
   pickBy,
-  slice
+  range
 } from "lodash";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
@@ -615,23 +615,21 @@ export function useMaterialSampleSave({
     sample: InputResource<MaterialSample>,
     {
       group,
-      organismsQuantity = sample.organism?.length
+      organismsQuantity = sample.organism?.length ?? 0
     }: { group: string | undefined; organismsQuantity: number | undefined }
   ): Promise<InputResource<MaterialSample>> {
     if (!sample.organism?.length) {
       return sample;
     }
 
-    const preparedOrganisms: Organism[] = slice(
-      sample.organism,
-      0,
-      organismsQuantity
-    ).map(org => ({
-      ...org,
-      // Default to the sample's group:
-      group,
-      type: "organism"
-    }));
+    const preparedOrganisms: Organism[] = range(0, organismsQuantity).map(
+      index => ({
+        ...sample.organism?.[index],
+        // Default to the sample's group:
+        group,
+        type: "organism"
+      })
+    );
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
       resource => ({

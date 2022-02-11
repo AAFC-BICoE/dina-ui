@@ -1,4 +1,9 @@
-import { AutoSuggestTextField, TextField } from "common-ui";
+import {
+  AutoSuggestTextField,
+  FieldSpy,
+  TextField,
+  useDinaFormContext
+} from "common-ui";
 import { DeterminationField } from "..";
 import { MaterialSample } from "../../../types/collection-api";
 
@@ -23,6 +28,8 @@ export function OrganismStateField({
   namePrefix = "",
   id = "organism-state-section"
 }: OrganismStateFieldProps) {
+  const { readOnly } = useDinaFormContext();
+
   /** Applies name prefix to field props */
   function fieldProps(fieldName: typeof ORGANISM_FIELDS[number]) {
     return {
@@ -31,6 +38,8 @@ export function OrganismStateField({
       customName: fieldName
     };
   }
+
+  const determinationFieldProps = fieldProps("determination");
 
   return (
     <div id={id}>
@@ -61,7 +70,14 @@ export function OrganismStateField({
           <TextField {...fieldProps("remarks")} multiLines={true} />
         </div>
       </div>
-      <DeterminationField {...fieldProps("determination")} />
+      <FieldSpy<[]> fieldName={determinationFieldProps.name}>
+        {determinations =>
+          // Hide in read-only mode when there are no determinations:
+          readOnly && !determinations?.length ? null : (
+            <DeterminationField {...determinationFieldProps} />
+          )
+        }
+      </FieldSpy>
     </div>
   );
 }
