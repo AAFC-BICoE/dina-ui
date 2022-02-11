@@ -1202,7 +1202,7 @@ describe("Material Sample Edit Page", () => {
     ]);
   });
 
-  it("Removed linked organisms when you decrease the Organism Quantity and then submit.", async () => {
+  it("Removes linked organisms when you decrease the Organism Quantity and then submit.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
@@ -1289,6 +1289,100 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "organism-1",
+                      type: "organism"
+                    }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you remove an organism with the Remove button.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 2 organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
+
+    // Initially has 2 organisms:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(2);
+
+    // Remove the first organism:
+    wrapper.find("button.remove-organism-button").first().simulate("click");
+
+    // The quantity input is updated:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(1);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        // Saves only 1 organism (the second one):
+        [
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  // Only 1 organism linked now:
+                  data: [
+                    {
+                      id: "organism-2",
                       type: "organism"
                     }
                   ]

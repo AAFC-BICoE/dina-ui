@@ -6,7 +6,7 @@ import {
   useFieldLabels
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
-import { get, isEmpty } from "lodash";
+import { get, isEmpty, keys } from "lodash";
 import { useState } from "react";
 import ReactTable, { Column } from "react-table";
 import { OrganismStateField } from "..";
@@ -53,8 +53,9 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
 
-            const organismsQuantity =
-              Number(form.values.organismsQuantity) || (organisms.length ?? 1);
+            const organismsQuantity = readOnly
+              ? organisms.length
+              : Number(form.values.organismsQuantity) || 1;
 
             function removeOrganism(index: number) {
               remove(index);
@@ -174,7 +175,7 @@ function OrganismsTable({
         <>
           {!isTemplate && !readOnly && (
             <FormikButton
-              className="btn btn-dark"
+              className="btn btn-dark remove-organism-button"
               onClick={() => handleRemoveClick(index)}
             >
               <DinaMessage id="removeOrganism" />
@@ -232,7 +233,7 @@ function OrganismExpanderComponent({ isExpanded, index }) {
 
   const hasError =
     !isEmpty(get(errors, prefix)) ||
-    Object.keys(errors).some(key => key.startsWith(prefix));
+    keys(errors).some(key => key.startsWith(prefix));
 
   return (
     <button

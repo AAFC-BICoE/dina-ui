@@ -25,8 +25,7 @@ export interface OrganismStateFieldProps {
 
 /** Form section for a single organism. */
 export function OrganismStateField({
-  namePrefix = "",
-  id = "organism-state-section"
+  namePrefix = ""
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -42,7 +41,7 @@ export function OrganismStateField({
   const determinationFieldProps = fieldProps("determination");
 
   return (
-    <div id={id}>
+    <div className="organism-state-field">
       <div className="row mx-0">
         <div className="col-md-6">
           <AutoSuggestTextField<MaterialSample>
