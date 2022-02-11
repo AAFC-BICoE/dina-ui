@@ -58,7 +58,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     numberRange: false,
     dateRange: false
   };
-  const fieldType = esIndexMapping?.[0].type;
+  const fieldType = esIndexMapping?.[0]?.type;
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }

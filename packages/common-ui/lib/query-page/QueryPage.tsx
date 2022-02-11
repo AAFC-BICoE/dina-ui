@@ -122,11 +122,15 @@ export function QueryPage<TData extends KitsuResource>({
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
-      setAvailableSamples(result);
-      setSearchResults(result);
+      const processedResult = result.map(rslt => ({
+        id: rslt.id,
+        type: rslt.type,
+        ...rslt.attributes
+      }));
+      setAvailableSamples(processedResult);
+      setSearchResults(processedResult);
     });
   };
-
   const totalCount = searchResults?.length ?? initData?.length;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
@@ -173,7 +177,7 @@ export function QueryPage<TData extends KitsuResource>({
       initialValues={{
         queryRows: [
           {
-            fieldName: data?.[0].value + "(" + data?.[0].type + ")",
+            fieldName: data?.[0]?.value + "(" + data?.[0]?.type + ")",
             matchType: "match",
             boolean: "true",
             date: moment().format()
