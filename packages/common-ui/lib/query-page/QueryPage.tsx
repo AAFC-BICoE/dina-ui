@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -22,13 +22,13 @@ import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields"
 import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
-import moment from "moment";
 import { SavedSearch } from "./SavedSearch";
 import { FieldWrapper } from "../formik-connected/FieldWrapper";
 import { JsonObject, JsonValue } from "type-fest";
 import { useAccount } from "..";
 import useLocalStorage from "@rehooks/local-storage";
 import { get } from "lodash";
+import { FormikProps } from "formik";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -57,6 +57,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
+  const pageRef = useRef<FormikProps<any>>(null);
   const [initSavedSearchValues, setInitSavedSearchValues] = useState<
     JsonObject[]
   >([]);
@@ -231,8 +232,12 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <DinaForm
       key={uuidv4()}
+      innerRef={pageRef}
       initialValues={
-        initSavedSearchValues && initSavedSearchValues.length > 0
+        pageRef.current?.values.queryRows &&
+        Object.keys(pageRef.current?.values.queryRows).length > 1
+          ? { queryRows: pageRef.current?.values.queryRows }
+          : initSavedSearchValues && initSavedSearchValues.length > 0
           ? { queryRows: initSavedSearchValues }
           : {
               queryRows: [{}]
@@ -266,6 +271,7 @@ export function QueryPage<TData extends KitsuResource>({
                 ? Object.keys(savedSearches?.[username as any])
                 : []
             }
+            initialSavedSearches={savedSearches?.[username as any]}
           />
         )}
       </FieldWrapper>
