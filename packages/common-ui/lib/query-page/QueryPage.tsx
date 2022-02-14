@@ -29,6 +29,7 @@ import { useAccount } from "..";
 import useLocalStorage from "@rehooks/local-storage";
 import { get } from "lodash";
 import { FormikProps } from "formik";
+import { useRouter } from "next/router";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -71,7 +72,7 @@ export function QueryPage<TData extends KitsuResource>({
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
-  const [visible, setVisible] = useState(false);
+  const router = useRouter();
 
   const resolvedReactTableProps = { sortable: true, ...reactTableProps };
 
@@ -226,12 +227,14 @@ export function QueryPage<TData extends KitsuResource>({
     setSavedSearches(
       mySavedSearches ?? (newSavedSearches as Map<string, JsonValue>)
     );
+    router.reload();
   }
 
   function deleteSavedSearch(savedSearchName?: string) {
     const mySavedSearch = savedSearches;
     delete mySavedSearch?.[username as any]?.[`${savedSearchName}`];
     setSavedSearches(mySavedSearch as any);
+    router.reload();
   }
 
   const initialValues = {
@@ -305,8 +308,6 @@ export function QueryPage<TData extends KitsuResource>({
                 <div className="flex-grow-1">
                   <Tooltip
                     id="queryTableMultiSortExplanation"
-                    setVisible={setVisible}
-                    visible={visible}
                     visibleElement={
                       <a
                         href="#"

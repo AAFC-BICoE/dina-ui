@@ -15,7 +15,7 @@ export interface SavedSearchProps {
   deleteSavedSearch: (savedSearchName?: string) => void;
   value: JsonValue;
   savedSearchNames?: string[];
-  initialSavedSearches?: JsonValue[];
+  initialSavedSearches?: JsonValue;
   selectedSearch?: string;
 }
 
@@ -65,7 +65,9 @@ export function SavedSearch(props: SavedSearchProps) {
       <button
         className="btn btn-primary"
         onClick={() => loadSavedSearch(curSelected ?? selectedSearch)}
-        disabled={!initialSavedSearches}
+        disabled={
+          !initialSavedSearches || !Object.keys(initialSavedSearches).length
+        }
       >
         {formatMessage("load")}
       </button>
@@ -80,7 +82,9 @@ export function SavedSearch(props: SavedSearchProps) {
         onClick={() =>
           deleteSavedSearch((curSelected as any) ?? selectedSearch)
         }
-        disabled={!initialSavedSearches}
+        disabled={
+          !initialSavedSearches || !Object.keys(initialSavedSearches).length
+        }
       >
         {formatMessage("deleteButtonText")}
       </button>

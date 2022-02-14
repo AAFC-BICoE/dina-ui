@@ -32,11 +32,8 @@ export function useSavedSearchModal() {
               <>
                 <TextField name="searchName" removeLabel={true} />
                 <div className="d-flex gap-2">
-                  <button className="btn btn-secondary" onClick={closeModal}>
-                    {formatMessage("cancelButtonText")}
-                  </button>
                   <FormikButton
-                    className="btn btn-primary"
+                    className="btn btn-primary order-3"
                     onClick={(submittedValues, _) => {
                       saveSearch(
                         value as any,
@@ -49,7 +46,7 @@ export function useSavedSearchModal() {
                     {formatMessage("save")}
                   </FormikButton>
                   <FormikButton
-                    className="btn btn-primary"
+                    className="btn btn-primary order-2"
                     onClick={() => {
                       saveSearch(value as any, true);
                       closeModal();
@@ -57,6 +54,12 @@ export function useSavedSearchModal() {
                   >
                     {formatMessage("saveAsDefault")}
                   </FormikButton>
+                  <button
+                    className="btn btn-secondary order-1"
+                    onClick={closeModal}
+                  >
+                    {formatMessage("cancelButtonText")}
+                  </button>
                 </div>
               </>
             </DinaForm>
