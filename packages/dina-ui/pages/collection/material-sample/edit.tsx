@@ -730,15 +730,20 @@ export function nextSampleInitialValues(
     createdBy,
     materialSampleName,
     allowDuplicateName,
+    organism,
     ...copiedValues
   } = originalSample;
+
+  // Omit the IDs from the original sample's organisms:
+  const newOrganisms = organism?.map(org => org && { ...org, id: undefined });
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
   const initialValues = {
     ...copiedValues,
-    materialSampleName: newMaterialSampleName
+    materialSampleName: newMaterialSampleName,
+    organism: newOrganisms
   };
 
   return initialValues;

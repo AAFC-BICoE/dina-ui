@@ -847,6 +847,28 @@ describe("Material Sample Edit Page", () => {
       type: "material-sample",
       materialSampleName: ""
     });
+
+    // Organisms should not be linked to multiple Samples.
+    // Instead create new organisms with the same values by omitting the IDs:
+    expect(
+      nextSampleInitialValues({
+        id: "123",
+        type: "material-sample",
+        materialSampleName: "MY-SAMPLE-100",
+        organism: [
+          { id: "organism-1", type: "organism", lifeStage: "test lifestage 1" },
+          { id: "organism-2", type: "organism", lifeStage: "test lifestage 2" }
+        ]
+      })
+    ).toEqual({
+      type: "material-sample",
+      materialSampleName: "MY-SAMPLE-101",
+      // The original organism IDs should be omitted:
+      organism: [
+        { type: "organism", lifeStage: "test lifestage 1" },
+        { type: "organism", lifeStage: "test lifestage 2" }
+      ]
+    });
   });
 
   it("Creates a material sample with a new Acquisition Event", async () => {

@@ -73,7 +73,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   bulkEditResourceLinkerWarningMulti:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
-    "These {fieldName} will be set on all {targetType}s.",
+    "These {fieldName}s will be set on all {targetType}s.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",

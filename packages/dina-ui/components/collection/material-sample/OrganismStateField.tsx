@@ -42,7 +42,7 @@ export function OrganismStateField({
 
   return (
     <div className="organism-state-field">
-      <div className="row">
+      <div className="row mx-0">
         <div className="col-md-6">
           <AutoSuggestTextField<MaterialSample>
             {...fieldProps("lifeStage")}
@@ -73,7 +73,9 @@ export function OrganismStateField({
         {determinations =>
           // Hide in read-only mode when there are no determinations:
           readOnly && !determinations?.length ? null : (
-            <DeterminationField {...determinationFieldProps} />
+            <div className="px-2">
+              <DeterminationField {...determinationFieldProps} />
+            </div>
           )
         }
       </FieldSpy>
