@@ -213,21 +213,25 @@ export function QueryPage<TData extends KitsuResource>({
 
   function saveSearch(value, isDefault, searchName) {
     let newSavedSearches;
-    if (savedSearches && Object.keys(savedSearches)?.length > 0) {
-      savedSearches[username as any][`${isDefault ? "default" : searchName}`] =
-        value;
+    const mySavedSearches = savedSearches;
+    if (mySavedSearches && Object.keys(mySavedSearches)?.length > 0) {
+      mySavedSearches[username as any][
+        `${isDefault ? "default" : searchName}`
+      ] = value;
     } else {
       newSavedSearches = {
         [`${username}`]: { [`${isDefault ? "default" : searchName}`]: value }
       };
     }
     setSavedSearches(
-      savedSearches ?? (newSavedSearches as Map<string, JsonValue>)
+      mySavedSearches ?? (newSavedSearches as Map<string, JsonValue>)
     );
   }
 
   function deleteSavedSearch(savedSearchName?: string) {
-    // todo
+    const mySavedSearch = savedSearches;
+    delete mySavedSearch?.[username as any]?.[`${savedSearchName}`];
+    setSavedSearches(mySavedSearch as any);
   }
 
   const initialValues = {
