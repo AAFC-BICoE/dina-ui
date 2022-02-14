@@ -302,6 +302,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSample_identifierType_materialSampleId_label:
     "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
+  field_organismsIndividualEntry: "Individual Organism Entry",
+  field_organismsIndividualEntry_tooltip:
+    "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",

@@ -5,7 +5,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { DeterminationField } from "..";
-import { MaterialSample } from "../../../types/collection-api";
+import { Organism } from "../../../types/collection-api";
 
 /**
  * List of field names in the OrganismStateField component.
@@ -44,24 +44,28 @@ export function OrganismStateField({
     <div className="organism-state-field">
       <div className="row mx-0">
         <div className="col-md-6">
-          <AutoSuggestTextField<MaterialSample>
+          <AutoSuggestTextField<Organism>
             {...fieldProps("lifeStage")}
-            query={(_, _ctx) => ({
-              path: "collection-api/material-sample",
-              include: "organism"
+            query={(search, ctx) => ({
+              path: "collection-api/organism",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `lifeStage==${search}*`
+              }
             })}
-            suggestion={matSample =>
-              matSample.organism?.map(it => it?.lifeStage)
-            }
+            suggestion={org => org.lifeStage}
             alwaysShowSuggestions={true}
           />
-          <AutoSuggestTextField<MaterialSample>
+          <AutoSuggestTextField<Organism>
             {...fieldProps("sex")}
-            query={(_, _ctx) => ({
-              path: "collection-api/material-sample",
-              include: "organism"
+            query={(search, ctx) => ({
+              path: "collection-api/organism",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `sex==${search}*`
+              }
             })}
-            suggestion={matSample => matSample.organism?.map(it => it?.sex)}
+            suggestion={org => org.sex}
             alwaysShowSuggestions={true}
           />
         </div>

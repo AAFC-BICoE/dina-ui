@@ -56,7 +56,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
 
             const organismsQuantity = readOnly
               ? organisms.length
-              : Number(form.values.organismsQuantity ?? 1);
+              : Number(form.values.organismsQuantity ?? 0);
             const organismsIndividualEntry = !!(
               form.values.organismsIndividualEntry ?? false
             );
@@ -83,17 +83,18 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                     </div>
                   </div>
                 )}
-                {organismsIndividualEntry ? (
-                  <OrganismsTable
-                    namePrefix={name}
-                    organisms={organisms}
-                    organismsQuantity={organismsQuantity}
-                    onRemoveClick={removeOrganism}
-                    onRowMove={move}
-                  />
-                ) : (
-                  <OrganismStateField namePrefix={`${name}[0].`} />
-                )}
+                {organismsQuantity > 0 &&
+                  (organismsIndividualEntry ? (
+                    <OrganismsTable
+                      namePrefix={name}
+                      organisms={organisms}
+                      organismsQuantity={organismsQuantity}
+                      onRemoveClick={removeOrganism}
+                      onRowMove={move}
+                    />
+                  ) : (
+                    <OrganismStateField namePrefix={`${name}[0].`} />
+                  ))}
               </div>
             );
           }}
