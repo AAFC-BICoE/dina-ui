@@ -293,12 +293,12 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <div className="mb-1">
           {!omitPaging && (
-            <div className="d-flex ">
+            <div className="d-flex align-items-end">
               <span>
                 <CommonMessage id="tableTotalCount" values={{ totalCount }} />
               </span>
               {resolvedReactTableProps?.sortable !== false && (
-                <span className="flex-grow-1">
+                <div className="flex-grow-1">
                   <Tooltip
                     id="queryTableMultiSortExplanation"
                     setVisible={setVisible}
@@ -307,20 +307,12 @@ export function QueryPage<TData extends KitsuResource>({
                       <a
                         href="#"
                         aria-describedby={"queryTableMultiSortExplanation"}
-                        onKeyUp={e =>
-                          e.key === "Escape"
-                            ? setVisible(false)
-                            : setVisible(true)
-                        }
-                        onMouseOver={() => setVisible(true)}
-                        onMouseOut={() => setVisible(false)}
-                        onBlur={() => setVisible(false)}
                       >
                         <CommonMessage id="queryTableMultiSortTooltipTitle" />
                       </a>
                     }
                   />
-                </span>
+                </div>
               )}
               <div className="">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
