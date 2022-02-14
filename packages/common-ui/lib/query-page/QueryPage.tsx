@@ -24,7 +24,7 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { FieldWrapper } from "../formik-connected/FieldWrapper";
-import { JsonObject, JsonValue } from "type-fest";
+import { JsonValue } from "type-fest";
 import { useAccount } from "..";
 import useLocalStorage from "@rehooks/local-storage";
 import { get } from "lodash";
@@ -59,9 +59,8 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage } = useIntl();
   const refreshPage = useRef<boolean>(true);
   const pageRef = useRef<FormikProps<any>>(null);
-  const [initSavedSearchValues, setInitSavedSearchValues] = useState<
-    JsonObject[]
-  >([]);
+  const [initSavedSearchValues, setInitSavedSearchValues] =
+    useState<Map<string, JsonValue[]>>();
   const { username } = useAccount();
   const SAVED_SEARCHES = "saved-searches";
   const [savedSearches, setSavedSearches] =
@@ -88,10 +87,12 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   const savedEsIndexMapping =
-    initSavedSearchValues && initSavedSearchValues.length > 0
-      ? (initSavedSearchValues as any).filter(initVal =>
-          get(initVal, "props.esIndexMapping")
-        )?.[0]?.props?.esIndexMapping
+    initSavedSearchValues && initSavedSearchValues.size > 0
+      ? initSavedSearchValues
+          .values()
+          .next()
+          .value?.filter(initVal => get(initVal, "props.esIndexMapping"))?.[0]
+          ?.props?.esIndexMapping
       : undefined;
 
   const combinedColumns = [
@@ -203,10 +204,11 @@ export function QueryPage<TData extends KitsuResource>({
 
   function loadSavedSearch(savedSearchName) {
     refreshPage.current = true;
-
-    setInitSavedSearchValues(
+    const initValus = new Map().set(
+      savedSearchName,
       savedSearches ? savedSearches[username as any]?.[savedSearchName] : [{}]
     );
+    setInitSavedSearchValues(initValus);
   }
 
   function saveSearch(value, isDefault, searchName) {
@@ -235,8 +237,8 @@ export function QueryPage<TData extends KitsuResource>({
     queryRows:
       refreshPage.current &&
       initSavedSearchValues &&
-      initSavedSearchValues.length > 0
-        ? initSavedSearchValues
+      initSavedSearchValues.size > 0
+        ? initSavedSearchValues.values().next().value
         : pageRef.current?.values.queryRows &&
           Object.keys(pageRef.current?.values.queryRows).length > 1
         ? pageRef.current?.values.queryRows
@@ -278,6 +280,11 @@ export function QueryPage<TData extends KitsuResource>({
                 : []
             }
             initialSavedSearches={savedSearches?.[username as any]}
+            selectedSearch={
+              initSavedSearchValues
+                ? initSavedSearchValues.keys().next().value
+                : undefined
+            }
           />
         )}
       </FieldWrapper>
