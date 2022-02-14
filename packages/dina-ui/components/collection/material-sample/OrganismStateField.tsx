@@ -42,44 +42,45 @@ export function OrganismStateField({
 
   return (
     <div className="organism-state-field">
-      <div className="row mx-0">
-        <div className="col-md-6">
-          <AutoSuggestTextField<Organism>
-            {...fieldProps("lifeStage")}
-            query={(search, ctx) => ({
-              path: "collection-api/organism",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `lifeStage==${search}*`
-              }
-            })}
-            suggestion={org => org.lifeStage}
-            alwaysShowSuggestions={true}
-          />
-          <AutoSuggestTextField<Organism>
-            {...fieldProps("sex")}
-            query={(search, ctx) => ({
-              path: "collection-api/organism",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `sex==${search}*`
-              }
-            })}
-            suggestion={org => org.sex}
-            alwaysShowSuggestions={true}
-          />
-        </div>
-        <div className="col-md-6">
-          <TextField {...fieldProps("remarks")} multiLines={true} />
-        </div>
+      <div className="row">
+        <AutoSuggestTextField<Organism>
+          className="col-sm-6"
+          {...fieldProps("lifeStage")}
+          query={(search, ctx) => ({
+            path: "collection-api/organism",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `lifeStage==${search}*`
+            }
+          })}
+          suggestion={org => org.lifeStage}
+          alwaysShowSuggestions={true}
+        />
+        <AutoSuggestTextField<Organism>
+          className="col-sm-6"
+          {...fieldProps("sex")}
+          query={(search, ctx) => ({
+            path: "collection-api/organism",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `sex==${search}*`
+            }
+          })}
+          suggestion={org => org.sex}
+          alwaysShowSuggestions={true}
+        />
+        <TextField
+          {...fieldProps("remarks")}
+          customName="organismRemarks"
+          className="col-sm-12"
+          multiLines={true}
+        />
       </div>
       <FieldSpy<[]> fieldName={determinationFieldProps.name}>
         {determinations =>
           // Hide in read-only mode when there are no determinations:
           readOnly && !determinations?.length ? null : (
-            <div className="px-2">
-              <DeterminationField {...determinationFieldProps} />
-            </div>
+            <DeterminationField {...determinationFieldProps} />
           )
         }
       </FieldSpy>

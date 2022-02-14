@@ -237,7 +237,11 @@ function OrganismsTable({
 
           return (
             <div className={isOdd ? "-odd" : ""} style={{ backgroundColor }}>
-              <OrganismStateField namePrefix={`${namePrefix}[${row.index}].`} />
+              <div className="p-3">
+                <OrganismStateField
+                  namePrefix={`${namePrefix}[${row.index}].`}
+                />
+              </div>
             </div>
           );
         }}
