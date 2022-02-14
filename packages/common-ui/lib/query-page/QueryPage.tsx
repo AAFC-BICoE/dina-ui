@@ -57,6 +57,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
+  const refreshPage = useRef<boolean>(true);
   const pageRef = useRef<FormikProps<any>>(null);
   const [initSavedSearchValues, setInitSavedSearchValues] = useState<
     JsonObject[]
@@ -201,6 +202,8 @@ export function QueryPage<TData extends KitsuResource>({
   if (loading || error) return <></>;
 
   function loadSavedSearch(savedSearchName) {
+    refreshPage.current = true;
+
     setInitSavedSearchValues(
       savedSearches ? savedSearches[username as any]?.[savedSearchName] : [{}]
     );
@@ -228,21 +231,24 @@ export function QueryPage<TData extends KitsuResource>({
   function onChange(e) {
     // todo
   }
+  const initialValues = {
+    queryRows:
+      refreshPage.current &&
+      initSavedSearchValues &&
+      initSavedSearchValues.length > 0
+        ? initSavedSearchValues
+        : pageRef.current?.values.queryRows &&
+          Object.keys(pageRef.current?.values.queryRows).length > 1
+        ? pageRef.current?.values.queryRows
+        : [{}]
+  };
+  refreshPage.current = false;
 
   return (
     <DinaForm
       key={uuidv4()}
       innerRef={pageRef}
-      initialValues={
-        pageRef.current?.values.queryRows &&
-        Object.keys(pageRef.current?.values.queryRows).length > 1
-          ? { queryRows: pageRef.current?.values.queryRows }
-          : initSavedSearchValues && initSavedSearchValues.length > 0
-          ? { queryRows: initSavedSearchValues }
-          : {
-              queryRows: [{}]
-            }
-      }
+      initialValues={initialValues}
       onSubmit={onSubmit}
     >
       <label
