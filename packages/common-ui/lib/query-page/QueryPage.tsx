@@ -230,9 +230,6 @@ export function QueryPage<TData extends KitsuResource>({
     // todo
   }
 
-  function onChange(e) {
-    // todo
-  }
   const initialValues = {
     queryRows:
       refreshPage.current &&
@@ -240,7 +237,7 @@ export function QueryPage<TData extends KitsuResource>({
       initSavedSearchValues.size > 0
         ? initSavedSearchValues.values().next().value
         : pageRef.current?.values.queryRows &&
-          Object.keys(pageRef.current?.values.queryRows).length > 1
+          Object.keys(pageRef.current?.values.queryRows).length > 0
         ? pageRef.current?.values.queryRows
         : [{}]
   };

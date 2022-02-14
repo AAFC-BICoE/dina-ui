@@ -1,5 +1,5 @@
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Select from "react-select";
 import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
@@ -13,7 +13,6 @@ export interface SavedSearchProps {
     searchName: string
   ) => void;
   deleteSavedSearch: (savedSearchName?: string) => void;
-  onChange?: (e) => void;
   value: JsonValue;
   savedSearchNames?: string[];
   initialSavedSearches?: JsonValue[];
@@ -24,7 +23,6 @@ export function SavedSearch(props: SavedSearchProps) {
   const {
     loadSavedSearch,
     deleteSavedSearch,
-    onChange,
     value,
     saveSearch,
     savedSearchNames,
@@ -32,15 +30,15 @@ export function SavedSearch(props: SavedSearchProps) {
     selectedSearch
   } = props;
   const { formatMessage } = useDinaIntl();
+  const [curSelected, setCurSelected] = useState(null);
+  const previousSelectedSearch = useRef(selectedSearch);
+
+  const { openSavedSearchModal } = useSavedSearchModal();
   const savedSearchNamesOptions: SelectOption<string>[] = [];
 
   savedSearchNames?.map(name =>
     savedSearchNamesOptions.push({ label: name, value: name })
   );
-
-  const [curSelected, setCurSelected] = useState(null);
-
-  const { openSavedSearchModal } = useSavedSearchModal();
 
   function onSelectedSavedSearchChanged(e) {
     setCurSelected(e.value);
@@ -67,7 +65,9 @@ export function SavedSearch(props: SavedSearchProps) {
       />
       <button
         className="btn btn-primary"
-        onClick={() => loadSavedSearch(curSelected)}
+        onClick={() =>
+          loadSavedSearch(curSelected ?? previousSelectedSearch.current)
+        }
         disabled={!initialSavedSearches}
       >
         {formatMessage("load")}
@@ -80,7 +80,11 @@ export function SavedSearch(props: SavedSearchProps) {
       </button>
       <button
         className="btn btn-danger"
-        onClick={() => deleteSavedSearch(curSelected as any)}
+        onClick={() =>
+          deleteSavedSearch(
+            (curSelected as any) ?? previousSelectedSearch.current
+          )
+        }
         disabled={!initialSavedSearches}
       >
         {formatMessage("deleteButtonText")}
