@@ -8,7 +8,7 @@ import {
   FieldSpy,
   withResponse
 } from "common-ui";
-import { FastField, Field } from "formik";
+import { Field } from "formik";
 import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
@@ -20,22 +20,20 @@ import {
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
-  StorageLinkerField,
-  TagsAndRestrictionsSection,
+  OrganismsField,
   ProjectSelectSection,
-  OrganismsField
+  StorageLinkerField,
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventFormLayout,
-  DeterminationField,
-  OrganismStateField,
-  ORGANISM_FIELDS,
   PreparationField,
   PREPARATION_FIELDS,
   SamplesView,
   ScheduledActionsField,
   useCollectingEventQuery,
-  useMaterialSampleQuery
+  useMaterialSampleQuery,
+  withOrganismEditorValues
 } from "../../../components/collection/";
 import {
   AssociationsField,
@@ -106,7 +104,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
-      {withResponse(materialSampleQuery, ({ data: materialSample }) => {
+      {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
+        const materialSample = withOrganismEditorValues(materialSampleData);
+
         const hasPreparations = PREPARATION_FIELDS.some(
           fieldName => !isEmpty(materialSample[fieldName])
         );

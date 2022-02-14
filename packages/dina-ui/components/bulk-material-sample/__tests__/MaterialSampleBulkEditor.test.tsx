@@ -819,7 +819,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toContain("Invalid barcode");
   });
 
-  it("Doesn't override the values when the Override All button is not clicked.", async () => {
+  it("Doesnt override the values when the Override All button is not clicked.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -1876,9 +1876,6 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              preparationAttachment: undefined,
-              projects: undefined,
-              attachment: undefined,
               id: "1",
               associations: [],
               hostOrganism: {
@@ -1892,9 +1889,6 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: {
-              preparationAttachment: undefined,
-              projects: undefined,
-              attachment: undefined,
               id: "2",
               hostOrganism: {
                 name: "test host organism",

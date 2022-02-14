@@ -65,10 +65,10 @@ export function NumberField(props: NumberFieldProps) {
 
         return (
           <input
+            type="text"
             {...inputProps}
             onBlur={onBlur}
             onChange={onChange}
-            type="text"
           />
         );
       }}

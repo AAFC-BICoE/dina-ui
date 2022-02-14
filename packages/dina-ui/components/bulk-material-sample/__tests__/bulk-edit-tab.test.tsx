@@ -85,7 +85,9 @@ describe("Material sample bulk edit tab", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockSubmitOverride).lastCalledWith({ type: "material-sample" });
+    expect(mockSubmitOverride).lastCalledWith({
+      type: "material-sample"
+    });
   });
 
   it("Overrides the barcode field", async () => {
@@ -164,7 +166,8 @@ describe("Material sample bulk edit tab", () => {
       associations: [{}],
       // Sets the default organism because it's enabled and there are no values set in the other tabs:
       organism: [{}],
-      organismsQuantity: 1
+      organismsQuantity: 1,
+      organismsIndividualEntry: false
     });
   });
 

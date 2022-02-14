@@ -344,11 +344,8 @@ export function useMaterialSampleSave({
     publiclyReleasable: true
   };
 
-  const msInitialValues: InputResource<MaterialSample> = {
-    ...(materialSample || defaultValues),
-    // Client-side-only field organismsQuantity:
-    organismsQuantity: materialSample?.organism?.length
-  };
+  const msInitialValues: InputResource<MaterialSample> =
+    withOrganismEditorValues(materialSample ?? defaultValues);
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
@@ -399,7 +396,11 @@ export function useMaterialSampleSave({
 
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
-      ...(!enableOrganisms && { organism: [] }),
+      ...(!enableOrganisms && {
+        organismsIndividualEntry: null,
+        organismsQuantity: null,
+        organism: []
+      }),
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),
@@ -542,7 +543,9 @@ export function useMaterialSampleSave({
       : msPreprocessed;
 
     const organismsWereChanged =
-      !!msDiff.organism || msDiff.organismsQuantity !== undefined;
+      !!msDiff.organism ||
+      msDiff.organismsQuantity !== undefined ||
+      msDiff.organismsIndividualEntry !== undefined;
 
     const msDiffWithOrganisms = organismsWereChanged
       ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
@@ -554,7 +557,8 @@ export function useMaterialSampleSave({
     } = {
       ...msDiffWithOrganisms,
 
-      // This value is not submitted to the back-end:
+      // These values are not submitted to the back-end:
+      organismsIndividualEntry: undefined,
       organismsQuantity: undefined,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
@@ -618,13 +622,25 @@ export function useMaterialSampleSave({
   ): Promise<PersistedResource<Organism>[]> {
     const preparedOrganisms: Organism[] = range(
       0,
-      sample.organismsQuantity
-    ).map(index => ({
-      ...sample.organism?.[index],
-      // Default to the sample's group:
-      group: sample.group,
-      type: "organism"
-    }));
+      sample.organismsQuantity ?? undefined
+    ).map(index => {
+      const defaults = {
+        // Default to the sample's group:
+        group: sample.group,
+        type: "organism" as const
+      };
+
+      const { id: firstOrganismId, ...firstOrganismValues } =
+        sample.organism?.[0] ?? {};
+
+      return {
+        ...sample.organism?.[index],
+        // When Individual Entry is disabled,
+        // copy the first organism's values onto the rest of the organisms:
+        ...(!sample.organismsIndividualEntry && firstOrganismValues),
+        ...defaults
+      };
+    });
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
       resource => ({
@@ -790,5 +806,27 @@ export function useMaterialSampleSave({
     prepareSampleInput,
     prepareSampleSaveOperation,
     loading
+  };
+}
+
+/** Returns the material sample with the added client-side-only form fields. */
+export function withOrganismEditorValues<
+  T extends InputResource<MaterialSample> | PersistedResource<MaterialSample>
+>(materialSample: T): T {
+  // If there are different organisms then initially show the individual organisms edit UI:
+  const hasDifferentOrganisms = !!materialSample?.organism?.some(org => {
+    const firstOrg = materialSample?.organism?.[0];
+
+    const { id: _firstOrgId, ...firstOrgValues } = firstOrg ?? {};
+    const { id: _id, ...thisOrgValues } = org ?? {};
+
+    return !isEqual(firstOrgValues, thisOrgValues);
+  });
+
+  return {
+    ...materialSample,
+    // Client-side-only organisms UI fields:
+    organismsQuantity: materialSample?.organism?.length,
+    organismsIndividualEntry: hasDifferentOrganisms
   };
 }

@@ -42,7 +42,7 @@ export function OrganismStateField({
 
   return (
     <div className="organism-state-field">
-      <div className="row mx-0">
+      <div className="row">
         <div className="col-md-6">
           <AutoSuggestTextField<MaterialSample>
             {...fieldProps("lifeStage")}

@@ -2,6 +2,7 @@ import {
   FieldSet,
   FormikButton,
   NumberField,
+  ToggleField,
   useDinaFormContext,
   useFieldLabels
 } from "common-ui";
@@ -56,6 +57,9 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
             const organismsQuantity = readOnly
               ? organisms.length
               : Number(form.values.organismsQuantity ?? 1);
+            const organismsIndividualEntry = !!(
+              form.values.organismsIndividualEntry ?? false
+            );
 
             function removeOrganism(index: number) {
               remove(index);
@@ -64,28 +68,32 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
 
             return (
               <div>
-                {!isTemplate && !readOnly && (
+                {!isTemplate && (
                   <div className="row">
-                    <NumberField
-                      name="organismsQuantity"
-                      className="col-sm-6"
-                    />
+                    <div className="col-md-6 d-flex gap-3">
+                      <NumberField
+                        name="organismsQuantity"
+                        className="flex-grow-1"
+                        inputProps={{ type: "number" }}
+                        min={0}
+                      />
+                      {!readOnly && (
+                        <ToggleField name="organismsIndividualEntry" />
+                      )}
+                    </div>
                   </div>
                 )}
-                {
-                  // Render the table for more than one, otherwise render a single organism field set:
-                  organismsQuantity > 1 ? (
-                    <OrganismsTable
-                      namePrefix={name}
-                      organisms={organisms}
-                      organismsQuantity={organismsQuantity}
-                      onRemoveClick={removeOrganism}
-                      onRowMove={move}
-                    />
-                  ) : organismsQuantity === 1 ? (
-                    <OrganismStateField namePrefix={`${name}[0].`} />
-                  ) : null
-                }
+                {organismsIndividualEntry ? (
+                  <OrganismsTable
+                    namePrefix={name}
+                    organisms={organisms}
+                    organismsQuantity={organismsQuantity}
+                    onRemoveClick={removeOrganism}
+                    onRowMove={move}
+                  />
+                ) : (
+                  <OrganismStateField namePrefix={`${name}[0].`} />
+                )}
               </div>
             );
           }}
@@ -116,13 +124,17 @@ function OrganismsTable({
 
   const initialLength = Number(get(initialValues, namePrefix)?.length) || 1;
 
-  const allExpandedInitially = [...new Array(initialLength)].reduce<
+  /** Number-to-boolean map for when all organisms are expanded. */
+  const expandAll = [...new Array(initialLength)].reduce<
     Record<number, boolean>
   >((prev, _, index) => ({ ...prev, [index]: true }), {});
 
+  /** Number-to-boolean map for when only the first organism is expanded. */
+  const expandFirstOnly = { 0: organismsQuantity === 1 };
+
   const initialExpanded: Record<number, boolean> = readOnly
-    ? allExpandedInitially
-    : { 0: organismsQuantity === 1 };
+    ? expandAll
+    : expandFirstOnly;
 
   const [expanded, setExpanded] = useState(initialExpanded);
 
@@ -174,6 +186,7 @@ function OrganismsTable({
     },
     ...["lifeStage", "sex"].map<Column<Organism>>(accessor => ({
       accessor,
+      className: `${accessor}-cell`,
       Header: getFieldLabel({ name: accessor }).fieldLabel
     })),
     {

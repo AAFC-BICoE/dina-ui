@@ -529,7 +529,7 @@ describe("Material Sample Edit Page", () => {
     expect(wrapper.find(".organisms-section").exists()).toEqual(true);
   });
 
-  it("Renders an existing Material Sample with the Assoication section enabled.", async () => {
+  it("Renders an existing Material Sample with the Association section enabled.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleForm
         materialSample={{
@@ -1406,7 +1406,7 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           group: "test-group",
           materialSampleName: "test-ms",
-          // This sample already has 2 organisms:
+          // This sample already has 1 organism:
           organism: [
             {
               type: "organism",
@@ -1447,6 +1447,364 @@ describe("Material Sample Edit Page", () => {
               relationships: expect.objectContaining({
                 organism: {
                   data: []
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you add multiple of the SAME Organism by leaving the 'Organisms Individual Entry' toggle off and increasing the Quantity.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 1 organism:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Initially has 1 organism:
+    wrapper
+      .find(".organismsQuantity-field input")
+      .simulate("change", { target: { value: "3" } });
+
+    wrapper
+      .find(".lifeStage-field input")
+      .simulate("change", { target: { value: "common-life-stage" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample with the organisms:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        // In the first API call, the 3 organisms are saved:
+        [
+          // This is the initial existing organism with an ID from the form's initial values:
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-1",
+              lifeStage: "common-life-stage",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          // New organism which is a copy of Organism #1:
+          {
+            resource: {
+              group: "test-group",
+              lifeStage: "common-life-stage",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          // New organism which is a copy of Organism #1:
+          {
+            resource: {
+              group: "test-group",
+              lifeStage: "common-life-stage",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  // The first organism is kept, and 2 more copies are added:
+                  data: [
+                    {
+                      id: "organism-1",
+                      type: "organism"
+                    },
+                    {
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "organism"
+                    },
+                    {
+                      id: "11111111-1111-1111-1111-111111111111",
+                      type: "organism"
+                    }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you edit one of multiple DIFFERENT existing attached organisms.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 3 DIFFERENT organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-3",
+              lifeStage: "lifestage 3",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // 3 organisms in quantity:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(3);
+    // Individual mode selected by default:
+    expect(
+      wrapper
+        .find(".organismsIndividualEntry-field")
+        .find(Switch)
+        .prop("checked")
+    ).toEqual(true);
+
+    // Renders the initial lifestage values:
+    expect(
+      wrapper.find(".rt-td.lifeStage-cell").map(cell => cell.text())
+    ).toEqual(["lifestage 1", "lifestage 2", "lifestage 3"]);
+
+    // Expand the 3rd organism:
+    wrapper.find("button.expand-organism").at(2).simulate("click");
+    // Edit the lifeStage field:
+    wrapper
+      .find(".lifeStage-field input")
+      .simulate("change", { target: { value: "lifestage 3 edited" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample with the organisms:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          // Keeps the old values of the first 2 organisms:
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          // Adds the new value to the 3rd organism:
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-3",
+              lifeStage: "lifestage 3 edited",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
+                    { id: "organism-1", type: "organism" },
+                    { id: "organism-2", type: "organism" },
+                    { id: "organism-3", type: "organism" }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you switch from multiple DIFFERENT organisms to multiple SAME organisms.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 3 DIFFERENT organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              group: "test-group"
+            },
+            {
+              type: "organism",
+              id: "organism-3",
+              lifeStage: "lifestage 3",
+              group: "test-group"
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // 3 organisms in quantity:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(3);
+    // Individual mode selected by default:
+    expect(
+      wrapper
+        .find(".organismsIndividualEntry-field")
+        .find(Switch)
+        .prop("checked")
+    ).toEqual(true);
+
+    // Switch 'Individual Entry' off:
+    wrapper
+      .find(".organismsIndividualEntry-field")
+      .find(Switch)
+      .prop<any>("onChange")(false);
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample with the 3 SAME organisms:
+    expect(mockSave.mock.calls).toEqual([
+      // Organism 1's values with "lifestage 1" are copied to the other organisms:
+      [
+        [
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-2",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          },
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-3",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      // The material sample is saved with the same 3 organisms linked:
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
+                    { id: "organism-1", type: "organism" },
+                    { id: "organism-2", type: "organism" },
+                    { id: "organism-3", type: "organism" }
+                  ]
                 }
               }),
               type: "material-sample"
