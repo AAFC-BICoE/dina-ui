@@ -387,6 +387,7 @@ export function useMaterialSampleSave({
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
+  /** Gets the new state of the sample before submission to the back-end, given the form state. */
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
@@ -397,8 +398,8 @@ export function useMaterialSampleSave({
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
       ...(!enableOrganisms && {
-        organismsIndividualEntry: null,
-        organismsQuantity: null,
+        organismsIndividualEntry: undefined,
+        organismsQuantity: undefined,
         organism: []
       }),
       ...(!enableStorage && {
@@ -525,6 +526,10 @@ export function useMaterialSampleSave({
     return materialSampleInput;
   }
 
+  /**
+   * Gets the diff of the form's initial values to the new sample state,
+   * so only edited values are submitted to the back-end.
+   */
   async function prepareSampleSaveOperation({
     submittedValues,
     preProcessSample
@@ -814,7 +819,7 @@ export function withOrganismEditorValues<
   T extends InputResource<MaterialSample> | PersistedResource<MaterialSample>
 >(materialSample: T): T {
   // If there are different organisms then initially show the individual organisms edit UI:
-  const hasDifferentOrganisms = !!materialSample?.organism?.some(org => {
+  const hasDifferentOrganisms = materialSample?.organism?.some(org => {
     const firstOrg = materialSample?.organism?.[0];
 
     const { id: _firstOrgId, ...firstOrgValues } = firstOrg ?? {};

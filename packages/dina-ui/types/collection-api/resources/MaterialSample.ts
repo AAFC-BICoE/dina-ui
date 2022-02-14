@@ -39,8 +39,8 @@ export interface MaterialSampleAttributes {
   organism?: (Organism | null | undefined)[] | null;
 
   // Client-side only fields for the organism section:
-  organismsQuantity?: number | null;
-  organismsIndividualEntry?: boolean | null;
+  organismsQuantity?: number;
+  organismsIndividualEntry?: boolean;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;

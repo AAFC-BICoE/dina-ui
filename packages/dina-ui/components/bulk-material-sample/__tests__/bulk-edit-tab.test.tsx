@@ -166,8 +166,7 @@ describe("Material sample bulk edit tab", () => {
       associations: [{}],
       // Sets the default organism because it's enabled and there are no values set in the other tabs:
       organism: [{}],
-      organismsQuantity: 1,
-      organismsIndividualEntry: false
+      organismsQuantity: 1
     });
   });
 
