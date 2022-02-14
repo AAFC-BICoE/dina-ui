@@ -31,7 +31,6 @@ export function SavedSearch(props: SavedSearchProps) {
   } = props;
   const { formatMessage } = useDinaIntl();
   const [curSelected, setCurSelected] = useState(null);
-  const previousSelectedSearch = useRef(selectedSearch);
 
   const { openSavedSearchModal } = useSavedSearchModal();
   const savedSearchNamesOptions: SelectOption<string>[] = [];
@@ -65,9 +64,7 @@ export function SavedSearch(props: SavedSearchProps) {
       />
       <button
         className="btn btn-primary"
-        onClick={() =>
-          loadSavedSearch(curSelected ?? previousSelectedSearch.current)
-        }
+        onClick={() => loadSavedSearch(curSelected ?? selectedSearch)}
         disabled={!initialSavedSearches}
       >
         {formatMessage("load")}
@@ -81,9 +78,7 @@ export function SavedSearch(props: SavedSearchProps) {
       <button
         className="btn btn-danger"
         onClick={() =>
-          deleteSavedSearch(
-            (curSelected as any) ?? previousSelectedSearch.current
-          )
+          deleteSavedSearch((curSelected as any) ?? selectedSearch)
         }
         disabled={!initialSavedSearches}
       >

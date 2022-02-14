@@ -237,20 +237,10 @@ export function QueryTable<TData extends KitsuResource>({
               <span className="mx-3">
                 <Tooltip
                   id="queryTableMultiSortExplanation"
-                  setVisible={setVisible}
-                  visible={visible}
                   visibleElement={
                     <a
                       href="#"
                       aria-describedby={"queryTableMultiSortExplanation"}
-                      onKeyUp={e =>
-                        e.key === "Escape"
-                          ? setVisible(false)
-                          : setVisible(true)
-                      }
-                      onMouseOver={() => setVisible(true)}
-                      onMouseOut={() => setVisible(false)}
-                      onBlur={() => setVisible(false)}
                     >
                       <CommonMessage id="queryTableMultiSortTooltipTitle" />
                     </a>
