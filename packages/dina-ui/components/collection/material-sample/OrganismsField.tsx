@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import {
   FieldSet,
   FormikButton,
@@ -9,19 +10,18 @@ import {
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
 import { useState } from "react";
-import ReactTable, { Column } from "react-table";
-import { OrganismStateField } from "..";
-import { BulkEditTabWarning } from "../..";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Organism } from "../../../types/collection-api/resources/Organism";
+import { MdDragHandle } from "react-icons/md";
 import {
   SortableContainer,
   SortableElement,
   SortableHandle,
   SortEnd
 } from "react-sortable-hoc";
-import { MdDragHandle } from "react-icons/md";
-import classNames from "classnames";
+import ReactTable, { Column } from "react-table";
+import { OrganismStateField } from "..";
+import { BulkEditTabWarning } from "../..";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { Organism } from "../../../types/collection-api/resources/Organism";
 
 export interface OrganismsFieldProps {
   /** Organism array field name. */
@@ -48,6 +48,9 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
           ctx.bulkEditFormRef?.current?.setFieldValue("organismsQuantity", 1);
           ctx.bulkEditFormRef?.current?.setFieldValue(name, [{}]);
         }}
+        // Each Organism can only be attached to one Sample, so never show the Same Values warning,
+        // because the bulk edited samples' Organisms should never be the same.
+        showWarningWhenValuesAreTheSame={true}
       >
         <FieldArray name={name}>
           {({ form, remove, move }) => {
@@ -56,6 +59,8 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
 
             const organismsQuantity = readOnly
               ? organisms.length
+              : isTemplate
+              ? 1
               : Number(form.values.organismsQuantity ?? 0);
             const organismsIndividualEntry = !!(
               form.values.organismsIndividualEntry ?? false

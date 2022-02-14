@@ -6,6 +6,7 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { isEqual } from "lodash";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -408,13 +409,21 @@ describe("BulkEditTabWarning", () => {
     ]);
   });
 
-  it("Shows the common value when all samples have the same organisms and determinations.", async () => {
+  it("Shows the Override button on the Organisms section, even when the Organisms are the same.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
         samples={SAMPLES_WITH_SAME_DETERMINATIONS}
       />,
       testCtx
+    );
+
+    // Make sure all samples have the sample organism for this test,
+    // even though the back-end shouldn't actually alloow this:
+    expect(
+      SAMPLES_WITH_SAME_DETERMINATIONS.every(sample =>
+        isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
+      )
     );
 
     await new Promise(setImmediate);
@@ -429,31 +438,29 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The 2 common organisms are shown in the Edit All tab:
+    // You must click the override button:
     expect(
-      wrapper.find(
-        ".tabpanel-EDIT_ALL .determination-section li.react-tabs__tab"
-      ).length
-    ).toEqual(2);
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
+    ).toEqual(true);
+    wrapper
+      .find(".organisms-section button.override-all-button")
+      .simulate("click");
+    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
 
-    // The green bulk-override indicator is not shown before changing any values:
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .determination-section .has-bulk-edit-value")
-        .exists()
-    ).toEqual(false);
-
-    // Override the name in the first determination:
+    // Add a determination and override its name:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
-      .simulate("change", { target: { value: "first name override" } });
+      .simulate("change", { target: { value: "test-name-override" } });
 
-    // The green bulk-override indicator is now shown:
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .verbatimScientificName .has-bulk-edit-value")
-        .exists()
-    ).toEqual(true);
+    await new Promise(setImmediate);
+    wrapper.update();
 
     wrapper.find("button.bulk-save-button").simulate("click");
 
@@ -462,43 +469,24 @@ describe("BulkEditTabWarning", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [
-          {
-            isFileAs: true,
-            isPrimary: true,
-            verbatimScientificName: "first name override"
-          },
-          { verbatimScientificName: "second name" }
-        ],
+        determination: [{ verbatimScientificName: "test-name-override" }],
         type: "organism"
       },
       type: "organism"
     };
 
-    // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
-      // The new organism is saved 3 times, once per sample:
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
-      // The samples are saved in their own transaction:
       [
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
           resource: {
             id: sample.id,
-            type: sample.type,
-            // Organisms are saved in the relationships field:
-            organism: undefined,
             relationships: {
-              organism: {
-                data: [
-                  {
-                    id: "11111",
-                    type: "organism"
-                  }
-                ]
-              }
-            }
+              organism: { data: [{ id: "11111", type: "organism" }] }
+            },
+            type: "material-sample"
           },
           type: "material-sample"
         })),
