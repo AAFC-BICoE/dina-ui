@@ -452,23 +452,27 @@ export function MaterialSampleForm({
                 />
               )}
               {!isTemplate && (
-                <FieldSet
-                  legend={<DinaMessage id="managedAttributeListTitle" />}
-                  id={navIds.managedAttributes}
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
                 >
-                  <DinaFormSection
-                    // Disabled the template's restrictions for this section:
-                    enabledFields={null}
-                  >
-                    <ManagedAttributesEditor
-                      valuesPath="managedAttributes"
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      apiBaseUrl="/collection-api"
-                      managedAttributeComponent="MATERIAL_SAMPLE"
-                      managedAttributeKeyField="key"
-                    />
-                  </DinaFormSection>
-                </FieldSet>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <ManagedAttributesEditor
+                        valuesPath="managedAttributes"
+                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeComponent="MATERIAL_SAMPLE"
+                        fieldSetProps={{
+                          id: navIds.managedAttributes,
+                          legend: (
+                            <DinaMessage id="materialSampleManagedAttributes" />
+                          )
+                        }}
+                        showCustomViewDropdown={true}
+                      />
+                    </div>
+                  </div>
+                </DinaFormSection>
               )}
               <AttachmentsField
                 name={attachmentsField}

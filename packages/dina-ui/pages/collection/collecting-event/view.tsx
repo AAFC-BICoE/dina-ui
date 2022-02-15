@@ -23,7 +23,6 @@ export default function CollectingEventDetailsPage() {
           </FieldSet>
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/collecting-event/${id}` })}
       customQueryHook={id => useCollectingEventQuery(id)}
       nameField="id"
       entityLink="/collection/collecting-event"

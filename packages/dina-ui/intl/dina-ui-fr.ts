@@ -258,7 +258,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcVerbatimSRS_tooltip:
     "L’ellipsoïde, le datum géodésique ou le système de référence spatiale (SRS) sur lesquels sont basées les coordonnées données dans verbatimLatitude et verbatimLongitude, ou verbatimCoordinates. La meilleure pratique recommandée est d’utiliser le code EPSG du SRS, s’il est connu. Exemples : EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Attributs intégrés",
-  field_editableManagedAttributes: "Attributs gérés",
+  field_visibleManagedAttributes: "Attributs gérés visibles",
   field_email: "Courriel",
   field_endDate: "Date de fin",
   field_endEventDateTime: "Date et heure de l'événement final",
@@ -382,7 +382,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   makeFiledAs: "Indiquer comme Classé en tant que",
   makePrimary: "Marque principale",
   managedAttributeEditTitle: "Modifier l’attribut géré",
-  managedAttributeListTitle: "Attributs gérés",
+  managedAttributes: "Attributs gérés",
   managedAttributeValueLabel: "Valeur",
   materialSample: "Échantillon de matériaux",
   materialSampleAssociationLegend: "Association d'échantillons de matériaux",

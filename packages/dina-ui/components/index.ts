@@ -20,6 +20,7 @@ export * from "./head";
 export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
 export * from "./object-store/attachment-list/AttachmentsField";
+export * from "./object-store/managed-attributes/ManagedAttributesEditor";
 export * from "./page-layouts/ViewPageLayout";
 export * from "./resource-select-fields/resource-select-fields";
 export * from "./revision-by-user/CommonRevisionsByUserPage";

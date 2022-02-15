@@ -121,7 +121,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           id: "initial-attachment-2",
           originalFileName: "initial-attachment-2"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m1":
+      case "managed-attribute/MATERIAL_SAMPLE.m1":
         return {
           type: "managed-attribute",
           id: "1",
@@ -130,7 +130,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 1"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m2":
+      case "managed-attribute/MATERIAL_SAMPLE.m2":
         return {
           type: "managed-attribute",
           id: "2",
@@ -139,7 +139,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 2"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m3":
+      case "managed-attribute/MATERIAL_SAMPLE.m3":
         return {
           type: "managed-attribute",
           id: "3",
@@ -1495,7 +1495,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL .editable-attribute-menu .react-select__multi-value__label"
+          ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
         )
         .map(node => node.text())
     ).toEqual([
