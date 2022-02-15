@@ -587,6 +587,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewDetailButtonLabel: " View Detail",
   viewOnMap: "View on Map",
   viewPreviewButtonText: "Preview",
+  virusNames: "Virus Names",
   warningMessage: "Warning Message",
   whoAmITitle: "Who Am I",
   workbookGroupUploadTitle: "Upload Workbook",
