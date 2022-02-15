@@ -338,11 +338,14 @@ function NavTransactionsDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       onKeyDown={onKeyDown}
     >
+      <NavDropdown.Item href="/loan-transaction/transaction/list">
+        <DinaMessage id="transactions" />
+      </NavDropdown.Item>
       <NavDropdown.Item
-        href="/loan-transaction/transaction/list"
+        href="/loan-transaction/revisions-by-user"
         onKeyDown={onKeyDownLastItem}
       >
-        <DinaMessage id="transactions" />
+        <DinaMessage id="revisionsByUserPageTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );
