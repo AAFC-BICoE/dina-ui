@@ -7,11 +7,15 @@ import {
   FieldWrapper,
   filterBy,
   ResourceSelectField,
+  SaveArgs,
+  StringArrayField,
   SubmitButton,
   TextField,
+  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
+import { isArray } from "lodash";
 import * as yup from "yup";
 import {
   GroupSelectField,
@@ -21,6 +25,8 @@ import {
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { StorageUnit, StorageUnitType } from "../../types/collection-api";
+
+import { useState } from "react";
 
 export const storageUnitFormSchema = yup.object({
   storageUnitType: yup.object().required()
@@ -56,17 +62,27 @@ export function StorageUnitForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<StorageUnit>) {
-    const [savedStorage] = await save<StorageUnit>(
-      [
-        {
-          resource: submittedValues,
-          type: "storage-unit"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
+    const savedArgs: SaveArgs<StorageUnit>[] = [];
 
-    await onSaved(savedStorage);
+    if (submittedValues.isMultiple && isArray(submittedValues.name)) {
+      delete submittedValues.isMultiple;
+      submittedValues.name.map(unitName =>
+        savedArgs.push({
+          resource: { ...submittedValues, name: unitName },
+          type: "storage-unit"
+        })
+      );
+    } else {
+      delete submittedValues.isMultiple;
+      savedArgs.push({
+        resource: submittedValues,
+        type: "storage-unit"
+      });
+    }
+    const savedStorage = await save<StorageUnit>(savedArgs, {
+      apiBaseUrl: "/collection-api"
+    });
+    await onSaved(savedStorage?.[0]);
   }
 
   return (
@@ -86,6 +102,10 @@ export function StorageUnitForm({
 export function StorageUnitFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+  const [showTextAreaInput, setShowTextAreaInput] = useState(false);
+  const onStorageUnitMultipleToggled = checked => {
+    setShowTextAreaInput(checked);
+  };
 
   return (
     <div>
@@ -106,11 +126,29 @@ export function StorageUnitFormFields() {
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <TextField
-          className="col-md-6"
-          name="name"
-          label={formatMessage("storageUnitName")}
-        />
+        <div className="col-md-6 d-flex ">
+          {!readOnly && !initialValues.id && (
+            <ToggleField
+              onChangeExternal={onStorageUnitMultipleToggled}
+              name="isMultiple"
+            />
+          )}
+          {!showTextAreaInput && (
+            <TextField
+              className="ms-4 flex-grow-1"
+              name="name"
+              label={formatMessage("storageUnitName")}
+            />
+          )}
+
+          {showTextAreaInput && (
+            <StringArrayField
+              className="ms-4 flex-grow-1"
+              name="name"
+              label={formatMessage("storageUnitName")}
+            />
+          )}
+        </div>
       </div>
       {readOnly ? (
         <FieldWrapper
