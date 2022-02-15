@@ -24,7 +24,7 @@ export interface Shipment {
   contentRemarks?: string;
   value?: string; // Number stored as string.
   currency?: string;
-  itemCount?: number;
+  itemCount?: number | string;
   shippedOn?: string;
   status?: string;
   packingMethod?: string;

@@ -133,6 +133,7 @@ export function TransactionFormLayout() {
       <FieldSet legend={<DinaMessage id="transactionDetails" />}>
         <div className="row">
           <RadioButtonsField
+            radioStyle="BUTTONS"
             name="materialDirection"
             className="col-6 col-md-3"
             options={[
