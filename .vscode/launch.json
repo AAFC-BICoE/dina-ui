@@ -36,5 +36,12 @@
       "hostName": "localhost",
       "port": 5009
     },
+    {
+      "name": "Attach to Loans and Transactions API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5010
+    },
   ]
 }
