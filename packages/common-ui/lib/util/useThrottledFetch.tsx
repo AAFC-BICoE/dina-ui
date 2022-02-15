@@ -49,7 +49,8 @@ export function useThrottledFetch<TData>({
 
   let searchResult;
 
-  if (isVirusName) searchResult = mySearchResult.names;
+  // tslint:disable-next-line
+  if (isVirusName) searchResult = mySearchResult?.["names"];
   else searchResult = mySearchResult;
 
   const searchIsDisabled = throttled || !inputValue || searchIsLoading;
