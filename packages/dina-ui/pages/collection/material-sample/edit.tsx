@@ -339,7 +339,10 @@ export function MaterialSampleForm({
               </div>
             )}
             <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-            <ProjectSelectSection resourcePath="collection-api/project" />
+            <ProjectSelectSection
+              classNames="mt-3"
+              resourcePath="collection-api/project"
+            />
           </>
         )}
         <div className="data-components">
@@ -645,7 +648,7 @@ export function MaterialSampleIdentifiersFormLayout({
                   setPrimaryIdDisabled(event.target.checked)
                 }
                 name="useNextSequence"
-                className="ms-2 mt-1 align-items-center"
+                className="ms-2 mt-1"
                 // only enabled when add new sample and collection is selected
                 disabled={initialValues.id || !value?.id}
                 overridecheckboxProps={{
