@@ -10,6 +10,7 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   FieldSet,
+  NumberField,
   RadioButtonsField,
   StringArrayField,
   SubmitButton,
@@ -78,7 +79,7 @@ export function TransactionForm({
 
   const initialValues: InputResource<Transaction> = fetchedTransaction
     ? { ...fetchedTransaction }
-    : { type: "transaction" };
+    : { type: "transaction", materialDirection: "IN" };
 
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
@@ -87,7 +88,7 @@ export function TransactionForm({
       [
         {
           resource: submittedValues,
-          type: "project"
+          type: "transaction"
         }
       ],
       { apiBaseUrl: "/loan-transaction-api" }
@@ -95,19 +96,24 @@ export function TransactionForm({
     await onSaved(savedTransaction);
   };
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={fetchedTransaction?.id}
+        entityLink="/loan-transaction/transaction"
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  );
+
   return (
     <DinaForm<InputResource<Transaction>>
       initialValues={initialValues}
       onSubmit={onSubmit}
     >
-      <ButtonBar>
-        <BackButton
-          entityId={fetchedTransaction?.id}
-          entityLink="/loan-transaction/transaction"
-        />
-        <SubmitButton className="ms-auto" />
-      </ButtonBar>
+      {buttonBar}
       <TransactionFormLayout />
+      {buttonBar}
     </DinaForm>
   );
 }
@@ -127,14 +133,18 @@ export function TransactionFormLayout() {
       <FieldSet legend={<DinaMessage id="transactionDetails" />}>
         <div className="row">
           <RadioButtonsField
-            name="direction"
+            name="materialDirection"
             className="col-6 col-md-3"
             options={[
               { label: formatMessage("materialIn"), value: "IN" },
               { label: formatMessage("materialOut"), value: "OUT" }
             ]}
           />
-          <ToggleField name="toBeReturned" className="col-6 col-md-3" />
+          <ToggleField
+            name="materialToBeReturned"
+            customName="toBeReturned"
+            className="col-6 col-md-3"
+          />
         </div>
         <div className="row">
           <div className="col-md-6">
@@ -148,32 +158,193 @@ export function TransactionFormLayout() {
                 }
               })}
               alwaysShowSuggestions={true}
-              suggestion={transaction => transaction?.transactionType ?? ""}
+              suggestion={transaction => transaction?.transactionType}
             />
-            <AutoSuggestTextField<Transaction>
-              name="transactionNumber"
-              query={(search, ctx) => ({
-                path: "loan-transaction-api/transaction",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `transactionNumber==${search}*`
-                }
-              })}
-              alwaysShowSuggestions={true}
-              suggestion={transaction => transaction?.transactionNumber ?? ""}
-            />
+            <TextField name="transactionNumber" />
           </div>
           <div className="col-md-6">
             <StringArrayField name="otherIdentifiers" />
           </div>
         </div>
         <div className="row">
-          <DateField name="dateOpened" className="col-sm-6" />
-          <DateField name="dateClosed" className="col-sm-6" />
-          <DateField name="dateDue" className="col-sm-6" />
+          <AutoSuggestTextField<Transaction>
+            className="col-sm-6"
+            name="status"
+            query={(search, ctx) => ({
+              path: "loan-transaction-api/transaction",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `status==${search}*`
+              }
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={transaction => transaction?.status}
+          />
+          <AutoSuggestTextField<Transaction>
+            className="col-sm-6"
+            name="purpose"
+            query={(search, ctx) => ({
+              path: "loan-transaction-api/transaction",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `purpose==${search}*`
+              }
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={transaction => transaction?.purpose}
+          />
         </div>
-        <TextField name="transactionRemarks" multiLines={true} />
+        <div className="row">
+          <DateField name="openedDate" className="col-sm-6" />
+          <DateField name="closedDate" className="col-sm-6" />
+          <DateField name="dueDate" className="col-sm-6" />
+        </div>
+        <TextField
+          name="remarks"
+          customName="transactionRemarks"
+          multiLines={true}
+        />
       </FieldSet>
+      <ShipmentDetailsFieldSet fieldName="shipment" />
     </div>
+  );
+}
+
+interface ShipmentDetailsFieldSetProps {
+  fieldName?: string;
+}
+
+function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
+  /** Applies name prefix to field props */
+  function fieldProps(name: string) {
+    return {
+      name: `${fieldName}.${name}`,
+      // Don't use the prefix for the labels and tooltips:
+      customName: name
+    };
+  }
+
+  return (
+    <FieldSet
+      fieldName={fieldName}
+      legend={<DinaMessage id="shipmentDetails" />}
+    >
+      <FieldSet
+        legend={<DinaMessage id="contents" />}
+        style={{ backgroundColor: "#f3f3f3" }}
+      >
+        <TextField {...fieldProps("contentRemarks")} multiLines={true} />
+        <div className="row">
+          <NumberField
+            {...fieldProps("value")}
+            className="col-sm-6"
+            label={<DinaMessage id="valueCad" />}
+          />
+          <NumberField
+            {...fieldProps("itemCount")}
+            className="col-sm-6"
+            isInteger={true}
+          />
+        </div>
+      </FieldSet>
+      <div className="row">
+        <DateField {...fieldProps("shippedOn")} className="col-sm-6" />
+        <AutoSuggestTextField<Transaction>
+          className="col-sm-6"
+          {...fieldProps("status")}
+          query={(search, ctx) => ({
+            path: "loan-transaction-api/transaction",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `${fieldName}.status==${search}*`
+            }
+          })}
+          alwaysShowSuggestions={true}
+          suggestion={transaction => transaction?.shipment?.status}
+        />
+        <AutoSuggestTextField<Transaction>
+          className="col-sm-6"
+          {...fieldProps("packingMethod")}
+          query={(search, ctx) => ({
+            path: "loan-transaction-api/transaction",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `${fieldName}.packingMethod==${search}*`
+            }
+          })}
+          alwaysShowSuggestions={true}
+          suggestion={transaction => transaction?.shipment?.packingMethod}
+        />
+        <TextField {...fieldProps("trackingNumber")} className="col-sm-6" />
+      </div>
+      <FieldSet
+        legend={<DinaMessage id="shipmentAddress" />}
+        style={{ backgroundColor: "#f3f3f3" }}
+      >
+        <div className="row">
+          <AutoSuggestTextField<Transaction>
+            className="col-sm-6"
+            {...fieldProps("address.receiverName")}
+            query={(search, ctx) => ({
+              path: "loan-transaction-api/transaction",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `${fieldName}.address.receiverName==${search}*`
+              }
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={transaction =>
+              transaction?.shipment?.address?.receiverName
+            }
+          />
+          <AutoSuggestTextField<Transaction>
+            className="col-sm-6"
+            {...fieldProps("address.companyName")}
+            query={(search, ctx) => ({
+              path: "loan-transaction-api/transaction",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `${fieldName}.address.companyName==${search}*`
+              }
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={transaction =>
+              transaction?.shipment?.address?.companyName
+            }
+          />
+          <TextField
+            {...fieldProps("address.addressLine1")}
+            customName="addressLine1"
+            className="col-sm-6"
+          />
+          <TextField
+            {...fieldProps("address.addressLine2")}
+            customName="addressLine2"
+            className="col-sm-6"
+          />
+          <TextField
+            {...fieldProps("address.city")}
+            customName="city"
+            className="col-sm-6"
+          />
+          <TextField
+            {...fieldProps("address.provinceState")}
+            customName="provinceState"
+            className="col-sm-6"
+          />
+          <TextField
+            {...fieldProps("address.zipCode")}
+            customName="zipCode"
+            className="col-sm-6"
+          />
+          <TextField
+            {...fieldProps("address.country")}
+            customName="country"
+            className="col-sm-6"
+          />
+        </div>
+        <TextField {...fieldProps("shipmentRemarks")} multiLines={true} />
+      </FieldSet>
+    </FieldSet>
   );
 }

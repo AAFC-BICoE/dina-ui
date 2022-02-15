@@ -11,43 +11,46 @@ import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
+  "materialDirection",
   "transactionNumber",
-  "direction",
-  "toBeReturned",
+  "materialToBeReturned",
+  "purpose",
   "transactionType",
-  "otherIdentifiers",
-  "transactionStatus",
-  "purposeOfTransaction",
+  "status",
   {
-    name: "dateOpened",
+    name: "openedDate",
     type: "DATE"
   },
   {
-    name: "dateClosed",
+    name: "closedDate",
     type: "DATE"
   },
   {
-    name: "dateDue",
+    name: "dueDate",
     type: "DATE"
-  }
+  },
+  "remarks"
 ];
 
 const TABLE_COLUMNS = [
   {
-    Cell: ({ original: { id, name } }) => (
-      <Link href={`/loan-transaction/transaction/view?id=${id}`}>{name}</Link>
+    Cell: ({ original: { id, transactionNumber } }) => (
+      <Link href={`/loan-transaction/transaction/view?id=${id}`}>
+        {transactionNumber}
+      </Link>
     ),
     accessor: "transactionNumber"
   },
-  "direction",
-  "toBeReturned",
-  "transactionType",
+  "materialDirection",
   stringArrayCell("otherIdentifiers"),
-  "transactionStatus",
-  "purposeOfTransaction",
+  "materialToBeReturned",
+  "purpose",
+  "status",
   dateCell("dateOpened"),
   dateCell("dateClosed"),
-  dateCell("dateDue")
+  dateCell("dateDue"),
+  "createdBy",
+  dateCell("createdOn")
 ];
 
 export default function TransactionListPage() {
@@ -69,13 +72,7 @@ export default function TransactionListPage() {
           id="transaction-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "loan-transaction-api/transaction",
-            defaultSort: [
-              {
-                id: "name",
-                desc: false
-              }
-            ]
+            path: "loan-transaction-api/transaction"
           }}
         />
       </main>
