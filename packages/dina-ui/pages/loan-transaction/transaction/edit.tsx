@@ -79,7 +79,11 @@ export function TransactionForm({
 
   const initialValues: InputResource<Transaction> = fetchedTransaction
     ? { ...fetchedTransaction }
-    : { type: "transaction", materialDirection: "IN" };
+    : {
+        type: "transaction",
+        materialDirection: "IN",
+        materialToBeReturned: false
+      };
 
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
@@ -141,11 +145,7 @@ export function TransactionFormLayout() {
               { label: formatMessage("materialOut"), value: "OUT" }
             ]}
           />
-          <ToggleField
-            name="materialToBeReturned"
-            customName="toBeReturned"
-            className="col-6 col-md-3"
-          />
+          <ToggleField name="materialToBeReturned" className="col-6 col-md-3" />
         </div>
         <div className="row">
           <div className="col-md-6">

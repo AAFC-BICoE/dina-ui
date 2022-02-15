@@ -303,6 +303,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSample_identifierType_catalogueNumber_label: "Catalogue Number",
   field_materialSample_identifierType_materialSampleId_label:
     "Material Sample ID",
+  field_materialToBeReturned: "To Be Returned",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",

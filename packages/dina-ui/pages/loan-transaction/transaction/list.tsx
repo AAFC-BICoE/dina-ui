@@ -11,24 +11,23 @@ import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "materialDirection",
   "transactionNumber",
-  "materialToBeReturned",
-  "purpose",
   "transactionType",
+  "purpose",
   "status",
-  {
-    name: "openedDate",
-    type: "DATE"
-  },
-  {
-    name: "closedDate",
-    type: "DATE"
-  },
-  {
-    name: "dueDate",
-    type: "DATE"
-  },
+  // Throws an error on back-end: "BAD_REQUEST: Cannot parse argument type class java.time.LocalDate"
+  // {
+  //   name: "openedDate",
+  //   type: "DATE"
+  // },
+  // {
+  //   name: "closedDate",
+  //   type: "DATE"
+  // },
+  // {
+  //   name: "dueDate",
+  //   type: "DATE"
+  // },
   "remarks"
 ];
 
@@ -36,21 +35,20 @@ const TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, transactionNumber } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${id}`}>
-        {transactionNumber}
+        <a>{transactionNumber || id}</a>
       </Link>
     ),
     accessor: "transactionNumber"
   },
+  "transactionType",
   "materialDirection",
   stringArrayCell("otherIdentifiers"),
   "materialToBeReturned",
   "purpose",
   "status",
-  dateCell("dateOpened"),
-  dateCell("dateClosed"),
-  dateCell("dateDue"),
-  "createdBy",
-  dateCell("createdOn")
+  dateCell("openedDate"),
+  dateCell("closedDate"),
+  dateCell("dueDate")
 ];
 
 export default function TransactionListPage() {
