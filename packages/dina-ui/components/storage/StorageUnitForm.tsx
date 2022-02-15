@@ -35,7 +35,7 @@ export const storageUnitFormSchema = yup.object({
 export interface StorageUnitFormProps {
   initialParent?: PersistedResource<StorageUnit>;
   storageUnit?: PersistedResource<StorageUnit>;
-  onSaved: (storageUnit: PersistedResource<StorageUnit>) => Promise<void>;
+  onSaved: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
   buttonBar?: JSX.Element;
 }
 
@@ -82,7 +82,7 @@ export function StorageUnitForm({
     const savedStorage = await save<StorageUnit>(savedArgs, {
       apiBaseUrl: "/collection-api"
     });
-    await onSaved(savedStorage?.[0]);
+    await onSaved(savedStorage);
   }
 
   return (
