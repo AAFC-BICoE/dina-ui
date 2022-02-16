@@ -163,9 +163,7 @@ export function BulkMetadataEditor({
 
     const managedAttributesInUse = await getManagedAttributesInUse(
       metadatas.map(it => it.managedAttributeValues),
-      bulkGet,
-      apiClient,
-      true
+      bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
 

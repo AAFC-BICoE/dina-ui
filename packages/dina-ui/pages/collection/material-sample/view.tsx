@@ -5,10 +5,9 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  FieldSpy,
   withResponse
 } from "common-ui";
-import { FastField, Field } from "formik";
+import { Field } from "formik";
 import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
@@ -16,13 +15,14 @@ import { withRouter } from "next/router";
 import {
   Footer,
   Head,
+  ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
+  ProjectSelectSection,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  ProjectSelectSection
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventFormLayout,
@@ -41,7 +41,6 @@ import {
   HOSTORGANISM_FIELDS
 } from "../../../components/collection/AssociationsField";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
@@ -208,24 +207,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}
-              <FieldSet
-                legend={<DinaMessage id="materialSampleManagedAttributes" />}
-              >
+              <div className="row">
                 <div className="col-md-6">
-                  <FieldSpy<
-                    Record<string, string>
-                  > fieldName="managedAttributes">
-                    {value => (
-                      <ManagedAttributesViewer
-                        values={value ?? {}}
-                        managedAttributeApiPath={key =>
-                          `collection-api/managed-attribute/material_sample.${key}`
-                        }
-                      />
-                    )}
-                  </FieldSpy>
+                  <ManagedAttributesEditor
+                    fieldSetProps={{
+                      legend: (
+                        <DinaMessage id="materialSampleManagedAttributes" />
+                      )
+                    }}
+                    valuesPath="managedAttributes"
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    managedAttributeComponent="MATERIAL_SAMPLE"
+                    showCustomViewDropdown={true}
+                  />
                 </div>
-              </FieldSet>
+              </div>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (

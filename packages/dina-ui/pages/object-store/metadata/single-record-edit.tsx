@@ -252,15 +252,13 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           />
         </div>
       </FieldSet>
-      <FieldSet legend={<DinaMessage id="managedAttributeListTitle" />}>
-        <ManagedAttributesEditor
-          valuesPath="managedAttributeValues"
-          managedAttributeApiPath="objectstore-api/managed-attribute"
-          apiBaseUrl="/objectstore-api"
-          managedAttributeKeyField="key"
-          useKeyInFilter={true}
-        />
-      </FieldSet>
+      <ManagedAttributesEditor
+        valuesPath="managedAttributeValues"
+        managedAttributeApiPath="objectstore-api/managed-attribute"
+        fieldSetProps={{
+          legend: <DinaMessage id="managedAttributes" />
+        }}
+      />
       {buttonBar}
     </DinaForm>
   );

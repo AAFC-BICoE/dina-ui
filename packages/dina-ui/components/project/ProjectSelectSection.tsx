@@ -10,16 +10,18 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
+  classNames?: string;
 }
 
 export function ProjectSelectSection({
-  resourcePath
-}: ProjectSelectFieldProps) {
+  resourcePath,
+  classNames
+}: ProjectSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
     <ProjectSelectField resourcePath={resourcePath} />
   ) : (
-    <div className="row">
+    <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
         <div className="col-md-6">
           <div className="d-flex flex-row gap-1">
