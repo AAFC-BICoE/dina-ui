@@ -35,10 +35,10 @@ export function useThrottledFetch<TData>({
       const throttleReset = setTimeout(() => setThrottled(false), timeoutMs);
       return () => clearTimeout(throttleReset);
     }
-  }, [searchValue]);
+  }, [searchValue, isVirusName]);
 
   const { isValidating: searchIsLoading, data: mySearchResult } = useSWR(
-    [searchValue],
+    [searchValue, isVirusName],
     () => fetcher(searchValue),
     {
       shouldRetryOnError: false,
@@ -49,7 +49,7 @@ export function useThrottledFetch<TData>({
 
   let searchResult;
 
-  // tslint:disable-next-line
+  // tslint:disable: no-string-literal
   if (isVirusName) searchResult = mySearchResult?.["names"];
   else searchResult = mySearchResult;
 
