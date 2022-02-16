@@ -44,7 +44,7 @@ export default function ExternalResourceMetadataPage() {
 
   const query = useQuery<Metadata>(
     {
-      path: `objectstore-api/metadata/${id}`
+      path: `objectstore-api/metadata/${id}?include=dcCreator,derivatives`
     },
     {
       onSuccess: async ({ data: metadata }) => {
