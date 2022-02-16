@@ -111,7 +111,9 @@ export function StorageTreeList({
     ({ data: units, meta: { totalResourceCount } }) => (
       <div>
         {totalResourceCount === 0 ? (
-          <DinaMessage id="noNestedStorageUnits" />
+          <DinaMessage
+            id={parentId ? "noNestedStorageUnits" : "noResultsFound"}
+          />
         ) : (
           <>
             {units.map((unit, index) => (
