@@ -25,10 +25,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
   addInstitutionTitle: "Add Institution",
-  addManagedAttributeButtonText: "Add New Managed Attribute",
   addManagedAttribute: "Add Managed Attribute",
-  addManagedAttributesViewTitle: "Create Managed Attributes View",
+  addManagedAttributeButtonText: "Add New Managed Attribute",
   addManagedAttributeTitle: "Add New Managed Attribute",
+  addManagedAttributesViewTitle: "Create Managed Attributes View",
   addMaterialSampleTitle: "Add Material Sample",
   addMaterialSampleTypeTitle: "Add Material Sample Type",
   addNewChildStorageUnit: "Add New Child Storage Unit",
@@ -70,9 +70,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   browseContents: "Browse Contents",
   browseStorageTree: "Browse Storage Tree",
   bulkCreate: "Create Multiple New",
-  bulkEditResourceLinkerWarningSingle:
-    "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceLinkerWarningMulti:
+    "This {fieldName} will be linked to all {targetType}s.",
+  bulkEditResourceLinkerWarningSingle:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
     "These {fieldName} will be set on all {targetType}s.",
@@ -150,8 +150,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
   dragDropMouseInstructions: "Drag and drop the attribute to its new position.",
-  withAMouse: "With a mouse",
-  withAKeyboard: "With a keyboard",
   duplicate: "Duplicate",
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
@@ -275,25 +273,22 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcVerbatimSRS_tooltip:
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
-  field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
-  field_visibleManagedAttributes_tooltip:
-    "Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
   field_email: "Email",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",
-  field_isolatedBy: "Isolated By",
-  field_isolatedOn: "Isolated On",
-  field_isolationRemarks: "Isolation Remarks",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
-  field_isInseperable: "Keep Contents Together",
-  field_isInseperable_tooltip: "Contents are inseparable",
   field_isFileAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
+  field_isInseperable: "Keep Contents Together",
+  field_isInseperable_tooltip: "Contents are inseparable",
   field_isPrimary_tooltip:
     "Make this determination the primary data point when exported. Only one determination can be primary",
+  field_isolatedBy: "Isolated By",
+  field_isolatedOn: "Isolated On",
+  field_isolationRemarks: "Isolation Remarks",
   field_license: "License",
   field_managedAttributeComponent: "Target Data Component Type",
   field_managedAttributeCreatedBy: "Created By",
@@ -344,6 +339,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_verbatimEventDateTime: "Verbatim Event Date Time",
   field_verbatimRemarks: "Verbatim Remarks",
   field_verbatimScientificName: "Verbatim Scientific Name",
+  field_visibleManagedAttributes: "Visible Managed Attributes in Editor",
+  field_visibleManagedAttributes_tooltip:
+    "Adding or removing an attribute using this dropdown doesn't change or remove the value. It only affects the attribute's visibility in this editor.",
   field_webpage: "Web Page",
   field_xmpMetadataDate: "Last Updated On",
   field_xmpMetadataDate_tooltip:
@@ -401,9 +399,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   makeFiledAs: "Make Filed As",
   makePrimary: "Make Primary",
   managedAttributeEditTitle: "Edit Managed Attribute",
+  managedAttributeValueLabel: "Value",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Managed Attributes Views",
-  managedAttributeValueLabel: "Value",
   materialSample: "Material Sample",
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
@@ -604,6 +602,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   viewPreviewButtonText: "Preview",
   warningMessage: "Warning Message",
   whoAmITitle: "Who Am I",
+  withAKeyboard: "With a keyboard",
+  withAMouse: "With a mouse",
   workbookGroupUploadTitle: "Upload Workbook",
   workbookTitle: "Workbooks",
   workbookUploadFailure:
