@@ -203,7 +203,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
   };
 
 /** Renders the determination revision value. */
-function determinationRevision(value) {
+export function determinationRevision(value) {
   return value?.map((det, index) => (
     <div className="pb-2" key={index}>
       <strong>{index + 1}:</strong>
