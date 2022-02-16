@@ -144,7 +144,7 @@ services:
       # Use the host maven repository:
       - "~/.m2:/var/maven/.m2"
     ports:
-      - "5010:5005" # debug port
+      - "5011:5005" # debug port
     working_dir: /app
     # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
     command: >

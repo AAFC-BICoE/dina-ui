@@ -37,11 +37,18 @@
       "port": 5009
     },
     {
-      "name": "Attach to Loans and Transactions API",
+      "name": "Attach to Search API",
       "request": "attach",
       "type": "java",
       "hostName": "localhost",
       "port": 5010
+    },
+    {
+      "name": "Attach to Loans and Transactions API",
+      "request": "attach",
+      "type": "java",
+      "hostName": "localhost",
+      "port": 5011
     },
   ]
 }
