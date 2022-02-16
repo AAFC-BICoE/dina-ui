@@ -628,24 +628,35 @@ export function useMaterialSampleSave({
     const preparedOrganisms: Organism[] = range(
       0,
       sample.organismsQuantity ?? undefined
-    ).map(index => {
-      const defaults = {
-        // Default to the sample's group:
-        group: sample.group,
-        type: "organism" as const
-      };
+    )
+      .map(index => {
+        const defaults = {
+          // Default to the sample's group:
+          group: sample.group,
+          type: "organism" as const
+        };
 
-      const { id: firstOrganismId, ...firstOrganismValues } =
-        sample.organism?.[0] ?? {};
+        const { id: firstOrganismId, ...firstOrganismValues } =
+          sample.organism?.[0] ?? {};
 
-      return {
-        ...sample.organism?.[index],
-        // When Individual Entry is disabled,
-        // copy the first organism's values onto the rest of the organisms:
-        ...(!sample.organismsIndividualEntry && firstOrganismValues),
-        ...defaults
-      };
-    });
+        return {
+          ...sample.organism?.[index],
+          // When Individual Entry is disabled,
+          // copy the first organism's values onto the rest of the organisms:
+          ...(!sample.organismsIndividualEntry && firstOrganismValues),
+          ...defaults
+        };
+      })
+      // Convert determiners from Objects to UUID strings:
+      .map(org => ({
+        ...org,
+        determination: org.determination?.map(det => ({
+          ...det,
+          determiner: det.determiner?.map(determiner =>
+            typeof determiner === "string" ? determiner : String(determiner.id)
+          )
+        }))
+      }));
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
       resource => ({
@@ -822,8 +833,16 @@ export function withOrganismEditorValues<
   const hasDifferentOrganisms = materialSample?.organism?.some(org => {
     const firstOrg = materialSample?.organism?.[0];
 
-    const { id: _firstOrgId, ...firstOrgValues } = firstOrg ?? {};
-    const { id: _id, ...thisOrgValues } = org ?? {};
+    const {
+      id: _firstOrgId,
+      createdOn: _firstOrgCreatedOn,
+      ...firstOrgValues
+    } = firstOrg ?? {};
+    const {
+      id: _id,
+      createdOn: _thisOrgCreatedOn,
+      ...thisOrgValues
+    } = org ?? {};
 
     return !isEqual(firstOrgValues, thisOrgValues);
   });

@@ -8,6 +8,8 @@ export interface OrganismAttributes {
   sex?: string | null;
   remarks?: string | null;
   determination?: Determination[] | null;
+  createdOn?: string;
+  createdBy?: string;
 }
 
 export type Organism = KitsuResource & OrganismAttributes;

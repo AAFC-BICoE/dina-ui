@@ -8,8 +8,8 @@ export interface PersonAttributes {
   givenNames?: string;
   familyNames?: string;
   aliases?: string[];
-  email: string;
-  uuid: string | undefined;
+  email?: string;
+  uuid?: string | undefined;
   createdBy?: string;
   createdOn?: string;
   identifiers?: PersonIdentifier[];

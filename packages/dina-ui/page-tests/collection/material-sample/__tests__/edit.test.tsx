@@ -11,6 +11,7 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
+import Select from "react-select";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -1891,6 +1892,149 @@ describe("Material Sample Edit Page", () => {
                     { id: "organism-2", type: "organism" },
                     { id: "organism-3", type: "organism" }
                   ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Converts the Sample's determiners from object (front-end format) to UUID (back-end format).", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 3 DIFFERENT organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group",
+              determination: [
+                {
+                  isPrimary: true,
+                  determiner: [
+                    {
+                      id: "person-1-uuid",
+                      type: "person",
+                      displayName: "Person 1"
+                    }
+                  ]
+                },
+                {
+                  isPrimary: true,
+                  determiner: [
+                    {
+                      id: "person-2-uuid",
+                      type: "person",
+                      displayName: "Person 2"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Shows the initial determiner value:
+    expect(
+      wrapper
+        .find(".organism_0__determination_0__determiner-field")
+        .find(Select)
+        .prop("value")
+    ).toEqual([
+      {
+        label: "Person 1",
+        resource: {
+          displayName: "Person 1",
+          id: "person-1-uuid",
+          type: "person"
+        },
+        value: "person-1-uuid"
+      }
+    ]);
+
+    // Add a second Person to the primary Determination's determiners:
+    wrapper
+      .find(".organism_0__determination_0__determiner-field")
+      .find(Select)
+      .prop<any>("onChange")([
+      {
+        resource: {
+          displayName: "Person 1",
+          id: "person-1-uuid",
+          type: "person"
+        }
+      },
+      {
+        resource: {
+          displayName: "Person 2",
+          id: "person-2-uuid",
+          type: "person"
+        }
+      }
+    ]);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Saves the Material Sample with the 3 SAME organisms:
+    expect(mockSave.mock.calls).toEqual([
+      // Updates the organism with the new determiners:
+      [
+        [
+          {
+            resource: {
+              determination: [
+                {
+                  // The new value as IDs only:
+                  determiner: ["person-1-uuid", "person-2-uuid"],
+                  isPrimary: true
+                },
+                {
+                  determiner: ["person-2-uuid"],
+                  isPrimary: true
+                }
+              ],
+              group: "test-group",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              type: "organism"
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [{ id: "organism-1", type: "organism" }]
                 }
               }),
               type: "material-sample"

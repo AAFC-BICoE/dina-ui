@@ -10,7 +10,7 @@ import {
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
 import { useState } from "react";
-import { MdDragHandle } from "react-icons/md";
+import { GiHamburgerMenu } from "react-icons/gi";
 import {
   SortableContainer,
   SortableElement,
@@ -174,7 +174,7 @@ function OrganismsTable({
       ? []
       : [
           {
-            Header: "Sort",
+            Header: "",
             Cell: () => <RowSortHandle />,
             width: 60
           }
@@ -221,7 +221,7 @@ function OrganismsTable({
     <>
       <style>{`
         .rt-expandable, .rt-th:first-child {
-          min-width: 12rem !important;
+          min-width: 4rem !important;
         }
       `}</style>
       <ReactTable
@@ -229,11 +229,13 @@ function OrganismsTable({
         data={visibleTableData}
         sortable={false}
         minRows={organismsQuantity}
+        pageSize={organismsQuantity || 1}
         ExpanderComponent={OrganismExpanderComponent}
         expanded={expanded}
         TbodyComponent={TbodyComponent}
         getTbodyProps={() => ({ onSortStart, onSortEnd })}
         onExpandedChange={onExpandedChange}
+        showPagination={false}
         SubComponent={row => {
           const isOdd = (row.index + 1) % 2 === 1;
 
@@ -275,9 +277,6 @@ function OrganismExpanderComponent({ isExpanded, index }) {
       type="button"
     >
       <div>
-        <strong>
-          <DinaMessage id="showHide" />
-        </strong>
         <span className={`rt-expander ${isExpanded ? "-open" : false}`}>•</span>
       </div>
       {hasError && (
@@ -324,5 +323,5 @@ const SortableTBody = SortableContainer(({ children, ...bodyProps }) => {
 const SortableTRow = SortableElement(({ children }) => <>{children}</>);
 
 const RowSortHandle = SortableHandle(() => (
-  <MdDragHandle cursor="grab" size="3em" />
+  <GiHamburgerMenu cursor="grab" size="2.5em" />
 ));
