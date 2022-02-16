@@ -105,7 +105,7 @@ export function StorageLinker({
               <TabPanel>
                 <BrowseStorageTree
                   onSelect={changeStorageAndResetTab}
-                  readOnly={readOnly}
+                  disabled={readOnly}
                 />
               </TabPanel>
             )}

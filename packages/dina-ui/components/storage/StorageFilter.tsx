@@ -77,7 +77,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
   }
 
   return (
-    <div>
+    <div style={{ maxWidth: "70rem" }}>
       <div className="mb-3">
         <strong>
           <DinaMessage id="filterRecordsTitle" />
