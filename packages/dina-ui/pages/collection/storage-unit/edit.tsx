@@ -45,9 +45,10 @@ export default function StorageUnitEditPage() {
   const title = id ? "editStorageUnitTitle" : "addStorageUnitTitle";
 
   async function goToViewPage(resources: PersistedResource<StorageUnit>[]) {
+    const ids = resources.map(resource => resource.id);
     resources.length === 1
       ? await router.push(`/collection/storage-unit/view?id=${resources[0].id}`)
-      : await router.push(`/collection/storage-unit/list`);
+      : await router.push(`/collection/storage-unit/bulk-result?ids=${ids}`);
   }
 
   return (

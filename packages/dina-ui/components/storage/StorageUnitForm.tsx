@@ -131,6 +131,7 @@ export function StorageUnitFormFields() {
             <ToggleField
               onChangeExternal={onStorageUnitMultipleToggled}
               name="isMultiple"
+              label={formatMessage("multipleUnits")}
             />
           )}
           {!showTextAreaInput && (
