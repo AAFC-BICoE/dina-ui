@@ -6,19 +6,30 @@ import {
   useModal
 } from "common-ui";
 import dynamic from "next/dynamic";
-import Switch from "react-switch";
+import Switch, { ReactSwitchProps } from "react-switch";
+import { ComponentType, PropsWithChildren } from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSampleAssociation
 } from "../../../types/collection-api";
 import { useMaterialSampleSave } from "./useMaterialSample";
+import {
+  SortableContainer,
+  SortableElement,
+  SortableHandle,
+  SortEnd
+} from "react-sortable-hoc";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
   disableRemovePrompt?: boolean;
+
+  navOrder?: MaterialSampleFormSectionId[];
+  onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[]) => void;
 }
 
 const renderNav = process.env.NODE_ENV !== "test";
@@ -43,15 +54,41 @@ const ScrollSpyNav = renderNav
     )
   : "div";
 
+const MATERIAL_SAMPLE_FORM_SECTIONS = [
+  "identifiers-section",
+  "collecting-event-section",
+  "acquisition-event-section",
+  "preparations-section",
+  "organism-state-section",
+  "determination-section",
+  "associations-section",
+  "storage-section",
+  "scheduled-actions-section",
+  "managedAttributes-section",
+  "material-sample-attachments-section"
+] as const;
+
+type MaterialSampleFormSectionId = typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
+
+interface ScrollTarget {
+  id: MaterialSampleFormSectionId;
+  msg: string | JSX.Element;
+  className?: string;
+  disabled?: boolean;
+  setEnabled?: (val: boolean) => void;
+  customSwitch?: ComponentType<ReactSwitchProps>;
+}
+
 /** Form navigation and toggles to enable/disable form sections. */
 export function MaterialSampleFormNav({
   dataComponentState,
-  disableRemovePrompt
+  disableRemovePrompt,
+  navOrder,
+  onChangeNavOrder
 }: MaterialSampleNavProps) {
   const { formatMessage } = useDinaIntl();
-  const { openModal } = useModal();
 
-  const scrollTargets = [
+  const scrollTargets: ScrollTarget[] = [
     { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
     {
       id: "collecting-event-section",
@@ -121,6 +158,16 @@ export function MaterialSampleFormNav({
     }
   ];
 
+  function onSortStart(_, event: unknown) {
+    if (event instanceof MouseEvent) {
+      document.body.style.cursor = "grabbing";
+    }
+  }
+
+  function onSortEnd(se: SortEnd) {
+    document.body.style.cursor = "default";
+  }
+
   return (
     <div className="sticky-md-top material-sample-nav">
       <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
@@ -143,55 +190,21 @@ export function MaterialSampleFormNav({
               <DinaMessage id="dataComponents" />
             </strong>
           </label>
-          <div className="list-group">
-            {scrollTargets.map(section => {
-              const Tag = section.disabled ? "div" : "a";
-              const SwitchComponent = section.customSwitch ?? Switch;
-
-              function toggle(newVal: boolean) {
-                if (!newVal && !disableRemovePrompt) {
-                  // When removing data, ask the user for confirmation first:
-                  openModal(
-                    <AreYouSureModal
-                      actionMessage={
-                        <DinaMessage
-                          id="removeComponentData"
-                          values={{ component: section.msg }}
-                        />
-                      }
-                      onYesButtonClicked={() => section.setEnabled?.(newVal)}
-                    />
-                  );
-                } else {
-                  section.setEnabled?.(newVal);
-                }
-              }
-
-              return (
-                <div
-                  className={classNames(
-                    section.className,
-                    "list-group-item d-flex align-items-center"
-                  )}
-                  key={section.id}
-                  style={{ height: "3rem" }}
-                >
-                  <Tag
-                    className="flex-grow-1 text-decoration-none"
-                    href={section.disabled ? undefined : `#${section.id}`}
-                  >
-                    {section.msg}
-                  </Tag>
-                  {section.setEnabled && (
-                    <SwitchComponent
-                      checked={!section.disabled}
-                      onChange={toggle}
-                    />
-                  )}
-                </div>
-              );
-            })}
-          </div>
+          <SortableListGroup
+            axis="y"
+            useDragHandle={true}
+            onSortStart={onSortStart}
+            onSortEnd={onSortEnd}
+          >
+            {scrollTargets.map((section, index) => (
+              <SortableNavItem
+                key={section.id}
+                index={index}
+                section={section}
+                disableRemovePrompt={disableRemovePrompt}
+              />
+            ))}
+          </SortableListGroup>
         </nav>
       </ScrollSpyNav>
     </div>
@@ -239,3 +252,68 @@ function AssociationsSwitch(props) {
     </FieldSpy>
   );
 }
+
+const SortableListGroup = SortableContainer(
+  ({ children }: PropsWithChildren<{}>) => (
+    <div className="list-group">{children}</div>
+  )
+);
+
+interface NavItemProps {
+  section: ScrollTarget;
+  disableRemovePrompt?: boolean;
+}
+
+const SortableNavItem = SortableElement(
+  ({ section, disableRemovePrompt }: NavItemProps) => {
+    const { openModal } = useModal();
+
+    const Tag = section.disabled ? "div" : "a";
+    const SwitchComponent = section.customSwitch ?? Switch;
+
+    function toggle(newVal: boolean) {
+      if (!newVal && !disableRemovePrompt) {
+        // When removing data, ask the user for confirmation first:
+        openModal(
+          <AreYouSureModal
+            actionMessage={
+              <DinaMessage
+                id="removeComponentData"
+                values={{ component: section.msg }}
+              />
+            }
+            onYesButtonClicked={() => section.setEnabled?.(newVal)}
+          />
+        );
+      } else {
+        section.setEnabled?.(newVal);
+      }
+    }
+
+    return (
+      <div
+        className={classNames(
+          section.className,
+          "list-group-item d-flex gap-2 align-items-center"
+        )}
+        key={section.id}
+        style={{ height: "3rem" }}
+      >
+        <NavSortHandle />
+        <Tag
+          className="flex-grow-1 text-decoration-none"
+          href={section.disabled ? undefined : `#${section.id}`}
+        >
+          {section.msg}
+        </Tag>
+        {section.setEnabled && (
+          <SwitchComponent checked={!section.disabled} onChange={toggle} />
+        )}
+      </div>
+    );
+  }
+);
+
+const NavSortHandle = SortableHandle(() => (
+  <GiHamburgerMenu cursor="grab" size="2em" />
+));
