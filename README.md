@@ -57,6 +57,11 @@ cd dina-compose
 ./dev.sh -f docker-compose.search.base.yml -f docker-compose.search.dev.yml up
 ```
 
+If you want to reduce memory usage you can omit any APIs you don't need running at the moment using the "scale" option:
+```
+./dev.sh up --scale seqdb-api=0 --scale loan-transaction-api=0
+```
+
 `dev.sh` is just short-hand for `docker-compose` with some pre-written options.
 
 The UI should be available at dina.traefik.me. Note: traefik.me and its subdomains use a DNS server to point to <127.0.0.1> (localhost).
