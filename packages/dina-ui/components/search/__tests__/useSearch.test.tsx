@@ -41,7 +41,7 @@ describe("doSearch function", () => {
 
     expect(mockGet.mock.calls).toEqual([
       [
-        "search-api/search/auto-complete",
+        "search-api/search-ws/auto-complete",
         {
           params: {
             additionalField: "",
