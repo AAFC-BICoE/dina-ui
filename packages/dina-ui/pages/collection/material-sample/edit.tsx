@@ -279,9 +279,8 @@ export function MaterialSampleForm({
 
   const attachmentsField = "attachment";
 
-  const [formSectionOrder, setFormSectionOrder] = useState<
-    MaterialSampleFormSectionId[]
-  >([]);
+  const [formSectionOrder, setFormSectionOrder] =
+    useState<MaterialSampleFormSectionId[]>();
 
   /**
    * A map where:
@@ -455,7 +454,9 @@ export function MaterialSampleForm({
 
   const sortedFormSectionPairs = uniq([
     ...compact(
-      formSectionOrder.map(id => formSectionPairs.find(([it]) => it === id))
+      (formSectionOrder ?? []).map(id =>
+        formSectionPairs.find(([it]) => it === id)
+      )
     ),
     ...formSectionPairs
   ]);
