@@ -23,6 +23,7 @@ import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
+import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -123,7 +124,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
-    const queryDSL = transformQueryToDSL(submittedValues.queryRows);
+    const queryDSL = transformQueryToDSL(submittedValues);
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
@@ -198,6 +199,7 @@ export function QueryPage<TData extends KitsuResource>({
         {formatMessage({ id: "search" })}
       </label>
       <QueryBuilder name="queryRows" esIndexMapping={data} />
+      <GroupSelectField name="group" />
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>
