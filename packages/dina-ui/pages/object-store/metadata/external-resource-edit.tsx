@@ -1,5 +1,4 @@
 import {
-  BackButton,
   ButtonBar,
   DateField,
   DinaForm,
@@ -9,13 +8,13 @@ import {
   SelectField,
   SubmitButton,
   TextField,
+  useAccount,
   useApiClient,
   useQuery,
   withResponse
 } from "common-ui";
-import { Field } from "formik";
-import { keys } from "lodash";
 import { NextRouter, useRouter } from "next/router";
+import { Field } from "formik";
 import {
   Footer,
   Head,
@@ -24,44 +23,30 @@ import {
   PersonSelectField,
   TagsAndRestrictionsSection
 } from "../../../components";
-import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
+import {
+  DCTYPE_OPTIONS,
+  ORIENTATION_OPTIONS
+} from "../metadata/single-record-edit";
 
-interface SingleMetadataFormProps {
-  /** Existing Metadata is required, no new ones are added with this form. */
-  metadata: Metadata;
-  router: NextRouter;
-}
-
-export default function MetadataEditPage() {
+export default function ExternalResourceMetadataPage() {
+  const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  const id = router.query.id?.toString();
+  const id = router?.query.id?.toString();
 
-  const { formatMessage } = useDinaIntl();
   const { apiClient } = useApiClient();
 
   const query = useQuery<Metadata>(
     {
-      path: `objectstore-api/metadata/${id}`,
-      include: "dcCreator,derivatives"
+      path: `objectstore-api/metadata/${id}?include=dcCreator,derivatives`
     },
     {
-      joinSpecs: [
-        // Join to persons api:
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ],
       onSuccess: async ({ data: metadata }) => {
         // Get the License resource based on the Metadata's xmpRightsWebStatement field:
         if (metadata.xmpRightsWebStatement) {
@@ -78,17 +63,24 @@ export default function MetadataEditPage() {
 
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")} />
+      <Head title={formatMessage("externalResourceListTitle")} />
       <Nav />
       <main className="container">
-        {id && (
+        {id ? (
           <div>
             <h1 id="wb-cont">
-              <DinaMessage id="editMetadataTitle" />
+              <DinaMessage id="editExternalResourceTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <SingleMetadataForm metadata={data} router={router} />
+              <ExternalResourceMetatdataForm metadata={data} router={router} />
             ))}
+          </div>
+        ) : (
+          <div>
+            <h1 id="wb-cont">
+              <DinaMessage id="addExternalResourceTitle" />
+            </h1>
+            <ExternalResourceMetatdataForm router={router} />
           </div>
         )}
       </main>
@@ -97,22 +89,32 @@ export default function MetadataEditPage() {
   );
 }
 
-function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
-  const { formatMessage, locale } = useDinaIntl();
-  const { id } = router.query;
+interface ExternalResourceMetatdataProps {
+  /** Existing Metadata is required, no new ones are added with this form. */
+  metadata?: Metadata;
+  router: NextRouter;
+}
 
-  const initialValues = {
-    ...metadata,
-    // Convert the string to an object for the dropdown:
-    acSubtype: metadata.acSubtype
-      ? {
-          id: "id-unavailable",
-          type: "object-subtype",
-          acSubtype: metadata.acSubtype
-        }
-      : null
-  };
+function ExternalResourceMetatdataForm({
+  router,
+  metadata
+}: ExternalResourceMetatdataProps) {
+  const { locale, formatMessage } = useDinaIntl();
+  const { groupNames } = useAccount();
 
+  const initialValues = metadata
+    ? {
+        ...metadata,
+        // Convert the string to an object for the dropdown:
+        acSubtype: metadata?.acSubtype
+          ? {
+              id: "id-unavailable",
+              type: "object-subtype",
+              acSubtype: metadata?.acSubtype
+            }
+          : null
+      }
+    : {};
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { apiClient, save }
@@ -143,18 +145,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     const metadataEdit = {
       ...metadataValues,
       // Convert the object back to a string:
-      acSubtype: acSubtype?.acSubtype ?? null
+      acSubtype: acSubtype?.acSubtype ?? null,
+      bucket: metadataValues.bucket ?? groupNames?.[0]
     };
 
-    // Remove blank managed attribute values from the map:
-    const blankValues: any[] = ["", null];
-    for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
-      if (blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])) {
-        delete metadataEdit?.managedAttributeValues?.[maKey];
-      }
-    }
-
-    await save(
+    const savedMeta = await save(
       [
         {
           resource: metadataEdit,
@@ -164,12 +159,13 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-store/object/view?id=${id}`);
+    await router.push(
+      `/object-store/object/external-resource-view?id=${savedMeta?.[0].id}`
+    );
   };
 
   const buttonBar = (
     <ButtonBar>
-      <BackButton entityId={id as string} entityLink="/object-store/object" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   );
@@ -178,9 +174,6 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
-      <div className="mb-3">
-        <MetadataFileView metadata={metadata} imgHeight="15rem" />
-      </div>
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
         tagsFieldName="acTags"
@@ -190,9 +183,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         <div className="row">
           <TextField
             className="col-md-6"
-            name="originalFilename"
-            readOnly={true}
+            name="resourceExternalURL"
+            label={formatMessage("metadataResourceExternalURLLabel")}
           />
+          <TextField className="col-md-6" name="dcFormat" />
+          <TextField className="col-md-6" name="acCaption" />
           <DateField
             className="col-md-6"
             name="acDigitizationDate"
@@ -222,9 +217,11 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           </Field>
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="acCaption" />
-        </div>
-        <div className="row">
+          <TextField
+            className="col-md-6"
+            name="fileExtension"
+            label={formatMessage("metadataFileExtensionLabel")}
+          />
           <PersonSelectField
             className="col-md-6"
             name="dcCreator"
@@ -252,35 +249,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           />
         </div>
       </FieldSet>
-      <ManagedAttributesEditor
-        valuesPath="managedAttributeValues"
-        managedAttributeApiPath="objectstore-api/managed-attribute"
-        fieldSetProps={{
-          legend: <DinaMessage id="managedAttributes" />
-        }}
-      />
       {buttonBar}
     </DinaForm>
   );
 }
-
-export const DCTYPE_OPTIONS = [
-  { label: "Image", value: "IMAGE" },
-  { label: "Moving Image", value: "MOVING_IMAGE" },
-  { label: "Sound", value: "SOUND" },
-  { label: "Text", value: "TEXT" },
-  { label: "Dataset", value: "DATASET" },
-  { label: "Undetermined", value: "UNDETERMINED" }
-];
-
-export const ORIENTATION_OPTIONS = [
-  { label: "1 - Normal", value: 1 },
-  { label: "3 - Rotated 180 degrees", value: 3 },
-  { label: "6 - Rotated 90 degrees CW", value: 6 },
-  { label: "8 - Rotated 90 degrees CCW", value: 8 },
-  { label: "2 - Flipped", value: 2 },
-  { label: "4 - Rotated 180 degrees + Flipped", value: 4 },
-  { label: "5 - Rotated 90 degrees CW + Flipped", value: 5 },
-  { label: "7 - Rotated 90 degrees CCW + Flipped", value: 7 },
-  { label: "Undetermined", value: null }
-];

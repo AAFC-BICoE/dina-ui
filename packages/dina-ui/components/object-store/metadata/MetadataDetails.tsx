@@ -52,13 +52,16 @@ export function useMetadataQuery(id?: string) {
  */
 export function MetadataDetails({ metadata }: MetadataDetailsProps) {
   const { formatMessage } = useDinaIntl();
-
+  const isExternalResource = !!metadata.resourceExternalURL;
   return (
     <div>
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          { name: "group", value: <GroupLabel groupName={metadata.group} /> },
+          {
+            name: "group",
+            value: <GroupLabel groupName={metadata.group} />
+          },
           {
             name: "createdDate",
             value: <DateView date={metadata.createdDate} />
@@ -70,32 +73,39 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
           "acMetadataCreator.displayName",
           "acSubtype"
         ]}
-        title={formatMessage("metadataUploadDetailsLabel")}
+        title={
+          isExternalResource
+            ? formatMessage("metadataExternalResourceDetailsLabel")
+            : formatMessage("metadataUploadDetailsLabel")
+        }
       />
-      <CollapsableSection
-        collapserId="managed-attributes"
-        title={formatMessage("metadataManagedAttributesLabel")}
-      >
-        <ManagedAttributesViewer
-          values={metadata.managedAttributeValues}
-          managedAttributeApiPath={id =>
-            `objectstore-api/managed-attribute/${id}`
-          }
-        />
-      </CollapsableSection>
+      {!isExternalResource && (
+        <CollapsableSection
+          collapserId="managed-attributes"
+          title={formatMessage("metadataManagedAttributesLabel")}
+        >
+          <ManagedAttributesViewer
+            values={metadata.managedAttributeValues}
+            managedAttributeApiPath={id =>
+              `objectstore-api/managed-attribute/${id}`
+            }
+          />
+        </CollapsableSection>
+      )}
       <MetadataAttributeGroup
         metadata={metadata}
         fields={[
-          "originalFilename",
+          ...(isExternalResource ? ["resourceExternalURL"] : []),
+          "dcFormat",
+          "acCaption",
           {
             name: "acDigitizationDate",
             value: <DateView date={metadata.acDigitizationDate} />
           },
+          "dcType",
+          ...(!isExternalResource ? ["originalFilename"] : []),
           "fileExtension",
           "dcCreator.displayName",
-          "dcType",
-          "dcFormat",
-          "acCaption",
           "orientation"
         ]}
         title={formatMessage("metadataMediaDetailsLabel")}
@@ -105,11 +115,13 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         fields={["dcRights", "xmpRightsWebStatement"]}
         title={formatMessage("metadataRightsDetailsLabel")}
       />
-      <MetadataAttributeGroup
-        metadata={metadata}
-        fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
-        title={formatMessage("metadataFileStorageDetailsLabel")}
-      />
+      {!isExternalResource && (
+        <MetadataAttributeGroup
+          metadata={metadata}
+          fields={["fileIdentifier", "acHashFunction", "acHashValue"]}
+          title={formatMessage("metadataFileStorageDetailsLabel")}
+        />
+      )}
     </div>
   );
 }

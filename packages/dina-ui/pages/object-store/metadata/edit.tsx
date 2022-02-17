@@ -16,9 +16,16 @@ export default function EditMetadatasPage() {
     return <LoadingSpinner loading={true} />;
   }
 
-  async function afterMetadatasSaved(ids: string[]) {
+  async function afterMetadatasSaved(
+    ids: string[],
+    isExternalResource?: boolean
+  ) {
     if (ids.length === 1) {
-      await router.push(`/object-store/object/view?id=${ids[0]}`);
+      await router.push(
+        `/object-store/object/${
+          isExternalResource ? "external-resource-view" : "view"
+        }?id=${ids[0]}`
+      );
     } else {
       await router.push("/object-store/object/list");
     }

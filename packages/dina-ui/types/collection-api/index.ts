@@ -11,6 +11,7 @@ export * from "./resources/ManagedAttributesView";
 export * from "./resources/MaterialSample";
 export * from "./resources/MaterialSampleRunConfig";
 export * from "./resources/MaterialSampleType";
+export * from "./resources/Organism";
 export * from "./resources/Project";
 export * from "./resources/PreparationProcessDefinition";
 export * from "./resources/PreparationType";

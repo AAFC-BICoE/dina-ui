@@ -158,7 +158,7 @@ export function TabbedArrayField<T>({
                                     values={{ typeName }}
                                   />
                                 </FormikButton>
-                                {elements.length > 1 && (
+                                {elements.length >= 1 && (
                                   <FormikButton
                                     className="list-inline-item btn btn-dark"
                                     onClick={() => removeElement(index)}
@@ -179,7 +179,7 @@ export function TabbedArrayField<T>({
                 {!elements.length && !readOnly && !isTemplate && (
                   <div className="d-flex">
                     <FormikButton
-                      className="btn btn-primary add-button"
+                      className="btn btn-primary mb-2 add-button"
                       onClick={addElement}
                     >
                       <DinaMessage id="addNewElement" values={{ typeName }} />

@@ -14,16 +14,6 @@ interface NumberSpinnerFieldProps extends FieldWrapperProps {
 export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
   const { min, max, size, step, onChangeExternal, name } = props;
 
-  const customStyle = (
-    <style>{`
-    /* Making sure under chrome, the spinnig show by default */
-    input[type=number]::-webkit-inner-spin-button, 
-    input[type=number]::-webkit-outer-spin-button {  
-       opacity: 1;
-    }    
-  `}</style>
-  );
-
   /* Avoid entries like 'e' for valid number */
   const onKeyDown = e => {
     const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
@@ -52,21 +42,18 @@ export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
         }
 
         return (
-          <>
-            {customStyle}
-            <input
-              className="form-control"
-              type="number"
-              min={min ?? 1}
-              max={max}
-              size={size ?? 4}
-              step={step ?? 1}
-              onKeyDown={onKeyDown}
-              onChange={e => onChangeInternal(e.target.value)}
-              onClick={e => (e.target as any).select()}
-              value={value}
-            />
-          </>
+          <input
+            className="form-control"
+            type="number"
+            min={min ?? 1}
+            max={max}
+            size={size ?? 4}
+            step={step ?? 1}
+            onKeyDown={onKeyDown}
+            onChange={e => onChangeInternal(e.target.value)}
+            onClick={e => (e.target as any).select()}
+            value={value}
+          />
         );
       }}
     </FieldWrapper>

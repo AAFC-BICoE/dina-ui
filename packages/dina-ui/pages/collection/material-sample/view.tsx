@@ -20,21 +20,20 @@ import {
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
+  OrganismsField,
   ProjectSelectSection,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventFormLayout,
-  DeterminationField,
-  OrganismStateField,
-  ORGANISM_FIELDS,
   PreparationField,
   PREPARATION_FIELDS,
   SamplesView,
   ScheduledActionsField,
   useCollectingEventQuery,
-  useMaterialSampleQuery
+  useMaterialSampleQuery,
+  withOrganismEditorValues
 } from "../../../components/collection/";
 import {
   AssociationsField,
@@ -104,17 +103,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
-      {withResponse(materialSampleQuery, ({ data: materialSample }) => {
+      {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
+        const materialSample = withOrganismEditorValues(materialSampleData);
+
         const hasPreparations = PREPARATION_FIELDS.some(
           fieldName => !isEmpty(materialSample[fieldName])
         );
 
-        const hasOrganism = ORGANISM_FIELDS.some(
-          fieldName => materialSample.organism?.[fieldName]
-        );
-
-        const hasDetermination = materialSample?.determination?.some(
-          det => !isEmpty(det)
+        const hasOrganism = materialSample?.organism?.some(
+          org => !isEmpty(org)
         );
 
         /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
@@ -193,8 +190,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               ))}
               {hasPreparations && <PreparationField />}
-              {hasOrganism && <OrganismStateField />}
-              {hasDetermination && <DeterminationField />}
+              {hasOrganism && <OrganismsField name="organism" />}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">

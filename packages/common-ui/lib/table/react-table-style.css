@@ -45,3 +45,8 @@
 .ReactTable .-pagination .-center .select-wrap.-pageSizeOptions > select:focus {
   border-color: #66afe9;
 }
+
+.ReactTable .-odd .card {
+  /* Nested cards in an odd table row should have the same background color. */
+  background-color: inherit;
+}

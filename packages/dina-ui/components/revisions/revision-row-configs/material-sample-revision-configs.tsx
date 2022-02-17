@@ -163,32 +163,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             />
           </div>
         )),
-      determination: ({ original: { value } }) =>
-        value?.map((det, index) => (
-          <div className="pb-2" key={index}>
-            <strong>{index + 1}:</strong>
-            <KeyValueTable
-              data={det}
-              customValueCells={{
-                scientificNameDetails: ({ value: details }) => (
-                  <KeyValueTable data={details} />
-                ),
-                determiner: ({ value: ids }) =>
-                  ids?.map(id => (
-                    <div key={id}>
-                      <ReferenceLink<Person>
-                        baseApiPath="agent-api"
-                        type="person"
-                        reference={{ id }}
-                        name={person => person.displayName}
-                        href="/person/view?id="
-                      />
-                    </div>
-                  )) ?? null
-              }}
-            />
-          </div>
-        )),
+      determination: ({ original: { value } }) => determinationRevision(value),
       scheduledActions: ({ original: { value } }) =>
         value?.map((action, index) => (
           <div className="pb-2" key={index}>
@@ -211,8 +186,48 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           </div>
         )),
       hostOrganism: ({ original: { value } }) => <KeyValueTable data={value} />,
-      organism: ({ original: { value } }) => <KeyValueTable data={value} />,
+      organism: ({ original: { value: orgs } }) =>
+        orgs?.map((org, index) => (
+          <KeyValueTable
+            key={index}
+            data={org}
+            customValueCells={{
+              detertmination: ({ original: { value: dets } }) =>
+                determinationRevision(dets)
+            }}
+          />
+        )),
       // Don't render this one because it isn't an editable field:
       materialSampleChildren: () => <></>
     }
   };
+
+/** Renders the determination revision value. */
+export function determinationRevision(value) {
+  return value?.map((det, index) => (
+    <div className="pb-2" key={index}>
+      <strong>{index + 1}:</strong>
+      <KeyValueTable
+        data={det}
+        customValueCells={{
+          scientificNameDetails: ({ value: details }) => (
+            <KeyValueTable data={details} />
+          ),
+          managedAttributes: ({ value: data }) => <KeyValueTable data={data} />,
+          determiner: ({ value: ids }) =>
+            ids?.map(id => (
+              <div key={id}>
+                <ReferenceLink<Person>
+                  baseApiPath="agent-api"
+                  type="person"
+                  reference={{ id }}
+                  name={person => person.displayName}
+                  href="/person/view?id="
+                />
+              </div>
+            )) ?? null
+        }}
+      />
+    </div>
+  ));
+}

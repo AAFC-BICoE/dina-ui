@@ -21,6 +21,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCustomPlaceName: "Add",
   addDetermination: "Add Determination",
   addExistingStorageUnitAsChild: "Add Existing Storage Unit as Child",
+  addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addGroup: "Add Group",
   addIdentifier: "Add Identifier",
@@ -75,7 +76,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   bulkEditResourceLinkerWarningSingle:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
-    "These {fieldName} will be set on all {targetType}s.",
+    "These {fieldName}s will be set on all {targetType}s.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -141,6 +142,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detailsPageLink: "Details Page",
   determination: "Determination",
   determinationManagedAttributes: "Determination Managed Attributes",
+  determinationPrimary: "Determination (Primary)",
   determinations: "Determinations",
   determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",
@@ -181,6 +183,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   endEventDateTime: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   exifProperties: "Exif Properties",
   existingAttachments: "Existing Attachments",
+  editExternalResourceTitle: "Edit External Resource",
+  externalResourceListTitle: "External Resources",
   extensionListTitle: " Field Extensions",
   feedbackButtonText: "Feedback",
   field_acCaption: "Caption",
@@ -310,6 +314,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSample_identifierType_materialSampleId_label:
     "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
+  field_organismsIndividualEntry: "Individual Organism Entry",
+  field_organismsIndividualEntry_tooltip:
+    "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
@@ -421,6 +428,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
   metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
+  metadataExternalResourceDetailsLabel: "External Resource Details",
   metadataFileExtensionLabel: "File Extension",
   metadataFileIdentifierLabel: "File Identifier",
   metadataFileStorageDetailsLabel: "File Storage",
@@ -437,6 +445,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataMediaDetailsLabel: "Media",
   metadataObjectTypeLabel: "Stored Object Type",
   metadataPageLink: "Details Page",
+  metadataResourceExternalURLLabel: "Resource External URL",
   metadataRightsDetailsLabel: "Rights",
   metadataTagsLabel: "Tags",
   metadataUploadDetailsLabel: "Upload Details",
@@ -469,6 +478,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
+  organism: "Organism",
+  organisms: "Organisms",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: " Parent Sample",
@@ -501,6 +512,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeIdentifier: "Remove Identifier",
   removeManagedAttributeValue:
     "Remove Managed Attribute Value: {attributeNames}",
+  removeOrganism: "Remove Organism",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",

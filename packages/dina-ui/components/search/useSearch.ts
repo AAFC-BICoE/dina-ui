@@ -47,7 +47,7 @@ export async function doSearch<T extends KitsuResource>(
   }
 
   const response = await axios.get<AutocompleteSearchResponse>(
-    "search-api/search/auto-complete",
+    "search-api/search-ws/auto-complete",
     {
       params: {
         prefix: searchValue,
