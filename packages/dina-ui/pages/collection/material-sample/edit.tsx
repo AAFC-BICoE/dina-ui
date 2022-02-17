@@ -11,9 +11,9 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { mapValues } from "lodash";
+import { toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, Ref, useContext, useState } from "react";
+import { ReactNode, Ref, useContext, useState, Fragment } from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -279,28 +279,179 @@ export function MaterialSampleForm({
 
   const attachmentsField = "attachment";
 
-  /** Set IDs to blank when this component is off-screen. */
-  const navIds = mapValues(
-    {
-      identifiers: "identifiers-section",
-      colEvent: "collecting-event-section",
-      acqEvent: "acquisition-event-section",
-      preparation: "preparations-section",
-      organism: "organisms-section",
-      associations: "associations-section",
-      storage: "storage-section",
-      ScheduledActions: "scheduled-actions-section",
-      managedAttributes: "managedAttributes-section",
-      attachments: "material-sample-attachments-section"
-    },
-    id => (isOffScreen ? "" : id)
-  );
-
   const [formSectionOrder, setFormSectionOrder] = useState<
     MaterialSampleFormSectionId[]
   >([]);
 
-  const mateirialSampleInternal = (
+  /**
+   * A map where:
+   * - The key is the form section ID.
+   * - The value is the section's render function given the ID as a param.
+   */
+  const formSections: Record<
+    MaterialSampleFormSectionId,
+    (id: string) => ReactNode
+  > = {
+    "identifiers-section": id =>
+      !reduceRendering && (
+        <>
+          <MaterialSampleIdentifiersSection
+            id={id}
+            disableSampleNameField={disableSampleNameField}
+            hideUseSequence={hideUseSequence}
+          />
+          <MaterialSampleInfoSection />
+        </>
+      ),
+    "collecting-event-section": id =>
+      dataComponentState.enableCollectingEvent && (
+        <TabbedResourceLinker<CollectingEvent>
+          fieldSetId={id}
+          legend={<DinaMessage id="collectingEvent" />}
+          briefDetails={colEvent => (
+            <CollectingEventBriefDetails collectingEvent={colEvent} />
+          )}
+          linkerTabContent={
+            reduceRendering ? null : (
+              <CollectingEventLinker
+                onCollectingEventSelect={colEventToLink => {
+                  setColEventId(colEventToLink.id);
+                }}
+              />
+            )
+          }
+          nestedForm={nestedCollectingEventForm}
+          useResourceQuery={useCollectingEventQuery}
+          setResourceId={setColEventId}
+          disableLinkerTab={templateAttachesCollectingEvent}
+          readOnlyLink="/collection/collecting-event/view?id="
+          resourceId={colEventId}
+          fieldName="collectingEvent"
+          targetType="materialSample"
+        />
+      ),
+    "acquisition-event-section": id =>
+      dataComponentState.enableAcquisitionEvent && (
+        <TabbedResourceLinker<AcquisitionEvent>
+          fieldSetId={id}
+          legend={<DinaMessage id="acquisitionEvent" />}
+          briefDetails={acqEvent => (
+            <DinaForm initialValues={acqEvent} readOnly={true}>
+              <AcquisitionEventFormLayout />
+            </DinaForm>
+          )}
+          linkerTabContent={
+            reduceRendering ? null : (
+              <AcquisitionEventLinker
+                onAcquisitionEventSelect={acqEventToLink => {
+                  setAcqEventId(acqEventToLink.id);
+                }}
+              />
+            )
+          }
+          nestedForm={nestedAcqEventForm}
+          useResourceQuery={useAcquisitionEvent}
+          setResourceId={setAcqEventId}
+          disableLinkerTab={templateAttachesAcquisitionEvent}
+          readOnlyLink="/collection/acquisition-event/view?id="
+          resourceId={acqEventId}
+          fieldName="acquisitionEvent"
+          targetType="materialSample"
+        />
+      ),
+    "preparations-section": id =>
+      !reduceRendering &&
+      dataComponentState.enablePreparations && (
+        <PreparationField
+          id={id}
+          // Use the same attachments config for preparations as the Material Sample:
+          attachmentsConfig={attachmentsConfig?.materialSample}
+        />
+      ),
+    "organisms-section": id =>
+      !reduceRendering &&
+      dataComponentState.enableOrganisms && (
+        <OrganismsField id={id} name="organism" />
+      ),
+    "associations-section": id =>
+      !reduceRendering &&
+      dataComponentState.enableAssociations && <AssociationsField id={id} />,
+    "storage-section": id =>
+      !reduceRendering &&
+      dataComponentState.enableStorage && (
+        <FieldSet
+          id={id}
+          legend={<DinaMessage id="storage" />}
+          fieldName="storageUnit"
+        >
+          <StorageLinkerField
+            name="storageUnit"
+            hideLabel={true}
+            targetType="material-sample"
+          />
+        </FieldSet>
+      ),
+    "scheduled-actions-section": id =>
+      !reduceRendering &&
+      dataComponentState.enableScheduledActions && (
+        <ScheduledActionsField
+          id={id}
+          wrapContent={content => (
+            <BulkEditTabWarning
+              targetType="material-sample"
+              fieldName="scheduledActions"
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      ),
+    "managedAttributes-section": id =>
+      !reduceRendering &&
+      !isTemplate && (
+        <DinaFormSection
+          // Disabled the template's restrictions for this section:
+          enabledFields={null}
+        >
+          <div className="row">
+            <div className="col-md-6">
+              <ManagedAttributesEditor
+                valuesPath="managedAttributes"
+                managedAttributeApiPath="collection-api/managed-attribute"
+                managedAttributeComponent="MATERIAL_SAMPLE"
+                fieldSetProps={{
+                  id,
+                  legend: <DinaMessage id="materialSampleManagedAttributes" />
+                }}
+                showCustomViewDropdown={true}
+              />
+            </div>
+          </div>
+        </DinaFormSection>
+      ),
+    "material-sample-attachments-section": id =>
+      !reduceRendering && (
+        <AttachmentsField
+          name={attachmentsField}
+          title={<DinaMessage id="materialSampleAttachments" />}
+          id={id}
+          allowNewFieldName="attachmentsConfig.allowNew"
+          allowExistingFieldName="attachmentsConfig.allowExisting"
+          allowAttachmentsConfig={attachmentsConfig?.materialSample}
+          attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+          wrapContent={content => (
+            <BulkEditTabWarning
+              targetType="material-sample"
+              fieldName={attachmentsField}
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
+        />
+      )
+  };
+
+  const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
         {(!isOffScreen || !reduceRendering) && (
@@ -338,161 +489,18 @@ export function MaterialSampleForm({
             />
           </>
         )}
+        {/* The toggleable / re-arrangeable form sections: */}
         <div className="data-components">
-          {!reduceRendering && (
-            <>
-              <MaterialSampleIdentifiersSection
-                id={navIds.identifiers}
-                disableSampleNameField={disableSampleNameField}
-                hideUseSequence={hideUseSequence}
-              />
-              <MaterialSampleInfoSection />
-            </>
-          )}
-          {dataComponentState.enableCollectingEvent && (
-            <TabbedResourceLinker<CollectingEvent>
-              fieldSetId={navIds.colEvent}
-              legend={<DinaMessage id="collectingEvent" />}
-              briefDetails={colEvent => (
-                <CollectingEventBriefDetails collectingEvent={colEvent} />
-              )}
-              linkerTabContent={
-                reduceRendering ? null : (
-                  <CollectingEventLinker
-                    onCollectingEventSelect={colEventToLink => {
-                      setColEventId(colEventToLink.id);
-                    }}
-                  />
-                )
-              }
-              nestedForm={nestedCollectingEventForm}
-              useResourceQuery={useCollectingEventQuery}
-              setResourceId={setColEventId}
-              disableLinkerTab={templateAttachesCollectingEvent}
-              readOnlyLink="/collection/collecting-event/view?id="
-              resourceId={colEventId}
-              fieldName="collectingEvent"
-              targetType="materialSample"
-            />
-          )}
-          {dataComponentState.enableAcquisitionEvent && (
-            <TabbedResourceLinker<AcquisitionEvent>
-              fieldSetId={navIds.acqEvent}
-              legend={<DinaMessage id="acquisitionEvent" />}
-              briefDetails={acqEvent => (
-                <DinaForm initialValues={acqEvent} readOnly={true}>
-                  <AcquisitionEventFormLayout />
-                </DinaForm>
-              )}
-              linkerTabContent={
-                reduceRendering ? null : (
-                  <AcquisitionEventLinker
-                    onAcquisitionEventSelect={acqEventToLink => {
-                      setAcqEventId(acqEventToLink.id);
-                    }}
-                  />
-                )
-              }
-              nestedForm={nestedAcqEventForm}
-              useResourceQuery={useAcquisitionEvent}
-              setResourceId={setAcqEventId}
-              disableLinkerTab={templateAttachesAcquisitionEvent}
-              readOnlyLink="/collection/acquisition-event/view?id="
-              resourceId={acqEventId}
-              fieldName="acquisitionEvent"
-              targetType="materialSample"
-            />
-          )}
-          {!reduceRendering && (
-            <>
-              {dataComponentState.enablePreparations && (
-                <PreparationField
-                  id={navIds.preparation}
-                  // Use the same attachments config for preparations as the Material Sample:
-                  attachmentsConfig={attachmentsConfig?.materialSample}
-                />
-              )}
-              {dataComponentState.enableOrganisms && (
-                <OrganismsField id={navIds.organism} name="organism" />
-              )}
-              {dataComponentState.enableAssociations && (
-                <AssociationsField id={navIds.associations} />
-              )}
-              {dataComponentState.enableStorage && (
-                <FieldSet
-                  id={navIds.storage}
-                  legend={<DinaMessage id="storage" />}
-                  fieldName="storageUnit"
-                >
-                  <StorageLinkerField
-                    name="storageUnit"
-                    hideLabel={true}
-                    targetType="material-sample"
-                  />
-                </FieldSet>
-              )}
-              {dataComponentState.enableScheduledActions && (
-                <ScheduledActionsField
-                  id={navIds.ScheduledActions}
-                  wrapContent={content => (
-                    <BulkEditTabWarning
-                      targetType="material-sample"
-                      fieldName="scheduledActions"
-                    >
-                      {content}
-                    </BulkEditTabWarning>
-                  )}
-                />
-              )}
-              {!isTemplate && (
-                <DinaFormSection
-                  // Disabled the template's restrictions for this section:
-                  enabledFields={null}
-                >
-                  <div className="row">
-                    <div className="col-md-6">
-                      <ManagedAttributesEditor
-                        valuesPath="managedAttributes"
-                        managedAttributeApiPath="collection-api/managed-attribute"
-                        managedAttributeComponent="MATERIAL_SAMPLE"
-                        fieldSetProps={{
-                          id: navIds.managedAttributes,
-                          legend: (
-                            <DinaMessage id="materialSampleManagedAttributes" />
-                          )
-                        }}
-                        showCustomViewDropdown={true}
-                      />
-                    </div>
-                  </div>
-                </DinaFormSection>
-              )}
-              <AttachmentsField
-                name={attachmentsField}
-                title={<DinaMessage id="materialSampleAttachments" />}
-                id={navIds.attachments}
-                allowNewFieldName="attachmentsConfig.allowNew"
-                allowExistingFieldName="attachmentsConfig.allowExisting"
-                allowAttachmentsConfig={attachmentsConfig?.materialSample}
-                attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
-                wrapContent={content => (
-                  <BulkEditTabWarning
-                    targetType="material-sample"
-                    fieldName={attachmentsField}
-                  >
-                    {content}
-                  </BulkEditTabWarning>
-                )}
-              />
-            </>
-          )}
+          {toPairs(formSections).map(([id, renderFn]) => (
+            <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
+          ))}
         </div>
       </div>
     </div>
   );
 
   return isTemplate ? (
-    mateirialSampleInternal
+    formLayout
   ) : loading ? (
     <LoadingSpinner loading={true} />
   ) : (
@@ -504,7 +512,7 @@ export function MaterialSampleForm({
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
-      {mateirialSampleInternal}
+      {formLayout}
       {buttonBar}
     </DinaForm>
   );
