@@ -1,20 +1,12 @@
 import classNames from "classnames";
 import {
   AreYouSureModal,
-  DinaForm,
-  DinaFormOnSubmit,
   FieldSpy,
-  filterBy,
-  FormikButton,
-  ResourceSelect,
-  SubmitButton,
-  TextField,
-  useApiClient,
   useBulkEditTabContext,
   useModal
 } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
-import { compact, isEqual, uniq } from "lodash";
+import { PersistedResource } from "kitsu";
+import { compact, uniq } from "lodash";
 import dynamic from "next/dynamic";
 import { ComponentType, PropsWithChildren, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -32,6 +24,7 @@ import {
   MaterialSampleAssociation,
   Organism
 } from "../../../types/collection-api";
+import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
 import { useMaterialSampleSave } from "./useMaterialSample";
 
 export interface MaterialSampleNavProps {
@@ -81,6 +74,23 @@ export const MATERIAL_SAMPLE_FORM_SECTIONS = [
 
 export type MaterialSampleFormSectionId =
   typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
+
+/** Yup needs this as an array even though it's a single string literal. */
+const typeNameArray = ["material-sample-form-section-order"] as const;
+
+/** Expected shape of the CustomView's viewConfiguration field. */
+export const materialSampleFormViewConfigSchema = yup.object({
+  type: yup
+    .mixed<typeof typeNameArray[number]>()
+    .oneOf([...typeNameArray])
+    .required(),
+  navOrder: yup.array(
+    yup
+      .mixed<MaterialSampleFormSectionId>()
+      .oneOf([...MATERIAL_SAMPLE_FORM_SECTIONS])
+      .required()
+  )
+});
 
 interface ScrollTarget {
   id: MaterialSampleFormSectionId;
@@ -189,219 +199,6 @@ export function MaterialSampleFormNav({
         </nav>
       </ScrollSpyNav>
     </div>
-  );
-}
-
-/** Yup needs this as an array even though it's a single string literal. */
-const typeNameArray = ["material-sample-form-section-order"] as const;
-
-/** Expected shape of the CustomView's viewConfiguration field. */
-const materialSampleFormViewConfigSchema = yup.object({
-  type: yup
-    .mixed<typeof typeNameArray[number]>()
-    .oneOf([...typeNameArray])
-    .required(),
-  navOrder: yup.array(
-    yup
-      .mixed<MaterialSampleFormSectionId>()
-      .oneOf([...MATERIAL_SAMPLE_FORM_SECTIONS])
-      .required()
-  )
-});
-
-interface MaterialSampleNavCustomViewSelect {
-  onChange: (newVal: PersistedResource<CustomView> | { id: null }) => void;
-  selectedView?: PersistedResource<CustomView> | { id: null };
-  navOrder?: MaterialSampleFormSectionId[];
-}
-
-const navSaveFormSchema = yup.object({
-  name: yup.string().required()
-});
-
-function MaterialSampleNavCustomViewSelect({
-  onChange: onChangeProp,
-  selectedView,
-  navOrder
-}: MaterialSampleNavCustomViewSelect) {
-  const { openModal, closeModal } = useModal();
-  const [lastUpdate, setLastUpdate] = useState(Date.now());
-
-  const { save } = useApiClient();
-
-  const viewConfig =
-    selectedView?.id &&
-    materialSampleFormViewConfigSchema.isValidSync(
-      selectedView.viewConfiguration
-    )
-      ? selectedView.viewConfiguration
-      : null;
-
-  const isEdited = navOrder && !isEqual(navOrder, viewConfig?.navOrder);
-
-  function onChange(newSelected: PersistedResource<CustomView> | { id: null }) {
-    onChangeProp(newSelected);
-    setLastUpdate(Date.now());
-  }
-
-  return (
-    <FieldSpy<string> fieldName="group">
-      {group => {
-        const saveNewView: DinaFormOnSubmit<
-          yup.InferType<typeof navSaveFormSchema>
-        > = async ({ submittedValues }) => {
-          const newViewConfig: yup.InferType<
-            typeof materialSampleFormViewConfigSchema
-          > = {
-            type: "material-sample-form-section-order",
-            navOrder
-          };
-
-          const newView: InputResource<CustomView> = {
-            type: "custom-view",
-            name: submittedValues.name,
-            group: group ?? undefined,
-            restrictToCreatedBy: false,
-            viewConfiguration: newViewConfig
-          };
-
-          await saveView(newView);
-        };
-
-        async function saveView(newView: InputResource<CustomView>) {
-          const [savedView] = await save<CustomView>(
-            [
-              {
-                resource: newView,
-                type: "custom-view"
-              }
-            ],
-            { apiBaseUrl: "/collection-api" }
-          );
-          onChange(savedView);
-          closeModal();
-        }
-
-        return (
-          <div>
-            {isEdited && (
-              <div className="d-flex justify-content-center">
-                <FormikButton
-                  className="btn btn-outline-primary mb-2"
-                  onClick={() =>
-                    openModal(
-                      <div className="modal-content">
-                        <style>{`.modal-dialog { max-width: 50rem; }`}</style>
-                        <div className="modal-body">
-                          <div className="card card-body">
-                            <h2>
-                              <DinaMessage id="createNewView" />
-                            </h2>
-                            <DinaForm
-                              validationSchema={navSaveFormSchema}
-                              initialValues={{ name: "" }}
-                              onSubmit={saveNewView}
-                            >
-                              <TextField
-                                name="name"
-                                customInput={inputProps => (
-                                  <div className="input-group">
-                                    <input {...inputProps} type="text" />
-                                    <SubmitButton />
-                                  </div>
-                                )}
-                              />
-                            </DinaForm>
-                          </div>
-                          {selectedView?.id && (
-                            <>
-                              <div className="d-flex align-items-center">
-                                <strong className="mx-3 fs-4">
-                                  <DinaMessage id="OR" />
-                                </strong>
-                              </div>
-                              <div className="card card-body">
-                                <h2>
-                                  <DinaMessage id="updateExistingView" />:
-                                  <div>{selectedView.name}</div>
-                                </h2>
-                                <DinaForm
-                                  initialValues={{}}
-                                  onSubmit={async () => {
-                                    const newViewConfig: yup.InferType<
-                                      typeof materialSampleFormViewConfigSchema
-                                    > = {
-                                      type: "material-sample-form-section-order",
-                                      navOrder
-                                    };
-
-                                    const newView: InputResource<CustomView> = {
-                                      type: "custom-view",
-                                      id: selectedView.id,
-                                      viewConfiguration: {
-                                        ...viewConfig,
-                                        ...newViewConfig
-                                      }
-                                    };
-
-                                    await saveView(newView);
-                                  }}
-                                >
-                                  <SubmitButton
-                                    buttonProps={() => ({
-                                      style: { width: "" }
-                                    })}
-                                  >
-                                    <DinaMessage id="update" />:{" "}
-                                    {selectedView.name}
-                                  </SubmitButton>
-                                </DinaForm>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <div className="modal-footer">
-                          <button className="btn btn-dark" onClick={closeModal}>
-                            <DinaMessage id="cancelButtonText" />
-                          </button>
-                        </div>
-                      </div>
-                    )
-                  }
-                >
-                  <DinaMessage id="saveThisView" />
-                  ...
-                </FormikButton>
-              </div>
-            )}
-            <label className="w-100">
-              <div className="mb-2 fw-bold">
-                <DinaMessage id="customComponentOrder" />
-              </div>
-              <ResourceSelect<CustomView>
-                filter={input => ({
-                  // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
-                  "viewConfiguration.type":
-                    "material-sample-form-section-order",
-                  // Filter by view name typed into the dropdown:
-                  ...filterBy(["name"])(input),
-                  // Filter by the form's group:
-                  ...(group && { group: { EQ: `${group}` } })
-                })}
-                optionLabel={view => view.name || view.id}
-                model="collection-api/custom-view"
-                onChange={newVal =>
-                  onChange(newVal as PersistedResource<CustomView>)
-                }
-                value={selectedView}
-                // Refresh the query whenever the custom view is changed.
-                key={lastUpdate}
-              />
-            </label>
-          </div>
-        );
-      }}
-    </FieldSpy>
   );
 }
 
