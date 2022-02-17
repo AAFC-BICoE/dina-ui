@@ -5,22 +5,24 @@ import {
   useBulkEditTabContext,
   useModal
 } from "common-ui";
+import { compact, uniq } from "lodash";
 import dynamic from "next/dynamic";
-import Switch, { ReactSwitchProps } from "react-switch";
 import { ComponentType, PropsWithChildren } from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  Organism,
-  MaterialSampleAssociation
-} from "../../../types/collection-api";
-import { useMaterialSampleSave } from "./useMaterialSample";
+import { GiHamburgerMenu } from "react-icons/gi";
 import {
   SortableContainer,
   SortableElement,
   SortableHandle,
-  SortEnd
+  SortEnd,
+  arrayMove
 } from "react-sortable-hoc";
-import { GiHamburgerMenu } from "react-icons/gi";
+import Switch, { ReactSwitchProps } from "react-switch";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  MaterialSampleAssociation,
+  Organism
+} from "../../../types/collection-api";
+import { useMaterialSampleSave } from "./useMaterialSample";
 
 export interface MaterialSampleNavProps {
   dataComponentState: ReturnType<
@@ -54,13 +56,12 @@ const ScrollSpyNav = renderNav
     )
   : "div";
 
-const MATERIAL_SAMPLE_FORM_SECTIONS = [
+export const MATERIAL_SAMPLE_FORM_SECTIONS = [
   "identifiers-section",
   "collecting-event-section",
   "acquisition-event-section",
   "preparations-section",
-  "organism-state-section",
-  "determination-section",
+  "organisms-section",
   "associations-section",
   "storage-section",
   "scheduled-actions-section",
@@ -68,7 +69,8 @@ const MATERIAL_SAMPLE_FORM_SECTIONS = [
   "material-sample-attachments-section"
 ] as const;
 
-type MaterialSampleFormSectionId = typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
+export type MaterialSampleFormSectionId =
+  typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
 
 interface ScrollTarget {
   id: MaterialSampleFormSectionId;
@@ -88,7 +90,12 @@ export function MaterialSampleFormNav({
 }: MaterialSampleNavProps) {
   const { formatMessage } = useDinaIntl();
 
-  const scrollTargets: ScrollTarget[] = [
+  const navOrderWithAllSections = uniq([
+    ...(navOrder ?? []),
+    ...MATERIAL_SAMPLE_FORM_SECTIONS
+  ]);
+
+  const defaultScrollTargets: ScrollTarget[] = [
     { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
     {
       id: "collecting-event-section",
@@ -151,14 +158,30 @@ export function MaterialSampleFormNav({
     }
   ];
 
+  const sortedScrollTargets = uniq([
+    ...compact(
+      navOrderWithAllSections.map(id =>
+        defaultScrollTargets.find(it => it.id === id)
+      )
+    ),
+    ...defaultScrollTargets
+  ]);
+
   function onSortStart(_, event: unknown) {
     if (event instanceof MouseEvent) {
       document.body.style.cursor = "grabbing";
     }
   }
 
-  function onSortEnd(se: SortEnd) {
-    document.body.style.cursor = "default";
+  function onSortEnd(sortEnd: SortEnd) {
+    document.body.style.cursor = "inherit";
+
+    const newOrder = arrayMove(
+      sortedScrollTargets,
+      sortEnd.oldIndex,
+      sortEnd.newIndex
+    ).map(it => it.id);
+    onChangeNavOrder?.(newOrder);
   }
 
   return (
@@ -167,8 +190,8 @@ export function MaterialSampleFormNav({
       <ScrollSpyNav
         {...(renderNav
           ? {
-              key: scrollTargets.filter(it => !it.disabled).length,
-              scrollTargetIds: scrollTargets
+              key: sortedScrollTargets.filter(it => !it.disabled).length,
+              scrollTargetIds: sortedScrollTargets
                 .filter(it => !it.disabled)
                 .map(it => it.id),
               activeNavClass: "active",
@@ -189,7 +212,7 @@ export function MaterialSampleFormNav({
             onSortStart={onSortStart}
             onSortEnd={onSortEnd}
           >
-            {scrollTargets.map((section, index) => (
+            {sortedScrollTargets.map((section, index) => (
               <SortableNavItem
                 key={section.id}
                 index={index}

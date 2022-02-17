@@ -32,6 +32,7 @@ import {
   Head,
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
+  MaterialSampleFormSectionId,
   MaterialSampleStateReadOnlyRender,
   Nav,
   OrganismsField,
@@ -304,6 +305,10 @@ export function MaterialSampleForm({
     id => (isOffScreen ? "" : id)
   );
 
+  const [formSectionOrder, setFormSectionOrder] = useState<
+    MaterialSampleFormSectionId[]
+  >([]);
+
   const mateirialSampleInternal = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
@@ -311,6 +316,8 @@ export function MaterialSampleForm({
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
             disableRemovePrompt={disableNavRemovePrompt}
+            navOrder={formSectionOrder}
+            onChangeNavOrder={setFormSectionOrder}
           />
         )}
       </div>

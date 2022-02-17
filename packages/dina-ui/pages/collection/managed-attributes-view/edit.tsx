@@ -230,7 +230,7 @@ export function ManagedAttributesViewFormLayout({
                     }
                   }
                   function onSortEnd(se: SortEnd) {
-                    document.body.style.cursor = "default";
+                    document.body.style.cursor = "inherit";
                     move(se.oldIndex, se.newIndex);
                   }
 
