@@ -64,9 +64,12 @@ export function StorageUnitForm({
   }: DinaFormSubmitParams<StorageUnit>) {
     const savedArgs: SaveArgs<StorageUnit>[] = [];
 
-    if (submittedValues.isMultiple && isArray(submittedValues.name)) {
+    if (submittedValues.isMultiple) {
+      const names = isArray(submittedValues.name)
+        ? submittedValues.name
+        : [submittedValues.name];
       delete submittedValues.isMultiple;
-      submittedValues.name.map(unitName =>
+      names.map(unitName =>
         savedArgs.push({
           resource: { ...submittedValues, name: unitName },
           type: "storage-unit"
@@ -75,10 +78,13 @@ export function StorageUnitForm({
     } else {
       delete submittedValues.isMultiple;
       savedArgs.push({
-        resource: submittedValues,
+        resource: isArray(submittedValues.name)
+          ? { ...submittedValues, name: submittedValues.name.join() }
+          : submittedValues,
         type: "storage-unit"
       });
     }
+
     const savedStorage = await save<StorageUnit>(savedArgs, {
       apiBaseUrl: "/collection-api"
     });
