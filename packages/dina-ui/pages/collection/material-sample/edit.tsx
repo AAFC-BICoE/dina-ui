@@ -11,7 +11,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { toPairs } from "lodash";
+import { toPairs, uniq, compact } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode, Ref, useContext, useState, Fragment } from "react";
 import {
@@ -451,6 +451,15 @@ export function MaterialSampleForm({
       )
   };
 
+  const formSectionPairs = toPairs(formSections);
+
+  const sortedFormSectionPairs = uniq([
+    ...compact(
+      formSectionOrder.map(id => formSectionPairs.find(([it]) => it === id))
+    ),
+    ...formSectionPairs
+  ]);
+
   const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
@@ -491,7 +500,7 @@ export function MaterialSampleForm({
         )}
         {/* The toggleable / re-arrangeable form sections: */}
         <div className="data-components">
-          {toPairs(formSections).map(([id, renderFn]) => (
+          {sortedFormSectionPairs.map(([id, renderFn]) => (
             <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
           ))}
         </div>
