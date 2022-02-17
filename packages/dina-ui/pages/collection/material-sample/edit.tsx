@@ -15,9 +15,7 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
-  useApiClient,
   useDinaFormContext,
-  useFieldLabels,
   withResponse
 } from "common-ui";
 import { FormikProps, useField } from "formik";
@@ -25,7 +23,6 @@ import { InputResource, PersistedResource } from "kitsu";
 import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
 import { ReactNode, Ref, useContext, useState } from "react";
-import * as yup from "yup";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -37,13 +34,13 @@ import {
   MaterialSampleFormNav,
   MaterialSampleStateReadOnlyRender,
   Nav,
+  OrganismsField,
   ProjectSelectSection,
   StorageLinkerField,
   TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
-  DeterminationField,
   ScheduledActionsField,
   SetDefaultSampleName,
   TabbedResourceLinker,
@@ -53,7 +50,6 @@ import {
 } from "../../../components/collection";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
-import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
 import { PreparationField } from "../../../components/collection/material-sample/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
@@ -298,8 +294,7 @@ export function MaterialSampleForm({
       colEvent: "collecting-event-section",
       acqEvent: "acquisition-event-section",
       preparation: "preparations-section",
-      organism: "organism-state-section",
-      determination: "determination-section",
+      organism: "organisms-section",
       associations: "associations-section",
       storage: "storage-section",
       ScheduledActions: "scheduled-actions-section",
@@ -419,11 +414,8 @@ export function MaterialSampleForm({
                   attachmentsConfig={attachmentsConfig?.materialSample}
                 />
               )}
-              {dataComponentState.enableOrganism && (
-                <OrganismStateField id={navIds.organism} />
-              )}
-              {dataComponentState.enableDetermination && (
-                <DeterminationField id={navIds.determination} />
+              {dataComponentState.enableOrganisms && (
+                <OrganismsField id={navIds.organism} name="organism" />
               )}
               {dataComponentState.enableAssociations && (
                 <AssociationsField id={navIds.associations} />
@@ -745,15 +737,20 @@ export function nextSampleInitialValues(
     createdBy,
     materialSampleName,
     allowDuplicateName,
+    organism,
     ...copiedValues
   } = originalSample;
+
+  // Omit the IDs from the original sample's organisms:
+  const newOrganisms = organism?.map(org => org && { ...org, id: undefined });
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
   const initialValues = {
     ...copiedValues,
-    materialSampleName: newMaterialSampleName
+    materialSampleName: newMaterialSampleName,
+    organism: newOrganisms
   };
 
   return initialValues;

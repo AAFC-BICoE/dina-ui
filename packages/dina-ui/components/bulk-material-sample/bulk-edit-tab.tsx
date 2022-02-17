@@ -28,8 +28,7 @@ export function useBulkEditTab({
   const { formatMessage } = useDinaIntl();
 
   const initialValues: InputResource<MaterialSample> = {
-    type: "material-sample",
-    determination: []
+    type: "material-sample"
   };
   const bulkEditSampleHook = useMaterialSampleSave({
     materialSample: initialValues,
@@ -97,11 +96,6 @@ export function useBulkEditTab({
         ...withoutBlankFields(bulkEditSample?.managedAttributes)
       };
 
-      const newOrganism = {
-        ...withoutBlankFields(baseSample.organism),
-        ...withoutBlankFields(bulkEditSample?.organism)
-      };
-
       const newHostOrganism = {
         ...withoutBlankFields(baseSample.hostOrganism),
         ...withoutBlankFields(bulkEditSample?.hostOrganism)
@@ -112,9 +106,6 @@ export function useBulkEditTab({
         ...overrides,
         ...(!isEmpty(newManagedAttributes) && {
           managedAttributes: newManagedAttributes
-        }),
-        ...(!isEmpty(newOrganism) && {
-          organism: newOrganism
         }),
         ...(!isEmpty(newHostOrganism) && {
           hostOrganism: newHostOrganism

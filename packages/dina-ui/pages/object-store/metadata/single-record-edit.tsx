@@ -264,7 +264,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   );
 }
 
-const DCTYPE_OPTIONS = [
+export const DCTYPE_OPTIONS = [
   { label: "Image", value: "IMAGE" },
   { label: "Moving Image", value: "MOVING_IMAGE" },
   { label: "Sound", value: "SOUND" },
@@ -273,7 +273,7 @@ const DCTYPE_OPTIONS = [
   { label: "Undetermined", value: "UNDETERMINED" }
 ];
 
-const ORIENTATION_OPTIONS = [
+export const ORIENTATION_OPTIONS = [
   { label: "1 - Normal", value: 1 },
   { label: "3 - Rotated 180 degrees", value: 3 },
   { label: "6 - Rotated 90 degrees CW", value: 6 },

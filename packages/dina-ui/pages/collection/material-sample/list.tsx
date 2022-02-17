@@ -1,13 +1,15 @@
 import {
   ButtonBar,
-  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
   FilterAttribute,
   filterBy,
   ListPageLayout,
-  stringArrayCell
+  QueryPage,
+  stringArrayCell,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -187,7 +189,45 @@ export function SampleListLayout({
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-
+  const [queryKey, setQueryKey] = useState("");
+  const queryState = useQuery<MaterialSample[]>(
+    {
+      path: "collection-api/material-sample",
+      include: "collection,materialSampleType"
+    },
+    {}
+  );
+  const { error, loading, response } = queryState;
+  const columns = [
+    ...getColumnDefinition(),
+    ...[
+      {
+        Cell: ({ original: sample }) => (
+          <div className="d-flex">
+            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="view" />
+              </a>
+            </Link>
+            <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+            <DeleteButton
+              replaceClassName="btn btn-link"
+              type="material-sample"
+              id={sample.id}
+              options={{ apiBaseUrl: "/collection-api" }}
+              onDeleted={() => setQueryKey(String(Math.random()))}
+            />
+          </div>
+        ),
+        Header: "",
+        sortable: false
+      }
+    ]
+  ];
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -204,7 +244,21 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <SampleListLayout showBulkActions={true} />
+        {withResponse({ loading, error, response }, () => (
+          <QueryPage
+            indexName={"dina_material_sample_index"}
+            columns={columns}
+            initData={response?.data}
+            bulkDeleteButtonProps={{
+              typeName: "material-sample",
+              apiBaseUrl: "/collection-api"
+            }}
+            bulkEditPath={ids => ({
+              pathname: "/collection/material-sample/bulk-edit",
+              query: { ids: ids.join(",") }
+            })}
+          />
+        ))}
       </main>
       <Footer />
     </div>
