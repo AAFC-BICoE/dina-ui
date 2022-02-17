@@ -6,6 +6,7 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { isEqual } from "lodash";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -50,11 +51,17 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: [
+    organism: [
       {
-        isPrimary: true,
-        isFileAs: true,
-        verbatimScientificName: "test-name-existing"
+        id: "organism-1",
+        type: "organism",
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "test-name-existing"
+          }
+        ]
       }
     ]
   },
@@ -64,9 +71,15 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: [
+    organism: [
       {
-        verbatimDeterminer: "this-should-be-overridden"
+        id: "organism-1",
+        type: "organism",
+        determination: [
+          {
+            verbatimDeterminer: "this-should-be-overridden"
+          }
+        ]
       }
     ]
   },
@@ -79,14 +92,14 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
   }
 ];
 
-const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
+const SAMPLES_WITHOUT_ORGANISMS: InputResource<MaterialSample>[] = [
   {
     ...blankMaterialSample(),
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: []
+    organism: []
   },
   {
     ...blankMaterialSample(),
@@ -94,7 +107,7 @@ const SAMPLES_WITHOUT_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: null
+    organism: null
   },
   {
     ...blankMaterialSample(),
@@ -112,9 +125,18 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS1",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        type: "organism",
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   },
   {
@@ -123,9 +145,18 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS2",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        type: "organism",
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   },
   {
@@ -134,9 +165,18 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
     type: "material-sample",
     materialSampleName: "MS3",
     collection: { id: "1", type: "collection" },
-    determination: [
-      { isPrimary: true, isFileAs: true, verbatimScientificName: "first name" },
-      { verbatimScientificName: "second name" }
+    organism: [
+      {
+        type: "organism",
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "first name"
+          },
+          { verbatimScientificName: "second name" }
+        ]
+      }
     ]
   }
 ];
@@ -158,7 +198,7 @@ describe("BulkEditTabWarning", () => {
 
     // Enable the determination:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -167,16 +207,21 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(true);
     wrapper
-      .find(".determination-section button.override-all-button")
+      .find(".organisms-section button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Override the name in the new determination:
+    // Add a determination and override its name:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
       .simulate("change", { target: { value: "test-name-override" } });
@@ -189,39 +234,52 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "test-name-override" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the new material samples with the new common determination:
     expect(mockSave.mock.calls).toEqual([
+      // Creates the same organism 3 times, 1 for each of the 3 samples:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      // Saves the 3 samples (with linked organisms) in one transaction:
       [
         [
           {
             resource: expect.objectContaining({
-              determination: [
-                {
-                  verbatimScientificName: "test-name-override"
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
           },
           {
             resource: expect.objectContaining({
-              determination: [
-                {
-                  verbatimScientificName: "test-name-override"
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
           },
           {
             resource: expect.objectContaining({
-              determination: [
-                {
-                  verbatimScientificName: "test-name-override"
+              relationships: {
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
-              ],
+              },
               type: "material-sample"
             }),
             type: "material-sample"
@@ -246,7 +304,7 @@ describe("BulkEditTabWarning", () => {
 
     // Enable the determination:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -255,7 +313,7 @@ describe("BulkEditTabWarning", () => {
 
     // The Override button is there:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(true);
 
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -280,11 +338,11 @@ describe("BulkEditTabWarning", () => {
     ]);
   });
 
-  it("Lets you set the values without a warning when there are no determinations in the samples.", async () => {
+  it("Lets you set the values without a warning when there are no organisms in the samples.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
-        samples={SAMPLES_WITHOUT_DETERMINATIONS}
+        samples={SAMPLES_WITHOUT_ORGANISMS}
       />,
       testCtx
     );
@@ -292,9 +350,9 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable the determination:
+    // Enable the organisms:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
@@ -303,10 +361,13 @@ describe("BulkEditTabWarning", () => {
 
     // There is no override button:
     expect(
-      wrapper.find(".determination-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
     ).toEqual(false);
 
     // Override the name in the new determination:
+    wrapper.find(".determination-section button.add-button").simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
       .simulate("change", { target: { value: "test-name-override" } });
@@ -316,19 +377,30 @@ describe("BulkEditTabWarning", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "test-name-override" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the material samples:
     expect(mockSave.mock.calls).toEqual([
+      // 3 copies of the organism are saved, 1 for each sample:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
-        SAMPLES_WITHOUT_DETERMINATIONS.map(sample => ({
+        SAMPLES_WITHOUT_ORGANISMS.map(sample => ({
           resource: {
             id: sample.id,
             type: sample.type,
-            determination: [
-              {
-                verbatimScientificName: "test-name-override"
+            relationships: {
+              organism: {
+                data: [{ id: "11111", type: "organism" }]
               }
-            ],
-            relationships: {}
+            }
           },
           type: "material-sample"
         })),
@@ -337,7 +409,7 @@ describe("BulkEditTabWarning", () => {
     ]);
   });
 
-  it("Shows the common value when all samples have the same determinations.", async () => {
+  it("Shows the Override button on the Organisms section, even when the Organisms are the same.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -346,65 +418,75 @@ describe("BulkEditTabWarning", () => {
       testCtx
     );
 
+    // Make sure all samples have the sample organism for this test,
+    // even though the back-end shouldn't actually alloow this:
+    expect(
+      SAMPLES_WITH_SAME_DETERMINATIONS.every(sample =>
+        isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
+      )
+    );
+
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable the determination:
+    // Enable the organisms:
     wrapper
-      .find(".tabpanel-EDIT_ALL .enable-determination")
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
       .find(Switch)
       .prop<any>("onChange")(true);
 
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The 2 common determinations are shown in the Edit All tab:
+    // You must click the override button:
     expect(
-      wrapper.find(
-        ".tabpanel-EDIT_ALL .determination-section li.react-tabs__tab"
-      ).length
-    ).toEqual(2);
+      wrapper.find(".organisms-section .multiple-values-warning").exists()
+    ).toEqual(true);
+    wrapper
+      .find(".organisms-section button.override-all-button")
+      .simulate("click");
+    wrapper.find(".are-you-sure-modal form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
 
-    // The green bulk-override indicator is not shown before changing any values:
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .determination-section .has-bulk-edit-value")
-        .exists()
-    ).toEqual(false);
-
-    // Override the name in the first determination:
+    // Add a determination and override its name:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .determination-section button.add-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
     wrapper
       .find(".tabpanel-EDIT_ALL .verbatimScientificName input")
-      .simulate("change", { target: { value: "first name override" } });
+      .simulate("change", { target: { value: "test-name-override" } });
 
-    // The green bulk-override indicator is now shown:
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .verbatimScientificName .has-bulk-edit-value")
-        .exists()
-    ).toEqual(true);
+    await new Promise(setImmediate);
+    wrapper.update();
 
     wrapper.find("button.bulk-save-button").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Saves the material samples:
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "test-name-override" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     expect(mockSave.mock.calls).toEqual([
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
           resource: {
             id: sample.id,
-            type: sample.type,
-            determination: [
-              {
-                isPrimary: true,
-                isFileAs: true,
-                verbatimScientificName: "first name override"
-              },
-              { verbatimScientificName: "second name" }
-            ],
-            relationships: {}
+            relationships: {
+              organism: { data: [{ id: "11111", type: "organism" }] }
+            },
+            type: "material-sample"
           },
           type: "material-sample"
         })),

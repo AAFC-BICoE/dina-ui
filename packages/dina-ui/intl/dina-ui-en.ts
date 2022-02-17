@@ -76,7 +76,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   bulkEditResourceLinkerWarningSingle:
     "This {fieldName} will be linked to all {targetType}s.",
   bulkEditResourceSetWarningMulti:
-    "These {fieldName} will be set on all {targetType}s.",
+    "These {fieldName}s will be set on all {targetType}s.",
   bulkOperationCompleteTitle: "Bulk Operation Complete",
   cancelButtonText: "Cancel",
   cataloguedObjectListTitle: "Catalogued Objects",
@@ -142,6 +142,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   detailsPageLink: "Details Page",
   determination: "Determination",
   determinationManagedAttributes: "Determination Managed Attributes",
+  determinationPrimary: "Determination (Primary)",
   determinations: "Determinations",
   determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",
@@ -313,6 +314,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_materialSample_identifierType_materialSampleId_label:
     "Material Sample ID",
   field_notPubliclyReleasableReason: "Not Publicly Releasable Reason",
+  field_organismsIndividualEntry: "Individual Organism Entry",
+  field_organismsIndividualEntry_tooltip:
+    "Leave this OFF to copy the same data for every Organism. Toggle ON to enter different data for each Organism.",
   field_organizationMandatoryFieldsError:
     "At least one orgnization name is required",
   field_orientation: "Orientation",
@@ -474,6 +478,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   organizationListTitle: "Organizations",
   originalFile: "Original File",
   originalMaterialSampleLabel: "Original Material Sample",
+  organism: "Organism",
+  organisms: "Organisms",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
   parentMaterialSample: " Parent Sample",
@@ -506,6 +512,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeIdentifier: "Remove Identifier",
   removeManagedAttributeValue:
     "Remove Managed Attribute Value: {attributeNames}",
+  removeOrganism: "Remove Organism",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",

@@ -3,6 +3,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   DoOperationsError,
+  OperationError,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -18,13 +19,13 @@ import {
   isEqual,
   mapKeys,
   pick,
-  pickBy
+  pickBy,
+  range
 } from "lodash";
-import { useLayoutEffect, useRef, useState, ComponentProps } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
-  ORGANISM_FIELDS,
   PREPARATION_FIELDS,
   useCollectingEventQuery,
   useCollectingEventSave,
@@ -35,7 +36,8 @@ import {
   AcquisitionEvent,
   CollectingEvent,
   Collection,
-  MaterialSample
+  MaterialSample,
+  Organism
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import {
@@ -79,24 +81,27 @@ export function useMaterialSampleQuery(id?: string | null) {
         }
       ],
       onSuccess: async ({ data }) => {
-        if (data.determination) {
-          // Retrieve determiner arrays on determination.
-          for (const determination of data.determination) {
-            if (determination.determiner) {
-              determination.determiner = compact(
-                await bulkGet<Person, true>(
-                  determination.determiner.map(
-                    (personId: string) => `/person/${personId}`
-                  ),
-                  {
-                    apiBaseUrl: "/agent-api",
-                    returnNullForMissingResource: true
-                  }
-                )
-              );
+        for (const organism of data.organism ?? []) {
+          if (organism?.determination) {
+            // Retrieve determiner arrays on determination.
+            for (const determination of organism.determination) {
+              if (determination.determiner) {
+                determination.determiner = compact(
+                  await bulkGet<Person, true>(
+                    determination.determiner.map(
+                      (personId: string) => `/person/${personId}`
+                    ),
+                    {
+                      apiBaseUrl: "/agent-api",
+                      returnNullForMissingResource: true
+                    }
+                  )
+                );
+              }
             }
           }
         }
+
         if (data.materialSampleChildren) {
           data.materialSampleChildren = compact(
             await bulkGet<MaterialSample, true>(
@@ -206,30 +211,18 @@ export function useMaterialSampleSave({
       )
     );
 
-  const hasOrganismTemplate =
+  const hasOrganismsTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ORGANISM_FIELDS.map(
-          organismFieldName => `organism.${organismFieldName}`
-        )
+        (_, key) => key.startsWith("organism[0].")
       )
     );
 
   const hasStorageTemplate =
     isTemplate &&
     materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
-
-  // For editing existing templates:
-  const hasDeterminationTemplate =
-    isTemplate &&
-    !isEmpty(
-      pickBy(
-        materialSampleTemplateInitialValues?.templateCheckboxes,
-        (_, key) => key.startsWith("determination[0].")
-      )
-    );
 
   const hasScheduledActionsTemplate =
     isTemplate &&
@@ -278,16 +271,12 @@ export function useMaterialSampleSave({
     )
   );
 
-  const [enableOrganism, setEnableOrganism] = useState(
+  const [enableOrganisms, setEnableOrganisms] = useState(
     Boolean(
-      hasOrganismTemplate ||
-        // Show the organism section if a field is set or the field is enabled:
-        ORGANISM_FIELDS.some(
-          organismFieldName =>
-            materialSample?.organism?.[`${organismFieldName}`] ||
-            enabledFields?.materialSample?.includes(
-              `organism.${organismFieldName}`
-            )
+      hasOrganismsTemplate ||
+        materialSample?.organism?.length ||
+        enabledFields?.materialSample?.some(enabledField =>
+          enabledField.startsWith("organism[0].")
         )
     )
   );
@@ -298,20 +287,6 @@ export function useMaterialSampleSave({
       hasStorageTemplate ||
         materialSample?.storageUnit?.id ||
         enabledFields?.materialSample?.includes("storageUnit")
-    )
-  );
-
-  const [enableDetermination, setEnableDetermination] = useState(
-    Boolean(
-      hasDeterminationTemplate ||
-        // Show the determination section if a field is set or the field is enabled:
-        // Ignore the "isPrimary": field:
-        materialSample?.determination?.some(
-          ({ isPrimary, ...det }) => !isEmpty(det)
-        ) ||
-        enabledFields?.materialSample?.some(enabledField =>
-          enabledField.startsWith("determination[")
-        )
     )
   );
 
@@ -349,12 +324,10 @@ export function useMaterialSampleSave({
     setEnableAcquisitionEvent,
     enablePreparations,
     setEnablePreparations,
-    enableOrganism,
-    setEnableOrganism,
+    enableOrganisms,
+    setEnableOrganisms,
     enableStorage,
     setEnableStorage,
-    enableDetermination,
-    setEnableDetermination,
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
@@ -363,15 +336,16 @@ export function useMaterialSampleSave({
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
-  const msInitialValues: InputResource<MaterialSample> = {
-    ...(materialSample || {
-      type: "material-sample",
-      managedAttributes: {},
-      // Defaults to the last Collection used to create a Material Sample:
-      collection: lastUsedCollection,
-      publiclyReleasable: true
-    })
+  const defaultValues: InputResource<MaterialSample> = {
+    type: "material-sample",
+    managedAttributes: {},
+    // Defaults to the last Collection used to create a Material Sample:
+    collection: lastUsedCollection,
+    publiclyReleasable: true
   };
+
+  const msInitialValues: InputResource<MaterialSample> =
+    withOrganismEditorValues(materialSample ?? defaultValues);
 
   /** Used to get the values of the nested CollectingEvent form. */
   const colEventFormRef = colEventFormRefProp ?? useRef<FormikProps<any>>(null);
@@ -413,6 +387,7 @@ export function useMaterialSampleSave({
 
   const { withDuplicateSampleNameCheck } = useDuplicateSampleNameDetection();
 
+  /** Gets the new state of the sample before submission to the back-end, given the form state. */
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
@@ -422,7 +397,11 @@ export function useMaterialSampleSave({
 
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
-      ...(!enableOrganism && { organism: null }),
+      ...(!enableOrganisms && {
+        organismsIndividualEntry: undefined,
+        organismsQuantity: undefined,
+        organism: []
+      }),
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),
@@ -433,19 +412,6 @@ export function useMaterialSampleSave({
         acquisitionEvent: { id: null, type: "acquisition-event" }
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
-
-      determination: enableDetermination
-        ? submittedValues.determination?.map(det => ({
-            ...det,
-            ...(!!det.determiner && {
-              determiner: det.determiner.map(determiner =>
-                typeof determiner === "string"
-                  ? determiner
-                  : String(determiner.id)
-              )
-            })
-          }))
-        : [],
 
       // Remove the scheduledAction field from the workflow template:
       ...{ scheduledAction: undefined }
@@ -560,6 +526,10 @@ export function useMaterialSampleSave({
     return materialSampleInput;
   }
 
+  /**
+   * Gets the diff of the form's initial values to the new sample state,
+   * so only edited values are submitted to the back-end.
+   */
   async function prepareSampleSaveOperation({
     submittedValues,
     preProcessSample
@@ -577,39 +547,59 @@ export function useMaterialSampleSave({
         })
       : msPreprocessed;
 
+    const organismsWereChanged =
+      !!msDiff.organism ||
+      msDiff.organismsQuantity !== undefined ||
+      msDiff.organismsIndividualEntry !== undefined;
+
+    const msDiffWithOrganisms = organismsWereChanged
+      ? { ...msDiff, organism: await saveAndAttachOrganisms(msPreprocessed) }
+      : msDiff;
+
     /** Input to submit to the back-end API. */
     const msInputWithRelationships: InputResource<MaterialSample> & {
       relationships: any;
     } = {
-      ...msDiff,
+      ...msDiffWithOrganisms,
+
+      // These values are not submitted to the back-end:
+      organismsIndividualEntry: undefined,
+      organismsQuantity: undefined,
 
       // Kitsu serialization can't tell the difference between an array attribute and an array relationship.
       // Explicitly declare these fields as relationships here before saving:
       // One-to-many relationships go in the 'relationships' object:
       relationships: {
-        ...(msDiff.attachment && {
+        ...(msDiffWithOrganisms.attachment && {
           attachment: {
-            data: msDiff.attachment.map(({ id, type }) => ({ id, type }))
+            data: msDiffWithOrganisms.attachment.map(it =>
+              pick(it, "id", "type")
+            )
           }
         }),
-        ...(msDiff.preparationAttachment && {
+        ...(msDiffWithOrganisms.preparationAttachment && {
           preparationAttachment: {
-            data: msDiff.preparationAttachment.map(({ id, type }) => ({
-              id,
-              type
-            }))
+            data: msDiffWithOrganisms.preparationAttachment.map(it =>
+              pick(it, "id", "type")
+            )
           }
         }),
-        ...(msDiff.projects && {
+        ...(msDiffWithOrganisms.projects && {
           projects: {
-            data: msDiff.projects.map(({ id, type }) => ({ id, type }))
+            data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
+          }
+        }),
+        ...(msDiffWithOrganisms.organism && {
+          organism: {
+            data: msDiffWithOrganisms.organism.map(it => pick(it, "id", "type"))
           }
         })
       },
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
       preparationAttachment: undefined,
-      projects: undefined
+      projects: undefined,
+      organism: undefined
     };
 
     // delete the association if associated sample is left unfilled
@@ -626,6 +616,85 @@ export function useMaterialSampleSave({
     };
 
     return saveOperation;
+  }
+
+  /**
+   * Saves and attaches them to the sample with the ID.
+   * Does not modify the sample input, just returns a new sample input.
+   */
+  async function saveAndAttachOrganisms(
+    sample: InputResource<MaterialSample>
+  ): Promise<PersistedResource<Organism>[]> {
+    const preparedOrganisms: Organism[] = range(
+      0,
+      sample.organismsQuantity ?? undefined
+    )
+      .map(index => {
+        const defaults = {
+          // Default to the sample's group:
+          group: sample.group,
+          type: "organism" as const
+        };
+
+        const { id: firstOrganismId, ...firstOrganismValues } =
+          sample.organism?.[0] ?? {};
+
+        return {
+          ...sample.organism?.[index],
+          // When Individual Entry is disabled,
+          // copy the first organism's values onto the rest of the organisms:
+          ...(!sample.organismsIndividualEntry && firstOrganismValues),
+          ...defaults
+        };
+      })
+      // Convert determiners from Objects to UUID strings:
+      .map(org => ({
+        ...org,
+        determination: org.determination?.map(det => ({
+          ...det,
+          determiner: det.determiner?.map(determiner =>
+            typeof determiner === "string" ? determiner : String(determiner.id)
+          )
+        }))
+      }));
+
+    const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
+      resource => ({
+        resource,
+        type: "organism"
+      })
+    );
+
+    try {
+      // Don't call the API with an empty Save array:
+      if (!organismSaveArgs.length) {
+        return [];
+      }
+      const savedOrganisms = await save<Organism>(organismSaveArgs, {
+        apiBaseUrl: "/collection-api"
+      });
+      return savedOrganisms;
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>(err => ({
+          fieldErrors: mapKeys(
+            err.fieldErrors,
+            (_, field) => `organism[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
+    }
   }
 
   async function onSubmit({
@@ -753,5 +822,35 @@ export function useMaterialSampleSave({
     prepareSampleInput,
     prepareSampleSaveOperation,
     loading
+  };
+}
+
+/** Returns the material sample with the added client-side-only form fields. */
+export function withOrganismEditorValues<
+  T extends InputResource<MaterialSample> | PersistedResource<MaterialSample>
+>(materialSample: T): T {
+  // If there are different organisms then initially show the individual organisms edit UI:
+  const hasDifferentOrganisms = materialSample?.organism?.some(org => {
+    const firstOrg = materialSample?.organism?.[0];
+
+    const {
+      id: _firstOrgId,
+      createdOn: _firstOrgCreatedOn,
+      ...firstOrgValues
+    } = firstOrg ?? {};
+    const {
+      id: _id,
+      createdOn: _thisOrgCreatedOn,
+      ...thisOrgValues
+    } = org ?? {};
+
+    return !isEqual(firstOrgValues, thisOrgValues);
+  });
+
+  return {
+    ...materialSample,
+    // Client-side-only organisms UI fields:
+    organismsQuantity: materialSample?.organism?.length,
+    organismsIndividualEntry: hasDifferentOrganisms
   };
 }
