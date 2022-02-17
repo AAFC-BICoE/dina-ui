@@ -11,7 +11,7 @@ const mockGet = jest.fn(async path => {
   switch (path) {
     case "objectstore-api/metadata/undefined":
       return {};
-    case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612":
+    case "objectstore-api/metadata/25f81de5-bbee-430c-b5fa-71986b70e612?include=dcCreator,derivatives":
       return { data: TEST_METADATA };
     case "objectstore-api/license":
       return { data: TEST_LICENSES };
