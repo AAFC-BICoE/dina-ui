@@ -121,7 +121,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           id: "initial-attachment-2",
           originalFileName: "initial-attachment-2"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m1":
+      case "managed-attribute/MATERIAL_SAMPLE.m1":
         return {
           type: "managed-attribute",
           id: "1",
@@ -130,7 +130,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 1"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m2":
+      case "managed-attribute/MATERIAL_SAMPLE.m2":
         return {
           type: "managed-attribute",
           id: "2",
@@ -139,7 +139,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 2"
         };
-      case "/managed-attribute/MATERIAL_SAMPLE.m3":
+      case "managed-attribute/MATERIAL_SAMPLE.m3":
         return {
           type: "managed-attribute",
           id: "3",
@@ -200,13 +200,23 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     id: "1",
     type: "material-sample",
     materialSampleName: "MS1",
-    determination: [
+    organism: [
       {
-        isPrimary: true,
-        isFileAs: true,
-        verbatimScientificName: "initial determination 1"
+        id: "organism-1",
+        type: "organism",
+        determination: [
+          {
+            isPrimary: true,
+            isFileAs: true,
+            verbatimScientificName: "initial determination 1"
+          }
+        ]
       },
-      { verbatimScientificName: "initial determination 2" }
+      {
+        id: "organism-2",
+        type: "organism",
+        determination: [{ verbatimScientificName: "initial determination 2" }]
+      }
     ],
     associations: [{ associatedSample: "500", remarks: "initial remarks" }],
     attachment: [{ id: "initial-attachment-1", type: "metadata" }],
@@ -335,33 +345,26 @@ const TEST_SAMPLES_SAME_STORAGE_UNIT: InputResource<MaterialSample>[] = [
   }
 ];
 
-const TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM: InputResource<MaterialSample>[] =
-  [
-    {
-      ...blankMaterialSample(),
-      id: "1",
-      type: "material-sample",
-      materialSampleName: "sample 1",
-      organism: {
-        lifeStage: "test lifestage"
-      },
-      hostOrganism: {
-        name: "test host organism"
-      }
-    },
-    {
-      ...blankMaterialSample(),
-      id: "2",
-      type: "material-sample",
-      materialSampleName: "sample 2",
-      organism: {
-        lifeStage: "test lifestage"
-      },
-      hostOrganism: {
-        name: "test host organism"
-      }
+const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
+  {
+    ...blankMaterialSample(),
+    id: "1",
+    type: "material-sample",
+    materialSampleName: "sample 1",
+    hostOrganism: {
+      name: "test host organism"
     }
-  ];
+  },
+  {
+    ...blankMaterialSample(),
+    id: "2",
+    type: "material-sample",
+    materialSampleName: "sample 2",
+    hostOrganism: {
+      name: "test host organism"
+    }
+  }
+];
 
 describe("MaterialSampleBulkEditor", () => {
   beforeEach(jest.clearAllMocks);
@@ -816,7 +819,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toContain("Invalid barcode");
   });
 
-  it("Doesn't override the values when the Override All button is not clicked.", async () => {
+  it("Doesnt override the values when the Override All button is not clicked.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -830,7 +833,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Enable all the sections with the "Override All" warning boxes:
     [
-      ".enable-determination",
+      ".enable-organisms",
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
@@ -847,9 +850,7 @@ describe("MaterialSampleBulkEditor", () => {
     // Shows the warnings:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL .determination-section .multiple-values-warning"
-        )
+        .find(".tabpanel-EDIT_ALL .organisms-section .multiple-values-warning")
         .exists()
     ).toEqual(true);
     expect(
@@ -947,7 +948,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Enable all the sections with the "Override All" warning boxes:
     [
-      ".enable-determination",
+      ".enable-organisms",
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
@@ -963,7 +964,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the Override All buttons:
     for (const section of [
-      "#determination-section",
+      ".organisms-section",
       "#material-sample-attachments-section",
       "#preparation-protocols-section",
       "#associations-section",
@@ -975,12 +976,10 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper.update();
     }
 
-    // Determinations section opens with an initial value, so it has the green indicator on the fieldset:
+    // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
-        )
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
         .first()
         .hasClass("changed-field")
     ).toEqual(true);
@@ -1029,6 +1028,7 @@ describe("MaterialSampleBulkEditor", () => {
     ).toEqual(false);
 
     // Set the override values:
+    wrapper.find(".determination-section button.add-button").simulate("click");
     wrapper
       .find(
         ".tabpanel-EDIT_ALL .determination-section .verbatimScientificName input"
@@ -1070,9 +1070,7 @@ describe("MaterialSampleBulkEditor", () => {
     // All overridable fieldsets should now have the green bulk edited indicator:
     expect(
       wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#determination-section .legend-wrapper"
-        )
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
         .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
@@ -1117,9 +1115,21 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    const EXPECTED_ORGANISM_SAVE = {
+      resource: {
+        determination: [{ verbatimScientificName: "new-scientific-name" }],
+        type: "organism"
+      },
+      type: "organism"
+    };
+
     // Saves the material samples:
     // The warnable fields are overridden with the default/empty values:
     expect(mockSave.mock.calls).toEqual([
+      // Creates the same organism 3 times, 1 for each of the 3 samples:
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
+      [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         [
           ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
@@ -1133,11 +1143,6 @@ describe("MaterialSampleBulkEditor", () => {
                   associationType: "has_host"
                 }
               ],
-              determination: [
-                {
-                  verbatimScientificName: "new-scientific-name"
-                }
-              ],
               scheduledActions: [
                 { actionType: "new-action-type", date: expect.anything() }
               ],
@@ -1149,6 +1154,9 @@ describe("MaterialSampleBulkEditor", () => {
                   data: [
                     { id: "new-preparation-attachment-id", type: "metadata" }
                   ]
+                },
+                organism: {
+                  data: [{ id: "11111", type: "organism" }]
                 }
               }
             }
@@ -1495,7 +1503,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL .editable-attribute-menu .react-select__multi-value__label"
+          ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
         )
         .map(node => node.text())
     ).toEqual([
@@ -1833,11 +1841,11 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Edits the nested organism and hostOrganism fields.", async () => {
+  it("Edits the nested hostOrganism field.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
-        samples={TEST_SAMPLES_SAME_ORGANISM_AND_HOST_ORGANISM}
+        samples={TEST_SAMPLES_SAME_HOST_ORGANISM}
       />,
       testCtx
     );
@@ -1845,11 +1853,7 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable organism and host organism fields:
-    wrapper
-      .find(".tabpanel-EDIT_ALL .enable-organism-state")
-      .find(Switch)
-      .prop<any>("onChange")(true);
+    // Enable host organism fields:
     wrapper
       .find(".tabpanel-EDIT_ALL .enable-associations")
       .find(Switch)
@@ -1857,9 +1861,6 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper
-      .find(".tabpanel-EDIT_ALL .substrate-field input")
-      .simulate("change", { target: { value: "bulk-edit-substrate" } });
     wrapper
       .find(".tabpanel-EDIT_ALL .hostOrganism_remarks-field textarea")
       .simulate("change", { target: { value: "bulk-edit-remarks" } });
@@ -1875,15 +1876,8 @@ describe("MaterialSampleBulkEditor", () => {
         [
           {
             resource: {
-              preparationAttachment: undefined,
-              projects: undefined,
-              attachment: undefined,
               id: "1",
               associations: [],
-              organism: {
-                lifeStage: "test lifestage",
-                substrate: "bulk-edit-substrate"
-              },
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"
@@ -1895,14 +1889,7 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: {
-              preparationAttachment: undefined,
-              projects: undefined,
-              attachment: undefined,
               id: "2",
-              organism: {
-                lifeStage: "test lifestage",
-                substrate: "bulk-edit-substrate"
-              },
               hostOrganism: {
                 name: "test host organism",
                 remarks: "bulk-edit-remarks"

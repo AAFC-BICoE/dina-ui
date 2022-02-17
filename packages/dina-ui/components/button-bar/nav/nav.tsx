@@ -152,11 +152,14 @@ function NavObjectStoreDropdown({ formatMessage }) {
       <NavDropdown.Item href="/object-store/upload">
         <DinaMessage id="uploadPageTitle" />
       </NavDropdown.Item>
+      <NavDropdown.Item href="/object-store/metadata/external-resource-edit">
+        <DinaMessage id="externalResourceListTitle" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object/list">
         <DinaMessage id="objectListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/managedAttributesView/listView">
-        <DinaMessage id="managedAttributeListTitle" />
+        <DinaMessage id="managedAttributes" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object-subtype/list">
         <DinaMessage id="objectSubtypeListTitle" />
@@ -281,8 +284,11 @@ function NavCollectionDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/storage-unit/list">
         <DinaMessage id="storageUnitListTitle" />
       </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/managed-attributes-view/list">
+        <DinaMessage id="managedAttributesViews" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/managed-attribute/list">
-        <DinaMessage id="managedAttributeListTitle" />
+        <DinaMessage id="managedAttributes" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/workflow-template/list">
         <DinaMessage id="workflowTemplateListTitle" />

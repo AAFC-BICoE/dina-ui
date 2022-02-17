@@ -34,7 +34,7 @@ const Home: React.FunctionComponent = () => (
           <li>
             <Link href="/object-store/managedAttributesView/listView">
               <a>
-                <DinaMessage id="managedAttributeListTitle" />
+                <DinaMessage id="managedAttributes" />
               </a>
             </Link>
           </li>
@@ -180,9 +180,16 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/managed-attributes-view/list">
+              <a>
+                <DinaMessage id="managedAttributesViews" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/managed-attribute/list">
               <a>
-                <DinaMessage id="managedAttributeListTitle" />
+                <DinaMessage id="managedAttributes" />
               </a>
             </Link>
           </li>

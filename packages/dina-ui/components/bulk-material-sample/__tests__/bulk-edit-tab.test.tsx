@@ -60,6 +60,40 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
+  return paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.a":
+        return {
+          id: "1",
+          type: "managed-attribute",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "a",
+          name: "Managed Attribute 1"
+        };
+      case "managed-attribute/MATERIAL_SAMPLE.b":
+        return {
+          id: "2",
+          type: "managed-attribute",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "b",
+          name: "Managed Attribute 2"
+        };
+      case "managed-attribute/MATERIAL_SAMPLE.c":
+        return {
+          id: "3",
+          type: "managed-attribute",
+          managedAttributeType: "STRING",
+          managedAttributeComponent: "MATERIAL_SAMPLE",
+          key: "c",
+          name: "Managed Attribute 3"
+        };
+    }
+  });
+});
+
 const mockSave = jest.fn<any, any>(ops =>
   ops.map(op => ({
     ...op.resource,
@@ -68,7 +102,11 @@ const mockSave = jest.fn<any, any>(ops =>
 );
 
 const testCtx = {
-  apiContext: { apiClient: { get: mockGet }, save: mockSave }
+  apiContext: {
+    apiClient: { get: mockGet },
+    save: mockSave,
+    bulkGet: mockBulkGet
+  }
 };
 
 describe("Material sample bulk edit tab", () => {
@@ -85,7 +123,9 @@ describe("Material sample bulk edit tab", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockSubmitOverride).lastCalledWith({ type: "material-sample" });
+    expect(mockSubmitOverride).lastCalledWith({
+      type: "material-sample"
+    });
   });
 
   it("Overrides the barcode field", async () => {
@@ -162,8 +202,9 @@ describe("Material sample bulk edit tab", () => {
       },
       // Sets the default association because it's enabled and there are no values set in the other tabs:
       associations: [{}],
-      // Sets the default determination because it's enabled and there are no values set in the other tabs:
-      determination: [{}]
+      // Sets the default organism because it's enabled and there are no values set in the other tabs:
+      organism: [{}],
+      organismsQuantity: 1
     });
   });
 
@@ -217,57 +258,6 @@ describe("Material sample bulk edit tab", () => {
         a: "value A",
         b: "new-b-value",
         c: "new-c-value"
-      }
-    });
-  });
-
-  it("Combines organism values from the original and the bulk override.", async () => {
-    const wrapper = mountWithAppContext(
-      <BulkEditTab
-        baseSample={{
-          type: "material-sample",
-          materialSampleName: "test-sample",
-          organism: {
-            lifeStage: "initial lifestage",
-            remarks: "initial remarks"
-          }
-        }}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Override values for attributes B and C:
-    wrapper.find(".enable-organism-state").find(Switch).prop<any>("onChange")(
-      true
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Leave lifestage blank:
-    wrapper
-      .find(".lifeStage-field input")
-      .simulate("change", { target: { value: "" } });
-    // Leave remarks blank
-    wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "test override remarks" } });
-
-    wrapper.find("button.get-overrides").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockSubmitOverride).lastCalledWith({
-      // Keeps the name and type:
-      type: "material-sample",
-      materialSampleName: "test-sample",
-      organism: {
-        lifeStage: "initial lifestage",
-        remarks: "test override remarks"
       }
     });
   });

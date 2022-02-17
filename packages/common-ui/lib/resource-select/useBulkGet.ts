@@ -1,6 +1,6 @@
 import { KitsuResource, PersistedResource } from "kitsu";
 import useSWR from "swr";
-import { Fragment, useMemo } from "react";
+import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useApiClient } from "..";
 
@@ -12,6 +12,13 @@ export interface UseBulkGetParams {
 
 const LIST_PATH_REGEX = /^(.*)\/(.*)$/;
 
+interface FetchResourcesResponse<TData extends KitsuResource> {
+  /** The data with nulls in place of missing resources. */
+  fetchedWithNulls: (PersistedResource<TData> | null)[];
+  /** The data with KitsuResource objects (id and type) in place of missing resources. */
+  fetchedWithoutNulls: PersistedResource<TData | KitsuResource>[];
+}
+
 export function useBulkGet<TData extends KitsuResource>({
   ids,
   listPath,
@@ -20,7 +27,7 @@ export function useBulkGet<TData extends KitsuResource>({
   const { bulkGet } = useApiClient();
 
   async function fetchResources(): Promise<
-    PersistedResource<TData | KitsuResource>[] | undefined
+    FetchResourcesResponse<TData> | undefined
   > {
     if (disabled) {
       return undefined;
@@ -34,27 +41,34 @@ export function useBulkGet<TData extends KitsuResource>({
     const [_, apiBaseUrl, typeName] = listPathMatch;
     const paths = ids.map(id => `${typeName}/${id}`);
 
-    const fetched = await bulkGet<TData, true>(paths, {
+    const fetchedWithNulls = await bulkGet<TData, true>(paths, {
       apiBaseUrl: `/${apiBaseUrl}`,
       returnNullForMissingResource: true
     });
 
-    const fetchedNonNull = fetched.map(
+    const fetchedWithoutNulls = fetchedWithNulls.map(
       (resource, idx) => resource ?? { id: ids[idx], type: typeName }
     );
 
-    return fetchedNonNull;
+    return { fetchedWithNulls, fetchedWithoutNulls };
   }
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const queryKey = JSON.stringify({ ids, disabled });
   const cacheId = useMemo(() => uuidv4(), [queryKey]);
 
-  const { data, isValidating } = useSWR([cacheId], fetchResources, {
-    shouldRetryOnError: false,
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false
-  });
+  const { data: fetchResponse, isValidating } = useSWR(
+    [cacheId],
+    fetchResources,
+    {
+      shouldRetryOnError: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false
+    }
+  );
 
-  return { data, loading: isValidating };
+  const data = fetchResponse?.fetchedWithoutNulls;
+  const dataWithNullForMissing = fetchResponse?.fetchedWithNulls;
+
+  return { data, dataWithNullForMissing, loading: isValidating };
 }

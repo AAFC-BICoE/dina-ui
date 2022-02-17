@@ -76,3 +76,12 @@ input[id^="react-select"] {
 .has-bulk-edit-value input[type="checkbox"] {
   color: rgb(175, 255, 175) !important;
 }
+
+/*
+ * For number inputs in chrome, the spinning shows by default.
+ * (Up / Down arrows to increment the number)
+ */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}

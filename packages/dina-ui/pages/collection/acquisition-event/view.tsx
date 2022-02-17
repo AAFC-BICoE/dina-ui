@@ -11,9 +11,6 @@ export default function AcquisitionEventDetailsPage() {
           <AcquisitionEventFormLayout />
         </DinaForm>
       )}
-      query={id => ({
-        path: `collection-api/acquisition-event/${id}`
-      })}
       customQueryHook={id => useAcquisitionEvent(id)}
       entityLink="/collection/acquisition-event"
       type="acquisition-event"

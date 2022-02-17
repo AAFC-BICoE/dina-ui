@@ -11,7 +11,6 @@ export default function MolecularSampleDetailsPage() {
           <MolecularSampleFields />
         </DinaForm>
       )}
-      query={id => ({ path: `seqdb-api/molecular-sample/${id}` })}
       customQueryHook={id => useMolecularSample(id)}
       entityLink="/seqdb/molecular-sample"
       type="molecular-sample"

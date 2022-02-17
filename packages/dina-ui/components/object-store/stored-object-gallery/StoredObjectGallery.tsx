@@ -13,7 +13,7 @@ interface StoredObjectGalleryProps {
   metadatas: PersistedResource<Metadata>[];
 
   /** Called when a Metadata is selected for preview. */
-  onSelectPreviewMetadataId: (id: string) => void;
+  onSelectPreviewMetadata: (metadata: Metadata) => void;
 
   /** The ID of the currently previewed Metadata. */
   previewMetadataId: string | null;
@@ -34,7 +34,7 @@ const HIGHLIGHT_COLOR = "rgb(222, 252, 222)";
 export function StoredObjectGallery({
   CheckBoxField,
   metadatas,
-  onSelectPreviewMetadataId,
+  onSelectPreviewMetadata,
   previewMetadataId
 }: StoredObjectGalleryProps) {
   return (
@@ -48,7 +48,7 @@ export function StoredObjectGallery({
                 CheckBoxField={CheckBoxField}
                 highlighted={previewMetadataId === metadata.id}
                 metadata={metadata}
-                onSelectPreviewMetadataId={onSelectPreviewMetadataId}
+                onSelectPreviewMetadata={onSelectPreviewMetadata}
               />
             </li>
           );
@@ -64,14 +64,14 @@ interface GalleryItemProps {
   /** The GroupedCheckBox component for selecting Metadatas to edit. */
   CheckBoxField: React.ComponentType<CheckBoxFieldProps<Metadata>>;
   /** Called when a Metadata is selected for preview. */
-  onSelectPreviewMetadataId: (id: string) => void;
+  onSelectPreviewMetadata: (metadata: Metadata) => void;
 }
 
 function GalleryItem({
   highlighted,
   CheckBoxField,
   metadata,
-  onSelectPreviewMetadataId
+  onSelectPreviewMetadata
 }: GalleryItemProps) {
   const { id, acCaption, originalFilename } = metadata;
 
@@ -115,7 +115,7 @@ function GalleryItem({
         <div className="col-9">
           <button
             className="btn btn-info w-100 preview-button"
-            onClick={() => onSelectPreviewMetadataId(id)}
+            onClick={() => onSelectPreviewMetadata(metadata)}
             type="button"
           >
             <DinaMessage id="viewPreviewButtonText" />
