@@ -18,7 +18,13 @@ import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  IDENTIFIERS_FIELDS,
+  MATERIALSAMPLE_FIELDSET_FIELDS,
+  Nav
+} from "../../../components";
 import {
   PREPARATION_FIELDS,
   useMaterialSampleSave
@@ -30,11 +36,7 @@ import {
   TemplateField,
   TemplateFields
 } from "../../../types/collection-api";
-import {
-  IDENTIFIERS_FIELDS,
-  MaterialSampleForm,
-  MATERIALSAMPLE_FIELDSET_FIELDS
-} from "../material-sample/edit";
+import { MaterialSampleForm } from "../material-sample/edit";
 
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),

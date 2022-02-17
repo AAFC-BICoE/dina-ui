@@ -17,6 +17,8 @@ import {
   Head,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
+  MaterialSampleIdentifiersSection,
+  MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
@@ -46,10 +48,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
-import {
-  MaterialSampleFormLayout,
-  MaterialSampleIdentifiersFormLayout
-} from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -140,7 +138,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <TagsAndRestrictionsSection />
                 <ProjectSelectSection />
               </div>
-              <MaterialSampleIdentifiersFormLayout />
+              <MaterialSampleIdentifiersSection />
               {materialSample.parentMaterialSample && (
                 <SamplesView
                   samples={[materialSample.parentMaterialSample]}
@@ -153,7 +151,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   fieldSetId={<DinaMessage id="childMaterialSamples" />}
                 />
               )}
-              <MaterialSampleFormLayout />
+              <MaterialSampleInfoSection />
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={colEvent} readOnly={true}>

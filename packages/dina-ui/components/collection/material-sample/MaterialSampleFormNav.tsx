@@ -88,6 +88,82 @@ export function MaterialSampleFormNav({
   navOrder,
   onChangeNavOrder
 }: MaterialSampleNavProps) {
+  const { sortedScrollTargets } = useMaterialSampleSectionOrder({
+    dataComponentState,
+    navOrder
+  });
+
+  function onSortStart(_, event: unknown) {
+    if (event instanceof MouseEvent) {
+      document.body.style.cursor = "grabbing";
+    }
+  }
+
+  function onSortEnd(sortEnd: SortEnd) {
+    document.body.style.cursor = "inherit";
+
+    const newOrder = arrayMove(
+      sortedScrollTargets,
+      sortEnd.oldIndex,
+      sortEnd.newIndex
+    ).map(it => it.id);
+    onChangeNavOrder?.(newOrder);
+  }
+
+  return (
+    <div className="sticky-md-top material-sample-nav">
+      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
+      <ScrollSpyNav
+        {...(renderNav
+          ? {
+              key: sortedScrollTargets.filter(it => !it.disabled).length,
+              scrollTargetIds: sortedScrollTargets
+                .filter(it => !it.disabled)
+                .map(it => it.id),
+              activeNavClass: "active",
+              offset: -20,
+              scrollDuration: "100"
+            }
+          : {})}
+      >
+        <nav className="card card-body">
+          <label className="mb-2 text-uppercase">
+            <strong>
+              <DinaMessage id="dataComponents" />
+            </strong>
+          </label>
+          <SortableListGroup
+            axis="y"
+            useDragHandle={true}
+            onSortStart={onSortStart}
+            onSortEnd={onSortEnd}
+          >
+            {sortedScrollTargets.map((section, index) => (
+              <SortableNavItem
+                key={section.id}
+                index={index}
+                section={section}
+                disableRemovePrompt={disableRemovePrompt}
+              />
+            ))}
+          </SortableListGroup>
+        </nav>
+      </ScrollSpyNav>
+    </div>
+  );
+}
+
+export interface MaterialSampleSectionOrderParams {
+  dataComponentState: ReturnType<
+    typeof useMaterialSampleSave
+  >["dataComponentState"];
+  navOrder?: MaterialSampleFormSectionId[];
+}
+
+export function useMaterialSampleSectionOrder({
+  dataComponentState,
+  navOrder
+}: MaterialSampleSectionOrderParams) {
   const { formatMessage } = useDinaIntl();
 
   const navOrderWithAllSections = uniq([
@@ -167,64 +243,7 @@ export function MaterialSampleFormNav({
     ...defaultScrollTargets
   ]);
 
-  function onSortStart(_, event: unknown) {
-    if (event instanceof MouseEvent) {
-      document.body.style.cursor = "grabbing";
-    }
-  }
-
-  function onSortEnd(sortEnd: SortEnd) {
-    document.body.style.cursor = "inherit";
-
-    const newOrder = arrayMove(
-      sortedScrollTargets,
-      sortEnd.oldIndex,
-      sortEnd.newIndex
-    ).map(it => it.id);
-    onChangeNavOrder?.(newOrder);
-  }
-
-  return (
-    <div className="sticky-md-top material-sample-nav">
-      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
-      <ScrollSpyNav
-        {...(renderNav
-          ? {
-              key: sortedScrollTargets.filter(it => !it.disabled).length,
-              scrollTargetIds: sortedScrollTargets
-                .filter(it => !it.disabled)
-                .map(it => it.id),
-              activeNavClass: "active",
-              offset: -20,
-              scrollDuration: "100"
-            }
-          : {})}
-      >
-        <nav className="card card-body">
-          <label className="mb-2 text-uppercase">
-            <strong>
-              <DinaMessage id="dataComponents" />
-            </strong>
-          </label>
-          <SortableListGroup
-            axis="y"
-            useDragHandle={true}
-            onSortStart={onSortStart}
-            onSortEnd={onSortEnd}
-          >
-            {sortedScrollTargets.map((section, index) => (
-              <SortableNavItem
-                key={section.id}
-                index={index}
-                section={section}
-                disableRemovePrompt={disableRemovePrompt}
-              />
-            ))}
-          </SortableListGroup>
-        </nav>
-      </ScrollSpyNav>
-    </div>
-  );
+  return { sortedScrollTargets };
 }
 
 /** The organisms switch adds an initial organism if there isn't one already. */

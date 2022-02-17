@@ -1,9 +1,6 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import {
-  MaterialSampleForm,
-  nextSampleInitialValues
-} from "../../../../pages/collection/material-sample/edit";
+import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -12,6 +9,7 @@ import {
   MaterialSample
 } from "../../../../types/collection-api";
 import Select from "react-select";
+import { nextSampleInitialValues } from "../../../../components";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
