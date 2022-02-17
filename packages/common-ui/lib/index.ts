@@ -84,3 +84,6 @@ export * from "./formik-connected/NumberSpinnerField";
 export * from "./formik-connected/SelectFieldWithNav";
 export * from "./text-field-with-multiplication-button/TextFieldWithMultiplicationButton";
 export * from "./formik-connected/PlaceSectionsSelectionField";
+export * from "./query-builder/QueryBuilder";
+export * from "./formik-connected/QueryLogicSwitchField";
+export * from "./query-page/QueryPage";

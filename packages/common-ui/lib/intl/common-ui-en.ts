@@ -96,9 +96,9 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   oneValuePerLineTooltip:
     "Write one value per line. Press enter while typing in the field to add a new line.",
   overrideAll: "Override All",
-  overrideAllConfirmationTitle: "Override All {fieldName}s?",
   overrideAllConfirmation:
     "This will REMOVE ALL {fieldName}s for ALL Material Samples.",
+  overrideAllConfirmationTitle: "Override All {fieldName}s?",
   page: "Page",
   previous: "Previous",
   queryTable: "Query Table",

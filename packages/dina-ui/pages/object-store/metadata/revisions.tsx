@@ -4,7 +4,7 @@ import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout
 export default () => (
   <RevisionsPage
     auditSnapshotPath="objectstore-api/audit-snapshot"
-    detailsPageLink="/object-store/object/view?id="
+    detailsPageLink={`/object-store/object`}
     queryPath="objectstore-api/metadata"
     resourceType="metadata"
     revisionRowConfigsByType={OBJECT_STORE_MODULE_REVISION_ROW_CONFIG}

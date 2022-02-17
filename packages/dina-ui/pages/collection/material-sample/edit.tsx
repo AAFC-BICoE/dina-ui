@@ -334,7 +334,10 @@ export function MaterialSampleForm({
               </div>
             )}
             <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-            <ProjectSelectSection resourcePath="collection-api/project" />
+            <ProjectSelectSection
+              classNames="mt-3"
+              resourcePath="collection-api/project"
+            />
           </>
         )}
         <div className="data-components">
@@ -444,23 +447,27 @@ export function MaterialSampleForm({
                 />
               )}
               {!isTemplate && (
-                <FieldSet
-                  legend={<DinaMessage id="managedAttributeListTitle" />}
-                  id={navIds.managedAttributes}
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
                 >
-                  <DinaFormSection
-                    // Disabled the template's restrictions for this section:
-                    enabledFields={null}
-                  >
-                    <ManagedAttributesEditor
-                      valuesPath="managedAttributes"
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      apiBaseUrl="/collection-api"
-                      managedAttributeComponent="MATERIAL_SAMPLE"
-                      managedAttributeKeyField="key"
-                    />
-                  </DinaFormSection>
-                </FieldSet>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <ManagedAttributesEditor
+                        valuesPath="managedAttributes"
+                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeComponent="MATERIAL_SAMPLE"
+                        fieldSetProps={{
+                          id: navIds.managedAttributes,
+                          legend: (
+                            <DinaMessage id="materialSampleManagedAttributes" />
+                          )
+                        }}
+                        showCustomViewDropdown={true}
+                      />
+                    </div>
+                  </div>
+                </DinaFormSection>
               )}
               <AttachmentsField
                 name={attachmentsField}
@@ -637,7 +644,7 @@ export function MaterialSampleIdentifiersFormLayout({
                   setPrimaryIdDisabled(event.target.checked)
                 }
                 name="useNextSequence"
-                className="ms-2 mt-1 align-items-center"
+                className="ms-2 mt-1"
                 // only enabled when add new sample and collection is selected
                 disabled={initialValues.id || !value?.id}
                 overridecheckboxProps={{

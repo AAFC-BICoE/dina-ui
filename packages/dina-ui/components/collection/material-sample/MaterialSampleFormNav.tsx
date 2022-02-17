@@ -106,7 +106,7 @@ export function MaterialSampleFormNav({
     },
     {
       id: "managedAttributes-section",
-      msg: formatMessage("managedAttributeListTitle")
+      msg: formatMessage("managedAttributes")
     },
     {
       id: "material-sample-attachments-section",

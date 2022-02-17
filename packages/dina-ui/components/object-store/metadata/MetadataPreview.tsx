@@ -38,25 +38,37 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           <style>{METADATA_PREVIEW_STYLE}</style>
           <div className="metadata-edit-link">
             <Link
-              href={`/object-store/metadata/single-record-edit?id=${metadataId}`}
+              href={`/object-store/metadata/${
+                metadata.resourceExternalURL
+                  ? "external-resource-edit"
+                  : "single-record-edit"
+              }?id=${metadataId}`}
             >
               <a className="btn btn-primary metadata-edit-link">
                 <DinaMessage id="editButtonText" />
               </a>
             </Link>
           </div>
-          <Link href={`/object-store/metadata/revisions?id=${metadataId}`}>
+          <Link
+            href={`/object-store/metadata/revisions?id=${metadataId}&isExternalResourceMetadata=${!!metadata.resourceExternalURL}`}
+          >
             <a className="btn btn-info metadata-revisions-link">
               <DinaMessage id="revisionsButtonText" />
             </a>
           </Link>
-          <MetadataFileView metadata={metadata} />
-          <NotPubliclyReleasableWarning />
-          <div className="px-3">
-            <TagsAndRestrictionsSection tagsFieldName="acTags" />
-          </div>
+          {metadata.fileIdentifier && (
+            <>
+              <MetadataFileView metadata={metadata} />
+              <NotPubliclyReleasableWarning />
+              <div className="px-3">
+                <TagsAndRestrictionsSection tagsFieldName="acTags" />
+              </div>
+            </>
+          )}
           <MetadataDetails metadata={metadata} />
-          <ExifView objectUpload={metadata.objectUpload} />
+          {metadata.fileIdentifier && (
+            <ExifView objectUpload={metadata.objectUpload} />
+          )}
         </DinaForm>
       </div>
     );

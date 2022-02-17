@@ -323,7 +323,6 @@ export function DeterminationField({
                       isDetermination={true}
                     />
                   )}
-
                   <PersonSelectField
                     {...fieldProps("determiner")}
                     label={formatMessage("determiningAgents")}
@@ -339,21 +338,20 @@ export function DeterminationField({
                   />
                 </FieldSet>
                 {!isTemplate && (
-                  <FieldSet
-                    legend={<DinaMessage id="determinationManagedAttributes" />}
-                    // Disabled the template's restrictions for this section:
-                    enabledFields={null}
-                    className="non-strip"
-                  >
-                    <ManagedAttributesEditor
-                      valuesPath={fieldProps("managedAttributes").name}
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      apiBaseUrl="/collection-api"
-                      managedAttributeComponent="DETERMINATION"
-                      managedAttributeKeyField="key"
-                      attributeSelectorWidth={12}
-                    />
-                  </FieldSet>
+                  <ManagedAttributesEditor
+                    valuesPath={fieldProps("managedAttributes").name}
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    managedAttributeComponent="DETERMINATION"
+                    attributeSelectorWidth={12}
+                    fieldSetProps={{
+                      legend: (
+                        <DinaMessage id="determinationManagedAttributes" />
+                      ),
+                      enabledFields: null,
+                      className: "non-strip"
+                    }}
+                    showCustomViewDropdown={true}
+                  />
                 )}
               </div>
             </div>

@@ -112,11 +112,14 @@ describe("ResourceSelect component", () => {
     onChange(options[3], null as any);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith({
-      id: "3",
-      name: "todo 3",
-      type: "todo"
-    });
+    expect(mockOnChange).lastCalledWith(
+      {
+        id: "3",
+        name: "todo 3",
+        type: "todo"
+      },
+      null
+    );
   });
 
   it("Allows the 'onChange' prop to be undefined.", () => {
@@ -279,7 +282,7 @@ describe("ResourceSelect component", () => {
 
     // This should call the onChange prop function with { id: null }.
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith({ id: null });
+    expect(mockOnChange).lastCalledWith({ id: null }, null);
   });
 
   it("Shows a <None> label when the <None> option is selected.", () => {
@@ -328,18 +331,21 @@ describe("ResourceSelect component", () => {
     onChange([options[1], options[2]], null as any);
 
     expect(mockOnChange).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith([
-      {
-        id: "2",
-        name: "todo 2",
-        type: "todo"
-      },
-      {
-        id: "3",
-        name: "todo 3",
-        type: "todo"
-      }
-    ]);
+    expect(mockOnChange).lastCalledWith(
+      [
+        {
+          id: "2",
+          name: "todo 2",
+          type: "todo"
+        },
+        {
+          id: "3",
+          name: "todo 3",
+          type: "todo"
+        }
+      ],
+      null
+    );
   });
 
   it("Renders a list of selected options in multi-select mode.", async () => {
@@ -422,7 +428,7 @@ describe("ResourceSelect component", () => {
     wrapper.update();
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
-    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO);
+    expect(mockOnChange).lastCalledWith(TEST_ASYNC_TODO, undefined);
   });
 
   it("Allows a callback options prop to show special options that call a function (multi dropdown mode).", async () => {
@@ -463,7 +469,10 @@ describe("ResourceSelect component", () => {
 
     expect(mockGetResource).toHaveBeenCalledTimes(1);
     // Called with the normal option plus the async-fetched value:
-    expect(mockOnChange).lastCalledWith([options[0].resource, TEST_ASYNC_TODO]);
+    expect(mockOnChange).lastCalledWith(
+      [options[0].resource, TEST_ASYNC_TODO],
+      undefined
+    );
   });
 
   it("Always renders the async options, no matter what the search is", async () => {

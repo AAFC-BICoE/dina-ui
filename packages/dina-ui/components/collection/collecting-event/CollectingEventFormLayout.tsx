@@ -45,7 +45,6 @@ import {
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
   nominatimAddressDetailSearch,
@@ -821,35 +820,20 @@ export function CollectingEventFormLayout({
       </div>
 
       {!isTemplate && (
-        <FieldSet
-          legend={<DinaMessage id="collectingEventManagedAttributes" />}
+        <DinaFormSection
+          // Disabled the template's restrictions for this section:
+          enabledFields={null}
         >
-          {readOnly ? (
-            <FieldSpy<Record<string, string>> fieldName="managedAttributes">
-              {value => (
-                <ManagedAttributesViewer
-                  values={value ?? {}}
-                  managedAttributeApiPath={key =>
-                    `collection-api/managed-attribute/collecting_event.${key}`
-                  }
-                />
-              )}
-            </FieldSpy>
-          ) : (
-            <DinaFormSection
-              // Disabled the template's restrictions for this section:
-              enabledFields={null}
-            >
-              <ManagedAttributesEditor
-                valuesPath="managedAttributes"
-                managedAttributeApiPath="collection-api/managed-attribute"
-                apiBaseUrl="/collection-api"
-                managedAttributeComponent="COLLECTING_EVENT"
-                managedAttributeKeyField="key"
-              />
-            </DinaFormSection>
-          )}
-        </FieldSet>
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="COLLECTING_EVENT"
+            fieldSetProps={{
+              legend: <DinaMessage id="collectingEventManagedAttributes" />
+            }}
+            showCustomViewDropdown={true}
+          />
+        </DinaFormSection>
       )}
       <div className="mb-3">
         <AttachmentsField
