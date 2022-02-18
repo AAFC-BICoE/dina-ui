@@ -212,7 +212,7 @@ describe("MaterialSampleFormNav", () => {
     );
 
     expect(lastUsedButton.text()).toEqual(
-      "Use Last Selected ORder View: persisted-view"
+      "Use Last Selected Order View: persisted-view"
     );
     lastUsedButton.simulate("click");
 

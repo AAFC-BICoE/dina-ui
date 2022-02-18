@@ -102,6 +102,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/acquisition-event":
+    case "collection-api/custom-view":
       return { data: [] };
   }
 });
