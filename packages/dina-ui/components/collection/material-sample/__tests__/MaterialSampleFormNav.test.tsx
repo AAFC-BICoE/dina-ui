@@ -345,7 +345,7 @@ describe("MaterialSampleFormNav", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Select the last used Custom View:
+    // Select the last used Custom View to use the Stored Last Selected ID:
     wrapper
       .find(".material-sample-nav button.use-last-selected-view")
       .simulate("click");
@@ -374,5 +374,10 @@ describe("MaterialSampleFormNav", () => {
     expect(
       wrapper.find(".material-sample-nav").find(ResourceSelect).prop("value")
     ).toEqual({ id: null });
+
+    // The Last Selected button is gone:
+    expect(wrapper.find("button.use-last-selected-view").exists()).toEqual(
+      false
+    );
   });
 });

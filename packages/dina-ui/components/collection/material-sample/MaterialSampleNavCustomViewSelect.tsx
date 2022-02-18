@@ -50,7 +50,7 @@ export function MaterialSampleNavCustomViewSelect({
   const { username } = useAccount();
   const { openModal, closeModal } = useModal();
   const [lastUpdate, setLastUpdate] = useState(Date.now());
-  const [lastSelectedId, setLastSelectedId] = useLocalStorage(
+  const [lastSelectedId, setLastSelectedId] = useLocalStorage<string | null>(
     LAST_USED_ID_STORAGE_KEY
   );
 
@@ -131,7 +131,10 @@ export function MaterialSampleNavCustomViewSelect({
               <DeleteButton
                 id={selectedView.id}
                 options={{ apiBaseUrl: "/collection-api" }}
-                onDeleted={() => onChange({ id: null })}
+                onDeleted={() => {
+                  onChange({ id: null });
+                  setLastSelectedId(null);
+                }}
                 type="custom-view"
                 replaceClassName="btn btn-outline-danger delete-view"
                 style={{ width: "" }}
