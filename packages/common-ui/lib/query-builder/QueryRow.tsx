@@ -107,8 +107,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   }
 
   const queryRowOptions = esIndexMapping
-    ?.sort((a, b) => a.label.localeCompare(b.label))
-    .map(prop => ({
+    ?.filter(prop => !prop.label.startsWith("group"))
+    ?.map(prop => ({
       label: prop.label,
       value: prop.value + "(" + prop.type + ")"
     }));
