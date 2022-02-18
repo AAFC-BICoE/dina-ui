@@ -1,11 +1,18 @@
 import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
 
-export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
+interface TransformQueryToDSLParams {
+  queryRows: QueryRowExportProps[];
+  group: string;
+}
+
+export function transformQueryToDSL(
+  submittedValues: TransformQueryToDSLParams
+) {
   const builder = Bodybuilder();
 
   // Remove the type from value before submit to elastic search
-  exportedQueryRows.map(queryRow => {
+  submittedValues.queryRows.map(queryRow => {
     queryRow.type = queryRow.fieldName?.substring(
       queryRow.fieldName.indexOf("(") + 1,
       queryRow.fieldName.indexOf(")")
@@ -31,7 +38,9 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
       if (rowToBuild.type === "text") {
         builder.query(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
@@ -41,7 +50,9 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
       if (rowToBuild.type === "text") {
         builder.andQuery(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
@@ -51,7 +62,9 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
       if (rowToBuild.type === "text") {
         builder.orFilter(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
@@ -60,7 +73,7 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
     }
   }
 
-  exportedQueryRows
+  submittedValues.queryRows
     .filter(
       // Remove the row that user did not select any field to search on or
       // no value is put for the selected field
@@ -72,11 +85,16 @@ export function transformQueryToDSL(exportedQueryRows: QueryRowExportProps[]) {
           (queryRow.type === "text" && queryRow.matchType))
     )
     .map((queryRow, idx) => {
-      if (exportedQueryRows.length === 1) buildQuery(queryRow, queryRow, true);
+      if (submittedValues.queryRows.length === 1)
+        buildQuery(queryRow, queryRow, true);
       else {
-        if (idx === 1) buildQuery(queryRow, exportedQueryRows[0], false);
+        if (idx === 1)
+          buildQuery(queryRow, submittedValues.queryRows[0], false);
         if (idx !== 0) buildQuery(queryRow, null, false);
       }
     });
+
+  if (submittedValues.group)
+    builder.andQuery("match", "data.attributes.group", submittedValues.group);
   return builder.build();
 }
