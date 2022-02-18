@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { DinaForm } from "../formik-connected/DinaForm";
+import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { ColumnDefinition } from "../table/QueryTable";
@@ -23,6 +23,7 @@ import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
+import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -123,7 +124,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
-    const queryDSL = transformQueryToDSL(submittedValues.queryRows);
+    const queryDSL = transformQueryToDSL(submittedValues);
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
@@ -198,6 +199,9 @@ export function QueryPage<TData extends KitsuResource>({
         {formatMessage({ id: "search" })}
       </label>
       <QueryBuilder name="queryRows" esIndexMapping={data} />
+      <DinaFormSection horizontal={[1, 11]}>
+        <GroupSelectField name="group" className="col-md-4" />
+      </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>
