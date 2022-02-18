@@ -152,6 +152,11 @@ export function ViewPageLayout<T extends KitsuResource>({
               </ButtonBar>
               <h1 id="wb-cont">{title}</h1>
               {form(formProps)}
+              <Link href={`${entityLink}/revisions?id=${id}`}>
+                <a>
+                  <DinaMessage id="revisionsButtonText" />
+                </a>
+              </Link>
             </>
           );
         })}
