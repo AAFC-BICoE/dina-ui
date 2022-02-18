@@ -279,8 +279,9 @@ export function MaterialSampleForm({
 
   const attachmentsField = "attachment";
 
-  const [formSectionOrder, setFormSectionOrder] =
-    useState<MaterialSampleFormSectionId[]>();
+  const [formSectionOrder, setFormSectionOrder] = useState<
+    MaterialSampleFormSectionId[] | null
+  >(null);
 
   /**
    * A map where:
@@ -463,7 +464,7 @@ export function MaterialSampleForm({
 
   const formLayout = (
     <div className="d-md-flex">
-      <div style={{ minWidth: "20rem" }}>
+      <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
         {(!isOffScreen || !reduceRendering) && (
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}

@@ -1,4 +1,6 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import {
+  DeleteButton,
   DinaForm,
   DinaFormSubmitParams,
   FieldSpy,
@@ -7,8 +9,10 @@ import {
   ResourceSelect,
   SubmitButton,
   TextField,
+  useAccount,
   useApiClient,
-  useModal
+  useModal,
+  useQuery
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { isEqual } from "lodash";
@@ -28,16 +32,30 @@ const navSaveFormSchema = yup.object({
 export interface MaterialSampleNavCustomViewSelect {
   onChange: (newVal: PersistedResource<CustomView> | { id: null }) => void;
   selectedView?: PersistedResource<CustomView> | { id: null };
-  navOrder?: MaterialSampleFormSectionId[];
+  navOrder: MaterialSampleFormSectionId[] | null;
 }
 
+/**
+ * Dropdown menu for selecting a Material Sample Form custom view order.
+ * With controls for create/update/delete.
+ */
 export function MaterialSampleNavCustomViewSelect({
   onChange: onChangeProp,
   selectedView,
   navOrder
 }: MaterialSampleNavCustomViewSelect) {
+  const { username } = useAccount();
   const { openModal, closeModal } = useModal();
   const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [lastSelectedId, setLastSelectedId] = useLocalStorage(
+    "last-selected-material-sample-form-section-order-id"
+  );
+
+  const lastUsedViewQuery = useQuery<CustomView>(
+    { path: `collection-api/custom-view/${lastSelectedId}` },
+    { disabled: !lastSelectedId }
+  );
+  const lastUsedView = lastUsedViewQuery.response?.data;
 
   const viewConfig =
     selectedView?.id &&
@@ -52,6 +70,9 @@ export function MaterialSampleNavCustomViewSelect({
   function onChange(newSelected: PersistedResource<CustomView> | { id: null }) {
     onChangeProp(newSelected);
     setLastUpdate(Date.now());
+    if (newSelected.id) {
+      setLastSelectedId(newSelected.id);
+    }
   }
 
   return (
@@ -59,9 +80,9 @@ export function MaterialSampleNavCustomViewSelect({
       {group => (
         <div>
           {isEdited && (
-            <div className="d-flex justify-content-center">
+            <div className="d-flex mb-2 justify-content-center">
               <FormikButton
-                className="btn btn-outline-primary mb-2"
+                className="btn btn-outline-primary"
                 onClick={() =>
                   openModal(
                     <MaterialSampleNavViewModal
@@ -74,12 +95,12 @@ export function MaterialSampleNavCustomViewSelect({
                   )
                 }
               >
-                <DinaMessage id="saveThisView" />
+                <DinaMessage id="saveThisOrderView" />
                 ...
               </FormikButton>
             </div>
           )}
-          <label className="w-100">
+          <label className="w-100 mb-3">
             <div className="mb-2 fw-bold">
               <DinaMessage id="customComponentOrder" />
             </div>
@@ -100,8 +121,33 @@ export function MaterialSampleNavCustomViewSelect({
               value={selectedView}
               // Refresh the query whenever the custom view is changed.
               key={lastUpdate}
+              selectProps={{ isClearable: true }}
             />
           </label>
+          {selectedView?.id && selectedView.createdBy === username && (
+            <div className="d-flex justify-content-end mb-2">
+              <DeleteButton
+                id={selectedView.id}
+                options={{ apiBaseUrl: "/collection-api" }}
+                onDeleted={() => onChange({ id: null })}
+                type="custom-view"
+                replaceClassName="btn btn-outline-danger"
+                style={{ width: "" }}
+              >
+                <DinaMessage id="deleteThisView" />
+              </DeleteButton>
+            </div>
+          )}
+          {lastUsedView && selectedView?.id !== lastSelectedId && (
+            <div className="d-flex mb-2">
+              <FormikButton
+                className="btn btn-outline-primary text-start overflow-hidden"
+                onClick={() => onChange(lastUsedView)}
+              >
+                <DinaMessage id="useLastSelectedView" />: {lastUsedView.name}
+              </FormikButton>
+            </div>
+          )}
         </div>
       )}
     </FieldSpy>
@@ -112,7 +158,7 @@ export interface MaterialSampleNavViewModalProps {
   closeModal: () => void;
   onChange: (newSelected: PersistedResource<CustomView> | { id: null }) => void;
   selectedView?: PersistedResource<CustomView> | { id: null };
-  navOrder?: MaterialSampleFormSectionId[];
+  navOrder: MaterialSampleFormSectionId[];
   group?: string;
 }
 
@@ -125,6 +171,14 @@ export function MaterialSampleNavViewModal({
   group
 }: MaterialSampleNavViewModalProps) {
   const { save } = useApiClient();
+  const { username } = useAccount();
+
+  const NEW_VIEW_CONFIG: yup.InferType<
+    typeof materialSampleFormViewConfigSchema
+  > = {
+    type: "material-sample-form-section-order",
+    navOrder
+  };
 
   async function saveView(newView: InputResource<CustomView>) {
     const [savedView] = await save<CustomView>(
@@ -143,38 +197,24 @@ export function MaterialSampleNavViewModal({
   async function saveNewView({
     submittedValues
   }: DinaFormSubmitParams<yup.InferType<typeof navSaveFormSchema>>) {
-    const newViewConfig: yup.InferType<
-      typeof materialSampleFormViewConfigSchema
-    > = {
-      type: "material-sample-form-section-order",
-      navOrder
-    };
-
     const newView: InputResource<CustomView> = {
       type: "custom-view",
       name: submittedValues.name,
       group: group ?? undefined,
       restrictToCreatedBy: false,
-      viewConfiguration: newViewConfig
+      viewConfiguration: NEW_VIEW_CONFIG
     };
 
     await saveView(newView);
   }
 
   async function saveExistingView(existingView: PersistedResource<CustomView>) {
-    const newViewConfig: yup.InferType<
-      typeof materialSampleFormViewConfigSchema
-    > = {
-      type: "material-sample-form-section-order",
-      navOrder
-    };
-
     const newView: InputResource<CustomView> = {
       type: "custom-view",
       id: existingView.id,
       viewConfiguration: {
         ...viewConfig,
-        ...newViewConfig
+        ...NEW_VIEW_CONFIG
       }
     };
 
@@ -213,7 +253,7 @@ export function MaterialSampleNavViewModal({
             />
           </DinaForm>
         </div>
-        {selectedView?.id && (
+        {selectedView?.id && selectedView.createdBy === username && (
           <>
             <div className="d-flex align-items-center">
               <strong className="mx-3 fs-4">

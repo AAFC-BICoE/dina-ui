@@ -33,8 +33,8 @@ export interface MaterialSampleNavProps {
   >["dataComponentState"];
   disableRemovePrompt?: boolean;
 
-  navOrder?: MaterialSampleFormSectionId[];
-  onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[]) => void;
+  navOrder?: MaterialSampleFormSectionId[] | null;
+  onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 }
 
 const renderNav = process.env.NODE_ENV !== "test";
@@ -133,7 +133,7 @@ export function MaterialSampleFormNav({
         onChangeNavOrder(newView.viewConfiguration.navOrder ?? []);
       }
     } else {
-      onChangeNavOrder([]);
+      onChangeNavOrder(null);
     }
   }
 
@@ -194,7 +194,7 @@ export function MaterialSampleFormNav({
           <MaterialSampleNavCustomViewSelect
             onChange={updateCustomView}
             selectedView={customView}
-            navOrder={navOrder}
+            navOrder={navOrder ?? null}
           />
         </nav>
       </ScrollSpyNav>
@@ -206,7 +206,7 @@ export interface MaterialSampleSectionOrderParams {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
-  navOrder?: MaterialSampleFormSectionId[];
+  navOrder?: MaterialSampleFormSectionId[] | null;
 }
 
 export function useMaterialSampleSectionOrder({
