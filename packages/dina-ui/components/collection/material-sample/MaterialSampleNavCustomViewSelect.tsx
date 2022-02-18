@@ -29,6 +29,9 @@ const navSaveFormSchema = yup.object({
   name: yup.string().required()
 });
 
+export const LAST_USED_ID_STORAGE_KEY =
+  "last-selected-material-sample-form-section-order-id";
+
 export interface MaterialSampleNavCustomViewSelect {
   onChange: (newVal: PersistedResource<CustomView> | { id: null }) => void;
   selectedView?: PersistedResource<CustomView> | { id: null };
@@ -48,7 +51,7 @@ export function MaterialSampleNavCustomViewSelect({
   const { openModal, closeModal } = useModal();
   const [lastUpdate, setLastUpdate] = useState(Date.now());
   const [lastSelectedId, setLastSelectedId] = useLocalStorage(
-    "last-selected-material-sample-form-section-order-id"
+    LAST_USED_ID_STORAGE_KEY
   );
 
   const lastUsedViewQuery = useQuery<CustomView>(
@@ -82,7 +85,7 @@ export function MaterialSampleNavCustomViewSelect({
           {isEdited && (
             <div className="d-flex mb-2 justify-content-center">
               <FormikButton
-                className="btn btn-outline-primary"
+                className="btn btn-outline-primary save-this-view"
                 onClick={() =>
                   openModal(
                     <MaterialSampleNavViewModal
@@ -100,7 +103,7 @@ export function MaterialSampleNavCustomViewSelect({
               </FormikButton>
             </div>
           )}
-          <label className="w-100 mb-3">
+          <label className="w-100 mb-3 custom-view-select">
             <div className="mb-2 fw-bold">
               <DinaMessage id="customComponentOrder" />
             </div>
@@ -121,7 +124,6 @@ export function MaterialSampleNavCustomViewSelect({
               value={selectedView}
               // Refresh the query whenever the custom view is changed.
               key={lastUpdate}
-              selectProps={{ isClearable: true }}
             />
           </label>
           {selectedView?.id && selectedView.createdBy === username && (
@@ -131,7 +133,7 @@ export function MaterialSampleNavCustomViewSelect({
                 options={{ apiBaseUrl: "/collection-api" }}
                 onDeleted={() => onChange({ id: null })}
                 type="custom-view"
-                replaceClassName="btn btn-outline-danger"
+                replaceClassName="btn btn-outline-danger delete-view"
                 style={{ width: "" }}
               >
                 <DinaMessage id="deleteThisView" />
@@ -141,7 +143,7 @@ export function MaterialSampleNavCustomViewSelect({
           {lastUsedView && selectedView?.id !== lastSelectedId && (
             <div className="d-flex mb-2">
               <FormikButton
-                className="btn btn-outline-primary text-start overflow-hidden"
+                className="btn btn-outline-primary text-start overflow-hidden use-last-selected-view"
                 onClick={() => onChange(lastUsedView)}
               >
                 <DinaMessage id="useLastSelectedView" />: {lastUsedView.name}
@@ -233,7 +235,7 @@ export function MaterialSampleNavViewModal({
     <div className="modal-content">
       <style>{`.modal-dialog { max-width: 50rem; }`}</style>
       <div className="modal-body">
-        <div className="card card-body">
+        <div className="card card-body save-new-view-form">
           <h2>
             <DinaMessage id="createNewView" />
           </h2>
@@ -260,7 +262,7 @@ export function MaterialSampleNavViewModal({
                 <DinaMessage id="OR" />
               </strong>
             </div>
-            <div className="card card-body">
+            <div className="card card-body save-existing-view-form">
               <h2>
                 <DinaMessage id="updateExistingView" />:
                 <div>{selectedView.name}</div>
