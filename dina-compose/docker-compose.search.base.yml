@@ -65,6 +65,17 @@ services:
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
       - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+  search-ws:
+    environment:
+      SPRING_APPLICATION_JSON: >
+        {
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth"
+        }
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
 
 volumes:
   elasticsearch-data:
