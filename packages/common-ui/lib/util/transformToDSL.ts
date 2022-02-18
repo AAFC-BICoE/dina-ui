@@ -38,7 +38,9 @@ export function transformQueryToDSL(
       if (rowToBuild.type === "text") {
         builder.query(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
@@ -48,7 +50,9 @@ export function transformQueryToDSL(
       if (rowToBuild.type === "text") {
         builder.andQuery(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
@@ -58,7 +62,9 @@ export function transformQueryToDSL(
       if (rowToBuild.type === "text") {
         builder.orFilter(
           rowToBuild.matchType as string,
-          rowToBuild.fieldName,
+          rowToBuild.matchType === "term"
+            ? rowToBuild.fieldName + ".keyword"
+            : rowToBuild.fieldName,
           rowToBuild.matchValue ?? ""
         );
       } else {
