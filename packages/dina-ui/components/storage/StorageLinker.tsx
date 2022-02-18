@@ -112,7 +112,9 @@ export function StorageLinker({
             {!value?.id && (
               <TabPanel>
                 <StorageUnitForm
-                  onSaved={changeStorageAndResetTab}
+                  onSaved={savedUnits =>
+                    changeStorageAndResetTab(savedUnits[0])
+                  }
                   buttonBar={
                     <ButtonBar>
                       <SubmitButton className="ms-auto">

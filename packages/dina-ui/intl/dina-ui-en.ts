@@ -453,6 +453,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Use the following units for auto-conversion: ft, in, ft in, yd, mm, cm, km, pd, po, pd po.",
   moveAllContent: " Move All Content",
   multiple: "Multiple",
+  multipleUnits: "Multiple Units",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
   nestedStorageUnits: "Nested Storage Units",
