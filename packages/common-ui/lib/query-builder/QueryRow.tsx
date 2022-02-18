@@ -106,10 +106,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     }
   }
 
-  const queryRowOptions = esIndexMapping?.map(prop => ({
-    label: prop.label,
-    value: prop.value + "(" + prop.type + ")"
-  }));
+  const queryRowOptions = esIndexMapping
+    ?.sort((a, b) => a.label.localeCompare(b.label))
+    .map(prop => ({
+      label: prop.label,
+      value: prop.value + "(" + prop.type + ")"
+    }));
 
   function fieldProps(fieldName: string, idx: number) {
     return {
