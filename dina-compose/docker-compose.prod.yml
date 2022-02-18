@@ -11,5 +11,7 @@ services:
     build: ../repos/agent-api
   collection-api:
     build: ../repos/collection-api
+  loan-transaction-api:
+    build: ../repos/loan-transaction-api
   user-api:
     build: ../repos/dina-user-api

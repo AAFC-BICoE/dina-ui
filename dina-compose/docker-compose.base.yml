@@ -54,8 +54,10 @@ services:
       OBJECTSTORE_API_ADDRESS: objectstore-api:8080
       USER_API_ADDRESS: user-api:8080
       COLLECTION_API_ADDRESS: collection-api:8080
+      LOAN_TRANSACTION_API_ADDRESS: loan-transaction-api:8080
       SEQDB_API_ADDRESS: seqdb-api:8080
       SEARCH_API_ADDRESS: search-ws:8085
+      ELASTIC_SEARCH_ADDRESS: elasticsearch-dina:9200
       KEYCLOAK_CLIENTID: dina
       KEYCLOAK_REALM: dina
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
@@ -133,6 +135,26 @@ services:
           "spring.datasource.continue-on-error": "true",
           "spring.liquibase.user": "postgres",
           "spring.liquibase.password": "p",
+          "keycloak.enabled": "true",
+          "keycloak.resource": "dina",
+          "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "rabbitmq.host": "rabbitmq",
+          "messaging.isProducer": "true"
+        }
+    extra_hosts:
+      # Resolve the Keycloak domain to Keycloak's static IP:
+      - "${KEYCLOAK_DOMAIN}:${KEYCLOAK_IP}"
+  loan-transaction-api:
+    environment:
+      SPRING_APPLICATION_JSON: >
+        {
+          "spring.datasource.url": "jdbc:postgresql://database/dina?currentSchema=loan_transaction",
+          "spring.datasource.username": "postgres",
+          "spring.datasource.password": "p",
+          "spring.datasource.continue-on-error": "true",
+          "spring.liquibase.user": "postgres",
+          "spring.liquibase.password": "p",
+          "spring.liquibase.liquibase-schema": "loan_transaction",
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",

@@ -131,6 +131,32 @@ services:
       \"
       spring-boot:run
       "
+  loan-transaction-api:
+    image: maven:3.6.3-jdk-11
+    # Run as Docker host user so generated files don't belong to root:
+    user: $UID:$GID
+    volumes:
+      - "../repos/loan-transaction-api:/app"
+      # Share host users:
+      - "/etc/group:/etc/group:ro"
+      - "/etc/passwd:/etc/passwd:ro"
+      - "/etc/shadow:/etc/shadow:ro"
+      # Use the host maven repository:
+      - "~/.m2:/var/maven/.m2"
+    ports:
+      - "5011:5005" # debug port
+    working_dir: /app
+    # The maven container ignores the docker-compose "environment" field, so pass in variables in the command:
+    command: >
+      bash -c "
+      mvn
+      -Duser.home=/var/maven
+      -Dspring-boot-maven-plugin.fork=true
+      -Dspring-boot.run.jvmArguments=\"
+        -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
+      \"
+      spring-boot:run
+      "
   # Nextjs's dev-mode server that hot-reloads the UI source code:
   dina-ui-dev-server:
     image: node:14.18.1
