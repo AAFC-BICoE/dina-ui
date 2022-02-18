@@ -87,10 +87,8 @@ export function transformQueryToDSL(
         if (idx !== 0) buildQuery(queryRow, null, false);
       }
     });
-  builder.andQuery(
-    "match",
-    "data.attributes.group",
-    submittedValues.group ?? ""
-  );
+
+  if (submittedValues.group)
+    builder.andQuery("match", "data.attributes.group", submittedValues.group);
   return builder.build();
 }
