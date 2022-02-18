@@ -30,7 +30,7 @@ services:
       "
   # Addition of Kibana, for development purpose or browsing through the dina indices.
   kibana-dina:
-    image: docker.elastic.co/kibana/kibana:7.13.3
+    image: docker.elastic.co/kibana/kibana:7.16.2
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch-dina:9200
     ports:

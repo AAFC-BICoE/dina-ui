@@ -110,7 +110,28 @@ Or if you also want to add the dina-search-api:
 ./prod.sh -f docker-compose.search.base.yml -f docker-compose.search.prod.yml up
 ```
 
-## VS Code Error: command 'java.execute.workspaceCommand' not found
+## Troubleshooting
+
+### ERROR: Error response from daemon: Address already in use
+
+1. Stop and remove all containers.
+```bash
+./dev.sh down
+```
+
+2. Start the keycloak container only.
+```bash
+./dev.sh up -d keycloak
+```
+
+3. Once keycloak is running, try starting the rest of the containers.
+```bash
+./dev.sh up
+```
+
+These steps can also be followed when using the search api as well, just add the `-d keycloak` after the `up`.
+
+### VS Code Error: command 'java.execute.workspaceCommand' not found
 
 If you get this error using VS Code Remote, you may need to uninstall VS Code's Lombok extension from the host VS Code.
 Extensions are installed separately for the host and remote machine, and the Lombok extension may have issues being installed on both.

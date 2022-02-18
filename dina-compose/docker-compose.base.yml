@@ -57,6 +57,7 @@ services:
       LOAN_TRANSACTION_API_ADDRESS: loan-transaction-api:8080
       SEQDB_API_ADDRESS: seqdb-api:8080
       SEARCH_API_ADDRESS: search-ws:8085
+      ELASTIC_SEARCH_ADDRESS: elasticsearch-dina:9200
       KEYCLOAK_CLIENTID: dina
       KEYCLOAK_REALM: dina
       KEYCLOAK_PUBLIC_URL: http://${KEYCLOAK_DOMAIN}/auth
