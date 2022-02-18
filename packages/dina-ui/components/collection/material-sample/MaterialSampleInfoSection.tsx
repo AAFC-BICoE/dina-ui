@@ -22,7 +22,7 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({ id }: { id: string }) {
+export function MaterialSampleInfoSection({ id }: { id?: string }) {
   const { locale, formatMessage } = useDinaIntl();
 
   const { readOnly } = useDinaFormContext();

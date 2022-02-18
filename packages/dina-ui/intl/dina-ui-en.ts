@@ -610,7 +610,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   userListTitle: "Users",
   userMustBelongToGroup: "User must belong to a Group",
   userViewTitle: "User",
-  useLastSelectedView: "Use Last Selected View",
+  useLastSelectedOrderView: "Use Last Selected Order View",
   verbatimDeterminationLegend: "Verbatim Determination",
   verbatimEventDateTime: "Verbatim Event DateTime",
   verbatimLabelLegend: "Verbatim Label",

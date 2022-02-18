@@ -146,7 +146,8 @@ export function MaterialSampleNavCustomViewSelect({
                 className="btn btn-outline-primary text-start overflow-hidden use-last-selected-view"
                 onClick={() => onChange(lastUsedView)}
               >
-                <DinaMessage id="useLastSelectedView" />: {lastUsedView.name}
+                <DinaMessage id="useLastSelectedOrderView" />:{" "}
+                {lastUsedView.name}
               </FormikButton>
             </div>
           )}

@@ -59,6 +59,10 @@ const ScrollSpyNav = renderNav
     )
   : "div";
 
+/**
+ * All form sections in order.
+ * This array is the source of truth for the section ID names and their order.
+ */
 export const MATERIAL_SAMPLE_FORM_SECTIONS = [
   "identifiers-section",
   "material-sample-info-section",
@@ -93,8 +97,8 @@ export const materialSampleFormViewConfigSchema = yup.object({
   )
 });
 
-interface ScrollTarget {
-  id: MaterialSampleFormSectionId;
+interface ScrollTarget<T extends MaterialSampleFormSectionId> {
+  id: T;
   msg: string | JSX.Element;
   className?: string;
   disabled?: boolean;
@@ -216,85 +220,86 @@ export function useMaterialSampleSectionOrder({
 }: MaterialSampleSectionOrderParams) {
   const { formatMessage } = useDinaIntl();
 
+  /** An array with all section IDs, beginning with the user-defined order. */
   const navOrderWithAllSections = uniq([
     ...(navOrder ?? []),
     ...MATERIAL_SAMPLE_FORM_SECTIONS
   ]);
 
-  const defaultScrollTargets: ScrollTarget[] = [
-    { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
+  const scrollTargets: { [P in MaterialSampleFormSectionId]: ScrollTarget<P> } =
     {
-      id: "material-sample-info-section",
-      msg: <DinaMessage id="materialSampleInfo" />
-    },
-    {
-      id: "collecting-event-section",
-      msg: formatMessage("collectingEvent"),
-      className: "enable-collecting-event",
-      disabled: !dataComponentState.enableCollectingEvent,
-      setEnabled: dataComponentState.setEnableCollectingEvent
-    },
-    {
-      id: "acquisition-event-section",
-      msg: formatMessage("acquisitionEvent"),
-      className: "enable-acquisition-event",
-      disabled: !dataComponentState.enableAcquisitionEvent,
-      setEnabled: dataComponentState.setEnableAcquisitionEvent
-    },
-    {
-      id: "preparations-section",
-      msg: formatMessage("preparations"),
-      className: "enable-catalogue-info",
-      disabled: !dataComponentState.enablePreparations,
-      setEnabled: dataComponentState.setEnablePreparations
-    },
-    {
-      id: "organisms-section",
-      msg: formatMessage("organisms"),
-      className: "enable-organisms",
-      disabled: !dataComponentState.enableOrganisms,
-      setEnabled: dataComponentState.setEnableOrganisms,
-      customSwitch: OrganismsSwitch
-    },
-    {
-      id: "associations-section",
-      msg: formatMessage("associationsLegend"),
-      className: "enable-associations",
-      disabled: !dataComponentState.enableAssociations,
-      setEnabled: dataComponentState.setEnableAssociations,
-      customSwitch: AssociationsSwitch
-    },
-    {
-      id: "storage-section",
-      msg: formatMessage("storage"),
-      className: "enable-storage",
-      disabled: !dataComponentState.enableStorage,
-      setEnabled: dataComponentState.setEnableStorage
-    },
-    {
-      id: "scheduled-actions-section",
-      msg: formatMessage("scheduledActions"),
-      className: "enable-scheduled-actions",
-      disabled: !dataComponentState.enableScheduledActions,
-      setEnabled: dataComponentState.setEnableScheduledActions
-    },
-    {
-      id: "managedAttributes-section",
-      msg: formatMessage("managedAttributes")
-    },
-    {
-      id: "material-sample-attachments-section",
-      msg: formatMessage("materialSampleAttachments")
-    }
-  ];
+      "identifiers-section": {
+        id: "identifiers-section",
+        msg: <DinaMessage id="identifiers" />
+      },
+      "material-sample-info-section": {
+        id: "material-sample-info-section",
+        msg: <DinaMessage id="materialSampleInfo" />
+      },
+      "collecting-event-section": {
+        id: "collecting-event-section",
+        msg: formatMessage("collectingEvent"),
+        className: "enable-collecting-event",
+        disabled: !dataComponentState.enableCollectingEvent,
+        setEnabled: dataComponentState.setEnableCollectingEvent
+      },
+      "acquisition-event-section": {
+        id: "acquisition-event-section",
+        msg: formatMessage("acquisitionEvent"),
+        className: "enable-acquisition-event",
+        disabled: !dataComponentState.enableAcquisitionEvent,
+        setEnabled: dataComponentState.setEnableAcquisitionEvent
+      },
+      "preparations-section": {
+        id: "preparations-section",
+        msg: formatMessage("preparations"),
+        className: "enable-catalogue-info",
+        disabled: !dataComponentState.enablePreparations,
+        setEnabled: dataComponentState.setEnablePreparations
+      },
+      "organisms-section": {
+        id: "organisms-section",
+        msg: formatMessage("organisms"),
+        className: "enable-organisms",
+        disabled: !dataComponentState.enableOrganisms,
+        setEnabled: dataComponentState.setEnableOrganisms,
+        customSwitch: OrganismsSwitch
+      },
+      "associations-section": {
+        id: "associations-section",
+        msg: formatMessage("associationsLegend"),
+        className: "enable-associations",
+        disabled: !dataComponentState.enableAssociations,
+        setEnabled: dataComponentState.setEnableAssociations,
+        customSwitch: AssociationsSwitch
+      },
+      "storage-section": {
+        id: "storage-section",
+        msg: formatMessage("storage"),
+        className: "enable-storage",
+        disabled: !dataComponentState.enableStorage,
+        setEnabled: dataComponentState.setEnableStorage
+      },
+      "scheduled-actions-section": {
+        id: "scheduled-actions-section",
+        msg: formatMessage("scheduledActions"),
+        className: "enable-scheduled-actions",
+        disabled: !dataComponentState.enableScheduledActions,
+        setEnabled: dataComponentState.setEnableScheduledActions
+      },
+      "managedAttributes-section": {
+        id: "managedAttributes-section",
+        msg: formatMessage("managedAttributes")
+      },
+      "material-sample-attachments-section": {
+        id: "material-sample-attachments-section",
+        msg: formatMessage("materialSampleAttachments")
+      }
+    };
 
   const sortedScrollTargets = uniq([
-    ...compact(
-      navOrderWithAllSections.map(id =>
-        defaultScrollTargets.find(it => it.id === id)
-      )
-    ),
-    ...defaultScrollTargets
+    ...navOrderWithAllSections.map(id => scrollTargets[id]),
+    ...MATERIAL_SAMPLE_FORM_SECTIONS.map(id => scrollTargets[id])
   ]);
 
   return { sortedScrollTargets };
@@ -349,13 +354,16 @@ export const SortableNavGroup = SortableContainer(
   )
 );
 
-interface NavItemProps {
-  section: ScrollTarget;
+interface NavItemProps<T extends MaterialSampleFormSectionId> {
+  section: ScrollTarget<T>;
   disableRemovePrompt?: boolean;
 }
 
 const SortableNavItem = SortableElement(
-  ({ section, disableRemovePrompt }: NavItemProps) => {
+  ({
+    section,
+    disableRemovePrompt
+  }: NavItemProps<MaterialSampleFormSectionId>) => {
     const { openModal } = useModal();
 
     const Tag = section.disabled ? "div" : "a";
