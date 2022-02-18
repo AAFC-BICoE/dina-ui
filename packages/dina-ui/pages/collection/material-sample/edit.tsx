@@ -294,15 +294,14 @@ export function MaterialSampleForm({
   > = {
     "identifiers-section": id =>
       !reduceRendering && (
-        <>
-          <MaterialSampleIdentifiersSection
-            id={id}
-            disableSampleNameField={disableSampleNameField}
-            hideUseSequence={hideUseSequence}
-          />
-          <MaterialSampleInfoSection />
-        </>
+        <MaterialSampleIdentifiersSection
+          id={id}
+          disableSampleNameField={disableSampleNameField}
+          hideUseSequence={hideUseSequence}
+        />
       ),
+    "material-sample-info-section": id =>
+      !reduceRendering && <MaterialSampleInfoSection id={id} />,
     "collecting-event-section": id =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>

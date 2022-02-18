@@ -61,6 +61,7 @@ const ScrollSpyNav = renderNav
 
 export const MATERIAL_SAMPLE_FORM_SECTIONS = [
   "identifiers-section",
+  "material-sample-info-section",
   "collecting-event-section",
   "acquisition-event-section",
   "preparations-section",
@@ -176,7 +177,7 @@ export function MaterialSampleFormNav({
               <DinaMessage id="dataComponents" />
             </strong>
           </label>
-          <SortableListGroup
+          <SortableNavGroup
             axis="y"
             useDragHandle={true}
             onSortStart={onSortStart}
@@ -190,7 +191,7 @@ export function MaterialSampleFormNav({
                 disableRemovePrompt={disableRemovePrompt}
               />
             ))}
-          </SortableListGroup>
+          </SortableNavGroup>
           <MaterialSampleNavCustomViewSelect
             onChange={updateCustomView}
             selectedView={customView}
@@ -222,6 +223,10 @@ export function useMaterialSampleSectionOrder({
 
   const defaultScrollTargets: ScrollTarget[] = [
     { id: "identifiers-section", msg: <DinaMessage id="identifiers" /> },
+    {
+      id: "material-sample-info-section",
+      msg: <DinaMessage id="materialSampleInfo" />
+    },
     {
       id: "collecting-event-section",
       msg: formatMessage("collectingEvent"),
@@ -338,7 +343,7 @@ function AssociationsSwitch(props) {
   );
 }
 
-const SortableListGroup = SortableContainer(
+export const SortableNavGroup = SortableContainer(
   ({ children }: PropsWithChildren<{}>) => (
     <div className="list-group mb-3">{children}</div>
   )

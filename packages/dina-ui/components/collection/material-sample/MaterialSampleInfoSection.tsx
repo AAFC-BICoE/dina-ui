@@ -22,7 +22,7 @@ export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleType"
 ];
 
-export function MaterialSampleInfoSection({ id = "material-sample-section" }) {
+export function MaterialSampleInfoSection({ id }: { id: string }) {
   const { locale, formatMessage } = useDinaIntl();
 
   const { readOnly } = useDinaFormContext();
@@ -35,7 +35,7 @@ export function MaterialSampleInfoSection({ id = "material-sample-section" }) {
   };
 
   return (
-    <FieldSet id={id} legend={<DinaMessage id="materialSample" />}>
+    <FieldSet id={id} legend={<DinaMessage id="materialSampleInfo" />}>
       <div className="row">
         <div className="col-md-6">
           <ResourceSelectField<MaterialSampleType>
