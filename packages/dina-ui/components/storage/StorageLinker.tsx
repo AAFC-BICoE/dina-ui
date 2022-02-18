@@ -14,7 +14,7 @@ import { KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Promisable } from "type-fest";
-import { StorageUnitForm } from "..";
+import { StorageActionMode, StorageUnitForm } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { AssignedStorage } from "./AssignedStorage";
@@ -27,13 +27,15 @@ export interface StorageLinkerProps {
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) => Promisable<void>;
   placeholder?: string;
+  actionMode?: StorageActionMode;
 }
 
 /** Multi-Tab Storage Assignment UI. */
 export function StorageLinker({
   onChange: onChangeProp,
   value,
-  placeholder
+  placeholder,
+  actionMode
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -82,7 +84,7 @@ export function StorageLinker({
                 <DinaMessage id="browseStorageTree" />
               </Tab>
             )}
-            {!value?.id && (
+            {!value?.id && actionMode !== "ADD_EXISTING_AS_CHILD" && (
               <Tab>
                 <DinaMessage id="createStorage" />
               </Tab>
