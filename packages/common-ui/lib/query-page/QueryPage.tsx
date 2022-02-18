@@ -178,12 +178,15 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
+  const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
+
   return (
     <DinaForm
       initialValues={{
         queryRows: [
           {
-            fieldName: data?.[0]?.value + "(" + data?.[0]?.type + ")",
+            fieldName:
+              sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
             matchType: "match",
             boolean: "true",
             date: moment().format()
@@ -198,7 +201,7 @@ export function QueryPage<TData extends KitsuResource>({
         {" "}
         {formatMessage({ id: "search" })}
       </label>
-      <QueryBuilder name="queryRows" esIndexMapping={data} />
+      <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
       <DinaFormSection horizontal={[1, 11]}>
         <GroupSelectField name="group" className="col-md-4" />
       </DinaFormSection>

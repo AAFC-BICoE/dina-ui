@@ -53,12 +53,12 @@ describe("QueryBuilder component", () => {
         .prop("options")
     ).toEqual([
       {
-        label: "allowDuplicateName",
-        value: "data.attributes.allowDuplicateName(boolean)"
-      },
-      {
         label: "createdOn",
         value: "data.attributes.createdOn(date)"
+      },
+      {
+        label: "allowDuplicateName",
+        value: "data.attributes.allowDuplicateName(boolean)"
       }
     ]);
   });
