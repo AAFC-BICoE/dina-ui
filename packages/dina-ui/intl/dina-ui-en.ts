@@ -20,7 +20,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addCollectorGroupTitle: "Add Collector Group",
   addCustomPlaceName: "Add",
   addDetermination: "Add Determination",
-  addExistingStorageUnitAsChild: "Add Existing Storage Unit as Child",
+  addExistingStorageUnitAsChild: "Add Existing Storage Unit",
   addExternalResourceTitle: "Add New External Resource",
   addFilesButton: "Add Files",
   addGroup: "Add Group",

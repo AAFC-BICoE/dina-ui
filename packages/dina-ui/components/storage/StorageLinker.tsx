@@ -28,6 +28,7 @@ export interface StorageLinkerProps {
   ) => Promisable<void>;
   placeholder?: string;
   actionMode?: StorageActionMode;
+  parentIdInURL?: string;
 }
 
 /** Multi-Tab Storage Assignment UI. */
@@ -35,7 +36,8 @@ export function StorageLinker({
   onChange: onChangeProp,
   value,
   placeholder,
-  actionMode
+  actionMode,
+  parentIdInURL
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -70,7 +72,11 @@ export function StorageLinker({
         </div>
       )}
       {value?.id ? (
-        <AssignedStorage value={value} onChange={changeStorageAndResetTab} />
+        <AssignedStorage
+          value={value}
+          parentIdInURL={parentIdInURL}
+          onChange={changeStorageAndResetTab}
+        />
       ) : (
         <Tabs selectedIndex={activeTab} onSelect={setActiveTab}>
           <TabList className="react-tabs__tab-list mb-0">
@@ -137,6 +143,7 @@ export interface StorageLinkerFieldProps {
   targetType: string;
   customName?: string;
   hideLabel?: boolean;
+  parentIdInURL?: string;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -144,7 +151,8 @@ export function StorageLinkerField({
   name,
   customName,
   hideLabel,
-  targetType
+  targetType,
+  parentIdInURL
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
 
@@ -184,6 +192,7 @@ export function StorageLinkerField({
             value={value}
             onChange={setValue}
             placeholder={placeholder}
+            parentIdInURL={parentIdInURL}
           />
         </div>
       )}
