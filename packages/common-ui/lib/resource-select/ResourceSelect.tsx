@@ -9,7 +9,8 @@ import React, { ComponentProps, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
   components as reactSelectComponents,
-  StylesConfig
+  StylesConfig,
+  ActionMeta
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
@@ -20,14 +21,12 @@ import { useBulkGet } from "./useBulkGet";
 /** ResourceSelect component props. */
 export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Sets the input's value so the value can be controlled externally. */
-  value?:
-    | PersistedResource<TData>
-    | PersistedResource<TData>[]
-    | KitsuResourceLink;
+  value?: ResourceSelectValue<TData>;
 
   /** Function called when an option is selected. */
   onChange?: (
-    value: PersistedResource<TData> | PersistedResource<TData>[]
+    value: PersistedResource<TData> | PersistedResource<TData>[],
+    actionMeta?: ActionMeta<{ resource: PersistedResource<TData> }>
   ) => void;
 
   /** The model type to select resources from. */
@@ -74,7 +73,16 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /* Remove the default sort by createdOn */
   removeDefaultSort?: boolean;
+
+  placeholder?: string;
+
+  isLoading?: boolean;
 }
+
+type ResourceSelectValue<TData extends KitsuResource> =
+  | PersistedResource<TData>
+  | PersistedResource<TData>[]
+  | KitsuResourceLink;
 
 /**
  * Special dropdown option that can fetch an async value.
@@ -108,7 +116,9 @@ export function ResourceSelect<TData extends KitsuResource>({
   selectProps,
   pageSize,
   useCustomQuery,
-  removeDefaultSort
+  removeDefaultSort,
+  placeholder,
+  isLoading: loadingProp
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -140,7 +150,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const { loading: queryIsLoading, response } =
     useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
-  const isLoading = queryIsLoading || inputValue !== searchValue;
+  const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
 
   // Build the list of options from the returned resources.
   const resourceOptions =
@@ -176,7 +186,10 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Show no options while loading: (react-select will show the "Loading..." text.)
   const options = isLoading ? [] : compact([mainOptions, actionOptions]);
 
-  async function onChange(newSelectedRaw) {
+  async function onChange(
+    newSelectedRaw,
+    actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
+  ) {
     const newSelected = castArray(newSelectedRaw);
 
     // If an async option is selected:
@@ -191,11 +204,11 @@ export function ResourceSelect<TData extends KitsuResource>({
         const newResources = newSelected.map(option =>
           option === asyncOption ? asyncResource : option.resource
         );
-        onChangeProp(isMulti ? newResources : newResources[0]);
+        onChangeProp(isMulti ? newResources : newResources[0], actionMeta);
       }
     } else {
       const resources = newSelected?.map(o => o.resource) || [];
-      onChangeProp(isMulti ? resources : resources[0]);
+      onChangeProp(isMulti ? resources : resources[0], actionMeta);
     }
   }
 
@@ -262,9 +275,10 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChange={onChange}
       isLoading={isLoading}
       options={options}
-      placeholder={formatMessage({ id: "typeHereToSearch" })}
+      placeholder={placeholder ?? formatMessage({ id: "typeHereToSearch" })}
       loadingMessage={() => formatMessage({ id: "loadingText" })}
       styles={customStyle}
+      classNamePrefix="react-select"
       value={selectValue}
       // The filtering is already done at the API level:
       filterOption={() => true}

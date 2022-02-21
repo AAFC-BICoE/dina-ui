@@ -1,6 +1,6 @@
 import { FieldsParam, FilterParam, KitsuResource, KitsuResponse } from "kitsu";
 import { isPlainObject } from "lodash";
-import React, { useRef, useState } from "react";
+import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import {
@@ -69,6 +69,10 @@ export interface QueryTableProps<TData extends KitsuResource> {
     | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
 
   hideTopPagination?: boolean;
+
+  topRightCorner?: ReactNode;
+
+  ariaLabel?: string;
 }
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -92,7 +96,9 @@ export function QueryTable<TData extends KitsuResource>({
   onSortedChange,
   path,
   hideTopPagination,
-  reactTableProps
+  reactTableProps,
+  topRightCorner,
+  ariaLabel
 }: QueryTableProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -196,6 +202,24 @@ export function QueryTable<TData extends KitsuResource>({
 
   const [visible, setVisible] = useState(false);
 
+  // Auto set aria label for react table using part of path
+  let autoAriaLabel = path
+    .substring(path.lastIndexOf("/") ? path.lastIndexOf("/") + 1 : 0)
+    .replaceAll("-", " ");
+
+  autoAriaLabel = autoAriaLabel.endsWith("s")
+    ? autoAriaLabel + "es"
+    : autoAriaLabel + "s";
+
+  useEffect(() => {
+    const reactTableDivs = document?.querySelectorAll<any>(
+      "div.rt-table[role='grid']"
+    );
+    reactTableDivs?.forEach(element => {
+      element.setAttribute("aria-label", ariaLabel ?? autoAriaLabel);
+    });
+  });
+
   return (
     <div
       className="query-table-wrapper"
@@ -203,34 +227,41 @@ export function QueryTable<TData extends KitsuResource>({
       role="search"
       aria-label={formatMessage({ id: "queryTable" })}
     >
-      {!omitPaging && (
-        <span>
-          <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-        </span>
-      )}
-      {resolvedReactTableProps?.sortable !== false && (
-        <span className="mx-3">
-          <Tooltip
-            id="queryTableMultiSortExplanation"
-            setVisible={setVisible}
-            visible={visible}
-            visibleElement={
-              <a
-                href="#"
-                aria-describedby={"queryTableMultiSortExplanation"}
-                onKeyUp={e =>
-                  e.key === "Escape" ? setVisible(false) : setVisible(true)
-                }
-                onMouseOver={() => setVisible(true)}
-                onMouseOut={() => setVisible(false)}
-                onBlur={() => setVisible(false)}
-              >
-                <CommonMessage id="queryTableMultiSortTooltipTitle" />
-              </a>
-            }
-          />
-        </span>
-      )}
+      <div className="d-flex align-items-end mb-1">
+        {!omitPaging && (
+          <>
+            <span>
+              <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+            </span>
+            {resolvedReactTableProps?.sortable !== false && (
+              <span className="mx-3">
+                <Tooltip
+                  id="queryTableMultiSortExplanation"
+                  setVisible={setVisible}
+                  visible={visible}
+                  visibleElement={
+                    <a
+                      href="#"
+                      aria-describedby={"queryTableMultiSortExplanation"}
+                      onKeyUp={e =>
+                        e.key === "Escape"
+                          ? setVisible(false)
+                          : setVisible(true)
+                      }
+                      onMouseOver={() => setVisible(true)}
+                      onMouseOut={() => setVisible(false)}
+                      onBlur={() => setVisible(false)}
+                    >
+                      <CommonMessage id="queryTableMultiSortTooltipTitle" />
+                    </a>
+                  }
+                />
+              </span>
+            )}
+          </>
+        )}
+        {topRightCorner && <div className="ms-auto">{topRightCorner}</div>}
+      </div>
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
           <input

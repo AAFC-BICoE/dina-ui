@@ -1,12 +1,15 @@
 import {
   ButtonBar,
-  ColumnDefinition,
   CreateButton,
   dateCell,
+  DeleteButton,
   FilterAttribute,
   filterBy,
   ListPageLayout,
-  stringArrayCell
+  QueryPage,
+  stringArrayCell,
+  useQuery,
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -16,6 +19,7 @@ import {
   MaterialSample,
   MaterialSampleType
 } from "../../../types/collection-api";
+import { useState } from "react";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
@@ -24,19 +28,15 @@ export interface SampleListLayoutProps {
   hideTopPagination?: boolean;
   hideGroupFilter?: boolean;
   showBulkActions?: boolean;
-  openLinkInNewTab?: boolean;
 }
 
-export const getColumnDefinition = ({ openLinkInNewTab }) => {
+export const getColumnDefinition = () => {
   return [
     {
       Cell: ({
         original: { id, materialSampleName, dwcOtherCatalogNumbers }
       }) => (
-        <a
-          href={`/collection/material-sample/view?id=${id}`}
-          target={openLinkInNewTab ? "_blank" : ""}
-        >
+        <a href={`/collection/material-sample/view?id=${id}`}>
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </a>
       ),
@@ -64,8 +64,7 @@ export function SampleListLayout({
   btnMsg,
   hideTopPagination,
   hideGroupFilter,
-  showBulkActions,
-  openLinkInNewTab
+  showBulkActions
 }: SampleListLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const MATERIAL_SAMPLE_FILTER_ATTRIBUTES: FilterAttribute[] = [
@@ -87,8 +86,10 @@ export function SampleListLayout({
     }
   ];
 
+  const [queryKey, setQueryKey] = useState("");
+
   const columns = [
-    ...getColumnDefinition({ openLinkInNewTab }),
+    ...getColumnDefinition(),
     ...(onSelect
       ? [
           {
@@ -107,7 +108,33 @@ export function SampleListLayout({
             sortable: false
           }
         ]
-      : [])
+      : [
+          {
+            Cell: ({ original: sample }) => (
+              <div className="d-flex">
+                <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+                  <a className="btn btn-link">
+                    <DinaMessage id="view" />
+                  </a>
+                </Link>
+                <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
+                  <a className="btn btn-link">
+                    <DinaMessage id="editButtonText" />
+                  </a>
+                </Link>
+                <DeleteButton
+                  replaceClassName="btn btn-link"
+                  type="material-sample"
+                  id={sample.id}
+                  options={{ apiBaseUrl: "/collection-api" }}
+                  onDeleted={() => setQueryKey(String(Math.random()))}
+                />
+              </div>
+            ),
+            Header: "",
+            sortable: false
+          }
+        ])
   ];
 
   return (
@@ -122,7 +149,8 @@ export function SampleListLayout({
         columns,
         path: "collection-api/material-sample",
         include: "collection,materialSampleType",
-        hideTopPagination
+        hideTopPagination,
+        deps: [queryKey]
       }}
       filterFormchildren={({ submitForm }) =>
         !hideGroupFilter ? (
@@ -161,7 +189,45 @@ export function SampleListLayout({
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-
+  const [queryKey, setQueryKey] = useState("");
+  const queryState = useQuery<MaterialSample[]>(
+    {
+      path: "collection-api/material-sample",
+      include: "collection,materialSampleType"
+    },
+    {}
+  );
+  const { error, loading, response } = queryState;
+  const columns = [
+    ...getColumnDefinition(),
+    ...[
+      {
+        Cell: ({ original: sample }) => (
+          <div className="d-flex">
+            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="view" />
+              </a>
+            </Link>
+            <Link href={`/collection/material-sample/edit?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="editButtonText" />
+              </a>
+            </Link>
+            <DeleteButton
+              replaceClassName="btn btn-link"
+              type="material-sample"
+              id={sample.id}
+              options={{ apiBaseUrl: "/collection-api" }}
+              onDeleted={() => setQueryKey(String(Math.random()))}
+            />
+          </div>
+        ),
+        Header: "",
+        sortable: false
+      }
+    ]
+  ];
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -178,7 +244,21 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        <SampleListLayout showBulkActions={true} openLinkInNewTab={false} />
+        {withResponse({ loading, error, response }, () => (
+          <QueryPage
+            indexName={"dina_material_sample_index"}
+            columns={columns}
+            initData={response?.data}
+            bulkDeleteButtonProps={{
+              typeName: "material-sample",
+              apiBaseUrl: "/collection-api"
+            }}
+            bulkEditPath={ids => ({
+              pathname: "/collection/material-sample/bulk-edit",
+              query: { ids: ids.join(",") }
+            })}
+          />
+        ))}
       </main>
       <Footer />
     </div>

@@ -1,19 +1,24 @@
 import {
+  BulkEditTabContextI,
   ButtonBar,
   DinaForm,
   DoOperationsError,
   FormikButton,
+  getBulkEditTabFieldInfo,
+  SampleWithHooks,
+  SaveArgs,
   useApiClient
 } from "common-ui";
-import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { useMemo, useRef, useState } from "react";
+import { keys, omit, pick, pickBy } from "lodash";
+import { useMemo, useRef, useState, useEffect } from "react";
 import { Promisable } from "type-fest";
-import { MaterialSampleBulkNavigator, SampleWithHooks } from "..";
-import { DinaMessage } from "../../intl/dina-ui-intl";
+import { BulkNavigatorTab, MaterialSampleBulkNavigator } from "..";
+import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useMaterialSampleSave } from "../collection";
+import { useBulkEditTab } from "./bulk-edit-tab";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -31,107 +36,56 @@ export function MaterialSampleBulkEditor({
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
 
-  const sampleHooks = samples.map<SampleWithHooks>(sample => ({
-    sample,
-    saveHook: useMaterialSampleSave({ materialSample: sample }),
-    formRef: useRef<FormikProps<InputResource<MaterialSample>>>(null)
-  }));
+  const [selectedTab, setSelectedTab] = useState<
+    BulkNavigatorTab | SampleWithHooks
+  >();
 
-  const { save } = useApiClient();
+  const sampleHooks = samples.map<SampleWithHooks>((sample, index) => {
+    const key = `sample-${index}`;
+    return {
+      key,
+      sample,
+      saveHook: useMaterialSampleSave({
+        materialSample: sample,
+        // Reduce the off-screen tabs rendering for better performance:
+        reduceRendering: key !== selectedTab?.key,
+        // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
+        disableNestedFormEdits: true
+      }),
+      formRef: useRef(null)
+    };
+  });
 
-  const [_error, setError] = useState<unknown | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  async function saveAll() {
-    setError(null);
-    try {
-      // First clear all tab errors:
-      for (const { formRef } of sampleHooks) {
-        formRef.current?.setStatus(null);
-        formRef.current?.setErrors({});
-      }
+  const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
+    sampleHooks,
+    hideBulkEditTab: !initialized,
+    hideUseSequence: true
+  });
 
-      const saveOperations = await Promise.all(
-        sampleHooks.map(async ({ formRef, sample, saveHook }, index) => {
-          const formik = formRef.current;
+  useEffect(() => {
+    // Set the initial tab to the Edit All tab:
+    setSelectedTab(bulkEditTab);
+  }, []);
 
-          // These two errors shouldn't happen:
-          if (!formik) {
-            throw new Error(
-              `Missing Formik ref for sample ${sample.materialSampleName}`
-            );
-          }
-          if (!saveHook) {
-            throw new Error(
-              `Missing Save Hook for sample ${sample.materialSampleName}`
-            );
-          }
-
-          // TODO get rid of this try/catch when we can save
-          // the Col Event + Acq event + material sample all at once.
-          try {
-            return await saveHook.prepareSampleSaveOperation(
-              formik.values,
-              formik
-            );
-          } catch (error) {
-            if (error instanceof DoOperationsError) {
-              // In case of an error involving the intermediary Collecting or Acquisition Event.
-              // Rethrow the same error but with the tab's index:
-              throw new DoOperationsError(
-                error.message,
-                error.fieldErrors,
-                error.individualErrors.map(operationError => ({
-                  ...operationError,
-                  index
-                }))
-              );
-            }
-            throw error;
-          }
-        })
-      );
-
-      const validOperations = saveOperations.map(op => {
-        if (!op) {
-          throw new Error("Some material sample saves failed.");
-        }
-        return op;
-      });
-
-      const savedSamples = await save<MaterialSample>(validOperations, {
-        apiBaseUrl: "/collection-api"
-      });
-
-      await onSaved(savedSamples);
-    } catch (error: unknown) {
-      // When there is an error from the bulk save-all operation, put it into the correct form:
-      if (error instanceof DoOperationsError) {
-        for (const opError of error.individualErrors) {
-          const formik = sampleHooks[opError.index].formRef.current;
-          if (formik) {
-            formik.setStatus(opError.errorMessage);
-            formik.setErrors(opError.fieldErrors);
-          }
-        }
-      }
-      setError(error);
-      throw new Error(
-        `Bulk submission error: Check the tabs with a red label.`
-      );
-    }
-  }
+  const { saveAll } = useBulkSampleSave({
+    onSaved,
+    samplePreProcessor: sampleBulkOverrider,
+    bulkEditCtx: { sampleHooks, bulkEditFormRef }
+  });
 
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="justify-content-end">
+        <ButtonBar className="justify-content-end gap-4">
           {onPreviousClick && (
             <FormikButton
-              className="btn btn-primary previous-button"
+              className="btn btn-outline-secondary previous-button"
               onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "10rem" } })}
+              buttonProps={() => ({ style: { width: "13rem" } })}
             >
-              <DinaMessage id="previous" />
+              <DinaMessage id="goToThePreviousStep" />
             </FormikButton>
           )}
           <FormikButton
@@ -143,18 +97,169 @@ export function MaterialSampleBulkEditor({
           </FormikButton>
         </ButtonBar>
       </DinaForm>
-      <MaterialSampleBulkNavigator
-        samples={sampleHooks}
-        renderOneSample={(_sample, index) => (
-          <MaterialSampleForm
-            disableSampleNameField={disableSampleNameField}
-            materialSampleFormRef={sampleHooks[index].formRef}
-            materialSampleSaveHook={sampleHooks[index].saveHook}
-            buttonBar={() => null}
-            disableAutoNamePrefix={true}
-          />
-        )}
-      />
+      {selectedTab && (
+        <MaterialSampleBulkNavigator
+          selectedTab={selectedTab}
+          onSelectTab={setSelectedTab}
+          samples={sampleHooks}
+          extraTabs={[bulkEditTab]}
+          renderOneSample={({ index, isSelected }) => (
+            <MaterialSampleForm
+              hideUseSequence={true}
+              disableSampleNameField={disableSampleNameField}
+              materialSampleFormRef={form => {
+                const isLastRefSetter =
+                  sampleHooks.filter(it => !it.formRef.current).length === 1;
+                sampleHooks[index].formRef.current = form;
+                if (isLastRefSetter && form) {
+                  setInitialized(true);
+                }
+              }}
+              materialSampleSaveHook={sampleHooks[index].saveHook}
+              buttonBar={null}
+              disableAutoNamePrefix={true}
+              isOffScreen={!isSelected}
+              reduceRendering={!isSelected}
+            />
+          )}
+        />
+      )}
     </div>
   );
+}
+
+interface BulkSampleSaveParams {
+  onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
+  samplePreProcessor?: () => (
+    sample: InputResource<MaterialSample>
+  ) => Promise<InputResource<MaterialSample>>;
+  bulkEditCtx: BulkEditTabContextI;
+}
+
+function useBulkSampleSave({
+  onSaved,
+  samplePreProcessor,
+  bulkEditCtx
+}: BulkSampleSaveParams) {
+  // Force re-render when there is a bulk submission error:
+  const [_error, setError] = useState<unknown | null>(null);
+  const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
+
+  const { bulkEditFormRef, sampleHooks } = bulkEditCtx;
+
+  async function saveAll() {
+    setError(null);
+    bulkEditFormRef.current?.setStatus(null);
+    bulkEditFormRef.current?.setErrors({});
+    try {
+      // First clear all tab errors:
+      for (const { formRef } of sampleHooks) {
+        formRef.current?.setStatus(null);
+        formRef.current?.setErrors({});
+      }
+
+      const preProcessSample = samplePreProcessor?.();
+
+      const saveOperations: SaveArgs<MaterialSample>[] = [];
+      for (let index = 0; index < sampleHooks.length; index++) {
+        const { formRef, sample, saveHook } = sampleHooks[index];
+        const formik = formRef.current;
+
+        // These two errors shouldn't happen:
+        if (!formik) {
+          throw new Error(
+            `Missing Formik ref for sample ${sample.materialSampleName}`
+          );
+        }
+
+        // TODO get rid of these try/catches when we can save
+        // the Col Event + Acq event + material sample all at once.
+        try {
+          const saveOp = await saveHook.prepareSampleSaveOperation({
+            submittedValues: formik.values,
+            preProcessSample: async original => {
+              try {
+                return (await preProcessSample?.(original)) ?? original;
+              } catch (error: unknown) {
+                if (error instanceof DoOperationsError) {
+                  // Re-throw as Edit All tab error:
+                  throw new DoOperationsError(
+                    error.message,
+                    error.fieldErrors,
+                    error.individualErrors.map(opError => ({
+                      ...opError,
+                      index: "EDIT_ALL"
+                    }))
+                  );
+                }
+                throw error;
+              }
+            }
+          });
+          saveOperations.push(saveOp);
+        } catch (error: unknown) {
+          if (error instanceof DoOperationsError) {
+            // Rethrow the error with the tab's index:
+            throw new DoOperationsError(
+              error.message,
+              error.fieldErrors,
+              error.individualErrors.map(operationError => ({
+                ...operationError,
+                index:
+                  typeof operationError.index === "number"
+                    ? index
+                    : operationError.index
+              }))
+            );
+          }
+          throw error;
+        }
+      }
+
+      const savedSamples = await save<MaterialSample>(saveOperations, {
+        apiBaseUrl: "/collection-api"
+      });
+
+      await onSaved(savedSamples);
+    } catch (error: unknown) {
+      // When there is an error from the bulk save-all operation, put it into the correct form:
+      if (error instanceof DoOperationsError) {
+        for (const opError of error.individualErrors) {
+          const formik =
+            typeof opError.index === "number"
+              ? sampleHooks[opError.index].formRef.current
+              : bulkEditFormRef.current;
+
+          if (formik) {
+            formik.setStatus(opError.errorMessage);
+            formik.setErrors(opError.fieldErrors);
+          }
+        }
+        // Any errored field that was edited in the Edit All tab should
+        // get the red indicator in the Edit All tab.
+        const badBulkEditedFields = keys(
+          pickBy(
+            error.fieldErrors,
+            (_, fieldName) =>
+              getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
+                .hasBulkEditValue
+          )
+        );
+        bulkEditFormRef.current?.setErrors({
+          ...bulkEditFormRef.current?.errors,
+          ...pick(error.fieldErrors, badBulkEditedFields)
+        });
+        // Don't show the bulk edited fields' errors in the individual sample tabs
+        // because the user can't fix them there:
+        sampleHooks
+          .map(it => it.formRef?.current)
+          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+      }
+      setError(error);
+      throw new Error(formatMessage("bulkSubmissionErrorInfo"));
+    }
+  }
+
+  return { saveAll };
 }

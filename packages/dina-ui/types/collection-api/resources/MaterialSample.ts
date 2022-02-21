@@ -1,16 +1,16 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
-import { KitsuResource, KitsuResourceLink } from "kitsu";
-import { JsonValue } from "type-fest";
+import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
+import { BLANK_PREPARATION } from "../../../components/collection";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
+import { AcquisitionEvent } from "./AcquisitionEvent";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
 import { Determination } from "./Determination";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
-import { Project } from "./Project";
 import { PreparationType } from "./PreparationType";
+import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
-import { AcquisitionEvent } from "./AcquisitionEvent";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";
@@ -29,7 +29,6 @@ export interface MaterialSampleAttributes {
 
   managedAttributes?: ManagedAttributeValues;
 
-  determination?: Determination[];
   hierarchy?: HierarchyItem[];
 
   barcode?: string;
@@ -37,8 +36,13 @@ export interface MaterialSampleAttributes {
   materialSampleState?: string;
   materialSampleRemarks?: string;
 
-  organism?: Organism | null;
-  publiclyReleasable?: boolean;
+  organism?: (Organism | null | undefined)[] | null;
+
+  // Client-side only fields for the organism section:
+  organismsQuantity?: number;
+  organismsIndividualEntry?: boolean;
+
+  publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
   materialSampleChildren?: Partial<MaterialSample>[];
   tags?: string[];
@@ -51,6 +55,8 @@ export interface MaterialSampleAttributes {
 
   stateChangedOn?: string;
   stateChangeRemarks?: string;
+
+  useNextSequence?: boolean;
 }
 
 export interface HostOrganism {
@@ -84,6 +90,15 @@ export interface MaterialSampleRelationships {
   storageUnit?: StorageUnit;
   projects?: Project[];
   acquisitionEvent?: AcquisitionEvent;
+}
+
+export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
+  return {
+    ...BLANK_PREPARATION,
+    associations: [],
+    hostOrganism: null,
+    organism: []
+  };
 }
 
 export type MaterialSample = KitsuResource &

@@ -1,8 +1,11 @@
 import { DefaultTd, FieldHeader } from "common-ui";
-import { toPairs } from "lodash";
+import { isArray, toPairs } from "lodash";
 import { ComponentType } from "react";
 import ReactTable, { CellInfo, TableCellRenderer } from "react-table";
+import { ReadOnlyValue } from "../formik-connected/FieldView";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { ErrorBoundary } from "react-error-boundary";
+import classNames from "classnames";
 
 export interface KeyValueTableProps {
   /** The object whose keys and values are to be shown. */
@@ -15,6 +18,7 @@ export interface KeyValueTableProps {
   valueHeader?: JSX.Element;
 
   attributeCell?: TableCellRenderer;
+  tableClassName?: string;
 }
 
 /** Table that shows an object's keys in the left column and values in the right column. */
@@ -27,7 +31,8 @@ export function KeyValueTable({
       <FieldHeader name={field} />
     </strong>
   ),
-  valueHeader = <CommonMessage id="valueLabel" />
+  valueHeader = <CommonMessage id="valueLabel" />,
+  tableClassName
 }: KeyValueTableProps) {
   const pairs = toPairs(data);
   const entries = pairs.map(([field, value]) => ({
@@ -37,7 +42,7 @@ export function KeyValueTable({
 
   return (
     <ReactTable
-      className="-striped"
+      className={classNames("-striped", tableClassName)}
       columns={[
         // Render the intl name of the field, or by default a title-case field:
         {
@@ -52,11 +57,23 @@ export function KeyValueTable({
           Cell: props => {
             const CustomCell = customValueCells?.[props.original.field];
             if (CustomCell) {
-              return <CustomCell {...props} />;
+              return (
+                <ErrorBoundary
+                  // The error boundary is just for render errors
+                  // so an error thrown in a cell's render function kills just that cell,
+                  // not the whole page.
+                  FallbackComponent={({ error: renderError }) => (
+                    <div className="alert alert-danger" role="alert">
+                      <pre className="mb-0">{renderError.message}</pre>
+                    </div>
+                  )}
+                >
+                  <CustomCell {...props} />
+                </ErrorBoundary>
+              );
             }
-            return typeof props.value === "object"
-              ? JSON.stringify(props.value)
-              : props.value;
+
+            return <ReadOnlyValue value={props.value} />;
           },
           Header: valueHeader,
           accessor: "value",

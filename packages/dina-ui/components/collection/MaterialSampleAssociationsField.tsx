@@ -9,7 +9,11 @@ import {
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import React, { useRef, useState } from "react";
-import { VocabularyReadOnlyView, VocabularySelectField } from "..";
+import {
+  BulkEditTabWarning,
+  VocabularyReadOnlyView,
+  VocabularySelectField
+} from "..";
 import {
   MaterialSample,
   MaterialSampleAssociation
@@ -34,8 +38,21 @@ export function MaterialSampleAssociationsField({
       typeName={formatMessage("association")}
       makeNewElement={() => ({})}
       name={fieldName}
-      sectionId="associations-section"
+      sectionId="associations-tabs"
       className={classNames(className, "non-strip")}
+      // Wrap in the bulk edit tab warning in case this is bulk edit mode:
+      wrapContent={content => (
+        <BulkEditTabWarning
+          targetType="material-sample"
+          fieldName={fieldName}
+          setDefaultValue={ctx =>
+            // Auto-create the first association:
+            ctx.bulkEditFormRef?.current?.setFieldValue(fieldName, [{}])
+          }
+        >
+          {content}
+        </BulkEditTabWarning>
+      )}
       renderTab={(assoc, index) => {
         const hasName = Boolean(
           (assoc.associationType || assoc.associatedSample)?.trim()
@@ -136,7 +153,7 @@ export function MaterialSampleLink({ id, disableLink = false }) {
       name
     ) : (
       <Link href={`/collection/material-sample/view?id=${id}`}>
-        <a target="_blank">{name}</a>
+        <a>{name}</a>
       </Link>
     );
   });

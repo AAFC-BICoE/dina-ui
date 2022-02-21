@@ -5,6 +5,7 @@ import {
   FieldSet,
   FormikButton,
   QueryTable,
+  stringArrayCell,
   TextField
 } from "common-ui";
 import { FormikContextType, FormikProps } from "formik";
@@ -36,6 +37,7 @@ export function CollectingEventLinker({
   const filterFormRef = useRef<FormikProps<any>>(null);
 
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
+    stringArrayCell("dwcOtherRecordNumbers"),
     "createdBy",
     {
       Cell: ({ original: { dwcVerbatimLocality } }) => (
@@ -51,7 +53,7 @@ export function CollectingEventLinker({
           <Link
             href={`/collection/collecting-event/view?id=${collectingEvent.id}`}
           >
-            <a target="_blank" className="flex-grow-1 my-auto">
+            <a className="flex-grow-1 my-auto">
               <DinaMessage id="viewDetails" />
             </a>
           </Link>
@@ -96,14 +98,12 @@ export function CollectingEventLinker({
   }
 
   /** Pressing enter on the search inputs should submit the filter form, not the outer Catalogued Object form. */
-  const nestedFormInputProps = {
-    onKeyDown(e) {
-      if (e.keyCode === 13) {
-        e.preventDefault();
-        filterFormRef.current?.submitForm();
-      }
+  function onKeyDown(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+      filterFormRef.current?.submitForm();
     }
-  };
+  }
 
   return (
     <div>
@@ -123,12 +123,18 @@ export function CollectingEventLinker({
               <TextField
                 name="createdBy"
                 className="col-md-3"
-                inputProps={nestedFormInputProps}
+                inputProps={{
+                  onKeyDown,
+                  className: "col-md-3 search-input"
+                }}
               />
               <TextField
                 name="location"
                 className="col-md-3"
-                inputProps={nestedFormInputProps}
+                inputProps={{
+                  onKeyDown,
+                  className: "col-md-3 search-input"
+                }}
               />
               {/* Commented out due to filtering issue (https://redmine.biodiversity.agr.gc.ca/issues/22300) */}
               {/* <DateField

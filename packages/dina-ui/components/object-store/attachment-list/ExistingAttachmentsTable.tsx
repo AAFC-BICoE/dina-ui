@@ -20,7 +20,6 @@ export interface ExistingAttachmentsTableProps {
   onDetachMetadataIds?: (metadataIds: string[]) => Promise<void>;
   onMetadatasEdited?: () => void | Promise<void>;
   detachTotalSelected?: boolean;
-  readOnly?: boolean;
 }
 export interface AttachmentsTableFormValues {
   /** Tracks which metadata IDs are selected. */
@@ -32,8 +31,7 @@ export function ExistingAttachmentsTable({
   attachmentPath,
   onDetachMetadataIds,
   onMetadatasEdited,
-  detachTotalSelected,
-  readOnly
+  detachTotalSelected
 }: ExistingAttachmentsTableProps) {
   const {
     CheckBoxField,
@@ -73,10 +71,7 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.originalFilename ? (
-          <a
-            href={`/object-store/object/view?id=${id}`}
-            target={readOnly ? "" : "_blank"}
-          >
+          <a href={`/object-store/object/view?id=${id}`}>
             {metadata?.originalFilename}
           </a>
         ) : null;
@@ -184,6 +179,7 @@ export function ExistingAttachmentsTable({
         reactTableProps={{ sortable: false }}
         defaultPageSize={10000}
         onSuccess={res => setAvailableMetadatas(res.data)}
+        ariaLabel="Existing attachments"
       />
     </DinaForm>
   );

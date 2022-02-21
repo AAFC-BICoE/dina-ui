@@ -153,16 +153,19 @@ export function GeoReferenceAssertionRow({
           </div>
         )}
         <Field name={commonRoot + "dwcGeoreferenceVerificationStatus"}>
-          {() => (
-            <CheckBoxField
-              name={commonRoot + "dwcGeoreferenceVerificationStatus"}
-              onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
-              disabled={readOnly}
-              customName="dwcGeoreferenceVerificationStatus"
-              type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
-              hideLabel={readOnly && !georeferenceDisabled ? true : false}
-            />
-          )}
+          {() =>
+            readOnly && !georeferenceDisabled ? (
+              <></>
+            ) : (
+              <CheckBoxField
+                name={commonRoot + "dwcGeoreferenceVerificationStatus"}
+                onCheckBoxClick={onGeoReferencingImpossibleCheckBoxClick}
+                disabled={readOnly}
+                customName="dwcGeoreferenceVerificationStatus"
+                type={readOnly && !georeferenceDisabled ? "hidden" : "checkbox"}
+              />
+            )
+          }
         </Field>
         <NumberField
           name={commonRoot + "dwcDecimalLatitude"}
@@ -250,7 +253,6 @@ export const ViewInMapButton = connect<{ assertionPath: string }>(
       <div className="mb-3">
         <a
           href={`/collection/collecting-event/map?mlat=${lat}&mlon=${lon}`}
-          target="_blank"
           className="btn btn-info"
         >
           <DinaMessage id="viewOnMap" />

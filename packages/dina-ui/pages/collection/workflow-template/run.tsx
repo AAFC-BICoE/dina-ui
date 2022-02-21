@@ -94,6 +94,7 @@ export function CreateMaterialSampleFromWorkflowForm({
 
   return (
     <MaterialSampleForm
+      enableStoredDefaultGroup={true}
       buttonBar={
         <ButtonBar className="d-flex">
           <BackButton
@@ -151,11 +152,23 @@ function useWorkflowMaterialSampleInitialValues(
 
     /* If no template entrry for determination or there is only one determination, make it primary
      * same as georeference assertion */
-    if (!materialSampleInitialValues.determination) {
-      materialSampleInitialValues.determination = [{ isPrimary: true }];
-    } else if (materialSampleInitialValues.determination.length === 1) {
-      materialSampleInitialValues.determination[0].isPrimary = true;
-    }
+    materialSampleInitialValues.organism =
+      materialSampleInitialValues.organism?.map(org => {
+        if (!org?.determination?.length) {
+          return {
+            ...org,
+            type: "organism",
+            determination: [{ isPrimary: true }]
+          };
+        } else if (org?.determination.length === 1) {
+          return {
+            ...org,
+            type: "organism",
+            determination: [{ ...org.determination[0], isPrimary: true }]
+          };
+        }
+        return org;
+      });
 
     const collectingEvent = getInitialValuesFromTemplateFields(
       "collecting-event",

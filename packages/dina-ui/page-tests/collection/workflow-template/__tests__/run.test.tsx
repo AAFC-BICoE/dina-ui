@@ -244,18 +244,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [],
-              organism: null,
               relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -340,18 +331,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [],
-              organism: null,
               relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -447,7 +429,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Only the material sample is saved, and it's linked to the existing Collecting Event ID from the template:
+    // Only the material sample is saved:
     expect(mockSave.mock.calls).toEqual([
       [
         [
@@ -468,19 +450,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              organism: null,
-              determination: [],
 
               relationships: {
-                attachment: {
-                  data: []
-                },
-                preparationAttachment: {
-                  data: []
-                },
-                projects: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -524,7 +497,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(true);
   });
 
-  it("Renders the Material Sample form with only the Determinations section enabled.", async () => {
+  it("Renders the Material Sample form with only the Organisms section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
       actionType: "ADD",
@@ -534,7 +507,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           allowNew: true,
           templateFields: {
             ...({
-              "determination[0].verbatimScientificName": {
+              "organism[0].determination[0].verbatimScientificName": {
                 enabled: true,
                 defaultValue: "test verbatim scientific name"
               }
@@ -547,17 +520,17 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // Only the Determination section should be enabled:
+    // Only the Organisms section should be enabled:
     expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
 
     // Renders the determination section:
     expect(
       wrapper
         .find(".determination-section .verbatimScientificName-field input")
-        .exists()
-    ).toEqual(true);
+        .prop("value")
+    ).toEqual("test verbatim scientific name");
   });
 
   it("Renders the Material Sample form with only the Associations section enabled.", async () => {
@@ -589,7 +562,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
 
-    // Renders the determination section:
+    // Renders the associations section:
     expect(
       wrapper.find(".association-type").find(CreatableSelect).exists()
     ).toEqual(true);
@@ -762,7 +735,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(false);
   });
 
-  it("Renders the Material Sample form with only the Storage section enabled.", async () => {
+  it("Renders the Material Sample form with only the Scheduled Action section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
       actionType: "ADD",
@@ -772,6 +745,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           allowNew: false,
           templateFields: {
             ...({
+              "scheduledAction.actionType": {
+                defaultValue: "default-action-type",
+                enabled: true
+              },
               "scheduledAction.remarks": {
                 defaultValue: "default-remarks",
                 enabled: true
@@ -804,5 +781,66 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         .find("#scheduled-actions-section .remarks-field textarea")
         .prop("value")
     ).toEqual("default-remarks");
+
+    // Add the first scheduled action with the default value:
+    wrapper
+      .find("#scheduled-actions-section button.add-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Add the second scheduled action with the default value:
+    wrapper
+      .find("#scheduled-actions-section button.add-new-button")
+      .simulate("click");
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper
+      .find("#scheduled-actions-section button.add-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // There should be 2 rows:
+    expect(
+      wrapper.find("#scheduled-actions-section .rt-tbody .rt-tr").length
+    ).toEqual(2);
+
+    // Submit the form:
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Submits the sample with the 2 scheduled actions:
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              // Singular scheduledAction field from the template should not be included.
+              // This should prove the bug fix for https://redmine.biodiversity.agr.gc.ca/issues/26308
+              scheduledAction: undefined,
+              // Both scheduledActions are made with the default values:
+              scheduledActions: [
+                {
+                  actionType: "default-action-type",
+                  remarks: "default-remarks"
+                },
+                {
+                  actionType: "default-action-type",
+                  remarks: "default-remarks"
+                }
+              ],
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
   });
 });

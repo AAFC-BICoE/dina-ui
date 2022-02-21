@@ -6,7 +6,7 @@ import {
   rsql,
   useDinaFormContext
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { KitsuResourceLink, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useState } from "react";
 import { Promisable } from "type-fest";
@@ -19,7 +19,7 @@ import {
 } from "./StorageUnitBreadCrumb";
 
 export interface StorageSearchSelectorProps {
-  onChange: (newValue: PersistedResource<StorageUnit>) => Promisable<void>;
+  onChange: (newValue: KitsuResourceLink) => Promisable<void>;
 }
 
 /** Table UI to search for and select a Storage Unit. */
@@ -33,9 +33,7 @@ export function StorageSearchSelector({
     {
       Cell: ({ original }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
-          <a target={!readOnly ? "_blank" : ""}>
-            {storageUnitDisplayName(original)}
-          </a>
+          <a>{storageUnitDisplayName(original)}</a>
         </Link>
       ),
       width: 400,
@@ -43,7 +41,11 @@ export function StorageSearchSelector({
     },
     {
       Cell: ({ original }) => (
-        <StorageUnitBreadCrumb storageUnit={original} readOnly={readOnly} />
+        <StorageUnitBreadCrumb
+          storageUnit={original}
+          // Do not repeat the unit name because it's in the "name" column:
+          hideThisUnit={true}
+        />
       ),
       accessor: "location",
       sortable: false
@@ -52,13 +54,15 @@ export function StorageSearchSelector({
       Cell: ({ original }) => (
         <FormikButton
           className="btn btn-primary select-storage"
-          onClick={async () => await onChange(original)}
+          onClick={async () =>
+            await onChange({ id: original.id, type: original.type })
+          }
         >
-          <DinaMessage id="assignToStorage" />
+          <DinaMessage id="select" />
         </FormikButton>
       ),
       width: 250,
-      accessor: "assignToStorage",
+      accessor: "select",
       sortable: false
     }
   ];

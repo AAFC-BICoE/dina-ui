@@ -2,6 +2,7 @@ import {
   AutoSuggestTextField,
   DateField,
   FieldSet,
+  FieldSpy,
   filterBy,
   ResourceSelectField,
   TextField,
@@ -9,7 +10,7 @@ import {
 } from "common-ui";
 import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField, PersonSelectField } from "../..";
+import { AttachmentsField, BulkEditTabWarning, PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
@@ -22,6 +23,7 @@ export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
   attachmentsConfig?: AllowAttachmentsConfig;
+  id?: string;
 }
 
 /**
@@ -54,7 +56,8 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  attachmentsConfig = { allowExisting: true, allowNew: true }
+  attachmentsConfig = { allowExisting: true, allowNew: true },
+  id = "preparations-section"
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
   const { initialValues } = useDinaFormContext();
@@ -68,16 +71,18 @@ export function PreparationField({
     };
   }
 
+  const attachmentsField = "preparationAttachment";
+
   return (
     <FieldSet
       className={className}
-      id="preparations-section"
+      id={id}
       legend={<DinaMessage id="preparations" />}
     >
       <div className="row">
         <div className="col-md-6">
-          <Field name={`${namePrefix}preparationType`}>
-            {({ form: { values } }) => (
+          <FieldSpy<string> fieldName="group">
+            {group => (
               <ResourceSelectField<PreparationType>
                 {...fieldProps("preparationType")}
                 model="collection-api/preparation-type"
@@ -85,17 +90,17 @@ export function PreparationField({
                 readOnlyLink="/collection/preparation-type/view?id="
                 className="preparation-type"
                 filter={input =>
-                  values.group
+                  group
                     ? {
                         ...filterBy(["name"])(input),
-                        group: { EQ: `${values.group}` }
+                        group: { EQ: `${group}` }
                       }
                     : { ...filterBy(["name"])(input) }
                 }
-                key={values.group}
+                key={group}
               />
             )}
-          </Field>
+          </FieldSpy>
           <AutoSuggestTextField<MaterialSample>
             {...fieldProps("preparationMethod")}
             query={(search, ctx) => ({
@@ -131,13 +136,22 @@ export function PreparationField({
       </div>
       <div>
         <AttachmentsField
-          {...fieldProps("preparationAttachment")}
+          {...fieldProps(attachmentsField)}
           title={<DinaMessage id="preparationProtocols" />}
           allowNewFieldName="attachmentsConfig.allowNew"
           allowExistingFieldName="attachmentsConfig.allowExisting"
           id="preparation-protocols-section"
           allowAttachmentsConfig={attachmentsConfig}
           attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
+          // Wrap in the bulk edit tab warning in case this is bulk edit mode:
+          wrapContent={content => (
+            <BulkEditTabWarning
+              targetType="material-sample"
+              fieldName={attachmentsField}
+            >
+              {content}
+            </BulkEditTabWarning>
+          )}
         />
       </div>
     </FieldSet>

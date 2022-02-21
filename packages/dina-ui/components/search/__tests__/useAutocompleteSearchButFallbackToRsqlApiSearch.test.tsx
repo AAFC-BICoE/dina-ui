@@ -98,14 +98,17 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
     wrapper.update();
 
     expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
-    expect(mockSearchApiGet).lastCalledWith("search-api/search/auto-complete", {
-      params: {
-        additionalField: "",
-        autoCompleteField: "data.attributes.displayName",
-        indexName: "dina_agent_index",
-        prefix: "test-query"
+    expect(mockSearchApiGet).lastCalledWith(
+      "search-api/search-ws/auto-complete",
+      {
+        params: {
+          additionalField: "",
+          autoCompleteField: "data.attributes.displayName",
+          indexName: "dina_agent_index",
+          prefix: "test-query"
+        }
       }
-    });
+    );
     expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
 
     expect(wrapper.find(".person-list li").length).toEqual(1);
@@ -129,7 +132,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
 
     expect(mockSearchApiGetWithEmptyResponse).toHaveBeenCalledTimes(1);
     expect(mockSearchApiGetWithEmptyResponse).lastCalledWith(
-      "search-api/search/auto-complete",
+      "search-api/search-ws/auto-complete",
       {
         params: {
           additionalField: "",

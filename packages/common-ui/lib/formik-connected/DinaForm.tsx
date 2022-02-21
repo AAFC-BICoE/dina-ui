@@ -8,9 +8,15 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useMemo
+} from "react";
 import { useIntl } from "react-intl";
-import { createContext, PropsWithChildren, useContext, useMemo } from "react";
-import { scrollToError } from "..";
+import { BulkEditTabContext, scrollToError } from "..";
 import { AccountContextI, useAccount } from "../account/AccountProvider";
 import { ApiClientI, useApiClient } from "../api-client/ApiClientContext";
 import { ErrorViewer } from "./ErrorViewer";
@@ -65,7 +71,6 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
 ) {
   const api = useApiClient();
   const account = useAccount();
-  const { formatMessage } = useIntl();
 
   const isNestedForm = !!useContext(DinaFormContext);
 
@@ -103,7 +108,23 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     [props.initialValues]
   );
 
-  return (
+  /**
+   * Disable the bulk edit tab context for nested forms.
+   * e.g. Don't show the has-bulk-edit-value indicators in the Material Sample
+   * form's nested Collecting Event form.
+   */
+  const withBulkEditCtx = useCallback<(content: JSX.Element) => JSX.Element>(
+    isNestedForm
+      ? content => (
+          <BulkEditTabContext.Provider value={null}>
+            {content}
+          </BulkEditTabContext.Provider>
+        )
+      : content => content,
+    [isNestedForm]
+  );
+
+  return withBulkEditCtx(
     <DinaFormContext.Provider
       value={{
         ...props,

@@ -111,8 +111,8 @@ async function mountForm(
   const catalogSwitch = () =>
     wrapper.find(".enable-catalogue-info").find(ReactSwitch);
   const storageSwitch = () => wrapper.find(".enable-storage").find(ReactSwitch);
-  const determinationSwitch = () =>
-    wrapper.find(".enable-determination").find(ReactSwitch);
+  const organismsSwitch = () =>
+    wrapper.find(".enable-organisms").find(ReactSwitch);
   const scheduledActionsSwitch = () =>
     wrapper.find(".enable-scheduled-actions").find(ReactSwitch);
   const acquisitionEventSwitch = () =>
@@ -149,8 +149,8 @@ async function mountForm(
     await toggleDataComponent(storageSwitch(), val);
   }
 
-  async function toggleDeterminations(val: boolean) {
-    await toggleDataComponent(determinationSwitch(), val);
+  async function toggleOrganisms(val: boolean) {
+    await toggleDataComponent(organismsSwitch(), val);
   }
 
   async function toggleScheduledActions(val: boolean) {
@@ -185,7 +185,7 @@ async function mountForm(
     toggleColEvent,
     togglePreparations,
     toggleStorage,
-    toggleDeterminations,
+    toggleOrganisms,
     toggleScheduledActions,
     toggleAcquisitionEvent,
     toggleAssociations,
@@ -193,7 +193,7 @@ async function mountForm(
     catalogSwitch,
     storageSwitch,
     scheduledActionsSwitch,
-    determinationSwitch,
+    organismsSwitch,
     acquisitionEventSwitch,
     associationsSwitch,
     fillOutRequiredFields,
@@ -387,14 +387,14 @@ describe("Workflow template edit page", () => {
     });
   });
 
-  it("Submits a new action-definition: Only set Determinations template fields.", async () => {
-    const { wrapper, toggleDeterminations, fillOutRequiredFields, submitForm } =
+  it("Submits a new action-definition: Only set Organism template fields.", async () => {
+    const { wrapper, toggleOrganisms, fillOutRequiredFields, submitForm } =
       await mountForm();
 
     await fillOutRequiredFields();
 
-    // Enable the component toggles:
-    await toggleDeterminations(true);
+    // Enable the organisms:
+    await toggleOrganisms(true);
 
     // Only allow new attachments:
     wrapper
@@ -417,7 +417,7 @@ describe("Workflow template edit page", () => {
         MATERIAL_SAMPLE: {
           allowNew: true,
           templateFields: {
-            "determination[0].verbatimScientificName": {
+            "organism[0].determination[0].verbatimScientificName": {
               defaultValue: "test scientific name",
               enabled: true
             }
@@ -921,12 +921,12 @@ describe("Workflow template edit page", () => {
       colEventSwitch,
       catalogSwitch,
       storageSwitch,
-      determinationSwitch,
+      organismsSwitch,
       scheduledActionsSwitch,
       toggleColEvent,
       togglePreparations,
       toggleStorage,
-      toggleDeterminations,
+      toggleOrganisms,
       toggleScheduledActions,
       submitForm
     } = await mountForm({
@@ -963,7 +963,7 @@ describe("Workflow template edit page", () => {
               } as StorageUnit
             },
             ...{
-              "determination[0].verbatimScientificName": {
+              "organism[0].determination[0].verbatimScientificName": {
                 defaultValue: "test scientific name",
                 enabled: true
               },
@@ -985,14 +985,14 @@ describe("Workflow template edit page", () => {
     expect(colEventSwitch().prop("checked")).toEqual(true);
     expect(catalogSwitch().prop("checked")).toEqual(true);
     expect(storageSwitch().prop("checked")).toEqual(true);
-    expect(determinationSwitch().prop("checked")).toEqual(true);
+    expect(organismsSwitch().prop("checked")).toEqual(true);
     expect(scheduledActionsSwitch().prop("checked")).toEqual(true);
 
     // Remove all data components:
     await toggleColEvent(false);
     await togglePreparations(false);
     await toggleStorage(false);
-    await toggleDeterminations(false);
+    await toggleOrganisms(false);
     await toggleScheduledActions(false);
 
     await submitForm();

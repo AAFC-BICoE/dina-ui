@@ -10,6 +10,7 @@ import moment from "moment";
 import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GlobalNamesSearchResult } from "./global-names-search-result-type";
+import { useState } from "react";
 
 export type Selection =
   | string
@@ -53,6 +54,7 @@ export function GlobalNamesSearchBox({
   dateSupplier = () => moment().format("YYYY-MM-DD") // Today
 }: GlobalNamesSearchBoxProps) {
   const { formatMessage } = useDinaIntl();
+  const [isVirusName, setIsVirusName] = useState(false);
 
   const {
     searchIsLoading,
@@ -64,7 +66,9 @@ export function GlobalNamesSearchBox({
   } = useThrottledFetch({
     fetcher: searchValue =>
       globalNamesQuery<GlobalNamesSearchResult[]>({
-        url: `https://verifier.globalnames.org/api/v1/verifications/${
+        url: `https://verifier.globalnames.org/api/${
+          isVirusName ? "v0" : "v1"
+        }/verifications/${
           searchValue[0].toUpperCase() + searchValue.substring(1)
         }`,
         params: {
@@ -74,7 +78,8 @@ export function GlobalNamesSearchBox({
         fetchJson
       }),
     timeoutMs: 1000,
-    initSearchValue
+    initSearchValue,
+    isVirusName
   });
 
   const onInputChange = value => {
@@ -85,6 +90,10 @@ export function GlobalNamesSearchBox({
       setValue?.(value);
       onChange?.(value, formik as any);
     }
+  };
+
+  const onVirusNameChange = value => {
+    setIsVirusName(value.checked);
   };
 
   return (
@@ -106,6 +115,20 @@ export function GlobalNamesSearchBox({
                 }}
                 value={inputValue}
               />
+              <label className="mx-2">
+                <strong>{formatMessage("virusNames")}</strong>
+                <input
+                  type="checkbox"
+                  className="global-name-virus-check"
+                  style={{
+                    display: "block",
+                    height: "20px",
+                    marginLeft: "15px",
+                    width: "20px"
+                  }}
+                  onChange={e => onVirusNameChange(e.target)}
+                />
+              </label>
               <button
                 style={{ width: "10rem" }}
                 onClick={doThrottledSearch}
@@ -190,12 +213,10 @@ export function GlobalNamesSearchBox({
       {!!searchResult && (
         <div className="list-group">
           {searchResult
-            .filter(result => result.matchType !== "NoMatch")
-            .map((result, idx) => {
+            ?.filter(result => result.matchType !== "NoMatch")
+            ?.map((result, idx) => {
               const link = document.createElement("a");
               link.setAttribute("href", result.bestResult?.outlink);
-              link.setAttribute("target", "_blank");
-              link.setAttribute("rel", "noopener");
 
               const paths = result.bestResult?.classificationPath.split("|");
               const ranks = result.bestResult?.classificationRanks.split("|");

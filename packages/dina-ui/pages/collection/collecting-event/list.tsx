@@ -1,4 +1,10 @@
-import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
+import {
+  ButtonBar,
+  CreateButton,
+  dateCell,
+  ListPageLayout,
+  stringArrayCell
+} from "common-ui";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -20,6 +26,7 @@ export default function CollectingEventListPage() {
       Header: <DinaMessage id="viewDetails" />,
       sortable: false
     },
+    stringArrayCell("dwcOtherRecordNumbers"),
     "createdBy",
     "startEventDateTime",
     "endEventDateTime",

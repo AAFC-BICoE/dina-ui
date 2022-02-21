@@ -37,11 +37,16 @@
   color: rgba(0, 0, 0, 0.8) !important;
 }
 
-.ReactTable .rt-tr-group:hover {
+.ReactTable:not(.no-hover-highlight) .rt-tr-group .rt-tr:hover {
   /* Highlights the hovered table row in green. */
   background-color: rgb(222, 252, 222) !important;
 }
 
 .ReactTable .-pagination .-center .select-wrap.-pageSizeOptions > select:focus {
   border-color: #66afe9;
+}
+
+.ReactTable .-odd .card {
+  /* Nested cards in an odd table row should have the same background color. */
+  background-color: inherit;
 }

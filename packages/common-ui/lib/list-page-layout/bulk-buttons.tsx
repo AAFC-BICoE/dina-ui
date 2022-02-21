@@ -13,7 +13,9 @@ import {
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
   // Disable the button if none are selected:
-  const disabled = !compact(Object.values(ctx.values.selectedResources)).length;
+  const disabled =
+    !ctx.values.selectedResources ||
+    !compact(Object.values(ctx.values.selectedResources)).length;
   return { disabled };
 }
 

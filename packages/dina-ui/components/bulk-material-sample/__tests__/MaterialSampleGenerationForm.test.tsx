@@ -1,7 +1,9 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 import Select from "react-select";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
+import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
@@ -31,6 +33,12 @@ const testCtx = {
 
 describe("MaterialSampleGenerationForm", () => {
   beforeEach(jest.clearAllMocks);
+
+  beforeEach(() => {
+    // Set the deault group selection:
+    writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
+    jest.clearAllMocks();
+  });
 
   it("Generates the initial values for the new samples in series mode.", async () => {
     const wrapper = mountWithAppContext(
@@ -93,6 +101,7 @@ describe("MaterialSampleGenerationForm", () => {
       samples: expectedNames.map(name => ({
         allowDuplicateName: false,
         collection: { id: "100", name: "test-collection", type: "collection" },
+        group: "aafc",
         materialSampleName: name,
         publiclyReleasable: true,
         type: "material-sample"
@@ -104,6 +113,7 @@ describe("MaterialSampleGenerationForm", () => {
           name: "test-collection",
           type: "collection"
         },
+        group: "aafc",
         increment: "NUMERICAL",
         numberToCreate: "5",
         samples: [],
@@ -175,6 +185,7 @@ describe("MaterialSampleGenerationForm", () => {
       samples: expectedNames.map(name => ({
         allowDuplicateName: true,
         collection: { id: "100", name: "test-collection", type: "collection" },
+        group: "aafc",
         materialSampleName: name,
         publiclyReleasable: true,
         type: "material-sample"
@@ -186,6 +197,7 @@ describe("MaterialSampleGenerationForm", () => {
           name: "test-collection",
           type: "collection"
         },
+        group: "aafc",
         increment: "NUMERICAL",
         numberToCreate: "5",
         samples: [],
@@ -271,6 +283,7 @@ describe("MaterialSampleGenerationForm", () => {
           name: "test-collection",
           type: "collection"
         },
+        group: "aafc",
         increment: "LETTER",
         numberToCreate: "5",
         samples: [],
@@ -284,6 +297,7 @@ describe("MaterialSampleGenerationForm", () => {
           id: "test-collection-id",
           type: "collection"
         }),
+        group: "aafc",
         parentMaterialSample: { id: "test-parent-id", type: "material-sample" },
         publiclyReleasable: true,
         materialSampleName: name,

@@ -19,42 +19,32 @@ const mockGet = jest.fn(async path => {
       return { data: TEST_LICENSES };
     case "objectstore-api/license/open-government-license-canada":
       return { data: TEST_LICENSES[0] };
+    case "agent-api/person":
+    case "objectstore-api/metadata":
+    case "objectstore-api/object-subtype":
+      return { data: [] };
   }
 });
 
-const mockBulkGet = jest.fn(async paths => {
-  if (!paths.length) {
-    return [];
-  }
-  if ((paths[0] as string).startsWith("/metadata/")) {
-    return TEST_METADATA;
-  }
-  if ((paths[0] as string).startsWith("/managed-attribute/")) {
-    return paths.map(() => ({
-      id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
-      name: "test-managed-attribute",
-      managedAttributeType: "STRING"
-    }));
-  }
-  if ((paths[0] as string).startsWith("/object-upload/")) {
-    return paths.map(() => ({
-      id: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
-      dateTimeDigitized: "2020-12-17T23:37:45.932Z",
-      originalFilename: "test-file.png"
-    }));
-  }
-  if (
-    (paths[0] as string).startsWith(
-      "person/6e80e42a-bcf6-4062-9db3-946e0f26458f"
-    )
-  ) {
-    return paths.map(() => ({
-      id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
-      type: "person",
-      displayName: "Mat Poff"
-    }));
-  }
-});
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map(path => {
+    switch (path) {
+      case "person/6e80e42a-bcf6-4062-9db3-946e0f26458f":
+        return {
+          id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
+          type: "person",
+          displayName: "Mat Poff"
+        };
+      case "managed-attribute/test_managed_attribute":
+        return {
+          id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
+          name: "test-managed-attribute",
+          key: "test_managed_attribute",
+          managedAttributeType: "STRING"
+        };
+    }
+  })
+);
 
 const TEST_LICENSES: PersistedResource<License>[] = [
   {
@@ -87,7 +77,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   id: "25f81de5-bbee-430c-b5fa-71986b70e612",
   type: "metadata",
   managedAttributeValues: {
-    "test-managed-attribute": "test-managed-attribute-value"
+    test_managed_attribute: "test-managed-attribute-value"
   }
 };
 
@@ -144,7 +134,7 @@ describe("Metadata single record edit page.", () => {
       { label: "tag3", value: "tag3" }
     ]);
     expect(
-      wrapper.find(".managed-attributes-editor input").last().prop("value")
+      wrapper.find(".test_managed_attribute-field input").prop("value")
     ).toEqual("test-managed-attribute-value");
 
     // Set new values:
@@ -187,7 +177,7 @@ describe("Metadata single record edit page.", () => {
             fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",
             managedAttributeValues: {
-              "test-managed-attribute": "new-managed-attribute-value"
+              test_managed_attribute: "new-managed-attribute-value"
             },
             originalFilename: "test-file.png",
             type: "metadata",

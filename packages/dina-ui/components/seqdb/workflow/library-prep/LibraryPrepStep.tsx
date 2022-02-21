@@ -86,14 +86,14 @@ export function LibraryPrepStep(props: StepRendererProps) {
           <Link
             href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=table`}
           >
-            <a className="list-inline-item btn btn-primary" target="_blank">
+            <a className="list-inline-item btn btn-primary">
               Library Prep Worksheet With Table
             </a>
           </Link>
           <Link
             href={`/seqdb/workflow/library-prep-worksheet?stepResourceId=${stepResource.id}&sampleLayout=grid`}
           >
-            <a className="list-inline-item btn btn-primary" target="_blank">
+            <a className="list-inline-item btn btn-primary">
               Library Prep Worksheet With Grid
             </a>
           </Link>

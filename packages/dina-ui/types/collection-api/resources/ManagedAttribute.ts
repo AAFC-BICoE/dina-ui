@@ -3,7 +3,7 @@ import { MultilingualDescription } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export interface ManagedAttributeAttributes<TComponent = string> {
-  type: string;
+  type: "managed-attribute";
   name: string;
   managedAttributeType: string;
   managedAttributeComponent: TComponent;
@@ -18,7 +18,8 @@ export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
 
 export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",
-  "MATERIAL_SAMPLE"
+  "MATERIAL_SAMPLE",
+  "DETERMINATION"
 ] as const;
 export type CollectionModuleType = typeof COLLECTION_MODULE_TYPES[number];
 export const COLLECTION_MODULE_TYPE_LABELS: Record<
@@ -26,7 +27,8 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   string
 > = {
   COLLECTING_EVENT: "collectingEvent",
-  MATERIAL_SAMPLE: "materialSample"
+  MATERIAL_SAMPLE: "materialSample",
+  DETERMINATION: "determination"
 };
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {

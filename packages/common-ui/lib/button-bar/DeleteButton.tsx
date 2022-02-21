@@ -12,6 +12,9 @@ interface DeleteButtonProps {
   /** Additional button classes. */
   className?: string;
 
+  /** Replaces all classNames */
+  replaceClassName?: string;
+
   disabled?: boolean;
 
   /** The resource ID. */
@@ -23,6 +26,8 @@ interface DeleteButtonProps {
   /** URL to redirect to after deleting. */
   postDeleteRedirect?: string;
 
+  onDeleted?: () => void;
+
   options?: DoOperationsOptions;
 
   withLeadingSlash?: boolean;
@@ -32,13 +37,15 @@ interface DeleteButtonProps {
 
 export function DeleteButton({
   className,
+  replaceClassName,
   disabled,
   id,
   options,
   postDeleteRedirect,
   type,
   withLeadingSlash,
-  reload
+  reload,
+  onDeleted
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
@@ -54,6 +61,8 @@ export function DeleteButton({
       ],
       options
     );
+
+    onDeleted?.();
 
     // Force reload the postredirect page after deletion
     if (reload) {
@@ -71,7 +80,10 @@ export function DeleteButton({
 
   return (
     <button
-      className={`btn btn-danger delete-button ${className}`}
+      className={
+        replaceClassName ?? `btn btn-danger delete-button ${className}`
+      }
+      style={{ width: "6rem" }}
       disabled={disabled}
       onClick={() =>
         openModal(

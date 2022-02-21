@@ -10,6 +10,7 @@ export interface StorageUnitAttributes {
   createdBy?: string;
   storageUnitChildren?: StorageUnit[];
   uuid?: string;
+  isMultiple?: boolean | null;
 }
 
 export interface HierarchyItem {

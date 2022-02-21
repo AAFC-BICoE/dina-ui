@@ -30,9 +30,7 @@ export function IdentifierRow({ index, typeOptions }: IdentifierRowProps) {
             if (url.protocol === "http:" || url.protocol === "https:") {
               return (
                 <Fragment key={value}>
-                  <a target="_blank" href={value} rel="noopener noreferrer">
-                    {value}
-                  </a>
+                  <a href={value}>{value}</a>
                 </Fragment>
               );
             }

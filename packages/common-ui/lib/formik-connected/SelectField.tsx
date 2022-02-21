@@ -2,14 +2,14 @@ import { FormikContextType } from "formik";
 import { isArray } from "lodash";
 import { ComponentProps, RefObject } from "react";
 import Select, { StylesConfig } from "react-select";
-import { FieldWrapper, LabelWrapperParams } from "./FieldWrapper";
+import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 
 export interface SelectOption<T> {
   label: string;
   value: T;
 }
 
-export interface SelectFieldProps<T = string> extends LabelWrapperParams {
+export interface SelectFieldProps<T = string> extends FieldWrapperProps {
   disabled?: boolean;
 
   /** Whether this is a multi-select dropdown. */
@@ -44,7 +44,7 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
 
   return (
     <FieldWrapper {...labelWrapperProps}>
-      {({ setValue, value, formik, invalid }) => {
+      {({ setValue, value, formik, invalid, placeholder }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
         ) {
@@ -94,8 +94,10 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
               value={selectedOption}
               styles={customStyle}
               isLoading={isLoading}
+              classNamePrefix="react-select"
               ref={forwardedRef as any}
               {...selectProps}
+              placeholder={placeholder ?? selectProps?.placeholder}
             />
           </div>
         );

@@ -15,7 +15,7 @@ export default function CollectingEventDetailsPage() {
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
             <QueryTable
               path="collection-api/material-sample"
-              columns={getColumnDefinition({ openLinkInNewTab: false })}
+              columns={getColumnDefinition()}
               filter={{
                 rsql: `collectingEvent.uuid==${props.initialValues.id}`
               }}
@@ -23,7 +23,6 @@ export default function CollectingEventDetailsPage() {
           </FieldSet>
         </DinaForm>
       )}
-      query={id => ({ path: `collection-api/collecting-event/${id}` })}
       customQueryHook={id => useCollectingEventQuery(id)}
       nameField="id"
       entityLink="/collection/collecting-event"

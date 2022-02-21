@@ -19,7 +19,7 @@ import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
-import { CollectionSelectField } from "..";
+import { CollectionSelectField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useLastUsedCollection } from "../collection";
@@ -53,22 +53,29 @@ export function MaterialSampleGenerationForm({
   }) => {
     const samples = [...Array(Number(submittedValues.numberToCreate))].map<
       InputResource<MaterialSample>
-    >((_, index) => ({
-      type: "material-sample",
-      parentMaterialSample: parentId
-        ? { id: parentId, type: "material-sample" }
-        : undefined,
-      materialSampleName: generateName({
-        generationMode,
-        index,
-        formState: submittedValues
-      }),
-      collection: submittedValues.collection,
-      publiclyReleasable: true,
-      // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
-      allowDuplicateName: generationMode === "BATCH",
-      ...submittedValues.samples[index]
-    }));
+    >((_, index) => {
+      const sample = submittedValues.samples[index];
+
+      return {
+        type: "material-sample",
+        parentMaterialSample: parentId
+          ? { id: parentId, type: "material-sample" }
+          : undefined,
+        group: submittedValues.group,
+        collection: submittedValues.collection,
+        publiclyReleasable: true,
+        // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
+        allowDuplicateName: generationMode === "BATCH",
+        ...sample,
+        materialSampleName:
+          sample?.materialSampleName?.trim?.() ||
+          generateName({
+            generationMode,
+            index,
+            formState: submittedValues
+          })
+      };
+    });
 
     onGenerate({ samples, submittedValues, generationMode });
   };
@@ -89,10 +96,10 @@ export function MaterialSampleGenerationForm({
   }
 
   return (
-    <DinaForm<GeneratorFormValues>
+    <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
         initialValues || {
-          numberToCreate: 0,
+          numberToCreate: 1,
           samples: [],
           increment: "NUMERICAL",
           suffix: "",
@@ -113,10 +120,17 @@ export function MaterialSampleGenerationForm({
           <h2>
             <DinaMessage id="splitFrom" />:{" "}
             <Link href={`/collection/material-sample/view?id=${ms.id}`}>
-              <a target="_blank">{ms.materialSampleName}</a>
+              <a>{ms.materialSampleName}</a>
             </Link>
           </h2>
         ))}
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          className="col-sm-6"
+          enableStoredDefaultGroup={true}
+        />
+      </div>
       <div style={{ width: "25rem" }}>
         <NumberSpinnerField
           name="numberToCreate"
@@ -342,9 +356,14 @@ function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
 }
 
 const generatorFormSchema = yup.object({
+  group: yup.string().required(),
   collection: yup.mixed().required(),
   numberToCreate: yup.number().required(),
-  samples: yup.array(yup.object()).required(),
+  samples: yup
+    .array(
+      yup.object({ materialSampleName: yup.string().nullable() }).nullable()
+    )
+    .required(),
   baseName: yup.string(),
   separator: yup.string(),
   // Batch mode:

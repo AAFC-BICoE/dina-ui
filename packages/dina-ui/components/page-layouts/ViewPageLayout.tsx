@@ -18,30 +18,44 @@ import { HasDinaMetaInfo } from "../../types/DinaJsonMetaInfo";
 import Link from "next/link";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
-export interface ViewPageLayoutProps<T extends KitsuResource> {
-  query: (id: string) => JsonApiQuerySpec;
-  /** Override useQuery call with a custom hook call. */
-  customQueryHook?: (id: string) => QueryState<T, unknown>;
-  queryOptions?: QueryOptions<T, unknown>;
-  form: (formProps: ResourceFormProps<T>) => ReactNode;
-  entityLink: string;
-  type: string;
-  apiBaseUrl: string;
+/** This Component requires either the "query" or "customQueryHook" prop. */
+type ViewPageLayoutPropsBase<T extends KitsuResource> =
+  | {
+      /** The JSONAPI query. */
+      query: (id: string) => JsonApiQuerySpec;
+      customQueryHook?: never;
+    }
+  | {
+      query?: never;
+      /** Custom query hook which may have more complicated logic than the usual useQuery hook. */
+      customQueryHook: (id: string) => QueryState<T, unknown>;
+    };
 
-  /** The field on the resource to use as the page title. */
-  nameField?: string | string[];
+export type ViewPageLayoutProps<T extends KitsuResource> =
+  ViewPageLayoutPropsBase<T> & {
+    queryOptions?: QueryOptions<T, unknown>;
+    form: (formProps: ResourceFormProps<T>) => ReactNode;
+    entityLink: string;
+    type: string;
+    apiBaseUrl: string;
 
-  /** main tag class, defaults to "container" */
-  mainClass?: string;
+    /** The field on the resource to use as the page title. */
+    nameField?:
+      | string
+      | string[]
+      | ((resource: PersistedResource<T>) => string);
 
-  isRestricted?: boolean;
+    /** main tag class, defaults to "container" */
+    mainClass?: string;
 
-  // Override page elements:
-  editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
-  deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
-  /** Show the link to the "revisions" page if there is one. */
-  showRevisionsLink?: boolean;
-}
+    isRestricted?: boolean;
+
+    // Override page elements:
+    editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
+    deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
+    /** Show the link to the "revisions" page if there is one. */
+    showRevisionsLink?: boolean;
+  };
 
 export interface ResourceFormProps<T extends KitsuResource> {
   initialValues: PersistedResource<T>;
@@ -67,20 +81,22 @@ export function ViewPageLayout<T extends KitsuResource>({
   const router = useRouter();
   const id = String(router.query.id);
 
-  const resourceQuery: QueryState<T & HasDinaMetaInfo, unknown> =
-    customQueryHook?.(id) ??
-    useQuery(
-      { ...query(id), header: { "include-dina-permission": "true" } },
-      { disabled: !id, ...queryOptions }
-    );
+  const resourceQuery = (customQueryHook?.(id) ??
+    (query &&
+      useQuery(
+        { ...query(id), header: { "include-dina-permission": "true" } },
+        { disabled: !id, ...queryOptions }
+      ))) as QueryState<T & HasDinaMetaInfo, unknown>;
 
   return (
     <div>
       <Nav />
       <main className={mainClass}>
         {withResponse(resourceQuery, ({ data }) => {
+          const resource = data as PersistedResource<T>;
+
           const formProps = {
-            initialValues: data as PersistedResource<T>,
+            initialValues: resource,
             readOnly: true
           };
 
@@ -93,14 +109,18 @@ export function ViewPageLayout<T extends KitsuResource>({
 
           const nameFields = castArray(nameField);
           const title = [...nameFields, "id"].reduce(
-            (lastValue, currentField) => lastValue || get(data, currentField),
+            (lastValue, currentField) =>
+              lastValue ||
+              (typeof currentField === "function"
+                ? currentField(resource)
+                : get(data, currentField)),
             ""
           );
 
           return (
             <>
               <Head title={title} />
-              <ButtonBar>
+              <ButtonBar className="gap-2">
                 <BackButton
                   entityId={id}
                   className="me-auto"
@@ -119,9 +139,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                   </Link>
                 )}
                 {canDelete &&
-                  (deleteButton?.(formProps) ?? (
+                  (deleteButton ? (
+                    deleteButton(formProps)
+                  ) : (
                     <DeleteButton
-                      className="ms-5"
                       id={id}
                       options={{ apiBaseUrl }}
                       postDeleteRedirect={`${entityLink}/list`}

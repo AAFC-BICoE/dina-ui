@@ -1,4 +1,5 @@
 import { Person } from "../../agent-api/resources/Person";
+import { ManagedAttributeValues } from "../../objectstore-api";
 
 export interface Determination {
   verbatimScientificName?: string;
@@ -16,6 +17,7 @@ export interface Determination {
   scientificNameDetails?: ScientificNameSourceDetails;
   isFileAs?: boolean;
   determinationRemarks?: string;
+  managedAttributes?: ManagedAttributeValues;
 }
 
 export type ScientificNameSourceDetails = {

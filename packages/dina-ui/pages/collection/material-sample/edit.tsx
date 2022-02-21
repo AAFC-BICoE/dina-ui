@@ -2,11 +2,13 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CheckBoxField,
   DateField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -14,17 +16,16 @@ import {
   SubmitButton,
   TextField,
   useDinaFormContext,
-  useFieldLabels,
   withResponse
 } from "common-ui";
+import { FormikProps, useField } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { padStart } from "lodash";
+import { mapValues, padStart } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, useContext, useRef, useState, Ref } from "react";
-import { FormikProps } from "formik";
-import * as yup from "yup";
+import { ReactNode, Ref, useContext, useState } from "react";
 import {
   AttachmentsField,
+  BulkEditTabWarning,
   CollectionSelectField,
   Footer,
   GroupSelectField,
@@ -33,22 +34,22 @@ import {
   MaterialSampleFormNav,
   MaterialSampleStateReadOnlyRender,
   Nav,
+  OrganismsField,
+  ProjectSelectSection,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  ProjectSelectSection
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventLinker,
-  DeterminationField,
   ScheduledActionsField,
   SetDefaultSampleName,
   TabbedResourceLinker,
+  useCollectingEventQuery,
   useMaterialSampleQuery,
   useMaterialSampleSave
 } from "../../../components/collection";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
-import { OrganismStateField } from "../../../components/collection/material-sample/OrganismStateField";
 import { PreparationField } from "../../../components/collection/material-sample/PreparationField";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { AllowAttachmentsConfig } from "../../../components/object-store";
@@ -61,7 +62,10 @@ import {
   MaterialSampleType,
   Vocabulary
 } from "../../../types/collection-api";
-import { AcquisitionEventFormLayout } from "../acquisition-event/edit";
+import {
+  AcquisitionEventFormLayout,
+  useAcquisitionEvent
+} from "../acquisition-event/edit";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -92,7 +96,8 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
-  const sampleFormProps = {
+  const sampleFormProps: Partial<MaterialSampleFormProps> = {
+    enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
         <BackButton
@@ -201,6 +206,23 @@ export interface MaterialSampleFormProps {
   disableSampleNameField?: boolean;
 
   materialSampleFormRef?: Ref<FormikProps<InputResource<MaterialSample>>>;
+
+  /** Disables the "Are You Sure" prompt in the nav when removing a data component. */
+  disableNavRemovePrompt?: boolean;
+
+  /**
+   * Removes the html tag IDs from hidden tabs.
+   * This needs to be done for off-screen forms in the bulk editor.
+   */
+  isOffScreen?: boolean;
+
+  /** Reduces the rendering to improve performance when bulk editing many material samples. */
+  reduceRendering?: boolean;
+
+  /** Hide the use next identifer checkbox, e.g when create multiple new samples */
+  hideUseSequence?: boolean;
+  /** Sets a default group from local storage when the group is not already set. */
+  enableStoredDefaultGroup?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -214,6 +236,11 @@ export function MaterialSampleForm({
   disableAutoNamePrefix,
   materialSampleFormRef,
   disableSampleNameField,
+  disableNavRemovePrompt,
+  isOffScreen,
+  reduceRendering,
+  hideUseSequence,
+  enableStoredDefaultGroup,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -232,8 +259,6 @@ export function MaterialSampleForm({
     dataComponentState,
     colEventId,
     setColEventId,
-    colEventQuery,
-    acqEventQuery,
     acqEventId,
     setAcqEventId,
     onSubmit,
@@ -247,7 +272,8 @@ export function MaterialSampleForm({
       acquisitionEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields
+      enabledFields,
+      reduceRendering
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -259,134 +285,213 @@ export function MaterialSampleForm({
     enabledFields?.acquisitionEvent.includes("id")
   );
 
+  const attachmentsField = "attachment";
+
+  /** Set IDs to blank when this component is off-screen. */
+  const navIds = mapValues(
+    {
+      identifiers: "identifiers-section",
+      colEvent: "collecting-event-section",
+      acqEvent: "acquisition-event-section",
+      preparation: "preparations-section",
+      organism: "organisms-section",
+      associations: "associations-section",
+      storage: "storage-section",
+      ScheduledActions: "scheduled-actions-section",
+      managedAttributes: "managedAttributes-section",
+      attachments: "material-sample-attachments-section"
+    },
+    id => (isOffScreen ? "" : id)
+  );
+
   const mateirialSampleInternal = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem" }}>
-        <MaterialSampleFormNav dataComponentState={dataComponentState} />
-      </div>
-      <div className="flex-grow-1 container-fluid">
-        {!isTemplate && materialSample && (
-          <MaterialSampleBreadCrumb
-            disableLastLink={true}
-            materialSample={materialSample as any}
+        {(!isOffScreen || !reduceRendering) && (
+          <MaterialSampleFormNav
+            dataComponentState={dataComponentState}
+            disableRemovePrompt={disableNavRemovePrompt}
           />
         )}
-        {!isTemplate && <MaterialSampleInfoFormLayout />}
-        <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-        <ProjectSelectSection resourcePath="collection-api/project" />
-        <MaterialSampleIdentifiersFormLayout
-          disableSampleNameField={disableSampleNameField}
-        />
-        <MaterialSampleFormLayout />
+      </div>
+      <div className="flex-grow-1 container-fluid">
+        {!reduceRendering && (
+          <>
+            {!isTemplate && materialSample && (
+              <MaterialSampleBreadCrumb
+                disableLastLink={true}
+                materialSample={materialSample as any}
+              />
+            )}
+            {!isTemplate && (
+              <div className="row">
+                <div className="col-md-6">
+                  <GroupSelectField
+                    name="group"
+                    enableStoredDefaultGroup={enableStoredDefaultGroup}
+                  />
+                </div>
+              </div>
+            )}
+            <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+            <ProjectSelectSection
+              classNames="mt-3"
+              resourcePath="collection-api/project"
+            />
+          </>
+        )}
         <div className="data-components">
+          {!reduceRendering && (
+            <>
+              <MaterialSampleIdentifiersFormLayout
+                id={navIds.identifiers}
+                disableSampleNameField={disableSampleNameField}
+                hideUseSequence={hideUseSequence}
+              />
+              <MaterialSampleFormLayout />
+            </>
+          )}
           {dataComponentState.enableCollectingEvent && (
-            <FieldSet
-              id="collecting-event-section"
+            <TabbedResourceLinker<CollectingEvent>
+              fieldSetId={navIds.colEvent}
               legend={<DinaMessage id="collectingEvent" />}
-            >
-              <TabbedResourceLinker<CollectingEvent>
-                briefDetails={colEvent => (
-                  <CollectingEventBriefDetails collectingEvent={colEvent} />
-                )}
-                linkerTabContent={
+              briefDetails={colEvent => (
+                <CollectingEventBriefDetails collectingEvent={colEvent} />
+              )}
+              linkerTabContent={
+                reduceRendering ? null : (
                   <CollectingEventLinker
                     onCollectingEventSelect={colEventToLink => {
                       setColEventId(colEventToLink.id);
                     }}
                   />
-                }
-                nestedForm={nestedCollectingEventForm}
-                resourceQuery={colEventQuery}
-                setResourceId={setColEventId}
-                disableLinkerTab={templateAttachesCollectingEvent}
-                readOnlyLink="/collection/collecting-event/view?id="
-                resourceId={colEventId}
-              />
-            </FieldSet>
+                )
+              }
+              nestedForm={nestedCollectingEventForm}
+              useResourceQuery={useCollectingEventQuery}
+              setResourceId={setColEventId}
+              disableLinkerTab={templateAttachesCollectingEvent}
+              readOnlyLink="/collection/collecting-event/view?id="
+              resourceId={colEventId}
+              fieldName="collectingEvent"
+              targetType="materialSample"
+            />
           )}
           {dataComponentState.enableAcquisitionEvent && (
-            <FieldSet
-              id="acquisition-event-section"
+            <TabbedResourceLinker<AcquisitionEvent>
+              fieldSetId={navIds.acqEvent}
               legend={<DinaMessage id="acquisitionEvent" />}
-            >
-              <TabbedResourceLinker<AcquisitionEvent>
-                briefDetails={acqEvent => (
-                  <DinaForm initialValues={acqEvent} readOnly={true}>
-                    <AcquisitionEventFormLayout />
-                  </DinaForm>
-                )}
-                linkerTabContent={
+              briefDetails={acqEvent => (
+                <DinaForm initialValues={acqEvent} readOnly={true}>
+                  <AcquisitionEventFormLayout />
+                </DinaForm>
+              )}
+              linkerTabContent={
+                reduceRendering ? null : (
                   <AcquisitionEventLinker
                     onAcquisitionEventSelect={acqEventToLink => {
                       setAcqEventId(acqEventToLink.id);
                     }}
                   />
-                }
-                nestedForm={nestedAcqEventForm}
-                resourceQuery={acqEventQuery}
-                setResourceId={setAcqEventId}
-                disableLinkerTab={templateAttachesAcquisitionEvent}
-                readOnlyLink="/collection/acquisition-event/view?id="
-                resourceId={acqEventId}
-              />
-            </FieldSet>
-          )}
-          {dataComponentState.enablePreparations && (
-            <PreparationField
-              // Use the same attachments config for preparations as the Material Sample:
-              attachmentsConfig={attachmentsConfig?.materialSample}
+                )
+              }
+              nestedForm={nestedAcqEventForm}
+              useResourceQuery={useAcquisitionEvent}
+              setResourceId={setAcqEventId}
+              disableLinkerTab={templateAttachesAcquisitionEvent}
+              readOnlyLink="/collection/acquisition-event/view?id="
+              resourceId={acqEventId}
+              fieldName="acquisitionEvent"
+              targetType="materialSample"
             />
           )}
-          {dataComponentState.enableOrganism && <OrganismStateField />}
-          {dataComponentState.enableDetermination && <DeterminationField />}
-          {dataComponentState.enableAssociations && <AssociationsField />}
-          {dataComponentState.enableStorage && (
-            <FieldSet
-              id="storage-section"
-              legend={<DinaMessage id="storage" />}
-            >
-              <div className="card card-body mb-3">
-                <StorageLinkerField name="storageUnit" removeLabelTag={true} />
-              </div>
-            </FieldSet>
-          )}
-          {dataComponentState.enableScheduledActions && (
-            <ScheduledActionsField />
-          )}
-          {!isTemplate && (
-            <FieldSet
-              legend={<DinaMessage id="managedAttributeListTitle" />}
-              id="managedAttributes-section"
-            >
-              <DinaFormSection
-                // Disabled the template's restrictions for this section:
-                enabledFields={null}
-              >
-                <ManagedAttributesEditor
-                  valuesPath="managedAttributes"
-                  managedAttributeApiPath="collection-api/managed-attribute"
-                  apiBaseUrl="/collection-api"
-                  managedAttributeComponent="MATERIAL_SAMPLE"
-                  managedAttributeKeyField="key"
+          {!reduceRendering && (
+            <>
+              {dataComponentState.enablePreparations && (
+                <PreparationField
+                  id={navIds.preparation}
+                  // Use the same attachments config for preparations as the Material Sample:
+                  attachmentsConfig={attachmentsConfig?.materialSample}
                 />
-              </DinaFormSection>
-            </FieldSet>
+              )}
+              {dataComponentState.enableOrganisms && (
+                <OrganismsField id={navIds.organism} name="organism" />
+              )}
+              {dataComponentState.enableAssociations && (
+                <AssociationsField id={navIds.associations} />
+              )}
+              {dataComponentState.enableStorage && (
+                <FieldSet
+                  id={navIds.storage}
+                  legend={<DinaMessage id="storage" />}
+                  fieldName="storageUnit"
+                >
+                  <StorageLinkerField
+                    name="storageUnit"
+                    hideLabel={true}
+                    targetType="material-sample"
+                  />
+                </FieldSet>
+              )}
+              {dataComponentState.enableScheduledActions && (
+                <ScheduledActionsField
+                  id={navIds.ScheduledActions}
+                  wrapContent={content => (
+                    <BulkEditTabWarning
+                      targetType="material-sample"
+                      fieldName="scheduledActions"
+                    >
+                      {content}
+                    </BulkEditTabWarning>
+                  )}
+                />
+              )}
+              {!isTemplate && (
+                <DinaFormSection
+                  // Disabled the template's restrictions for this section:
+                  enabledFields={null}
+                >
+                  <div className="row">
+                    <div className="col-md-6">
+                      <ManagedAttributesEditor
+                        valuesPath="managedAttributes"
+                        managedAttributeApiPath="collection-api/managed-attribute"
+                        managedAttributeComponent="MATERIAL_SAMPLE"
+                        fieldSetProps={{
+                          id: navIds.managedAttributes,
+                          legend: (
+                            <DinaMessage id="materialSampleManagedAttributes" />
+                          )
+                        }}
+                        showCustomViewDropdown={true}
+                      />
+                    </div>
+                  </div>
+                </DinaFormSection>
+              )}
+              <AttachmentsField
+                name={attachmentsField}
+                title={<DinaMessage id="materialSampleAttachments" />}
+                id={navIds.attachments}
+                allowNewFieldName="attachmentsConfig.allowNew"
+                allowExistingFieldName="attachmentsConfig.allowExisting"
+                allowAttachmentsConfig={attachmentsConfig?.materialSample}
+                attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+                wrapContent={content => (
+                  <BulkEditTabWarning
+                    targetType="material-sample"
+                    fieldName={attachmentsField}
+                  >
+                    {content}
+                  </BulkEditTabWarning>
+                )}
+              />
+            </>
           )}
-          <AttachmentsField
-            name="attachment"
-            title={<DinaMessage id="materialSampleAttachments" />}
-            id="material-sample-attachments-section"
-            allowNewFieldName="attachmentsConfig.allowNew"
-            allowExistingFieldName="attachmentsConfig.allowExisting"
-            allowAttachmentsConfig={attachmentsConfig?.materialSample}
-            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
-          />
         </div>
       </div>
     </div>
   );
-
-  const { materialSampleSchema } = useMaterialSampleSchema();
 
   return isTemplate ? (
     mateirialSampleInternal
@@ -398,9 +503,6 @@ export function MaterialSampleForm({
       initialValues={initialValues}
       onSubmit={onSubmit}
       enabledFields={enabledFields?.materialSample}
-      validationSchema={
-        dataComponentState.enableAssociations ? materialSampleSchema : null
-      }
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}
@@ -409,39 +511,21 @@ export function MaterialSampleForm({
     </DinaForm>
   );
 }
-export function MaterialSampleInfoFormLayout() {
-  return (
-    <div className="row">
-      <div className="col-md-6">
-        <GroupSelectField name="group" enableStoredDefaultGroup={true} />
-      </div>
-    </div>
-  );
-}
 
-export function MaterialSampleFormLayout() {
+export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
   const { locale, formatMessage } = useDinaIntl();
-  const divRef = useRef<HTMLDivElement>(null);
 
-  const { readOnly, initialValues } = useDinaFormContext();
+  const { readOnly } = useDinaFormContext();
 
   const onMaterialSampleStateChanged = (form, _name, value) => {
-    if (divRef.current) {
-      if (value) {
-        divRef.current.className = "";
-      } else {
-        divRef.current.className = divRef.current.className + " d-none";
-        form.setFieldValue("stateChangeRemarks", null);
-        form.setFieldValue("stateChangedOn", null);
-      }
+    if (value === "") {
+      form.setFieldValue("stateChangeRemarks", null);
+      form.setFieldValue("stateChangedOn", null);
     }
   };
 
   return (
-    <FieldSet
-      id="material-sample-section"
-      legend={<DinaMessage id="materialSample" />}
-    >
+    <FieldSet id={id} legend={<DinaMessage id="materialSample" />}>
       <div className="row">
         <div className="col-md-6">
           <ResourceSelectField<MaterialSampleType>
@@ -474,26 +558,25 @@ export function MaterialSampleFormLayout() {
         </div>
       </div>
       {!readOnly && (
-        <div
-          ref={divRef}
-          className={!initialValues.materialSampleState ? "d-none" : ""}
-        >
-          <FieldSet legend={<DinaMessage id="stateChangeMetaLegend" />}>
-            <div className="row">
-              <DateField
-                className="col-md-6"
-                name="stateChangedOn"
-                label={formatMessage("date")}
-              />
-              <TextField
-                className="col-md-6"
-                name="stateChangeRemarks"
-                multiLines={true}
-                label={formatMessage("additionalRemarks")}
-              />
-            </div>
-          </FieldSet>
-        </div>
+        <FieldSpy fieldName="materialSampleState">
+          {materialSampleState =>
+            materialSampleState ? (
+              <div className="row">
+                <DateField
+                  className="col-md-6"
+                  name="stateChangedOn"
+                  label={formatMessage("date")}
+                />
+                <TextField
+                  className="col-md-6"
+                  name="stateChangeRemarks"
+                  multiLines={true}
+                  label={formatMessage("additionalRemarks")}
+                />
+              </div>
+            ) : null
+          }
+        </FieldSpy>
       )}
     </FieldSet>
   );
@@ -504,6 +587,8 @@ export interface MaterialSampleIdentifiersFormLayoutProps {
   className?: string;
   namePrefix?: string;
   sampleNamePlaceHolder?: string;
+  id?: string;
+  hideUseSequence?: boolean;
 }
 
 export const IDENTIFIERS_FIELDS: (keyof MaterialSample)[] = [
@@ -524,11 +609,17 @@ export function MaterialSampleIdentifiersFormLayout({
   disableSampleNameField,
   className,
   namePrefix = "",
-  sampleNamePlaceHolder
+  sampleNamePlaceHolder,
+  hideUseSequence,
+  id = "identifiers-section"
 }: MaterialSampleIdentifiersFormLayoutProps) {
+  const [{ value }] = useField("collection");
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
+
   return (
     <FieldSet
-      id="identifiers-section"
+      id={id}
       legend={<DinaMessage id="identifiers" />}
       className={className}
     >
@@ -538,13 +629,34 @@ export function MaterialSampleIdentifiersFormLayout({
             name={`${namePrefix}collection`}
             customName="collection"
           />
-          <TextField
-            name={`${namePrefix}materialSampleName`}
-            customName="materialSampleName"
-            className="materialSampleName"
-            readOnly={disableSampleNameField}
-            placeholder={sampleNamePlaceHolder}
-          />
+          <div className="d-flex">
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              inputProps={{ disabled: primaryIdDisabled }}
+              customName="materialSampleName"
+              className="materialSampleName flex-grow-1"
+              readOnly={disableSampleNameField}
+              placeholder={sampleNamePlaceHolder}
+            />
+            {!readOnly && !hideUseSequence && (
+              <CheckBoxField
+                onCheckBoxClick={event =>
+                  setPrimaryIdDisabled(event.target.checked)
+                }
+                name="useNextSequence"
+                className="ms-2 mt-1"
+                // only enabled when add new sample and collection is selected
+                disabled={initialValues.id || !value?.id}
+                overridecheckboxProps={{
+                  style: {
+                    height: "30px",
+                    width: "30px"
+                  }
+                }}
+              />
+            )}
+          </div>
+
           <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
         <div className="col-md-6">
@@ -625,39 +737,21 @@ export function nextSampleInitialValues(
     createdBy,
     materialSampleName,
     allowDuplicateName,
+    organism,
     ...copiedValues
   } = originalSample;
+
+  // Omit the IDs from the original sample's organisms:
+  const newOrganisms = organism?.map(org => org && { ...org, id: undefined });
 
   // Calculate the next suffix:
   const newMaterialSampleName = nextSampleName(materialSampleName);
 
   const initialValues = {
     ...copiedValues,
-    materialSampleName: newMaterialSampleName
+    materialSampleName: newMaterialSampleName,
+    organism: newOrganisms
   };
 
   return initialValues;
-}
-
-function useMaterialSampleSchema() {
-  const { getFieldLabel } = useFieldLabels();
-
-  /** Front-end validation. */
-  const materialSampleSchema = yup.object({
-    associations: yup.array(
-      yup.object({
-        associatedSample: yup
-          .string()
-          .nullable()
-          .required()
-          .label(getFieldLabel({ name: "associatedSample" }).fieldLabel),
-        associationType: yup
-          .string()
-          .required()
-          .label(getFieldLabel({ name: "associationType" }).fieldLabel)
-      })
-    )
-  });
-
-  return { materialSampleSchema };
 }

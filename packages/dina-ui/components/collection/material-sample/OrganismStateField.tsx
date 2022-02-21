@@ -1,6 +1,11 @@
-import { AutoSuggestTextField, FieldSet, TextField } from "common-ui";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  AutoSuggestTextField,
+  FieldSpy,
+  TextField,
+  useDinaFormContext
+} from "common-ui";
+import { DeterminationField } from "..";
+import { Organism } from "../../../types/collection-api";
 
 /**
  * List of field names in the OrganismStateField component.
@@ -9,72 +14,76 @@ import { MaterialSample } from "../../../types/collection-api";
 export const ORGANISM_FIELDS = [
   "lifeStage",
   "sex",
-  "substrate",
-  "remarks"
+  "remarks",
+  "determination"
 ] as const;
 
 export interface OrganismStateFieldProps {
-  className?: string;
   namePrefix?: string;
+  id?: string;
 }
 
+/** Form section for a single organism. */
 export function OrganismStateField({
-  className,
   namePrefix = ""
 }: OrganismStateFieldProps) {
+  const { readOnly } = useDinaFormContext();
+
+  /** Applies name prefix to field props */
+  function fieldProps(fieldName: typeof ORGANISM_FIELDS[number]) {
+    return {
+      name: `${namePrefix}${fieldName}`,
+      // Don't use the prefix for the labels and tooltips:
+      customName: fieldName
+    };
+  }
+
+  const determinationFieldProps = fieldProps("determination");
+
   return (
-    <FieldSet
-      className={className}
-      id="organism-state-section"
-      legend={<DinaMessage id="organismState" />}
-    >
+    <div className="organism-state-field">
       <div className="row">
-        <div className="col-md-6">
-          <div className="row">
-            <div className="col-md-6">
-              <AutoSuggestTextField<MaterialSample>
-                name={`${namePrefix}organism.lifeStage`}
-                customName="lifeStage"
-                query={(_, _ctx) => ({
-                  path: "collection-api/material-sample",
-                  include: "organism"
-                })}
-                suggestion={matSample => matSample.organism?.lifeStage}
-                alwaysShowSuggestions={true}
-              />
-            </div>
-            <div className="col-md-6">
-              <AutoSuggestTextField<MaterialSample>
-                name={`${namePrefix}organism.sex`}
-                customName="sex"
-                query={(_, _ctx) => ({
-                  path: "collection-api/material-sample",
-                  include: "organism"
-                })}
-                suggestion={matSample => matSample.organism?.sex}
-                alwaysShowSuggestions={true}
-              />
-            </div>
-          </div>
-          <AutoSuggestTextField<MaterialSample>
-            name={`${namePrefix}organism.substrate`}
-            customName="substrate"
-            query={(_, _ctx) => ({
-              path: "collection-api/material-sample",
-              include: "organism"
-            })}
-            suggestion={matSample => matSample.organism?.substrate ?? ""}
-            alwaysShowSuggestions={true}
-          />
-        </div>
-        <div className="col-md-6">
-          <TextField
-            name={`${namePrefix}organism.remarks`}
-            customName="remarks"
-            multiLines={true}
-          />
-        </div>
+        <AutoSuggestTextField<Organism>
+          className="col-sm-6"
+          {...fieldProps("lifeStage")}
+          query={(search, ctx) => ({
+            path: "collection-api/organism",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `lifeStage==${search}*`
+            }
+          })}
+          suggestion={org => org.lifeStage}
+          alwaysShowSuggestions={true}
+        />
+        <AutoSuggestTextField<Organism>
+          className="col-sm-6"
+          {...fieldProps("sex")}
+          query={(search, ctx) => ({
+            path: "collection-api/organism",
+            filter: {
+              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+              rsql: `sex==${search}*`
+            }
+          })}
+          suggestion={org => org.sex}
+          alwaysShowSuggestions={true}
+        />
+        <TextField
+          {...fieldProps("remarks")}
+          customName="organismRemarks"
+          className="col-sm-12"
+          multiLines={true}
+        />
       </div>
-    </FieldSet>
+      <FieldSpy<[]> fieldName={determinationFieldProps.name}>
+        {determinations =>
+          // Hide in read-only mode when there are no determinations:
+          readOnly && !determinations?.length ? null : (
+            <DeterminationField {...determinationFieldProps} />
+          )
+        }
+      </FieldSpy>
+    </div>
   );
 }

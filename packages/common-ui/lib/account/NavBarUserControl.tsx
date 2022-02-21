@@ -8,20 +8,20 @@ export function NavbarUserControl() {
     useAccount();
 
   return (
-    <div className="d-flex">
+    <div className="d-flex align-items-center">
       {initialized && authenticated ? (
         <>
           {username && (
             <span className="me-2 my-auto">
               <CommonMessage id="loggedInAsUser" />{" "}
               <Link href={`/dina-user/view?id=${subject}`}>
-                <a target="_blank">{username}</a>
+                <a>{username}</a>
               </Link>
             </span>
           )}
           <button
             type="button"
-            className="btn btn-dark logout-button"
+            className="btn btn-dark logout-button my-auto"
             onClick={() => logout()}
           >
             <CommonMessage id="logoutBtn" />

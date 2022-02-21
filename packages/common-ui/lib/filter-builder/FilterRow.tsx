@@ -150,8 +150,9 @@ export class FilterRow extends React.Component<FilterRowProps> {
 
           {attribute.type === "STRING" && (
             <input
+              type="text"
               aria-label="Filter Value"
-              className="filter-value form-control d-inline-block"
+              className="filter-value form-control d-inline-block search-input"
               style={{
                 width: "16rem",
                 visibility:
