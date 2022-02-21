@@ -52,7 +52,9 @@ function StorageEditButton({ initialValues }: ResourceFormProps<StorageUnit>) {
         ariaDescribedBy="notEditableWhenThereAreChildStorageUnits"
         disabled={hasChildren(initialValues)}
       />
-      <Tooltip id="notEditableWhenThereAreChildStorageUnits" />
+      {hasChildren(initialValues) && (
+        <Tooltip id="notEditableWhenThereAreChildStorageUnits" />
+      )}
     </div>
   );
 }

@@ -38,16 +38,24 @@ export function StorageUnitForm({
   initialParent,
   storageUnit,
   onSaved,
+  parentIdInURL,
   buttonBar = (
     <ButtonBar>
-      <BackButton
-        entityId={storageUnit?.id}
-        entityLink="/collection/storage-unit"
-      />
+      {parentIdInURL ? (
+        <BackButton
+          entityId={parentIdInURL}
+          entityLink={`/collection/storage-unit`}
+          buttonMsg={"backToParentUnit"}
+        />
+      ) : (
+        <BackButton
+          entityId={storageUnit?.id}
+          entityLink="/collection/storage-unit"
+        />
+      )}
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  ),
-  parentIdInURL
+  )
 }: StorageUnitFormProps) {
   const initialValues = storageUnit || {
     type: "storage-unit",

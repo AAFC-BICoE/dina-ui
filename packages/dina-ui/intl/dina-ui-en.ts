@@ -66,6 +66,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachSelected: "Attach Selected",
   attachments: "Attachments",
   attributeLabel: "Attribute",
+  backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
   batchModeInfo: "Batch Mode: All Material Samples have the same ID.",
   browseContents: "Browse Contents",
