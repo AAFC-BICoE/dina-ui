@@ -14,10 +14,27 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
+const MOCK_USER_GROUP_RESP = {
+  data: [
+    {
+      id: "1",
+      type: "group",
+      name: "cnc"
+    },
+    {
+      id: "2",
+      type: "group",
+      name: "aafc"
+    }
+  ]
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
+    case "user-api/group":
+      return MOCK_USER_GROUP_RESP;
   }
 });
 
@@ -91,6 +108,12 @@ describe("QueryPage component", () => {
       .find(Select)
       .prop<any>("onChange")({ value: "false" });
 
+    // simulate select a group from dropdown
+    wrapper
+      .find("SelectField[name='group']")
+      .find(Select)
+      .prop<any>("onChange")({ value: "testGroup" });
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -103,6 +126,57 @@ describe("QueryPage component", () => {
           params: {
             indexName: "testIndex"
           }
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
         }
       ]
     ]);
@@ -126,6 +200,11 @@ describe("QueryPage component", () => {
                     }
                   }
                 ]
+              }
+            },
+            must: {
+              match: {
+                "data.attributes.group": "testGroup"
               }
             }
           }

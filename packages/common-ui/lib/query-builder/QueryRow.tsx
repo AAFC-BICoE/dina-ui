@@ -24,6 +24,10 @@ export interface ESIndexMapping {
   type: string;
 }
 
+export type QueryRowMatchValue = "match" | "term";
+export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
+export type QueryRowBooleanType = "TRUE" | "FALSE";
+
 export interface QueryRowExportProps {
   fieldName: string;
   matchValue?: string;
@@ -36,9 +40,6 @@ export interface QueryRowExportProps {
   boolean?: string;
   type?: string;
 }
-
-type queryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-type queryRowBooleanType = "TRUE" | "FALSE";
 
 const queryRowMatchOptions = [
   { label: "PARTIAL_MATCH", value: "match" },
@@ -112,10 +113,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     }
   }
 
-  const queryRowOptions = esIndexMapping?.map(prop => ({
-    label: prop.label,
-    value: prop.value + "(" + prop.type + ")"
-  }));
+  const queryRowOptions = esIndexMapping
+    ?.filter(prop => !prop.label.startsWith("group"))
+    ?.map(prop => ({
+      label: prop.label,
+      value: prop.value + "(" + prop.type + ")"
+    }));
 
   function fieldProps(fldName: string, idx: number) {
     return {

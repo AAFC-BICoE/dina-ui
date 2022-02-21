@@ -57,11 +57,11 @@ export default function ManagedAttributesListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("managedAttributeListTitle")} />
+      <Head title={formatMessage("managedAttributes")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <DinaMessage id="managedAttributeListTitle" />
+          <DinaMessage id="managedAttributes" />
         </h1>
         <ButtonBar>
           <Link href="/object-store/managedAttributesView/detailsView">

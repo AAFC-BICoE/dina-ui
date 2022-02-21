@@ -17,10 +17,10 @@ export function NumberField(props: NumberFieldProps) {
 
   function validate(value: unknown) {
     let validator = yup.number().nullable().notRequired();
-    if (props.min) {
+    if (props.min !== undefined) {
       validator = validator.min(props.min);
     }
-    if (props.max) {
+    if (props.max !== undefined) {
       validator = validator.max(props.max);
     }
     if (props.isInteger) {
@@ -65,10 +65,10 @@ export function NumberField(props: NumberFieldProps) {
 
         return (
           <input
+            type="text"
             {...inputProps}
             onBlur={onBlur}
             onChange={onChange}
-            type="text"
           />
         );
       }}

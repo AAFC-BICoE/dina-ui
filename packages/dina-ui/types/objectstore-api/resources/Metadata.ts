@@ -7,7 +7,7 @@ import { DcType } from "./ObjectUpload";
 export interface MetadataAttributes {
   type: "metadata";
   bucket: string;
-  fileIdentifier: string;
+  fileIdentifier?: string;
   fileExtension?: string;
 
   /** Refers to the License/LicenseDTO's 'url' field. */
@@ -33,6 +33,8 @@ export interface MetadataAttributes {
 
   acHashFunction?: string;
   acHashValue?: string;
+
+  resourceExternalURL?: string;
 }
 
 export interface MetadataRelationships {

@@ -9,7 +9,8 @@ import React, { ComponentProps, useState } from "react";
 import { useIntl } from "react-intl";
 import Select, {
   components as reactSelectComponents,
-  StylesConfig
+  StylesConfig,
+  ActionMeta
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
@@ -24,7 +25,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Function called when an option is selected. */
   onChange?: (
-    value: PersistedResource<TData> | PersistedResource<TData>[]
+    value: PersistedResource<TData> | PersistedResource<TData>[],
+    actionMeta?: ActionMeta<{ resource: PersistedResource<TData> }>
   ) => void;
 
   /** The model type to select resources from. */
@@ -73,6 +75,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   removeDefaultSort?: boolean;
 
   placeholder?: string;
+
+  isLoading?: boolean;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -113,7 +117,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   pageSize,
   useCustomQuery,
   removeDefaultSort,
-  placeholder
+  placeholder,
+  isLoading: loadingProp
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
 
@@ -145,7 +150,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const { loading: queryIsLoading, response } =
     useCustomQuery?.(inputValue, querySpec) ?? useQuery<TData[]>(querySpec);
 
-  const isLoading = queryIsLoading || inputValue !== searchValue;
+  const isLoading = queryIsLoading || inputValue !== searchValue || loadingProp;
 
   // Build the list of options from the returned resources.
   const resourceOptions =
@@ -181,7 +186,10 @@ export function ResourceSelect<TData extends KitsuResource>({
   // Show no options while loading: (react-select will show the "Loading..." text.)
   const options = isLoading ? [] : compact([mainOptions, actionOptions]);
 
-  async function onChange(newSelectedRaw) {
+  async function onChange(
+    newSelectedRaw,
+    actionMeta: ActionMeta<{ resource: PersistedResource<TData> }>
+  ) {
     const newSelected = castArray(newSelectedRaw);
 
     // If an async option is selected:
@@ -196,11 +204,11 @@ export function ResourceSelect<TData extends KitsuResource>({
         const newResources = newSelected.map(option =>
           option === asyncOption ? asyncResource : option.resource
         );
-        onChangeProp(isMulti ? newResources : newResources[0]);
+        onChangeProp(isMulti ? newResources : newResources[0], actionMeta);
       }
     } else {
       const resources = newSelected?.map(o => o.resource) || [];
-      onChangeProp(isMulti ? resources : resources[0]);
+      onChangeProp(isMulti ? resources : resources[0], actionMeta);
     }
   }
 
