@@ -1,3 +1,5 @@
+# Create local maven repo folder .m2
+mkdir ~/.m2
 # Get the Dina repos:
 mkdir repos
 git clone --branch dev https://github.com/AAFC-BICoE/dina-ui.git ./repos/dina-ui

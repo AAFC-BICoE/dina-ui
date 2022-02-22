@@ -15,14 +15,38 @@ To run the DINA containers you will at least need:
   * You can avoid running a slow IDE inside your virtual machine by running VS Code on your host machine instead
   and connecting to the dev environment using
   [VS Code Remote](https://code.visualstudio.com/docs/remote/remote-overview)
+
 * [Docker](https://github.com/docker/docker-install)
+```
+sudo apt install curl 
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+sudo usermod -aG docker ${USER}
+
+```
+* Note after adding yourself to the docker group, a login/logout is required to action the change or reboot the VM
+
 * [Docker compose](https://docs.docker.com/compose/install/)
+```
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
 
 For development and running tests from your IDE you will need:
 
 * [Node.js](https://nodejs.org/en/)
 * Yarn (package manager): Run `npm install -g yarn@latest` after installing Node.js
-* Maven (Java build tool): Run `sudo apt install maven`
+* Maven (Java build tool} 
+```
+sudo apt install maven
+```
+
+* [Git Install]
+```
+sudo apt install git
+```
+
 
 ## Initial Repo Setup:
 
