@@ -4,14 +4,26 @@ import Select from "react-select";
 import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { SelectOption } from "../formik-connected/SelectField";
+import { UserPreference } from "packages/dina-ui/types/user-api";
 
 export interface SavedSearchProps {
-  loadSavedSearch: (savedSearchName) => void;
-  saveSearch: (isDefault: boolean, searchName?: string) => void;
-  deleteSavedSearch: (savedSearchName?: string) => void;
+  loadSavedSearch: (
+    savedSearchName: string,
+    savedSearches: UserPreference[]
+  ) => void;
+  saveSearch: (
+    isDefault: boolean,
+    savedSearches: UserPreference[],
+    searchName?: string
+  ) => void;
+  deleteSavedSearch: (
+    savedSearchName: string,
+    savedSearches: UserPreference[]
+  ) => void;
   savedSearchNames?: string[];
   initialSavedSearches?: JsonValue;
   selectedSearch?: string;
+  savedSearches: UserPreference[];
 }
 
 export function SavedSearch(props: SavedSearchProps) {
@@ -21,7 +33,8 @@ export function SavedSearch(props: SavedSearchProps) {
     saveSearch,
     savedSearchNames,
     initialSavedSearches,
-    selectedSearch
+    selectedSearch,
+    savedSearches
   } = props;
   const { formatMessage } = useDinaIntl();
   const [curSelected, setCurSelected] = useState(null);
@@ -58,7 +71,12 @@ export function SavedSearch(props: SavedSearchProps) {
       />
       <button
         className="btn btn-primary"
-        onClick={() => loadSavedSearch(curSelected ?? selectedSearch)}
+        onClick={() =>
+          loadSavedSearch(
+            curSelected ?? (selectedSearch as string),
+            savedSearches
+          )
+        }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length
         }
@@ -67,14 +85,17 @@ export function SavedSearch(props: SavedSearchProps) {
       </button>
       <button
         className="btn btn-secondary"
-        onClick={() => openSavedSearchModal({ saveSearch })}
+        onClick={() => openSavedSearchModal({ saveSearch, savedSearches })}
       >
         {formatMessage("save")}
       </button>
       <button
         className="btn btn-danger"
         onClick={() =>
-          deleteSavedSearch((curSelected as any) ?? selectedSearch)
+          deleteSavedSearch(
+            (curSelected as any) ?? selectedSearch,
+            savedSearches
+          )
         }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length

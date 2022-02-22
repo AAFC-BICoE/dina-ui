@@ -1,8 +1,8 @@
-import { KitsuResource } from "kitsu";
+import { FilterParam, KitsuResource } from "kitsu";
 import { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps } from "react-table";
-import { useApiClient } from "../api-client/ApiClientContext";
+import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
@@ -17,7 +17,7 @@ import {
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { MetaWithTotal } from "../api-client/operations-types";
-import { QueryState } from "../api-client/useQuery";
+import { QueryState, useQuery, withResponse } from "../api-client/useQuery";
 import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
 import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
@@ -25,12 +25,12 @@ import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { JsonValue } from "type-fest";
 import { useAccount } from "..";
-import useLocalStorage from "@rehooks/local-storage";
 import { get, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
+import { UserPreference } from "../../../dina-ui/types/user-api";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -57,16 +57,13 @@ export function QueryPage<TData extends KitsuResource>({
   omitPaging,
   reactTableProps
 }: QueryPageProps<TData>) {
-  const { apiClient } = useApiClient();
+  const { apiClient, save, doOperations } = useApiClient();
   const { formatMessage } = useIntl();
   const refreshPage = useRef<boolean>(true);
   const pageRef = useRef<FormikProps<any>>(null);
   const [initSavedSearchValues, setInitSavedSearchValues] =
     useState<Map<string, JsonValue[]>>();
-  const { username } = useAccount();
-  const SAVED_SEARCHES = "savedSearches";
-  const [savedSearches, setSavedSearches] =
-    useLocalStorage<Map<string, JsonValue>>(SAVED_SEARCHES);
+  const { username, subject } = useAccount();
 
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
@@ -74,9 +71,6 @@ export function QueryPage<TData extends KitsuResource>({
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
   const router = useRouter();
-
-  const resolvedReactTableProps = { sortable: true, ...reactTableProps };
-
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -87,6 +81,7 @@ export function QueryPage<TData extends KitsuResource>({
       ? searchResults?.results
       : initData
   });
+  const resolvedReactTableProps = { sortable: true, ...reactTableProps };
 
   // Retrieve the actual saved search content
   const formValues = initSavedSearchValues?.values().next().value;
@@ -187,6 +182,14 @@ export function QueryPage<TData extends KitsuResource>({
     return result;
   }
 
+  const savedSearchQuery = useQuery<UserPreference[]>({
+    path: "user-api/user-preference",
+    filter: {
+      userId: subject as FilterParam
+    },
+    page: { limit: 1000 }
+  });
+
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
 
@@ -207,21 +210,27 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
-  function loadSavedSearch(savedSearchName) {
+  function loadSavedSearch(savedSearchName, savedSearches) {
     refreshPage.current = true;
     const initValus = new Map().set(
       savedSearchName,
-      savedSearches ? savedSearches[username as any]?.[savedSearchName] : [{}]
+      savedSearches
+        ? savedSearches[0]?.savedSearches?.[username as any]?.[savedSearchName]
+        : [{}]
     );
     setInitSavedSearchValues(initValus);
   }
 
-  function saveSearch(isDefault, searchName) {
+  function saveSearch(isDefault, savedSearches, searchName) {
     let newSavedSearches;
     const mySavedSearches = savedSearches;
 
-    if (mySavedSearches && Object.keys(mySavedSearches)?.length > 0) {
-      mySavedSearches[username as any][
+    if (
+      mySavedSearches &&
+      mySavedSearches?.[0]?.savedSearches &&
+      Object.keys(mySavedSearches?.[0]?.savedSearches)?.length > 0
+    ) {
+      mySavedSearches[0].savedSearches[username as any][
         `${isDefault ? "default" : searchName}`
       ] = pageRef.current?.values;
     } else {
@@ -231,16 +240,35 @@ export function QueryPage<TData extends KitsuResource>({
         }
       };
     }
-    setSavedSearches(
-      mySavedSearches ?? (newSavedSearches as Map<string, JsonValue>)
-    );
-    router.reload();
+    const saveArgs: SaveArgs<UserPreference> = {
+      resource: {
+        userId: subject,
+        savedSearches:
+          mySavedSearches?.[0]?.savedSearches ??
+          (newSavedSearches as Map<string, JsonValue>)
+      } as any,
+      type: "user-preference"
+    };
+
+    save([saveArgs], { apiBaseUrl: "/user-api" }).then(() => router.reload());
   }
 
-  function deleteSavedSearch(savedSearchName?: string) {
+  async function deleteSavedSearch(
+    savedSearchName: string,
+    savedSearches: UserPreference[]
+  ) {
     const mySavedSearch = savedSearches;
     delete mySavedSearch?.[username as any]?.[`${savedSearchName}`];
-    setSavedSearches(mySavedSearch as any);
+
+    await doOperations(
+      [
+        {
+          op: "DELETE",
+          path: `user-preference/${savedSearches?.[0].id}`
+        }
+      ],
+      { apiBaseUrl: "/objectstore-api" }
+    );
     router.reload();
   }
   const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
@@ -283,23 +311,28 @@ export function QueryPage<TData extends KitsuResource>({
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>
-
-      <SavedSearch
-        loadSavedSearch={loadSavedSearch}
-        deleteSavedSearch={deleteSavedSearch}
-        saveSearch={saveSearch}
-        savedSearchNames={
-          savedSearches?.[username as any]
-            ? Object.keys(savedSearches?.[username as any])
-            : []
-        }
-        initialSavedSearches={savedSearches?.[username as any]}
-        selectedSearch={
-          initSavedSearchValues
-            ? initSavedSearchValues.keys().next().value
-            : undefined
-        }
-      />
+      {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
+        const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
+          username as any
+        ] as any;
+        return (
+          <SavedSearch
+            savedSearches={userPreferences}
+            loadSavedSearch={loadSavedSearch}
+            deleteSavedSearch={deleteSavedSearch}
+            saveSearch={saveSearch}
+            savedSearchNames={
+              initialSavedSearches ? Object.keys(initialSavedSearches) : []
+            }
+            initialSavedSearches={initialSavedSearches}
+            selectedSearch={
+              initSavedSearchValues
+                ? initSavedSearchValues.keys().next().value
+                : undefined
+            }
+          />
+        );
+      })}
 
       <div
         className="query-table-wrapper"
