@@ -382,7 +382,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   makeFiledAs: "Indiquer comme Classé en tant que",
   makePrimary: "Marque principale",
   managedAttributeEditTitle: "Modifier l’attribut géré",
-  managedAttributeListTitle: "Attributs gérés",
+  managedAttributes: "Attributs gérés",
   managedAttributeValueLabel: "Valeur",
   materialSample: "Échantillon de matériaux",
   materialSampleAssociationLegend: "Association d'échantillons de matériaux",
