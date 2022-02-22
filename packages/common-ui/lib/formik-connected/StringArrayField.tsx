@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import { isArray, isEqual } from "lodash";
 import { useEffect } from "react";
 import { InputHTMLAttributes, useState } from "react";
 import { FieldHeader } from "../field-header/FieldHeader";
@@ -83,5 +83,9 @@ function asArray(text?: string) {
 }
 
 function asText(array?: string[]) {
-  return (array ?? []).concat("").join("\n");
+  return (
+    isArray(array) ? array : array && typeof array === "string" ? [array] : []
+  )
+    .concat("")
+    .join("\n");
 }
