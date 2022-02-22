@@ -18,9 +18,11 @@ import {
   ToggleField,
   useApiClient,
   useQuery,
-  withResponse
+  withResponse,
+  DinaFormSection
 } from "common-ui";
 import { GroupSelectField, Head, Nav } from "../../../components";
+import { ManagedAttributesEditor } from "packages/dina-ui/components/object-store/managed-attributes/ManagedAttributesEditor";
 
 interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -207,6 +209,19 @@ export function TransactionFormLayout() {
         />
       </FieldSet>
       <ShipmentDetailsFieldSet fieldName="shipment" />
+      <FieldSet legend={<DinaMessage id="managedAttributes" />}>
+        <DinaFormSection
+          // Disabled the template's restrictions for this section:
+          enabledFields={null}
+        >
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="loan-transaction-api/managed-attribute"
+            apiBaseUrl="/loan-transaction-api"
+            managedAttributeKeyField="key"
+          />
+        </DinaFormSection>
+      </FieldSet>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
+export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST" | "DATE";
 
 export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",

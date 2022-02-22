@@ -157,7 +157,7 @@ function NavObjectStoreDropdown({ formatMessage }) {
         <DinaMessage id="objectListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/managedAttributesView/listView">
-        <DinaMessage id="managedAttributeListTitle" />
+        <DinaMessage id="managedAttributes" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object-subtype/list">
         <DinaMessage id="objectSubtypeListTitle" />
@@ -283,7 +283,7 @@ function NavCollectionDropdown({ formatMessage }) {
         <DinaMessage id="storageUnitListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/managed-attribute/list">
-        <DinaMessage id="managedAttributeListTitle" />
+        <DinaMessage id="managedAttributes" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/workflow-template/list">
         <DinaMessage id="workflowTemplateListTitle" />
@@ -338,6 +338,9 @@ function NavTransactionsDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       onKeyDown={onKeyDown}
     >
+      <NavDropdown.Item href="/loan-transaction/managed-attribute/list">
+        <DinaMessage id="managedAttributes" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/loan-transaction/transaction/list">
         <DinaMessage id="transactions" />
       </NavDropdown.Item>

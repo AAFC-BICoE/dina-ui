@@ -19,6 +19,7 @@ export * from "./group-select/GroupSelectField";
 export * from "./head";
 export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
+export * from "./managed-attribute/ManagedAttributeForm";
 export * from "./object-store/attachment-list/AttachmentsField";
 export * from "./page-layouts/ViewPageLayout";
 export * from "./resource-select-fields/resource-select-fields";
