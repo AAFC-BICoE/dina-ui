@@ -305,7 +305,7 @@ export function QueryPage<TData extends KitsuResource>({
         {formatMessage({ id: "search" })}
       </label>
       <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
-      <DinaFormSection horizontal={[1, 11]}>
+      <DinaFormSection horizontal={"flex"}>
         <GroupSelectField name="group" className="col-md-4" />
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
