@@ -22,7 +22,7 @@ import {
   DinaFormSection
 } from "common-ui";
 import { GroupSelectField, Head, Nav } from "../../../components";
-import { ManagedAttributesEditor } from "packages/dina-ui/components/object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 
 interface TransactionFormProps {
   fetchedTransaction?: Transaction;
