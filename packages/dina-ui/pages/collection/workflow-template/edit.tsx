@@ -25,8 +25,13 @@ import {
 } from "../../../components/collection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  AcquisitionEvent,
+  CollectingEvent,
+  CustomView,
   FormTemplate,
-  PreparationProcessDefinition,
+  MaterialSample,
+  MaterialSampleFormViewConfig,
+  materialSampleFormViewConfigSchema,
   TemplateField,
   TemplateFields
 } from "../../../types/collection-api";
@@ -53,8 +58,8 @@ export default function PreparationProcessTemplatePage() {
   const router = useRouter();
   const id = router.query.id?.toString();
 
-  const workflowTemplateQuery = useQuery<PreparationProcessDefinition>(
-    { path: `/collection-api/material-sample-action-definition/${id}` },
+  const workflowTemplateQuery = useQuery<CustomView>(
+    { path: `/collection-api/custom-view/${id}` },
     { disabled: !id }
   );
 
@@ -75,9 +80,9 @@ export default function PreparationProcessTemplatePage() {
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (
-          withResponse(workflowTemplateQuery, ({ data: fetchedDefinition }) => (
+          withResponse(workflowTemplateQuery, ({ data: fetchedCustomView }) => (
             <WorkflowTemplateForm
-              fetchedActionDefinition={fetchedDefinition}
+              fetchedCustomView={fetchedCustomView}
               onSaved={moveToNextPage}
             />
           ))
@@ -90,38 +95,46 @@ export default function PreparationProcessTemplatePage() {
 }
 
 export interface WorkflowTemplateFormProps {
-  fetchedActionDefinition?: PersistedResource<PreparationProcessDefinition>;
-  onSaved: (
-    savedDefinition: PersistedResource<PreparationProcessDefinition>
-  ) => Promisable<void>;
+  fetchedCustomView?: PersistedResource<CustomView>;
+  onSaved: (savedDefinition: PersistedResource<CustomView>) => Promisable<void>;
 }
 
 export function WorkflowTemplateForm({
-  fetchedActionDefinition,
+  fetchedCustomView,
   onSaved
 }: WorkflowTemplateFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
 
-  const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
+  const { viewConfiguration: unknownViewConfig, ...initialDefinition } =
+    fetchedCustomView ?? {
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {},
+        type: "material-sample-form-custom-view"
+      }
+    };
+
+  const initialViewConfig =
+    materialSampleFormViewConfigSchema.parse(unknownViewConfig);
 
   // Initialize the tempalte form default values and checkbox states:
   const colEventTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.COLLECTING_EVENT
+    getTemplateInitialValuesFromSavedFormTemplate<CollectingEvent>(
+      initialViewConfig.formTemplates?.COLLECTING_EVENT
     );
   if (!colEventTemplateInitialValues.geoReferenceAssertions?.length) {
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
   const acqEventTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.ACQUISITION_EVENT
+    getTemplateInitialValuesFromSavedFormTemplate<AcquisitionEvent>(
+      initialViewConfig.formTemplates?.ACQUISITION_EVENT
     );
 
   const materialSampleTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.MATERIAL_SAMPLE
+    getTemplateInitialValuesFromSavedFormTemplate<MaterialSample>(
+      initialViewConfig.formTemplates?.MATERIAL_SAMPLE
     );
 
   if (!materialSampleTemplateInitialValues.organism?.length) {
@@ -165,7 +178,7 @@ export function WorkflowTemplateForm({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    const mainTemplateFields = pick(submittedValues, "id", "group", "name");
+    const customViewFields = pick(submittedValues, "id", "group", "name");
 
     const enabledTemplateFields =
       getEnabledTemplateFieldsFromForm(submittedValues);
@@ -206,9 +219,7 @@ export function WorkflowTemplateForm({
       : {};
 
     // Construct the template definition to persist based on the form values:
-    const definition: InputResource<PreparationProcessDefinition> = {
-      ...mainTemplateFields,
-      actionType: "ADD",
+    const newViewConfig: MaterialSampleFormViewConfig = {
       formTemplates: {
         MATERIAL_SAMPLE: {
           ...submittedValues.attachmentsConfig,
@@ -254,16 +265,20 @@ export function WorkflowTemplateForm({
             }
           : undefined
       },
-      type: "material-sample-action-definition"
+      type: "material-sample-form-custom-view"
     };
 
-    const [savedDefinition] = await save<PreparationProcessDefinition>(
-      [
-        {
-          resource: definition,
-          type: "material-sample-action-definition"
-        }
-      ],
+    const validatedViewConfig =
+      materialSampleFormViewConfigSchema.parse(newViewConfig);
+
+    const customView: InputResource<CustomView> = {
+      ...customViewFields,
+      type: "custom-view",
+      viewConfiguration: validatedViewConfig
+    };
+
+    const [savedDefinition] = await save<CustomView>(
+      [{ resource: customView, type: "custom-view" }],
       { apiBaseUrl: "/collection-api" }
     );
 
@@ -274,16 +289,16 @@ export function WorkflowTemplateForm({
     <ButtonBar>
       <div className="container d-flex">
         <BackButton
-          entityId={fetchedActionDefinition?.id}
+          entityId={fetchedCustomView?.id}
           className="me-auto"
           entityLink="/collection/workflow-template"
           byPassView={true}
         />
         <DeleteButton
-          id={fetchedActionDefinition?.id}
+          id={fetchedCustomView?.id}
           options={{ apiBaseUrl: "/collection-api" }}
           postDeleteRedirect="/collection/workflow-template/list"
-          type="material-sample-action-definition"
+          type="custom-view"
           className="me-5"
         />
         <SubmitButton />
@@ -342,7 +357,7 @@ export function getEnabledTemplateFieldsFromForm(
 
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
-  formTemplate?: Partial<FormTemplate<T>>
+  formTemplate?: Partial<FormTemplate>
 ): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   if (!formTemplate) {
     return {};
@@ -355,7 +370,7 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
 
   // Get the default values from the stored template:
   const defaultValues: Partial<T> = {};
-  for (const [field, templateField] of toPairs<TemplateField<any> | undefined>(
+  for (const [field, templateField] of toPairs<TemplateField | undefined>(
     formTemplate.templateFields
   )) {
     if (templateField?.enabled && templateField.defaultValue) {

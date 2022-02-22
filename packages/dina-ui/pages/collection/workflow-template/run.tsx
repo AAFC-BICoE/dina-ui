@@ -12,7 +12,12 @@ import { useMemo, useState } from "react";
 import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  PreparationProcessDefinition,
+  AcquisitionEvent,
+  CollectingEvent,
+  CustomView,
+  MaterialSample,
+  MaterialSampleFormViewConfig,
+  materialSampleFormViewConfigSchema,
   TemplateFields
 } from "../../../types/collection-api";
 import { MaterialSampleForm } from "../material-sample/edit";
@@ -24,10 +29,8 @@ export default function CreateMaterialSampleFromWorkflowPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  const actionDefinitionQuery = useQuery<PreparationProcessDefinition>(
-    {
-      path: `collection-api/material-sample-action-definition/${actionDefinitionId}`
-    },
+  const actionDefinitionQuery = useQuery<CustomView>(
+    { path: `collection-api/custom-view/${actionDefinitionId}` },
     { disabled: !actionDefinitionId }
   );
 
@@ -51,20 +54,26 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
-        {withResponse(actionDefinitionQuery, ({ data }) => (
-          <CreateMaterialSampleFromWorkflowForm
-            actionDefinition={data}
-            moveToNewRunPage={moveToNewRunPage}
-            moveToSampleViewPage={moveToSampleViewPage}
-          />
-        ))}
+        {withResponse(actionDefinitionQuery, ({ data }) => {
+          const viewConfig = materialSampleFormViewConfigSchema.parse(
+            data.viewConfiguration
+          );
+
+          return (
+            <CreateMaterialSampleFromWorkflowForm
+              actionDefinition={viewConfig}
+              moveToNewRunPage={moveToNewRunPage}
+              moveToSampleViewPage={moveToSampleViewPage}
+            />
+          );
+        })}
       </div>
     </div>
   );
 }
 
 export interface CreateMaterialSampleFromWorkflowForm {
-  actionDefinition: PersistedResource<PreparationProcessDefinition>;
+  actionDefinition: MaterialSampleFormViewConfig;
   moveToSampleViewPage: (id: string) => Promise<void>;
   moveToNewRunPage: () => Promise<void>;
 }
@@ -142,13 +151,14 @@ export function CreateMaterialSampleFromWorkflowForm({
 
 /** Gets the initial form values from the template default values. */
 function useWorkflowMaterialSampleInitialValues(
-  actionDefinition: PreparationProcessDefinition
+  actionDefinition: MaterialSampleFormViewConfig
 ) {
   return useMemo(() => {
-    const materialSampleInitialValues = getInitialValuesFromTemplateFields(
-      "material-sample",
-      actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
-    );
+    const materialSampleInitialValues =
+      getInitialValuesFromTemplateFields<MaterialSample>(
+        "material-sample",
+        actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+      );
 
     /* If no template entrry for determination or there is only one determination, make it primary
      * same as georeference assertion */
@@ -170,14 +180,15 @@ function useWorkflowMaterialSampleInitialValues(
         return org;
       });
 
-    const collectingEvent = getInitialValuesFromTemplateFields(
+    const collectingEvent = getInitialValuesFromTemplateFields<CollectingEvent>(
       "collecting-event",
       actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
     );
-    const acquisitionEvent = getInitialValuesFromTemplateFields(
-      "acquisition-event",
-      actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
-    );
+    const acquisitionEvent =
+      getInitialValuesFromTemplateFields<AcquisitionEvent>(
+        "acquisition-event",
+        actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+      );
 
     if (collectingEvent.id) {
       materialSampleInitialValues.collectingEvent = {
@@ -234,7 +245,7 @@ function useWorkflowMaterialSampleInitialValues(
 /** Gets the form's initial values from the stored Template. */
 function getInitialValuesFromTemplateFields<TResource extends KitsuResource>(
   type: TResource["type"],
-  templateFields?: TemplateFields<TResource>
+  templateFields?: TemplateFields
 ): InputResource<TResource> {
   const initialValues = { type } as InputResource<TResource>;
   for (const [key, val] of toPairs(templateFields)) {

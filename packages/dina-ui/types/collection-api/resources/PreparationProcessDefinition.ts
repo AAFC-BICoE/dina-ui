@@ -1,39 +1,43 @@
-import { KitsuResource } from "kitsu";
-import { AcquisitionEvent } from "..";
-import { CollectingEvent } from "./CollectingEvent";
-import { MaterialSample } from "./MaterialSample";
+import { z } from "zod";
+
+// Define as Zod schemas instead of Typescript interfaces to enforce structure at runtime:
+
+const templateFieldSchema = z.object({
+  enabled: z.boolean(),
+  defaultValue: z.unknown()
+});
+
+const templateFieldsSchema = z.record(
+  z.string(),
+  templateFieldSchema.optional()
+);
+
+const formTemplateSchema = z.object({
+  allowNew: z.boolean().optional(),
+  allowExisting: z.boolean().optional(),
+  templateFields: templateFieldsSchema
+});
+
+export const materialSampleFormViewConfigSchema = z.object({
+  type: z.literal("material-sample-form-custom-view"),
+  formTemplates: z.object({
+    COLLECTING_EVENT: formTemplateSchema.optional(),
+    MATERIAL_SAMPLE: formTemplateSchema.optional(),
+    ACQUISITION_EVENT: formTemplateSchema.optional()
+  })
+});
+
+// Export typescript interfaces derived from the Zod schemas:
 
 /** Form template config and default values. */
-export interface FormTemplate<TFormValues> {
-  allowNew?: boolean;
-  allowExisting?: boolean;
-  templateFields: TemplateFields<TFormValues>;
-}
+export type FormTemplate = z.infer<typeof formTemplateSchema>;
 
 /** Map of form field names to template field config. */
-export type TemplateFields<TFormValues = any> = {
-  [Field in keyof TFormValues]?: TemplateField<TFormValues[Field]>;
-};
+export type TemplateFields = z.infer<typeof templateFieldsSchema>;
 
 /** Configures one field in a form template. */
-export interface TemplateField<TFieldType> {
-  enabled: boolean;
-  defaultValue: TFieldType | null;
-}
+export type TemplateField = z.infer<typeof templateFieldSchema>;
 
-export interface PreparationProcessDefinitionAttributes {
-  type: "material-sample-action-definition";
-  name: string;
-  actionType: "ADD" | "SPLIT" | "MERGE";
-  createdBy?: string;
-  createdOn?: string;
-  group: string;
-  formTemplates: {
-    COLLECTING_EVENT?: FormTemplate<CollectingEvent>;
-    MATERIAL_SAMPLE?: FormTemplate<MaterialSample>;
-    ACQUISITION_EVENT?: FormTemplate<AcquisitionEvent>;
-  };
-}
-
-export type PreparationProcessDefinition = KitsuResource &
-  PreparationProcessDefinitionAttributes;
+export type MaterialSampleFormViewConfig = z.infer<
+  typeof materialSampleFormViewConfigSchema
+>;

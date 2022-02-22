@@ -9,7 +9,7 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  PreparationProcessDefinition,
+  CustomView,
   StorageUnit
 } from "../../../../types/collection-api";
 
@@ -74,14 +74,10 @@ const mockGet = jest.fn<any, any>(async path => {
 });
 
 const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
-  saves.map(save => {
-    switch (save.type) {
-      case "material-sample-action-definition":
-        return { ...save.resource, id: "123" };
-      default:
-        console.error("No save return type defined for", save);
-    }
-  })
+  saves.map(save => ({
+    ...save.resource,
+    id: save.resource.id ?? "123"
+  }))
 );
 
 const apiContext = {
@@ -93,12 +89,12 @@ const apiContext = {
 
 /** Mount the form and provide test util functions. */
 async function mountForm(
-  existingActionDefinition?: PersistedResource<PreparationProcessDefinition>
+  existingActionDefinition?: PersistedResource<CustomView>
 ) {
   const wrapper = mountWithAppContext(
     <WorkflowTemplateForm
       onSaved={mockOnSaved}
-      fetchedActionDefinition={existingActionDefinition}
+      fetchedCustomView={existingActionDefinition}
     />,
     { apiContext }
   );
@@ -242,20 +238,22 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        // Both data components enabled but no fields defined:
-        COLLECTING_EVENT: {
-          templateFields: {}
+      viewConfiguration: {
+        formTemplates: {
+          // Both data components enabled but no fields defined:
+          COLLECTING_EVENT: {
+            templateFields: {}
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
+          }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -301,41 +299,43 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        COLLECTING_EVENT: {
-          allowNew: true,
-          templateFields: {
-            "geoReferenceAssertions[0].dwcDecimalLatitude": {
-              defaultValue: "1",
-              enabled: true
-            },
-            "geoReferenceAssertions[0].dwcDecimalLongitude": {
-              defaultValue: "2",
-              enabled: true
-            },
-            startEventDateTime: {
-              // No default value set:
-              enabled: true
-            },
-            endEventDateTime: {
-              // No default value set:
-              enabled: true
-            },
-            verbatimEventDateTime: {
-              defaultValue: "test-verbatim-default-datetime",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowNew: true,
+            templateFields: {
+              "geoReferenceAssertions[0].dwcDecimalLatitude": {
+                defaultValue: "1",
+                enabled: true
+              },
+              "geoReferenceAssertions[0].dwcDecimalLongitude": {
+                defaultValue: "2",
+                enabled: true
+              },
+              startEventDateTime: {
+                // No default value set:
+                enabled: true
+              },
+              endEventDateTime: {
+                // No default value set:
+                enabled: true
+              },
+              verbatimEventDateTime: {
+                defaultValue: "test-verbatim-default-datetime",
+                enabled: true
+              }
             }
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
           }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -364,26 +364,28 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          templateFields: {
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
-              },
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            templateFields: {
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -412,22 +414,24 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          templateFields: {
-            "organism[0].determination[0].verbatimScientificName": {
-              defaultValue: "test scientific name",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            templateFields: {
+              "organism[0].determination[0].verbatimScientificName": {
+                defaultValue: "test scientific name",
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -457,24 +461,26 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          templateFields: {
-            "associations[0].associatedSample": {
-              enabled: true
-            },
-            "associations[0].associationType": {
-              defaultValue: "test default association type",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              "associations[0].associatedSample": {
+                enabled: true
+              },
+              "associations[0].associationType": {
+                defaultValue: "test default association type",
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -499,25 +505,27 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        COLLECTING_EVENT: {
-          templateFields: {
-            // Only includes the linked collecting event's ID:
-            id: {
-              defaultValue: "321",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          COLLECTING_EVENT: {
+            templateFields: {
+              // Only includes the linked collecting event's ID:
+              id: {
+                defaultValue: "321",
+                enabled: true
+              }
             }
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
           }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -543,24 +551,26 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          templateFields: {
-            storageUnit: {
-              enabled: true,
-              defaultValue: {
-                id: "TEST_STORAGE",
-                name: "TEST_STORAGE"
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              storageUnit: {
+                enabled: true,
+                defaultValue: {
+                  id: "TEST_STORAGE",
+                  name: "TEST_STORAGE"
+                }
               }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -589,21 +599,23 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          templateFields: {
-            "scheduledAction.remarks": {
-              defaultValue: "default-remarks",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              "scheduledAction.remarks": {
+                defaultValue: "default-remarks",
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -632,24 +644,26 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        },
-        ACQUISITION_EVENT: {
-          templateFields: {
-            receptionRemarks: {
-              defaultValue: "default-reception-remarks",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {}
+          },
+          ACQUISITION_EVENT: {
+            templateFields: {
+              receptionRemarks: {
+                defaultValue: "default-reception-remarks",
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -678,37 +692,41 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        ACQUISITION_EVENT: {
-          templateFields: {
-            // Only includes the linked acquisition event's ID:
-            id: {
-              defaultValue: "987",
-              enabled: true
+      viewConfiguration: {
+        formTemplates: {
+          ACQUISITION_EVENT: {
+            templateFields: {
+              // Only includes the linked acquisition event's ID:
+              id: {
+                defaultValue: "987",
+                enabled: true
+              }
             }
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
           }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
   it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
     const { colEventSwitch, catalogSwitch, scheduledActionsSwitch } =
       await mountForm({
-        actionType: "ADD",
-        formTemplates: {},
+        type: "custom-view",
+        viewConfiguration: {
+          formTemplates: {},
+          type: "material-sample-form-custom-view"
+        },
         group: "test-group-1",
         id: "123",
-        name: "test-config",
-        type: "material-sample-action-definition"
+        name: "test-config"
       });
 
     // Checkboxes are unchecked:
@@ -720,23 +738,25 @@ describe("Workflow template edit page", () => {
   it("Edits an existing action-definition: Can unlink an existing Collecting Event.", async () => {
     const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
       await mountForm({
-        actionType: "ADD",
-        formTemplates: {
-          COLLECTING_EVENT: {
-            allowExisting: false,
-            allowNew: false,
-            templateFields: {
-              id: {
-                enabled: true,
-                defaultValue: "321"
+        id: "123",
+        type: "custom-view",
+        name: "test-config",
+        group: "test-group-1",
+        viewConfiguration: {
+          formTemplates: {
+            COLLECTING_EVENT: {
+              allowExisting: false,
+              allowNew: false,
+              templateFields: {
+                id: {
+                  enabled: true,
+                  defaultValue: "321"
+                }
               }
             }
-          }
-        },
-        group: "test-group-1",
-        id: "123",
-        name: "test-config",
-        type: "material-sample-action-definition"
+          },
+          type: "material-sample-form-custom-view"
+        }
       });
 
     expect(colEventSwitch().prop("checked")).toEqual(true);
@@ -751,45 +771,52 @@ describe("Workflow template edit page", () => {
 
     await submitForm();
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        COLLECTING_EVENT: {
-          allowExisting: false,
-          allowNew: false,
-          templateFields: {}
+      viewConfiguration: {
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowExisting: false,
+            allowNew: false,
+            templateFields: {}
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
+          }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
   it("Edits an existing action-definition: Can unlink an existing Acquisition Event.", async () => {
     const { wrapper, acquisitionEventSwitch, submitForm } = await mountForm({
-      actionType: "ADD",
-      formTemplates: {
-        ACQUISITION_EVENT: {
-          allowExisting: true,
-          allowNew: true,
-          templateFields: {
-            id: {
-              enabled: true,
-              defaultValue: "987"
+      viewConfiguration: {
+        formTemplates: {
+          ACQUISITION_EVENT: {
+            allowExisting: true,
+            allowNew: true,
+            templateFields: {
+              id: {
+                enabled: true,
+                defaultValue: "987"
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
 
     expect(acquisitionEventSwitch().prop("checked")).toEqual(true);
@@ -805,60 +832,64 @@ describe("Workflow template edit page", () => {
 
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        ACQUISITION_EVENT: {
-          templateFields: {}
+      viewConfiguration: {
+        formTemplates: {
+          ACQUISITION_EVENT: {
+            templateFields: {}
+          },
+          MATERIAL_SAMPLE: {
+            templateFields: {}
+          }
         },
-        MATERIAL_SAMPLE: {
-          templateFields: {}
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
   it("Edits an existing action-definition: Can change the enabled and default values.", async () => {
     const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
       await mountForm({
-        actionType: "ADD",
-        formTemplates: {
-          COLLECTING_EVENT: {
-            allowNew: true,
-            allowExisting: true,
-            templateFields: {
-              dwcRecordNumber: {
-                defaultValue: null,
-                enabled: true
-              },
-              verbatimEventDateTime: {
-                defaultValue: "test-verbatim-default-datetime",
-                enabled: true
+        viewConfiguration: {
+          formTemplates: {
+            COLLECTING_EVENT: {
+              allowNew: true,
+              allowExisting: true,
+              templateFields: {
+                dwcRecordNumber: {
+                  defaultValue: null,
+                  enabled: true
+                },
+                verbatimEventDateTime: {
+                  defaultValue: "test-verbatim-default-datetime",
+                  enabled: true
+                }
+              }
+            },
+            MATERIAL_SAMPLE: {
+              allowNew: true,
+              allowExisting: true,
+              templateFields: {
+                preparationType: {
+                  defaultValue: {
+                    id: "100",
+                    name: "test-prep-type",
+                    type: "preparation-type"
+                  },
+                  enabled: true
+                }
               }
             }
           },
-          MATERIAL_SAMPLE: {
-            allowNew: true,
-            allowExisting: true,
-            templateFields: {
-              preparationType: {
-                defaultValue: {
-                  id: "100",
-                  name: "test-prep-type",
-                  type: "preparation-type"
-                },
-                enabled: true
-              }
-            }
-          }
+          type: "material-sample-form-custom-view"
         },
         group: "test-group-1",
         id: "123",
         name: "test-config",
-        type: "material-sample-action-definition"
+        type: "custom-view"
       });
 
     // Data Component checkboxes are checked:
@@ -881,38 +912,40 @@ describe("Workflow template edit page", () => {
 
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        COLLECTING_EVENT: {
-          allowExisting: true,
-          allowNew: true,
-          templateFields: {
-            // New values:
-            dwcRecordNumber: {
-              enabled: true,
-              defaultValue: "test-default-recorded-by"
+      viewConfiguration: {
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowExisting: true,
+            allowNew: true,
+            templateFields: {
+              // New values:
+              dwcRecordNumber: {
+                enabled: true,
+                defaultValue: "test-default-recorded-by"
+              }
+            }
+          },
+          MATERIAL_SAMPLE: {
+            allowExisting: true,
+            allowNew: true,
+            templateFields: {
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              }
             }
           }
         },
-        MATERIAL_SAMPLE: {
-          allowExisting: true,
-          allowNew: true,
-          templateFields: {
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
-              },
-              enabled: true
-            }
-          }
-        }
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
@@ -930,55 +963,57 @@ describe("Workflow template edit page", () => {
       toggleScheduledActions,
       submitForm
     } = await mountForm({
-      actionType: "ADD",
-      formTemplates: {
-        COLLECTING_EVENT: {
-          allowNew: true,
-          allowExisting: true,
-          templateFields: {
-            verbatimEventDateTime: {
-              defaultValue: "test-verbatim-default-datetime",
-              enabled: true
-            }
-          }
-        },
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          allowExisting: true,
-          templateFields: {
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
-              },
-              enabled: true
-            },
-            storageUnit: {
-              enabled: true,
-              defaultValue: {
-                id: "TEST_STORAGE",
-                type: "storage-unit",
-                name: "TEST_STORAGE"
-              } as StorageUnit
-            },
-            ...{
-              "organism[0].determination[0].verbatimScientificName": {
-                defaultValue: "test scientific name",
-                enabled: true
-              },
-              "scheduledAction.remarks": {
-                defaultValue: "default-remarks",
+      viewConfiguration: {
+        formTemplates: {
+          COLLECTING_EVENT: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {
+              verbatimEventDateTime: {
+                defaultValue: "test-verbatim-default-datetime",
                 enabled: true
               }
             }
+          },
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              },
+              storageUnit: {
+                enabled: true,
+                defaultValue: {
+                  id: "TEST_STORAGE",
+                  type: "storage-unit",
+                  name: "TEST_STORAGE"
+                } as StorageUnit
+              },
+              ...{
+                "organism[0].determination[0].verbatimScientificName": {
+                  defaultValue: "test scientific name",
+                  enabled: true
+                },
+                "scheduledAction.remarks": {
+                  defaultValue: "default-remarks",
+                  enabled: true
+                }
+              }
+            }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
 
     // Data Component checkboxes are checked:
@@ -998,53 +1033,57 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      // Both data components removed:
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          allowExisting: true,
-          templateFields: {}
-        }
+      viewConfiguration: {
+        // Both data components removed:
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {}
+          }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 
   it("Edits an existing action-definition: Splits the Identifiers and Preparation subforms correctly", async () => {
     const { wrapper, submitForm } = await mountForm({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowNew: true,
-          allowExisting: true,
-          templateFields: {
-            materialSampleName: {
-              defaultValue: "test-default-name",
-              enabled: true
-            },
-            dwcOtherCatalogNumbers: {
-              defaultValue: ["other-number-1", "other-number-2"],
-              enabled: true
-            },
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            allowNew: true,
+            allowExisting: true,
+            templateFields: {
+              materialSampleName: {
+                defaultValue: "test-default-name",
+                enabled: true
               },
-              enabled: true
+              dwcOtherCatalogNumbers: {
+                defaultValue: ["other-number-1", "other-number-2"],
+                enabled: true
+              },
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              }
             }
           }
-        }
+        },
+        type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
 
     // The input values should be initialized:
@@ -1069,28 +1108,30 @@ describe("Workflow template edit page", () => {
     await submitForm();
 
     expect(mockOnSaved).lastCalledWith({
-      actionType: "ADD",
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowExisting: true,
-          allowNew: true,
-          templateFields: {
-            dwcOtherCatalogNumbers: {
-              defaultValue: ["other-number-1", "other-number-2"],
-              enabled: true
-            },
-            materialSampleName: {
-              // The edited value:
-              defaultValue: "edited-material-sample-name",
-              enabled: true
-            },
-            preparationType: {
-              defaultValue: {
-                id: "100",
-                name: "test-prep-type",
-                type: "preparation-type"
+      viewConfiguration: {
+        type: "material-sample-form-custom-view",
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            allowExisting: true,
+            allowNew: true,
+            templateFields: {
+              dwcOtherCatalogNumbers: {
+                defaultValue: ["other-number-1", "other-number-2"],
+                enabled: true
               },
-              enabled: true
+              materialSampleName: {
+                // The edited value:
+                defaultValue: "edited-material-sample-name",
+                enabled: true
+              },
+              preparationType: {
+                defaultValue: {
+                  id: "100",
+                  name: "test-prep-type",
+                  type: "preparation-type"
+                },
+                enabled: true
+              }
             }
           }
         }
@@ -1098,7 +1139,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
-      type: "material-sample-action-definition"
+      type: "custom-view"
     });
   });
 });

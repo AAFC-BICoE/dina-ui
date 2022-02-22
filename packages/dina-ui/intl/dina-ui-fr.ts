@@ -573,7 +573,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitType: "Type d’unité de stockage",
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
-  switchToActionType: 'Passer à "{actionType}".',
   tags: "Étiquettes",
   templateNameMandatoryErrorMsg:
     "Veuillez entrer un nom de modèle de flux de travaux.",

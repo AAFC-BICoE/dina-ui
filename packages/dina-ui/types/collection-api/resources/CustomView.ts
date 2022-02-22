@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 
-export interface CustomViewAttributes {
+export interface CustomView extends KitsuResource {
   type: "custom-view";
   createdOn?: string;
   createdBy?: string;
@@ -11,5 +11,3 @@ export interface CustomViewAttributes {
   /** This field is JSON with unknown structure, so use Yup for schema validation / casting. */
   viewConfiguration?: unknown;
 }
-
-export type CustomView = KitsuResource & CustomViewAttributes;

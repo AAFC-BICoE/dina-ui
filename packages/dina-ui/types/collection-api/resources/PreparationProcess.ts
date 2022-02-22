@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MaterialSample } from "./MaterialSample";
-import { PreparationProcessDefinition } from "./PreparationProcessDefinition";
+import { MaterialSampleFormViewConfig } from "./PreparationProcessDefinition";
 
 export interface PreparationProcessAttributes {
   uuid?: string;
@@ -11,7 +11,7 @@ export interface PreparationProcessAttributes {
 }
 
 export interface PreparationProcessRelationships {
-  preparationProcessDefinition?: PreparationProcessDefinition;
+  preparationProcessDefinition?: MaterialSampleFormViewConfig;
   sourceMaterialSample?: MaterialSample;
 }
 
