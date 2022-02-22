@@ -154,7 +154,7 @@ describe("QueryPage component", () => {
             "Crnk-Compact": "true"
           },
           params: {
-            filter: '{"name":["aafc","cnc"]}',
+            filter: '{"name":["testGroup","aafc","cnc"]}',
             page: {
               limit: 1000
             }
@@ -162,23 +162,7 @@ describe("QueryPage component", () => {
           paramsSerializer: expect.anything()
         }
       ],
-      [
-        "user-api/group",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
-        }
-      ]
+      expect.anything()
     ]);
 
     expect(mockPost).lastCalledWith(

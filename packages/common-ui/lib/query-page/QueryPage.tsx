@@ -23,11 +23,10 @@ import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
-import { FieldWrapper } from "../formik-connected/FieldWrapper";
 import { JsonValue } from "type-fest";
 import { useAccount } from "..";
 import useLocalStorage from "@rehooks/local-storage";
-import { get } from "lodash";
+import { get, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
 import moment from "moment";
@@ -65,7 +64,7 @@ export function QueryPage<TData extends KitsuResource>({
   const [initSavedSearchValues, setInitSavedSearchValues] =
     useState<Map<string, JsonValue[]>>();
   const { username } = useAccount();
-  const SAVED_SEARCHES = "saved-searches";
+  const SAVED_SEARCHES = "savedSearches";
   const [savedSearches, setSavedSearches] =
     useLocalStorage<Map<string, JsonValue>>(SAVED_SEARCHES);
 
@@ -89,14 +88,17 @@ export function QueryPage<TData extends KitsuResource>({
       : initData
   });
 
-  const savedEsIndexMapping =
-    initSavedSearchValues && initSavedSearchValues.size > 0
-      ? initSavedSearchValues
-          .values()
-          .next()
-          .value?.filter(initVal => get(initVal, "props.esIndexMapping"))?.[0]
-          ?.props?.esIndexMapping
-      : undefined;
+  // Retrieve the actual saved search content
+  const formValues = initSavedSearchValues?.values().next().value;
+
+  // tslint:disable: no-string-literal
+  const savedEsIndexMapping = formValues
+    ? toPairs(formValues as JsonValue[])
+        ?.filter(([key, _]) => key !== "group")?.[0]
+        ?.["queryRows"]?.filter(([_, value]) =>
+          get(value, "props.esIndexMapping")
+        )?.[0]?.[1]?.["props"]?.["esIndexMapping"]
+    : undefined;
 
   const combinedColumns = [
     ...(showRowCheckboxes
@@ -214,16 +216,19 @@ export function QueryPage<TData extends KitsuResource>({
     setInitSavedSearchValues(initValus);
   }
 
-  function saveSearch(value, isDefault, searchName) {
+  function saveSearch(isDefault, searchName) {
     let newSavedSearches;
     const mySavedSearches = savedSearches;
+
     if (mySavedSearches && Object.keys(mySavedSearches)?.length > 0) {
       mySavedSearches[username as any][
         `${isDefault ? "default" : searchName}`
-      ] = value;
+      ] = pageRef.current?.values;
     } else {
       newSavedSearches = {
-        [`${username}`]: { [`${isDefault ? "default" : searchName}`]: value }
+        [`${username}`]: {
+          [`${isDefault ? "default" : searchName}`]: pageRef.current?.values
+        }
       };
     }
     setSavedSearches(
@@ -239,17 +244,23 @@ export function QueryPage<TData extends KitsuResource>({
     router.reload();
   }
   const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
-  const initialValues = {
-    queryRows:
-      refreshPage.current &&
-      initSavedSearchValues &&
-      initSavedSearchValues.size > 0
-        ? initSavedSearchValues.values().next().value
-        : pageRef.current?.values.queryRows &&
-          Object.keys(pageRef.current?.values.queryRows).length > 0
-        ? pageRef.current?.values.queryRows
-        : [{}]
-  };
+  const initialValues =
+    refreshPage.current && formValues && toPairs(formValues).length > 0
+      ? formValues
+      : pageRef.current?.values
+      ? pageRef.current?.values
+      : {
+          queryRows: [
+            {
+              fieldName:
+                sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
+              matchType: "match",
+              boolean: "true",
+              date: moment().format()
+            }
+          ]
+        };
+
   refreshPage.current = false;
 
   return (
@@ -273,27 +284,22 @@ export function QueryPage<TData extends KitsuResource>({
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
       </div>
 
-      <FieldWrapper name="queryRows" hideLabel={true}>
-        {({ value }) => (
-          <SavedSearch
-            loadSavedSearch={loadSavedSearch}
-            value={value}
-            deleteSavedSearch={deleteSavedSearch}
-            saveSearch={saveSearch}
-            savedSearchNames={
-              savedSearches?.[username as any]
-                ? Object.keys(savedSearches?.[username as any])
-                : []
-            }
-            initialSavedSearches={savedSearches?.[username as any]}
-            selectedSearch={
-              initSavedSearchValues
-                ? initSavedSearchValues.keys().next().value
-                : undefined
-            }
-          />
-        )}
-      </FieldWrapper>
+      <SavedSearch
+        loadSavedSearch={loadSavedSearch}
+        deleteSavedSearch={deleteSavedSearch}
+        saveSearch={saveSearch}
+        savedSearchNames={
+          savedSearches?.[username as any]
+            ? Object.keys(savedSearches?.[username as any])
+            : []
+        }
+        initialSavedSearches={savedSearches?.[username as any]}
+        selectedSearch={
+          initSavedSearchValues
+            ? initSavedSearchValues.keys().next().value
+            : undefined
+        }
+      />
 
       <div
         className="query-table-wrapper"

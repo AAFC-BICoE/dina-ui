@@ -1,22 +1,16 @@
 import { DinaForm, TextField, useModal } from "common-ui";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { JsonValue } from "type-fest";
 import { FormikButton } from "../formik-connected/FormikButton";
 
 interface SavedSearchModalParams {
-  value: JsonValue;
-  saveSearch: (
-    value: JsonValue,
-    isDefault: boolean,
-    searchName?: string
-  ) => void;
+  saveSearch: (isDefault: boolean, searchName?: string) => void;
 }
 
 export function useSavedSearchModal() {
   const { closeModal, openModal } = useModal();
   const { formatMessage } = useDinaIntl();
 
-  function openSavedSearchModal({ value, saveSearch }: SavedSearchModalParams) {
+  function openSavedSearchModal({ saveSearch }: SavedSearchModalParams) {
     openModal(
       <div className="modal-content">
         <style>{`
@@ -35,11 +29,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-3"
                     onClick={(submittedValues, _) => {
-                      saveSearch(
-                        value as any,
-                        false,
-                        submittedValues.searchName
-                      );
+                      saveSearch(false, submittedValues.searchName);
                       closeModal();
                     }}
                   >
@@ -48,7 +38,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-2"
                     onClick={() => {
-                      saveSearch(value as any, true);
+                      saveSearch(true);
                       closeModal();
                     }}
                   >
