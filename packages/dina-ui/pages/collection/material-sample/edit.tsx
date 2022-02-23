@@ -528,12 +528,17 @@ export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
     <FieldSet id={id} legend={<DinaMessage id="materialSample" />}>
       <div className="row">
         <div className="col-md-6">
-          <ResourceSelectField<MaterialSampleType>
+          <AutoSuggestTextField<Vocabulary>
             name="materialSampleType"
-            filter={filterBy(["name"])}
-            model="collection-api/material-sample-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/material-sample-type/view?id="
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleType"
+            })}
+            suggestion={vocabElement =>
+              vocabElement?.vocabularyElements?.map(
+                it => it?.labels?.[locale] ?? ""
+              ) ?? ""
+            }
+            alwaysShowSuggestions={true}
           />
           {!readOnly ? (
             <AutoSuggestTextField<Vocabulary>
