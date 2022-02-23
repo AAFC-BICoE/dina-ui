@@ -209,19 +209,18 @@ export function TransactionFormLayout() {
         />
       </FieldSet>
       <ShipmentDetailsFieldSet fieldName="shipment" />
-      <FieldSet legend={<DinaMessage id="managedAttributes" />}>
-        <DinaFormSection
-          // Disabled the template's restrictions for this section:
-          enabledFields={null}
-        >
-          <ManagedAttributesEditor
-            valuesPath="managedAttributes"
-            managedAttributeApiPath="loan-transaction-api/managed-attribute"
-            apiBaseUrl="/loan-transaction-api"
-            managedAttributeKeyField="key"
-          />
-        </DinaFormSection>
-      </FieldSet>
+      <DinaFormSection
+        // Disabled the template's restrictions for this section:
+        enabledFields={null}
+      >
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="loan-transaction-api/managed-attribute"
+          fieldSetProps={{
+            legend: <DinaMessage id="managedAttributes" />
+          }}
+        />
+      </DinaFormSection>
     </div>
   );
 }
