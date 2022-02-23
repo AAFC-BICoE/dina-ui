@@ -16,6 +16,7 @@ import {
   CollectingEvent,
   CustomView,
   MaterialSample,
+  MaterialSampleFormSectionId,
   MaterialSampleFormViewConfig,
   materialSampleFormViewConfigSchema,
   TemplateFields
@@ -29,15 +30,13 @@ export default function CreateMaterialSampleFromWorkflowPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  const actionDefinitionQuery = useQuery<CustomView>(
+  const customViewQuery = useQuery<CustomView>(
     { path: `collection-api/custom-view/${actionDefinitionId}` },
     { disabled: !actionDefinitionId }
   );
 
   const pageTitle = `${formatMessage("runWorkflow")}${
-    actionDefinitionQuery.response
-      ? `: ${actionDefinitionQuery.response.data.name}`
-      : ""
+    customViewQuery.response ? `: ${customViewQuery.response.data.name}` : ""
   }`;
 
   async function moveToSampleViewPage(id: string) {
@@ -54,7 +53,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
-        {withResponse(actionDefinitionQuery, ({ data }) => {
+        {withResponse(customViewQuery, ({ data }) => {
           const viewConfig = materialSampleFormViewConfigSchema.parse(
             data.viewConfiguration
           );
@@ -97,6 +96,10 @@ export function CreateMaterialSampleFromWorkflowForm({
   function selectOnSaved(routeString: RoutingButtonStrings) {
     return routeString === "newRun" ? moveToNewRunPage : moveToSampleViewPage;
   }
+
+  const [navOrder, setNavOrder] = useState<
+    MaterialSampleFormSectionId[] | null
+  >(actionDefinition.navOrder);
 
   const [onSaveString, setOnSaveString] =
     useState<RoutingButtonStrings>("viewSample");
@@ -145,6 +148,8 @@ export function CreateMaterialSampleFromWorkflowForm({
           "allowExisting"
         )
       }}
+      navOrder={navOrder}
+      onChangeNavOrder={setNavOrder}
     />
   );
 }
