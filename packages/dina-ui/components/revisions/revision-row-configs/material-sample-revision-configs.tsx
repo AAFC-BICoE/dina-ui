@@ -98,15 +98,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           )}
         </div>
       ),
-      materialSampleType: ({ original: { value } }) => (
-        <ReferenceLink<MaterialSampleType>
-          baseApiPath="collection-api"
-          type="material-sample-type"
-          reference={value}
-          name={({ name }) => name}
-          href="/collection/material-sample-type/view?id="
-        />
-      ),
+      materialSampleType: ({ original: { value } }) => value,
       preparedBy: ({ original: { value } }) => (
         <ReferenceLink<Person>
           baseApiPath="agent-api"

@@ -52,7 +52,7 @@ export const getColumnDefinition = () => {
       accessor: "collection.name"
     },
     stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType.name" },
+    { accessor: "materialSampleType" },
     "createdBy",
     dateCell("createdOn")
   ];
@@ -73,13 +73,7 @@ export function SampleListLayout({
     "createdBy",
     "collection.name",
     "collection.code",
-    {
-      name: "materialSampleType.uuid",
-      type: "DROPDOWN",
-      resourcePath: "collection-api/material-sample-type",
-      filter: filterBy(["name"]),
-      optionLabel: (it: PersistedResource<MaterialSampleType>) => it.name
-    },
+    "materialSampleType",
     {
       name: "createdOn",
       type: "DATE"
@@ -148,7 +142,7 @@ export function SampleListLayout({
       queryTableProps={{
         columns,
         path: "collection-api/material-sample",
-        include: "collection,materialSampleType",
+        include: "collection",
         hideTopPagination,
         deps: [queryKey]
       }}
@@ -193,7 +187,7 @@ export default function MaterialSampleListPage() {
   const queryState = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      include: "collection,materialSampleType"
+      include: "collection"
     },
     {}
   );

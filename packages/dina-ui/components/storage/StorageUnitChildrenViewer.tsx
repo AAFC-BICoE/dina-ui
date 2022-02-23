@@ -202,7 +202,7 @@ export function StorageUnitContents({
       ),
       accessor: "materialSampleName"
     },
-    "materialSampleType.name",
+    "materialSampleType",
     {
       Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
       accessor: "tags"
