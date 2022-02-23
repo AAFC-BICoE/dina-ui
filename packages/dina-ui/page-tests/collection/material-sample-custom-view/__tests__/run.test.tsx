@@ -1,4 +1,3 @@
-import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components";
@@ -807,5 +806,27 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Renders the Material Sample form with a custom nav order", async () => {
+    const wrapper = await getWrapper({
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {}
+        }
+      },
+      navOrder: ["material-sample-info-section", "identifiers-section"],
+      type: "material-sample-form-custom-view"
+    });
+
+    // Shows the custom order: "Material Sample Info" then "Identifiers":
+    const listItemsAfter = wrapper.find(
+      ".material-sample-nav .list-group-item"
+    );
+    expect(
+      [listItemsAfter.at(0), listItemsAfter.at(1)].map(item => item.text())
+    ).toEqual(["Material Sample Info", "Identifiers"]);
   });
 });
