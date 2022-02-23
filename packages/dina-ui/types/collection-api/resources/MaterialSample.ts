@@ -22,6 +22,10 @@ export interface MaterialSampleAttributes {
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
   preparationMethod?: string | null;
+  preservationType?: string | null;
+  preparationFixative?: string | null;
+  preparationMaterials?: string | null;
+  preparationSubstrate?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;
