@@ -2,12 +2,16 @@ import { Vocabulary } from "../../../dina-ui/types/collection-api/resources/Voca
 
 import { SortableContainer } from "react-sortable-hoc";
 import Select from "react-select";
-import { useQuery } from "../api-client/useQuery";
+import {
+  JsonApiQuerySpec,
+  useQuery,
+  withResponse
+} from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
-  query?: () => any;
+  query?: () => JsonApiQuerySpec;
 }
 
 export function ControlledVocabularySelectField(
@@ -16,34 +20,35 @@ export function ControlledVocabularySelectField(
   const { locale, formatMessage } = useDinaIntl();
   const { query } = controlledVocabularySelectFieldProps;
 
-  const { loading, response } = useQuery<Vocabulary>(query?.());
-  if (loading) return <></>;
+  const vocQuery = useQuery<Vocabulary>(query?.() as any);
 
-  const options = response?.data?.vocabularyElements?.map(el => ({
-    label: el.labels?.[locale],
-    value: el.name
-  }));
+  return withResponse(vocQuery, ({ data }) => {
+    const options = data?.vocabularyElements?.map(el => ({
+      label: el.labels?.[locale],
+      value: el.name
+    }));
 
-  return (
-    <FieldWrapper {...controlledVocabularySelectFieldProps}>
-      {({ setValue, value }) => {
-        function onChange(newValue) {
-          setValue(newValue.value);
-        }
-        const selectedValue = options?.filter(opt => opt.value === value);
-        return (
-          <SortableSelect
-            onChange={onChange}
-            options={options}
-            placeholder={formatMessage("typeHereToSearch")}
-            value={selectedValue}
-            axis="xy"
-            distance={4}
-          />
-        );
-      }}
-    </FieldWrapper>
-  );
+    return (
+      <FieldWrapper {...controlledVocabularySelectFieldProps}>
+        {({ setValue, value }) => {
+          function onChange(newValue) {
+            setValue(newValue.value);
+          }
+          const selectedValue = options?.filter(opt => opt.value === value);
+          return (
+            <SortableSelect
+              onChange={onChange}
+              options={options}
+              placeholder={formatMessage("typeHereToSearch")}
+              value={selectedValue}
+              axis="xy"
+              distance={4}
+            />
+          );
+        }}
+      </FieldWrapper>
+    );
+  });
 }
 
 const SortableSelect = SortableContainer(Select);
