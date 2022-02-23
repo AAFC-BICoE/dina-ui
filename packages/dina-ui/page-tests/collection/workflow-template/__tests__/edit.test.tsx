@@ -253,6 +253,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -335,6 +336,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -385,6 +387,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -431,6 +434,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -480,6 +484,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -525,6 +530,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -570,6 +576,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -615,6 +622,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -663,6 +671,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -712,6 +721,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -726,6 +736,7 @@ describe("Workflow template edit page", () => {
         },
         group: "test-group-1",
         id: "123",
+        restrictToCreatedBy: false,
         name: "test-config"
       });
 
@@ -741,6 +752,7 @@ describe("Workflow template edit page", () => {
         id: "123",
         type: "custom-view",
         name: "test-config",
+        restrictToCreatedBy: false,
         group: "test-group-1",
         viewConfiguration: {
           formTemplates: {
@@ -792,6 +804,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -816,6 +829,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
 
@@ -846,6 +860,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -889,6 +904,7 @@ describe("Workflow template edit page", () => {
         group: "test-group-1",
         id: "123",
         name: "test-config",
+        restrictToCreatedBy: false,
         type: "custom-view"
       });
 
@@ -945,6 +961,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -1013,6 +1030,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
 
@@ -1047,6 +1065,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });
@@ -1083,6 +1102,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
 
@@ -1139,6 +1159,7 @@ describe("Workflow template edit page", () => {
       group: "test-group-1",
       id: "123",
       name: "test-config",
+      restrictToCreatedBy: false,
       type: "custom-view"
     });
   });

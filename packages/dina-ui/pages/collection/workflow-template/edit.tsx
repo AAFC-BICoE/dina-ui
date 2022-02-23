@@ -41,10 +41,12 @@ import {
   MATERIALSAMPLE_FIELDSET_FIELDS
 } from "../material-sample/edit";
 
+/** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
   id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required(),
+  restrictToCreatedBy: yup.boolean().required(),
   attachmentsConfig: yup.mixed(),
 
   storageUnit: yup.mixed(),
@@ -109,6 +111,7 @@ export function WorkflowTemplateForm({
   const { viewConfiguration: unknownViewConfig, ...initialDefinition } =
     fetchedCustomView ?? {
       type: "custom-view",
+      restrictToCreatedBy: false,
       viewConfiguration: {
         formTemplates: {},
         type: "material-sample-form-custom-view"
@@ -178,10 +181,18 @@ export function WorkflowTemplateForm({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    const customViewFields = pick(submittedValues, "id", "group", "name");
+    const {
+      id,
+      group,
+      name,
+      restrictToCreatedBy,
+      ...materialSampleTemplateFields
+    } = submittedValues;
+    const customViewFields = { id, group, name, restrictToCreatedBy };
 
-    const enabledTemplateFields =
-      getEnabledTemplateFieldsFromForm(submittedValues);
+    const enabledTemplateFields = getEnabledTemplateFieldsFromForm(
+      materialSampleTemplateFields
+    );
 
     const identifierTemplateFields = pick(
       enabledTemplateFields,
@@ -222,7 +233,7 @@ export function WorkflowTemplateForm({
     const newViewConfig: MaterialSampleFormViewConfig = {
       formTemplates: {
         MATERIAL_SAMPLE: {
-          ...submittedValues.attachmentsConfig,
+          ...materialSampleTemplateFields.attachmentsConfig,
           templateFields: {
             ...identifierTemplateFields,
             ...materialSampleFieldsetTemplateFields,
