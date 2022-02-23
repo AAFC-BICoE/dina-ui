@@ -413,7 +413,7 @@ export function useMaterialSampleSave({
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-      // Remove the scheduledAction field from the workflow template:
+      // Remove the scheduledAction field from the Custom View:
       ...{ scheduledAction: undefined }
     };
 

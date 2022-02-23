@@ -107,7 +107,7 @@ export function CreateMaterialSampleFromWorkflowForm({
       buttonBar={
         <ButtonBar className="d-flex">
           <BackButton
-            entityLink="/collection/workflow-template"
+            entityLink="/collection/material-sample-custom-view"
             className="flex-grow-1"
           />
           <SubmitButton

@@ -4,7 +4,7 @@ import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { StorageLinker } from "../../../../components";
-import { WorkflowTemplateForm } from "../../../../pages/collection/workflow-template/edit";
+import { MaterialSampleCustomViewForm } from "../../../../pages/collection/material-sample-custom-view/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -92,7 +92,7 @@ async function mountForm(
   existingActionDefinition?: PersistedResource<CustomView>
 ) {
   const wrapper = mountWithAppContext(
-    <WorkflowTemplateForm
+    <MaterialSampleCustomViewForm
       onSaved={mockOnSaved}
       fetchedCustomView={existingActionDefinition}
     />,

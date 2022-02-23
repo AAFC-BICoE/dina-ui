@@ -117,7 +117,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createNewMaterialSamples: "Create New Material Samples",
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
-  createWorkflowTemplateTitle: "Create Workflow Template",
+  createMaterialSampleCustomView: "Create Material Sample Custom View",
   customPlaceName: "Custom Place Name",
   customView: "Custom View",
   dataComponents: "Data Components",
@@ -177,7 +177,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   editStorageUnitTitle: "Edit Storage Unit",
   editStorageUnitTypeTitle: "Edit Storage Type",
   editThisCustomView: "Edit This Custom View",
-  editWorkflowTemplateTitle: "Edit Workflow Template",
+  editMaterialSampleCustomView: "Edit Material Sample Custom View",
   elevationInMeters: "Elevation in Meters",
   enableDateRangeLabel: "Enable Date Range",
   endEventDateTime: "End Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
@@ -581,7 +581,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storageUnitTypeListTitle: "Storage Unit Types",
   storagesCreatedByMe: "Storages Created By Me",
   tags: "Tags",
-  templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillLoseAllDataEnteredInThisStep:
     "This will lose all data entered in this step.",
   thisWillRemoveYourTemplate:
@@ -623,8 +622,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
-  workflowTemplateListTitle: "Workflow Templates",
-  workflowTemplateTitle: "Workflow Template",
+  materialSampleCustomViews: "Material Sample Custom Views",
+  materialSampleCustomView: "Material Sample Custom View",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",

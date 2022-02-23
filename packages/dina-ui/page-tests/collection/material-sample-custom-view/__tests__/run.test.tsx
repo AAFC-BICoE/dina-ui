@@ -2,7 +2,7 @@ import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { BLANK_PREPARATION } from "../../../../components/collection";
-import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/workflow-template/run";
+import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,

@@ -65,17 +65,17 @@ export default function PreparationProcessTemplatePage() {
   const router = useRouter();
   const id = router.query.id?.toString();
 
-  const workflowTemplateQuery = useQuery<CustomView>(
+  const customViewQuery = useQuery<CustomView>(
     { path: `/collection-api/custom-view/${id}` },
     { disabled: !id }
   );
 
   const pageTitle = id
-    ? "editWorkflowTemplateTitle"
-    : "createWorkflowTemplateTitle";
+    ? "editMaterialSampleCustomView"
+    : "createMaterialSampleCustomView";
 
   async function moveToNextPage() {
-    await router.push("/collection/workflow-template/list");
+    await router.push("/collection/material-sample-custom-view/list");
   }
 
   return (
@@ -87,29 +87,29 @@ export default function PreparationProcessTemplatePage() {
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (
-          withResponse(workflowTemplateQuery, ({ data: fetchedCustomView }) => (
-            <WorkflowTemplateForm
+          withResponse(customViewQuery, ({ data: fetchedCustomView }) => (
+            <MaterialSampleCustomViewForm
               fetchedCustomView={fetchedCustomView}
               onSaved={moveToNextPage}
             />
           ))
         ) : (
-          <WorkflowTemplateForm onSaved={moveToNextPage} />
+          <MaterialSampleCustomViewForm onSaved={moveToNextPage} />
         )}
       </main>
     </div>
   );
 }
 
-export interface WorkflowTemplateFormProps {
+export interface MaterialSampleCustomViewFormProps {
   fetchedCustomView?: PersistedResource<CustomView>;
   onSaved: (savedDefinition: PersistedResource<CustomView>) => Promisable<void>;
 }
 
-export function WorkflowTemplateForm({
+export function MaterialSampleCustomViewForm({
   fetchedCustomView,
   onSaved
-}: WorkflowTemplateFormProps) {
+}: MaterialSampleCustomViewFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
 
@@ -315,13 +315,13 @@ export function WorkflowTemplateForm({
         <BackButton
           entityId={fetchedCustomView?.id}
           className="me-auto"
-          entityLink="/collection/workflow-template"
+          entityLink="/collection/material-sample-custom-view"
           byPassView={true}
         />
         <DeleteButton
           id={fetchedCustomView?.id}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/workflow-template/list"
+          postDeleteRedirect="/collection/material-sample-custom-view/list"
           type="custom-view"
           className="me-5"
         />
