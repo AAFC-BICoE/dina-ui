@@ -2,6 +2,7 @@ import Link from "next/link";
 import { KeyValueTable } from "common-ui";
 import { Transaction } from "../../../types/loan-transaction-api";
 import { RevisionRowConfig } from "../revision-row-config";
+import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 
 export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
   name: ({ id, transactionNumber }) => (
@@ -18,6 +19,14 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
             <KeyValueTable data={address} />
           )
         }}
+      />
+    ),
+    managedAttributes: ({ original: { value } }) => (
+      <ManagedAttributesViewer
+        managedAttributeApiPath={key =>
+          `collection-api/managed-attribute/${key}`
+        }
+        values={value}
       />
     )
   }
