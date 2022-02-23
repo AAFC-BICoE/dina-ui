@@ -165,7 +165,7 @@ function OrganismsTable({
   }
 
   function onSortEnd(se: SortEnd) {
-    document.body.style.cursor = "default";
+    document.body.style.cursor = "inherit";
     onRowMove(se.oldIndex, se.newIndex);
   }
 

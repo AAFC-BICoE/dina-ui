@@ -1,9 +1,8 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
+import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import {
-  MaterialSampleForm,
-  nextSampleInitialValues
-} from "../../../../pages/collection/material-sample/edit";
+import { nextSampleInitialValues } from "../../../../components";
+import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -11,7 +10,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import Select from "react-select";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -106,6 +104,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
     case "collection-api/vocabulary/associationType":
+    case "collection-api/custom-view":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
 });

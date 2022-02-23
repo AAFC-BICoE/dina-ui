@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { get, mapValues, pick, pickBy, set, toPairs, isNil } from "lodash";
+import { get, isNil, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
@@ -21,6 +21,8 @@ import * as yup from "yup";
 import {
   GroupSelectField,
   Head,
+  IDENTIFIERS_FIELDS,
+  MATERIALSAMPLE_FIELDSET_FIELDS,
   Nav,
   TAG_SECTION_FIELDS
 } from "../../../components";
@@ -40,11 +42,7 @@ import {
   TemplateField,
   TemplateFields
 } from "../../../types/collection-api";
-import {
-  IDENTIFIERS_FIELDS,
-  MaterialSampleForm,
-  MATERIALSAMPLE_FIELDSET_FIELDS
-} from "../material-sample/edit";
+import { MaterialSampleForm } from "../material-sample/edit";
 
 /** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
