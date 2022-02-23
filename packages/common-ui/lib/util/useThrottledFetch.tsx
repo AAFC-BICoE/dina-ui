@@ -6,12 +6,14 @@ export interface UseThrottledFetchParams<TData> {
   fetcher: (query: string) => Promise<TData>;
   timeoutMs: number;
   initSearchValue?: string;
+  isVirusName?: boolean;
 }
 
 export function useThrottledFetch<TData>({
   fetcher,
   timeoutMs,
-  initSearchValue
+  initSearchValue,
+  isVirusName
 }: UseThrottledFetchParams<TData>) {
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState(initSearchValue ?? "");
@@ -33,10 +35,10 @@ export function useThrottledFetch<TData>({
       const throttleReset = setTimeout(() => setThrottled(false), timeoutMs);
       return () => clearTimeout(throttleReset);
     }
-  }, [searchValue]);
+  }, [searchValue, isVirusName]);
 
-  const { isValidating: searchIsLoading, data: searchResult } = useSWR(
-    [searchValue],
+  const { isValidating: searchIsLoading, data: mySearchResult } = useSWR(
+    [searchValue, isVirusName],
     () => fetcher(searchValue),
     {
       shouldRetryOnError: false,
@@ -44,6 +46,12 @@ export function useThrottledFetch<TData>({
       revalidateOnReconnect: false
     }
   );
+
+  let searchResult;
+
+  // tslint:disable: no-string-literal
+  if (isVirusName) searchResult = mySearchResult?.["names"];
+  else searchResult = mySearchResult;
 
   const searchIsDisabled = throttled || !inputValue || searchIsLoading;
 

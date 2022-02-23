@@ -1,6 +1,15 @@
-export interface Organism {
+import { KitsuResource } from "kitsu";
+import { Determination } from "..";
+
+export interface OrganismAttributes {
+  type: "organism";
+  group?: string;
   lifeStage?: string | null;
   sex?: string | null;
-  substrate?: string | null;
   remarks?: string | null;
+  determination?: Determination[] | null;
+  createdOn?: string;
+  createdBy?: string;
 }
+
+export type Organism = KitsuResource & OrganismAttributes;

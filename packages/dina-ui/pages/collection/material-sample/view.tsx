@@ -5,10 +5,9 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  FieldSpy,
   withResponse
 } from "common-ui";
-import { FastField, Field } from "formik";
+import { Field } from "formik";
 import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
@@ -16,32 +15,31 @@ import { withRouter } from "next/router";
 import {
   Footer,
   Head,
+  ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
+  OrganismsField,
+  ProjectSelectSection,
   StorageLinkerField,
-  TagsAndRestrictionsSection,
-  ProjectSelectSection
+  TagsAndRestrictionsSection
 } from "../../../components";
 import {
   CollectingEventFormLayout,
-  DeterminationField,
-  OrganismStateField,
-  ORGANISM_FIELDS,
   PreparationField,
   PREPARATION_FIELDS,
   SamplesView,
   ScheduledActionsField,
   useCollectingEventQuery,
-  useMaterialSampleQuery
+  useMaterialSampleQuery,
+  withOrganismEditorValues
 } from "../../../components/collection/";
 import {
   AssociationsField,
   HOSTORGANISM_FIELDS
 } from "../../../components/collection/AssociationsField";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
-import { ManagedAttributesViewer } from "../../../components/object-store/managed-attributes/ManagedAttributesViewer";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
@@ -105,17 +103,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage("materialSampleViewTitle")} />
       <Nav />
-      {withResponse(materialSampleQuery, ({ data: materialSample }) => {
+      {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
+        const materialSample = withOrganismEditorValues(materialSampleData);
+
         const hasPreparations = PREPARATION_FIELDS.some(
           fieldName => !isEmpty(materialSample[fieldName])
         );
 
-        const hasOrganism = ORGANISM_FIELDS.some(
-          fieldName => materialSample.organism?.[fieldName]
-        );
-
-        const hasDetermination = materialSample?.determination?.some(
-          det => !isEmpty(det)
+        const hasOrganism = materialSample?.organism?.some(
+          org => !isEmpty(org)
         );
 
         /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
@@ -194,8 +190,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 </FieldSet>
               ))}
               {hasPreparations && <PreparationField />}
-              {hasOrganism && <OrganismStateField />}
-              {hasDetermination && <DeterminationField />}
+              {hasOrganism && <OrganismsField name="organism" />}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
@@ -208,24 +203,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}
-              <FieldSet
-                legend={<DinaMessage id="materialSampleManagedAttributes" />}
-              >
+              <div className="row">
                 <div className="col-md-6">
-                  <FieldSpy<
-                    Record<string, string>
-                  > fieldName="managedAttributes">
-                    {value => (
-                      <ManagedAttributesViewer
-                        values={value ?? {}}
-                        managedAttributeApiPath={key =>
-                          `collection-api/managed-attribute/material_sample.${key}`
-                        }
-                      />
-                    )}
-                  </FieldSpy>
+                  <ManagedAttributesEditor
+                    fieldSetProps={{
+                      legend: (
+                        <DinaMessage id="materialSampleManagedAttributes" />
+                      )
+                    }}
+                    valuesPath="managedAttributes"
+                    managedAttributeApiPath="collection-api/managed-attribute"
+                    managedAttributeComponent="MATERIAL_SAMPLE"
+                    showCustomViewDropdown={true}
+                  />
                 </div>
-              </FieldSet>
+              </div>
               <div className="mb-3">
                 <Field name="id">
                   {({ field: { value: materialSampleId } }) => (

@@ -15,6 +15,9 @@ export interface FieldSetProps extends DinaFormSectionProps {
 
   /** The fieldName if  this fieldset corresponds to a DinaForm field. */
   fieldName?: string;
+
+  /** Renders this JSX to the right of the FieldSet legend. */
+  wrapLegend?: (legend: JSX.Element) => JSX.Element;
 }
 
 /** Wrapper around HTML fieldset element with Bootstrap styling. */
@@ -24,9 +27,16 @@ export function FieldSet({
   id,
   fieldName,
   style,
+  wrapLegend,
   ...formSectionProps
 }: FieldSetProps) {
   const isInForm = !!useContext(DinaFormContext);
+
+  const legendElement = (
+    <legend className={classNames("w-auto", fieldName && "field-label")}>
+      <h2 className="fieldset-h2-adjustment">{legend}</h2>
+    </legend>
+  );
 
   const fieldSetProps = (fieldSpyProps?: FieldSpyRenderProps) => ({
     className: classNames("mb-3 border card px-4 py-2", className),
@@ -41,9 +51,7 @@ export function FieldSet({
             fieldSpyProps?.isChanged && "changed-field"
           )}
         >
-          <legend className={classNames("w-auto", fieldName && "field-label")}>
-            <h2 className="fieldset-h2-adjustment">{legend}</h2>
-          </legend>
+          {wrapLegend?.(legendElement) ?? legendElement}
         </div>
         <DinaFormSection {...formSectionProps} />
       </>

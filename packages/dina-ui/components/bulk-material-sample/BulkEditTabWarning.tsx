@@ -15,13 +15,15 @@ export interface BulkEditTabWarningProps {
   fieldName: string;
   targetType: string;
   setDefaultValue?: (ctx: BulkEditTabContextI) => void;
+  showWarningWhenValuesAreTheSame?: boolean;
 }
 
 export function BulkEditTabWarning({
   fieldName,
   setDefaultValue,
   targetType,
-  children
+  children,
+  showWarningWhenValuesAreTheSame
 }: PropsWithChildren<BulkEditTabWarningProps>) {
   const bulkEditCtx = useBulkEditTabContext();
   const bulkField = useBulkEditTabField({ fieldName });
@@ -67,7 +69,11 @@ export function BulkEditTabWarning({
       // Make the field name singular:
       .fieldLabel.replace(/s$/, "");
 
-    return hasNoValues || override || hasSameValues ? (
+    // Don't show the "Multiple Values" warning + "Override All" button in certain cases:
+    const skipBulkEditWarning =
+      hasNoValues || (!showWarningWhenValuesAreTheSame && hasSameValues);
+
+    return skipBulkEditWarning || override ? (
       <div>
         <FieldSpy fieldName={fieldName}>
           {(_, { bulkContext }) =>

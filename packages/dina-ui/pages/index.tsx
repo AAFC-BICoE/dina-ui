@@ -180,6 +180,13 @@ const Home: React.FunctionComponent = () => (
             </Link>
           </li>
           <li>
+            <Link href="/collection/managed-attributes-view/list">
+              <a>
+                <DinaMessage id="managedAttributesViews" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/collection/managed-attribute/list">
               <a>
                 <DinaMessage id="managedAttributes" />

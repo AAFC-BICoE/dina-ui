@@ -153,6 +153,9 @@ function NavObjectStoreDropdown({ formatMessage }) {
       <NavDropdown.Item href="/object-store/upload">
         <DinaMessage id="uploadPageTitle" />
       </NavDropdown.Item>
+      <NavDropdown.Item href="/object-store/metadata/external-resource-edit">
+        <DinaMessage id="externalResourceListTitle" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object/list">
         <DinaMessage id="objectListTitle" />
       </NavDropdown.Item>
@@ -281,6 +284,9 @@ function NavCollectionDropdown({ formatMessage }) {
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/storage-unit/list">
         <DinaMessage id="storageUnitListTitle" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/managed-attributes-view/list">
+        <DinaMessage id="managedAttributesViews" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/managed-attribute/list">
         <DinaMessage id="managedAttributes" />

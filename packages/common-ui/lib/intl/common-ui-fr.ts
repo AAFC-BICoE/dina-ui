@@ -20,6 +20,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     bulkEdit: "Modification groupée",
     bulkEditorValidationError:
       "Valeur non valide sur la ligne {row} : {valeur}",
+    bulkSubmissionErrorInfo:
+      "Erreur d'envoi en bloc : Vérifiez les onglets ayant une étiquette rouge",
     cancelButtonText: "Annuler",
     checkAll: "Cocher tout",
     checkAllTooltipMessage:
@@ -39,7 +41,9 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     destroyedLabel: "Détruit",
     detach: "Détacher",
     done: "Terminé",
+    dontChangeValues: "Ne pas modifier les valeurs",
     dropdownSearchResults: "Rechercher résultats",
+    editAll: "Éditer tout",
     editButtonText: "Modifier",
     editSelectedButtonText: "Modifier les éléments sélectionnés",
     editableTable: "Tableau modifiable",
@@ -81,6 +85,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     logoutBtn: "Fermer la session",
     max: "Max",
     min: "Min",
+    multipleValues: "Valeurs multiples",
+    multipleValuesFound: "Valeurs multiples trouvées",
     name: "Nom",
     navigation: "Navigation",
     next: "Suivant",
@@ -91,6 +97,10 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     oneValuePerLine: "Une valeur par ligne",
     oneValuePerLineTooltip:
       "Écrivez une valeur par ligne. Appuyez sur Entrer lorsque vous dactylographiez dans le champ pour ajouter une nouvelle ligne.",
+    overrideAll: "Remplacer tout",
+    overrideAllConfirmation:
+      "Ceci ÉLIMINERA TOUS LES {fieldName}s pour TOUS les échantillons de matériaux",
+    overrideAllConfirmationTitle: "Remplacer tous les {fieldName}s?",
     page: "Page",
     previous: "Précédente",
     queryTable: "Interroger la table",
@@ -130,6 +140,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     uiAppVersion: "Version de l’application IU : {version}",
     valueLabel: "Valeur",
     valueSourceType: "Type de valeur de départ",
+    view: "Visualiser",
     viewDetails: "Voir les détails",
     warning: "Avertissement",
     yes: "Oui"

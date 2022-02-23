@@ -8,6 +8,7 @@ import { MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-confi
 import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-configs";
 import { MATERIAL_SAMPLE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-type-revision-config";
 import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-config";
+import { ORGANISM_REVISION_ROW_CONFIG } from "./revision-row-configs/organism-revision-config";
 import { PREPARATION_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-type-revision-config";
 import { PROJECT_REVISION_ROW_CONFIG } from "./revision-row-configs/project-revision-config";
 import { STORAGE_UNIT_REVISION_ROW_CONFIG } from "./revision-row-configs/storage-unit-revision-config";
@@ -31,7 +32,8 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   "collection-method": COLLECTION_METHOD_REVISION_ROW_CONFIG,
   "preparation-type": PREPARATION_TYPE_REVISION_ROW_CONFIG,
   "managed-attribute": MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG,
-  "storage-unit-type": STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG
+  "storage-unit-type": STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG,
+  organism: ORGANISM_REVISION_ROW_CONFIG
 };
 
 export const LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =

@@ -99,7 +99,7 @@ export function MaterialSampleGenerationForm({
     <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
         initialValues || {
-          numberToCreate: 0,
+          numberToCreate: 1,
           samples: [],
           increment: "NUMERICAL",
           suffix: "",

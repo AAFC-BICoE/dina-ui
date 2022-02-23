@@ -244,12 +244,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [],
-              organism: null,
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -334,12 +331,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              determination: [],
-              organism: null,
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -456,13 +450,10 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
-              organism: null,
-              determination: [],
 
               relationships: {
-                preparationAttachment: {
-                  data: []
-                }
+                organism: { data: [] },
+                preparationAttachment: { data: [] }
               },
               type: "material-sample"
             },
@@ -506,7 +497,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ).toEqual(true);
   });
 
-  it("Renders the Material Sample form with only the Determinations section enabled.", async () => {
+  it("Renders the Material Sample form with only the Organisms section enabled.", async () => {
     const wrapper = await getWrapper({
       id: "1",
       actionType: "ADD",
@@ -516,7 +507,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           allowNew: true,
           templateFields: {
             ...({
-              "determination[0].verbatimScientificName": {
+              "organism[0].determination[0].verbatimScientificName": {
                 enabled: true,
                 defaultValue: "test verbatim scientific name"
               }
@@ -529,17 +520,17 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       type: "material-sample-action-definition"
     });
 
-    // Only the Determination section should be enabled:
+    // Only the Organisms section should be enabled:
     expect(
-      wrapper.find(".enable-determination").find(ReactSwitch).prop("checked")
+      wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
 
     // Renders the determination section:
     expect(
       wrapper
         .find(".determination-section .verbatimScientificName-field input")
-        .exists()
-    ).toEqual(true);
+        .prop("value")
+    ).toEqual("test verbatim scientific name");
   });
 
   it("Renders the Material Sample form with only the Associations section enabled.", async () => {
@@ -571,7 +562,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
 
-    // Renders the determination section:
+    // Renders the associations section:
     expect(
       wrapper.find(".association-type").find(CreatableSelect).exists()
     ).toEqual(true);

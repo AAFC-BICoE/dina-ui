@@ -3,7 +3,7 @@ import { MultilingualDescription } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export interface ManagedAttributeAttributes<TComponent = string> {
-  type: string;
+  type: "managed-attribute";
   name: string;
   managedAttributeType: string;
   managedAttributeComponent: TComponent;
