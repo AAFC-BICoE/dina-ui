@@ -13,12 +13,17 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { get, mapValues, pick, pickBy, set, toPairs } from "lodash";
+import { get, mapValues, pick, pickBy, set, toPairs, isNil } from "lodash";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  TAG_SECTION_FIELDS
+} from "../../../components";
 import {
   PREPARATION_FIELDS,
   useMaterialSampleSave
@@ -112,6 +117,7 @@ export function WorkflowTemplateForm({
     fetchedCustomView ?? {
       type: "custom-view",
       restrictToCreatedBy: false,
+      publiclyReleasable: true,
       viewConfiguration: {
         formTemplates: {},
         type: "material-sample-form-custom-view"
@@ -194,6 +200,12 @@ export function WorkflowTemplateForm({
       materialSampleTemplateFields
     );
 
+    const tagSectionTemplateFields = pick(
+      enabledTemplateFields,
+      ...TAG_SECTION_FIELDS,
+      "projects"
+    );
+
     const identifierTemplateFields = pick(
       enabledTemplateFields,
       ...IDENTIFIERS_FIELDS
@@ -235,6 +247,7 @@ export function WorkflowTemplateForm({
         MATERIAL_SAMPLE: {
           ...materialSampleTemplateFields.attachmentsConfig,
           templateFields: {
+            ...tagSectionTemplateFields,
             ...identifierTemplateFields,
             ...materialSampleFieldsetTemplateFields,
             ...preparationTemplateFields,
@@ -356,11 +369,11 @@ export function getEnabledTemplateFieldsFromForm(
   delete formValues.templateCheckboxes?.determination;
   return mapValues(
     formValues.templateCheckboxes ?? {},
-    (val: boolean | undefined, key) =>
-      val
+    (checked: boolean | undefined, key) =>
+      checked
         ? {
             enabled: true,
-            defaultValue: get(formValues, key) || undefined
+            defaultValue: get(formValues, key) ?? undefined
           }
         : undefined
   );
@@ -384,7 +397,7 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
   for (const [field, templateField] of toPairs<TemplateField | undefined>(
     formTemplate.templateFields
   )) {
-    if (templateField?.enabled && templateField.defaultValue) {
+    if (templateField?.enabled && !isNil(templateField.defaultValue)) {
       set(defaultValues, field, templateField.defaultValue);
     }
   }

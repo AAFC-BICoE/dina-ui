@@ -676,6 +676,107 @@ describe("Workflow template edit page", () => {
     });
   });
 
+  it("Submits a new action-definition: Only set the acquisition event template fields.", async () => {
+    const { wrapper, fillOutRequiredFields, submitForm } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Set a default tag:
+    wrapper
+      .find(".tags input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(".tags-field").find(CreatableSelect).prop<any>("onChange")([
+      { value: "default-tag-1" }
+    ]);
+
+    wrapper
+      .find(".projects input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              projects: {
+                enabled: true
+              },
+              tags: {
+                defaultValue: ["default-tag-1"],
+                enabled: true
+              }
+            }
+          }
+        },
+        type: "material-sample-form-custom-view"
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view"
+    });
+  });
+
+  it("Submits a new action-definition: Only set the 'publicly releasable' template fields.", async () => {
+    const { wrapper, fillOutRequiredFields, submitForm } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    expect(
+      wrapper.find(".notPubliclyReleasable").find(ReactSwitch).prop("checked")
+    ).toEqual(false);
+
+    // Enable "Not publicly releasable" and set it to TRUE:
+    wrapper
+      .find(".notPubliclyReleasable input[type='checkbox']")
+      .first()
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".notPubliclyReleasable")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+
+    wrapper.update();
+
+    // Set the default reason:
+    wrapper
+      .find(".notPubliclyReleasableReason input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".notPubliclyReleasableReason textarea")
+      .simulate("change", { target: { value: "test default reason" } });
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              notPubliclyReleasableReason: {
+                defaultValue: "test default reason",
+                enabled: true
+              },
+              publiclyReleasable: {
+                defaultValue: false,
+                enabled: true
+              }
+            }
+          }
+        },
+        type: "material-sample-form-custom-view"
+      },
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view"
+    });
+  });
+
   it("Submits a new action-definition: Link to an existing Acquisition Event.", async () => {
     const {
       wrapper,
