@@ -1,7 +1,7 @@
 import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components/collection";
+import { BLANK_PREPARATION } from "../../../../components";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -134,6 +134,7 @@ async function getWrapper(actionDefinition?: MaterialSampleFormViewConfig) {
               templateFields: {}
             }
           },
+          navOrder: null,
           type: "material-sample-form-custom-view"
         }
       }
@@ -276,6 +277,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -356,6 +358,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -393,7 +396,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
   it("Renders the Material Sample form with no template fields enabled.", async () => {
     const wrapper = await getWrapper({
       formTemplates: {},
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-custom-view",
+      navOrder: null
     });
 
     // Get the switches:
@@ -463,6 +467,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -491,6 +496,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -524,6 +530,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           } as any
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -552,6 +559,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -611,6 +619,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -678,6 +687,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 
@@ -713,6 +723,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
+      navOrder: null,
       type: "material-sample-form-custom-view"
     });
 

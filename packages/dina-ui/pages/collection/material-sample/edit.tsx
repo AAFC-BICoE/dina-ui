@@ -11,36 +11,33 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
-import { toPairs, uniq, compact } from "lodash";
+import { compact, toPairs, uniq } from "lodash";
 import { useRouter } from "next/router";
-import { ReactNode, Ref, useContext, useState, Fragment } from "react";
+import { Fragment, ReactNode, Ref, useContext, useState } from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
+  CollectingEventLinker,
   Footer,
   GroupSelectField,
   Head,
   MaterialSampleBreadCrumb,
   MaterialSampleFormNav,
-  MaterialSampleFormSectionId,
   MaterialSampleIdentifiersSection,
   MaterialSampleInfoSection,
   Nav,
   nextSampleInitialValues,
   OrganismsField,
   ProjectSelectSection,
-  StorageLinkerField,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import {
-  CollectingEventLinker,
   ScheduledActionsField,
   SetDefaultSampleName,
+  StorageLinkerField,
   TabbedResourceLinker,
+  TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
   useMaterialSampleSave
-} from "../../../components/collection";
+} from "../../../components";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
 import { CollectingEventBriefDetails } from "../../../components/collection/collecting-event/CollectingEventBriefDetails";
@@ -52,7 +49,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  MaterialSample
+  MaterialSample,
+  MaterialSampleFormSectionId
 } from "../../../types/collection-api";
 import {
   AcquisitionEventFormLayout,
@@ -215,6 +213,10 @@ export interface MaterialSampleFormProps {
   hideUseSequence?: boolean;
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
+
+  /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
+  navOrder?: MaterialSampleFormSectionId[] | null;
+  onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 }
 
 export function MaterialSampleForm({
@@ -233,6 +235,8 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
+  navOrder: navOrderProp,
+  onChangeNavOrder: onChangeNavOrderProp,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -279,9 +283,12 @@ export function MaterialSampleForm({
 
   const attachmentsField = "attachment";
 
-  const [formSectionOrder, setFormSectionOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(null);
+  const navState = useState<MaterialSampleFormSectionId[] | null>(null);
+
+  // Allow either controlled or uncontrolle state for the nav section:
+  const [formSectionOrder, setFormSectionOrder] = onChangeNavOrderProp
+    ? [navOrderProp, onChangeNavOrderProp]
+    : navState;
 
   /**
    * A map where:

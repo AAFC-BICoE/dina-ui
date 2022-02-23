@@ -3,7 +3,7 @@ import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
-import { StorageLinker } from "../../../../components";
+import { SortableNavGroup, StorageLinker } from "../../../../components";
 import { MaterialSampleCustomViewForm } from "../../../../pages/collection/material-sample-custom-view/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -213,6 +213,66 @@ describe("Workflow template edit page", () => {
     );
   });
 
+  it("Renders the template page with a custom Navigation order.", async () => {
+    const { wrapper, submitForm, fillOutRequiredFields } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Initially shows the default order: "Identifiers" then "Material Sample Info":
+    const listItemsBefore = wrapper.find(
+      ".material-sample-nav .list-group-item"
+    );
+    expect(
+      [listItemsBefore.at(0), listItemsBefore.at(1)].map(item => item.text())
+    ).toEqual(["Identifiers", "Material Sample Info"]);
+
+    // Simulate a sort event:
+    wrapper.find(SortableNavGroup).prop<any>("onSortEnd")({
+      oldIndex: 1,
+      newIndex: 0
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Shows the changed order: "Material Sample Info" then "Identifiers":
+    const listItemsAfter = wrapper.find(
+      ".material-sample-nav .list-group-item"
+    );
+    expect(
+      [listItemsAfter.at(0), listItemsAfter.at(1)].map(item => item.text())
+    ).toEqual(["Material Sample Info", "Identifiers"]);
+
+    await submitForm();
+
+    expect(mockOnSaved).lastCalledWith({
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {
+          ACQUISITION_EVENT: undefined,
+          COLLECTING_EVENT: undefined,
+          MATERIAL_SAMPLE: {
+            templateFields: {}
+          }
+        },
+        navOrder: expect.arrayContaining([]),
+        type: "material-sample-form-custom-view"
+      }
+    });
+
+    // The changed nav order was saved:
+    expect(
+      mockOnSaved.mock.calls[0][0].viewConfiguration.navOrder.slice(0, 2)
+    ).toEqual([
+      "material-sample-info-section", // Was Moved
+      "identifiers-section" // Was Moved
+    ]);
+  });
+
   it("Submits a new action-definition: minimal form submission.", async () => {
     const {
       toggleColEvent,
@@ -248,6 +308,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -331,6 +392,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -382,6 +444,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -429,6 +492,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -479,6 +543,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -525,6 +590,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -571,6 +637,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -617,6 +684,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -666,6 +734,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -710,6 +779,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -767,6 +837,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -817,6 +888,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -833,6 +905,7 @@ describe("Workflow template edit page", () => {
         type: "custom-view",
         viewConfiguration: {
           formTemplates: {},
+          navOrder: null,
           type: "material-sample-form-custom-view"
         },
         group: "test-group-1",
@@ -868,6 +941,7 @@ describe("Workflow template edit page", () => {
               }
             }
           },
+          navOrder: null,
           type: "material-sample-form-custom-view"
         }
       });
@@ -900,6 +974,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -925,6 +1000,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -956,6 +1032,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -1000,6 +1077,7 @@ describe("Workflow template edit page", () => {
               }
             }
           },
+          navOrder: null,
           type: "material-sample-form-custom-view"
         },
         group: "test-group-1",
@@ -1057,6 +1135,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -1126,6 +1205,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -1161,6 +1241,7 @@ describe("Workflow template edit page", () => {
             templateFields: {}
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -1198,6 +1279,7 @@ describe("Workflow template edit page", () => {
             }
           }
         },
+        navOrder: null,
         type: "material-sample-form-custom-view"
       },
       group: "test-group-1",
@@ -1231,6 +1313,7 @@ describe("Workflow template edit page", () => {
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
         type: "material-sample-form-custom-view",
+        navOrder: null,
         formTemplates: {
           MATERIAL_SAMPLE: {
             allowExisting: true,

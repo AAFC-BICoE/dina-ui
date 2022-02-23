@@ -3,7 +3,6 @@ import {
   CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
-  FieldSpy,
   filterBy,
   FormattedTextField,
   FormikButton,
@@ -19,10 +18,10 @@ import {
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
-import { GeographySearchBox } from "..";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
+  GeographySearchBox,
   GroupSelectField,
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,

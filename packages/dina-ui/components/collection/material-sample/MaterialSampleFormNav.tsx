@@ -6,7 +6,7 @@ import {
   useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { compact, uniq } from "lodash";
+import { uniq } from "lodash";
 import dynamic from "next/dynamic";
 import { ComponentType, PropsWithChildren, useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -22,6 +22,8 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   MaterialSampleAssociation,
+  MaterialSampleFormSectionId,
+  MATERIAL_SAMPLE_FORM_SECTIONS,
   Organism
 } from "../../../types/collection-api";
 import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
@@ -58,27 +60,6 @@ const ScrollSpyNav = renderNav
       { ssr: false }
     )
   : "div";
-
-/**
- * All form sections in order.
- * This array is the source of truth for the section ID names and their order.
- */
-export const MATERIAL_SAMPLE_FORM_SECTIONS = [
-  "identifiers-section",
-  "material-sample-info-section",
-  "collecting-event-section",
-  "acquisition-event-section",
-  "preparations-section",
-  "organisms-section",
-  "associations-section",
-  "storage-section",
-  "scheduled-actions-section",
-  "managedAttributes-section",
-  "material-sample-attachments-section"
-] as const;
-
-export type MaterialSampleFormSectionId =
-  typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
 
 /** Yup needs this as an array even though it's a single string literal. */
 const typeNameArray = ["material-sample-form-section-order"] as const;

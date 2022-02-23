@@ -4,7 +4,7 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { DeterminationField } from "..";
+import { DeterminationField } from "../..";
 import { Organism } from "../../../types/collection-api";
 
 /**

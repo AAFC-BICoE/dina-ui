@@ -31,7 +31,7 @@ import {
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
   useLastUsedCollection
-} from "..";
+} from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,

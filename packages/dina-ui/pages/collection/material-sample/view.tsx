@@ -13,8 +13,11 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  AssociationsField,
+  CollectingEventFormLayout,
   Footer,
   Head,
+  HOSTORGANISM_FIELDS,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
   MaterialSampleIdentifiersSection,
@@ -23,24 +26,17 @@ import {
   Nav,
   NotPubliclyReleasableWarning,
   OrganismsField,
-  ProjectSelectSection,
-  StorageLinkerField,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import {
-  CollectingEventFormLayout,
   PreparationField,
   PREPARATION_FIELDS,
+  ProjectSelectSection,
   SamplesView,
   ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
   withOrganismEditorValues
-} from "../../../components/collection/";
-import {
-  AssociationsField,
-  HOSTORGANISM_FIELDS
-} from "../../../components/collection/AssociationsField";
+} from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MATERIAL_SAMPLE_FORM_SECTIONS } from "..";
 
 // Define as Zod schemas instead of Typescript interfaces to enforce structure at runtime:
 
@@ -20,6 +21,11 @@ const formTemplateSchema = z.object({
 
 export const materialSampleFormViewConfigSchema = z.object({
   type: z.literal("material-sample-form-custom-view"),
+  navOrder: z
+    .enum(MATERIAL_SAMPLE_FORM_SECTIONS)
+    .array()
+    // Fallback to null:
+    .or(z.any().transform(() => null)),
   formTemplates: z.object({
     COLLECTING_EVENT: formTemplateSchema.optional(),
     MATERIAL_SAMPLE: formTemplateSchema.optional(),

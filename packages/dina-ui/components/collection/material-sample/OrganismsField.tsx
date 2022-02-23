@@ -18,8 +18,7 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import ReactTable, { Column } from "react-table";
-import { OrganismStateField } from "..";
-import { BulkEditTabWarning } from "../..";
+import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
 

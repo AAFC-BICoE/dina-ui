@@ -11,13 +11,16 @@ import {
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
-import { BulkNavigatorTab, MaterialSampleBulkNavigator } from "..";
+import {
+  BulkNavigatorTab,
+  MaterialSampleBulkNavigator,
+  useMaterialSampleSave
+} from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { useMaterialSampleSave } from "../collection";
 import { useBulkEditTab } from "./bulk-edit-tab";
 
 export interface MaterialSampleBulkEditorProps {

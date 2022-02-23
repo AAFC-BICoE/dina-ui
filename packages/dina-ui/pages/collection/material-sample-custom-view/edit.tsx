@@ -15,7 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, isNil, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import {
@@ -24,12 +24,10 @@ import {
   IDENTIFIERS_FIELDS,
   MATERIALSAMPLE_FIELDSET_FIELDS,
   Nav,
-  TAG_SECTION_FIELDS
-} from "../../../components";
-import {
   PREPARATION_FIELDS,
+  TAG_SECTION_FIELDS,
   useMaterialSampleSave
-} from "../../../components/collection";
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
@@ -37,6 +35,7 @@ import {
   CustomView,
   FormTemplate,
   MaterialSample,
+  MaterialSampleFormSectionId,
   MaterialSampleFormViewConfig,
   materialSampleFormViewConfigSchema,
   TemplateField,
@@ -58,7 +57,7 @@ const workflowMainFieldsSchema = yup.object({
 
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
-export default function PreparationProcessTemplatePage() {
+export default function MaterialSampleCustomViewEditPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const id = router.query.id?.toString();
@@ -124,6 +123,10 @@ export function MaterialSampleCustomViewForm({
 
   const initialViewConfig =
     materialSampleFormViewConfigSchema.parse(unknownViewConfig);
+
+  const [navOrder, setNavOrder] = useState<
+    MaterialSampleFormSectionId[] | null
+  >(initialViewConfig.navOrder);
 
   // Initialize the tempalte form default values and checkbox states:
   const colEventTemplateInitialValues =
@@ -287,6 +290,7 @@ export function MaterialSampleCustomViewForm({
             }
           : undefined
       },
+      navOrder,
       type: "material-sample-form-custom-view"
     };
 
@@ -352,6 +356,8 @@ export function MaterialSampleCustomViewForm({
         <MaterialSampleForm
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
+          navOrder={navOrder}
+          onChangeNavOrder={setNavOrder}
         />
       </DinaFormSection>
       {buttonBar}
