@@ -26,6 +26,7 @@ import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { FormikButton, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { useRouter } from "next/router";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -55,6 +56,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
+  const router = useRouter();
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
@@ -112,18 +114,8 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  function resetForm(_, formik) {
-    formik?.setValues({
-      queryRows: [
-        {
-          fieldName: sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
-          matchType: "match",
-          boolean: "true",
-          date: moment().format()
-        }
-      ],
-      group: groupNames?.[0]
-    });
+  function resetForm() {
+    router.reload();
   }
 
   async function searchES(queryDSL) {
@@ -224,9 +216,9 @@ export function QueryPage<TData extends KitsuResource>({
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
+        <button className="btn btn-secondary mx-2" onClick={resetForm}>
           <DinaMessage id="resetFilters" />
-        </FormikButton>
+        </button>
       </div>
       <div
         className="query-table-wrapper"
