@@ -55,6 +55,9 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
     /** Show the link to the "revisions" page if there is one. */
     showRevisionsLink?: boolean;
+
+    /** Show the link to the "revisions" page at page bottom as link. */
+    showRevisionsLinkAtBottom?: boolean;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -76,7 +79,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   mainClass = "container",
   showRevisionsLink,
-  isRestricted
+  isRestricted,
+  showRevisionsLinkAtBottom
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -152,7 +156,7 @@ export function ViewPageLayout<T extends KitsuResource>({
               </ButtonBar>
               <h1 id="wb-cont">{title}</h1>
               {form(formProps)}
-              {!showRevisionsLink && (
+              {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>
                   <a>
                     <DinaMessage id="revisionsButtonText" />
