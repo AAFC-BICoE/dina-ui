@@ -16,15 +16,15 @@ import {
 import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useRef, useState } from "react";
+import { RiDeleteBinLine } from "react-icons/ri";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
+import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
-import { RiDeleteBinLine } from "react-icons/ri";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -45,6 +45,8 @@ export interface ManagedAttributesEditorProps {
    * Shows the dropdown to select a custom-view for Managed Attributes.
    */
   showCustomViewDropdown?: boolean;
+
+  managedAttributeOrderFieldName?: string;
 }
 
 export function ManagedAttributesEditor({
@@ -53,10 +55,11 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
-  showCustomViewDropdown
+  showCustomViewDropdown,
+  managedAttributeOrderFieldName
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, isTemplate } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   const [customView, setCustomView] = useState<PersistedResource<CustomView>>();
@@ -107,6 +110,8 @@ export function ManagedAttributesEditor({
             listPath: managedAttributeApiPath
           });
 
+        // Store the last fetched Attributes in a ref instead of showing a
+        // loading state when the visible attributes change.
         const lastFetchedAttributes = useRef<
           PersistedResource<ManagedAttribute>[]
         >([]);
@@ -158,73 +163,79 @@ export function ManagedAttributesEditor({
                 </div>
               )}
               {!!visibleAttributes.length && <hr />}
-              <div className="row">
-                {visibleAttributes.map(attribute => {
-                  const attributeKey = attribute.key;
+              {isTemplate && managedAttributeOrderFieldName ? (
+                <ManagedAttributesSorter
+                  name={managedAttributeOrderFieldName}
+                />
+              ) : (
+                <div className="row">
+                  {visibleAttributes.map(attribute => {
+                    const attributeKey = attribute.key;
 
-                  const attributePath = `${valuesPath}.${attributeKey}`;
-                  const props = {
-                    removeBottomMargin: true,
-                    removeLabel: true,
-                    name: attributePath
-                  };
+                    const attributePath = `${valuesPath}.${attributeKey}`;
+                    const props = {
+                      removeBottomMargin: true,
+                      removeLabel: true,
+                      name: attributePath
+                    };
 
-                  const isSelectAttr = !!(
-                    attribute.managedAttributeType === "STRING" &&
-                    attribute.acceptedValues?.length
-                  );
+                    const isSelectAttr = !!(
+                      attribute.managedAttributeType === "STRING" &&
+                      attribute.acceptedValues?.length
+                    );
 
-                  const isIntegerAttr =
-                    attribute.managedAttributeType === "INTEGER";
+                    const isIntegerAttr =
+                      attribute.managedAttributeType === "INTEGER";
 
-                  return (
-                    <label
-                      key={attributeKey}
-                      className={`${attributeKey}-field col-sm-6 mb-3`}
-                      htmlFor="none"
-                    >
-                      <div className="mb-2 d-flex align-items-center">
-                        <strong className="me-auto">
-                          {attribute.name ?? attributeKey}
-                        </strong>
-                        {!readOnly && (
-                          <FormikButton
-                            className="btn remove-attribute"
-                            onClick={(_, form) => {
-                              // Delete the value and hide the managed attribute:
-                              form.setFieldValue(attributePath, undefined);
-                              setVisibleAttributeKeys(current =>
-                                current.filter(it => it !== attributeKey)
-                              );
-                            }}
-                          >
-                            <RiDeleteBinLine size="1.8em" />
-                          </FormikButton>
+                    return (
+                      <label
+                        key={attributeKey}
+                        className={`${attributeKey}-field col-sm-6 mb-3`}
+                        htmlFor="none"
+                      >
+                        <div className="mb-2 d-flex align-items-center">
+                          <strong className="me-auto">
+                            {attribute.name ?? attributeKey}
+                          </strong>
+                          {!readOnly && (
+                            <FormikButton
+                              className="btn remove-attribute"
+                              onClick={(_, form) => {
+                                // Delete the value and hide the managed attribute:
+                                form.setFieldValue(attributePath, undefined);
+                                setVisibleAttributeKeys(current =>
+                                  current.filter(it => it !== attributeKey)
+                                );
+                              }}
+                            >
+                              <RiDeleteBinLine size="1.8em" />
+                            </FormikButton>
+                          )}
+                        </div>
+                        {isSelectAttr ? (
+                          <SelectField
+                            {...props}
+                            options={[
+                              {
+                                label: `<${formatMessage("none")}>`,
+                                value: ""
+                              },
+                              ...(attribute.acceptedValues?.map(value => ({
+                                label: value,
+                                value
+                              })) ?? [])
+                            ]}
+                          />
+                        ) : isIntegerAttr ? (
+                          <NumberField {...props} />
+                        ) : (
+                          <TextField {...props} />
                         )}
-                      </div>
-                      {isSelectAttr ? (
-                        <SelectField
-                          {...props}
-                          options={[
-                            {
-                              label: `<${formatMessage("none")}>`,
-                              value: ""
-                            },
-                            ...(attribute.acceptedValues?.map(value => ({
-                              label: value,
-                              value
-                            })) ?? [])
-                          ]}
-                        />
-                      ) : isIntegerAttr ? (
-                        <NumberField {...props} />
-                      ) : (
-                        <TextField {...props} />
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </FieldSet>
         );

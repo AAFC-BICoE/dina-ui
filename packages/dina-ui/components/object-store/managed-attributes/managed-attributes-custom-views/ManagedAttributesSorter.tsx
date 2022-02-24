@@ -21,16 +21,19 @@ import { ManagedAttributeName } from "../ManagedAttributesViewer";
 
 export interface ManagedAttributeSorterProps {
   managedAttributeFilter?: Record<string, JsonValue>;
+  /** Field name for the managed attribute key array. */
+  name: string;
 }
 
-export function ManagedAttributeSorter({
-  managedAttributeFilter
+export function ManagedAttributesSorter({
+  managedAttributeFilter,
+  name
 }: ManagedAttributeSorterProps) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
-    <FieldArray name="viewConfiguration.attributeKeys">
+    <FieldArray name={name}>
       {({ push, remove, form, move }) => {
         function onSortStart(_, event: unknown) {
           if (event instanceof MouseEvent) {

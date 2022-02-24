@@ -45,12 +45,13 @@ import { MaterialSampleForm } from "../material-sample/edit";
 
 /** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
+  // CustomView resource fields:
   id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required(),
   restrictToCreatedBy: yup.boolean().required(),
-  attachmentsConfig: yup.mixed(),
 
+  attachmentsConfig: yup.mixed(),
   storageUnit: yup.mixed(),
   templateCheckboxes: yup.mixed()
 });

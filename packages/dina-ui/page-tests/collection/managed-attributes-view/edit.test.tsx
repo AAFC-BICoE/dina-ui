@@ -1,7 +1,7 @@
 import { ResourceSelect } from "common-ui";
 import Select from "react-select";
 import { ManagedAttributesViewForm } from "../../../components";
-import { SortableAttributesViewList } from "../../../components/object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributeSorter";
+import { SortableAttributesViewList } from "../../../components/object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributesSorter";
 import ManagedAttributesViewEditPage from "../../../pages/collection/managed-attributes-view/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {

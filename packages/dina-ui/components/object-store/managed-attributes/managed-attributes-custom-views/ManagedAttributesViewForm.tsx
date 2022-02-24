@@ -23,7 +23,7 @@ import {
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS
 } from "../../../../types/collection-api/resources/ManagedAttribute";
-import { ManagedAttributeSorter } from "./ManagedAttributeSorter";
+import { ManagedAttributesSorter } from "./ManagedAttributesSorter";
 
 /**
  * Validate the JSON field on the front-end because it's unstructured JSON on the back-end.
@@ -140,7 +140,8 @@ export function ManagedAttributesViewFormLayout({
           managedAttributeComponent ? (
             <>
               <hr />
-              <ManagedAttributeSorter
+              <ManagedAttributesSorter
+                name="viewConfiguration.attributeKeys"
                 managedAttributeFilter={{ managedAttributeComponent }}
               />
             </>
