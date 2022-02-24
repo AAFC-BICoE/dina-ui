@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { Person } from "../../objectstore-api";
 
 export interface TransactionAttributes {
   type: "transaction";
@@ -15,6 +16,7 @@ export interface TransactionAttributes {
   closedDate?: string;
   dueDate?: string;
   remarks?: string;
+  agentRoles?: AgentRole[];
   shipment?: Shipment;
   createdBy?: string;
   createdOn?: string;
@@ -42,6 +44,14 @@ export interface ShipmentAddress {
   provinceState?: string;
   zipCode?: string;
   country?: string;
+}
+
+export interface AgentRole {
+  // "agent" should be converted to a Person on the front-end, but submitted to the back-end as a UUID:
+  agent?: string | Person | null;
+  roles?: string[];
+  date?: string;
+  remarks?: string;
 }
 
 export type Transaction = KitsuResource & TransactionAttributes;

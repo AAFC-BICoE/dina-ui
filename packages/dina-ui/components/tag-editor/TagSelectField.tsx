@@ -6,7 +6,7 @@ import {
   useQuery
 } from "common-ui";
 import { KitsuResource } from "kitsu";
-import { compact, last, uniq } from "lodash";
+import { compact, last, uniq, get } from "lodash";
 import { useMemo, useState } from "react";
 import { AiFillTag } from "react-icons/ai";
 import { components as reactSelectComponents } from "react-select";
@@ -18,6 +18,8 @@ export interface TagSelectFieldProps extends FieldWrapperProps {
   /** The API path to search for previous tags. */
   resourcePath?: string;
   groupSelectorName?: string;
+  /** The field name to use when finding other tags via RSQL filter. */
+  tagsFieldName?: string;
 }
 
 export interface TagSelectOption {
@@ -25,13 +27,10 @@ export interface TagSelectOption {
   value: string;
 }
 
-interface KitsuResourceWithTags extends KitsuResource {
-  tags?: string[];
-}
-
 /** Tag Select/Create field hooked into Formik. */
 export function TagSelectField({
   resourcePath,
+  tagsFieldName,
   ...props
 }: TagSelectFieldProps) {
   return (
@@ -62,6 +61,7 @@ export function TagSelectField({
           resourcePath={resourcePath}
           groupSelectorName={props.groupSelectorName}
           placeholder={placeholder}
+          tagsFieldName={tagsFieldName}
         />
       )}
     </FieldWrapper>
@@ -112,7 +112,7 @@ function TagSelect({
       : undefined
   );
 
-  const { loading, response } = useQuery<KitsuResourceWithTags[]>(
+  const { loading, response } = useQuery<KitsuResource[]>(
     {
       path: resourcePath ?? "",
       sort: "-createdOn",
@@ -128,7 +128,9 @@ function TagSelect({
 
   const previousTagsOptions = useMemo(
     () =>
-      uniq(compact((response?.data ?? []).flatMap(({ tags }) => tags)))
+      uniq(
+        compact((response?.data ?? []).flatMap(it => get(it, tagsFieldName)))
+      )
         .filter(tag => tag.includes(inputValue))
         .map(tag => ({ label: tag, value: tag })),
     [response]

@@ -1,13 +1,38 @@
-import { InputResource } from "kitsu";
-import { Transaction } from "../../../../types/loan-transaction-api";
-import { TransactionForm } from "../../../../pages/loan-transaction/transaction/edit";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { ResourceSelect } from "common-ui";
+import { InputResource, PersistedResource } from "kitsu";
+import CreatableSelect from "react-select/creatable";
 import Switch from "react-switch";
+import TransactionEditPage, {
+  TransactionForm
+} from "../../../../pages/loan-transaction/transaction/edit";
+import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { Transaction } from "../../../../types/loan-transaction-api";
+
+const TEST_EXISTING_TRANSACTION: PersistedResource<Transaction> = {
+  type: "transaction",
+  id: "test-transaction-id",
+  transactionNumber: "test number",
+  agentRoles: [
+    {
+      agent: "test-person-id",
+      date: "2022-02-24",
+      roles: ["role 1", "role 2", "role 3"]
+    }
+  ]
+};
+
+jest.mock("next/router", () => ({
+  useRouter: () => ({ query: { id: "test-transaction-id" } })
+}));
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
+    case "loan-transaction-api/transaction/test-transaction-id":
+      return { data: TEST_EXISTING_TRANSACTION };
     case "user-api/group":
     case "loan-transaction-api/transaction":
+    case "loan-transaction-api/managed-attribute":
+    case "loan-transaction/transaction":
       return { data: [] };
   }
 });
@@ -22,6 +47,12 @@ const mockSave = jest.fn(async saves => {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map(path => {
     switch (path) {
+      case "person/test-person-id":
+        return {
+          id: "test-person-id",
+          type: "person",
+          displayName: "Test Person"
+        };
     }
   })
 );
@@ -82,8 +113,8 @@ describe("Transaction Form", () => {
       .find(".dueDate-field input")
       .simulate("change", { target: { value: "2022-01-03" } });
     wrapper
-      .find(".remarks-field textarea")
-      .simulate("change", { target: { value: "remarks" } });
+      .find(".transactionRemarks-field textarea")
+      .simulate("change", { target: { value: "transaction remarks" } });
     wrapper
       .find(".shipment_contentRemarks-field textarea")
       .simulate("change", { target: { value: "shipment_contentRemarks" } });
@@ -143,6 +174,27 @@ describe("Transaction Form", () => {
       .find(".shipment_shipmentRemarks-field textarea")
       .simulate("change", { target: { value: "shipment_shipmentRemarks" } });
 
+    // Add an Agent role:
+    wrapper.find(".agent-roles-section button.add-button").simulate("click");
+    wrapper
+      .find(".agentRoles_0__roles-field")
+      .find(CreatableSelect)
+      .prop<any>("onChange")([{ value: "my-role-1" }]);
+    wrapper
+      .find(".agentRoles_0__agent-field")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "test-person-id",
+      type: "person",
+      displayName: "Test Person"
+    });
+    wrapper
+      .find(".agentRoles_0__date-field input")
+      .simulate("change", { target: { value: "2022-02-24" } });
+    wrapper
+      .find(".agentRoles_0__remarks-field textarea")
+      .simulate("change", { target: { value: "test remarks" } });
+
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -150,6 +202,15 @@ describe("Transaction Form", () => {
 
     /** Make sure the expected submission matches the typescript type. */
     const EXPECTED_SUBMITTED_TRANSACTION: InputResource<Transaction> = {
+      agentRoles: [
+        {
+          // The agent should be submitted as just an ID, not the full person object:
+          agent: "test-person-id",
+          date: "2022-02-24",
+          remarks: "test remarks",
+          roles: ["my-role-1"]
+        }
+      ],
       closedDate: "2022-01-02",
       dueDate: "2022-01-03",
       materialDirection: "OUT",
@@ -157,7 +218,7 @@ describe("Transaction Form", () => {
       openedDate: "2022-01-01",
       otherIdentifiers: ["otherIdentifiers"],
       purpose: "purpose",
-      remarks: "remarks",
+      remarks: "transaction remarks",
       shipment: {
         address: {
           addressLine1: "shipment_address_addressLine1",
@@ -203,5 +264,24 @@ describe("Transaction Form", () => {
         }
       ]
     ]);
+  });
+
+  it("Renders the form for an existing Transaction", async () => {
+    // The Next.js router is mocked to provide the existing Transaction's ID
+    const wrapper = mountWithAppContext(<TransactionEditPage />, testCtx);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The Agent ID string should be converted to an object with ID and type:
+    expect(
+      wrapper
+        .find(".agentRoles_0__agent-field")
+        .find(ResourceSelect)
+        .prop("value")
+    ).toEqual({
+      id: "test-person-id",
+      type: "person"
+    });
   });
 });

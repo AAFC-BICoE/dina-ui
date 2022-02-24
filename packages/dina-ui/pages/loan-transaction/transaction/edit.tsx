@@ -1,7 +1,3 @@
-import { InputResource, PersistedResource } from "kitsu";
-import { Transaction } from "../../../types/loan-transaction-api";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useRouter } from "next/router";
 import {
   AutoSuggestTextField,
   BackButton,
@@ -9,6 +5,7 @@ import {
   DateField,
   DinaForm,
   DinaFormOnSubmit,
+  DinaFormSection,
   FieldSet,
   NumberField,
   RadioButtonsField,
@@ -18,22 +15,53 @@ import {
   ToggleField,
   useApiClient,
   useQuery,
-  withResponse,
-  DinaFormSection
+  withResponse
 } from "common-ui";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import { InputResource, PersistedResource } from "kitsu";
+import { useRouter } from "next/router";
+import { TabbedArrayField } from "../../../components/collection/TabbedArrayField";
+import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
+import { Person } from "../../../types/objectstore-api";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  PersonSelectField
+} from "../../../components";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 
-interface TransactionFormProps {
+export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
   onSaved: (transaction: PersistedResource<Transaction>) => Promise<void>;
 }
 
+export function useTransactionQuery(id?: string, showPermissions?: boolean) {
+  return useQuery<Transaction>(
+    {
+      path: `loan-transaction-api/transaction/${id}`,
+      ...(showPermissions && { header: { "include-dina-permission": "true" } })
+    },
+    {
+      onSuccess: async ({ data: transaction }) => {
+        // Convert the agent UUIDs to Person objects:
+        for (const agentRole of transaction.agentRoles ?? []) {
+          if (typeof agentRole.agent === "string") {
+            agentRole.agent = {
+              id: agentRole.agent,
+              type: "person"
+            };
+          }
+        }
+      }
+    }
+  );
+}
+
 export default function TransactionEditPage() {
   const router = useRouter();
-  const {
-    query: { id }
-  } = router;
+  const id = router.query.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
   async function goToViewPage(transaction: PersistedResource<Transaction>) {
@@ -44,9 +72,7 @@ export default function TransactionEditPage() {
 
   const title = id ? "editTransactionTitle" : "addTransactionTitle";
 
-  const query = useQuery<Transaction>({
-    path: `loan-transaction-api/transaction/${id}`
-  });
+  const query = useTransactionQuery(id);
 
   return (
     <div>
@@ -84,16 +110,29 @@ export function TransactionForm({
     : {
         type: "transaction",
         materialDirection: "IN",
-        materialToBeReturned: false
+        materialToBeReturned: false,
+        agentRoles: []
       };
 
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
+    const transactionInput: InputResource<Transaction> = {
+      ...submittedValues,
+      // Convert the Agent objects to UUIDs for submission to the back-end:
+      agentRoles: submittedValues.agentRoles?.map(agentRole => ({
+        ...agentRole,
+        agent:
+          typeof agentRole.agent === "object"
+            ? agentRole.agent?.id
+            : agentRole.agent
+      }))
+    };
+
     const [savedTransaction] = await save<Transaction>(
       [
         {
-          resource: submittedValues,
+          resource: transactionInput,
           type: "transaction"
         }
       ],
@@ -208,6 +247,50 @@ export function TransactionFormLayout() {
           multiLines={true}
         />
       </FieldSet>
+      <TabbedArrayField<AgentRole>
+        legend={<DinaMessage id="agentDetails" />}
+        name="agentRoles"
+        typeName={formatMessage("agent")}
+        sectionId="agent-roles-section"
+        makeNewElement={() => ({})}
+        renderTab={(role, index) => (
+          <span className="m-3">
+            {index + 1}:{" "}
+            {typeof role.agent === "object" && role.agent?.id && (
+              <>
+                <PersonName id={role.agent.id} />{" "}
+              </>
+            )}
+            {role.roles?.join?.(", ")}
+          </span>
+        )}
+        renderTabPanel={({ fieldProps }) => (
+          <div>
+            <div className="row">
+              <TagSelectField
+                {...fieldProps("roles")}
+                resourcePath="loan-transaction/transaction"
+                tagsFieldName="agentRoles[0].roles"
+                className="col-sm-4"
+                label={<DinaMessage id="roleAction" />}
+              />
+              <PersonSelectField
+                {...fieldProps("agent")}
+                className="col-sm-4"
+              />
+              <DateField {...fieldProps("date")} className="col-sm-4" />
+            </div>
+            <div className="row">
+              <TextField
+                {...fieldProps("remarks")}
+                className="col-sm-12"
+                label={<DinaMessage id="agentRemarks" />}
+                multiLines={true}
+              />
+            </div>
+          </div>
+        )}
+      />
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <DinaFormSection
         // Disabled the template's restrictions for this section:
@@ -362,4 +445,13 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
       </FieldSet>
     </FieldSet>
   );
+}
+
+/** Render a Person's name given the ID. */
+export function PersonName({ id }: { id: string }) {
+  const { response } = useQuery<Person>({
+    path: `agent-api/person/${id}`
+  });
+
+  return <>{response?.data?.displayName ?? id}</>;
 }
