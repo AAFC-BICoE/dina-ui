@@ -73,6 +73,7 @@ export default function StorageUnitEditPage() {
               <StorageUnitForm
                 initialParent={initialParent}
                 onSaved={goToViewPage}
+                parentIdInURL={parentId}
               />
             )
           )
