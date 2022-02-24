@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
@@ -56,7 +56,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
-  const router = useRouter();
+  const isResetRef = useRef<boolean>(false);
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
@@ -114,8 +114,20 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  function resetForm() {
-    router.reload();
+  function resetForm(_, formik) {
+    isResetRef.current = true;
+    const resetToVal = {
+      queryRows: [
+        {
+          fieldName: sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
+          matchType: "match",
+          boolean: "true",
+          date: moment().format()
+        }
+      ],
+      group: groupNames?.[0]
+    };
+    formik?.setValues(resetToVal);
   }
 
   async function searchES(queryDSL) {
@@ -187,7 +199,9 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
-  const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
+  const sortedData = data
+    ?.sort((a, b) => a.label.localeCompare(b.label))
+    .filter(prop => !prop.label.startsWith("group"));
 
   return (
     <DinaForm
@@ -210,15 +224,19 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <DinaMessage id="search" />
       </label>
-      <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
+      <QueryBuilder
+        name="queryRows"
+        esIndexMapping={sortedData}
+        isResetRef={isResetRef}
+      />
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField name="group" className="col-md-4" />
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-        <button className="btn btn-secondary mx-2" onClick={resetForm}>
+        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
           <DinaMessage id="resetFilters" />
-        </button>
+        </FormikButton>
       </div>
       <div
         className="query-table-wrapper"
