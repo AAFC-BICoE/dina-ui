@@ -1,10 +1,8 @@
 import { ResourceSelect } from "common-ui";
-import { ErrorBoundaryPage } from "../../../components";
 import Select from "react-select";
-import ManagedAttributesViewEditPage, {
-  ManagedAttributesViewForm,
-  SortableAttributesViewList
-} from "../../../pages/collection/managed-attributes-view/edit";
+import { ManagedAttributesViewForm } from "../../../components";
+import { SortableAttributesViewList } from "../../../components/object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributeSorter";
+import ManagedAttributesViewEditPage from "../../../pages/collection/managed-attributes-view/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   CustomView,

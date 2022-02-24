@@ -23,7 +23,7 @@ import {
 } from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
-import { ManagedAttributesViewSelect } from "./ManagedAttributesViewSelect";
+import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 export interface ManagedAttributesEditorProps {

@@ -47,6 +47,7 @@ export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
 export * from "./object-store/attachment-list/AttachmentsField";
 export * from "./object-store/managed-attributes/ManagedAttributesEditor";
+export * from "./object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributesViewForm";
 export * from "./page-layouts/ViewPageLayout";
 export * from "./project/ProjectSelectSection";
 export * from "./resource-select-fields/resource-select-fields";
