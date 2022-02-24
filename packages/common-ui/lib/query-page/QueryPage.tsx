@@ -225,7 +225,7 @@ export function QueryPage<TData extends KitsuResource>({
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
         <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
-          <DinaMessage id="resetButtonText" />
+          <DinaMessage id="resetFilters" />
         </FormikButton>
       </div>
       <div
