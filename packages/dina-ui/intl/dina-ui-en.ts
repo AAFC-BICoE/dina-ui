@@ -52,6 +52,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   agent: "Agent",
   agentDetails: "Agent Details",
   agentRemarks: "Agent Remarks",
+  agentName: "Agent Name",
+  agentRole: "Agent Role",
   agentsSectionTitle: "Agents",
   allowDuplicate: "Allow Duplicate",
   allowExisting: "Allow Existing",

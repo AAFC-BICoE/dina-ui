@@ -16,6 +16,7 @@ import {
   ToggleField,
   useApiClient,
   useDinaFormContext,
+  useFieldLabels,
   useQuery,
   withResponse
 } from "common-ui";
@@ -34,6 +35,8 @@ import {
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
+import ReactTable, { Column } from "react-table";
+import Link from "next/link";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -302,50 +305,116 @@ export function TransactionFormLayout() {
           multiLines={true}
         />
       </FieldSet>
-      <TabbedArrayField<AgentRole>
-        legend={<DinaMessage id="agentDetails" />}
-        name="agentRoles"
-        typeName={formatMessage("agent")}
-        sectionId="agent-roles-section"
-        makeNewElement={() => ({})}
-        renderTab={(role, index) => (
-          <span className="m-3">
-            {index + 1}:{" "}
-            {typeof role.agent === "object" && role.agent?.id && (
-              <>
-                <PersonName id={role.agent.id} />{" "}
-              </>
-            )}
-            {role.roles?.join?.(", ")}
-          </span>
-        )}
-        renderTabPanel={({ fieldProps }) => (
-          <div>
-            <div className="row">
-              <TagSelectField
-                {...fieldProps("roles")}
-                resourcePath="loan-transaction/transaction"
-                tagsFieldName="agentRoles[0].roles"
-                className="col-sm-4"
-                label={<DinaMessage id="roleAction" />}
-              />
-              <PersonSelectField
-                {...fieldProps("agent")}
-                className="col-sm-4"
-              />
-              <DateField {...fieldProps("date")} className="col-sm-4" />
+      {readOnly ? (
+        <FieldSpy<AgentRole[]> fieldName="agentRoles">
+          {agentRoles => {
+            const tableColumns: Column<AgentRole>[] = [
+              {
+                id: "roles",
+                accessor: it => it.roles?.join(", "),
+                Header: <strong>{formatMessage("agentRole")}</strong>,
+                width: 300
+              },
+              {
+                id: "agentName",
+                accessor: it =>
+                  typeof it.agent === "object" && it?.agent?.id ? (
+                    <Link href={`/person/view?id=${it.agent.id}`}>
+                      <a>
+                        <PersonName id={it.agent.id} />
+                      </a>
+                    </Link>
+                  ) : (
+                    it.agent
+                  ),
+                Header: <strong>{formatMessage("agentName")}</strong>,
+                width: 300
+              },
+              {
+                accessor: "date",
+                Header: <strong>{formatMessage("date")}</strong>,
+                width: 150
+              },
+              {
+                accessor: "remarks",
+                Header: <strong>{formatMessage("agentRemarks")}</strong>
+              }
+            ];
+
+            return (
+              !!agentRoles?.length && (
+                <FieldSet
+                  legend={<DinaMessage id="agentDetails" />}
+                  fieldName="agentRoles"
+                >
+                  <div className="mb-3">
+                    <style>{`
+                      /* Render line breaks in the table.*/
+                      .ReactTable .rt-td {
+                        white-space: pre !important;
+                      }
+                    `}</style>
+                    <ReactTable
+                      columns={tableColumns}
+                      data={agentRoles}
+                      minRows={1}
+                      showPagination={false}
+                      sortable={false}
+                      pageSize={agentRoles?.length || 1}
+                      className="-striped"
+                    />
+                  </div>
+                </FieldSet>
+              )
+            );
+          }}
+        </FieldSpy>
+      ) : (
+        <TabbedArrayField<AgentRole>
+          legend={<DinaMessage id="agentDetails" />}
+          name="agentRoles"
+          typeName={formatMessage("agent")}
+          sectionId="agent-roles-section"
+          makeNewElement={() => ({})}
+          renderTab={(role, index) => (
+            <span className="m-3">
+              {index + 1}:{" "}
+              {typeof role.agent === "object" && role.agent?.id && (
+                <>
+                  <PersonName id={role.agent.id} />{" "}
+                </>
+              )}
+              {role.roles?.join?.(", ")}
+            </span>
+          )}
+          renderTabPanel={({ fieldProps }) => (
+            <div>
+              <div className="row">
+                <TagSelectField
+                  {...fieldProps("roles")}
+                  resourcePath="loan-transaction/transaction"
+                  tagsFieldName="agentRoles[0].roles"
+                  className="col-sm-4"
+                  label={<DinaMessage id="roleAction" />}
+                />
+                <PersonSelectField
+                  {...fieldProps("agent")}
+                  className="col-sm-4"
+                />
+                <DateField {...fieldProps("date")} className="col-sm-4" />
+              </div>
+              <div className="row">
+                <TextField
+                  {...fieldProps("remarks")}
+                  className="col-sm-12"
+                  label={<DinaMessage id="agentRemarks" />}
+                  multiLines={true}
+                />
+              </div>
             </div>
-            <div className="row">
-              <TextField
-                {...fieldProps("remarks")}
-                className="col-sm-12"
-                label={<DinaMessage id="agentRemarks" />}
-                multiLines={true}
-              />
-            </div>
-          </div>
-        )}
-      />
+          )}
+        />
+      )}
       <ShipmentDetailsFieldSet fieldName="shipment" />
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
@@ -506,9 +575,11 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
 
 /** Render a Person's name given the ID. */
 export function PersonName({ id }: { id: string }) {
-  const { response } = useQuery<Person>({
+  const query = useQuery<Person>({
     path: `agent-api/person/${id}`
   });
 
-  return <>{response?.data?.displayName ?? id}</>;
+  return withResponse(query, ({ data: person }) => (
+    <>{person.displayName ?? id}</>
+  ));
 }
