@@ -35,7 +35,7 @@ export interface MaterialSampleAttributes {
 
   materialSampleState?: string;
   materialSampleRemarks?: string;
-
+  materialSampleType?: MaterialSampleType;
   organism?: (Organism | null | undefined)[] | null;
 
   // Client-side only fields for the organism section:
@@ -80,7 +80,6 @@ export interface ScheduledAction {
 
 export interface MaterialSampleRelationships {
   collection?: Collection;
-  materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationAttachment?: ResourceIdentifierObject[];
