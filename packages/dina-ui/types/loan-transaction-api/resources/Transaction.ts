@@ -1,3 +1,4 @@
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
 
@@ -20,6 +21,10 @@ export interface TransactionAttributes {
   shipment?: Shipment;
   createdBy?: string;
   createdOn?: string;
+}
+
+export interface TransactionRelationships {
+  attachment?: ResourceIdentifierObject[];
 }
 
 export interface Shipment {
@@ -54,4 +59,6 @@ export interface AgentRole {
   remarks?: string;
 }
 
-export type Transaction = KitsuResource & TransactionAttributes;
+export type Transaction = KitsuResource &
+  TransactionRelationships &
+  TransactionAttributes;

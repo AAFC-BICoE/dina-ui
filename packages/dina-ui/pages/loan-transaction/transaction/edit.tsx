@@ -7,6 +7,7 @@ import {
   DinaFormOnSubmit,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
   NumberField,
   RadioButtonsField,
   StringArrayField,
@@ -14,6 +15,7 @@ import {
   TextField,
   ToggleField,
   useApiClient,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -23,6 +25,7 @@ import { TabbedArrayField } from "../../../components/collection/TabbedArrayFiel
 import { TagSelectField } from "../../../components/tag-editor/TagSelectField";
 import { Person } from "../../../types/objectstore-api";
 import {
+  AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
@@ -41,6 +44,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
   return useQuery<Transaction>(
     {
       path: `loan-transaction-api/transaction/${id}`,
+      include: "attachment",
       ...(showPermissions && { header: { "include-dina-permission": "true" } })
     },
     {
@@ -117,8 +121,24 @@ export function TransactionForm({
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
   }) => {
-    const transactionInput: InputResource<Transaction> = {
+    const transactionInput: InputResource<Transaction> & {
+      relationships: any;
+    } = {
       ...submittedValues,
+
+      // Convert the attachments to a 'relationships' array so it works with JSONAPI:
+      attachment: undefined,
+      relationships: {
+        ...(submittedValues.attachment && {
+          attachment: {
+            data: submittedValues.attachment.map(it => ({
+              id: it.id,
+              type: it.type
+            }))
+          }
+        })
+      },
+
       // Convert the Agent objects to UUIDs for submission to the back-end:
       agentRoles: submittedValues.agentRoles?.map(agentRole => ({
         ...agentRole,
@@ -165,6 +185,7 @@ export function TransactionForm({
 
 export function TransactionFormLayout() {
   const { formatMessage } = useDinaIntl();
+  const { readOnly, initialValues } = useDinaFormContext();
 
   return (
     <div>
@@ -176,18 +197,52 @@ export function TransactionFormLayout() {
         />
       </div>
       <FieldSet legend={<DinaMessage id="transactionDetails" />}>
-        <div className="row">
-          <RadioButtonsField
-            radioStyle="BUTTONS"
-            name="materialDirection"
-            className="col-6 col-md-3"
-            options={[
-              { label: formatMessage("materialIn"), value: "IN" },
-              { label: formatMessage("materialOut"), value: "OUT" }
-            ]}
-          />
-          <ToggleField name="materialToBeReturned" className="col-6 col-md-3" />
-        </div>
+        {readOnly ? (
+          <div className="d-flex gap-2 mb-3">
+            <FieldSpy<string> fieldName="materialDirection">
+              {direction => (
+                <h2 className="my-0">
+                  <div className="badge bg-primary">
+                    {direction === "IN" ? (
+                      <DinaMessage id="materialIn" />
+                    ) : direction === "OUT" ? (
+                      <DinaMessage id="materialOut" />
+                    ) : (
+                      direction
+                    )}
+                  </div>
+                </h2>
+              )}
+            </FieldSpy>
+            <FieldSpy<boolean> fieldName="materialToBeReturned">
+              {toBeReturned =>
+                toBeReturned && (
+                  <h2 className="my-0">
+                    <span className="badge bg-primary">
+                      <DinaMessage id="toBeReturned" />
+                    </span>
+                  </h2>
+                )
+              }
+            </FieldSpy>
+          </div>
+        ) : (
+          <div className="row">
+            <RadioButtonsField
+              radioStyle="BUTTONS"
+              name="materialDirection"
+              className="col-6 col-md-3"
+              options={[
+                { label: formatMessage("materialIn"), value: "IN" },
+                { label: formatMessage("materialOut"), value: "OUT" }
+              ]}
+            />
+            <ToggleField
+              name="materialToBeReturned"
+              className="col-6 col-md-3"
+            />
+          </div>
+        )}
         <div className="row">
           <div className="col-md-6">
             <AutoSuggestTextField<Transaction>
@@ -292,18 +347,20 @@ export function TransactionFormLayout() {
         )}
       />
       <ShipmentDetailsFieldSet fieldName="shipment" />
-      <DinaFormSection
-        // Disabled the template's restrictions for this section:
-        enabledFields={null}
-      >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="loan-transaction-api/managed-attribute"
-          fieldSetProps={{
-            legend: <DinaMessage id="managedAttributes" />
-          }}
+      <ManagedAttributesEditor
+        valuesPath="managedAttributes"
+        managedAttributeApiPath="loan-transaction-api/managed-attribute"
+        fieldSetProps={{
+          legend: <DinaMessage id="managedAttributes" />
+        }}
+      />
+      <div className="mb-3">
+        <AttachmentsField
+          name="attachment"
+          title={<DinaMessage id="transactionAttachments" />}
+          attachmentPath={`loan-transaction-api/transaction/${initialValues.id}/attachment`}
         />
-      </DinaFormSection>
+      </div>
     </div>
   );
 }

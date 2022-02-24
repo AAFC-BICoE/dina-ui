@@ -8,31 +8,42 @@ import TransactionEditPage, {
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { Transaction } from "../../../../types/loan-transaction-api";
 
-const TEST_EXISTING_TRANSACTION: PersistedResource<Transaction> = {
-  type: "transaction",
-  id: "test-transaction-id",
-  transactionNumber: "test number",
-  agentRoles: [
-    {
-      agent: "test-person-id",
-      date: "2022-02-24",
-      roles: ["role 1", "role 2", "role 3"]
-    }
-  ]
-};
+function testExistingTransaction(): PersistedResource<Transaction> {
+  return {
+    type: "transaction",
+    id: "test-transaction-id",
+    transactionNumber: "test number",
+    agentRoles: [
+      {
+        agent: "test-person-id",
+        date: "2022-02-24",
+        roles: ["role 1", "role 2", "role 3"]
+      }
+    ],
+    attachment: [
+      { id: "attach-1", type: "metadata" },
+      { id: "attach-2", type: "metadata" }
+    ]
+  };
+}
 
 jest.mock("next/router", () => ({
-  useRouter: () => ({ query: { id: "test-transaction-id" } })
+  useRouter: () => ({
+    query: { id: "test-transaction-id" },
+    push: () => undefined
+  })
 }));
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "loan-transaction-api/transaction/test-transaction-id":
-      return { data: TEST_EXISTING_TRANSACTION };
+      return { data: testExistingTransaction() };
     case "user-api/group":
     case "loan-transaction-api/transaction":
     case "loan-transaction-api/managed-attribute":
     case "loan-transaction/transaction":
+    case "agent-api/person":
+    case "objectstore-api/metadata":
       return { data: [] };
   }
 });
@@ -47,6 +58,10 @@ const mockSave = jest.fn(async saves => {
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   paths.map(path => {
     switch (path) {
+      case "metadata/attach-1":
+        return { id: "metadata/attach-1", type: "metadata" };
+      case "metadata/attach-2":
+        return { id: "metadata/attach-2", type: "metadata" };
       case "person/test-person-id":
         return {
           id: "test-person-id",
@@ -201,7 +216,9 @@ describe("Transaction Form", () => {
     wrapper.update();
 
     /** Make sure the expected submission matches the typescript type. */
-    const EXPECTED_SUBMITTED_TRANSACTION: InputResource<Transaction> = {
+    const EXPECTED_SUBMITTED_TRANSACTION: InputResource<Transaction> & {
+      relationships: any;
+    } = {
       agentRoles: [
         {
           // The agent should be submitted as just an ID, not the full person object:
@@ -218,6 +235,7 @@ describe("Transaction Form", () => {
       openedDate: "2022-01-01",
       otherIdentifiers: ["otherIdentifiers"],
       purpose: "purpose",
+      relationships: {},
       remarks: "transaction remarks",
       shipment: {
         address: {
@@ -266,7 +284,7 @@ describe("Transaction Form", () => {
     ]);
   });
 
-  it("Renders the form for an existing Transaction", async () => {
+  it("Edits an existing Transaction", async () => {
     // The Next.js router is mocked to provide the existing Transaction's ID
     const wrapper = mountWithAppContext(<TransactionEditPage />, testCtx);
 
@@ -283,5 +301,34 @@ describe("Transaction Form", () => {
       id: "test-person-id",
       type: "person"
     });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: {
+              ...testExistingTransaction(),
+              attachment: undefined,
+              // Moves the attachments into the relationships field:
+              relationships: {
+                attachment: {
+                  data: [
+                    { id: "attach-1", type: "metadata" },
+                    { id: "attach-2", type: "metadata" }
+                  ]
+                }
+              }
+            },
+            type: "transaction"
+          }
+        ],
+        { apiBaseUrl: "/loan-transaction-api" }
+      ]
+    ]);
   });
 });
