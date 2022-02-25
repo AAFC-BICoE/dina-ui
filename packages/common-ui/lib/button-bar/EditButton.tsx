@@ -38,8 +38,11 @@ export function EditButton({
   onKeyUp,
   ariaDescribedBy
 }: EditButtonProps) {
+  // Make sure the URL is prefixed with a forward slash e.g. loan-transaction -> /loan-transaction.
+  const baseUrl = entityLink.replace(/^\/?/, "/");
+
   return (
-    <Link href={`/${entityLink}/edit?id=${entityId}`}>
+    <Link href={`${baseUrl}/edit?id=${entityId}`}>
       <a
         className={classNames("btn btn-primary", { disabled }, className)}
         style={{ width: "6rem", ...style }}
