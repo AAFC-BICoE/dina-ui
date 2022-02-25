@@ -7,7 +7,7 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
-import { ColumnDefinition } from "../table/QueryTable";
+import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
 import { transformQueryToDSL } from "../util/transformToDSL";
 import {
   BulkDeleteButton,
@@ -48,6 +48,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
         responseData: PersistedResource<TData>[] | undefined,
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
       ) => Partial<TableProps>);
+
+  onSortedChange?: (newSort: SortingRule[]) => void;
 }
 export function QueryPage<TData extends KitsuResource>({
   indexName,
@@ -57,12 +59,15 @@ export function QueryPage<TData extends KitsuResource>({
   bulkEditPath,
   omitPaging,
   reactTableProps,
-  defaultSort
+  defaultSort,
+  onSortedChange
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
   const isResetRef = useRef<boolean>(false);
+  // JSONAPI sort attribute.
+  const [sortingRules, setSortingRules] = useState(defaultSort);
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
@@ -177,7 +182,6 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-
     Object.keys(resp.data)
       .filter(key => key.includes("data.attributes."))
       .map(key => {
@@ -299,6 +303,41 @@ export function QueryPage<TData extends KitsuResource>({
           columns={mappedColumns}
           data={searchResults?.results ?? initData}
           minRows={1}
+          {...resolvedReactTableProps}
+          pageText={<CommonMessage id="page" />}
+          noDataText={<CommonMessage id="noRowsFound" />}
+          ofText={<CommonMessage id="of" />}
+          rowsText={formatMessage({ id: "rows" })}
+          previousText={<CommonMessage id="previous" />}
+          nextText={<CommonMessage id="next" />}
+          TbodyComponent={
+            error
+              ? () => (
+                  <div
+                    className="alert alert-danger"
+                    style={{
+                      whiteSpace: "pre-line"
+                    }}
+                  >
+                    <p>
+                      {error.errors?.map(e => e.detail).join("\n") ??
+                        String(error)}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        const newSort = [{ id: "createdOn", desc: true }];
+                        onSortedChange?.(newSort);
+                        setSortingRules(newSort);
+                      }}
+                    >
+                      <CommonMessage id="resetSort" />
+                    </button>
+                  </div>
+                )
+              : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+          }
         />
       </div>
     </DinaForm>

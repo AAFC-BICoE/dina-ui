@@ -3,14 +3,54 @@ import {
   BulkDeleteButton,
   BulkSelectableFormValues,
   DinaForm,
-  QueryTable
+  QueryPage
 } from "common-ui";
 import { PersistedResource } from "kitsu";
+import { Group } from "../../../../types/user-api";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage from "../../../../pages/object-store/object/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { Metadata } from "../../../../types/objectstore-api";
+import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
+
+const TEST_PERSON: PersistedResource<Person> = {
+  id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+  type: "person",
+  displayName: "test agent"
+};
+
+const TEST_GROUP: PersistedResource<Group>[] = [
+  {
+    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    type: "group",
+    name: "test group",
+    path: " test path",
+    labels: { fr: "CNCFR" }
+  }
+];
+
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    "data.id.type": "text",
+    "data.attributes.createdOn.type": "date",
+    "meta.moduleVersion.type": "text",
+    "data.attributes.allowDuplicateName.type": "boolean"
+  }
+};
+
+const mockGet = jest.fn<any, any>(async path => {
+  if (path === "objectstore-api/metadata") {
+    return { data: TEST_METADATAS };
+  } else if (path === "objectstore-api/object-upload") {
+    return { data: TEST_OBJECTUPLOAD };
+  } else if (path === "agent-api/person") {
+    return { data: TEST_PERSON };
+  } else if (path === "search-api/search-ws/mapping") {
+    return MOCK_INDEX_MAPPING_RESP;
+  } else if (path === "user-api/group") {
+    return TEST_GROUP;
+  }
+});
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -60,11 +100,15 @@ const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   type: "object-upload"
 };
 
-const mockGet = jest.fn();
 const mockDoOperations = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet },
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGet
+    }
+  },
   doOperations: mockDoOperations
 };
 
@@ -78,15 +122,6 @@ jest.mock("next/router", () => ({
 describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGet.mockImplementation(async path => {
-      if (
-        path === "objectstore-api/metadata?include=acMetadataCreator,dcCreator"
-      ) {
-        return { data: TEST_METADATAS };
-      } else if (path === "objectstore-api/object-upload") {
-        return { data: TEST_OBJECTUPLOAD };
-      }
-    });
   });
 
   it("Renders the metadata table by default.", async () => {
@@ -95,7 +130,7 @@ describe("Metadata List Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(QueryTable).find(".rt-td").exists()).toEqual(true);
+    expect(wrapper.find(QueryPage).find(".rt-td").exists()).toEqual(true);
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
@@ -109,9 +144,6 @@ describe("Metadata List Page", () => {
         .find("input")
         .prop("checked")
     ).toEqual(true);
-    expect(wrapper.find(".table-section").find(QueryTable).exists()).toEqual(
-      true
-    );
 
     await new Promise(setImmediate);
     wrapper.update();
