@@ -26,6 +26,7 @@ export const materialSampleFormViewConfigSchema = z.object({
     .array()
     // Fallback to null:
     .or(z.any().transform(() => null)),
+  managedAttributesOrder: z.string().array().optional(),
   formTemplates: z.object({
     COLLECTING_EVENT: formTemplateSchema.optional(),
     MATERIAL_SAMPLE: formTemplateSchema.optional(),

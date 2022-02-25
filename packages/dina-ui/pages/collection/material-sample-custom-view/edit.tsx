@@ -50,6 +50,7 @@ const workflowMainFieldsSchema = yup.object({
   name: yup.string().trim().required(),
   group: yup.string().required(),
   restrictToCreatedBy: yup.boolean().required(),
+  managedAttributesOrder: yup.array(yup.string().required()),
 
   attachmentsConfig: yup.mixed(),
   storageUnit: yup.mixed(),
@@ -159,6 +160,7 @@ export function MaterialSampleCustomViewForm({
 
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,
+    managedAttributesOrder: initialViewConfig.managedAttributesOrder,
     ...materialSampleTemplateInitialValues
   };
 
@@ -194,6 +196,9 @@ export function MaterialSampleCustomViewForm({
       group,
       name,
       restrictToCreatedBy,
+
+      managedAttributesOrder,
+
       ...materialSampleTemplateFields
     } = submittedValues;
     const customViewFields = { id, group, name, restrictToCreatedBy };
@@ -292,6 +297,7 @@ export function MaterialSampleCustomViewForm({
           : undefined
       },
       navOrder,
+      managedAttributesOrder,
       type: "material-sample-form-custom-view"
     };
 

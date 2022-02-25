@@ -185,6 +185,17 @@ function useWorkflowMaterialSampleInitialValues(
         return org;
       });
 
+    // Create a blank managed attribute map from the template's attribute order:
+    const defaultManagedAttributes: Record<string, string> = {};
+    for (const key of actionDefinition.managedAttributesOrder ?? []) {
+      defaultManagedAttributes[key] = "";
+    }
+
+    materialSampleInitialValues.managedAttributes = {
+      ...defaultManagedAttributes,
+      ...materialSampleInitialValues.managedAttributes
+    };
+
     const collectingEvent = getInitialValuesFromTemplateFields<CollectingEvent>(
       "collecting-event",
       actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
