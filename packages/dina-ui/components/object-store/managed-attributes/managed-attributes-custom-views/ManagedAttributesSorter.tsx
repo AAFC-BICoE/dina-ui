@@ -6,6 +6,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
+import { get } from "lodash";
 import { PropsWithChildren } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -14,11 +15,9 @@ import {
   SortableElement,
   SortEnd
 } from "react-sortable-hoc";
-import { JsonValue } from "type-fest";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../../types/objectstore-api";
 import { ManagedAttributeName } from "../ManagedAttributesViewer";
-import { get } from "lodash";
 
 export interface ManagedAttributeSorterProps {
   managedAttributeComponent?: string;

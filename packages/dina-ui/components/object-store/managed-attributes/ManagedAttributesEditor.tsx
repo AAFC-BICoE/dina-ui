@@ -3,11 +3,7 @@ import {
   FieldSetProps,
   FieldSpy,
   filterBy,
-  FormikButton,
-  NumberField,
   ResourceSelect,
-  SelectField,
-  TextField,
   Tooltip,
   useBulkEditTabContext,
   useBulkGet,
@@ -16,7 +12,6 @@ import {
 import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useRef, useState } from "react";
-import { RiDeleteBinLine } from "react-icons/ri";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
@@ -25,6 +20,7 @@ import {
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
+import { ManagedAttributeField } from "./ManagedAttributeField";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -171,71 +167,18 @@ export function ManagedAttributesEditor({
                   )}
                   {!!visibleAttributes.length && <hr />}
                   <div className="row">
-                    {visibleAttributes.map(attribute => {
-                      const attributeKey = attribute.key;
-
-                      const attributePath = `${valuesPath}.${attributeKey}`;
-                      const props = {
-                        removeBottomMargin: true,
-                        removeLabel: true,
-                        name: attributePath
-                      };
-
-                      const isSelectAttr = !!(
-                        attribute.managedAttributeType === "STRING" &&
-                        attribute.acceptedValues?.length
-                      );
-
-                      const isIntegerAttr =
-                        attribute.managedAttributeType === "INTEGER";
-
-                      return (
-                        <label
-                          key={attributeKey}
-                          className={`${attributeKey}-field col-sm-6 mb-3`}
-                          htmlFor="none"
-                        >
-                          <div className="mb-2 d-flex align-items-center">
-                            <strong className="me-auto">
-                              {attribute.name ?? attributeKey}
-                            </strong>
-                            {!readOnly && (
-                              <FormikButton
-                                className="btn remove-attribute"
-                                onClick={(_, form) => {
-                                  // Delete the value and hide the managed attribute:
-                                  form.setFieldValue(attributePath, undefined);
-                                  setVisibleAttributeKeys(current =>
-                                    current.filter(it => it !== attributeKey)
-                                  );
-                                }}
-                              >
-                                <RiDeleteBinLine size="1.8em" />
-                              </FormikButton>
-                            )}
-                          </div>
-                          {isSelectAttr ? (
-                            <SelectField
-                              {...props}
-                              options={[
-                                {
-                                  label: `<${formatMessage("none")}>`,
-                                  value: ""
-                                },
-                                ...(attribute.acceptedValues?.map(value => ({
-                                  label: value,
-                                  value
-                                })) ?? [])
-                              ]}
-                            />
-                          ) : isIntegerAttr ? (
-                            <NumberField {...props} />
-                          ) : (
-                            <TextField {...props} />
-                          )}
-                        </label>
-                      );
-                    })}
+                    {visibleAttributes.map(attribute => (
+                      <ManagedAttributeField
+                        key={attribute.key}
+                        attribute={attribute}
+                        valuesPath={valuesPath}
+                        onRemoveClick={attributeKey =>
+                          setVisibleAttributeKeys(current =>
+                            current.filter(it => it !== attributeKey)
+                          )
+                        }
+                      />
+                    ))}
                   </div>
                 </div>
               )}
