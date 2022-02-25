@@ -351,7 +351,7 @@ export function TransactionFormLayout() {
                     <style>{`
                       /* Render line breaks in the table.*/
                       .ReactTable .rt-td {
-                        white-space: pre !important;
+                        white-space: pre-wrap !important;
                       }
                     `}</style>
                     <ReactTable
@@ -463,6 +463,9 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
             {...fieldProps("value")}
             className="col-sm-6"
             label={<DinaMessage id="valueCad" />}
+            readOnlyRender={val =>
+              typeof val === "string" ? `$${numberWithCommas(val)}` : val
+            }
           />
           <NumberField
             {...fieldProps("itemCount")}
@@ -582,4 +585,9 @@ export function PersonName({ id }: { id: string }) {
   return withResponse(query, ({ data: person }) => (
     <>{person.displayName ?? id}</>
   ));
+}
+
+/** Returns the number with comma separators. */
+function numberWithCommas(num: string) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
