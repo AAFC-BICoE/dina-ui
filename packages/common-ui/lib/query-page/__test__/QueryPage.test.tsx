@@ -36,7 +36,7 @@ const TEST_COLUMNS: ColumnDefinition<any>[] = [
   { accessor: "materialSampleName" },
   { accessor: "collection.name" },
   { accessor: "dwcOtherCatalogNumbers" },
-  { accessor: "materialSampleType.name" },
+  { accessor: "materialSampleType" },
   "createdBy",
   { accessor: "createdOn" },
   { Header: "", sortable: false }

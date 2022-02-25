@@ -24,6 +24,9 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
+import { FormikButton, useAccount } from "..";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { useRouter } from "next/router";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -51,7 +54,9 @@ export function QueryPage<TData extends KitsuResource>({
   reactTableProps
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
+  const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
+  const router = useRouter();
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
@@ -108,6 +113,10 @@ export function QueryPage<TData extends KitsuResource>({
       ...(typeof column === "string" ? { accessor: column } : { ...column })
     };
   });
+
+  function resetForm() {
+    router.reload();
+  }
 
   async function searchES(queryDSL) {
     const query = { ...queryDSL };
@@ -183,6 +192,7 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <DinaForm
       initialValues={{
+        group: groupNames?.[0],
         queryRows: [
           {
             fieldName:
@@ -198,17 +208,18 @@ export function QueryPage<TData extends KitsuResource>({
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
-        {" "}
-        {formatMessage({ id: "search" })}
+        <DinaMessage id="search" />
       </label>
       <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
-      <DinaFormSection horizontal={[1, 11]}>
+      <DinaFormSection horizontal={"flex"}>
         <GroupSelectField name="group" className="col-md-4" />
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+        <button className="btn btn-secondary mx-2" onClick={resetForm}>
+          <DinaMessage id="resetFilters" />
+        </button>
       </div>
-
       <div
         className="query-table-wrapper"
         role="search"

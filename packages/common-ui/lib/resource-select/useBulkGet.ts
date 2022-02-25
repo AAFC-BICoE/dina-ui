@@ -32,14 +32,20 @@ export function useBulkGet<TData extends KitsuResource>({
     if (disabled) {
       return undefined;
     }
+    // Enable bulk get to handle include
+    const includeIdx = listPath.lastIndexOf("?include");
+    const includes = includeIdx > 0 ? listPath.substring(includeIdx) : null;
+    const myListPath = includes
+      ? listPath.substring(0, listPath.lastIndexOf(includes))
+      : listPath;
 
-    const listPathMatch = LIST_PATH_REGEX.exec(listPath);
+    const listPathMatch = LIST_PATH_REGEX.exec(myListPath);
 
     if (!listPathMatch) {
       return undefined;
     }
     const [_, apiBaseUrl, typeName] = listPathMatch;
-    const paths = ids.map(id => `${typeName}/${id}`);
+    const paths = ids.map(id => `${typeName}/${id}${includes ?? ""}`);
 
     const fetchedWithNulls = await bulkGet<TData, true>(paths, {
       apiBaseUrl: `/${apiBaseUrl}`,

@@ -19,8 +19,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCollectorGroupTitle: "Ajouter un groupe de collecte",
   addCustomPlaceName: "Ajouter",
   addDetermination: "Ajouter une détermination",
-  addExistingStorageUnitAsChild:
-    "Ajouter une unité de stockage existante comme enfant",
+  addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
   addIdentifier: "Ajouter un identifiant",
