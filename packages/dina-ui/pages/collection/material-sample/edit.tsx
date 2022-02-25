@@ -214,6 +214,8 @@ export interface MaterialSampleFormProps {
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
 
+  /** Hides the custom view selection, but keeps the drag/drop handles. */
+  hideCustomViewSelect?: boolean;
   /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
@@ -235,6 +237,7 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
+  hideCustomViewSelect,
   navOrder: navOrderProp,
   onChangeNavOrder: onChangeNavOrderProp,
   buttonBar = (
@@ -428,7 +431,10 @@ export function MaterialSampleForm({
                   id,
                   legend: <DinaMessage id="materialSampleManagedAttributes" />
                 }}
-                showCustomViewDropdown={true}
+                // Custom view selection is supported for material samples,
+                // but not in template editor mode:
+                showCustomViewDropdown={!isTemplate}
+                managedAttributeOrderFieldName="managedAttributesOrder"
               />
             </div>
           </div>
@@ -474,6 +480,7 @@ export function MaterialSampleForm({
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
             disableRemovePrompt={disableNavRemovePrompt}
+            hideCustomViewSelect={hideCustomViewSelect}
             navOrder={formSectionOrder}
             onChangeNavOrder={setFormSectionOrder}
           />

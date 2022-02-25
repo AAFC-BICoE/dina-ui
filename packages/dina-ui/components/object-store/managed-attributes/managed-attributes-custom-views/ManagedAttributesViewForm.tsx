@@ -142,7 +142,7 @@ export function ManagedAttributesViewFormLayout({
               <hr />
               <ManagedAttributesSorter
                 name="viewConfiguration.attributeKeys"
-                managedAttributeFilter={{ managedAttributeComponent }}
+                managedAttributeComponent={managedAttributeComponent}
               />
             </>
           ) : null

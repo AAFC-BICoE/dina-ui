@@ -357,6 +357,7 @@ export function MaterialSampleCustomViewForm({
         <MaterialSampleForm
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
+          hideCustomViewSelect={true}
           navOrder={navOrder}
           onChangeNavOrder={setNavOrder}
         />

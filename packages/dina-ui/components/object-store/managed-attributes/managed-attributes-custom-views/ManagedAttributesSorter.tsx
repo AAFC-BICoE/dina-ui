@@ -18,15 +18,16 @@ import { JsonValue } from "type-fest";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../../types/objectstore-api";
 import { ManagedAttributeName } from "../ManagedAttributesViewer";
+import { get } from "lodash";
 
 export interface ManagedAttributeSorterProps {
-  managedAttributeFilter?: Record<string, JsonValue>;
+  managedAttributeComponent?: string;
   /** Field name for the managed attribute key array. */
   name: string;
 }
 
 export function ManagedAttributesSorter({
-  managedAttributeFilter,
+  managedAttributeComponent,
   name
 }: ManagedAttributeSorterProps) {
   const { readOnly } = useDinaFormContext();
@@ -45,6 +46,8 @@ export function ManagedAttributesSorter({
           move(se.oldIndex, se.newIndex);
         }
 
+        const attributeKeys = (get(form.values, name) ?? []) as string[];
+
         return (
           <div>
             {!readOnly && (
@@ -55,15 +58,15 @@ export function ManagedAttributesSorter({
                 <ResourceSelect<ManagedAttribute>
                   filter={input => ({
                     ...filterBy(["name"])(input),
-                    ...managedAttributeFilter
+                    ...(managedAttributeComponent
+                      ? { managedAttributeComponent }
+                      : {})
                   })}
                   model="collection-api/managed-attribute"
                   onChange={ma => {
                     if (
                       !Array.isArray(ma) &&
-                      !form.values.viewConfiguration?.attributeKeys?.includes?.(
-                        ma.key
-                      )
+                      !attributeKeys.includes?.(ma.key)
                     ) {
                       push(ma.key);
                     }
@@ -74,32 +77,31 @@ export function ManagedAttributesSorter({
                 />
               </div>
             )}
-            {!readOnly &&
-              form.values.viewConfiguration?.attributeKeys?.length >= 2 && (
-                <div>
-                  <div className="alert alert-warning d-flex flex-column gap-2">
-                    <div>
-                      <strong>
-                        <DinaMessage id="dragDropInstructionsHeader" />
-                      </strong>
-                    </div>
-                    <div>
-                      <strong>
-                        <DinaMessage id="withAMouse" />:
-                      </strong>{" "}
-                      <DinaMessage id="dragDropMouseInstructions" />
-                    </div>
-                    <div>
-                      <strong>
-                        <DinaMessage id="withAKeyboard" />:
-                      </strong>{" "}
-                      <DinaMessage id="dragDropKeyboardInstructions" />
-                    </div>
+            {!readOnly && attributeKeys.length >= 2 && (
+              <div>
+                <div className="alert alert-warning d-flex flex-column gap-2">
+                  <div>
+                    <strong>
+                      <DinaMessage id="dragDropInstructionsHeader" />
+                    </strong>
+                  </div>
+                  <div>
+                    <strong>
+                      <DinaMessage id="withAMouse" />:
+                    </strong>{" "}
+                    <DinaMessage id="dragDropMouseInstructions" />
+                  </div>
+                  <div>
+                    <strong>
+                      <DinaMessage id="withAKeyboard" />:
+                    </strong>{" "}
+                    <DinaMessage id="dragDropKeyboardInstructions" />
                   </div>
                 </div>
-              )}
+              </div>
+            )}
             <div>
-              <FieldSpy<string[]> fieldName="viewConfiguration.attributeKeys">
+              <FieldSpy<string[]> fieldName={name}>
                 {keys => (
                   <SortableAttributesViewList
                     axis="xy"
@@ -111,11 +113,11 @@ export function ManagedAttributesSorter({
                   >
                     {/* Give the lifted drag/drop item a blue background. */}
                     <style>{`
-                              .form-control.sortable-lifted {
-                                background-color: rgb(222, 235, 255);
-                                z-index: 1100;
-                              }
-                            `}</style>
+                      .form-control.sortable-lifted {
+                        background-color: rgb(222, 235, 255);
+                        z-index: 1100;
+                      }
+                    `}</style>
                     {keys?.map((key, index) => (
                       <SortableAttributesViewItem
                         disabled={readOnly}
@@ -123,6 +125,7 @@ export function ManagedAttributesSorter({
                         attributeKey={key}
                         onRemoveClick={() => remove(index)}
                         index={index}
+                        managedAttributeComponent={managedAttributeComponent}
                       />
                     ))}
                   </SortableAttributesViewList>
@@ -145,9 +148,11 @@ function AttributesViewList({ children }: PropsWithChildren<{}>) {
 interface AttributesViewItemProps {
   attributeKey: string;
   onRemoveClick: () => void;
+  managedAttributeComponent?: string;
 }
 
 function AttributesViewItem({
+  managedAttributeComponent,
   attributeKey,
   onRemoveClick
 }: AttributesViewItemProps) {
@@ -169,18 +174,14 @@ function AttributesViewItem({
         <div className="mb-2 d-flex align-items-center">
           <div className="me-auto">
             <strong>
-              <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
-                {managedAttributeComponent =>
-                  managedAttributeComponent ? (
-                    <ManagedAttributeName
-                      managedAttributeKey={attributeKey}
-                      managedAttributeApiPath={key =>
-                        `collection-api/managed-attribute/${managedAttributeComponent}.${key}`
-                      }
-                    />
-                  ) : null
-                }
-              </FieldSpy>
+              {managedAttributeComponent ? (
+                <ManagedAttributeName
+                  managedAttributeKey={attributeKey}
+                  managedAttributeApiPath={key =>
+                    `collection-api/managed-attribute/${managedAttributeComponent}.${key}`
+                  }
+                />
+              ) : null}
             </strong>
           </div>
           {!readOnly && (

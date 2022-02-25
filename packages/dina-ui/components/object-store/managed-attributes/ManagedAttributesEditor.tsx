@@ -141,99 +141,102 @@ export function ManagedAttributesEditor({
             })}
           >
             <div className="mb-3 managed-attributes-editor">
-              {!readOnly && (
-                <div className="row">
-                  <label
-                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-                  >
-                    <div className="mb-2">
-                      <strong>
-                        <DinaMessage id="field_visibleManagedAttributes" />
-                      </strong>
-                      <Tooltip id="field_visibleManagedAttributes_tooltip" />
-                    </div>
-                    <ManagedAttributeMultiSelect
-                      managedAttributeApiPath={managedAttributeApiPath}
-                      managedAttributeComponent={managedAttributeComponent}
-                      onChange={setVisibleAttributeKeys}
-                      visibleAttributes={visibleAttributes}
-                      loading={loading}
-                    />
-                  </label>
-                </div>
-              )}
-              {!!visibleAttributes.length && <hr />}
               {isTemplate && managedAttributeOrderFieldName ? (
                 <ManagedAttributesSorter
+                  managedAttributeComponent={managedAttributeComponent}
                   name={managedAttributeOrderFieldName}
                 />
               ) : (
-                <div className="row">
-                  {visibleAttributes.map(attribute => {
-                    const attributeKey = attribute.key;
-
-                    const attributePath = `${valuesPath}.${attributeKey}`;
-                    const props = {
-                      removeBottomMargin: true,
-                      removeLabel: true,
-                      name: attributePath
-                    };
-
-                    const isSelectAttr = !!(
-                      attribute.managedAttributeType === "STRING" &&
-                      attribute.acceptedValues?.length
-                    );
-
-                    const isIntegerAttr =
-                      attribute.managedAttributeType === "INTEGER";
-
-                    return (
+                <div>
+                  {!readOnly && (
+                    <div className="row">
                       <label
-                        key={attributeKey}
-                        className={`${attributeKey}-field col-sm-6 mb-3`}
-                        htmlFor="none"
+                        className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
                       >
-                        <div className="mb-2 d-flex align-items-center">
-                          <strong className="me-auto">
-                            {attribute.name ?? attributeKey}
+                        <div className="mb-2">
+                          <strong>
+                            <DinaMessage id="field_visibleManagedAttributes" />
                           </strong>
-                          {!readOnly && (
-                            <FormikButton
-                              className="btn remove-attribute"
-                              onClick={(_, form) => {
-                                // Delete the value and hide the managed attribute:
-                                form.setFieldValue(attributePath, undefined);
-                                setVisibleAttributeKeys(current =>
-                                  current.filter(it => it !== attributeKey)
-                                );
-                              }}
-                            >
-                              <RiDeleteBinLine size="1.8em" />
-                            </FormikButton>
-                          )}
+                          <Tooltip id="field_visibleManagedAttributes_tooltip" />
                         </div>
-                        {isSelectAttr ? (
-                          <SelectField
-                            {...props}
-                            options={[
-                              {
-                                label: `<${formatMessage("none")}>`,
-                                value: ""
-                              },
-                              ...(attribute.acceptedValues?.map(value => ({
-                                label: value,
-                                value
-                              })) ?? [])
-                            ]}
-                          />
-                        ) : isIntegerAttr ? (
-                          <NumberField {...props} />
-                        ) : (
-                          <TextField {...props} />
-                        )}
+                        <ManagedAttributeMultiSelect
+                          managedAttributeApiPath={managedAttributeApiPath}
+                          managedAttributeComponent={managedAttributeComponent}
+                          onChange={setVisibleAttributeKeys}
+                          visibleAttributes={visibleAttributes}
+                          loading={loading}
+                        />
                       </label>
-                    );
-                  })}
+                    </div>
+                  )}
+                  {!!visibleAttributes.length && <hr />}
+                  <div className="row">
+                    {visibleAttributes.map(attribute => {
+                      const attributeKey = attribute.key;
+
+                      const attributePath = `${valuesPath}.${attributeKey}`;
+                      const props = {
+                        removeBottomMargin: true,
+                        removeLabel: true,
+                        name: attributePath
+                      };
+
+                      const isSelectAttr = !!(
+                        attribute.managedAttributeType === "STRING" &&
+                        attribute.acceptedValues?.length
+                      );
+
+                      const isIntegerAttr =
+                        attribute.managedAttributeType === "INTEGER";
+
+                      return (
+                        <label
+                          key={attributeKey}
+                          className={`${attributeKey}-field col-sm-6 mb-3`}
+                          htmlFor="none"
+                        >
+                          <div className="mb-2 d-flex align-items-center">
+                            <strong className="me-auto">
+                              {attribute.name ?? attributeKey}
+                            </strong>
+                            {!readOnly && (
+                              <FormikButton
+                                className="btn remove-attribute"
+                                onClick={(_, form) => {
+                                  // Delete the value and hide the managed attribute:
+                                  form.setFieldValue(attributePath, undefined);
+                                  setVisibleAttributeKeys(current =>
+                                    current.filter(it => it !== attributeKey)
+                                  );
+                                }}
+                              >
+                                <RiDeleteBinLine size="1.8em" />
+                              </FormikButton>
+                            )}
+                          </div>
+                          {isSelectAttr ? (
+                            <SelectField
+                              {...props}
+                              options={[
+                                {
+                                  label: `<${formatMessage("none")}>`,
+                                  value: ""
+                                },
+                                ...(attribute.acceptedValues?.map(value => ({
+                                  label: value,
+                                  value
+                                })) ?? [])
+                              ]}
+                            />
+                          ) : isIntegerAttr ? (
+                            <NumberField {...props} />
+                          ) : (
+                            <TextField {...props} />
+                          )}
+                        </label>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </div>

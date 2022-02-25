@@ -35,6 +35,8 @@ export interface MaterialSampleNavProps {
   >["dataComponentState"];
   disableRemovePrompt?: boolean;
 
+  /** Hides the custom view selection, but keeps the drag/drop handles. */
+  hideCustomViewSelect?: boolean;
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 }
@@ -91,6 +93,7 @@ interface ScrollTarget<T extends MaterialSampleFormSectionId> {
 export function MaterialSampleFormNav({
   dataComponentState,
   disableRemovePrompt,
+  hideCustomViewSelect,
   navOrder,
   onChangeNavOrder
 }: MaterialSampleNavProps) {
@@ -177,11 +180,13 @@ export function MaterialSampleFormNav({
               />
             ))}
           </SortableNavGroup>
-          <MaterialSampleNavCustomViewSelect
-            onChange={updateCustomView}
-            selectedView={customView}
-            navOrder={navOrder ?? null}
-          />
+          {!hideCustomViewSelect && (
+            <MaterialSampleNavCustomViewSelect
+              onChange={updateCustomView}
+              selectedView={customView}
+              navOrder={navOrder ?? null}
+            />
+          )}
         </nav>
       </ScrollSpyNav>
     </div>
