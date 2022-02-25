@@ -146,7 +146,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       <div className="col-md-6">
         <div className="d-flex">
           {(isResetRef?.current
-            ? esIndexMapping?.[0].type === "text"
+            ? esIndexMapping?.[0]?.type === "text"
             : visibility.text) && (
             <TextField
               name={fieldProps("matchValue", index).name}
@@ -155,7 +155,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0].type === "date"
+            ? esIndexMapping?.[0]?.type === "date"
             : visibility.date) && (
             <DateField
               name={fieldProps("date", index).name}
@@ -164,7 +164,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0].type === "text"
+            ? esIndexMapping?.[0]?.type === "text"
             : visibility.text) && (
             <SelectField
               name={fieldProps("matchType", index).name}
@@ -174,7 +174,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0].type === "boolean"
+            ? esIndexMapping?.[0]?.type === "boolean"
             : visibility.boolean) && (
             <SelectField
               name={fieldProps("boolean", index).name}
@@ -184,7 +184,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0].type === "number"
+            ? esIndexMapping?.[0]?.type === "number"
             : visibility.number) && (
             <NumberField
               name={fieldProps("number", index).name}

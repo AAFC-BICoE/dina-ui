@@ -38,7 +38,7 @@ export function QueryBuilder({
 
           fieldArrayProps.form.setFieldValue(
             `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
-            esIndexMapping?.[0].label
+            esIndexMapping?.[0]?.label
           );
           fieldArrayProps.form.setFieldValue(
             `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,

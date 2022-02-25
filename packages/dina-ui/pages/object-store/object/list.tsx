@@ -4,8 +4,10 @@ import {
   dateCell,
   FilterAttribute,
   filterBy,
-  ListPageLayout,
-  SplitPagePanel
+  QueryPage,
+  SplitPagePanel,
+  useQuery,
+  withResponse
 } from "common-ui";
 import Link from "next/link";
 import { Component, useMemo, useState } from "react";
@@ -52,6 +54,29 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
+  const metadataQuery = useQuery<Metadata[]>(
+    {
+      path: "objectstore-api/metadata",
+      include: "acMetadataCreator,dcCreator"
+    },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "acMetadataCreator",
+          joinField: "acMetadataCreator",
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
+        },
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `person/${metadata.dcCreator.id}`
+        }
+      ]
+    }
+  );
+  const { error, loading, response } = metadataQuery;
 
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
@@ -149,55 +174,30 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              <ListPageLayout<Metadata>
-                additionalFilters={filterForm => ({
-                  // Apply group filter:
-                  ...(filterForm.group && { bucket: filterForm.group })
-                })}
-                defaultSort={[
-                  {
-                    desc: true,
-                    id: "xmpMetadataDate"
-                  }
-                ]}
-                filterAttributes={METADATA_FILTER_ATTRIBUTES}
-                filterFormchildren={({ submitForm }) => (
-                  <div className="mb-3">
-                    <div style={{ width: "300px" }}>
-                      <GroupSelectField
-                        onChange={() => setImmediate(submitForm)}
-                        name="group"
-                        showAnyOption={true}
-                        showAllGroups={true}
-                      />
-                    </div>
-                  </div>
-                )}
-                id="metadata-list"
-                queryTableProps={({ CheckBoxField }) => ({
-                  columns: METADATA_TABLE_COLUMNS,
-                  // Include the Agents from the Agent API in the Metadatas:
-                  joinSpecs: [
+              {withResponse({ loading, error, response }, () => (
+                <QueryPage
+                  indexName={"dina_object_store_index"}
+                  columns={METADATA_TABLE_COLUMNS}
+                  initData={response?.data}
+                  bulkDeleteButtonProps={{
+                    typeName: "metadata",
+                    apiBaseUrl: "/objectstore-api"
+                  }}
+                  bulkEditPath={ids => ({
+                    pathname: "/object-store/metadata/edit",
+                    query: { metadataIds: ids.join(",") }
+                  })}
+                  defaultSort={[
                     {
-                      apiBaseUrl: "/agent-api",
-                      idField: "acMetadataCreator",
-                      joinField: "acMetadataCreator",
-                      path: metadata =>
-                        `person/${metadata.acMetadataCreator.id}`
-                    },
-                    {
-                      apiBaseUrl: "/agent-api",
-                      idField: "dcCreator",
-                      joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator.id}`
+                      desc: true,
+                      id: "xmpMetadataDate"
                     }
-                  ],
-                  path: "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
-                  reactTableProps: ({ response }) => {
+                  ]}
+                  reactTableProps={(responseData, CheckBoxField) => {
                     TBodyGallery.innerComponent = (
                       <StoredObjectGallery
                         CheckBoxField={CheckBoxField}
-                        metadatas={response?.data ?? []}
+                        metadatas={(responseData as any) ?? []}
                         previewMetadataId={previewMetadata?.id as any}
                         onSelectPreviewMetadata={setPreviewMetadata}
                       />
@@ -220,17 +220,9 @@ export default function MetadataListPage() {
                         return {};
                       }
                     };
-                  }
-                })}
-                bulkDeleteButtonProps={{
-                  typeName: "metadata",
-                  apiBaseUrl: "/objectstore-api"
-                }}
-                bulkEditPath={ids => ({
-                  pathname: "/object-store/metadata/edit",
-                  query: { metadataIds: ids.join(",") }
-                })}
-              />
+                  }}
+                />
+              ))}
             </SplitPagePanel>
           </div>
           <div className={`preview-section col-${previewSectionWidth}`}>
