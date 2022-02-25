@@ -91,7 +91,7 @@ export function QueryPage<TData extends KitsuResource>({
       ? reactTableProps(initData as any, CheckBoxField)
       : reactTableProps;
 
-  const resolvedReactTableProps = { defaultSort, ...computedReactTableProps };
+  const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
   const combinedColumns = [
     ...(showRowCheckboxes
@@ -289,7 +289,7 @@ export function QueryPage<TData extends KitsuResource>({
                   />
                 </span>
               )}
-              <div className="">
+              <div className="d-flex gap-3">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
                 {bulkDeleteButtonProps && (
                   <BulkDeleteButton {...bulkDeleteButtonProps} />

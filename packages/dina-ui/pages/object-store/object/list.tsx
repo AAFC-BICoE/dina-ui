@@ -76,7 +76,6 @@ export default function MetadataListPage() {
       ]
     }
   );
-  const { error, loading, response } = metadataQuery;
 
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
@@ -174,11 +173,11 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              {withResponse({ loading, error, response }, () => (
+              {withResponse(metadataQuery, () => (
                 <QueryPage
                   indexName={"dina_object_store_index"}
                   columns={METADATA_TABLE_COLUMNS}
-                  initData={response?.data}
+                  initData={metadataQuery.response?.data}
                   bulkDeleteButtonProps={{
                     typeName: "metadata",
                     apiBaseUrl: "/objectstore-api"
