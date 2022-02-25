@@ -21,7 +21,7 @@ export interface StorageTreeFieldProps {
   parentId: string;
 }
 
-type StorageActionMode = "VIEW" | "MOVE_ALL" | "ADD_EXISTING_AS_CHILD";
+export type StorageActionMode = "VIEW" | "MOVE_ALL" | "ADD_EXISTING_AS_CHILD";
 
 export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
   const { readOnly } = useDinaFormContext();
@@ -137,7 +137,10 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
                 <StorageLinker onChange={moveAllContent} />
               )}
               {actionMode === "ADD_EXISTING_AS_CHILD" && (
-                <StorageLinker onChange={addExistingStorageUnitAsChild} />
+                <StorageLinker
+                  actionMode="ADD_EXISTING_AS_CHILD"
+                  onChange={addExistingStorageUnitAsChild}
+                />
               )}
             </FieldSet>
           )}
@@ -202,7 +205,7 @@ export function StorageUnitContents({
       ),
       accessor: "materialSampleName"
     },
-    "materialSampleType.name",
+    "materialSampleType",
     {
       Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
       accessor: "tags"

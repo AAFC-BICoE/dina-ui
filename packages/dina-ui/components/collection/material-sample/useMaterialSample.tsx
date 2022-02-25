@@ -60,7 +60,6 @@ export function useMaterialSampleQuery(id?: string | null) {
         "attachment",
         "preparationAttachment",
         "preparationType",
-        "materialSampleType",
         "preparedBy",
         "storageUnit",
         "hierarchy",
@@ -106,8 +105,7 @@ export function useMaterialSampleQuery(id?: string | null) {
           data.materialSampleChildren = compact(
             await bulkGet<MaterialSample, true>(
               data.materialSampleChildren.map(
-                child =>
-                  `/material-sample/${child.id}?include=materialSampleType`
+                child => `/material-sample/${child.id}`
               ),
               {
                 apiBaseUrl: "/collection-api",
@@ -609,7 +607,6 @@ export function useMaterialSampleSave({
     ) {
       msInputWithRelationships.associations = [];
     }
-
     const saveOperation = {
       resource: msInputWithRelationships,
       type: "material-sample"

@@ -36,7 +36,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       Header: formatMessage("field_materialSampleName")
     },
     {
-      accessor: "materialSampleType.name",
+      accessor: "materialSampleType",
       sortable: false,
       Header: formatMessage("field_materialSampleType.name")
     },

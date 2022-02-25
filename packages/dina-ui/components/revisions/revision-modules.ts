@@ -6,7 +6,6 @@ import { COLLECTION_REVISION_ROW_CONFIG } from "./revision-row-configs/collectio
 import { INSTITUTION_REVISION_ROW_CONFIG } from "./revision-row-configs/institution-revision-config";
 import { MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/managed-attribute-revision-config";
 import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-configs";
-import { MATERIAL_SAMPLE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-type-revision-config";
 import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-config";
 import { ORGANISM_REVISION_ROW_CONFIG } from "./revision-row-configs/organism-revision-config";
 import { PREPARATION_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-type-revision-config";
@@ -22,7 +21,6 @@ export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
 export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
   "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG,
-  "material-sample-type": MATERIAL_SAMPLE_TYPE_REVISION_ROW_CONFIG,
   collection: COLLECTION_REVISION_ROW_CONFIG,
   project: PROJECT_REVISION_ROW_CONFIG,
   institution: INSTITUTION_REVISION_ROW_CONFIG,

@@ -177,9 +177,9 @@ export function MolecularSampleFields() {
             // Only allow linking to the built-in Molecular Sample type:
             extraFilters: [
               {
-                selector: "materialSampleType.uuid",
+                selector: "materialSampleType",
                 comparison: "==",
-                arguments: "3426a6db-99db-4f9d-9c26-eaed1d6906e5"
+                arguments: "MOLECULAR_SAMPLE"
               }
             ]
           })}
