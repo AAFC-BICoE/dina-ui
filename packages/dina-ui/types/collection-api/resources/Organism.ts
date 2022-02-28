@@ -7,6 +7,7 @@ export interface OrganismAttributes {
   lifeStage?: string | null;
   sex?: string | null;
   remarks?: string | null;
+  isTarget?: boolean;
   determination?: Determination[] | null;
   createdOn?: string;
   createdBy?: string;
