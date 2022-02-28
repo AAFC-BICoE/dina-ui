@@ -31,10 +31,52 @@ const TEST_GROUP: PersistedResource<Group>[] = [
 
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    "data.id.type": "text",
-    "data.attributes.createdOn.type": "date",
-    "meta.moduleVersion.type": "text",
-    "data.attributes.allowDuplicateName.type": "boolean"
+    body: {
+      indexName: "dina_object_store_index",
+      attributes: [
+        {
+          name: "originalFilename",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "bucket",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "createdBy",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "acCaption",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "id",
+          type: "text",
+          path: "data"
+        },
+        {
+          name: "type",
+          type: "text",
+          path: "data"
+        },
+        {
+          name: "createdOn",
+          type: "date",
+          path: "data.attributes"
+        }
+      ],
+      relationships: {
+        type: "text",
+        attributes: []
+      }
+    },
+    statusCode: "OK",
+    statusCodeValue: 200
   }
 };
 
