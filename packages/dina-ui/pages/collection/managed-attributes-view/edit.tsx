@@ -384,13 +384,13 @@ function AttributesViewItem({
           </div>
           {!readOnly && (
             <div className="d-flex align-items-center gap-2">
+              <GiMove size="1.8em" />
               <FormikButton
                 className="btn remove-attribute"
                 onClick={() => onRemoveClick()}
               >
                 <RiDeleteBinLine size="1.8em" />
               </FormikButton>
-              <GiMove size="1.8em" />
             </div>
           )}
         </div>
