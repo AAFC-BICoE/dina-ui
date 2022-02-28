@@ -21,15 +21,20 @@ export const ORGANISM_FIELDS = [
 ] as const;
 
 export interface OrganismStateFieldProps {
+  index: number;
   individualEntry: boolean;
   namePrefix?: string;
   id?: string;
+
+  onTargetChecked: (index: number) => void;
 }
 
 /** Form section for a single organism. */
 export function OrganismStateField({
+  index,
   namePrefix = "",
-  individualEntry
+  individualEntry,
+  onTargetChecked
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -47,15 +52,15 @@ export function OrganismStateField({
   return (
     <div className="organism-state-field">
       <div className="row">
-        {individualEntry && (
+        {individualEntry && !readOnly && (
           <ToggleField
             {...fieldProps("isTarget")}
-            className="primary-determination-button"
-            // onChangeExternal={checked => {
-            //  if (checked) {
-            //
-            //  }
-            // }}
+            className="col-sm-1"
+            onChangeExternal={checked => {
+              if (checked) {
+                onTargetChecked(index);
+              }
+            }}
           />
         )}
         <AutoSuggestTextField<Organism>
@@ -72,7 +77,7 @@ export function OrganismStateField({
           alwaysShowSuggestions={true}
         />
         <AutoSuggestTextField<Organism>
-          className="col-sm-6"
+          className={individualEntry ? "col-sm-5" : "col-sm-6"}
           {...fieldProps("sex")}
           query={(search, ctx) => ({
             path: "collection-api/organism",
