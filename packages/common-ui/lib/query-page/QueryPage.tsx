@@ -144,6 +144,20 @@ export function QueryPage<TData extends KitsuResource>({
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
+
+    const submitVal = {
+      queryRows: [
+        {
+          fieldName: sortedData?.[0]?.value,
+          matchType: "match",
+          boolean: "true",
+          date: moment().format(),
+          type: sortedData?.[0]?.type
+        }
+      ],
+      group: groupNames?.[0]
+    };
+    onSubmit({ submittedValues: submitVal });
   }
 
   async function searchES(queryDSL) {
@@ -182,16 +196,14 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-    Object.keys(resp.data)
-      .filter(key => key.includes("data.attributes."))
-      .map(key => {
-        const fieldNameLabel = key.substring("data.attributes.".length);
-        result.push({
-          label: fieldNameLabel,
-          value: key,
-          type: resp.data?.[key]
-        });
+    resp.data.body.attributes.map(key => {
+      result.push({
+        label: key.name,
+        value: key.path + "." + key.name,
+        type: key.type,
+        path: key.path
       });
+    });
     return result;
   }
 

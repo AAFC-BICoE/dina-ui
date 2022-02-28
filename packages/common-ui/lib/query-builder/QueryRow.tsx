@@ -21,6 +21,7 @@ export interface ESIndexMapping {
   value: string;
   label: string;
   type: string;
+  path: string;
 }
 
 export type QueryRowMatchValue = "match" | "term";
