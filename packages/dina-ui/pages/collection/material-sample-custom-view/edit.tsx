@@ -50,6 +50,10 @@ const workflowMainFieldsSchema = yup.object({
   name: yup.string().trim().required(),
   group: yup.string().required(),
   restrictToCreatedBy: yup.boolean().required(),
+
+  // Managed Attributes default values:
+  managedAttributes: yup.object({}),
+  // Managed Attributes display order:
   managedAttributesOrder: yup.array(yup.string().required()),
 
   attachmentsConfig: yup.mixed(),
@@ -197,6 +201,7 @@ export function MaterialSampleCustomViewForm({
       name,
       restrictToCreatedBy,
 
+      managedAttributes,
       managedAttributesOrder,
 
       ...materialSampleTemplateFields
@@ -206,6 +211,15 @@ export function MaterialSampleCustomViewForm({
     const enabledTemplateFields = getEnabledTemplateFieldsFromForm(
       materialSampleTemplateFields
     );
+
+    // Managed attribute default values don't need the template checkbox, all are set to "enabled":
+    const managedAttributesTemplateFields: TemplateFields = {};
+    for (const key of managedAttributesOrder ?? []) {
+      managedAttributesTemplateFields[`managedAttributes.${key}`] = {
+        enabled: true,
+        defaultValue: managedAttributes[key]
+      };
+    }
 
     const tagSectionTemplateFields = pick(
       enabledTemplateFields,
@@ -261,7 +275,8 @@ export function MaterialSampleCustomViewForm({
             ...organismsTemplateFields,
             ...storageTemplateFields,
             ...scheduledActionsTemplateFields,
-            ...associationTemplateFields
+            ...associationTemplateFields,
+            ...managedAttributesTemplateFields
           }
         },
         COLLECTING_EVENT: enableCollectingEvent

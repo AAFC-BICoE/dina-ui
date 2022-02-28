@@ -12,7 +12,7 @@ import {
 import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useRef, useState } from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   managedAttributesViewSchema
@@ -20,7 +20,7 @@ import {
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
-import { ManagedAttributeField } from "./ManagedAttributeField";
+import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -56,7 +56,6 @@ export function ManagedAttributesEditor({
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
-  const { formatMessage } = useDinaIntl();
 
   const [customView, setCustomView] = useState<PersistedResource<CustomView>>();
   return (
@@ -141,6 +140,8 @@ export function ManagedAttributesEditor({
                 <ManagedAttributesSorter
                   managedAttributeComponent={managedAttributeComponent}
                   name={managedAttributeOrderFieldName}
+                  managedAttributeApiPath={managedAttributeApiPath}
+                  valuesPath={valuesPath}
                 />
               ) : (
                 <div>
@@ -168,7 +169,7 @@ export function ManagedAttributesEditor({
                   {!!visibleAttributes.length && <hr />}
                   <div className="row">
                     {visibleAttributes.map(attribute => (
-                      <ManagedAttributeField
+                      <ManagedAttributeFieldWithLabel
                         key={attribute.key}
                         attribute={attribute}
                         valuesPath={valuesPath}

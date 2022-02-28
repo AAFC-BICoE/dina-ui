@@ -1,13 +1,16 @@
 import {
+  DinaFormSection,
   FieldSpy,
   filterBy,
   FormikButton,
   ResourceSelect,
+  useBulkGet,
   useDinaFormContext
 } from "common-ui";
 import { FieldArray } from "formik";
-import { get } from "lodash";
-import { PropsWithChildren } from "react";
+import { PersistedResource } from "kitsu";
+import { compact, get } from "lodash";
+import { useRef } from "react";
 import { GiMove } from "react-icons/gi";
 import { RiDeleteBinLine } from "react-icons/ri";
 import {
@@ -17,17 +20,22 @@ import {
 } from "react-sortable-hoc";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../../types/objectstore-api";
-import { ManagedAttributeName } from "../ManagedAttributesViewer";
+import { ManagedAttributeField } from "../ManagedAttributeField";
 
 export interface ManagedAttributeSorterProps {
   managedAttributeComponent?: string;
   /** Field name for the managed attribute key array. */
   name: string;
+  /** If inputa are editable, this is the path to the managedAttributes field in the form. */
+  valuesPath?: string;
+  managedAttributeApiPath: string;
 }
 
 export function ManagedAttributesSorter({
   managedAttributeComponent,
-  name
+  name,
+  managedAttributeApiPath,
+  valuesPath
 }: ManagedAttributeSorterProps) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
@@ -61,7 +69,7 @@ export function ManagedAttributesSorter({
                       ? { managedAttributeComponent }
                       : {})
                   })}
-                  model="collection-api/managed-attribute"
+                  model={managedAttributeApiPath}
                   onChange={ma => {
                     if (
                       !Array.isArray(ma) &&
@@ -109,25 +117,12 @@ export function ManagedAttributesSorter({
                     // "distance" is needed to allow clicking the Remove button:
                     distance={1}
                     helperClass="sortable-lifted"
-                  >
-                    {/* Give the lifted drag/drop item a blue background. */}
-                    <style>{`
-                      .form-control.sortable-lifted {
-                        background-color: rgb(222, 235, 255);
-                        z-index: 1100;
-                      }
-                    `}</style>
-                    {keys?.map((key, index) => (
-                      <SortableAttributesViewItem
-                        disabled={readOnly}
-                        key={key}
-                        attributeKey={key}
-                        onRemoveClick={() => remove(index)}
-                        index={index}
-                        managedAttributeComponent={managedAttributeComponent}
-                      />
-                    ))}
-                  </SortableAttributesViewList>
+                    keys={keys ?? []}
+                    managedAttributeApiPath={managedAttributeApiPath}
+                    managedAttributeComponent={managedAttributeComponent}
+                    onRemoveClick={index => remove(index)}
+                    valuesPath={valuesPath}
+                  />
                 )}
               </FieldSpy>
             </div>
@@ -138,22 +133,80 @@ export function ManagedAttributesSorter({
   );
 }
 
-function AttributesViewList({ children }: PropsWithChildren<{}>) {
+interface AttributesViewListProps {
+  keys: string[];
+  managedAttributeApiPath: string;
+  managedAttributeComponent?: string;
+  onRemoveClick: (index: number) => void;
+  valuesPath?: string;
+}
+
+/** Sortable Managed Attribute list. */
+function AttributesViewList({
+  keys,
+  managedAttributeApiPath,
+  managedAttributeComponent,
+  onRemoveClick,
+  valuesPath
+}: AttributesViewListProps) {
+  const { readOnly } = useDinaFormContext();
+
+  // Fetch the attributes, but omit any that are missing e.g. were deleted.
+  const { dataWithNullForMissing: fetchedAttributes, loading } =
+    useBulkGet<ManagedAttribute>({
+      ids: keys.map(key =>
+        // Use the component prefix if needed by the back-end:
+        compact([managedAttributeComponent, key]).join(".")
+      ),
+      listPath: managedAttributeApiPath
+    });
+
+  // Store the last fetched Attributes in a ref instead of showing a
+  // loading state when the visible attributes change.
+  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
+    []
+  );
+  if (fetchedAttributes) {
+    lastFetchedAttributes.current = compact(fetchedAttributes);
+  }
+
+  const visibleAttributes = lastFetchedAttributes.current;
+
   return (
-    <div className="d-flex justify-content-between flex-wrap">{children}</div>
+    <div className="d-flex justify-content-between flex-wrap">
+      {/* Give the lifted drag/drop item a blue background. */}
+      <style>{`
+        .form-control.sortable-lifted {
+          background-color: rgb(222, 235, 255);
+          z-index: 1100;
+        }
+      `}</style>
+      <DinaFormSection isTemplate={false}>
+        {visibleAttributes.map((attribute, index) => (
+          <SortableAttributesViewItem
+            disabled={readOnly}
+            key={attribute.key}
+            onRemoveClick={() => onRemoveClick(index)}
+            index={index}
+            attribute={attribute}
+            valuesPath={valuesPath}
+          />
+        ))}
+      </DinaFormSection>
+    </div>
   );
 }
 
 interface AttributesViewItemProps {
-  attributeKey: string;
   onRemoveClick: () => void;
-  managedAttributeComponent?: string;
+  attribute: PersistedResource<ManagedAttribute>;
+  valuesPath?: string;
 }
 
 function AttributesViewItem({
-  managedAttributeComponent,
-  attributeKey,
-  onRemoveClick
+  onRemoveClick,
+  attribute,
+  valuesPath
 }: AttributesViewItemProps) {
   const { readOnly } = useDinaFormContext();
   const cursor = readOnly ? undefined : "grab";
@@ -161,7 +214,7 @@ function AttributesViewItem({
   return (
     <div
       // form-control adds the blue focus ring around the div:
-      className="card card-body mb-4 form-control"
+      className="card card-body mb-4 form-control sortable-managed-attribute"
       style={{
         cursor,
         maxWidth: "49.2%"
@@ -172,16 +225,7 @@ function AttributesViewItem({
       <label htmlFor="none" style={{ cursor }}>
         <div className="mb-2 d-flex align-items-center">
           <div className="me-auto">
-            <strong>
-              {managedAttributeComponent ? (
-                <ManagedAttributeName
-                  managedAttributeKey={attributeKey}
-                  managedAttributeApiPath={key =>
-                    `collection-api/managed-attribute/${managedAttributeComponent}.${key}`
-                  }
-                />
-              ) : null}
-            </strong>
+            <strong>{attribute.name}</strong>
           </div>
           {!readOnly && (
             <div className="d-flex align-items-center gap-2">
@@ -195,7 +239,18 @@ function AttributesViewItem({
             </div>
           )}
         </div>
-        <input type="text" className="form-control" disabled={true} />
+        {
+          // If a valuesPath is provided e.g. "managedAttributes", allow editing the inputs.
+          // This can be used for setting default values in a form template editor.
+          valuesPath ? (
+            <ManagedAttributeField
+              attribute={attribute}
+              valuesPath={valuesPath}
+            />
+          ) : (
+            <input type="text" className="form-control" disabled={true} />
+          )
+        }
       </label>
     </div>
   );

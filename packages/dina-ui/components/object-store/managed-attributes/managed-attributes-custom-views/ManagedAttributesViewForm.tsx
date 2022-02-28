@@ -143,6 +143,7 @@ export function ManagedAttributesViewFormLayout({
               <ManagedAttributesSorter
                 name="viewConfiguration.attributeKeys"
                 managedAttributeComponent={managedAttributeComponent}
+                managedAttributeApiPath="collection-api/managed-attribute"
               />
             </>
           ) : null

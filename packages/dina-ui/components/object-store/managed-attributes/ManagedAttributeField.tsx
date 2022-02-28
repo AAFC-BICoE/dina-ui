@@ -13,32 +13,23 @@ import { ManagedAttribute } from "../../../types/objectstore-api";
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
   valuesPath: string;
+}
+
+export interface ManagedAttributeFieldWithLabelProps
+  extends ManagedAttributeFieldProps {
   onRemoveClick: (attributeKey: string) => void;
 }
 
-/** Formik-connected field for a single Managed Attribute. */
-export function ManagedAttributeField({
-  attribute,
-  valuesPath,
-  onRemoveClick
-}: ManagedAttributeFieldProps) {
+/** Single Managed Attribute Formik-connected field wrapped in a label. */
+export function ManagedAttributeFieldWithLabel(
+  props: ManagedAttributeFieldWithLabelProps
+) {
+  const { attribute, valuesPath, onRemoveClick } = props;
+
   const { readOnly } = useDinaFormContext();
   const attributeKey = attribute.key;
-  const { formatMessage } = useDinaIntl();
 
   const attributePath = `${valuesPath}.${attributeKey}`;
-  const props = {
-    removeBottomMargin: true,
-    removeLabel: true,
-    name: attributePath
-  };
-
-  const isSelectAttr = !!(
-    attribute.managedAttributeType === "STRING" &&
-    attribute.acceptedValues?.length
-  );
-
-  const isIntegerAttr = attribute.managedAttributeType === "INTEGER";
 
   return (
     <label
@@ -61,25 +52,50 @@ export function ManagedAttributeField({
           </FormikButton>
         )}
       </div>
-      {isSelectAttr ? (
-        <SelectField
-          {...props}
-          options={[
-            {
-              label: `<${formatMessage("none")}>`,
-              value: ""
-            },
-            ...(attribute.acceptedValues?.map(value => ({
-              label: value,
-              value
-            })) ?? [])
-          ]}
-        />
-      ) : isIntegerAttr ? (
-        <NumberField {...props} />
-      ) : (
-        <TextField {...props} />
-      )}
+      <ManagedAttributeField {...props} />
     </label>
+  );
+}
+
+/** Formik-connected field for a single Managed Attribute. No surrounding label tag. */
+export function ManagedAttributeField({
+  attribute,
+  valuesPath
+}: ManagedAttributeFieldProps) {
+  const { formatMessage } = useDinaIntl();
+
+  const attributePath = `${valuesPath}.${attribute.key}`;
+
+  const props = {
+    removeBottomMargin: true,
+    removeLabel: true,
+    name: attributePath
+  };
+
+  const isSelectAttr = !!(
+    attribute.managedAttributeType === "STRING" &&
+    attribute.acceptedValues?.length
+  );
+
+  const isIntegerAttr = attribute.managedAttributeType === "INTEGER";
+
+  return isSelectAttr ? (
+    <SelectField
+      {...props}
+      options={[
+        {
+          label: `<${formatMessage("none")}>`,
+          value: ""
+        },
+        ...(attribute.acceptedValues?.map(value => ({
+          label: value,
+          value
+        })) ?? [])
+      ]}
+    />
+  ) : isIntegerAttr ? (
+    <NumberField {...props} />
+  ) : (
+    <TextField {...props} />
   );
 }
