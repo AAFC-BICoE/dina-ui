@@ -20,6 +20,9 @@ export interface ESIndexMapping {
   value: string;
   label: string;
   type: string;
+  path: string;
+  parentPath?: string;
+  parentType?: string;
 }
 
 export type QueryRowMatchValue = "match" | "term";
@@ -106,13 +109,34 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     }
   }
 
-  const queryRowOptions = esIndexMapping
-    ?.filter(prop => !prop.label.startsWith("group"))
+  const simpleRowOptions = esIndexMapping
+    ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
       label: prop.label,
       value: prop.value + "(" + prop.type + ")"
     }));
 
+  let nestedGroupLabel = "Nested Group";
+
+  const nestedRowOptions = esIndexMapping
+    ?.filter(prop => !!prop.parentPath)
+    ?.map(prop => {
+      nestedGroupLabel = prop.parentType as string;
+      return {
+        label: prop.label,
+        value: {
+          name: prop.parentPath + "." + prop.value + "(" + prop.type + ")",
+          type: prop.parentType
+        }
+      };
+    });
+
+  const queryRowOptions = [
+    ...simpleRowOptions,
+    ...(nestedRowOptions?.length > 0
+      ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
+      : [])
+  ];
   function fieldProps(fieldName: string, idx: number) {
     return {
       name: `${name}[${idx}].${fieldName}`
@@ -133,7 +157,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
             name={fieldProps("fieldName", index).name}
-            options={queryRowOptions}
+            options={queryRowOptions as any}
             onChange={(value, formik) =>
               onSelectionChange(value, formik, index)
             }

@@ -9,7 +9,7 @@ export interface SelectOption<T> {
   value: T;
 }
 
-export interface SelectFieldProps<T = string> extends FieldWrapperProps {
+export interface SelectFieldProps<T> extends FieldWrapperProps {
   disabled?: boolean;
 
   /** Whether this is a multi-select dropdown. */
@@ -29,7 +29,7 @@ export interface SelectFieldProps<T = string> extends FieldWrapperProps {
 }
 
 /** Formik-connected select input. */
-export function SelectField<T = string>(props: SelectFieldProps<T>) {
+export function SelectField<T>(props: SelectFieldProps<T>) {
   const {
     disabled,
     isMulti,
