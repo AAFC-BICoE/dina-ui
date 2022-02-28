@@ -6,6 +6,17 @@
     }
   },
   "mappings": {
+    "dynamic_templates": [
+      {
+        "id_as_keywords": {
+          "match_mapping_type": "string",
+          "match":   "id",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
+      }
+    ],
     "properties": {
       "data": {
         "properties": {
@@ -167,12 +178,25 @@
               }
             }
           },
-          "id": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
+          "relationships": {
+            "properties": {
+              "attachment": {
+                "type": "object"
+              },
+              "collectingEvent": {
+                "properties": {
+                  "data": {
+                    "properties": {
+                      "type": {
+                        "type": "constant_keyword",
+                        "value": "collecting-event"
+                      }
+                    }
+                  }
+                }
+              },
+              "storageUnit": {
+                "type": "object"
               }
             }
           },

@@ -6,6 +6,17 @@
     }
   },
   "mappings": {
+    "dynamic_templates": [
+      {
+        "id_as_keywords": {
+          "match_mapping_type": "string",
+          "match":   "id",
+          "mapping": {
+            "type": "keyword"
+          }
+        }
+      }
+    ],
     "properties": {
       "data": {
         "properties": {
@@ -55,30 +66,12 @@
               }
             }
           },
-          "id": {
-            "type": "text",
-            "fields": {
-              "keyword": {
-                "type": "keyword",
-                "ignore_above": 256
-              }
-            }
-          },
           "relationships": {
             "properties": {
               "derivatives": {
                 "properties": {
                   "data": {
                     "properties": {
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
                       "type": {
                         "type": "text",
                         "fields": {
@@ -96,15 +89,6 @@
                 "properties": {
                   "data": {
                     "properties": {
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
                       "type": {
                         "type": "text",
                         "fields": {
@@ -122,15 +106,6 @@
                 "properties": {
                   "data": {
                     "properties": {
-                      "id": {
-                        "type": "text",
-                        "fields": {
-                          "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                          }
-                        }
-                      },
                       "type": {
                         "type": "text",
                         "fields": {
