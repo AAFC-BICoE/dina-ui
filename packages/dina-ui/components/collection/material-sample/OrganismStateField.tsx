@@ -2,7 +2,8 @@ import {
   AutoSuggestTextField,
   FieldSpy,
   TextField,
-  useDinaFormContext
+  useDinaFormContext,
+  ToggleField
 } from "common-ui";
 import { DeterminationField } from "..";
 import { Organism } from "../../../types/collection-api";
@@ -15,17 +16,20 @@ export const ORGANISM_FIELDS = [
   "lifeStage",
   "sex",
   "remarks",
-  "determination"
+  "determination",
+  "isTarget"
 ] as const;
 
 export interface OrganismStateFieldProps {
+  individualEntry: boolean;
   namePrefix?: string;
   id?: string;
 }
 
 /** Form section for a single organism. */
 export function OrganismStateField({
-  namePrefix = ""
+  namePrefix = "",
+  individualEntry
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -43,6 +47,17 @@ export function OrganismStateField({
   return (
     <div className="organism-state-field">
       <div className="row">
+        {individualEntry && (
+          <ToggleField
+            {...fieldProps("isTarget")}
+            className="primary-determination-button"
+            // onChangeExternal={checked => {
+            //  if (checked) {
+            //
+            //  }
+            // }}
+          />
+        )}
         <AutoSuggestTextField<Organism>
           className="col-sm-6"
           {...fieldProps("lifeStage")}

@@ -583,6 +583,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storagesCreatedByMe: "Storages Created By Me",
   switchToActionType: 'Switch to "{actionType}".',
   tags: "Tags",
+  target: "Target",
   templateNameMandatoryErrorMsg: "Please enter a workflow template name.",
   thisWillLoseAllDataEnteredInThisStep:
     "This will lose all data entered in this step.",

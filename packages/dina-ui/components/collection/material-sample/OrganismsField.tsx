@@ -98,7 +98,10 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                       onRowMove={move}
                     />
                   ) : (
-                    <OrganismStateField namePrefix={`${name}[0].`} />
+                    <OrganismStateField
+                      namePrefix={`${name}[0].`}
+                      individualEntry={false}
+                    />
                   ))}
               </div>
             );
@@ -179,6 +182,10 @@ function OrganismsTable({
             width: 60
           }
         ]),
+    ...["isTarget"].map<Column<Organism>>(accessor => ({
+      accessor,
+      Header: formatMessage("target")
+    })),
     {
       id: "determination",
       Cell: ({ original: o }) => {
@@ -214,7 +221,7 @@ function OrganismsTable({
 
   /** Only show up to the organismsQuantity number */
   const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
-    (_, index) => organisms[index] || { type: "organism" }
+    (_, index) => organisms[index] || { type: "organism", isTarget: false }
   );
 
   return (
@@ -247,6 +254,7 @@ function OrganismsTable({
               <div className="p-3">
                 <OrganismStateField
                   namePrefix={`${namePrefix}[${row.index}].`}
+                  individualEntry={true}
                 />
               </div>
             </div>
