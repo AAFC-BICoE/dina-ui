@@ -262,6 +262,13 @@ const Home: React.FunctionComponent = () => (
         </h2>
         <ul>
           <li>
+            <Link href="/loan-transaction/managed-attribute/list">
+              <a>
+                <DinaMessage id="managedAttributes" />
+              </a>
+            </Link>
+          </li>
+          <li>
             <Link href="/loan-transaction/transaction/list">
               <a>
                 <DinaMessage id="transactions" />

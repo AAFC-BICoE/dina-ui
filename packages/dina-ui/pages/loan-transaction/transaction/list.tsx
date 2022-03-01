@@ -43,7 +43,11 @@ const TABLE_COLUMNS = [
   "transactionType",
   "materialDirection",
   stringArrayCell("otherIdentifiers"),
-  "materialToBeReturned",
+  {
+    accessor: "materialToBeReturned",
+    Cell: ({ original: transaction }) =>
+      transaction.materialToBeReturned?.toString()
+  },
   "purpose",
   "status",
   dateCell("openedDate"),
