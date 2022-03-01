@@ -98,7 +98,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
     formik.setFieldValue(`${name}[${idx}]`, state);
     switch (type) {
-      case "text": {
+      case "text":
+      case "keyword": {
         return setVisibility({ ...initVisibility, text: true });
       }
       case "date": {
@@ -128,15 +129,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       nestedGroupLabel = prop.parentName as string;
       return {
         label: prop.label,
-        value:
-          prop.parentPath +
-          "." +
-          prop.path +
-          "." +
-          prop.value +
-          "(" +
-          prop.type +
-          ")"
+        value: prop.parentPath + "." + prop.value + "(" + prop.type + ")"
       };
     });
 

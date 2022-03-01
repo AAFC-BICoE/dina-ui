@@ -157,7 +157,11 @@ export function QueryPage<TData extends KitsuResource>({
     resp.data.body.attributes.map(key => {
       result.push({
         label: key.name,
-        value: key.path + "." + key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
         type: key.type,
         path: key.path
       });
@@ -165,8 +169,14 @@ export function QueryPage<TData extends KitsuResource>({
 
     resp.data.body.relationships.attributes.map(key => {
       result.push({
-        label: key.name,
-        value: key.name,
+        label: key.path?.includes(".")
+          ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
+          : key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
         type: key.type,
         path: key.path,
         parentPath: resp.data.body.relationships.path,
