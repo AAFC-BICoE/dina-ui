@@ -12,6 +12,7 @@ import { PREPARATION_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/pre
 import { PROJECT_REVISION_ROW_CONFIG } from "./revision-row-configs/project-revision-config";
 import { STORAGE_UNIT_REVISION_ROW_CONFIG } from "./revision-row-configs/storage-unit-revision-config";
 import { STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/storage-unit-type-revision-config";
+import { TRANSACTION_REVISION_ROW_CONFIG } from "./revision-row-configs/transacton-revision-config";
 
 /** Custom revision row behavior for Object Store Resources. */
 export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
@@ -32,3 +33,8 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   "storage-unit-type": STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG,
   organism: ORGANISM_REVISION_ROW_CONFIG
 };
+
+export const LOAN_TRANSACTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
+  {
+    transaction: TRANSACTION_REVISION_ROW_CONFIG
+  };

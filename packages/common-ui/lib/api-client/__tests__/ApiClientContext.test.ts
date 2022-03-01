@@ -427,6 +427,59 @@ Constraint violation: description size must be between 1 and 10`;
     );
   });
 
+  it("Removed the 'meta' field when saving to the back-end.", async () => {
+    // Mock PATCH response:
+    mockPatch.mockImplementationOnce(() => ({
+      data: [
+        {
+          data: {
+            attributes: {
+              lotNumber: 1,
+              name: "testPrimer1 edited"
+            },
+            id: "123",
+            type: "pcrPrimer"
+          },
+          status: 201
+        }
+      ]
+    }));
+
+    await save([
+      {
+        resource: {
+          id: "123",
+          lotNumber: 1,
+          name: "testPrimer1 edited",
+          // Sometimes the initial GET operation include the "meta" field:
+          meta: {
+            permissions: ["create", "update", "delete"],
+            permissionsProvider: "GroupAuthorizationService"
+          },
+          type: "pcrPrimer"
+        } as TestPcrPrimer,
+        type: "pcrPrimer"
+      }
+    ]);
+
+    expect(mockPatch).lastCalledWith(
+      "/operations",
+      [
+        // The "meta" field should be excluded from the save operation:
+        {
+          op: "PATCH",
+          path: "pcrPrimer/123",
+          value: {
+            attributes: { lotNumber: 1, name: "testPrimer1 edited" },
+            id: "123",
+            type: "pcrPrimer"
+          }
+        }
+      ],
+      expect.anything()
+    );
+  });
+
   it("Provides a bulk-get-by-ID function.", async () => {
     mockPatch.mockImplementationOnce(() => ({
       data: [

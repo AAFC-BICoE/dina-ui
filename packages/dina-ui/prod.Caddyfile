@@ -52,6 +52,12 @@ route /api/collection-api/* {
 	reverse_proxy {$COLLECTION_API_ADDRESS}
 }
 
+# Proxy to the back-end Loans and Transactions API:
+route /api/loan-transaction-api/* {
+	uri replace /api/loan-transaction-api /api/v1
+	reverse_proxy {$LOAN_TRANSACTION_API_ADDRESS}
+}
+
 # Proxy to the back-end search API:
 route /api/search-api/* {
 	uri replace /api/search-api/ /
