@@ -166,11 +166,11 @@ export function QueryPage<TData extends KitsuResource>({
     resp.data.body.relationships.attributes.map(key => {
       result.push({
         label: key.name,
-        value: key.path + "." + key.name,
+        value: key.name,
         type: key.type,
         path: key.path,
         parentPath: resp.data.body.relationships.path,
-        parentType: resp.data.body.relationships.name
+        parentName: resp.data.body.relationships.value
       });
     });
     return result;

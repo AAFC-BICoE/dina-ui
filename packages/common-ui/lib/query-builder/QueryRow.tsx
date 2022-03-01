@@ -22,7 +22,7 @@ export interface ESIndexMapping {
   type: string;
   path: string;
   parentPath?: string;
-  parentType?: string;
+  parentName?: string;
 }
 
 export type QueryRowMatchValue = "match" | "term";
@@ -85,7 +85,11 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   };
 
   function onSelectionChange(value, formik, idx) {
-    const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+    const computedVal = typeof value === "object" ? value.name : value;
+    const type = computedVal.substring(
+      computedVal.indexOf("(") + 1,
+      computedVal.indexOf(")")
+    );
     const state = {
       ...formik.values?.[`${name}`]?.[`${idx}`],
       ...initState,
@@ -121,13 +125,18 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const nestedRowOptions = esIndexMapping
     ?.filter(prop => !!prop.parentPath)
     ?.map(prop => {
-      nestedGroupLabel = prop.parentType as string;
+      nestedGroupLabel = prop.parentName as string;
       return {
         label: prop.label,
-        value: {
-          name: prop.parentPath + "." + prop.value + "(" + prop.type + ")",
-          type: prop.parentType
-        }
+        value:
+          prop.parentPath +
+          "." +
+          prop.path +
+          "." +
+          prop.value +
+          "(" +
+          prop.type +
+          ")"
       };
     });
 
