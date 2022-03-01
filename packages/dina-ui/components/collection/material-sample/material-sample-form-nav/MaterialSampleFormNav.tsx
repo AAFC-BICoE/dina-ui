@@ -17,30 +17,34 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import Switch, { ReactSwitchProps } from "react-switch";
-import * as yup from "yup";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
   CustomView,
   MaterialSampleAssociation,
   MaterialSampleFormSectionId,
   MATERIAL_SAMPLE_FORM_SECTIONS,
   Organism
-} from "../../../types/collection-api";
+} from "../../../../types/collection-api";
 import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
-import { useMaterialSampleSave } from "./useMaterialSample";
+import { useMaterialSampleSave } from "../useMaterialSample";
+import { materialSampleNavOrderSchema } from "./materialSampleNavOrderSchema";
 
-export interface MaterialSampleNavProps {
+export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
+
+  /** Disabled the Are You Sure modal when toggling a data component off. */
   disableRemovePrompt?: boolean;
 
   /** Hides the custom view selection, but keeps the drag/drop handles. */
   hideCustomViewSelect?: boolean;
+
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 }
 
+// Don't render the react-scrollspy-nav component during tests because it only works in the browser.
 const renderNav = process.env.NODE_ENV !== "test";
 
 const ScrollSpyNav = renderNav
@@ -48,7 +52,8 @@ const ScrollSpyNav = renderNav
       async () => {
         const NavClass = await import("react-scrollspy-nav");
 
-        // Put the "active" class on the list-group-item instead of the <a> tag:
+        // Do a small patch to the module:
+        // Put the "active" class on the "list-group-item" div instead of the <a> tag:
         class MyNavClass extends NavClass.default {
           getNavLinkElement(sectionID) {
             return super
@@ -62,23 +67,6 @@ const ScrollSpyNav = renderNav
       { ssr: false }
     )
   : "div";
-
-/** Yup needs this as an array even though it's a single string literal. */
-const typeNameArray = ["material-sample-form-section-order"] as const;
-
-/** Expected shape of the CustomView's viewConfiguration field. */
-export const materialSampleFormViewConfigSchema = yup.object({
-  type: yup
-    .mixed<typeof typeNameArray[number]>()
-    .oneOf([...typeNameArray])
-    .required(),
-  navOrder: yup.array(
-    yup
-      .mixed<MaterialSampleFormSectionId>()
-      .oneOf([...MATERIAL_SAMPLE_FORM_SECTIONS])
-      .required()
-  )
-});
 
 interface ScrollTarget<T extends MaterialSampleFormSectionId> {
   id: T;
@@ -96,7 +84,7 @@ export function MaterialSampleFormNav({
   hideCustomViewSelect,
   navOrder,
   onChangeNavOrder
-}: MaterialSampleNavProps) {
+}: MaterialSampleFormNavProps) {
   const { sortedScrollTargets } = useMaterialSampleSectionOrder({
     dataComponentState,
     navOrder
@@ -114,11 +102,7 @@ export function MaterialSampleFormNav({
 
     // Update the nav order:
     if (newView.id) {
-      if (
-        materialSampleFormViewConfigSchema.isValidSync(
-          newView.viewConfiguration
-        )
-      ) {
+      if (materialSampleNavOrderSchema.isValidSync(newView.viewConfiguration)) {
         onChangeNavOrder(newView.viewConfiguration.navOrder ?? []);
       }
     } else {

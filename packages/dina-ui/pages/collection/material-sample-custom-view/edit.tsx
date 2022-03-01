@@ -19,13 +19,18 @@ import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import {
+  FormTemplate,
   GroupSelectField,
   Head,
   IDENTIFIERS_FIELDS,
+  materialSampleFormCustomViewSchema,
+  MaterialSampleFormCustomViewConfig,
   MATERIALSAMPLE_FIELDSET_FIELDS,
   Nav,
   PREPARATION_FIELDS,
   TAG_SECTION_FIELDS,
+  TemplateField,
+  TemplateFieldMap,
   useMaterialSampleSave
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -33,13 +38,8 @@ import {
   AcquisitionEvent,
   CollectingEvent,
   CustomView,
-  FormTemplate,
   MaterialSample,
-  MaterialSampleFormSectionId,
-  MaterialSampleFormViewConfig,
-  materialSampleFormViewConfigSchema,
-  TemplateField,
-  TemplateFields
+  MaterialSampleFormSectionId
 } from "../../../types/collection-api";
 import { MaterialSampleForm } from "../material-sample/edit";
 
@@ -128,7 +128,7 @@ export function MaterialSampleCustomViewForm({
     };
 
   const initialViewConfig =
-    materialSampleFormViewConfigSchema.parse(unknownViewConfig);
+    materialSampleFormCustomViewSchema.parse(unknownViewConfig);
 
   const [navOrder, setNavOrder] = useState<
     MaterialSampleFormSectionId[] | null
@@ -213,7 +213,7 @@ export function MaterialSampleCustomViewForm({
     );
 
     // Managed attribute default values don't need the template checkbox, all are set to "enabled":
-    const managedAttributesTemplateFields: TemplateFields = {};
+    const managedAttributesTemplateFields: TemplateFieldMap = {};
     for (const key of managedAttributesOrder ?? []) {
       managedAttributesTemplateFields[`managedAttributes.${key}`] = {
         enabled: true,
@@ -263,7 +263,7 @@ export function MaterialSampleCustomViewForm({
       : {};
 
     // Construct the template definition to persist based on the form values:
-    const newViewConfig: MaterialSampleFormViewConfig = {
+    const newViewConfig: MaterialSampleFormCustomViewConfig = {
       formTemplates: {
         MATERIAL_SAMPLE: {
           ...materialSampleTemplateFields.attachmentsConfig,
@@ -317,7 +317,7 @@ export function MaterialSampleCustomViewForm({
     };
 
     const validatedViewConfig =
-      materialSampleFormViewConfigSchema.parse(newViewConfig);
+      materialSampleFormCustomViewSchema.parse(newViewConfig);
 
     const customView: InputResource<CustomView> = {
       ...customViewFields,
@@ -391,7 +391,7 @@ export function MaterialSampleCustomViewForm({
 /** Get the enabled template fields with their default values from the form. */
 export function getEnabledTemplateFieldsFromForm(
   formValues: any
-): TemplateFields {
+): TemplateFieldMap {
   // delete the key "determination" as children with index are actual keys
   delete formValues.templateCheckboxes?.determination;
   return mapValues(

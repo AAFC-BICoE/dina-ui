@@ -18,12 +18,12 @@ import { InputResource, PersistedResource } from "kitsu";
 import { isEqual } from "lodash";
 import { useState } from "react";
 import * as yup from "yup";
-import { materialSampleFormViewConfigSchema } from "../..";
-import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { materialSampleNavOrderSchema } from "../../..";
+import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import {
   CustomView,
   MaterialSampleFormSectionId
-} from "../../../types/collection-api";
+} from "../../../../types/collection-api";
 
 const navSaveFormSchema = yup.object({
   name: yup.string().required()
@@ -62,9 +62,7 @@ export function MaterialSampleNavCustomViewSelect({
 
   const viewConfig =
     selectedView?.id &&
-    materialSampleFormViewConfigSchema.isValidSync(
-      selectedView.viewConfiguration
-    )
+    materialSampleNavOrderSchema.isValidSync(selectedView.viewConfiguration)
       ? selectedView.viewConfiguration
       : null;
 
@@ -179,9 +177,7 @@ export function MaterialSampleNavViewModal({
   const { save } = useApiClient();
   const { username } = useAccount();
 
-  const NEW_VIEW_CONFIG: yup.InferType<
-    typeof materialSampleFormViewConfigSchema
-  > = {
+  const NEW_VIEW_CONFIG: yup.InferType<typeof materialSampleNavOrderSchema> = {
     type: "material-sample-form-section-order",
     navOrder
   };
@@ -229,9 +225,7 @@ export function MaterialSampleNavViewModal({
 
   const viewConfig =
     selectedView?.id &&
-    materialSampleFormViewConfigSchema.isValidSync(
-      selectedView.viewConfiguration
-    )
+    materialSampleNavOrderSchema.isValidSync(selectedView.viewConfiguration)
       ? selectedView.viewConfiguration
       : null;
 

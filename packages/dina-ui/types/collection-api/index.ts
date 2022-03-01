@@ -13,7 +13,6 @@ export * from "./resources/MaterialSampleRunConfig";
 export * from "./resources/MaterialSampleType";
 export * from "./resources/Organism";
 export * from "./resources/Project";
-export * from "./resources/MaterialSampleFormViewConfig";
 export * from "./resources/PreparationType";
 export * from "./resources/StorageUnit";
 export * from "./resources/StorageUnitType";

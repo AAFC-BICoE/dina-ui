@@ -8,6 +8,6 @@ export interface CustomView extends KitsuResource {
   group?: string;
   restrictToCreatedBy?: boolean;
 
-  /** This field is JSON with unknown structure, so use Yup for schema validation / casting. */
+  /** This field is JSON with unknown structure, so use Yup or Zod for schema validation / casting. */
   viewConfiguration?: unknown;
 }

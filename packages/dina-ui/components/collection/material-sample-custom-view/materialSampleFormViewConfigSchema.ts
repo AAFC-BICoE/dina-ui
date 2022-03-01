@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MATERIAL_SAMPLE_FORM_SECTIONS } from "..";
+import { MATERIAL_SAMPLE_FORM_SECTIONS } from "../../../types/collection-api";
 
 // Define as Zod schemas instead of Typescript interfaces to enforce structure at runtime:
 
@@ -8,7 +8,7 @@ const templateFieldSchema = z.object({
   defaultValue: z.unknown()
 });
 
-const templateFieldsSchema = z.record(
+const templateFieldMapSchema = z.record(
   z.string(),
   templateFieldSchema.optional()
 );
@@ -16,10 +16,10 @@ const templateFieldsSchema = z.record(
 const formTemplateSchema = z.object({
   allowNew: z.boolean().optional(),
   allowExisting: z.boolean().optional(),
-  templateFields: templateFieldsSchema
+  templateFields: templateFieldMapSchema
 });
 
-export const materialSampleFormViewConfigSchema = z.object({
+export const materialSampleFormCustomViewSchema = z.object({
   type: z.literal("material-sample-form-custom-view"),
   navOrder: z
     .enum(MATERIAL_SAMPLE_FORM_SECTIONS)
@@ -40,11 +40,11 @@ export const materialSampleFormViewConfigSchema = z.object({
 export type FormTemplate = z.infer<typeof formTemplateSchema>;
 
 /** Map of form field names to template field config. */
-export type TemplateFields = z.infer<typeof templateFieldsSchema>;
+export type TemplateFieldMap = z.infer<typeof templateFieldMapSchema>;
 
 /** Configures one field in a form template. */
 export type TemplateField = z.infer<typeof templateFieldSchema>;
 
-export type MaterialSampleFormViewConfig = z.infer<
-  typeof materialSampleFormViewConfigSchema
+export type MaterialSampleFormCustomViewConfig = z.infer<
+  typeof materialSampleFormCustomViewSchema
 >;

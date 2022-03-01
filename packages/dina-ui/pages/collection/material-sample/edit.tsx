@@ -5,12 +5,15 @@ import {
   DinaFormContext,
   DinaFormSection,
   FieldSet,
+  FieldSpy,
+  filterBy,
   LoadingSpinner,
+  ResourceSelect,
   SubmitButton,
   withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { compact, toPairs, uniq } from "lodash";
 import { useRouter } from "next/router";
 import { Fragment, ReactNode, Ref, useContext, useState } from "react";
@@ -36,7 +39,8 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  useMaterialSampleSave
+  useMaterialSampleSave,
+  useMaterialSampleFormCustomViewProps
 } from "../../../components";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
@@ -49,6 +53,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
   CollectingEvent,
+  CustomView,
   MaterialSample,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
@@ -86,15 +91,46 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
+  const [sampleFormCustomView, setSampleFormCustomView] =
+    useState<PersistedResource<CustomView>>();
+
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
-        <BackButton
-          className="me-auto"
-          entityId={id}
-          entityLink="/collection/material-sample"
-        />
+        <BackButton entityId={id} entityLink="/collection/material-sample" />
+        <div className="flex-grow-1 d-flex">
+          <div className="mx-auto" style={{ width: "20rem" }}>
+            <label>
+              <div className="mb-2 fw-bold">
+                <DinaMessage id="customMaterialSampleFormView" />
+              </div>
+              <FieldSpy<string> fieldName="group">
+                {group => (
+                  <ResourceSelect<CustomView>
+                    filter={input => ({
+                      // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
+                      "viewConfiguration.type":
+                        "material-sample-form-custom-view",
+                      // Filter by view name typed into the dropdown:
+                      ...filterBy(["name"])(input),
+                      // Filter by the form's group:
+                      ...(group && { group: { EQ: `${group}` } })
+                    })}
+                    optionLabel={view => view.name || view.id}
+                    model="collection-api/custom-view"
+                    onChange={newVal =>
+                      setSampleFormCustomView(
+                        newVal as PersistedResource<CustomView>
+                      )
+                    }
+                    value={sampleFormCustomView}
+                  />
+                )}
+              </FieldSpy>
+            </label>
+          </div>
+        </div>
         {!id && (
           <SubmitButton
             buttonProps={() => ({
@@ -160,6 +196,15 @@ export default function MaterialSampleEditPage() {
   );
 }
 
+/**
+ * The enabled fields if creating from a template.
+ * Nested DinaForms (Collecting Event and Acquisition Event) have separate string arrays.
+ */
+export interface MatrialSampleFormEnabledFields {
+  materialSample: string[];
+  collectingEvent: string[];
+  acquisitionEvent: string[];
+}
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -176,11 +221,7 @@ export interface MaterialSampleFormProps {
   };
 
   /** The enabled fields if creating from a template. */
-  enabledFields?: {
-    materialSample: string[];
-    collectingEvent: string[];
-    acquisitionEvent: string[];
-  };
+  enabledFields?: MatrialSampleFormEnabledFields;
 
   attachmentsConfig?: {
     materialSample: AllowAttachmentsConfig;

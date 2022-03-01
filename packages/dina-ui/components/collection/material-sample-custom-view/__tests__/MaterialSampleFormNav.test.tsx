@@ -2,8 +2,8 @@ import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
 import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { SortableNavGroup } from "../MaterialSampleFormNav";
-import { LAST_USED_ID_STORAGE_KEY } from "../MaterialSampleNavCustomViewSelect";
+import { SortableNavGroup } from "../../material-sample/material-sample-form-nav/MaterialSampleFormNav";
+import { LAST_USED_ID_STORAGE_KEY } from "../../material-sample/material-sample-form-nav/MaterialSampleNavCustomViewSelect";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {

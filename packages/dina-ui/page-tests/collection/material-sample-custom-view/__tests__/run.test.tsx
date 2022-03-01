@@ -1,12 +1,14 @@
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
-import { BLANK_PREPARATION } from "../../../../components";
+import {
+  BLANK_PREPARATION,
+  MaterialSampleFormCustomViewConfig
+} from "../../../../components";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
-  CollectingEvent,
-  MaterialSampleFormViewConfig
+  CollectingEvent
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
@@ -99,7 +101,9 @@ const apiContext = {
 
 const mockOnSaved = jest.fn();
 
-async function getWrapper(actionDefinition?: MaterialSampleFormViewConfig) {
+async function getWrapper(
+  actionDefinition?: MaterialSampleFormCustomViewConfig
+) {
   const wrapper = mountWithAppContext(
     <CreateMaterialSampleFromWorkflowForm
       actionDefinition={
