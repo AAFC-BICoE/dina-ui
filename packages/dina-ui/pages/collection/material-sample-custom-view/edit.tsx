@@ -31,7 +31,8 @@ import {
   TAG_SECTION_FIELDS,
   TemplateField,
   TemplateFieldMap,
-  useMaterialSampleSave
+  useMaterialSampleSave,
+  MaterialSampleForm
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -41,7 +42,6 @@ import {
   MaterialSample,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
-import { MaterialSampleForm } from "../material-sample/edit";
 
 /** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({

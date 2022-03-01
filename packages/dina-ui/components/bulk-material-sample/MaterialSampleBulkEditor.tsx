@@ -16,10 +16,10 @@ import { Promisable } from "type-fest";
 import {
   BulkNavigatorTab,
   MaterialSampleBulkNavigator,
+  MaterialSampleForm,
   useMaterialSampleSave
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 import { useBulkEditTab } from "./bulk-edit-tab";
 

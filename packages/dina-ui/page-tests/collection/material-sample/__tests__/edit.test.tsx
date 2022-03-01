@@ -1,8 +1,10 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import { nextSampleInitialValues } from "../../../../components";
-import { MaterialSampleForm } from "../../../../pages/collection/material-sample/edit";
+import {
+  MaterialSampleForm,
+  nextSampleInitialValues
+} from "../../../../components";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,

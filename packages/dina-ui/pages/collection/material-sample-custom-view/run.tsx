@@ -13,14 +13,14 @@ import {
   materialSampleFormCustomViewSchema,
   MaterialSampleFormCustomViewConfig,
   Nav,
-  useMaterialSampleFormCustomViewProps
+  useMaterialSampleFormCustomViewProps,
+  MaterialSampleForm
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
-import { MaterialSampleForm } from "../material-sample/edit";
 
 export default function CreateMaterialSampleFromWorkflowPage() {
   const router = useRouter();

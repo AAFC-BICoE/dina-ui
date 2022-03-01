@@ -1,7 +1,7 @@
 import { InputResource, KitsuResource } from "kitsu";
 import { compact, isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
-import { MatrialSampleFormEnabledFields } from "../../../pages/collection/material-sample/edit";
+import { MatrialSampleFormEnabledFields } from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,

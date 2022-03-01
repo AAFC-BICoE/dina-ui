@@ -8,9 +8,12 @@ import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { useRef } from "react";
-import { BulkNavigatorTab, useMaterialSampleSave } from "..";
+import {
+  BulkNavigatorTab,
+  MaterialSampleForm,
+  useMaterialSampleSave
+} from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { MaterialSampleForm } from "../../pages/collection/material-sample/edit";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
 
 export interface UseBulkEditTabParams {

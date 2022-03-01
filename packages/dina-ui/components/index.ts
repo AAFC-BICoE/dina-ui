@@ -26,6 +26,7 @@ export * from "./collection/material-sample/material-sample-form-nav/MaterialSam
 export * from "./collection/material-sample/material-sample-form-nav/materialSampleNavOrderSchema";
 export * from "./collection/material-sample/MaterialSampleIdentifiersSection";
 export * from "./collection/material-sample/MaterialSampleInfoSection";
+export * from "./collection/material-sample/MaterialSampleForm";
 export * from "./collection/material-sample/next-sample-functions";
 export * from "./collection/material-sample/OrganismsField";
 export * from "./collection/material-sample/OrganismStateField";
