@@ -21,6 +21,7 @@ export interface MaterialSampleFormCustomViewProps {
   collectingEventInitialValues: InputResource<CollectingEvent>;
   acquisitionEventInitialValues: InputResource<AcquisitionEvent>;
   enabledFields: MatrialSampleFormEnabledFields;
+  visibleManagedAttributeKeys?: string[];
 }
 
 /**
@@ -133,7 +134,8 @@ export function useMaterialSampleFormCustomViewProps<
       materialSampleInitialValues,
       collectingEventInitialValues,
       acquisitionEventInitialValues,
-      enabledFields
+      enabledFields,
+      visibleManagedAttributeKeys: actionDefinition.managedAttributesOrder
     };
   }, [actionDefinition]);
 }

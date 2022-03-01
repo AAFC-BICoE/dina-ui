@@ -11,7 +11,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
@@ -42,7 +42,17 @@ export interface ManagedAttributesEditorProps {
    */
   showCustomViewDropdown?: boolean;
 
+  /**
+   * The formik field name for editing a Custom View's managed attributes order.
+   * Has no effect in editing an actual resource e.g. in the Material Sample form.
+   */
   managedAttributeOrderFieldName?: string;
+
+  /**
+   * When this prop is changed, the visible managed attributes state is updated in useEffect.
+   * e.g. when the form's custom view is updated.
+   */
+  visibleAttributeKeys?: string[];
 }
 
 export function ManagedAttributesEditor({
@@ -52,7 +62,8 @@ export function ManagedAttributesEditor({
   attributeSelectorWidth = 6,
   fieldSetProps,
   showCustomViewDropdown,
-  managedAttributeOrderFieldName
+  managedAttributeOrderFieldName,
+  visibleAttributeKeys: visibleAttributeKeysProp
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -77,6 +88,13 @@ export function ManagedAttributesEditor({
         const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
           getAttributeKeysInUse
         );
+
+        // When the visibleAttributeKeys prop changes, update the internal visible keys state:
+        useEffect(() => {
+          setVisibleAttributeKeys(
+            visibleAttributeKeysProp ?? getAttributeKeysInUse()
+          );
+        }, [visibleAttributeKeysProp]);
 
         /** Put the Custom View into the dropdown and update the visible attribute keys.  */
         function updateCustomView(newView?: PersistedResource<CustomView>) {

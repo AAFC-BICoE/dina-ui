@@ -25,6 +25,7 @@ import {
   GroupSelectField,
   Head,
   MaterialSampleBreadCrumb,
+  materialSampleFormCustomViewSchema,
   MaterialSampleFormNav,
   MaterialSampleIdentifiersSection,
   MaterialSampleInfoSection,
@@ -38,9 +39,9 @@ import {
   TabbedResourceLinker,
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
+  useMaterialSampleFormCustomViewProps,
   useMaterialSampleQuery,
-  useMaterialSampleSave,
-  useMaterialSampleFormCustomViewProps
+  useMaterialSampleSave
 } from "../../../components";
 import { AcquisitionEventLinker } from "../../../components/collection/AcquisitionEventLinker";
 import { AssociationsField } from "../../../components/collection/AssociationsField";
@@ -94,7 +95,19 @@ export default function MaterialSampleEditPage() {
   const [sampleFormCustomView, setSampleFormCustomView] =
     useState<PersistedResource<CustomView>>();
 
+  const customViewConfig = sampleFormCustomView?.id
+    ? materialSampleFormCustomViewSchema.parse(
+        sampleFormCustomView?.viewConfiguration
+      )
+    : undefined;
+
+  // Call the custom view hook but only use the "enabledFields" value:
+  const { enabledFields, visibleManagedAttributeKeys } =
+    useMaterialSampleFormCustomViewProps(customViewConfig) ?? {};
+
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
+    enabledFields,
+    visibleManagedAttributeKeys,
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
@@ -260,6 +273,12 @@ export interface MaterialSampleFormProps {
   /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
+
+  /**
+   * When this prop is changed, the visible managed attributes state is updated in useEffect.
+   * e.g. when the form's custom view is updated.
+   */
+  visibleManagedAttributeKeys?: string[];
 }
 
 export function MaterialSampleForm({
@@ -281,6 +300,7 @@ export function MaterialSampleForm({
   hideCustomViewSelect,
   navOrder: navOrderProp,
   onChangeNavOrder: onChangeNavOrderProp,
+  visibleManagedAttributeKeys,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -476,6 +496,7 @@ export function MaterialSampleForm({
                 // but not in template editor mode:
                 showCustomViewDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
+                visibleAttributeKeys={visibleManagedAttributeKeys}
               />
             </div>
           </div>
