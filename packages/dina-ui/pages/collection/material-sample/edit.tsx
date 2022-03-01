@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Footer,
   Head,
@@ -23,7 +23,10 @@ import {
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CustomView } from "../../../types/collection-api";
+import {
+  CustomView,
+  MaterialSampleFormSectionId
+} from "../../../types/collection-api";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -67,7 +70,22 @@ export default function MaterialSampleEditPage() {
   const { enabledFields, visibleManagedAttributeKeys } =
     useMaterialSampleFormCustomViewProps(customViewConfig) ?? {};
 
+  // Store the nav order in the Page components state:
+  const [navOrder, setNavOrder] = useState<
+    MaterialSampleFormSectionId[] | null
+  >(null);
+
+  // Effect hook: When the Custom View changes,
+  // update the navOrder to what's stored in the Custom View:
+  useEffect(() => {
+    if (sampleFormCustomView) {
+      setNavOrder(customViewConfig?.navOrder ?? null);
+    }
+  }, [customViewConfig]);
+
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
+    navOrder,
+    onChangeNavOrder: setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys,
     enableStoredDefaultGroup: true,
