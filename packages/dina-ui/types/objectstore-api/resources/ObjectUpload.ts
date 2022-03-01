@@ -2,12 +2,12 @@ import { KitsuResource } from "kitsu";
 import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 
 export type DcType =
-  | "IMAGE"
-  | "MOVING_IMAGE"
-  | "SOUND"
-  | "TEXT"
-  | "DATASET"
-  | "UNDETERMINED";
+  | "Image"
+  | "Moving Image"
+  | "Sound"
+  | "Text"
+  | "Dataset"
+  | "Undetermined";
 
 export interface ObjectUploadAttributes {
   bucket?: string;

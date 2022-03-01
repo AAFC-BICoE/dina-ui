@@ -83,6 +83,10 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               })
             );
           }
+
+          if (!selectedOption || Object.keys(selectedOption).length === 0) {
+            selectedOption = { label: String(value), value };
+          }
         } else {
           selectedOption = null;
         }
