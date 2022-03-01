@@ -4,7 +4,7 @@ import { Organization } from "./Organization";
 
 export interface PersonAttributes {
   type: "person";
-  displayName: string;
+  displayName?: string;
   givenNames?: string;
   familyNames?: string;
   aliases?: string[];
