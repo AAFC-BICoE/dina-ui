@@ -110,7 +110,7 @@ export interface MaterialSampleFormProps {
   enableStoredDefaultGroup?: boolean;
 
   /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideCustomViewSelect?: boolean;
+  hideNavCustomViewSelect?: boolean;
   /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
@@ -138,7 +138,7 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
-  hideCustomViewSelect,
+  hideNavCustomViewSelect,
   navOrder: navOrderProp,
   onChangeNavOrder: onChangeNavOrderProp,
   visibleManagedAttributeKeys,
@@ -383,7 +383,7 @@ export function MaterialSampleForm({
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
             disableRemovePrompt={disableNavRemovePrompt}
-            hideCustomViewSelect={hideCustomViewSelect}
+            hideCustomViewSelect={hideNavCustomViewSelect}
             navOrder={formSectionOrder}
             onChangeNavOrder={setFormSectionOrder}
           />

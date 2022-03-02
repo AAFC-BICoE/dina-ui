@@ -1,10 +1,7 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
 import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import {
-  MaterialSampleForm,
-  nextSampleInitialValues
-} from "../../../../components";
+import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -130,14 +127,18 @@ const mockSave = jest.fn<any, any>(async saves => {
   });
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
-  if (!paths.length) {
-    return [];
-  }
-  if ((paths[0] as string).startsWith("/managed-attribute")) {
-    return [TEST_MANAGED_ATTRIBUTE];
-  }
-});
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+    }
+  })
+);
 
 const testCtx = {
   apiContext: {
@@ -2184,5 +2185,102 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Lets you set a Custom managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          managedAttributes: {
+            // Has existing attribute_1 and attribute_2 values:
+            attribute_1: "attribute 1 value",
+            attribute_2: "attribute 2 value"
+          }
+        }}
+        visibleManagedAttributeKeys={["attribute_2", "attribute_3"]}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attribute 1 should be hidden:
+    expect(wrapper.find(".attribute_1-field input").exists()).toEqual(false);
+
+    // Attribute 2 already has a value:
+    expect(wrapper.find(".attribute_2-field input").prop("value")).toEqual(
+      "attribute 2 value"
+    );
+    // Attribute 3 is visible and empty:
+    expect(wrapper.find(".attribute_3-field input").prop("value")).toEqual("");
+
+    // Set a new value for attribute 2:
+    wrapper
+      .find(".attribute_2-field input")
+      .simulate("change", { target: { value: "new attribute 2 value" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              managedAttributes: {
+                // The existing Attribute 1 value is kept event though it was hidden by the custom view:
+                attribute_1: "attribute 1 value",
+                // The new Attribute 2 value is saved:
+                attribute_2: "new attribute 2 value"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you set a Custom Navigation section order via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        // Custom navOrder:
+        navOrder={[
+          "managedAttributes-section",
+          "material-sample-info-section",
+          "identifiers-section"
+        ]}
+        onChangeNavOrder={() => undefined}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Check the first 3 sections for the sections defined in the prop:
+    expect(
+      wrapper
+        .find(".material-sample-nav .list-group-item")
+        .map(node => node.text())
+        .slice(0, 3)
+    ).toEqual(["Managed Attributes", "Material Sample Info", "Identifiers"]);
   });
 });
