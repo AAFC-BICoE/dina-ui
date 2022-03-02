@@ -1798,19 +1798,22 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
+              group: "test-group",
+              isTarget: true
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              group: "test-group"
+              group: "test-group",
+              isTarget: false
             },
             {
               type: "organism",
               id: "organism-3",
               lifeStage: "lifestage 3",
-              group: "test-group"
+              group: "test-group",
+              isTarget: false
             }
           ]
         }}
@@ -1847,6 +1850,7 @@ describe("Material Sample Edit Page", () => {
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
+      // IsTarget should be reverted to false.
       // Organism 1's values with "lifestage 1" are copied to the other organisms:
       [
         [
@@ -1855,7 +1859,8 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
+              isTarget: false
             },
             type: "organism"
           },
@@ -1864,7 +1869,8 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-2",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
+              isTarget: false
             },
             type: "organism"
           },
@@ -1873,7 +1879,139 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-3",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
+              isTarget: false
+            },
+            type: "organism"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ],
+      // The material sample is saved with the same 3 organisms linked:
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              id: "333",
+              relationships: expect.objectContaining({
+                organism: {
+                  data: [
+                    { id: "organism-1", type: "organism" },
+                    { id: "organism-2", type: "organism" },
+                    { id: "organism-3", type: "organism" }
+                  ]
+                }
+              }),
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Changing the target organism should unset all the other organisms as the target", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          // This sample already has 3 DIFFERENT organisms:
+          organism: [
+            {
+              type: "organism",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              group: "test-group",
+              isTarget: false
+            },
+            {
+              type: "organism",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              group: "test-group",
+              isTarget: true
+            },
+            {
+              type: "organism",
+              id: "organism-3",
+              lifeStage: "lifestage 3",
+              group: "test-group",
+              isTarget: false
+            }
+          ]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // 3 organisms in quantity:
+    expect(
+      wrapper.find(".organismsQuantity-field input").prop("value")
+    ).toEqual(3);
+
+    // Individual mode selected by default:
+    expect(
+      wrapper
+        .find(".organismsIndividualEntry-field")
+        .find(Switch)
+        .prop("checked")
+    ).toEqual(true);
+
+    // Expand the first organism section
+    wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
+
+    // Switch the first organism to be the target.
+    wrapper
+      .find(".organism_0__isTarget-field")
+      .find(Switch)
+      .prop<any>("onChange")(true);
+
+    // Submit form
+    wrapper.find("form").simulate("submit");
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Check to ensure that
+    expect(mockSave.mock.calls).toEqual([
+      // Since the first organism was toggled, the second organism should be false now.
+      [
+        [
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-1",
+              lifeStage: "lifestage 1",
+              type: "organism",
+              isTarget: true
+            },
+            type: "organism"
+          },
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-2",
+              lifeStage: "lifestage 2",
+              type: "organism",
+              isTarget: false
+            },
+            type: "organism"
+          },
+          {
+            resource: {
+              group: "test-group",
+              id: "organism-3",
+              lifeStage: "lifestage 3",
+              type: "organism",
+              isTarget: false
             },
             type: "organism"
           }

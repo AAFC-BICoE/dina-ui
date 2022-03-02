@@ -60,14 +60,14 @@ export function AcquisitionEventListLayout({
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
       filter: filterBy(["displayName"]),
-      optionLabel: (it: PersistedResource<Person>) => it.displayName
+      optionLabel: (it: PersistedResource<Person>) => it.displayName ?? it.id
     },
     {
       name: "isolatedBy",
       type: "DROPDOWN",
       resourcePath: "agent-api/person",
       filter: filterBy(["displayName"]),
-      optionLabel: (it: PersistedResource<Person>) => it.displayName
+      optionLabel: (it: PersistedResource<Person>) => it.displayName ?? it.id
     },
     "isolationRemarks"
   ];

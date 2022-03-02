@@ -19,8 +19,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   addCollectorGroupTitle: "Ajouter un groupe de collecte",
   addCustomPlaceName: "Ajouter",
   addDetermination: "Ajouter une détermination",
-  addExistingStorageUnitAsChild:
-    "Ajouter une unité de stockage existante comme enfant",
+  addExistingStorageUnitAsChild: "Ajouter une unité de stockage existante",
   addFilesButton: "Ajouter des fichiers",
   addGroup: "Ajouter un groupe",
   addIdentifier: "Ajouter un identifiant",
@@ -394,8 +393,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   makeFiledAs: "Indiquer comme Classé en tant que",
   makePrimary: "Marque principale",
   managedAttributeEditTitle: "Modifier l’attribut géré",
-  managedAttributeValueLabel: "Valeur",
   managedAttributes: "Attributs gérés",
+  managedAttributeValueLabel: "Valeur",
   materialSample: "Échantillon de matériaux",
   materialSampleAssociationLegend: "Association d'échantillons de matériaux",
   materialSampleAttachments: "Pièces jointes de l’échantillon de matériaux",
@@ -572,8 +571,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
   tags: "Étiquettes",
-  thisWillLoseAllDataEnteredInThisStep:
-    "Cette opération entraîne la perte de toutes les données saisies au cours de cette étape.",
   thisWillRemoveYourTemplate:
     "Cette opération supprimera les champs du modèle sélectionnés et les valeurs par défaut.",
   thumbnail: "Vignette",

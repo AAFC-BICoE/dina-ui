@@ -13,6 +13,7 @@ export interface AssignedStorageProps {
     newValue: PersistedResource<StorageUnit> | { id: null }
   ) => Promisable<void>;
   noneMessage?: JSX.Element;
+  parentIdInURL?: string;
 }
 
 /** Displays the currently assigned Storage, and lets you unlink it. */
@@ -20,7 +21,8 @@ export function AssignedStorage({
   onChange,
   readOnly,
   value,
-  noneMessage
+  noneMessage,
+  parentIdInURL
 }: AssignedStorageProps) {
   const storageQuery = useStorageUnit(value?.id);
 
@@ -38,7 +40,7 @@ export function AssignedStorage({
               </div>
             )}
           </div>
-          {!readOnly && (
+          {!readOnly && !parentIdInURL && (
             <FormikButton
               className="remove-storage btn btn-danger mb-3"
               onClick={async () => await onChange?.({ id: null })}

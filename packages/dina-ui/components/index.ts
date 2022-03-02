@@ -49,6 +49,7 @@ export * from "./group-select/GroupSelectField";
 export * from "./head";
 export * from "./identifier/IdentifierFields";
 export * from "./identifier/IdentifierRow";
+export * from "./managed-attribute/ManagedAttributeForm";
 export * from "./object-store/attachment-list/AttachmentsField";
 export * from "./object-store/managed-attributes/ManagedAttributesEditor";
 export * from "./object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributesViewForm";

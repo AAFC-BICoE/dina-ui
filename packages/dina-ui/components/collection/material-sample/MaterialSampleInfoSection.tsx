@@ -1,18 +1,14 @@
 import {
   AutoSuggestTextField,
+  ControlledVocabularySelectField,
   DateField,
   FieldSet,
   FieldSpy,
-  filterBy,
-  ResourceSelectField,
   TextField,
   useDinaFormContext
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
-import {
-  MaterialSample,
-  MaterialSampleType
-} from "../../..//types/collection-api";
+import { MaterialSample } from "../../..//types/collection-api";
 import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
 
@@ -38,12 +34,11 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
     <FieldSet id={id} legend={<DinaMessage id="materialSampleInfo" />}>
       <div className="row">
         <div className="col-md-6">
-          <ResourceSelectField<MaterialSampleType>
+          <ControlledVocabularySelectField
             name="materialSampleType"
-            filter={filterBy(["name"])}
-            model="collection-api/material-sample-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/material-sample-type/view?id="
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleType"
+            })}
           />
           {!readOnly ? (
             <AutoSuggestTextField<Vocabulary>

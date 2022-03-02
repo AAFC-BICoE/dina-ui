@@ -70,6 +70,30 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
               form.setFieldValue("organismsQuantity", organismsQuantity - 1);
             }
 
+            /**
+             * Reset all organisms isTarget field to false.
+             *
+             * This should be used when switching the editing mode (Individual Organism Entry)
+             */
+            function resetIsTarget() {
+              organisms.forEach((_, idx) => {
+                form.setFieldValue(`${name}[${idx}].isTarget`, false);
+              });
+            }
+
+            /**
+             * When a target checkbox has been changed from false TO true.
+             *
+             * Since only one organism (or none) can be marked as a target, this method will
+             * reset all the other toggles to false so there is only one marked as the target.
+             *
+             * @param index The toggle that was changed.
+             */
+            function targetChecked(index: number) {
+              resetIsTarget();
+              form.setFieldValue(`${name}[${index}].isTarget`, true);
+            }
+
             return (
               <div>
                 {!isTemplate && (
@@ -82,7 +106,10 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                         min={0}
                       />
                       {!readOnly && (
-                        <ToggleField name="organismsIndividualEntry" />
+                        <ToggleField
+                          name="organismsIndividualEntry"
+                          onChangeExternal={() => resetIsTarget()}
+                        />
                       )}
                     </div>
                   </div>
@@ -94,10 +121,16 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                       organisms={organisms}
                       organismsQuantity={organismsQuantity}
                       onRemoveClick={removeOrganism}
+                      onTargetChecked={targetChecked}
                       onRowMove={move}
                     />
                   ) : (
-                    <OrganismStateField namePrefix={`${name}[0].`} />
+                    <OrganismStateField
+                      index={0}
+                      namePrefix={`${name}[0].`}
+                      individualEntry={false}
+                      onTargetChecked={targetChecked}
+                    />
                   ))}
               </div>
             );
@@ -113,6 +146,7 @@ interface OrganismsTableProps {
   organisms: (Organism | null | undefined)[];
   namePrefix: string;
   onRemoveClick: (index: number) => void;
+  onTargetChecked: (index: number) => void;
   onRowMove: (from: number, to: number) => void;
 }
 
@@ -121,6 +155,7 @@ function OrganismsTable({
   organisms,
   namePrefix,
   onRemoveClick,
+  onTargetChecked,
   onRowMove
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
@@ -179,6 +214,16 @@ function OrganismsTable({
           }
         ]),
     {
+      Header: formatMessage("target"),
+      id: "isTarget",
+      Cell: ({ original: o }) => {
+        const isTarget: boolean = o?.isTarget;
+        const checkMark = isTarget ? <span>True</span> : <span>False</span>;
+
+        return <span className="organism-target-cell">{checkMark}</span>;
+      }
+    },
+    {
       id: "determination",
       Cell: ({ original: o }) => {
         const primaryDet = o?.determination?.find(it => it.isPrimary);
@@ -213,7 +258,7 @@ function OrganismsTable({
 
   /** Only show up to the organismsQuantity number */
   const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
-    (_, index) => organisms[index] || { type: "organism" }
+    (_, index) => organisms[index] || { type: "organism", isTarget: false }
   );
 
   return (
@@ -245,7 +290,10 @@ function OrganismsTable({
             <div className={isOdd ? "-odd" : ""} style={{ backgroundColor }}>
               <div className="p-3">
                 <OrganismStateField
+                  index={row.index}
                   namePrefix={`${namePrefix}[${row.index}].`}
+                  individualEntry={true}
+                  onTargetChecked={onTargetChecked}
                 />
               </div>
             </div>

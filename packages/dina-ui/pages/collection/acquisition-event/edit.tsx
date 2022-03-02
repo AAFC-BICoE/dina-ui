@@ -134,7 +134,7 @@ export function AcquisitionEventFormLayout() {
               readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => person.displayName}
+              optionLabel={person => person.displayName ?? person.id}
               asyncOptions={[
                 {
                   label: <DinaMessage id="addNewPerson" />,
@@ -157,7 +157,7 @@ export function AcquisitionEventFormLayout() {
               readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => person.displayName}
+              optionLabel={person => person.displayName ?? person.id}
               asyncOptions={[
                 {
                   label: <DinaMessage id="addNewPerson" />,

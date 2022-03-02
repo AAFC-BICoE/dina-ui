@@ -1,10 +1,6 @@
-import { KitsuResource } from "kitsu";
-
-export interface MaterialSampleTypeAttributes {
-  type: "material-sample-type";
-  name: string;
-  createdBy?: string;
-  createdOn?: string;
+export enum MaterialSampleType {
+  WHOLE_ORGANISM = "WHOLE_ORGANISM",
+  ORGANISM_PART = "ORGANISM_PART",
+  MIXED_ORGANISMS = "MIXED_ORGANISMS",
+  MOLECULAR_SAMPLE = "MOLECULAR_SAMPLE"
 }
-
-export type MaterialSampleType = KitsuResource & MaterialSampleTypeAttributes;

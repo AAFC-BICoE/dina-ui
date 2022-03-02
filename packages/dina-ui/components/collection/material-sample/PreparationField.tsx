@@ -34,6 +34,10 @@ export const PREPARATION_FIELDS = [
   "preparationType",
   "preparationDate",
   "preparationMethod",
+  "preservationType",
+  "preparationFixative",
+  "preparationMaterials",
+  "preparationSubstrate",
   "preparedBy",
   "preparationRemarks",
   "dwcDegreeOfEstablishment",
@@ -50,6 +54,10 @@ export const BLANK_PREPARATION: Required<
   preparationRemarks: null,
   dwcDegreeOfEstablishment: null,
   preparationMethod: null,
+  preservationType: null,
+  preparationFixative: null,
+  preparationMaterials: null,
+  preparationSubstrate: null,
   preparationAttachment: []
 });
 
@@ -114,8 +122,10 @@ export function PreparationField({
             suggestion={sample => sample?.preparationMethod ?? ""}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
-          <PersonSelectField {...fieldProps("preparedBy")} />
-          <DateField {...fieldProps("preparationDate")} />
+          <TextField {...fieldProps("preservationType")} />
+          <TextField {...fieldProps("preparationFixative")} />
+          <TextField {...fieldProps("preparationMaterials")} />
+          <TextField {...fieldProps("preparationSubstrate")} />
         </div>
         <div className="col-md-6">
           <TextField {...fieldProps("preparationRemarks")} multiLines={true} />
@@ -132,6 +142,8 @@ export function PreparationField({
             alwaysShowSuggestions={true}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
+          <PersonSelectField {...fieldProps("preparedBy")} />
+          <DateField {...fieldProps("preparationDate")} />
         </div>
       </div>
       <div>
