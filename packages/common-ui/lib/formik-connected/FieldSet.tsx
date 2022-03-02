@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { CSSProperties } from "react";
 import { useContext } from "react";
 import { DinaFormContext, FieldSpy, FieldSpyRenderProps } from "..";
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";
@@ -8,6 +9,7 @@ export interface FieldSetProps extends DinaFormSectionProps {
   legend: JSX.Element;
 
   className?: string;
+  style?: CSSProperties;
 
   id?: string;
 
@@ -24,6 +26,7 @@ export function FieldSet({
   className,
   id,
   fieldName,
+  style,
   wrapLegend,
   ...formSectionProps
 }: FieldSetProps) {
@@ -37,6 +40,7 @@ export function FieldSet({
 
   const fieldSetProps = (fieldSpyProps?: FieldSpyRenderProps) => ({
     className: classNames("mb-3 border card px-4 py-2", className),
+    style,
     id,
     children: (
       <>

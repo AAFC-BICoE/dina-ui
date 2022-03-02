@@ -441,7 +441,7 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
     resourceSelectCell<Person>(
       {
         filter: input => ({ rsql: `displayName==${input}*` }),
-        label: person => person.displayName,
+        label: person => person.displayName ?? person.id,
         model: "agent-api/person",
         type: "person"
       },

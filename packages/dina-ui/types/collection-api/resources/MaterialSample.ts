@@ -22,6 +22,10 @@ export interface MaterialSampleAttributes {
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
   preparationMethod?: string | null;
+  preservationType?: string | null;
+  preparationFixative?: string | null;
+  preparationMaterials?: string | null;
+  preparationSubstrate?: string | null;
   preparationDate?: string | null;
   preparationRemarks?: string | null;
   description?: string;
@@ -35,7 +39,7 @@ export interface MaterialSampleAttributes {
 
   materialSampleState?: string;
   materialSampleRemarks?: string;
-
+  materialSampleType?: MaterialSampleType;
   organism?: (Organism | null | undefined)[] | null;
 
   // Client-side only fields for the organism section:
@@ -80,7 +84,6 @@ export interface ScheduledAction {
 
 export interface MaterialSampleRelationships {
   collection?: Collection;
-  materialSampleType?: MaterialSampleType;
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationAttachment?: ResourceIdentifierObject[];

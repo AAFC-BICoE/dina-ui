@@ -46,7 +46,7 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     type: "DROPDOWN",
     resourcePath: "agent-api/person",
     filter: filterBy(["displayName"]),
-    optionLabel: person => (person as Person).displayName
+    optionLabel: person => (person as Person).displayName ?? person.id
   }
 ];
 

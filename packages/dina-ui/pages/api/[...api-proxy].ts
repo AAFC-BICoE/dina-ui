@@ -55,6 +55,10 @@ const API_PROXY_REWRITES = [
     destination: `http://${process.env.COLLECTION_API_ADDRESS}/api/v1`
   },
   {
+    source: "/loan-transaction-api",
+    destination: `http://${process.env.LOAN_TRANSACTION_API_ADDRESS}`
+  },
+  {
     source: "/api/search-api",
     destination: `http://${process.env.SEARCH_API_ADDRESS}`
   }
