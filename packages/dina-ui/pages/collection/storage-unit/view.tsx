@@ -1,6 +1,5 @@
-import { DeleteButton, DinaForm, EditButton } from "common-ui";
+import { DeleteButton, DinaForm, EditButton, Tooltip } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import {
   ResourceFormProps,
   storageUnitDisplayName,
@@ -34,8 +33,8 @@ export default function StorageUnitDetailsPage() {
           />
         )
       }
-      showRevisionsLink={true}
       nameField={unit => storageUnitDisplayName(unit)}
+      showRevisionsLinkAtBottom={true}
     />
   );
 }
@@ -46,15 +45,17 @@ function hasChildren(unit: PersistedResource<StorageUnit>) {
 }
 
 function StorageEditButton({ initialValues }: ResourceFormProps<StorageUnit>) {
-  return hasChildren(initialValues) ? (
-    <div className="alert alert-warning m-0">
-      <DinaMessage id="notEditableWhenThereAreChildStorageUnits" />
+  return (
+    <div>
+      <EditButton
+        entityId={initialValues.id}
+        entityLink="collection/storage-unit"
+        ariaDescribedBy="notEditableWhenThereAreChildStorageUnits"
+        disabled={hasChildren(initialValues)}
+      />
+      {hasChildren(initialValues) && (
+        <Tooltip id="notEditableWhenThereAreChildStorageUnits" />
+      )}
     </div>
-  ) : (
-    <EditButton
-      entityId={initialValues.id}
-      entityLink="collection/storage-unit"
-      ariaDescribedBy="notEditableWhenThereAreChildStorageUnits"
-    />
   );
 }

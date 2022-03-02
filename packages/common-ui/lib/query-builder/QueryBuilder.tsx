@@ -30,6 +30,25 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
             }].compoundQueryType`,
             "and"
           );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
+            esIndexMapping?.[0]?.label
+          );
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,
+            "match"
+          );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].boolean`,
+            "true"
+          );
+
+          fieldArrayProps.form.setFieldValue(
+            `${fieldArrayProps.name}[${elements?.length ?? 0}].date`,
+            moment().format()
+          );
         }
 
         function removeRow(index) {

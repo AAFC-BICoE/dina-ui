@@ -3,6 +3,7 @@ import {
   BackButton,
   ButtonBar,
   CheckBoxField,
+  ControlledVocabularySelectField,
   DateField,
   DinaForm,
   DinaFormContext,
@@ -528,12 +529,11 @@ export function MaterialSampleFormLayout({ id = "material-sample-section" }) {
     <FieldSet id={id} legend={<DinaMessage id="materialSample" />}>
       <div className="row">
         <div className="col-md-6">
-          <ResourceSelectField<MaterialSampleType>
+          <ControlledVocabularySelectField
             name="materialSampleType"
-            filter={filterBy(["name"])}
-            model="collection-api/material-sample-type"
-            optionLabel={it => it.name}
-            readOnlyLink="/collection/material-sample-type/view?id="
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleType"
+            })}
           />
           {!readOnly ? (
             <AutoSuggestTextField<Vocabulary>

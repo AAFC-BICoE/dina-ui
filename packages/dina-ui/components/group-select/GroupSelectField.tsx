@@ -14,7 +14,7 @@ import { Group } from "../../types/user-api";
 import { GroupLabel } from "./GroupFieldView";
 import { useStoredDefaultGroup } from "./useStoredDefaultGroup";
 
-interface GroupSelectFieldProps extends Omit<SelectFieldProps, "options"> {
+interface GroupSelectFieldProps extends Omit<SelectFieldProps<any>, "options"> {
   /** Show the "any" option. */
   showAnyOption?: boolean;
 

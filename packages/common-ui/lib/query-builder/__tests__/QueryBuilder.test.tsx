@@ -12,12 +12,14 @@ const ES_INDEX_MAPPING_OPTIONS = [
   {
     label: "createdOn",
     value: "data.attributes.createdOn",
-    type: "date"
+    type: "date",
+    path: "data.attributes"
   },
   {
     label: "allowDuplicateName",
     value: "data.attributes.allowDuplicateName",
-    type: "boolean"
+    type: "boolean",
+    path: "data.attributes"
   }
 ];
 

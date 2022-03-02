@@ -24,13 +24,14 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { JsonValue } from "type-fest";
-import { useAccount } from "..";
 import { get, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
 import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
+import { FormikButton, useAccount } from "..";
+import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -64,13 +65,14 @@ export function QueryPage<TData extends KitsuResource>({
   const [initSavedSearchValues, setInitSavedSearchValues] =
     useState<Map<string, JsonValue[]>>();
   const { username, subject } = useAccount();
-
+  const { groupNames } = useAccount();
+  const router = useRouter();
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
-  const router = useRouter();
+
   const {
     CheckBoxField,
     CheckBoxHeader,
@@ -132,6 +134,10 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
+  function resetForm() {
+    router.reload();
+  }
+
   async function searchES(queryDSL) {
     const query = { ...queryDSL };
     const resp = await apiClient.axios.post(
@@ -168,17 +174,35 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-
-    Object.keys(resp.data)
-      .filter(key => key.includes("data.attributes."))
-      .map(key => {
-        const fieldNameLabel = key.substring("data.attributes.".length);
-        result.push({
-          label: fieldNameLabel,
-          value: key,
-          type: resp.data?.[key]
-        });
+    resp.data.body.attributes.map(key => {
+      result.push({
+        label: key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
+        type: key.type,
+        path: key.path
       });
+    });
+
+    resp.data.body.relationships.attributes.map(key => {
+      result.push({
+        label: key.path?.includes(".")
+          ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
+          : key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
+        type: key.type,
+        path: key.path,
+        parentPath: resp.data.body.relationships.path,
+        parentName: resp.data.body.relationships.value
+      });
+    });
     return result;
   }
 
@@ -242,6 +266,7 @@ export function QueryPage<TData extends KitsuResource>({
     }
     const saveArgs: SaveArgs<UserPreference> = {
       resource: {
+        id: savedSearches?.[0]?.id,
         userId: subject,
         savedSearches:
           mySavedSearches?.[0]?.savedSearches ??
@@ -271,7 +296,9 @@ export function QueryPage<TData extends KitsuResource>({
     );
     router.reload();
   }
-  const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
+  const sortedData = data
+    ?.sort((a, b) => a.label.localeCompare(b.label))
+    .filter(prop => !prop.label.startsWith("group"));
   const initialValues =
     refreshPage.current && formValues && toPairs(formValues).length > 0
       ? formValues
@@ -301,8 +328,7 @@ export function QueryPage<TData extends KitsuResource>({
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
-        {" "}
-        {formatMessage({ id: "search" })}
+        <DinaMessage id="search" />
       </label>
       <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
       <DinaFormSection horizontal={"flex"}>
@@ -310,6 +336,9 @@ export function QueryPage<TData extends KitsuResource>({
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
+          <DinaMessage id="resetFilters" />
+        </FormikButton>
       </div>
       {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
         const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
@@ -360,7 +389,7 @@ export function QueryPage<TData extends KitsuResource>({
                   />
                 </div>
               )}
-              <div className="">
+              <div className="d-flex gap-3">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
                 {bulkDeleteButtonProps && (
                   <BulkDeleteButton {...bulkDeleteButtonProps} />
