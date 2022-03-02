@@ -245,9 +245,9 @@ export function QueryPage<TData extends KitsuResource>({
     setInitSavedSearchValues(initValus);
   }
 
-  function saveSearch(isDefault, savedSearches, searchName) {
+  function saveSearch(isDefault, userPreferences, searchName) {
     let newSavedSearches;
-    const mySavedSearches = savedSearches;
+    const mySavedSearches = userPreferences;
 
     if (
       mySavedSearches &&
@@ -266,7 +266,7 @@ export function QueryPage<TData extends KitsuResource>({
     }
     const saveArgs: SaveArgs<UserPreference> = {
       resource: {
-        id: savedSearches?.[0]?.id,
+        id: userPreferences?.[0]?.id,
         userId: subject,
         savedSearches:
           mySavedSearches?.[0]?.savedSearches ??
@@ -346,7 +346,7 @@ export function QueryPage<TData extends KitsuResource>({
         ] as any;
         return (
           <SavedSearch
-            savedSearches={userPreferences}
+            userPreferences={userPreferences}
             loadSavedSearch={loadSavedSearch}
             deleteSavedSearch={deleteSavedSearch}
             saveSearch={saveSearch}

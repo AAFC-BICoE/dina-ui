@@ -9,21 +9,21 @@ import { UserPreference } from "packages/dina-ui/types/user-api";
 export interface SavedSearchProps {
   loadSavedSearch: (
     savedSearchName: string,
-    savedSearches: UserPreference[]
+    userPreferences: UserPreference[]
   ) => void;
   saveSearch: (
     isDefault: boolean,
-    savedSearches: UserPreference[],
+    userPreferences: UserPreference[],
     searchName?: string
   ) => void;
   deleteSavedSearch: (
     savedSearchName: string,
-    savedSearches: UserPreference[]
+    userPreferences: UserPreference[]
   ) => void;
   savedSearchNames?: string[];
   initialSavedSearches?: JsonValue;
   selectedSearch?: string;
-  savedSearches: UserPreference[];
+  userPreferences: UserPreference[];
 }
 
 export function SavedSearch(props: SavedSearchProps) {
@@ -34,7 +34,7 @@ export function SavedSearch(props: SavedSearchProps) {
     savedSearchNames,
     initialSavedSearches,
     selectedSearch,
-    savedSearches
+    userPreferences
   } = props;
   const { formatMessage } = useDinaIntl();
   const [curSelected, setCurSelected] = useState(null);
@@ -74,7 +74,7 @@ export function SavedSearch(props: SavedSearchProps) {
         onClick={() =>
           loadSavedSearch(
             curSelected ?? (selectedSearch as string),
-            savedSearches
+            userPreferences
           )
         }
         disabled={
@@ -85,7 +85,7 @@ export function SavedSearch(props: SavedSearchProps) {
       </button>
       <button
         className="btn btn-secondary"
-        onClick={() => openSavedSearchModal({ saveSearch, savedSearches })}
+        onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
       >
         {formatMessage("save")}
       </button>
@@ -94,7 +94,7 @@ export function SavedSearch(props: SavedSearchProps) {
         onClick={() =>
           deleteSavedSearch(
             (curSelected as any) ?? selectedSearch,
-            savedSearches
+            userPreferences
           )
         }
         disabled={

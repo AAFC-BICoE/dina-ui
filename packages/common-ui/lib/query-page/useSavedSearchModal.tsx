@@ -6,10 +6,10 @@ import { FormikButton } from "../formik-connected/FormikButton";
 interface SavedSearchModalParams {
   saveSearch: (
     isDefault: boolean,
-    savedSearches: UserPreference[],
+    userPreferences: UserPreference[],
     searchName?: string
   ) => void;
-  savedSearches: UserPreference[];
+  userPreferences: UserPreference[];
 }
 
 export function useSavedSearchModal() {
@@ -18,7 +18,7 @@ export function useSavedSearchModal() {
 
   function openSavedSearchModal({
     saveSearch,
-    savedSearches
+    userPreferences
   }: SavedSearchModalParams) {
     openModal(
       <div className="modal-content">
@@ -40,7 +40,7 @@ export function useSavedSearchModal() {
                     onClick={(submittedValues, _) => {
                       saveSearch(
                         false,
-                        savedSearches,
+                        userPreferences,
                         submittedValues.searchName
                       );
                       closeModal();
@@ -51,7 +51,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-2"
                     onClick={() => {
-                      saveSearch(true, savedSearches);
+                      saveSearch(true, userPreferences);
                       closeModal();
                     }}
                   >
