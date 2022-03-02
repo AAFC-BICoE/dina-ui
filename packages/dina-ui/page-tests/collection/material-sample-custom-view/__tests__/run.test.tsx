@@ -74,15 +74,30 @@ const mockGet = jest.fn<any, any>(async path => {
     case "user-api/group":
     case "agent-api/person":
     case "objectstore-api/metadata":
+    case "collection-api/collection":
+    case "collection-api/custom-view":
       return { data: [] };
   }
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
-  if (!paths.length) {
-    return [];
-  }
-});
+const mockBulkGet = jest.fn<any, any>(async paths =>
+  paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
+        return {
+          id: "1",
+          key: "attribute_1",
+          name: "Attribute 1"
+        };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
+        return {
+          id: "2",
+          key: "attribute_2",
+          name: "Attribute 2"
+        };
+    }
+  })
+);
 
 const mockSave = jest.fn<any, any>(ops =>
   ops.map(op => ({
@@ -834,5 +849,31 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(
       [listItemsAfter.at(0), listItemsAfter.at(1)].map(item => item.text())
     ).toEqual(["Material Sample Info", "Identifiers"]);
+  });
+
+  it("Renders the Material Sample form with a custom default managed attributes order.", async () => {
+    const wrapper = await getWrapper({
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            "managedAttributes.attribute_1": {
+              enabled: true,
+              defaultValue: "attribute 1 default value"
+            }
+          }
+        }
+      },
+      navOrder: [],
+      managedAttributesOrder: ["attribute_1", "attribute_2"],
+      type: "material-sample-form-custom-view"
+    });
+
+    // The default attribute values are rendered:
+    expect(wrapper.find(".attribute_1-field input").prop("value")).toEqual(
+      "attribute 1 default value"
+    );
+    expect(wrapper.find(".attribute_2-field input").prop("value")).toEqual("");
   });
 });

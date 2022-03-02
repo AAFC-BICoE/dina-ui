@@ -1,4 +1,4 @@
-import { SaveArgs } from "common-ui";
+import { ResourceSelect, SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
@@ -63,15 +63,31 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [testAcquisitionEvent()] };
     case "collection-api/acquisition-event/987":
       return { data: testAcquisitionEvent() };
+    case "collection-api/preparation-type":
+      return { data: [TEST_PREP_TYPE] };
     case "agent-api/person":
     case "collection-api/material-sample-type":
     case "collection-api/vocabulary/degreeOfEstablishment":
     case "collection-api/vocabulary/srs":
+    case "collection-api/material-sample":
+    case "collection-api/managed-attribute":
+    case "collection-api/vocabulary/materialSampleState":
+    case "collection-api/collection":
+    case "collection-api/project":
       return { data: [] };
-    case "collection-api/preparation-type":
-      return { data: [TEST_PREP_TYPE] };
   }
 });
+
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
+        return { id: "1", key: "attribute_2", name: "Attribute 2" };
+    }
+  })
+);
 
 const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
   saves.map(save => ({
@@ -81,6 +97,7 @@ const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
 );
 
 const apiContext = {
+  bulkGet: mockBulkGet,
   apiClient: {
     get: mockGet
   },
@@ -213,7 +230,78 @@ describe("Workflow template edit page", () => {
     );
   });
 
-  it("Renders the template page with a custom Navigation order.", async () => {
+  it("Renders the template page with a custom Nav Order.", async () => {
+    const { submitForm } = await mountForm({
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {},
+        navOrder: ["material-sample-info-section", "identifiers-section"],
+        type: "material-sample-form-custom-view"
+      }
+    });
+
+    await submitForm();
+
+    // The nav order was re-saved:
+    expect(
+      mockOnSaved.mock.calls[0][0].viewConfiguration.navOrder.slice(0, 2)
+    ).toEqual(["material-sample-info-section", "identifiers-section"]);
+  });
+
+  it("Renders the template page with a custom Managed Attributes Order.", async () => {
+    const { wrapper, submitForm } = await mountForm({
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              "managedAttributes.attribute_1": {
+                enabled: true,
+                defaultValue: "attribute 1 default value"
+              }
+            }
+          }
+        },
+        navOrder: null,
+        managedAttributesOrder: ["attribute_2", "attribute_1"],
+        type: "material-sample-form-custom-view"
+      }
+    });
+
+    expect(
+      wrapper.find(".managedAttributes_attribute_1-field input").prop("value")
+    ).toEqual("attribute 1 default value");
+    expect(
+      wrapper.find(".managedAttributes_attribute_2-field input").prop("value")
+    ).toEqual("");
+
+    await submitForm();
+
+    // The managed attributes order was re-saved:
+    expect(
+      mockOnSaved.mock.calls[0][0].viewConfiguration.managedAttributesOrder.slice(
+        0,
+        2
+      )
+    ).toEqual(["attribute_2", "attribute_1"]);
+    expect(
+      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplates
+        .MATERIAL_SAMPLE.templateFields["managedAttributes.attribute_1"]
+    ).toEqual({
+      enabled: true,
+      defaultValue: "attribute 1 default value"
+    });
+  });
+
+  it("Submits a custom Navigation order.", async () => {
     const { wrapper, submitForm, fillOutRequiredFields } = await mountForm();
 
     await fillOutRequiredFields();
@@ -271,6 +359,123 @@ describe("Workflow template edit page", () => {
       "material-sample-info-section", // Was Moved
       "identifiers-section" // Was Moved
     ]);
+  });
+
+  it("Submits a custom Managed Attributes order.", async () => {
+    const { wrapper, submitForm, fillOutRequiredFields } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Add 2 managed attributes:
+    wrapper
+      .find(".managed-attributes-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "1",
+      key: "attribute_1",
+      name: "Attribute 1"
+    });
+    wrapper
+      .find(".managed-attributes-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "2",
+      key: "attribute_2",
+      name: "Attribute 2"
+    });
+
+    await submitForm();
+
+    // Submits the custom view with 2 managed attributes:
+    expect(mockOnSaved).lastCalledWith({
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            templateFields: {
+              "managedAttributes.attribute_1": {
+                enabled: true
+              },
+              "managedAttributes.attribute_2": {
+                enabled: true
+              }
+            }
+          }
+        },
+        managedAttributesOrder: ["attribute_1", "attribute_2"],
+        navOrder: null,
+        type: "material-sample-form-custom-view"
+      }
+    });
+  });
+
+  it("Submits a custom Managed Attributes order with default values.", async () => {
+    const { wrapper, submitForm, fillOutRequiredFields } = await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Add 2 managed attributes:
+    wrapper
+      .find(".managed-attributes-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "1",
+      key: "attribute_1",
+      name: "Attribute 1"
+    });
+    wrapper
+      .find(".managed-attributes-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")({
+      id: "2",
+      key: "attribute_2",
+      name: "Attribute 2"
+    });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper
+      .find(".managedAttributes_attribute_1-field input")
+      .simulate("change", { target: { value: "attribute 1 default" } });
+    wrapper
+      .find(".managedAttributes_attribute_2-field input")
+      .simulate("change", { target: { value: "attribute 2 default" } });
+
+    await submitForm();
+
+    // Submits the custom view with 2 managed attributes:
+    expect(mockOnSaved).lastCalledWith({
+      group: "test-group-1",
+      id: "123",
+      name: "test-config",
+      restrictToCreatedBy: false,
+      type: "custom-view",
+      viewConfiguration: {
+        formTemplates: {
+          MATERIAL_SAMPLE: {
+            // Has the default values:
+            templateFields: {
+              "managedAttributes.attribute_1": {
+                defaultValue: "attribute 1 default",
+                enabled: true
+              },
+              "managedAttributes.attribute_2": {
+                defaultValue: "attribute 2 default",
+                enabled: true
+              }
+            }
+          }
+        },
+        managedAttributesOrder: ["attribute_1", "attribute_2"],
+        navOrder: null,
+        type: "material-sample-form-custom-view"
+      }
+    });
   });
 
   it("Submits a new action-definition: minimal form submission.", async () => {

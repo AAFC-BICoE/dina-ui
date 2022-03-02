@@ -217,7 +217,7 @@ export function MaterialSampleCustomViewForm({
     for (const key of managedAttributesOrder ?? []) {
       managedAttributesTemplateFields[`managedAttributes.${key}`] = {
         enabled: true,
-        defaultValue: managedAttributes[key]
+        defaultValue: managedAttributes?.[key]
       };
     }
 
