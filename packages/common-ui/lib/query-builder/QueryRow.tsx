@@ -22,6 +22,8 @@ export interface ESIndexMapping {
   label: string;
   type: string;
   path: string;
+  parentPath?: string;
+  parentName?: string;
 }
 
 export type QueryRowMatchValue = "match" | "term";
@@ -86,7 +88,11 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   function onSelectionChange(value, formik, idx) {
     if (isResetRef) isResetRef.current = false;
-    const type = value.substring(value.indexOf("(") + 1, value.indexOf(")"));
+    const computedVal = typeof value === "object" ? value.name : value;
+    const type = computedVal.substring(
+      computedVal.indexOf("(") + 1,
+      computedVal.indexOf(")")
+    );
     const state = {
       ...formik.values?.[`${name}`]?.[`${idx}`],
       ...initState,
@@ -95,7 +101,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
     formik.setFieldValue(`${name}[${idx}]`, state);
     switch (type) {
-      case "text": {
+      case "text":
+      case "keyword": {
         return setVisibility({ ...initVisibility, text: true });
       }
       case "date": {
@@ -110,11 +117,31 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     }
   }
 
-  const queryRowOptions = esIndexMapping?.map(prop => ({
-    label: prop.label,
-    value: prop.value + "(" + prop.type + ")"
-  }));
+  const simpleRowOptions = esIndexMapping
+    ?.filter(prop => !prop.parentPath)
+    ?.map(prop => ({
+      label: prop.label,
+      value: prop.value + "(" + prop.type + ")"
+    }));
 
+  let nestedGroupLabel = "Nested Group";
+
+  const nestedRowOptions = esIndexMapping
+    ?.filter(prop => !!prop.parentPath)
+    ?.map(prop => {
+      nestedGroupLabel = prop.parentName as string;
+      return {
+        label: prop.label,
+        value: prop.parentPath + "." + prop.value + "(" + prop.type + ")"
+      };
+    });
+
+  const queryRowOptions = [
+    ...simpleRowOptions,
+    ...(nestedRowOptions?.length > 0
+      ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
+      : [])
+  ];
   function fieldProps(fieldName: string, idx: number) {
     return {
       name: `${name}[${idx}].${fieldName}`
@@ -135,7 +162,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
             name={fieldProps("fieldName", index).name}
-            options={queryRowOptions}
+            options={queryRowOptions as any}
             onChange={(value, formik) =>
               onSelectionChange(value, formik, index)
             }

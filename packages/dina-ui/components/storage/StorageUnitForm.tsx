@@ -37,18 +37,28 @@ export interface StorageUnitFormProps {
   storageUnit?: PersistedResource<StorageUnit>;
   onSaved: (storageUnit: PersistedResource<StorageUnit>[]) => Promise<void>;
   buttonBar?: JSX.Element;
+  parentIdInURL?: string;
 }
 
 export function StorageUnitForm({
   initialParent,
   storageUnit,
   onSaved,
+  parentIdInURL,
   buttonBar = (
     <ButtonBar>
-      <BackButton
-        entityId={storageUnit?.id}
-        entityLink="/collection/storage-unit"
-      />
+      {parentIdInURL ? (
+        <BackButton
+          entityId={parentIdInURL}
+          entityLink={`/collection/storage-unit`}
+          buttonMsg={"backToParentUnit"}
+        />
+      ) : (
+        <BackButton
+          entityId={storageUnit?.id}
+          entityLink="/collection/storage-unit"
+        />
+      )}
       <SubmitButton className="ms-auto" />
     </ButtonBar>
   )
@@ -98,14 +108,19 @@ export function StorageUnitForm({
       onSubmit={onSubmit}
     >
       {buttonBar}
-      <StorageUnitFormFields />
+      <StorageUnitFormFields parentIdInURL={parentIdInURL} />
       {buttonBar}
     </DinaForm>
   );
 }
 
+export interface StorageUnitFormFieldsProps {
+  parentIdInURL?: string;
+}
 /** Re-usable field layout between edit and view pages. */
-export function StorageUnitFormFields() {
+export function StorageUnitFormFields({
+  parentIdInURL
+}: StorageUnitFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const [showTextAreaInput, setShowTextAreaInput] = useState(false);
@@ -172,6 +187,7 @@ export function StorageUnitFormFields() {
         <StorageLinkerField
           name="parentStorageUnit"
           targetType="storage-unit"
+          parentIdInURL={parentIdInURL}
         />
       )}
       {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
