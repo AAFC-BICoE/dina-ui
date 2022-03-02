@@ -1,7 +1,10 @@
 import { InputResource, KitsuResource } from "kitsu";
 import { compact, isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
-import { MatrialSampleFormEnabledFields } from "../..";
+import {
+  MatrialSampleFormEnabledFields,
+  VisibleManagedAttributesConfig
+} from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -18,10 +21,10 @@ import {
  */
 export interface MaterialSampleFormCustomViewProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
-  collectingEventInitialValues: InputResource<CollectingEvent>;
-  acquisitionEventInitialValues: InputResource<AcquisitionEvent>;
+  collectingEventInitialValues?: InputResource<CollectingEvent>;
+  acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
   enabledFields: MatrialSampleFormEnabledFields;
-  visibleManagedAttributeKeys?: string[];
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 /**
@@ -130,13 +133,20 @@ export function useMaterialSampleFormCustomViewProps<
         ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
-    return {
+
+    const config: MaterialSampleFormCustomViewProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
       acquisitionEventInitialValues,
       enabledFields,
-      visibleManagedAttributeKeys: actionDefinition.managedAttributesOrder
+      visibleManagedAttributeKeys: {
+        materialSample: actionDefinition.managedAttributesOrder,
+        collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,
+        determination: actionDefinition.determinationManagedAttributesOrder
+      }
     };
+
+    return config;
   }, [actionDefinition]);
 }
 

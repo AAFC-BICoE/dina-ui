@@ -66,7 +66,8 @@ export default function MaterialSampleEditPage() {
       )
     : undefined;
 
-  // Call the custom view hook but only use the "enabledFields" value:
+  // Call the custom view hook but don't use the "initialValues" fields
+  // because we're not creating a sample from a template:
   const { enabledFields, visibleManagedAttributeKeys } =
     useMaterialSampleFormCustomViewProps(customViewConfig) ?? {};
 

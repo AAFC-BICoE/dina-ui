@@ -55,6 +55,7 @@ const workflowMainFieldsSchema = yup.object({
   managedAttributes: yup.object({}),
   // Managed Attributes display order:
   managedAttributesOrder: yup.array(yup.string().required()),
+  determinationManagedAttributesOrder: yup.array(yup.string().required()),
 
   attachmentsConfig: yup.mixed(),
   storageUnit: yup.mixed(),
@@ -134,11 +135,15 @@ export function MaterialSampleCustomViewForm({
     MaterialSampleFormSectionId[] | null
   >(initialViewConfig.navOrder);
 
-  // Initialize the tempalte form default values and checkbox states:
-  const colEventTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate<CollectingEvent>(
+  // Initialize the template form default values and checkbox states:
+  const colEventTemplateInitialValues = {
+    ...getTemplateInitialValuesFromSavedFormTemplate<CollectingEvent>(
       initialViewConfig.formTemplates?.COLLECTING_EVENT
-    );
+    ),
+    managedAttributesOrder:
+      initialViewConfig.collectingEventManagedAttributesOrder
+  };
+
   if (!colEventTemplateInitialValues.geoReferenceAssertions?.length) {
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
@@ -165,6 +170,8 @@ export function MaterialSampleCustomViewForm({
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,
     managedAttributesOrder: initialViewConfig.managedAttributesOrder,
+    determinationManagedAttributesOrder:
+      initialViewConfig.determinationManagedAttributesOrder,
     ...materialSampleTemplateInitialValues
   };
 
@@ -201,25 +208,22 @@ export function MaterialSampleCustomViewForm({
       name,
       restrictToCreatedBy,
 
-      managedAttributes,
+      managedAttributes: sampleManagedAttributes,
       managedAttributesOrder,
+      determinationManagedAttributesOrder,
 
       ...materialSampleTemplateFields
     } = submittedValues;
     const customViewFields = { id, group, name, restrictToCreatedBy };
 
+    const determinationManagedAttributes = (get(
+      materialSampleTemplateFields,
+      "organism[0].determination[0].managedAttributes"
+    ) ?? {}) as Record<string, string | null | undefined>;
+
     const enabledTemplateFields = getEnabledTemplateFieldsFromForm(
       materialSampleTemplateFields
     );
-
-    // Managed attribute default values don't need the template checkbox, all are set to "enabled":
-    const managedAttributesTemplateFields: TemplateFieldMap = {};
-    for (const key of managedAttributesOrder ?? []) {
-      managedAttributesTemplateFields[`managedAttributes.${key}`] = {
-        enabled: true,
-        defaultValue: managedAttributes?.[key]
-      };
-    }
 
     const tagSectionTemplateFields = pick(
       enabledTemplateFields,
@@ -276,7 +280,15 @@ export function MaterialSampleCustomViewForm({
             ...storageTemplateFields,
             ...scheduledActionsTemplateFields,
             ...associationTemplateFields,
-            ...managedAttributesTemplateFields
+            ...getManagedAttributeTemplate(
+              sampleManagedAttributes,
+              managedAttributesOrder
+            ),
+            ...getManagedAttributeTemplate(
+              determinationManagedAttributes,
+              determinationManagedAttributesOrder,
+              "organism[0].determination[0].managedAttributes"
+            )
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
@@ -291,6 +303,11 @@ export function MaterialSampleCustomViewForm({
                 : {
                     ...getEnabledTemplateFieldsFromForm(
                       collectingEvtFormRef.current?.values
+                    ),
+                    ...getManagedAttributeTemplate(
+                      collectingEvtFormRef.current?.values.managedAttributes,
+                      collectingEvtFormRef.current?.values
+                        ?.managedAttributesOrder
                     ),
                     id: undefined
                   }
@@ -313,6 +330,9 @@ export function MaterialSampleCustomViewForm({
       },
       navOrder,
       managedAttributesOrder,
+      determinationManagedAttributesOrder,
+      collectingEventManagedAttributesOrder:
+        collectingEvtFormRef.current?.values?.managedAttributesOrder,
       type: "material-sample-form-custom-view"
     };
 
@@ -378,7 +398,7 @@ export function MaterialSampleCustomViewForm({
         <MaterialSampleForm
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
-          hideCustomViewSelect={true}
+          hideNavCustomViewSelect={true}
           navOrder={navOrder}
           onChangeNavOrder={setNavOrder}
         />
@@ -435,4 +455,24 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
     templateCheckboxes,
     attachmentsConfig: { allowNew, allowExisting }
   };
+}
+
+/**
+ * Gets the tempalte fields for the managed attributes,
+ * which are enabled without the usual visibility checkbox.
+ */
+function getManagedAttributeTemplate(
+  managedAttributes: Record<string, string | null | undefined>,
+  managedAttributesOrder?: string[],
+  managedAttributePath = "managedAttributes"
+): TemplateFieldMap {
+  // Managed attribute default values don't need the template checkbox, all are set to "enabled":
+  const templateFieldMap: TemplateFieldMap = {};
+  for (const key of managedAttributesOrder ?? []) {
+    templateFieldMap[`${managedAttributePath}.${key}`] = {
+      enabled: true,
+      defaultValue: managedAttributes?.[key]
+    };
+  }
+  return templateFieldMap;
 }

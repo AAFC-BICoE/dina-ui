@@ -76,6 +76,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "objectstore-api/metadata":
     case "collection-api/collection":
     case "collection-api/custom-view":
+    case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
 });
@@ -84,17 +85,17 @@ const mockBulkGet = jest.fn<any, any>(async paths =>
   paths.map(path => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
-        return {
-          id: "1",
-          key: "attribute_1",
-          name: "Attribute 1"
-        };
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
       case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
-        return {
-          id: "2",
-          key: "attribute_2",
-          name: "Attribute 2"
-        };
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_1":
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/DETERMINATION.attribute_1":
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
+      case "managed-attribute/DETERMINATION.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
     }
   })
 );
@@ -875,5 +876,79 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
       "attribute 1 default value"
     );
     expect(wrapper.find(".attribute_2-field input").prop("value")).toEqual("");
+  });
+
+  it("Renders the Material Sample form with a custom default Collecting Event managed attributes order.", async () => {
+    const wrapper = await getWrapper({
+      formTemplates: {
+        COLLECTING_EVENT: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            "managedAttributes.attribute_1": {
+              enabled: true,
+              defaultValue: "attribute 1 default value"
+            },
+            "managedAttributes.attribute_2": {
+              enabled: true
+            }
+          }
+        }
+      },
+      navOrder: [],
+      collectingEventManagedAttributesOrder: ["attribute_1", "attribute_2"],
+      type: "material-sample-form-custom-view"
+    });
+
+    // The default attribute values are rendered:
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_1-field input")
+        .prop("value")
+    ).toEqual("attribute 1 default value");
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_2-field input")
+        .prop("value")
+    ).toEqual("");
+  });
+
+  it("Renders the Material Sample form with a custom default Determination managed attributes order.", async () => {
+    const wrapper = await getWrapper({
+      formTemplates: {
+        MATERIAL_SAMPLE: {
+          allowExisting: false,
+          allowNew: false,
+          templateFields: {
+            "organism[0].determination[0].managedAttributes.attribute_1": {
+              defaultValue: "attribute 1 default value",
+              enabled: true
+            },
+            "organism[0].determination[0].managedAttributes.attribute_2": {
+              enabled: true
+            }
+          }
+        }
+      },
+      navOrder: [],
+      determinationManagedAttributesOrder: ["attribute_1", "attribute_2"],
+      type: "material-sample-form-custom-view"
+    });
+
+    // The default attribute values are rendered:
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_1-field input"
+        )
+        .prop("value")
+    ).toEqual("attribute 1 default value");
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_2-field input"
+        )
+        .prop("value")
+    ).toEqual("");
   });
 });

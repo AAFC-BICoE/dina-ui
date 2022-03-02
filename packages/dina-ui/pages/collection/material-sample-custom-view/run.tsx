@@ -85,7 +85,8 @@ export function CreateMaterialSampleFromWorkflowForm({
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues,
-    enabledFields
+    enabledFields,
+    visibleManagedAttributeKeys
   } = useMaterialSampleFormCustomViewProps(actionDefinition);
 
   type RoutingButtonStrings = "newRun" | "viewSample";
@@ -149,6 +150,7 @@ export function CreateMaterialSampleFromWorkflowForm({
       }}
       navOrder={navOrder}
       onChangeNavOrder={setNavOrder}
+      visibleManagedAttributeKeys={visibleManagedAttributeKeys}
     />
   );
 }

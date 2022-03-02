@@ -45,6 +45,7 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
+import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -161,6 +162,8 @@ export interface UseMaterialSampleSaveParams {
   disableNestedFormEdits?: boolean;
 
   showChangedIndicatorsInNestedForms?: boolean;
+
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -185,7 +188,8 @@ export function useMaterialSampleSave({
   materialSampleTemplateInitialValues,
   reduceRendering,
   disableNestedFormEdits,
-  showChangedIndicatorsInNestedForms
+  showChangedIndicatorsInNestedForms,
+  visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -765,6 +769,9 @@ export function useMaterialSampleSave({
       ) : (
         <div className={nestedFormClassName}>
           <CollectingEventFormLayout
+            visibleManagedAttributeKeys={
+              visibleManagedAttributeKeys?.collectingEvent
+            }
             attachmentsConfig={collectingEventAttachmentsConfig}
           />
         </div>

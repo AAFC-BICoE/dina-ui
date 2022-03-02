@@ -57,13 +57,6 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
-const TEST_MANAGED_ATTRIBUTE = {
-  id: "1",
-  type: "managed-attribute",
-  name: "testAttr",
-  key: "test_attr"
-};
-
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
@@ -104,6 +97,8 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/project":
     case "collection-api/vocabulary/associationType":
     case "collection-api/custom-view":
+    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
@@ -135,6 +130,14 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
       case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
         return { id: "2", key: "attribute_2", name: "Attribute 2" };
       case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+      case "managed-attribute/DETERMINATION.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/DETERMINATION.attribute_3":
         return { id: "3", key: "attribute_3", name: "Attribute 3" };
     }
   })
@@ -2201,7 +2204,9 @@ describe("Material Sample Edit Page", () => {
             attribute_2: "attribute 2 value"
           }
         }}
-        visibleManagedAttributeKeys={["attribute_2", "attribute_3"]}
+        visibleManagedAttributeKeys={{
+          materialSample: ["attribute_2", "attribute_3"]
+        }}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -2249,6 +2254,93 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Lets you set a Custom Collecting Event managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        visibleManagedAttributeKeys={{
+          collectingEvent: ["attribute_2", "attribute_3"]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attributes 2 and 3 are visible and empty:
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_2-field input")
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_3-field input")
+        .prop("value")
+    ).toEqual("");
+  });
+
+  it("Lets you set a Custom Determination managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        visibleManagedAttributeKeys={{
+          determination: ["attribute_2", "attribute_3"]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".determination-section button.add-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attributes 2 and 3 are visible and empty:
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_2-field input"
+        )
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_3-field input"
+        )
+        .prop("value")
+    ).toEqual("");
   });
 
   it("Lets you set a Custom Navigation section order via prop.", async () => {

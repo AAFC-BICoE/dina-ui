@@ -59,6 +59,11 @@ export interface MatrialSampleFormEnabledFields {
   acquisitionEvent: string[];
 }
 
+export interface VisibleManagedAttributesConfig {
+  materialSample?: string[];
+  collectingEvent?: string[];
+  determination?: string[];
+}
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -119,7 +124,7 @@ export interface MaterialSampleFormProps {
    * When this prop is changed, the visible managed attributes state is updated in useEffect.
    * e.g. when the form's custom view is updated.
    */
-  visibleManagedAttributeKeys?: string[];
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 export function MaterialSampleForm({
@@ -174,7 +179,8 @@ export function MaterialSampleForm({
       onSaved,
       isTemplate,
       enabledFields,
-      reduceRendering
+      reduceRendering,
+      visibleManagedAttributeKeys
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -282,7 +288,13 @@ export function MaterialSampleForm({
     "organisms-section": id =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (
-        <OrganismsField id={id} name="organism" />
+        <OrganismsField
+          id={id}
+          name="organism"
+          visibleManagedAttributeKeys={
+            visibleManagedAttributeKeys?.determination
+          }
+        />
       ),
     "associations-section": id =>
       !reduceRendering &&
@@ -337,7 +349,9 @@ export function MaterialSampleForm({
                 // but not in template editor mode:
                 showCustomViewDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
-                visibleAttributeKeys={visibleManagedAttributeKeys}
+                visibleAttributeKeys={
+                  visibleManagedAttributeKeys?.materialSample
+                }
               />
             </div>
           </div>
