@@ -154,17 +154,35 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-
-    Object.keys(resp.data)
-      .filter(key => key.includes("data.attributes."))
-      .map(key => {
-        const fieldNameLabel = key.substring("data.attributes.".length);
-        result.push({
-          label: fieldNameLabel,
-          value: key,
-          type: resp.data?.[key]
-        });
+    resp.data.body.attributes.map(key => {
+      result.push({
+        label: key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
+        type: key.type,
+        path: key.path
       });
+    });
+
+    resp.data.body.relationships.attributes.map(key => {
+      result.push({
+        label: key.path?.includes(".")
+          ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
+          : key.name,
+        value: key.path
+          ? key.path + "." + key.name
+          : key.name === "id" || "type"
+          ? "data." + key.name
+          : key.name,
+        type: key.type,
+        path: key.path,
+        parentPath: resp.data.body.relationships.path,
+        parentName: resp.data.body.relationships.value
+      });
+    });
     return result;
   }
 
@@ -187,7 +205,9 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
-  const sortedData = data?.sort((a, b) => a.label.localeCompare(b.label));
+  const sortedData = data
+    ?.sort((a, b) => a.label.localeCompare(b.label))
+    .filter(prop => !prop.label.startsWith("group"));
 
   return (
     <DinaForm
@@ -216,9 +236,9 @@ export function QueryPage<TData extends KitsuResource>({
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-        <button className="btn btn-secondary mx-2" onClick={resetForm}>
+        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
           <DinaMessage id="resetFilters" />
-        </button>
+        </FormikButton>
       </div>
       <div
         className="query-table-wrapper"
@@ -256,7 +276,7 @@ export function QueryPage<TData extends KitsuResource>({
                   />
                 </span>
               )}
-              <div className="">
+              <div className="d-flex gap-3">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
                 {bulkDeleteButtonProps && (
                   <BulkDeleteButton {...bulkDeleteButtonProps} />

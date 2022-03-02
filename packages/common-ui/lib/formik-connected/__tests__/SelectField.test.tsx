@@ -23,6 +23,15 @@ const PRIMER_TYPE_OPTIONS = [
   {
     label: "iTru Primer",
     value: "ITRU_PRIMER"
+  },
+  {
+    label: "nested group",
+    options: [
+      {
+        label: "nested label",
+        value: "nested value"
+      }
+    ]
   }
 ];
 

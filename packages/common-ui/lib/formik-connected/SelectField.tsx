@@ -1,3 +1,4 @@
+// tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
 import { isArray } from "lodash";
 import { ComponentProps, RefObject } from "react";
@@ -6,10 +7,10 @@ import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 
 export interface SelectOption<T> {
   label: string;
-  value: T;
+  value?: T;
 }
 
-export interface SelectFieldProps<T = string> extends FieldWrapperProps {
+export interface SelectFieldProps<T> extends FieldWrapperProps {
   disabled?: boolean;
 
   /** Whether this is a multi-select dropdown. */
@@ -29,7 +30,7 @@ export interface SelectFieldProps<T = string> extends FieldWrapperProps {
 }
 
 /** Formik-connected select input. */
-export function SelectField<T = string>(props: SelectFieldProps<T>) {
+export function SelectField<T>(props: SelectFieldProps<T>) {
   const {
     disabled,
     isMulti,
@@ -57,17 +58,38 @@ export function SelectField<T = string>(props: SelectFieldProps<T>) {
             ? change.map(option => option.value)
             : change?.value;
           setValue(newValue);
-          onChange?.(newValue, formik);
+          onChange?.(newValue as any, formik);
         }
 
-        const selectedOption = isMulti
-          ? options?.filter(option => value?.includes(option.value))
-          : value
-          ? options?.find(option => option.value === value) ?? {
-              label: String(value),
-              value
-            }
-          : null;
+        let selectedOption;
+
+        if (isMulti) {
+          selectedOption = options?.filter(option =>
+            value?.includes(option.value)
+          );
+        } else if (value) {
+          selectedOption = options
+            .filter(opt => !!opt.value)
+            .find(option => option.value === value) as any;
+          // also search in possible nested options
+          if (!selectedOption || Object.keys(selectedOption).length === 0) {
+            const optionWithNested = options.filter(opt => !!opt["options"]);
+            optionWithNested.map(option =>
+              option["options"].map(opt => {
+                if (opt.value === value) {
+                  selectedOption = opt;
+                  return;
+                }
+              })
+            );
+          }
+
+          if (!selectedOption || Object.keys(selectedOption).length === 0) {
+            selectedOption = { label: String(value), value };
+          }
+        } else {
+          selectedOption = null;
+        }
 
         const customStyle = {
           placeholder: (provided, _) => ({
