@@ -192,7 +192,7 @@ services:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3.8.20-management-alpine
     ports:
         - 5672:5672
         - 15672:15672
