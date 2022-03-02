@@ -7,10 +7,42 @@ import { ColumnDefinition } from "../../table/QueryTable";
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    "data.id.type": "text",
-    "data.attributes.createdOn.type": "date",
-    "meta.moduleVersion.type": "text",
-    "data.attributes.allowDuplicateName.type": "boolean"
+    headers: {},
+    body: {
+      indexName: "dina_material_sample_index",
+      attributes: [
+        {
+          name: "verbatimDeterminer",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "uuid",
+          type: "text",
+          path: "data.attributes.hierarchy"
+        },
+        {
+          name: "publiclyReleasable",
+          type: "boolean",
+          path: "data.attributes"
+        },
+        {
+          name: "materialSampleRemarks",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "dwcOtherCatalogNumbers",
+          type: "text",
+          path: "data.attributes"
+        }
+      ],
+      relationships: {
+        attributes: []
+      }
+    },
+    statusCode: "OK",
+    statusCodeValue: 200
   }
 };
 
