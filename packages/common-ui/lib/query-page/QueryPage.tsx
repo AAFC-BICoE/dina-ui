@@ -88,7 +88,12 @@ export function QueryPage<TData extends KitsuResource>({
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
-      ? reactTableProps(initData as any, CheckBoxField)
+      ? reactTableProps(
+          searchResults?.isFromSearch
+            ? searchResults.results
+            : (initData as any),
+          CheckBoxField
+        )
       : reactTableProps;
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
