@@ -83,8 +83,14 @@ services:
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "messaging.isProducer": "true",
           "rabbitmq.host": "rabbitmq",
-          "messaging.isProducer": "true"
+          "rabbitmq.queue": "dina.search.queue",
+          "rabbitmq.exchange": "dina.search.exchange",
+          "rabbitmq.routingkey": "dina.search.routingkey",
+          "rabbitmq.username": "guest",
+          "rabbitmq.password": "guest",
+          "rabbitmq.port": "15672"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
@@ -119,8 +125,14 @@ services:
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "messaging.isProducer": "true",
           "rabbitmq.host": "rabbitmq",
-          "messaging.isProducer": "true"
+          "rabbitmq.queue": "dina.search.queue",
+          "rabbitmq.exchange": "dina.search.exchange",
+          "rabbitmq.routingkey": "dina.search.routingkey",
+          "rabbitmq.username": "guest",
+          "rabbitmq.password": "guest",
+          "rabbitmq.port": "15672"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
@@ -138,8 +150,14 @@ services:
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "messaging.isProducer": "true",
           "rabbitmq.host": "rabbitmq",
-          "messaging.isProducer": "true"
+          "rabbitmq.queue": "dina.search.queue",
+          "rabbitmq.exchange": "dina.search.exchange",
+          "rabbitmq.routingkey": "dina.search.routingkey",
+          "rabbitmq.username": "guest",
+          "rabbitmq.password": "guest",
+          "rabbitmq.port": "15672"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
@@ -158,8 +176,14 @@ services:
           "keycloak.enabled": "true",
           "keycloak.resource": "dina",
           "keycloak.auth-server-url": "http://${KEYCLOAK_DOMAIN}/auth",
+          "messaging.isProducer": "true",
           "rabbitmq.host": "rabbitmq",
-          "messaging.isProducer": "true"
+          "rabbitmq.queue": "dina.search.queue",
+          "rabbitmq.exchange": "dina.search.exchange",
+          "rabbitmq.routingkey": "dina.search.routingkey",
+          "rabbitmq.username": "guest",
+          "rabbitmq.password": "guest",
+          "rabbitmq.port": "15672"
         }
     extra_hosts:
       # Resolve the Keycloak domain to Keycloak's static IP:
@@ -192,7 +216,7 @@ services:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
   rabbitmq:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3.8.20-management-alpine
     ports:
         - 5672:5672
         - 15672:15672
