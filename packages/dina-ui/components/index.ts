@@ -39,6 +39,8 @@ export * from "./collection/material-sample/useLastUsedCollection";
 export * from "./collection/material-sample/useMaterialSample";
 export * from "./collection/material-sample-custom-view/materialSampleFormViewConfigSchema";
 export * from "./collection/material-sample-custom-view/useMaterialSampleFormCustomViewProps";
+export * from "./collection/material-sample-custom-view/useMaterialSampleCustomViewSelectState";
+export * from "./collection/material-sample-custom-view/MaterialSampleCustomViewSelect";
 export * from "./collection/MaterialSampleStateWarning";
 export * from "./collection/MaterialSampleAssociationsField";
 export * from "./collection/TabbedResourceLinker";

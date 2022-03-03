@@ -1,32 +1,19 @@
-import {
-  BackButton,
-  ButtonBar,
-  FieldSpy,
-  filterBy,
-  ResourceSelect,
-  SubmitButton,
-  withResponse
-} from "common-ui";
-import { PersistedResource } from "kitsu";
+import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Footer,
   Head,
+  MaterialSampleCustomViewSelect,
   MaterialSampleForm,
-  materialSampleFormCustomViewSchema,
   MaterialSampleFormProps,
   Nav,
   nextSampleInitialValues,
-  useMaterialSampleFormCustomViewProps,
+  useMaterialSampleFormCustomViewSelectState,
   useMaterialSampleQuery
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  CustomView,
-  MaterialSampleFormSectionId
-} from "../../../types/collection-api";
 
 export type PostSaveRedirect = "VIEW" | "CREATE_NEXT";
 
@@ -57,32 +44,14 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
-  const [sampleFormCustomView, setSampleFormCustomView] =
-    useState<PersistedResource<CustomView>>();
-
-  const customViewConfig = sampleFormCustomView?.id
-    ? materialSampleFormCustomViewSchema.parse(
-        sampleFormCustomView?.viewConfiguration
-      )
-    : undefined;
-
-  // Call the custom view hook but don't use the "initialValues" fields
-  // because we're not creating a sample from a template:
-  const { enabledFields, visibleManagedAttributeKeys } =
-    useMaterialSampleFormCustomViewProps(customViewConfig) ?? {};
-
-  // Store the nav order in the Page components state:
-  const [navOrder, setNavOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(null);
-
-  // Effect hook: When the Custom View changes,
-  // update the navOrder to what's stored in the Custom View:
-  useEffect(() => {
-    if (sampleFormCustomView) {
-      setNavOrder(customViewConfig?.navOrder ?? null);
-    }
-  }, [customViewConfig]);
+  const {
+    navOrder,
+    setNavOrder,
+    enabledFields,
+    sampleFormCustomView,
+    setSampleFormCustomView,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormCustomViewSelectState();
 
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     navOrder,
@@ -95,34 +64,10 @@ export default function MaterialSampleEditPage() {
         <BackButton entityId={id} entityLink="/collection/material-sample" />
         <div className="flex-grow-1 d-flex">
           <div className="mx-auto" style={{ width: "20rem" }}>
-            <label>
-              <div className="mb-2 fw-bold">
-                <DinaMessage id="customMaterialSampleFormView" />
-              </div>
-              <FieldSpy<string> fieldName="group">
-                {group => (
-                  <ResourceSelect<CustomView>
-                    filter={input => ({
-                      // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
-                      "viewConfiguration.type":
-                        "material-sample-form-custom-view",
-                      // Filter by view name typed into the dropdown:
-                      ...filterBy(["name"])(input),
-                      // Filter by the form's group:
-                      ...(group && { group: { EQ: `${group}` } })
-                    })}
-                    optionLabel={view => view.name || view.id}
-                    model="collection-api/custom-view"
-                    onChange={newVal =>
-                      setSampleFormCustomView(
-                        newVal as PersistedResource<CustomView>
-                      )
-                    }
-                    value={sampleFormCustomView}
-                  />
-                )}
-              </FieldSpy>
-            </label>
+            <MaterialSampleCustomViewSelect
+              value={sampleFormCustomView}
+              onChange={setSampleFormCustomView}
+            />
           </div>
         </div>
         {!id && (
