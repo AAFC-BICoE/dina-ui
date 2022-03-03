@@ -68,7 +68,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }
-      : fieldType === "number"
+      : fieldType === "long"
       ? { number: true }
       : fieldType === "date"
       ? { date: true }
@@ -212,7 +212,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0]?.type === "number"
+            ? esIndexMapping?.[0]?.type === "long"
             : visibility.number) && (
             <NumberField
               name={fieldProps("number", index).name}

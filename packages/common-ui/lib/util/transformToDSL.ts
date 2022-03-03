@@ -28,7 +28,7 @@ export function transformQueryToDSL(
     const value =
       rowToBuild.type === "boolean"
         ? rowToBuild.boolean
-        : rowToBuild.type === "number"
+        : rowToBuild.type === "long"
         ? rowToBuild.number
         : rowToBuild.type === "date"
         ? rowToBuild.date
@@ -80,7 +80,7 @@ export function transformQueryToDSL(
       queryRow =>
         queryRow.fieldName &&
         ((queryRow.type === "boolean" && queryRow.boolean) ||
-          (queryRow.type === "number" && queryRow.number) ||
+          (queryRow.type === "long" && queryRow.number) ||
           (queryRow.type === "date" && queryRow.date) ||
           ((queryRow.type === "text" || queryRow.type === "keyword") &&
             queryRow.matchType &&
