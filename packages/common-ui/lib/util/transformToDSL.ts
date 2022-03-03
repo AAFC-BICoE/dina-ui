@@ -28,14 +28,22 @@ export function transformQueryToDSL(
     const value =
       rowToBuild.type === "boolean"
         ? rowToBuild.boolean
-        : rowToBuild.type === "number"
+        : rowToBuild.type === "long" ||
+          rowToBuild.type === "short" ||
+          rowToBuild.type === "integer" ||
+          rowToBuild.type === "byte" ||
+          rowToBuild.type === "double" ||
+          rowToBuild.type === "float" ||
+          rowToBuild.type === "half_float" ||
+          rowToBuild.type === "scaled_float" ||
+          rowToBuild.type === "unsiged_long"
         ? rowToBuild.number
         : rowToBuild.type === "date"
         ? rowToBuild.date
         : null;
 
     if (onlyOneRow) {
-      if (rowToBuild.type === "text") {
+      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.query(
           rowToBuild.matchType as string,
           rowToBuild.matchType === "term"
@@ -47,7 +55,7 @@ export function transformQueryToDSL(
         builder.filter("term", rowToBuild.fieldName, value);
       }
     } else if (curRow.compoundQueryType === "and") {
-      if (rowToBuild.type === "text") {
+      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.andQuery(
           rowToBuild.matchType as string,
           rowToBuild.matchType === "term"
@@ -59,7 +67,7 @@ export function transformQueryToDSL(
         builder.andFilter("term", rowToBuild.fieldName, value);
       }
     } else if (curRow.compoundQueryType === "or") {
-      if (rowToBuild.type === "text") {
+      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.orFilter(
           rowToBuild.matchType as string,
           rowToBuild.matchType === "term"
@@ -80,9 +88,20 @@ export function transformQueryToDSL(
       queryRow =>
         queryRow.fieldName &&
         ((queryRow.type === "boolean" && queryRow.boolean) ||
-          (queryRow.type === "number" && queryRow.number) ||
+          ((queryRow.type === "long" ||
+            queryRow.type === "short" ||
+            queryRow.type === "integer" ||
+            queryRow.type === "byte" ||
+            queryRow.type === "double" ||
+            queryRow.type === "float" ||
+            queryRow.type === "half_float" ||
+            queryRow.type === "scaled_float" ||
+            queryRow.type === "unsiged_long") &&
+            queryRow.number) ||
           (queryRow.type === "date" && queryRow.date) ||
-          (queryRow.type === "text" && queryRow.matchType))
+          ((queryRow.type === "text" || queryRow.type === "keyword") &&
+            queryRow.matchType &&
+            queryRow.matchValue))
     )
     .map((queryRow, idx) => {
       if (submittedValues.queryRows.length === 1)
@@ -96,5 +115,6 @@ export function transformQueryToDSL(
 
   if (submittedValues.group)
     builder.andQuery("match", "data.attributes.group", submittedValues.group);
+
   return builder.build();
 }

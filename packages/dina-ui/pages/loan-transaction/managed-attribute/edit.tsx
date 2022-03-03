@@ -1,20 +1,15 @@
-import { SelectField, useQuery, withResponse } from "common-ui";
+import { useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import {
   Footer,
   Head,
-  Nav,
   ManagedAttributeForm,
-  ManagedAttributeFormProps
+  ManagedAttributeFormProps,
+  Nav
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  CollectionModuleType,
-  COLLECTION_MODULE_TYPES,
-  COLLECTION_MODULE_TYPE_LABELS,
-  ManagedAttribute
-} from "../../../types/collection-api/resources/ManagedAttribute";
+import { ManagedAttribute } from "../../../types/collection-api/resources/ManagedAttribute";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -22,29 +17,14 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
   const query = useQuery<ManagedAttribute>({
-    path: `collection-api/managed-attribute/${id}`
+    path: `loan-transaction-api/managed-attribute/${id}`
   });
-
-  const ATTRIBUTE_COMPONENT_OPTIONS: {
-    label: string;
-    value: CollectionModuleType;
-  }[] = COLLECTION_MODULE_TYPES.map(dataType => ({
-    label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
-    value: dataType
-  }));
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/collection/managed-attribute/list",
-    apiBaseUrl: "/collection-api",
-    listHref: "/collection/managed-attribute/list",
-    componentField: (
-      <SelectField
-        className="col-md-6"
-        name="managedAttributeComponent"
-        options={ATTRIBUTE_COMPONENT_OPTIONS}
-      />
-    )
+    postSaveRedirect: "/loan-transaction/managed-attribute/list",
+    apiBaseUrl: "/loan-transaction-api",
+    listHref: "/loan-transaction/managed-attribute/list"
   };
 
   return (

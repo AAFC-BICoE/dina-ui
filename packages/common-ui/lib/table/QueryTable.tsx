@@ -328,7 +328,7 @@ export function QueryTable<TData extends KitsuResource>({
   );
 }
 
-function DefaultTBody(props) {
+export function DefaultTBody(props) {
   return <div {...props} className="rt-tbody" />;
 }
 

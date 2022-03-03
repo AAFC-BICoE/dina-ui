@@ -116,7 +116,7 @@ export function DefaultValuesConfigSelect({
       options={selectOptions}
       onChange={(option: any) => onChangeConfigIndex(option.value)}
       value={ruleConfigOptions[ruleConfigIndex ?? -1] ?? null}
-      styles={styles}
+      styles={styles as any}
     />
   );
 }

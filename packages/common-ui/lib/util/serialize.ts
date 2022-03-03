@@ -32,6 +32,9 @@ export async function serialize<TData extends KitsuResource>({
   // Create a copy of the resource so the original is not affected, and omit "undefined" values.
   const resourceCopy = JSON.parse(JSON.stringify(resource));
 
+  // Delete the "meta" property which can't be re-sent to the back-end:
+  delete resourceCopy.meta;
+
   // Get rid of undefined IDs, which can cause errors:
   if (typeof resourceCopy.id === "undefined") {
     delete resourceCopy.id;
