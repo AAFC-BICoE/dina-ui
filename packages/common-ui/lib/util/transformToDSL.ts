@@ -83,7 +83,8 @@ export function transformQueryToDSL(
           (queryRow.type === "number" && queryRow.number) ||
           (queryRow.type === "date" && queryRow.date) ||
           ((queryRow.type === "text" || queryRow.type === "keyword") &&
-            queryRow.matchType))
+            queryRow.matchType &&
+            queryRow.matchValue))
     )
     .map((queryRow, idx) => {
       if (submittedValues.queryRows.length === 1)
