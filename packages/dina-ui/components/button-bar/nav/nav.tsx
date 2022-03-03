@@ -10,12 +10,89 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext, useState } from "react";
 import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
-import Container from "react-bootstrap/Container";
 import NavDropdown from "react-bootstrap/NavDropdown";
 
 export function Nav() {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
+
+  // Editable if current user is dina-admin, or a collection manager of any group:
+  const showUserNav =
+    Object.values(rolesPerGroup ?? {})
+      ?.flatMap(it => it)
+      ?.includes("collection-manager") || isAdmin;
+
+  return (
+    <>
+      <SkipLinks />
+
+      <header>
+        <div className="header-container row d-flex px-5">
+          <div className="text-start col-4">
+            <GovernmentLogo />
+          </div>
+          <div className="text-end col-8">
+            <ul className="list-inline mt-1 mb-1">
+              <li className="list-inline-item mx-2 my-auto">
+                <a
+                  className="btn-link px-0"
+                  href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+                >
+                  <DinaMessage id="feedbackButtonText" />
+                </a>
+              </li>
+              <li className="list-inline-item mx-2">&#8211;</li>
+              <li className="list-inline-item mx-2">
+                <LanguageSelector />
+              </li>
+            </ul>
+            <ul className="list-inline">
+              <li className="list-inline-item mx-2 my-auto">
+                <NavbarUserControl />
+              </li>
+            </ul>
+          </div>
+        </div>
+        <Navbar className="app-bar px-5" expand="sm">
+          <Navbar.Brand href="/" className="app-name">
+            <DinaMessage id="appTitle" />
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <ReactNav>
+              <NavObjectStoreDropdown formatMessage={formatMessage} />
+              <NavAgentDropdown formatMessage={formatMessage} />
+              <NavSequenceDropdown formatMessage={formatMessage} />
+              <NavCollectionDropdown formatMessage={formatMessage} />
+              <NavTransactionsDropdown formatMessage={formatMessage} />
+              {showUserNav && (
+                <NavDinaUserDropdown formatMessage={formatMessage} />
+              )}
+            </ReactNav>
+          </Navbar.Collapse>
+        </Navbar>
+      </header>
+    </>
+  );
+}
+
+function SkipLinks() {
+  return (
+    <nav id="wb-tphp" className="d-flex flex-column align-items-center">
+      <a className="wb-link-inv wb-sl" href="#wb-cont">
+        <DinaMessage id="skipToMainContent" />
+      </a>
+      <a className="wb-link-inv wb-sl" href="#wb-info">
+        <DinaMessage id="skipToAboutThisApplication" />
+      </a>
+      <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
+        <DinaMessage id="skipToBasicHtmlVersion" />
+      </a>
+    </nav>
+  );
+}
+
+function GovernmentLogo() {
   const { locale } = useContext(intlContext);
 
   // Generate accessible message for Government of Canada Logo.
@@ -30,86 +107,20 @@ export function Nav() {
       </span>
     );
 
-  // Editable if current user is dina-admin, or a collection manager of any group:
-  const showUserNav =
-    Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
-      ?.includes("collection-manager") || isAdmin;
-
   return (
     <>
-      <nav id="wb-tphp" className="d-flex flex-column align-items-center">
-        <a className="wb-link-inv wb-sl" href="#wb-cont">
-          <DinaMessage id="skipToMainContent" />
-        </a>
-        <a className="wb-link-inv wb-sl" href="#wb-info">
-          <DinaMessage id="skipToAboutThisApplication" />
-        </a>
-        <a className="wb-link-inv wb-sl" rel="alternate" href="?wbdisable=true">
-          <DinaMessage id="skipToBasicHtmlVersion" />
-        </a>
-      </nav>
-
-      <header className="py-3">
-        <div id="wb-bnr" className="container">
-          <div className="row d-flex">
-            <div
-              className="brand col-5 col-md-4"
-              property="publisher"
-              typeof="GovernmentOrganization"
-            >
-              <img
-                src={"/static/images/canadaLogo_" + locale + ".svg"}
-                property="logo"
-                alt=""
-              />
-              {logoSpan}
-              <meta property="areaServed" typeof="Country" content="Canada" />
-            </div>
-            <section id="wb-lng" className="text-end ms-auto col-7 col-md-8">
-              <ul className="list-inline">
-                <li className="list-inline-item mx-2">
-                  <NavbarUserControl />
-                </li>
-                <li className="list-inline-item mx-2 my-auto">
-                  <a
-                    className="btn btn-info"
-                    href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-                  >
-                    <DinaMessage id="feedbackButtonText" />
-                  </a>
-                </li>
-                <li className="list-inline-item mx-2">
-                  <LanguageSelector />
-                </li>
-              </ul>
-            </section>
-          </div>
-        </div>
-        <Navbar className="app-bar" expand="sm">
-          <Container>
-            <Navbar.Brand href="/" className="app-name">
-              <DinaMessage id="appTitle" />
-            </Navbar.Brand>
-            <Navbar.Toggle aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <ReactNav className="">
-                <NavObjectStoreDropdown formatMessage={formatMessage} />
-                <NavAgentDropdown formatMessage={formatMessage} />
-                <NavSequenceDropdown formatMessage={formatMessage} />
-                <NavCollectionDropdown formatMessage={formatMessage} />
-                <NavTransactionsDropdown formatMessage={formatMessage} />
-                {showUserNav && (
-                  <NavDinaUserDropdown formatMessage={formatMessage} />
-                )}
-              </ReactNav>
-            </Navbar.Collapse>
-          </Container>
-        </Navbar>
-      </header>
+      <img
+        src={"/static/images/canadaLogo_" + locale + ".svg"}
+        property="logo"
+        alt=""
+        className="logo"
+      />
+      {logoSpan}
+      <meta property="areaServed" typeof="Country" content="Canada" />
     </>
   );
 }
+
 function menuDisplayControl() {
   const [show, setShow] = useState(false);
   const showDropdown = () => {
