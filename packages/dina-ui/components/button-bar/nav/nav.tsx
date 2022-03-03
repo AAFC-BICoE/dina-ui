@@ -98,6 +98,7 @@ export function Nav() {
                 <NavAgentDropdown formatMessage={formatMessage} />
                 <NavSequenceDropdown formatMessage={formatMessage} />
                 <NavCollectionDropdown formatMessage={formatMessage} />
+                <NavTransactionsDropdown formatMessage={formatMessage} />
                 {showUserNav && (
                   <NavDinaUserDropdown formatMessage={formatMessage} />
                 )}
@@ -326,6 +327,34 @@ function NavDinaUserDropdown({ formatMessage }) {
         onKeyDown={onKeyDownLastItem}
       >
         <DinaMessage id="whoAmITitle" />
+      </NavDropdown.Item>
+    </NavDropdown>
+  );
+}
+
+function NavTransactionsDropdown({ formatMessage }) {
+  const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
+    menuDisplayControl();
+
+  return (
+    <NavDropdown
+      title={formatMessage("loanTransactionsSectionTitle")}
+      show={show}
+      onMouseOver={showDropdown}
+      onMouseLeave={hideDropdown}
+      onKeyDown={onKeyDown}
+    >
+      <NavDropdown.Item href="/loan-transaction/managed-attribute/list">
+        <DinaMessage id="managedAttributes" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/loan-transaction/transaction/list">
+        <DinaMessage id="transactions" />
+      </NavDropdown.Item>
+      <NavDropdown.Item
+        href="/loan-transaction/revisions-by-user"
+        onKeyDown={onKeyDownLastItem}
+      >
+        <DinaMessage id="revisionsByUserPageTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );
