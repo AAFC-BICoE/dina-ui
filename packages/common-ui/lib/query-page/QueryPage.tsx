@@ -1,13 +1,13 @@
-import { KitsuResource } from "kitsu";
-import { useState, useMemo } from "react";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { Column, TableProps } from "react-table";
+import ReactTable, { Column, SortingRule, TableProps } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
-import { ColumnDefinition } from "../table/QueryTable";
+import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
 import { transformQueryToDSL } from "../util/transformToDSL";
 import {
   BulkDeleteButton,
@@ -16,9 +16,11 @@ import {
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { MetaWithTotal } from "../api-client/operations-types";
-import { QueryState } from "../api-client/useQuery";
-import { useGroupedCheckBoxes } from "../formik-connected/GroupedCheckBoxFields";
+
+import {
+  CheckBoxFieldProps,
+  useGroupedCheckBoxes
+} from "../formik-connected/GroupedCheckBoxFields";
 import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
@@ -26,12 +28,12 @@ import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { FormikButton, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { useRouter } from "next/router";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
   indexName: string;
   initData?: TData[];
+  defaultSort?: SortingRule[];
   /** Adds the bulk edit button and the row checkboxes. */
   bulkEditPath?: (ids: string[]) => {
     pathname: string;
@@ -42,7 +44,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
   omitPaging?: boolean;
   reactTableProps?:
     | Partial<TableProps>
-    | ((queryState: QueryState<TData[], MetaWithTotal>) => Partial<TableProps>);
+    | ((
+        responseData: PersistedResource<TData>[] | undefined,
+        CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
+      ) => Partial<TableProps>);
+
+  onSortedChange?: (newSort: SortingRule[]) => void;
 }
 export function QueryPage<TData extends KitsuResource>({
   indexName,
@@ -51,20 +58,22 @@ export function QueryPage<TData extends KitsuResource>({
   bulkDeleteButtonProps,
   bulkEditPath,
   omitPaging,
-  reactTableProps
+  reactTableProps,
+  defaultSort,
+  onSortedChange
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
-  const router = useRouter();
+  const isResetRef = useRef<boolean>(false);
+  // JSONAPI sort attribute.
+  const [sortingRules, setSortingRules] = useState(defaultSort);
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
   const [visible, setVisible] = useState(false);
-
-  const resolvedReactTableProps = { sortable: true, ...reactTableProps };
 
   const {
     CheckBoxField,
@@ -76,6 +85,18 @@ export function QueryPage<TData extends KitsuResource>({
       ? searchResults?.results
       : initData
   });
+
+  const computedReactTableProps =
+    typeof reactTableProps === "function"
+      ? reactTableProps(
+          searchResults?.isFromSearch
+            ? searchResults.results
+            : (initData as any),
+          CheckBoxField
+        )
+      : reactTableProps;
+
+  const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
   const combinedColumns = [
     ...(showRowCheckboxes
@@ -114,8 +135,34 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  function resetForm() {
-    router.reload();
+  function resetForm(_, formik) {
+    isResetRef.current = true;
+    const resetToVal = {
+      queryRows: [
+        {
+          fieldName: sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
+          matchType: "match",
+          boolean: "true",
+          date: moment().format()
+        }
+      ],
+      group: groupNames?.[0]
+    };
+    formik?.setValues(resetToVal);
+
+    const submitVal = {
+      queryRows: [
+        {
+          fieldName: sortedData?.[0]?.value,
+          matchType: "match",
+          boolean: "true",
+          date: moment().format(),
+          type: sortedData?.[0]?.type
+        }
+      ],
+      group: groupNames?.[0]
+    };
+    onSubmit({ submittedValues: submitVal });
   }
 
   async function searchES(queryDSL) {
@@ -230,7 +277,11 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <DinaMessage id="search" />
       </label>
-      <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
+      <QueryBuilder
+        name="queryRows"
+        esIndexMapping={sortedData}
+        isResetRef={isResetRef}
+      />
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField name="group" className="col-md-4" />
       </DinaFormSection>
@@ -290,6 +341,41 @@ export function QueryPage<TData extends KitsuResource>({
           columns={mappedColumns}
           data={searchResults?.results ?? initData}
           minRows={1}
+          {...resolvedReactTableProps}
+          pageText={<CommonMessage id="page" />}
+          noDataText={<CommonMessage id="noRowsFound" />}
+          ofText={<CommonMessage id="of" />}
+          rowsText={formatMessage({ id: "rows" })}
+          previousText={<CommonMessage id="previous" />}
+          nextText={<CommonMessage id="next" />}
+          TbodyComponent={
+            error
+              ? () => (
+                  <div
+                    className="alert alert-danger"
+                    style={{
+                      whiteSpace: "pre-line"
+                    }}
+                  >
+                    <p>
+                      {error.errors?.map(e => e.detail).join("\n") ??
+                        String(error)}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        const newSort = [{ id: "createdOn", desc: true }];
+                        onSortedChange?.(newSort);
+                        setSortingRules(newSort);
+                      }}
+                    >
+                      <CommonMessage id="resetSort" />
+                    </button>
+                  </div>
+                )
+              : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+          }
         />
       </div>
     </DinaForm>

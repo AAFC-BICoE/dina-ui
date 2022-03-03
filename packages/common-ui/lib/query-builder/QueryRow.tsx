@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   DateField,
   NumberField,
@@ -14,6 +14,7 @@ export interface QueryRowProps {
   addRow?: () => void;
   removeRow?: (index) => void;
   name: string;
+  isResetRef?: React.MutableRefObject<boolean>;
 }
 
 export interface ESIndexMapping {
@@ -28,6 +29,16 @@ export interface ESIndexMapping {
 export type QueryRowMatchValue = "match" | "term";
 export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
 export type QueryRowBooleanType = "TRUE" | "FALSE";
+export type QueryRowNumberType =
+  | "long"
+  | "short"
+  | "integer"
+  | "byte"
+  | "double"
+  | "float"
+  | "half_float"
+  | "scaled_float"
+  | "unsiged_long";
 
 export interface QueryRowExportProps {
   fieldName: string;
@@ -53,7 +64,8 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name, isResetRef } =
+    queryRowProps;
   const initVisibility = {
     text: false,
     date: false,
@@ -66,7 +78,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }
-      : fieldType === "number"
+      : fieldType === "long" ||
+        fieldType === "short" ||
+        fieldType === "integer" ||
+        fieldType === "byte" ||
+        fieldType === "double" ||
+        fieldType === "float" ||
+        fieldType === "half_float" ||
+        fieldType === "scaled_float" ||
+        fieldType === "unsiged_long"
       ? { number: true }
       : fieldType === "date"
       ? { date: true }
@@ -85,6 +105,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   };
 
   function onSelectionChange(value, formik, idx) {
+    if (isResetRef) isResetRef.current = false;
     const computedVal = typeof value === "object" ? value.name : value;
     const type = computedVal.substring(
       computedVal.indexOf("(") + 1,
@@ -108,7 +129,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       case "boolean": {
         return setVisibility({ ...initVisibility, boolean: true });
       }
-      case "long": {
+      case "long":
+      case "short":
+      case "integer":
+      case "byte":
+      case "double":
+      case "float":
+      case "half_float":
+      case "scaled_float":
+      case "unsiged_long": {
         return setVisibility({ ...initVisibility, number: true });
       }
     }
@@ -170,21 +199,27 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {visibility.text && (
+          {(isResetRef?.current
+            ? esIndexMapping?.[0]?.type === "text"
+            : visibility.text) && (
             <TextField
               name={fieldProps("matchValue", index).name}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.date && (
+          {(isResetRef?.current
+            ? esIndexMapping?.[0]?.type === "date"
+            : visibility.date) && (
             <DateField
               name={fieldProps("date", index).name}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.text && (
+          {(isResetRef?.current
+            ? esIndexMapping?.[0]?.type === "text"
+            : visibility.text) && (
             <SelectField
               name={fieldProps("matchType", index).name}
               options={queryRowMatchOptions}
@@ -192,7 +227,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               removeLabel={true}
             />
           )}
-          {visibility.boolean && (
+          {(isResetRef?.current
+            ? esIndexMapping?.[0]?.type === "boolean"
+            : visibility.boolean) && (
             <SelectField
               name={fieldProps("boolean", index).name}
               options={queryRowBooleanOptions}
@@ -200,7 +237,17 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               removeLabel={true}
             />
           )}
-          {visibility.number && (
+          {(isResetRef?.current
+            ? esIndexMapping?.[0]?.type === "long" ||
+              esIndexMapping?.[0]?.type === "short" ||
+              esIndexMapping?.[0]?.type === "integer" ||
+              esIndexMapping?.[0]?.type === "byte" ||
+              esIndexMapping?.[0]?.type === "double" ||
+              esIndexMapping?.[0]?.type === "float" ||
+              esIndexMapping?.[0]?.type === "half_float" ||
+              esIndexMapping?.[0]?.type === "scaled_float" ||
+              esIndexMapping?.[0]?.type === "unsiged_long"
+            : visibility.number) && (
             <NumberField
               name={fieldProps("number", index).name}
               className="me-1 flex-fill"
