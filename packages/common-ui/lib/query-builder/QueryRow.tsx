@@ -29,6 +29,16 @@ export interface ESIndexMapping {
 export type QueryRowMatchValue = "match" | "term";
 export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
 export type QueryRowBooleanType = "TRUE" | "FALSE";
+export type QueryRowNumberType =
+  | "long"
+  | "short"
+  | "integer"
+  | "byte"
+  | "double"
+  | "float"
+  | "half_float"
+  | "scaled_float"
+  | "unsiged_long";
 
 export interface QueryRowExportProps {
   fieldName: string;
@@ -68,7 +78,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }
-      : fieldType === "long"
+      : fieldType === "long" ||
+        fieldType === "short" ||
+        fieldType === "integer" ||
+        fieldType === "byte" ||
+        fieldType === "double" ||
+        fieldType === "float" ||
+        fieldType === "half_float" ||
+        fieldType === "scaled_float" ||
+        fieldType === "unsiged_long"
       ? { number: true }
       : fieldType === "date"
       ? { date: true }
@@ -111,7 +129,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       case "boolean": {
         return setVisibility({ ...initVisibility, boolean: true });
       }
-      case "long": {
+      case "long":
+      case "short":
+      case "integer":
+      case "byte":
+      case "double":
+      case "float":
+      case "half_float":
+      case "scaled_float":
+      case "unsiged_long": {
         return setVisibility({ ...initVisibility, number: true });
       }
     }
@@ -212,7 +238,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
           {(isResetRef?.current
-            ? esIndexMapping?.[0]?.type === "long"
+            ? esIndexMapping?.[0]?.type === "long" ||
+              esIndexMapping?.[0]?.type === "short" ||
+              esIndexMapping?.[0]?.type === "integer" ||
+              esIndexMapping?.[0]?.type === "byte" ||
+              esIndexMapping?.[0]?.type === "double" ||
+              esIndexMapping?.[0]?.type === "float" ||
+              esIndexMapping?.[0]?.type === "half_float" ||
+              esIndexMapping?.[0]?.type === "scaled_float" ||
+              esIndexMapping?.[0]?.type === "unsiged_long"
             : visibility.number) && (
             <NumberField
               name={fieldProps("number", index).name}
