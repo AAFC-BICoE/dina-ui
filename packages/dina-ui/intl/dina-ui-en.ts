@@ -127,7 +127,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
   createMaterialSampleCustomView: "Create Material Sample Custom View",
-  customMaterialSampleFormView: "Custom Material Sample Form View",
+  customFormView: "Custom Form View",
   customPlaceName: "Custom Place Name",
   customComponentOrder: "Custom Component Order View",
   customView: "Custom View",

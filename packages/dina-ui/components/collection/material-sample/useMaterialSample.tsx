@@ -45,7 +45,10 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
+import {
+  MatrialSampleFormEnabledFields,
+  VisibleManagedAttributesConfig
+} from "./MaterialSampleForm";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -147,11 +150,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Optionally restrict the form to these enabled fields. */
-  enabledFields?: {
-    materialSample?: string[];
-    collectingEvent?: string[];
-    acquisitionEvent?: string[];
-  };
+  enabledFields?: MatrialSampleFormEnabledFields;
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 

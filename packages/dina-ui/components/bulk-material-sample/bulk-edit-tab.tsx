@@ -11,6 +11,8 @@ import { useRef } from "react";
 import {
   BulkNavigatorTab,
   MaterialSampleForm,
+  MaterialSampleFormProps,
+  useMaterialSampleFormCustomViewSelectState,
   useMaterialSampleSave
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
@@ -20,12 +22,16 @@ export interface UseBulkEditTabParams {
   sampleHooks: SampleWithHooks[];
   hideBulkEditTab?: boolean;
   hideUseSequence?: boolean;
+
+  /** Additional props forwarded to the MaterialSampleForm. */
+  sampleFormProps?: Partial<MaterialSampleFormProps>;
 }
 
 export function useBulkEditTab({
   hideBulkEditTab,
   sampleHooks,
-  hideUseSequence
+  hideUseSequence,
+  sampleFormProps
 }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
 
@@ -33,6 +39,7 @@ export function useBulkEditTab({
     type: "material-sample"
   };
   const bulkEditSampleHook = useMaterialSampleSave({
+    ...sampleFormProps,
     materialSample: initialValues,
     showChangedIndicatorsInNestedForms: true
   });
@@ -52,6 +59,7 @@ export function useBulkEditTab({
       hideBulkEditTab ? null : (
         <BulkEditTabContext.Provider value={ctx}>
           <MaterialSampleForm
+            {...sampleFormProps}
             buttonBar={null}
             hideUseSequence={hideUseSequence}
             materialSampleFormRef={bulkEditFormRef}

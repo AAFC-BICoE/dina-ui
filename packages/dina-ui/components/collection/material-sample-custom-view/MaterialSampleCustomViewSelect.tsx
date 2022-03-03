@@ -1,6 +1,6 @@
 import { FieldSpy, filterBy, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CustomView } from "../../../types/collection-api";
 
 export interface MaterialSampleCustomViewSelectProps {
@@ -13,28 +13,30 @@ export function MaterialSampleCustomViewSelect({
   value
 }: MaterialSampleCustomViewSelectProps) {
   return (
-    <label>
-      <div className="mb-2 fw-bold">
-        <DinaMessage id="customMaterialSampleFormView" />
+    <label className="d-flex align-items-center gap-2 material-sample-custom-view-select">
+      <div className="fw-bold">
+        <DinaMessage id="customFormView" />
       </div>
-      <FieldSpy<string> fieldName="group">
-        {group => (
-          <ResourceSelect<CustomView>
-            filter={input => ({
-              // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
-              "viewConfiguration.type": "material-sample-form-custom-view",
-              // Filter by view name typed into the dropdown:
-              ...filterBy(["name"])(input),
-              // Filter by the form's group:
-              ...(group && { group: { EQ: `${group}` } })
-            })}
-            optionLabel={view => view.name || view.id}
-            model="collection-api/custom-view"
-            onChange={onChange}
-            value={value}
-          />
-        )}
-      </FieldSpy>{" "}
+      <div style={{ width: "20rem" }}>
+        <FieldSpy<string> fieldName="group">
+          {group => (
+            <ResourceSelect<CustomView>
+              filter={input => ({
+                // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
+                "viewConfiguration.type": "material-sample-form-custom-view",
+                // Filter by view name typed into the dropdown:
+                ...filterBy(["name"])(input),
+                // Filter by the form's group:
+                ...(group && { group: { EQ: `${group}` } })
+              })}
+              optionLabel={view => view.name || view.id}
+              model="collection-api/custom-view"
+              onChange={onChange}
+              value={value}
+            />
+          )}
+        </FieldSpy>{" "}
+      </div>
     </label>
   );
 }

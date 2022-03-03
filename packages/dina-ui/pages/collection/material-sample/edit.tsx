@@ -63,7 +63,7 @@ export default function MaterialSampleEditPage() {
       <ButtonBar>
         <BackButton entityId={id} entityLink="/collection/material-sample" />
         <div className="flex-grow-1 d-flex">
-          <div className="mx-auto" style={{ width: "20rem" }}>
+          <div className="mx-auto">
             <MaterialSampleCustomViewSelect
               value={sampleFormCustomView}
               onChange={setSampleFormCustomView}

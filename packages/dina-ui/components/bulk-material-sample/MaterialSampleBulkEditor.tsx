@@ -16,7 +16,10 @@ import { Promisable } from "type-fest";
 import {
   BulkNavigatorTab,
   MaterialSampleBulkNavigator,
+  MaterialSampleCustomViewSelect,
   MaterialSampleForm,
+  MaterialSampleFormProps,
+  useMaterialSampleFormCustomViewSelectState,
   useMaterialSampleSave
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -43,6 +46,23 @@ export function MaterialSampleBulkEditor({
     BulkNavigatorTab | SampleWithHooks
   >();
 
+  // Allow selecting a custom view for the form:
+  const {
+    sampleFormCustomView,
+    setSampleFormCustomView,
+    navOrder,
+    setNavOrder,
+    enabledFields,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormCustomViewSelectState();
+
+  const customViewProps: Partial<MaterialSampleFormProps> = {
+    navOrder,
+    onChangeNavOrder: setNavOrder,
+    enabledFields,
+    visibleManagedAttributeKeys
+  };
+
   const sampleHooks = samples.map<SampleWithHooks>((sample, index) => {
     const key = `sample-${index}`;
     return {
@@ -53,7 +73,9 @@ export function MaterialSampleBulkEditor({
         // Reduce the off-screen tabs rendering for better performance:
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
-        disableNestedFormEdits: true
+        disableNestedFormEdits: true,
+        visibleManagedAttributeKeys,
+        enabledFields
       }),
       formRef: useRef(null)
     };
@@ -64,7 +86,8 @@ export function MaterialSampleBulkEditor({
   const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
     sampleHooks,
     hideBulkEditTab: !initialized,
-    hideUseSequence: true
+    hideUseSequence: true,
+    sampleFormProps: customViewProps
   });
 
   useEffect(() => {
@@ -81,7 +104,7 @@ export function MaterialSampleBulkEditor({
   return (
     <div>
       <DinaForm initialValues={{}}>
-        <ButtonBar className="justify-content-end gap-4">
+        <ButtonBar className="gap-4">
           {onPreviousClick && (
             <FormikButton
               className="btn btn-outline-secondary previous-button"
@@ -91,6 +114,14 @@ export function MaterialSampleBulkEditor({
               <DinaMessage id="goToThePreviousStep" />
             </FormikButton>
           )}
+          <div className="flex-grow-1">
+            <div className="mx-auto">
+              <MaterialSampleCustomViewSelect
+                value={sampleFormCustomView}
+                onChange={setSampleFormCustomView}
+              />
+            </div>
+          </div>
           <FormikButton
             className="btn btn-primary bulk-save-button"
             onClick={saveAll}
@@ -123,6 +154,7 @@ export function MaterialSampleBulkEditor({
               disableAutoNamePrefix={true}
               isOffScreen={!isSelected}
               reduceRendering={!isSelected}
+              {...customViewProps}
             />
           )}
         />
@@ -139,6 +171,10 @@ interface BulkSampleSaveParams {
   bulkEditCtx: BulkEditTabContextI;
 }
 
+/**
+ * Provides a "save" method to bulk save the samples in one database transaction
+ * with try/catch error handling to put the error indicators on the correct tab.
+ */
 function useBulkSampleSave({
   onSaved,
   samplePreProcessor,

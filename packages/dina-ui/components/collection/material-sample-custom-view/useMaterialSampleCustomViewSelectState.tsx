@@ -1,5 +1,5 @@
 import { PersistedResource } from "kitsu";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CustomView,
   MaterialSampleFormSectionId
@@ -16,11 +16,15 @@ export function useMaterialSampleFormCustomViewSelectState() {
   const [sampleFormCustomView, setSampleFormCustomView] =
     useState<PersistedResource<CustomView>>();
 
-  const customViewConfig = sampleFormCustomView?.id
-    ? materialSampleFormCustomViewSchema.parse(
-        sampleFormCustomView?.viewConfiguration
-      )
-    : undefined;
+  const customViewConfig = useMemo(
+    () =>
+      sampleFormCustomView?.id
+        ? materialSampleFormCustomViewSchema.parse(
+            sampleFormCustomView?.viewConfiguration
+          )
+        : undefined,
+    [sampleFormCustomView]
+  );
 
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
