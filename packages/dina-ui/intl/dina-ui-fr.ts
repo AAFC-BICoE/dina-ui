@@ -508,7 +508,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   role: "Role",
   roles: "Rôles",
   rolesPerGroup: "Rôles par groupe",
-  runWorkflow: "Exécuter le flux de travail",
   saveAll: "Enregistrer tout",
   saveAndCopyToNext: "Sauvegarder et copier au prochain",
   saveAndCreateNewMaterialSampleButton:

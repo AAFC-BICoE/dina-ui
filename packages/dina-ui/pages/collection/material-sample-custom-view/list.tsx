@@ -37,7 +37,7 @@ export default function MaterialSampleCustomViewListPage() {
           </Link>
           <Link href={`/collection/material-sample-custom-view/run?id=${id}`}>
             <a className="list-inline-item btn btn-primary">
-              <DinaMessage id="runWorkflow" />
+              <DinaMessage id="createSampleWithCustomView" />
             </a>
           </Link>
         </div>

@@ -3,6 +3,7 @@ import {
   AreYouSureModal,
   FieldSpy,
   useBulkEditTabContext,
+  useDinaFormContext,
   useModal
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -85,6 +86,8 @@ export function MaterialSampleFormNav({
   navOrder,
   onChangeNavOrder
 }: MaterialSampleFormNavProps) {
+  const { isTemplate } = useDinaFormContext();
+
   const { sortedScrollTargets } = useMaterialSampleSectionOrder({
     dataComponentState,
     navOrder
@@ -170,6 +173,11 @@ export function MaterialSampleFormNav({
               selectedView={customView}
               navOrder={navOrder ?? null}
             />
+          )}
+          {isTemplate && (
+            <div className="alert alert-warning">
+              <DinaMessage id="materialSampleNavTemplateInfo" />
+            </div>
           )}
         </nav>
       </ScrollSpyNav>

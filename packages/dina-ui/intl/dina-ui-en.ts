@@ -428,6 +428,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialOut: "Material Out",
   managedAttributes: "Managed Attributes",
   managedAttributesViews: "Managed Attributes Views",
+  managedAttributeTemplateOrderInfo:
+    "This Managed Attribute layout will be saved into the Custom View.",
   materialSample: "Material Sample",
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
@@ -435,6 +437,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
+  materialSampleNavTemplateInfo:
+    "This Data Component order will be saved into the Custom View.",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "Material Sample",
   materialSamples: "Material Samples",
@@ -544,7 +548,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   roleAction: "Role/Action",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
-  runWorkflow: "Run Workflow",
+  createSampleWithCustomView: "Create Sample with Custom View",
   saveAll: "Save All",
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",

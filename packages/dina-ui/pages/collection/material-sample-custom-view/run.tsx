@@ -34,7 +34,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
     { disabled: !actionDefinitionId }
   );
 
-  const pageTitle = `${formatMessage("runWorkflow")}${
+  const pageTitle = `${formatMessage("createSampleWithCustomView")}${
     customViewQuery.response ? `: ${customViewQuery.response.data.name}` : ""
   }`;
 

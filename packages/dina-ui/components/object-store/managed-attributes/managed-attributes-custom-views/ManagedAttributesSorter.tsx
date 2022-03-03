@@ -37,7 +37,7 @@ export function ManagedAttributesSorter({
   managedAttributeApiPath,
   valuesPath
 }: ManagedAttributeSorterProps) {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, isTemplate } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
@@ -82,6 +82,11 @@ export function ManagedAttributesSorter({
                   placeholder={formatMessage("addManagedAttribute")}
                   omitNullOption={true}
                 />
+              </div>
+            )}
+            {isTemplate && (
+              <div className="alert alert-warning">
+                <DinaMessage id="managedAttributeTemplateOrderInfo" />
               </div>
             )}
             {!readOnly && attributeKeys.length >= 2 && (
