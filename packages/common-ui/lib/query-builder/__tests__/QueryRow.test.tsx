@@ -5,8 +5,8 @@ import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { ESIndexMapping, QueryRow } from "../QueryRow";
 
 const testFieldsOptions: ESIndexMapping[] = [
-  { label: "testA", value: "testA", type: "boolean" },
-  { label: "testB", value: "testB", type: "number" }
+  { label: "testA", value: "testA", type: "boolean", path: "data.attributes" },
+  { label: "testB", value: "testB", type: "number", path: "data.attributes" }
 ];
 
 describe("QueryRow component", () => {
