@@ -144,7 +144,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   determiningAgents: "Établissement des agents",
   determiningDate: "Établissement de la date",
   dinaHomeH1: "Dina Accueil",
-  dinaUserSectionTitle: "Utilisateur Dina ",
   duplicate: "Dupliquer",
   duplicateFilesFound: "fichiers en double trouvés",
   duplicatePrimaryIdFound: "Copie du document d'identité principal trouvée ",
