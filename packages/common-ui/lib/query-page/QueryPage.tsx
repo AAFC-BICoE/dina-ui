@@ -68,16 +68,16 @@ export function QueryPage<TData extends KitsuResource>({
   defaultSort,
   onSortedChange
 }: QueryPageProps<TData>) {
-  const { apiClient, save, doOperations } = useApiClient();
+  const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
   const isFromLoadedRef = useRef<boolean>(true);
+  const isResetRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
+  // Initial saved search values for the user with its saved search names as keys
   const [initSavedSearchValues, setInitSavedSearchValues] =
     useState<Map<string, JsonValue[]>>();
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
-  const router = useRouter();
-  const isResetRef = useRef<boolean>(false);
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
   const [searchResults, setSearchResults] = useState<{
@@ -97,17 +97,8 @@ export function QueryPage<TData extends KitsuResource>({
       : initData
   });
 
-  // Retrieve the actual saved search content
+  // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
   const formValues = initSavedSearchValues?.values().next().value;
-
-  // tslint:disable: no-string-literal
-  const savedEsIndexMapping = formValues
-    ? toPairs(formValues as JsonValue[])
-        ?.filter(([key, _]) => key !== "group")?.[0]
-        ?.["queryRows"]?.filter(([_, value]) =>
-          get(value, "props.esIndexMapping")
-        )?.[0]?.[1]?.["props"]?.["esIndexMapping"]
-    : undefined;
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
@@ -280,8 +271,7 @@ export function QueryPage<TData extends KitsuResource>({
     {
       shouldRetryOnError: true,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-      suspense: !!savedEsIndexMapping
+      revalidateOnReconnect: false
     }
   );
 

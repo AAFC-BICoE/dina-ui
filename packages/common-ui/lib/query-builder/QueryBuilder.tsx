@@ -1,12 +1,11 @@
 import { FieldWrapperProps } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
-import { FieldArray, FormikContextType } from "formik";
+import { FieldArray } from "formik";
 import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
   isResetRef?: React.MutableRefObject<boolean>;
-  formik?: FormikContextType<any>;
   isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
 export function QueryBuilder({
