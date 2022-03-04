@@ -13,6 +13,8 @@ import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
 
 export function Nav() {
   const { isAdmin, rolesPerGroup } = useAccount();
@@ -30,14 +32,14 @@ export function Nav() {
 
       <header className="mb-4">
         <Container fluid={true}>
-          <div className="header-container row d-flex px-5">
+          <Row xs={1} md={2} className="header-container row d-flex px-5">
             {/* Left section of the header */}
-            <div className="text-start col-4 px-1">
+            <Col className="px-1">
               <GovernmentLogo />
-            </div>
+            </Col>
 
             {/* Right section of the header */}
-            <div className="text-end col-8 px-1">
+            <Col className="px-1 text-end">
               <ul className="list-inline mt-1 mb-1">
                 <li className="list-inline-item mr-1 my-auto">
                   <FeedbackButton />
@@ -52,8 +54,8 @@ export function Nav() {
                   <NavbarUserControl />
                 </li>
               </ul>
-            </div>
-          </div>
+            </Col>
+          </Row>
         </Container>
         <Navbar className="app-bar" expand="lg">
           <Container fluid={true} className="px-5">

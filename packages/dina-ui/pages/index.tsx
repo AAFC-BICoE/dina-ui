@@ -46,7 +46,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="collectionSectionTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/collection/collecting-event/list">
                 <a>
                   <DinaMessage id="collectingEventListTitle" />
@@ -81,7 +81,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="loanTransactionsSectionTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/loan-transaction/revisions-by-user">
                 <a>
                   <DinaMessage id="revisionsByUserPageTitle" />
@@ -101,7 +101,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="objectStoreTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/object-store/metadata/external-resource-edit">
                 <a>
                   <DinaMessage id="externalResourceListTitle" />
@@ -136,7 +136,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="agentsSectionTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/organization/list">
                 <a>
                   <DinaMessage id="organizationListTitle" />
@@ -156,7 +156,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="collectionSectionTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/seqdb/index-set/list">
                 <a>
                   <SeqdbMessage id="indexSetListTitle" />
@@ -211,7 +211,7 @@ const Home: React.FunctionComponent = () => (
               <DinaMessage id="dinaManagementSectionTitle" />
             </h2>
 
-            <Stack>
+            <Stack style={{ display: "inline-flex" }}>
               <Link href="/collection/collection-method/list">
                 <a>
                   <DinaMessage id="collectionMethodListTitle" />
