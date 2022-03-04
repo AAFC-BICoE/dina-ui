@@ -201,9 +201,16 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
+
     resp.data.body.attributes.map(key => {
+      const path = key.path;
+      const prefix = "data.attributes";
+      let attrPrefix;
+      if (path && path.includes(prefix)) {
+        attrPrefix = path.substring(prefix.length + 1);
+      }
       result.push({
-        label: key.name,
+        label: attrPrefix ? attrPrefix + "." + key.name : key.name,
         value: key.path
           ? key.path + "." + key.name
           : key.name === "id" || "type"
