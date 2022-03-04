@@ -18,6 +18,10 @@ body {
   height: 35px;
 }
 
+.btn-link {
+  text-decoration: underline !important;
+}
+
 /* Ensure the react bootstrap Nav related classes having good contrast */
 a.nav-link.dropdown-toggle,
 a.nav-link.dropdown-toggle:focus,

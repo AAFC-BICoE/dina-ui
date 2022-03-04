@@ -14,9 +14,12 @@ export function NavbarUserControl() {
         <>
           {username && (
             <>
+              {/* User Icon */}
               <span className="me-2 my-auto h4">
                 <FaUserCircle />
               </span>
+
+              {/* Profile Link */}
               <span className="me-4 my-auto h5">
                 <Link href={`/dina-user/view?id=${subject}`}>
                   <a>{username}</a>
@@ -24,6 +27,8 @@ export function NavbarUserControl() {
               </span>
             </>
           )}
+
+          {/* Logout Button */}
           <button
             type="button"
             className="btn btn-info logout-button my-auto"

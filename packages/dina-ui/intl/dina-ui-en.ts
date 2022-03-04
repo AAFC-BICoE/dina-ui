@@ -155,7 +155,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningAgents: "Determining Agents",
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
-  dinaUserSectionTitle: "Users",
+  dinaUserSectionTitle: "Management",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
@@ -412,7 +412,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   literalGeoreferencedByLabel: "Georeferenced By",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
-  loanTransactionsSectionTitle: "Loans and Transactions",
+  loanTransactionsSectionTitle: "Transactions",
   locationLabel: "Location",
   longitudeValidationError:
     "Invalid longitude: {longtitude},   \nValid longitude is between -180 to 180 for degree, and 0 to 60 for minute and second",

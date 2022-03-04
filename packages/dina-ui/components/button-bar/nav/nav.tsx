@@ -8,9 +8,11 @@ import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { useContext, useState } from "react";
+import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import Container from "react-bootstrap/Container";
 
 export function Nav() {
   const { isAdmin, rolesPerGroup } = useAccount();
@@ -27,49 +29,56 @@ export function Nav() {
       <SkipLinks />
 
       <header>
-        <div className="header-container row d-flex px-5">
-          <div className="text-start col-4">
-            <GovernmentLogo />
+        <Container fluid={true}>
+          <div className="header-container row d-flex px-5">
+            {/* Left section of the header */}
+            <div className="text-start col-4 px-1">
+              <GovernmentLogo />
+            </div>
+
+            {/* Right section of the header */}
+            <div className="text-end col-8 px-1">
+              <ul className="list-inline mt-1 mb-1">
+                <li className="list-inline-item mr-1 my-auto">
+                  <FeedbackButton />
+                </li>
+                <li className="list-inline-item px-2">&#8211;</li>
+                <li className="list-inline-item mr-0">
+                  <LanguageSelector />
+                </li>
+              </ul>
+              <ul className="list-inline">
+                <li className="list-inline-item my-auto">
+                  <NavbarUserControl />
+                </li>
+              </ul>
+            </div>
           </div>
-          <div className="text-end col-8">
-            <ul className="list-inline mt-1 mb-1">
-              <li className="list-inline-item mx-2 my-auto">
-                <a
-                  className="btn-link px-0"
-                  href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
-                >
-                  <DinaMessage id="feedbackButtonText" />
-                </a>
-              </li>
-              <li className="list-inline-item mx-2">&#8211;</li>
-              <li className="list-inline-item mx-2">
-                <LanguageSelector />
-              </li>
-            </ul>
-            <ul className="list-inline">
-              <li className="list-inline-item mx-2 my-auto">
-                <NavbarUserControl />
-              </li>
-            </ul>
-          </div>
-        </div>
-        <Navbar className="app-bar px-5" expand="sm">
-          <Navbar.Brand href="/" className="app-name">
-            <DinaMessage id="appTitle" />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <ReactNav>
-              <NavObjectStoreDropdown formatMessage={formatMessage} />
-              <NavAgentDropdown formatMessage={formatMessage} />
-              <NavSequenceDropdown formatMessage={formatMessage} />
-              <NavCollectionDropdown formatMessage={formatMessage} />
-              <NavTransactionsDropdown formatMessage={formatMessage} />
-              {showUserNav && (
-                <NavDinaUserDropdown formatMessage={formatMessage} />
-              )}
-            </ReactNav>
-          </Navbar.Collapse>
+        </Container>
+        <Navbar className="app-bar" expand="lg">
+          <Container fluid={true} className="px-5">
+            <Navbar.Brand href="/" className="app-name">
+              <DinaMessage id="appTitle" />
+            </Navbar.Brand>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              {/* Navigation menu left */}
+              <ReactNav>
+                <NavCollectionDropdown formatMessage={formatMessage} />
+                <NavTransactionsDropdown formatMessage={formatMessage} />
+                <NavObjectStoreDropdown formatMessage={formatMessage} />
+                <NavAgentDropdown formatMessage={formatMessage} />
+                <NavSequenceDropdown formatMessage={formatMessage} />
+              </ReactNav>
+
+              {/* Navigation menu right */}
+              <ReactNav style={{ marginLeft: "auto" }}>
+                {showUserNav && (
+                  <NavDinaUserDropdown formatMessage={formatMessage} />
+                )}
+              </ReactNav>
+            </Navbar.Collapse>
+          </Container>
         </Navbar>
       </header>
     </>
@@ -89,6 +98,18 @@ function SkipLinks() {
         <DinaMessage id="skipToBasicHtmlVersion" />
       </a>
     </nav>
+  );
+}
+
+function FeedbackButton() {
+  return (
+    <Button
+      variant="link"
+      className="px-0"
+      href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+    >
+      <DinaMessage id="feedbackButtonText" />
+    </Button>
   );
 }
 
@@ -329,6 +350,7 @@ function NavDinaUserDropdown({ formatMessage }) {
       onKeyDown={onKeyDown}
       onMouseLeave={hideDropdown}
       show={show}
+      className="float-right"
     >
       <NavDropdown.Item href="/dina-user/list">
         <DinaMessage id="userListTitle" />
