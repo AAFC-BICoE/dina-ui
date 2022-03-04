@@ -1,4 +1,4 @@
-import { FieldWrapperProps, useApiClient } from "..";
+import { FieldWrapperProps } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
 import { FieldArray, FormikContextType } from "formik";
 import moment from "moment";

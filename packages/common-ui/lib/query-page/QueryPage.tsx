@@ -287,18 +287,20 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
-  function loadSavedSearch(savedSearchName, savedSearches) {
+  function loadSavedSearch(savedSearchName, userPreferences) {
     isFromLoadedRef.current = true;
     const initValus = new Map().set(
       savedSearchName,
-      savedSearches
-        ? savedSearches[0]?.savedSearches?.[username as any]?.[savedSearchName]
+      userPreferences
+        ? userPreferences[0]?.savedSearches?.[username as any]?.[
+            savedSearchName
+          ]
         : [{}]
     );
     setInitSavedSearchValues(initValus);
   }
 
-  function saveSearch(isDefault, userPreferences, searchName) {
+  async function saveSearch(isDefault, userPreferences, searchName) {
     let newSavedSearches;
     const mySavedSearches = userPreferences;
 
@@ -307,6 +309,14 @@ export function QueryPage<TData extends KitsuResource>({
       mySavedSearches?.[0]?.savedSearches &&
       Object.keys(mySavedSearches?.[0]?.savedSearches)?.length > 0
     ) {
+      // Remove irrelevent formik field array properties before save
+      pageRef.current?.values.queryRows?.map(val => {
+        delete val.props;
+        delete val.key;
+        delete val._store;
+        delete val._owner;
+        delete val.ref;
+      });
       mySavedSearches[0].savedSearches[username as any][
         `${isDefault ? "default" : searchName}`
       ] = pageRef.current?.values;
@@ -327,27 +337,31 @@ export function QueryPage<TData extends KitsuResource>({
       } as any,
       type: "user-preference"
     };
-
-    save([saveArgs], { apiBaseUrl: "/user-api" }).then(() => router.reload());
+    await save([saveArgs], { apiBaseUrl: "/user-api" });
+    loadSavedSearch(isDefault ? "default" : searchName, userPreferences);
   }
 
   async function deleteSavedSearch(
     savedSearchName: string,
-    savedSearches: UserPreference[]
+    userPreferences: UserPreference[]
   ) {
-    const mySavedSearch = savedSearches;
-    delete mySavedSearch?.[username as any]?.[`${savedSearchName}`];
+    const userSavedSearches =
+      userPreferences[0]?.savedSearches?.[username as any];
+    delete userSavedSearches?.[`${savedSearchName}`];
 
-    await doOperations(
-      [
-        {
-          op: "DELETE",
-          path: `user-preference/${savedSearches?.[0].id}`
-        }
-      ],
-      { apiBaseUrl: "/user-api" }
-    );
-    router.reload();
+    const saveArgs: SaveArgs<UserPreference> = {
+      resource: {
+        id: userPreferences?.[0]?.id,
+        userId: subject,
+        savedSearches: userPreferences?.[0]?.savedSearches
+      } as any,
+      type: "user-preference"
+    };
+
+    await save([saveArgs], { apiBaseUrl: "/user-api" });
+    if (userSavedSearches && toPairs(userSavedSearches).length > 0) {
+      loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+    }
   }
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
