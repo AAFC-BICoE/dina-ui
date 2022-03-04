@@ -9,6 +9,7 @@ import {
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType } from "formik";
+import { useDinaFormContext } from "../formik-connected/DinaForm";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
@@ -16,6 +17,8 @@ export interface QueryRowProps {
   removeRow?: (index) => void;
   name: string;
   isResetRef?: React.MutableRefObject<boolean>;
+  formik?: FormikContextType<any>;
+  isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
 
 export interface ESIndexMapping {
@@ -65,8 +68,16 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { esIndexMapping, index, addRow, removeRow, name, isResetRef } =
-    queryRowProps;
+  const { initialValues } = useDinaFormContext();
+  const {
+    esIndexMapping,
+    index,
+    addRow,
+    removeRow,
+    name,
+    isResetRef,
+    isFromLoadedRef
+  } = queryRowProps;
   const initVisibility = {
     text: false,
     date: false,
@@ -75,7 +86,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     numberRange: false,
     dateRange: false
   };
-  const fieldType = esIndexMapping?.[0]?.type;
+  const typeFromFieldName = initialValues.queryRows?.[
+    index
+  ]?.fieldName?.substring(
+    initialValues.queryRows?.[index]?.fieldName?.indexOf("(") + 1,
+    initialValues.queryRows?.[index]?.fieldName?.indexOf(")")
+  );
+  const fieldType = isFromLoadedRef
+    ? typeFromFieldName
+    : esIndexMapping?.[0]?.type;
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }
@@ -96,7 +115,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     ...initVisibility,
     ...visibilityOverridden
   });
-
   const initState = {
     matchValue: null,
     matchType: "match",
@@ -106,7 +124,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   };
 
   function onSelectionChange(value, formik, idx) {
+    // When selection is changed, the reset filter or loaded from saved search query should be reset
     if (isResetRef) isResetRef.current = false;
+    if (isFromLoadedRef) isFromLoadedRef.current = false;
     const computedVal = typeof value === "object" ? value.name : value;
     const type = computedVal.substring(
       computedVal.indexOf("(") + 1,

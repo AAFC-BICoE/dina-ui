@@ -1,16 +1,19 @@
 import { FieldWrapperProps, useApiClient } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
-import { FieldArray } from "formik";
+import { FieldArray, FormikContextType } from "formik";
 import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
   isResetRef?: React.MutableRefObject<boolean>;
+  formik?: FormikContextType<any>;
+  isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
 export function QueryBuilder({
   name,
   esIndexMapping,
-  isResetRef
+  isResetRef,
+  isFromLoadedRef
 }: QueryBuilderProps) {
   return (
     <FieldArray name={name}>
@@ -26,6 +29,7 @@ export function QueryBuilder({
               removeRow={removeRow}
               addRow={addRow}
               isResetRef={isResetRef}
+              isFromLoadedRef={isFromLoadedRef}
             />
           );
           // initialize the logic switch value to be "and"//
@@ -70,6 +74,7 @@ export function QueryBuilder({
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
                 isResetRef={isResetRef}
+                isFromLoadedRef={isFromLoadedRef}
               />
             ))
           : null;

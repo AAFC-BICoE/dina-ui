@@ -70,7 +70,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient, save, doOperations } = useApiClient();
   const { formatMessage } = useIntl();
-  const refreshPage = useRef<boolean>(true);
+  const isFromLoadedRef = useRef<boolean>(true);
   const pageRef = useRef<FormikProps<any>>(null);
   const [initSavedSearchValues, setInitSavedSearchValues] =
     useState<Map<string, JsonValue[]>>();
@@ -203,6 +203,9 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
+    // After a search, the reset filter or loaded from saved search query should be reset
+    isResetRef.current = false;
+    isFromLoadedRef.current = false;
     const queryDSL = transformQueryToDSL(submittedValues);
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
@@ -285,7 +288,7 @@ export function QueryPage<TData extends KitsuResource>({
   if (loading || error) return <></>;
 
   function loadSavedSearch(savedSearchName, savedSearches) {
-    refreshPage.current = true;
+    isFromLoadedRef.current = true;
     const initValus = new Map().set(
       savedSearchName,
       savedSearches
@@ -342,7 +345,7 @@ export function QueryPage<TData extends KitsuResource>({
           path: `user-preference/${savedSearches?.[0].id}`
         }
       ],
-      { apiBaseUrl: "/objectstore-api" }
+      { apiBaseUrl: "/user-api" }
     );
     router.reload();
   }
@@ -350,7 +353,7 @@ export function QueryPage<TData extends KitsuResource>({
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
   const initialValues =
-    refreshPage.current && formValues && toPairs(formValues).length > 0
+    isFromLoadedRef.current && formValues && toPairs(formValues).length > 0
       ? formValues
       : pageRef.current?.values
       ? pageRef.current?.values
@@ -365,8 +368,6 @@ export function QueryPage<TData extends KitsuResource>({
             }
           ]
         };
-
-  refreshPage.current = false;
 
   return (
     <DinaForm
@@ -384,6 +385,7 @@ export function QueryPage<TData extends KitsuResource>({
         name="queryRows"
         esIndexMapping={sortedData}
         isResetRef={isResetRef}
+        isFromLoadedRef={isFromLoadedRef}
       />
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField name="group" className="col-md-4" />
