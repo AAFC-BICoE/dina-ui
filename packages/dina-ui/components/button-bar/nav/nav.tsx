@@ -21,7 +21,7 @@ export function Nav() {
   const { formatMessage } = useDinaIntl();
 
   // Editable if current user is dina-admin, or a collection manager of any group:
-  const showUserNav =
+  const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
       ?.flatMap(it => it)
       ?.includes("collection-manager") || isAdmin;
@@ -75,7 +75,7 @@ export function Nav() {
 
               {/* Navigation menu right */}
               <ReactNav style={{ marginLeft: "auto" }}>
-                {showUserNav && (
+                {showManagementNavigation && (
                   <NavDinaManagementDropdown formatMessage={formatMessage} />
                 )}
               </ReactNav>
@@ -336,7 +336,7 @@ function NavSequenceDropdown({ formatMessage }) {
 function NavDinaManagementDropdown({ formatMessage }) {
   const { show, showDropdown, hideDropdown, onKeyDown, onKeyDownLastItem } =
     menuDisplayControl();
-  const { subject } = useAccount();
+  const { isAdmin } = useAccount();
   return (
     <NavDropdown
       title={formatMessage("dinaManagementSectionTitle")}
@@ -358,7 +358,9 @@ function NavDinaManagementDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/institution/list">
         <DinaMessage id="institutionListTitle" />
       </NavDropdown.Item>
-      {/* Managed Attributes page here. */}
+      <NavDropdown.Item href="/managed-attribute/list">
+        <DinaMessage id="managedAttributes" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/object-store/object-subtype/list">
         <DinaMessage id="objectSubtypeListTitle" />
       </NavDropdown.Item>
@@ -369,13 +371,19 @@ function NavDinaManagementDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/project/list">
         <DinaMessage id="projectListTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/storage-unit-type/list">
+      <NavDropdown.Item
+        href="/collection/storage-unit-type/list"
+        onKeyDown={!isAdmin ? onKeyDownLastItem : undefined}
+      >
         <DinaMessage id="storageUnitTypeListTitle" />
       </NavDropdown.Item>
-      {/* Admin only */}
-      <NavDropdown.Item href="/dina-user/list" onKeyDown={onKeyDownLastItem}>
-        <DinaMessage id="userListTitle" />
-      </NavDropdown.Item>
+
+      {/* Admins only can view users. */}
+      {isAdmin && (
+        <NavDropdown.Item href="/dina-user/list" onKeyDown={onKeyDownLastItem}>
+          <DinaMessage id="userListTitle" />
+        </NavDropdown.Item>
+      )}
     </NavDropdown>
   );
 }
@@ -385,8 +393,8 @@ export function Footer() {
   return (
     <footer id="wb-info" className="mt-3" style={{ zIndex: 0 }}>
       <div className="brand">
-        <div className="container">
-          <div className="row">
+        <Container fluid={true}>
+          <div className="row px-5">
             <nav className="col-md-10 ftr-urlt-lnk py-3">
               <ul>
                 <li>
@@ -414,14 +422,15 @@ export function Footer() {
                 )}
               </div>
             </nav>
-            <div className="col-6 col-md-3 col-lg-2 text-end">
+            <div className="col-6 col-md-3 col-lg-2 text-end pt-2">
               <img
                 src="https://www.canada.ca/etc/designs/canada/cdts/gcweb/v4_0_32/assets/wmms-blk.svg"
                 alt={formatMessage("governmentOfCanadaSymbol")}
+                className="mt-4"
               />
             </div>
           </div>
-        </div>
+        </Container>
       </div>
     </footer>
   );

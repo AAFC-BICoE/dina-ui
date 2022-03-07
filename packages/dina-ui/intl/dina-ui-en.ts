@@ -119,6 +119,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   coordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
   copyFromParentLabel: "Copy From Parent",
   countryLabel: "Country",
+  createNew: "Create New:",
   creatNewWorkflow: "Create New",
   createAndAssign: "Create & Assign",
   createCustomView: "Create Custom View",
