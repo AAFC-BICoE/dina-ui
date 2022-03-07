@@ -5,8 +5,13 @@ import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
+  isResetRef?: React.MutableRefObject<boolean>;
 }
-export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
+export function QueryBuilder({
+  name,
+  esIndexMapping,
+  isResetRef
+}: QueryBuilderProps) {
   return (
     <FieldArray name={name}>
       {fieldArrayProps => {
@@ -20,6 +25,7 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
+              isResetRef={isResetRef}
             />
           );
           // initialize the logic switch value to be "and"//
@@ -63,6 +69,7 @@ export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
                 addRow={addRow}
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
+                isResetRef={isResetRef}
               />
             ))
           : null;

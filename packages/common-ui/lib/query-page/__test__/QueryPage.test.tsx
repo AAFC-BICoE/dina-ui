@@ -123,6 +123,9 @@ describe("QueryPage component", () => {
       .find(Select)
       .prop<any>("onChange")({ value: "false" });
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // simulate select a group from dropdown
     wrapper
       .find("SelectField[name='group']")
@@ -162,40 +165,57 @@ describe("QueryPage component", () => {
       ]
     ]);
 
-    expect(mockPost).lastCalledWith(
-      "search-api/search-ws/search",
-      {
-        query: {
-          bool: {
-            filter: {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      createdOn: "2022-01-25"
+    expect(mockPost.mock.calls).toEqual([
+      [
+        "search-api/search-ws/search",
+        {
+          query: {
+            bool: {
+              filter: {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        createdOn: "2022-01-25"
+                      }
+                    },
+                    {
+                      term: {
+                        allowDuplicateName: "false"
+                      }
                     }
-                  },
-                  {
-                    term: {
-                      allowDuplicateName: "false"
-                    }
-                  }
-                ]
-              }
-            },
-            must: {
-              match: {
-                "data.attributes.group": "testGroup"
+                  ]
+                }
+              },
+              must: {
+                match: {
+                  "data.attributes.group": "testGroup"
+                }
               }
             }
           }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
         }
-      },
-      {
-        params: {
-          indexName: "testIndex"
+      ],
+      [
+        "search-api/search-ws/search",
+        {
+          query: {
+            match: {
+              "data.attributes.group": "testGroup"
+            }
+          }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
         }
-      }
-    );
+      ]
+    ]);
   });
 });
