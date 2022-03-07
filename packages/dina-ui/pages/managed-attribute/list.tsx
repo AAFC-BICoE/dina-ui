@@ -1,10 +1,6 @@
-import {
-  ButtonBar,
-  ColumnDefinition,
-  CommonMessage,
-  descriptionCell,
-  ListPageLayout
-} from "common-ui";
+import { ColumnDefinition, descriptionCell, ListPageLayout } from "common-ui";
+import { useState } from "react";
+import { useRouter } from "next/router";
 import Container from "react-bootstrap/Container";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
@@ -21,12 +17,71 @@ import {
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../types/collection-api/resources/ManagedAttribute";
 
-const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
-const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
-const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
-
 export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
+
+  // Get default tab from URL query.
+  const defaultTab: string = router.query.tab
+    ? String(router.query.tab)
+    : "collection";
+
+  // Recorded tab key state.
+  const [selectedTabKey, setSelectedTabKey] = useState(defaultTab);
+
+  return (
+    <div>
+      <Head title={formatMessage("managedAttributes")} />
+      <Nav />
+      <main role="main">
+        <Container fluid={true} className="px-5">
+          <h1 id="wb-cont">
+            <DinaMessage id="managedAttributes" />
+          </h1>
+
+          <Tabs
+            activeKey={selectedTabKey}
+            onSelect={key => (key ? setSelectedTabKey(key) : null)}
+            id="managedAttributeListTab"
+            className="mb-3"
+          >
+            <Tab eventKey="collection" title="Collections">
+              <CollectionAttributeListView />
+            </Tab>
+            <Tab eventKey="objectStore" title="Object Store">
+              <ObjectStoreAttributeListView />
+            </Tab>
+            <Tab eventKey="transaction" title="Transactions">
+              <TransactionAttributeListView />
+            </Tab>
+          </Tabs>
+        </Container>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+interface CreateButtonProps {
+  href: string;
+}
+
+function CreateNewSection({ href }: CreateButtonProps) {
+  return (
+    <Card bg="light" className="mb-4">
+      <Card.Body>
+        <Button href={href} variant="info" className="mx-1 my-1">
+          <DinaMessage id="createNewLabel" />
+        </Button>
+      </Card.Body>
+    </Card>
+  );
+}
+
+function CollectionAttributeListView() {
+  const { formatMessage } = useDinaIntl();
+
+  const COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
 
   const COLLECTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<
     ManagedAttribute<CollectionModuleType>
@@ -79,6 +134,26 @@ export default function ManagedAttributesListPage() {
     descriptionCell("multilingualDescription")
   ];
 
+  return (
+    <>
+      {/* Quick create menu */}
+      <CreateNewSection href="/collection/managed-attribute/edit" />
+
+      <ListPageLayout
+        filterAttributes={COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES}
+        id="collections-module-managed-attribute-list"
+        queryTableProps={{
+          columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
+          path: "collection-api/managed-attribute"
+        }}
+      />
+    </>
+  );
+}
+
+function ObjectStoreAttributeListView() {
+  const OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
+
   const OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
     [
       {
@@ -118,6 +193,26 @@ export default function ManagedAttributesListPage() {
       }
     ];
 
+  return (
+    <>
+      {/* Quick create menu */}
+      <CreateNewSection href="/object-store/managedAttributesView/detailsView" />
+
+      <ListPageLayout
+        filterAttributes={OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES}
+        id="object-store-module-managed-attribute-list"
+        queryTableProps={{
+          columns: OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS,
+          path: "objectstore-api/managed-attribute"
+        }}
+      />
+    </>
+  );
+}
+
+function TransactionAttributeListView() {
+  const TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES = ["name"];
+
   const TRANSACTION_ATTRIBUTES_LIST_COLUMNS: ColumnDefinition<ManagedAttribute>[] =
     [
       {
@@ -156,63 +251,18 @@ export default function ManagedAttributesListPage() {
     ];
 
   return (
-    <div>
-      <Head title={formatMessage("loanTransactionManagedAttributeListTitle")} />
-      <Nav />
-      <main role="main">
-        <Container fluid={true} className="px-5">
-          <h1 id="wb-cont">
-            <DinaMessage id="managedAttributes" />
-          </h1>
+    <>
+      {/* Quick create menu */}
+      <CreateNewSection href="/loan-transaction/managed-attribute/edit" />
 
-          <Tabs
-            defaultActiveKey="profile"
-            id="uncontrolled-tab-example"
-            className="mb-3"
-          >
-            <Tab eventKey="home" title="Collections">
-              {/* Quick create menu */}
-              <Card bg="light" className="mb-4">
-                <Card.Body>
-                  <Button variant="info" className="mx-1 my-1">
-                    Create New
-                  </Button>
-                </Card.Body>
-              </Card>
-
-              <ListPageLayout
-                filterAttributes={COLLECTIONS_ATTRIBUTES_FILTER_ATTRIBUTES}
-                id="collections-module-managed-attribute-list"
-                queryTableProps={{
-                  columns: COLLECTION_ATTRIBUTES_LIST_COLUMNS,
-                  path: "collection-api/managed-attribute"
-                }}
-              />
-            </Tab>
-            <Tab eventKey="profile" title="Object Store">
-              <ListPageLayout
-                filterAttributes={OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES}
-                id="object-store-module-managed-attribute-list"
-                queryTableProps={{
-                  columns: OBJECT_STORE_ATTRIBUTES_LIST_COLUMNS,
-                  path: "objectstore-api/managed-attribute"
-                }}
-              />
-            </Tab>
-            <Tab eventKey="contact" title="Transactions">
-              <ListPageLayout
-                filterAttributes={TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES}
-                id="loan-transaction-module-managed-attribute-list"
-                queryTableProps={{
-                  columns: TRANSACTION_ATTRIBUTES_LIST_COLUMNS,
-                  path: "loan-transaction-api/managed-attribute"
-                }}
-              />
-            </Tab>
-          </Tabs>
-        </Container>
-      </main>
-      <Footer />
-    </div>
+      <ListPageLayout
+        filterAttributes={TRANSACTION_ATTRIBUTES_FILTER_ATTRIBUTES}
+        id="loan-transaction-module-managed-attribute-list"
+        queryTableProps={{
+          columns: TRANSACTION_ATTRIBUTES_LIST_COLUMNS,
+          path: "loan-transaction-api/managed-attribute"
+        }}
+      />
+    </>
   );
 }

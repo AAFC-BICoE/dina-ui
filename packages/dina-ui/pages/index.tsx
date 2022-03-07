@@ -29,7 +29,7 @@ export function Home() {
           <Card bg="light" className="mb-4">
             <Card.Body>
               <span className="mx-3">
-                <DinaMessage id="createNew" />
+                <DinaMessage id="createNewLabel" />:
               </span>
 
               <Button variant="info" className="mx-1 my-1">
