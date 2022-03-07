@@ -127,7 +127,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <NotPubliclyReleasableWarning />
               <MaterialSampleStateWarning />
               {buttonBar}
               <h1 id="wb-cont">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MaterialSample } from "../../../types/collection-api";
+import { NotPubliclyReleasableWarning } from "../../tag-editor/NotPubliclyReleasableWarning";
 
 export interface MaterialSampleBreadCrumbProps {
   disableLastLink?: boolean;
@@ -35,7 +36,10 @@ export function MaterialSampleBreadCrumb({
               <a>{displayName}</a>
             </Link>
           ) : (
-            displayName
+            <div className="d-flex flex-row align-items-center">
+              <span>{displayName}</span>
+              <NotPubliclyReleasableWarning />
+            </div>
           )}
         </strong>
       </li>
