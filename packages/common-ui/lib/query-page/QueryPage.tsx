@@ -138,14 +138,7 @@ export function QueryPage<TData extends KitsuResource>({
   function resetForm(_, formik) {
     isResetRef.current = true;
     const resetToVal = {
-      queryRows: [
-        {
-          fieldName: sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
-          matchType: "match",
-          boolean: "true",
-          date: moment().format()
-        }
-      ],
+      queryRows: [{}],
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
@@ -260,15 +253,7 @@ export function QueryPage<TData extends KitsuResource>({
     <DinaForm
       initialValues={{
         group: groupNames?.[0],
-        queryRows: [
-          {
-            fieldName:
-              sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
-            matchType: "match",
-            boolean: "true",
-            date: moment().format()
-          }
-        ]
+        queryRows: [{}]
       }}
       onSubmit={onSubmit}
     >
@@ -283,7 +268,13 @@ export function QueryPage<TData extends KitsuResource>({
         isResetRef={isResetRef}
       />
       <DinaFormSection horizontal={"flex"}>
-        <GroupSelectField name="group" className="col-md-4" />
+        <GroupSelectField
+          name="group"
+          className="col-md-4"
+          onChange={(value, formik) =>
+            onSubmit({ submittedValues: { ...formik.values, group: value } })
+          }
+        />
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
         <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>

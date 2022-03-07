@@ -162,12 +162,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       };
     });
 
-  const queryRowOptions = [
-    ...simpleRowOptions,
-    ...(nestedRowOptions?.length > 0
-      ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
-      : [])
-  ];
+  const queryRowOptions = simpleRowOptions
+    ? [
+        ...simpleRowOptions,
+        ...(nestedRowOptions?.length > 0
+          ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
+          : [])
+      ]
+    : [];
   function fieldProps(fieldName: string, idx: number) {
     return {
       name: `${name}[${idx}].${fieldName}`
