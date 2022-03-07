@@ -1,7 +1,6 @@
 import { FieldWrapperProps } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
-import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
@@ -37,25 +36,6 @@ export function QueryBuilder({
               elements?.length ?? 0
             }].compoundQueryType`,
             "and"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
-            esIndexMapping?.[0]?.label
-          );
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,
-            "match"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].boolean`,
-            "true"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].date`,
-            moment().format()
           );
         }
 

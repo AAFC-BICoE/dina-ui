@@ -8,8 +8,7 @@ import {
 } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
-import { FormikContextType } from "formik";
-import { useDinaFormContext } from "../formik-connected/DinaForm";
+import { FormikContextType, useFormikContext } from "formik";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
@@ -68,7 +67,7 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { initialValues } = useDinaFormContext();
+  const { values } = useFormikContext();
   const {
     esIndexMapping,
     index,
@@ -86,15 +85,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     numberRange: false,
     dateRange: false
   };
-  const typeFromFieldName = initialValues.queryRows?.[
+  const typeFromFieldName = (values as any)?.queryRows?.[
     index
   ]?.fieldName?.substring(
-    initialValues.queryRows?.[index]?.fieldName?.indexOf("(") + 1,
-    initialValues.queryRows?.[index]?.fieldName?.indexOf(")")
+    (values as any)?.queryRows?.[index]?.fieldName?.indexOf("(") + 1,
+    (values as any)?.queryRows?.[index]?.fieldName?.indexOf(")")
   );
-  const fieldType = isFromLoadedRef
-    ? typeFromFieldName
-    : esIndexMapping?.[0]?.type;
+
+  const fieldType = typeFromFieldName ?? esIndexMapping?.[0]?.type;
+
   const visibilityOverridden =
     fieldType === "boolean"
       ? { boolean: true }

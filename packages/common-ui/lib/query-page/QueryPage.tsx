@@ -70,7 +70,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
-  const isFromLoadedRef = useRef<boolean>(true);
+  const isFromLoadedRef = useRef<boolean>(false);
   const isResetRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
   // Initial saved search values for the user with its saved search names as keys
@@ -85,6 +85,7 @@ export function QueryPage<TData extends KitsuResource>({
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+  const router = useRouter();
 
   const {
     CheckBoxField,
@@ -344,7 +345,7 @@ export function QueryPage<TData extends KitsuResource>({
     await save([saveArgs], { apiBaseUrl: "/user-api" });
     if (userSavedSearches && toPairs(userSavedSearches).length > 0) {
       loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
-    }
+    } else router.reload();
   }
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
