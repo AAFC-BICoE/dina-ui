@@ -155,20 +155,7 @@ export function QueryPage<TData extends KitsuResource>({
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
-
-    const submitVal = {
-      queryRows: [
-        {
-          fieldName: sortedData?.[0]?.value,
-          matchType: "match",
-          boolean: "true",
-          date: moment().format(),
-          type: sortedData?.[0]?.type
-        }
-      ],
-      group: groupNames?.[0]
-    };
-    onSubmit({ submittedValues: submitVal });
+    onSubmit({ submittedValues: resetToVal });
   }
 
   async function searchES(queryDSL) {
