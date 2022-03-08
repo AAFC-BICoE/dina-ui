@@ -70,6 +70,7 @@ export function SavedSearch(props: SavedSearchProps) {
         value={selectedOption}
       />
       <button
+        type="button"
         className="btn btn-primary"
         onClick={() =>
           loadSavedSearch(
@@ -84,6 +85,7 @@ export function SavedSearch(props: SavedSearchProps) {
         {formatMessage("load")}
       </button>
       <button
+        type="button"
         className="btn btn-secondary"
         onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
       >
@@ -91,6 +93,7 @@ export function SavedSearch(props: SavedSearchProps) {
       </button>
       <button
         className="btn btn-danger"
+        type="button"
         onClick={() =>
           deleteSavedSearch(
             (curSelected as any) ?? selectedSearch,

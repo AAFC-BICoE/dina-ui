@@ -26,7 +26,7 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { JsonValue } from "type-fest";
-import { get, toPairs } from "lodash";
+import { toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
 import moment from "moment";
@@ -343,22 +343,24 @@ export function QueryPage<TData extends KitsuResource>({
     };
 
     await save([saveArgs], { apiBaseUrl: "/user-api" });
-    if (userSavedSearches && toPairs(userSavedSearches).length > 0) {
-      loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
-    } else router.reload();
+    loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
   }
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
-  const initialValues =
-    isFromLoadedRef.current && formValues && toPairs(formValues).length > 0
+  const initialValues = isFromLoadedRef.current
+    ? formValues && toPairs(formValues).length > 0
       ? formValues
-      : pageRef.current?.values
-      ? pageRef.current?.values
       : {
           group: groupNames?.[0],
           queryRows: [{}]
-        };
+        }
+    : pageRef.current?.values
+    ? pageRef.current?.values
+    : {
+        group: groupNames?.[0],
+        queryRows: [{}]
+      };
 
   return (
     <DinaForm
