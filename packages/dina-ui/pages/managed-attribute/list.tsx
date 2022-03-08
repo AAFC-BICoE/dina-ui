@@ -42,16 +42,27 @@ export default function ManagedAttributesListPage() {
           <Tabs
             activeKey={selectedTabKey}
             onSelect={key => (key ? setSelectedTabKey(key) : null)}
+            mountOnEnter={true}
+            unmountOnExit={true}
             id="managedAttributeListTab"
             className="mb-3"
           >
-            <Tab eventKey="collection" title="Collections">
+            <Tab
+              eventKey="collection"
+              title={formatMessage("collectionListTitle")}
+            >
               <CollectionAttributeListView />
             </Tab>
-            <Tab eventKey="objectStore" title="Object Store">
+            <Tab
+              eventKey="objectStore"
+              title={formatMessage("objectStoreTitle")}
+            >
               <ObjectStoreAttributeListView />
             </Tab>
-            <Tab eventKey="transaction" title="Transactions">
+            <Tab
+              eventKey="transaction"
+              title={formatMessage("loanTransactionsSectionTitle")}
+            >
               <TransactionAttributeListView />
             </Tab>
           </Tabs>
@@ -136,6 +147,10 @@ function CollectionAttributeListView() {
 
   return (
     <>
+      <h3 className="mb-3">
+        <DinaMessage id="collectionListTitle" />
+      </h3>
+
       {/* Quick create menu */}
       <CreateNewSection href="/collection/managed-attribute/edit" />
 
@@ -195,6 +210,10 @@ function ObjectStoreAttributeListView() {
 
   return (
     <>
+      <h3 className="mb-3">
+        <DinaMessage id="objectStoreTitle" />
+      </h3>
+
       {/* Quick create menu */}
       <CreateNewSection href="/object-store/managedAttributesView/detailsView" />
 
@@ -252,6 +271,10 @@ function TransactionAttributeListView() {
 
   return (
     <>
+      <h3 className="mb-3">
+        <DinaMessage id="loanTransactionsSectionTitle" />
+      </h3>
+
       {/* Quick create menu */}
       <CreateNewSection href="/loan-transaction/managed-attribute/edit" />
 

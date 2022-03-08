@@ -519,7 +519,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   primaryId: "Primary ID",
   proceedToCreateMetadata: "Proceed to Create Metadata",
   projectAttachments: "Project Attachments",
-  projectListTitle: "Project",
+  projectListTitle: "Projects",
   projects: "Projects",
   reception: "Reception",
   removeAssertionLabel: "Remove this GeoReference",

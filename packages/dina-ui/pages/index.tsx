@@ -199,6 +199,11 @@ export function Home() {
                     <SeqdbMessage id="productListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/protocol/list">
+                  <a>
+                    <SeqdbMessage id="protocolListTitle" />
+                  </a>
+                </Link>
                 <Link href="/seqdb/region/list">
                   <a>
                     <SeqdbMessage id="regionListTitle" />
@@ -235,12 +240,21 @@ export function Home() {
                       <DinaMessage id="collectionListTitle" />
                     </a>
                   </Link>
+                  <Link href="/collection/managed-attributes-view/list">
+                    <a>
+                      <DinaMessage id="managedAttributesViews" />
+                    </a>
+                  </Link>
                   <Link href="/collection/institution/list">
                     <a>
                       <DinaMessage id="institutionListTitle" />
                     </a>
                   </Link>
-                  {/* Managed attributes link here */}
+                  <Link href="/managed-attribute/list">
+                    <a>
+                      <DinaMessage id="managedAttributes" />
+                    </a>
+                  </Link>
                   <Link href="/object-store/object-subtype/list">
                     <a>
                       <DinaMessage id="objectSubtypeListTitle" />
@@ -269,11 +283,6 @@ export function Home() {
                       </a>
                     </Link>
                   )}
-                  <Link href="/collection/workflow-template/list">
-                    <a>
-                      <DinaMessage id="workflowTemplateListTitle" />
-                    </a>
-                  </Link>
                 </Stack>
               </Col>
             )}
