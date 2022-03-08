@@ -8,6 +8,7 @@ import {
   ListPageLayout,
   QueryPage,
   stringArrayCell,
+  useAccount,
   useQuery,
   withResponse
 } from "common-ui";
@@ -184,10 +185,12 @@ export function SampleListLayout({
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
   const [queryKey, setQueryKey] = useState("");
+  const { groupNames } = useAccount();
   const queryState = useQuery<MaterialSample[]>(
     {
       path: "collection-api/material-sample",
-      include: "collection"
+      include: "collection",
+      filter: { rsql: `group=in=(${groupNames?.[0]})` }
     },
     {}
   );

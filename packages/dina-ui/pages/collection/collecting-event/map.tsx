@@ -1,7 +1,6 @@
 import { withRouter } from "next/router";
 import React from "react";
-import { Footer, Head, Nav } from "../../../components";
-import { CollectingEventMap } from "../../../components/collection/event-map/CollectingEventMap";
+import { Footer, Head, Nav, CollectingEventMap } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 
 export function CollectingEventDetailsPage() {

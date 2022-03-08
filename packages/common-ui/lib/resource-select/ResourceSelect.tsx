@@ -257,6 +257,7 @@ export function ResourceSelect<TData extends KitsuResource>({
         "&:hover": { borderColor: "rgb(148, 26, 37)" }
       })
     }),
+    menu: base => ({ ...base, zIndex: 1050 }),
     // Make the menu's height fit the resource options and the action options:
     menuList: base => ({ ...base, maxHeight: "400px" }),
     group: (base, gProps) => ({

@@ -10,29 +10,25 @@ jest.mock("use-debounce", () => ({
 
 const ONE_PERSON_RESPONSE = {
   data: {
-    hits: {
-      hits: [
-        {
-          sourceAsMap: {
-            data: {
-              id: "100",
-              type: "person",
-              attributes: {
-                displayName: "Person from Search API"
-              }
+    hits: [
+      {
+        source: {
+          data: {
+            id: "100",
+            type: "person",
+            attributes: {
+              displayName: "Person from Search API"
             }
           }
         }
-      ]
-    }
+      }
+    ]
   }
 };
 
 const EMPTY_SEARCH_RESPONSE = {
   data: {
-    hits: {
-      hits: []
-    }
+    hits: []
   }
 };
 

@@ -28,7 +28,15 @@ export function transformQueryToDSL(
     const value =
       rowToBuild.type === "boolean"
         ? rowToBuild.boolean
-        : rowToBuild.type === "number"
+        : rowToBuild.type === "long" ||
+          rowToBuild.type === "short" ||
+          rowToBuild.type === "integer" ||
+          rowToBuild.type === "byte" ||
+          rowToBuild.type === "double" ||
+          rowToBuild.type === "float" ||
+          rowToBuild.type === "half_float" ||
+          rowToBuild.type === "scaled_float" ||
+          rowToBuild.type === "unsiged_long"
         ? rowToBuild.number
         : rowToBuild.type === "date"
         ? rowToBuild.date
@@ -80,10 +88,20 @@ export function transformQueryToDSL(
       queryRow =>
         queryRow.fieldName &&
         ((queryRow.type === "boolean" && queryRow.boolean) ||
-          (queryRow.type === "number" && queryRow.number) ||
+          ((queryRow.type === "long" ||
+            queryRow.type === "short" ||
+            queryRow.type === "integer" ||
+            queryRow.type === "byte" ||
+            queryRow.type === "double" ||
+            queryRow.type === "float" ||
+            queryRow.type === "half_float" ||
+            queryRow.type === "scaled_float" ||
+            queryRow.type === "unsiged_long") &&
+            queryRow.number) ||
           (queryRow.type === "date" && queryRow.date) ||
           ((queryRow.type === "text" || queryRow.type === "keyword") &&
-            queryRow.matchType))
+            queryRow.matchType &&
+            queryRow.matchValue))
     )
     .map((queryRow, idx) => {
       if (submittedValues.queryRows.length === 1)

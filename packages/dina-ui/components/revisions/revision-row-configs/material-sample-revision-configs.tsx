@@ -1,13 +1,12 @@
-import { DateView, KeyValueTable } from "common-ui";
+import { KeyValueTable } from "common-ui";
 import Link from "next/link";
-import { DinaUser } from "packages/dina-ui/types/user-api/resources/DinaUser";
+import { DinaUser } from "../../../types/user-api/resources/DinaUser";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
   CollectingEvent,
   Collection,
   MaterialSample,
-  MaterialSampleType,
   StorageUnit
 } from "../../../types/collection-api";
 import { Project } from "../../../types/collection-api/resources/Project";

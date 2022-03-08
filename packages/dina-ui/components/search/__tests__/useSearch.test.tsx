@@ -4,21 +4,19 @@ describe("doSearch function", () => {
   it("Fetches the search result data.", async () => {
     const mockGet = jest.fn<any, any>(async () => ({
       data: {
-        hits: {
-          hits: [
-            {
-              sourceAsMap: {
-                data: {
-                  id: "100",
-                  type: "person",
-                  attributes: {
-                    displayName: "Mat Poff"
-                  }
+        hits: [
+          {
+            source: {
+              data: {
+                id: "100",
+                type: "person",
+                attributes: {
+                  displayName: "Mat Poff"
                 }
               }
             }
-          ]
-        }
+          }
+        ]
       }
     }));
 

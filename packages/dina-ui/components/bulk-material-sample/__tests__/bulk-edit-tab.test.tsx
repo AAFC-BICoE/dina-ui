@@ -56,6 +56,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/vocabulary/degreeOfEstablishment":
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
+    case "collection-api/custom-view":
       return { data: [] };
   }
 });
