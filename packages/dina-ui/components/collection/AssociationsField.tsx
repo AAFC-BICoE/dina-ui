@@ -1,5 +1,5 @@
 import { FieldSet, TextField } from "common-ui";
-import { CatalogueOfLifeNameField, GlobalNamesField } from ".";
+import { CatalogueOfLifeNameField } from "..";
 import { HostOrganism } from "../../../dina-ui/types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSampleAssociationsField } from "./MaterialSampleAssociationsField";

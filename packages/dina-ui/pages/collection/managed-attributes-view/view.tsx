@@ -1,10 +1,10 @@
 import { DinaForm } from "common-ui";
-import { ViewPageLayout } from "../../../components";
-import { CustomView } from "../../../types/collection-api";
 import {
   ManagedAttributesViewFormLayout,
-  useManagedAttributesView
-} from "./edit";
+  ViewPageLayout
+} from "../../../components";
+import { CustomView } from "../../../types/collection-api";
+import { useManagedAttributesView } from "./edit";
 
 export default function ManagedAttributesViewDetailsPage() {
   return (

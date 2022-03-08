@@ -20,7 +20,7 @@ const checkboxProps = {
     marginLeft: "15px",
     width: "20px",
     // So clicking the checkbox takes priority over the surrounding label:
-    zIndex: 1000
+    zIndex: 1
   },
   tabIndex: -1,
   type: "checkbox"

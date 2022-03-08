@@ -19,10 +19,13 @@ import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
 import * as yup from "yup";
-import { CollectionSelectField, GroupSelectField } from "..";
+import {
+  CollectionSelectField,
+  GroupSelectField,
+  useLastUsedCollection
+} from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { useLastUsedCollection } from "../collection";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
