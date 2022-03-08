@@ -2,7 +2,7 @@ import { CheckBoxWithoutWrapper, useDinaFormContext } from "common-ui";
 import { Field } from "formik";
 import { clamp } from "lodash";
 import { ChangeEvent, useRef } from "react";
-import { GeoReferenceAssertionRow } from ".";
+import { GeoReferenceAssertionRow } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   CollectingEvent,

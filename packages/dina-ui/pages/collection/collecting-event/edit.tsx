@@ -9,14 +9,16 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { Footer, Head, Nav } from "../../../components";
 import {
   CollectingEventFormLayout,
   DEFAULT_VERBATIM_COORDSYS_KEY,
   DEFAULT_VERBATIM_SRS_KEY,
+  Footer,
+  Head,
+  Nav,
   useCollectingEventQuery,
   useCollectingEventSave
-} from "../../../components/collection";
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 

@@ -291,8 +291,8 @@ function NavCollectionDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/managed-attribute/list">
         <DinaMessage id="managedAttributes" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/workflow-template/list">
-        <DinaMessage id="workflowTemplateListTitle" />
+      <NavDropdown.Item href="/collection/material-sample-custom-view/list">
+        <DinaMessage id="materialSampleCustomViews" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/extension/list">
         <DinaMessage id="extensionListTitle" />

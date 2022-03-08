@@ -2,9 +2,8 @@ import { LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { compact } from "lodash";
 import { Promisable } from "type-fest";
-import { MaterialSampleBulkEditor } from "..";
+import { MaterialSampleBulkEditor, useMaterialSampleQuery } from "..";
 import { MaterialSample } from "../../types/collection-api";
-import { useMaterialSampleQuery } from "../collection";
 
 export interface ExistingMaterialSampleBulkEditorProps {
   ids: string[];

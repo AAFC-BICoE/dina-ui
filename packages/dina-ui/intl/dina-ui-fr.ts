@@ -115,7 +115,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériaux",
   createSplitWorkflow: "Créer un fractionnement",
   createStorage: "Créer un espace d'entreposage",
-  createWorkflowTemplateTitle: "Créer un modèle de flux des travaux",
   customPlaceName: "Nom de lieu personnalisé",
   dataComponents: "Éléments de données",
   dataEntryLabel: "Saisie de données",
@@ -169,7 +168,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Modifier les métadonnées de la pièce jointe sélectionnée",
   editStorageUnitTitle: "Modifier l’unité de stockage",
   editStorageUnitTypeTitle: "Modifier le type de stockage",
-  editWorkflowTemplateTitle: "Modifier le modèle de flux de travail",
   elevationInMeters: "Élévation en mètres",
   enableDateRangeLabel: "Activer la plage de dates",
   endEventDateTime: "Date/heure de fin d’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
@@ -510,7 +508,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   role: "Role",
   roles: "Rôles",
   rolesPerGroup: "Rôles par groupe",
-  runWorkflow: "Exécuter le flux de travail",
   saveAll: "Enregistrer tout",
   saveAndCopyToNext: "Sauvegarder et copier au prochain",
   saveAndCreateNewMaterialSampleButton:
@@ -572,12 +569,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   storageUnitType: "Type d’unité de stockage",
   storageUnitTypeListTitle: "Types d’unités de stockage",
   storagesCreatedByMe: "Stockages créés par moi",
-  switchToActionType: 'Passer à "{actionType}".',
   tags: "Étiquettes",
-  templateNameMandatoryErrorMsg:
-    "Veuillez entrer un nom de modèle de flux de travaux.",
-  thisWillLoseAllDataEnteredInThisStep:
-    "Cette opération entraîne la perte de toutes les données saisies au cours de cette étape.",
   thisWillRemoveYourTemplate:
     "Cette opération supprimera les champs du modèle sélectionnés et les valeurs par défaut.",
   thumbnail: "Vignette",
@@ -616,8 +608,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Un problème est survenu lors de la tentative de lecture de la feuille de calcul téléchargée.",
   workbookUploadInstructions:
     "Faites glisser et déposez une feuille de calcul ici ou cliquez pour ouvrir la boîte de dialogue de navigation.",
-  workflowTemplateListTitle: "Modèles de flux de travail",
-  workflowTemplateTitle: "Modèle de flux des travaux",
   year: "Année",
   yearMonth: "Année-Mois",
   yearMonthDay: "Année-Mois-Jour",
