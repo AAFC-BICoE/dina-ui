@@ -10,7 +10,6 @@ interface QueryBuilderProps extends FieldWrapperProps {
 export function QueryBuilder({
   name,
   esIndexMapping,
-  isResetRef,
   isFromLoadedRef
 }: QueryBuilderProps) {
   return (
@@ -26,7 +25,6 @@ export function QueryBuilder({
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
-              isResetRef={isResetRef}
               isFromLoadedRef={isFromLoadedRef}
             />
           );
@@ -52,7 +50,6 @@ export function QueryBuilder({
                 addRow={addRow}
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
-                isResetRef={isResetRef}
                 isFromLoadedRef={isFromLoadedRef}
               />
             ))

@@ -71,7 +71,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
   const isFromLoadedRef = useRef<boolean>(false);
-  const isResetRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
   // Initial saved search values for the user with its saved search names as keys
   const [initSavedSearchValues, setInitSavedSearchValues] =
@@ -151,7 +150,6 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   function resetForm(_, formik) {
-    isResetRef.current = true;
     const resetToVal = {
       queryRows: [{}],
       group: groupNames?.[0]
@@ -188,8 +186,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
-    // After a search, the reset filter or loaded from saved search query should be reset
-    isResetRef.current = false;
+    // After a search, isFromLoaded should be reset
     isFromLoadedRef.current = false;
     const queryDSL = transformQueryToDSL(submittedValues);
     // No search when query has no content in it
@@ -377,7 +374,6 @@ export function QueryPage<TData extends KitsuResource>({
       <QueryBuilder
         name="queryRows"
         esIndexMapping={sortedData}
-        isResetRef={isResetRef}
         isFromLoadedRef={isFromLoadedRef}
       />
       <DinaFormSection horizontal={"flex"}>
