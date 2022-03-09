@@ -39,13 +39,9 @@ export function StorageUnitBreadCrumb({
       {!hideThisUnit && (
         <li className="breadcrumb-item">
           <strong>
-            {storageUnit.id && !disableLastLink && newTab ? (
+            {storageUnit.id && !disableLastLink ? (
               <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-                <a target="_blank">{unitDisplayName}</a>
-              </Link>
-            ) : storageUnit.id && !disableLastLink ? (
-              <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-                <a>{unitDisplayName}</a>
+                <a target={newTab ? "_blank" : undefined}>{unitDisplayName}</a>
               </Link>
             ) : (
               unitDisplayName
