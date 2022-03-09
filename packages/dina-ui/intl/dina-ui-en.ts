@@ -541,6 +541,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
   resetNamesToDefaultValues: "Reset Names to Default Values",
+  restrictions: "Restrictions",
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
