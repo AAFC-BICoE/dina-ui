@@ -28,7 +28,6 @@ import { SavedSearch } from "./SavedSearch";
 import { JsonValue } from "type-fest";
 import { cloneDeep, toPairs } from "lodash";
 import { FormikProps } from "formik";
-import { useRouter } from "next/router";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
 import { AreYouSureModal, FormikButton, useAccount, useModal } from "..";
