@@ -33,7 +33,7 @@ export function StorageSearchSelector({
     {
       Cell: ({ original }) => (
         <Link href={`/collection/storage-unit/view?id=${original.id}`}>
-          <a>{storageUnitDisplayName(original)}</a>
+          <a target="_blank">{storageUnitDisplayName(original)}</a>
         </Link>
       ),
       width: 400,
