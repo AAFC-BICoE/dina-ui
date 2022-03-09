@@ -311,8 +311,28 @@ describe("QueryPage component", () => {
         "search-api/search-ws/search",
         {
           query: {
-            match: {
-              "data.attributes.group": "testGroup"
+            bool: {
+              filter: {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        createdOn: "2022-01-25"
+                      }
+                    },
+                    {
+                      term: {
+                        allowDuplicateName: "false"
+                      }
+                    }
+                  ]
+                }
+              },
+              must: {
+                match: {
+                  "data.attributes.group": "testGroup"
+                }
+              }
             }
           }
         },

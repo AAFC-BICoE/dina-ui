@@ -26,7 +26,7 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { JsonValue } from "type-fest";
-import { toPairs } from "lodash";
+import { cloneDeep, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
 import moment from "moment";
@@ -367,9 +367,10 @@ export function QueryPage<TData extends KitsuResource>({
         <GroupSelectField
           name="group"
           className="col-md-4"
-          onChange={(value, formik) =>
-            onSubmit({ submittedValues: { ...formik.values, group: value } })
-          }
+          onChange={(value, formik) => {
+            const resetToVal = cloneDeep(formik.values);
+            onSubmit({ submittedValues: { ...resetToVal, group: value } });
+          }}
         />
       </DinaFormSection>
       <div className="d-flex justify-content-end mb-3">
