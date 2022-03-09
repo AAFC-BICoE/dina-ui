@@ -415,6 +415,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
+  loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
   loanTransactionsSectionTitle: "Transactions",
@@ -478,6 +479,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   moveAllContent: " Move All Content",
   multiple: "Multiple",
   multipleUnits: "Multiple Units",
+  multipleMaterialSamples: "Multiple Material Samples",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
   nestedStorageUnits: "Nested Storage Units",

@@ -486,7 +486,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   primaryId: "No d'identification principal",
   proceedToCreateMetadata: "Passez à la création de métadonnées",
   projectAttachments: "Pièces jointes liées au projet",
-  projectListTitle: "Projets",
   projects: "Projets",
   reception: "Réception",
   removeAssertionLabel: "Supprimer ce géoréférencement",

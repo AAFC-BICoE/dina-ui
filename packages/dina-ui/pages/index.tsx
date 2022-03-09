@@ -32,20 +32,40 @@ export function Home() {
                 <DinaMessage id="createNewLabel" />:
               </span>
 
-              <Button variant="info" className="mx-1 my-1">
-                Material Sample
+              <Button
+                href="/collection/material-sample/edit"
+                variant="info"
+                className="mx-1 my-1"
+              >
+                <DinaMessage id="materialSample" />
               </Button>
-              <Button variant="info" className="mx-1 my-1">
-                Multiple Material Samples
+              <Button
+                href="/collection/material-sample/bulk-create"
+                variant="info"
+                className="mx-1 my-1"
+              >
+                <DinaMessage id="multipleMaterialSamples" />
               </Button>
-              <Button variant="info" className="mx-1 my-1">
-                Collecting Event
+              <Button
+                href="/collection/collecting-event/edit"
+                variant="info"
+                className="mx-1 my-1"
+              >
+                <DinaMessage id="collectingEvent" />
               </Button>
-              <Button variant="info" className="mx-1 my-1">
-                Transaction
+              <Button
+                href="/loan-transaction/transaction/edit"
+                variant="info"
+                className="mx-1 my-1"
+              >
+                <DinaMessage id="loanTransaction" />
               </Button>
-              <Button variant="info" className="mx-1 my-1">
-                Upload Files
+              <Button
+                href="/object-store/upload"
+                variant="info"
+                className="mx-1 my-1"
+              >
+                <DinaMessage id="uploadPageTitle" />
               </Button>
             </Card.Body>
           </Card>
@@ -54,7 +74,7 @@ export function Home() {
           <Row lg={3} md={2} xs={1} className="mb-5">
             {/* Collection Links */}
             <Col className="mb-4">
-              <h2 className="mb-4">
+              <h2>
                 <DinaMessage id="collectionSectionTitle" />
               </h2>
 
