@@ -64,13 +64,15 @@ export function SavedSearch(props: SavedSearchProps) {
 
   return (
     <div className="d-flex gap-2">
-      <Select
-        aria-label="Saved Search"
-        className="saved-search"
-        options={savedSearchNamesOptions}
-        onChange={onSelectedSavedSearchChanged}
-        value={selectedOption}
-      />
+      <div style={{ width: "400px" }}>
+        <Select
+          aria-label="Saved Search"
+          className="saved-search"
+          options={savedSearchNamesOptions}
+          onChange={onSelectedSavedSearchChanged}
+          value={selectedOption}
+        />
+      </div>
       <button
         type="button"
         className="btn btn-primary"
