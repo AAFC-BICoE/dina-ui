@@ -5,6 +5,7 @@ import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { SelectOption } from "../formik-connected/SelectField";
 import { UserPreference } from "packages/dina-ui/types/user-api";
+import { useFormikContext } from "formik";
 
 export interface SavedSearchProps {
   loadSavedSearch: (
@@ -37,6 +38,7 @@ export function SavedSearch(props: SavedSearchProps) {
     userPreferences
   } = props;
   const { formatMessage } = useDinaIntl();
+  const formik = useFormikContext();
   const [curSelected, setCurSelected] = useState(null);
 
   const { openSavedSearchModal } = useSavedSearchModal();
@@ -88,6 +90,7 @@ export function SavedSearch(props: SavedSearchProps) {
         type="button"
         className="btn btn-secondary"
         onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
+        disabled={!formik.dirty}
       >
         {formatMessage("save")}
       </button>

@@ -530,6 +530,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeManagedAttributeValue:
     "Remove Managed Attribute Value: {attributeNames}",
   removeOrganism: "Remove Organism",
+  removeSavedSearch: "Remove Saved Search",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",

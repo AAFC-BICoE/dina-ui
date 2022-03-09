@@ -29,10 +29,9 @@ import { JsonValue } from "type-fest";
 import { cloneDeep, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { useRouter } from "next/router";
-import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
-import { FormikButton, useAccount } from "..";
+import { AreYouSureModal, FormikButton, useAccount, useModal } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface QueryPageProps<TData extends KitsuResource> {
@@ -70,6 +69,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
+  const { openModal } = useModal();
   const isFromLoadedRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
   // Initial saved search values for the user with its saved search names as keys
@@ -84,7 +84,6 @@ export function QueryPage<TData extends KitsuResource>({
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
-  const router = useRouter();
 
   const {
     CheckBoxField,
@@ -313,22 +312,36 @@ export function QueryPage<TData extends KitsuResource>({
     savedSearchName: string,
     userPreferences: UserPreference[]
   ) {
-    const userSavedSearches =
-      userPreferences[0]?.savedSearches?.[username as any];
-    delete userSavedSearches?.[`${savedSearchName}`];
+    async function deleteSearch() {
+      const userSavedSearches =
+        userPreferences[0]?.savedSearches?.[username as any];
+      delete userSavedSearches?.[`${savedSearchName}`];
 
-    const saveArgs: SaveArgs<UserPreference> = {
-      resource: {
-        id: userPreferences?.[0]?.id,
-        userId: subject,
-        savedSearches: userPreferences?.[0]?.savedSearches
-      } as any,
-      type: "user-preference"
-    };
+      const saveArgs: SaveArgs<UserPreference> = {
+        resource: {
+          id: userPreferences?.[0]?.id,
+          userId: subject,
+          savedSearches: userPreferences?.[0]?.savedSearches
+        } as any,
+        type: "user-preference"
+      };
 
-    await save([saveArgs], { apiBaseUrl: "/user-api" });
-    loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+      await save([saveArgs], { apiBaseUrl: "/user-api" });
+      loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+    }
+
+    openModal(
+      <AreYouSureModal
+        actionMessage={
+          <>
+            <DinaMessage id="removeSavedSearch" /> {`${savedSearchName ?? ""}`}{" "}
+          </>
+        }
+        onYesButtonClicked={deleteSearch}
+      />
+    );
   }
+
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
@@ -373,35 +386,39 @@ export function QueryPage<TData extends KitsuResource>({
           }}
         />
       </DinaFormSection>
-      <div className="d-flex justify-content-end mb-3">
-        <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
-          <DinaMessage id="resetFilters" />
-        </FormikButton>
-      </div>
-      {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
-        const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
-          username as any
-        ] as any;
-        return (
-          <SavedSearch
-            userPreferences={userPreferences}
-            loadSavedSearch={loadSavedSearch}
-            deleteSavedSearch={deleteSavedSearch}
-            saveSearch={saveSearch}
-            savedSearchNames={
-              initialSavedSearches ? Object.keys(initialSavedSearches) : []
-            }
-            initialSavedSearches={initialSavedSearches}
-            selectedSearch={
-              initSavedSearchValues
-                ? initSavedSearchValues.keys().next().value
-                : undefined
-            }
-          />
-        );
-      })}
 
+      <div className="d-flex mb-3">
+        <div className="flex-grow-1">
+          {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
+            const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
+              username as any
+            ] as any;
+            return (
+              <SavedSearch
+                userPreferences={userPreferences}
+                loadSavedSearch={loadSavedSearch}
+                deleteSavedSearch={deleteSavedSearch}
+                saveSearch={saveSearch}
+                savedSearchNames={
+                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
+                }
+                initialSavedSearches={initialSavedSearches}
+                selectedSearch={
+                  initSavedSearchValues
+                    ? initSavedSearchValues.keys().next().value
+                    : undefined
+                }
+              />
+            );
+          })}
+        </div>
+        <div>
+          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+          <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
+            <DinaMessage id="resetFilters" />
+          </FormikButton>
+        </div>
+      </div>
       <div
         className="query-table-wrapper"
         role="search"
