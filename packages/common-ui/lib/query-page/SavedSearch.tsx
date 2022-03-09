@@ -92,7 +92,6 @@ export function SavedSearch(props: SavedSearchProps) {
         type="button"
         className="btn btn-secondary"
         onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
-        disabled={!formik.dirty}
       >
         {formatMessage("save")}
       </button>
