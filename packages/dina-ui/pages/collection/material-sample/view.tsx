@@ -12,6 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { RestrictionField } from "packages/dina-ui/components/collection/material-sample/RestrictionField";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -194,6 +195,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   />
                 </div>
               )}
+              {materialSample.isRestricted && <RestrictionField />}
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}

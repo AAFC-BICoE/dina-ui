@@ -49,6 +49,7 @@ import {
   MatrialSampleFormEnabledFields,
   VisibleManagedAttributesConfig
 } from "./MaterialSampleForm";
+import { RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -117,6 +118,21 @@ export function useMaterialSampleQuery(id?: string | null) {
               }
             )
           );
+        }
+        // Convert to seperated list
+        if (data.restrictionFieldsExtension && data.isRestricted) {
+          data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_animal_rg"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[1]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_human_rg"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[2]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "cfia_ppc"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[3]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_cl"
+          )?.[0];
         }
       }
     }
@@ -244,6 +260,15 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasRestrictionsTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...RESTRICTIONS_FIELDS
+      )
+    );
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
@@ -317,6 +342,18 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableRestrictions, setEnableRestrictions] = useState(
+    Boolean(
+      hasRestrictionsTemplate ||
+        // Show the restriction section if a field is set or the field is enabled:
+        RESTRICTIONS_FIELDS.some(
+          restrictFieldName =>
+            !isEmpty(materialSample?.[restrictFieldName]) ||
+            enabledFields?.materialSample?.includes(restrictFieldName)
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -332,7 +369,9 @@ export function useMaterialSampleSave({
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
-    setEnableAssociations
+    setEnableAssociations,
+    enableRestrictions,
+    setEnableRestrictions
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
@@ -392,6 +431,21 @@ export function useMaterialSampleSave({
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
+    // Set the restrictedExtensions
+    submittedValues.restrictionFieldsExtension = [
+      ...(submittedValues.cfia_ppc ? [submittedValues.cfia_ppc] : []),
+      ...(submittedValues.phac_animal_rg
+        ? [submittedValues.phac_animal_rg]
+        : []),
+      ...(submittedValues.phac_cl ? [submittedValues.phac_cl] : []),
+      ...(submittedValues.phac_human_rg ? [submittedValues.phac_human_rg] : [])
+    ];
+
+    delete submittedValues.phac_animal_rg;
+    delete submittedValues.phac_cl;
+    delete submittedValues.phac_human_rg;
+    delete submittedValues.cfia_ppc;
+
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,

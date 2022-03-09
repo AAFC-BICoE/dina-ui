@@ -48,6 +48,7 @@ import { PreparationField } from "./PreparationField";
 import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
+import { RestrictionField } from "./RestrictionField";
 
 /**
  * The enabled fields if creating from a template.
@@ -314,6 +315,9 @@ export function MaterialSampleForm({
           />
         </FieldSet>
       ),
+    "restriction-section": id =>
+      !reduceRendering &&
+      dataComponentState.enableRestrictions && <RestrictionField id={id} />,
     "scheduled-actions-section": id =>
       !reduceRendering &&
       dataComponentState.enableScheduledActions && (

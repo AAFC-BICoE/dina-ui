@@ -26,13 +26,13 @@ export function FieldExtensionSelectField(
   const fieldExtensionQuery = useQuery<FieldExtension>(query?.() as any);
 
   return withResponse(fieldExtensionQuery, ({ data: fieldExtension }) => {
-    const extensionValue: ExtensionValue = {
-      extKey: fieldExtension.extension.key,
-      extTerm: fieldExtension.extension.fields?.[0]?.term,
-      extVersion: fieldExtension.extension.version
-    };
     const options = fieldExtension?.extension.fields?.[0]?.acceptedValues?.map(
       val => {
+        const extensionValue: ExtensionValue = {
+          extKey: fieldExtension.extension.key,
+          extTerm: fieldExtension.extension.fields?.[0]?.term,
+          extVersion: fieldExtension.extension.version
+        };
         extensionValue.value = val;
         return {
           label: val,
@@ -47,7 +47,9 @@ export function FieldExtensionSelectField(
           function onChange(newValue) {
             setValue(newValue.value);
           }
-          const selectedValue = options?.filter(opt => opt.value === value);
+          const selectedValue = options?.filter(
+            opt => opt.value.value === value.value
+          );
           return (
             <SortableSelect
               onChange={onChange}
