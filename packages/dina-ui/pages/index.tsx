@@ -185,7 +185,7 @@ export function Home() {
             {/* Sequencing Links */}
             <Col className="mb-4">
               <h2>
-                <DinaMessage id="collectionSectionTitle" />
+                <SeqdbMessage id="seqdbTitle" />
               </h2>
 
               <Stack style={{ display: "inline-flex" }}>
