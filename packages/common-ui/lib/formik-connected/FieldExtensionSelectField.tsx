@@ -48,7 +48,7 @@ export function FieldExtensionSelectField(
             setValue(newValue.value);
           }
           const selectedValue = options?.filter(
-            opt => opt.value.value === value.value
+            opt => opt.value.value === value?.value
           );
           return (
             <SortableSelect

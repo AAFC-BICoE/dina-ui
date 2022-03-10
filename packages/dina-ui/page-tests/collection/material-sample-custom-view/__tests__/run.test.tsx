@@ -254,9 +254,16 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
+              attachment: undefined,
+              restrictionFieldsExtension: [],
+              scheduledAction: undefined,
               storageUnit: { id: null, type: "storage-unit" },
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
@@ -339,7 +346,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-
+              attachment: undefined,
+              restrictionFieldsExtension: [],
+              scheduledAction: undefined,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
@@ -457,6 +470,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               preparationAttachment: undefined,
+              attachment: undefined,
+              restrictionFieldsExtension: [],
+              scheduledAction: undefined,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               managedAttributes: {},
               relationships: {
                 organism: { data: [] },
