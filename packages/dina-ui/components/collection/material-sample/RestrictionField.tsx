@@ -19,13 +19,10 @@ export const RESTRICTIONS_FIELDS = [
 ] as const;
 
 /** Blank values for all Preparation fields. */
-export const BLANK_RESTRICTION: Required<
-  Pick<InputResource<MaterialSample>, typeof RESTRICTIONS_FIELDS[number]>
+export const BLANK_RESTRICTION: Pick<
+  InputResource<MaterialSample>,
+  typeof RESTRICTIONS_FIELDS[number]
 > = Object.seal({
-  phac_animal_rg: null,
-  phac_human_rg: null,
-  cfia_ppc: null,
-  phac_cl: null,
   isRestricted: false,
   restrictionRemarks: null,
   restrictionFieldsExtension: null

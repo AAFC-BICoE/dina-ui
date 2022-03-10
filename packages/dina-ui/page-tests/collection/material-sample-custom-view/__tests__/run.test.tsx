@@ -2,6 +2,7 @@ import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import {
   BLANK_PREPARATION,
+  BLANK_RESTRICTION,
   MaterialSampleFormCustomViewConfig
 } from "../../../../components";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
@@ -255,11 +256,11 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               attachment: undefined,
-              restrictionFieldsExtension: [],
               scheduledAction: undefined,
               storageUnit: { id: null, type: "storage-unit" },
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
               projects: undefined,
               organism: undefined,
               organismsIndividualEntry: undefined,
@@ -347,7 +348,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               },
               storageUnit: { id: null, type: "storage-unit" },
               attachment: undefined,
-              restrictionFieldsExtension: [],
               scheduledAction: undefined,
               projects: undefined,
               organism: undefined,
@@ -355,6 +355,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               organismsQuantity: undefined,
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
               preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
@@ -469,9 +470,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
               preparationAttachment: undefined,
               attachment: undefined,
-              restrictionFieldsExtension: [],
               scheduledAction: undefined,
               projects: undefined,
               organism: undefined,

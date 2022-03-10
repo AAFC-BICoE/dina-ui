@@ -328,14 +328,11 @@ describe("BulkEditTabWarning", () => {
         SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map(sample => ({
           resource: {
             attachment: undefined,
-            isRestricted: false,
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
             preparationAttachment: undefined,
             projects: undefined,
-            restrictionFieldsExtension: [],
-            restrictionRemarks: null,
             id: sample.id,
             type: sample.type,
             relationships: {}
@@ -394,6 +391,7 @@ describe("BulkEditTabWarning", () => {
             determiner: undefined
           }
         ],
+        group: undefined,
         type: "organism"
       },
       type: "organism"
@@ -411,14 +409,11 @@ describe("BulkEditTabWarning", () => {
             id: sample.id,
             type: sample.type,
             attachment: undefined,
-            isRestricted: false,
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
             preparationAttachment: undefined,
             projects: undefined,
-            restrictionFieldsExtension: [],
-            restrictionRemarks: null,
             relationships: {
               organism: {
                 data: [{ id: "11111", type: "organism" }]
@@ -512,14 +507,11 @@ describe("BulkEditTabWarning", () => {
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
           resource: {
             attachment: undefined,
-            isRestricted: false,
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
             preparationAttachment: undefined,
             projects: undefined,
-            restrictionFieldsExtension: [],
-            restrictionRemarks: null,
             id: sample.id,
             relationships: {
               organism: { data: [{ id: "11111", type: "organism" }] }

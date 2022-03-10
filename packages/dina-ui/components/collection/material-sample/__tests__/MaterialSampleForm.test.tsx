@@ -235,7 +235,17 @@ describe("Material Sample Edit Page", () => {
               managedAttributes: {},
               publiclyReleasable: true, // Default value
               relationships: { organism: { data: [] } },
-              type: "material-sample"
+              type: "material-sample",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
+              isRestricted: false,
+              restrictionFieldsExtension: null,
+              restrictionRemarks: null,
+              scheduledAction: undefined
             },
             type: "material-sample"
           }
@@ -303,6 +313,16 @@ describe("Material Sample Edit Page", () => {
               collection: undefined,
               publiclyReleasable: true, // Default value
               type: "material-sample",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
+              isRestricted: false,
+              restrictionFieldsExtension: null,
+              restrictionRemarks: null,
+              scheduledAction: undefined,
               relationships: {
                 organism: { data: [] }
               }
