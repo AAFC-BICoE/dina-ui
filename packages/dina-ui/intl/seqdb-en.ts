@@ -87,7 +87,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   selectButtonText: "Select",
   selectSamples: "Select Molecular Samples",
   selectedSamplesTitle: "Selected Molecular Samples",
-  seqdbTitle: "Sequence Database",
+  seqdbTitle: "Sequencing",
   shearedStatus: "Sheared",
   shearingLabel: "Shearing",
   sizeSelectedStatus: "Size Selection Added",

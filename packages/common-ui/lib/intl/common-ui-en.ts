@@ -136,6 +136,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   typeHereToSearch: "Type here to search.",
   typeToSearchOrChooseFromNewest: "Type to search or choose from newest",
   uiAppVersion: "UI Application Version: {version}",
+  update: "Update",
   valueLabel: "Value",
   valueSourceType: "Value Source Type",
   view: "View",

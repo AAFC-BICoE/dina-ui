@@ -39,17 +39,11 @@ export function Tooltip({
   link,
   linkText,
   image,
-  altImage,
-  setVisible,
-  visible
+  altImage
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
-  let [popupVisible, setPopupVisible] = useState(false);
-  if (setVisible && visible) {
-    setPopupVisible = setVisible;
-    popupVisible = visible;
-  }
+  const [popupVisible, setPopupVisible] = useState(false);
 
   // Determine if a tooltip message needs to be displayed.
   const tooltipMessage =
@@ -100,7 +94,20 @@ export function Tooltip({
         visible={popupVisible}
       >
         <span>
-          {visibleElement ?? (
+          {visibleElement ? (
+            <span
+              onKeyUp={e =>
+                e.key === "Escape"
+                  ? setPopupVisible(false)
+                  : setPopupVisible(true)
+              }
+              onMouseOver={() => setPopupVisible(true)}
+              onMouseOut={() => setPopupVisible(false)}
+              onBlur={() => setPopupVisible(false)}
+            >
+              {visibleElement}
+            </span>
+          ) : (
             <img
               src="/static/images/iconInformation.gif"
               alt={id ? formatMessage({ id }) : ""}

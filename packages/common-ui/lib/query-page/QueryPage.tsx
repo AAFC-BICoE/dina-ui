@@ -1,8 +1,8 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { Column, SortingRule, TableProps } from "react-table";
-import { useApiClient } from "../api-client/ApiClientContext";
+import ReactTable, { Column, TableProps, SortingRule } from "react-table";
+import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
@@ -16,7 +16,7 @@ import {
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-
+import { useQuery, withResponse } from "../api-client/useQuery";
 import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
@@ -24,9 +24,13 @@ import {
 import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
-import moment from "moment";
+import { SavedSearch } from "./SavedSearch";
+import { JsonValue } from "type-fest";
+import { cloneDeep, toPairs } from "lodash";
+import { FormikProps } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
-import { FormikButton, useAccount } from "..";
+import { UserPreference } from "../../../dina-ui/types/user-api";
+import { AreYouSureModal, FormikButton, useAccount, useModal } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 
 export interface QueryPageProps<TData extends KitsuResource> {
@@ -62,10 +66,16 @@ export function QueryPage<TData extends KitsuResource>({
   defaultSort,
   onSortedChange
 }: QueryPageProps<TData>) {
-  const { apiClient } = useApiClient();
-  const { groupNames } = useAccount();
+  const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
-  const isResetRef = useRef<boolean>(false);
+  const { openModal } = useModal();
+  const isFromLoadedRef = useRef<boolean>(false);
+  const pageRef = useRef<FormikProps<any>>(null);
+  // Initial saved search values for the user with its saved search names as keys
+  const [initSavedSearchValues, setInitSavedSearchValues] =
+    useState<Map<string, JsonValue[]>>();
+  const { username, subject } = useAccount();
+  const { groupNames } = useAccount();
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
   const [searchResults, setSearchResults] = useState<{
@@ -73,7 +83,6 @@ export function QueryPage<TData extends KitsuResource>({
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
-  const [visible, setVisible] = useState(false);
 
   const {
     CheckBoxField,
@@ -85,6 +94,9 @@ export function QueryPage<TData extends KitsuResource>({
       ? searchResults?.results
       : initData
   });
+
+  // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
+  const formValues = initSavedSearchValues?.values().next().value;
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
@@ -136,33 +148,12 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   function resetForm(_, formik) {
-    isResetRef.current = true;
     const resetToVal = {
-      queryRows: [
-        {
-          fieldName: sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
-          matchType: "match",
-          boolean: "true",
-          date: moment().format()
-        }
-      ],
+      queryRows: [{}],
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
-
-    const submitVal = {
-      queryRows: [
-        {
-          fieldName: sortedData?.[0]?.value,
-          matchType: "match",
-          boolean: "true",
-          date: moment().format(),
-          type: sortedData?.[0]?.type
-        }
-      ],
-      group: groupNames?.[0]
-    };
-    onSubmit({ submittedValues: submitVal });
+    onSubmit({ submittedValues: resetToVal });
   }
 
   async function searchES(queryDSL) {
@@ -180,6 +171,8 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
+    // After a search, isFromLoaded should be reset
+    isFromLoadedRef.current = false;
     const queryDSL = transformQueryToDSL(submittedValues);
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
@@ -201,37 +194,56 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-    resp.data.body.attributes.map(key => {
-      result.push({
-        label: key.name,
-        value: key.path
-          ? key.path + "." + key.name
-          : key.name === "id" || "type"
-          ? "data." + key.name
-          : key.name,
-        type: key.type,
-        path: key.path
-      });
-    });
 
-    resp.data.body.relationships.attributes.map(key => {
-      result.push({
-        label: key.path?.includes(".")
-          ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
-          : key.name,
-        value: key.path
-          ? key.path + "." + key.name
-          : key.name === "id" || "type"
-          ? "data." + key.name
-          : key.name,
-        type: key.type,
-        path: key.path,
-        parentPath: resp.data.body.relationships.path,
-        parentName: resp.data.body.relationships.value
+    resp.data.body.attributes
+      .filter(key => key.name !== "type")
+      .map(key => {
+        const path = key.path;
+        const prefix = "data.attributes";
+        let attrPrefix;
+        if (path && path.includes(prefix)) {
+          attrPrefix = path.substring(prefix.length + 1);
+        }
+        result.push({
+          label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+          value: key.path
+            ? key.path + "." + key.name
+            : key.name === "id"
+            ? "data." + key.name
+            : key.name,
+          type: key.type,
+          path: key.path
+        });
       });
-    });
+
+    resp.data.body.relationships.attributes
+      .filter(key => key.name !== "type")
+      .map(key => {
+        result.push({
+          label: key.path?.includes(".")
+            ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
+            : key.name,
+          value: key.path
+            ? key.path + "." + key.name
+            : key.name === "id"
+            ? "data." + key.name
+            : key.name,
+          type: key.type,
+          path: key.path,
+          parentPath: resp.data.body.relationships.path,
+          parentName: resp.data.body.relationships.value
+        });
+      });
     return result;
   }
+
+  const savedSearchQuery = useQuery<UserPreference[]>({
+    path: "user-api/user-preference",
+    filter: {
+      userId: subject as FilterParam
+    },
+    page: { limit: 1000 }
+  });
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
@@ -252,24 +264,116 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
+  function loadSavedSearch(savedSearchName, userPreferences) {
+    isFromLoadedRef.current = true;
+    const initValus = new Map().set(
+      savedSearchName,
+      userPreferences
+        ? userPreferences[0]?.savedSearches?.[username as any]?.[
+            savedSearchName
+          ]
+        : [{}]
+    );
+    setInitSavedSearchValues(initValus);
+  }
+
+  async function saveSearch(isDefault, userPreferences, searchName) {
+    let newSavedSearches;
+    const mySavedSearches = userPreferences;
+
+    if (
+      mySavedSearches &&
+      mySavedSearches?.[0]?.savedSearches &&
+      Object.keys(mySavedSearches?.[0]?.savedSearches)?.length > 0
+    ) {
+      // Remove irrelevent formik field array properties before save
+      pageRef.current?.values.queryRows?.map(val => {
+        delete val.props;
+        delete val.key;
+        delete val._store;
+        delete val._owner;
+        delete val.ref;
+      });
+      mySavedSearches[0].savedSearches[username as any][
+        `${isDefault ? "default" : searchName}`
+      ] = pageRef.current?.values;
+    } else {
+      newSavedSearches = {
+        [`${username}`]: {
+          [`${isDefault ? "default" : searchName}`]: pageRef.current?.values
+        }
+      };
+    }
+    const saveArgs: SaveArgs<UserPreference> = {
+      resource: {
+        id: userPreferences?.[0]?.id,
+        userId: subject,
+        savedSearches:
+          mySavedSearches?.[0]?.savedSearches ??
+          (newSavedSearches as Map<string, JsonValue>)
+      } as any,
+      type: "user-preference"
+    };
+    await save([saveArgs], { apiBaseUrl: "/user-api" });
+    loadSavedSearch(isDefault ? "default" : searchName, userPreferences);
+  }
+
+  async function deleteSavedSearch(
+    savedSearchName: string,
+    userPreferences: UserPreference[]
+  ) {
+    async function deleteSearch() {
+      const userSavedSearches =
+        userPreferences[0]?.savedSearches?.[username as any];
+      delete userSavedSearches?.[`${savedSearchName}`];
+
+      const saveArgs: SaveArgs<UserPreference> = {
+        resource: {
+          id: userPreferences?.[0]?.id,
+          userId: subject,
+          savedSearches: userPreferences?.[0]?.savedSearches
+        } as any,
+        type: "user-preference"
+      };
+
+      await save([saveArgs], { apiBaseUrl: "/user-api" });
+      loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+    }
+
+    openModal(
+      <AreYouSureModal
+        actionMessage={
+          <>
+            <DinaMessage id="removeSavedSearch" /> {`${savedSearchName ?? ""}`}{" "}
+          </>
+        }
+        onYesButtonClicked={deleteSearch}
+      />
+    );
+  }
+
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
+  const initialValues = isFromLoadedRef.current
+    ? formValues && toPairs(formValues).length > 0
+      ? formValues
+      : {
+          group: groupNames?.[0],
+          queryRows: [{}]
+        }
+    : pageRef.current?.values
+    ? pageRef.current?.values
+    : {
+        group: groupNames?.[0],
+        queryRows: [{}]
+      };
 
   return (
     <DinaForm
-      initialValues={{
-        group: groupNames?.[0],
-        queryRows: [
-          {
-            fieldName:
-              sortedData?.[0]?.value + "(" + sortedData?.[0]?.type + ")",
-            matchType: "match",
-            boolean: "true",
-            date: moment().format()
-          }
-        ]
-      }}
+      key={uuidv4()}
+      innerRef={pageRef}
+      initialValues={initialValues}
       onSubmit={onSubmit}
     >
       <label
@@ -280,16 +384,50 @@ export function QueryPage<TData extends KitsuResource>({
       <QueryBuilder
         name="queryRows"
         esIndexMapping={sortedData}
-        isResetRef={isResetRef}
+        isFromLoadedRef={isFromLoadedRef}
       />
       <DinaFormSection horizontal={"flex"}>
-        <GroupSelectField name="group" className="col-md-4" />
+        <GroupSelectField
+          name="group"
+          className="col-md-4"
+          onChange={(value, formik) => {
+            const resetToVal = cloneDeep(formik.values);
+            onSubmit({ submittedValues: { ...resetToVal, group: value } });
+          }}
+        />
       </DinaFormSection>
-      <div className="d-flex justify-content-end mb-3">
-        <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-        <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
-          <DinaMessage id="resetFilters" />
-        </FormikButton>
+
+      <div className="d-flex mb-3">
+        <div className="flex-grow-1">
+          {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
+            const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
+              username as any
+            ] as any;
+            return (
+              <SavedSearch
+                userPreferences={userPreferences}
+                loadSavedSearch={loadSavedSearch}
+                deleteSavedSearch={deleteSavedSearch}
+                saveSearch={saveSearch}
+                savedSearchNames={
+                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
+                }
+                initialSavedSearches={initialSavedSearches}
+                selectedSearch={
+                  initSavedSearchValues
+                    ? initSavedSearchValues.keys().next().value
+                    : undefined
+                }
+              />
+            );
+          })}
+        </div>
+        <div>
+          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+          <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
+            <DinaMessage id="resetFilters" />
+          </FormikButton>
+        </div>
       </div>
       <div
         className="query-table-wrapper"
@@ -298,34 +436,24 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <div className="mb-1">
           {!omitPaging && (
-            <div className="d-flex ">
+            <div className="d-flex align-items-end">
               <span>
                 <CommonMessage id="tableTotalCount" values={{ totalCount }} />
               </span>
               {resolvedReactTableProps?.sortable !== false && (
-                <span className="flex-grow-1">
+                <div className="flex-grow-1">
                   <Tooltip
                     id="queryTableMultiSortExplanation"
-                    setVisible={setVisible}
-                    visible={visible}
                     visibleElement={
                       <a
                         href="#"
                         aria-describedby={"queryTableMultiSortExplanation"}
-                        onKeyUp={e =>
-                          e.key === "Escape"
-                            ? setVisible(false)
-                            : setVisible(true)
-                        }
-                        onMouseOver={() => setVisible(true)}
-                        onMouseOut={() => setVisible(false)}
-                        onBlur={() => setVisible(false)}
                       >
                         <CommonMessage id="queryTableMultiSortTooltipTitle" />
                       </a>
                     }
                   />
-                </span>
+                </div>
               )}
               <div className="d-flex gap-3">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}

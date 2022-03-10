@@ -13,32 +13,30 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import {
+  AssociationsField,
+  CollectingEventFormLayout,
   Footer,
   Head,
+  HOSTORGANISM_FIELDS,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
+  MaterialSampleIdentifiersSection,
+  MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
   OrganismsField,
-  ProjectSelectSection,
-  StorageLinkerField,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import {
-  CollectingEventFormLayout,
   PreparationField,
   PREPARATION_FIELDS,
+  ProjectSelectSection,
   SamplesView,
   ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
   withOrganismEditorValues
-} from "../../../components/collection/";
-import {
-  AssociationsField,
-  HOSTORGANISM_FIELDS
-} from "../../../components/collection/AssociationsField";
+} from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -46,10 +44,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
-import {
-  MaterialSampleFormLayout,
-  MaterialSampleIdentifiersFormLayout
-} from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -140,7 +134,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <TagsAndRestrictionsSection />
                 <ProjectSelectSection />
               </div>
-              <MaterialSampleIdentifiersFormLayout />
+              <MaterialSampleIdentifiersSection />
               {materialSample.parentMaterialSample && (
                 <SamplesView
                   samples={[materialSample.parentMaterialSample]}
@@ -153,7 +147,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   fieldSetId={<DinaMessage id="childMaterialSamples" />}
                 />
               )}
-              <MaterialSampleFormLayout />
+              <MaterialSampleInfoSection />
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={colEvent} readOnly={true}>

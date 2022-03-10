@@ -147,14 +147,14 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/object-store/managedAttributesView/listView`);
+    await router.push(`/managed-attribute/list?tab=objectStore`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <Link href="/object-store/managedAttributesView/listView">
+        <Link href="/managed-attribute/list?tab=objectStore">
           <a className="btn btn-dark">
             <DinaMessage id="cancelButtonText" />
           </a>
@@ -163,7 +163,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           className="ms-5"
           id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/managedAttributesView/listView"
+          postDeleteRedirect="/managed-attribute/list?tab=objectStore"
           type="managed-attribute"
         />
       </ButtonBar>

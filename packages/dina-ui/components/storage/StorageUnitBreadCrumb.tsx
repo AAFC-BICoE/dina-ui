@@ -5,12 +5,14 @@ export interface StorageUnitBreadCrumbProps {
   disableLastLink?: boolean;
   hideThisUnit?: boolean;
   storageUnit: StorageUnit;
+  newTab?: boolean;
 }
 
 export function StorageUnitBreadCrumb({
   disableLastLink,
   hideThisUnit,
-  storageUnit
+  storageUnit,
+  newTab
 }: StorageUnitBreadCrumbProps) {
   const parentPath = [
     ...(storageUnit.parentStorageUnit?.hierarchy ??
@@ -39,7 +41,7 @@ export function StorageUnitBreadCrumb({
           <strong>
             {storageUnit.id && !disableLastLink ? (
               <Link href={`/collection/storage-unit/view?id=${storageUnit.id}`}>
-                <a>{unitDisplayName}</a>
+                <a target={newTab ? "_blank" : undefined}>{unitDisplayName}</a>
               </Link>
             ) : (
               unitDisplayName

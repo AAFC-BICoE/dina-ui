@@ -7,8 +7,8 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { CustomView } from "../../../types/collection-api";
+import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
+import { CustomView } from "../../../../types/collection-api";
 import { useManagedAttributesViewEditModal } from "./managed-attributes-view-modal";
 
 export interface ManagedAttributesViewSelectProps {
