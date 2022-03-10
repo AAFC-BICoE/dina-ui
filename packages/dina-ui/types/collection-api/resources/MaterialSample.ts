@@ -1,10 +1,11 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
-import { BLANK_PREPARATION } from "../../../components";
+import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { AcquisitionEvent } from "./AcquisitionEvent";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
+import { ExtensionValue } from "./FieldExtension";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
 import { PreparationType } from "./PreparationType";
@@ -24,6 +25,7 @@ export const MATERIAL_SAMPLE_FORM_SECTIONS = [
   "organisms-section",
   "associations-section",
   "storage-section",
+  "restriction-section",
   "scheduled-actions-section",
   "managedAttributes-section",
   "material-sample-attachments-section"
@@ -81,6 +83,16 @@ export interface MaterialSampleAttributes {
   stateChangeRemarks?: string;
 
   useNextSequence?: boolean;
+
+  restrictionFieldsExtension?: ExtensionValue[] | null;
+
+  phac_human_rg?: ExtensionValue | null;
+  phac_cl?: ExtensionValue | null;
+  phac_animal_rg?: ExtensionValue | null;
+  cfia_ppc?: ExtensionValue | null;
+
+  isRestricted?: boolean;
+  restrictionRemarks?: string | null;
 }
 
 export interface HostOrganism {
@@ -118,6 +130,7 @@ export interface MaterialSampleRelationships {
 export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
   return {
     ...BLANK_PREPARATION,
+    ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
     organism: []

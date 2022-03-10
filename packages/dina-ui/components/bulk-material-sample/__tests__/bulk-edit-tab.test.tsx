@@ -125,6 +125,7 @@ describe("Material sample bulk edit tab", () => {
     wrapper.update();
 
     expect(mockSubmitOverride).lastCalledWith({
+      isRestricted: false,
       type: "material-sample"
     });
   });
@@ -157,7 +158,8 @@ describe("Material sample bulk edit tab", () => {
     expect(mockSubmitOverride).lastCalledWith({
       type: "material-sample",
       materialSampleName: "test-sample",
-      barcode: "test-barcode-override"
+      barcode: "test-barcode-override",
+      isRestricted: false
     });
   });
 
@@ -253,6 +255,7 @@ describe("Material sample bulk edit tab", () => {
 
     expect(mockSubmitOverride).lastCalledWith({
       // Keeps the name and type:
+      isRestricted: false,
       type: "material-sample",
       materialSampleName: "test-sample",
       managedAttributes: {

@@ -2,6 +2,7 @@ import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import {
   BLANK_PREPARATION,
+  BLANK_RESTRICTION,
   MaterialSampleFormCustomViewConfig
 } from "../../../../components";
 import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
@@ -254,9 +255,16 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 id: "11111111-1111-1111-1111-111111111111",
                 type: "collecting-event"
               },
+              attachment: undefined,
+              scheduledAction: undefined,
               storageUnit: { id: null, type: "storage-unit" },
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
@@ -339,9 +347,15 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
                 type: "collecting-event"
               },
               storageUnit: { id: null, type: "storage-unit" },
-
+              attachment: undefined,
+              scheduledAction: undefined,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
               preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
@@ -456,7 +470,14 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
+              ...BLANK_RESTRICTION,
               preparationAttachment: undefined,
+              attachment: undefined,
+              scheduledAction: undefined,
+              projects: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
               managedAttributes: {},
               relationships: {
                 organism: { data: [] },
