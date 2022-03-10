@@ -30,29 +30,35 @@ export function TagsAndRestrictionsSection({
   groupSelectorName = "group",
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const isInBulkEditTab = !!useBulkEditTabContext();
 
   return readOnly ? (
     <>
       <div className="d-flex flex-column">
-        <div className="d-flex flex-row">
-          <div className="flex-grow-1">
-            <RestrictionWarning isRestrictionSelect={true} />
+        {((initialValues.restrictionFieldsExtension &&
+          initialValues.isRestricted) ||
+          initialValues.tags?.length > 0) && (
+          <div className="d-flex flex-row">
+            <div className="flex-grow-1">
+              <RestrictionWarning isRestrictionSelect={true} />
+            </div>
+            <div>
+              <TagSelectField
+                resourcePath={resourcePath}
+                className="mb-3 ps-2"
+                name={tagsFieldName}
+                removeLabel={true}
+                groupSelectorName={groupSelectorName}
+              />
+            </div>
           </div>
-          <div>
-            <TagSelectField
-              resourcePath={resourcePath}
-              className="mb-3 ps-2"
-              name={tagsFieldName}
-              removeLabel={true}
-              groupSelectorName={groupSelectorName}
-            />
+        )}
+        {initialValues.restrictionRemarks && (
+          <div className="d-flex flex-row">
+            <RestrictionWarning isRestrictionRemarks={true} />
           </div>
-        </div>
-        <div className="d-flex flex-row">
-          <RestrictionWarning isRestrictionRemarks={true} />
-        </div>
+        )}
       </div>
     </>
   ) : (

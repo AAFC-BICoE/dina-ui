@@ -27,6 +27,22 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
             })}
           />
           <FieldExtensionSelectField
+            name="phac_human_rg"
+            hideLabel={true}
+            label={formatMessage("phacHumanRGLevel")}
+            query={() => ({
+              path: "collection-api/extension/phac_human_rg"
+            })}
+          />
+          <FieldExtensionSelectField
+            name="cfia_ppc"
+            hideLabel={true}
+            label={formatMessage("cfiaPPCLevel")}
+            query={() => ({
+              path: "collection-api/extension/cfia_ppc"
+            })}
+          />
+          <FieldExtensionSelectField
             hideLabel={true}
             label={formatMessage("phacContainmentLevel")}
             name="phac_cl"
