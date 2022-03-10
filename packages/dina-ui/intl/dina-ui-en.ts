@@ -125,6 +125,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   createCustomView: "Create Custom View",
   createNewMaterialSamples: "Create New Material Samples",
   createNewView: "Create New View",
+  createSampleWithCustomView: "Create Sample with Custom View",
   createSplitWorkflow: "Create Split",
   createStorage: "Create Storage",
   createMaterialSampleCustomView: "Create Material Sample Custom View",
@@ -415,6 +416,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   latitudeValidationError:
     "Invalid latitude: {latitude},   \nValid latitude range is between -90 to 90 for degree, and 0 to 60 for minute and second",
   literalGeoreferencedByLabel: "Georeferenced By",
+  load: "Load",
   loanTransaction: "Transaction",
   loanTransactionManagedAttributeListTitle:
     "Loans and Transactions Managed Attributes",
@@ -540,6 +542,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   removeManagedAttributeValue:
     "Remove Managed Attribute Value: {attributeNames}",
   removeOrganism: "Remove Organism",
+  removeSavedSearch: "Remove Saved Search",
   removeThisElement: "Remove This {typeName}",
   removeThisPlaceLabel: " Remove this Place",
   resetMetadataEditorAttributesButtonText: "Reset to initial attributes layout",
@@ -551,12 +554,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   roleAction: "Role/Action",
   roles: "Roles",
   rolesPerGroup: "Roles Per Group",
-  createSampleWithCustomView: "Create Sample with Custom View",
+  runWorkflow: "Run Workflow",
+  save: "Save",
   saveAll: "Save All",
+  saveAsDefault: "Save as Default",
   saveAndCopyToNext: "Save & Copy To Next",
   saveAndCreateNewMaterialSampleButton: "Save & Create New Material Sample",
   saveAndGoToViewPageButton: "Save & Go To View Page",
   saveGeoReferenceAssertion: "Save GeoReference Assertion",
+  saveSearch: "Save Search",
+  saveSearchInstruction:
+    "Enter a name for your search. You can also make this your default search.",
   saveThisOrderView: "Save This Order View",
   scheduledActions: "Scheduled Actions",
   scientificNameSearch: "Scientific Name Search",
