@@ -1,6 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
-import { BLANK_PREPARATION } from "../../../components";
+import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { AcquisitionEvent } from "./AcquisitionEvent";
 import { CollectingEvent } from "./CollectingEvent";
@@ -84,7 +84,7 @@ export interface MaterialSampleAttributes {
 
   useNextSequence?: boolean;
 
-  restrictionFieldsExtension?: ExtensionValue[];
+  restrictionFieldsExtension?: ExtensionValue[] | null;
 
   phac_human_rg?: ExtensionValue | null;
   phac_cl?: ExtensionValue | null;
@@ -130,6 +130,7 @@ export interface MaterialSampleRelationships {
 export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
   return {
     ...BLANK_PREPARATION,
+    ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
     organism: []

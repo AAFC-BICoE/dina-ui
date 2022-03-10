@@ -49,7 +49,7 @@ import {
   MatrialSampleFormEnabledFields,
   VisibleManagedAttributesConfig
 } from "./MaterialSampleForm";
-import { RESTRICTIONS_FIELDS } from "./RestrictionField";
+import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -441,17 +441,13 @@ export function useMaterialSampleSave({
       ...(submittedValues.phac_human_rg ? [submittedValues.phac_human_rg] : [])
     ];
 
-    delete submittedValues.phac_animal_rg;
-    delete submittedValues.phac_cl;
-    delete submittedValues.phac_human_rg;
-    delete submittedValues.cfia_ppc;
-
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
+      ...(!enableRestrictions && BLANK_RESTRICTION),
       ...(!enableOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
@@ -577,6 +573,11 @@ export function useMaterialSampleSave({
         throw error;
       }
     }
+
+    delete materialSampleInput.phac_animal_rg;
+    delete materialSampleInput.phac_cl;
+    delete materialSampleInput.phac_human_rg;
+    delete materialSampleInput.cfia_ppc;
 
     return materialSampleInput;
   }

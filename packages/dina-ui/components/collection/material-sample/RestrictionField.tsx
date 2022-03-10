@@ -7,13 +7,6 @@ import {
 import { InputResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
 import { MaterialSample } from "../../..//types/collection-api";
-import Switch from "react-switch";
-
-export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
-  "materialSampleRemarks",
-  "materialSampleState",
-  "materialSampleType"
-];
 
 export const RESTRICTIONS_FIELDS = [
   "phac_animal_rg",
@@ -21,7 +14,8 @@ export const RESTRICTIONS_FIELDS = [
   "cfia_ppc",
   "phac_cl",
   "isRestricted",
-  "restrictionRemarks"
+  "restrictionRemarks",
+  "restrictionFieldsExtension"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -33,7 +27,8 @@ export const BLANK_RESTRICTION: Required<
   cfia_ppc: null,
   phac_cl: null,
   isRestricted: false,
-  restrictionRemarks: null
+  restrictionRemarks: null,
+  restrictionFieldsExtension: null
 });
 
 export function RestrictionField({ id }: { id?: string }) {
