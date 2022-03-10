@@ -8,12 +8,10 @@ import { compact } from "lodash";
 // The parts of the API response used by this component:
 export interface AutocompleteSearchResponse {
   hits?: {
-    hits?: {
-      id?: string;
-      index?: string;
-      sourceAsMap?: DocWithData;
-    }[];
-  };
+    id?: string;
+    index?: string;
+    source?: DocWithData;
+  }[];
 }
 
 export type AutocompleteSearchParams = Omit<DoSearchParams, "searchValue">;
@@ -58,9 +56,7 @@ export async function doSearch<T extends KitsuResource>(
     }
   );
 
-  const jsonApiDocs = compact(
-    response.data.hits?.hits?.map(hit => hit.sourceAsMap)
-  );
+  const jsonApiDocs = compact(response.data.hits?.map(hit => hit.source));
 
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(

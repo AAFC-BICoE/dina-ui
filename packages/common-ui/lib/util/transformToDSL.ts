@@ -81,37 +81,35 @@ export function transformQueryToDSL(
     }
   }
 
-  submittedValues.queryRows
-    .filter(
-      // Remove the row that user did not select any field to search on or
-      // no value is put for the selected field
-      queryRow =>
-        queryRow.fieldName &&
-        ((queryRow.type === "boolean" && queryRow.boolean) ||
-          ((queryRow.type === "long" ||
-            queryRow.type === "short" ||
-            queryRow.type === "integer" ||
-            queryRow.type === "byte" ||
-            queryRow.type === "double" ||
-            queryRow.type === "float" ||
-            queryRow.type === "half_float" ||
-            queryRow.type === "scaled_float" ||
-            queryRow.type === "unsiged_long") &&
-            queryRow.number) ||
-          (queryRow.type === "date" && queryRow.date) ||
-          ((queryRow.type === "text" || queryRow.type === "keyword") &&
-            queryRow.matchType &&
-            queryRow.matchValue))
-    )
-    .map((queryRow, idx) => {
-      if (submittedValues.queryRows.length === 1)
-        buildQuery(queryRow, queryRow, true);
-      else {
-        if (idx === 1)
-          buildQuery(queryRow, submittedValues.queryRows[0], false);
-        if (idx !== 0) buildQuery(queryRow, null, false);
-      }
-    });
+  const filteredValues = submittedValues.queryRows.filter(
+    // Remove the row that user did not select any field to search on or
+    // no value is put for the selected field
+    queryRow =>
+      queryRow.fieldName &&
+      ((queryRow.type === "boolean" && queryRow.boolean) ||
+        ((queryRow.type === "long" ||
+          queryRow.type === "short" ||
+          queryRow.type === "integer" ||
+          queryRow.type === "byte" ||
+          queryRow.type === "double" ||
+          queryRow.type === "float" ||
+          queryRow.type === "half_float" ||
+          queryRow.type === "scaled_float" ||
+          queryRow.type === "unsiged_long") &&
+          queryRow.number) ||
+        (queryRow.type === "date" && queryRow.date) ||
+        ((queryRow.type === "text" || queryRow.type === "keyword") &&
+          queryRow.matchType &&
+          queryRow.matchValue))
+  );
+  const len = filteredValues.length;
+  filteredValues.map((queryRow, idx) => {
+    if (filteredValues.length === 1) buildQuery(queryRow, queryRow, true);
+    else {
+      if (idx === 1) buildQuery(queryRow, filteredValues[0], false);
+      if (idx !== 0) buildQuery(queryRow, null, false);
+    }
+  });
 
   if (submittedValues.group)
     builder.andQuery("match", "data.attributes.group", submittedValues.group);

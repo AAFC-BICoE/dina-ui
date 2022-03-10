@@ -31,7 +31,7 @@ import {
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
   useLastUsedCollection
-} from "..";
+} from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -45,6 +45,10 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
+import {
+  MatrialSampleFormEnabledFields,
+  VisibleManagedAttributesConfig
+} from "./MaterialSampleForm";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -146,11 +150,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Optionally restrict the form to these enabled fields. */
-  enabledFields?: {
-    materialSample?: string[];
-    collectingEvent?: string[];
-    acquisitionEvent?: string[];
-  };
+  enabledFields?: MatrialSampleFormEnabledFields;
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 
@@ -161,6 +161,8 @@ export interface UseMaterialSampleSaveParams {
   disableNestedFormEdits?: boolean;
 
   showChangedIndicatorsInNestedForms?: boolean;
+
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -185,7 +187,8 @@ export function useMaterialSampleSave({
   materialSampleTemplateInitialValues,
   reduceRendering,
   disableNestedFormEdits,
-  showChangedIndicatorsInNestedForms
+  showChangedIndicatorsInNestedForms,
+  visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -411,7 +414,7 @@ export function useMaterialSampleSave({
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-      // Remove the scheduledAction field from the workflow template:
+      // Remove the scheduledAction field from the Custom View:
       ...{ scheduledAction: undefined }
     };
 
@@ -765,6 +768,9 @@ export function useMaterialSampleSave({
       ) : (
         <div className={nestedFormClassName}>
           <CollectingEventFormLayout
+            visibleManagedAttributeKeys={
+              visibleManagedAttributeKeys?.collectingEvent
+            }
             attachmentsConfig={collectingEventAttachmentsConfig}
           />
         </div>

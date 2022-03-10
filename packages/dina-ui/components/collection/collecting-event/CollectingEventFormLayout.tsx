@@ -3,7 +3,6 @@ import {
   CheckBoxWithoutWrapper,
   DinaFormSection,
   FieldSet,
-  FieldSpy,
   filterBy,
   FormattedTextField,
   FormikButton,
@@ -19,10 +18,10 @@ import {
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
 import useSWR from "swr";
-import { GeographySearchBox } from "..";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
+  GeographySearchBox,
   GroupSelectField,
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
@@ -58,13 +57,16 @@ interface CollectingEventFormLayoutProps {
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
   initialValuesForTemplate?: any;
   attachmentsConfig?: AllowAttachmentsConfig;
+  /** Forwarded to ManagedAttributesEditor */
+  visibleManagedAttributeKeys?: string[];
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
-  attachmentsConfig
+  attachmentsConfig,
+  visibleManagedAttributeKeys
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -818,23 +820,22 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
       </div>
-
-      {!isTemplate && (
-        <DinaFormSection
-          // Disabled the template's restrictions for this section:
-          enabledFields={null}
-        >
-          <ManagedAttributesEditor
-            valuesPath="managedAttributes"
-            managedAttributeApiPath="collection-api/managed-attribute"
-            managedAttributeComponent="COLLECTING_EVENT"
-            fieldSetProps={{
-              legend: <DinaMessage id="collectingEventManagedAttributes" />
-            }}
-            showCustomViewDropdown={true}
-          />
-        </DinaFormSection>
-      )}
+      <DinaFormSection
+        // Disabled the template's restrictions for this section:
+        enabledFields={null}
+      >
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/managed-attribute"
+          managedAttributeComponent="COLLECTING_EVENT"
+          fieldSetProps={{
+            legend: <DinaMessage id="collectingEventManagedAttributes" />
+          }}
+          showCustomViewDropdown={!isTemplate}
+          managedAttributeOrderFieldName="managedAttributesOrder"
+          visibleAttributeKeys={visibleManagedAttributeKeys}
+        />
+      </DinaFormSection>
       <div className="mb-3">
         <AttachmentsField
           name="attachment"

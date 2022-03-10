@@ -3,11 +3,7 @@ import {
   FieldSetProps,
   FieldSpy,
   filterBy,
-  FormikButton,
-  NumberField,
   ResourceSelect,
-  SelectField,
-  TextField,
   Tooltip,
   useBulkEditTabContext,
   useBulkGet,
@@ -15,16 +11,16 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
-import { useRef, useState } from "react";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useEffect, useRef, useState } from "react";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   CustomView,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
-import { ManagedAttributesViewer } from "./ManagedAttributesViewer";
-import { ManagedAttributesViewSelect } from "./ManagedAttributesViewSelect";
-import { RiDeleteBinLine } from "react-icons/ri";
+import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
+import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
+import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 
 export interface ManagedAttributesEditorProps {
   /** Formik path to the ManagedAttribute values field. */
@@ -45,6 +41,18 @@ export interface ManagedAttributesEditorProps {
    * Shows the dropdown to select a custom-view for Managed Attributes.
    */
   showCustomViewDropdown?: boolean;
+
+  /**
+   * The formik field name for editing a Custom View's managed attributes order.
+   * Has no effect in editing an actual resource e.g. in the Material Sample form.
+   */
+  managedAttributeOrderFieldName?: string;
+
+  /**
+   * When this prop is changed, the visible managed attributes state is updated in useEffect.
+   * e.g. when the form's custom view is updated.
+   */
+  visibleAttributeKeys?: string[];
 }
 
 export function ManagedAttributesEditor({
@@ -53,11 +61,12 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
-  showCustomViewDropdown
+  showCustomViewDropdown,
+  managedAttributeOrderFieldName,
+  visibleAttributeKeys: visibleAttributeKeysProp
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
-  const { readOnly } = useDinaFormContext();
-  const { formatMessage } = useDinaIntl();
+  const { readOnly, isTemplate } = useDinaFormContext();
 
   const [customView, setCustomView] = useState<PersistedResource<CustomView>>();
   return (
@@ -79,6 +88,13 @@ export function ManagedAttributesEditor({
         const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
           getAttributeKeysInUse
         );
+
+        // When the visibleAttributeKeys prop changes, update the internal visible keys state:
+        useEffect(() => {
+          setVisibleAttributeKeys(
+            visibleAttributeKeysProp ?? getAttributeKeysInUse()
+          );
+        }, [visibleAttributeKeysProp]);
 
         /** Put the Custom View into the dropdown and update the visible attribute keys.  */
         function updateCustomView(newView?: PersistedResource<CustomView>) {
@@ -107,6 +123,8 @@ export function ManagedAttributesEditor({
             listPath: managedAttributeApiPath
           });
 
+        // Store the last fetched Attributes in a ref instead of showing a
+        // loading state when the visible attributes change.
         const lastFetchedAttributes = useRef<
           PersistedResource<ManagedAttribute>[]
         >([]);
@@ -136,95 +154,53 @@ export function ManagedAttributesEditor({
             })}
           >
             <div className="mb-3 managed-attributes-editor">
-              {!readOnly && (
-                <div className="row">
-                  <label
-                    className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-                  >
-                    <div className="mb-2">
-                      <strong>
-                        <DinaMessage id="field_visibleManagedAttributes" />
-                      </strong>
-                      <Tooltip id="field_visibleManagedAttributes_tooltip" />
+              {isTemplate && managedAttributeOrderFieldName ? (
+                <ManagedAttributesSorter
+                  managedAttributeComponent={managedAttributeComponent}
+                  name={managedAttributeOrderFieldName}
+                  managedAttributeApiPath={managedAttributeApiPath}
+                  valuesPath={valuesPath}
+                />
+              ) : (
+                <div>
+                  {!readOnly && (
+                    <div className="row">
+                      <label
+                        className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+                      >
+                        <div className="mb-2">
+                          <strong>
+                            <DinaMessage id="field_visibleManagedAttributes" />
+                          </strong>
+                          <Tooltip id="field_visibleManagedAttributes_tooltip" />
+                        </div>
+                        <ManagedAttributeMultiSelect
+                          managedAttributeApiPath={managedAttributeApiPath}
+                          managedAttributeComponent={managedAttributeComponent}
+                          onChange={setVisibleAttributeKeys}
+                          visibleAttributes={visibleAttributes}
+                          loading={loading}
+                        />
+                      </label>
                     </div>
-                    <ManagedAttributeMultiSelect
-                      managedAttributeApiPath={managedAttributeApiPath}
-                      managedAttributeComponent={managedAttributeComponent}
-                      onChange={setVisibleAttributeKeys}
-                      visibleAttributes={visibleAttributes}
-                      loading={loading}
-                    />
-                  </label>
+                  )}
+                  {!!visibleAttributes.length && <hr />}
+                  <div className="row">
+                    {visibleAttributes.map(attribute => (
+                      <ManagedAttributeFieldWithLabel
+                        key={attribute.key}
+                        attribute={attribute}
+                        valuesPath={valuesPath}
+                        onRemoveClick={attributeKey =>
+                          setVisibleAttributeKeys(current =>
+                            current.filter(it => it !== attributeKey)
+                          )
+                        }
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
-              {!!visibleAttributes.length && <hr />}
-              <div className="row">
-                {visibleAttributes.map(attribute => {
-                  const attributeKey = attribute.key;
-
-                  const attributePath = `${valuesPath}.${attributeKey}`;
-                  const props = {
-                    removeBottomMargin: true,
-                    removeLabel: true,
-                    name: attributePath
-                  };
-
-                  const isSelectAttr = !!(
-                    attribute.managedAttributeType === "STRING" &&
-                    attribute.acceptedValues?.length
-                  );
-
-                  const isIntegerAttr =
-                    attribute.managedAttributeType === "INTEGER";
-
-                  return (
-                    <label
-                      key={attributeKey}
-                      className={`${attributeKey}-field col-sm-6 mb-3`}
-                      htmlFor="none"
-                    >
-                      <div className="mb-2 d-flex align-items-center">
-                        <strong className="me-auto">
-                          {attribute.name ?? attributeKey}
-                        </strong>
-                        {!readOnly && (
-                          <FormikButton
-                            className="btn remove-attribute"
-                            onClick={(_, form) => {
-                              // Delete the value and hide the managed attribute:
-                              form.setFieldValue(attributePath, undefined);
-                              setVisibleAttributeKeys(current =>
-                                current.filter(it => it !== attributeKey)
-                              );
-                            }}
-                          >
-                            <RiDeleteBinLine size="1.8em" />
-                          </FormikButton>
-                        )}
-                      </div>
-                      {isSelectAttr ? (
-                        <SelectField
-                          {...props}
-                          options={[
-                            {
-                              label: `<${formatMessage("none")}>`,
-                              value: ""
-                            },
-                            ...(attribute.acceptedValues?.map(value => ({
-                              label: value,
-                              value
-                            })) ?? [])
-                          ]}
-                        />
-                      ) : isIntegerAttr ? (
-                        <NumberField {...props} />
-                      ) : (
-                        <TextField {...props} />
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
             </div>
           </FieldSet>
         );

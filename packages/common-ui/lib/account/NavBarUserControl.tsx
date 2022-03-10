@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { useAccount } from "./AccountProvider";
+import { FaUserCircle } from "react-icons/fa";
 
 /** Shows the logged-in user and the logout button. */
 export function NavbarUserControl() {
@@ -8,20 +9,29 @@ export function NavbarUserControl() {
     useAccount();
 
   return (
-    <div className="d-flex align-items-center">
+    <div className="d-flex align-items-center text-end">
       {initialized && authenticated ? (
         <>
           {username && (
-            <span className="me-2 my-auto">
-              <CommonMessage id="loggedInAsUser" />{" "}
-              <Link href={`/dina-user/view?id=${subject}`}>
-                <a>{username}</a>
-              </Link>
-            </span>
+            <>
+              {/* User Icon */}
+              <span className="me-2 my-auto h4">
+                <FaUserCircle />
+              </span>
+
+              {/* Profile Link */}
+              <span className="me-4 my-auto h5">
+                <Link href={`/dina-user/view?id=${subject}`}>
+                  <a>{username}</a>
+                </Link>
+              </span>
+            </>
           )}
+
+          {/* Logout Button */}
           <button
             type="button"
-            className="btn btn-dark logout-button my-auto"
+            className="btn btn-info logout-button my-auto"
             onClick={() => logout()}
           >
             <CommonMessage id="logoutBtn" />

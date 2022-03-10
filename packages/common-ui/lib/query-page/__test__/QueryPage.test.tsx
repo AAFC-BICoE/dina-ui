@@ -46,10 +46,44 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
+const MOCK_USER_GROUP_RESP = {
+  data: [
+    {
+      id: "1",
+      type: "group",
+      name: "cnc"
+    },
+    {
+      id: "2",
+      type: "group",
+      name: "aafc"
+    }
+  ]
+};
+
+const MOCK_USER_PREFERENCE_RESP = {
+  data: [
+    {
+      id: "1",
+      type: "user-preferences",
+      userId: "cnc"
+    },
+    {
+      id: "2",
+      type: "user-preferences",
+      userId: "aafc"
+    }
+  ]
+};
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
+    case "user-api/group":
+      return MOCK_USER_GROUP_RESP;
+    case "user-api/user-preferences":
+      return MOCK_USER_PREFERENCE_RESP;
   }
 });
 
@@ -98,6 +132,7 @@ describe("QueryPage component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
     // set date value
     wrapper
       .find("DateField[name='queryRows[0].date']")
@@ -123,6 +158,9 @@ describe("QueryPage component", () => {
       .find(Select)
       .prop<any>("onChange")({ value: "false" });
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // simulate select a group from dropdown
     wrapper
       .find("SelectField[name='group']")
@@ -135,6 +173,25 @@ describe("QueryPage component", () => {
     wrapper.update();
 
     expect(mockGet.mock.calls).toEqual([
+      [
+        "user-api/user-preference",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: {
+              userId: undefined
+            },
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
       [
         "search-api/search-ws/mapping",
         {
@@ -159,43 +216,132 @@ describe("QueryPage component", () => {
           },
           paramsSerializer: expect.anything()
         }
-      ]
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["testGroup","aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          headers: {
+            Accept: "application/vnd.api+json",
+            "Content-Type": "application/vnd.api+json",
+            "Crnk-Compact": "true"
+          },
+          params: {
+            filter: '{"name":["testGroup","aafc","cnc"]}',
+            page: {
+              limit: 1000
+            }
+          },
+          paramsSerializer: expect.anything()
+        }
+      ],
+      expect.anything()
     ]);
 
-    expect(mockPost).lastCalledWith(
-      "search-api/search-ws/search",
-      {
-        query: {
-          bool: {
-            filter: {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      createdOn: "2022-01-25"
+    expect(mockPost.mock.calls).toEqual([
+      [
+        "search-api/search-ws/search",
+        {
+          query: {
+            bool: {
+              filter: {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        createdOn: "2022-01-25"
+                      }
+                    },
+                    {
+                      term: {
+                        allowDuplicateName: "false"
+                      }
                     }
-                  },
-                  {
-                    term: {
-                      allowDuplicateName: "false"
-                    }
-                  }
-                ]
-              }
-            },
-            must: {
-              match: {
-                "data.attributes.group": "testGroup"
+                  ]
+                }
+              },
+              must: {
+                match: {
+                  "data.attributes.group": "testGroup"
+                }
               }
             }
           }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
         }
-      },
-      {
-        params: {
-          indexName: "testIndex"
+      ],
+      [
+        "search-api/search-ws/search",
+        {
+          query: {
+            bool: {
+              filter: {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        createdOn: "2022-01-25"
+                      }
+                    },
+                    {
+                      term: {
+                        allowDuplicateName: "false"
+                      }
+                    }
+                  ]
+                }
+              },
+              must: {
+                match: {
+                  "data.attributes.group": "testGroup"
+                }
+              }
+            }
+          }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
         }
-      }
-    );
+      ]
+    ]);
   });
 });

@@ -1,6 +1,5 @@
 import { DinaForm, FieldSet, QueryTable } from "common-ui";
-import { ViewPageLayout } from "../../../components";
-import { useCollectingEventQuery } from "../../../components/collection";
+import { useCollectingEventQuery, ViewPageLayout } from "../../../components";
 import { CollectingEventFormLayout } from "../../../components/collection/collecting-event/CollectingEventFormLayout";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
