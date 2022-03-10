@@ -34,7 +34,6 @@ export function RestrictionField({ id }: { id?: string }) {
     <FieldSet id={id} legend={<DinaMessage id="restrictions" />}>
       <div className="row">
         <FieldExtensionSelectField
-          readOnlyRender={value => value?.value}
           name="phac_animal_rg"
           label={formatMessage("phacAnimalRGLevel")}
           className="col-md-6"
@@ -43,7 +42,6 @@ export function RestrictionField({ id }: { id?: string }) {
           })}
         />
         <FieldExtensionSelectField
-          readOnlyRender={value => value?.value}
           name="phac_human_rg"
           label={formatMessage("phacHumanRGLevel")}
           className="col-md-6"
@@ -54,7 +52,6 @@ export function RestrictionField({ id }: { id?: string }) {
       </div>
       <div className="row">
         <FieldExtensionSelectField
-          readOnlyRender={value => value?.value}
           name="cfia_ppc"
           label={formatMessage("cfiaPPCLevel")}
           className="col-md-6"
@@ -63,7 +60,6 @@ export function RestrictionField({ id }: { id?: string }) {
           })}
         />
         <FieldExtensionSelectField
-          readOnlyRender={value => value?.value}
           className="col-md-6"
           label={formatMessage("phacContainmentLevel")}
           name="phac_cl"

@@ -11,6 +11,7 @@ import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
+import { RestrictionWarning } from "../collection/material-sample/RestrictionWarning";
 
 export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
   "tags",
@@ -34,13 +35,25 @@ export function TagsAndRestrictionsSection({
 
   return readOnly ? (
     <>
-      <TagSelectField
-        resourcePath={resourcePath}
-        className="mb-3"
-        name={tagsFieldName}
-        removeLabel={true}
-        groupSelectorName={groupSelectorName}
-      />
+      <div className="d-flex flex-column">
+        <div className="d-flex flex-row">
+          <div className="flex-grow-1">
+            <RestrictionWarning isRestrictionSelect={true} />
+          </div>
+          <div>
+            <TagSelectField
+              resourcePath={resourcePath}
+              className="mb-3 ps-2"
+              name={tagsFieldName}
+              removeLabel={true}
+              groupSelectorName={groupSelectorName}
+            />
+          </div>
+        </div>
+        <div className="d-flex flex-row">
+          <RestrictionWarning isRestrictionRemarks={true} />
+        </div>
+      </div>
     </>
   ) : (
     <div className="row">

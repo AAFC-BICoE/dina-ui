@@ -12,6 +12,7 @@ import {
 } from "../api-client/useQuery";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import { GoCircleSlash } from "react-icons/go";
 
 export interface FieldExtensionSelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -42,7 +43,19 @@ export function FieldExtensionSelectField(
     );
 
     return (
-      <FieldWrapper {...fieldExtensionSelectFieldProps}>
+      <FieldWrapper
+        {...fieldExtensionSelectFieldProps}
+        readOnlyRender={value =>
+          value ? (
+            <div className="card p-1 flex-row align-items-center gap-1 bg-danger">
+              <GoCircleSlash className="text-white" />
+              <span className="text-white">
+                {fieldExtensionSelectFieldProps.label + ":" + value?.value}
+              </span>
+            </div>
+          ) : null
+        }
+      >
         {({ setValue, value }) => {
           function onChange(newValue) {
             setValue(newValue.value);
