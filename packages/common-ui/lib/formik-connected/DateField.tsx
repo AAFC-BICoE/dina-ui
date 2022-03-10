@@ -58,7 +58,16 @@ export function DateField(props: DateFieldProps) {
         function onChangeRaw(event: FocusEvent<HTMLInputElement>) {
           // When typing into the input:
           if (event?.type === "change") {
-            const newText = event.target.value;
+            let newText = event.target.value;
+            const dashOccurences = newText.split("-").length - 1;
+            if (newText.length === 8 && dashOccurences === 0) {
+              newText =
+                newText.slice(0, 4) +
+                "-" +
+                newText.slice(4, 6) +
+                "-" +
+                newText.slice(6);
+            }
             setValue(newText);
           }
         }
