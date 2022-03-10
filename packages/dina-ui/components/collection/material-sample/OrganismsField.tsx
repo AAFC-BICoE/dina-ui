@@ -18,8 +18,7 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import ReactTable, { Column } from "react-table";
-import { OrganismStateField } from "..";
-import { BulkEditTabWarning } from "../..";
+import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
 
@@ -28,9 +27,16 @@ export interface OrganismsFieldProps {
   name: string;
   /** FieldSet id */
   id?: string;
+
+  /** Forwarded to ManagedAttributesEditor. */
+  visibleManagedAttributeKeys?: string[];
 }
 
-export function OrganismsField({ name, id }: OrganismsFieldProps) {
+export function OrganismsField({
+  name,
+  id,
+  visibleManagedAttributeKeys
+}: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
 
   return (
@@ -131,6 +137,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                       namePrefix={`${name}[0].`}
                       individualEntry={false}
                       onTargetChecked={targetChecked}
+                      visibleManagedAttributeKeys={visibleManagedAttributeKeys}
                     />
                   ))}
               </div>
@@ -200,7 +207,7 @@ function OrganismsTable({
   }
 
   function onSortEnd(se: SortEnd) {
-    document.body.style.cursor = "default";
+    document.body.style.cursor = "inherit";
     onRowMove(se.oldIndex, se.newIndex);
   }
 

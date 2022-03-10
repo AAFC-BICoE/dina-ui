@@ -1,9 +1,7 @@
 import { InputResource, KitsuResourceLink } from "kitsu";
+import Select from "react-select";
 import { default as ReactSwitch, default as Switch } from "react-switch";
-import {
-  MaterialSampleForm,
-  nextSampleInitialValues
-} from "../../../../pages/collection/material-sample/edit";
+import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -11,7 +9,6 @@ import {
   CollectingEvent,
   MaterialSample
 } from "../../../../types/collection-api";
-import Select from "react-select";
 
 // Mock out the dynamic component, which should only be rendered in the browser
 jest.mock("next/dynamic", () => () => {
@@ -60,13 +57,6 @@ function testMaterialSample(): InputResource<MaterialSample> {
   };
 }
 
-const TEST_MANAGED_ATTRIBUTE = {
-  id: "1",
-  type: "managed-attribute",
-  name: "testAttr",
-  key: "test_attr"
-};
-
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "collection-api/collecting-event":
@@ -106,6 +96,9 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
     case "collection-api/vocabulary/associationType":
+    case "collection-api/custom-view":
+    case "collection-api/vocabulary/materialSampleType":
+    case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
   }
 });
@@ -129,14 +122,26 @@ const mockSave = jest.fn<any, any>(async saves => {
   });
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
-  if (!paths.length) {
-    return [];
-  }
-  if ((paths[0] as string).startsWith("/managed-attribute")) {
-    return [TEST_MANAGED_ATTRIBUTE];
-  }
-});
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
+  paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
+        return { id: "1", key: "attribute_1", name: "Attribute 1" };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/COLLECTING_EVENT.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+      case "managed-attribute/DETERMINATION.attribute_2":
+        return { id: "2", key: "attribute_2", name: "Attribute 2" };
+      case "managed-attribute/DETERMINATION.attribute_3":
+        return { id: "3", key: "attribute_3", name: "Attribute 3" };
+    }
+  })
+);
 
 const testCtx = {
   apiContext: {
@@ -2183,5 +2188,191 @@ describe("Material Sample Edit Page", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Lets you set a Custom managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms",
+          managedAttributes: {
+            // Has existing attribute_1 and attribute_2 values:
+            attribute_1: "attribute 1 value",
+            attribute_2: "attribute 2 value"
+          }
+        }}
+        visibleManagedAttributeKeys={{
+          materialSample: ["attribute_2", "attribute_3"]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attribute 1 should be hidden:
+    expect(wrapper.find(".attribute_1-field input").exists()).toEqual(false);
+
+    // Attribute 2 already has a value:
+    expect(wrapper.find(".attribute_2-field input").prop("value")).toEqual(
+      "attribute 2 value"
+    );
+    // Attribute 3 is visible and empty:
+    expect(wrapper.find(".attribute_3-field input").prop("value")).toEqual("");
+
+    // Set a new value for attribute 2:
+    wrapper
+      .find(".attribute_2-field input")
+      .simulate("change", { target: { value: "new attribute 2 value" } });
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockSave.mock.calls).toEqual([
+      [
+        [
+          {
+            resource: expect.objectContaining({
+              managedAttributes: {
+                // The existing Attribute 1 value is kept event though it was hidden by the custom view:
+                attribute_1: "attribute 1 value",
+                // The new Attribute 2 value is saved:
+                attribute_2: "new attribute 2 value"
+              },
+              type: "material-sample"
+            }),
+            type: "material-sample"
+          }
+        ],
+        { apiBaseUrl: "/collection-api" }
+      ]
+    ]);
+  });
+
+  it("Lets you set a Custom Collecting Event managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        visibleManagedAttributeKeys={{
+          collectingEvent: ["attribute_2", "attribute_3"]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".enable-collecting-event").find(Switch).prop<any>("onChange")(
+      true
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attributes 2 and 3 are visible and empty:
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_2-field input")
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find("#collecting-event-section .attribute_3-field input")
+        .prop("value")
+    ).toEqual("");
+  });
+
+  it("Lets you set a Custom Determination managed attributes view via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        visibleManagedAttributeKeys={{
+          determination: ["attribute_2", "attribute_3"]
+        }}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".enable-organisms").find(Switch).prop<any>("onChange")(true);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find(".determination-section button.add-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Attributes 2 and 3 are visible and empty:
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_2-field input"
+        )
+        .prop("value")
+    ).toEqual("");
+    expect(
+      wrapper
+        .find(
+          ".organism_0__determination_0__managedAttributes_attribute_3-field input"
+        )
+        .prop("value")
+    ).toEqual("");
+  });
+
+  it("Lets you set a Custom Navigation section order via prop.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleForm
+        materialSample={{
+          type: "material-sample",
+          id: "333",
+          group: "test-group",
+          materialSampleName: "test-ms"
+        }}
+        // Custom navOrder:
+        navOrder={[
+          "managedAttributes-section",
+          "material-sample-info-section",
+          "identifiers-section"
+        ]}
+        onChangeNavOrder={() => undefined}
+        onSaved={mockOnSaved}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Check the first 3 sections for the sections defined in the prop:
+    expect(
+      wrapper
+        .find(".material-sample-nav .list-group-item")
+        .map(node => node.text())
+        .slice(0, 3)
+    ).toEqual(["Managed Attributes", "Material Sample Info", "Identifiers"]);
   });
 });

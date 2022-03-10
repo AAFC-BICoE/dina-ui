@@ -3,7 +3,7 @@ import { FastField } from "formik";
 import React from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { FieldWrapper } from "..";
-import { MaterialSampleLink } from "../../../dina-ui/components/collection/MaterialSampleAssociationsField";
+import { MaterialSampleLink } from "../../../dina-ui/components";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { SampleListLayout } from "../../../dina-ui/pages/collection/material-sample/list";
 

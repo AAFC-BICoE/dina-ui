@@ -7,10 +7,16 @@ import {
   useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
-import { Field } from "formik";
+import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
+
+export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
+  "tags",
+  "publiclyReleasable",
+  "notPubliclyReleasableReason"
+];
 
 export interface TagsAndRestrictionsSection {
   resourcePath?: string;
@@ -41,7 +47,7 @@ export function TagsAndRestrictionsSection({
       <DinaFormSection horizontal="flex">
         <TagSelectField
           resourcePath={resourcePath}
-          className="col-sm-6"
+          className="col-sm-6 tags"
           name={tagsFieldName}
           groupSelectorName={groupSelectorName}
           label={
@@ -68,17 +74,18 @@ export function TagsAndRestrictionsSection({
             />
           ) : (
             <InverseToggleField
+              className="notPubliclyReleasable"
               name="publiclyReleasable"
               label={<DinaMessage id="notPubliclyReleasable" />}
             />
           )}
           <DinaFormSection horizontal={false}>
-            <FieldSpy fieldName="publiclyReleasable">
+            <FieldSpy<boolean> fieldName="publiclyReleasable">
               {pr =>
                 pr === false ? (
                   <TextField
                     name="notPubliclyReleasableReason"
-                    className="flex-grow-1"
+                    className="flex-grow-1 notPubliclyReleasableReason"
                     multiLines={true}
                   />
                 ) : null

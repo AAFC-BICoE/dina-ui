@@ -13,57 +13,73 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import { get, mapValues, pick, pickBy, set, toPairs } from "lodash";
+import { get, isNil, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
-import { GroupSelectField, Head, Nav } from "../../../components";
-import {
-  PREPARATION_FIELDS,
-  useMaterialSampleSave
-} from "../../../components/collection";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   FormTemplate,
-  PreparationProcessDefinition,
-  TemplateField,
-  TemplateFields
-} from "../../../types/collection-api";
-import {
+  GroupSelectField,
+  Head,
   IDENTIFIERS_FIELDS,
-  MaterialSampleForm,
-  MATERIALSAMPLE_FIELDSET_FIELDS
-} from "../material-sample/edit";
+  materialSampleFormCustomViewSchema,
+  MaterialSampleFormCustomViewConfig,
+  MATERIALSAMPLE_FIELDSET_FIELDS,
+  Nav,
+  PREPARATION_FIELDS,
+  TAG_SECTION_FIELDS,
+  TemplateField,
+  TemplateFieldMap,
+  useMaterialSampleSave,
+  MaterialSampleForm
+} from "../../../components";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import {
+  AcquisitionEvent,
+  CollectingEvent,
+  CustomView,
+  MaterialSample,
+  MaterialSampleFormSectionId
+} from "../../../types/collection-api";
 
+/** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
+  // CustomView resource fields:
   id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required(),
-  attachmentsConfig: yup.mixed(),
+  restrictToCreatedBy: yup.boolean().required(),
 
+  // Managed Attributes default values:
+  managedAttributes: yup.object({}),
+  // Managed Attributes display order:
+  managedAttributesOrder: yup.array(yup.string().required()),
+  determinationManagedAttributesOrder: yup.array(yup.string().required()),
+
+  attachmentsConfig: yup.mixed(),
   storageUnit: yup.mixed(),
   templateCheckboxes: yup.mixed()
 });
 
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
-export default function PreparationProcessTemplatePage() {
+export default function MaterialSampleCustomViewEditPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const id = router.query.id?.toString();
 
-  const workflowTemplateQuery = useQuery<PreparationProcessDefinition>(
-    { path: `/collection-api/material-sample-action-definition/${id}` },
+  const customViewQuery = useQuery<CustomView>(
+    { path: `/collection-api/custom-view/${id}` },
     { disabled: !id }
   );
 
   const pageTitle = id
-    ? "editWorkflowTemplateTitle"
-    : "createWorkflowTemplateTitle";
+    ? "editMaterialSampleCustomView"
+    : "createMaterialSampleCustomView";
 
   async function moveToNextPage() {
-    await router.push("/collection/workflow-template/list");
+    await router.push("/collection/material-sample-custom-view/list");
   }
 
   return (
@@ -75,53 +91,71 @@ export default function PreparationProcessTemplatePage() {
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (
-          withResponse(workflowTemplateQuery, ({ data: fetchedDefinition }) => (
-            <WorkflowTemplateForm
-              fetchedActionDefinition={fetchedDefinition}
+          withResponse(customViewQuery, ({ data: fetchedCustomView }) => (
+            <MaterialSampleCustomViewForm
+              fetchedCustomView={fetchedCustomView}
               onSaved={moveToNextPage}
             />
           ))
         ) : (
-          <WorkflowTemplateForm onSaved={moveToNextPage} />
+          <MaterialSampleCustomViewForm onSaved={moveToNextPage} />
         )}
       </main>
     </div>
   );
 }
 
-export interface WorkflowTemplateFormProps {
-  fetchedActionDefinition?: PersistedResource<PreparationProcessDefinition>;
-  onSaved: (
-    savedDefinition: PersistedResource<PreparationProcessDefinition>
-  ) => Promisable<void>;
+export interface MaterialSampleCustomViewFormProps {
+  fetchedCustomView?: PersistedResource<CustomView>;
+  onSaved: (savedDefinition: PersistedResource<CustomView>) => Promisable<void>;
 }
 
-export function WorkflowTemplateForm({
-  fetchedActionDefinition,
+export function MaterialSampleCustomViewForm({
+  fetchedCustomView,
   onSaved
-}: WorkflowTemplateFormProps) {
+}: MaterialSampleCustomViewFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
 
-  const { formTemplates, ...initialDefinition } = fetchedActionDefinition ?? {};
+  const { viewConfiguration: unknownViewConfig, ...initialDefinition } =
+    fetchedCustomView ?? {
+      type: "custom-view",
+      restrictToCreatedBy: false,
+      publiclyReleasable: true,
+      viewConfiguration: {
+        formTemplates: {},
+        type: "material-sample-form-custom-view"
+      }
+    };
 
-  // Initialize the tempalte form default values and checkbox states:
-  const colEventTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.COLLECTING_EVENT
-    );
+  const initialViewConfig =
+    materialSampleFormCustomViewSchema.parse(unknownViewConfig);
+
+  const [navOrder, setNavOrder] = useState<
+    MaterialSampleFormSectionId[] | null
+  >(initialViewConfig.navOrder);
+
+  // Initialize the template form default values and checkbox states:
+  const colEventTemplateInitialValues = {
+    ...getTemplateInitialValuesFromSavedFormTemplate<CollectingEvent>(
+      initialViewConfig.formTemplates?.COLLECTING_EVENT
+    ),
+    managedAttributesOrder:
+      initialViewConfig.collectingEventManagedAttributesOrder
+  };
+
   if (!colEventTemplateInitialValues.geoReferenceAssertions?.length) {
     colEventTemplateInitialValues.geoReferenceAssertions = [{}];
   }
 
   const acqEventTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.ACQUISITION_EVENT
+    getTemplateInitialValuesFromSavedFormTemplate<AcquisitionEvent>(
+      initialViewConfig.formTemplates?.ACQUISITION_EVENT
     );
 
   const materialSampleTemplateInitialValues =
-    getTemplateInitialValuesFromSavedFormTemplate(
-      formTemplates?.MATERIAL_SAMPLE
+    getTemplateInitialValuesFromSavedFormTemplate<MaterialSample>(
+      initialViewConfig.formTemplates?.MATERIAL_SAMPLE
     );
 
   if (!materialSampleTemplateInitialValues.organism?.length) {
@@ -135,6 +169,9 @@ export function WorkflowTemplateForm({
 
   const initialValues: Partial<WorkflowFormValues> = {
     ...initialDefinition,
+    managedAttributesOrder: initialViewConfig.managedAttributesOrder,
+    determinationManagedAttributesOrder:
+      initialViewConfig.determinationManagedAttributesOrder,
     ...materialSampleTemplateInitialValues
   };
 
@@ -165,10 +202,34 @@ export function WorkflowTemplateForm({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<WorkflowFormValues>) {
-    const mainTemplateFields = pick(submittedValues, "id", "group", "name");
+    const {
+      id,
+      group,
+      name,
+      restrictToCreatedBy,
 
-    const enabledTemplateFields =
-      getEnabledTemplateFieldsFromForm(submittedValues);
+      managedAttributes: sampleManagedAttributes,
+      managedAttributesOrder,
+      determinationManagedAttributesOrder,
+
+      ...materialSampleTemplateFields
+    } = submittedValues;
+    const customViewFields = { id, group, name, restrictToCreatedBy };
+
+    const determinationManagedAttributes = (get(
+      materialSampleTemplateFields,
+      "organism[0].determination[0].managedAttributes"
+    ) ?? {}) as Record<string, string | null | undefined>;
+
+    const enabledTemplateFields = getEnabledTemplateFieldsFromForm(
+      materialSampleTemplateFields
+    );
+
+    const tagSectionTemplateFields = pick(
+      enabledTemplateFields,
+      ...TAG_SECTION_FIELDS,
+      "projects"
+    );
 
     const identifierTemplateFields = pick(
       enabledTemplateFields,
@@ -206,20 +267,28 @@ export function WorkflowTemplateForm({
       : {};
 
     // Construct the template definition to persist based on the form values:
-    const definition: InputResource<PreparationProcessDefinition> = {
-      ...mainTemplateFields,
-      actionType: "ADD",
+    const newViewConfig: MaterialSampleFormCustomViewConfig = {
       formTemplates: {
         MATERIAL_SAMPLE: {
-          ...submittedValues.attachmentsConfig,
+          ...materialSampleTemplateFields.attachmentsConfig,
           templateFields: {
+            ...tagSectionTemplateFields,
             ...identifierTemplateFields,
             ...materialSampleFieldsetTemplateFields,
             ...preparationTemplateFields,
             ...organismsTemplateFields,
             ...storageTemplateFields,
             ...scheduledActionsTemplateFields,
-            ...associationTemplateFields
+            ...associationTemplateFields,
+            ...getManagedAttributeTemplate(
+              sampleManagedAttributes,
+              managedAttributesOrder
+            ),
+            ...getManagedAttributeTemplate(
+              determinationManagedAttributes,
+              determinationManagedAttributesOrder,
+              "organism[0].determination[0].managedAttributes"
+            )
           }
         },
         COLLECTING_EVENT: enableCollectingEvent
@@ -234,6 +303,11 @@ export function WorkflowTemplateForm({
                 : {
                     ...getEnabledTemplateFieldsFromForm(
                       collectingEvtFormRef.current?.values
+                    ),
+                    ...getManagedAttributeTemplate(
+                      collectingEvtFormRef.current?.values.managedAttributes,
+                      collectingEvtFormRef.current?.values
+                        ?.managedAttributesOrder
                     ),
                     id: undefined
                   }
@@ -254,16 +328,25 @@ export function WorkflowTemplateForm({
             }
           : undefined
       },
-      type: "material-sample-action-definition"
+      navOrder,
+      managedAttributesOrder,
+      determinationManagedAttributesOrder,
+      collectingEventManagedAttributesOrder:
+        collectingEvtFormRef.current?.values?.managedAttributesOrder,
+      type: "material-sample-form-custom-view"
     };
 
-    const [savedDefinition] = await save<PreparationProcessDefinition>(
-      [
-        {
-          resource: definition,
-          type: "material-sample-action-definition"
-        }
-      ],
+    const validatedViewConfig =
+      materialSampleFormCustomViewSchema.parse(newViewConfig);
+
+    const customView: InputResource<CustomView> = {
+      ...customViewFields,
+      type: "custom-view",
+      viewConfiguration: validatedViewConfig
+    };
+
+    const [savedDefinition] = await save<CustomView>(
+      [{ resource: customView, type: "custom-view" }],
       { apiBaseUrl: "/collection-api" }
     );
 
@@ -274,16 +357,16 @@ export function WorkflowTemplateForm({
     <ButtonBar>
       <div className="container d-flex">
         <BackButton
-          entityId={fetchedActionDefinition?.id}
+          entityId={fetchedCustomView?.id}
           className="me-auto"
-          entityLink="/collection/workflow-template"
+          entityLink="/collection/material-sample-custom-view"
           byPassView={true}
         />
         <DeleteButton
-          id={fetchedActionDefinition?.id}
+          id={fetchedCustomView?.id}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/workflow-template/list"
-          type="material-sample-action-definition"
+          postDeleteRedirect="/collection/material-sample-custom-view/list"
+          type="custom-view"
           className="me-5"
         />
         <SubmitButton />
@@ -315,6 +398,9 @@ export function WorkflowTemplateForm({
         <MaterialSampleForm
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
+          hideNavCustomViewSelect={true}
+          navOrder={navOrder}
+          onChangeNavOrder={setNavOrder}
         />
       </DinaFormSection>
       {buttonBar}
@@ -325,16 +411,16 @@ export function WorkflowTemplateForm({
 /** Get the enabled template fields with their default values from the form. */
 export function getEnabledTemplateFieldsFromForm(
   formValues: any
-): TemplateFields {
+): TemplateFieldMap {
   // delete the key "determination" as children with index are actual keys
   delete formValues.templateCheckboxes?.determination;
   return mapValues(
     formValues.templateCheckboxes ?? {},
-    (val: boolean | undefined, key) =>
-      val
+    (checked: boolean | undefined, key) =>
+      checked
         ? {
             enabled: true,
-            defaultValue: get(formValues, key) || undefined
+            defaultValue: get(formValues, key) ?? undefined
           }
         : undefined
   );
@@ -342,7 +428,7 @@ export function getEnabledTemplateFieldsFromForm(
 
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
-  formTemplate?: Partial<FormTemplate<T>>
+  formTemplate?: Partial<FormTemplate>
 ): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   if (!formTemplate) {
     return {};
@@ -355,10 +441,10 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
 
   // Get the default values from the stored template:
   const defaultValues: Partial<T> = {};
-  for (const [field, templateField] of toPairs<TemplateField<any> | undefined>(
+  for (const [field, templateField] of toPairs<TemplateField | undefined>(
     formTemplate.templateFields
   )) {
-    if (templateField?.enabled && templateField.defaultValue) {
+    if (templateField?.enabled && !isNil(templateField.defaultValue)) {
       set(defaultValues, field, templateField.defaultValue);
     }
   }
@@ -369,4 +455,24 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
     templateCheckboxes,
     attachmentsConfig: { allowNew, allowExisting }
   };
+}
+
+/**
+ * Gets the tempalte fields for the managed attributes,
+ * which are enabled without the usual visibility checkbox.
+ */
+function getManagedAttributeTemplate(
+  managedAttributes: Record<string, string | null | undefined>,
+  managedAttributesOrder?: string[],
+  managedAttributePath = "managedAttributes"
+): TemplateFieldMap {
+  // Managed attribute default values don't need the template checkbox, all are set to "enabled":
+  const templateFieldMap: TemplateFieldMap = {};
+  for (const key of managedAttributesOrder ?? []) {
+    templateFieldMap[`${managedAttributePath}.${key}`] = {
+      enabled: true,
+      defaultValue: managedAttributes?.[key]
+    };
+  }
+  return templateFieldMap;
 }

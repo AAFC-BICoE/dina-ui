@@ -35,9 +35,9 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/collection/managed-attribute/list",
+    postSaveRedirect: "/managed-attribute/list?tab=collection",
     apiBaseUrl: "/collection-api",
-    listHref: "/collection/managed-attribute/list",
+    listHref: "/managed-attribute/list?tab=collection",
     componentField: (
       <SelectField
         className="col-md-6"

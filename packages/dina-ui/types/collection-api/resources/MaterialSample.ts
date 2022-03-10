@@ -1,16 +1,36 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
-import { BLANK_PREPARATION } from "../../../components/collection";
+import { BLANK_PREPARATION } from "../../../components";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { AcquisitionEvent } from "./AcquisitionEvent";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
-import { Determination } from "./Determination";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
+
+/**
+ * All Material Sample form sections in order.
+ * This array is the source of truth for the section ID names and their order.
+ */
+export const MATERIAL_SAMPLE_FORM_SECTIONS = [
+  "identifiers-section",
+  "material-sample-info-section",
+  "collecting-event-section",
+  "acquisition-event-section",
+  "preparations-section",
+  "organisms-section",
+  "associations-section",
+  "storage-section",
+  "scheduled-actions-section",
+  "managedAttributes-section",
+  "material-sample-attachments-section"
+] as const;
+
+export type MaterialSampleFormSectionId =
+  typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
 
 export interface MaterialSampleAttributes {
   type: "material-sample";

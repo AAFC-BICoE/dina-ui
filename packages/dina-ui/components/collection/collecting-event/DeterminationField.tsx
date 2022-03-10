@@ -57,11 +57,13 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export interface DeterminationFieldProps {
   id?: string;
   name?: string;
+  visibleManagedAttributeKeys?: string[];
 }
 
 export function DeterminationField({
   id = "determination-section",
-  name
+  name,
+  visibleManagedAttributeKeys
 }: DeterminationFieldProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
@@ -337,22 +339,20 @@ export function DeterminationField({
                     multiLines={true}
                   />
                 </FieldSet>
-                {!isTemplate && (
-                  <ManagedAttributesEditor
-                    valuesPath={fieldProps("managedAttributes").name}
-                    managedAttributeApiPath="collection-api/managed-attribute"
-                    managedAttributeComponent="DETERMINATION"
-                    attributeSelectorWidth={12}
-                    fieldSetProps={{
-                      legend: (
-                        <DinaMessage id="determinationManagedAttributes" />
-                      ),
-                      enabledFields: null,
-                      className: "non-strip"
-                    }}
-                    showCustomViewDropdown={true}
-                  />
-                )}
+                <ManagedAttributesEditor
+                  valuesPath={fieldProps("managedAttributes").name}
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  managedAttributeComponent="DETERMINATION"
+                  attributeSelectorWidth={12}
+                  fieldSetProps={{
+                    legend: <DinaMessage id="determinationManagedAttributes" />,
+                    enabledFields: null,
+                    className: "non-strip"
+                  }}
+                  showCustomViewDropdown={!isTemplate}
+                  managedAttributeOrderFieldName="determinationManagedAttributesOrder"
+                  visibleAttributeKeys={visibleManagedAttributeKeys}
+                />
               </div>
             </div>
           );

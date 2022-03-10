@@ -194,35 +194,46 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     const result: ESIndexMapping[] = [];
-    resp.data.body.attributes.map(key => {
-      result.push({
-        label: key.name,
-        value: key.path
-          ? key.path + "." + key.name
-          : key.name === "id" || "type"
-          ? "data." + key.name
-          : key.name,
-        type: key.type,
-        path: key.path
-      });
-    });
 
-    resp.data.body.relationships.attributes.map(key => {
-      result.push({
-        label: key.path?.includes(".")
-          ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
-          : key.name,
-        value: key.path
-          ? key.path + "." + key.name
-          : key.name === "id" || "type"
-          ? "data." + key.name
-          : key.name,
-        type: key.type,
-        path: key.path,
-        parentPath: resp.data.body.relationships.path,
-        parentName: resp.data.body.relationships.value
+    resp.data.body.attributes
+      .filter(key => key.name !== "type")
+      .map(key => {
+        const path = key.path;
+        const prefix = "data.attributes";
+        let attrPrefix;
+        if (path && path.includes(prefix)) {
+          attrPrefix = path.substring(prefix.length + 1);
+        }
+        result.push({
+          label: attrPrefix ? attrPrefix + "." + key.name : key.name,
+          value: key.path
+            ? key.path + "." + key.name
+            : key.name === "id"
+            ? "data." + key.name
+            : key.name,
+          type: key.type,
+          path: key.path
+        });
       });
-    });
+
+    resp.data.body.relationships.attributes
+      .filter(key => key.name !== "type")
+      .map(key => {
+        result.push({
+          label: key.path?.includes(".")
+            ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
+            : key.name,
+          value: key.path
+            ? key.path + "." + key.name
+            : key.name === "id"
+            ? "data." + key.name
+            : key.name,
+          type: key.type,
+          path: key.path,
+          parentPath: resp.data.body.relationships.path,
+          parentName: resp.data.body.relationships.value
+        });
+      });
     return result;
   }
 

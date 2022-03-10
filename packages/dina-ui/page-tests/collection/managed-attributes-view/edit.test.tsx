@@ -1,10 +1,8 @@
 import { ResourceSelect } from "common-ui";
-import { ErrorBoundaryPage } from "../../../components";
 import Select from "react-select";
-import ManagedAttributesViewEditPage, {
-  ManagedAttributesViewForm,
-  SortableAttributesViewList
-} from "../../../pages/collection/managed-attributes-view/edit";
+import { ManagedAttributesViewForm } from "../../../components";
+import { SortableAttributesViewList } from "../../../components/object-store/managed-attributes/managed-attributes-custom-views/ManagedAttributesSorter";
+import ManagedAttributesViewEditPage from "../../../pages/collection/managed-attributes-view/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   CustomView,
@@ -42,14 +40,12 @@ const TEST_BAD_CUSTOM_VIEW: CustomView = {
   }
 };
 
+const ATTRIBUTE_1 = { id: "1", key: "attribute_1", name: "Attribute 1" };
+const ATTRIBUTE_2 = { id: "2", key: "attribute_2", name: "Attribute 2" };
+const ATTRIBUTE_3 = { id: "3", key: "attribute_3", name: "Attribute 3" };
+
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_1":
-      return { data: { id: "1", key: "attribute_1", name: "Attribute 1" } };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_2":
-      return { data: { id: "2", key: "attribute_2", name: "Attribute 2" } };
-    case "collection-api/managed-attribute/MATERIAL_SAMPLE.attribute_3":
-      return { data: { id: "3", key: "attribute_3", name: "Attribute 3" } };
     case "collection-api/custom-view/bad-custom-view":
       return { data: TEST_BAD_CUSTOM_VIEW };
     case "collection-api/custom-view/123":
@@ -58,6 +54,19 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/managed-attribute":
       return { data: [] };
   }
+});
+
+const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
+  return paths.map(path => {
+    switch (path) {
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
+        return ATTRIBUTE_1;
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_2":
+        return ATTRIBUTE_2;
+      case "managed-attribute/MATERIAL_SAMPLE.attribute_3":
+        return ATTRIBUTE_3;
+    }
+  });
 });
 
 const mockSave = jest.fn<any, any>(ops =>
@@ -72,6 +81,7 @@ const testCtx = {
     apiClient: {
       get: mockGet
     },
+    bulkGet: mockBulkGet,
     save: mockSave
   }
 };
@@ -125,6 +135,11 @@ describe("ManagedAttributesViewEditPage", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // The inputs should be disabled when you are just editing a custom view without default values:
+    expect(
+      wrapper.find(".sortable-managed-attribute input").first().prop("disabled")
+    ).toEqual(true);
 
     // Simulate a Drag and Drop of attribute_3 to the beginning of the list:
     wrapper.find(SortableAttributesViewList).prop<any>("onSortEnd")({
