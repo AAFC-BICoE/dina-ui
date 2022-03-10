@@ -1,5 +1,6 @@
 import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
+import { LimitOffsetPageSpec } from "../api-client/operations-types";
 
 interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
@@ -7,7 +8,8 @@ interface TransformQueryToDSLParams {
 }
 
 export function transformQueryToDSL(
-  submittedValues: TransformQueryToDSLParams
+  submittedValues: TransformQueryToDSLParams,
+  pagination: LimitOffsetPageSpec
 ) {
   const builder = Bodybuilder();
 
@@ -115,6 +117,12 @@ export function transformQueryToDSL(
 
   if (submittedValues.group)
     builder.andQuery("match", "data.attributes.group", submittedValues.group);
+
+  // Apply pagination rules to elastic search query.
+  if (pagination) {
+    builder.size(pagination.limit);
+    builder.from(pagination.offset);
+  }
 
   return builder.build();
 }

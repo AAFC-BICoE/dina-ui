@@ -26,8 +26,9 @@ import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import moment from "moment";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
-import { FormikButton, useAccount } from "..";
+import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { FormikProps } from "formik";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -51,6 +52,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
+
+/**
+ * Default size for QueryTable.
+ */
+const DEFAULT_PAGE_SIZE = 25;
+
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
@@ -65,15 +72,26 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { groupNames } = useAccount();
   const { formatMessage } = useIntl();
+  const formRef = useRef<FormikProps<any>>(null);
   const isResetRef = useRef<boolean>(false);
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
   const [searchResults, setSearchResults] = useState<{
     results?: TData[];
+    totalResults?: number;
     isFromSearch?: boolean;
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
   const [visible, setVisible] = useState(false);
+
+  // JSONAPI page spec.
+  const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
+    limit: DEFAULT_PAGE_SIZE,
+    offset: 0
+  });
+
+  // Current page being displayed.
+  const [currentPage, setCurrentPage] = useState(0);
 
   const {
     CheckBoxField,
@@ -169,24 +187,67 @@ export function QueryPage<TData extends KitsuResource>({
         }
       }
     );
-    return resp?.data?.hits.hits.map(hit => hit._source?.data);
+    return resp?.data?.hits;
   }
 
   const onSubmit = ({ submittedValues }) => {
-    const queryDSL = transformQueryToDSL(submittedValues);
+    const queryDSL = transformQueryToDSL(submittedValues, pagination);
     // No search when query has no content in it
     if (!Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
-      const processedResult = result?.map(rslt => ({
-        id: rslt.id,
-        type: rslt.type,
-        ...rslt.attributes
-      }));
+      const processedResult = result?.hits
+        .map(hit => hit._source?.data)
+        .map(rslt => ({
+          id: rslt.id,
+          type: rslt.type,
+          ...rslt.attributes
+        }));
       setAvailableSamples(processedResult);
-      setSearchResults({ results: processedResult, isFromSearch: true });
+      setSearchResults({
+        results: processedResult,
+        totalResults: result?.total.value,
+        isFromSearch: true
+      });
     });
   };
-  const totalCount = searchResults?.results?.length ?? initData?.length;
+
+  /**
+   * Triggered when the user changes the page. This will also determine the offset to apply to the
+   * elasticsearch.
+   *
+   * @param newPageNumber The new page number set.
+   */
+  const onPageChange = (newPageNumber: number) => {
+    setCurrentPage(newPageNumber);
+
+    setPagination({ ...pagination, offset: newPageNumber * pagination.limit });
+
+    // Trigger submit to apply new pagination only if not using initData.
+    if (searchResults?.results) {
+      formRef.current?.submitForm();
+    }
+  };
+
+  /**
+   * Triggered when the user changes the number of records to display on a page. This will also
+   * change the number of records retrieved from elasticsearch.
+   *
+   * @param newPageSize Number of records to display on page.
+   */
+  const onPageSizeChange = (newPageSize: number) => {
+    setPagination({ ...pagination, limit: newPageSize });
+
+    // Trigger submit to apply new pagination only if not using initData.
+    if (searchResults?.results) {
+      formRef.current?.submitForm();
+    }
+  };
+
+  const totalRecords = searchResults?.totalResults ?? initData?.length;
+
+  const numberOfPages = totalRecords
+    ? Math.floor(totalRecords / pagination.limit)
+    : undefined;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
@@ -262,6 +323,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <DinaForm
+      innerRef={formRef}
       initialValues={{
         group: groupNames?.[0],
         queryRows: [{}]
@@ -302,7 +364,10 @@ export function QueryPage<TData extends KitsuResource>({
           {!omitPaging && (
             <div className="d-flex ">
               <span>
-                <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+                <CommonMessage
+                  id="tableTotalCount"
+                  values={{ totalCount: totalRecords }}
+                />
               </span>
               {resolvedReactTableProps?.sortable !== false && (
                 <span className="flex-grow-1">
@@ -350,6 +415,11 @@ export function QueryPage<TData extends KitsuResource>({
           rowsText={formatMessage({ id: "rows" })}
           previousText={<CommonMessage id="previous" />}
           nextText={<CommonMessage id="next" />}
+          pageSize={pagination.limit}
+          pages={numberOfPages}
+          page={currentPage}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           TbodyComponent={
             error
               ? () => (
