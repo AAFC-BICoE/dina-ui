@@ -491,7 +491,22 @@ export function QueryPage<TData extends KitsuResource>({
           })}
         </div>
         <div>
-          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+          <FormikButton
+            className="btn btn-primary px-5"
+            onClick={async formik => {
+              // New searches should set the pagination.
+              setPagination({
+                ...pagination,
+                currentPage: 0,
+                offset: 0
+              });
+
+              // Submit form.
+              pageRef.current?.submitForm();
+            }}
+          >
+            <DinaMessage id="search" />
+          </FormikButton>
           <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
             <DinaMessage id="resetFilters" />
           </FormikButton>
@@ -526,7 +541,7 @@ export function QueryPage<TData extends KitsuResource>({
                   />
                 </div>
               )}
-              <div className="d-flex gap-3">
+              <div className="d-flex gap-2">
                 {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
                 {bulkDeleteButtonProps && (
                   <BulkDeleteButton {...bulkDeleteButtonProps} />
