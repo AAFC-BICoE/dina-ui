@@ -110,6 +110,10 @@ const TEST_COLUMNS: ColumnDefinition<any>[] = [
 ];
 describe("QueryPage component", () => {
   it("Query Page is able to aggretate first level queries", async () => {
+    // Clear any previously captured post and get requests.
+    mockPost.mockClear();
+    mockGet.mockClear();
+
     const wrapper = mountWithAppContext(
       <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
       {
@@ -351,6 +355,10 @@ describe("QueryPage component", () => {
   });
 
   it("Pagination is properly handled", async () => {
+    // Clear any previously captured post and get requests.
+    mockPost.mockClear();
+    mockGet.mockClear();
+
     const wrapper = mountWithAppContext(
       <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
       {
