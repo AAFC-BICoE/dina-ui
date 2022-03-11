@@ -493,7 +493,7 @@ export function QueryPage<TData extends KitsuResource>({
         <div>
           <FormikButton
             className="btn btn-primary px-5"
-            onClick={async formik => {
+            onClick={() => {
               // New searches should set the pagination.
               setPagination({
                 ...pagination,
