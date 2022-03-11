@@ -3,6 +3,7 @@ import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { QueryPage } from "../QueryPage";
 import DatePicker from "react-datepicker";
 import { ColumnDefinition } from "../../table/QueryTable";
+import ReactTable from "react-table";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
@@ -275,6 +276,8 @@ describe("QueryPage component", () => {
       [
         "search-api/search-ws/search",
         {
+          from: 0,
+          size: 25,
           query: {
             bool: {
               filter: {
@@ -310,6 +313,8 @@ describe("QueryPage component", () => {
       [
         "search-api/search-ws/search",
         {
+          from: 0,
+          size: 25,
           query: {
             bool: {
               filter: {
@@ -333,6 +338,77 @@ describe("QueryPage component", () => {
                   "data.attributes.group": "testGroup"
                 }
               }
+            }
+          }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
+        }
+      ]
+    ]);
+  });
+
+  it("Pagination is properly handled", async () => {
+    const wrapper = mountWithAppContext(
+      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      {
+        apiContext
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Force the page to elastic search data.
+    wrapper.find("form").simulate("submit");
+
+    // Change the page size.
+    wrapper.find(ReactTable).prop<any>("onPageSizeChange")(5, null);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Go to page 3.
+    wrapper.find(ReactTable).prop<any>("onPageChange")(3, null);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Force the page to elastic search data.
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Ensure calls made to elastic search match the following:
+    expect(mockPost.mock.calls).toEqual([
+      [
+        "search-api/search-ws/search",
+        {
+          from: 0,
+          size: 25,
+          query: {
+            match: {
+              "data.attributes.group": "aafc"
+            }
+          }
+        },
+        {
+          params: {
+            indexName: "testIndex"
+          }
+        }
+      ],
+      [
+        "search-api/search-ws/search",
+        {
+          from: 15,
+          size: 5,
+          query: {
+            match: {
+              "data.attributes.group": "aafc"
             }
           }
         },
