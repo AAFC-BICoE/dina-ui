@@ -106,36 +106,47 @@ export function GlobalNamesReadOnly({
   const paths = scientificNameDetails?.classificationPath?.split("|");
   const ranks = scientificNameDetails?.classificationRanks?.split("|");
 
-  const familyIdx = ranks?.findIndex(path => path === "family");
-  const kingdomIdx = ranks?.findIndex(path => path === "kingdom");
+  const pathsReverse = paths?.slice(0).reverse();
+  const ranksReverse = ranks?.slice(0).reverse();
 
-  const kingdomRank =
-    kingdomIdx && kingdomIdx >= 0 ? paths?.[kingdomIdx] : undefined;
-  const familyRank =
-    familyIdx && familyIdx >= 0 ? paths?.[familyIdx] + ": " : undefined;
+  const genusIdx = ranks?.findIndex(path => path === "genus");
+  const speciesIdx = ranks?.findIndex(path => path === "species");
+
+  const speciesRank =
+    speciesIdx && speciesIdx >= 0 ? paths?.[speciesIdx] : undefined;
+  const genusRank =
+    genusIdx && genusIdx >= 0 ? paths?.[genusIdx] + " > " : undefined;
 
   const initTaxonTree = (
     <span>
       {" "}
-      {kingdomRank ? <b>Kingdom: </b> : undefined} {kingdomRank}
-      {familyRank ? <b> &gt;Family: </b> : undefined} {familyRank}
+      {speciesRank ? <b>Species : </b> : undefined} {speciesRank}
+      {genusRank ? (
+        <>
+          {" "}
+          &gt; <b> Genus : </b>{" "}
+        </>
+      ) : undefined}{" "}
+      {genusRank}
     </span>
   );
 
   const fullTaxonTree = (
     <>
-      {paths?.map((path, idx) => {
-        let boldText = ranks?.[idx] && (
+      {pathsReverse?.map((path, idx) => {
+        let boldText = ranksReverse?.[idx] && (
           <>
             <b>
               {" "}
-              {ranks[idx].charAt(0)?.toUpperCase() + ranks[idx].substring(1)} :
+              {ranksReverse[idx].charAt(0)?.toUpperCase() +
+                ranksReverse[idx].substring(1)}{" "}
+              :
             </b>{" "}
             <>{path}</>{" "}
           </>
         );
 
-        if (idx !== path.length - 1 && boldText) {
+        if (idx !== pathsReverse.length - 1 && boldText) {
           boldText = <> {boldText} &gt;</>;
         }
         return boldText;
