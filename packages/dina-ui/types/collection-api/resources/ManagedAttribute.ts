@@ -14,7 +14,12 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST" | "DATE";
+export type ManagedAttributeType =
+  | "INTEGER"
+  | "STRING"
+  | "PICKLIST"
+  | "DATE"
+  | "BOOLEAN";
 
 export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",
@@ -46,6 +51,14 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   {
     labelKey: "field_managedAttributeType_picklist_label",
     value: "PICKLIST"
+  },
+  {
+    labelKey: "field_managedAttributeType_date_label",
+    value: "DATE"
+  },
+  {
+    labelKey: "field_managedAttributeType_boolean_label",
+    value: "BOOLEAN"
   }
 ];
 

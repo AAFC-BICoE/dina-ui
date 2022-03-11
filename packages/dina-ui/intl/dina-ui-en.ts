@@ -318,6 +318,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeType_integer_label: "Numerical",
   field_managedAttributeType_picklist_label: "Pick List",
   field_managedAttributeType_text_label: "Text",
+  field_managedAttributeType_date_label: "Date",
+  field_managedAttributeType_boolean_label: "Boolean",
   field_materialSampleName: "Primary ID",
   field_materialSampleState_tooltip:
     "Represents the state of a material sample when its condition is negatively impacted.",
