@@ -31,13 +31,14 @@ import { GroupSelectField } from "../../../dina-ui/components/group-select/Group
 import { UserPreference } from "../../../dina-ui/types/user-api";
 import {
   AreYouSureModal,
-  LimitOffsetPageSpec,
   FormikButton,
   useAccount,
-  useModal
+  useModal,
+  Pagination
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { FormikProps } from "formik";
+import { useEffect } from "react";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
@@ -97,14 +98,12 @@ export function QueryPage<TData extends KitsuResource>({
   }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
-  // JSONAPI page spec.
-  const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
+  // Pagination data to use to render table and query elastic search.
+  const [pagination, setPagination] = useState<Pagination>({
+    currentPage: 0,
     limit: DEFAULT_PAGE_SIZE,
     offset: 0
   });
-
-  // Current page being displayed.
-  const [currentPage, setCurrentPage] = useState(0);
 
   const {
     CheckBoxField,
@@ -215,6 +214,14 @@ export function QueryPage<TData extends KitsuResource>({
     });
   };
 
+  // Anytime the pagination is updated, should call a new elasticsearch request.
+  useEffect(() => {
+    // Trigger submit to apply new pagination only if not using initData.
+    if (searchResults?.results) {
+      pageRef.current?.submitForm();
+    }
+  }, [pagination]);
+
   /**
    * Triggered when the user changes the page. This will also determine the offset to apply to the
    * elasticsearch.
@@ -222,14 +229,11 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageNumber The new page number set.
    */
   const onPageChange = (newPageNumber: number) => {
-    setCurrentPage(newPageNumber);
-
-    setPagination({ ...pagination, offset: newPageNumber * pagination.limit });
-
-    // Trigger submit to apply new pagination only if not using initData.
-    if (searchResults?.results) {
-      pageRef.current?.submitForm();
-    }
+    setPagination({
+      ...pagination,
+      offset: newPageNumber * pagination.limit,
+      currentPage: newPageNumber
+    });
   };
 
   /**
@@ -239,18 +243,17 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageSize Number of records to display on page.
    */
   const onPageSizeChange = (newPageSize: number) => {
-    setPagination({ ...pagination, limit: newPageSize });
-
-    // Trigger submit to apply new pagination only if not using initData.
-    if (searchResults?.results) {
-      pageRef.current?.submitForm();
-    }
+    setPagination({
+      offset: 0,
+      limit: newPageSize,
+      currentPage: 0
+    });
   };
 
   const totalRecords = searchResults?.totalResults ?? initData?.length;
 
   const numberOfPages = totalRecords
-    ? Math.floor(totalRecords / pagination.limit)
+    ? Math.ceil(totalRecords / pagination.limit)
     : undefined;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
@@ -544,9 +547,10 @@ export function QueryPage<TData extends KitsuResource>({
           rowsText={formatMessage({ id: "rows" })}
           previousText={<CommonMessage id="previous" />}
           nextText={<CommonMessage id="next" />}
+          manual={searchResults?.results ? true : false}
           pageSize={pagination.limit}
           pages={numberOfPages}
-          page={currentPage}
+          page={pagination.currentPage}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
           TbodyComponent={

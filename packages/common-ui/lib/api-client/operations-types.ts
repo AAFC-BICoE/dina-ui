@@ -39,3 +39,12 @@ export interface LimitOffsetPageSpec {
   limit: number;
   offset: number;
 }
+
+/**
+ * Pagination data used for data tables.
+ */
+export interface Pagination {
+  currentPage: number;
+  limit: number;
+  offset: number;
+}
