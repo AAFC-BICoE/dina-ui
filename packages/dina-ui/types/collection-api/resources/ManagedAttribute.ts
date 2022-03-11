@@ -19,7 +19,7 @@ export type ManagedAttributeType =
   | "STRING"
   | "PICKLIST"
   | "DATE"
-  | "BOOLEAN";
+  | "BOOL";
 
 export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",
@@ -58,7 +58,7 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   },
   {
     labelKey: "field_managedAttributeType_boolean_label",
-    value: "BOOLEAN"
+    value: "BOOL"
   }
 ];
 
