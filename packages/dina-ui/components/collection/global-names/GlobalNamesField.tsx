@@ -109,13 +109,17 @@ export function GlobalNamesReadOnly({
   const pathsReverse = paths?.slice(0).reverse();
   const ranksReverse = ranks?.slice(0).reverse();
 
-  const genusIdx = ranks?.findIndex(path => path === "genus");
-  const speciesIdx = ranks?.findIndex(path => path === "species");
+  const genusIdx = ranksReverse?.findIndex(path => path === "genus");
+  const speciesIdx = ranksReverse?.findIndex(path => path === "species");
 
   const speciesRank =
-    speciesIdx && speciesIdx >= 0 ? paths?.[speciesIdx] : undefined;
+    typeof speciesIdx !== "undefined" && speciesIdx >= 0
+      ? pathsReverse?.[speciesIdx]
+      : undefined;
   const genusRank =
-    genusIdx && genusIdx >= 0 ? paths?.[genusIdx] + " > " : undefined;
+    typeof genusIdx !== "undefined" && genusIdx >= 0
+      ? pathsReverse?.[genusIdx] + " > "
+      : undefined;
 
   const initTaxonTree = (
     <span>
