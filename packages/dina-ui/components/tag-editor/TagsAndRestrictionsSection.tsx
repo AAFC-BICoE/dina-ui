@@ -46,7 +46,6 @@ export function TagsAndRestrictionsSection({
             <div>
               <TagSelectField
                 resourcePath={resourcePath}
-                className="mb-3 ps-2"
                 name={tagsFieldName}
                 removeLabel={true}
                 groupSelectorName={groupSelectorName}
@@ -55,7 +54,7 @@ export function TagsAndRestrictionsSection({
           </div>
         )}
         {initialValues.restrictionRemarks && (
-          <div className="d-flex flex-row">
+          <div className="d-flex flex-row mb-3">
             <RestrictionWarning isRestrictionRemarks={true} />
           </div>
         )}

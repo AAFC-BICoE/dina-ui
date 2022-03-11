@@ -50,7 +50,7 @@ export function FieldExtensionSelectField(
             <div className="card p-1 flex-row align-items-center gap-1 bg-danger">
               <GoCircleSlash className="text-white" />
               <span className="text-white">
-                {fieldExtensionSelectFieldProps.label + ":" + value?.value}
+                {fieldExtensionSelectFieldProps.label + " : " + value?.value}
               </span>
             </div>
           ) : null
