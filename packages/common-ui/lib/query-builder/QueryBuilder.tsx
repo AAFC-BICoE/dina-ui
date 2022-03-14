@@ -1,16 +1,16 @@
-import { FieldWrapperProps, useApiClient } from "..";
+import { FieldWrapperProps } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
-import moment from "moment";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
   isResetRef?: React.MutableRefObject<boolean>;
+  isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
 export function QueryBuilder({
   name,
   esIndexMapping,
-  isResetRef
+  isFromLoadedRef
 }: QueryBuilderProps) {
   return (
     <FieldArray name={name}>
@@ -25,7 +25,7 @@ export function QueryBuilder({
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
-              isResetRef={isResetRef}
+              isFromLoadedRef={isFromLoadedRef}
             />
           );
           // initialize the logic switch value to be "and"//
@@ -34,25 +34,6 @@ export function QueryBuilder({
               elements?.length ?? 0
             }].compoundQueryType`,
             "and"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].fieldName`,
-            esIndexMapping?.[0]?.label
-          );
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].matchType`,
-            "match"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].boolean`,
-            "true"
-          );
-
-          fieldArrayProps.form.setFieldValue(
-            `${fieldArrayProps.name}[${elements?.length ?? 0}].date`,
-            moment().format()
           );
         }
 
@@ -69,7 +50,7 @@ export function QueryBuilder({
                 addRow={addRow}
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
-                isResetRef={isResetRef}
+                isFromLoadedRef={isFromLoadedRef}
               />
             ))
           : null;
