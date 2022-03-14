@@ -15,6 +15,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, isNil, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
+import { RESTRICTIONS_FIELDS } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
@@ -194,7 +195,8 @@ export function MaterialSampleCustomViewForm({
       enableOrganisms,
       enableScheduledActions,
       enableAssociations,
-      enableAcquisitionEvent
+      enableAcquisitionEvent,
+      enableRestrictions
     }
   } = materialSampleSaveHook;
 
@@ -244,6 +246,9 @@ export function MaterialSampleCustomViewForm({
     const preparationTemplateFields =
       enablePreparations && pick(enabledTemplateFields, ...PREPARATION_FIELDS);
 
+    const restrictionsTemplateFields =
+      enableRestrictions && pick(enabledTemplateFields, ...RESTRICTIONS_FIELDS);
+
     const organismsTemplateFields =
       enableOrganisms &&
       pickBy(enabledTemplateFields, (_, key) => key.startsWith("organism[0]."));
@@ -280,6 +285,7 @@ export function MaterialSampleCustomViewForm({
             ...storageTemplateFields,
             ...scheduledActionsTemplateFields,
             ...associationTemplateFields,
+            ...restrictionsTemplateFields,
             ...getManagedAttributeTemplate(
               sampleManagedAttributes,
               managedAttributesOrder
