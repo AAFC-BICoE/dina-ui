@@ -1176,8 +1176,14 @@ describe("MaterialSampleBulkEditor", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [{ verbatimScientificName: "new-scientific-name" }],
-        type: "organism"
+        determination: [
+          {
+            verbatimScientificName: "new-scientific-name",
+            determiner: undefined
+          }
+        ],
+        type: "organism",
+        group: undefined
       },
       type: "organism"
     };
@@ -1195,6 +1201,12 @@ describe("MaterialSampleBulkEditor", () => {
             type: "material-sample",
             resource: {
               id: sample.id,
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: sample.type,
               associations: [
                 {
@@ -1388,6 +1400,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1396,6 +1414,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1460,6 +1484,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
               type: "material-sample"
@@ -1469,6 +1499,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1799,6 +1835,12 @@ describe("MaterialSampleBulkEditor", () => {
               },
               relationships: {},
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -1811,6 +1853,12 @@ describe("MaterialSampleBulkEditor", () => {
               },
               relationships: {},
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -1873,6 +1921,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               storageUnit: {
                 id: "C",
@@ -1885,6 +1939,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               storageUnit: {
                 id: "C",
