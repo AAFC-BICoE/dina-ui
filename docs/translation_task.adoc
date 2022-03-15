@@ -1,6 +1,6 @@
 == To export to csv file
 
-* To get the net items for translation ( instead of sending the all items in the file with some items with blank French translation), add a filter in messages-csv-export.ts as in below line:
+* To get the net items for translation ( instead of sending all entries in the file with some items having blank French translation), add a filter in messages-csv-export.ts as in below line:
 
 [source,tsx]
 ----
