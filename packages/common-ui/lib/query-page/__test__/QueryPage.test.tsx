@@ -289,13 +289,13 @@ describe("QueryPage component", () => {
                       term: {
                         allowDuplicateName: "false"
                       }
+                    },
+                    {
+                      term: {
+                        "data.attributes.group": "testGroup"
+                      }
                     }
                   ]
-                }
-              },
-              must: {
-                match: {
-                  "data.attributes.group": "testGroup"
                 }
               }
             }
@@ -324,13 +324,13 @@ describe("QueryPage component", () => {
                       term: {
                         allowDuplicateName: "false"
                       }
+                    },
+                    {
+                      term: {
+                        "data.attributes.group": "testGroup"
+                      }
                     }
                   ]
-                }
-              },
-              must: {
-                match: {
-                  "data.attributes.group": "testGroup"
                 }
               }
             }
