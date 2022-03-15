@@ -66,6 +66,7 @@ export function FileView({
       {showFile ? (
         <a
           href={authenticatedFilePath}
+          target="_blank"
           style={{
             color: "inherit",
             textDecoration: "none",
