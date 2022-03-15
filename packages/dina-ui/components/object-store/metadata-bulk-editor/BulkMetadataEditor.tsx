@@ -166,7 +166,7 @@ export function BulkMetadataEditor({
     }
 
     const managedAttributesInUse = await getManagedAttributesInUse(
-      metadatas.map(it => it.managedAttributeValues),
+      metadatas.map(it => it.managedAttributes),
       bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -286,11 +286,9 @@ export function BulkMetadataEditor({
 
         // Remove blank managed attribute values from the map:
         const blankValues: any[] = ["", null];
-        for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
-          if (
-            blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])
-          ) {
-            delete metadataEdit?.managedAttributeValues?.[maKey];
+        for (const maKey of keys(metadataEdit?.managedAttributes)) {
+          if (blankValues.includes(metadataEdit?.managedAttributes?.[maKey])) {
+            delete metadataEdit?.managedAttributes?.[maKey];
           }
         }
 
@@ -482,7 +480,7 @@ export function managedAttributeColumns(
   editableManagedAttributes: ManagedAttribute[]
 ) {
   return editableManagedAttributes.map(attr => ({
-    data: `metadata.managedAttributeValues.${attr.key}`,
+    data: `metadata.managedAttributes.${attr.key}`,
     title: attr.name,
     ...(attr.acceptedValues?.length
       ? {
