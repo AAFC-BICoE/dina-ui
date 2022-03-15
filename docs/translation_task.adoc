@@ -1,0 +1,40 @@
+== To export to csv file
+
+* To get the net items for translation ( instead of sending the all items in the file with some items with blank French translation), add a filter in messages-csv-export.ts as in below line:
+
+[source,tsx]
+----
+const rows = keys.filter(key => english.messages[key] && (french.messages[key] === undefined || 
+      french.messages[key]?.trim().length === 0 ||
+    french.messages[key] === null )
+    ).map<CsvRow>(key => ({
+----
+
+run 
+[source,bash]
+----
+cd ./packages/scripts
+yarn --silent export-intl-csv > messages.csv
+----
+
+* Open the csv and save as xlsx file, make sure the xlsx is able to be previewed
+
+* Go to the translation site and clone the previous project (or create a new project), upload the xlsx file and submit, when translation is received or done, an email will be sent to the contact email.
+
+== To import from translated csv file
+
+* Go to the translation site and download the target translated file
+* Make sure the column header has french instead of français
+* Open the file in windows excel and save it as csv file
+* Import the file 
+
+run
+
+[source,bash]
+----
+cd ./packages/scripts
+CSVFILE=messages.csv yarn import-intl-csv
+----
+
+* Verify there are no unexpected characters, e.g apostrophe are the same as existing ones etc.
+
