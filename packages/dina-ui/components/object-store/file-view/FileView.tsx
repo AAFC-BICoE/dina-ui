@@ -18,8 +18,8 @@ export interface FileViewProps {
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
-  id: string;
-  preview: boolean;
+  id?: string;
+  preview?: boolean;
 }
 
 // The FileViewer component can't be server-side rendered:

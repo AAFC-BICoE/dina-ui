@@ -5,8 +5,8 @@ import { DownLoadLinks, FileView } from "../file-view/FileView";
 export interface MetadataFileViewProps {
   metadata: Metadata;
   imgHeight?: string;
-  id: string;
-  preview: boolean;
+  id?: string;
+  preview?: boolean;
 }
 
 /** Displays the file for the given metadata. */
