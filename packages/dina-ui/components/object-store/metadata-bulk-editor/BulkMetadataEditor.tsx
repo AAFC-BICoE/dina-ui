@@ -14,7 +14,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { get, set, keys } from "lodash";
+import { get, set, keys, merge } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -247,7 +247,11 @@ export function BulkMetadataEditor({
           type,
           // When adding new Metadatas, add the required fields from the ObjectUpload:
           ...(!id ? row.original.metadata : {}),
-          ...metadata
+          ...metadata,
+          managedAttributes: merge(
+            row.original.metadata.managedAttributes,
+            metadata?.managedAttributes
+          )
         } as Metadata;
 
         if (dcCreator !== undefined) {
