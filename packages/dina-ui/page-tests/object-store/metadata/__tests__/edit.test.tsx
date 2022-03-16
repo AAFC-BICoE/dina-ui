@@ -503,9 +503,6 @@ describe("Metadata bulk edit page", () => {
               xmpRightsUsageTerms: "default-value",
               xmpRightsWebStatement: "default-value",
               publiclyReleasable: true, // Default Value
-              // dcType: undefined,
-              // id: undefined,
-              // managedAttributes:  {},
               type: "metadata"
             },
             type: "metadata"
