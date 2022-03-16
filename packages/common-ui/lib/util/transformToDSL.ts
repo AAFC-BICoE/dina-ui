@@ -111,8 +111,14 @@ export function transformQueryToDSL(
     }
   });
 
-  if (submittedValues.group)
-    builder.andQuery("match", "data.attributes.group", submittedValues.group);
+  if (
+    Array.isArray(submittedValues.group) &&
+    submittedValues.group.length > 0
+  ) {
+    builder.andFilter("terms", "data.attributes.group", submittedValues.group);
+  } else if (!Array.isArray(submittedValues.group) && submittedValues.group) {
+    builder.andFilter("term", "data.attributes.group", submittedValues.group);
+  }
 
   return builder.build();
 }
