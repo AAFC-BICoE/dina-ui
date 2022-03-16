@@ -12,6 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -121,9 +122,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <NotPubliclyReleasableWarning />
-              <MaterialSampleStateWarning />
               {buttonBar}
+              <MaterialSampleStateWarning />
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}

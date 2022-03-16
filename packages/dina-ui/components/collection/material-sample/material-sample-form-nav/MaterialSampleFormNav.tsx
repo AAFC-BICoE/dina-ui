@@ -258,6 +258,13 @@ export function useMaterialSampleSectionOrder({
         disabled: !dataComponentState.enableStorage,
         setEnabled: dataComponentState.setEnableStorage
       },
+      "restriction-section": {
+        id: "restriction-section",
+        msg: formatMessage("restrictions"),
+        className: "enable-restrictions",
+        disabled: !dataComponentState.enableRestrictions,
+        setEnabled: dataComponentState.setEnableRestrictions
+      },
       "scheduled-actions-section": {
         id: "scheduled-actions-section",
         msg: formatMessage("scheduledActions"),

@@ -1,4 +1,5 @@
 import { PersistedResource } from "kitsu";
+import { DinaForm } from "../../../../../common-ui/lib";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../../types/collection-api";
 import { MaterialSampleBreadCrumb } from "../MaterialSampleBreadCrumb";
@@ -18,10 +19,12 @@ const materialSampleWithHierarchy: PersistedResource<MaterialSample> = {
 describe("MaterialSampleBreadCrumb component", () => {
   it("Renders the breadcrumb path from the hierarchy, lastLink disabled", async () => {
     const wrapper = mountWithAppContext(
-      <MaterialSampleBreadCrumb
-        materialSample={materialSampleWithHierarchy}
-        disableLastLink={true}
-      />
+      <DinaForm initialValues={{}}>
+        <MaterialSampleBreadCrumb
+          materialSample={materialSampleWithHierarchy}
+          disableLastLink={true}
+        />
+      </DinaForm>
     );
     /* It will have 3 items , last one is current sample */
     expect(

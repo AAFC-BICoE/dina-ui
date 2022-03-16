@@ -14,7 +14,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { get, set, keys } from "lodash";
+import { get, set, keys, merge, cloneDeep, toPairs } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -166,7 +166,7 @@ export function BulkMetadataEditor({
     }
 
     const managedAttributesInUse = await getManagedAttributesInUse(
-      metadatas.map(it => it.managedAttributeValues),
+      metadatas.map(it => it.managedAttributes),
       bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -231,76 +231,127 @@ export function BulkMetadataEditor({
     }
   }
 
-  async function onSubmit(changes: RowChange<BulkMetadataEditRow>[]) {
-    // Loop through the changes per row to get the data to POST to the bulk operations API:
-    const editedMetadatas = await Promise.all(
-      changes.map<Promise<SaveArgs<Metadata>>>(async row => {
-        const {
-          changes: { acTags, acSubtype, dcCreator, license, metadata },
-          original: {
-            metadata: { id, type }
-          }
-        } = row;
-
-        const metadataEdit = {
-          id,
-          type,
-          // When adding new Metadatas, add the required fields from the ObjectUpload:
-          ...(!id ? row.original.metadata : {}),
-          ...metadata
-        } as Metadata;
-
-        if (dcCreator !== undefined) {
-          metadataEdit.dcCreator = {
-            id: decodeResourceCell(dcCreator).id as any,
-            type: "person"
-          };
-        }
-
-        if (acSubtype !== undefined) {
-          const subtypeName =
-            ENCODED_RESOURCE_NAME_MATCHER.exec(acSubtype)?.[1] ?? "";
-          metadataEdit.acSubtype = subtypeName;
-        }
-
-        if (acTags !== undefined) {
-          metadataEdit.acTags = acTags.split(",").map(t => t.trim());
-        }
-
-        if (license !== undefined) {
-          const selectedLicense = license
-            ? (
-                await apiClient.get<License>(
-                  `objectstore-api/license/${
-                    decodeResourceCell(license).id as string
-                  }`,
-                  {}
-                )
-              ).data
-            : null;
-          // The Metadata's xmpRightsWebStatement field stores the license's url.
-          metadataEdit.xmpRightsWebStatement = selectedLicense?.url ?? "";
-          // No need to store this ; The url should be enough.
-          metadataEdit.xmpRightsUsageTerms = "";
-        }
-
-        // Remove blank managed attribute values from the map:
-        const blankValues: any[] = ["", null];
-        for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
-          if (
-            blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])
-          ) {
-            delete metadataEdit?.managedAttributeValues?.[maKey];
-          }
-        }
-
-        return {
-          resource: metadataEdit,
-          type: "metadata"
+  async function onSubmit(
+    changes: RowChange<BulkMetadataEditRow>[],
+    formikValues,
+    _,
+    workingTableData
+  ) {
+    async function preProcessMetadata(metadataEdit: BulkMetadataEditRow) {
+      if (metadataEdit.dcCreator !== undefined) {
+        metadataEdit.metadata.dcCreator = {
+          id: decodeResourceCell(metadataEdit.dcCreator).id as any,
+          type: "person"
         };
-      })
-    );
+      }
 
+      if (metadataEdit.acSubtype !== undefined) {
+        const subtypeName =
+          ENCODED_RESOURCE_NAME_MATCHER.exec(metadataEdit.acSubtype)?.[1] ?? "";
+        metadataEdit.metadata.acSubtype = subtypeName;
+      }
+
+      if (metadataEdit.acTags !== undefined) {
+        metadataEdit.metadata.acTags = metadataEdit.acTags
+          .split(",")
+          .map(t => t.trim());
+      }
+
+      if (metadataEdit.license !== undefined) {
+        const selectedLicense = metadataEdit.license
+          ? (
+              await apiClient.get<License>(
+                `objectstore-api/license/${
+                  decodeResourceCell(metadataEdit.license).id as string
+                }`,
+                {}
+              )
+            ).data
+          : null;
+        // The Metadata's xmpRightsWebStatement field stores the license's url.
+        metadataEdit.metadata.xmpRightsWebStatement =
+          selectedLicense?.url ?? "";
+        // No need to store this ; The url should be enough.
+        metadataEdit.metadata.xmpRightsUsageTerms = "";
+      }
+
+      // Remove blank managed attribute values from the map:
+      const blankValues: any[] = ["", null];
+      for (const maKey of keys(metadataEdit?.metadata.managedAttributes)) {
+        if (
+          blankValues.includes(
+            metadataEdit?.metadata.managedAttributes?.[maKey]
+          )
+        ) {
+          delete metadataEdit?.metadata.managedAttributes?.[maKey];
+        }
+      }
+    }
+
+    let editedMetadatas;
+    // Handle when user removing managed attributes
+    if (changes.length === 0) {
+      const managedAttributeNamesInUse =
+        formikValues.editableManagedAttributes.map(maAttr => maAttr.name);
+
+      const copied = cloneDeep(workingTableData);
+
+      copied.map((tableData: BulkMetadataEditRow) =>
+        preProcessMetadata(tableData)
+      );
+      // Remove the managed attributes that are not within the in use list anymore
+      editedMetadatas = copied.map(copy => {
+        toPairs(copy.metadata.managedAttributes).forEach(ma => {
+          if (!managedAttributeNamesInUse.includes(ma[0])) {
+            delete copy.metadata.managedAttributes[ma[0]];
+          }
+        });
+
+        return { resource: copy.metadata, type: "metadata" };
+      });
+    } else {
+      // Loop through the changes per row to get the data to POST to the bulk operations API:
+      editedMetadatas = await Promise.all(
+        changes.map<Promise<SaveArgs<Metadata>>>(async row => {
+          const {
+            changes: { acTags, acSubtype, dcCreator, license, metadata },
+            original: {
+              metadata: { id, type }
+            }
+          } = row;
+
+          const metadataEdit = {
+            id,
+            type,
+            // When adding new Metadatas, add the required fields from the ObjectUpload:
+            ...(!id ? row.original.metadata : {}),
+            ...metadata,
+            ...(id
+              ? {
+                  managedAttributes: merge(
+                    row.original.metadata.managedAttributes,
+                    metadata?.managedAttributes
+                  )
+                }
+              : {})
+          } as Metadata;
+
+          const bulkMetadataEditRow: BulkMetadataEditRow = {
+            metadata: metadataEdit,
+            dcCreator: dcCreator as any,
+            acSubtype: acSubtype as any,
+            acTags: acTags as any,
+            license: license as any
+          };
+
+          preProcessMetadata(bulkMetadataEditRow);
+          return {
+            resource: metadataEdit,
+            type: "metadata"
+          };
+        })
+      );
+    }
     if (metadataIds) {
       // When editing existing Metadatas:
       await save(editedMetadatas, { apiBaseUrl: "/objectstore-api" });
@@ -482,7 +533,7 @@ export function managedAttributeColumns(
   editableManagedAttributes: ManagedAttribute[]
 ) {
   return editableManagedAttributes.map(attr => ({
-    data: `metadata.managedAttributeValues.${attr.key}`,
+    data: `metadata.managedAttributes.${attr.key}`,
     title: attr.name,
     ...(attr.acceptedValues?.length
       ? {
