@@ -13,7 +13,12 @@ export interface ManagedAttributeAttributes {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type ManagedAttributeType = "INTEGER" | "STRING" | "PICKLIST";
+export type ManagedAttributeType =
+  | "INTEGER"
+  | "STRING"
+  | "PICKLIST"
+  | "DATE"
+  | "BOOL";
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
@@ -30,6 +35,14 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   {
     labelKey: "field_managedAttributeType_picklist_label",
     value: "PICKLIST"
+  },
+  {
+    labelKey: "field_managedAttributeType_date_label",
+    value: "DATE"
+  },
+  {
+    labelKey: "field_managedAttributeType_boolean_label",
+    value: "BOOL"
   }
 ];
 
