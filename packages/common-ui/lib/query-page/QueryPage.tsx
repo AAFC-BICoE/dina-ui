@@ -388,6 +388,7 @@ export function QueryPage<TData extends KitsuResource>({
       />
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField
+          isMulti={true}
           name="group"
           className="col-md-4"
           onChange={(value, formik) => {

@@ -116,7 +116,11 @@ export function useAvailableGroupOptions({
 
   const selectableGroupNames = uniq([
     // If the value is already set, include it in the dropdown regardless of user permissions.
-    ...(initialGroupName ? [initialGroupName] : []),
+    ...(initialGroupName
+      ? Array.isArray(initialGroupName)
+        ? initialGroupName
+        : [initialGroupName]
+      : []),
     // Include the group names the user belongs to.
     ...(myGroupNames ?? [])
   ]);
