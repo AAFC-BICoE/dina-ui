@@ -62,7 +62,9 @@ export function FileView({
 
   const showFile = !isSpreadsheet;
 
-  const fileId = filePath.split("/").pop();
+  if (preview) {
+    clickToDownload = false;
+  }
 
   if (!token) {
     return null;
