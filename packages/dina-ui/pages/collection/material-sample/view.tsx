@@ -122,9 +122,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <NotPubliclyReleasableWarning />
-              <MaterialSampleStateWarning />
               {buttonBar}
+              <MaterialSampleStateWarning />
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
@@ -195,7 +194,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   />
                 </div>
               )}
-              {materialSample.isRestricted && <RestrictionField />}
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}

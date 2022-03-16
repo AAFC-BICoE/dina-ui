@@ -11,12 +11,12 @@ export function MaterialSampleStateWarning() {
   }
 
   return (
-    <div className="alert-danger px-1" role="alert">
+    <div className="bg-danger card text-white px-1" role="alert">
       <div className="d-flex gap-2 align-items-center">
         <BsExclamationTriangle style={{ width: "24px", height: "24px" }} />
-        <span style={{ font: "fw-bold", fontSize: "1.2em" }}>
+        <div style={{ font: "fw-bold", fontSize: "1.2em" }} className="mt-3">
           <MaterialSampleStateReadOnlyRender removeLabel={true} />
-        </span>
+        </div>
       </div>
     </div>
   );
@@ -41,7 +41,6 @@ export function MaterialSampleStateReadOnlyRender({ removeLabel }) {
       name={"materialSampleState"}
       disableLabelClick={true}
       removeLabel={removeLabel}
-      className={"my-1"}
       readOnlyRender={renderAsReadOnly}
     >
       <></>

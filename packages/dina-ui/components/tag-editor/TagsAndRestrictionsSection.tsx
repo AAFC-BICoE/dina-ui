@@ -11,6 +11,7 @@ import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
+import { RestrictionWarning } from "../collection/material-sample/RestrictionWarning";
 
 export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
   "tags",
@@ -29,18 +30,35 @@ export function TagsAndRestrictionsSection({
   groupSelectorName = "group",
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const isInBulkEditTab = !!useBulkEditTabContext();
 
   return readOnly ? (
     <>
-      <TagSelectField
-        resourcePath={resourcePath}
-        className="mb-3"
-        name={tagsFieldName}
-        removeLabel={true}
-        groupSelectorName={groupSelectorName}
-      />
+      <div className="d-flex flex-column">
+        {((initialValues.restrictionFieldsExtension &&
+          initialValues.isRestricted) ||
+          initialValues.tags?.length > 0) && (
+          <div className="d-flex flex-row">
+            <div className="flex-grow-1">
+              <RestrictionWarning isRestrictionSelect={true} />
+            </div>
+            <div>
+              <TagSelectField
+                resourcePath={resourcePath}
+                name={tagsFieldName}
+                removeLabel={true}
+                groupSelectorName={groupSelectorName}
+              />
+            </div>
+          </div>
+        )}
+        {initialValues.restrictionRemarks && (
+          <div className="d-flex flex-row mb-3">
+            <RestrictionWarning isRestrictionRemarks={true} />
+          </div>
+        )}
+      </div>
     </>
   ) : (
     <div className="row">
