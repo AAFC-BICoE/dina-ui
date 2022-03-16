@@ -347,7 +347,8 @@ describe("Metadata bulk edit page", () => {
             },
             acTags: ["newTag1", "newTag2"],
             managedAttributes: {
-              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": "new attr value"
+              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": "new attr value",
+              existing_attribute: "existingValue"
             },
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"
@@ -393,7 +394,8 @@ describe("Metadata bulk edit page", () => {
             id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
             type: "metadata",
             xmpRightsUsageTerms: "",
-            xmpRightsWebStatement: ""
+            xmpRightsWebStatement: "",
+            managedAttributes: {}
           },
           type: "metadata"
         }
@@ -501,6 +503,9 @@ describe("Metadata bulk edit page", () => {
               xmpRightsUsageTerms: "default-value",
               xmpRightsWebStatement: "default-value",
               publiclyReleasable: true, // Default Value
+              // dcType: undefined,
+              // id: undefined,
+              // managedAttributes:  {},
               type: "metadata"
             },
             type: "metadata"

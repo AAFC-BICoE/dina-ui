@@ -326,10 +326,14 @@ export function BulkMetadataEditor({
             // When adding new Metadatas, add the required fields from the ObjectUpload:
             ...(!id ? row.original.metadata : {}),
             ...metadata,
-            managedAttributes: merge(
-              row.original.metadata.managedAttributes,
-              metadata?.managedAttributes
-            )
+            ...(id
+              ? {
+                  managedAttributes: merge(
+                    row.original.metadata.managedAttributes,
+                    metadata?.managedAttributes
+                  )
+                }
+              : {})
           } as Metadata;
 
           const bulkMetadataEditRow: BulkMetadataEditRow = {
