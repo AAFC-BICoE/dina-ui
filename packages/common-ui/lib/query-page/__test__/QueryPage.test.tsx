@@ -51,12 +51,14 @@ const MOCK_USER_GROUP_RESP = {
     {
       id: "1",
       type: "group",
-      name: "cnc"
+      name: "cnc",
+      labels: { en: "CNC" }
     },
     {
       id: "2",
       type: "group",
-      name: "aafc"
+      name: "aafc",
+      labels: { en: "AAFC" }
     }
   ]
 };
@@ -80,10 +82,12 @@ const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
-    case "user-api/group":
+    case "user-api/group": {
       return MOCK_USER_GROUP_RESP;
-    case "user-api/user-preferences":
+    }
+    case "user-api/user-preference": {
       return MOCK_USER_PREFERENCE_RESP;
+    }
   }
 });
 
@@ -94,6 +98,7 @@ const TEST_SEARCH_DATE =
 
 const apiContext = {
   apiClient: {
+    get: mockGet,
     axios: { get: mockGet, post: mockPost } as any
   }
 } as any;
@@ -176,20 +181,12 @@ describe("QueryPage component", () => {
       [
         "user-api/user-preference",
         {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
+          filter: {
+            userId: undefined
           },
-          params: {
-            filter: {
-              userId: undefined
-            },
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+          page: {
+            limit: 1000
+          }
         }
       ],
       [
@@ -201,74 +198,61 @@ describe("QueryPage component", () => {
         }
       ],
       [
-        "user-api/group",
+        "user-api/user-preference",
         {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
+          filter: {
+            userId: undefined
           },
-          params: {
-            filter: '{"name":["aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+          page: {
+            limit: 1000
+          }
         }
       ],
       [
         "user-api/group",
         {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+          filter: '{"name":["aafc","cnc"]}',
+          page: {
+            limit: 1000
+          }
         }
       ],
       [
         "user-api/group",
         {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["testGroup","aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+          filter: '{"name":["aafc","cnc"]}',
+          page: {
+            limit: 1000
+          }
         }
       ],
       [
         "user-api/group",
         {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["testGroup","aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+          filter: '{"name":["testGroup","aafc","cnc"]}',
+          page: {
+            limit: 1000
+          }
         }
       ],
-      expect.anything()
+      [
+        "user-api/group",
+        {
+          filter: '{"name":["testGroup","aafc","cnc"]}',
+          page: {
+            limit: 1000
+          }
+        }
+      ],
+      [
+        "user-api/group",
+        {
+          filter: '{"name":["testGroup","aafc","cnc"]}',
+          page: {
+            limit: 1000
+          }
+        }
+      ]
     ]);
 
     expect(mockPost.mock.calls).toEqual([

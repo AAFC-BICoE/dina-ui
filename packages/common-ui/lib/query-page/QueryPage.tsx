@@ -1,5 +1,5 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps, SortingRule } from "react-table";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
@@ -97,7 +97,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
   const formValues = initSavedSearchValues?.values().next().value;
-
   const computedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(
@@ -171,11 +170,13 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   const onSubmit = ({ submittedValues }) => {
+    if (!submittedValues) return;
+    const copy = cloneDeep(submittedValues);
     // After a search, isFromLoaded should be reset
     isFromLoadedRef.current = false;
-    const queryDSL = transformQueryToDSL(submittedValues);
+    const queryDSL = transformQueryToDSL(copy);
     // No search when query has no content in it
-    if (!Object.keys(queryDSL).length) return;
+    if (!queryDSL || !Object.keys(queryDSL).length) return;
     searchES(queryDSL).then(result => {
       const processedResult = result?.map(rslt => ({
         id: rslt.id,
@@ -245,6 +246,21 @@ export function QueryPage<TData extends KitsuResource>({
     page: { limit: 1000 }
   });
 
+  useEffect(() => {
+    if (!isFromLoadedRef.current) {
+      apiClient
+        .get<UserPreference[]>("user-api/user-preference", {
+          filter: {
+            userId: subject as FilterParam
+          },
+          page: { limit: 1000 }
+        })
+        .then(response => {
+          loadSavedSearch("default", response?.data);
+        });
+    }
+  }, []);
+
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
 
@@ -278,6 +294,8 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   async function saveSearch(isDefault, userPreferences, searchName) {
+    const computedName = isDefault ? "default" : searchName ?? "default";
+
     let newSavedSearches;
     const mySavedSearches = userPreferences;
 
@@ -294,13 +312,17 @@ export function QueryPage<TData extends KitsuResource>({
         delete val._owner;
         delete val.ref;
       });
-      mySavedSearches[0].savedSearches[username as any][
-        `${isDefault ? "default" : searchName}`
-      ] = pageRef.current?.values;
+      mySavedSearches[0].savedSearches[username as any][computedName] = {
+        ...pageRef.current?.values,
+        savedSearchSelect: computedName
+      };
     } else {
       newSavedSearches = {
         [`${username}`]: {
-          [`${isDefault ? "default" : searchName}`]: pageRef.current?.values
+          [computedName]: {
+            ...pageRef.current?.values,
+            savedSearchSelect: computedName
+          }
         }
       };
     }
@@ -315,7 +337,7 @@ export function QueryPage<TData extends KitsuResource>({
       type: "user-preference"
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
-    loadSavedSearch(isDefault ? "default" : searchName, userPreferences);
+    loadSavedSearch(computedName, userPreferences);
   }
 
   async function deleteSavedSearch(
@@ -355,6 +377,7 @@ export function QueryPage<TData extends KitsuResource>({
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
+
   const initialValues = isFromLoadedRef.current
     ? formValues && toPairs(formValues).length > 0
       ? formValues

@@ -9,6 +9,7 @@ interface TransformQueryToDSLParams {
 export function transformQueryToDSL(
   submittedValues: TransformQueryToDSLParams
 ) {
+  if (!submittedValues) return null;
   const builder = Bodybuilder();
 
   // Remove the type from value before submit to elastic search

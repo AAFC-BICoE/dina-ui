@@ -1,9 +1,7 @@
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { useState } from "react";
-import Select from "react-select";
 import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
-import { SelectOption } from "../formik-connected/SelectField";
+import { SelectField, SelectOption } from "../formik-connected/SelectField";
 import { UserPreference } from "packages/dina-ui/types/user-api";
 import { useFormikContext } from "formik";
 
@@ -38,49 +36,31 @@ export function SavedSearch(props: SavedSearchProps) {
     userPreferences
   } = props;
   const { formatMessage } = useDinaIntl();
-  const formik = useFormikContext();
-  const [curSelected, setCurSelected] = useState(null);
+  const formik = useFormikContext<any>();
 
   const { openSavedSearchModal } = useSavedSearchModal();
-  const savedSearchNamesOptions: SelectOption<string>[] = [];
+  const savedSearchNamesOptions: SelectOption<any>[] = [];
 
   savedSearchNames?.map(name =>
     savedSearchNamesOptions.push({ label: name, value: name })
   );
 
-  function onSelectedSavedSearchChanged(e) {
-    setCurSelected(e.value);
-  }
-
-  const computedSelected = curSelected ?? selectedSearch;
-  const selectedOption = computedSelected
-    ? savedSearchNamesOptions?.find(
-        option => option?.value === computedSelected
-      ) ?? {
-        label: String(computedSelected),
-        value: computedSelected
-      }
-    : null;
-
   return (
-    <div className="d-flex gap-2">
+    <div className="d-flex gap-2 align-items-center">
       <div style={{ width: "400px" }}>
-        <Select
+        <SelectField
+          name={"savedSearchSelect"}
           aria-label="Saved Search"
           className="saved-search"
           options={savedSearchNamesOptions}
-          onChange={onSelectedSavedSearchChanged}
-          value={selectedOption}
+          removeLabel={true}
         />
       </div>
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-primary mb-3"
         onClick={() =>
-          loadSavedSearch(
-            curSelected ?? (selectedSearch as string),
-            userPreferences
-          )
+          loadSavedSearch(formik.values.savedSearchSelect, userPreferences)
         }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length
@@ -90,19 +70,16 @@ export function SavedSearch(props: SavedSearchProps) {
       </button>
       <button
         type="button"
-        className="btn btn-secondary"
+        className="btn btn-secondary mb-3"
         onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
       >
         {formatMessage("save")}
       </button>
       <button
-        className="btn btn-danger"
+        className="btn btn-danger mb-3"
         type="button"
         onClick={() =>
-          deleteSavedSearch(
-            (curSelected as any) ?? selectedSearch,
-            userPreferences
-          )
+          deleteSavedSearch(formik.values.savedSearchSelect, userPreferences)
         }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length
