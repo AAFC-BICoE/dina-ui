@@ -115,7 +115,11 @@ describe("QueryPage component", () => {
     mockGet.mockClear();
 
     const wrapper = mountWithAppContext(
-      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      <QueryPage
+        indexName="testIndex"
+        columns={TEST_COLUMNS}
+        fallbackQuery={{ path: "/test" }}
+      />,
       {
         apiContext
       }
@@ -360,7 +364,11 @@ describe("QueryPage component", () => {
     mockGet.mockClear();
 
     const wrapper = mountWithAppContext(
-      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      <QueryPage
+        indexName="testIndex"
+        columns={TEST_COLUMNS}
+        fallbackQuery={{ path: "/test" }}
+      />,
       {
         apiContext
       }

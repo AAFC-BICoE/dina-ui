@@ -1,14 +1,14 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
-import { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps, SortingRule } from "react-table";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
-import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
 import { transformQueryToDSL } from "../util/transformToDSL";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
@@ -16,7 +16,11 @@ import {
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { useQuery, withResponse } from "../api-client/useQuery";
+import {
+  JsonApiQuerySpec,
+  useQuery,
+  withResponse
+} from "../api-client/useQuery";
 import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
@@ -34,16 +38,21 @@ import {
   FormikButton,
   useAccount,
   useModal,
-  Pagination
+  Pagination,
+  MetaWithTotal
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { FormikProps } from "formik";
 import { useEffect } from "react";
+import { DocWithErrors } from "jsonapi-typescript";
+import { SubmitButton } from "../formik-connected/SubmitButton";
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
   indexName: string;
-  initData?: TData[];
+
+  fallbackQuery: JsonApiQuerySpec;
+
   defaultSort?: SortingRule[];
   /** Adds the bulk edit button and the row checkboxes. */
   bulkEditPath?: (ids: string[]) => {
@@ -63,15 +72,24 @@ export interface QueryPageProps<TData extends KitsuResource> {
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
 
+interface TableData<TData extends KitsuResource> {
+  data?: TData[];
+  totalRecords?: number;
+  pagination: Pagination;
+  error?: DocWithErrors | undefined;
+  loading: boolean;
+  elasticSearch: boolean;
+}
+
 /**
  * Default size for QueryTable.
  */
-const DEFAULT_PAGE_SIZE = 25;
+export const DEFAULT_PAGE_SIZE = 25;
 
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
-  initData,
+  fallbackQuery,
   bulkDeleteButtonProps,
   bulkEditPath,
   omitPaging,
@@ -82,7 +100,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
   const { openModal } = useModal();
-  const isFromLoadedRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
   // Initial saved search values for the user with its saved search names as keys
   const [initSavedSearchValues, setInitSavedSearchValues] =
@@ -91,19 +108,131 @@ export function QueryPage<TData extends KitsuResource>({
   const { groupNames } = useAccount();
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
-  const [searchResults, setSearchResults] = useState<{
-    results?: TData[];
-    totalResults?: number;
-    isFromSearch?: boolean;
-  }>({});
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
-  // Pagination data to use to render table and query elastic search.
-  const [pagination, setPagination] = useState<Pagination>({
-    currentPage: 0,
-    limit: DEFAULT_PAGE_SIZE,
-    offset: 0
+  // Setup default table data
+  const [tableData, setTableData] = useState<TableData<TData>>({
+    pagination: {
+      currentPage: 0,
+      limit: DEFAULT_PAGE_SIZE,
+      offset: 0
+    },
+    elasticSearch: true,
+    loading: true
   });
+
+  // Setup default search query
+  const [searchQueries, setSearchQueries] = useState<any>({
+    group: groupNames?.[0],
+    queryRows: [{}]
+  });
+
+  function performSearch() {
+    // Set the table into a loading state...
+    setTableData({
+      ...tableData,
+      loading: true,
+      data: undefined,
+      totalRecords: undefined,
+      error: undefined
+    });
+
+    if (tableData.elasticSearch) {
+      performElasticSearch();
+    } else {
+      performFallbackSearch();
+    }
+  }
+
+  function performElasticSearch() {
+    const queryDSL = transformQueryToDSL(searchQueries, tableData?.pagination);
+    // No search when query has no content in it
+    if (!Object.keys(queryDSL).length) return;
+    searchES(queryDSL)
+      .then(result => {
+        const processedResult = result?.hits
+          .map(hit => hit._source?.data)
+          .map(rslt => ({
+            id: rslt.id,
+            type: rslt.type,
+            ...rslt.attributes
+          }));
+        setAvailableSamples(processedResult);
+
+        setTableData({
+          ...tableData,
+          elasticSearch: true,
+          data: processedResult as TData[],
+          totalRecords: result?.total.value,
+          loading: false,
+          error: undefined
+        });
+      })
+      .catch(error => {
+        // Report the error to the tableData reference.
+        setTableData({
+          ...tableData,
+          elasticSearch: false,
+          data: undefined,
+          totalRecords: undefined,
+          loading: true,
+          error
+        });
+
+        // Try to use fallback search instead.
+        performFallbackSearch();
+      });
+  }
+
+  async function searchES(queryDSL) {
+    const query = { ...queryDSL };
+    const resp = await apiClient.axios.post(
+      `search-api/search-ws/search`,
+      query,
+      {
+        params: {
+          indexName
+        }
+      }
+    );
+    return resp?.data?.hits;
+  }
+
+  function performFallbackSearch() {
+    searchAPI()
+      .then(result => {
+        setTableData({
+          ...tableData,
+          elasticSearch: false,
+          data: result.data as TData[],
+          totalRecords: result.meta.totalResourceCount,
+          loading: false,
+          error: undefined
+        });
+      })
+      .catch(error => {
+        setTableData({
+          ...tableData,
+          elasticSearch: false,
+          data: undefined,
+          totalRecords: undefined,
+          loading: false,
+          error
+        });
+      });
+  }
+
+  async function searchAPI() {
+    const { path, ...getQuery } = fallbackQuery;
+    const resp = await apiClient.get<TData[], MetaWithTotal>(path, {
+      ...getQuery,
+      page: {
+        limit: tableData.pagination.limit,
+        offset: tableData.pagination.offset
+      }
+    });
+    return resp;
+  }
 
   const {
     CheckBoxField,
@@ -111,22 +240,12 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: searchResults?.isFromSearch
-      ? searchResults?.results
-      : initData
+    defaultAvailableItems: tableData?.data
   });
-
-  // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
-  const formValues = initSavedSearchValues?.values().next().value;
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
-      ? reactTableProps(
-          searchResults?.isFromSearch
-            ? searchResults.results
-            : (initData as any),
-          CheckBoxField
-        )
+      ? reactTableProps(tableData?.data as any, CheckBoxField)
       : reactTableProps;
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
@@ -177,50 +296,14 @@ export function QueryPage<TData extends KitsuResource>({
     onSubmit({ submittedValues: resetToVal });
   }
 
-  async function searchES(queryDSL) {
-    const query = { ...queryDSL };
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/search`,
-      query,
-      {
-        params: {
-          indexName
-        }
-      }
-    );
-    return resp?.data?.hits;
-  }
-
   const onSubmit = ({ submittedValues }) => {
-    // After a search, isFromLoaded should be reset
-    isFromLoadedRef.current = false;
-    const queryDSL = transformQueryToDSL(submittedValues, pagination);
-    // No search when query has no content in it
-    if (!Object.keys(queryDSL).length) return;
-    searchES(queryDSL).then(result => {
-      const processedResult = result?.hits
-        .map(hit => hit._source?.data)
-        .map(rslt => ({
-          id: rslt.id,
-          type: rslt.type,
-          ...rslt.attributes
-        }));
-      setAvailableSamples(processedResult);
-      setSearchResults({
-        results: processedResult,
-        totalResults: result?.total.value,
-        isFromSearch: true
-      });
-    });
+    setSearchQueries(submittedValues);
   };
 
-  // Anytime the pagination is updated, should call a new elasticsearch request.
+  // Perform a search if the pagination is different or a new search query.
   useEffect(() => {
-    // Trigger submit to apply new pagination only if not using initData.
-    if (searchResults?.results) {
-      pageRef.current?.submitForm();
-    }
-  }, [pagination]);
+    performSearch();
+  }, [tableData.pagination, searchQueries]);
 
   /**
    * Triggered when the user changes the page. This will also determine the offset to apply to the
@@ -229,10 +312,13 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageNumber The new page number set.
    */
   const onPageChange = (newPageNumber: number) => {
-    setPagination({
-      ...pagination,
-      offset: newPageNumber * pagination.limit,
-      currentPage: newPageNumber
+    setTableData({
+      ...tableData,
+      pagination: {
+        ...tableData.pagination,
+        offset: newPageNumber * tableData.pagination.limit,
+        currentPage: newPageNumber
+      }
     });
   };
 
@@ -243,18 +329,19 @@ export function QueryPage<TData extends KitsuResource>({
    * @param newPageSize Number of records to display on page.
    */
   const onPageSizeChange = (newPageSize: number) => {
-    setPagination({
-      offset: 0,
-      limit: newPageSize,
-      currentPage: 0
+    setTableData({
+      ...tableData,
+      pagination: {
+        offset: 0,
+        limit: newPageSize,
+        currentPage: 0
+      }
     });
   };
 
-  const totalRecords = searchResults?.totalResults ?? initData?.length;
-
-  const numberOfPages = totalRecords
-    ? Math.ceil(totalRecords / pagination.limit)
-    : undefined;
+  const numberOfPages = tableData?.totalRecords
+    ? Math.ceil(tableData?.totalRecords / tableData.pagination.limit)
+    : 0;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
@@ -317,23 +404,24 @@ export function QueryPage<TData extends KitsuResource>({
   const cacheId = useMemo(() => uuidv4(), []);
 
   const {
-    data,
-    error,
-    isValidating: loading
+    data: indexData,
+    error: indexError,
+    isValidating: indexLoading
   } = useSWR<ESIndexMapping[], any>(
     [indexName, cacheId],
     fetchQueryFieldsByIndex,
     {
-      shouldRetryOnError: true,
+      shouldRetryOnError: false,
       revalidateOnFocus: false,
       revalidateOnReconnect: false
     }
   );
 
-  if (loading || error) return <></>;
+  if (tableData.elasticSearch === undefined) {
+    performElasticSearch();
+  }
 
   function loadSavedSearch(savedSearchName, userPreferences) {
-    isFromLoadedRef.current = true;
     const initValus = new Map().set(
       savedSearchName,
       userPreferences
@@ -342,7 +430,8 @@ export function QueryPage<TData extends KitsuResource>({
           ]
         : [{}]
     );
-    setInitSavedSearchValues(initValus);
+
+    setSearchQueries(initValus);
   }
 
   async function saveSearch(isDefault, userPreferences, searchName) {
@@ -420,28 +509,15 @@ export function QueryPage<TData extends KitsuResource>({
     );
   }
 
-  const sortedData = data
+  const sortedData = indexData
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
-  const initialValues = isFromLoadedRef.current
-    ? formValues && toPairs(formValues).length > 0
-      ? formValues
-      : {
-          group: groupNames?.[0],
-          queryRows: [{}]
-        }
-    : pageRef.current?.values
-    ? pageRef.current?.values
-    : {
-        group: groupNames?.[0],
-        queryRows: [{}]
-      };
 
   return (
     <DinaForm
       key={uuidv4()}
       innerRef={pageRef}
-      initialValues={initialValues}
+      initialValues={searchQueries}
       onSubmit={onSubmit}
     >
       <label
@@ -449,155 +525,197 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <DinaMessage id="search" />
       </label>
-      <QueryBuilder
-        name="queryRows"
-        esIndexMapping={sortedData}
-        isFromLoadedRef={isFromLoadedRef}
-      />
-      <DinaFormSection horizontal={"flex"}>
-        <GroupSelectField
-          name="group"
-          className="col-md-4"
-          onChange={(value, formik) => {
-            const resetToVal = cloneDeep(formik.values);
-            onSubmit({ submittedValues: { ...resetToVal, group: value } });
-          }}
-        />
-      </DinaFormSection>
 
-      <div className="d-flex mb-3">
-        <div className="flex-grow-1">
-          {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
-            const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
-              username as any
-            ] as any;
-            return (
-              <SavedSearch
-                userPreferences={userPreferences}
-                loadSavedSearch={loadSavedSearch}
-                deleteSavedSearch={deleteSavedSearch}
-                saveSearch={saveSearch}
-                savedSearchNames={
-                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
-                }
-                initialSavedSearches={initialSavedSearches}
-                selectedSearch={
-                  initSavedSearchValues
-                    ? initSavedSearchValues.keys().next().value
-                    : undefined
-                }
-              />
-            );
-          })}
-        </div>
-        <div>
-          <FormikButton
-            className="btn btn-primary px-5"
-            onClick={() => {
-              // New searches should set the pagination.
-              setPagination({
-                ...pagination,
-                currentPage: 0,
-                offset: 0
-              });
-
-              // Submit form.
-              pageRef.current?.submitForm();
-            }}
-          >
-            <DinaMessage id="search" />
-          </FormikButton>
-          <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
-            <DinaMessage id="resetFilters" />
-          </FormikButton>
-        </div>
-      </div>
-      <div
-        className="query-table-wrapper"
-        role="search"
-        aria-label={formatMessage({ id: "queryTable" })}
-      >
-        <div className="mb-1">
-          {!omitPaging && (
-            <div className="d-flex align-items-end">
-              <span>
-                <CommonMessage
-                  id="tableTotalCount"
-                  values={{ totalCount: totalRecords }}
-                />
-              </span>
-              {resolvedReactTableProps?.sortable !== false && (
-                <div className="flex-grow-1">
-                  <Tooltip
-                    id="queryTableMultiSortExplanation"
-                    visibleElement={
-                      <a
-                        href="#"
-                        aria-describedby={"queryTableMultiSortExplanation"}
-                      >
-                        <CommonMessage id="queryTableMultiSortTooltipTitle" />
-                      </a>
-                    }
-                  />
-                </div>
-              )}
-              <div className="d-flex gap-2">
-                {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
-                {bulkDeleteButtonProps && (
-                  <BulkDeleteButton {...bulkDeleteButtonProps} />
-                )}
-              </div>
+      {/* Search Query Section */}
+      {indexLoading ? (
+        <>
+          <LoadingSpinner loading={true} />
+          <br />
+        </>
+      ) : (
+        <>
+          {/* Search Query Error */}
+          {indexError ? (
+            <div
+              className="alert alert-danger"
+              style={{
+                whiteSpace: "pre-line"
+              }}
+            >
+              <p className="mb-0">{String(indexError)}</p>
             </div>
-          )}
-        </div>
-        <ReactTable
-          className="-striped"
-          columns={mappedColumns}
-          data={searchResults?.results ?? initData}
-          minRows={1}
-          {...resolvedReactTableProps}
-          pageText={<CommonMessage id="page" />}
-          noDataText={<CommonMessage id="noRowsFound" />}
-          ofText={<CommonMessage id="of" />}
-          rowsText={formatMessage({ id: "rows" })}
-          previousText={<CommonMessage id="previous" />}
-          nextText={<CommonMessage id="next" />}
-          manual={searchResults?.results ? true : false}
-          pageSize={pagination.limit}
-          pages={numberOfPages}
-          page={pagination.currentPage}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          TbodyComponent={
-            error
-              ? () => (
-                  <div
-                    className="alert alert-danger"
-                    style={{
-                      whiteSpace: "pre-line"
+          ) : (
+            <>
+              <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
+              <DinaFormSection horizontal={"flex"}>
+                <GroupSelectField
+                  name="group"
+                  className="col-md-4"
+                  onChange={(value, formik) => {
+                    const resetToVal = cloneDeep(formik.values);
+                    onSubmit({
+                      submittedValues: { ...resetToVal, group: value }
+                    });
+                  }}
+                />
+              </DinaFormSection>
+
+              <div className="d-flex mb-3">
+                <div className="flex-grow-1">
+                  {withResponse(
+                    savedSearchQuery,
+                    ({ data: userPreferences }) => {
+                      const initialSavedSearches = userPreferences?.[0]
+                        ?.savedSearches?.[username as any] as any;
+                      return (
+                        <SavedSearch
+                          userPreferences={userPreferences}
+                          loadSavedSearch={loadSavedSearch}
+                          deleteSavedSearch={deleteSavedSearch}
+                          saveSearch={saveSearch}
+                          savedSearchNames={
+                            initialSavedSearches
+                              ? Object.keys(initialSavedSearches)
+                              : []
+                          }
+                          initialSavedSearches={initialSavedSearches}
+                          selectedSearch={
+                            initSavedSearchValues
+                              ? initSavedSearchValues.keys().next().value
+                              : undefined
+                          }
+                        />
+                      );
+                    }
+                  )}
+                </div>
+                <div>
+                  <FormikButton
+                    className="btn btn-primary px-5"
+                    onClick={() => {
+                      // New searches should set the pagination.
+                      setTableData({
+                        ...tableData,
+                        pagination: {
+                          ...tableData.pagination,
+                          currentPage: 0,
+                          offset: 0
+                        }
+                      });
+
+                      // Submit form.
+                      pageRef.current?.submitForm();
                     }}
                   >
-                    <p>
-                      {error.errors?.map(e => e.detail).join("\n") ??
-                        String(error)}
-                    </p>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        const newSort = [{ id: "createdOn", desc: true }];
-                        onSortedChange?.(newSort);
-                        setSortingRules(newSort);
+                    <DinaMessage id="search" />
+                  </FormikButton>
+                  <FormikButton
+                    className="btn btn-secondary mx-2"
+                    onClick={resetForm}
+                  >
+                    <DinaMessage id="resetFilters" />
+                  </FormikButton>
+                </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+
+      {/* Table Data */}
+      {tableData.loading ? (
+        <LoadingSpinner loading={true} />
+      ) : (
+        <div
+          className="query-table-wrapper"
+          role="search"
+          aria-label={formatMessage({ id: "queryTable" })}
+        >
+          <div className="mb-1">
+            {!omitPaging && (
+              <div className="d-flex align-items-end">
+                <span>
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: tableData?.totalRecords }}
+                  />
+                </span>
+                {resolvedReactTableProps?.sortable !== false && (
+                  <div className="flex-grow-1">
+                    <Tooltip
+                      id="queryTableMultiSortExplanation"
+                      visibleElement={
+                        <a
+                          href="#"
+                          aria-describedby={"queryTableMultiSortExplanation"}
+                        >
+                          <CommonMessage id="queryTableMultiSortTooltipTitle" />
+                        </a>
+                      }
+                    />
+                  </div>
+                )}
+                <div className="d-flex gap-2">
+                  {bulkEditPath && (
+                    <BulkEditButton bulkEditPath={bulkEditPath} />
+                  )}
+                  {bulkDeleteButtonProps && (
+                    <BulkDeleteButton {...bulkDeleteButtonProps} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+          <ReactTable
+            className="-striped"
+            columns={mappedColumns}
+            data={tableData.data}
+            minRows={1}
+            {...resolvedReactTableProps}
+            pageText={<CommonMessage id="page" />}
+            noDataText={<CommonMessage id="noRowsFound" />}
+            ofText={<CommonMessage id="of" />}
+            rowsText={formatMessage({ id: "rows" })}
+            previousText={<CommonMessage id="previous" />}
+            nextText={<CommonMessage id="next" />}
+            manual={true}
+            pageSize={tableData.pagination.limit}
+            pages={numberOfPages}
+            page={tableData.pagination.currentPage}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+            TbodyComponent={
+              tableData?.error
+                ? () => (
+                    <div
+                      className="alert alert-danger"
+                      style={{
+                        whiteSpace: "pre-line"
                       }}
                     >
-                      <CommonMessage id="resetSort" />
-                    </button>
-                  </div>
-                )
-              : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
-          }
-        />
-      </div>
+                      <p>
+                        {tableData?.error?.errors
+                          ?.map(e => e.detail)
+                          .join("\n") ?? String(tableData?.error)}
+                      </p>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => {
+                          const newSort = [{ id: "createdOn", desc: true }];
+                          onSortedChange?.(newSort);
+                          setSortingRules(newSort);
+                        }}
+                      >
+                        <CommonMessage id="resetSort" />
+                      </button>
+                    </div>
+                  )
+                : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+            }
+          />
+        </div>
+      )}
     </DinaForm>
   );
 }
