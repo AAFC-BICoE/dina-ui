@@ -1,8 +1,10 @@
 import {
+  DateField,
   FormikButton,
   NumberField,
   SelectField,
   TextField,
+  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -79,6 +81,10 @@ export function ManagedAttributeField({
 
   const isIntegerAttr = attribute.managedAttributeType === "INTEGER";
 
+  const isDateAttr = attribute.managedAttributeType === "DATE";
+
+  const isBoolAttr = attribute.managedAttributeType === "BOOL";
+
   return isSelectAttr ? (
     <SelectField
       {...props}
@@ -95,6 +101,10 @@ export function ManagedAttributeField({
     />
   ) : isIntegerAttr ? (
     <NumberField {...props} />
+  ) : isDateAttr ? (
+    <DateField {...props} />
+  ) : isBoolAttr ? (
+    <ToggleField {...props} />
   ) : (
     <TextField {...props} />
   );
