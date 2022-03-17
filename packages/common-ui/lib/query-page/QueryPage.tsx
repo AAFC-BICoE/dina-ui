@@ -256,6 +256,10 @@ export function QueryPage<TData extends KitsuResource>({
           page: { limit: 1000 }
         })
         .then(response => {
+          onSubmit({
+            submittedValues:
+              response?.data[0]?.savedSearches?.[username as any].default
+          });
           loadSavedSearch("default", response?.data);
         });
     }
