@@ -55,6 +55,7 @@ export function MaterialSampleGenerationForm({
   const [useNextSequence, setUseNextSequence] = useState<boolean>(
     initialValues?.useNextSequence || false
   );
+
   const { save } = useApiClient();
 
   const { formatMessage } = useDinaIntl();
@@ -125,6 +126,11 @@ export function MaterialSampleGenerationForm({
     return <LoadingSpinner loading={true} />;
   }
 
+  const baseNameFromCollection =
+    collectionQuery?.lastUsedCollection?.code ??
+    collectionQuery?.lastUsedCollection?.name;
+  const baseNameFromParent =
+    parentQuery.response?.data?.materialSampleName || "";
   return (
     <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
@@ -134,7 +140,7 @@ export function MaterialSampleGenerationForm({
           increment: "NUMERICAL",
           suffix: "",
           start: "001",
-          baseName: parentQuery.response?.data?.materialSampleName || "",
+          baseName: baseNameFromParent,
           separator: "",
           collection:
             parentQuery.response?.data?.collection ||
@@ -170,7 +176,12 @@ export function MaterialSampleGenerationForm({
           />
         </div>
         <CheckBoxField
-          onCheckBoxClick={event => {
+          onCheckBoxClick={(event, formik) => {
+            if (event.target.checked) {
+              formik.setFieldValue("baseName", baseNameFromCollection);
+            } else {
+              formik.setFieldValue("baseName", baseNameFromParent);
+            }
             setUseNextSequence(event.target.checked);
             setGenerationMode(GENERATION_MODES[0]);
           }}
@@ -201,9 +212,11 @@ export function MaterialSampleGenerationForm({
         <TabPanel>
           <GeneratorFields
             generationMode={generationMode}
-            useNextSeq={useNextSequence}
+            useNextSequence={useNextSequence}
           />
-          <PreviewAndCustomizeFields generationMode={generationMode} />
+          {!useNextSequence && (
+            <PreviewAndCustomizeFields generationMode={generationMode} />
+          )}
         </TabPanel>
         {!useNextSequence && (
           <TabPanel>
@@ -239,10 +252,13 @@ export type IncrementMode = typeof INCREMENT_MODES[number];
 
 interface GeneratorFieldsProps {
   generationMode: GenerationMode;
-  useNextSeq?: boolean;
+  useNextSequence?: boolean;
 }
 
-function GeneratorFields({ generationMode, useNextSeq }: GeneratorFieldsProps) {
+function GeneratorFields({
+  generationMode,
+  useNextSequence
+}: GeneratorFieldsProps) {
   const { formatMessage } = useDinaIntl();
 
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map(mode => ({
@@ -262,14 +278,14 @@ function GeneratorFields({ generationMode, useNextSeq }: GeneratorFieldsProps) {
               name="suffix"
               className="col-md-3"
               inputProps={{
-                disabled: useNextSeq
+                disabled: useNextSequence
               }}
             />
             <TextField
               name="separator"
               className="col-md-3"
               inputProps={{
-                disabled: useNextSeq
+                disabled: useNextSequence
               }}
             />
           </>
@@ -306,13 +322,19 @@ function GeneratorFields({ generationMode, useNextSeq }: GeneratorFieldsProps) {
         )}
       </div>
       <div className="row">
-        <TextField className="col-sm-6" name="baseName" />
+        <TextField
+          className="col-sm-6"
+          name="baseName"
+          inputProps={{
+            disabled: useNextSequence
+          }}
+        />
         {generationMode === "SERIES" && (
           <TextField
             name="separator"
             className="col-md-3"
             inputProps={{
-              disabled: useNextSeq
+              disabled: useNextSequence
             }}
           />
         )}
