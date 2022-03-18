@@ -69,8 +69,9 @@ export function ManagedAttributeField({
 
   const attributePath = `${valuesPath}.${attribute.key}`;
 
-  const onChangeExternal = (typeof values != "undefined" && attribute.key in values) ? true : false;
-
+  const overrideValue = (typeof values != "undefined" && values.hasOwnProperty(attribute.key)) ? values[attribute.key] === "true": undefined;
+  // console.log(values)
+  console.log(overrideValue);
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
@@ -107,7 +108,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <ToggleField {...props}/>
+    <ToggleField {...props} overrideValue={overrideValue}/>
   ) : (
     <TextField {...props} />
   );
