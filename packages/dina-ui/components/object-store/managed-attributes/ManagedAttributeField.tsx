@@ -14,6 +14,7 @@ import { ManagedAttribute } from "../../../types/objectstore-api";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
+  values?: object;
   valuesPath: string;
 }
 
@@ -27,7 +28,6 @@ export function ManagedAttributeFieldWithLabel(
   props: ManagedAttributeFieldWithLabelProps
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
-
   const { readOnly } = useDinaFormContext();
   const attributeKey = attribute.key;
 
@@ -62,16 +62,19 @@ export function ManagedAttributeFieldWithLabel(
 /** Formik-connected field for a single Managed Attribute. No surrounding label tag. */
 export function ManagedAttributeField({
   attribute,
+  values,
   valuesPath
 }: ManagedAttributeFieldProps) {
   const { formatMessage } = useDinaIntl();
 
   const attributePath = `${valuesPath}.${attribute.key}`;
 
+  const onChangeExternal = (typeof values != "undefined" && attribute.key in values) ? true : false;
+
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
-    name: attributePath
+    name: attributePath,
   };
 
   const isSelectAttr = !!(
@@ -104,7 +107,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <ToggleField {...props} />
+    <ToggleField {...props}/>
   ) : (
     <TextField {...props} />
   );
