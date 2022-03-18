@@ -2,9 +2,9 @@ import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
 import { LimitOffsetPageSpec } from "../api-client/operations-types";
 
-interface TransformQueryToDSLParams {
+export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
-  group: string;
+  group?: string;
 }
 
 export function transformQueryToDSL(
