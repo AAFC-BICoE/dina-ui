@@ -433,19 +433,11 @@ export function QueryPage<TData extends KitsuResource>({
             ] as any;
             return (
               <SavedSearch
+                pageRef={pageRef as any}
                 userPreferences={userPreferences}
                 loadSavedSearch={loadSavedSearch}
                 deleteSavedSearch={deleteSavedSearch}
                 saveSearch={saveSearch}
-                savedSearchNames={
-                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
-                }
-                initialSavedSearches={initialSavedSearches}
-                selectedSearch={
-                  initSavedSearchValues
-                    ? initSavedSearchValues.keys().next().value
-                    : undefined
-                }
               />
             );
           })}

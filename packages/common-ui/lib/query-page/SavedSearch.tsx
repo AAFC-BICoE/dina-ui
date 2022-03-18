@@ -1,9 +1,9 @@
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { SelectField, SelectOption } from "../formik-connected/SelectField";
 import { UserPreference } from "packages/dina-ui/types/user-api";
-import { useFormikContext } from "formik";
+import { FormikProps } from "formik";
+import { useAccount } from "../account/AccountProvider";
 
 export interface SavedSearchProps {
   loadSavedSearch: (
@@ -19,10 +19,8 @@ export interface SavedSearchProps {
     savedSearchName: string,
     userPreferences: UserPreference[]
   ) => void;
-  savedSearchNames?: string[];
-  initialSavedSearches?: JsonValue;
-  selectedSearch?: string;
   userPreferences: UserPreference[];
+  pageRef: React.MutableRefObject<FormikProps<any>>;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
@@ -30,16 +28,22 @@ export function SavedSearch(props: SavedSearchProps) {
     loadSavedSearch,
     deleteSavedSearch,
     saveSearch,
-    savedSearchNames,
-    initialSavedSearches,
-    selectedSearch,
-    userPreferences
+    userPreferences,
+    pageRef
   } = props;
   const { formatMessage } = useDinaIntl();
-  const formik = useFormikContext<any>();
+  const { username } = useAccount();
 
   const { openSavedSearchModal } = useSavedSearchModal();
   const savedSearchNamesOptions: SelectOption<any>[] = [];
+
+  const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
+    username as any
+  ] as any;
+
+  const savedSearchNames = initialSavedSearches
+    ? Object.keys(initialSavedSearches)
+    : [];
 
   savedSearchNames?.map(name =>
     savedSearchNamesOptions.push({ label: name, value: name })
@@ -60,7 +64,10 @@ export function SavedSearch(props: SavedSearchProps) {
         type="button"
         className="btn btn-primary mb-3"
         onClick={() =>
-          loadSavedSearch(formik.values.savedSearchSelect, userPreferences)
+          loadSavedSearch(
+            pageRef.current.values.savedSearchSelect,
+            userPreferences
+          )
         }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length
@@ -79,7 +86,10 @@ export function SavedSearch(props: SavedSearchProps) {
         className="btn btn-danger mb-3"
         type="button"
         onClick={() =>
-          deleteSavedSearch(formik.values.savedSearchSelect, userPreferences)
+          deleteSavedSearch(
+            pageRef.current.values.savedSearchSelect,
+            userPreferences
+          )
         }
         disabled={
           !initialSavedSearches || !Object.keys(initialSavedSearches).length
