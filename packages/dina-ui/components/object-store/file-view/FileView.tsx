@@ -72,7 +72,7 @@ export function FileView({
 
   return (
     <div className="file-viewer-wrapper text-center">
-      {(showFile && isImage) ? (
+      {showFile ? (
         <Link href={`/object-store/metadata/preview?id=${id}`}>
           <a
             target="_blank"
