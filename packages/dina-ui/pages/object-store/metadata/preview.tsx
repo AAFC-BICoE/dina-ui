@@ -29,7 +29,7 @@ export default function MetadataImagePreviewPage() {
         <style>{OBJECT_DETAILS_PAGE_CSS}</style>
         <main className="container-fluid">
           <div className="row">
-            <div className="col-md-4">
+            <div>
               <MetadataFileView metadata={metadata} id={id} preview={preview} />
             </div>
           </div>
