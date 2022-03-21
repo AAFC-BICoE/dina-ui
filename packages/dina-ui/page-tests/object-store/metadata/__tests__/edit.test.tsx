@@ -34,7 +34,7 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     fileExtension: ".png",
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
     id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
-    managedAttributeValues: {
+    managedAttributes: {
       existing_attribute: "existingValue"
     },
     type: "metadata"
@@ -261,17 +261,17 @@ describe("Metadata bulk edit page", () => {
 
     expect(columns).toEqual([
       {
-        data: "metadata.managedAttributeValues.Specimen_ID",
+        data: "metadata.managedAttributes.Specimen_ID",
         source: ["Holotype", "Paratype", "Syntype"],
         title: "SpecimenID",
         type: "dropdown"
       },
       {
-        data: "metadata.managedAttributeValues.type_status",
+        data: "metadata.managedAttributes.type_status",
         title: "Type Status"
       },
       {
-        data: "metadata.managedAttributeValues.scientific_name",
+        data: "metadata.managedAttributes.scientific_name",
         title: "Scientific Name"
       }
     ]);
@@ -324,7 +324,7 @@ describe("Metadata bulk edit page", () => {
     tableData[1].acTags = "newTag1, newTag2";
 
     // Set new managed attribute value:
-    (tableData[1].metadata.managedAttributeValues as Record<string, string>)[
+    (tableData[1].metadata.managedAttributes as Record<string, string>)[
       "4ed1dc15-c931-414a-ab13-cc766fd6fae2"
     ] = "new attr value";
 
@@ -335,7 +335,7 @@ describe("Metadata bulk edit page", () => {
 
     // Only 1 row should have been updated, using 2 operations for the row:
     // - The Metadata is updated with new dcCreator and new tags.
-    // - The metadata's managedAttributeValues is udpated with a new attribute value.
+    // - The metadata's managedAttributes is udpated with a new attribute value.
     expect(mockSave).lastCalledWith(
       [
         {
@@ -346,8 +346,9 @@ describe("Metadata bulk edit page", () => {
               type: "person"
             },
             acTags: ["newTag1", "newTag2"],
-            managedAttributeValues: {
-              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": "new attr value"
+            managedAttributes: {
+              "4ed1dc15-c931-414a-ab13-cc766fd6fae2": "new attr value",
+              existing_attribute: "existingValue"
             },
             id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
             type: "metadata"
@@ -393,7 +394,8 @@ describe("Metadata bulk edit page", () => {
             id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
             type: "metadata",
             xmpRightsUsageTerms: "",
-            xmpRightsWebStatement: ""
+            xmpRightsWebStatement: "",
+            managedAttributes: {}
           },
           type: "metadata"
         }

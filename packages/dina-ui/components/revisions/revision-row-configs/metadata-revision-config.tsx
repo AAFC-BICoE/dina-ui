@@ -45,7 +45,7 @@ export const METADATA_REVISION_ROW_CONFIG: RevisionRowConfig<Metadata> = {
       );
     },
     // Show the entire value of the metadata map in a key-value table:
-    managedAttributeValues: ({ original: { value } }) => (
+    managedAttributes: ({ original: { value } }) => (
       <ManagedAttributesViewer
         managedAttributeApiPath={key =>
           `objectstore-api/managed-attribute/${key}`

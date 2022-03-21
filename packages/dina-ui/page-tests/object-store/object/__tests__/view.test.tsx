@@ -11,7 +11,7 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   fileIdentifier: "cf99c285-0353-4fed-a15d-ac963e0514f3",
   id: "232eda40-dc97-4255-91c4-f30485e2c707",
   acCaption: "Test Caption",
-  managedAttributeValues: {
+  managedAttributes: {
     "0763db31-a0c9-43f8-b7fc-705a783c35df": "attr1 value",
     "e5b9765e-1246-4119-b4e4-8d2267175662": "attr2 value"
   },

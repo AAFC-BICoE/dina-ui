@@ -10,7 +10,9 @@ describe("NotPubliclyReleasableWarning component", () => {
       </DinaForm>
     );
 
-    expect(wrapper.find(".alert").exists()).toEqual(true);
+    expect(wrapper.find(".not-publicly-releasable-alert").exists()).toEqual(
+      true
+    );
   });
 
   it("Doesn't render when Publicly Releasable is true.", () => {
