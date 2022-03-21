@@ -8,7 +8,10 @@ import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
-import { transformQueryToDSL } from "../util/transformToDSL";
+import {
+  transformQueryToDSL,
+  TransformQueryToDSLParams
+} from "../util/transformToDSL";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
@@ -30,13 +33,26 @@ import { cloneDeep, toPairs } from "lodash";
 import { FormikProps } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
-import { AreYouSureModal, FormikButton, useAccount, useModal } from "..";
+import {
+  AreYouSureModal,
+  FormikButton,
+  LimitOffsetPageSpec,
+  useAccount,
+  useModal
+} from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { useEffect } from "react";
+
+const DEFAULT_PAGE_SIZE = 25;
+
+interface SearchResultData<TData extends KitsuResource> {
+  results: TData[];
+  total: number;
+}
 
 export interface QueryPageProps<TData extends KitsuResource> {
   columns: ColumnDefinition<TData>[];
   indexName: string;
-  initData?: TData[];
   defaultSort?: SortingRule[];
   /** Adds the bulk edit button and the row checkboxes. */
   bulkEditPath?: (ids: string[]) => {
@@ -58,7 +74,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
-  initData,
   bulkDeleteButtonProps,
   bulkEditPath,
   omitPaging,
@@ -76,13 +91,62 @@ export function QueryPage<TData extends KitsuResource>({
     useState<Map<string, JsonValue[]>>();
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
+  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
-  const [searchResults, setSearchResults] = useState<{
-    results?: TData[];
-    isFromSearch?: boolean;
-  }>({});
-  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+
+  // Search results with pagination applied.
+  const [searchResults, setSearchResults] = useState<SearchResultData<TData>>({
+    results: [],
+    total: 0
+  });
+
+  // JSONAPI pagination specs
+  const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
+    limit: DEFAULT_PAGE_SIZE,
+    offset: 0
+  });
+
+  // Search filters to apply.
+  const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
+    {
+      group: groupNames?.[0] ?? "",
+      queryRows: [
+        {
+          fieldName: ""
+        }
+      ]
+    }
+  );
+
+  // Fetch data if the pagination or search filters have changed.
+  useEffect(() => {
+    // After a search, isFromLoaded should be reset
+    isFromLoadedRef.current = false;
+
+    // Elastic search query with pagination settings.
+    const queryDSL = transformQueryToDSL(pagination, cloneDeep(searchFilters));
+
+    // No search when query has no content in it
+    if (!Object.keys(queryDSL).length) return;
+
+    // Fetch data using elastic search.
+    searchES(queryDSL).then(result => {
+      const processedResult = result?.hits
+        .map(hit => hit._source?.data)
+        .map(rslt => ({
+          id: rslt.id,
+          type: rslt.type,
+          ...rslt.attributes
+        }));
+      setAvailableSamples(processedResult);
+      setSearchResults({
+        results: processedResult,
+        total: result?.total.value
+      });
+    });
+  }, [pagination, searchFilters]);
 
   const {
     CheckBoxField,
@@ -90,9 +154,7 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: searchResults?.isFromSearch
-      ? searchResults?.results
-      : initData
+    defaultAvailableItems: searchResults.results
   });
 
   // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
@@ -101,9 +163,7 @@ export function QueryPage<TData extends KitsuResource>({
   const computedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(
-          searchResults?.isFromSearch
-            ? searchResults.results
-            : (initData as any),
+          searchResults.results as PersistedResource<TData>[],
           CheckBoxField
         )
       : reactTableProps;
@@ -167,26 +227,60 @@ export function QueryPage<TData extends KitsuResource>({
         }
       }
     );
-    return resp?.data?.hits.hits.map(hit => hit._source?.data);
+    return resp?.data?.hits;
   }
 
+  /**
+   * On search filter submit. This will also update the pagination to go back to the first page on
+   * a new search.
+   *
+   * @param submittedValues search filter form values.
+   */
   const onSubmit = ({ submittedValues }) => {
-    // After a search, isFromLoaded should be reset
-    isFromLoadedRef.current = false;
-    const queryDSL = transformQueryToDSL(submittedValues);
-    // No search when query has no content in it
-    if (!Object.keys(queryDSL).length) return;
-    searchES(queryDSL).then(result => {
-      const processedResult = result?.map(rslt => ({
-        id: rslt.id,
-        type: rslt.type,
-        ...rslt.attributes
-      }));
-      setAvailableSamples(processedResult);
-      setSearchResults({ results: processedResult, isFromSearch: true });
+    setSearchFilters(submittedValues);
+    setPagination({
+      ...pagination,
+      offset: 0
     });
   };
-  const totalCount = searchResults?.results?.length ?? initData?.length;
+
+  /**
+   * When the user changes the react-table page size, it will trigger this event.
+   *
+   * This method will update the pagination, and since we have a useEffect hook on the pagination
+   * this will trigger a new search. This will update the pagination limit.
+   *
+   * @param newPageSize
+   */
+  function onPageSizeChange(newPageSize: number) {
+    setPagination({
+      offset: 0,
+      limit: newPageSize
+    });
+  }
+
+  /**
+   * When the user changes the react-table page, it will trigger this event.
+   *
+   * This method will update the pagination, and since we have a useEffect hook on the pagination
+   * this will trigger a new search. Using the page size we can determine the offset.
+   *
+   * For example:
+   *    pageSize: 25
+   *    newPage: 5
+   *
+   *    The offset would be 25 * 5 = 125.
+   *
+   * @param newPage
+   */
+  function onPageChange(newPage: number) {
+    setPagination({
+      ...pagination,
+      offset: pagination.limit * newPage
+    });
+  }
+
+  const totalCount = searchResults.total;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
@@ -265,16 +359,14 @@ export function QueryPage<TData extends KitsuResource>({
   if (loading || error) return <></>;
 
   function loadSavedSearch(savedSearchName, userPreferences) {
-    isFromLoadedRef.current = true;
-    const initValus = new Map().set(
-      savedSearchName,
-      userPreferences
+    setSearchFilters({
+      ...searchFilters,
+      queryRows: userPreferences
         ? userPreferences[0]?.savedSearches?.[username as any]?.[
             savedSearchName
           ]
         : [{}]
-    );
-    setInitSavedSearchValues(initValus);
+    });
   }
 
   async function saveSearch(isDefault, userPreferences, searchName) {
@@ -355,25 +447,12 @@ export function QueryPage<TData extends KitsuResource>({
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
-  const initialValues = isFromLoadedRef.current
-    ? formValues && toPairs(formValues).length > 0
-      ? formValues
-      : {
-          group: groupNames?.[0],
-          queryRows: [{}]
-        }
-    : pageRef.current?.values
-    ? pageRef.current?.values
-    : {
-        group: groupNames?.[0],
-        queryRows: [{}]
-      };
 
   return (
     <DinaForm
       key={uuidv4()}
       innerRef={pageRef}
-      initialValues={initialValues}
+      initialValues={searchFilters}
       onSubmit={onSubmit}
     >
       <label
@@ -392,8 +471,10 @@ export function QueryPage<TData extends KitsuResource>({
           name="group"
           className="col-md-4"
           onChange={(value, formik) => {
-            const resetToVal = cloneDeep(formik.values);
-            onSubmit({ submittedValues: { ...resetToVal, group: value } });
+            const currentSubmittedValues = cloneDeep(formik.values);
+            onSubmit({
+              submittedValues: { ...currentSubmittedValues, group: value }
+            });
           }}
         />
       </DinaFormSection>
@@ -468,7 +549,7 @@ export function QueryPage<TData extends KitsuResource>({
         <ReactTable
           className="-striped"
           columns={mappedColumns}
-          data={searchResults?.results ?? initData}
+          data={searchResults.results}
           minRows={1}
           {...resolvedReactTableProps}
           pageText={<CommonMessage id="page" />}
@@ -477,6 +558,13 @@ export function QueryPage<TData extends KitsuResource>({
           rowsText={formatMessage({ id: "rows" })}
           previousText={<CommonMessage id="previous" />}
           nextText={<CommonMessage id="next" />}
+          // Pagination props
+          manual={true}
+          pageSize={pagination.limit}
+          pages={totalCount ? Math.ceil(totalCount / pagination.limit) : 0}
+          page={pagination.offset / pagination.limit}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           TbodyComponent={
             error
               ? () => (

@@ -186,15 +186,6 @@ export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
   const [queryKey, setQueryKey] = useState("");
   const { groupNames } = useAccount();
-  const queryState = useQuery<MaterialSample[]>(
-    {
-      path: "collection-api/material-sample",
-      include: "collection",
-      filter: { rsql: `group=in=(${groupNames?.[0]})` }
-    },
-    {}
-  );
-  const { error, loading, response } = queryState;
   const columns = [
     ...getColumnDefinition(),
     ...[
@@ -241,21 +232,18 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        {withResponse({ loading, error, response }, () => (
-          <QueryPage
-            indexName={"dina_material_sample_index"}
-            columns={columns}
-            initData={response?.data}
-            bulkDeleteButtonProps={{
-              typeName: "material-sample",
-              apiBaseUrl: "/collection-api"
-            }}
-            bulkEditPath={ids => ({
-              pathname: "/collection/material-sample/bulk-edit",
-              query: { ids: ids.join(",") }
-            })}
-          />
-        ))}
+        <QueryPage
+          indexName={"dina_material_sample_index"}
+          columns={columns}
+          bulkDeleteButtonProps={{
+            typeName: "material-sample",
+            apiBaseUrl: "/collection-api"
+          }}
+          bulkEditPath={ids => ({
+            pathname: "/collection/material-sample/bulk-edit",
+            query: { ids: ids.join(",") }
+          })}
+        />
       </main>
       <Footer />
     </div>

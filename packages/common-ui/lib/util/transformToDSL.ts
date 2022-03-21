@@ -1,12 +1,14 @@
 import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
+import { LimitOffsetPageSpec } from "..";
 
-interface TransformQueryToDSLParams {
+export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
   group: string;
 }
 
 export function transformQueryToDSL(
+  pagination: LimitOffsetPageSpec,
   submittedValues: TransformQueryToDSLParams
 ) {
   const builder = Bodybuilder();
@@ -118,6 +120,12 @@ export function transformQueryToDSL(
     builder.andFilter("terms", "data.attributes.group", submittedValues.group);
   } else if (!Array.isArray(submittedValues.group) && submittedValues.group) {
     builder.andFilter("term", "data.attributes.group", submittedValues.group);
+  }
+
+  // Apply pagination rules to elastic search query.
+  if (pagination) {
+    builder.size(pagination.limit);
+    builder.from(pagination.offset);
   }
 
   return builder.build();
