@@ -84,11 +84,7 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient, save } = useApiClient();
   const { formatMessage } = useIntl();
   const { openModal } = useModal();
-  const isFromLoadedRef = useRef<boolean>(false);
   const pageRef = useRef<FormikProps<any>>(null);
-  // Initial saved search values for the user with its saved search names as keys
-  const [initSavedSearchValues, setInitSavedSearchValues] =
-    useState<Map<string, JsonValue[]>>();
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
@@ -120,11 +116,11 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
+  // Selected saved search for the saved search dropdown.
+  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
+
   // Fetch data if the pagination or search filters have changed.
   useEffect(() => {
-    // After a search, isFromLoaded should be reset
-    isFromLoadedRef.current = false;
-
     // Elastic search query with pagination settings.
     const queryDSL = transformQueryToDSL(pagination, cloneDeep(searchFilters));
 
@@ -156,9 +152,6 @@ export function QueryPage<TData extends KitsuResource>({
     fieldName: "selectedResources",
     defaultAvailableItems: searchResults.results
   });
-
-  // Retrieve the actual saved search content:{group: cnc,queryRows: {}}
-  const formValues = initSavedSearchValues?.values().next().value;
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
@@ -359,14 +352,11 @@ export function QueryPage<TData extends KitsuResource>({
   if (loading || error) return <></>;
 
   function loadSavedSearch(savedSearchName, userPreferences) {
-    setSearchFilters({
-      ...searchFilters,
-      queryRows: userPreferences
-        ? userPreferences[0]?.savedSearches?.[username as any]?.[
-            savedSearchName
-          ]
-        : [{}]
-    });
+    if (!userPreferences || !savedSearchName) return;
+    setSearchFilters(
+      userPreferences[0]?.savedSearches?.[username as any]?.[savedSearchName]
+    );
+    setSelectedSavedSearch(savedSearchName);
   }
 
   async function saveSearch(isDefault, userPreferences, searchName) {
@@ -429,7 +419,12 @@ export function QueryPage<TData extends KitsuResource>({
       };
 
       await save([saveArgs], { apiBaseUrl: "/user-api" });
-      loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+
+      if (toPairs(userSavedSearches)?.[0]?.[0]) {
+        loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+      } else {
+        setSelectedSavedSearch("");
+      }
     }
 
     openModal(
@@ -460,11 +455,7 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <DinaMessage id="search" />
       </label>
-      <QueryBuilder
-        name="queryRows"
-        esIndexMapping={sortedData}
-        isFromLoadedRef={isFromLoadedRef}
-      />
+      <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField
           isMulti={true}
@@ -495,11 +486,7 @@ export function QueryPage<TData extends KitsuResource>({
                   initialSavedSearches ? Object.keys(initialSavedSearches) : []
                 }
                 initialSavedSearches={initialSavedSearches}
-                selectedSearch={
-                  initSavedSearchValues
-                    ? initSavedSearchValues.keys().next().value
-                    : undefined
-                }
+                selectedSearch={selectedSavedSearch}
               />
             );
           })}

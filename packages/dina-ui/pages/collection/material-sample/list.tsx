@@ -4,22 +4,15 @@ import {
   dateCell,
   DeleteButton,
   FilterAttribute,
-  filterBy,
   ListPageLayout,
   QueryPage,
-  stringArrayCell,
-  useAccount,
-  useQuery,
-  withResponse
+  stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  MaterialSample,
-  MaterialSampleType
-} from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { useState } from "react";
 
 export interface SampleListLayoutProps {
@@ -185,7 +178,6 @@ export function SampleListLayout({
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
   const [queryKey, setQueryKey] = useState("");
-  const { groupNames } = useAccount();
   const columns = [
     ...getColumnDefinition(),
     ...[
