@@ -106,7 +106,19 @@ and dev machine:
 curl -i http://dina.traefik.me
 ```
 
-### Attaching VS Code debugger to a running Java app:
+## Downloading elastic-search indexes
+
+When running the `./dev.sh` script, it will automatically download the elastic-search indexes from the `dina-local-deployment` repository.
+
+By default it will retrieve these indexes from `master` branch, but it can be changed by editing the branch variable from inside the `dev.sh` file:
+
+```bash
+...
+branch="master"
+...
+```
+
+## Attaching VS Code debugger to a running Java app:
 
 For breakpoints and inspection:
 
