@@ -70,8 +70,7 @@ export function ManagedAttributeField({
   const attributePath = `${valuesPath}.${attribute.key}`;
 
   const overrideValue = (typeof values != "undefined" && values.hasOwnProperty(attribute.key)) ? values[attribute.key] === "true": undefined;
-  // console.log(values)
-  console.log(overrideValue);
+
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
