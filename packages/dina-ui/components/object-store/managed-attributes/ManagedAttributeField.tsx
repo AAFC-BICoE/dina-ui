@@ -62,14 +62,11 @@ export function ManagedAttributeFieldWithLabel(
 /** Formik-connected field for a single Managed Attribute. No surrounding label tag. */
 export function ManagedAttributeField({
   attribute,
-  values,
   valuesPath
 }: ManagedAttributeFieldProps) {
   const { formatMessage } = useDinaIntl();
 
   const attributePath = `${valuesPath}.${attribute.key}`;
-
-  const overrideValue = (typeof values != "undefined" && values.hasOwnProperty(attribute.key)) ? values[attribute.key] === "true": undefined;
 
   const props = {
     removeBottomMargin: true,
@@ -107,7 +104,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <ToggleField {...props} overrideValue={overrideValue}/>
+    <ToggleField {...props}/>
   ) : (
     <TextField {...props} />
   );
