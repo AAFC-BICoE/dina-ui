@@ -62,14 +62,14 @@ export function FileView({
 
   const showFile = !isSpreadsheet;
 
-  if (preview) {
+  if (preview || !isImage) {
     clickToDownload = false;
   }
 
   if (!token) {
     return null;
   }
-
+  
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
