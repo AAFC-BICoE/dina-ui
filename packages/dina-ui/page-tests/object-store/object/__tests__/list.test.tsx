@@ -81,19 +81,28 @@ const MOCK_INDEX_MAPPING_RESP = {
 };
 
 const mockGet = jest.fn<any, any>(async path => {
-  if (path === "objectstore-api/metadata") {
-    return { data: TEST_METADATAS };
-  } else if (path === "objectstore-api/object-upload") {
-    return { data: TEST_OBJECTUPLOAD };
-  } else if (path === "agent-api/person") {
-    return { data: TEST_PERSON };
-  } else if (path === "search-api/search-ws/mapping") {
-    return MOCK_INDEX_MAPPING_RESP;
-  } else if (path === "user-api/group") {
-    return TEST_GROUP;
+  switch (path) {
+    case "objectstore-api/metadata":
+      return { data: TEST_METADATAS };
+    case "objectstore-api/object-upload":
+      return { data: TEST_OBJECTUPLOAD };
+    case "agent-api/person":
+      return { data: TEST_PERSON };
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
+    case "user-api/group":
+      return TEST_GROUP;
   }
 });
 
+const mockPost = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
+  }
+});
+
+// This will be used in the future with the fallback.
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1"],
@@ -125,6 +134,64 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
   }
 ];
 
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 3
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+              type: "metadata",
+              attributes: {
+                acTags: ["tag1"],
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
+                originalFilename: "file1.png"
+              }
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+              type: "metadata",
+              attributes: {
+                acTags: ["tag1", "tag2"],
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
+                originalFilename: "file2.png"
+              }
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+              type: "metadata",
+              attributes: {
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -148,7 +215,8 @@ const apiContext: any = {
   apiClient: {
     get: mockGet,
     axios: {
-      get: mockGet
+      get: mockGet,
+      post: mockPost
     }
   },
   doOperations: mockDoOperations

@@ -124,7 +124,7 @@ export function QueryPage<TData extends KitsuResource>({
     // Elastic search query with pagination settings.
     const queryDSL = transformQueryToDSL(pagination, cloneDeep(searchFilters));
 
-    // No search when query has no content in it
+    // Do not search when the query has no content. (It should at least have pagination.)
     if (!Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
@@ -144,13 +144,34 @@ export function QueryPage<TData extends KitsuResource>({
     });
   }, [pagination, searchFilters]);
 
+  /**
+   * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
+   * the indexName in the prop.
+   *
+   * @param queryDSL query containing filters and pagination.
+   * @returns Elastic search response.
+   */
+  async function searchES(queryDSL) {
+    const query = { ...queryDSL };
+    const resp = await apiClient.axios.post(
+      `search-api/search-ws/search`,
+      query,
+      {
+        params: {
+          indexName
+        }
+      }
+    );
+    return resp?.data?.hits;
+  }
+
   const {
     CheckBoxField,
     CheckBoxHeader,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: searchResults.results
+    defaultAvailableItems: searchResults.results ?? []
   });
 
   const computedReactTableProps =
@@ -207,20 +228,6 @@ export function QueryPage<TData extends KitsuResource>({
     };
     formik?.setValues(resetToVal);
     onSubmit({ submittedValues: resetToVal });
-  }
-
-  async function searchES(queryDSL) {
-    const query = { ...queryDSL };
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/search`,
-      query,
-      {
-        params: {
-          indexName
-        }
-      }
-    );
-    return resp?.data?.hits;
   }
 
   /**
@@ -506,7 +513,7 @@ export function QueryPage<TData extends KitsuResource>({
         <div className="mb-1">
           {!omitPaging && (
             <div className="d-flex align-items-end">
-              <span>
+              <span id="queryPageCount">
                 <CommonMessage id="tableTotalCount" values={{ totalCount }} />
               </span>
               {resolvedReactTableProps?.sortable !== false && (
