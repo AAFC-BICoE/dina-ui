@@ -165,183 +165,73 @@ describe("QueryPage component", () => {
     wrapper
       .find("SelectField[name='group']")
       .find(Select)
-      .prop<any>("onChange")({ value: "testGroup" });
+      .prop<any>("onChange")({ value: "cnc" });
 
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet.mock.calls).toEqual([
-      [
-        "user-api/user-preference",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
+    // The first call should just be with the first group as the filter.
+    expect(mockPost.mock.calls[0]).toEqual([
+      "search-api/search-ws/search",
+      {
+        from: 0,
+        size: 25,
+        query: {
+          bool: {
             filter: {
-              userId: undefined
-            },
-            page: {
-              limit: 1000
+              term: {
+                "data.attributes.group": "aafc"
+              }
             }
-          },
-          paramsSerializer: expect.anything()
-        }
-      ],
-      [
-        "search-api/search-ws/mapping",
-        {
-          params: {
-            indexName: "testIndex"
           }
         }
-      ],
-      [
-        "user-api/group",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
+      },
+      {
+        params: {
+          indexName: "testIndex"
         }
-      ],
-      [
-        "user-api/group",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
-        }
-      ],
-      [
-        "user-api/group",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["testGroup","aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
-        }
-      ],
-      [
-        "user-api/group",
-        {
-          headers: {
-            Accept: "application/vnd.api+json",
-            "Content-Type": "application/vnd.api+json",
-            "Crnk-Compact": "true"
-          },
-          params: {
-            filter: '{"name":["testGroup","aafc","cnc"]}',
-            page: {
-              limit: 1000
-            }
-          },
-          paramsSerializer: expect.anything()
-        }
-      ],
-      expect.anything()
+      }
     ]);
 
-    expect(mockPost.mock.calls).toEqual([
-      [
-        "search-api/search-ws/search",
-        {
-          query: {
-            bool: {
-              filter: {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        createdOn: "2022-01-25"
-                      }
-                    },
-                    {
-                      term: {
-                        allowDuplicateName: "false"
-                      }
-                    },
-                    {
-                      term: {
-                        "data.attributes.group": "testGroup"
-                      }
+    // The last call should be all of the expected filters applied and the new group applied.
+    expect(mockPost.mock.calls.pop()).toEqual([
+      "search-api/search-ws/search",
+      {
+        from: 0,
+        size: 25,
+        query: {
+          bool: {
+            filter: {
+              bool: {
+                must: [
+                  {
+                    term: {
+                      createdOn: "2022-01-25"
                     }
-                  ]
-                }
+                  },
+                  {
+                    term: {
+                      allowDuplicateName: "false"
+                    }
+                  },
+                  {
+                    term: {
+                      "data.attributes.group": "cnc"
+                    }
+                  }
+                ]
               }
             }
           }
-        },
-        {
-          params: {
-            indexName: "testIndex"
-          }
         }
-      ],
-      [
-        "search-api/search-ws/search",
-        {
-          query: {
-            bool: {
-              filter: {
-                bool: {
-                  must: [
-                    {
-                      term: {
-                        createdOn: "2022-01-25"
-                      }
-                    },
-                    {
-                      term: {
-                        allowDuplicateName: "false"
-                      }
-                    },
-                    {
-                      term: {
-                        "data.attributes.group": "testGroup"
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        },
-        {
-          params: {
-            indexName: "testIndex"
-          }
+      },
+      {
+        params: {
+          indexName: "testIndex"
         }
-      ]
+      }
     ]);
   });
 });

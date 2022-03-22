@@ -16,7 +16,6 @@ export interface QueryRowProps {
   removeRow?: (index) => void;
   name: string;
   formik?: FormikContextType<any>;
-  isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
 
 export interface ESIndexMapping {
@@ -67,8 +66,7 @@ const queryRowBooleanOptions = [
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const { values } = useFormikContext();
-  const { esIndexMapping, index, addRow, removeRow, name, isFromLoadedRef } =
-    queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
   const initVisibility = {
     text: false,
     date: false,
@@ -115,8 +113,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   };
 
   function onSelectionChange(value, formik, idx) {
-    // When selection is changed, the loaded from saved search query should be reset
-    if (isFromLoadedRef) isFromLoadedRef.current = false;
     const computedVal = typeof value === "object" ? value.name : value;
     const type = computedVal.substring(
       computedVal.indexOf("(") + 1,

@@ -54,28 +54,6 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
 
 export default function MetadataListPage() {
   const { formatMessage } = useDinaIntl();
-  const metadataQuery = useQuery<Metadata[]>(
-    {
-      path: "objectstore-api/metadata",
-      include: "acMetadataCreator,dcCreator"
-    },
-    {
-      joinSpecs: [
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "acMetadataCreator",
-          joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator.id}`
-        },
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ]
-    }
-  );
 
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
@@ -173,55 +151,52 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              {withResponse(metadataQuery, () => (
-                <QueryPage
-                  indexName={"dina_object_store_index"}
-                  columns={METADATA_TABLE_COLUMNS}
-                  initData={metadataQuery.response?.data}
-                  bulkDeleteButtonProps={{
-                    typeName: "metadata",
-                    apiBaseUrl: "/objectstore-api"
-                  }}
-                  bulkEditPath={ids => ({
-                    pathname: "/object-store/metadata/edit",
-                    query: { metadataIds: ids.join(",") }
-                  })}
-                  defaultSort={[
-                    {
-                      desc: true,
-                      id: "xmpMetadataDate"
-                    }
-                  ]}
-                  reactTableProps={(responseData, CheckBoxField) => {
-                    TBodyGallery.innerComponent = (
-                      <StoredObjectGallery
-                        CheckBoxField={CheckBoxField}
-                        metadatas={(responseData as any) ?? []}
-                        previewMetadataId={previewMetadata?.id as any}
-                        onSelectPreviewMetadata={setPreviewMetadata}
-                      />
-                    );
+              <QueryPage
+                indexName={"dina_object_store_index"}
+                columns={METADATA_TABLE_COLUMNS}
+                bulkDeleteButtonProps={{
+                  typeName: "metadata",
+                  apiBaseUrl: "/objectstore-api"
+                }}
+                bulkEditPath={ids => ({
+                  pathname: "/object-store/metadata/edit",
+                  query: { metadataIds: ids.join(",") }
+                })}
+                defaultSort={[
+                  {
+                    desc: true,
+                    id: "xmpMetadataDate"
+                  }
+                ]}
+                reactTableProps={(responseData, CheckBoxField) => {
+                  TBodyGallery.innerComponent = (
+                    <StoredObjectGallery
+                      CheckBoxField={CheckBoxField}
+                      metadatas={(responseData as any) ?? []}
+                      previewMetadataId={previewMetadata?.id as any}
+                      onSelectPreviewMetadata={setPreviewMetadata}
+                    />
+                  );
 
-                    return {
-                      TbodyComponent:
-                        listLayoutType === "GALLERY" ? TBodyGallery : undefined,
-                      getTrProps: (_, rowInfo) => {
-                        if (rowInfo) {
-                          const metadata: Metadata = rowInfo.original;
-                          return {
-                            style: {
-                              background:
-                                metadata.id === previewMetadata?.id &&
-                                HIGHLIGHT_COLOR
-                            }
-                          };
-                        }
-                        return {};
+                  return {
+                    TbodyComponent:
+                      listLayoutType === "GALLERY" ? TBodyGallery : undefined,
+                    getTrProps: (_, rowInfo) => {
+                      if (rowInfo) {
+                        const metadata: Metadata = rowInfo.original;
+                        return {
+                          style: {
+                            background:
+                              metadata.id === previewMetadata?.id &&
+                              HIGHLIGHT_COLOR
+                          }
+                        };
                       }
-                    };
-                  }}
-                />
-              ))}
+                      return {};
+                    }
+                  };
+                }}
+              />
             </SplitPagePanel>
           </div>
           <div className={`preview-section col-${previewSectionWidth}`}>

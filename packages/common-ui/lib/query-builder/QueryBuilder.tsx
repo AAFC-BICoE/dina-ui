@@ -5,13 +5,8 @@ import { FieldArray } from "formik";
 interface QueryBuilderProps extends FieldWrapperProps {
   esIndexMapping?: ESIndexMapping[];
   isResetRef?: React.MutableRefObject<boolean>;
-  isFromLoadedRef?: React.MutableRefObject<boolean>;
 }
-export function QueryBuilder({
-  name,
-  esIndexMapping,
-  isFromLoadedRef
-}: QueryBuilderProps) {
+export function QueryBuilder({ name, esIndexMapping }: QueryBuilderProps) {
   return (
     <FieldArray name={name}>
       {fieldArrayProps => {
@@ -25,7 +20,6 @@ export function QueryBuilder({
               index={elements?.length ?? 0}
               removeRow={removeRow}
               addRow={addRow}
-              isFromLoadedRef={isFromLoadedRef}
             />
           );
           // initialize the logic switch value to be "and"//
@@ -50,7 +44,6 @@ export function QueryBuilder({
                 addRow={addRow}
                 removeRow={removeRow}
                 esIndexMapping={esIndexMapping as any}
-                isFromLoadedRef={isFromLoadedRef}
               />
             ))
           : null;
