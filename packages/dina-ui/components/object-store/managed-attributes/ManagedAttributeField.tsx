@@ -3,8 +3,8 @@ import {
   FormikButton,
   NumberField,
   SelectField,
+  StringToggleField,
   TextField,
-  ToggleField,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -104,7 +104,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <ToggleField {...props}/>
+    <StringToggleField {...props}/>
   ) : (
     <TextField {...props} />
   );

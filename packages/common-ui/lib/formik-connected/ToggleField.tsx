@@ -25,6 +25,25 @@ export function ToggleField({
   );
 }
 
+/** Toggle UI for a boolean field. */
+export function StringToggleField({
+  onChangeExternal, ...props }: ToggleFieldProps) {
+    
+  return (
+    <FieldWrapper {...props} >
+      {({ value, setValue, formik }) => (
+        <Switch
+          checked={value === "true" ?? false}
+          onChange={checked => {
+            setValue(String(checked));
+            onChangeExternal?.(checked, formik);
+          }}
+        />
+      )}
+    </FieldWrapper>
+  );
+}
+
 /** Toggle UI showing the opposite state (true -> off, false -> on) for a boolean field. */
 export function InverseToggleField({
   onChangeExternal,
