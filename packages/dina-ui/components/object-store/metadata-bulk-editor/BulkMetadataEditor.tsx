@@ -540,6 +540,12 @@ export function managedAttributeColumns(
           source: attr.acceptedValues,
           type: "dropdown"
         }
-      : {})
+      : attr.managedAttributeType === "BOOL"? {
+          source: [
+            "true",
+            "false",
+          ],
+          type: "dropdown"
+      } : {})
   }));
 }

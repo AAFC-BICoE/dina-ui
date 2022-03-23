@@ -7,7 +7,9 @@ export interface ToggleFieldProps extends FieldWrapperProps {
 }
 
 /** Toggle UI for a boolean field. */
-export function ToggleField({ onChangeExternal, ...props }: ToggleFieldProps) {
+export function ToggleField({ 
+  onChangeExternal, ...props }: ToggleFieldProps) {
+    
   return (
     <FieldWrapper {...props} readOnlyRender={value => String(!!value)}>
       {({ value, setValue, formik }) => (
@@ -15,6 +17,25 @@ export function ToggleField({ onChangeExternal, ...props }: ToggleFieldProps) {
           checked={!!value ?? false}
           onChange={checked => {
             setValue(checked);
+            onChangeExternal?.(checked, formik);
+          }}
+        />
+      )}
+    </FieldWrapper>
+  );
+}
+
+/** Toggle UI for a boolean field. */
+export function StringToggleField({
+  onChangeExternal, ...props }: ToggleFieldProps) {
+    
+  return (
+    <FieldWrapper {...props} >
+      {({ value, setValue, formik }) => (
+        <Switch
+          checked={value === "true" ?? false}
+          onChange={checked => {
+            setValue(String(checked));
             onChangeExternal?.(checked, formik);
           }}
         />
