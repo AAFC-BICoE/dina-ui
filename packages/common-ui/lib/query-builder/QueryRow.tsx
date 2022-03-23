@@ -18,12 +18,62 @@ export interface QueryRowProps {
   formik?: FormikContextType<any>;
 }
 
+/**
+ * The full path will be generated for elastic using a combination of the parent path and
+ * the value. The path is generated using the following:
+ * 
+ * {parentPath}.{path}.{value}
+ * 
+ * Example: included.attributes.determination.verbatimScientificName
+ */
 export interface ESIndexMapping {
+  /**
+   * Name of the attribute.
+   * 
+   * Example: verbatimScientificName
+   */
   value: string;
+
+  /**
+   * Text that is displayed to the user in the Query Filtering option menu.
+   * 
+   * This text is a user-friendly generated label, which may show some paths to help the user
+   * understand the relationships better. This is generated from the path.
+   * 
+   * Example: determination.verbatimScientificName
+   */
   label: string;
+
+  /**
+   * The attributes type. This can change how the query row is displayed and the options provided.
+   * 
+   * Examples: text, keyword, boolean, date, boolean, long, short, integer...
+   */
   type: string;
+
+  /**
+   * The path for the attribute without the attribute name. This path does not include the parent
+   * path.
+   * 
+   * Example: attribute.determination
+   */
   path: string;
+
+  /**
+   * If the attribute belongs to a relationship, this is the path for only the parent. When generating
+   * the elastic search query it will use this as the prefix of the path.
+   * 
+   * Example: included
+   */
   parentPath?: string;
+
+  /**
+   * If the attribute belongs to a relationship, this is the name which will be used to group
+   * attributes under the same relationship together in the search. This name will also be used to
+   * display text of the group.
+   * 
+   * Example: organism
+   */
   parentName?: string;
 }
 

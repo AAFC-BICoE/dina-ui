@@ -289,6 +289,7 @@ export function QueryPage<TData extends KitsuResource>({
 
     const result: ESIndexMapping[] = [];
 
+    // Read index attributes.
     resp.data.body.attributes
       .filter(key => key.name !== "type")
       .map(key => {
@@ -310,23 +311,32 @@ export function QueryPage<TData extends KitsuResource>({
         });
       });
 
-    resp.data.body.relationships.attributes
-      .filter(key => key.name !== "type")
-      .map(key => {
-        result.push({
-          label: key.path?.includes(".")
-            ? key.path.substring(key.path.indexOf(".") + 1) + "." + key.name
-            : key.name,
-          value: key.path
-            ? key.path + "." + key.name
-            : key.name === "id"
-            ? "data." + key.name
-            : key.name,
-          type: key.type,
-          path: key.path,
-          parentPath: resp.data.body.relationships.path,
-          parentName: resp.data.body.relationships.value
-        });
+    // Read relationship attributes.
+    resp.data.body.relationships
+      .map(relationship => {
+
+        relationship.attributes
+          .map(relationshipAttribute => {
+
+            // This is the user-friendly label to display on the search dropdown.
+            const attributeLabel = relationshipAttribute.path?.includes(".")
+              ? relationshipAttribute.path.substring(
+                  relationshipAttribute.path.indexOf(".") + 1
+                ) +
+                "." +
+                relationshipAttribute.name
+              : relationshipAttribute.name;
+
+            result.push({
+              label: attributeLabel,
+              value: relationshipAttribute.name,
+              type: relationshipAttribute.type,
+              path: relationshipAttribute.path,
+              parentName: relationship.value,
+              parentPath: relationship.path
+            })
+
+          })
       });
     return result;
   }

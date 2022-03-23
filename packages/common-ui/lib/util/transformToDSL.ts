@@ -13,37 +13,81 @@ export function transformQueryToDSL(
 ) {
   const builder = Bodybuilder();
 
-  // Remove the type from value before submit to elastic search
+  // Remove the type from value before submit to elastic search.
   submittedValues.queryRows.map(queryRow => {
+    console.log(queryRow);
+
+    // Retrieve the type from the brackets.
     queryRow.type = queryRow.fieldName?.substring(
       queryRow.fieldName.indexOf("(") + 1,
       queryRow.fieldName.indexOf(")")
     );
+    
+    // Retrieve the name before the bracket.
     queryRow.fieldName = queryRow.fieldName?.substring(
       0,
       queryRow.fieldName.indexOf("(")
     );
   });
 
+  /**
+   * Formik will store the values in different spots depending on the queryRow type.
+   * 
+   * This helper function will retrieve the value based on the type.
+   * 
+   * @param queryRow 
+   * @returns value based on the query row type.
+   */
+  function getValueBasedOnType(queryRow) {
+    switch (queryRow.type) {
+      // Boolean type
+      case "boolean":
+        return queryRow.boolean;
+
+      // Number types
+      case "long":
+      case "short":
+      case "integer":
+      case "byte":
+      case "double":
+      case "float":
+      case "scaled_float":
+      case "unsigned_long":
+        return queryRow.number;
+
+      // Date type
+      case "date":
+        return queryRow.date;
+
+      // Text types
+      case "text":
+      case "keyword":
+        return queryRow.matchValue ?? ""
+
+      default:
+        return null;
+    }
+  }
+
+  function buildRelationshipQuery(curRow, firstRow, onlyOneRow) {
+
+  }
+
+  /**
+   * Used for attributes directly involved with the index. Relationship queries should be using
+   * the buildRelationshipQuery function instead.
+   * 
+   * @param curRow current row.
+   * @param firstRow first row (used for AND/OR type searching).
+   * @param onlyOneRow boolean if there is only one buildQuery to generate.
+   */
   function buildQuery(curRow, firstRow, onlyOneRow) {
     const rowToBuild = firstRow ?? curRow;
-    const value =
-      rowToBuild.type === "boolean"
-        ? rowToBuild.boolean
-        : rowToBuild.type === "long" ||
-          rowToBuild.type === "short" ||
-          rowToBuild.type === "integer" ||
-          rowToBuild.type === "byte" ||
-          rowToBuild.type === "double" ||
-          rowToBuild.type === "float" ||
-          rowToBuild.type === "half_float" ||
-          rowToBuild.type === "scaled_float" ||
-          rowToBuild.type === "unsiged_long"
-        ? rowToBuild.number
-        : rowToBuild.type === "date"
-        ? rowToBuild.date
-        : null;
 
+    // Special searches like boolean store the value in a different part of the structure.
+    const value = getValueBasedOnType(rowToBuild);
+
+    // A single row query option.
     if (onlyOneRow) {
       if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.query(
@@ -51,11 +95,13 @@ export function transformQueryToDSL(
           rowToBuild.matchType === "term"
             ? rowToBuild.fieldName + ".keyword"
             : rowToBuild.fieldName,
-          rowToBuild.matchValue ?? ""
+          value
         );
       } else {
         builder.filter("term", rowToBuild.fieldName, value);
       }
+
+    // And Query
     } else if (curRow.compoundQueryType === "and") {
       if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.andQuery(
@@ -63,11 +109,13 @@ export function transformQueryToDSL(
           rowToBuild.matchType === "term"
             ? rowToBuild.fieldName + ".keyword"
             : rowToBuild.fieldName,
-          rowToBuild.matchValue ?? ""
+          value
         );
       } else {
         builder.andFilter("term", rowToBuild.fieldName, value);
       }
+
+    // Or Query
     } else if (curRow.compoundQueryType === "or") {
       if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
         builder.orFilter(
@@ -75,7 +123,7 @@ export function transformQueryToDSL(
           rowToBuild.matchType === "term"
             ? rowToBuild.fieldName + ".keyword"
             : rowToBuild.fieldName,
-          rowToBuild.matchValue ?? ""
+          value
         );
       } else {
         builder.orFilter("term", rowToBuild.fieldName, value);
@@ -104,8 +152,9 @@ export function transformQueryToDSL(
           queryRow.matchType &&
           queryRow.matchValue))
   );
-  const len = filteredValues.length;
+
   filteredValues.map((queryRow, idx) => {
+    // Only one row, change the "onlyOneRow" option on buildQuery.
     if (filteredValues.length === 1) buildQuery(queryRow, queryRow, true);
     else {
       if (idx === 1) buildQuery(queryRow, filteredValues[0], false);
@@ -113,6 +162,7 @@ export function transformQueryToDSL(
     }
   });
 
+  // Add the search group filter.
   if (
     Array.isArray(submittedValues.group) &&
     submittedValues.group.length > 0
