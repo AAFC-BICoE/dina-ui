@@ -23,7 +23,7 @@ export function transformQueryToDSL(
       queryRow.fieldName.indexOf(")")
     );
     
-    // Retrieve the name before the bracket.
+    // Retrieve the name removing the brackets at the end.
     queryRow.fieldName = queryRow.fieldName?.substring(
       0,
       queryRow.fieldName.indexOf("(")
@@ -69,96 +69,80 @@ export function transformQueryToDSL(
     }
   }
 
-  function buildRelationshipQuery(curRow, firstRow, onlyOneRow) {
+  function getMatchType(queryRow) {
+    switch (queryRow.type) {
+      // Text based input can also have exact or partial matches.
+      case "text":
+      case "keyword":
+        return queryRow.matchType as string
 
+      default:
+        return "term"
+    }
+  }
+
+  function getFieldName(queryRow) {
+    if (queryRow.matchType === "term") return queryRow.fieldName + ".keyword";
+    return queryRow.fieldName;
+  }
+
+  function buildRelationshipQuery(rowToBuild) {
+    // The type can change some of these fields below.
+    const value = getValueBasedOnType(rowToBuild);
+    const type = getMatchType(rowToBuild);
+    const fieldName = getFieldName(rowToBuild);
+
+    // Create a nested query for each relationship type query.
+    // TODO: Currently it's hard coded for testing purposes. Need to actually get the data from the fieldname.
+    builder.query('nested', { path: 'included' }, (queryBuilder) => {
+      return queryBuilder
+        .query("match", "included.type", "organism")
+        .query(type, 'included.attributes.substrate', value)
+    })
   }
 
   /**
    * Used for attributes directly involved with the index. Relationship queries should be using
    * the buildRelationshipQuery function instead.
    * 
-   * @param curRow current row.
-   * @param firstRow first row (used for AND/OR type searching).
-   * @param onlyOneRow boolean if there is only one buildQuery to generate.
+   * @param rowToBuild
    */
-  function buildQuery(curRow, firstRow, onlyOneRow) {
-    const rowToBuild = firstRow ?? curRow;
-
-    // Special searches like boolean store the value in a different part of the structure.
+  function buildQuery(rowToBuild) {
+    // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
+    const type = getMatchType(rowToBuild);
+    const fieldName = getFieldName(rowToBuild);
 
-    // A single row query option.
-    if (onlyOneRow) {
-      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
-        builder.query(
-          rowToBuild.matchType as string,
-          rowToBuild.matchType === "term"
-            ? rowToBuild.fieldName + ".keyword"
-            : rowToBuild.fieldName,
-          value
-        );
-      } else {
-        builder.filter("term", rowToBuild.fieldName, value);
-      }
-
-    // And Query
-    } else if (curRow.compoundQueryType === "and") {
-      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
-        builder.andQuery(
-          rowToBuild.matchType as string,
-          rowToBuild.matchType === "term"
-            ? rowToBuild.fieldName + ".keyword"
-            : rowToBuild.fieldName,
-          value
-        );
-      } else {
-        builder.andFilter("term", rowToBuild.fieldName, value);
-      }
-
-    // Or Query
-    } else if (curRow.compoundQueryType === "or") {
-      if (rowToBuild.type === "text" || rowToBuild.type === "keyword") {
-        builder.orFilter(
-          rowToBuild.matchType as string,
-          rowToBuild.matchType === "term"
-            ? rowToBuild.fieldName + ".keyword"
-            : rowToBuild.fieldName,
-          value
-        );
-      } else {
-        builder.orFilter("term", rowToBuild.fieldName, value);
-      }
-    }
+    // Currently only AND is supported, so this acts just like a AND.
+    builder.filter(type, fieldName, value);
   }
 
-  const filteredValues = submittedValues.queryRows.filter(
-    // Remove the row that user did not select any field to search on or
-    // no value is put for the selected field
-    queryRow =>
-      queryRow.fieldName &&
-      ((queryRow.type === "boolean" && queryRow.boolean) ||
-        ((queryRow.type === "long" ||
-          queryRow.type === "short" ||
-          queryRow.type === "integer" ||
-          queryRow.type === "byte" ||
-          queryRow.type === "double" ||
-          queryRow.type === "float" ||
-          queryRow.type === "half_float" ||
-          queryRow.type === "scaled_float" ||
-          queryRow.type === "unsiged_long") &&
-          queryRow.number) ||
-        (queryRow.type === "date" && queryRow.date) ||
-        ((queryRow.type === "text" || queryRow.type === "keyword") &&
-          queryRow.matchType &&
-          queryRow.matchValue))
-  );
+  // Remove the row that user did not select any field to search on or
+  // no value is put for the selected field
+  submittedValues.queryRows.filter(queryRow =>
+    queryRow.fieldName &&
+    ((queryRow.type === "boolean" && queryRow.boolean) ||
+      ((queryRow.type === "long" ||
+        queryRow.type === "short" ||
+        queryRow.type === "integer" ||
+        queryRow.type === "byte" ||
+        queryRow.type === "double" ||
+        queryRow.type === "float" ||
+        queryRow.type === "half_float" ||
+        queryRow.type === "scaled_float" ||
+        queryRow.type === "unsigned_long") &&
+        queryRow.number) ||
+      (queryRow.type === "date" && queryRow.date) ||
+      ((queryRow.type === "text" || queryRow.type === "keyword") &&
+        queryRow.matchType &&
+        queryRow.matchValue))
+  ).map((queryRow) => {
 
-  filteredValues.map((queryRow, idx) => {
-    // Only one row, change the "onlyOneRow" option on buildQuery.
-    if (filteredValues.length === 1) buildQuery(queryRow, queryRow, true);
-    else {
-      if (idx === 1) buildQuery(queryRow, filteredValues[0], false);
-      if (idx !== 0) buildQuery(queryRow, null, false);
+    // Determine if the attribute is inside a relationship.
+    if (queryRow.fieldName.startsWith("included")) {
+      buildRelationshipQuery(queryRow);
+    } else {
+      buildQuery(queryRow);
     }
   });
 
