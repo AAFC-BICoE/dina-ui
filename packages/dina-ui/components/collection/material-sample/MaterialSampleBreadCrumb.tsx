@@ -36,7 +36,7 @@ export function MaterialSampleBreadCrumb({
               <a>{displayName}</a>
             </Link>
           ) : (
-            <div className="d-flex flex-row align-items-center">
+            <div className="d-inline-flex flex-row align-items-center">
               <span>{displayName}</span>
               <NotPubliclyReleasableWarning />
             </div>
