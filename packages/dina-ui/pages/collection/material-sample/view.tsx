@@ -52,20 +52,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
-
-  if (materialSampleQuery.response?.data.parentMaterialSample) {
-    // const highestParentId = materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
-    // const materialSampleQuery2 = useMaterialSampleQuery(highestParentId);
-    // const highestParentMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
-    // const highestParentColEventQuery = useCollectingEventQuery(
-    //   highestParentMaterialSampleQuery.response?.data?.collectingEvent?.id
-    // );
-    // console.log(highestParentColEventQuery);
-    console.log(materialSampleQuery.response?.data.parentMaterialSample);
-    // console.log(id);
+  const highestParentId = materialSampleQuery.response?.data.parentMaterialSample && materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
+  const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
+  if (highestParentId) {
+    console.log(highestMaterialSampleQuery);
   }
+  
 
-  const colEventQuery = useCollectingEventQuery(
+  const colEventQuery = useCollectingEventQuery(highestParentId ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id :
     materialSampleQuery.response?.data?.collectingEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(

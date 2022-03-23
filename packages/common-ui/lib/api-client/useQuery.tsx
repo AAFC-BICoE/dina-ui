@@ -91,7 +91,7 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   const queryKey = JSON.stringify({ querySpec, disabled, deps });
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), []);
+  const cacheId = useMemo(() => uuidv4(), [queryKey]);
 
   const {
     data: apiResponse,
