@@ -1,6 +1,7 @@
 import {
   BackToListButton,
   ButtonBar,
+  CheckBoxField,
   DinaForm,
   DinaFormOnSubmit,
   LoadingSpinner,
@@ -8,6 +9,7 @@ import {
   SelectField,
   SubmitButton,
   TextField,
+  useApiClient,
   useQuery,
   withResponse
 } from "common-ui";
@@ -26,6 +28,7 @@ import {
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import { useGenerateSequence } from "../collection/material-sample/useGenerateSequence";
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
@@ -49,38 +52,63 @@ export function MaterialSampleGenerationForm({
   const [generationMode, setGenerationMode] = useState<GenerationMode>(
     initialMode || "BATCH"
   );
+  const [useNextSequence, setUseNextSequence] = useState<boolean>(
+    initialValues?.useNextSequence || false
+  );
+
+  const { save } = useApiClient();
+
   const { formatMessage } = useDinaIntl();
 
   const onSubmit: DinaFormOnSubmit<GeneratorFormValues> = ({
     submittedValues
   }) => {
-    const samples = [...Array(Number(submittedValues.numberToCreate))].map<
-      InputResource<MaterialSample>
-    >((_, index) => {
-      const sample = submittedValues.samples[index];
+    let generatedLowId: number;
+    if (useNextSequence) {
+      useGenerateSequence({
+        collectionId: submittedValues.collection.id,
+        amount: submittedValues.numberToCreate as any,
+        save
+      }).then(async data => {
+        if (data.result?.lowReservedID && data.result.highReservedID) {
+          generatedLowId = data.result?.lowReservedID;
+          onGenerateSamples();
+        }
+      });
+    } else {
+      onGenerateSamples();
+    }
 
-      return {
-        type: "material-sample",
-        parentMaterialSample: parentId
-          ? { id: parentId, type: "material-sample" }
-          : undefined,
-        group: submittedValues.group,
-        collection: submittedValues.collection,
-        publiclyReleasable: true,
-        // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
-        allowDuplicateName: generationMode === "BATCH",
-        ...sample,
-        materialSampleName:
-          sample?.materialSampleName?.trim?.() ||
-          generateName({
-            generationMode,
-            index,
-            formState: submittedValues
-          })
-      };
-    });
-
-    onGenerate({ samples, submittedValues, generationMode });
+    function onGenerateSamples() {
+      const samples = [...Array(Number(submittedValues.numberToCreate))].map<
+        InputResource<MaterialSample>
+      >((_, index) => {
+        const sample = submittedValues.samples[index];
+        return {
+          type: "material-sample",
+          parentMaterialSample: parentId
+            ? { id: parentId, type: "material-sample" }
+            : undefined,
+          group: submittedValues.group,
+          collection: submittedValues.collection,
+          publiclyReleasable: true,
+          // Batch mode generates samples with the same name, so allow duplicate names in batch mode:
+          allowDuplicateName: generationMode === "BATCH",
+          ...sample,
+          materialSampleName:
+            sample?.materialSampleName?.trim?.() || useNextSequence
+              ? submittedValues.baseName
+                ? submittedValues.baseName + (generatedLowId + index)
+                : `${generatedLowId + index}`
+              : generateName({
+                  generationMode,
+                  index,
+                  formState: submittedValues
+                })
+        };
+      });
+      onGenerate({ samples, submittedValues, generationMode });
+    }
   };
 
   const parentQuery = useQuery<MaterialSample>(
@@ -98,6 +126,11 @@ export function MaterialSampleGenerationForm({
     return <LoadingSpinner loading={true} />;
   }
 
+  const baseNameFromCollection =
+    collectionQuery?.lastUsedCollection?.code ??
+    collectionQuery?.lastUsedCollection?.name;
+  const baseNameFromParent =
+    parentQuery.response?.data?.materialSampleName || "";
   return (
     <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
@@ -107,7 +140,7 @@ export function MaterialSampleGenerationForm({
           increment: "NUMERICAL",
           suffix: "",
           start: "001",
-          baseName: parentQuery.response?.data?.materialSampleName || "",
+          baseName: baseNameFromParent,
           separator: "",
           collection:
             parentQuery.response?.data?.collection ||
@@ -134,11 +167,32 @@ export function MaterialSampleGenerationForm({
           enableStoredDefaultGroup={true}
         />
       </div>
-      <div style={{ width: "25rem" }}>
-        <NumberSpinnerField
-          name="numberToCreate"
-          max={30}
-          label={formatMessage("materialSamplesToCreate")}
+      <div className="d-flex justify-content-between">
+        <div style={{ width: "25rem" }}>
+          <NumberSpinnerField
+            name="numberToCreate"
+            max={30}
+            label={formatMessage("materialSamplesToCreate")}
+          />
+        </div>
+        <CheckBoxField
+          onCheckBoxClick={(event, formik) => {
+            if (event.target.checked) {
+              formik.setFieldValue("baseName", baseNameFromCollection);
+            } else {
+              formik.setFieldValue("baseName", baseNameFromParent);
+            }
+            setUseNextSequence(event.target.checked);
+            setGenerationMode(GENERATION_MODES[0]);
+          }}
+          name="useNextSequence"
+          className="gap-3 "
+          overridecheckboxProps={{
+            style: {
+              height: "30px",
+              width: "30px"
+            }
+          }}
         />
       </div>
       <Tabs
@@ -149,18 +203,27 @@ export function MaterialSampleGenerationForm({
           <Tab className="react-tabs__tab batch-tab">
             <DinaMessage id="generateBatch" />
           </Tab>
-          <Tab className="react-tabs__tab series-tab">
-            <DinaMessage id="generateSeries" />
-          </Tab>
+          {!useNextSequence && (
+            <Tab className="react-tabs__tab series-tab">
+              <DinaMessage id="generateSeries" />
+            </Tab>
+          )}
         </TabList>
         <TabPanel>
-          <GeneratorFields generationMode={generationMode} />
-          <PreviewAndCustomizeFields generationMode={generationMode} />
+          <GeneratorFields
+            generationMode={generationMode}
+            useNextSequence={useNextSequence}
+          />
+          {!useNextSequence && (
+            <PreviewAndCustomizeFields generationMode={generationMode} />
+          )}
         </TabPanel>
-        <TabPanel>
-          <GeneratorFields generationMode={generationMode} />
-          <PreviewAndCustomizeFields generationMode={generationMode} />
-        </TabPanel>
+        {!useNextSequence && (
+          <TabPanel>
+            <GeneratorFields generationMode={generationMode} />
+            <PreviewAndCustomizeFields generationMode={generationMode} />
+          </TabPanel>
+        )}
       </Tabs>
       <ButtonBar>
         <BackToListButton
@@ -189,16 +252,19 @@ export type IncrementMode = typeof INCREMENT_MODES[number];
 
 interface GeneratorFieldsProps {
   generationMode: GenerationMode;
+  useNextSequence?: boolean;
 }
 
-function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
+function GeneratorFields({
+  generationMode,
+  useNextSequence
+}: GeneratorFieldsProps) {
   const { formatMessage } = useDinaIntl();
 
   const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map(mode => ({
     label: formatMessage(mode),
     value: mode
   }));
-
   return (
     <div>
       <h4>
@@ -208,8 +274,20 @@ function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
         <CollectionSelectField className="col-sm-6" name="collection" />
         {generationMode === "BATCH" && (
           <>
-            <TextField name="suffix" className="col-md-3" />
-            <TextField name="separator" className="col-md-3" />
+            <TextField
+              name="suffix"
+              className="col-md-3"
+              inputProps={{
+                disabled: useNextSequence
+              }}
+            />
+            <TextField
+              name="separator"
+              className="col-md-3"
+              inputProps={{
+                disabled: useNextSequence
+              }}
+            />
           </>
         )}
         {generationMode === "SERIES" && (
@@ -244,9 +322,21 @@ function GeneratorFields({ generationMode }: GeneratorFieldsProps) {
         )}
       </div>
       <div className="row">
-        <TextField className="col-sm-6" name="baseName" />
+        <TextField
+          className="col-sm-6"
+          name="baseName"
+          inputProps={{
+            disabled: useNextSequence
+          }}
+        />
         {generationMode === "SERIES" && (
-          <TextField name="separator" className="col-md-3" />
+          <TextField
+            name="separator"
+            className="col-md-3"
+            inputProps={{
+              disabled: useNextSequence
+            }}
+          />
         )}
       </div>
     </div>
@@ -328,10 +418,8 @@ function generateName(params: GenerateNameParams) {
       ? formState.suffix || ""
       : generateSeriesSuffix(params)
   }`;
-
   return generatedName;
 }
-
 function generateSeriesSuffix({ index, formState }: GenerateNameParams) {
   if (formState.increment === "NUMERICAL") {
     const start = formState.start ?? "001";
@@ -373,7 +461,8 @@ const generatorFormSchema = yup.object({
   suffix: yup.string(),
   // Series mode:
   increment: yup.string(),
-  start: yup.string()
+  start: yup.string(),
+  useNextSequence: yup.boolean()
 });
 
 type GeneratorFormValues = yup.InferType<typeof generatorFormSchema>;
