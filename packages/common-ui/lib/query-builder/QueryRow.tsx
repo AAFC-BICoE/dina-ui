@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   DateField,
   NumberField,
@@ -89,7 +89,7 @@ export type QueryRowNumberType =
   | "float"
   | "half_float"
   | "scaled_float"
-  | "unsiged_long";
+  | "unsigned_long";
 
 export interface QueryRowExportProps {
   fieldName: string;
@@ -104,6 +104,11 @@ export interface QueryRowExportProps {
   type?: string;
 }
 
+interface QueryRowDataProps {
+  fieldName: string;
+  type: string;
+}
+
 const queryRowMatchOptions = [
   { label: "PARTIAL_MATCH", value: "match" },
   { label: "EXACT_MATCH", value: "term" }
@@ -115,45 +120,15 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { values } = useFormikContext();
+  const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
-  const initVisibility = {
-    text: false,
-    date: false,
-    boolean: false,
-    number: false,
-    numberRange: false,
-    dateRange: false
-  };
-  const typeFromFieldName = (values as any)?.queryRows?.[
-    index
-  ]?.fieldName?.substring(
-    (values as any)?.queryRows?.[index]?.fieldName?.indexOf("(") + 1,
-    (values as any)?.queryRows?.[index]?.fieldName?.indexOf(")")
-  );
 
-  const fieldType = typeFromFieldName ?? esIndexMapping?.[0]?.type;
-
-  const visibilityOverridden =
-    fieldType === "boolean"
-      ? { boolean: true }
-      : fieldType === "long" ||
-        fieldType === "short" ||
-        fieldType === "integer" ||
-        fieldType === "byte" ||
-        fieldType === "double" ||
-        fieldType === "float" ||
-        fieldType === "half_float" ||
-        fieldType === "scaled_float" ||
-        fieldType === "unsiged_long"
-      ? { number: true }
-      : fieldType === "date"
-      ? { date: true }
-      : { text: true };
-  const [visibility, setVisibility] = useState({
-    ...initVisibility,
-    ...visibilityOverridden
+  // Determine the name of the query row based on the current formik values.
+  const [queryRowData, setQueryRowData] = useState<QueryRowDataProps>({
+    fieldName: (formikProps.values as any)?.queryRows?.[index].fieldName,
+    type: ""
   });
+
   const initState = {
     matchValue: null,
     matchType: "match",
@@ -162,49 +137,49 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     number: null
   };
 
-  function onSelectionChange(value, formik, idx) {
-    const computedVal = typeof value === "object" ? value.name : value;
-    const type = computedVal.substring(
-      computedVal.indexOf("(") + 1,
-      computedVal.indexOf(")")
-    );
-    const state = {
-      ...formik.values?.[`${name}`]?.[`${idx}`],
-      ...initState,
-      fieldName: value
-    };
+  // Find the specific index mapping settings for this query row. Only updates when the fieldName changes.
+  const attributeSettings = useMemo(
+    () => esIndexMapping.find((attribute) => attribute.value === queryRowData.fieldName),
+    [queryRowData]
+  );
 
-    formik.setFieldValue(`${name}[${idx}]`, state);
-    switch (type) {
-      case "text":
-      case "keyword": {
-        return setVisibility({ ...initVisibility, text: true });
-      }
-      case "date": {
-        return setVisibility({ ...initVisibility, date: true });
-      }
-      case "boolean": {
-        return setVisibility({ ...initVisibility, boolean: true });
-      }
-      case "long":
-      case "short":
-      case "integer":
-      case "byte":
-      case "double":
-      case "float":
-      case "half_float":
-      case "scaled_float":
-      case "unsiged_long": {
-        return setVisibility({ ...initVisibility, number: true });
-      }
-    }
+  useEffect(() => {
+    formikProps.setFieldValue(`${name}[${index}]`, {
+      ...initState,
+      ...queryRowData
+    });
+  }, [queryRowData])
+
+  // Depending on the type, it changes what fields need to be displayed.
+  const typeVisibility = {
+    isText: attributeSettings?.type === "text",
+    isBoolean: attributeSettings?.type === "boolean",
+    isNumber: attributeSettings?.type === "long" || 
+              attributeSettings?.type === "short" || 
+              attributeSettings?.type === "integer" || 
+              attributeSettings?.type === "byte" || 
+              attributeSettings?.type === "double" || 
+              attributeSettings?.type === "float" || 
+              attributeSettings?.type === "half_float" || 
+              attributeSettings?.type === "scaled_float" || 
+              attributeSettings?.type === "unsigned",
+    isDate: attributeSettings?.type === "date",
+  }
+
+  function onSelectionChange(value) {
+    const dataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === value);
+
+    setQueryRowData({
+      fieldName: value,
+      type: dataFromIndexMapping?.type ?? "text",
+    });
   }
 
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
       label: prop.label,
-      value: prop.value + "(" + prop.type + ")"
+      value: prop.value
     }));
 
   let nestedGroupLabel = "Nested Group";
@@ -215,7 +190,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       nestedGroupLabel = prop.parentName as string;
       return {
         label: prop.label,
-        value: prop.parentPath + "." + prop.value + "(" + prop.type + ")"
+        value: prop.value
       };
     });
 
@@ -227,18 +202,18 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           : [])
       ]
     : [];
+  
   function fieldProps(fldName: string, idx: number) {
-    return {
-      name: `${name}[${idx}].${fldName}`
-    };
+    return `${name}[${idx}].${fldName}`
   }
+
   return (
     <div className="row">
       <div className="col-md-6 d-flex">
         {index > 0 && (
           <div style={{ width: index > 0 ? "8%" : "100%" }}>
             <QueryLogicSwitchField
-              name={fieldProps("compoundQueryType", index).name}
+              name={fieldProps("compoundQueryType", index)}
               removeLabel={true}
               className={"compoundQueryType" + index}
             />
@@ -246,11 +221,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         )}
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
-            name={fieldProps("fieldName", index).name}
+            name={fieldProps("fieldName", index)}
             options={queryRowOptions as any}
-            onChange={(value, formik) =>
-              onSelectionChange(value, formik, index)
-            }
+            onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
             removeLabel={true}
           />
@@ -258,39 +231,39 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {visibility.text && (
+          {typeVisibility.isText && (
             <TextField
-              name={fieldProps("matchValue", index).name}
+              name={fieldProps("matchValue", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.date && (
+          {typeVisibility.isDate && (
             <DateField
-              name={fieldProps("date", index).name}
+              name={fieldProps("date", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.text && (
+          {typeVisibility.isText && (
             <SelectField
-              name={fieldProps("matchType", index).name}
+              name={fieldProps("matchType", index)}
               options={queryRowMatchOptions}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.boolean && (
+          {typeVisibility.isBoolean && (
             <SelectField
-              name={fieldProps("boolean", index).name}
+              name={fieldProps("boolean", index)}
               options={queryRowBooleanOptions}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.number && (
+          {typeVisibility.isNumber && (
             <NumberField
-              name={fieldProps("number", index).name}
+              name={fieldProps("number", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
@@ -301,14 +274,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               onClick={addRow as any}
               size="2em"
               style={{ cursor: "pointer" }}
-              name={fieldProps("addRow", index).name}
+              name={fieldProps("addRow", index)}
             />
           ) : (
             <FaMinus
               onClick={() => removeRow?.(index)}
               size="2em"
               style={{ cursor: "pointer" }}
-              name={fieldProps("removeRow", index).name}
+              name={fieldProps("removeRow", index)}
             />
           )}
         </div>
