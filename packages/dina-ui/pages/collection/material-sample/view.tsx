@@ -53,12 +53,25 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
   const materialSampleQuery = useMaterialSampleQuery(id);
 
+  if (materialSampleQuery.response?.data.parentMaterialSample) {
+    // const highestParentId = materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
+    // const materialSampleQuery2 = useMaterialSampleQuery(highestParentId);
+    // const highestParentMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
+    // const highestParentColEventQuery = useCollectingEventQuery(
+    //   highestParentMaterialSampleQuery.response?.data?.collectingEvent?.id
+    // );
+    // console.log(highestParentColEventQuery);
+    console.log(materialSampleQuery.response?.data.parentMaterialSample);
+    // console.log(id);
+  }
+
   const colEventQuery = useCollectingEventQuery(
     materialSampleQuery.response?.data?.collectingEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(
     materialSampleQuery.response?.data?.acquisitionEvent?.id
   );
+
 
   const buttonBar = id && (
     <ButtonBar className="flex">
@@ -148,7 +161,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
               )}
               <MaterialSampleInfoSection />
-              {withResponse(colEventQuery, ({ data: colEvent }) => (
+              {withResponse(materialSample.parentMaterialSample ? colEventQuery : colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
