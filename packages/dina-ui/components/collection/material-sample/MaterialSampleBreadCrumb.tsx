@@ -27,7 +27,7 @@ export function MaterialSampleBreadCrumb({
           </Link>
         </li>
       ))}
-      <li className="breadcrumb-item d-inline-flex">
+      <li className="breadcrumb-item">
         <strong>
           {!disableLastLink ? (
             <Link
@@ -38,12 +38,10 @@ export function MaterialSampleBreadCrumb({
           ) : (
             <div className="d-inline-flex flex-row align-items-center">
               <span>{displayName}</span>
+              <NotPubliclyReleasableWarning />
             </div>
           )}
         </strong>
-        <div style={{ marginTop: "-10px" }}>
-          <NotPubliclyReleasableWarning />
-        </div>
       </li>
     </ol>
   );
