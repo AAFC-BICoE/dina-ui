@@ -12,14 +12,14 @@ export function NotPubliclyReleasableWarning() {
   }
 
   return (
-    <div className=" d-flex gap-2 align-items-center not-publicly-releasable-alert">
+    <div className="align-items-center not-publicly-releasable-alert">
       <Tooltip
         id="notPubliclyReleasable"
         setVisible={setVisible}
         visible={visible}
         visibleElement={
           <MdVpnLock
-            style={{ width: "24px", height: "24px" }}
+            style={{ width: "24px", height: "24px", marginLeft: "5px", marginTop: "-5px" }}
             onMouseOver={() => setVisible(true)}
             onMouseOut={() => setVisible(false)}
           />
