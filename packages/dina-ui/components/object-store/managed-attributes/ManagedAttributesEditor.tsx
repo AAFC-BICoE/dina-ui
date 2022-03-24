@@ -53,6 +53,8 @@ export interface ManagedAttributesEditorProps {
    * e.g. when the form's custom view is updated.
    */
   visibleAttributeKeys?: string[];
+  
+  values?: object;
 }
 
 export function ManagedAttributesEditor({
@@ -63,7 +65,8 @@ export function ManagedAttributesEditor({
   fieldSetProps,
   showCustomViewDropdown,
   managedAttributeOrderFieldName,
-  visibleAttributeKeys: visibleAttributeKeysProp
+  visibleAttributeKeys: visibleAttributeKeysProp,
+  values
 }: ManagedAttributesEditorProps) {
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
@@ -133,7 +136,7 @@ export function ManagedAttributesEditor({
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
-
+        
         return (
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
@@ -190,6 +193,7 @@ export function ManagedAttributesEditor({
                       <ManagedAttributeFieldWithLabel
                         key={attribute.key}
                         attribute={attribute}
+                        values={values}
                         valuesPath={valuesPath}
                         onRemoveClick={attributeKey =>
                           setVisibleAttributeKeys(current =>
