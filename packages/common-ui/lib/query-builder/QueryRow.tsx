@@ -9,6 +9,7 @@ import {
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
+import lodash from "lodash";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
@@ -104,9 +105,11 @@ export interface QueryRowExportProps {
   type?: string;
 }
 
-interface QueryRowDataProps {
-  fieldName: string;
-  type: string;
+interface TypeVisibility {
+  isText: boolean,
+  isBoolean: boolean,
+  isNumber: boolean,
+  isDate: boolean
 }
 
 const queryRowMatchOptions = [
@@ -123,12 +126,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
 
-  // Determine the name of the query row based on the current formik values.
-  const [queryRowData, setQueryRowData] = useState<QueryRowDataProps>({
-    fieldName: (formikProps.values as any)?.queryRows?.[index].fieldName,
-    type: ""
-  });
-
   const initState = {
     matchValue: null,
     matchType: "match",
@@ -137,44 +134,58 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     number: null
   };
 
-  // Find the specific index mapping settings for this query row. Only updates when the fieldName changes.
-  const attributeSettings = useMemo(
-    () => esIndexMapping.find((attribute) => attribute.value === queryRowData.fieldName),
-    [queryRowData]
-  );
+  console.log(formikProps.values);
 
-  useEffect(() => {
-    formikProps.setFieldValue(`${name}[${index}]`, {
-      ...initState,
-      ...queryRowData
-    });
-  }, [queryRowData])
+  const [fieldName, setFieldName] = useState<string>((formikProps.values as any)?.queryRows?.[index].fieldName);
+
+  const dataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === fieldName);
 
   // Depending on the type, it changes what fields need to be displayed.
-  const typeVisibility = {
-    isText: attributeSettings?.type === "text",
-    isBoolean: attributeSettings?.type === "boolean",
-    isNumber: attributeSettings?.type === "long" || 
-              attributeSettings?.type === "short" || 
-              attributeSettings?.type === "integer" || 
-              attributeSettings?.type === "byte" || 
-              attributeSettings?.type === "double" || 
-              attributeSettings?.type === "float" || 
-              attributeSettings?.type === "half_float" || 
-              attributeSettings?.type === "scaled_float" || 
-              attributeSettings?.type === "unsigned",
-    isDate: attributeSettings?.type === "date",
-  }
+  const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
+    isText: dataFromIndexMapping?.type === "text",
+    isBoolean: dataFromIndexMapping?.type === "boolean",
+    isNumber: dataFromIndexMapping?.type === "long" || 
+        dataFromIndexMapping?.type === "short" || 
+        dataFromIndexMapping?.type === "integer" || 
+        dataFromIndexMapping?.type === "byte" || 
+        dataFromIndexMapping?.type === "double" || 
+        dataFromIndexMapping?.type === "float" || 
+        dataFromIndexMapping?.type === "half_float" || 
+        dataFromIndexMapping?.type === "scaled_float" || 
+        dataFromIndexMapping?.type === "unsigned",
+    isDate: dataFromIndexMapping?.type === "date",  
+  });
 
   function onSelectionChange(value) {
-    const dataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === value);
+    const newDataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === value);
 
-    setQueryRowData({
+    formikProps.setFieldValue(`${name}[${index}]`, {
+      ...initState,
       fieldName: value,
-      type: dataFromIndexMapping?.type ?? "text",
+      type: newDataFromIndexMapping?.type ?? "text",
+      parentPath: newDataFromIndexMapping?.parentPath,
+      parentName: newDataFromIndexMapping?.parentName
     });
+
+    setTypeVisibility({
+      isText: newDataFromIndexMapping?.type === "text",
+      isBoolean: newDataFromIndexMapping?.type === "boolean",
+      isNumber: newDataFromIndexMapping?.type === "long" || 
+      newDataFromIndexMapping?.type === "short" || 
+      newDataFromIndexMapping?.type === "integer" || 
+      newDataFromIndexMapping?.type === "byte" || 
+      newDataFromIndexMapping?.type === "double" || 
+      newDataFromIndexMapping?.type === "float" || 
+          newDataFromIndexMapping?.type === "half_float" || 
+          newDataFromIndexMapping?.type === "scaled_float" || 
+          newDataFromIndexMapping?.type === "unsigned",
+      isDate: newDataFromIndexMapping?.type === "date",      
+    })
+
+    setFieldName(value);
   }
 
+  // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
@@ -182,24 +193,34 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       value: prop.value
     }));
 
-  let nestedGroupLabel = "Nested Group";
-
+  // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
     ?.filter(prop => !!prop.parentPath)
     ?.map(prop => {
-      nestedGroupLabel = prop.parentName as string;
       return {
+        parentName: prop.parentName,
         label: prop.label,
         value: prop.value
       };
     });
 
+  // Using the parent name, group the relationships into sections.
+  const groupedNestRowOptions = lodash.chain(nestedRowOptions)
+      .groupBy(prop => prop.parentName)
+      .map((group, key) => {
+        return {
+          label: key,
+          options: group
+        }
+      })
+      .value();
+
+  console.log(groupedNestRowOptions);
+
   const queryRowOptions = simpleRowOptions
     ? [
         ...simpleRowOptions,
-        ...(nestedRowOptions?.length > 0
-          ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
-          : [])
+        ...groupedNestRowOptions
       ]
     : [];
   

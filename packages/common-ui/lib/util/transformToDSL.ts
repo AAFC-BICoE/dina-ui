@@ -15,7 +15,7 @@ export function transformQueryToDSL(
 
   // Remove the type from value before submit to elastic search.
   submittedValues.queryRows.map(queryRow => {
-    console.log(queryRow);
+    //console.log(queryRow);
 
     // Retrieve the type from the brackets.
     queryRow.type = queryRow.fieldName?.substring(
