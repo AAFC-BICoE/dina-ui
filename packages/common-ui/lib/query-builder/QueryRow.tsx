@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   DateField,
   NumberField,
@@ -103,6 +103,8 @@ export interface QueryRowExportProps {
   date?: string;
   boolean?: string;
   type?: string;
+  parentName?: string;
+  parentPath?: string;
 }
 
 interface TypeVisibility {
@@ -133,8 +135,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     boolean: "true",
     number: null
   };
-
-  console.log(formikProps.values);
 
   const [fieldName, setFieldName] = useState<string>((formikProps.values as any)?.queryRows?.[index].fieldName);
 
@@ -214,8 +214,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         }
       })
       .value();
-
-  console.log(groupedNestRowOptions);
 
   const queryRowOptions = simpleRowOptions
     ? [

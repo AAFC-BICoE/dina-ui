@@ -329,7 +329,7 @@ export function QueryPage<TData extends KitsuResource>({
 
             result.push({
               label: attributeLabel,
-              value: relationship.path + "." + relationship.value + "." + relationshipAttribute.name,
+              value: relationship.path + "." + attributeLabel,
               type: relationshipAttribute.type,
               path: relationshipAttribute.path,
               parentName: relationship.value,

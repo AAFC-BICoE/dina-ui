@@ -13,23 +13,6 @@ export function transformQueryToDSL(
 ) {
   const builder = Bodybuilder();
 
-  // Remove the type from value before submit to elastic search.
-  submittedValues.queryRows.map(queryRow => {
-    //console.log(queryRow);
-
-    // Retrieve the type from the brackets.
-    queryRow.type = queryRow.fieldName?.substring(
-      queryRow.fieldName.indexOf("(") + 1,
-      queryRow.fieldName.indexOf(")")
-    );
-    
-    // Retrieve the name removing the brackets at the end.
-    queryRow.fieldName = queryRow.fieldName?.substring(
-      0,
-      queryRow.fieldName.indexOf("(")
-    );
-  });
-
   /**
    * Formik will store the values in different spots depending on the queryRow type.
    * 
@@ -87,17 +70,16 @@ export function transformQueryToDSL(
   }
 
   function buildRelationshipQuery(rowToBuild) {
-    // The type can change some of these fields below.
+    // The type can change some of these fields below. 
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
     const fieldName = getFieldName(rowToBuild);
 
     // Create a nested query for each relationship type query.
-    // TODO: Currently it's hard coded for testing purposes. Need to actually get the data from the fieldname.
-    builder.query('nested', { path: 'included' }, (queryBuilder) => {
+    builder.query("nested", { path: "included" }, (queryBuilder) => {
       return queryBuilder
-        .query("match", "included.type", "organism")
-        .query(type, 'included.attributes.substrate', value)
+        .andQuery("match", "included.type", rowToBuild.parentName)
+        .andQuery(type, fieldName.replace("included.", "included.attributes."), value)
     })
   }
 
@@ -114,7 +96,7 @@ export function transformQueryToDSL(
     const fieldName = getFieldName(rowToBuild);
 
     // Currently only AND is supported, so this acts just like a AND.
-    builder.filter(type, fieldName, value);
+    builder.query(type, fieldName, value);
   }
 
   // Remove the row that user did not select any field to search on or
@@ -139,7 +121,7 @@ export function transformQueryToDSL(
   ).map((queryRow) => {
 
     // Determine if the attribute is inside a relationship.
-    if (queryRow.fieldName.startsWith("included")) {
+    if (queryRow.parentName) {
       buildRelationshipQuery(queryRow);
     } else {
       buildQuery(queryRow);
