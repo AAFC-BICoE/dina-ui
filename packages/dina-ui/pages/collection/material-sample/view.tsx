@@ -55,6 +55,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const highestParentId =
     materialSampleQuery.response?.data.parentMaterialSample &&
     materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
+
+  const highestParentMaterialSample =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.name;
+
   const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
   const colEventQuery = useCollectingEventQuery(
     highestParentId
@@ -159,20 +164,20 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     <div>
                       {materialSample.parentMaterialSample ? (
                         <div>
-                          <DinaMessage id="collectingEventFromParent" />
-                          {" "}
+                          <DinaMessage id="collectingEventFromParent" />{" "}
                           <Link
                             href={`/collection/material-sample/view?id=${highestParentId}`}
                           >
                             <a>
                               {
-                                materialSample.parentMaterialSample
-                                  .materialSampleName
+                                highestParentMaterialSample
                               }
                             </a>
                           </Link>
                         </div>
-                      ) : <DinaMessage id="collectingEvent" />}
+                      ) : (
+                        <DinaMessage id="collectingEvent" />
+                      )}
                     </div>
                   }
                 >
