@@ -52,20 +52,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
-  const highestParentId = materialSampleQuery.response?.data.parentMaterialSample && materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
+  const highestParentId =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
   const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
-  if (highestParentId) {
-    console.log(highestMaterialSampleQuery);
-  }
-  
-
-  const colEventQuery = useCollectingEventQuery(highestParentId ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id :
-    materialSampleQuery.response?.data?.collectingEvent?.id
+  const colEventQuery = useCollectingEventQuery(
+    highestParentId
+      ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id
+      : materialSampleQuery.response?.data?.collectingEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(
     materialSampleQuery.response?.data?.acquisitionEvent?.id
   );
-
 
   const buttonBar = id && (
     <ButtonBar className="flex">
@@ -155,8 +153,29 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
               )}
               <MaterialSampleInfoSection />
-              {withResponse(materialSample.parentMaterialSample ? colEventQuery : colEventQuery, ({ data: colEvent }) => (
-                <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+              {withResponse(colEventQuery, ({ data: colEvent }) => (
+                <FieldSet
+                  legend={
+                    <div>
+                      {materialSample.parentMaterialSample ? (
+                        <div>
+                          <DinaMessage id="collectingEventFromParent" />
+                          {" "}
+                          <Link
+                            href={`/collection/material-sample/view?id=${highestParentId}`}
+                          >
+                            <a>
+                              {
+                                materialSample.parentMaterialSample
+                                  .materialSampleName
+                              }
+                            </a>
+                          </Link>
+                        </div>
+                      ) : <DinaMessage id="collectingEvent" />}
+                    </div>
+                  }
+                >
                   <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link
