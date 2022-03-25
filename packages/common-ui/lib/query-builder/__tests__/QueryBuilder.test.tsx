@@ -56,15 +56,15 @@ describe("QueryBuilder component", () => {
     ).toEqual([
       {
         label: "createdOn",
-        value: "data.attributes.createdOn(date)"
+        value: "data.attributes.createdOn"
       },
       {
         label: "allowDuplicateName",
-        value: "data.attributes.allowDuplicateName(boolean)"
+        value: "data.attributes.allowDuplicateName"
       }
     ]);
   });
-  it("Query builder can be used to add rows to aggretate level queries", async () => {
+  it("Query builder can be used to add rows to aggregate level queries", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ queryRows: [{}] }}>
         <QueryBuilder

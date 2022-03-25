@@ -288,13 +288,28 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             />
           )}
 
-          {index === 0 ? (
-            <FaPlus
-              onClick={addRow as any}
-              size="2em"
-              style={{ cursor: "pointer" }}
-              name={fieldProps("addRow", index)}
+          {/* Disabled text field when no search filter is selected. */}
+          {!fieldName && (
+            <TextField
+              name={fieldProps("matchValue", index)}
+              className="me-1 flex-fill"
+              removeLabel={true}
+              readOnly={true}
             />
+          )}
+
+          {/* Plus / Minus Buttons */}
+          {index === 0 ? (
+            <>
+              {fieldName && (
+                <FaPlus
+                  onClick={addRow as any}
+                  size="2em"
+                  style={{ cursor: "pointer" }}
+                  name={fieldProps("addRow", index)}
+                />
+              )}
+            </>
           ) : (
             <FaMinus
               onClick={() => removeRow?.(index)}
@@ -303,6 +318,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               name={fieldProps("removeRow", index)}
             />
           )}
+
         </div>
       </div>
     </div>

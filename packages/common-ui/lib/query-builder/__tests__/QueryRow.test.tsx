@@ -29,15 +29,15 @@ describe("QueryRow component", () => {
     ).toEqual([
       {
         label: "testA",
-        value: "testA(boolean)"
+        value: "testA"
       },
       {
         label: "testB",
-        value: "testB(number)"
+        value: "testB"
       }
     ]);
   });
-  it("Select a field from fieldName dropdown of query row, the correspondant fields should be set visible.", async () => {
+  it("Select a field from fieldName dropdown of query row, the correspondent fields should be set visible.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <QueryRow esIndexMapping={testFieldsOptions} index={0} name="test" />
