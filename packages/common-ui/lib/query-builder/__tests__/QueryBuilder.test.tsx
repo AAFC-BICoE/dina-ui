@@ -56,15 +56,15 @@ describe("QueryBuilder component", () => {
     ).toEqual([
       {
         label: "createdOn",
-        value: "data.attributes.createdOn(date)"
+        value: "data.attributes.createdOn"
       },
       {
         label: "allowDuplicateName",
-        value: "data.attributes.allowDuplicateName(boolean)"
+        value: "data.attributes.allowDuplicateName"
       }
     ]);
   });
-  it("Query builder can be used to add rows to aggretate level queries", async () => {
+  it("Query builder can be used to add rows to aggregate level queries", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ queryRows: [{}] }}>
         <QueryBuilder
@@ -76,6 +76,16 @@ describe("QueryBuilder component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    // select first row to a date field
+    wrapper
+      .find("SelectField[name='queryRows[0].fieldName']")
+      .find(Select)
+      .prop<any>("onChange")({ value: "data.attributes.createdOn" });
+
+    await new Promise(setImmediate);
+    wrapper.update();    
+
     wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
 
     await new Promise(setImmediate);
@@ -83,12 +93,6 @@ describe("QueryBuilder component", () => {
 
     // Expect the boolean dropdown to be visible
     expect(wrapper.find(".compoundQueryType0").length).toBe(0);
-
-    // select first row to a date field
-    wrapper
-      .find("SelectField[name='queryRows[0].fieldName']")
-      .find(Select)
-      .prop<any>("onChange")({ value: "createdOn(date)" });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -106,7 +110,7 @@ describe("QueryBuilder component", () => {
     wrapper
       .find("SelectField[name='queryRows[1].fieldName']")
       .find(Select)
-      .prop<any>("onChange")({ value: "allowDuplicateName(boolean)" });
+      .prop<any>("onChange")({ value: "data.attributes.allowDuplicateName" });
 
     await new Promise(setImmediate);
     wrapper.update();
