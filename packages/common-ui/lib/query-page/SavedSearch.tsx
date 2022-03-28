@@ -73,9 +73,6 @@ export function SavedSearch(props: SavedSearchProps) {
         delete val.ref;
       });
 
-      console.log("Save the following:")
-      console.log(formik.values);
-
       mySavedSearches[0].savedSearches[username as any][
         `${isDefault ? "default" : searchName}`
       ] = formik.values;
