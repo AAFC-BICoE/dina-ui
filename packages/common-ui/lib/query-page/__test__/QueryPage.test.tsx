@@ -3,14 +3,21 @@ import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { QueryPage } from "../QueryPage";
 import DatePicker from "react-datepicker";
 import { ColumnDefinition } from "../../table/QueryTable";
+import { PersistedResource } from "kitsu";
+import { Group } from "packages/dina-ui/types/user-api";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
     headers: {},
     body: {
-      indexName: "dina_material_sample_index",
+      indexName: "testIndex",
       attributes: [
+        {
+          name: "createdOn",
+          type: "date",
+          path: "data.attributes"
+        },
         {
           name: "verbatimDeterminer",
           type: "text",
@@ -37,43 +44,92 @@ const MOCK_INDEX_MAPPING_RESP = {
           path: "data.attributes"
         }
       ],
-      relationships: {
-        attributes: []
-      }
+      relationships: []
     },
     statusCode: "OK",
     statusCodeValue: 200
   }
 };
 
-const MOCK_USER_GROUP_RESP = {
-  data: [
-    {
-      id: "1",
-      type: "group",
-      name: "cnc"
-    },
-    {
-      id: "2",
-      type: "group",
-      name: "aafc"
-    }
-  ]
+const TEST_GROUP: PersistedResource<Group>[] = [
+  {
+    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    type: "group",
+    name: "cnc",
+    path: "test path",
+    labels: { fr: "CNCFR" }
+  }
+];
+
+const USER_PREFERENCE = {
+  data: [],
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
 };
 
-const MOCK_USER_PREFERENCE_RESP = {
-  data: [
-    {
-      id: "1",
-      type: "user-preferences",
-      userId: "cnc"
+// Mock elastic search data to use with the query page.
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 1,
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: "2c0d2f4d-c9a3-434e-bc76-d6cd4f02fb2c",
+              type: "material-sample",
+              attributes: {
+                version: 0,
+                group: "aafc",
+                createdOn: "2022-03-28T13:04:50.689122Z",
+                createdBy: "dina-admin",
+                dwcCatalogNumber: null,
+                dwcOtherCatalogNumbers: null,
+                materialSampleName: null,
+                materialSampleType: null,
+                materialSampleChildren: [],
+                preparationDate: null,
+                preparationMethod: null,
+                preservationType: null,
+                preparationFixative: null,
+                preparationMaterials: null,
+                preparationSubstrate: null,
+                managedAttributes: {},
+                preparationRemarks: null,
+                dwcDegreeOfEstablishment: null,
+                hierarchy: [
+                  {
+                    uuid: "09a256c7-56c8-424b-8013-0590e16e39cb",
+                    rank: 1,
+                  },
+                ],
+                host: null,
+                barcode: null,
+                publiclyReleasable: true,
+                notPubliclyReleasableReason: null,
+                tags: null,
+                materialSampleState: null,
+                materialSampleRemarks: null,
+                stateChangedOn: null,
+                stateChangeRemarks: null,
+                associations: [],
+                allowDuplicateName: false,
+                restrictionFieldsExtension: null,
+                isRestricted: false,
+                restrictionRemarks: null,
+              },
+              relationships: {
+                collectingEvent: {
+                  data: null,
+                },
+              },
+            },
+          },
+        },
+      ],
     },
-    {
-      id: "2",
-      type: "user-preferences",
-      userId: "aafc"
-    }
-  ]
+  },
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -81,22 +137,32 @@ const mockGet = jest.fn<any, any>(async path => {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;
     case "user-api/group":
-      return MOCK_USER_GROUP_RESP;
-    case "user-api/user-preferences":
-      return MOCK_USER_PREFERENCE_RESP;
+      return TEST_GROUP;
+    case "user-api/user-preference":
+      return USER_PREFERENCE;
   }
 });
 
-const mockPost = jest.fn(() => null);
+const mockPost = jest.fn<any, any>(async path => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
+  }
+});
 
 const TEST_SEARCH_DATE =
   "Tue Jan 25 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
-const apiContext = {
+const apiContext: any = {
   apiClient: {
-    axios: { get: mockGet, post: mockPost } as any
+    get: mockGet,
+    axios: {
+      get: mockGet,
+      post: mockPost
+    }
   }
-} as any;
+};
 
 const TEST_COLUMNS: ColumnDefinition<any>[] = [
   { accessor: "materialSampleName" },
@@ -107,8 +173,9 @@ const TEST_COLUMNS: ColumnDefinition<any>[] = [
   { accessor: "createdOn" },
   { Header: "", sortable: false }
 ];
+
 describe("QueryPage component", () => {
-  it("Query Page is able to aggretate first level queries", async () => {
+  it("Query Page is able to aggregate first level queries", async () => {
     const wrapper = mountWithAppContext(
       <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
       {
@@ -119,16 +186,11 @@ describe("QueryPage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
     // select first row to a date field
     wrapper
       .find("SelectField[name='queryRows[0].fieldName']")
       .find(Select)
-      .prop<any>("onChange")({ value: "createdOn(date)" });
+      .prop<any>("onChange")({ value: "data.attributes.createdOn" });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -139,11 +201,16 @@ describe("QueryPage component", () => {
       .find(DatePicker)
       .prop<any>("onChange")(new Date(TEST_SEARCH_DATE));
 
+    wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
     // select second row to a boolean field
     wrapper
       .find("SelectField[name='queryRows[1].fieldName']")
       .find(Select)
-      .prop<any>("onChange")({ value: "allowDuplicateName(boolean)" });
+      .prop<any>("onChange")({ value: "data.attributes.publiclyReleasable" });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -199,39 +266,23 @@ describe("QueryPage component", () => {
     expect(mockPost.mock.calls.pop()).toEqual([
       "search-api/search-ws/search",
       {
-        from: 0,
         size: 25,
+        from: 0,
         query: {
           bool: {
-            filter: {
-              bool: {
-                must: [
-                  {
-                    term: {
-                      createdOn: "2022-01-25"
-                    }
-                  },
-                  {
-                    term: {
-                      allowDuplicateName: "false"
-                    }
-                  },
-                  {
-                    term: {
-                      "data.attributes.group": "cnc"
-                    }
-                  }
-                ]
-              }
-            }
-          }
-        }
+            filter: { term: { "data.attributes.group": "cnc" } },
+            must: [
+              { term: { "data.attributes.createdOn": "2022-01-25" } },
+              { term: { "data.attributes.publiclyReleasable": "false" } },
+            ],
+          },
+        },
       },
       {
         params: {
-          indexName: "testIndex"
-        }
-      }
+          indexName: "testIndex",
+        },
+      },
     ]);
   });
 });

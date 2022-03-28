@@ -49,7 +49,7 @@ describe("QueryRow component", () => {
       .find("SelectField[name='test[0].fieldName']")
       .find(Select)
       .prop<any>("onChange")({
-      value: "testA(boolean)"
+      value: "testA"
     });
 
     await new Promise(setImmediate);
