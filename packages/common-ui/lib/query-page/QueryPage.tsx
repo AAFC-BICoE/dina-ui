@@ -81,10 +81,8 @@ export function QueryPage<TData extends KitsuResource>({
   defaultSort,
   onSortedChange
 }: QueryPageProps<TData>) {
-  const { apiClient, save } = useApiClient();
+  const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
-  const { openModal } = useModal();
-  const pageRef = useRef<FormikProps<any>>(null);
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
@@ -280,6 +278,15 @@ export function QueryPage<TData extends KitsuResource>({
     });
   }
 
+  /**
+   * When the saved search is loading data, we need to save the new loaded search and cause a
+   * re-render.
+   */
+  function onSavedSearchLoad(savedSearchName, savedSearchData) {
+    setSearchFilters(savedSearchData);
+    setSelectedSavedSearch(savedSearchName);
+  }
+
   const totalCount = searchResults.total;
 
   async function fetchQueryFieldsByIndex(searchIndexName) {
@@ -368,94 +375,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   if (loading || error) return <></>;
 
-  function loadSavedSearch(savedSearchName, userPreferences) {
-    if (!userPreferences || !savedSearchName) return;
-    setSearchFilters(
-      userPreferences[0]?.savedSearches?.[username as any]?.[savedSearchName]
-    );
-    setSelectedSavedSearch(savedSearchName);
-  }
-
-  async function saveSearch(isDefault, userPreferences, searchName) {
-    let newSavedSearches;
-    const mySavedSearches = userPreferences;
-
-    if (
-      mySavedSearches &&
-      mySavedSearches?.[0]?.savedSearches &&
-      Object.keys(mySavedSearches?.[0]?.savedSearches)?.length > 0
-    ) {
-      // Remove irrelevent formik field array properties before save
-      pageRef.current?.values.queryRows?.map(val => {
-        delete val.props;
-        delete val.key;
-        delete val._store;
-        delete val._owner;
-        delete val.ref;
-      });
-      mySavedSearches[0].savedSearches[username as any][
-        `${isDefault ? "default" : searchName}`
-      ] = pageRef.current?.values;
-    } else {
-      newSavedSearches = {
-        [`${username}`]: {
-          [`${isDefault ? "default" : searchName}`]: pageRef.current?.values
-        }
-      };
-    }
-    const saveArgs: SaveArgs<UserPreference> = {
-      resource: {
-        id: userPreferences?.[0]?.id,
-        userId: subject,
-        savedSearches:
-          mySavedSearches?.[0]?.savedSearches ??
-          (newSavedSearches as Map<string, JsonValue>)
-      } as any,
-      type: "user-preference"
-    };
-    await save([saveArgs], { apiBaseUrl: "/user-api" });
-    loadSavedSearch(isDefault ? "default" : searchName, userPreferences);
-  }
-
-  async function deleteSavedSearch(
-    savedSearchName: string,
-    userPreferences: UserPreference[]
-  ) {
-    async function deleteSearch() {
-      const userSavedSearches =
-        userPreferences[0]?.savedSearches?.[username as any];
-      delete userSavedSearches?.[`${savedSearchName}`];
-
-      const saveArgs: SaveArgs<UserPreference> = {
-        resource: {
-          id: userPreferences?.[0]?.id,
-          userId: subject,
-          savedSearches: userPreferences?.[0]?.savedSearches
-        } as any,
-        type: "user-preference"
-      };
-
-      await save([saveArgs], { apiBaseUrl: "/user-api" });
-
-      if (toPairs(userSavedSearches)?.[0]?.[0]) {
-        loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
-      } else {
-        setSelectedSavedSearch("");
-      }
-    }
-
-    openModal(
-      <AreYouSureModal
-        actionMessage={
-          <>
-            <DinaMessage id="removeSavedSearch" /> {`${savedSearchName ?? ""}`}{" "}
-          </>
-        }
-        onYesButtonClicked={deleteSearch}
-      />
-    );
-  }
-
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
@@ -463,7 +382,6 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <DinaForm
       key={uuidv4()}
-      innerRef={pageRef}
       initialValues={searchFilters}
       onSubmit={onSubmit}
     >
@@ -495,10 +413,8 @@ export function QueryPage<TData extends KitsuResource>({
             ] as any;
             return (
               <SavedSearch
+                onSavedSearchLoad={onSavedSearchLoad}
                 userPreferences={userPreferences}
-                loadSavedSearch={loadSavedSearch}
-                deleteSavedSearch={deleteSavedSearch}
-                saveSearch={saveSearch}
                 savedSearchNames={
                   initialSavedSearches ? Object.keys(initialSavedSearches) : []
                 }
