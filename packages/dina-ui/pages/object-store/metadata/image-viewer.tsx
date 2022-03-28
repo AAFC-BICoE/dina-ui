@@ -1,13 +1,6 @@
 import {  useAccount } from "common-ui";
 import { useRouter } from "next/router";
 
-const OBJECT_DETAILS_PAGE_CSS = `
-    .file-viewer-wrapper img {
-      max-width: 100%;
-      height: auto;
-    }
-  `;
-
 export default function MetadataImagePreviewPage() {
   const { token } = useAccount();
   const router = useRouter();
@@ -27,7 +20,6 @@ export default function MetadataImagePreviewPage() {
   const authenticatedFilePath = `${filePath}?access_token=${token}`;
   return (
     <div>
-      <style>{OBJECT_DETAILS_PAGE_CSS}</style>
       <main className="container-fluid">
         <div className="row">
           <div>
