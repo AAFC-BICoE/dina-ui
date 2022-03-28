@@ -5,12 +5,16 @@ import { DownLoadLinks, FileView } from "../file-view/FileView";
 export interface MetadataFileViewProps {
   metadata: Metadata;
   imgHeight?: string;
+  id?: string;
+  preview?: boolean;
 }
 
 /** Displays the file for the given metadata. */
 export function MetadataFileView({
   metadata,
-  imgHeight
+  imgHeight,
+  id,
+  preview
 }: MetadataFileViewProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -82,16 +86,20 @@ export function MetadataFileView({
               </div>
             )
           }
+          id={id}
+          preview={preview}
         />
       </div>
-      <div className="container">
-        <div className="mb-3 metadata-caption">
-          <strong>
-            <DinaMessage id="field_acCaption" />:
-          </strong>{" "}
-          {metadata.acCaption}
+      {!preview && (
+        <div className="container">
+          <div className="mb-3 metadata-caption">
+            <strong>
+              <DinaMessage id="field_acCaption" />:
+            </strong>{" "}
+            {metadata.acCaption}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -36,6 +36,8 @@ export default function MetadataViewPage() {
 
   const { loading, response } = useMetadataQuery(id);
 
+  const preview = false;
+
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
@@ -75,7 +77,7 @@ export default function MetadataViewPage() {
           {buttonBar}
           <div className="row">
             <div className="col-md-4">
-              <MetadataFileView metadata={metadata} />
+              <MetadataFileView metadata={metadata} id={id} preview={preview} />
             </div>
             <div className="col-md-8">
               <div className="container">

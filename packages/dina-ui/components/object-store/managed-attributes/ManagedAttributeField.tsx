@@ -1,7 +1,9 @@
 import {
+  DateField,
   FormikButton,
   NumberField,
   SelectField,
+  StringToggleField,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -12,6 +14,7 @@ import { ManagedAttribute } from "../../../types/objectstore-api";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;
+  values?: object;
   valuesPath: string;
 }
 
@@ -25,7 +28,6 @@ export function ManagedAttributeFieldWithLabel(
   props: ManagedAttributeFieldWithLabelProps
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
-
   const { readOnly } = useDinaFormContext();
   const attributeKey = attribute.key;
 
@@ -69,7 +71,7 @@ export function ManagedAttributeField({
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
-    name: attributePath
+    name: attributePath,
   };
 
   const isSelectAttr = !!(
@@ -78,6 +80,10 @@ export function ManagedAttributeField({
   );
 
   const isIntegerAttr = attribute.managedAttributeType === "INTEGER";
+
+  const isDateAttr = attribute.managedAttributeType === "DATE";
+
+  const isBoolAttr = attribute.managedAttributeType === "BOOL";
 
   return isSelectAttr ? (
     <SelectField
@@ -95,6 +101,10 @@ export function ManagedAttributeField({
     />
   ) : isIntegerAttr ? (
     <NumberField {...props} />
+  ) : isDateAttr ? (
+    <DateField {...props} />
+  ) : isBoolAttr ? (
+    <StringToggleField {...props}/>
   ) : (
     <TextField {...props} />
   );
