@@ -9,6 +9,7 @@ import {
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
+import lodash from "lodash";
 export interface QueryRowProps {
   esIndexMapping: ESIndexMapping[];
   index: number;
@@ -18,12 +19,62 @@ export interface QueryRowProps {
   formik?: FormikContextType<any>;
 }
 
+/**
+ * The full path will be generated for elastic using a combination of the parent path and
+ * the value. The path is generated using the following:
+ * 
+ * {parentPath}.{path}.{value}
+ * 
+ * Example: included.attributes.determination.verbatimScientificName
+ */
 export interface ESIndexMapping {
+  /**
+   * Name of the attribute.
+   * 
+   * Example: verbatimScientificName
+   */
   value: string;
+
+  /**
+   * Text that is displayed to the user in the Query Filtering option menu.
+   * 
+   * This text is a user-friendly generated label, which may show some paths to help the user
+   * understand the relationships better. This is generated from the path.
+   * 
+   * Example: determination.verbatimScientificName
+   */
   label: string;
+
+  /**
+   * The attributes type. This can change how the query row is displayed and the options provided.
+   * 
+   * Examples: text, keyword, boolean, date, boolean, long, short, integer...
+   */
   type: string;
+
+  /**
+   * The path for the attribute without the attribute name. This path does not include the parent
+   * path.
+   * 
+   * Example: attribute.determination
+   */
   path: string;
+
+  /**
+   * If the attribute belongs to a relationship, this is the path for only the parent. When generating
+   * the elastic search query it will use this as the prefix of the path.
+   * 
+   * Example: included
+   */
   parentPath?: string;
+
+  /**
+   * If the attribute belongs to a relationship, this is the name which will be used to group
+   * attributes under the same relationship together in the search. This name will also be used to
+   * display text of the group.
+   * 
+   * Example: organism
+   */
   parentName?: string;
 }
 
@@ -39,7 +90,7 @@ export type QueryRowNumberType =
   | "float"
   | "half_float"
   | "scaled_float"
-  | "unsiged_long";
+  | "unsigned_long";
 
 export interface QueryRowExportProps {
   fieldName: string;
@@ -52,6 +103,15 @@ export interface QueryRowExportProps {
   date?: string;
   boolean?: string;
   type?: string;
+  parentName?: string;
+  parentPath?: string;
+}
+
+interface TypeVisibility {
+  isText: boolean,
+  isBoolean: boolean,
+  isNumber: boolean,
+  isDate: boolean
 }
 
 const queryRowMatchOptions = [
@@ -65,45 +125,9 @@ const queryRowBooleanOptions = [
 ];
 
 export function QueryRow(queryRowProps: QueryRowProps) {
-  const { values } = useFormikContext();
+  const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
-  const initVisibility = {
-    text: false,
-    date: false,
-    boolean: false,
-    number: false,
-    numberRange: false,
-    dateRange: false
-  };
-  const typeFromFieldName = (values as any)?.queryRows?.[
-    index
-  ]?.fieldName?.substring(
-    (values as any)?.queryRows?.[index]?.fieldName?.indexOf("(") + 1,
-    (values as any)?.queryRows?.[index]?.fieldName?.indexOf(")")
-  );
 
-  const fieldType = typeFromFieldName ?? esIndexMapping?.[0]?.type;
-
-  const visibilityOverridden =
-    fieldType === "boolean"
-      ? { boolean: true }
-      : fieldType === "long" ||
-        fieldType === "short" ||
-        fieldType === "integer" ||
-        fieldType === "byte" ||
-        fieldType === "double" ||
-        fieldType === "float" ||
-        fieldType === "half_float" ||
-        fieldType === "scaled_float" ||
-        fieldType === "unsiged_long"
-      ? { number: true }
-      : fieldType === "date"
-      ? { date: true }
-      : { text: true };
-  const [visibility, setVisibility] = useState({
-    ...initVisibility,
-    ...visibilityOverridden
-  });
   const initState = {
     matchValue: null,
     matchType: "match",
@@ -112,83 +136,103 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     number: null
   };
 
-  function onSelectionChange(value, formik, idx) {
-    const computedVal = typeof value === "object" ? value.name : value;
-    const type = computedVal.substring(
-      computedVal.indexOf("(") + 1,
-      computedVal.indexOf(")")
-    );
-    const state = {
-      ...formik.values?.[`${name}`]?.[`${idx}`],
-      ...initState,
-      fieldName: value
-    };
+  const [fieldName, setFieldName] = useState<string>((formikProps.values as any)?.queryRows?.[index].fieldName);
 
-    formik.setFieldValue(`${name}[${idx}]`, state);
-    switch (type) {
-      case "text":
-      case "keyword": {
-        return setVisibility({ ...initVisibility, text: true });
-      }
-      case "date": {
-        return setVisibility({ ...initVisibility, date: true });
-      }
-      case "boolean": {
-        return setVisibility({ ...initVisibility, boolean: true });
-      }
-      case "long":
-      case "short":
-      case "integer":
-      case "byte":
-      case "double":
-      case "float":
-      case "half_float":
-      case "scaled_float":
-      case "unsiged_long": {
-        return setVisibility({ ...initVisibility, number: true });
-      }
-    }
+  const dataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === fieldName);
+
+  // Depending on the type, it changes what fields need to be displayed.
+  const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
+    isText: dataFromIndexMapping?.type === "text",
+    isBoolean: dataFromIndexMapping?.type === "boolean",
+    isNumber: dataFromIndexMapping?.type === "long" || 
+        dataFromIndexMapping?.type === "short" || 
+        dataFromIndexMapping?.type === "integer" || 
+        dataFromIndexMapping?.type === "byte" || 
+        dataFromIndexMapping?.type === "double" || 
+        dataFromIndexMapping?.type === "float" || 
+        dataFromIndexMapping?.type === "half_float" || 
+        dataFromIndexMapping?.type === "scaled_float" || 
+        dataFromIndexMapping?.type === "unsigned",
+    isDate: dataFromIndexMapping?.type === "date",  
+  });
+
+  function onSelectionChange(value) {
+    const newDataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === value);
+
+    formikProps.setFieldValue(`${name}[${index}]`, {
+      ...initState,
+      fieldName: value,
+      type: newDataFromIndexMapping?.type ?? "text",
+      parentPath: newDataFromIndexMapping?.parentPath,
+      parentName: newDataFromIndexMapping?.parentName
+    });
+
+    setTypeVisibility({
+      isText: newDataFromIndexMapping?.type === "text",
+      isBoolean: newDataFromIndexMapping?.type === "boolean",
+      isNumber: newDataFromIndexMapping?.type === "long" || 
+      newDataFromIndexMapping?.type === "short" || 
+      newDataFromIndexMapping?.type === "integer" || 
+      newDataFromIndexMapping?.type === "byte" || 
+      newDataFromIndexMapping?.type === "double" || 
+      newDataFromIndexMapping?.type === "float" || 
+          newDataFromIndexMapping?.type === "half_float" || 
+          newDataFromIndexMapping?.type === "scaled_float" || 
+          newDataFromIndexMapping?.type === "unsigned",
+      isDate: newDataFromIndexMapping?.type === "date",      
+    })
+
+    setFieldName(value);
   }
 
+  // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
       label: prop.label,
-      value: prop.value + "(" + prop.type + ")"
+      value: prop.value
     }));
 
-  let nestedGroupLabel = "Nested Group";
-
+  // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
     ?.filter(prop => !!prop.parentPath)
     ?.map(prop => {
-      nestedGroupLabel = prop.parentName as string;
       return {
+        parentName: prop.parentName,
         label: prop.label,
-        value: prop.parentPath + "." + prop.value + "(" + prop.type + ")"
+        value: prop.value
       };
     });
+
+  // Using the parent name, group the relationships into sections.
+  const groupedNestRowOptions = lodash.chain(nestedRowOptions)
+      .groupBy(prop => prop.parentName)
+      .map((group, key) => {
+        return {
+          label: key,
+          options: group
+        }
+      })
+      .value();
 
   const queryRowOptions = simpleRowOptions
     ? [
         ...simpleRowOptions,
-        ...(nestedRowOptions?.length > 0
-          ? [{ label: nestedGroupLabel, options: nestedRowOptions }]
-          : [])
+        ...groupedNestRowOptions
       ]
     : [];
+  
   function fieldProps(fldName: string, idx: number) {
-    return {
-      name: `${name}[${idx}].${fldName}`
-    };
+    return `${name}[${idx}].${fldName}`
   }
+
   return (
     <div className="row">
       <div className="col-md-6 d-flex">
         {index > 0 && (
           <div style={{ width: index > 0 ? "8%" : "100%" }}>
             <QueryLogicSwitchField
-              name={fieldProps("compoundQueryType", index).name}
+              name={fieldProps("compoundQueryType", index)}
               removeLabel={true}
               className={"compoundQueryType" + index}
             />
@@ -196,11 +240,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         )}
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
-            name={fieldProps("fieldName", index).name}
+            name={fieldProps("fieldName", index)}
             options={queryRowOptions as any}
-            onChange={(value, formik) =>
-              onSelectionChange(value, formik, index)
-            }
+            onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
             removeLabel={true}
           />
@@ -208,59 +250,75 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {visibility.text && (
+          {typeVisibility.isText && (
             <TextField
-              name={fieldProps("matchValue", index).name}
+              name={fieldProps("matchValue", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.date && (
+          {typeVisibility.isDate && (
             <DateField
-              name={fieldProps("date", index).name}
+              name={fieldProps("date", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.text && (
+          {typeVisibility.isText && (
             <SelectField
-              name={fieldProps("matchType", index).name}
+              name={fieldProps("matchType", index)}
               options={queryRowMatchOptions}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.boolean && (
+          {typeVisibility.isBoolean && (
             <SelectField
-              name={fieldProps("boolean", index).name}
+              name={fieldProps("boolean", index)}
               options={queryRowBooleanOptions}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
-          {visibility.number && (
+          {typeVisibility.isNumber && (
             <NumberField
-              name={fieldProps("number", index).name}
+              name={fieldProps("number", index)}
               className="me-1 flex-fill"
               removeLabel={true}
             />
           )}
 
-          {index === 0 ? (
-            <FaPlus
-              onClick={addRow as any}
-              size="2em"
-              style={{ cursor: "pointer" }}
-              name={fieldProps("addRow", index).name}
+          {/* Disabled text field when no search filter is selected. */}
+          {!fieldName && (
+            <TextField
+              name={fieldProps("matchValue", index)}
+              className="me-1 flex-fill"
+              removeLabel={true}
+              readOnly={true}
             />
+          )}
+
+          {/* Plus / Minus Buttons */}
+          {index === 0 ? (
+            <>
+              {fieldName && (
+                <FaPlus
+                  onClick={addRow as any}
+                  size="2em"
+                  style={{ cursor: "pointer" }}
+                  name={fieldProps("addRow", index)}
+                />
+              )}
+            </>
           ) : (
             <FaMinus
               onClick={() => removeRow?.(index)}
               size="2em"
               style={{ cursor: "pointer" }}
-              name={fieldProps("removeRow", index).name}
+              name={fieldProps("removeRow", index)}
             />
           )}
+
         </div>
       </div>
     </div>
