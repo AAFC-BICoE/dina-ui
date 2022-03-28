@@ -63,7 +63,7 @@ export function FileView({
   const fileId = filePath.split("/").at(-1);
   const isDerivative = filePath.includes("derivative").toString();
   const fileBucket = filePath.split("/").at(4);
-  const imageViewerLink = `/object-store/metadata/image-viewer?bucket=${fileBucket}&isDerivative=${isDerivative}&fileId=${fileId}`;
+  const imageViewerLink = `/object-store/image-viewer?bucket=${fileBucket}&isDerivative=${isDerivative}&fileId=${fileId}`;
   
 
   if (preview || !isImage) {
