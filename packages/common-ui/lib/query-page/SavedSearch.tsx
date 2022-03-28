@@ -31,7 +31,7 @@ export function SavedSearch(props: SavedSearchProps) {
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
-  const { username, subject } = useAccount();
+  const { username, subject, groupNames } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
   const [curSelected, setCurSelected] = useState(null);
   const savedSearchNamesOptions: SelectOption<string>[] = [];
@@ -124,7 +124,7 @@ export function SavedSearch(props: SavedSearchProps) {
         loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
       } else {
         // Clear the saved search data
-        onSavedSearchLoad("", { queryRows: [ {fieldName: ""} ], group:  });
+        onSavedSearchLoad("", { queryRows: [ {fieldName: ""} ], group: groupNames?.[0] ?? "", });
       }
     }
 

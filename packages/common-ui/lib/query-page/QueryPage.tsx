@@ -1,5 +1,5 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { Column, TableProps, SortingRule } from "react-table";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
@@ -28,17 +28,13 @@ import { ESIndexMapping } from "../query-builder/QueryRow";
 import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
-import { JsonValue } from "type-fest";
-import { cloneDeep, toPairs } from "lodash";
-import { FormikProps } from "formik";
+import { cloneDeep } from "lodash";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
 import {
-  AreYouSureModal,
   FormikButton,
   LimitOffsetPageSpec,
-  useAccount,
-  useModal
+  useAccount
 } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
