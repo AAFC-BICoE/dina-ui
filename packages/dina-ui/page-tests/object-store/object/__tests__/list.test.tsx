@@ -70,10 +70,7 @@ const MOCK_INDEX_MAPPING_RESP = {
           path: "data.attributes"
         }
       ],
-      relationships: {
-        type: "text",
-        attributes: []
-      }
+      relationships: []
     },
     statusCode: "OK",
     statusCodeValue: 200
@@ -83,7 +80,7 @@ const MOCK_INDEX_MAPPING_RESP = {
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
     case "objectstore-api/metadata":
-      return { data: TEST_METADATAS };
+      return { data: TEST_METADATA };
     case "objectstore-api/object-upload":
       return { data: TEST_OBJECTUPLOAD };
     case "agent-api/person":
@@ -92,18 +89,21 @@ const mockGet = jest.fn<any, any>(async path => {
       return MOCK_INDEX_MAPPING_RESP;
     case "user-api/group":
       return TEST_GROUP;
+    case "user-api/user-preference":
+      return USER_PREFERENCE;
   }
 });
 
 const mockPost = jest.fn<any, any>(async path => {
   switch (path) {
+    // Elastic search response with object store mock metadata data.
     case "search-api/search-ws/search":
       return TEST_ELASTIC_SEARCH_RESPONSE;
   }
 });
 
 // This will be used in the future with the fallback.
-const TEST_METADATAS: PersistedResource<Metadata>[] = [
+const TEST_METADATA: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1"],
     bucket: "testbucket",
@@ -133,6 +133,11 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
     type: "metadata"
   }
 ];
+
+const USER_PREFERENCE = {
+  data: [],
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
+};
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
@@ -237,6 +242,7 @@ describe("Metadata List Page", () => {
   it("Renders the metadata table by default.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
+    await new Promise(setImmediate);
     await new Promise(setImmediate);
     wrapper.update();
 
