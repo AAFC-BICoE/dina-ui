@@ -106,8 +106,12 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
+  const [apiError, setApiError] = useState<any>();
+
   // Saved search dropdown options
-  const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
+  const [userPreferences, setUserPreferences] = useState<UserPreference>({
+    type: "user-preference"
+  });
 
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
@@ -121,20 +125,24 @@ export function QueryPage<TData extends KitsuResource>({
     if (!Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
-    searchES(queryDSL).then(result => {
-      const processedResult = result?.hits
-        .map(hit => hit._source?.data)
-        .map(rslt => ({
-          id: rslt.id,
-          type: rslt.type,
-          ...rslt.attributes
-        }));
-      setAvailableSamples(processedResult);
-      setSearchResults({
-        results: processedResult,
-        total: result?.total.value
+    searchES(queryDSL)
+      .then(result => {
+        const processedResult = result?.hits
+          .map(hit => hit._source?.data)
+          .map(rslt => ({
+            id: rslt.id,
+            type: rslt.type,
+            ...rslt.attributes
+          }));
+        setAvailableSamples(processedResult);
+        setSearchResults({
+          results: processedResult,
+          total: result?.total.value
+        });
+      })
+      .catch(errorMessage => {
+        setApiError(errorMessage);
       });
-    });
   }, [pagination, searchFilters]);
 
   // Retrieve user preferences only once.
@@ -148,28 +156,17 @@ export function QueryPage<TData extends KitsuResource>({
         page: { limit: 1000 }
       })
       .then(response => {
-        setUserPreferences(response.data);
+        setUserPreferences(response.data[0]);
 
         // If the user has a default search, use it.
         if (response.data[0].savedSearches?.[username as any].default) {
-          setSelectedSavedSearch("default");
+          onSavedSearchLoad("default");
         }
+      })
+      .catch(errorMessage => {
+        setApiError(errorMessage);
       });
   }, [userPreferences]);
-
-  // Anytime the selected saved search is changed, the filters need to update as well.
-  useEffect(() => {
-    const selectedSearchFilters =
-      userPreferences[0]?.savedSearches?.[username as any]?.[
-        selectedSavedSearch
-      ];
-
-    // Check in the users preferences to ensure the saved search exists.
-    if (selectedSearchFilters) {
-      // Apply the search filters.
-      setSearchFilters(selectedSearchFilters);
-    }
-  }, [selectedSavedSearch]);
 
   /**
    * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
@@ -313,6 +310,15 @@ export function QueryPage<TData extends KitsuResource>({
    */
   function onSavedSearchLoad(savedSearchName) {
     setSelectedSavedSearch(savedSearchName);
+
+    const selectedSearchFilters =
+      userPreferences?.savedSearches?.[username as any]?.[savedSearchName];
+
+    // Check in the users preferences to ensure the saved search exists.
+    if (selectedSearchFilters) {
+      // Apply the search filters.
+      setSearchFilters(selectedSearchFilters);
+    }
   }
 
   const totalCount = searchResults.total;
@@ -388,11 +394,31 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
-  if (loading || error) return <></>;
+  if (loading) return <></>;
+  if (apiError || error)
+    return (
+      <div
+        className="alert alert-danger"
+        style={{
+          whiteSpace: "pre-line"
+        }}
+      >
+        <p>
+          {error
+            ? error
+            : apiError.errors?.map(e => e.detail).join("\n") ??
+              String(apiError)}
+        </p>
+      </div>
+    );
 
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
+
+  const initialSavedSearches = userPreferences?.savedSearches?.[
+    username as string
+  ] as any;
 
   return (
     <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
@@ -421,6 +447,10 @@ export function QueryPage<TData extends KitsuResource>({
           <SavedSearch
             onSavedSearchLoad={onSavedSearchLoad}
             userPreferences={userPreferences}
+            savedSearchNames={
+              initialSavedSearches ? Object.keys(initialSavedSearches) : []
+            }
+            initialSavedSearches={initialSavedSearches}
             selectedSearch={selectedSavedSearch}
           />
         </div>
