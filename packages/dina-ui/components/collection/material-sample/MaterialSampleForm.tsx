@@ -192,7 +192,6 @@ export function MaterialSampleForm({
   const templateAttachesAcquisitionEvent = Boolean(
     enabledFields?.acquisitionEvent.includes("id")
   );
-
   const attachmentsField = "attachment";
 
   const navState = useState<MaterialSampleFormSectionId[] | null>(null);
@@ -394,6 +393,9 @@ export function MaterialSampleForm({
     ...formSectionPairs
   ]);
 
+  // Disable Collecting Event Switch for child material samples
+  const disableCollectingEventSwitch = materialSample?.parentMaterialSample ? true : false;
+  
   const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
@@ -401,6 +403,7 @@ export function MaterialSampleForm({
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
             disableRemovePrompt={disableNavRemovePrompt}
+            disableCollectingEventSwitch={disableCollectingEventSwitch}
             hideCustomViewSelect={hideNavCustomViewSelect}
             navOrder={formSectionOrder}
             onChangeNavOrder={setFormSectionOrder}

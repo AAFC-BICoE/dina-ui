@@ -268,13 +268,12 @@ export function useMaterialSampleSave({
         ...RESTRICTIONS_FIELDS
       )
     );
-
+  
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
         materialSample?.collectingEvent ||
-        enabledFields?.collectingEvent?.length
-    )
+        enabledFields?.collectingEvent?.length)
   );
 
   const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState(
