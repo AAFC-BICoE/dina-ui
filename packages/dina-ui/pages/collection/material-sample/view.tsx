@@ -160,14 +160,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <MaterialSampleInfoSection />
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-                  <div>
-                    <DinaMessage id="collectingEventFromParent"/>{" "}
-                    <Link
-                      href={`/collection/material-sample/view?id=${highestParentId}`}
-                    >
-                      <a>{highestParentMaterialSample}</a>
-                    </Link>
-                  </div>
+                  {materialSample.parentMaterialSample && (
+                    <div>
+                      <DinaMessage id="collectingEventFromParent" />{" "}
+                      <Link
+                        href={`/collection/material-sample/view?id=${highestParentId}`}
+                      >
+                        <a>{highestParentMaterialSample}</a>
+                      </Link>
+                    </div>
+                  )}
                   <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link
