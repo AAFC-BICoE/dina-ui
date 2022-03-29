@@ -31,11 +31,7 @@ import { SavedSearch } from "./SavedSearch";
 import { cloneDeep } from "lodash";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
-import {
-  FormikButton,
-  LimitOffsetPageSpec,
-  useAccount
-} from "..";
+import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
 
@@ -110,6 +106,9 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
+  // Saved search dropdown options
+  const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
+
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
 
@@ -137,6 +136,29 @@ export function QueryPage<TData extends KitsuResource>({
       });
     });
   }, [pagination, searchFilters]);
+
+  // Retrieve user preferences only once.
+  useEffect(() => {
+    // Retrieve user preferences...
+    apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        },
+        page: { limit: 1000 }
+      })
+      .then(response => {
+        setUserPreferences(response.data);
+
+        // If the user has a default search, use it.
+        if (response.data[0].savedSearches?.[username as any].default) {
+          setSelectedSavedSearch("default");
+          setSearchFilters(
+            response.data[0].savedSearches?.[username as any].default
+          );
+        }
+      });
+  }, [userPreferences]);
 
   /**
    * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
@@ -315,32 +337,27 @@ export function QueryPage<TData extends KitsuResource>({
       });
 
     // Read relationship attributes.
-    resp.data.body.relationships
-      .map(relationship => {
+    resp.data.body.relationships.map(relationship => {
+      relationship.attributes.map(relationshipAttribute => {
+        // This is the user-friendly label to display on the search dropdown.
+        const attributeLabel = relationshipAttribute.path?.includes(".")
+          ? relationshipAttribute.path.substring(
+              relationshipAttribute.path.indexOf(".") + 1
+            ) +
+            "." +
+            relationshipAttribute.name
+          : relationshipAttribute.name;
 
-        relationship.attributes
-          .map(relationshipAttribute => {
-
-            // This is the user-friendly label to display on the search dropdown.
-            const attributeLabel = relationshipAttribute.path?.includes(".")
-              ? relationshipAttribute.path.substring(
-                  relationshipAttribute.path.indexOf(".") + 1
-                ) +
-                "." +
-                relationshipAttribute.name
-              : relationshipAttribute.name;
-
-            result.push({
-              label: attributeLabel,
-              value: relationship.path + "." + attributeLabel,
-              type: relationshipAttribute.type,
-              path: relationshipAttribute.path,
-              parentName: relationship.value,
-              parentPath: relationship.path
-            })
-
-          })
+        result.push({
+          label: attributeLabel,
+          value: relationship.path + "." + attributeLabel,
+          type: relationshipAttribute.type,
+          path: relationshipAttribute.path,
+          parentName: relationship.value,
+          parentPath: relationship.path
+        });
       });
+    });
     return result;
   }
 
@@ -375,12 +392,12 @@ export function QueryPage<TData extends KitsuResource>({
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
 
+  const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
+    username as any
+  ] as any;
+
   return (
-    <DinaForm
-      key={uuidv4()}
-      initialValues={searchFilters}
-      onSubmit={onSubmit}
-    >
+    <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
@@ -403,22 +420,15 @@ export function QueryPage<TData extends KitsuResource>({
 
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
-          {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
-            const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
-              username as any
-            ] as any;
-            return (
-              <SavedSearch
-                onSavedSearchLoad={onSavedSearchLoad}
-                userPreferences={userPreferences}
-                savedSearchNames={
-                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
-                }
-                initialSavedSearches={initialSavedSearches}
-                selectedSearch={selectedSavedSearch}
-              />
-            );
-          })}
+          <SavedSearch
+            onSavedSearchLoad={onSavedSearchLoad}
+            userPreferences={userPreferences}
+            savedSearchNames={
+              initialSavedSearches ? Object.keys(initialSavedSearches) : []
+            }
+            initialSavedSearches={initialSavedSearches}
+            selectedSearch={selectedSavedSearch}
+          />
         </div>
         <div>
           <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
