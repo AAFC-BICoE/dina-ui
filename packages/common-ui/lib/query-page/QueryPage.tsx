@@ -151,7 +151,7 @@ export function QueryPage<TData extends KitsuResource>({
         setUserPreferences(response.data);
 
         // If the user has a default search, use it.
-        if (response.data[0].savedSearches?.[username as any].default) {
+        if (response.data?.[0]?.savedSearches?.[username as any].default) {
           setSelectedSavedSearch("default");
           setSearchFilters(
             response.data[0].savedSearches?.[username as any].default
