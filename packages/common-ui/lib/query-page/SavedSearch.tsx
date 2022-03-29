@@ -11,51 +11,50 @@ import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { toPairs } from "lodash";
+import { useEffect } from "react";
 
 export interface SavedSearchProps {
-  onSavedSearchLoad: (savedSearchName, savedSearchData) => void;
-  savedSearchNames?: string[];
-  initialSavedSearches?: JsonValue;
+  onSavedSearchLoad: (savedSearchName) => void;
   selectedSearch?: string;
   userPreferences: UserPreference[];
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const {
-    savedSearchNames,
-    initialSavedSearches,
-    selectedSearch,
-    userPreferences,
-    onSavedSearchLoad
-  } = props;
+  const { selectedSearch, userPreferences, onSavedSearchLoad } = props;
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
-  const { username, subject, groupNames } = useAccount();
+  const { username, subject } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
   const [curSelected, setCurSelected] = useState(null);
-  const savedSearchNamesOptions: SelectOption<string>[] = [];
+  const [savedSearchOptions, setSavedSearchOptions] = useState<
+    SelectOption<string>[]
+  >([]);
   const formik = useFormikContext();
 
-  savedSearchNames?.map(name =>
-    savedSearchNamesOptions.push({ label: name, value: name })
-  );
+  // When the user preferences update, the options should be saved.
+  useEffect(() => {
+    // if (userPreferences.length !== 0) {
+    //   let selectOptions : SelectOption<string>[] = [];
+    //   const options = (userPreferences[0].savedSearches?.[username as string] as Map<string, JsonValue>).forEach(option => {
+    //     selectOptions.push({label: String(option), value: String(option)});
+    //   })
+    //   console.log(selectOptions)
+    // }
+  }, [userPreferences]);
 
   function onSelectedSavedSearchChanged(e) {
     setCurSelected(e.value);
   }
 
-  function loadSavedSearch(savedSearchName, userPreferences) {
+  function loadSavedSearch(savedSearchName) {
     if (!userPreferences || !savedSearchName) return;
 
     // Drill up to the query page component to load the new saved search data.
-    onSavedSearchLoad(
-      savedSearchName,
-      userPreferences[0]?.savedSearches?.[username as any]?.[savedSearchName]
-    )
+    onSavedSearchLoad(savedSearchName);
   }
 
-  async function saveSearch(isDefault, userPreferences, searchName) {
+  async function saveSearch(isDefault, searchName) {
     let newSavedSearches;
     const mySavedSearches = userPreferences;
 
@@ -94,13 +93,10 @@ export function SavedSearch(props: SavedSearchProps) {
       type: "user-preference"
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
-    loadSavedSearch(isDefault ? "default" : searchName, userPreferences);
+    loadSavedSearch(isDefault ? "default" : searchName);
   }
 
-  async function deleteSavedSearch(
-    savedSearchName: string,
-    userPreferences: UserPreference[]
-  ) {
+  async function deleteSavedSearch(savedSearchName: string) {
     async function deleteSearch() {
       const userSavedSearches =
         userPreferences[0]?.savedSearches?.[username as any];
@@ -118,10 +114,10 @@ export function SavedSearch(props: SavedSearchProps) {
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
       if (toPairs(userSavedSearches)?.[0]?.[0]) {
-        loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0], userPreferences);
+        loadSavedSearch(toPairs(userSavedSearches)?.[0]?.[0]);
       } else {
         // Clear the saved search data
-        onSavedSearchLoad("", { queryRows: [ {fieldName: ""} ], group: groupNames?.[0] ?? "", });
+        onSavedSearchLoad("");
       }
     }
 
@@ -139,7 +135,7 @@ export function SavedSearch(props: SavedSearchProps) {
 
   const computedSelected = curSelected ?? selectedSearch;
   const selectedOption = computedSelected
-    ? savedSearchNamesOptions?.find(
+    ? savedSearchOptions?.find(
         option => option?.value === computedSelected
       ) ?? {
         label: String(computedSelected),
@@ -153,7 +149,7 @@ export function SavedSearch(props: SavedSearchProps) {
         <Select
           aria-label="Saved Search"
           className="saved-search"
-          options={savedSearchNamesOptions}
+          options={savedSearchOptions}
           onChange={onSelectedSavedSearchChanged}
           value={selectedOption}
         />
@@ -162,20 +158,17 @@ export function SavedSearch(props: SavedSearchProps) {
         type="button"
         className="btn btn-primary"
         onClick={() =>
-          loadSavedSearch(
-            curSelected ?? (selectedSearch as string),
-            userPreferences
-          )
+          loadSavedSearch(curSelected ?? (selectedSearch as string))
         }
-        disabled={
-          !initialSavedSearches || !Object.keys(initialSavedSearches).length
-        }
+        // disabled={
+        //   !initialSavedSearches || !Object.keys(initialSavedSearches).length
+        // }
       >
         {formatMessage("load")}
       </button>
       <button
         type="button"
-        className="btn btn-secondary"
+        className="btn btn-primary"
         onClick={() => openSavedSearchModal({ saveSearch, userPreferences })}
       >
         {formatMessage("save")}
@@ -184,14 +177,11 @@ export function SavedSearch(props: SavedSearchProps) {
         className="btn btn-danger"
         type="button"
         onClick={() =>
-          deleteSavedSearch(
-            (curSelected as any) ?? selectedSearch,
-            userPreferences
-          )
+          deleteSavedSearch((curSelected as any) ?? selectedSearch)
         }
-        disabled={
-          !initialSavedSearches || !Object.keys(initialSavedSearches).length
-        }
+        // disabled={
+        //   !initialSavedSearches || !Object.keys(initialSavedSearches).length
+        // }
       >
         {formatMessage("deleteButtonText")}
       </button>

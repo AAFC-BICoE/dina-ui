@@ -31,11 +31,7 @@ import { SavedSearch } from "./SavedSearch";
 import { cloneDeep } from "lodash";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
-import {
-  FormikButton,
-  LimitOffsetPageSpec,
-  useAccount
-} from "..";
+import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
 
@@ -110,6 +106,9 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
+  // Saved search dropdown options
+  const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
+
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
 
@@ -137,6 +136,40 @@ export function QueryPage<TData extends KitsuResource>({
       });
     });
   }, [pagination, searchFilters]);
+
+  // Retrieve user preferences only once.
+  useEffect(() => {
+    // Retrieve user preferences...
+    apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        },
+        page: { limit: 1000 }
+      })
+      .then(response => {
+        setUserPreferences(response.data);
+
+        // If the user has a default search, use it.
+        if (response.data[0].savedSearches?.[username as any].default) {
+          setSelectedSavedSearch("default");
+        }
+      });
+  }, [userPreferences]);
+
+  // Anytime the selected saved search is changed, the filters need to update as well.
+  useEffect(() => {
+    const selectedSearchFilters =
+      userPreferences[0]?.savedSearches?.[username as any]?.[
+        selectedSavedSearch
+      ];
+
+    // Check in the users preferences to ensure the saved search exists.
+    if (selectedSearchFilters) {
+      // Apply the search filters.
+      setSearchFilters(selectedSearchFilters);
+    }
+  }, [selectedSavedSearch]);
 
   /**
    * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
@@ -278,8 +311,7 @@ export function QueryPage<TData extends KitsuResource>({
    * When the saved search is loading data, we need to save the new loaded search and cause a
    * re-render.
    */
-  function onSavedSearchLoad(savedSearchName, savedSearchData) {
-    setSearchFilters(savedSearchData);
+  function onSavedSearchLoad(savedSearchName) {
     setSelectedSavedSearch(savedSearchName);
   }
 
@@ -315,42 +347,29 @@ export function QueryPage<TData extends KitsuResource>({
       });
 
     // Read relationship attributes.
-    resp.data.body.relationships
-      .map(relationship => {
+    resp.data.body.relationships.map(relationship => {
+      relationship.attributes.map(relationshipAttribute => {
+        // This is the user-friendly label to display on the search dropdown.
+        const attributeLabel = relationshipAttribute.path?.includes(".")
+          ? relationshipAttribute.path.substring(
+              relationshipAttribute.path.indexOf(".") + 1
+            ) +
+            "." +
+            relationshipAttribute.name
+          : relationshipAttribute.name;
 
-        relationship.attributes
-          .map(relationshipAttribute => {
-
-            // This is the user-friendly label to display on the search dropdown.
-            const attributeLabel = relationshipAttribute.path?.includes(".")
-              ? relationshipAttribute.path.substring(
-                  relationshipAttribute.path.indexOf(".") + 1
-                ) +
-                "." +
-                relationshipAttribute.name
-              : relationshipAttribute.name;
-
-            result.push({
-              label: attributeLabel,
-              value: relationship.path + "." + attributeLabel,
-              type: relationshipAttribute.type,
-              path: relationshipAttribute.path,
-              parentName: relationship.value,
-              parentPath: relationship.path
-            })
-
-          })
+        result.push({
+          label: attributeLabel,
+          value: relationship.path + "." + attributeLabel,
+          type: relationshipAttribute.type,
+          path: relationshipAttribute.path,
+          parentName: relationship.value,
+          parentPath: relationship.path
+        });
       });
+    });
     return result;
   }
-
-  const savedSearchQuery = useQuery<UserPreference[]>({
-    path: "user-api/user-preference",
-    filter: {
-      userId: subject as FilterParam
-    },
-    page: { limit: 1000 }
-  });
 
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
@@ -376,11 +395,7 @@ export function QueryPage<TData extends KitsuResource>({
     .filter(prop => !prop.label.startsWith("group"));
 
   return (
-    <DinaForm
-      key={uuidv4()}
-      initialValues={searchFilters}
-      onSubmit={onSubmit}
-    >
+    <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
@@ -403,22 +418,11 @@ export function QueryPage<TData extends KitsuResource>({
 
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
-          {withResponse(savedSearchQuery, ({ data: userPreferences }) => {
-            const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
-              username as any
-            ] as any;
-            return (
-              <SavedSearch
-                onSavedSearchLoad={onSavedSearchLoad}
-                userPreferences={userPreferences}
-                savedSearchNames={
-                  initialSavedSearches ? Object.keys(initialSavedSearches) : []
-                }
-                initialSavedSearches={initialSavedSearches}
-                selectedSearch={selectedSavedSearch}
-              />
-            );
-          })}
+          <SavedSearch
+            onSavedSearchLoad={onSavedSearchLoad}
+            userPreferences={userPreferences}
+            selectedSearch={selectedSavedSearch}
+          />
         </div>
         <div>
           <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
