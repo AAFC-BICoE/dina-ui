@@ -31,11 +31,7 @@ import { SavedSearch } from "./SavedSearch";
 import { cloneDeep } from "lodash";
 import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 import { UserPreference } from "../../../dina-ui/types/user-api";
-import {
-  FormikButton,
-  LimitOffsetPageSpec,
-  useAccount
-} from "..";
+import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
 
@@ -293,8 +289,8 @@ export function QueryPage<TData extends KitsuResource>({
     const result: ESIndexMapping[] = [];
 
     // Read index attributes.
-    resp.data.body.attributes
-      .filter(key => key.name !== "type")
+    resp.data.body?.attributes
+      ?.filter(key => key.name !== "type")
       .map(key => {
         const path = key.path;
         const prefix = "data.attributes";
@@ -315,32 +311,27 @@ export function QueryPage<TData extends KitsuResource>({
       });
 
     // Read relationship attributes.
-    resp.data.body.relationships
-      .map(relationship => {
+    resp.data.body?.relationships?.map(relationship => {
+      relationship?.attributes?.map(relationshipAttribute => {
+        // This is the user-friendly label to display on the search dropdown.
+        const attributeLabel = relationshipAttribute.path?.includes(".")
+          ? relationshipAttribute.path.substring(
+              relationshipAttribute.path.indexOf(".") + 1
+            ) +
+            "." +
+            relationshipAttribute.name
+          : relationshipAttribute.name;
 
-        relationship.attributes
-          .map(relationshipAttribute => {
-
-            // This is the user-friendly label to display on the search dropdown.
-            const attributeLabel = relationshipAttribute.path?.includes(".")
-              ? relationshipAttribute.path.substring(
-                  relationshipAttribute.path.indexOf(".") + 1
-                ) +
-                "." +
-                relationshipAttribute.name
-              : relationshipAttribute.name;
-
-            result.push({
-              label: attributeLabel,
-              value: relationship.path + "." + attributeLabel,
-              type: relationshipAttribute.type,
-              path: relationshipAttribute.path,
-              parentName: relationship.value,
-              parentPath: relationship.path
-            })
-
-          })
+        result.push({
+          label: attributeLabel,
+          value: relationship.path + "." + attributeLabel,
+          type: relationshipAttribute.type,
+          path: relationshipAttribute.path,
+          parentName: relationship.value,
+          parentPath: relationship.path
+        });
       });
+    });
     return result;
   }
 
@@ -369,18 +360,12 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
-  if (loading || error) return <></>;
-
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
 
   return (
-    <DinaForm
-      key={uuidv4()}
-      initialValues={searchFilters}
-      onSubmit={onSubmit}
-    >
+    <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
