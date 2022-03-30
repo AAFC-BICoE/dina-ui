@@ -5,7 +5,6 @@ import { DownLoadLinks, FileView } from "../file-view/FileView";
 export interface MetadataFileViewProps {
   metadata: Metadata;
   imgHeight?: string;
-  id?: string;
   preview?: boolean;
 }
 
@@ -13,7 +12,6 @@ export interface MetadataFileViewProps {
 export function MetadataFileView({
   metadata,
   imgHeight,
-  id,
   preview
 }: MetadataFileViewProps) {
   const { formatMessage } = useDinaIntl();
@@ -86,7 +84,6 @@ export function MetadataFileView({
               </div>
             )
           }
-          id={id}
           preview={preview}
         />
       </div>

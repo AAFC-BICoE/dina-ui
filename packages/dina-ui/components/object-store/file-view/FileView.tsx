@@ -18,7 +18,6 @@ export interface FileViewProps {
   imgHeight?: string;
   downloadLinks?: DownLoadLinks;
   shownTypeIndicator?: ReactNode;
-  id?: string;
   preview?: boolean;
 }
 
@@ -49,8 +48,7 @@ export function FileView({
   imgHeight,
   downloadLinks,
   shownTypeIndicator,
-  id,
-  preview
+  preview,
 }: FileViewProps) {
   const { token } = useAccount();
 
@@ -61,6 +59,12 @@ export function FileView({
   const isSpreadsheet = SPREADSHEET_FORMATS.includes(fileType.toLowerCase());
 
   const showFile = !isSpreadsheet;
+
+  const fileId = filePath.split("/").at(-1);
+  const isDerivative = filePath.includes("derivative").toString();
+  const fileBucket = filePath.split("/").at(4);
+  const imageViewerLink = `/object-store/image-viewer?bucket=${fileBucket}&isDerivative=${isDerivative}&fileId=${fileId}`;
+  
 
   if (preview || !isImage) {
     clickToDownload = false;
@@ -73,7 +77,7 @@ export function FileView({
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
-        <Link href={`/object-store/metadata/preview?id=${id}`}>
+        <Link href={imageViewerLink}>
           <a
             target="_blank"
             style={{

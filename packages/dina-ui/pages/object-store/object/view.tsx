@@ -20,7 +20,7 @@ import {
   useMetadataQuery
 } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -77,7 +77,7 @@ export default function MetadataViewPage() {
           {buttonBar}
           <div className="row">
             <div className="col-md-4">
-              <MetadataFileView metadata={metadata} id={id} preview={preview} />
+              <MetadataFileView metadata={metadata} preview={preview} />
             </div>
             <div className="col-md-8">
               <div className="container">
