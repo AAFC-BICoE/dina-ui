@@ -315,8 +315,8 @@ export function QueryPage<TData extends KitsuResource>({
     const result: ESIndexMapping[] = [];
 
     // Read index attributes.
-    resp.data.body.attributes
-      .filter(key => key.name !== "type")
+    resp.data.body?.attributes
+      ?.filter(key => key.name !== "type")
       .map(key => {
         const path = key.path;
         const prefix = "data.attributes";
@@ -337,8 +337,8 @@ export function QueryPage<TData extends KitsuResource>({
       });
 
     // Read relationship attributes.
-    resp.data.body.relationships.map(relationship => {
-      relationship.attributes.map(relationshipAttribute => {
+    resp.data.body?.relationships?.map(relationship => {
+      relationship?.attributes?.map(relationshipAttribute => {
         // This is the user-friendly label to display on the search dropdown.
         const attributeLabel = relationshipAttribute.path?.includes(".")
           ? relationshipAttribute.path.substring(
@@ -385,8 +385,6 @@ export function QueryPage<TData extends KitsuResource>({
       revalidateOnReconnect: false
     }
   );
-
-  if (loading || error) return <></>;
 
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
