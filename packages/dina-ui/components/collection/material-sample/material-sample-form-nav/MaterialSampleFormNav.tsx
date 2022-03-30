@@ -404,15 +404,16 @@ const SortableNavItem = SortableElement(
           (disableSwitch ? (
             <Tooltip
               id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-              disableSpanMargin = {true}
+              disableSpanMargin={true}
               visibleElement={
                 <SwitchComponent
+                  className="mt-2"
                   checked={!section.disabled}
                   onChange={toggle}
                   disabled={disableSwitch}
                 />
               }
-            ></Tooltip>
+            />
           ) : (
             <SwitchComponent
               checked={!section.disabled}

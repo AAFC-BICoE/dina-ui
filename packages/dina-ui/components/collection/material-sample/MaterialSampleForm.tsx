@@ -122,6 +122,12 @@ export interface MaterialSampleFormProps {
   onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 
   /**
+   * Toggle to disable the collecting even switch due to a parent containing the collecting event
+   * information.
+   */
+  disableCollectingEventSwitch?: boolean;
+
+  /**
    * When this prop is changed, the visible managed attributes state is updated in useEffect.
    * e.g. when the form's custom view is updated.
    */
@@ -148,6 +154,7 @@ export function MaterialSampleForm({
   navOrder: navOrderProp,
   onChangeNavOrder: onChangeNavOrderProp,
   visibleManagedAttributeKeys,
+  disableCollectingEventSwitch,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -393,9 +400,6 @@ export function MaterialSampleForm({
     ...formSectionPairs
   ]);
 
-  // Disable Collecting Event Switch for child material samples
-  const disableCollectingEventSwitch = materialSample?.parentMaterialSample ? true : false;
-  
   const formLayout = (
     <div className="d-md-flex">
       <div style={{ minWidth: "20rem", maxWidth: "20rem" }}>
@@ -403,7 +407,10 @@ export function MaterialSampleForm({
           <MaterialSampleFormNav
             dataComponentState={dataComponentState}
             disableRemovePrompt={disableNavRemovePrompt}
-            disableCollectingEventSwitch={disableCollectingEventSwitch}
+            disableCollectingEventSwitch={
+              disableCollectingEventSwitch ||
+              initialValues.parentMaterialSample !== undefined
+            }
             hideCustomViewSelect={hideNavCustomViewSelect}
             navOrder={formSectionOrder}
             onChangeNavOrder={setFormSectionOrder}
