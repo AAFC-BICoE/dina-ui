@@ -28,6 +28,9 @@ interface TooltipProps {
   /** Image accessability text. */
   altImage?: string;
 
+  // add margin to tooltip span if true
+  disableSpanMargin?: boolean;
+
   setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
   visible?: boolean;
 }
@@ -39,7 +42,8 @@ export function Tooltip({
   link,
   linkText,
   image,
-  altImage
+  altImage,
+  disableSpanMargin
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
@@ -79,7 +83,7 @@ export function Tooltip({
     ) : null;
 
   return (
-    <span className="m-2">
+    <span className={disableSpanMargin ? undefined : "m-2"}>
       <RcTooltip
         id={id}
         overlay={
