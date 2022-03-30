@@ -2,6 +2,7 @@ import classNames from "classnames";
 import {
   AreYouSureModal,
   FieldSpy,
+  Tooltip,
   useBulkEditTabContext,
   useDinaFormContext,
   useModal
@@ -37,6 +38,9 @@ export interface MaterialSampleFormNavProps {
 
   /** Disabled the Are You Sure modal when toggling a data component off. */
   disableRemovePrompt?: boolean;
+
+  // Disables Collecting Event React Switch for child material samples
+  disableCollectingEventSwitch?: boolean;
 
   /** Hides the custom view selection, but keeps the drag/drop handles. */
   hideCustomViewSelect?: boolean;
@@ -82,6 +86,7 @@ interface ScrollTarget<T extends MaterialSampleFormSectionId> {
 export function MaterialSampleFormNav({
   dataComponentState,
   disableRemovePrompt,
+  disableCollectingEventSwitch,
   hideCustomViewSelect,
   navOrder,
   onChangeNavOrder
@@ -164,6 +169,10 @@ export function MaterialSampleFormNav({
                 index={index}
                 section={section}
                 disableRemovePrompt={disableRemovePrompt}
+                disableSwitch={
+                  section.id === "collecting-event-section" &&
+                  disableCollectingEventSwitch
+                }
               />
             ))}
           </SortableNavGroup>
@@ -342,12 +351,14 @@ export const SortableNavGroup = SortableContainer(
 interface NavItemProps<T extends MaterialSampleFormSectionId> {
   section: ScrollTarget<T>;
   disableRemovePrompt?: boolean;
+  disableSwitch?: boolean;
 }
 
 const SortableNavItem = SortableElement(
   ({
     section,
-    disableRemovePrompt
+    disableRemovePrompt,
+    disableSwitch
   }: NavItemProps<MaterialSampleFormSectionId>) => {
     const { openModal } = useModal();
 
@@ -389,9 +400,26 @@ const SortableNavItem = SortableElement(
         >
           {section.msg}
         </Tag>
-        {section.setEnabled && (
-          <SwitchComponent checked={!section.disabled} onChange={toggle} />
-        )}
+        {section.setEnabled &&
+          (disableSwitch ? (
+            <Tooltip
+              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+              disableSpanMargin = {true}
+              visibleElement={
+                <SwitchComponent
+                  checked={!section.disabled}
+                  onChange={toggle}
+                  disabled={disableSwitch}
+                />
+              }
+            ></Tooltip>
+          ) : (
+            <SwitchComponent
+              checked={!section.disabled}
+              onChange={toggle}
+              disabled={disableSwitch}
+            />
+          ))}
       </div>
     );
   }

@@ -96,7 +96,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingAgentsLegend: "Collecting Agents",
   collectingDateLegend: "Collecting Date",
   collectingEvent: "Collecting Event",
-  collectingEventFromParent: "Collecting Event from parent",
+  collectingEventFromParent: "From parent",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
   collectingEventListTitle: "Collecting Event",
@@ -164,6 +164,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   determiningDate: "Determining Date",
   dinaHomeH1: "Dina Home",
   dinaManagementSectionTitle: "Management",
+  disabledForChildMaterialSamples: "Disabled for child Material Samples",
   dragDropInstructionsHeader: "To rearrange the attribute order:",
   dragDropKeyboardInstructions:
     "Tab to the attribute, then press space to select it. Use the arrow keys to move the item, then press space to place it.",
