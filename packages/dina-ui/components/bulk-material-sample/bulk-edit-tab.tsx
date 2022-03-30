@@ -67,6 +67,9 @@ export function useBulkEditTab({
             materialSample={initialValues}
             disableAutoNamePrefix={true}
             disableSampleNameField={true}
+            disableCollectingEventSwitch={sampleHooks.some(
+              hook => hook.sample.parentMaterialSample !== undefined
+            )}
             isOffScreen={!isSelected}
             // Disable the nav's Are You Sure prompt when removing components,
             // because you aren't actually deleting data.

@@ -52,9 +52,19 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
+  const highestParentId =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
 
+  const highestParentMaterialSample =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.name;
+
+  const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
   const colEventQuery = useCollectingEventQuery(
-    materialSampleQuery.response?.data?.collectingEvent?.id
+    highestParentId
+      ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id
+      : materialSampleQuery.response?.data?.collectingEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(
     materialSampleQuery.response?.data?.acquisitionEvent?.id
@@ -150,6 +160,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <MaterialSampleInfoSection />
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+                  {materialSample.parentMaterialSample && (
+                    <div>
+                      <DinaMessage id="collectingEventFromParent" />{" "}
+                      <Link
+                        href={`/collection/material-sample/view?id=${highestParentId}`}
+                      >
+                        <a>{highestParentMaterialSample}</a>
+                      </Link>
+                    </div>
+                  )}
                   <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link

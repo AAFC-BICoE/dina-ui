@@ -22,32 +22,32 @@ export interface QueryRowProps {
 /**
  * The full path will be generated for elastic using a combination of the parent path and
  * the value. The path is generated using the following:
- * 
+ *
  * {parentPath}.{path}.{value}
- * 
+ *
  * Example: included.attributes.determination.verbatimScientificName
  */
 export interface ESIndexMapping {
   /**
    * Name of the attribute.
-   * 
+   *
    * Example: verbatimScientificName
    */
   value: string;
 
   /**
    * Text that is displayed to the user in the Query Filtering option menu.
-   * 
+   *
    * This text is a user-friendly generated label, which may show some paths to help the user
    * understand the relationships better. This is generated from the path.
-   * 
+   *
    * Example: determination.verbatimScientificName
    */
   label: string;
 
   /**
    * The attributes type. This can change how the query row is displayed and the options provided.
-   * 
+   *
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
    */
   type: string;
@@ -55,7 +55,7 @@ export interface ESIndexMapping {
   /**
    * The path for the attribute without the attribute name. This path does not include the parent
    * path.
-   * 
+   *
    * Example: attribute.determination
    */
   path: string;
@@ -63,7 +63,7 @@ export interface ESIndexMapping {
   /**
    * If the attribute belongs to a relationship, this is the path for only the parent. When generating
    * the elastic search query it will use this as the prefix of the path.
-   * 
+   *
    * Example: included
    */
   parentPath?: string;
@@ -72,7 +72,7 @@ export interface ESIndexMapping {
    * If the attribute belongs to a relationship, this is the name which will be used to group
    * attributes under the same relationship together in the search. This name will also be used to
    * display text of the group.
-   * 
+   *
    * Example: organism
    */
   parentName?: string;
@@ -108,10 +108,10 @@ export interface QueryRowExportProps {
 }
 
 interface TypeVisibility {
-  isText: boolean,
-  isBoolean: boolean,
-  isNumber: boolean,
-  isDate: boolean
+  isText: boolean;
+  isBoolean: boolean;
+  isNumber: boolean;
+  isDate: boolean;
 }
 
 const queryRowMatchOptions = [
@@ -136,28 +136,35 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     number: null
   };
 
-  const [fieldName, setFieldName] = useState<string>((formikProps.values as any)?.queryRows?.[index].fieldName);
+  const [fieldName, setFieldName] = useState<string>(
+    (formikProps.values as any)?.queryRows?.[index].fieldName
+  );
 
-  const dataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === fieldName);
+  const dataFromIndexMapping = esIndexMapping?.find(
+    attribute => attribute.value === fieldName
+  );
 
   // Depending on the type, it changes what fields need to be displayed.
   const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
     isText: dataFromIndexMapping?.type === "text",
     isBoolean: dataFromIndexMapping?.type === "boolean",
-    isNumber: dataFromIndexMapping?.type === "long" || 
-        dataFromIndexMapping?.type === "short" || 
-        dataFromIndexMapping?.type === "integer" || 
-        dataFromIndexMapping?.type === "byte" || 
-        dataFromIndexMapping?.type === "double" || 
-        dataFromIndexMapping?.type === "float" || 
-        dataFromIndexMapping?.type === "half_float" || 
-        dataFromIndexMapping?.type === "scaled_float" || 
-        dataFromIndexMapping?.type === "unsigned",
-    isDate: dataFromIndexMapping?.type === "date",  
+    isNumber:
+      dataFromIndexMapping?.type === "long" ||
+      dataFromIndexMapping?.type === "short" ||
+      dataFromIndexMapping?.type === "integer" ||
+      dataFromIndexMapping?.type === "byte" ||
+      dataFromIndexMapping?.type === "double" ||
+      dataFromIndexMapping?.type === "float" ||
+      dataFromIndexMapping?.type === "half_float" ||
+      dataFromIndexMapping?.type === "scaled_float" ||
+      dataFromIndexMapping?.type === "unsigned",
+    isDate: dataFromIndexMapping?.type === "date"
   });
 
   function onSelectionChange(value) {
-    const newDataFromIndexMapping = esIndexMapping.find((attribute) => attribute.value === value);
+    const newDataFromIndexMapping = esIndexMapping.find(
+      attribute => attribute.value === value
+    );
 
     formikProps.setFieldValue(`${name}[${index}]`, {
       ...initState,
@@ -170,17 +177,18 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     setTypeVisibility({
       isText: newDataFromIndexMapping?.type === "text",
       isBoolean: newDataFromIndexMapping?.type === "boolean",
-      isNumber: newDataFromIndexMapping?.type === "long" || 
-      newDataFromIndexMapping?.type === "short" || 
-      newDataFromIndexMapping?.type === "integer" || 
-      newDataFromIndexMapping?.type === "byte" || 
-      newDataFromIndexMapping?.type === "double" || 
-      newDataFromIndexMapping?.type === "float" || 
-          newDataFromIndexMapping?.type === "half_float" || 
-          newDataFromIndexMapping?.type === "scaled_float" || 
-          newDataFromIndexMapping?.type === "unsigned",
-      isDate: newDataFromIndexMapping?.type === "date",      
-    })
+      isNumber:
+        newDataFromIndexMapping?.type === "long" ||
+        newDataFromIndexMapping?.type === "short" ||
+        newDataFromIndexMapping?.type === "integer" ||
+        newDataFromIndexMapping?.type === "byte" ||
+        newDataFromIndexMapping?.type === "double" ||
+        newDataFromIndexMapping?.type === "float" ||
+        newDataFromIndexMapping?.type === "half_float" ||
+        newDataFromIndexMapping?.type === "scaled_float" ||
+        newDataFromIndexMapping?.type === "unsigned",
+      isDate: newDataFromIndexMapping?.type === "date"
+    });
 
     setFieldName(value);
   }
@@ -205,25 +213,23 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     });
 
   // Using the parent name, group the relationships into sections.
-  const groupedNestRowOptions = lodash.chain(nestedRowOptions)
-      .groupBy(prop => prop.parentName)
-      .map((group, key) => {
-        return {
-          label: key,
-          options: group
-        }
-      })
-      .value();
+  const groupedNestRowOptions = lodash
+    .chain(nestedRowOptions)
+    .groupBy(prop => prop.parentName)
+    .map((group, key) => {
+      return {
+        label: key,
+        options: group
+      };
+    })
+    .value();
 
   const queryRowOptions = simpleRowOptions
-    ? [
-        ...simpleRowOptions,
-        ...groupedNestRowOptions
-      ]
+    ? [...simpleRowOptions, ...groupedNestRowOptions]
     : [];
-  
+
   function fieldProps(fldName: string, idx: number) {
-    return `${name}[${idx}].${fldName}`
+    return `${name}[${idx}].${fldName}`;
   }
 
   return (
@@ -318,7 +324,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               name={fieldProps("removeRow", index)}
             />
           )}
-
         </div>
       </div>
     </div>
