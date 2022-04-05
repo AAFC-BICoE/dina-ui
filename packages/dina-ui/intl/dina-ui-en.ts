@@ -375,6 +375,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
+  fieldExtensions: "Field Extensions",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -677,6 +678,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
+  workflowTemplates: "Workflow Templates",
   materialSampleCustomViews: "Material Sample Custom Views",
   materialSampleCustomView: "Material Sample Custom View",
   year: "Year",
