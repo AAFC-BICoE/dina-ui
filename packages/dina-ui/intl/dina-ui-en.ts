@@ -302,7 +302,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
-  field_isFileAs_tooltip:
+  field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
   field_isInseperable_tooltip: "Contents are inseparable",
@@ -410,7 +410,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   includeAll: "Include All",
   institution: "Institution",
   institutionListTitle: "Institutions",
-  isFileAs: "Filed As",
+  isFiledAs: "Filed As",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",

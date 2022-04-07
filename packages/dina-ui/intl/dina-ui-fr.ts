@@ -273,7 +273,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Nom(s) de famille, y compris les noms de famille composés",
   field_givenNames: "Prénoms",
   field_givenNames_tooltip: "Prénom et tous les seconds prénoms",
-  field_isFileAs_tooltip:
+  field_isFiledAs_tooltip:
     'Classé en tant que (ajouter cette détermination). Une seule détermination peut être inscrite comme "Classé en tant que".',
   field_isInseperable: "Garder les contenus ensemble",
   field_isInseperable_tooltip: "Les contenus sont inséparables",
@@ -375,7 +375,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   includeAll: "Inclure tous",
   institution: "Établissement",
   institutionListTitle: "Établissements",
-  isFileAs: "Classé en tant que",
+  isFiledAs: "Classé en tant que",
   isolation: "Isolation",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageDescriptionEnglish: "Anglais",

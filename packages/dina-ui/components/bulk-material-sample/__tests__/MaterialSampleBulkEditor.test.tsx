@@ -266,7 +266,7 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "initial determination 1"
           }
         ]
