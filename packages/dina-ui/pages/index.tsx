@@ -104,6 +104,11 @@ export function Home() {
                     <DinaMessage id="storageUnitListTitle" />
                   </a>
                 </Link>
+                <Link href="/collection/material-sample-custom-view/list">
+                  <a>
+                    <DinaMessage id="workflowTemplates" />
+                  </a>
+                </Link>
               </Stack>
             </Col>
 
@@ -263,6 +268,11 @@ export function Home() {
                   <Link href="/collection/managed-attributes-view/list">
                     <a>
                       <DinaMessage id="managedAttributesViews" />
+                    </a>
+                  </Link>
+                  <Link href="/collection/extension/list">
+                    <a>
+                      <DinaMessage id="fieldExtensions" />
                     </a>
                   </Link>
                   <Link href="/collection/institution/list">
