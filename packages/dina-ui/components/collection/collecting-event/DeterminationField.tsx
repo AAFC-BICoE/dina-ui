@@ -46,7 +46,7 @@ const DETERMINATION_FIELDS_OBJECT: Required<Record<keyof Determination, true>> =
     transcriberRemarks: true,
     isPrimary: true,
     scientificNameDetails: true,
-    isFileAs: true,
+    isFiledAs: true,
     determinationRemarks: true,
     managedAttributes: true
   };
@@ -97,9 +97,9 @@ export function DeterminationField({
       get(formik.values, determinationsPath) ?? [];
 
     assertions.forEach((_, idx) => {
-      formik.setFieldValue(`${determinationsPath}[${idx}].isFileAs`, false);
+      formik.setFieldValue(`${determinationsPath}[${idx}].isFiledAs`, false);
     });
-    formik.setFieldValue(`${determinationsPath}[${index}].isFileAs`, true);
+    formik.setFieldValue(`${determinationsPath}[${index}].isFiledAs`, true);
   }
 
   return (
@@ -114,9 +114,9 @@ export function DeterminationField({
         renderTab={(det, index) => (
           <span className="m-3">
             {index + 1}
-            {det.isPrimary && det.isFileAs
-              ? ` (${formatMessage("primary")} | ${formatMessage("isFileAs")})`
-              : (det.isFileAs && `(${formatMessage("isFileAs")})`) ||
+            {det.isPrimary && det.isFiledAs
+              ? ` (${formatMessage("primary")} | ${formatMessage("isFiledAs")})`
+              : (det.isFiledAs && `(${formatMessage("isFiledAs")})`) ||
                 (det.isPrimary && `(${formatMessage("primary")})`)}
           </span>
         )}
@@ -144,7 +144,7 @@ export function DeterminationField({
                   />
                   <ToggleField
                     className="filed-as-button"
-                    {...fieldProps("isFileAs")}
+                    {...fieldProps("isFiledAs")}
                     onChangeExternal={(checked, formik) => {
                       if (checked) {
                         makeFiledAs(formik, index);

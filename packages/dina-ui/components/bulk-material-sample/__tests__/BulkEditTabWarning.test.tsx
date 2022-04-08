@@ -58,7 +58,7 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "test-name-existing"
           }
         ]
@@ -131,7 +131,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }
@@ -151,7 +151,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }
@@ -171,7 +171,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }

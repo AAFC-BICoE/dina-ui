@@ -302,7 +302,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
-  field_isFileAs_tooltip:
+  field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
   field_isInseperable_tooltip: "Contents are inseparable",
@@ -375,6 +375,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_xmpMetadataDate_tooltip:
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
+  fieldExtensions: "Field Extensions",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -410,7 +411,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   includeAll: "Include All",
   institution: "Institution",
   institutionListTitle: "Institutions",
-  isFileAs: "Filed As",
+  isFiledAs: "Filed As",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",
@@ -677,6 +678,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
+  workflowTemplates: "Workflow Templates",
   materialSampleCustomViews: "Material Sample Custom Views",
   materialSampleCustomView: "Material Sample Custom View",
   year: "Year",
