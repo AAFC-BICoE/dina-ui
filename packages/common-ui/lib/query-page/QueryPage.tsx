@@ -35,7 +35,13 @@ import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
 
-const DEFAULT_PAGE_SIZE = 25;
+const DEFAULT_PAGE_SIZE: number = 25;
+const DEFAULT_SORT: SortingRule[] = [
+  {
+    id: "id",
+    desc: true
+  }
+];
 
 interface SearchResultData<TData extends KitsuResource> {
   results: TData[];
@@ -80,7 +86,7 @@ export function QueryPage<TData extends KitsuResource>({
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
   // JSONAPI sort attribute.
-  const [sortingRules, setSortingRules] = useState(defaultSort);
+  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // Search results with pagination applied.
   const [searchResults, setSearchResults] = useState<SearchResultData<TData>>({
@@ -115,7 +121,11 @@ export function QueryPage<TData extends KitsuResource>({
   // Fetch data if the pagination or search filters have changed.
   useEffect(() => {
     // Elastic search query with pagination settings.
-    const queryDSL = transformQueryToDSL(pagination, cloneDeep(searchFilters));
+    const queryDSL = transformQueryToDSL(
+      pagination,
+      sortingRules,
+      cloneDeep(searchFilters)
+    );
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!Object.keys(queryDSL).length) return;
