@@ -34,7 +34,8 @@ export const getColumnDefinition = () => {
           {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </a>
       ),
-      accessor: "materialSampleName"
+      accessor: "materialSampleName",
+      index: "data.attributes.materialSampleName"
     },
     {
       Cell: ({ original: { collection } }) =>
@@ -43,7 +44,8 @@ export const getColumnDefinition = () => {
             {collection?.name}
           </Link>
         ) : null,
-      accessor: "collection.name"
+      accessor: "collection.name",
+      index: "data.relationships.collection.name"
     },
     stringArrayCell("dwcOtherCatalogNumbers"),
     { accessor: "materialSampleType" },

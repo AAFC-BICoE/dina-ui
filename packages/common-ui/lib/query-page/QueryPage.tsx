@@ -38,7 +38,7 @@ import { useEffect } from "react";
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
   {
-    id: "id",
+    id: "data.attributes.createdOn",
     desc: true
   }
 ];
@@ -69,6 +69,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
+
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
@@ -118,7 +119,7 @@ export function QueryPage<TData extends KitsuResource>({
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
 
-  // Fetch data if the pagination or search filters have changed.
+  // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     // Elastic search query with pagination settings.
     const queryDSL = transformQueryToDSL(
@@ -145,7 +146,7 @@ export function QueryPage<TData extends KitsuResource>({
         total: result?.total.value
       });
     });
-  }, [pagination, searchFilters]);
+  }, [pagination, searchFilters, sortingRules]);
 
   // Retrieve user preferences only once.
   useEffect(() => {
@@ -283,6 +284,18 @@ export function QueryPage<TData extends KitsuResource>({
       offset: 0,
       limit: newPageSize
     });
+  }
+
+  /**
+   * When the user changes the react-table page sort, it will trigger this event.
+   *
+   * This method will cause the useEffect with the search to trigger if the sorting has changed.
+   */
+  function onSortChange(newSort: SortingRule[]) {
+    setSortingRules(newSort);
+
+    // Trigger the prop event listener.
+    onSortedChange?.(newSort);
   }
 
   /**
@@ -499,6 +512,9 @@ export function QueryPage<TData extends KitsuResource>({
           page={pagination.offset / pagination.limit}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
+          // Sorting props
+          onSortedChange={onSortChange}
+          sorted={sortingRules}
           TbodyComponent={
             error
               ? () => (
