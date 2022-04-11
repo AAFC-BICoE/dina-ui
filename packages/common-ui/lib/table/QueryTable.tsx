@@ -25,6 +25,11 @@ export interface ElasticSearchColumnProps {
    * The index for elastic search to use.
    */
   indexPath?: string;
+
+  /**
+   * The relationship type the elastic search field is part of.
+   */
+  relationshipType?: string;
 }
 
 /** QueryTable component's props. */

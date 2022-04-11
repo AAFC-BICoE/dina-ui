@@ -90,7 +90,7 @@ export function QueryPage<TData extends KitsuResource>({
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
-  // JSONAPI sort attribute.
+  // JSON API sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // Search results with pagination applied.
@@ -99,7 +99,7 @@ export function QueryPage<TData extends KitsuResource>({
     total: 0
   });
 
-  // JSONAPI pagination specs
+  // JSON API pagination specs
   const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
     limit: DEFAULT_PAGE_SIZE,
     offset: 0
@@ -128,21 +128,11 @@ export function QueryPage<TData extends KitsuResource>({
     // Reset any error messages since we are trying again.
     setError(undefined);
 
-    // Add the index to the sorting rules, this is needed for elastic search.
-    const sortingRulesWithIndex = cloneDeep(sortingRules);
-    sortingRulesWithIndex.forEach(sortRule => {
-      const columnDefinition = columns.find(
-        column => column.accessor === sortRule.id
-      );
-      if (!columnDefinition || !columnDefinition.indexPath) return;
-
-      sortRule.id = columnDefinition.indexPath;
-    });
-
     // Elastic search query with pagination settings.
     const queryDSL = transformQueryToDSL(
       pagination,
-      sortingRulesWithIndex,
+      columns,
+      sortingRules,
       cloneDeep(searchFilters)
     );
 
@@ -152,13 +142,12 @@ export function QueryPage<TData extends KitsuResource>({
     // Fetch data using elastic search.
     searchES(queryDSL)
       .then(result => {
-        const processedResult = result?.hits
-          .map(hit => hit._source?.data)
-          .map(rslt => ({
-            id: rslt.id,
-            type: rslt.type,
-            ...rslt.attributes
-          }));
+        const processedResult = result?.hits.map(rslt => ({
+          id: rslt._source?.data?.id,
+          type: rslt._source?.data?.type,
+          data: rslt._source?.data?.attributes,
+          included: rslt._source?.included
+        }));
         setAvailableSamples(processedResult);
         setSearchResults({
           results: processedResult,

@@ -46,7 +46,8 @@ export const getColumnDefinition = () => {
           </Link>
         ) : null,
       accessor: "collection.name",
-      indexPath: "data.included.attributes.name.keyword"
+      indexPath: "included.attributes.name.keyword",
+      relationshipType: "collection"
     },
     stringArrayCell(
       "dwcOtherCatalogNumbers",

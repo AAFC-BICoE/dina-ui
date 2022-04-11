@@ -1,15 +1,17 @@
 import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
-import { LimitOffsetPageSpec } from "..";
+import { ColumnDefinition, LimitOffsetPageSpec } from "..";
 import { SortingRule } from "react-table";
+import { KitsuResource } from "kitsu";
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
   group: string;
 }
 
-export function transformQueryToDSL(
+export function transformQueryToDSL<TData extends KitsuResource>(
   pagination: LimitOffsetPageSpec,
+  columns: ColumnDefinition<TData>[],
   sortingRules: SortingRule[],
   submittedValues: TransformQueryToDSLParams
 ) {
@@ -155,7 +157,31 @@ export function transformQueryToDSL(
   // Apply sorting rules to elastic search query.
   if (sortingRules && sortingRules.length > 0) {
     sortingRules.forEach(sortingRule => {
-      builder.sort(sortingRule.id, sortingRule.desc ? "desc" : "asc");
+      const columnDefinition = columns.find(
+        column => column.accessor === sortingRule.id
+      );
+      if (!columnDefinition || !columnDefinition?.indexPath) return;
+
+      if (columnDefinition.relationshipType) {
+        builder.sort([
+          {
+            [columnDefinition.indexPath]: {
+              order: sortingRule.desc ? "desc" : "asc",
+              nested_path: "included",
+              nested_filter: {
+                term: {
+                  "included.type": columnDefinition.relationshipType
+                }
+              }
+            }
+          }
+        ]);
+      } else {
+        builder.sort(
+          columnDefinition.indexPath,
+          sortingRule.desc ? "desc" : "asc"
+        );
+      }
     });
   }
 

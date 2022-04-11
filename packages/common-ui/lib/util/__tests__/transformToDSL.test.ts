@@ -1,5 +1,6 @@
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { SortingRule } from "react-table";
-import { LimitOffsetPageSpec } from "../..";
+import { ColumnDefinition, LimitOffsetPageSpec } from "../..";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -20,12 +21,95 @@ const defaultSubmittedValues: TransformQueryToDSLParams = {
   queryRows: []
 };
 
-describe("Transform to DSL function", () => {
-  it("Submitted values to DSL", async () => {
-    // Add this test.
+const columnDefinitions: ColumnDefinition<MaterialSample>[] = [
+  {
+    accessor: "materialSampleName",
+    indexPath: "data.attributes.materialSampleName.keyword"
+  },
+  {
+    accessor: "materialSampleType",
+    indexPath: "data.attributes.materialSampleType.keyword"
+  },
+  {
+    accessor: "collection.name",
+    indexPath: "included.attributes.name.keyword",
+    relationshipType: "collection"
+  }
+];
+
+describe("Transform to DSL query function", () => {
+  it("Submitted values to DSL query", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchType: "term",
+          matchValue: "CNC001"
+        },
+        {
+          fieldName: "data.attributes.materialSampleType",
+          type: "text",
+          matchType: "match",
+          matchValue: "WHOLE_ORGANISM"
+        },
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "match"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          matchType: "match",
+          date: "2022-04-11"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure that the default pagination and query row filters are added.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                "data.attributes.materialSampleName.keyword": "CNC001"
+              }
+            },
+            {
+              match: {
+                "data.attributes.materialSampleType": "WHOLE_ORGANISM"
+              }
+            },
+            {
+              term: {
+                "data.attributes.allowDuplicateName": "true"
+              }
+            },
+            {
+              term: {
+                "data.attributes.createdOn": "2022-04-11"
+              }
+            }
+          ]
+        }
+      }
+    });
   });
 
-  it("Group settings to DSL", async () => {
+  it("Group settings to DSL query", async () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "cnc",
       queryRows: []
@@ -33,6 +117,7 @@ describe("Transform to DSL function", () => {
 
     const dsl = transformQueryToDSL(
       defaultPagination,
+      columnDefinitions,
       defaultSorting,
       submittedValues
     );
@@ -53,7 +138,7 @@ describe("Transform to DSL function", () => {
     });
   });
 
-  it("Pagination settings to DSL", async () => {
+  it("Pagination settings to DSL query", async () => {
     const pagination: LimitOffsetPageSpec = {
       limit: 50,
       offset: 50
@@ -61,6 +146,7 @@ describe("Transform to DSL function", () => {
 
     const dsl = transformQueryToDSL(
       pagination,
+      columnDefinitions,
       defaultSorting,
       defaultSubmittedValues
     );
@@ -72,20 +158,21 @@ describe("Transform to DSL function", () => {
     });
   });
 
-  it("Sorting settings to DSL", async () => {
+  it("Sorting attributes to DSL query", async () => {
     const sorting: SortingRule[] = [
       {
-        id: "fieldName1",
+        id: "materialSampleName",
         desc: true
       },
       {
-        id: "fieldName2",
+        id: "materialSampleType",
         desc: false
       }
     ];
 
     const dsl = transformQueryToDSL(
       defaultPagination,
+      columnDefinitions,
       sorting,
       defaultSubmittedValues
     );
@@ -96,13 +183,48 @@ describe("Transform to DSL function", () => {
       size: DEFAULT_LIMIT,
       sort: [
         {
-          fieldName1: {
+          "data.attributes.materialSampleName.keyword": {
             order: "desc"
           }
         },
         {
-          fieldName2: {
+          "data.attributes.materialSampleType.keyword": {
             order: "asc"
+          }
+        }
+      ]
+    });
+  });
+
+  it("Sorting relationships to DSL query", async () => {
+    const sorting: SortingRule[] = [
+      {
+        id: "collection.name",
+        desc: true
+      }
+    ];
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      sorting,
+      defaultSubmittedValues
+    );
+
+    // Ensure default pagination and sorting rules are applied correctly.
+    expect(dsl).toEqual({
+      from: DEFAULT_OFFSET,
+      size: DEFAULT_LIMIT,
+      sort: [
+        {
+          "included.attributes.name.keyword": {
+            order: "desc",
+            nested_path: "included",
+            nested_filter: {
+              term: {
+                "included.type": "collection"
+              }
+            }
           }
         }
       ]
