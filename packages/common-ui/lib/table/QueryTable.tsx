@@ -15,8 +15,17 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
-/** Object types accepted as a column definition. */
-export type ColumnDefinition<TData> = string | Column<TData>;
+/**
+ * Column props with extra props on top of it.
+ */
+export type ColumnDefinition<TData> = Column<TData> & ElasticSearchColumnProps;
+
+export interface ElasticSearchColumnProps {
+  /**
+   * The index for elastic search to use.
+   */
+  indexPath?: string;
+}
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
@@ -104,6 +113,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
+
   // JSONAPI page spec.
   const [page, setPage] = useState<LimitOffsetPageSpec>({
     limit: defaultPageSize,

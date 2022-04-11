@@ -1,8 +1,8 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState, useMemo } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { Column, TableProps, SortingRule } from "react-table";
-import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
+import ReactTable, { TableProps, SortingRule } from "react-table";
+import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
@@ -19,7 +19,6 @@ import {
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { useQuery, withResponse } from "../api-client/useQuery";
 import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
@@ -38,7 +37,7 @@ import { useEffect } from "react";
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
   {
-    id: "data.attributes.createdOn",
+    id: "createdOn",
     desc: true
   }
 ];
@@ -84,6 +83,11 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage } = useIntl();
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
+
+  // Query Page error message state
+  const [error, setError] = useState<any>();
+
+  // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
   // JSONAPI sort attribute.
@@ -121,10 +125,24 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    // Reset any error messages since we are trying again.
+    setError(undefined);
+
+    // Add the index to the sorting rules, this is needed for elastic search.
+    const sortingRulesWithIndex = cloneDeep(sortingRules);
+    sortingRulesWithIndex.forEach(sortRule => {
+      const columnDefinition = columns.find(
+        column => column.accessor === sortRule.id
+      );
+      if (!columnDefinition || !columnDefinition.indexPath) return;
+
+      sortRule.id = columnDefinition.indexPath;
+    });
+
     // Elastic search query with pagination settings.
     const queryDSL = transformQueryToDSL(
       pagination,
-      sortingRules,
+      sortingRulesWithIndex,
       cloneDeep(searchFilters)
     );
 
@@ -132,20 +150,24 @@ export function QueryPage<TData extends KitsuResource>({
     if (!Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
-    searchES(queryDSL).then(result => {
-      const processedResult = result?.hits
-        .map(hit => hit._source?.data)
-        .map(rslt => ({
-          id: rslt.id,
-          type: rslt.type,
-          ...rslt.attributes
-        }));
-      setAvailableSamples(processedResult);
-      setSearchResults({
-        results: processedResult,
-        total: result?.total.value
+    searchES(queryDSL)
+      .then(result => {
+        const processedResult = result?.hits
+          .map(hit => hit._source?.data)
+          .map(rslt => ({
+            id: rslt.id,
+            type: rslt.type,
+            ...rslt.attributes
+          }));
+        setAvailableSamples(processedResult);
+        setSearchResults({
+          results: processedResult,
+          total: result?.total.value
+        });
+      })
+      .catch(elasticSearchError => {
+        setError(elasticSearchError);
       });
-    });
   }, [pagination, searchFilters, sortingRules]);
 
   // Retrieve user preferences only once.
@@ -168,6 +190,9 @@ export function QueryPage<TData extends KitsuResource>({
             response.data[0].savedSearches?.[username as any].default
           );
         }
+      })
+      .catch(userPreferenceError => {
+        setError(userPreferenceError);
       });
   }, [userPreferences]);
 
@@ -211,7 +236,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
-  const combinedColumns = [
+  const combinedColumns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
@@ -227,24 +252,18 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const mappedColumns = combinedColumns.map<Column>(column => {
+  const mappedColumns = combinedColumns.map(column => {
     // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
+    const { fieldName, customHeader } = {
+      customHeader: column.Header,
+      fieldName: String(column.accessor)
+    };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...(typeof column === "string" ? { accessor: column } : { ...column })
+      ...column
     };
   });
 
@@ -254,6 +273,7 @@ export function QueryPage<TData extends KitsuResource>({
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
+    setError(undefined);
     onSubmit({ submittedValues: resetToVal });
   }
 
@@ -384,20 +404,12 @@ export function QueryPage<TData extends KitsuResource>({
     return result;
   }
 
-  const savedSearchQuery = useQuery<UserPreference[]>({
-    path: "user-api/user-preference",
-    filter: {
-      userId: subject as FilterParam
-    },
-    page: { limit: 1000 }
-  });
-
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
 
   const {
     data,
-    error,
+    error: indexError,
     isValidating: loading
   } = useSWR<ESIndexMapping[], any>(
     [indexName, cacheId],
@@ -408,6 +420,9 @@ export function QueryPage<TData extends KitsuResource>({
       revalidateOnReconnect: false
     }
   );
+  if (indexError) {
+    setError(indexError);
+  }
 
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
@@ -532,9 +547,9 @@ export function QueryPage<TData extends KitsuResource>({
                       type="button"
                       className="btn btn-primary"
                       onClick={() => {
-                        const newSort = [{ id: "createdOn", desc: true }];
-                        onSortedChange?.(newSort);
-                        setSortingRules(newSort);
+                        const newSort = defaultSort ?? DEFAULT_SORT;
+                        setError(undefined);
+                        onSortChange(newSort);
                       }}
                     >
                       <CommonMessage id="resetSort" />

@@ -1,5 +1,6 @@
 import {
   ButtonBar,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
@@ -35,7 +36,7 @@ export const getColumnDefinition = () => {
         </a>
       ),
       accessor: "materialSampleName",
-      index: "data.attributes.materialSampleName"
+      indexPath: "data.attributes.materialSampleName.keyword"
     },
     {
       Cell: ({ original: { collection } }) =>
@@ -45,12 +46,18 @@ export const getColumnDefinition = () => {
           </Link>
         ) : null,
       accessor: "collection.name",
-      index: "data.relationships.collection.name"
+      indexPath: "data.included.attributes.name.keyword"
     },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn")
+    stringArrayCell(
+      "dwcOtherCatalogNumbers",
+      "data.attributes.dwcOtherCatalogNumbers.keyword"
+    ),
+    {
+      accessor: "materialSampleType",
+      indexPath: "data.attributes.materialSampleType.keyword"
+    },
+    { accessor: "createdBy", indexPath: "data.attributes.createdBy.keyword" },
+    dateCell("createdOn", "data.attributes.createdOn")
   ];
 };
 
@@ -78,7 +85,7 @@ export function SampleListLayout({
 
   const [queryKey, setQueryKey] = useState("");
 
-  const columns = [
+  const columns: ColumnDefinition<MaterialSample>[] = [
     ...getColumnDefinition(),
     ...(onSelect
       ? [

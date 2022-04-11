@@ -1,7 +1,7 @@
 import { get } from "lodash";
 
 /** Renders a string array cell into a tabl in comma seperated format. */
-export function stringArrayCell(accessor: string) {
+export function stringArrayCell(accessor: string, indexPath?: string) {
   return {
     Cell: ({ original }) => {
       const value = get(original, accessor);
@@ -11,6 +11,7 @@ export function stringArrayCell(accessor: string) {
       }
       return null;
     },
-    accessor
+    accessor,
+    indexPath
   };
 }
