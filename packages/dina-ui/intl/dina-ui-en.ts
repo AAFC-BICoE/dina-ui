@@ -388,6 +388,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   formNavigation: "Form Navigation",
   generateBatch: "Generate Batch",
+  generateLabel: "Generate Label",
   generateSeries: "Generate Series",
   geoReferenceAssertion: "Georeference Assertion",
   geoReferencing: "Geo-Referencing",
