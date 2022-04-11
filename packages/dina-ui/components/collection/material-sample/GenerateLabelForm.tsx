@@ -1,4 +1,9 @@
-import { ButtonBar, BackButton, SelectField } from "packages/common-ui/lib";
+import {
+  ButtonBar,
+  BackButton,
+  SelectField,
+  DinaForm
+} from "packages/common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { ManagedAttributeType } from "packages/dina-ui/types/objectstore-api";
@@ -33,6 +38,20 @@ const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   }
 ];
 
+interface ManagedAttributeAttributes<TComponent = string> {
+  type: "managed-attribute";
+  name: string;
+  managedAttributeType: string;
+  managedAttributeComponent: TComponent;
+  acceptedValues?: string[] | null;
+  group?: string;
+  createdBy?: string;
+  createdOn?: string;
+}
+
+type ManagedAttribute<TComponent = string> =
+  ManagedAttributeAttributes<TComponent>;
+
 function GenerateLabelForm({}: GenerateLabelFormProps) {
   const { formatMessage } = useDinaIntl();
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
@@ -50,19 +69,18 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
     </ButtonBar>
   );
   return (
-    <div>
+    <DinaForm<Partial<ManagedAttribute>> initialValues={{}}>
       {buttonBar}
-      <div className="row">{"Template"}</div>
-      {/* <div className="row">
-        <SelectField
-          className="col-md-6"
-          name="managedAttributeType"
-          options={ATTRIBUTE_TYPE_OPTIONS}
-          //   onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
-        />
-      </div> */}
-      {buttonBar}
+      <div className="row">
+      <SelectField
+        className="col-md-6"
+        name="template"
+        options={ATTRIBUTE_TYPE_OPTIONS}
+        //   onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
+      />
     </div>
+      {buttonBar}
+    </DinaForm>
   );
 }
 

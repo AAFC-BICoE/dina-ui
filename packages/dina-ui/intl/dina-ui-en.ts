@@ -633,6 +633,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storagesCreatedByMe: "Storages Created By Me",
   tags: "Tags",
   target: "Target",
+  template: "Template",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
   thumbnail: "Thumbnail",
