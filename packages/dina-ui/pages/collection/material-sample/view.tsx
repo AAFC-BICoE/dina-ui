@@ -89,11 +89,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <DinaMessage id="duplicate" />
         </a>
       </Link>
-      <Link href={`/collection/material-sample/generate-label`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="generateLabel" />
-        </a>
-      </Link>
       <Link href={`/collection/material-sample/revisions?id=${id}`}>
         <a className="btn btn-info ms-5">
           <DinaMessage id="revisionsButtonText" />
