@@ -63,7 +63,7 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
       {buttonBar}
       <div className="row">
       <SelectField
-        className="col-md-6"
+        className="col-md-2"
         name="template"
         options={ATTRIBUTE_TYPE_OPTIONS}
         //   onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
