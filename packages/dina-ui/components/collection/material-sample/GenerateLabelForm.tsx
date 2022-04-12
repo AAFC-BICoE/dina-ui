@@ -6,39 +6,30 @@ import {
 } from "packages/common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { ManagedAttributeType } from "packages/dina-ui/types/objectstore-api";
 import React from "react";
 
 export interface GenerateLabelFormProps {}
 
-const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
+export type TemplateType =
+  | "AAFC_Beaver_ZT410.twig"
+  | "AAFC_Zebra_ZT410.twig";
+
+const TEMPLATE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
-  value: ManagedAttributeType;
+  value: TemplateType;
 }[] = [
   {
-    labelKey: "field_managedAttributeType_integer_label",
-    value: "INTEGER"
+    labelKey: "template_AAFC_Beaver_ZT410",
+    value: "AAFC_Beaver_ZT410.twig"
   },
   {
-    labelKey: "field_managedAttributeType_text_label",
-    value: "STRING"
+    labelKey: "template_AAFC_Zebra_ZT410",
+    value: "AAFC_Zebra_ZT410.twig"
   },
-  {
-    labelKey: "field_managedAttributeType_picklist_label",
-    value: "PICKLIST"
-  },
-  {
-    labelKey: "field_managedAttributeType_date_label",
-    value: "DATE"
-  },
-  {
-    labelKey: "field_managedAttributeType_boolean_label",
-    value: "BOOL"
-  }
 ];
 
-interface ManagedAttributeAttributes<TComponent = string> {
-  type: "managed-attribute";
+interface TemplateAttributes<TComponent = string> {
+  type: "template-attribute";
   name: string;
   managedAttributeType: string;
   managedAttributeComponent: TComponent;
@@ -48,12 +39,12 @@ interface ManagedAttributeAttributes<TComponent = string> {
   createdOn?: string;
 }
 
-type ManagedAttribute<TComponent = string> =
-  ManagedAttributeAttributes<TComponent>;
+type Template<TComponent = string> =
+  TemplateAttributes<TComponent>;
 
 function GenerateLabelForm({}: GenerateLabelFormProps) {
   const { formatMessage } = useDinaIntl();
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+  const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
   const buttonBar = (
@@ -68,7 +59,7 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
     </ButtonBar>
   );
   return (
-    <DinaForm<Partial<ManagedAttribute>> initialValues={{}}>
+    <DinaForm<Partial<Template>> initialValues={{}}>
       {buttonBar}
       <div className="row">
       <SelectField
