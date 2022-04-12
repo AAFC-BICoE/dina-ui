@@ -8,7 +8,6 @@ import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { ManagedAttributeType } from "packages/dina-ui/types/objectstore-api";
 import React from "react";
-import { SubmitButton } from "react-dropzone-uploader";
 
 export interface GenerateLabelFormProps {}
 
