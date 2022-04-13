@@ -17,10 +17,12 @@ import { Tooltip } from "../tooltip/Tooltip";
 
 /**
  * Column props with extra props designed specifically for our application on top of it.
+ *
+ * If a type of string is provided, it should just create a ColumnDefinition with accessor only.
  */
-export type ColumnDefinition<TData> = Column<TData> &
-  ElasticSearchColumnProps &
-  InternationalizationProps;
+export type ColumnDefinition<TData> =
+  | (Column<TData> & ElasticSearchColumnProps & InternationalizationProps)
+  | string;
 
 export interface InternationalizationProps {
   /**

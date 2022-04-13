@@ -244,17 +244,22 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   const mappedColumns = combinedColumns.map(column => {
-    // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } = {
-      customHeader: column.Header,
-      fieldName: String(column.label)
-    };
+    const { fieldName, customHeader } =
+      typeof column === "string"
+        ? {
+            customHeader: undefined,
+            fieldName: column
+          }
+        : {
+            customHeader: column.Header,
+            fieldName: String(column.label)
+          };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...column
+      ...(typeof column === "string" ? { accessor: column } : { ...column })
     };
   });
 

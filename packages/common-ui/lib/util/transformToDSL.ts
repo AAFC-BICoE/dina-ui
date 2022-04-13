@@ -157,33 +157,44 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   // Apply sorting rules to elastic search query.
   if (sortingRules && sortingRules.length > 0) {
     sortingRules.forEach(sortingRule => {
-      const columnDefinition = columns.find(
-        column => column.accessor === sortingRule.id
-      );
-      if (!columnDefinition || !columnDefinition?.accessor) return;
+      const columnDefinition = columns.find(column => {
+        // Depending on if it's a string or not.
+        if (typeof column === "string") {
+          return column === sortingRule.id;
+        } else {
+          return column.accessor === sortingRule.id;
+        }
+      });
 
-      const indexPath =
-        columnDefinition.accessor +
-        (columnDefinition.keyword && columnDefinition.keyword === true
-          ? ".keyword"
-          : "");
+      // Edge case if a string is only provided as the column definition.
+      if (typeof columnDefinition === "string") {
+        builder.sort(columnDefinition, sortingRule.desc ? "desc" : "asc");
+      } else {
+        if (!columnDefinition || !columnDefinition?.accessor) return;
 
-      if (columnDefinition.relationshipType) {
-        builder.sort([
-          {
-            [indexPath]: {
-              order: sortingRule.desc ? "desc" : "asc",
-              nested_path: "included",
-              nested_filter: {
-                term: {
-                  "included.type": columnDefinition.relationshipType
+        const indexPath =
+          columnDefinition.accessor +
+          (columnDefinition.keyword && columnDefinition.keyword === true
+            ? ".keyword"
+            : "");
+
+        if (columnDefinition.relationshipType) {
+          builder.sort([
+            {
+              [indexPath]: {
+                order: sortingRule.desc ? "desc" : "asc",
+                nested_path: "included",
+                nested_filter: {
+                  term: {
+                    "included.type": columnDefinition.relationshipType
+                  }
                 }
               }
             }
-          }
-        ]);
-      } else {
-        builder.sort(indexPath, sortingRule.desc ? "desc" : "asc");
+          ]);
+        } else {
+          builder.sort(indexPath, sortingRule.desc ? "desc" : "asc");
+        }
       }
     });
   }
