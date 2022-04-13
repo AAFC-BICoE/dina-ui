@@ -16,15 +16,24 @@ import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
 /**
- * Column props with extra props on top of it.
+ * Column props with extra props designed specifically for our application on top of it.
  */
-export type ColumnDefinition<TData> = Column<TData> & ElasticSearchColumnProps;
+export type ColumnDefinition<TData> = Column<TData> &
+  ElasticSearchColumnProps &
+  InternationalizationProps;
+
+export interface InternationalizationProps {
+  /**
+   * Key used to retrieve the label value from internationalization.
+   */
+  label?: string;
+}
 
 export interface ElasticSearchColumnProps {
   /**
-   * The index for elastic search to use.
+   * For elastic search operations, should .keyword appended to the accessor.
    */
-  indexPath?: string;
+  keyword?: boolean;
 
   /**
    * The relationship type the elastic search field is part of.

@@ -160,12 +160,18 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       const columnDefinition = columns.find(
         column => column.accessor === sortingRule.id
       );
-      if (!columnDefinition || !columnDefinition?.indexPath) return;
+      if (!columnDefinition || !columnDefinition?.accessor) return;
+
+      const indexPath =
+        columnDefinition.accessor +
+        (columnDefinition.keyword && columnDefinition.keyword === true
+          ? ".keyword"
+          : "");
 
       if (columnDefinition.relationshipType) {
         builder.sort([
           {
-            [columnDefinition.indexPath]: {
+            [indexPath]: {
               order: sortingRule.desc ? "desc" : "asc",
               nested_path: "included",
               nested_filter: {
@@ -177,10 +183,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
           }
         ]);
       } else {
-        builder.sort(
-          columnDefinition.indexPath,
-          sortingRule.desc ? "desc" : "asc"
-        );
+        builder.sort(indexPath, sortingRule.desc ? "desc" : "asc");
       }
     });
   }

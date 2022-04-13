@@ -145,7 +145,9 @@ export function QueryPage<TData extends KitsuResource>({
         const processedResult = result?.hits.map(rslt => ({
           id: rslt._source?.data?.id,
           type: rslt._source?.data?.type,
-          data: rslt._source?.data?.attributes,
+          data: {
+            attributes: rslt._source?.data?.attributes
+          },
           included: rslt._source?.included
         }));
         setAvailableSamples(processedResult);
@@ -245,7 +247,7 @@ export function QueryPage<TData extends KitsuResource>({
     // The "columns" prop can be a string or a react-table Column type.
     const { fieldName, customHeader } = {
       customHeader: column.Header,
-      fieldName: String(column.accessor)
+      fieldName: String(column.label)
     };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;

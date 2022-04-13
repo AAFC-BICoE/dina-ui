@@ -23,16 +23,19 @@ const defaultSubmittedValues: TransformQueryToDSLParams = {
 
 const columnDefinitions: ColumnDefinition<MaterialSample>[] = [
   {
-    accessor: "materialSampleName",
-    indexPath: "data.attributes.materialSampleName.keyword"
+    label: "materialSampleName",
+    accessor: "data.attributes.materialSampleName",
+    keyword: true
   },
   {
-    accessor: "materialSampleType",
-    indexPath: "data.attributes.materialSampleType.keyword"
+    label: "materialSampleType",
+    accessor: "data.attributes.materialSampleType",
+    keyword: true
   },
   {
-    accessor: "collection.name",
-    indexPath: "included.attributes.name.keyword",
+    label: "collection.name",
+    accessor: "included.attributes.name",
+    keyword: true,
     relationshipType: "collection"
   }
 ];

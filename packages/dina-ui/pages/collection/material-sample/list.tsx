@@ -28,36 +28,45 @@ export interface SampleListLayoutProps {
 export const getColumnDefinition = () => {
   return [
     {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
+      Cell: ({ original: { id, data } }) => (
         <a href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+          {data.attributes.materialSampleName ||
+            data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
         </a>
       ),
-      accessor: "materialSampleName",
-      indexPath: "data.attributes.materialSampleName.keyword"
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      keyword: true
     },
     {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
+      Cell: ({ original: { included } }) =>
+        included.collection?.id ? (
+          <Link
+            href={`/collection/collection/view?id=${included?.collection?.id}`}
+          >
+            {included?.collection?.name}
           </Link>
         ) : null,
-      accessor: "collection.name",
-      indexPath: "included.attributes.name.keyword",
-      relationshipType: "collection"
+      label: "collection.name",
+      accessor: "included.attributes.name",
+      relationshipType: "collection",
+      keyword: true
     },
     stringArrayCell(
       "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers.keyword"
+      "data.attributes.dwcOtherCatalogNumbers"
     ),
     {
-      accessor: "materialSampleType",
-      indexPath: "data.attributes.materialSampleType.keyword"
+      label: "materialSampleType",
+      accessor: "data.attributes.materialSampleType",
+      keyword: true
     },
-    { accessor: "createdBy", indexPath: "data.attributes.createdBy.keyword" },
+    {
+      label: "createdBy",
+      accessor: "data.attributes.createdBy",
+      keyword: true
+    },
     dateCell("createdOn", "data.attributes.createdOn")
   ];
 };
