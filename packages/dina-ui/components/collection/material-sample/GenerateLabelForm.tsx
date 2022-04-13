@@ -59,17 +59,18 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
     </ButtonBar>
   );
 
-  const [type, setType] = useState<TemplateType | null>(null);
-
+  const [template, setTemplate] = useState<TemplateType | null>(null);
+  const format = "pdf";
+    console.log(template);
   return (
     <DinaForm<Partial<Template>> initialValues={{}}>
       {buttonBar}
       <div className="row">
         <SelectField
-          className="col-md-3"
+          className="col-md-2"
           name="template"
           options={ATTRIBUTE_TYPE_OPTIONS}
-          onChange={(selectValue: TemplateType) => setType(selectValue)}
+          onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
         />
       </div>
       {buttonBar}
