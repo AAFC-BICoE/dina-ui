@@ -30,8 +30,8 @@ export const getColumnDefinition = () => {
     {
       Cell: ({ original: { id, data } }) => (
         <a href={`/collection/material-sample/view?id=${id}`}>
-          {data.attributes.materialSampleName ||
-            data.attributes.dwcOtherCatalogNumbers?.join?.(", ") ||
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
             id}
         </a>
       ),
@@ -41,11 +41,11 @@ export const getColumnDefinition = () => {
     },
     {
       Cell: ({ original: { included } }) =>
-        included.collection?.id ? (
+        included?.collection?.id ? (
           <Link
             href={`/collection/collection/view?id=${included?.collection?.id}`}
           >
-            {included?.collection?.name}
+            {included?.collection?.attributes?.name}
           </Link>
         ) : null,
       label: "collection.name",
@@ -96,7 +96,29 @@ export function SampleListLayout({
   const [queryKey, setQueryKey] = useState("");
 
   const columns: ColumnDefinition<MaterialSample>[] = [
-    ...getColumnDefinition(),
+    {
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+        </a>
+      ),
+      accessor: "materialSampleName"
+    },
+    {
+      Cell: ({ original: { collection } }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
+          </Link>
+        ) : null,
+      accessor: "collection.name"
+    },
+    stringArrayCell("dwcOtherCatalogNumbers"),
+    { accessor: "materialSampleType" },
+    "createdBy",
+    dateCell("createdOn"),
     ...(onSelect
       ? [
           {

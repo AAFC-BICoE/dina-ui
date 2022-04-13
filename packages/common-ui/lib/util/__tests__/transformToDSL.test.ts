@@ -164,11 +164,11 @@ describe("Transform to DSL query function", () => {
   it("Sorting attributes to DSL query", async () => {
     const sorting: SortingRule[] = [
       {
-        id: "materialSampleName",
+        id: "data.attributes.materialSampleName",
         desc: true
       },
       {
-        id: "materialSampleType",
+        id: "data.attributes.materialSampleType",
         desc: false
       }
     ];
@@ -202,7 +202,7 @@ describe("Transform to DSL query function", () => {
   it("Sorting relationships to DSL query", async () => {
     const sorting: SortingRule[] = [
       {
-        id: "collection.name",
+        id: "included.attributes.name",
         desc: true
       }
     ];

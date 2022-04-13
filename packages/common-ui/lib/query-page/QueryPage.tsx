@@ -140,6 +140,7 @@ export function QueryPage<TData extends KitsuResource>({
     if (!Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
+    // The included section will be transformed from an array to an object with the type name for each relationship.
     searchES(queryDSL)
       .then(result => {
         const processedResult = result?.hits.map(rslt => ({
@@ -148,8 +149,14 @@ export function QueryPage<TData extends KitsuResource>({
           data: {
             attributes: rslt._source?.data?.attributes
           },
-          included: rslt._source?.included
+          included: rslt._source?.included?.reduce(
+            (array, currentIncluded) => (
+              (array[currentIncluded?.type] = currentIncluded), array
+            ),
+            {}
+          )
         }));
+
         setAvailableSamples(processedResult);
         setSearchResults({
           results: processedResult,

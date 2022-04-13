@@ -1124,7 +1124,7 @@ describe("Material Sample Edit Page", () => {
     expect(mockOnSaved).lastCalledWith("11111111-1111-1111-1111-111111111111");
   });
 
-  it("Add the associated sample selected from search result list to a new association  .", async () => {
+  it("Add the associated sample selected from search result list to a new association.", async () => {
     // Mount a new material sample with no values
     const wrapper = mountWithAppContext(
       <MaterialSampleForm onSaved={mockOnSaved} />,
