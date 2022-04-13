@@ -12,6 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import GenerateLabelSection from "packages/dina-ui/components/collection/material-sample/GenerateLabelSection";
 import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import {
   AssociationsField,
@@ -52,20 +53,22 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
+
+  // Get info of highest parent material sample if one exists
   const highestParentId =
     materialSampleQuery.response?.data.parentMaterialSample &&
     materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
-
   const highestParentMaterialSample =
     materialSampleQuery.response?.data.parentMaterialSample &&
     materialSampleQuery.response?.data.hierarchy?.at(-1)?.name;
-
   const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
+
   const colEventQuery = useCollectingEventQuery(
     highestParentId
       ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id
       : materialSampleQuery.response?.data?.collectingEvent?.id
   );
+
   const acqEventQuery = useAcquisitionEvent(
     materialSampleQuery.response?.data?.acquisitionEvent?.id
   );
@@ -87,11 +90,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
         <a className="btn btn-primary">
           <DinaMessage id="duplicate" />
-        </a>
-      </Link>
-      <Link href={`/collection/material-sample/generate-label?id=${id}`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="generateLabel" />
         </a>
       </Link>
       <Link href={`/collection/material-sample/revisions?id=${id}`}>
@@ -222,6 +220,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}
+              <div className="mb-3">
+                <div className="col-md-6">
+                  <GenerateLabelSection
+                  title={<DinaMessage id="materialSampleAttachments" />}
+                  />
+                </div>
+              </div>
               <div className="row">
                 <div className="col-md-6">
                   <ManagedAttributesEditor
