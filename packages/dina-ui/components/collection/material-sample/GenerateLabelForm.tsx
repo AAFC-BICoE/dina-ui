@@ -2,11 +2,13 @@ import {
   ButtonBar,
   BackButton,
   SelectField,
-  DinaForm
+  DinaForm,
+  TextField
 } from "packages/common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import React from "react";
+import { useState } from "react";
 
 export interface GenerateLabelFormProps {}
 
@@ -47,6 +49,7 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
+  
   const buttonBar = (
     <ButtonBar className="flex">
       <BackButton
@@ -58,17 +61,26 @@ function GenerateLabelForm({}: GenerateLabelFormProps) {
       </a>
     </ButtonBar>
   );
+
+  const [type, setType] = useState<TemplateType | null>(null);
+  
   return (
     <DinaForm<Partial<Template>> initialValues={{}}>
       {buttonBar}
       <div className="row">
       <SelectField
-        className="col-md-2"
+        className="col-md-3"
         name="template"
         options={ATTRIBUTE_TYPE_OPTIONS}
-        //   onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
+          onChange={(selectValue: TemplateType) => setType(selectValue)}
       />
     </div>
+    <div className="row">
+        <TextField
+          className="col-md-3"
+          name="name"
+        />
+      </div>
       {buttonBar}
     </DinaForm>
   );
