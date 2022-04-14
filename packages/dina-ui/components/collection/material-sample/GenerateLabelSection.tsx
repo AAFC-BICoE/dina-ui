@@ -5,6 +5,7 @@ import {
   DinaForm,
   TextField,
   FieldSet,
+  SubmitButton,
 } from "packages/common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
@@ -77,9 +78,7 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
             onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
           />
           {template && (
-            <a className="btn btn-primary flex">
-              <DinaMessage id="generateLabel" />
-            </a>
+            <SubmitButton className="my-auto"><DinaMessage id="generateLabel"/></SubmitButton>
           )}
         </div>
       </DinaForm>

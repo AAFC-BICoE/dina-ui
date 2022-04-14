@@ -147,6 +147,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <TagsAndRestrictionsSection />
                 <ProjectSelectSection />
               </div>
+              <div className="mb-3">
+                <div className="col-md-6">
+                  <GenerateLabelSection
+                  title={<DinaMessage id="generateLabel" />}
+                  />
+                </div>
+              </div>
               <MaterialSampleIdentifiersSection />
               {materialSample.parentMaterialSample && (
                 <SamplesView
@@ -220,13 +227,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {!!materialSample?.scheduledActions?.length && (
                 <ScheduledActionsField />
               )}
-              <div className="mb-3">
-                <div className="col-md-6">
-                  <GenerateLabelSection
-                  title={<DinaMessage id="materialSampleAttachments" />}
-                  />
-                </div>
-              </div>
               <div className="row">
                 <div className="col-md-6">
                   <ManagedAttributesEditor
