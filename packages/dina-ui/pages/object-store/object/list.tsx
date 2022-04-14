@@ -6,8 +6,7 @@ import {
   filterBy,
   QueryPage,
   SplitPagePanel,
-  useQuery,
-  withResponse
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
 import { Component, useMemo, useState } from "react";
@@ -69,25 +68,34 @@ export default function MetadataListPage() {
       fileIdentifierField: "fileIdentifier"
     }),
     {
-      Cell: ({ original: { id, originalFilename } }) =>
-        originalFilename ? (
+      Cell: ({ original: { id, data } }) =>
+        data?.attributes?.originalFilename ? (
           <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
-            {originalFilename}
+            {data?.attributes?.originalFilename}
           </a>
         ) : null,
-      accessor: "originalFilename"
+      label: "originalFilename",
+      accessor: "data.attributes.originalFilename",
+      keyword: true
     },
-    "acCaption",
-    dateCell("acDigitizationDate"),
-    dateCell("xmpMetadataDate"),
     {
-      accessor: "acMetadataCreator.displayName",
+      label: "acCaption",
+      accessor: "data.attributes.acCaption",
+      keyword: true
+    },
+    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    {
+      Cell: ({ original: { included } }) => (
+        <>{included?.acMetadataCreator?.attributes?.displayName}</>
+      ),
+      label: "acMetadataCreator.displayName",
+      relationshipType: "person",
+      accessor: "included.attributes.displayName",
+      keyword: true,
       sortable: false
     },
-    {
-      Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
-      accessor: "acTags"
-    },
+    stringArrayCell("acTags", "data.attributes.acTags"),
     {
       Cell: ({ original }) => (
         <div className="d-flex h-100">
