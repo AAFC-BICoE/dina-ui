@@ -60,9 +60,15 @@ export function FileView({
 
   const showFile = !isSpreadsheet;
 
-  const fileId = filePath.split("/").at(-1);
+  // split file path into array
+  const filePathArray = filePath.split("/");
+
+  // fileId is last element of array
+  const fileId = filePathArray[filePathArray.length - 1];
   const isDerivative = filePath.includes("derivative").toString();
-  const fileBucket = filePath.split("/").at(4);
+  const fileBucket = filePathArray[4];
+  
+  // build link to image-viewer page
   const imageViewerLink = `/object-store/image-viewer?bucket=${fileBucket}&isDerivative=${isDerivative}&fileId=${fileId}`;
   
 
