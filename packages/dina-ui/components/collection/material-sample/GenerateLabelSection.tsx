@@ -76,9 +76,11 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
             options={ATTRIBUTE_TYPE_OPTIONS}
             onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
           />
-          {template && <a className="btn btn-primary col-md-2">
-            <DinaMessage id="generateLabel" />
-          </a>}
+          {template && (
+            <a className="btn btn-primary flex">
+              <DinaMessage id="generateLabel" />
+            </a>
+          )}
         </div>
       </DinaForm>
     </FieldSet>
