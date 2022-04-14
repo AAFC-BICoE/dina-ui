@@ -15,8 +15,33 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
-/** Object types accepted as a column definition. */
-export type ColumnDefinition<TData> = string | Column<TData>;
+/**
+ * Column props with extra props designed specifically for our application on top of it.
+ *
+ * If a type of string is provided, it should just create a ColumnDefinition with accessor only.
+ */
+export type ColumnDefinition<TData> =
+  | (Column<TData> & ElasticSearchColumnProps & InternationalizationProps)
+  | string;
+
+export interface InternationalizationProps {
+  /**
+   * Key used to retrieve the label value from internationalization.
+   */
+  label?: string;
+}
+
+export interface ElasticSearchColumnProps {
+  /**
+   * For elastic search operations, should .keyword appended to the accessor.
+   */
+  keyword?: boolean;
+
+  /**
+   * The relationship type the elastic search field is part of.
+   */
+  relationshipType?: string;
+}
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
@@ -104,6 +129,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
+
   // JSONAPI page spec.
   const [page, setPage] = useState<LimitOffsetPageSpec>({
     limit: defaultPageSize,

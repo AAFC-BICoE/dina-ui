@@ -1,8 +1,8 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState, useMemo } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { Column, TableProps, SortingRule } from "react-table";
-import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
+import ReactTable, { TableProps, SortingRule } from "react-table";
+import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
@@ -19,7 +19,6 @@ import {
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
-import { useQuery, withResponse } from "../api-client/useQuery";
 import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
@@ -35,7 +34,13 @@ import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
 
-const DEFAULT_PAGE_SIZE = 25;
+const DEFAULT_PAGE_SIZE: number = 25;
+const DEFAULT_SORT: SortingRule[] = [
+  {
+    id: "createdOn",
+    desc: true
+  }
+];
 
 interface SearchResultData<TData extends KitsuResource> {
   results: TData[];
@@ -63,6 +68,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
+
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
@@ -77,10 +83,15 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage } = useIntl();
   const { username, subject } = useAccount();
   const { groupNames } = useAccount();
+
+  // Query Page error message state
+  const [error, setError] = useState<any>();
+
+  // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
-  // JSONAPI sort attribute.
-  const [sortingRules, setSortingRules] = useState(defaultSort);
+  // JSON API sort attribute.
+  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // Search results with pagination applied.
   const [searchResults, setSearchResults] = useState<SearchResultData<TData>>({
@@ -88,7 +99,7 @@ export function QueryPage<TData extends KitsuResource>({
     total: 0
   });
 
-  // JSONAPI pagination specs
+  // JSON API pagination specs
   const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
     limit: DEFAULT_PAGE_SIZE,
     offset: 0
@@ -112,30 +123,50 @@ export function QueryPage<TData extends KitsuResource>({
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
 
-  // Fetch data if the pagination or search filters have changed.
+  // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    // Reset any error messages since we are trying again.
+    setError(undefined);
+
     // Elastic search query with pagination settings.
-    const queryDSL = transformQueryToDSL(pagination, cloneDeep(searchFilters));
+    const queryDSL = transformQueryToDSL(
+      pagination,
+      columns,
+      sortingRules,
+      cloneDeep(searchFilters)
+    );
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
-    searchES(queryDSL).then(result => {
-      const processedResult = result?.hits
-        .map(hit => hit._source?.data)
-        .map(rslt => ({
-          id: rslt.id,
-          type: rslt.type,
-          ...rslt.attributes
+    // The included section will be transformed from an array to an object with the type name for each relationship.
+    searchES(queryDSL)
+      .then(result => {
+        const processedResult = result?.hits.map(rslt => ({
+          id: rslt._source?.data?.id,
+          type: rslt._source?.data?.type,
+          data: {
+            attributes: rslt._source?.data?.attributes
+          },
+          included: rslt._source?.included?.reduce(
+            (array, currentIncluded) => (
+              (array[currentIncluded?.type] = currentIncluded), array
+            ),
+            {}
+          )
         }));
-      setAvailableSamples(processedResult);
-      setSearchResults({
-        results: processedResult,
-        total: result?.total.value
+
+        setAvailableSamples(processedResult);
+        setSearchResults({
+          results: processedResult,
+          total: result?.total.value
+        });
+      })
+      .catch(elasticSearchError => {
+        setError(elasticSearchError);
       });
-    });
-  }, [pagination, searchFilters]);
+  }, [pagination, searchFilters, sortingRules]);
 
   // Retrieve user preferences only once.
   useEffect(() => {
@@ -157,6 +188,9 @@ export function QueryPage<TData extends KitsuResource>({
             response.data[0].savedSearches?.[username as any].default
           );
         }
+      })
+      .catch(userPreferenceError => {
+        setError(userPreferenceError);
       });
   }, [userPreferences]);
 
@@ -200,7 +234,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
-  const combinedColumns = [
+  const combinedColumns: ColumnDefinition<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
@@ -216,8 +250,7 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const mappedColumns = combinedColumns.map<Column>(column => {
-    // The "columns" prop can be a string or a react-table Column type.
+  const mappedColumns = combinedColumns.map(column => {
     const { fieldName, customHeader } =
       typeof column === "string"
         ? {
@@ -226,7 +259,7 @@ export function QueryPage<TData extends KitsuResource>({
           }
         : {
             customHeader: column.Header,
-            fieldName: String(column.accessor)
+            fieldName: String(column.label)
           };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
@@ -243,6 +276,7 @@ export function QueryPage<TData extends KitsuResource>({
       group: groupNames?.[0]
     };
     formik?.setValues(resetToVal);
+    setError(undefined);
     onSubmit({ submittedValues: resetToVal });
   }
 
@@ -273,6 +307,18 @@ export function QueryPage<TData extends KitsuResource>({
       offset: 0,
       limit: newPageSize
     });
+  }
+
+  /**
+   * When the user changes the react-table page sort, it will trigger this event.
+   *
+   * This method will cause the useEffect with the search to trigger if the sorting has changed.
+   */
+  function onSortChange(newSort: SortingRule[]) {
+    setSortingRules(newSort);
+
+    // Trigger the prop event listener.
+    onSortedChange?.(newSort);
   }
 
   /**
@@ -361,20 +407,12 @@ export function QueryPage<TData extends KitsuResource>({
     return result;
   }
 
-  const savedSearchQuery = useQuery<UserPreference[]>({
-    path: "user-api/user-preference",
-    filter: {
-      userId: subject as FilterParam
-    },
-    page: { limit: 1000 }
-  });
-
   // Invalidate the query cache on query change, don't use SWR's built-in cache:
   const cacheId = useMemo(() => uuidv4(), []);
 
   const {
     data,
-    error,
+    error: indexError,
     isValidating: loading
   } = useSWR<ESIndexMapping[], any>(
     [indexName, cacheId],
@@ -385,6 +423,9 @@ export function QueryPage<TData extends KitsuResource>({
       revalidateOnReconnect: false
     }
   );
+  if (indexError) {
+    setError(indexError);
+  }
 
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
@@ -489,6 +530,9 @@ export function QueryPage<TData extends KitsuResource>({
           page={pagination.offset / pagination.limit}
           onPageChange={onPageChange}
           onPageSizeChange={onPageSizeChange}
+          // Sorting props
+          onSortedChange={onSortChange}
+          sorted={sortingRules}
           TbodyComponent={
             error
               ? () => (
@@ -506,9 +550,9 @@ export function QueryPage<TData extends KitsuResource>({
                       type="button"
                       className="btn btn-primary"
                       onClick={() => {
-                        const newSort = [{ id: "createdOn", desc: true }];
-                        onSortedChange?.(newSort);
-                        setSortingRules(newSort);
+                        const newSort = defaultSort ?? DEFAULT_SORT;
+                        setError(undefined);
+                        onSortChange(newSort);
                       }}
                     >
                       <CommonMessage id="resetSort" />
