@@ -70,7 +70,7 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
       }
     >
       <DinaForm<Partial<Template>> initialValues={{}}>
-        <div className="row">
+        <div className="row gap-2 align-items-end">
           <SelectField
             className="col-md-4"
             name="template"
@@ -78,7 +78,7 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
             onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
           />
           {template && (
-            <SubmitButton className="my-auto"><DinaMessage id="generateLabel"/></SubmitButton>
+            <SubmitButton className="mb-3"><DinaMessage id="generateLabel"/></SubmitButton>
           )}
         </div>
       </DinaForm>
