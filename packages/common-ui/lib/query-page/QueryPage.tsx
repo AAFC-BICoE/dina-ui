@@ -1,10 +1,10 @@
-import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
-import { useState, useMemo } from "react";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule } from "react-table";
+import ReactTable, { TableProps, SortingRule, Column } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
+import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
@@ -18,18 +18,14 @@ import {
   BulkEditButton
 } from "../../lib/list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
-import { Tooltip } from "../tooltip/Tooltip";
 import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
-import { ESIndexMapping } from "../query-builder/QueryRow";
-import useSWR from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
+import { MultiSortTooltip } from "./MultiSortTooltip";
 import { cloneDeep } from "lodash";
-import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
-import { UserPreference } from "../../../dina-ui/types/user-api";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { useEffect } from "react";
@@ -42,23 +38,54 @@ const DEFAULT_SORT: SortingRule[] = [
   }
 ];
 
-interface SearchResultData<TData extends KitsuResource> {
-  results: TData[];
-  total: number;
+export interface TableColumn {
+  /**
+   * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
+   */
+  label: string;
+
+  /**
+   * Elastic search path to the attribute.
+   *
+   * Example: data.attributes.name
+   */
+  attributePath: string;
+
+  /**
+   * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
+   */
+  isKeyword: boolean;
 }
 
 export interface QueryPageProps<TData extends KitsuResource> {
+  /**
+   * Columns to render on the table. This will also be used to map the data to a specific column.
+   */
   columns: ColumnDefinition<TData>[];
+
+  /**
+   * Used for the listing page to understand which columns can be provided. Filters are generated
+   * based on the index provided.
+   */
   indexName: string;
+
+  /**
+   * By default, the QueryPage will try sorting using "createdOn" attribute. You can override this
+   * setting by providing your own default sort.
+   */
   defaultSort?: SortingRule[];
-  /** Adds the bulk edit button and the row checkboxes. */
+
+  /**
+   * Adds the bulk edit button and the row checkboxes.
+   */
   bulkEditPath?: (ids: string[]) => {
     pathname: string;
     query: Record<string, string>;
   };
+
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
-  omitPaging?: boolean;
+
   reactTableProps?:
     | Partial<TableProps>
     | ((
@@ -66,46 +93,45 @@ export interface QueryPageProps<TData extends KitsuResource> {
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
       ) => Partial<TableProps>);
 
+  /**
+   * Event prop triggered when the user changes the sort settings.
+   *
+   * @param SortingRule[] rules for sorting. Contains the id (column name) and
+   *        sorting order.
+   */
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
 
+/**
+ * Top level component for displaying an elastic-search listing page.
+ *
+ * The following features are supported with the QueryPage:
+ *
+ * * Pagination
+ * * Sorting
+ * * Filtering using ElasticSearch Indexing
+ * * Saved Searches
+ */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
-  omitPaging,
   reactTableProps,
   defaultSort,
   onSortedChange
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
-  const { username, subject } = useAccount();
   const { groupNames } = useAccount();
 
-  // Query Page error message state
-  const [error, setError] = useState<any>();
+  // Search results returned by Elastic Search
+  const [searchResults, setSearchResults] = useState<TData[]>([]);
 
-  // Row Checkbox Toggle
-  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+  // Total number of records from the query. This is not the total displayed on the screen.
+  const [totalRecords, setTotalRecords] = useState<number>(0);
 
-  // JSON API sort attribute.
-  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
-
-  // Search results with pagination applied.
-  const [searchResults, setSearchResults] = useState<SearchResultData<TData>>({
-    results: [],
-    total: 0
-  });
-
-  // JSON API pagination specs
-  const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
-    limit: DEFAULT_PAGE_SIZE,
-    offset: 0
-  });
-
-  // Search filters to apply.
+  // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
     {
       group: groupNames?.[0] ?? "",
@@ -117,11 +143,20 @@ export function QueryPage<TData extends KitsuResource>({
     }
   );
 
-  // Saved search dropdown options
-  const [userPreferences, setUserPreferences] = useState<UserPreference[]>([]);
+  // User applied sorting rules for elastic search to use.
+  const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
-  // Selected saved search for the saved search dropdown.
-  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
+  // User applied pagination rules for elastic search to use.
+  const [pagination, setPagination] = useState<LimitOffsetPageSpec>({
+    limit: DEFAULT_PAGE_SIZE,
+    offset: 0
+  });
+
+  // Row Checkbox Toggle
+  const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
+
+  // Query Page error message state
+  const [error, setError] = useState<any>();
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
@@ -158,41 +193,13 @@ export function QueryPage<TData extends KitsuResource>({
         }));
 
         setAvailableSamples(processedResult);
-        setSearchResults({
-          results: processedResult,
-          total: result?.total.value
-        });
+        setSearchResults(processedResult);
+        setTotalRecords(result?.total?.value ?? 0);
       })
       .catch(elasticSearchError => {
         setError(elasticSearchError);
       });
   }, [pagination, searchFilters, sortingRules]);
-
-  // Retrieve user preferences only once.
-  useEffect(() => {
-    // Retrieve user preferences...
-    apiClient
-      .get<UserPreference[]>("user-api/user-preference", {
-        filter: {
-          userId: subject as FilterParam
-        },
-        page: { limit: 1000 }
-      })
-      .then(response => {
-        setUserPreferences(response.data);
-
-        // If the user has a default search, use it.
-        if (response.data?.[0]?.savedSearches?.[username as any].default) {
-          setSelectedSavedSearch("default");
-          setSearchFilters(
-            response.data[0].savedSearches?.[username as any].default
-          );
-        }
-      })
-      .catch(userPreferenceError => {
-        setError(userPreferenceError);
-      });
-  }, [userPreferences]);
 
   /**
    * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
@@ -221,13 +228,13 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
-    defaultAvailableItems: searchResults.results ?? []
+    defaultAvailableItems: searchResults ?? []
   });
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(
-          searchResults.results as PersistedResource<TData>[],
+          searchResults as PersistedResource<TData>[],
           CheckBoxField
         )
       : reactTableProps;
@@ -346,94 +353,9 @@ export function QueryPage<TData extends KitsuResource>({
    * When the saved search is loading data, we need to save the new loaded search and cause a
    * re-render.
    */
-  function onSavedSearchLoad(savedSearchName, savedSearchData) {
+  function onSavedSearchLoad(savedSearchData) {
     setSearchFilters(savedSearchData);
-    setSelectedSavedSearch(savedSearchName);
   }
-
-  const totalCount = searchResults.total;
-
-  async function fetchQueryFieldsByIndex(searchIndexName) {
-    const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-      params: { indexName: searchIndexName }
-    });
-
-    const result: ESIndexMapping[] = [];
-
-    // Read index attributes.
-    resp.data.body?.attributes
-      ?.filter(key => key.name !== "type")
-      .map(key => {
-        const path = key.path;
-        const prefix = "data.attributes";
-        let attrPrefix;
-        if (path && path.includes(prefix)) {
-          attrPrefix = path.substring(prefix.length + 1);
-        }
-        result.push({
-          label: attrPrefix ? attrPrefix + "." + key.name : key.name,
-          value: key.path
-            ? key.path + "." + key.name
-            : key.name === "id"
-            ? "data." + key.name
-            : key.name,
-          type: key.type,
-          path: key.path
-        });
-      });
-
-    // Read relationship attributes.
-    resp.data.body?.relationships?.map(relationship => {
-      relationship?.attributes?.map(relationshipAttribute => {
-        // This is the user-friendly label to display on the search dropdown.
-        const attributeLabel = relationshipAttribute.path?.includes(".")
-          ? relationshipAttribute.path.substring(
-              relationshipAttribute.path.indexOf(".") + 1
-            ) +
-            "." +
-            relationshipAttribute.name
-          : relationshipAttribute.name;
-
-        result.push({
-          label: attributeLabel,
-          value: relationship.path + "." + attributeLabel,
-          type: relationshipAttribute.type,
-          path: relationshipAttribute.path,
-          parentName: relationship.value,
-          parentPath: relationship.path
-        });
-      });
-    });
-    return result;
-  }
-
-  // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), []);
-
-  const {
-    data,
-    error: indexError,
-    isValidating: loading
-  } = useSWR<ESIndexMapping[], any>(
-    [indexName, cacheId],
-    fetchQueryFieldsByIndex,
-    {
-      shouldRetryOnError: true,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
-  if (indexError) {
-    setError(indexError);
-  }
-
-  const sortedData = data
-    ?.sort((a, b) => a.label.localeCompare(b.label))
-    .filter(prop => !prop.label.startsWith("group"));
-
-  const initialSavedSearches = userPreferences?.[0]?.savedSearches?.[
-    username as any
-  ] as any;
 
   return (
     <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
@@ -442,32 +364,17 @@ export function QueryPage<TData extends KitsuResource>({
       >
         <DinaMessage id="search" />
       </label>
-      <QueryBuilder name="queryRows" esIndexMapping={sortedData} />
-      <DinaFormSection horizontal={"flex"}>
-        <GroupSelectField
-          isMulti={true}
-          name="group"
-          className="col-md-4"
-          onChange={(value, formik) => {
-            const currentSubmittedValues = cloneDeep(formik.values);
-            onSubmit({
-              submittedValues: { ...currentSubmittedValues, group: value }
-            });
-          }}
-        />
-      </DinaFormSection>
+
+      {/* Query Filtering Options */}
+      <QueryBuilder
+        name="queryRows"
+        indexName={indexName}
+        onGroupChange={onSubmit}
+      />
 
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
-          <SavedSearch
-            onSavedSearchLoad={onSavedSearchLoad}
-            userPreferences={userPreferences}
-            savedSearchNames={
-              initialSavedSearches ? Object.keys(initialSavedSearches) : []
-            }
-            initialSavedSearches={initialSavedSearches}
-            selectedSearch={selectedSavedSearch}
-          />
+          <SavedSearch onSavedSearchLoad={onSavedSearchLoad} />
         </div>
         <div>
           <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
@@ -482,57 +389,48 @@ export function QueryPage<TData extends KitsuResource>({
         aria-label={formatMessage({ id: "queryTable" })}
       >
         <div className="mb-1">
-          {!omitPaging && (
-            <div className="d-flex align-items-end">
-              <span id="queryPageCount">
-                <CommonMessage id="tableTotalCount" values={{ totalCount }} />
-              </span>
-              {resolvedReactTableProps?.sortable !== false && (
-                <div className="flex-grow-1">
-                  <Tooltip
-                    id="queryTableMultiSortExplanation"
-                    visibleElement={
-                      <a
-                        href="#"
-                        aria-describedby={"queryTableMultiSortExplanation"}
-                      >
-                        <CommonMessage id="queryTableMultiSortTooltipTitle" />
-                      </a>
-                    }
-                  />
-                </div>
+          <div className="d-flex align-items-end">
+            <span id="queryPageCount">
+              <CommonMessage id="tableTotalCount" values={{ totalRecords }} />
+            </span>
+
+            {/* Multi sort tooltip - Only shown if it's possible to sort */}
+            {resolvedReactTableProps?.sortable !== false && (
+              <MultiSortTooltip />
+            )}
+
+            <div className="d-flex gap-3">
+              {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+              {bulkDeleteButtonProps && (
+                <BulkDeleteButton {...bulkDeleteButtonProps} />
               )}
-              <div className="d-flex gap-3">
-                {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
-                {bulkDeleteButtonProps && (
-                  <BulkDeleteButton {...bulkDeleteButtonProps} />
-                )}
-              </div>
             </div>
-          )}
+          </div>
         </div>
         <ReactTable
-          className="-striped"
+          // Column and data props
           columns={mappedColumns}
-          data={searchResults.results}
+          data={searchResults}
           minRows={1}
-          {...resolvedReactTableProps}
+          // Pagination props
+          manual={true}
+          pageSize={pagination.limit}
+          pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
+          page={pagination.offset / pagination.limit}
+          onPageChange={onPageChange}
+          onPageSizeChange={onPageSizeChange}
           pageText={<CommonMessage id="page" />}
           noDataText={<CommonMessage id="noRowsFound" />}
           ofText={<CommonMessage id="of" />}
           rowsText={formatMessage({ id: "rows" })}
           previousText={<CommonMessage id="previous" />}
           nextText={<CommonMessage id="next" />}
-          // Pagination props
-          manual={true}
-          pageSize={pagination.limit}
-          pages={totalCount ? Math.ceil(totalCount / pagination.limit) : 0}
-          page={pagination.offset / pagination.limit}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
           // Sorting props
           onSortedChange={onSortChange}
           sorted={sortingRules}
+          // Table customization props
+          {...resolvedReactTableProps}
+          className="-striped"
           TbodyComponent={
             error
               ? () => (
