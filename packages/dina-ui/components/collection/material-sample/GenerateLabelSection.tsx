@@ -75,10 +75,10 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   async function generateLabel(data, template) {
     // axios post request
     const resp = await apiClient.axios.post(
-      `http://localhost:7981/labels/v1.0/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
+      `/reports-labels-api/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
       data
     );
-
+    
     // POST request using fetch with async/await
     // const requestOptions = {
     //   method: "POST",
