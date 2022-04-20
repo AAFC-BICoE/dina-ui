@@ -11,6 +11,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { ReactNode, useState } from "react";
+import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
 
 export type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
 
@@ -43,6 +44,7 @@ type Template<TComponent = string> = TemplateAttributes<TComponent>;
 export interface GenerateLabelSectionProps {
   title?: ReactNode;
 }
+
 function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   const { formatMessage } = useDinaIntl();
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
@@ -53,12 +55,24 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   const format = "pdf";
   const data = [
     {
-      catalogNumber: "http://coll.mfn-berlin.de/u/ZMB_Phasm_D001",
+      catalogNumber: "coll.mfn-berlin.de/u/ZMB_Phasm_D001",
       rejuv_date: "1998-05-19",
       host: "hostData",
+      rootstock: "rootstockData",
+      location: "locationData",
       variety: "varietyData",
     },
   ];
+
+  const { apiClient } = useApiClient();
+
+  async function generateLabel(data, template) {
+    const resp = await apiClient.axios.post(
+      `http://localhost:7981/labels/v1.0/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
+      data
+    );
+    
+  }
 
   return (
     <FieldSet
@@ -78,7 +92,15 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
             onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
           />
           {template && (
-            <SubmitButton className="mb-3"><DinaMessage id="generateLabel"/></SubmitButton>
+            <button
+              type="button"
+              className="btn btn-primary mb-3 "
+              style={{ width: "10rem" }}
+              onClick={() => generateLabel(data, template)}
+            >
+              <DinaMessage id="generateLabel" />
+            </button>
+            // <SubmitButton className="mb-3"><DinaMessage id="generateLabel"/></SubmitButton>
           )}
         </div>
       </DinaForm>
