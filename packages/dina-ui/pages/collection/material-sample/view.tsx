@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import GenerateLabelSection from "packages/dina-ui/components/collection/material-sample/GenerateLabelSection";
+import {GenerateLabelSection} from "packages/dina-ui/components/collection/material-sample/GenerateLabelSection";
 import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import {
   AssociationsField,

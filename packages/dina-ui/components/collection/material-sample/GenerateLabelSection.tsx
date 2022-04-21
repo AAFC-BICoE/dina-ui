@@ -45,7 +45,7 @@ export interface GenerateLabelSectionProps {
   title?: ReactNode;
 }
 
-function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
+export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   const { formatMessage } = useDinaIntl();
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
@@ -115,5 +115,3 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
     </FieldSet>
   );
 }
-
-export default GenerateLabelSection;
