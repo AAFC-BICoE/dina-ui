@@ -73,10 +73,13 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
    */
   async function generateLabel(data, template) {
     // axios post request
-    const resp = await apiClient.axios.post(
-      `/reports-labels-api/labels/v1.0/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
-      data
-    );
+    await apiClient.axios.post(
+      `/reports-labels-api/labels/v1.0/?template=${template}&format=pdf`,
+      data,
+      {responseType: 'blob'}
+    ).then((response) => {
+      window.open(URL.createObjectURL(response.data));
+    })
   }
 
   return (
