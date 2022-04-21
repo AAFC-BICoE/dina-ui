@@ -5,14 +5,14 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  withResponse
+  withResponse,
 } from "common-ui";
 import { Field } from "formik";
 import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import {GenerateLabelSection} from "packages/dina-ui/components/collection/material-sample/GenerateLabelSection";
+import { GenerateLabelSection } from "../../../../dina-ui/components/collection/material-sample/GenerateLabelSection";
 import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import {
   AssociationsField,
@@ -37,13 +37,13 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent
+  useAcquisitionEvent,
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
 
@@ -115,18 +115,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const materialSample = withOrganismEditorValues(materialSampleData);
 
         const hasPreparations = PREPARATION_FIELDS.some(
-          fieldName => !isEmpty(materialSample[fieldName])
+          (fieldName) => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          org => !isEmpty(org)
+          (org) => !isEmpty(org)
         );
 
         /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
-            fieldName => materialSample.hostOrganism?.[fieldName]
+            (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
         return (
@@ -150,7 +150,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               <div className="mb-3">
                 <div className="col-md-6">
                   <GenerateLabelSection
-                  title={<DinaMessage id="generateLabel" />}
+                    title={<DinaMessage id="generateLabel" />}
                   />
                 </div>
               </div>
@@ -233,7 +233,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     fieldSetProps={{
                       legend: (
                         <DinaMessage id="materialSampleManagedAttributes" />
-                      )
+                      ),
                     }}
                     valuesPath="managedAttributes"
                     managedAttributeApiPath="collection-api/managed-attribute"

@@ -87,7 +87,6 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
       legend={
         <>
           {title ?? <DinaMessage id="generateLabel" />}{" "}
-          {/* <TotalAttachmentsIndicator attachmentPath={attachmentPath} /> */}
         </>
       }
     >
