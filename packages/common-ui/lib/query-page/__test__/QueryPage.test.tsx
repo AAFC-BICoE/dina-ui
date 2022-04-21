@@ -63,7 +63,7 @@ const TEST_GROUP: PersistedResource<Group>[] = [
 
 const USER_PREFERENCE = {
   data: [],
-  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
 };
 
 // Mock elastic search data to use with the query page.
@@ -71,7 +71,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
     hits: {
       total: {
-        value: 1,
+        value: 1
       },
       hits: [
         {
@@ -101,8 +101,8 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
                 hierarchy: [
                   {
                     uuid: "09a256c7-56c8-424b-8013-0590e16e39cb",
-                    rank: 1,
-                  },
+                    rank: 1
+                  }
                 ],
                 host: null,
                 barcode: null,
@@ -117,19 +117,19 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
                 allowDuplicateName: false,
                 restrictionFieldsExtension: null,
                 isRestricted: false,
-                restrictionRemarks: null,
+                restrictionRemarks: null
               },
               relationships: {
                 collectingEvent: {
-                  data: null,
-                },
-              },
-            },
-          },
-        },
-      ],
-    },
-  },
+                  data: null
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
 };
 
 const mockGet = jest.fn<any, any>(async path => {
@@ -245,6 +245,13 @@ describe("QueryPage component", () => {
       {
         from: 0,
         size: 25,
+        sort: [
+          {
+            createdOn: {
+              order: "desc"
+            }
+          }
+        ],
         query: {
           bool: {
             filter: {
@@ -268,21 +275,28 @@ describe("QueryPage component", () => {
       {
         size: 25,
         from: 0,
+        sort: [
+          {
+            createdOn: {
+              order: "desc"
+            }
+          }
+        ],
         query: {
           bool: {
             filter: { term: { "data.attributes.group": "cnc" } },
             must: [
               { term: { "data.attributes.createdOn": "2022-01-25" } },
-              { term: { "data.attributes.publiclyReleasable": "false" } },
-            ],
-          },
-        },
+              { term: { "data.attributes.publiclyReleasable": "false" } }
+            ]
+          }
+        }
       },
       {
         params: {
-          indexName: "testIndex",
-        },
-      },
+          indexName: "testIndex"
+        }
+      }
     ]);
   });
 });

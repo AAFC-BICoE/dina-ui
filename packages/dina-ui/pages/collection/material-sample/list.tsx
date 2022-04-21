@@ -1,5 +1,6 @@
 import {
   ButtonBar,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
@@ -27,28 +28,46 @@ export interface SampleListLayoutProps {
 export const getColumnDefinition = () => {
   return [
     {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
+      Cell: ({ original: { id, data } }) => (
         <a href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
         </a>
       ),
-      accessor: "materialSampleName"
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      keyword: true
     },
     {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
+      Cell: ({ original: { included } }) =>
+        included?.collection?.id ? (
+          <Link
+            href={`/collection/collection/view?id=${included?.collection?.id}`}
+          >
+            {included?.collection?.attributes?.name}
           </Link>
         ) : null,
-      accessor: "collection.name"
+      label: "collection.name",
+      accessor: "included.attributes.name",
+      relationshipType: "collection",
+      keyword: true
     },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn")
+    stringArrayCell(
+      "dwcOtherCatalogNumbers",
+      "data.attributes.dwcOtherCatalogNumbers"
+    ),
+    {
+      label: "materialSampleType",
+      accessor: "data.attributes.materialSampleType",
+      keyword: true
+    },
+    {
+      label: "createdBy",
+      accessor: "data.attributes.createdBy",
+      keyword: true
+    },
+    dateCell("createdOn", "data.attributes.createdOn")
   ];
 };
 
@@ -76,8 +95,30 @@ export function SampleListLayout({
 
   const [queryKey, setQueryKey] = useState("");
 
-  const columns = [
-    ...getColumnDefinition(),
+  const columns: ColumnDefinition<MaterialSample>[] = [
+    {
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+        </a>
+      ),
+      accessor: "materialSampleName"
+    },
+    {
+      Cell: ({ original: { collection } }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
+          </Link>
+        ) : null,
+      accessor: "collection.name"
+    },
+    stringArrayCell("dwcOtherCatalogNumbers"),
+    { accessor: "materialSampleType" },
+    "createdBy",
+    dateCell("createdOn"),
     ...(onSelect
       ? [
           {
