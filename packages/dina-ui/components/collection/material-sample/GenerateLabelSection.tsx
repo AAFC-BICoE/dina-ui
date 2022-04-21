@@ -52,7 +52,6 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   );
 
   const [template, setTemplate] = useState<TemplateType | null>(null);
-  const format = "pdf";
   const data = [
     {
       catalogNumber: "coll.mfn-berlin.de/u/ZMB_Phasm_D001",
@@ -75,21 +74,9 @@ function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   async function generateLabel(data, template) {
     // axios post request
     const resp = await apiClient.axios.post(
-      `/reports-labels-api/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
+      `/reports-labels-api/labels/v1.0/?template=AAFC_Zebra_ZT410.twig&format=pdf`,
       data
     );
-    
-    // POST request using fetch with async/await
-    // const requestOptions = {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: data,
-    // };
-    // const response = await fetch(
-    //   "http://localhost:7981/labels/v1.0/?template=AAFC_Zebra_ZT410.twig&format=pdf",
-    //   requestOptions
-    // );
-    // const resp = await response.json();
   }
 
   return (
