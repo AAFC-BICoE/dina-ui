@@ -17,15 +17,22 @@ export interface SavedSearchProps {
    * Event prop triggered when a new saved search is loaded.
    */
   onSavedSearchLoad: (savedSearchData) => void;
+
+  /**
+   * Index name passed from the QueryPage component. Since it doesn't make sense to display saved
+   * searches for all list pages, the index name is used to determine which saved searches should be
+   * displayed and where news one's are created.
+   */
+  indexName: string;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const { onSavedSearchLoad } = props;
+  const { onSavedSearchLoad, indexName } = props;
   const { apiClient } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
-  const { username, subject, groupNames } = useAccount();
+  const { subject, groupNames } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
   const formik = useFormikContext();
 
@@ -56,8 +63,9 @@ export function SavedSearch(props: SavedSearchProps) {
         page: { limit: 1000 }
       })
       .then(response => {
+        // Display the users saved searches for this specific index.
         const options =
-          response?.data?.[0]?.savedSearches?.[username as string] ?? null;
+          response?.data?.[0]?.savedSearches?.[indexName as string] ?? null;
         setSavedSearchOptions(options);
 
         // If the user has a default search, use it.
@@ -81,48 +89,53 @@ export function SavedSearch(props: SavedSearchProps) {
     onSavedSearchLoad(savedSearchSettings);
   }, [loadedSavedSearch]);
 
-  async function saveSearch(isDefault, searchName) {
-    let newSavedSearches;
-    const mySavedSearches = savedSearchOptions;
+  /**
+   * Add a new saved search to the user's preferences. Searches will be saved using the following
+   * format:
+   *
+   * userPreferences.savedSearches.[INDEX_NAME].[SEARCH_NAME]
+   *
+   * If an index does not exist yet for a user's saved search, this method will create that level
+   * as well.
+   *
+   * ! Please note that saving will OVERRIDE existing settings if named exactly the same currently !
+   *
+   * @param savedSearchName The saved search name. "default" is a special case, doesn't change how
+   *    it's saved but will load that search automatically.
+   */
+  async function saveSearch(savedSearchName: string) {
+    // Before saving, remove irrelevant formik field array properties.
+    (formik.values as any).queryRows?.map(val => {
+      delete val.props;
+      delete val.key;
+      delete val._store;
+      delete val._owner;
+      delete val.ref;
+    });
 
-    if (
-      mySavedSearches &&
-      mySavedSearches?.[0]?.savedSearches &&
-      Object.keys(mySavedSearches?.[0]?.savedSearches)?.length > 0
-    ) {
-      // Remove irrelevant formik field array properties before save
-      (formik.values as any).queryRows?.map(val => {
-        delete val.props;
-        delete val.key;
-        delete val._store;
-        delete val._owner;
-        delete val.ref;
-      });
+    // Copy any existing settings, just add/alter the saved search name.
+    const newSavedSearchOptions = {
+      [indexName]: { ...savedSearchOptions, [savedSearchName]: formik.values }
+    };
 
-      mySavedSearches[0].savedSearches[username as any][
-        `${isDefault ? "default" : searchName}`
-      ] = formik.values;
-    } else {
-      newSavedSearches = {
-        [`${username}`]: {
-          [`${isDefault ? "default" : searchName}`]: formik.values
-        }
-      };
-    }
+    // Perform saving request.
     const saveArgs: SaveArgs<UserPreference> = {
       resource: {
         id: savedSearchOptions?.[0]?.id,
         userId: subject,
-        savedSearches:
-          mySavedSearches?.[0]?.savedSearches ??
-          (newSavedSearches as Map<string, JsonValue>)
+        savedSearches: newSavedSearchOptions
       } as any,
       type: "user-preference"
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
-    setSelectedSavedSearch(isDefault ? "default" : searchName);
+
+    // The newly saved option, should be switched to the selected.
+    setSelectedSavedSearch(savedSearchName);
   }
 
+  /**
+   * Delete a saved search from the saved search name.
+   */
   async function deleteSavedSearch(savedSearchName: string) {
     async function deleteSearch() {
       delete savedSearchOptions?.[`${savedSearchName}`];

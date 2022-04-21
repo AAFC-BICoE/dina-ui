@@ -7,7 +7,7 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "../query-builder/QueryBuilder";
-import { ColumnDefinition, DefaultTBody } from "../table/QueryTable";
+import { DefaultTBody } from "../table/QueryTable";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -38,39 +38,56 @@ const DEFAULT_SORT: SortingRule[] = [
   }
 ];
 
-export interface TableColumn {
+/**
+ * This type extends the react-table column type, this just adds a few specific fields for elastic
+ * search mapping and internationalization.
+ */
+export interface TableColumn<TData extends KitsuResource>
+  extends Column<TData> {
   /**
    * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
    */
-  label: string;
+  label?: string;
 
   /**
    * Elastic search path to the attribute.
    *
-   * Example: data.attributes.name
+   * Example: `data.attributes.name`
    */
-  attributePath: string;
+  attributePath?: string;
+
+  /**
+   * This field is used to find the relationship in the included section.
+   */
+  relationshipType?: string;
 
   /**
    * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
    */
-  isKeyword: boolean;
+  isKeyword?: boolean;
 }
 
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Columns to render on the table. This will also be used to map the data to a specific column.
    */
-  columns: ColumnDefinition<TData>[];
+  columns: TableColumn<TData>[];
 
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
    * based on the index provided.
+   *
+   * Also used to store saved searches under a specific type:
+   *
+   * `UserPreference.savedSearches.[INDEX_NAME].[SAVED_SEARCH_NAME]`
+   *
+   * For example, to get the default saved searches for the material sample index:
+   * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
    */
   indexName: string;
 
   /**
-   * By default, the QueryPage will try sorting using "createdOn" attribute. You can override this
+   * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
    * setting by providing your own default sort.
    */
   defaultSort?: SortingRule[];
@@ -241,7 +258,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
-  const combinedColumns: ColumnDefinition<TData>[] = [
+  const combinedColumns: TableColumn<TData>[] = [
     ...(showRowCheckboxes
       ? [
           {
@@ -277,7 +294,13 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  function resetForm(_, formik) {
+  /**
+   * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
+   * performed.
+   *
+   * @param formik formik instance, used to set the current form to empty.
+   */
+  function resetForm(formik) {
     const resetToVal = {
       queryRows: [{}],
       group: groupNames?.[0]
@@ -374,15 +397,21 @@ export function QueryPage<TData extends KitsuResource>({
 
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
+          {/* Saved Searches */}
           <SavedSearch onSavedSearchLoad={onSavedSearchLoad} />
         </div>
         <div>
+          {/* Action Buttons */}
           <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-          <FormikButton className="btn btn-secondary mx-2" onClick={resetForm}>
+          <FormikButton
+            className="btn btn-secondary mx-2"
+            onClick={(_, formik) => resetForm(formik)}
+          >
             <DinaMessage id="resetFilters" />
           </FormikButton>
         </div>
       </div>
+
       <div
         className="query-table-wrapper"
         role="search"

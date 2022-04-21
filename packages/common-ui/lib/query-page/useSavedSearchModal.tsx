@@ -3,7 +3,7 @@ import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FormikButton } from "../formik-connected/FormikButton";
 
 interface SavedSearchModalParams {
-  saveSearch: (isDefault: boolean, searchName?: string) => void;
+  saveSearch: (searchName: string) => void;
 }
 
 export function useSavedSearchModal() {
@@ -29,7 +29,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-3"
                     onClick={(submittedValues, _) => {
-                      saveSearch(false, submittedValues.searchName);
+                      saveSearch(submittedValues.searchName);
                       closeModal();
                     }}
                   >
@@ -38,7 +38,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-2"
                     onClick={() => {
-                      saveSearch(true);
+                      saveSearch("default");
                       closeModal();
                     }}
                   >
