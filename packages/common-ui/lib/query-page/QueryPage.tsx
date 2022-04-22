@@ -383,6 +383,10 @@ export function QueryPage<TData extends KitsuResource>({
    */
   function onSavedSearchLoad(savedSearchData) {
     setSearchFilters(savedSearchData);
+    setPagination({
+      ...pagination,
+      offset: 0
+    });
     setLoading(true);
   }
 
@@ -404,10 +408,17 @@ export function QueryPage<TData extends KitsuResource>({
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
           {/* Saved Searches */}
-          <SavedSearch
-            onSavedSearchLoad={onSavedSearchLoad}
-            indexName={indexName}
-          />
+          <label className="group-field d-flex gap-2 align-items-center mb-2">
+            <div className="field-label">
+              <strong>Saved Searches</strong>
+            </div>
+            <div className="flex-grow-1">
+              <SavedSearch
+                onSavedSearchLoad={onSavedSearchLoad}
+                indexName={indexName}
+              />
+            </div>
+          </label>
         </div>
         <div>
           {/* Action Buttons */}
@@ -430,11 +441,14 @@ export function QueryPage<TData extends KitsuResource>({
           <div className="d-flex align-items-end">
             <span id="queryPageCount">
               {/* Loading indicator when total is not calculated yet. */}
-              {loading && <LoadingSpinner loading={true} />}
-              <CommonMessage
-                id="tableTotalCount"
-                values={{ totalCount: totalRecords }}
-              />
+              {loading ? (
+                <LoadingSpinner loading={true} />
+              ) : (
+                <CommonMessage
+                  id="tableTotalCount"
+                  values={{ totalCount: totalRecords }}
+                />
+              )}
             </span>
 
             {/* Multi sort tooltip - Only shown if it's possible to sort */}

@@ -2,7 +2,6 @@ import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { QueryPage, TableColumn } from "../QueryPage";
 import DatePicker from "react-datepicker";
-import { ColumnDefinition } from "../../table/QueryTable";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
 

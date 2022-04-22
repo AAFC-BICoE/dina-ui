@@ -9,7 +9,6 @@ import { useAccount } from "../account/AccountProvider";
 import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
-import { toPairs } from "lodash";
 import { FilterParam } from "kitsu";
 
 export interface SavedSearchProps {
@@ -37,8 +36,11 @@ export function SavedSearch(props: SavedSearchProps) {
   const formik = useFormikContext();
 
   // Saved search dropdown options
-  const [savedSearchOptions, setSavedSearchOptions] =
-    useState<Map<string, JsonValue>>();
+  const [savedSearchOptions, setSavedSearchOptions] = useState<
+    Map<string, JsonValue>
+  >(new Map());
+
+  const [userPreferenceID, setUserPreferenceID] = useState<string>();
 
   // Selected saved search for the saved search dropdown.
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
@@ -68,6 +70,9 @@ export function SavedSearch(props: SavedSearchProps) {
           response?.data?.[0]?.savedSearches?.[indexName as string] ?? null;
         setSavedSearchOptions(options);
 
+        // Set the preference ID for saving/editing.
+        setUserPreferenceID(response?.data?.[0].id);
+
         // If the user has a default search, use it.
         if (options?.default) {
           setSelectedSavedSearch("default");
@@ -77,7 +82,7 @@ export function SavedSearch(props: SavedSearchProps) {
       .catch(userPreferenceError => {
         setError(userPreferenceError);
       });
-  }, [savedSearchOptions]);
+  }, []);
 
   // When the loaded saved search has changed, we need to load the saved option.
   useEffect(() => {
@@ -104,6 +109,9 @@ export function SavedSearch(props: SavedSearchProps) {
    *    it's saved but will load that search automatically.
    */
   async function saveSearch(savedSearchName: string) {
+    // User preference ID needs to be set in order to update the record.
+    if (!userPreferenceID) return;
+
     // Before saving, remove irrelevant formik field array properties.
     (formik.values as any).queryRows?.map(val => {
       delete val.props;
@@ -121,7 +129,7 @@ export function SavedSearch(props: SavedSearchProps) {
     // Perform saving request.
     const saveArgs: SaveArgs<UserPreference> = {
       resource: {
-        id: savedSearchOptions?.[0]?.id,
+        id: userPreferenceID,
         userId: subject,
         savedSearches: newSavedSearchOptions
       } as any,
@@ -131,37 +139,52 @@ export function SavedSearch(props: SavedSearchProps) {
 
     // The newly saved option, should be switched to the selected.
     setSelectedSavedSearch(savedSearchName);
+    setLoadedSavedSearch(savedSearchName);
   }
 
   /**
-   * Delete a saved search from the saved search name.
+   * Delete a saved search from the saved search name. A prompt will appear asking the user they
+   * are sure they want to delete the record.
+   *
+   * Once a saved search is deleted, the user will go back to the default or the first option in the
+   * list.
+   *
+   * @param savedSearchName The saved search name to delete from the the saved search options.
    */
   async function deleteSavedSearch(savedSearchName: string) {
     async function deleteSearch() {
+      // User preference ID needs to be set in order to delete the record.
+      if (!userPreferenceID) return;
+
+      // Delete the key from the search options.
       delete savedSearchOptions?.[`${savedSearchName}`];
 
       const saveArgs: SaveArgs<UserPreference> = {
         resource: {
-          id: savedSearchOptions?.[0]?.id,
+          id: userPreferenceID,
           userId: subject,
-          savedSearches: savedSearchOptions?.[0]?.savedSearches
+          savedSearches: savedSearchOptions
         } as any,
         type: "user-preference"
       };
-
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-      if (toPairs(savedSearchOptions)?.[0]?.[0]) {
-        setSelectedSavedSearch(toPairs(savedSearchOptions)?.[0]?.[0]);
-      } else {
+      // Since the current selected was just deleted, We need to use another search.
+      if (savedSearchOptions.size === 0) {
         // Clear the saved search data
         onSavedSearchLoad({
           queryRows: [{ fieldName: "" }],
           group: groupNames?.[0] ?? ""
         });
+      } else {
+        // Go to default or just the first option.
+        setSelectedSavedSearch(
+          savedSearchOptions.get("default") ?? savedSearchOptions[0]
+        );
       }
     }
 
+    // Ask the user if they sure they want to delete the saved search.
     openModal(
       <AreYouSureModal
         actionMessage={
@@ -174,6 +197,14 @@ export function SavedSearch(props: SavedSearchProps) {
     );
   }
 
+  // Take the saved search options and convert to an option list.
+  const dropdownOptions = Object.keys(savedSearchOptions)
+    .sort()
+    .map(key => ({
+      value: key,
+      label: key
+    }));
+
   return (
     <div className="d-flex gap-2">
       <div style={{ width: "400px" }}>
@@ -181,12 +212,7 @@ export function SavedSearch(props: SavedSearchProps) {
           ref={selectRef}
           aria-label="Saved Search"
           className="saved-search"
-          options={Array.from(savedSearchOptions ?? [], ([key, _]) => {
-            return {
-              value: key,
-              label: key
-            };
-          })}
+          options={dropdownOptions}
           onChange={selectedOption =>
             setSelectedSavedSearch(selectedOption?.value ?? "")
           }
