@@ -43,10 +43,10 @@ export function SavedSearch(props: SavedSearchProps) {
   const [userPreferenceID, setUserPreferenceID] = useState<string>();
 
   // Selected saved search for the saved search dropdown.
-  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>("");
+  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>();
 
   // When the user uses the "load" button, the selected saved search is saved here.
-  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>("");
+  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>();
 
   // Query Page error message state
   const [error, setError] = useState<any>();
@@ -56,13 +56,36 @@ export function SavedSearch(props: SavedSearchProps) {
 
   // Retrieve user preferences on first render effect.
   useEffect(() => {
+    retrieveSavedSearches(true);
+  }, [savedSearchOptions]);
+
+  // When the loaded saved search has changed, we need to load the saved option.
+  useEffect(() => {
+    // Don't load if the saved search is not selected yet.
+    if (!loadedSavedSearch) return;
+
+    // Ensure the setting actually exists for the selected option.
+    const savedSearchSettings = savedSearchOptions?.[loadedSavedSearch];
+    if (!savedSearchSettings) return;
+
+    setSelectedSavedSearch(loadedSavedSearch);
+
+    // Drill up to the query page component to load the new saved search data.
+    onSavedSearchLoad(savedSearchSettings);
+  }, [loadedSavedSearch]);
+
+  /**
+   * Get the user's saved searches from the User Preferences.
+   *
+   * @param preloadDefault if the default saved search exists, load it.
+   */
+  async function retrieveSavedSearches(preloadDefault: boolean) {
     // Retrieve user preferences...
-    apiClient
+    await apiClient
       .get<UserPreference[]>("user-api/user-preference", {
         filter: {
           userId: subject as FilterParam
-        },
-        page: { limit: 1000 }
+        }
       })
       .then(response => {
         // Display the users saved searches for this specific index.
@@ -74,25 +97,14 @@ export function SavedSearch(props: SavedSearchProps) {
         setUserPreferenceID(response?.data?.[0].id);
 
         // If the user has a default search, use it.
-        if (options?.default) {
-          setSelectedSavedSearch("default");
-          setLoadedSavedSearch("default");
+        if (preloadDefault && options.default) {
+          // loadSavedSearch("default");
         }
       })
       .catch(userPreferenceError => {
         setError(userPreferenceError);
       });
-  }, []);
-
-  // When the loaded saved search has changed, we need to load the saved option.
-  useEffect(() => {
-    // Ensure the setting actually exists for the selected option.
-    const savedSearchSettings = savedSearchOptions?.[loadedSavedSearch];
-    if (!savedSearchSettings) return;
-
-    // Drill up to the query page component to load the new saved search data.
-    onSavedSearchLoad(savedSearchSettings);
-  }, [loadedSavedSearch]);
+  }
 
   /**
    * Add a new saved search to the user's preferences. Searches will be saved using the following
@@ -109,9 +121,6 @@ export function SavedSearch(props: SavedSearchProps) {
    *    it's saved but will load that search automatically.
    */
   async function saveSearch(savedSearchName: string) {
-    // User preference ID needs to be set in order to update the record.
-    if (!userPreferenceID) return;
-
     // Before saving, remove irrelevant formik field array properties.
     (formik.values as any).queryRows?.map(val => {
       delete val.props;
@@ -129,7 +138,7 @@ export function SavedSearch(props: SavedSearchProps) {
     // Perform saving request.
     const saveArgs: SaveArgs<UserPreference> = {
       resource: {
-        id: userPreferenceID,
+        id: userPreferenceID ?? null,
         userId: subject,
         savedSearches: newSavedSearchOptions
       } as any,
@@ -138,8 +147,9 @@ export function SavedSearch(props: SavedSearchProps) {
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
     // The newly saved option, should be switched to the selected.
-    setSelectedSavedSearch(savedSearchName);
     setLoadedSavedSearch(savedSearchName);
+
+    retrieveSavedSearches(false);
   }
 
   /**
@@ -170,7 +180,7 @@ export function SavedSearch(props: SavedSearchProps) {
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
       // Since the current selected was just deleted, We need to use another search.
-      if (savedSearchOptions.size === 0) {
+      if (!savedSearchOptions) {
         // Clear the saved search data
         onSavedSearchLoad({
           queryRows: [{ fieldName: "" }],
@@ -178,8 +188,8 @@ export function SavedSearch(props: SavedSearchProps) {
         });
       } else {
         // Go to default or just the first option.
-        setSelectedSavedSearch(
-          savedSearchOptions.get("default") ?? savedSearchOptions[0]
+        setLoadedSavedSearch(
+          savedSearchOptions.default ?? savedSearchOptions[0]
         );
       }
     }
@@ -198,7 +208,7 @@ export function SavedSearch(props: SavedSearchProps) {
   }
 
   // Take the saved search options and convert to an option list.
-  const dropdownOptions = Object.keys(savedSearchOptions)
+  const dropdownOptions = Object.keys(savedSearchOptions ?? {})
     .sort()
     .map(key => ({
       value: key,
@@ -227,6 +237,7 @@ export function SavedSearch(props: SavedSearchProps) {
             setLoadedSavedSearch(selectedSavedSearch);
           }
         }}
+        disabled={selectedSavedSearch ? false : true}
       >
         {formatMessage("load")}
       </button>
@@ -240,7 +251,8 @@ export function SavedSearch(props: SavedSearchProps) {
       <button
         className="btn btn-danger"
         type="button"
-        onClick={() => deleteSavedSearch(selectedSavedSearch)}
+        onClick={() => deleteSavedSearch(selectedSavedSearch ?? "")}
+        disabled={selectedSavedSearch ? false : true}
       >
         {formatMessage("deleteButtonText")}
       </button>

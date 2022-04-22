@@ -414,6 +414,7 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
             <div className="flex-grow-1">
               <SavedSearch
+                key={uuidv4()}
                 onSavedSearchLoad={onSavedSearchLoad}
                 indexName={indexName}
               />
