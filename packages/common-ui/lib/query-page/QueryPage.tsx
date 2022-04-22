@@ -28,6 +28,7 @@ import { MultiSortTooltip } from "./MultiSortTooltip";
 import { cloneDeep } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 
 const DEFAULT_PAGE_SIZE: number = 25;
@@ -172,6 +173,8 @@ export function QueryPage<TData extends KitsuResource>({
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
+  const [loading, setLoading] = useState<boolean>(true);
+
   // Query Page error message state
   const [error, setError] = useState<any>();
 
@@ -215,6 +218,10 @@ export function QueryPage<TData extends KitsuResource>({
       })
       .catch(elasticSearchError => {
         setError(elasticSearchError);
+      })
+      .finally(() => {
+        // No matter the end result, loading should stop.
+        setLoading(false);
       });
   }, [pagination, searchFilters, sortingRules]);
 
@@ -275,22 +282,16 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   const mappedColumns = combinedColumns.map(column => {
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.label)
-          };
+    const { fieldName, customHeader } = {
+      customHeader: column.Header,
+      fieldName: String(column.label)
+    };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...(typeof column === "string" ? { accessor: column } : { ...column })
+      ...column
     };
   });
 
@@ -322,6 +323,7 @@ export function QueryPage<TData extends KitsuResource>({
       ...pagination,
       offset: 0
     });
+    setLoading(true);
   };
 
   /**
@@ -337,6 +339,7 @@ export function QueryPage<TData extends KitsuResource>({
       offset: 0,
       limit: newPageSize
     });
+    setLoading(true);
   }
 
   /**
@@ -346,6 +349,7 @@ export function QueryPage<TData extends KitsuResource>({
    */
   function onSortChange(newSort: SortingRule[]) {
     setSortingRules(newSort);
+    setLoading(true);
 
     // Trigger the prop event listener.
     onSortedChange?.(newSort);
@@ -370,6 +374,7 @@ export function QueryPage<TData extends KitsuResource>({
       ...pagination,
       offset: pagination.limit * newPage
     });
+    setLoading(true);
   }
 
   /**
@@ -378,6 +383,7 @@ export function QueryPage<TData extends KitsuResource>({
    */
   function onSavedSearchLoad(savedSearchData) {
     setSearchFilters(savedSearchData);
+    setLoading(true);
   }
 
   return (
@@ -398,7 +404,10 @@ export function QueryPage<TData extends KitsuResource>({
       <div className="d-flex mb-3">
         <div className="flex-grow-1">
           {/* Saved Searches */}
-          <SavedSearch onSavedSearchLoad={onSavedSearchLoad} />
+          <SavedSearch
+            onSavedSearchLoad={onSavedSearchLoad}
+            indexName={indexName}
+          />
         </div>
         <div>
           {/* Action Buttons */}
@@ -420,7 +429,12 @@ export function QueryPage<TData extends KitsuResource>({
         <div className="mb-1">
           <div className="d-flex align-items-end">
             <span id="queryPageCount">
-              <CommonMessage id="tableTotalCount" values={{ totalRecords }} />
+              {/* Loading indicator when total is not calculated yet. */}
+              {loading && <LoadingSpinner loading={true} />}
+              <CommonMessage
+                id="tableTotalCount"
+                values={{ totalCount: totalRecords }}
+              />
             </span>
 
             {/* Multi sort tooltip - Only shown if it's possible to sort */}
@@ -441,6 +455,8 @@ export function QueryPage<TData extends KitsuResource>({
           columns={mappedColumns}
           data={searchResults}
           minRows={1}
+          // Loading Table props
+          loading={loading}
           // Pagination props
           manual={true}
           pageSize={pagination.limit}

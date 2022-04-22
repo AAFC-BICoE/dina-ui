@@ -1,6 +1,6 @@
 import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { QueryPage } from "../QueryPage";
+import { QueryPage, TableColumn } from "../QueryPage";
 import DatePicker from "react-datepicker";
 import { ColumnDefinition } from "../../table/QueryTable";
 import { PersistedResource } from "kitsu";
@@ -164,12 +164,12 @@ const apiContext: any = {
   }
 };
 
-const TEST_COLUMNS: ColumnDefinition<any>[] = [
+const TEST_COLUMNS: TableColumn<any>[] = [
   { accessor: "materialSampleName" },
   { accessor: "collection.name" },
   { accessor: "dwcOtherCatalogNumbers" },
   { accessor: "materialSampleType" },
-  "createdBy",
+  { accessor: "createdBy" },
   { accessor: "createdOn" },
   { Header: "", sortable: false }
 ];
