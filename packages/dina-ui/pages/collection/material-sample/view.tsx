@@ -151,6 +151,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <div className="col-md-6">
                   <GenerateLabelSection
                     title={<DinaMessage id="generateLabel" />}
+                    materialSample={materialSample}
                   />
                 </div>
               </div>

@@ -16,6 +16,8 @@ import {
 import React from "react";
 import { ReactNode, useState } from "react";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
+import { PersistedResource } from "kitsu";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 
 export type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
 
@@ -41,18 +43,22 @@ interface TemplateAttributes<TComponent = string> {
 type Template<TComponent = string> = TemplateAttributes<TComponent>;
 export interface GenerateLabelSectionProps {
   title?: ReactNode;
+  materialSample?: PersistedResource<MaterialSample>;
 }
 
-export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
+export function GenerateLabelSection({
+  title,
+  materialSample,
+}: GenerateLabelSectionProps) {
   const { formatMessage } = useDinaIntl();
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
-
+  
   const [template, setTemplate] = useState<TemplateType | null>(null);
   const data = [
     {
-      catalogNumber: "http://dina.local/",
+      catalogNumber: materialSample?.materialSampleName,
       rejuv_date: "1998-05-19",
       host: "hostData",
       rootstock: "rootstockData",
@@ -60,7 +66,6 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
       variety: "varietyData",
     },
   ];
-
   const { apiClient } = useApiClient();
 
   /**
