@@ -65,7 +65,60 @@ const USER_PREFERENCE = {
   meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
 };
 
-// Mock elastic search data to use with the query page.
+// Material sample data to use with the responses.
+const MATERIAL_SAMPLE_DATA = {
+  data: {
+    id: "2c0d2f4d-c9a3-434e-bc76-d6cd4f02fb2c",
+    type: "material-sample",
+    attributes: {
+      version: 0,
+      group: "aafc",
+      createdOn: "2022-03-28T13:04:50.689122Z",
+      createdBy: "dina-admin",
+      dwcCatalogNumber: null,
+      dwcOtherCatalogNumbers: null,
+      materialSampleName: null,
+      materialSampleType: null,
+      materialSampleChildren: [],
+      preparationDate: null,
+      preparationMethod: null,
+      preservationType: null,
+      preparationFixative: null,
+      preparationMaterials: null,
+      preparationSubstrate: null,
+      managedAttributes: {},
+      preparationRemarks: null,
+      dwcDegreeOfEstablishment: null,
+      hierarchy: [
+        {
+          uuid: "09a256c7-56c8-424b-8013-0590e16e39cb",
+          rank: 1
+        }
+      ],
+      host: null,
+      barcode: null,
+      publiclyReleasable: true,
+      notPubliclyReleasableReason: null,
+      tags: null,
+      materialSampleState: null,
+      materialSampleRemarks: null,
+      stateChangedOn: null,
+      stateChangeRemarks: null,
+      associations: [],
+      allowDuplicateName: false,
+      restrictionFieldsExtension: null,
+      isRestricted: false,
+      restrictionRemarks: null
+    },
+    relationships: {
+      collectingEvent: {
+        data: null
+      }
+    }
+  }
+};
+
+// Basic mock elastic search data to use with the query page.
 const TEST_ELASTIC_SEARCH_RESPONSE = {
   data: {
     hits: {
@@ -75,59 +128,36 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
       hits: [
         {
           _source: {
-            data: {
-              id: "2c0d2f4d-c9a3-434e-bc76-d6cd4f02fb2c",
-              type: "material-sample",
-              attributes: {
-                version: 0,
-                group: "aafc",
-                createdOn: "2022-03-28T13:04:50.689122Z",
-                createdBy: "dina-admin",
-                dwcCatalogNumber: null,
-                dwcOtherCatalogNumbers: null,
-                materialSampleName: null,
-                materialSampleType: null,
-                materialSampleChildren: [],
-                preparationDate: null,
-                preparationMethod: null,
-                preservationType: null,
-                preparationFixative: null,
-                preparationMaterials: null,
-                preparationSubstrate: null,
-                managedAttributes: {},
-                preparationRemarks: null,
-                dwcDegreeOfEstablishment: null,
-                hierarchy: [
-                  {
-                    uuid: "09a256c7-56c8-424b-8013-0590e16e39cb",
-                    rank: 1
-                  }
-                ],
-                host: null,
-                barcode: null,
-                publiclyReleasable: true,
-                notPubliclyReleasableReason: null,
-                tags: null,
-                materialSampleState: null,
-                materialSampleRemarks: null,
-                stateChangedOn: null,
-                stateChangeRemarks: null,
-                associations: [],
-                allowDuplicateName: false,
-                restrictionFieldsExtension: null,
-                isRestricted: false,
-                restrictionRemarks: null
-              },
-              relationships: {
-                collectingEvent: {
-                  data: null
-                }
-              }
-            }
+            MATERIAL_SAMPLE_DATA
           }
         }
       ]
     }
+  }
+};
+
+// Mock elastic search data with 10,000 total responses, this should trigger a count.
+const TEST_ELASTIC_SEARCH_COUNT_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 10000
+      },
+      hits: [
+        {
+          _source: {
+            MATERIAL_SAMPLE_DATA
+          }
+        }
+      ]
+    }
+  }
+};
+
+// Mock of the count response
+const TEST_ELASTIC_COUNT_RESPONSE = {
+  data: {
+    count: 2000000
   }
 };
 
@@ -144,24 +174,26 @@ const mockGet = jest.fn<any, any>(async path => {
 
 const mockPost = jest.fn<any, any>(async path => {
   switch (path) {
-    // Elastic search response with object store mock metadata data.
+    // Elastic search response with material sample mock metadata data.
     case "search-api/search-ws/search":
       return TEST_ELASTIC_SEARCH_RESPONSE;
+    case "search-api/search-ws/count":
+      return TEST_ELASTIC_COUNT_RESPONSE;
+  }
+});
+
+const mockCountPost = jest.fn<any, any>(async path => {
+  switch (path) {
+    // Elastic search response for the count test
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_COUNT_RESPONSE;
+    case "search-api/search-ws/count":
+      return TEST_ELASTIC_COUNT_RESPONSE;
   }
 });
 
 const TEST_SEARCH_DATE =
   "Tue Jan 25 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
-
-const apiContext: any = {
-  apiClient: {
-    get: mockGet,
-    axios: {
-      get: mockGet,
-      post: mockPost
-    }
-  }
-};
 
 const TEST_COLUMNS: TableColumn<any>[] = [
   { accessor: "materialSampleName" },
@@ -175,6 +207,17 @@ const TEST_COLUMNS: TableColumn<any>[] = [
 
 describe("QueryPage component", () => {
   it("Query Page is able to aggregate first level queries", async () => {
+    // Setup API context with the mocked queries.
+    const apiContext: any = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockPost
+        }
+      }
+    };
+
     const wrapper = mountWithAppContext(
       <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
       {
@@ -288,6 +331,54 @@ describe("QueryPage component", () => {
               { term: { "data.attributes.createdOn": "2022-01-25" } },
               { term: { "data.attributes.publiclyReleasable": "false" } }
             ]
+          }
+        }
+      },
+      {
+        params: {
+          indexName: "testIndex"
+        }
+      }
+    ]);
+  });
+
+  it("Query Page switches to use count request for large query sizes", async () => {
+    // Setup API context with the mocked queries.
+    const apiContext: any = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockCountPost
+        }
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      {
+        apiContext
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+    expect(wrapper.find("#queryPageCount").text()).toBe(
+      "Total matched records: " + TEST_ELASTIC_COUNT_RESPONSE.data.count
+    );
+
+    // The first expected POST call is the elastic search results, a second call should be made
+    // for the count.
+    expect(mockCountPost.mock.calls[1]).toEqual([
+      "search-api/search-ws/count",
+      {
+        query: {
+          bool: {
+            filter: {
+              term: {
+                "data.attributes.group": "aafc"
+              }
+            }
           }
         }
       },

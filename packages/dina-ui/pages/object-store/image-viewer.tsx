@@ -1,16 +1,13 @@
-import {  useAccount } from "common-ui";
+import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 
 export default function MetadataImagePreviewPage() {
   const { token } = useAccount();
   const router = useRouter();
-  const routerPath = router.asPath;
-  const filePathProperties = routerPath.split("?").at(-1);
+  const fileBucket = router.query.bucket?.toString();
+  const isDerivative = router.query.isDerivative?.toString();
+  const fileId = router.query.fileId?.toString();
 
-  const fileBucket = filePathProperties?.split("&").at(0)?.split("=").at(1);
-  const isDerivative = filePathProperties?.split("&").at(1)?.split("=").at(1);
-  const fileId = filePathProperties?.split("&").at(2)?.split("=").at(1);
-  
   const filePath = `/api/objectstore-api/file/${fileBucket}/${
     // Add derivative/ before the fileIdentifier if the file to display is a derivative.
     isDerivative === "true" ? "derivative/" : ""

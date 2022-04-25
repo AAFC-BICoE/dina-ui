@@ -41,6 +41,18 @@ const DEFAULT_SORT: SortingRule[] = [
 ];
 
 /**
+ * Elastic search by default will only count up to 10,000 records. If the search returns 10,000
+ * as the page size, there is a good chance that there is more and the /count endpoint will need
+ * to be used to get the actual total.
+ */
+const MAX_COUNT_SIZE: number = 10000;
+
+interface SearchResultData<TData extends KitsuResource> {
+  results: TData[];
+  total: number;
+}
+
+/**
  * This type extends the react-table column type, this just adds a few specific fields for elastic
  * search mapping and internationalization.
  */
@@ -204,7 +216,7 @@ export function QueryPage<TData extends KitsuResource>({
 
     // Fetch data using elastic search.
     // The included section will be transformed from an array to an object with the type name for each relationship.
-    searchES(queryDSL)
+    elasticSearchRequest(queryDSL)
       .then(result => {
         const processedResult = result?.hits.map(rslt => ({
           id: rslt._source?.data?.id,
@@ -220,9 +232,22 @@ export function QueryPage<TData extends KitsuResource>({
           )
         }));
 
+        // If we have reached the count limit, we will need to perform another request for the true
+        // query size.
+        if (result?.total.value === MAX_COUNT_SIZE) {
+          elasticSearchCountRequest(queryDSL)
+            .then(countResult => {
+              setTotalRecords(countResult);
+            })
+            .catch(elasticSearchError => {
+              setError(elasticSearchError);
+            });
+        } else {
+          setTotalRecords(result?.total?.value ?? 0);
+        }
+
         setAvailableSamples(processedResult);
         setSearchResults(processedResult);
-        setTotalRecords(result?.total?.value ?? 0);
       })
       .catch(elasticSearchError => {
         setError(elasticSearchError);
@@ -291,7 +316,7 @@ export function QueryPage<TData extends KitsuResource>({
    * @param queryDSL query containing filters and pagination.
    * @returns Elastic search response.
    */
-  async function searchES(queryDSL) {
+  async function elasticSearchRequest(queryDSL) {
     const query = { ...queryDSL };
     const resp = await apiClient.axios.post(
       `search-api/search-ws/search`,
@@ -303,6 +328,28 @@ export function QueryPage<TData extends KitsuResource>({
       }
     );
     return resp?.data?.hits;
+  }
+
+  /**
+   * Asynchronous POST request for elastic search count API. By default, the elastic search will
+   * only provide the count until `MAX_COUNT_SIZE`. This call is used to get the accurate total
+   * count for larger search sets.
+   *
+   * @param queryDSL query filters are only used, pagination and sorting are ignored.
+   * @returns Elastic search count response.
+   */
+  async function elasticSearchCountRequest(queryDSL) {
+    const query = { query: { ...queryDSL?.query } };
+    const resp = await apiClient.axios.post(
+      `search-api/search-ws/count`,
+      query,
+      {
+        params: {
+          indexName
+        }
+      }
+    );
+    return resp?.data?.count;
   }
 
   const {
