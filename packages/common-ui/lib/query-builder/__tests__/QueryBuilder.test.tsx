@@ -7,21 +7,51 @@ import DatePicker from "react-datepicker";
 const TEST_SEARCH_DATE =
   "Fri Jan 21 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
+const INDEX_NAME = "DINA_EXAMPLE_INDEX";
+
 /** Options array based on resources returned by elastic search mapping from api. */
-const ES_INDEX_MAPPING_OPTIONS = [
-  {
-    label: "createdOn",
-    value: "data.attributes.createdOn",
-    type: "date",
-    path: "data.attributes"
-  },
-  {
-    label: "allowDuplicateName",
-    value: "data.attributes.allowDuplicateName",
-    type: "boolean",
-    path: "data.attributes"
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    headers: {},
+    body: {
+      indexName: "testIndex",
+      attributes: [
+        {
+          label: "createdOn",
+          value: "data.attributes.createdOn",
+          type: "date",
+          path: "data.attributes"
+        },
+        {
+          label: "allowDuplicateName",
+          value: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          path: "data.attributes"
+        }
+      ],
+      relationships: []
+    },
+    statusCode: "OK",
+    statusCodeValue: 200
   }
-];
+};
+
+const mockGet = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
+  }
+});
+
+// Setup API context with the mocked queries.
+const apiContext: any = {
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGet
+    }
+  }
+};
 
 describe("QueryBuilder component", () => {
   beforeEach(() => {
@@ -33,9 +63,13 @@ describe("QueryBuilder component", () => {
       <DinaForm initialValues={{ queryRows: [{}] }}>
         <QueryBuilder
           name={"queryRows"}
-          esIndexMapping={ES_INDEX_MAPPING_OPTIONS}
+          indexName={INDEX_NAME}
+          onGroupChange={() => null}
         />
-      </DinaForm>
+      </DinaForm>,
+      {
+        apiContext
+      }
     );
 
     await new Promise(setImmediate);
@@ -69,9 +103,13 @@ describe("QueryBuilder component", () => {
       <DinaForm initialValues={{ queryRows: [{}] }}>
         <QueryBuilder
           name="queryRows"
-          esIndexMapping={ES_INDEX_MAPPING_OPTIONS}
+          indexName={INDEX_NAME}
+          onGroupChange={() => null}
         />
-      </DinaForm>
+      </DinaForm>,
+      {
+        apiContext
+      }
     );
 
     await new Promise(setImmediate);
@@ -84,7 +122,7 @@ describe("QueryBuilder component", () => {
       .prop<any>("onChange")({ value: "data.attributes.createdOn" });
 
     await new Promise(setImmediate);
-    wrapper.update();    
+    wrapper.update();
 
     wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
 

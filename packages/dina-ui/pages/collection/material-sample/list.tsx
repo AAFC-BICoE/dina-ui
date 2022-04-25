@@ -25,6 +25,57 @@ export interface SampleListLayoutProps {
   showBulkActions?: boolean;
 }
 
+/**
+ * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
+ *
+ * The old version of the listing is still when searching for associated samples.
+ */
+export const getColumnDefinition = () => {
+  return [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      keyword: true
+    },
+    {
+      Cell: ({ original: { included } }) =>
+        included?.collection?.id ? (
+          <Link
+            href={`/collection/collection/view?id=${included?.collection?.id}`}
+          >
+            {included?.collection?.attributes?.name}
+          </Link>
+        ) : null,
+      label: "collection.name",
+      accessor: "included.attributes.name",
+      relationshipType: "collection",
+      keyword: true
+    },
+    stringArrayCell(
+      "dwcOtherCatalogNumbers",
+      "data.attributes.dwcOtherCatalogNumbers"
+    ),
+    {
+      label: "materialSampleType",
+      accessor: "data.attributes.materialSampleType",
+      keyword: true
+    },
+    {
+      label: "createdBy",
+      accessor: "data.attributes.createdBy",
+      keyword: true
+    },
+    dateCell("createdOn", "data.attributes.createdOn")
+  ];
+};
+
 export function SampleListLayout({
   onSelect,
   classNames,
@@ -46,7 +97,6 @@ export function SampleListLayout({
       type: "DATE"
     }
   ];
-
   const [queryKey, setQueryKey] = useState("");
 
   const columns: ColumnDefinition<MaterialSample>[] = [
@@ -119,7 +169,6 @@ export function SampleListLayout({
           }
         ])
   ];
-
   return (
     <ListPageLayout
       additionalFilters={filterForm => ({
