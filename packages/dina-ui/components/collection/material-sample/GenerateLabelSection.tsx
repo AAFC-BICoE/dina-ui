@@ -6,9 +6,9 @@ import {
   TextField,
   FieldSet,
   SubmitButton,
-} from "packages/common-ui/lib";
-import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+} from "../../../../common-ui/lib";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
+import { DinaMessage, useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { ReactNode, useState } from "react";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
