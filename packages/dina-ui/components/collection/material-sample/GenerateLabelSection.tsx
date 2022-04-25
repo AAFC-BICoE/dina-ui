@@ -6,9 +6,13 @@ import {
   TextField,
   FieldSet,
   SubmitButton,
+  FormikButton,
 } from "../../../../common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
-import { DinaMessage, useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl,
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { ReactNode, useState } from "react";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
@@ -54,7 +58,7 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
   const [template, setTemplate] = useState<TemplateType | null>(null);
   const data = [
     {
-      catalogNumber: "coll.mfn-berlin.de/u/ZMB_Phasm_D001",
+      catalogNumber: "http://dina.local/",
       rejuv_date: "1998-05-19",
       host: "hostData",
       rootstock: "rootstockData",
@@ -65,7 +69,7 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
 
   const { apiClient } = useApiClient();
 
-    /**
+  /**
    * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
    *
    * @param data material sample data for reports_labels_api
@@ -73,23 +77,19 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
    */
   async function generateLabel(data, template) {
     // axios post request
-    await apiClient.axios.post(
-      `/reports-labels-api/labels/v1.0/?template=${template}&format=pdf`,
-      data,
-      {responseType: 'blob'}
-    ).then((response) => {
-      window.open(URL.createObjectURL(response.data));
-    })
+    await apiClient.axios
+      .post(
+        `/reports-labels-api/labels/v1.0/?template=${template}&format=pdf`,
+        data,
+        { responseType: "blob" }
+      )
+      .then((response) => {
+        window.open(URL.createObjectURL(response.data));
+      });
   }
 
   return (
-    <FieldSet
-      legend={
-        <>
-          {title ?? <DinaMessage id="generateLabel" />}{" "}
-        </>
-      }
-    >
+    <FieldSet legend={<>{title ?? <DinaMessage id="generateLabel" />} </>}>
       <DinaForm<Partial<Template>> initialValues={{}}>
         <div className="row gap-2 align-items-end">
           <SelectField
@@ -99,15 +99,12 @@ export function GenerateLabelSection({ title }: GenerateLabelSectionProps) {
             onChange={(selectValue: TemplateType) => setTemplate(selectValue)}
           />
           {template && (
-            <button
-              type="button"
-              className="btn btn-primary mb-3 "
-              style={{ width: "10rem" }}
-              onClick={() => generateLabel(data, template)}
+            <FormikButton
+              className="btn btn-primary col-md-3 mb-3 "
+              onClick={async () => await generateLabel(data, template)}
             >
               <DinaMessage id="generateLabel" />
-            </button>
-            // <SubmitButton className="mb-3"><DinaMessage id="generateLabel"/></SubmitButton>
+            </FormikButton>
           )}
         </div>
       </DinaForm>
