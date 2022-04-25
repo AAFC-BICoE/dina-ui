@@ -1,7 +1,6 @@
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Select from "react-select";
-import { JsonValue } from "type-fest";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
 import { useFormikContext } from "formik";
@@ -9,102 +8,65 @@ import { useAccount } from "../account/AccountProvider";
 import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
-import { FilterParam } from "kitsu";
 
 export interface SavedSearchProps {
-  /**
-   * Event prop triggered when a new saved search is loaded.
-   */
-  onSavedSearchLoad: (savedSearchData) => void;
-
   /**
    * Index name passed from the QueryPage component. Since it doesn't make sense to display saved
    * searches for all list pages, the index name is used to determine which saved searches should be
    * displayed and where news one's are created.
    */
   indexName: string;
+
+  /**
+   * The user preferences for the selected user. This should only be re-loaded on saving and deleting.
+   */
+  userPreferences?: UserPreference;
+
+  /**
+   * Passes the currently loaded saved search option, when a new loaded saved search is selected, it's
+   * set as the default selected saved search.
+   */
+  loadedSavedSearch?: string;
+
+  /**
+   * When the user clicks the "Load" button, the selected saved search becomes the loaded saved search.
+   */
+  setLoadedSavedSearch: (loadedSavedSearchName: string) => void;
+
+  /**
+   * When creating or deleting records, the saved search list must be refreshed with new data.
+   */
+  refreshSavedSearches: () => void;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const { onSavedSearchLoad, indexName } = props;
-  const { apiClient } = useApiClient();
+  const {
+    indexName,
+    userPreferences,
+    setLoadedSavedSearch,
+    loadedSavedSearch,
+    refreshSavedSearches
+  } = props;
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
-  const { subject, groupNames } = useAccount();
+  const { subject } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
   const formik = useFormikContext();
-
-  // Saved search dropdown options
-  const [savedSearchOptions, setSavedSearchOptions] = useState<
-    Map<string, JsonValue>
-  >(new Map());
-
-  const [userPreferenceID, setUserPreferenceID] = useState<string>();
-
-  // Selected saved search for the saved search dropdown.
-  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>();
-
-  // When the user uses the "load" button, the selected saved search is saved here.
-  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>();
-
-  // Query Page error message state
-  const [error, setError] = useState<any>();
 
   // Reference to the select dropdown element.
   const selectRef = useRef(null);
 
-  // Retrieve user preferences on first render effect.
-  useEffect(() => {
-    retrieveSavedSearches(true);
-  }, [savedSearchOptions]);
+  // Selected saved search for the saved search dropdown.
+  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>(
+    loadedSavedSearch &&
+      userPreferences?.savedSearches?.[indexName]?.[loadedSavedSearch]
+      ? loadedSavedSearch
+      : ""
+  );
 
-  // When the loaded saved search has changed, we need to load the saved option.
-  useEffect(() => {
-    // Don't load if the saved search is not selected yet.
-    if (!loadedSavedSearch) return;
-
-    // Ensure the setting actually exists for the selected option.
-    const savedSearchSettings = savedSearchOptions?.[loadedSavedSearch];
-    if (!savedSearchSettings) return;
-
-    setSelectedSavedSearch(loadedSavedSearch);
-
-    // Drill up to the query page component to load the new saved search data.
-    onSavedSearchLoad(savedSearchSettings);
-  }, [loadedSavedSearch]);
-
-  /**
-   * Get the user's saved searches from the User Preferences.
-   *
-   * @param preloadDefault if the default saved search exists, load it.
-   */
-  async function retrieveSavedSearches(preloadDefault: boolean) {
-    // Retrieve user preferences...
-    await apiClient
-      .get<UserPreference[]>("user-api/user-preference", {
-        filter: {
-          userId: subject as FilterParam
-        }
-      })
-      .then(response => {
-        // Display the users saved searches for this specific index.
-        const options =
-          response?.data?.[0]?.savedSearches?.[indexName as string] ?? null;
-        setSavedSearchOptions(options);
-
-        // Set the preference ID for saving/editing.
-        setUserPreferenceID(response?.data?.[0].id);
-
-        // If the user has a default search, use it.
-        if (preloadDefault && options.default) {
-          // loadSavedSearch("default");
-        }
-      })
-      .catch(userPreferenceError => {
-        setError(userPreferenceError);
-      });
-  }
+  // Using the user preferences get the options and user preferences.
+  const userPreferenceID = userPreferences?.id;
 
   /**
    * Add a new saved search to the user's preferences. Searches will be saved using the following
@@ -132,7 +94,11 @@ export function SavedSearch(props: SavedSearchProps) {
 
     // Copy any existing settings, just add/alter the saved search name.
     const newSavedSearchOptions = {
-      [indexName]: { ...savedSearchOptions, [savedSearchName]: formik.values }
+      ...userPreferences?.savedSearches,
+      [indexName]: {
+        ...userPreferences?.savedSearches?.[indexName],
+        [savedSearchName]: formik.values
+      }
     };
 
     // Perform saving request.
@@ -146,10 +112,10 @@ export function SavedSearch(props: SavedSearchProps) {
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
+    refreshSavedSearches();
+
     // The newly saved option, should be switched to the selected.
     setLoadedSavedSearch(savedSearchName);
-
-    retrieveSavedSearches(false);
   }
 
   /**
@@ -167,31 +133,21 @@ export function SavedSearch(props: SavedSearchProps) {
       if (!userPreferenceID) return;
 
       // Delete the key from the search options.
-      delete savedSearchOptions?.[`${savedSearchName}`];
+      delete userPreferences?.savedSearches?.[indexName]?.[savedSearchName];
 
       const saveArgs: SaveArgs<UserPreference> = {
         resource: {
           id: userPreferenceID,
           userId: subject,
-          savedSearches: savedSearchOptions
+          savedSearches: userPreferences?.savedSearches
         } as any,
         type: "user-preference"
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-      // Since the current selected was just deleted, We need to use another search.
-      if (!savedSearchOptions) {
-        // Clear the saved search data
-        onSavedSearchLoad({
-          queryRows: [{ fieldName: "" }],
-          group: groupNames?.[0] ?? ""
-        });
-      } else {
-        // Go to default or just the first option.
-        setLoadedSavedSearch(
-          savedSearchOptions.default ?? savedSearchOptions[0]
-        );
-      }
+      setLoadedSavedSearch("default");
+
+      refreshSavedSearches();
     }
 
     // Ask the user if they sure they want to delete the saved search.
@@ -208,7 +164,9 @@ export function SavedSearch(props: SavedSearchProps) {
   }
 
   // Take the saved search options and convert to an option list.
-  const dropdownOptions = Object.keys(savedSearchOptions ?? {})
+  const dropdownOptions = Object.keys(
+    userPreferences?.savedSearches?.[indexName] ?? {}
+  )
     .sort()
     .map(key => ({
       value: key,
@@ -234,7 +192,7 @@ export function SavedSearch(props: SavedSearchProps) {
         className="btn btn-primary"
         onClick={() => {
           if (selectRef && selectRef.current) {
-            setLoadedSavedSearch(selectedSavedSearch);
+            setLoadedSavedSearch(selectedSavedSearch ?? "");
           }
         }}
         disabled={selectedSavedSearch ? false : true}

@@ -1,4 +1,4 @@
-import { KitsuResource, PersistedResource } from "kitsu";
+import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { TableProps, SortingRule, Column } from "react-table";
@@ -30,6 +30,7 @@ import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
+import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -141,7 +142,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
-  const { groupNames } = useAccount();
+  const { groupNames, subject } = useAccount();
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -173,6 +174,13 @@ export function QueryPage<TData extends KitsuResource>({
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
 
+  // Users saved preferences.
+  const [userPreferences, setUserPreferences] = useState<UserPreference>();
+
+  // When the user uses the "load" button, the selected saved search is saved here.
+  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>();
+
+  // Loading state
   const [loading, setLoading] = useState<boolean>(true);
 
   // Query Page error message state
@@ -224,6 +232,57 @@ export function QueryPage<TData extends KitsuResource>({
         setLoading(false);
       });
   }, [pagination, searchFilters, sortingRules]);
+
+  // Actions to perform when the QueryPage is first mounted.
+  useEffect(() => {
+    // Setup saved searches
+    async function retrieveSavedDataOnFirstLoad() {
+      await retrieveUserPreferences();
+
+      // After the user preferences are loaded, try to load the default. (The useEffect will check if it exists.)
+      setLoadedSavedSearch("default");
+    }
+
+    retrieveSavedDataOnFirstLoad();
+  }, []);
+
+  // When the loadedSavedSearch changes, then the filters must be updated with it.
+  useEffect(() => {
+    if (!loadedSavedSearch) return;
+
+    // Ensure that the user preference exists, if not do not load anything.
+    const loadedOption =
+      userPreferences?.savedSearches?.[indexName]?.[loadedSavedSearch];
+    if (loadedOption) {
+      setSearchFilters(loadedOption);
+      setPagination({
+        ...pagination,
+        offset: 0
+      });
+      setLoading(true);
+    }
+  }, [loadedSavedSearch, userPreferences]);
+
+  /**
+   * Retrieve the user preference for the logged in user. This is used for the SavedSearch
+   * functionality since the saved searches are stored in the user preferences.
+   */
+  async function retrieveUserPreferences() {
+    // Retrieve user preferences...
+    await apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        }
+      })
+      .then(response => {
+        // Set the user preferences to be a state for the QueryPage.
+        setUserPreferences(response?.data?.[0]);
+      })
+      .catch(userPreferenceError => {
+        setError(userPreferenceError);
+      });
+  }
 
   /**
    * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
@@ -414,9 +473,11 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
             <div className="flex-grow-1">
               <SavedSearch
-                key={uuidv4()}
-                onSavedSearchLoad={onSavedSearchLoad}
                 indexName={indexName}
+                userPreferences={cloneDeep(userPreferences)}
+                loadedSavedSearch={loadedSavedSearch}
+                setLoadedSavedSearch={setLoadedSavedSearch}
+                refreshSavedSearches={retrieveUserPreferences}
               />
             </div>
           </label>
