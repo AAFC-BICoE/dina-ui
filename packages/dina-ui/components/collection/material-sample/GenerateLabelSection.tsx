@@ -35,13 +35,7 @@ const TEMPLATE_TYPE_OPTIONS: {
 
 interface TemplateAttributes<TComponent = string> {
   type: "template-attribute";
-  name: string;
-  managedAttributeType: string;
-  managedAttributeComponent: TComponent;
-  acceptedValues?: string[] | null;
-  group?: string;
-  createdBy?: string;
-  createdOn?: string;
+  templateComponent: TComponent;
 }
 
 type Template<TComponent = string> = TemplateAttributes<TComponent>;
