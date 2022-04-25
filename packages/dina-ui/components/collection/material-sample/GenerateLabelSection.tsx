@@ -56,9 +56,11 @@ export function GenerateLabelSection({
   );
   
   const [template, setTemplate] = useState<TemplateType | null>(null);
+
+  // data for POST request
   const data = [
     {
-      catalogNumber: materialSample?.materialSampleName,
+      materialSampleName: materialSample?.materialSampleName,
       rejuv_date: "1998-05-19",
       host: "hostData",
       rootstock: "rootstockData",
@@ -66,6 +68,9 @@ export function GenerateLabelSection({
       variety: "varietyData",
     },
   ];
+
+  const managedAttributeValues = materialSample?.managedAttributes;
+  
   const { apiClient } = useApiClient();
 
   /**
