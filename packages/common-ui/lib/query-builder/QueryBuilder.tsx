@@ -6,10 +6,10 @@ import {
 } from "..";
 import { ESIndexMapping, QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
-import React, { useMemo } from "react";
-import { GroupSelectField } from "packages/dina-ui/components";
-import useSWR from "swr";
+import { GroupSelectField } from "../../../dina-ui/components";
+import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
+import useSWR from "swr";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
