@@ -47,11 +47,6 @@ const DEFAULT_SORT: SortingRule[] = [
  */
 const MAX_COUNT_SIZE: number = 10000;
 
-interface SearchResultData<TData extends KitsuResource> {
-  results: TData[];
-  total: number;
-}
-
 /**
  * This type extends the react-table column type, this just adds a few specific fields for elastic
  * search mapping and internationalization.
@@ -260,39 +255,47 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Actions to perform when the QueryPage is first mounted.
   useEffect(() => {
-    // Setup saved searches
-    async function retrieveSavedDataOnFirstLoad() {
-      await retrieveUserPreferences();
-
-      // After the user preferences are loaded, try to load the default. (The useEffect will check if it exists.)
-      setLoadedSavedSearch("default");
-    }
-
-    retrieveSavedDataOnFirstLoad();
+    loadSavedSearch("default");
   }, []);
 
-  // When the loadedSavedSearch changes, then the filters must be updated with it.
-  useEffect(() => {
-    if (!loadedSavedSearch) return;
+  /**
+   * Using the user preferences, load the saved search name into the search filters.
+   *
+   * @param savedSearchName The name of the saved search to load.
+   * @param applyFilters boolean to indicate if it should just set the loadedSavedSearch without applying the filters.
+   * @returns
+   */
+  function loadSavedSearch(savedSearchName: string) {
+    if (!savedSearchName) return;
 
-    // Ensure that the user preference exists, if not do not load anything.
-    const loadedOption =
-      userPreferences?.savedSearches?.[indexName]?.[loadedSavedSearch];
-    if (loadedOption) {
-      setSearchFilters(loadedOption);
-      setPagination({
-        ...pagination,
-        offset: 0
-      });
-      setLoading(true);
-    }
-  }, [loadedSavedSearch, userPreferences]);
+    // Reload the user preferences incase they have changed.
+    retrieveUserPreferences(userPreference => {
+      setLoadedSavedSearch(savedSearchName);
+
+      // User preference must be returned.
+      if (!userPreference) return;
+
+      // Ensure that the user preference exists, if not do not load anything.
+      const loadedOption =
+        userPreference?.savedSearches?.[indexName]?.[savedSearchName];
+      if (loadedOption) {
+        setLoading(true);
+        setSearchFilters(loadedOption);
+        setPagination({
+          ...pagination,
+          offset: 0
+        });
+      }
+    });
+  }
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
    * functionality since the saved searches are stored in the user preferences.
    */
-  async function retrieveUserPreferences() {
+  async function retrieveUserPreferences(
+    callback: (userPreference?: UserPreference) => void
+  ) {
     // Retrieve user preferences...
     await apiClient
       .get<UserPreference[]>("user-api/user-preference", {
@@ -303,9 +306,11 @@ export function QueryPage<TData extends KitsuResource>({
       .then(response => {
         // Set the user preferences to be a state for the QueryPage.
         setUserPreferences(response?.data?.[0]);
+        callback(response?.data?.[0]);
       })
       .catch(userPreferenceError => {
         setError(userPreferenceError);
+        callback(undefined);
       });
   }
 
@@ -510,8 +515,7 @@ export function QueryPage<TData extends KitsuResource>({
                 indexName={indexName}
                 userPreferences={cloneDeep(userPreferences)}
                 loadedSavedSearch={loadedSavedSearch}
-                setLoadedSavedSearch={setLoadedSavedSearch}
-                refreshSavedSearches={retrieveUserPreferences}
+                loadSavedSearch={loadSavedSearch}
               />
             </div>
           </label>

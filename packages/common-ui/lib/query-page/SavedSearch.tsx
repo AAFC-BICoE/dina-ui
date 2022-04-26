@@ -29,24 +29,14 @@ export interface SavedSearchProps {
   loadedSavedSearch?: string;
 
   /**
-   * When the user clicks the "Load" button, the selected saved search becomes the loaded saved search.
+   * When the user clicks the "Load" button, it will trigger this method.
    */
-  setLoadedSavedSearch: (loadedSavedSearchName: string) => void;
-
-  /**
-   * When creating or deleting records, the saved search list must be refreshed with new data.
-   */
-  refreshSavedSearches: () => void;
+  loadSavedSearch: (savedSearchName: string) => void;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const {
-    indexName,
-    userPreferences,
-    setLoadedSavedSearch,
-    loadedSavedSearch,
-    refreshSavedSearches
-  } = props;
+  const { indexName, userPreferences, loadSavedSearch, loadedSavedSearch } =
+    props;
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
@@ -112,10 +102,8 @@ export function SavedSearch(props: SavedSearchProps) {
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-    refreshSavedSearches();
-
     // The newly saved option, should be switched to the selected.
-    setLoadedSavedSearch(savedSearchName);
+    loadSavedSearch(savedSearchName);
   }
 
   /**
@@ -145,9 +133,7 @@ export function SavedSearch(props: SavedSearchProps) {
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-      setLoadedSavedSearch("default");
-
-      refreshSavedSearches();
+      loadSavedSearch("default");
     }
 
     // Ask the user if they sure they want to delete the saved search.
@@ -192,7 +178,7 @@ export function SavedSearch(props: SavedSearchProps) {
         className="btn btn-primary"
         onClick={() => {
           if (selectRef && selectRef.current) {
-            setLoadedSavedSearch(selectedSavedSearch ?? "");
+            loadSavedSearch(selectedSavedSearch ?? "");
           }
         }}
         disabled={selectedSavedSearch ? false : true}
