@@ -54,25 +54,15 @@ export function GenerateLabelSection({
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
-  
+
   const [template, setTemplate] = useState<TemplateType | null>(null);
+  const { apiClient } = useApiClient();
 
   // data for POST request
   const data = [
-    {
-      materialSampleName: materialSample?.materialSampleName,
-      rejuv_date: "1998-05-19",
-      host: "hostData",
-      rootstock: "rootstockData",
-      location: "locationData",
-      variety: "varietyData",
-    },
+    materialSample
   ];
-
-  const managedAttributeValues = materialSample?.managedAttributes;
   
-  const { apiClient } = useApiClient();
-
   /**
    * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
    *
