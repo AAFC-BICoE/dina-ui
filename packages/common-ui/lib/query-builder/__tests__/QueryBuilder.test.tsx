@@ -15,19 +15,17 @@ const MOCK_INDEX_MAPPING_RESP = {
   data: {
     headers: {},
     body: {
-      indexName: "testIndex",
+      indexName: INDEX_NAME,
       attributes: [
         {
-          label: "createdOn",
-          value: "data.attributes.createdOn",
-          type: "date",
-          path: "data.attributes"
+          name: "createdOn",
+          path: "data.attributes",
+          type: "date"
         },
         {
-          label: "allowDuplicateName",
-          value: "data.attributes.allowDuplicateName",
-          type: "boolean",
-          path: "data.attributes"
+          name: "allowDuplicateName",
+          path: "data.attributes",
+          type: "boolean"
         }
       ],
       relationships: []
@@ -61,9 +59,9 @@ describe("QueryBuilder component", () => {
 
   it("Displays the Query builder with one Query Row by default.", async () => {
     const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{ queryRows: [{}] }}>
+      <DinaForm initialValues={{ queryRows: [{}], group: "" }}>
         <QueryBuilder
-          name={"queryRows"}
+          name="queryRows"
           indexName={INDEX_NAME}
           onGroupChange={() => null}
         />
@@ -90,12 +88,12 @@ describe("QueryBuilder component", () => {
         .prop("options")
     ).toEqual([
       {
-        label: "createdOn",
-        value: "data.attributes.createdOn"
-      },
-      {
         label: "allowDuplicateName",
         value: "data.attributes.allowDuplicateName"
+      },
+      {
+        label: "createdOn",
+        value: "data.attributes.createdOn"
       }
     ]);
   });

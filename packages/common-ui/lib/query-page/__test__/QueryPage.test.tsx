@@ -243,6 +243,9 @@ describe("QueryPage component", () => {
       .find(DatePicker)
       .prop<any>("onChange")(new Date(TEST_SEARCH_DATE));
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
     wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
 
     await new Promise(setImmediate);

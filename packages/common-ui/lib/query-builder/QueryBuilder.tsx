@@ -173,7 +173,9 @@ export function QueryBuilder({
           name="group"
           className="col-md-4"
           onChange={(value, formik) =>
-            onGroupChange({ group: value, ...formik.values })
+            onGroupChange({
+              submittedValues: { ...formik.values, group: value }
+            })
           }
         />
       </DinaFormSection>

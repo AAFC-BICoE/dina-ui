@@ -212,7 +212,7 @@ export function QueryPage<TData extends KitsuResource>({
     );
 
     // Do not search when the query has no content. (It should at least have pagination.)
-    if (!Object.keys(queryDSL).length) return;
+    if (!queryDSL || !Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
     // The included section will be transformed from an array to an object with the type name for each relationship.
@@ -479,19 +479,6 @@ export function QueryPage<TData extends KitsuResource>({
     setPagination({
       ...pagination,
       offset: pagination.limit * newPage
-    });
-    setLoading(true);
-  }
-
-  /**
-   * When the saved search is loading data, we need to save the new loaded search and cause a
-   * re-render.
-   */
-  function onSavedSearchLoad(savedSearchData) {
-    setSearchFilters(savedSearchData);
-    setPagination({
-      ...pagination,
-      offset: 0
     });
     setLoading(true);
   }
