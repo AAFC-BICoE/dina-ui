@@ -45,7 +45,8 @@
     "**/lodash": "^4.17.21",
     "**/react-file-viewer/**/three": "^0.125.0",
     "**/react-file-viewer/**/underscore": "^1.13.1",
-    "**/react-file-viewer/**/lodash": "^4.17.21"
+    "**/react-file-viewer/**/lodash": "^4.17.21",
+    "**/minimist": "^1.2.6"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
