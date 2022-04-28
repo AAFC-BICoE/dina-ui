@@ -33,46 +33,28 @@ export interface SampleListLayoutProps {
 export const getColumnDefinition = () => {
   return [
     {
-      Cell: ({ original: { id, data } }) => (
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
         <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </a>
       ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      keyword: true
+      accessor: "materialSampleName"
     },
     {
-      Cell: ({ original: { included } }) =>
-        included?.collection?.id ? (
-          <Link
-            href={`/collection/collection/view?id=${included?.collection?.id}`}
-          >
-            {included?.collection?.attributes?.name}
+      Cell: ({ original: { collection } }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
           </Link>
         ) : null,
-      label: "collection.name",
-      accessor: "included.attributes.name",
-      relationshipType: "collection",
-      keyword: true
+      accessor: "collection.name"
     },
-    stringArrayCell(
-      "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers"
-    ),
-    {
-      label: "materialSampleType",
-      accessor: "data.attributes.materialSampleType",
-      keyword: true
-    },
-    {
-      label: "createdBy",
-      accessor: "data.attributes.createdBy",
-      keyword: true
-    },
-    dateCell("createdOn", "data.attributes.createdOn")
+    stringArrayCell("dwcOtherCatalogNumbers"),
+    { accessor: "materialSampleType" },
+    "createdBy",
+    dateCell("createdOn")
   ];
 };
 
@@ -99,30 +81,9 @@ export function SampleListLayout({
   ];
   const [queryKey, setQueryKey] = useState("");
 
+  // The old style columns, but add the action buttons at the end.
   const columns: ColumnDefinition<MaterialSample>[] = [
-    {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </a>
-      ),
-      accessor: "materialSampleName"
-    },
-    {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
-          </Link>
-        ) : null,
-      accessor: "collection.name"
-    },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn"),
+    ...getColumnDefinition(),
     ...(onSelect
       ? [
           {

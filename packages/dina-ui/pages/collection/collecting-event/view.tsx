@@ -14,6 +14,7 @@ export default function CollectingEventDetailsPage() {
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
             <QueryTable
               path="collection-api/material-sample"
+              include="collection"
               columns={getColumnDefinition()}
               filter={{
                 rsql: `collectingEvent.uuid==${props.initialValues.id}`
