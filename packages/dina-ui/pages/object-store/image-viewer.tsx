@@ -1,4 +1,4 @@
-import {  useAccount } from "common-ui";
+import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 
 export default function MetadataImagePreviewPage() {
@@ -7,7 +7,7 @@ export default function MetadataImagePreviewPage() {
   const fileBucket = router.query.bucket?.toString();
   const isDerivative = router.query.isDerivative?.toString();
   const fileId = router.query.fileId?.toString();
-  
+
   const filePath = `/api/objectstore-api/file/${fileBucket}/${
     // Add derivative/ before the fileIdentifier if the file to display is a derivative.
     isDerivative === "true" ? "derivative/" : ""
@@ -27,4 +27,3 @@ export default function MetadataImagePreviewPage() {
     </div>
   );
 }
-
