@@ -1,6 +1,7 @@
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { SortingRule } from "react-table";
-import { ColumnDefinition, LimitOffsetPageSpec } from "../..";
+import { LimitOffsetPageSpec } from "../..";
+import { TableColumn } from "../../query-page/QueryPage";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -21,21 +22,21 @@ const defaultSubmittedValues: TransformQueryToDSLParams = {
   queryRows: []
 };
 
-const columnDefinitions: ColumnDefinition<MaterialSample>[] = [
+const columnDefinitions: TableColumn<MaterialSample>[] = [
   {
     label: "materialSampleName",
     accessor: "data.attributes.materialSampleName",
-    keyword: true
+    isKeyword: true
   },
   {
     label: "materialSampleType",
     accessor: "data.attributes.materialSampleType",
-    keyword: true
+    isKeyword: true
   },
   {
     label: "collection.name",
     accessor: "included.attributes.name",
-    keyword: true,
+    isKeyword: true,
     relationshipType: "collection"
   }
 ];

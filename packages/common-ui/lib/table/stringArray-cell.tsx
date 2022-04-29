@@ -12,7 +12,7 @@ export function stringArrayCell(label: string, accessor?: string) {
       return null;
     },
     label,
-    keyword: true,
+    isKeyword: true,
     accessor: accessor ?? label
   };
 }

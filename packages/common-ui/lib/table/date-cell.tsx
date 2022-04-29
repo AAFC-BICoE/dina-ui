@@ -9,7 +9,7 @@ export function dateCell(label: string, accessor?: string) {
       return <DateView date={value} />;
     },
     label,
-    keyword: false,
+    isKeyword: false,
     accessor: accessor ?? label
   };
 }
