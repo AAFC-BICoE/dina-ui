@@ -17,6 +17,10 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 ) {
   const builder = Bodybuilder();
 
+  if (!submittedValues) {
+    return;
+  }
+
   /**
    * Formik will store the values in different spots depending on the queryRow type.
    *
@@ -109,7 +113,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
-  submittedValues.queryRows
+  submittedValues?.queryRows
     .filter(
       queryRow =>
         queryRow.fieldName &&

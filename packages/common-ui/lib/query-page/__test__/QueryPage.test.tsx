@@ -1,8 +1,7 @@
 import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { QueryPage } from "../QueryPage";
+import { QueryPage, TableColumn } from "../QueryPage";
 import DatePicker from "react-datepicker";
-import { ColumnDefinition } from "../../table/QueryTable";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
 
@@ -196,12 +195,12 @@ const mockCountPost = jest.fn<any, any>(async path => {
 const TEST_SEARCH_DATE =
   "Tue Jan 25 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
 
-const TEST_COLUMNS: ColumnDefinition<any>[] = [
+const TEST_COLUMNS: TableColumn<any>[] = [
   { accessor: "materialSampleName" },
   { accessor: "collection.name" },
   { accessor: "dwcOtherCatalogNumbers" },
   { accessor: "materialSampleType" },
-  "createdBy",
+  { accessor: "createdBy" },
   { accessor: "createdOn" },
   { Header: "", sortable: false }
 ];
@@ -243,6 +242,9 @@ describe("QueryPage component", () => {
       .find("DateField[name='queryRows[0].date']")
       .find(DatePicker)
       .prop<any>("onChange")(new Date(TEST_SEARCH_DATE));
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     wrapper.find("FaPlus[name='queryRows[0].addRow']").simulate("click");
 

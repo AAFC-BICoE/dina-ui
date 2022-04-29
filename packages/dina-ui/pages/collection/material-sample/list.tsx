@@ -25,49 +25,36 @@ export interface SampleListLayoutProps {
   showBulkActions?: boolean;
 }
 
+/**
+ * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
+ *
+ * The old version of the listing is still when searching for associated samples.
+ */
 export const getColumnDefinition = () => {
   return [
     {
-      Cell: ({ original: { id, data } }) => (
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
         <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
         </a>
       ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      keyword: true
+      accessor: "materialSampleName"
     },
     {
-      Cell: ({ original: { included } }) =>
-        included?.collection?.id ? (
-          <Link
-            href={`/collection/collection/view?id=${included?.collection?.id}`}
-          >
-            {included?.collection?.attributes?.name}
+      Cell: ({ original: { collection } }) =>
+        collection?.id ? (
+          <Link href={`/collection/collection/view?id=${collection?.id}`}>
+            {collection?.name}
           </Link>
         ) : null,
-      label: "collection.name",
-      accessor: "included.attributes.name",
-      relationshipType: "collection",
-      keyword: true
+      accessor: "collection.name"
     },
-    stringArrayCell(
-      "dwcOtherCatalogNumbers",
-      "data.attributes.dwcOtherCatalogNumbers"
-    ),
-    {
-      label: "materialSampleType",
-      accessor: "data.attributes.materialSampleType",
-      keyword: true
-    },
-    {
-      label: "createdBy",
-      accessor: "data.attributes.createdBy",
-      keyword: true
-    },
-    dateCell("createdOn", "data.attributes.createdOn")
+    stringArrayCell("dwcOtherCatalogNumbers"),
+    { accessor: "materialSampleType" },
+    "createdBy",
+    dateCell("createdOn")
   ];
 };
 
@@ -92,33 +79,11 @@ export function SampleListLayout({
       type: "DATE"
     }
   ];
-
   const [queryKey, setQueryKey] = useState("");
 
+  // The old style columns, but add the action buttons at the end.
   const columns: ColumnDefinition<MaterialSample>[] = [
-    {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </a>
-      ),
-      accessor: "materialSampleName"
-    },
-    {
-      Cell: ({ original: { collection } }) =>
-        collection?.id ? (
-          <Link href={`/collection/collection/view?id=${collection?.id}`}>
-            {collection?.name}
-          </Link>
-        ) : null,
-      accessor: "collection.name"
-    },
-    stringArrayCell("dwcOtherCatalogNumbers"),
-    { accessor: "materialSampleType" },
-    "createdBy",
-    dateCell("createdOn"),
+    ...getColumnDefinition(),
     ...(onSelect
       ? [
           {
@@ -165,7 +130,6 @@ export function SampleListLayout({
           }
         ])
   ];
-
   return (
     <ListPageLayout
       additionalFilters={filterForm => ({
@@ -218,9 +182,63 @@ export function SampleListLayout({
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-  const [queryKey, setQueryKey] = useState("");
+
+  // Columns for the elastic search list page.
   const columns = [
-    ...getColumnDefinition(),
+    // Material Sample Name
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    },
+
+    // Collection Name (External Relationship)
+    {
+      Cell: ({ original: { included } }) =>
+        included?.collection?.id ? (
+          <Link
+            href={`/collection/collection/view?id=${included?.collection?.id}`}
+          >
+            {included?.collection?.attributes?.name}
+          </Link>
+        ) : null,
+      label: "collection.name",
+      accessor: "included.attributes.name",
+      relationshipType: "collection",
+      isKeyword: true
+    },
+
+    // List of catalogue numbers
+    stringArrayCell(
+      "dwcOtherCatalogNumbers",
+      "data.attributes.dwcOtherCatalogNumbers"
+    ),
+
+    // Material Sample Type
+    {
+      label: "materialSampleType",
+      accessor: "data.attributes.materialSampleType",
+      isKeyword: true
+    },
+
+    // Created By
+    {
+      label: "createdBy",
+      accessor: "data.attributes.createdBy",
+      isKeyword: true
+    },
+
+    // Created On
+    dateCell("createdOn", "data.attributes.createdOn"),
+
+    // Action buttons for each row.
     ...[
       {
         Cell: ({ original: sample }) => (
@@ -240,7 +258,6 @@ export default function MaterialSampleListPage() {
               type="material-sample"
               id={sample.id}
               options={{ apiBaseUrl: "/collection-api" }}
-              onDeleted={() => setQueryKey(String(Math.random()))}
             />
           </div>
         ),
@@ -249,6 +266,7 @@ export default function MaterialSampleListPage() {
       }
     ]
   ];
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
