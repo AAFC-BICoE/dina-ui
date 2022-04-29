@@ -1,6 +1,6 @@
 import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
-import { ColumnDefinition, LimitOffsetPageSpec } from "..";
+import { LimitOffsetPageSpec, TableColumn } from "..";
 import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
 
@@ -11,7 +11,7 @@ export interface TransformQueryToDSLParams {
 
 export function transformQueryToDSL<TData extends KitsuResource>(
   pagination: LimitOffsetPageSpec,
-  columns: ColumnDefinition<TData>[],
+  columns: TableColumn<TData>[],
   sortingRules: SortingRule[],
   submittedValues: TransformQueryToDSLParams
 ) {
@@ -178,7 +178,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
         const indexPath =
           columnDefinition.accessor +
-          (columnDefinition.keyword && columnDefinition.keyword === true
+          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
             ? ".keyword"
             : "");
 
