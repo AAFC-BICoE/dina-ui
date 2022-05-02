@@ -7,7 +7,8 @@ import {
   FilterAttribute,
   ListPageLayout,
   QueryPage,
-  stringArrayCell
+  stringArrayCell,
+  TableColumn
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -184,7 +185,7 @@ export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
 
   // Columns for the elastic search list page.
-  const columns = [
+  const columns: TableColumn<MaterialSample>[] = [
     // Material Sample Name
     {
       Cell: ({ original: { id, data } }) => (
