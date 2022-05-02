@@ -110,6 +110,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   const [debouncedSearchValue] = timeoutMs
     ? useDebounce(searchValue, timeoutMs)
     : [searchValue];
+  const [focus, setFocus] = useState<boolean>(false);
 
   const querySpec: JsonApiQuerySpec = {
     path: "",
@@ -123,7 +124,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     useQuery<T[]>(querySpec, {
       // Don't show results when the search is empty:
       disabled:
-        !query || (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
+        !query ||
+        !focus ||
+        (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
     });
 
   const allSuggestions = compact([
@@ -167,7 +170,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           background-color: #ddd;
           cursor: pointer;
         }
-        `}</style>
+      `}</style>
       <div className="autosuggest">
         <AutoSuggest
           id={id}
@@ -185,7 +188,11 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
           shouldRenderSuggestions={
             alwaysShowSuggestions ? () => !!alwaysShowSuggestions : undefined
           }
-          inputProps={inputProps as InputProps<any>}
+          inputProps={{
+            onFocus: () => setFocus(true),
+            onBlur: () => setFocus(false),
+            ...(inputProps as InputProps<any>)
+          }}
           theme={{
             suggestionsList: "list-group",
             suggestion: "list-group-item",
