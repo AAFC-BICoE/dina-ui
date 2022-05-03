@@ -347,7 +347,24 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Diagram of all the possible orientation values.",
   field_originalFilename: "Original Filename",
   field_parentStorageUnit: "Location",
+  field_preparationMethod: "Preparation Method",
+  field_preparationMethod_tooltip:
+    "A noun representing the process used (the how) in preparing the material sample. Examples: culture, mechanical innoculation, dissection.",
   field_preparationType: "Preparation Type",
+  field_preparationType_tooltip:
+    "A noun representing what is getting prepared. Examples: leg, tissues, DNA",
+  field_preservationType: "Preservation Type",
+  field_preservationType_tooltip:
+    "Description of the preservation type of the material sample. Example: Freeze-Dry.",
+  field_preparationFixative: "Preparation Fixative",
+  field_preparationFixative_tooltip:
+    "Solution that was applied to or in which the material sample is preserved. Examples: EtOH 95%, EtOH 75%, EtOH 70%, saline, glue.",
+  field_preparationMaterials: "Preparation Materials",
+  field_preparationMaterials_tooltip:
+    "Additional, typically inert physical environments or objects in which or on which the organism in a material sample is stored. It does not express the state of the organism nor the fixatives used but rather the materials that allow the organism to be presented. Examples: pinned, glass vial, plastic jar, glass jar, microscope slide, acid-free paper, sticky trap/card, Eppendorf tube.",
+  field_preparationSubstrate: "Preparation Substrate",
+  field_preparationSubstrate_tooltip:
+    "Material on which the organism in the material sample is presented or grows. Examples: rock, log, agar.",
   field_projectName: "Project Name",
   field_projectStatus: "Project Status",
   field_publiclyReleasable: "Publicly releasable",
@@ -409,6 +426,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifierURI: "Identifier URI",
   identifiers: "Identifiers",
   includeAll: "Include All",
+  inspiredBy: "Inspired by ABCD 3.0.",
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",

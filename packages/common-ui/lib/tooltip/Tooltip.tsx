@@ -1,7 +1,6 @@
 import RcTooltip from "rc-tooltip";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 
 interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
@@ -47,7 +46,6 @@ export function Tooltip({
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
-  const [popupVisible, setPopupVisible] = useState(false);
 
   // Determine if a tooltip message needs to be displayed.
   const tooltipMessage =
@@ -95,38 +93,23 @@ export function Tooltip({
         }
         placement="top"
         trigger={["focus", "hover"]}
-        visible={popupVisible}
       >
         <span>
           {visibleElement ? (
-            <span
-              onKeyUp={e =>
-                e.key === "Escape"
-                  ? setPopupVisible(false)
-                  : setPopupVisible(true)
-              }
-              onMouseOver={() => setPopupVisible(true)}
-              onMouseOut={() => setPopupVisible(false)}
-              onBlur={() => setPopupVisible(false)}
-            >
+            <span aria-describedby={id} tabIndex={0}>
               {visibleElement}
             </span>
           ) : (
             <img
               src="/static/images/iconInformation.gif"
               alt={id ? formatMessage({ id }) : ""}
+              aria-describedby={id}
               tabIndex={0}
-              onKeyUp={e =>
-                e.key === "Escape"
-                  ? setPopupVisible(false)
-                  : setPopupVisible(true)
-              }
-              onMouseOver={() => setPopupVisible(true)}
-              onMouseOut={() => setPopupVisible(false)}
-              onBlur={() => setPopupVisible(false)}
             />
           )}
         </span>
+
+        {/* Accessibility input */}
       </RcTooltip>
     </span>
   );

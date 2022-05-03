@@ -106,6 +106,8 @@ export function PreparationField({
                     : { ...filterBy(["name"])(input) }
                 }
                 key={group}
+                tooltipLink="https://abcd.tdwg.org/terms/#preparationType"
+                tooltipLinkText="inspiredBy"
               />
             )}
           </FieldSpy>
@@ -122,7 +124,11 @@ export function PreparationField({
             suggestion={sample => sample?.preparationMethod ?? ""}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
-          <TextField {...fieldProps("preservationType")} />
+          <TextField
+            {...fieldProps("preservationType")}
+            tooltipLink="https://abcd.tdwg.org/terms/#preservationType"
+            tooltipLinkText="inspiredBy"
+          />
           <TextField {...fieldProps("preparationFixative")} />
           <TextField {...fieldProps("preparationMaterials")} />
           <TextField {...fieldProps("preparationSubstrate")} />
