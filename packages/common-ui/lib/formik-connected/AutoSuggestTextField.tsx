@@ -43,10 +43,16 @@ interface AutoSuggestConfig<T extends KitsuResource> {
   /** Show the suggestions even when the input is blank. */
   alwaysShowSuggestions?: boolean;
 
-  /** Use a different query hook instead of the REST API. */
+  /**
+   * Use a different query hook instead of the REST API.
+   *
+   * The disabled property is optional but can be used to check if the query should be skipped.
+   * It's up to the useCustomQuery implementation to use the disabled property.
+   */
   useCustomQuery?: (
     searchQuery: string,
-    querySpec: JsonApiQuerySpec
+    querySpec: JsonApiQuerySpec,
+    disabled?: boolean
   ) => {
     loading?: boolean;
     response?: { data: PersistedResource<T>[] };
@@ -119,14 +125,18 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     ...query?.(debouncedSearchValue, formik)
   };
 
+  // Conditions when the query should be skipped. Custom queries will need to implement that directly
+  // into the custom query.
+  const disabledBoolean =
+    !query ||
+    !focus ||
+    (!alwaysShowSuggestions && !debouncedSearchValue?.trim());
+
   const { loading, response } =
-    useCustomQuery?.(searchValue, querySpec) ??
+    useCustomQuery?.(searchValue, querySpec, disabledBoolean) ??
     useQuery<T[]>(querySpec, {
-      // Don't show results when the search is empty:
-      disabled:
-        !query ||
-        !focus ||
-        (!alwaysShowSuggestions && !debouncedSearchValue?.trim())
+      // Don't show results when the search is empty or when not in focus:
+      disabled: disabledBoolean
     });
 
   const allSuggestions = compact([
