@@ -51,6 +51,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
       ...(showPermissions && { header: { "include-dina-permission": "true" } })
     },
     {
+      disabled: !id,
       onSuccess: async ({ data: transaction }) => {
         // Convert the agent UUIDs to Person objects:
         for (const agentRole of transaction.agentRoles ?? []) {
