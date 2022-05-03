@@ -4,7 +4,8 @@ import {
   dateCell,
   stringArrayCell,
   TableColumn,
-  QueryPage
+  QueryPage,
+  BooleanCell
 } from "common-ui";
 import Link from "next/link";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
@@ -33,12 +34,7 @@ const TABLE_COLUMNS: TableColumn<Transaction>[] = [
     isKeyword: true
   },
   stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
-  {
-    Cell: ({ original: data }) =>
-      data?.attributes?.materialToBeReturned?.toString() ?? "",
-    label: "materialToBeReturned",
-    accessor: "data.attributes.materialToBeReturned"
-  },
+  BooleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
     label: "purpose",
     accessor: "data.attributes.purpose",
