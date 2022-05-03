@@ -14,13 +14,13 @@ import { CommonMessage } from "../intl/common-ui-intl";
 export function BooleanCell(label: string, accessor?: string) {
   return {
     Cell: ({ original }) => {
-      const booleanValue = get(original, accessor ?? label).toString();
+      const booleanValue = get(original, accessor ?? label)?.toString();
       if (booleanValue === "true") {
         return <CommonMessage id="true" />;
       } else if (booleanValue === "false") {
         return <CommonMessage id="false" />;
       } else {
-        return "";
+        return <></>;
       }
     },
     label,
