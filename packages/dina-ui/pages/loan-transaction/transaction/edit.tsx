@@ -51,6 +51,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
       ...(showPermissions && { header: { "include-dina-permission": "true" } })
     },
     {
+      disabled: !id,
       onSuccess: async ({ data: transaction }) => {
         // Convert the agent UUIDs to Person objects:
         for (const agentRole of transaction.agentRoles ?? []) {
@@ -476,32 +477,8 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
       </FieldSet>
       <div className="row">
         <DateField {...fieldProps("shippedOn")} className="col-sm-6" />
-        <AutoSuggestTextField<Transaction>
-          className="col-sm-6"
-          {...fieldProps("status")}
-          query={(search, ctx) => ({
-            path: "loan-transaction-api/transaction",
-            filter: {
-              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `${fieldName}.status==${search}*`
-            }
-          })}
-          alwaysShowSuggestions={true}
-          suggestion={transaction => transaction?.shipment?.status}
-        />
-        <AutoSuggestTextField<Transaction>
-          className="col-sm-6"
-          {...fieldProps("packingMethod")}
-          query={(search, ctx) => ({
-            path: "loan-transaction-api/transaction",
-            filter: {
-              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `${fieldName}.packingMethod==${search}*`
-            }
-          })}
-          alwaysShowSuggestions={true}
-          suggestion={transaction => transaction?.shipment?.packingMethod}
-        />
+        <TextField {...fieldProps("status")} className="col-sm-6" />
+        <TextField {...fieldProps("packingMethod")} className="col-sm-6" />
         <TextField {...fieldProps("trackingNumber")} className="col-sm-6" />
       </div>
       <FieldSet
@@ -509,35 +486,15 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
         style={{ backgroundColor: "#f3f3f3" }}
       >
         <div className="row">
-          <AutoSuggestTextField<Transaction>
-            className="col-sm-6"
+          <TextField
             {...fieldProps("address.receiverName")}
-            query={(search, ctx) => ({
-              path: "loan-transaction-api/transaction",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `${fieldName}.address.receiverName==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={transaction =>
-              transaction?.shipment?.address?.receiverName
-            }
-          />
-          <AutoSuggestTextField<Transaction>
+            customName="receiverName"
             className="col-sm-6"
+          />
+          <TextField
             {...fieldProps("address.companyName")}
-            query={(search, ctx) => ({
-              path: "loan-transaction-api/transaction",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `${fieldName}.address.companyName==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={transaction =>
-              transaction?.shipment?.address?.companyName
-            }
+            customName="companyName"
+            className="col-sm-6"
           />
           <TextField
             {...fieldProps("address.addressLine1")}
