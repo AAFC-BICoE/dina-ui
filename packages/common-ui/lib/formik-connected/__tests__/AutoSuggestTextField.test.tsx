@@ -38,6 +38,7 @@ describe("AutoSuggestTextField", () => {
     );
 
     wrapper.find("input").simulate("change", { target: { value: "p" } });
+    wrapper.find("input").simulate("focus");
 
     await new Promise(setImmediate);
     wrapper.update();
