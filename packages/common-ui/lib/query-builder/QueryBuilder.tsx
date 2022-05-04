@@ -55,7 +55,8 @@ export function QueryBuilder({
             ? "data." + key.name
             : key.name,
           type: key.type,
-          path: key.path
+          path: key.path,
+          distinctTerm: key.distinct_term_agg ?? false
         });
       });
 
@@ -77,7 +78,8 @@ export function QueryBuilder({
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
           parentName: relationship.value,
-          parentPath: relationship.path
+          parentPath: relationship.path,
+          distinctTerm: relationship.distinct_term_agg ?? false
         });
       });
     });

@@ -4,8 +4,11 @@ import {
   NumberField,
   QueryLogicSwitchField,
   SelectField,
-  TextField
+  TextField,
+  JsonApiQuerySpec
 } from "..";
+import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
+import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
@@ -51,6 +54,14 @@ export interface ESIndexMapping {
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
    */
   type: string;
+
+  /**
+   * If enabled, it will allow the user to see suggestions as they type. The suggestions will come
+   * from elastic search based on most common values saved.
+   *
+   * Only available for the text type.
+   */
+  distinctTerm: boolean;
 
   /**
    * The path for the attribute without the attribute name. This path does not include the parent
@@ -109,6 +120,7 @@ export interface QueryRowExportProps {
 
 interface TypeVisibility {
   isText: boolean;
+  isSuggestedText: boolean;
   isBoolean: boolean;
   isNumber: boolean;
   isDate: boolean;
@@ -147,6 +159,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   // Depending on the type, it changes what fields need to be displayed.
   const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
     isText: dataFromIndexMapping?.type === "text",
+    isSuggestedText: dataFromIndexMapping?.distinctTerm ?? false,
     isBoolean: dataFromIndexMapping?.type === "boolean",
     isNumber:
       dataFromIndexMapping?.type === "long" ||
@@ -176,6 +189,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
     setTypeVisibility({
       isText: newDataFromIndexMapping?.type === "text",
+      isSuggestedText: dataFromIndexMapping?.distinctTerm ?? false,
       isBoolean: newDataFromIndexMapping?.type === "boolean",
       isNumber:
         newDataFromIndexMapping?.type === "long" ||
@@ -256,11 +270,19 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {typeVisibility.isText && (
+          {typeVisibility.isText && !typeVisibility.isSuggestedText && (
             <TextField
               name={fieldProps("matchValue", index)}
               className="me-1 flex-fill"
               removeLabel={true}
+            />
+          )}
+          {typeVisibility.isSuggestedText && (
+            <AutoSuggestTextField
+              name={name}
+              useCustomQuery={(textEntered: string, disabled: boolean) =>
+                useElasticSearchDistinctTerm({ textEntered, disabled })
+              }
             />
           )}
           {typeVisibility.isDate && (
