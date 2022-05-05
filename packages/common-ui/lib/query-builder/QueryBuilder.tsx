@@ -136,6 +136,7 @@ export function QueryBuilder({
             fieldArrayProps.push(
               <QueryRow
                 name={fieldArrayProps.name}
+                indexName={indexName}
                 esIndexMapping={sortedData as any}
                 index={elements?.length ?? 0}
                 removeRow={removeRow}
@@ -159,6 +160,7 @@ export function QueryBuilder({
             ? elements?.map((_, index) => (
                 <QueryRow
                   name={fieldArrayProps.name}
+                  indexName={indexName}
                   key={index}
                   index={index}
                   addRow={addRow}

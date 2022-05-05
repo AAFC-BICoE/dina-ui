@@ -4,8 +4,7 @@ import {
   NumberField,
   QueryLogicSwitchField,
   SelectField,
-  TextField,
-  JsonApiQuerySpec
+  TextField
 } from "..";
 import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
 import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
@@ -13,7 +12,11 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
+
 export interface QueryRowProps {
+  /** Index name passed from the QueryPage component. */
+  indexName: string;
+
   esIndexMapping: ESIndexMapping[];
   index: number;
   addRow?: () => void;
@@ -138,7 +141,8 @@ const queryRowBooleanOptions = [
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
-  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name, indexName } =
+    queryRowProps;
 
   const initState = {
     matchValue: null,
@@ -189,7 +193,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
     setTypeVisibility({
       isText: newDataFromIndexMapping?.type === "text",
-      isSuggestedText: dataFromIndexMapping?.distinctTerm ?? false,
+      isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
       isBoolean: newDataFromIndexMapping?.type === "boolean",
       isNumber:
         newDataFromIndexMapping?.type === "long" ||
@@ -285,13 +289,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               alwaysShowSuggestions={true}
               suggestions={value =>
                 useElasticSearchDistinctTerm({
-                  fieldName: "test",
-                  indexName: "dina_material_sample_index"
+                  fieldName,
+                  indexName
                 }).filter(suggestion =>
                   suggestion.toLowerCase().includes(value.toLowerCase())
                 )
               }
-              timeoutMs={0}
             />
           )}
           {typeVisibility.isDate && (

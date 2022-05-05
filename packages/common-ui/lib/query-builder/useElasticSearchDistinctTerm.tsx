@@ -2,6 +2,8 @@ import Bodybuilder from "bodybuilder";
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 
+const AGGREGATION_NAME = "term_aggregation";
+
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
   fieldName: string;
@@ -27,8 +29,16 @@ export function useElasticSearchDistinctTerm({
     // Use bodybuilder to generate the query to send to elastic search.
     const builder = Bodybuilder();
     builder.size(0);
-    builder.aggregation("terms", fieldName, {
-      size: 1000
+    builder.aggregation(
+      "terms",
+      "included.attributes.name.keyword",
+      {
+        size: 1000
+      },
+      AGGREGATION_NAME
+    );
+    builder.query("nested", { path: "included" }, queryBuilder => {
+      return queryBuilder.query("match", "included.type", "preparation-type");
     });
 
     const resp = await apiClient.axios.post(
@@ -41,7 +51,9 @@ export function useElasticSearchDistinctTerm({
       }
     );
 
-    setSuggestions(resp.data);
+    setSuggestions(
+      resp?.data?.aggregations?.[AGGREGATION_NAME as string]?.buckets
+    );
   }
 
   // Do not perform any searching if disabled. Return an empty result.
