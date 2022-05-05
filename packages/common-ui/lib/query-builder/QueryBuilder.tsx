@@ -56,7 +56,7 @@ export function QueryBuilder({
             : key.name,
           type: key.type,
           path: key.path,
-          distinctTerm: key.distinct_term_agg ?? false
+          distinctTerm: key.distinct_term_agg
         });
       });
 
@@ -74,12 +74,12 @@ export function QueryBuilder({
 
         result.push({
           label: attributeLabel,
-          value: relationship.path + "." + attributeLabel,
+          value: relationship.value + "." + attributeLabel,
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
           parentName: relationship.value,
           parentPath: relationship.path,
-          distinctTerm: relationship.distinct_term_agg ?? false
+          distinctTerm: relationshipAttribute.distinct_term_agg
         });
       });
     });

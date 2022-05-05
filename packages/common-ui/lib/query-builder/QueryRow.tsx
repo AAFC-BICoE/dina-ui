@@ -159,7 +159,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   // Depending on the type, it changes what fields need to be displayed.
   const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
     isText: dataFromIndexMapping?.type === "text",
-    isSuggestedText: dataFromIndexMapping?.distinctTerm ?? false,
+    isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
     isBoolean: dataFromIndexMapping?.type === "boolean",
     isNumber:
       dataFromIndexMapping?.type === "long" ||
@@ -279,10 +279,19 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           )}
           {typeVisibility.isSuggestedText && (
             <AutoSuggestTextField
-              name={name}
-              useCustomQuery={(textEntered: string, disabled: boolean) =>
-                useElasticSearchDistinctTerm({ textEntered, disabled })
+              name={fieldProps("matchValue", index)}
+              removeLabel={true}
+              className="me-1 flex-fill"
+              alwaysShowSuggestions={true}
+              suggestions={value =>
+                useElasticSearchDistinctTerm({
+                  fieldName: "test",
+                  indexName: "dina_material_sample_index"
+                }).filter(suggestion =>
+                  suggestion.toLowerCase().includes(value.toLowerCase())
+                )
               }
+              timeoutMs={0}
             />
           )}
           {typeVisibility.isDate && (
