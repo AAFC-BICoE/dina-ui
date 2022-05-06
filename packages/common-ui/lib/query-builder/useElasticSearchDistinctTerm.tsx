@@ -42,13 +42,8 @@ export function useElasticSearchDistinctTerm({
 
     // Group needs to be queried to only show the users most used values.
     if (groups && groups.length !== 0) {
-      if (groups.length === 1) {
-        // Only one group to filter by.
-        builder.query("match", "data.attributes.group", groups[0]);
-      } else {
-        // Multiple items.
-        builder.query("terms", "data.attributes.group", groups);
-      }
+      // terms is used to be able to support multiple groups.
+      builder.query("terms", "data.attributes.group", groups);
     }
 
     // If the field has a relationship type, we need to do a nested query to filter it.

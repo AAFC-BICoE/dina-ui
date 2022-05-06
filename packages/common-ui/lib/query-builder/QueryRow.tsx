@@ -164,7 +164,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   // Depending on the type, it changes what fields need to be displayed.
   const typeVisibility: TypeVisibility = {
-    isText: dataFromIndexMapping?.type === "text",
+    isText:
+      dataFromIndexMapping?.type === "text" &&
+      dataFromIndexMapping?.distinctTerm !== true,
     isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
     isBoolean: dataFromIndexMapping?.type === "boolean",
     isNumber:
@@ -259,35 +261,50 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {typeVisibility.isText && !typeVisibility.isSuggestedText && (
-            <TextField
-              name={fieldProps("matchValue", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
+          {typeVisibility.isText && (
+            <>
+              <TextField
+                name={fieldProps("matchValue", index)}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+              <SelectField
+                name={fieldProps("matchType", index)}
+                options={queryRowMatchOptions}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+            </>
           )}
           {typeVisibility.isSuggestedText && (
-            <AutoSuggestTextField
-              name={fieldProps("matchValue", index)}
-              removeLabel={true}
-              className="me-1 flex-fill"
-              alwaysShowSuggestions={true}
-              suggestions={value =>
-                useElasticSearchDistinctTerm({
-                  fieldName:
-                    dataFromIndexMapping?.parentPath +
-                    "." +
-                    dataFromIndexMapping?.path +
-                    "." +
-                    dataFromIndexMapping?.label,
-                  groups: selectedGroups,
-                  relationshipType: dataFromIndexMapping?.parentName,
-                  indexName
-                }).filter(suggestion =>
-                  suggestion?.toLowerCase()?.includes(value?.toLowerCase())
-                )
-              }
-            />
+            <>
+              <AutoSuggestTextField
+                name={fieldProps("matchValue", index)}
+                removeLabel={true}
+                className="me-1 flex-fill"
+                alwaysShowSuggestions={true}
+                suggestions={value =>
+                  useElasticSearchDistinctTerm({
+                    fieldName:
+                      dataFromIndexMapping?.parentPath +
+                      "." +
+                      dataFromIndexMapping?.path +
+                      "." +
+                      dataFromIndexMapping?.label,
+                    groups: selectedGroups,
+                    relationshipType: dataFromIndexMapping?.parentName,
+                    indexName
+                  }).filter(suggestion =>
+                    suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+                  )
+                }
+              />
+              <input
+                name={fieldProps("matchType", index)}
+                value={"term"}
+                type="hidden"
+              />
+            </>
           )}
           {typeVisibility.isDate && (
             <DateField
