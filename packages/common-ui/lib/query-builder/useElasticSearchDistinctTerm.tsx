@@ -2,8 +2,9 @@ import Bodybuilder from "bodybuilder";
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 
-const AGGREGATION_NAME = "term_aggregation";
-const NEST_AGGREGATION_NAME = "included_aggregation";
+const TOTAL_SUGGESTIONS: number = 100;
+const AGGREGATION_NAME: string = "term_aggregation";
+const NEST_AGGREGATION_NAME: string = "included_aggregation";
 
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
@@ -12,6 +13,9 @@ interface QuerySuggestionFieldProps {
   /** If the field is a relationship, we need to know the type to filter it. */
   relationshipType?: string;
 
+  /** An array of the groups to filter the distinct terms by. This can be an empty group which will skip filtering by group. */
+  groups: string[];
+
   /** The index you want elastic search to perform the search on */
   indexName: string;
 }
@@ -19,6 +23,7 @@ interface QuerySuggestionFieldProps {
 export function useElasticSearchDistinctTerm({
   fieldName,
   relationshipType,
+  groups,
   indexName
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
@@ -35,6 +40,17 @@ export function useElasticSearchDistinctTerm({
     const builder = Bodybuilder();
     builder.size(0);
 
+    // Group needs to be queried to only show the users most used values.
+    if (groups && groups.length !== 0) {
+      if (groups.length === 1) {
+        // Only one group to filter by.
+        builder.query("match", "data.attributes.group", groups[0]);
+      } else {
+        // Multiple items.
+        builder.query("terms", "data.attributes.group", groups);
+      }
+    }
+
     // If the field has a relationship type, we need to do a nested query to filter it.
     if (relationshipType) {
       builder
@@ -50,7 +66,7 @@ export function useElasticSearchDistinctTerm({
               "terms",
               fieldName + ".keyword",
               {
-                size: 1000
+                size: TOTAL_SUGGESTIONS
               },
               AGGREGATION_NAME
             )
@@ -61,7 +77,7 @@ export function useElasticSearchDistinctTerm({
         "terms",
         fieldName + ".keyword",
         {
-          size: 1000
+          size: TOTAL_SUGGESTIONS
         },
         AGGREGATION_NAME
       );
@@ -78,14 +94,11 @@ export function useElasticSearchDistinctTerm({
     );
 
     setSuggestions(
-      resp?.data?.aggregations?.[NEST_AGGREGATION_NAME as string]?.[
-        AGGREGATION_NAME as string
+      resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
+        AGGREGATION_NAME
       ]?.buckets?.map(bucket => bucket.key)
     );
   }
-
-  // Do not perform any searching if disabled. Return an empty result.
-  // if (disabled) return { loading: false, response: { data: [] } };
 
   return suggestions;
 }

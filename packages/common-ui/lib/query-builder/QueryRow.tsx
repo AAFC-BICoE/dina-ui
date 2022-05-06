@@ -160,6 +160,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     attribute => attribute.value === fieldName
   );
 
+  const selectedGroups: string[] = (formikProps.values as any)?.group;
+
   // Depending on the type, it changes what fields need to be displayed.
   const typeVisibility: TypeVisibility = {
     isText: dataFromIndexMapping?.type === "text",
@@ -278,6 +280,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                     dataFromIndexMapping?.path +
                     "." +
                     dataFromIndexMapping?.label,
+                  groups: selectedGroups,
                   relationshipType: dataFromIndexMapping?.parentName,
                   indexName
                 }).filter(suggestion =>
