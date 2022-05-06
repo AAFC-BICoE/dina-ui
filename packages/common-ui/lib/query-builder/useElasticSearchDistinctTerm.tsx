@@ -3,10 +3,14 @@ import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 
 const AGGREGATION_NAME = "term_aggregation";
+const NEST_AGGREGATION_NAME = "included_aggregation";
 
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
   fieldName: string;
+
+  /** If the field is a relationship, we need to know the type to filter it. */
+  relationshipType?: string;
 
   /** The index you want elastic search to perform the search on */
   indexName: string;
@@ -14,6 +18,7 @@ interface QuerySuggestionFieldProps {
 
 export function useElasticSearchDistinctTerm({
   fieldName,
+  relationshipType,
   indexName
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
@@ -29,17 +34,38 @@ export function useElasticSearchDistinctTerm({
     // Use bodybuilder to generate the query to send to elastic search.
     const builder = Bodybuilder();
     builder.size(0);
-    builder.aggregation(
-      "terms",
-      "included.attributes.name.keyword",
-      {
-        size: 1000
-      },
-      AGGREGATION_NAME
-    );
-    builder.query("nested", { path: "included" }, queryBuilder => {
-      return queryBuilder.query("match", "included.type", "preparation-type");
-    });
+
+    // If the field has a relationship type, we need to do a nested query to filter it.
+    if (relationshipType) {
+      builder
+        .query("nested", { path: "included" }, queryBuilder => {
+          return queryBuilder.query("match", "included.type", relationshipType);
+        })
+        .aggregation(
+          "nested",
+          { path: "included" },
+          NEST_AGGREGATION_NAME,
+          agg =>
+            agg.aggregation(
+              "terms",
+              fieldName + ".keyword",
+              {
+                size: 1000
+              },
+              AGGREGATION_NAME
+            )
+        );
+    } else {
+      // If it's an attribute, no need to use nested filters.
+      builder.aggregation(
+        "terms",
+        fieldName + ".keyword",
+        {
+          size: 1000
+        },
+        AGGREGATION_NAME
+      );
+    }
 
     const resp = await apiClient.axios.post(
       `search-api/search-ws/search`,
@@ -52,7 +78,9 @@ export function useElasticSearchDistinctTerm({
     );
 
     setSuggestions(
-      resp?.data?.aggregations?.[AGGREGATION_NAME as string]?.buckets
+      resp?.data?.aggregations?.[NEST_AGGREGATION_NAME as string]?.[
+        AGGREGATION_NAME as string
+      ]?.buckets?.map(bucket => bucket.key)
     );
   }
 

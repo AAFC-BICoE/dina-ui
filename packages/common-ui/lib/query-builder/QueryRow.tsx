@@ -161,7 +161,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   );
 
   // Depending on the type, it changes what fields need to be displayed.
-  const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
+  const typeVisibility: TypeVisibility = {
     isText: dataFromIndexMapping?.type === "text",
     isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
     isBoolean: dataFromIndexMapping?.type === "boolean",
@@ -176,7 +176,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       dataFromIndexMapping?.type === "scaled_float" ||
       dataFromIndexMapping?.type === "unsigned",
     isDate: dataFromIndexMapping?.type === "date"
-  });
+  };
 
   function onSelectionChange(value) {
     const newDataFromIndexMapping = esIndexMapping.find(
@@ -189,23 +189,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
       parentName: newDataFromIndexMapping?.parentName
-    });
-
-    setTypeVisibility({
-      isText: newDataFromIndexMapping?.type === "text",
-      isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
-      isBoolean: newDataFromIndexMapping?.type === "boolean",
-      isNumber:
-        newDataFromIndexMapping?.type === "long" ||
-        newDataFromIndexMapping?.type === "short" ||
-        newDataFromIndexMapping?.type === "integer" ||
-        newDataFromIndexMapping?.type === "byte" ||
-        newDataFromIndexMapping?.type === "double" ||
-        newDataFromIndexMapping?.type === "float" ||
-        newDataFromIndexMapping?.type === "half_float" ||
-        newDataFromIndexMapping?.type === "scaled_float" ||
-        newDataFromIndexMapping?.type === "unsigned",
-      isDate: newDataFromIndexMapping?.type === "date"
     });
 
     setFieldName(value);
@@ -289,10 +272,16 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               alwaysShowSuggestions={true}
               suggestions={value =>
                 useElasticSearchDistinctTerm({
-                  fieldName,
+                  fieldName:
+                    dataFromIndexMapping?.parentPath +
+                    "." +
+                    dataFromIndexMapping?.path +
+                    "." +
+                    dataFromIndexMapping?.label,
+                  relationshipType: dataFromIndexMapping?.parentName,
                   indexName
                 }).filter(suggestion =>
-                  suggestion.toLowerCase().includes(value.toLowerCase())
+                  suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                 )
               }
             />
