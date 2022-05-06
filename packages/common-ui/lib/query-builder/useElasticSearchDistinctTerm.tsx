@@ -78,21 +78,32 @@ export function useElasticSearchDistinctTerm({
       );
     }
 
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/search`,
-      builder.build(),
-      {
+    await apiClient.axios
+      .post(`search-api/search-ws/search`, builder.build(), {
         params: {
           indexName
         }
-      }
-    );
-
-    setSuggestions(
-      resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
-        AGGREGATION_NAME
-      ]?.buckets?.map(bucket => bucket.key)
-    );
+      })
+      .then(resp => {
+        // The path to the results in the response changes if it contains the nested aggregation.
+        if (relationshipType) {
+          setSuggestions(
+            resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
+              AGGREGATION_NAME
+            ]?.buckets?.map(bucket => bucket.key)
+          );
+        } else {
+          setSuggestions(
+            resp?.data?.aggregations?.[AGGREGATION_NAME]?.buckets?.map(
+              bucket => bucket.key
+            )
+          );
+        }
+      })
+      .catch(() => {
+        // If any issues have occurred, just return an empty list.
+        setSuggestions([]);
+      });
   }
 
   return suggestions;

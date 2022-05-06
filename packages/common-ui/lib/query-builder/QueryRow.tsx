@@ -313,14 +313,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               removeLabel={true}
             />
           )}
-          {typeVisibility.isText && (
-            <SelectField
-              name={fieldProps("matchType", index)}
-              options={queryRowMatchOptions}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
-          )}
           {typeVisibility.isBoolean && (
             <SelectField
               name={fieldProps("boolean", index)}
