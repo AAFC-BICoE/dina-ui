@@ -1,4 +1,5 @@
 import Bodybuilder from "bodybuilder";
+import { castArray } from "lodash";
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
 
@@ -33,7 +34,7 @@ export function useElasticSearchDistinctTerm({
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
     queryElasticSearchForSuggestions();
-  }, []);
+  }, [fieldName, relationshipType, groups]);
 
   async function queryElasticSearchForSuggestions() {
     // Use bodybuilder to generate the query to send to elastic search.
@@ -43,7 +44,7 @@ export function useElasticSearchDistinctTerm({
     // Group needs to be queried to only show the users most used values.
     if (groups && groups.length !== 0) {
       // terms is used to be able to support multiple groups.
-      builder.query("terms", "data.attributes.group", groups);
+      builder.query("terms", "data.attributes.group", castArray(groups));
     }
 
     // If the field has a relationship type, we need to do a nested query to filter it.

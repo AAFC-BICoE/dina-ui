@@ -54,13 +54,9 @@ const MOCK_ELASTIC_SEARCH_ATTRIBUTE_SUGGESTIONS = {
 };
 
 describe("useElasticSearchDistinctTerm hook", () => {
-  const hookReturnValue = jest.fn();
-
-  beforeEach(() => {
-    hookReturnValue.mockClear();
-  });
-
   it("Attribute elastic search suggestion testing", async () => {
+    const hookReturnValue = jest.fn();
+
     function TestComponent() {
       hookReturnValue(
         useElasticSearchDistinctTerm({
@@ -117,15 +113,15 @@ describe("useElasticSearchDistinctTerm hook", () => {
       }
     ]);
 
-    expect(hookReturnValue.mock.calls[0]).toEqual([
-      "Suggestion 1",
-      "Suggestion 2",
-      "Suggestion 3",
-      "Suggestion 4"
+    await new Promise(setImmediate);
+    expect(hookReturnValue.mock.calls.pop()).toEqual([
+      ["Suggestion 1", "Suggestion 2", "Suggestion 3", "Suggestion 4"]
     ]);
   });
 
-  it("Relationship elastic search suggestion testing", () => {
+  it("Relationship elastic search suggestion testing", async () => {
+    const hookReturnValue = jest.fn();
+
     function TestComponent() {
       hookReturnValue(
         useElasticSearchDistinctTerm({
@@ -206,15 +202,15 @@ describe("useElasticSearchDistinctTerm hook", () => {
       }
     ]);
 
-    expect(hookReturnValue.mock.calls[0]).toEqual([
-      "Suggestion 1",
-      "Suggestion 2",
-      "Suggestion 3",
-      "Suggestion 4"
+    await new Promise(setImmediate);
+    expect(hookReturnValue.mock.calls.pop()).toEqual([
+      ["Suggestion 1", "Suggestion 2", "Suggestion 3", "Suggestion 4"]
     ]);
   });
 
-  it("No group filtering option", () => {
+  it("No group filtering option", async () => {
+    const hookReturnValue = jest.fn();
+
     function TestComponent() {
       hookReturnValue(
         useElasticSearchDistinctTerm({
@@ -266,15 +262,15 @@ describe("useElasticSearchDistinctTerm hook", () => {
       }
     ]);
 
-    expect(hookReturnValue.mock.calls[0]).toEqual([
-      "Suggestion 1",
-      "Suggestion 2",
-      "Suggestion 3",
-      "Suggestion 4"
+    await new Promise(setImmediate);
+    expect(hookReturnValue.mock.calls.pop()).toEqual([
+      ["Suggestion 1", "Suggestion 2", "Suggestion 3", "Suggestion 4"]
     ]);
   });
 
-  it("elastic search not available, empty suggestions returned", () => {
+  it("elastic search not available, empty suggestions returned", async () => {
+    const hookReturnValue = jest.fn();
+
     function TestComponent() {
       hookReturnValue(
         useElasticSearchDistinctTerm({
@@ -288,6 +284,7 @@ describe("useElasticSearchDistinctTerm hook", () => {
 
     mountWithAppContext(<TestComponent />).update();
 
-    expect(hookReturnValue.mock.calls[0]).toEqual([]);
+    await new Promise(setImmediate);
+    expect(hookReturnValue.mock.calls[0]).toEqual([[]]);
   });
 });
