@@ -294,7 +294,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                     groups: selectedGroups,
                     relationshipType: dataFromIndexMapping?.parentName,
                     indexName
-                  }).filter(suggestion =>
+                  })?.filter(suggestion =>
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                   )
                 }
