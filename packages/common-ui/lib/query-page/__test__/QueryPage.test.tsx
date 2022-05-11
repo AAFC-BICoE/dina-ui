@@ -434,7 +434,7 @@ describe("QueryPage component", () => {
             must: [
               {
                 terms: {
-                  "data.attributes.group": "aafc"
+                  "data.attributes.group": ["aafc"]
                 }
               },
               {
