@@ -2,57 +2,52 @@ import {
   ButtonBar,
   CreateButton,
   dateCell,
-  FilterAttribute,
-  ListPageLayout,
-  stringArrayCell
+  stringArrayCell,
+  TableColumn,
+  QueryPage,
+  BooleanCell
 } from "common-ui";
 import Link from "next/link";
+import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const FILTER_ATTRIBUTES: FilterAttribute[] = [
-  "transactionNumber",
-  "transactionType",
-  "purpose",
-  "status",
-  // Throws an error on back-end: "BAD_REQUEST: Cannot parse argument type class java.time.LocalDate"
-  // {
-  //   name: "openedDate",
-  //   type: "DATE"
-  // },
-  // {
-  //   name: "closedDate",
-  //   type: "DATE"
-  // },
-  // {
-  //   name: "dueDate",
-  //   type: "DATE"
-  // },
-  "remarks"
-];
-
-const TABLE_COLUMNS = [
+const TABLE_COLUMNS: TableColumn<Transaction>[] = [
   {
-    Cell: ({ original: { id, transactionNumber } }) => (
+    Cell: ({ original: { data, id } }) => (
       <Link href={`/loan-transaction/transaction/view?id=${id}`}>
-        <a>{transactionNumber || id}</a>
+        <a>{data?.attributes?.transactionNumber || id}</a>
       </Link>
     ),
-    accessor: "transactionNumber"
+    label: "transactionNumber",
+    accessor: "data.attributes.transactionNumber",
+    isKeyword: true
   },
-  "transactionType",
-  "materialDirection",
-  stringArrayCell("otherIdentifiers"),
   {
-    accessor: "materialToBeReturned",
-    Cell: ({ original: transaction }) =>
-      transaction.materialToBeReturned?.toString()
+    label: "transactionType",
+    accessor: "data.attributes.transactionType",
+    isKeyword: true
   },
-  "purpose",
-  "status",
-  dateCell("openedDate"),
-  dateCell("closedDate"),
-  dateCell("dueDate")
+  {
+    label: "materialDirection",
+    accessor: "data.attributes.materialDirection",
+    isKeyword: true
+  },
+  stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
+  BooleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
+  {
+    label: "purpose",
+    accessor: "data.attributes.purpose",
+    isKeyword: true
+  },
+  {
+    label: "status",
+    accessor: "data.attributes.status",
+    isKeyword: true
+  },
+  dateCell("openedDate", "data.attributes.openedDate"),
+  dateCell("closedDate", "data.attributes.closedDate"),
+  dateCell("dueDate", "data.attributes.dueDate")
 ];
 
 export default function TransactionListPage() {
@@ -69,13 +64,9 @@ export default function TransactionListPage() {
         <ButtonBar>
           <CreateButton entityLink="/loan-transaction/transaction" />
         </ButtonBar>
-        <ListPageLayout
-          filterAttributes={FILTER_ATTRIBUTES}
-          id="transaction-list"
-          queryTableProps={{
-            columns: TABLE_COLUMNS,
-            path: "loan-transaction-api/transaction"
-          }}
+        <QueryPage
+          indexName={"dina_loan_transaction_index"}
+          columns={TABLE_COLUMNS}
         />
       </main>
       <Footer />

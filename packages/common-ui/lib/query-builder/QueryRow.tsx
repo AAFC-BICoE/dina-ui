@@ -6,11 +6,17 @@ import {
   SelectField,
   TextField
 } from "..";
+import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
+import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
+
 export interface QueryRowProps {
+  /** Index name passed from the QueryPage component. */
+  indexName: string;
+
   esIndexMapping: ESIndexMapping[];
   index: number;
   addRow?: () => void;
@@ -51,6 +57,14 @@ export interface ESIndexMapping {
    * Examples: text, keyword, boolean, date, boolean, long, short, integer...
    */
   type: string;
+
+  /**
+   * If enabled, it will allow the user to see suggestions as they type. The suggestions will come
+   * from elastic search based on most common values saved.
+   *
+   * Only available for the text type.
+   */
+  distinctTerm: boolean;
 
   /**
    * The path for the attribute without the attribute name. This path does not include the parent
@@ -105,10 +119,12 @@ export interface QueryRowExportProps {
   type?: string;
   parentName?: string;
   parentPath?: string;
+  distinctTerm?: boolean;
 }
 
 interface TypeVisibility {
   isText: boolean;
+  isSuggestedText: boolean;
   isBoolean: boolean;
   isNumber: boolean;
   isDate: boolean;
@@ -126,7 +142,8 @@ const queryRowBooleanOptions = [
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
-  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name, indexName } =
+    queryRowProps;
 
   const initState = {
     matchValue: null,
@@ -144,9 +161,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     attribute => attribute.value === fieldName
   );
 
+  const selectedGroups: string[] = (formikProps.values as any)?.group;
+
   // Depending on the type, it changes what fields need to be displayed.
-  const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
-    isText: dataFromIndexMapping?.type === "text",
+  const typeVisibility: TypeVisibility = {
+    isText:
+      dataFromIndexMapping?.type === "text" &&
+      dataFromIndexMapping?.distinctTerm !== true,
+    isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
     isBoolean: dataFromIndexMapping?.type === "boolean",
     isNumber:
       dataFromIndexMapping?.type === "long" ||
@@ -159,7 +181,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       dataFromIndexMapping?.type === "scaled_float" ||
       dataFromIndexMapping?.type === "unsigned",
     isDate: dataFromIndexMapping?.type === "date"
-  });
+  };
 
   function onSelectionChange(value) {
     const newDataFromIndexMapping = esIndexMapping.find(
@@ -171,23 +193,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       fieldName: value,
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
-      parentName: newDataFromIndexMapping?.parentName
-    });
-
-    setTypeVisibility({
-      isText: newDataFromIndexMapping?.type === "text",
-      isBoolean: newDataFromIndexMapping?.type === "boolean",
-      isNumber:
-        newDataFromIndexMapping?.type === "long" ||
-        newDataFromIndexMapping?.type === "short" ||
-        newDataFromIndexMapping?.type === "integer" ||
-        newDataFromIndexMapping?.type === "byte" ||
-        newDataFromIndexMapping?.type === "double" ||
-        newDataFromIndexMapping?.type === "float" ||
-        newDataFromIndexMapping?.type === "half_float" ||
-        newDataFromIndexMapping?.type === "scaled_float" ||
-        newDataFromIndexMapping?.type === "unsigned",
-      isDate: newDataFromIndexMapping?.type === "date"
+      parentName: newDataFromIndexMapping?.parentName,
+      distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
     setFieldName(value);
@@ -257,23 +264,48 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       <div className="col-md-6">
         <div className="d-flex">
           {typeVisibility.isText && (
-            <TextField
-              name={fieldProps("matchValue", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
+            <>
+              <TextField
+                name={fieldProps("matchValue", index)}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+              <SelectField
+                name={fieldProps("matchType", index)}
+                options={queryRowMatchOptions}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+            </>
+          )}
+          {typeVisibility.isSuggestedText && (
+            <>
+              <AutoSuggestTextField
+                name={fieldProps("matchValue", index)}
+                removeLabel={true}
+                className="me-1 flex-fill"
+                alwaysShowSuggestions={true}
+                suggestions={value =>
+                  useElasticSearchDistinctTerm({
+                    fieldName:
+                      dataFromIndexMapping?.parentPath +
+                      "." +
+                      dataFromIndexMapping?.path +
+                      "." +
+                      dataFromIndexMapping?.label,
+                    groups: selectedGroups,
+                    relationshipType: dataFromIndexMapping?.parentName,
+                    indexName
+                  })?.filter(suggestion =>
+                    suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+                  )
+                }
+              />
+            </>
           )}
           {typeVisibility.isDate && (
             <DateField
               name={fieldProps("date", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
-          )}
-          {typeVisibility.isText && (
-            <SelectField
-              name={fieldProps("matchType", index)}
-              options={queryRowMatchOptions}
               className="me-1 flex-fill"
               removeLabel={true}
             />
