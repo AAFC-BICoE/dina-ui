@@ -508,7 +508,7 @@ describe("QueryPage component", () => {
                       },
                       {
                         match: {
-                          "included.attributes.name": "Test value"
+                          "included.attributes.name.keyword": "Test value"
                         }
                       }
                     ]
