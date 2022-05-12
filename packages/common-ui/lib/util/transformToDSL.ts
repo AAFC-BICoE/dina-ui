@@ -73,7 +73,8 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   function getFieldName(queryRow) {
-    if (queryRow.matchType === "term") return queryRow.fieldName + ".keyword";
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return queryRow.fieldName + ".keyword";
     return queryRow.fieldName;
   }
 
@@ -94,7 +95,8 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       queryRow.parentPath +
       "." +
       queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-    if (queryRow.matchType === "term") return newFieldName + ".keyword";
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return newFieldName + ".keyword";
     return newFieldName;
   }
 

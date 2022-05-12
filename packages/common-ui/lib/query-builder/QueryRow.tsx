@@ -119,6 +119,7 @@ export interface QueryRowExportProps {
   type?: string;
   parentName?: string;
   parentPath?: string;
+  distinctTerm?: boolean;
 }
 
 interface TypeVisibility {
@@ -192,7 +193,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       fieldName: value,
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
-      parentName: newDataFromIndexMapping?.parentName
+      parentName: newDataFromIndexMapping?.parentName,
+      distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
     setFieldName(value);
@@ -298,11 +300,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                   )
                 }
-              />
-              <input
-                name={fieldProps("matchType", index)}
-                value={"term"}
-                type="hidden"
               />
             </>
           )}
