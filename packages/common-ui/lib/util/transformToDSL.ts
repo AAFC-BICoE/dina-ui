@@ -1,8 +1,9 @@
-import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
-import { LimitOffsetPageSpec, TableColumn } from "..";
+import { LimitOffsetPageSpec } from "..";
 import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
+import { QueryRowExportProps } from "../list-page/QueryRow";
+import { TableColumn } from "../list-page/types";
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
