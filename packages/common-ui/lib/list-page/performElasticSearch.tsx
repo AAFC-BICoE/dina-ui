@@ -7,9 +7,12 @@ import { useApiClient } from "..";
  */
 const MAX_COUNT_SIZE: number = 10000;
 
-export function performElasticSearch({ dispatch, indexName, query }) {
-  const { apiClient } = useApiClient();
-
+export function performElasticSearch({
+  dispatch,
+  indexName,
+  query,
+  apiClient
+}) {
   // Fetch data using elastic search.
   // The included section will be transformed from an array to an object with the type name for each relationship.
   elasticSearchRequest(query)

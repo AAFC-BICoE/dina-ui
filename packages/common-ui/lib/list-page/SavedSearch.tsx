@@ -9,7 +9,7 @@ import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { QueryPageActions, QueryPageStates } from "./QueryPage";
+import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
 
 export interface SavedSearchProps {
   /**
@@ -45,8 +45,11 @@ export function SavedSearch(props: SavedSearchProps) {
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
 
+  // User preferences should only be loaded if reloadUserPreferences is set to true.
   useEffect(() => {
-    retrieveUserPreferences();
+    if (reloadUserPreferences) {
+      retrieveUserPreferences();
+    }
   }, [reloadUserPreferences]);
 
   /**
