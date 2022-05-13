@@ -1,5 +1,5 @@
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Select from "react-select";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
@@ -8,35 +8,30 @@ import { useAccount } from "../account/AccountProvider";
 import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
+import { FilterParam } from "kitsu";
+import { QueryPageActions, QueryPageStates } from "./QueryPage";
 
 export interface SavedSearchProps {
   /**
-   * Index name passed from the QueryPage component. Since it doesn't make sense to display saved
-   * searches for all list pages, the index name is used to determine which saved searches should be
-   * displayed and where news one's are created.
+   * Dispatch actions from the QueryPage.
    */
-  indexName: string;
+  dispatch: React.Dispatch<QueryPageActions>;
 
   /**
-   * The user preferences for the selected user. This should only be re-loaded on saving and deleting.
+   * States from the query page reducer.
    */
-  userPreferences?: UserPreference;
-
-  /**
-   * Passes the currently loaded saved search option, when a new loaded saved search is selected, it's
-   * set as the default selected saved search.
-   */
-  loadedSavedSearch?: string;
-
-  /**
-   * When the user clicks the "Load" button, it will trigger this method.
-   */
-  loadSavedSearch: (savedSearchName: string) => void;
+  queryPageState: QueryPageStates;
 }
 
 export function SavedSearch(props: SavedSearchProps) {
-  const { indexName, userPreferences, loadSavedSearch, loadedSavedSearch } =
-    props;
+  const { apiClient } = useApiClient();
+  const { dispatch, queryPageState } = props;
+  const {
+    reloadUserPreferences,
+    userPreferences,
+    indexName,
+    selectedSavedSearch
+  } = queryPageState;
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
   const { openModal } = useModal();
@@ -47,16 +42,39 @@ export function SavedSearch(props: SavedSearchProps) {
   // Reference to the select dropdown element.
   const selectRef = useRef(null);
 
-  // Selected saved search for the saved search dropdown.
-  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>(
-    loadedSavedSearch &&
-      userPreferences?.savedSearches?.[indexName]?.[loadedSavedSearch]
-      ? loadedSavedSearch
-      : ""
-  );
-
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
+
+  useEffect(() => {
+    retrieveUserPreferences();
+  }, [reloadUserPreferences]);
+
+  /**
+   * Retrieve the user preference for the logged in user. This is used for the SavedSearch
+   * functionality since the saved searches are stored in the user preferences.
+   */
+  async function retrieveUserPreferences() {
+    // Retrieve user preferences...
+    await apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        }
+      })
+      .then(response => {
+        // Set the user preferences to be a state for the QueryPage.
+        dispatch({
+          type: "USER_PREFERENCE_CHANGE",
+          newUserPreferences: response?.data?.[0]
+        });
+      })
+      .catch(() => {
+        dispatch({
+          type: "ERROR",
+          errorLabel: "Failed to retrieve user preferences."
+        });
+      });
+  }
 
   /**
    * Add a new saved search to the user's preferences. Searches will be saved using the following
@@ -103,7 +121,7 @@ export function SavedSearch(props: SavedSearchProps) {
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
     // The newly saved option, should be switched to the selected.
-    loadSavedSearch(savedSearchName);
+    dispatch({ type: "LOAD_SAVED_SEARCH" });
   }
 
   /**
@@ -132,8 +150,8 @@ export function SavedSearch(props: SavedSearchProps) {
         type: "user-preference"
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
-
-      loadSavedSearch("default");
+      // TO DO: Default is needed here.
+      dispatch({ type: "LOAD_SAVED_SEARCH" });
     }
 
     // Ask the user if they sure they want to delete the saved search.
@@ -168,7 +186,10 @@ export function SavedSearch(props: SavedSearchProps) {
           className="saved-search"
           options={dropdownOptions}
           onChange={selectedOption =>
-            setSelectedSavedSearch(selectedOption?.value ?? "")
+            dispatch({
+              type: "SAVED_SEARCH_CHANGE",
+              newSavedSearch: selectedOption?.value ?? ""
+            })
           }
           value={{ value: selectedSavedSearch, label: selectedSavedSearch }}
         />
@@ -178,7 +199,7 @@ export function SavedSearch(props: SavedSearchProps) {
         className="btn btn-primary"
         onClick={() => {
           if (selectRef && selectRef.current) {
-            loadSavedSearch(selectedSavedSearch ?? "");
+            dispatch({ type: "LOAD_SAVED_SEARCH" });
           }
         }}
         disabled={selectedSavedSearch ? false : true}
