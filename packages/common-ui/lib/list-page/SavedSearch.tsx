@@ -10,6 +10,7 @@ import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 
 export interface SavedSearchProps {
   /**
@@ -30,7 +31,8 @@ export function SavedSearch(props: SavedSearchProps) {
     reloadUserPreferences,
     userPreferences,
     indexName,
-    selectedSavedSearch
+    selectedSavedSearch,
+    userPreferenceLoading
   } = queryPageState;
   const { formatMessage } = useDinaIntl();
   const { save } = useApiClient();
@@ -124,7 +126,7 @@ export function SavedSearch(props: SavedSearchProps) {
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
     // The newly saved option, should be switched to the selected.
-    dispatch({ type: "LOAD_SAVED_SEARCH" });
+    dispatch({ type: "RELOAD_SAVED_SEARCH", newSavedSearch: savedSearchName });
   }
 
   /**
@@ -153,8 +155,14 @@ export function SavedSearch(props: SavedSearchProps) {
         type: "user-preference"
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
-      // TO DO: Default is needed here.
-      dispatch({ type: "LOAD_SAVED_SEARCH" });
+
+      // Reload the saved search options and change the selected saved search to the default if
+      // possible.
+      if (userPreferences?.savedSearches?.[indexName].default) {
+        dispatch({ type: "RELOAD_SAVED_SEARCH", newSavedSearch: "default" });
+      } else {
+        dispatch({ type: "RELOAD_SAVED_SEARCH", newSavedSearch: "" });
+      }
     }
 
     // Ask the user if they sure they want to delete the saved search.
@@ -168,6 +176,10 @@ export function SavedSearch(props: SavedSearchProps) {
         onYesButtonClicked={deleteSearch}
       />
     );
+  }
+
+  if (userPreferenceLoading) {
+    return <LoadingSpinner loading={true} />;
   }
 
   // Take the saved search options and convert to an option list.

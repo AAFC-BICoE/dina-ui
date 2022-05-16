@@ -16,6 +16,7 @@ export type QueryPageActions =
   | { type: "SAVED_SEARCH_CHANGE"; newSavedSearch: string }
   | { type: "INDEX_CHANGE"; index: ESIndexMapping[] }
   | { type: "LOAD_SAVED_SEARCH" }
+  | { type: "RELOAD_SAVED_SEARCH"; newSavedSearch: string }
   | { type: "SUCCESS_TABLE_DATA"; searchResults: any[]; newTotal: number }
   | { type: "ERROR"; errorLabel: string }
   | { type: "RESET" };
@@ -102,9 +103,14 @@ export interface QueryPageStates {
   indexLoading: boolean;
 
   /**
+   * Used to display a loading spinner for the user preferences (saved search).
+   */
+  userPreferenceLoading: boolean;
+
+  /**
    * If any error has occurred.
    */
-  error: any;
+  error?: string;
 }
 
 /**
@@ -198,7 +204,8 @@ export function queryPageReducer(
       return {
         ...state,
         userPreferences: action.newUserPreferences,
-        reloadUserPreferences: false
+        reloadUserPreferences: false,
+        userPreferenceLoading: false
       };
 
     /**
@@ -240,6 +247,7 @@ export function queryPageReducer(
           }
         : {
             ...state,
+            error: undefined,
             elasticSearchLoading: true,
             searchFilters: loadedOption,
             pagination: {
@@ -249,6 +257,19 @@ export function queryPageReducer(
             loadedSavedSearch: state.selectedSavedSearch,
             performElasticSearchRequest: true
           };
+
+    /**
+     * Action to be performed after a saved search has been saved or a saved search was deleted.
+     * The user preferences will need to be reloaded and change the current selected saved search.
+     */
+    case "RELOAD_SAVED_SEARCH":
+      return {
+        ...state,
+        reloadUserPreferences: true,
+        performElasticSearchRequest: true,
+        elasticSearchLoading: true,
+        selectedSavedSearch: action.newSavedSearch
+      };
 
     /**
      * Successfully retrieved data from the search results. Loading and errors will be cleared
@@ -271,8 +292,14 @@ export function queryPageReducer(
       return {
         ...state,
         searchResults: [],
+        totalRecords: 0,
         error: action.errorLabel,
-        elasticSearchLoading: false
+        performElasticSearchRequest: false,
+        performIndexRequest: false,
+        reloadUserPreferences: false,
+        elasticSearchLoading: false,
+        indexLoading: false,
+        userPreferenceLoading: false
       };
 
     /**

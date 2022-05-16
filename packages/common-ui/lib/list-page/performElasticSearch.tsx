@@ -1,4 +1,4 @@
-import { useApiClient } from "..";
+import { QueryPageActions } from "./queryPageReducer";
 
 /**
  * Elastic search by default will only count up to 10,000 records. If the search returns 10,000
@@ -7,16 +7,25 @@ import { useApiClient } from "..";
  */
 const MAX_COUNT_SIZE: number = 10000;
 
+interface PerformElasticSearchProps {
+  dispatch: React.Dispatch<QueryPageActions>;
+  indexName: string;
+  query: any;
+  apiClient: any;
+}
+
 export function performElasticSearch({
   dispatch,
   indexName,
   query,
   apiClient
-}) {
+}: PerformElasticSearchProps) {
   // Fetch data using elastic search.
   // The included section will be transformed from an array to an object with the type name for each relationship.
   elasticSearchRequest(query)
-    .then(result => {
+    .then(response => {
+      const result = response?.data?.hits;
+
       const processedResult = result?.hits.map(rslt => ({
         id: rslt._source?.data?.id,
         type: rslt._source?.data?.type,
@@ -34,36 +43,31 @@ export function performElasticSearch({
       // If we have reached the count limit, we will need to perform another request for the true
       // query size.
       let totalRecords = 0;
+      let countError = false;
       if (result?.total.value === MAX_COUNT_SIZE) {
         elasticSearchCountRequest(query)
-          .then(countResult => {
-            totalRecords = countResult;
+          .then(countResponse => {
+            totalRecords = countResponse?.data?.count;
           })
-          .catch(() => {
-            dispatch({
-              type: "ERROR",
-              errorLabel:
-                "Cannot reach elastic search server. Please try again later."
-            });
-            return;
+          .catch(error => {
+            countError = true;
+            handleError(error);
           });
       } else {
         totalRecords = result?.total?.value ?? 0;
       }
 
-      dispatch({
-        type: "SUCCESS_TABLE_DATA",
-        searchResults: processedResult,
-        newTotal: totalRecords
-      });
+      // Perform the action to set the results and stop all loading.
+      if (!countError) {
+        dispatch({
+          type: "SUCCESS_TABLE_DATA",
+          searchResults: processedResult,
+          newTotal: totalRecords
+        });
+      }
     })
-    .catch(() => {
-      dispatch({
-        type: "ERROR",
-        errorLabel:
-          "Cannot reach elastic search server. Please try again later."
-      });
-      return;
+    .catch(error => {
+      handleError(error);
     });
 
   /**
@@ -75,7 +79,7 @@ export function performElasticSearch({
    */
   async function elasticSearchRequest(queryDSL) {
     const elasticSearchQuery = { ...queryDSL };
-    const resp = await apiClient.axios.post(
+    return await apiClient.axios.post(
       `search-api/search-ws/search`,
       elasticSearchQuery,
       {
@@ -84,7 +88,6 @@ export function performElasticSearch({
         }
       }
     );
-    return resp?.data?.hits;
   }
 
   /**
@@ -97,7 +100,7 @@ export function performElasticSearch({
    */
   async function elasticSearchCountRequest(queryDSL) {
     const elasticSearchQuery = { query: { ...queryDSL?.query } };
-    const resp = await apiClient.axios.post(
+    return await apiClient.axios.post(
       `search-api/search-ws/count`,
       elasticSearchQuery,
       {
@@ -106,7 +109,13 @@ export function performElasticSearch({
         }
       }
     );
-    return resp?.data?.count;
+  }
+
+  /**
+   * Dispatch the error action. This will stop all loading and set an error message on the page.
+   */
+  function handleError(error) {
+    dispatch({ type: "ERROR", errorLabel: error.toString() });
   }
 
   return;

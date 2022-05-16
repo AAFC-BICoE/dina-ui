@@ -129,7 +129,8 @@ export function QueryPage<TData extends KitsuResource>({
     selectedSavedSearch: "",
     performElasticSearchRequest: true,
     performIndexRequest: true,
-    indexLoading: true
+    indexLoading: true,
+    userPreferenceLoading: true
   };
 
   // Reducer to handle all user actions, checkout the queryPageReducer.tsx file.
@@ -143,7 +144,8 @@ export function QueryPage<TData extends KitsuResource>({
     searchFilters,
     elasticSearchLoading,
     totalRecords,
-    performElasticSearchRequest
+    performElasticSearchRequest,
+    error
   } = queryPageState;
 
   // Row Checkbox Toggle
@@ -239,6 +241,13 @@ export function QueryPage<TData extends KitsuResource>({
         dispatch({ type: "SEARCH_FILTER_CHANGE", newFilter: submittedValues })
       }
     >
+      {/** Display any error messages on the page. */}
+      {error !== undefined && (
+        <div className="alert alert-danger" role="status">
+          <p>{error}</p>
+        </div>
+      )}
+
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
