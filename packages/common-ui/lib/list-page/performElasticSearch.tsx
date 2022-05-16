@@ -42,27 +42,23 @@ export function performElasticSearch({
 
       // If we have reached the count limit, we will need to perform another request for the true
       // query size.
-      let totalRecords = 0;
-      let countError = false;
       if (result?.total.value === MAX_COUNT_SIZE) {
         elasticSearchCountRequest(query)
           .then(countResponse => {
-            totalRecords = countResponse?.data?.count;
+            dispatch({
+              type: "SUCCESS_TABLE_DATA",
+              searchResults: processedResult,
+              newTotal: countResponse?.data?.count
+            });
           })
           .catch(error => {
-            countError = true;
             handleError(error);
           });
       } else {
-        totalRecords = result?.total?.value ?? 0;
-      }
-
-      // Perform the action to set the results and stop all loading.
-      if (!countError) {
         dispatch({
           type: "SUCCESS_TABLE_DATA",
           searchResults: processedResult,
-          newTotal: totalRecords
+          newTotal: result?.total?.value ?? 0
         });
       }
     })
