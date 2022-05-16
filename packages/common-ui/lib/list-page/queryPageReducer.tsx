@@ -2,6 +2,7 @@ import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPr
 import { SortingRule } from "react-table";
 import { LimitOffsetPageSpec } from "..";
 import { TransformQueryToDSLParams } from "../util/transformToDSL";
+import { ESIndexMapping } from "./types";
 
 /**
  * Union of all the possible actions. Depending on the action it may have additional data.
@@ -13,6 +14,7 @@ export type QueryPageActions =
   | { type: "SEARCH_FILTER_CHANGE"; newFilter: TransformQueryToDSLParams }
   | { type: "USER_PREFERENCE_CHANGE"; newUserPreferences: UserPreference }
   | { type: "SAVED_SEARCH_CHANGE"; newSavedSearch: string }
+  | { type: "INDEX_CHANGE"; index: ESIndexMapping[] }
   | { type: "LOAD_SAVED_SEARCH" }
   | { type: "SUCCESS_TABLE_DATA"; searchResults: any[]; newTotal: number }
   | { type: "ERROR"; errorLabel: string }
@@ -24,6 +26,11 @@ export interface QueryPageStates {
    * state to make it easier to pass to children components.
    */
   indexName: string;
+
+  /**
+   * Elastic search mapping for the index name. This should only be populated once.
+   */
+  elasticSearchIndex: ESIndexMapping[];
 
   /**
    * Total number of records from the search. This leverages the elastic search count request if
@@ -64,9 +71,14 @@ export interface QueryPageStates {
   reloadUserPreferences: boolean;
 
   /**
-   * When this stat is true, a search will be performed.
+   * When this state is true, a search will be performed.
    */
   performElasticSearchRequest: boolean;
+
+  /**
+   * When this state is true, perform an index request.
+   */
+  performIndexRequest: boolean;
 
   /**
    * Selected saved search for the saved search dropdown.
@@ -79,9 +91,15 @@ export interface QueryPageStates {
   loadedSavedSearch?: string;
 
   /**
-   * Used to display a loading spinner when results are being fetched.
+   * Used to display a loading spinner when results are being fetched. This loading is only
+   * used for the elastic search results.
    */
-  loading: boolean;
+  elasticSearchLoading: boolean;
+
+  /**
+   * Used to display a loading spinner when the query builder is loading the index.
+   */
+  indexLoading: boolean;
 
   /**
    * If any error has occurred.
@@ -119,7 +137,7 @@ export function queryPageReducer(
     case "PAGINATION_PAGE_CHANGE":
       return {
         ...state,
-        loading: true,
+        elasticSearchLoading: true,
         pagination: {
           ...state.pagination,
           offset: state.pagination.limit * action.newPage
@@ -136,7 +154,7 @@ export function queryPageReducer(
     case "PAGINATION_SIZE_CHANGE":
       return {
         ...state,
-        loading: true,
+        elasticSearchLoading: true,
         pagination: {
           offset: 0,
           limit: action.newSize
@@ -152,7 +170,7 @@ export function queryPageReducer(
     case "SORTING_CHANGE":
       return {
         ...state,
-        loading: true,
+        elasticSearchLoading: true,
         sortingRules: action.newSort,
         performElasticSearchRequest: true
       };
@@ -165,11 +183,12 @@ export function queryPageReducer(
       return {
         ...state,
         searchFilters: action.newFilter,
-        loading: true,
+        elasticSearchLoading: true,
         pagination: {
           ...state.pagination,
           offset: 0
-        }
+        },
+        performElasticSearchRequest: true
       };
 
     /**
@@ -194,6 +213,15 @@ export function queryPageReducer(
         selectedSavedSearch: action.newSavedSearch
       };
 
+    case "INDEX_CHANGE":
+      return {
+        ...state,
+        elasticSearchLoading: false,
+        elasticSearchIndex: action.index,
+        performIndexRequest: false,
+        indexLoading: false
+      };
+
     /**
      * Using the saved saved search, we can find the saved search in the user preference and load
      * it in.
@@ -212,7 +240,7 @@ export function queryPageReducer(
           }
         : {
             ...state,
-            loading: true,
+            elasticSearchLoading: true,
             searchFilters: loadedOption,
             pagination: {
               ...state.pagination,
@@ -230,7 +258,7 @@ export function queryPageReducer(
       return {
         ...state,
         error: undefined,
-        loading: false,
+        elasticSearchLoading: false,
         searchResults: action.searchResults,
         totalRecords: action.newTotal,
         performElasticSearchRequest: false
@@ -244,7 +272,7 @@ export function queryPageReducer(
         ...state,
         searchResults: [],
         error: action.errorLabel,
-        loading: false
+        elasticSearchLoading: false
       };
 
     /**
@@ -255,7 +283,7 @@ export function queryPageReducer(
       return {
         ...state,
         error: undefined,
-        loading: true,
+        elasticSearchLoading: true,
         performElasticSearchRequest: true
       };
 

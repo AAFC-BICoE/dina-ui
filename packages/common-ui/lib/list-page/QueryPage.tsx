@@ -105,6 +105,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const initialState: QueryPageStates = {
     indexName,
+    elasticSearchIndex: [],
     totalRecords: 0,
     pagination: {
       limit: DEFAULT_PAGE_SIZE,
@@ -121,12 +122,14 @@ export function QueryPage<TData extends KitsuResource>({
     sortingRules: defaultSort ?? DEFAULT_SORT,
     searchResults: [],
     error: undefined,
-    loading: true,
+    elasticSearchLoading: true,
     userPreferences: undefined,
     reloadUserPreferences: true,
     loadedSavedSearch: "default",
     selectedSavedSearch: "",
-    performElasticSearchRequest: true
+    performElasticSearchRequest: true,
+    performIndexRequest: true,
+    indexLoading: true
   };
 
   // Reducer to handle all user actions, checkout the queryPageReducer.tsx file.
@@ -138,7 +141,7 @@ export function QueryPage<TData extends KitsuResource>({
     pagination,
     sortingRules,
     searchFilters,
-    loading,
+    elasticSearchLoading,
     totalRecords,
     performElasticSearchRequest
   } = queryPageState;
@@ -245,10 +248,8 @@ export function QueryPage<TData extends KitsuResource>({
       {/* Query Filtering Options */}
       <QueryBuilder
         name="queryRows"
-        indexName={indexName}
-        onGroupChange={({ submittedValues }) =>
-          dispatch({ type: "SEARCH_FILTER_CHANGE", newFilter: submittedValues })
-        }
+        dispatch={dispatch}
+        states={queryPageState}
       />
 
       <div className="d-flex mb-3">
@@ -287,7 +288,7 @@ export function QueryPage<TData extends KitsuResource>({
           <div className="d-flex align-items-end">
             <span id="queryPageCount">
               {/* Loading indicator when total is not calculated yet. */}
-              {loading ? (
+              {elasticSearchLoading ? (
                 <LoadingSpinner loading={true} />
               ) : (
                 <CommonMessage
@@ -316,7 +317,7 @@ export function QueryPage<TData extends KitsuResource>({
           data={searchResults}
           minRows={1}
           // Loading Table props
-          loading={loading}
+          loading={elasticSearchLoading}
           // Pagination props
           manual={true}
           pageSize={pagination.limit}

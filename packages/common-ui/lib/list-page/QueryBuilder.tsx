@@ -7,33 +7,35 @@ import {
 import { QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components";
-import { useMemo } from "react";
-import { v4 as uuidv4 } from "uuid";
-import useSWR from "swr";
+import { useEffect } from "react";
 import { ESIndexMapping } from "./types";
+import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
 
 interface QueryBuilderProps extends FieldWrapperProps {
-  indexName: string;
-  onGroupChange: (currentSubmittedValues: any) => void;
+  dispatch: React.Dispatch<QueryPageActions>;
+  states: QueryPageStates;
 }
 
-export function QueryBuilder({
-  name,
-  indexName,
-  onGroupChange
-}: QueryBuilderProps) {
+export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
+
+  const { indexName, indexLoading, elasticSearchIndex, performIndexRequest } =
+    states;
+
+  // Ensure that the index request is only done once per page load.
+  useEffect(() => {
+    if (performIndexRequest) {
+      fetchQueryFieldsByIndex();
+    }
+  }, [performIndexRequest]);
 
   /**
    * The query builder options are generated from the elastic search index. This method will
    * request the mappings from the index.
-   *
-   * @param searchIndexName index to retrieve from.
-   * @returns ESIndexMapping[]
    */
-  async function fetchQueryFieldsByIndex(searchIndexName) {
+  async function fetchQueryFieldsByIndex() {
     const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-      params: { indexName: searchIndexName }
+      params: { indexName }
     });
 
     const result: ESIndexMapping[] = [];
@@ -84,46 +86,16 @@ export function QueryBuilder({
         });
       });
     });
-    return result;
+
+    dispatch({ type: "INDEX_CHANGE", index: result });
   }
 
-  // Invalidate the query cache on query change, don't use SWR's built-in cache:
-  const cacheId = useMemo(() => uuidv4(), []);
-
-  const {
-    data,
-    error: indexError,
-    isValidating: loading
-  } = useSWR<ESIndexMapping[], any>(
-    [indexName, cacheId],
-    fetchQueryFieldsByIndex,
-    {
-      shouldRetryOnError: true,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false
-    }
-  );
-
   // Display loading spinner when performing request for the index.
-  if (loading) {
+  if (indexLoading) {
     return <LoadingSpinner loading={true} />;
   }
 
-  // Display an error if mapping could not be retrieved.
-  if (indexError) {
-    return (
-      <div
-        className="alert alert-danger"
-        style={{
-          whiteSpace: "pre-line"
-        }}
-      >
-        Could not communicate with elastic search.
-      </div>
-    );
-  }
-
-  const sortedData = data
+  const sortedData = elasticSearchIndex
     ?.sort((a, b) => a.label.localeCompare(b.label))
     .filter(prop => !prop.label.startsWith("group"));
 
@@ -178,8 +150,9 @@ export function QueryBuilder({
           name="group"
           className="col-md-4"
           onChange={(value, formik) =>
-            onGroupChange({
-              submittedValues: { ...formik.values, group: value }
+            dispatch({
+              type: "SEARCH_FILTER_CHANGE",
+              newFilter: { ...formik.values, group: value }
             })
           }
         />
