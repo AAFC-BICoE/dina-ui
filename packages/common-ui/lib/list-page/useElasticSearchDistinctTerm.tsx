@@ -1,40 +1,52 @@
 import Bodybuilder from "bodybuilder";
 import { castArray } from "lodash";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useApiClient } from "..";
+import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
 
 const TOTAL_SUGGESTIONS: number = 100;
 const AGGREGATION_NAME: string = "term_aggregation";
 const NEST_AGGREGATION_NAME: string = "included_aggregation";
 
 interface QuerySuggestionFieldProps {
+  /**
+   * Perform actions using the reducer. This is the "brains" of the Query Page.
+   */
+  dispatch: React.Dispatch<QueryPageActions>;
+
+  /**
+   * Retrieve all of the states from the reducer.
+   */
+  states: QueryPageStates;
+
   /** The string you want elastic search to use. */
   fieldName: string;
 
   /** If the field is a relationship, we need to know the type to filter it. */
   relationshipType?: string;
 
-  /** An array of the groups to filter the distinct terms by. This can be an empty group which will skip filtering by group. */
-  groups: string[];
-
   /** The index you want elastic search to perform the search on */
   indexName: string;
 }
 
 export function useElasticSearchDistinctTerm({
+  dispatch,
+  states,
   fieldName,
   relationshipType,
-  groups,
   indexName
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
 
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const { suggestions, performSuggestionRequest, searchFilters } = states;
+  const groups = searchFilters?.group;
 
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
-    queryElasticSearchForSuggestions();
-  }, [fieldName, relationshipType, groups]);
+    if (performSuggestionRequest) {
+      queryElasticSearchForSuggestions();
+    }
+  }, [performSuggestionRequest]);
 
   async function queryElasticSearchForSuggestions() {
     // Use bodybuilder to generate the query to send to elastic search.
@@ -88,22 +100,24 @@ export function useElasticSearchDistinctTerm({
       .then(resp => {
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
-          setSuggestions(
-            resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
+          dispatch({
+            type: "SUGGESTION_CHANGE",
+            newSuggestions: resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
               AGGREGATION_NAME
             ]?.buckets?.map(bucket => bucket.key)
-          );
+          });
         } else {
-          setSuggestions(
-            resp?.data?.aggregations?.[AGGREGATION_NAME]?.buckets?.map(
-              bucket => bucket.key
-            )
-          );
+          dispatch({
+            type: "SUGGESTION_CHANGE",
+            newSuggestions: resp?.data?.aggregations?.[
+              AGGREGATION_NAME
+            ]?.buckets?.map(bucket => bucket.key)
+          });
         }
       })
       .catch(() => {
         // If any issues have occurred, just return an empty list.
-        setSuggestions([]);
+        dispatch({ type: "SUGGESTION_CHANGE", newSuggestions: [] });
       });
   }
 

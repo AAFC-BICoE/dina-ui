@@ -121,6 +121,7 @@ export function QueryPage<TData extends KitsuResource>({
     },
     sortingRules: defaultSort ?? DEFAULT_SORT,
     searchResults: [],
+    suggestions: [],
     error: undefined,
     elasticSearchLoading: true,
     userPreferences: undefined,
@@ -130,7 +131,10 @@ export function QueryPage<TData extends KitsuResource>({
     performElasticSearchRequest: true,
     performIndexRequest: true,
     indexLoading: true,
-    userPreferenceLoading: true
+    userPreferenceLoading: true,
+    performSuggestionRequest: false,
+    groups: [],
+    performGroupRequest: true
   };
 
   // Reducer to handle all user actions, checkout the queryPageReducer.tsx file.

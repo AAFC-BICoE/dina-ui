@@ -2,14 +2,15 @@ import {
   DinaFormSection,
   FieldWrapperProps,
   LoadingSpinner,
-  useApiClient
+  useApiClient,
+  SelectField
 } from "..";
 import { QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
-import { GroupSelectField } from "../../../dina-ui/components";
 import { useEffect } from "react";
 import { ESIndexMapping } from "./types";
 import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
+import { useAvailableGroupOptions } from "packages/dina-ui/components/group-select/GroupSelectField";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   dispatch: React.Dispatch<QueryPageActions>;
@@ -19,8 +20,14 @@ interface QueryBuilderProps extends FieldWrapperProps {
 export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
 
-  const { indexName, indexLoading, elasticSearchIndex, performIndexRequest } =
-    states;
+  const {
+    indexName,
+    indexLoading,
+    elasticSearchIndex,
+    performIndexRequest,
+    performGroupRequest,
+    groups
+  } = states;
 
   // Ensure that the index request is only done once per page load.
   useEffect(() => {
@@ -28,6 +35,13 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
       fetchQueryFieldsByIndex();
     }
   }, [performIndexRequest]);
+
+  // Ensure the groups are only loaded once per page load.
+  useEffect(() => {
+    if (performGroupRequest) {
+      fetchGroups();
+    }
+  }, [performGroupRequest]);
 
   /**
    * The query builder options are generated from the elastic search index. This method will
@@ -90,6 +104,13 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
     dispatch({ type: "INDEX_CHANGE", index: result });
   }
 
+  async function fetchGroups() {
+    dispatch({
+      type: "GROUP_CHANGE",
+      newGroups: [{ label: "aafc", value: "aafc" }]
+    });
+  }
+
   // Display loading spinner when performing request for the index.
   if (indexLoading) {
     return <LoadingSpinner loading={true} />;
@@ -108,9 +129,9 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
           function addRow() {
             fieldArrayProps.push(
               <QueryRow
+                dispatch={dispatch}
+                states={states}
                 name={fieldArrayProps.name}
-                indexName={indexName}
-                esIndexMapping={sortedData as any}
                 index={elements?.length ?? 0}
                 removeRow={removeRow}
                 addRow={addRow}
@@ -133,19 +154,19 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
             ? elements?.map((_, index) => (
                 <QueryRow
                   name={fieldArrayProps.name}
-                  indexName={indexName}
+                  dispatch={dispatch}
+                  states={states}
                   key={index}
                   index={index}
                   addRow={addRow}
                   removeRow={removeRow}
-                  esIndexMapping={sortedData as any}
                 />
               ))
             : null;
         }}
       </FieldArray>
       <DinaFormSection horizontal={"flex"}>
-        <GroupSelectField
+        <SelectField
           isMulti={true}
           name="group"
           className="col-md-4"
@@ -155,6 +176,7 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
               newFilter: { ...formik.values, group: value }
             })
           }
+          options={groups}
         />
       </DinaFormSection>
     </>

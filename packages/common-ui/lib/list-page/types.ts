@@ -172,6 +172,7 @@ export const INTEGRATION_TEST_INITIAL_STATES: QueryPageStates = {
   },
   sortingRules: DEFAULT_SORT,
   searchResults: [],
+  suggestions: [],
   error: undefined,
   elasticSearchLoading: true,
   userPreferences: undefined,
@@ -181,5 +182,8 @@ export const INTEGRATION_TEST_INITIAL_STATES: QueryPageStates = {
   performElasticSearchRequest: true,
   performIndexRequest: true,
   indexLoading: true,
-  userPreferenceLoading: true
+  userPreferenceLoading: true,
+  performSuggestionRequest: false,
+  groups: [],
+  performGroupRequest: true
 };

@@ -1,6 +1,6 @@
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { SortingRule } from "react-table";
-import { LimitOffsetPageSpec } from "..";
+import { LimitOffsetPageSpec, SelectOption } from "..";
 import { TransformQueryToDSLParams } from "../util/transformToDSL";
 import { ESIndexMapping } from "./types";
 
@@ -15,11 +15,13 @@ export type QueryPageActions =
   | { type: "USER_PREFERENCE_CHANGE"; newUserPreferences: UserPreference }
   | { type: "SAVED_SEARCH_CHANGE"; newSavedSearch: string }
   | { type: "INDEX_CHANGE"; index: ESIndexMapping[] }
+  | { type: "SUGGESTION_CHANGE"; newSuggestions: string[] }
+  | { type: "GROUP_CHANGE"; newGroups: any[] }
+  | { type: "RELOAD_SUGGESTIONS" }
   | { type: "LOAD_SAVED_SEARCH" }
   | { type: "RELOAD_SAVED_SEARCH"; newSavedSearch: string }
   | { type: "SUCCESS_TABLE_DATA"; searchResults: any[]; newTotal: number }
-  | { type: "ERROR"; errorLabel: string }
-  | { type: "RESET" };
+  | { type: "ERROR"; errorLabel: string };
 
 export interface QueryPageStates {
   /**
@@ -32,6 +34,11 @@ export interface QueryPageStates {
    * Elastic search mapping for the index name. This should only be populated once.
    */
   elasticSearchIndex: ESIndexMapping[];
+
+  /**
+   * Groups the user can select from, this list should only be populated once per page load.
+   */
+  groups: any[];
 
   /**
    * Total number of records from the search. This leverages the elastic search count request if
@@ -67,6 +74,11 @@ export interface QueryPageStates {
   userPreferences?: UserPreference;
 
   /**
+   * If the user is used a suggested field, the suggestions will be stored here.
+   */
+  suggestions: string[];
+
+  /**
    * When this state is true, the user preferences will be reloaded.
    */
   reloadUserPreferences: boolean;
@@ -80,6 +92,18 @@ export interface QueryPageStates {
    * When this state is true, perform an index request.
    */
   performIndexRequest: boolean;
+
+  /**
+   * When this state is true, the suggestions will be reloaded based on the field and groups
+   * selected.
+   */
+  performSuggestionRequest: boolean;
+
+  /**
+   * When this state is true, the list of groups the users is part of will be reloaded. This should
+   * only be loaded once per page load.
+   */
+  performGroupRequest: boolean;
 
   /**
    * Selected saved search for the saved search dropdown.
@@ -194,7 +218,8 @@ export function queryPageReducer(
           ...state.pagination,
           offset: 0
         },
-        performElasticSearchRequest: true
+        performElasticSearchRequest: true,
+        performSuggestionRequest: true
       };
 
     /**
@@ -227,6 +252,33 @@ export function queryPageReducer(
         elasticSearchIndex: action.index,
         performIndexRequest: false,
         indexLoading: false
+      };
+
+    /**
+     * New suggestions have been provided.
+     */
+    case "SUGGESTION_CHANGE":
+      return {
+        ...state,
+        performSuggestionRequest: false,
+        suggestions: action.newSuggestions
+      };
+
+    case "GROUP_CHANGE":
+      return {
+        ...state,
+        performGroupRequest: false,
+        groups: action.newGroups
+      };
+
+    /**
+     * Set the performSuggestionRequest flag to true, this will cause the suggestion request to be
+     * sent.
+     */
+    case "RELOAD_SUGGESTIONS":
+      return {
+        ...state,
+        performSuggestionRequest: true
       };
 
     /**
@@ -300,18 +352,6 @@ export function queryPageReducer(
         elasticSearchLoading: false,
         indexLoading: false,
         userPreferenceLoading: false
-      };
-
-    /**
-     * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
-     * performed.
-     */
-    case "RESET":
-      return {
-        ...state,
-        error: undefined,
-        elasticSearchLoading: true,
-        performElasticSearchRequest: true
       };
 
     default:
