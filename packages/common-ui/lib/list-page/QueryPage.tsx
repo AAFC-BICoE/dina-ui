@@ -29,8 +29,8 @@ import { TableColumn } from "./types";
 import { performElasticSearch } from "./performElasticSearch";
 import { queryPageReducer, QueryPageStates } from "./queryPageReducer";
 
-const DEFAULT_PAGE_SIZE: number = 25;
-const DEFAULT_SORT: SortingRule[] = [
+export const DEFAULT_PAGE_SIZE: number = 25;
+export const DEFAULT_SORT: SortingRule[] = [
   {
     id: "createdOn",
     desc: true

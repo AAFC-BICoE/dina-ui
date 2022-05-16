@@ -1,21 +1,21 @@
 import Select from "react-select";
-import React from "react";
+import React, { useReducer } from "react";
 import { QueryBuilder } from "../QueryBuilder";
 import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import DatePicker from "react-datepicker";
+import { queryPageReducer } from "../queryPageReducer";
+import { INTEGRATION_TEST_INITIAL_STATES, TEST_INDEX_NAME } from "../types";
 
 const TEST_SEARCH_DATE =
   "Fri Jan 21 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";
-
-const INDEX_NAME = "DINA_EXAMPLE_INDEX";
 
 /** Options array based on resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
     headers: {},
     body: {
-      indexName: INDEX_NAME,
+      indexName: TEST_INDEX_NAME,
       attributes: [
         {
           name: "createdOn",
@@ -53,23 +53,28 @@ const apiContext: any = {
 };
 
 describe("QueryBuilder component", () => {
+  const ReducerProvider = () => {
+    const [states, dispatch] = useReducer(
+      queryPageReducer,
+      INTEGRATION_TEST_INITIAL_STATES
+    );
+
+    return (
+      <DinaForm initialValues={{ queryRows: [{}], group: "" }}>
+        <QueryBuilder name="queryRows" dispatch={dispatch} states={states} />
+      </DinaForm>
+    );
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("Displays the Query builder with one Query Row by default.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{ queryRows: [{}], group: "" }}>
-        <QueryBuilder
-          name="queryRows"
-          indexName={INDEX_NAME}
-          onGroupChange={() => null}
-        />
-      </DinaForm>,
-      {
-        apiContext
-      }
-    );
+    // Set up test dispatcher.
+    const wrapper = mountWithAppContext(<ReducerProvider />, {
+      apiContext
+    });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -98,18 +103,9 @@ describe("QueryBuilder component", () => {
     ]);
   });
   it("Query builder can be used to add rows to aggregate level queries", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{ queryRows: [{}] }}>
-        <QueryBuilder
-          name="queryRows"
-          indexName={INDEX_NAME}
-          onGroupChange={() => null}
-        />
-      </DinaForm>,
-      {
-        apiContext
-      }
-    );
+    const wrapper = mountWithAppContext(<ReducerProvider />, {
+      apiContext
+    });
 
     await new Promise(setImmediate);
     wrapper.update();

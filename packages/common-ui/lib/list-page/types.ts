@@ -1,5 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Column } from "react-table";
+import { DEFAULT_PAGE_SIZE, DEFAULT_SORT } from "./QueryPage";
+import { QueryPageStates } from "./queryPageReducer";
 
 /**
  * This type extends the react-table column type, this just adds a few specific fields for elastic
@@ -145,3 +147,39 @@ export type QueryRowNumberType =
   | "half_float"
   | "scaled_float"
   | "unsigned_long";
+
+export const TEST_INDEX_NAME = "DINA_EXAMPLE_INDEX";
+export const TEST_DEFAULT_GROUP = "aafc";
+
+/**
+ * This is used for the useReducer initial data setup.
+ */
+export const INTEGRATION_TEST_INITIAL_STATES: QueryPageStates = {
+  indexName: TEST_INDEX_NAME,
+  elasticSearchIndex: [],
+  totalRecords: 0,
+  pagination: {
+    limit: DEFAULT_PAGE_SIZE,
+    offset: 0
+  },
+  searchFilters: {
+    group: TEST_DEFAULT_GROUP,
+    queryRows: [
+      {
+        fieldName: ""
+      }
+    ]
+  },
+  sortingRules: DEFAULT_SORT,
+  searchResults: [],
+  error: undefined,
+  elasticSearchLoading: true,
+  userPreferences: undefined,
+  reloadUserPreferences: true,
+  loadedSavedSearch: "default",
+  selectedSavedSearch: "",
+  performElasticSearchRequest: true,
+  performIndexRequest: true,
+  indexLoading: true,
+  userPreferenceLoading: true
+};
