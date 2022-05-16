@@ -124,14 +124,19 @@ export function GlobalNamesReadOnly({
   const initTaxonTree = (
     <span>
       {" "}
-      {speciesRank ? <b>Species : </b> : undefined} {speciesRank}
+      {speciesRank ? (
+        <a>
+          <b>Species : </b> {speciesRank} &gt;
+        </a>
+      ) : undefined}
       {genusRank ? (
         <>
           {" "}
-          &gt; <b> Genus : </b>{" "}
+          <a>
+            <b>Genus : </b> {genusRank}
+          </a>{" "}
         </>
       ) : undefined}{" "}
-      {genusRank}
     </span>
   );
 
