@@ -1,10 +1,7 @@
-import { KitsuResource, PersistedResource } from "kitsu";
 import { useReducer } from "react";
 import { useIntl } from "react-intl";
 import ReactTable, { TableProps, SortingRule } from "react-table";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { DinaForm } from "../formik-connected/DinaForm";
-import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "./QueryBuilder";
 import { transformQueryToDSL } from "../util/transformToDSL";
 import {
@@ -17,17 +14,18 @@ import {
   CheckBoxFieldProps,
   useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
-import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
 import { cloneDeep } from "lodash";
-import { FormikButton, useAccount, useApiClient } from "..";
+import { useAccount, useApiClient } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 import { TableColumn } from "./types";
 import { performElasticSearch } from "./performElasticSearch";
 import { queryPageReducer, QueryPageStates } from "./queryPageReducer";
+import { KitsuResource, PersistedResource } from "kitsu";
+import { DinaForm } from "../formik-connected/DinaForm";
 
 export const DEFAULT_PAGE_SIZE: number = 25;
 export const DEFAULT_SORT: SortingRule[] = [
@@ -121,18 +119,18 @@ export function QueryPage<TData extends KitsuResource>({
     },
     sortingRules: defaultSort ?? DEFAULT_SORT,
     searchResults: [],
-    suggestions: [],
     error: undefined,
     elasticSearchLoading: true,
     userPreferences: undefined,
-    reloadUserPreferences: true,
+    performUserPreferenceRequest: true,
     loadedSavedSearch: "default",
     selectedSavedSearch: "",
     performElasticSearchRequest: true,
     performIndexRequest: true,
     indexLoading: true,
     userPreferenceLoading: true,
-    performSuggestionRequest: false
+    performSuggestionRequest: false,
+    suggestions: []
   };
 
   // Reducer to handle all user actions, checkout the queryPageReducer.tsx file.
@@ -220,33 +218,20 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  /**
-   * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
-   * performed.
-   *
-   * @param formik formik instance, used to set the current form to empty.
-   */
-  function resetForm(formik) {
-    const resetToVal = {
-      queryRows: [{}],
-      group: groupNames?.[0]
-    };
-    formik?.setValues(resetToVal);
-    dispatch({ type: "SEARCH_FILTER_CHANGE", newFilter: resetToVal as any });
-  }
-
   return (
-    <DinaForm
-      key={uuidv4()}
-      initialValues={searchFilters}
-      onSubmit={({ submittedValues }) =>
-        dispatch({ type: "SEARCH_FILTER_CHANGE", newFilter: submittedValues })
-      }
-    >
+    <>
       {/** Display any error messages on the page. */}
       {error !== undefined && (
         <div className="alert alert-danger" role="status">
           {error}
+          <br />
+          <br />
+          <button
+            className="btn btn-secondary float-right"
+            onClick={() => dispatch({ type: "RETRY" })}
+          >
+            <DinaMessage id="retry" />
+          </button>
         </div>
       )}
 
@@ -280,82 +265,99 @@ export function QueryPage<TData extends KitsuResource>({
         </div>
         <div>
           {/* Action Buttons */}
-          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-          <FormikButton
+          <button
+            className="btn btn-primary"
+            onClick={() => dispatch({ type: "PERFORM_SEARCH" })}
+          >
+            {formatMessage({ id: "search" })}
+          </button>
+          <button
             className="btn btn-secondary mx-2"
-            onClick={(_, formik) => resetForm(formik)}
+            onClick={() =>
+              dispatch({
+                type: "SEARCH_FILTER_CHANGE",
+                newFilter: {
+                  queryRows: [{ fieldName: "" }],
+                  group: groupNames?.[0] ?? ""
+                }
+              })
+            }
           >
             <DinaMessage id="resetFilters" />
-          </FormikButton>
+          </button>
         </div>
       </div>
 
-      <div
-        className="query-table-wrapper"
-        role="search"
-        aria-label={formatMessage({ id: "queryTable" })}
-      >
-        <div className="mb-1">
-          <div className="d-flex align-items-end">
-            <span id="queryPageCount">
-              {/* Loading indicator when total is not calculated yet. */}
-              {elasticSearchLoading ? (
-                <LoadingSpinner loading={true} />
-              ) : (
-                <CommonMessage
-                  id="tableTotalCount"
-                  values={{ totalCount: totalRecords }}
-                />
-              )}
-            </span>
+      <DinaForm initialValues={[]}>
+        <div
+          className="query-table-wrapper"
+          role="search"
+          aria-label={formatMessage({ id: "queryTable" })}
+        >
+          <div className="mb-1">
+            <div className="d-flex align-items-end">
+              <span id="queryPageCount">
+                {/* Loading indicator when total is not calculated yet. */}
+                {elasticSearchLoading ? (
+                  <LoadingSpinner loading={true} />
+                ) : (
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: totalRecords }}
+                  />
+                )}
+              </span>
 
-            {/* Multi sort tooltip - Only shown if it's possible to sort */}
-            {resolvedReactTableProps?.sortable !== false && (
-              <MultiSortTooltip />
-            )}
-
-            <div className="d-flex gap-3">
-              {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
-              {bulkDeleteButtonProps && (
-                <BulkDeleteButton {...bulkDeleteButtonProps} />
+              {/* Multi sort tooltip - Only shown if it's possible to sort */}
+              {resolvedReactTableProps?.sortable !== false && (
+                <MultiSortTooltip />
               )}
+
+              <div className="d-flex gap-3">
+                {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+                {bulkDeleteButtonProps && (
+                  <BulkDeleteButton {...bulkDeleteButtonProps} />
+                )}
+              </div>
             </div>
           </div>
+          <ReactTable
+            // Column and data props
+            columns={mappedColumns}
+            data={searchResults}
+            minRows={1}
+            // Loading Table props
+            loading={elasticSearchLoading}
+            // Pagination props
+            manual={true}
+            pageSize={pagination.limit}
+            pages={
+              totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0
+            }
+            page={pagination.offset / pagination.limit}
+            onPageChange={newPage =>
+              dispatch({ type: "PAGINATION_PAGE_CHANGE", newPage })
+            }
+            onPageSizeChange={newSize =>
+              dispatch({ type: "PAGINATION_SIZE_CHANGE", newSize })
+            }
+            pageText={<CommonMessage id="page" />}
+            noDataText={<CommonMessage id="noRowsFound" />}
+            ofText={<CommonMessage id="of" />}
+            rowsText={formatMessage({ id: "rows" })}
+            previousText={<CommonMessage id="previous" />}
+            nextText={<CommonMessage id="next" />}
+            // Sorting props
+            onSortedChange={newSort =>
+              dispatch({ type: "SORTING_CHANGE", newSort })
+            }
+            sorted={sortingRules}
+            // Table customization props
+            {...resolvedReactTableProps}
+            className="-striped"
+          />
         </div>
-        <ReactTable
-          // Column and data props
-          columns={mappedColumns}
-          data={searchResults}
-          minRows={1}
-          // Loading Table props
-          loading={elasticSearchLoading}
-          // Pagination props
-          manual={true}
-          pageSize={pagination.limit}
-          pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
-          page={pagination.offset / pagination.limit}
-          onPageChange={newPage =>
-            dispatch({ type: "PAGINATION_PAGE_CHANGE", newPage })
-          }
-          onPageSizeChange={newSize =>
-            dispatch({ type: "PAGINATION_SIZE_CHANGE", newSize })
-          }
-          pageText={<CommonMessage id="page" />}
-          noDataText={<CommonMessage id="noRowsFound" />}
-          ofText={<CommonMessage id="of" />}
-          rowsText={formatMessage({ id: "rows" })}
-          previousText={<CommonMessage id="previous" />}
-          nextText={<CommonMessage id="next" />}
-          // Sorting props
-          onSortedChange={newSort =>
-            dispatch({ type: "SORTING_CHANGE", newSort })
-          }
-          sorted={sortingRules}
-          // Table customization props
-          {...resolvedReactTableProps}
-          className="-striped"
-        />
-      </div>
-    </DinaForm>
+      </DinaForm>
+    </>
   );
 }

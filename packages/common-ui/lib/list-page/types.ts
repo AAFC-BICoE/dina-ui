@@ -172,16 +172,16 @@ export const INTEGRATION_TEST_INITIAL_STATES: QueryPageStates = {
   },
   sortingRules: DEFAULT_SORT,
   searchResults: [],
-  suggestions: [],
   error: undefined,
   elasticSearchLoading: true,
   userPreferences: undefined,
-  reloadUserPreferences: true,
+  performUserPreferenceRequest: true,
   loadedSavedSearch: "default",
   selectedSavedSearch: "",
   performElasticSearchRequest: true,
   performIndexRequest: true,
   indexLoading: true,
   userPreferenceLoading: true,
-  performSuggestionRequest: false
+  performSuggestionRequest: false,
+  suggestions: []
 };

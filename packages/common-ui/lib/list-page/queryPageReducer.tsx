@@ -1,6 +1,6 @@
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { SortingRule } from "react-table";
-import { LimitOffsetPageSpec, SelectOption } from "..";
+import { LimitOffsetPageSpec } from "..";
 import { TransformQueryToDSLParams } from "../util/transformToDSL";
 import { ESIndexMapping } from "./types";
 
@@ -15,11 +15,12 @@ export type QueryPageActions =
   | { type: "USER_PREFERENCE_CHANGE"; newUserPreferences: UserPreference }
   | { type: "SAVED_SEARCH_CHANGE"; newSavedSearch: string }
   | { type: "INDEX_CHANGE"; index: ESIndexMapping[] }
-  | { type: "SUGGESTION_CHANGE"; newSuggestions: string[] }
+  | { type: "SUGGESTION_CHANGE"; newSuggestions: string[]; index: number }
   | { type: "RELOAD_SUGGESTIONS" }
   | { type: "LOAD_SAVED_SEARCH" }
   | { type: "RELOAD_SAVED_SEARCH"; newSavedSearch: string }
   | { type: "SUCCESS_TABLE_DATA"; searchResults: any[]; newTotal: number }
+  | { type: "PERFORM_SEARCH" }
   | { type: "RETRY" }
   | { type: "ERROR"; errorLabel: string };
 
@@ -47,6 +48,11 @@ export interface QueryPageStates {
   searchFilters: TransformQueryToDSLParams;
 
   /**
+   * Used to store suggestions from the query filters that have distinct
+   */
+  suggestions: string[][];
+
+  /**
    * Current sorting rules being applied. This will be passed to elastic search.
    *
    * Please note that multiple rules can be applied at once.
@@ -69,14 +75,9 @@ export interface QueryPageStates {
   userPreferences?: UserPreference;
 
   /**
-   * If the user is used a suggested field, the suggestions will be stored here.
-   */
-  suggestions: string[];
-
-  /**
    * When this state is true, the user preferences will be reloaded.
    */
-  reloadUserPreferences: boolean;
+  performUserPreferenceRequest: boolean;
 
   /**
    * When this state is true, a search will be performed.
@@ -139,7 +140,6 @@ export function queryPageReducer(
   state: QueryPageStates,
   action: QueryPageActions
 ): QueryPageStates {
-  // console.log("ACTION PERFORMED: " + action.type + " / Current States: " + state)
   switch (action.type) {
     /**
      * When the user changes the react-table page, it will trigger this event.
@@ -202,13 +202,11 @@ export function queryPageReducer(
       return {
         ...state,
         searchFilters: action.newFilter,
-        elasticSearchLoading: true,
         pagination: {
           ...state.pagination,
           offset: 0
         },
-        performElasticSearchRequest: true,
-        performSuggestionRequest: true
+        performElasticSearchRequest: true
       };
 
     /**
@@ -218,7 +216,7 @@ export function queryPageReducer(
       return {
         ...state,
         userPreferences: action.newUserPreferences,
-        reloadUserPreferences: false,
+        performUserPreferenceRequest: false,
         userPreferenceLoading: false
       };
 
@@ -247,13 +245,16 @@ export function queryPageReducer(
       };
 
     /**
-     * New suggestions have been provided.
+     * New suggestions have been provided. The index is used to determine what query row is
+     * using these suggestions.
      */
     case "SUGGESTION_CHANGE":
+      const suggestions = { ...state.suggestions };
+      suggestions[action.index] = action.newSuggestions;
       return {
         ...state,
         performSuggestionRequest: false,
-        suggestions: action.newSuggestions
+        suggestions
       };
 
     /**
@@ -302,7 +303,7 @@ export function queryPageReducer(
     case "RELOAD_SAVED_SEARCH":
       return {
         ...state,
-        reloadUserPreferences: true,
+        performUserPreferenceRequest: true,
         performElasticSearchRequest: true,
         elasticSearchLoading: true,
         selectedSavedSearch: action.newSavedSearch
@@ -323,6 +324,15 @@ export function queryPageReducer(
       };
 
     /**
+     * Action when the form is submitted and ready to be searched.
+     */
+    case "PERFORM_SEARCH":
+      return {
+        ...state,
+        performElasticSearchRequest: true
+      };
+
+    /**
      * This action becomes possible with a user clicks the "Retry" button on an error message.
      * This will let them essentially retry all the of the requests again without refreshing the
      * page.
@@ -336,7 +346,7 @@ export function queryPageReducer(
         // Flag all requests to be reloaded.
         performElasticSearchRequest: true,
         performIndexRequest: true,
-        reloadUserPreferences: true,
+        performUserPreferenceRequest: true,
 
         // Turn off all loading indicators.
         elasticSearchLoading: true,
@@ -360,7 +370,7 @@ export function queryPageReducer(
         // Stop all requests from happening.
         performElasticSearchRequest: false,
         performIndexRequest: false,
-        reloadUserPreferences: false,
+        performUserPreferenceRequest: false,
 
         // Turn off all loading indicators.
         elasticSearchLoading: false,

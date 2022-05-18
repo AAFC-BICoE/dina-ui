@@ -111,6 +111,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   resetFilters: "Reset Filters",
   resetSort: "Reset Sort",
   results: " Results",
+  retry: "Retry",
   rows: "rows",
   rowsPerPage: "rows per page",
   search: "Search",

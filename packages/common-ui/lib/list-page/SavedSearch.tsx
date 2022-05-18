@@ -28,7 +28,7 @@ export function SavedSearch(props: SavedSearchProps) {
   const { apiClient } = useApiClient();
   const { dispatch, queryPageState } = props;
   const {
-    reloadUserPreferences,
+    performUserPreferenceRequest,
     userPreferences,
     indexName,
     selectedSavedSearch,
@@ -47,12 +47,12 @@ export function SavedSearch(props: SavedSearchProps) {
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
 
-  // User preferences should only be loaded if reloadUserPreferences is set to true.
+  // User preferences should only be loaded if performUserPreferenceRequest is set to true.
   useEffect(() => {
-    if (reloadUserPreferences) {
+    if (performUserPreferenceRequest) {
       retrieveUserPreferences();
     }
-  }, [reloadUserPreferences]);
+  }, [performUserPreferenceRequest]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch

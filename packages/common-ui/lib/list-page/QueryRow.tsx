@@ -231,7 +231,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                       "." +
                       dataFromIndexMapping?.label,
                     relationshipType: dataFromIndexMapping?.parentName,
-                    indexName
+                    indexName,
+                    index
                   })?.filter(suggestion =>
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                   )

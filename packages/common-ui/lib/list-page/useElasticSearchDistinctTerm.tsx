@@ -27,6 +27,9 @@ interface QuerySuggestionFieldProps {
 
   /** The index you want elastic search to perform the search on */
   indexName: string;
+
+  /** The index being rendered. */
+  index: number;
 }
 
 export function useElasticSearchDistinctTerm({
@@ -34,11 +37,11 @@ export function useElasticSearchDistinctTerm({
   states,
   fieldName,
   relationshipType,
-  indexName
+  indexName,
+  index
 }: QuerySuggestionFieldProps) {
   const { apiClient } = useApiClient();
-
-  const { suggestions, performSuggestionRequest, searchFilters } = states;
+  const { performSuggestionRequest, searchFilters, suggestions } = states;
   const groups = searchFilters?.group;
 
   // Every time the textEntered has changed, perform a new request for new suggestions.
@@ -104,22 +107,24 @@ export function useElasticSearchDistinctTerm({
             type: "SUGGESTION_CHANGE",
             newSuggestions: resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
               AGGREGATION_NAME
-            ]?.buckets?.map(bucket => bucket.key)
+            ]?.buckets?.map(bucket => bucket.key),
+            index
           });
         } else {
           dispatch({
             type: "SUGGESTION_CHANGE",
             newSuggestions: resp?.data?.aggregations?.[
               AGGREGATION_NAME
-            ]?.buckets?.map(bucket => bucket.key)
+            ]?.buckets?.map(bucket => bucket.key),
+            index
           });
         }
       })
       .catch(() => {
         // If any issues have occurred, just return an empty list.
-        dispatch({ type: "SUGGESTION_CHANGE", newSuggestions: [] });
+        dispatch({ type: "SUGGESTION_CHANGE", newSuggestions: [], index });
       });
   }
 
-  return suggestions;
+  return suggestions[index];
 }
