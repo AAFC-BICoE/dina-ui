@@ -160,7 +160,7 @@ export function GlobalNamesSearchBox({
                 type="button"
                 disabled={searchIsDisabled}
               >
-                <DinaMessage id="searchOnCOL" />
+                <DinaMessage id="searchButton" />
               </button>
             </div>
           )}
