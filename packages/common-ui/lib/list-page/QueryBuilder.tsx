@@ -2,15 +2,14 @@ import {
   DinaFormSection,
   FieldWrapperProps,
   LoadingSpinner,
-  useApiClient,
-  SelectField
+  useApiClient
 } from "..";
 import { QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
 import { useEffect } from "react";
 import { ESIndexMapping } from "./types";
 import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
-import { useAvailableGroupOptions } from "packages/dina-ui/components/group-select/GroupSelectField";
+import { GroupSelectField } from "../../../dina-ui/components/group-select/GroupSelectField";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   dispatch: React.Dispatch<QueryPageActions>;
@@ -20,14 +19,8 @@ interface QueryBuilderProps extends FieldWrapperProps {
 export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
 
-  const {
-    indexName,
-    indexLoading,
-    elasticSearchIndex,
-    performIndexRequest,
-    performGroupRequest,
-    groups
-  } = states;
+  const { indexName, indexLoading, elasticSearchIndex, performIndexRequest } =
+    states;
 
   // Ensure that the index request is only done once per page load.
   useEffect(() => {
@@ -35,13 +28,6 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
       fetchQueryFieldsByIndex();
     }
   }, [performIndexRequest]);
-
-  // Ensure the groups are only loaded once per page load.
-  useEffect(() => {
-    if (performGroupRequest) {
-      fetchGroups();
-    }
-  }, [performGroupRequest]);
 
   /**
    * The query builder options are generated from the elastic search index. This method will
@@ -104,21 +90,10 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
     dispatch({ type: "INDEX_CHANGE", index: result });
   }
 
-  async function fetchGroups() {
-    dispatch({
-      type: "GROUP_CHANGE",
-      newGroups: [{ label: "aafc", value: "aafc" }]
-    });
-  }
-
   // Display loading spinner when performing request for the index.
   if (indexLoading) {
     return <LoadingSpinner loading={true} />;
   }
-
-  const sortedData = elasticSearchIndex
-    ?.sort((a, b) => a.label.localeCompare(b.label))
-    .filter(prop => !prop.label.startsWith("group"));
 
   return (
     <>
@@ -166,7 +141,7 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
         }}
       </FieldArray>
       <DinaFormSection horizontal={"flex"}>
-        <SelectField
+        <GroupSelectField
           isMulti={true}
           name="group"
           className="col-md-4"
@@ -176,7 +151,6 @@ export function QueryBuilder({ name, dispatch, states }: QueryBuilderProps) {
               newFilter: { ...formik.values, group: value }
             })
           }
-          options={groups}
         />
       </DinaFormSection>
     </>

@@ -132,9 +132,7 @@ export function QueryPage<TData extends KitsuResource>({
     performIndexRequest: true,
     indexLoading: true,
     userPreferenceLoading: true,
-    performSuggestionRequest: false,
-    groups: [],
-    performGroupRequest: true
+    performSuggestionRequest: false
   };
 
   // Reducer to handle all user actions, checkout the queryPageReducer.tsx file.
@@ -248,7 +246,7 @@ export function QueryPage<TData extends KitsuResource>({
       {/** Display any error messages on the page. */}
       {error !== undefined && (
         <div className="alert alert-danger" role="status">
-          <p>{error}</p>
+          {error}
         </div>
       )}
 

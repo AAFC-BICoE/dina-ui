@@ -134,7 +134,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = elasticSearchIndex
+    ?.filter(prop => !prop.label.startsWith("group"))
     ?.filter(prop => !prop.parentPath)
+    ?.sort((a, b) => a.label.localeCompare(b.label))
     ?.map(prop => ({
       label: prop.label,
       value: prop.value
@@ -143,6 +145,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   // Get all the relationships for the search dropdown.
   const nestedRowOptions = elasticSearchIndex
     ?.filter(prop => !!prop.parentPath)
+    ?.sort((a, b) => a.label.localeCompare(b.label))
     ?.map(prop => {
       return {
         parentName: prop.parentName,

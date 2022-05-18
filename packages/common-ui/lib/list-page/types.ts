@@ -183,7 +183,5 @@ export const INTEGRATION_TEST_INITIAL_STATES: QueryPageStates = {
   performIndexRequest: true,
   indexLoading: true,
   userPreferenceLoading: true,
-  performSuggestionRequest: false,
-  groups: [],
-  performGroupRequest: true
+  performSuggestionRequest: false
 };

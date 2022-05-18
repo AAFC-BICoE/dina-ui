@@ -16,11 +16,11 @@ export type QueryPageActions =
   | { type: "SAVED_SEARCH_CHANGE"; newSavedSearch: string }
   | { type: "INDEX_CHANGE"; index: ESIndexMapping[] }
   | { type: "SUGGESTION_CHANGE"; newSuggestions: string[] }
-  | { type: "GROUP_CHANGE"; newGroups: any[] }
   | { type: "RELOAD_SUGGESTIONS" }
   | { type: "LOAD_SAVED_SEARCH" }
   | { type: "RELOAD_SAVED_SEARCH"; newSavedSearch: string }
   | { type: "SUCCESS_TABLE_DATA"; searchResults: any[]; newTotal: number }
+  | { type: "RETRY" }
   | { type: "ERROR"; errorLabel: string };
 
 export interface QueryPageStates {
@@ -34,11 +34,6 @@ export interface QueryPageStates {
    * Elastic search mapping for the index name. This should only be populated once.
    */
   elasticSearchIndex: ESIndexMapping[];
-
-  /**
-   * Groups the user can select from, this list should only be populated once per page load.
-   */
-  groups: any[];
 
   /**
    * Total number of records from the search. This leverages the elastic search count request if
@@ -98,12 +93,6 @@ export interface QueryPageStates {
    * selected.
    */
   performSuggestionRequest: boolean;
-
-  /**
-   * When this state is true, the list of groups the users is part of will be reloaded. This should
-   * only be loaded once per page load.
-   */
-  performGroupRequest: boolean;
 
   /**
    * Selected saved search for the saved search dropdown.
@@ -245,6 +234,9 @@ export function queryPageReducer(
         selectedSavedSearch: action.newSavedSearch
       };
 
+    /**
+     * Index has been updated, this request should only happen once per page load.
+     */
     case "INDEX_CHANGE":
       return {
         ...state,
@@ -262,13 +254,6 @@ export function queryPageReducer(
         ...state,
         performSuggestionRequest: false,
         suggestions: action.newSuggestions
-      };
-
-    case "GROUP_CHANGE":
-      return {
-        ...state,
-        performGroupRequest: false,
-        groups: action.newGroups
       };
 
     /**
@@ -338,17 +323,46 @@ export function queryPageReducer(
       };
 
     /**
+     * This action becomes possible with a user clicks the "Retry" button on an error message.
+     * This will let them essentially retry all the of the requests again without refreshing the
+     * page.
+     */
+    case "RETRY":
+      return {
+        ...state,
+        // Remove error message.
+        error: undefined,
+
+        // Flag all requests to be reloaded.
+        performElasticSearchRequest: true,
+        performIndexRequest: true,
+        reloadUserPreferences: true,
+
+        // Turn off all loading indicators.
+        elasticSearchLoading: true,
+        indexLoading: true,
+        userPreferenceLoading: true
+      };
+
+    /**
      * An error has occurred. Display an error message on the page.
      */
     case "ERROR":
       return {
         ...state,
+        // Display error message.
+        error: action.errorLabel,
+
+        // Hide results, since they could be incorrect.
         searchResults: [],
         totalRecords: 0,
-        error: action.errorLabel,
+
+        // Stop all requests from happening.
         performElasticSearchRequest: false,
         performIndexRequest: false,
         reloadUserPreferences: false,
+
+        // Turn off all loading indicators.
         elasticSearchLoading: false,
         indexLoading: false,
         userPreferenceLoading: false
