@@ -27,8 +27,9 @@ export function FieldExtensionSelectField(
   const fieldExtensionQuery = useQuery<FieldExtension>(query?.() as any);
 
   return withResponse(fieldExtensionQuery, ({ data: fieldExtension }) => {
-    const options = fieldExtension?.extension.fields?.[0]?.acceptedValues?.map(
-      val => {
+    const options = [
+      { label: "None", value: null }, // none option to deselect field, concatenated with mapped values
+      ...fieldExtension?.extension.fields?.[0]?.acceptedValues?.map(val => {
         const extensionValue: ExtensionValue = {
           extKey: fieldExtension.extension.key,
           extTerm: fieldExtension.extension.fields?.[0]?.term,
@@ -39,9 +40,8 @@ export function FieldExtensionSelectField(
           label: val,
           value: extensionValue
         };
-      }
-    );
-
+      })
+    ];
     return (
       <FieldWrapper
         {...fieldExtensionSelectFieldProps}
@@ -60,9 +60,12 @@ export function FieldExtensionSelectField(
           function onChange(newValue) {
             setValue(newValue.value);
           }
-          const selectedValue = options?.filter(
-            opt => opt.value.value === value?.value
+
+          // Display selected value, display default placeholder if None selected
+          const selectedValue = options?.filter(opt =>
+            opt.value ? opt.value.value === value?.value : null
           );
+
           return (
             <SortableSelect
               onChange={onChange}
@@ -71,6 +74,7 @@ export function FieldExtensionSelectField(
               value={selectedValue}
               axis="xy"
               distance={4}
+              defaultValue={null}
             />
           );
         }}
