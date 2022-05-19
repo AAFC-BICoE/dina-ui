@@ -12,6 +12,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
+import { ESIndexMapping, TypeVisibility } from "./types";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -24,87 +25,6 @@ export interface QueryRowProps {
   name: string;
   formik?: FormikContextType<any>;
 }
-
-/**
- * The full path will be generated for elastic using a combination of the parent path and
- * the value. The path is generated using the following:
- *
- * {parentPath}.{path}.{value}
- *
- * Example: included.attributes.determination.verbatimScientificName
- */
-export interface ESIndexMapping {
-  /**
-   * Name of the attribute.
-   *
-   * Example: verbatimScientificName
-   */
-  value: string;
-
-  /**
-   * Text that is displayed to the user in the Query Filtering option menu.
-   *
-   * This text is a user-friendly generated label, which may show some paths to help the user
-   * understand the relationships better. This is generated from the path.
-   *
-   * Example: determination.verbatimScientificName
-   */
-  label: string;
-
-  /**
-   * The attributes type. This can change how the query row is displayed and the options provided.
-   *
-   * Examples: text, keyword, boolean, date, boolean, long, short, integer...
-   */
-  type: string;
-
-  /**
-   * If enabled, it will allow the user to see suggestions as they type. The suggestions will come
-   * from elastic search based on most common values saved.
-   *
-   * Only available for the text type.
-   */
-  distinctTerm: boolean;
-
-  /**
-   * The path for the attribute without the attribute name. This path does not include the parent
-   * path.
-   *
-   * Example: attribute.determination
-   */
-  path: string;
-
-  /**
-   * If the attribute belongs to a relationship, this is the path for only the parent. When generating
-   * the elastic search query it will use this as the prefix of the path.
-   *
-   * Example: included
-   */
-  parentPath?: string;
-
-  /**
-   * If the attribute belongs to a relationship, this is the name which will be used to group
-   * attributes under the same relationship together in the search. This name will also be used to
-   * display text of the group.
-   *
-   * Example: organism
-   */
-  parentName?: string;
-}
-
-export type QueryRowMatchValue = "match" | "term";
-export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-export type QueryRowBooleanType = "TRUE" | "FALSE";
-export type QueryRowNumberType =
-  | "long"
-  | "short"
-  | "integer"
-  | "byte"
-  | "double"
-  | "float"
-  | "half_float"
-  | "scaled_float"
-  | "unsigned_long";
 
 export interface QueryRowExportProps {
   fieldName: string;
@@ -120,14 +40,6 @@ export interface QueryRowExportProps {
   parentName?: string;
   parentPath?: string;
   distinctTerm?: boolean;
-}
-
-interface TypeVisibility {
-  isText: boolean;
-  isSuggestedText: boolean;
-  isBoolean: boolean;
-  isNumber: boolean;
-  isDate: boolean;
 }
 
 const queryRowMatchOptions = [

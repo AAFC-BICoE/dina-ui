@@ -1,7 +1,7 @@
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { SortingRule } from "react-table";
 import { LimitOffsetPageSpec } from "../..";
-import { TableColumn } from "../../query-page/QueryPage";
+import { TableColumn } from "../../list-page/types";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams

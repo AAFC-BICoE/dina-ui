@@ -1,12 +1,12 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule, Column } from "react-table";
+import ReactTable, { TableProps, SortingRule } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
-import { QueryBuilder } from "../query-builder/QueryBuilder";
+import { QueryBuilder } from "./QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
 import {
   transformQueryToDSL,
@@ -16,7 +16,7 @@ import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
   BulkEditButton
-} from "../../lib/list-page-layout/bulk-buttons";
+} from "../list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import {
   CheckBoxFieldProps,
@@ -31,6 +31,7 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
+import { TableColumn } from "./types";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -46,35 +47,6 @@ const DEFAULT_SORT: SortingRule[] = [
  * to be used to get the actual total.
  */
 const MAX_COUNT_SIZE: number = 10000;
-
-/**
- * This type extends the react-table column type, this just adds a few specific fields for elastic
- * search mapping and internationalization.
- */
-export interface TableColumn<TData extends KitsuResource>
-  extends Column<TData> {
-  /**
-   * User-friendly column to be displayed. You can use a DinaMessage key for internationalization.
-   */
-  label?: string;
-
-  /**
-   * Elastic search path to the attribute.
-   *
-   * Example: `data.attributes.name`
-   */
-  attributePath?: string;
-
-  /**
-   * This field is used to find the relationship in the included section.
-   */
-  relationshipType?: string;
-
-  /**
-   * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
-   */
-  isKeyword?: boolean;
-}
 
 export interface QueryPageProps<TData extends KitsuResource> {
   /**
