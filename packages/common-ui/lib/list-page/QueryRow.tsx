@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   DateField,
+  FieldWrapperProps,
   NumberField,
   QueryLogicSwitchField,
   SelectField,
@@ -12,17 +13,38 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
-import { ESIndexMapping, TypeVisibility } from "./types";
+import { TypeVisibility } from "./types";
+import { QueryPageActions, QueryPageStates } from "./queryPageReducer";
 
-export interface QueryRowProps {
-  /** Index name passed from the QueryPage component. */
-  indexName: string;
+export interface QueryRowProps extends FieldWrapperProps {
+  /**
+   * Perform actions using the reducer. This is the "brains" of the Query Page.
+   */
+  dispatch: React.Dispatch<QueryPageActions>;
 
-  esIndexMapping: ESIndexMapping[];
+  /**
+   * Retrieve all of the states from the reducer.
+   */
+  states: QueryPageStates;
+
+  /**
+   * The current row number. Each row has a unique number.
+   */
   index: number;
+
+  /**
+   * The plus button was clicked, callback to QueryBuilder.
+   */
   addRow?: () => void;
+
+  /**
+   * The minus button was clicked, callback to the QueryBuilder.
+   */
   removeRow?: (index) => void;
-  name: string;
+
+  /**
+   * Formik context for editing/reading the current form.
+   */
   formik?: FormikContextType<any>;
 }
 
@@ -54,8 +76,8 @@ const queryRowBooleanOptions = [
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
-  const { esIndexMapping, index, addRow, removeRow, name, indexName } =
-    queryRowProps;
+  const { index, addRow, removeRow, name, dispatch, states } = queryRowProps;
+  const { indexName, elasticSearchIndex } = states;
 
   const initState = {
     matchValue: null,
@@ -69,11 +91,9 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     (formikProps.values as any)?.queryRows?.[index].fieldName
   );
 
-  const dataFromIndexMapping = esIndexMapping?.find(
+  const dataFromIndexMapping = elasticSearchIndex?.find(
     attribute => attribute.value === fieldName
   );
-
-  const selectedGroups: string[] = (formikProps.values as any)?.group;
 
   // Depending on the type, it changes what fields need to be displayed.
   const typeVisibility: TypeVisibility = {
@@ -96,7 +116,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   };
 
   function onSelectionChange(value) {
-    const newDataFromIndexMapping = esIndexMapping.find(
+    const newDataFromIndexMapping = elasticSearchIndex.find(
       attribute => attribute.value === value
     );
 
@@ -113,16 +133,19 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   }
 
   // Get all of the attributes from the index for the filter dropdown.
-  const simpleRowOptions = esIndexMapping
+  const simpleRowOptions = elasticSearchIndex
+    ?.filter(prop => !prop.label.startsWith("group"))
     ?.filter(prop => !prop.parentPath)
+    ?.sort((a, b) => a.label.localeCompare(b.label))
     ?.map(prop => ({
       label: prop.label,
       value: prop.value
     }));
 
   // Get all the relationships for the search dropdown.
-  const nestedRowOptions = esIndexMapping
+  const nestedRowOptions = elasticSearchIndex
     ?.filter(prop => !!prop.parentPath)
+    ?.sort((a, b) => a.label.localeCompare(b.label))
     ?.map(prop => {
       return {
         parentName: prop.parentName,
@@ -199,15 +222,17 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                 alwaysShowSuggestions={true}
                 suggestions={value =>
                   useElasticSearchDistinctTerm({
+                    dispatch,
+                    states,
                     fieldName:
                       dataFromIndexMapping?.parentPath +
                       "." +
                       dataFromIndexMapping?.path +
                       "." +
                       dataFromIndexMapping?.label,
-                    groups: selectedGroups,
                     relationshipType: dataFromIndexMapping?.parentName,
-                    indexName
+                    indexName,
+                    index
                   })?.filter(suggestion =>
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                   )
