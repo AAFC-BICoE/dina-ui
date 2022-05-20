@@ -107,7 +107,7 @@ export function PreparationField({
                 }
                 key={group}
                 tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
-                tooltipLinkText="inspiredBy"
+                tooltipLinkText="fromDinaUserGuide"
               />
             )}
           </FieldSpy>
@@ -127,7 +127,7 @@ export function PreparationField({
           <TextField
             {...fieldProps("preservationType")}
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preservation-type"
-            tooltipLinkText="inspiredBy"
+            tooltipLinkText="fromDinaUserGuide"
           />
           <TextField {...fieldProps("preparationFixative")} />
           <TextField {...fieldProps("preparationMaterials")} />

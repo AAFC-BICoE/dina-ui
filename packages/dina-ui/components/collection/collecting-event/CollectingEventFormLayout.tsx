@@ -596,12 +596,20 @@ export function CollectingEventFormLayout({
             className="non-strip"
           >
             <TextField name="habitat" />
-            <TextField name="host" />
+            <TextField
+              name="host"
+              customName={"collectingEventHost"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_host"
+              tooltipLinkText="fromDinaUserGuide"
+            />
             <Field name="group">
               {({ field: { value: group } }) => (
                 // Collection methods should be filtered by the Collecting Event's group:
                 <CollectionMethodSelectField
                   name="collectionMethod"
+                  customName={"collectingEventCollectionMethod"}
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#collection-method"
+                  tooltipLinkText="fromDinaUserGuide"
                   filter={filterBy(["name"], {
                     extraFilters: group
                       ? [
@@ -618,6 +626,9 @@ export function CollectingEventFormLayout({
             </Field>
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
+              customName={"collectingEventSubstrate"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
+              tooltipLinkText="fromDinaUserGuide"
               query={(searchValue, ctx) => ({
                 path: "collection-api/collecting-event",
                 filter: {
