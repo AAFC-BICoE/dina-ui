@@ -25,7 +25,7 @@ export function AssociationsField({ id = "associations-section" }) {
         <div className="row">
           <div className="col-md-6">
             <AssociationsHostField
-              name={"hostOrganism.host"}
+              name={"hostOrganism.name"}
               customName="host"
               isDetermination={false}
             />
