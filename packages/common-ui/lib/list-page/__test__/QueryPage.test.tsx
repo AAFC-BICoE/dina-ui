@@ -418,10 +418,25 @@ describe("QueryPage component", () => {
         aggs: {
           included_aggregation: {
             aggs: {
-              term_aggregation: {
-                terms: {
-                  field: "included.attributes.name.keyword",
-                  size: 100
+              included_type_filter: {
+                aggs: {
+                  term_aggregation: {
+                    terms: {
+                      field: "included.attributes.name.keyword",
+                      size: 100
+                    }
+                  }
+                },
+                filter: {
+                  bool: {
+                    filter: [
+                      {
+                        term: {
+                          "included.type": "preparation-type"
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             },
@@ -431,24 +446,8 @@ describe("QueryPage component", () => {
           }
         },
         query: {
-          bool: {
-            must: [
-              {
-                terms: {
-                  "data.attributes.group": ["aafc"]
-                }
-              },
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    match: {
-                      "included.type": "preparation-type"
-                    }
-                  }
-                }
-              }
-            ]
+          terms: {
+            "data.attributes.group": ["aafc"]
           }
         },
         size: 0
