@@ -1,5 +1,9 @@
 import Cleave from "cleave.js/react";
-import { DoOperationsError, MaterialSampleSearchHelper } from "common-ui";
+import {
+  DoOperationsError,
+  MaterialSampleSearchHelper,
+  ResourceSelect
+} from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -60,6 +64,45 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
   })
 );
 
+/** CustomView with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
+const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
+  id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
+  type: "custom-view",
+  createdOn: "2022-03-03T16:36:30.422992Z",
+  createdBy: "cnc-cm",
+  name: "test view with managed attributes",
+  group: "cnc",
+  restrictToCreatedBy: false,
+  viewConfiguration: {
+    type: "material-sample-form-custom-view",
+    navOrder: ["managedAttributes-section", "identifiers-section"],
+    formTemplates: {
+      MATERIAL_SAMPLE: {
+        templateFields: {
+          materialSampleName: { enabled: true, defaultValue: "default id" },
+          "organism[0].determination[0].managedAttributes.attribute_1": {
+            enabled: true
+          },
+          "managedAttributes.sample_attribute_1": {
+            enabled: true,
+            defaultValue: "sample attribute default value"
+          }
+        }
+      },
+      COLLECTING_EVENT: {
+        templateFields: {
+          "managedAttributes.collecting_event_attribute_1": {
+            enabled: true
+          }
+        }
+      }
+    },
+    managedAttributesOrder: ["sample_attribute_1"],
+    collectingEventManagedAttributesOrder: ["collecting_event_attribute_1"],
+    determinationManagedAttributesOrder: ["determination_attribute_1"]
+  }
+};
+
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/collection/1":
@@ -102,6 +145,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/acquisition-event":
+    case "collection-api/custom-view":
+    case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
 });
@@ -150,6 +195,20 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
         };
       case "collection/1":
         return TEST_COLLECTION_1;
+      case "managed-attribute/MATERIAL_SAMPLE.sample_attribute_1":
+        return { id: "1", key: "sample_attribute_1", name: "Attribute 1" };
+      case "managed-attribute/DETERMINATION.determination_attribute_1":
+        return {
+          id: "1",
+          key: "determination_attribute_1",
+          name: "Attribute 1"
+        };
+      case "managed-attribute/COLLECTING_EVENT.collecting_event_attribute_1":
+        return {
+          id: "1",
+          key: "collecting_event_attribute_1",
+          name: "Attribute 1"
+        };
     }
   });
 });
@@ -207,7 +266,7 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "initial determination 1"
           }
         ]
@@ -1117,8 +1176,14 @@ describe("MaterialSampleBulkEditor", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [{ verbatimScientificName: "new-scientific-name" }],
-        type: "organism"
+        determination: [
+          {
+            verbatimScientificName: "new-scientific-name",
+            determiner: undefined
+          }
+        ],
+        type: "organism",
+        group: undefined
       },
       type: "organism"
     };
@@ -1136,6 +1201,12 @@ describe("MaterialSampleBulkEditor", () => {
             type: "material-sample",
             resource: {
               id: sample.id,
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: sample.type,
               associations: [
                 {
@@ -1329,6 +1400,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1337,6 +1414,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1401,6 +1484,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
               type: "material-sample"
@@ -1410,6 +1499,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               type: "material-sample"
             },
@@ -1740,6 +1835,12 @@ describe("MaterialSampleBulkEditor", () => {
               },
               relationships: {},
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -1752,6 +1853,12 @@ describe("MaterialSampleBulkEditor", () => {
               },
               relationships: {},
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               type: "material-sample"
             },
             type: "material-sample"
@@ -1814,6 +1921,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "1",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               storageUnit: {
                 id: "C",
@@ -1826,6 +1939,12 @@ describe("MaterialSampleBulkEditor", () => {
           {
             resource: {
               id: "2",
+              attachment: undefined,
+              organism: undefined,
+              organismsIndividualEntry: undefined,
+              organismsQuantity: undefined,
+              preparationAttachment: undefined,
+              projects: undefined,
               relationships: {},
               storageUnit: {
                 id: "C",
@@ -2059,5 +2178,126 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ]
     ]);
+  });
+
+  it("Allows selecting a Custom View to show/hide fields in the bulk and single tass.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Select a custom view:
+    wrapper
+      .find(".material-sample-custom-view-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")(TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Shows the correct nav order in the bulk edit tab:
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .material-sample-nav .list-group-item")
+        .map(node => node.text())
+        .slice(0, 2)
+    ).toEqual(["Managed Attributes", "Identifiers"]);
+
+    // Enable Collecting Event:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+    // Enable Organism and Determination:
+    wrapper
+      .find(".tabpanel-EDIT_ALL .enable-organisms")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper.find(".determination-section button.add-button").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The bulk edit tab shows the managed attributes from the CustomView:
+    // For Material Sample:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
+    // For Collecting Event:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #collecting-event-section .managedAttributes_collecting_event_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
+    // For Determination:
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
+
+    // Switch to the first individual sample tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
+    // Enable Collecting Event:
+    wrapper
+      .find(".sample-tabpanel-0 .enable-collecting-event")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+    // Enable Organism and Determination:
+    wrapper
+      .find(".sample-tabpanel-0 .enable-organisms")
+      .find(ReactSwitch)
+      .prop<any>("onChange")(true);
+    await new Promise(setImmediate);
+    wrapper.update();
+    wrapper
+      .find(".sample-tabpanel-0 .determination-section button.add-button")
+      .simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // The individual sample tab tab shows the managed attributes from the CustomView:
+    // For Material Sample:
+    expect(
+      wrapper
+        .find(
+          ".sample-tabpanel-0 #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
+    // For Collecting Event:
+    expect(
+      wrapper
+        .find(
+          ".sample-tabpanel-0 #collecting-event-section .managedAttributes_collecting_event_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
+    // For Determination:
+    expect(
+      wrapper
+        .find(
+          ".sample-tabpanel-0 #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+        )
+        .exists()
+    ).toEqual(true);
   });
 });

@@ -15,6 +15,14 @@ export type ExtensionField = {
   name: string;
   definition: string;
   dinaComponent: string;
+  acceptedValues: string[];
 };
 
 export type FieldExtension = KitsuResource & FieldExtensionAttributes;
+
+export type ExtensionValue = {
+  extKey?: string;
+  extVersion?: string;
+  extTerm?: string;
+  value?: string;
+};

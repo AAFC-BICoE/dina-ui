@@ -1,25 +1,21 @@
 import {
   ButtonBar,
+  ColumnDefinition,
   CreateButton,
   dateCell,
   DeleteButton,
   FilterAttribute,
-  filterBy,
   ListPageLayout,
   QueryPage,
-  stringArrayCell,
-  useQuery,
-  withResponse
+  stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  MaterialSample,
-  MaterialSampleType
-} from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { useState } from "react";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;
@@ -30,6 +26,11 @@ export interface SampleListLayoutProps {
   showBulkActions?: boolean;
 }
 
+/**
+ * This getColumnDefinition is used for the QueryTable, not the new elastic search stuff.
+ *
+ * The old version of the listing is still when searching for associated samples.
+ */
 export const getColumnDefinition = () => {
   return [
     {
@@ -79,10 +80,10 @@ export function SampleListLayout({
       type: "DATE"
     }
   ];
-
   const [queryKey, setQueryKey] = useState("");
 
-  const columns = [
+  // The old style columns, but add the action buttons at the end.
+  const columns: ColumnDefinition<MaterialSample>[] = [
     ...getColumnDefinition(),
     ...(onSelect
       ? [
@@ -130,7 +131,6 @@ export function SampleListLayout({
           }
         ])
   ];
-
   return (
     <ListPageLayout
       additionalFilters={filterForm => ({
@@ -183,17 +183,63 @@ export function SampleListLayout({
 
 export default function MaterialSampleListPage() {
   const { formatMessage } = useDinaIntl();
-  const [queryKey, setQueryKey] = useState("");
-  const queryState = useQuery<MaterialSample[]>(
+
+  // Columns for the elastic search list page.
+  const columns: TableColumn<MaterialSample>[] = [
+    // Material Sample Name
     {
-      path: "collection-api/material-sample",
-      include: "collection"
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
     },
-    {}
-  );
-  const { error, loading, response } = queryState;
-  const columns = [
-    ...getColumnDefinition(),
+
+    // Collection Name (External Relationship)
+    {
+      Cell: ({ original: { included } }) =>
+        included?.collection?.id ? (
+          <Link
+            href={`/collection/collection/view?id=${included?.collection?.id}`}
+          >
+            {included?.collection?.attributes?.name}
+          </Link>
+        ) : null,
+      label: "collection.name",
+      accessor: "included.attributes.name",
+      relationshipType: "collection",
+      isKeyword: true
+    },
+
+    // List of catalogue numbers
+    stringArrayCell(
+      "dwcOtherCatalogNumbers",
+      "data.attributes.dwcOtherCatalogNumbers"
+    ),
+
+    // Material Sample Type
+    {
+      label: "materialSampleType",
+      accessor: "data.attributes.materialSampleType",
+      isKeyword: true
+    },
+
+    // Created By
+    {
+      label: "createdBy",
+      accessor: "data.attributes.createdBy",
+      isKeyword: true
+    },
+
+    // Created On
+    dateCell("createdOn", "data.attributes.createdOn"),
+
+    // Action buttons for each row.
     ...[
       {
         Cell: ({ original: sample }) => (
@@ -213,7 +259,6 @@ export default function MaterialSampleListPage() {
               type="material-sample"
               id={sample.id}
               options={{ apiBaseUrl: "/collection-api" }}
-              onDeleted={() => setQueryKey(String(Math.random()))}
             />
           </div>
         ),
@@ -222,6 +267,7 @@ export default function MaterialSampleListPage() {
       }
     ]
   ];
+
   return (
     <div>
       <Head title={formatMessage("materialSampleListTitle")} />
@@ -238,21 +284,18 @@ export default function MaterialSampleListPage() {
             </a>
           </Link>
         </ButtonBar>
-        {withResponse({ loading, error, response }, () => (
-          <QueryPage
-            indexName={"dina_material_sample_index"}
-            columns={columns}
-            initData={response?.data}
-            bulkDeleteButtonProps={{
-              typeName: "material-sample",
-              apiBaseUrl: "/collection-api"
-            }}
-            bulkEditPath={ids => ({
-              pathname: "/collection/material-sample/bulk-edit",
-              query: { ids: ids.join(",") }
-            })}
-          />
-        ))}
+        <QueryPage
+          indexName={"dina_material_sample_index"}
+          columns={columns}
+          bulkDeleteButtonProps={{
+            typeName: "material-sample",
+            apiBaseUrl: "/collection-api"
+          }}
+          bulkEditPath={ids => ({
+            pathname: "/collection/material-sample/bulk-edit",
+            query: { ids: ids.join(",") }
+          })}
+        />
       </main>
       <Footer />
     </div>

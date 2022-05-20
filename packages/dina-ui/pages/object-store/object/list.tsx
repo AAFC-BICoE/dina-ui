@@ -1,20 +1,16 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  ColumnDefinition,
   dateCell,
   FilterAttribute,
   filterBy,
-  ListPageLayout,
-  SplitPagePanel
+  QueryPage,
+  SplitPagePanel,
+  stringArrayCell
 } from "common-ui";
 import Link from "next/link";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import {
-  GroupSelectField,
-  Head,
-  Nav,
-  thumbnailCell
-} from "../../../components";
+import { Head, Nav, thumbnailCell } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -61,31 +57,40 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
+  const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
       bucketField: "bucket",
       fileIdentifierField: "fileIdentifier"
     }),
     {
-      Cell: ({ original: { id, originalFilename } }) =>
-        originalFilename ? (
+      Cell: ({ original: { id, data } }) =>
+        data?.attributes?.originalFilename ? (
           <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
-            {originalFilename}
+            {data?.attributes?.originalFilename}
           </a>
         ) : null,
-      accessor: "originalFilename"
+      label: "originalFilename",
+      accessor: "data.attributes.originalFilename",
+      isKeyword: true
     },
-    "acCaption",
-    dateCell("acDigitizationDate"),
-    dateCell("xmpMetadataDate"),
     {
-      accessor: "acMetadataCreator.displayName",
+      label: "acCaption",
+      accessor: "data.attributes.acCaption",
+      isKeyword: true
+    },
+    dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
+    dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
+    {
+      Cell: ({ original: { included } }) => (
+        <>{included?.acMetadataCreator?.attributes?.displayName}</>
+      ),
+      label: "acMetadataCreator.displayName",
+      relationshipType: "person",
+      accessor: "included.attributes.displayName",
+      isKeyword: true,
       sortable: false
     },
-    {
-      Cell: ({ original: { acTags } }) => <>{acTags?.join(", ")}</>,
-      accessor: "acTags"
-    },
+    stringArrayCell("acTags", "data.attributes.acTags"),
     {
       Cell: ({ original }) => (
         <div className="d-flex h-100">
@@ -149,79 +154,9 @@ export default function MetadataListPage() {
         <div className="row">
           <div className={`table-section col-${tableSectionWidth}`}>
             <SplitPagePanel>
-              <ListPageLayout<Metadata>
-                additionalFilters={filterForm => ({
-                  // Apply group filter:
-                  ...(filterForm.group && { bucket: filterForm.group })
-                })}
-                defaultSort={[
-                  {
-                    desc: true,
-                    id: "xmpMetadataDate"
-                  }
-                ]}
-                filterAttributes={METADATA_FILTER_ATTRIBUTES}
-                filterFormchildren={({ submitForm }) => (
-                  <div className="mb-3">
-                    <div style={{ width: "300px" }}>
-                      <GroupSelectField
-                        onChange={() => setImmediate(submitForm)}
-                        name="group"
-                        showAnyOption={true}
-                        showAllGroups={true}
-                      />
-                    </div>
-                  </div>
-                )}
-                id="metadata-list"
-                queryTableProps={({ CheckBoxField }) => ({
-                  columns: METADATA_TABLE_COLUMNS,
-                  // Include the Agents from the Agent API in the Metadatas:
-                  joinSpecs: [
-                    {
-                      apiBaseUrl: "/agent-api",
-                      idField: "acMetadataCreator",
-                      joinField: "acMetadataCreator",
-                      path: metadata =>
-                        `person/${metadata.acMetadataCreator.id}`
-                    },
-                    {
-                      apiBaseUrl: "/agent-api",
-                      idField: "dcCreator",
-                      joinField: "dcCreator",
-                      path: metadata => `person/${metadata.dcCreator.id}`
-                    }
-                  ],
-                  path: "objectstore-api/metadata?include=acMetadataCreator,dcCreator",
-                  reactTableProps: ({ response }) => {
-                    TBodyGallery.innerComponent = (
-                      <StoredObjectGallery
-                        CheckBoxField={CheckBoxField}
-                        metadatas={response?.data ?? []}
-                        previewMetadataId={previewMetadata?.id as any}
-                        onSelectPreviewMetadata={setPreviewMetadata}
-                      />
-                    );
-
-                    return {
-                      TbodyComponent:
-                        listLayoutType === "GALLERY" ? TBodyGallery : undefined,
-                      getTrProps: (_, rowInfo) => {
-                        if (rowInfo) {
-                          const metadata: Metadata = rowInfo.original;
-                          return {
-                            style: {
-                              background:
-                                metadata.id === previewMetadata?.id &&
-                                HIGHLIGHT_COLOR
-                            }
-                          };
-                        }
-                        return {};
-                      }
-                    };
-                  }
-                })}
+              <QueryPage
+                indexName={"dina_object_store_index"}
+                columns={METADATA_TABLE_COLUMNS}
                 bulkDeleteButtonProps={{
                   typeName: "metadata",
                   apiBaseUrl: "/objectstore-api"
@@ -230,6 +165,40 @@ export default function MetadataListPage() {
                   pathname: "/object-store/metadata/edit",
                   query: { metadataIds: ids.join(",") }
                 })}
+                defaultSort={[
+                  {
+                    desc: true,
+                    id: "xmpMetadataDate"
+                  }
+                ]}
+                reactTableProps={(responseData, CheckBoxField) => {
+                  TBodyGallery.innerComponent = (
+                    <StoredObjectGallery
+                      CheckBoxField={CheckBoxField}
+                      metadatas={(responseData as any) ?? []}
+                      previewMetadataId={previewMetadata?.id as any}
+                      onSelectPreviewMetadata={setPreviewMetadata}
+                    />
+                  );
+
+                  return {
+                    TbodyComponent:
+                      listLayoutType === "GALLERY" ? TBodyGallery : undefined,
+                    getTrProps: (_, rowInfo) => {
+                      if (rowInfo) {
+                        const metadata: Metadata = rowInfo.original;
+                        return {
+                          style: {
+                            background:
+                              metadata.id === previewMetadata?.id &&
+                              HIGHLIGHT_COLOR
+                          }
+                        };
+                      }
+                      return {};
+                    }
+                  };
+                }}
               />
             </SplitPagePanel>
           </div>

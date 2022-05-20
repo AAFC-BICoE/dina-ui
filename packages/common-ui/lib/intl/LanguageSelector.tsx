@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import { intlContext } from "./IntlSupport";
+import Button from "react-bootstrap/Button";
 
 const LANGUAGE_LABELS = {
   en: "English",
@@ -25,16 +26,15 @@ export function LanguageSelector() {
           }
 
           return (
-            <div key={locale} className="d-inline">
-              <button
-                className="btn btn-link px-0"
-                style={{ color: "#0000cc" }}
-                onClick={onClick}
-                lang={key}
-              >
-                {LANGUAGE_LABELS[key]}
-              </button>
-            </div>
+            <Button
+              variant="link"
+              onClick={onClick}
+              lang={key}
+              key={key}
+              className="px-0"
+            >
+              {LANGUAGE_LABELS[key]}
+            </Button>
           );
         })}
     </div>

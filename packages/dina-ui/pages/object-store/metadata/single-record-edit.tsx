@@ -148,9 +148,9 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
-    for (const maKey of keys(metadataEdit?.managedAttributeValues)) {
-      if (blankValues.includes(metadataEdit?.managedAttributeValues?.[maKey])) {
-        delete metadataEdit?.managedAttributeValues?.[maKey];
+    for (const maKey of keys(metadataEdit?.managedAttributes)) {
+      if (blankValues.includes(metadataEdit?.managedAttributes?.[maKey])) {
+        delete metadataEdit?.managedAttributes?.[maKey];
       }
     }
 
@@ -253,7 +253,8 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         </div>
       </FieldSet>
       <ManagedAttributesEditor
-        valuesPath="managedAttributeValues"
+        valuesPath="managedAttributes"
+        values={metadata.managedAttributes}
         managedAttributeApiPath="objectstore-api/managed-attribute"
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />

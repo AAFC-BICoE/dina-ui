@@ -58,7 +58,7 @@ const SAMPLES_WITH_DIFFERENT_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "test-name-existing"
           }
         ]
@@ -131,7 +131,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }
@@ -151,7 +151,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }
@@ -171,7 +171,7 @@ const SAMPLES_WITH_SAME_DETERMINATIONS: InputResource<MaterialSample>[] = [
         determination: [
           {
             isPrimary: true,
-            isFileAs: true,
+            isFiledAs: true,
             verbatimScientificName: "first name"
           },
           { verbatimScientificName: "second name" }
@@ -327,6 +327,12 @@ describe("BulkEditTabWarning", () => {
         // Keeps the original values:
         SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map(sample => ({
           resource: {
+            attachment: undefined,
+            organism: undefined,
+            organismsIndividualEntry: undefined,
+            organismsQuantity: undefined,
+            preparationAttachment: undefined,
+            projects: undefined,
             id: sample.id,
             type: sample.type,
             relationships: {}
@@ -379,7 +385,13 @@ describe("BulkEditTabWarning", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [{ verbatimScientificName: "test-name-override" }],
+        determination: [
+          {
+            verbatimScientificName: "test-name-override",
+            determiner: undefined
+          }
+        ],
+        group: undefined,
         type: "organism"
       },
       type: "organism"
@@ -396,6 +408,12 @@ describe("BulkEditTabWarning", () => {
           resource: {
             id: sample.id,
             type: sample.type,
+            attachment: undefined,
+            organism: undefined,
+            organismsIndividualEntry: undefined,
+            organismsQuantity: undefined,
+            preparationAttachment: undefined,
+            projects: undefined,
             relationships: {
               organism: {
                 data: [{ id: "11111", type: "organism" }]
@@ -469,7 +487,13 @@ describe("BulkEditTabWarning", () => {
 
     const EXPECTED_ORGANISM_SAVE = {
       resource: {
-        determination: [{ verbatimScientificName: "test-name-override" }],
+        group: undefined,
+        determination: [
+          {
+            verbatimScientificName: "test-name-override",
+            determiner: undefined
+          }
+        ],
         type: "organism"
       },
       type: "organism"
@@ -482,6 +506,12 @@ describe("BulkEditTabWarning", () => {
       [
         SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
           resource: {
+            attachment: undefined,
+            organism: undefined,
+            organismsIndividualEntry: undefined,
+            organismsQuantity: undefined,
+            preparationAttachment: undefined,
+            projects: undefined,
             id: sample.id,
             relationships: {
               organism: { data: [{ id: "11111", type: "organism" }] }

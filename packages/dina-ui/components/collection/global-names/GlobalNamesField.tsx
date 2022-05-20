@@ -103,23 +103,36 @@ export function GlobalNamesReadOnly({
     });
   }
 
-  const paths = scientificNameDetails?.classificationPath?.split("|");
-  const ranks = scientificNameDetails?.classificationRanks?.split("|");
-
-  const familyIdx = ranks?.findIndex(path => path === "family");
-  const kingdomIdx = ranks?.findIndex(path => path === "kingdom");
-
-  const kingdomRank =
-    kingdomIdx && kingdomIdx >= 0 ? paths?.[kingdomIdx] : undefined;
-  const familyRank =
-    familyIdx && familyIdx >= 0 ? paths?.[familyIdx] + ": " : undefined;
+  const paths = scientificNameDetails?.classificationPath
+    ?.split("|")
+    ?.reverse();
+  const ranks = scientificNameDetails?.classificationRanks
+    ?.split("|")
+    ?.reverse();
+  const pathsInit = paths?.slice(0, 2);
+  const ranksInit = ranks?.slice(0, 2);
 
   const initTaxonTree = (
-    <span>
-      {" "}
-      {kingdomRank ? <b>Kingdom: </b> : undefined} {kingdomRank}
-      {familyRank ? <b> &gt;Family: </b> : undefined} {familyRank}
-    </span>
+    <>
+      {pathsInit?.map((path, idx) => {
+        let boldText = ranksInit?.[idx] && (
+          <>
+            <b>
+              {" "}
+              {ranksInit[idx].charAt(0)?.toUpperCase() +
+                ranksInit[idx].substring(1)}{" "}
+              :
+            </b>{" "}
+            <>{path}</>{" "}
+          </>
+        );
+
+        if (idx !== pathsInit.length - 1 && boldText) {
+          boldText = <> {boldText} &gt;</>;
+        }
+        return boldText;
+      })}
+    </>
   );
 
   const fullTaxonTree = (
@@ -135,7 +148,7 @@ export function GlobalNamesReadOnly({
           </>
         );
 
-        if (idx !== path.length - 1 && boldText) {
+        if (idx !== paths.length - 1 && boldText) {
           boldText = <> {boldText} &gt;</>;
         }
         return boldText;
@@ -152,7 +165,12 @@ export function GlobalNamesReadOnly({
           <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
         </div>
       )}
-      {paths?.length && ranks?.length && (
+      {paths?.length &&
+      ranks?.length &&
+      paths.length < 3 &&
+      ranks.length < 3 ? (
+        <div className="mt-1">{initTaxonTree}</div>
+      ) : (
         <div className="mt-1">
           {showMore ? fullTaxonTree : initTaxonTree}
           <a

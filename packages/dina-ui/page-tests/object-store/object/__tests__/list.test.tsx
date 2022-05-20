@@ -3,16 +3,107 @@ import {
   BulkDeleteButton,
   BulkSelectableFormValues,
   DinaForm,
-  QueryTable
+  QueryPage
 } from "common-ui";
 import { PersistedResource } from "kitsu";
+import { Group } from "../../../../types/user-api";
 import { StoredObjectGallery } from "../../../../components/object-store";
 import MetadataListPage from "../../../../pages/object-store/object/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { Metadata } from "../../../../types/objectstore-api";
+import { Metadata, Person } from "../../../../types/objectstore-api";
 import { ObjectUpload } from "../../../../types/objectstore-api/resources/ObjectUpload";
 
-const TEST_METADATAS: PersistedResource<Metadata>[] = [
+const TEST_PERSON: PersistedResource<Person> = {
+  id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+  type: "person",
+  displayName: "test agent"
+};
+
+const TEST_GROUP: PersistedResource<Group>[] = [
+  {
+    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    type: "group",
+    name: "test group",
+    path: " test path",
+    labels: { fr: "CNCFR" }
+  }
+];
+
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    body: {
+      indexName: "dina_object_store_index",
+      attributes: [
+        {
+          name: "originalFilename",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "bucket",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "createdBy",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "acCaption",
+          type: "text",
+          path: "data.attributes"
+        },
+        {
+          name: "id",
+          type: "text",
+          path: "data"
+        },
+        {
+          name: "type",
+          type: "text",
+          path: "data"
+        },
+        {
+          name: "createdOn",
+          type: "date",
+          path: "data.attributes"
+        }
+      ],
+      relationships: []
+    },
+    statusCode: "OK",
+    statusCodeValue: 200
+  }
+};
+
+const mockGet = jest.fn<any, any>(async path => {
+  switch (path) {
+    case "objectstore-api/metadata":
+      return { data: TEST_METADATA };
+    case "objectstore-api/object-upload":
+      return { data: TEST_OBJECTUPLOAD };
+    case "agent-api/person":
+      return { data: TEST_PERSON };
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
+    case "user-api/group":
+      return TEST_GROUP;
+    case "user-api/user-preference":
+      return USER_PREFERENCE;
+  }
+});
+
+const mockPost = jest.fn<any, any>(async path => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return TEST_ELASTIC_SEARCH_RESPONSE;
+  }
+});
+
+// This will be used in the future with the fallback.
+const TEST_METADATA: PersistedResource<Metadata>[] = [
   {
     acTags: ["tag1"],
     bucket: "testbucket",
@@ -43,6 +134,69 @@ const TEST_METADATAS: PersistedResource<Metadata>[] = [
   }
 ];
 
+const USER_PREFERENCE = {
+  data: [],
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
+};
+
+const TEST_ELASTIC_SEARCH_RESPONSE = {
+  data: {
+    hits: {
+      total: {
+        value: 3
+      },
+      hits: [
+        {
+          _source: {
+            data: {
+              id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+              type: "metadata",
+              attributes: {
+                acTags: ["tag1"],
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
+                originalFilename: "file1.png"
+              }
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+              type: "metadata",
+              attributes: {
+                acTags: ["tag1", "tag2"],
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
+                originalFilename: "file2.png"
+              }
+            }
+          }
+        },
+        {
+          _source: {
+            data: {
+              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+              type: "metadata",
+              attributes: {
+                bucket: "testbucket",
+                dcType: "Image",
+                fileExtension: ".png",
+                fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+};
+
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -60,11 +214,16 @@ const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
   type: "object-upload"
 };
 
-const mockGet = jest.fn();
 const mockDoOperations = jest.fn();
 
 const apiContext: any = {
-  apiClient: { get: mockGet },
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGet,
+      post: mockPost
+    }
+  },
   doOperations: mockDoOperations
 };
 
@@ -78,24 +237,16 @@ jest.mock("next/router", () => ({
 describe("Metadata List Page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGet.mockImplementation(async path => {
-      if (
-        path === "objectstore-api/metadata?include=acMetadataCreator,dcCreator"
-      ) {
-        return { data: TEST_METADATAS };
-      } else if (path === "objectstore-api/object-upload") {
-        return { data: TEST_OBJECTUPLOAD };
-      }
-    });
   });
 
   it("Renders the metadata table by default.", async () => {
     const wrapper = mountWithAppContext(<MetadataListPage />, { apiContext });
 
     await new Promise(setImmediate);
+    await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(QueryTable).find(".rt-td").exists()).toEqual(true);
+    expect(wrapper.find(QueryPage).find(".rt-td").exists()).toEqual(true);
   });
 
   it("Provides a toggle to see the gallery view.", async () => {
@@ -109,9 +260,6 @@ describe("Metadata List Page", () => {
         .find("input")
         .prop("checked")
     ).toEqual(true);
-    expect(wrapper.find(".table-section").find(QueryTable).exists()).toEqual(
-      true
-    );
 
     await new Promise(setImmediate);
     wrapper.update();

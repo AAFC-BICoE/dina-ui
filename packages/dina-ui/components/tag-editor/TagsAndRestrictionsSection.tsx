@@ -7,10 +7,17 @@ import {
   useBulkEditTabContext,
   useDinaFormContext
 } from "common-ui";
-import { Field } from "formik";
+import { MaterialSample } from "../../types/collection-api";
 import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
+import { RestrictionWarning } from "../collection/material-sample/RestrictionWarning";
+
+export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
+  "tags",
+  "publiclyReleasable",
+  "notPubliclyReleasableReason"
+];
 
 export interface TagsAndRestrictionsSection {
   resourcePath?: string;
@@ -23,25 +30,42 @@ export function TagsAndRestrictionsSection({
   groupSelectorName = "group",
   tagsFieldName = "tags"
 }: TagsAndRestrictionsSection) {
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
   const isInBulkEditTab = !!useBulkEditTabContext();
 
   return readOnly ? (
     <>
-      <TagSelectField
-        resourcePath={resourcePath}
-        className="mb-3"
-        name={tagsFieldName}
-        removeLabel={true}
-        groupSelectorName={groupSelectorName}
-      />
+      <div className="d-flex flex-column">
+        {((initialValues.restrictionFieldsExtension &&
+          initialValues.isRestricted) ||
+          initialValues.tags?.length > 0) && (
+          <div className="d-flex flex-row">
+            <div className="flex-grow-1">
+              <RestrictionWarning isRestrictionSelect={true} />
+            </div>
+            <div>
+              <TagSelectField
+                resourcePath={resourcePath}
+                name={tagsFieldName}
+                removeLabel={true}
+                groupSelectorName={groupSelectorName}
+              />
+            </div>
+          </div>
+        )}
+        {initialValues.restrictionRemarks && (
+          <div className="d-flex flex-row mb-3">
+            <RestrictionWarning isRestrictionRemarks={true} />
+          </div>
+        )}
+      </div>
     </>
   ) : (
     <div className="row">
       <DinaFormSection horizontal="flex">
         <TagSelectField
           resourcePath={resourcePath}
-          className="col-sm-6"
+          className="col-sm-6 tags"
           name={tagsFieldName}
           groupSelectorName={groupSelectorName}
           label={
@@ -68,17 +92,18 @@ export function TagsAndRestrictionsSection({
             />
           ) : (
             <InverseToggleField
+              className="notPubliclyReleasable"
               name="publiclyReleasable"
               label={<DinaMessage id="notPubliclyReleasable" />}
             />
           )}
           <DinaFormSection horizontal={false}>
-            <FieldSpy fieldName="publiclyReleasable">
+            <FieldSpy<boolean> fieldName="publiclyReleasable">
               {pr =>
                 pr === false ? (
                   <TextField
                     name="notPubliclyReleasableReason"
-                    className="flex-grow-1"
+                    className="flex-grow-1 notPubliclyReleasableReason"
                     multiLines={true}
                   />
                 ) : null

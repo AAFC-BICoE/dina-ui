@@ -19,7 +19,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     backToReadOnlyPage: "Retour à la page en mode lecture seule",
     bulkEdit: "Modification groupée",
     bulkEditorValidationError:
-      "Valeur non valide sur la ligne {row} : {valeur}",
+      "Valeur non valide sur la ligne {row} : {valeur}",
     bulkSubmissionErrorInfo:
       "Erreur d'envoi en bloc : Vérifiez les onglets ayant une étiquette rouge",
     cancelButtonText: "Annuler",
@@ -81,7 +81,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     jumpToPage: "Passer à la page",
     languageOfPage: "fra",
     loadingText: "Chargement en cours...",
-    loggedInAsUser: "Connecté en tant que :",
+    loggedInAsUser: "Connecté en tant que :",
     logoutBtn: "Fermer la session",
     max: "Max",
     min: "Min",
@@ -105,7 +105,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     previous: "Précédente",
     queryTable: "Interroger la table",
     queryTableMultiSortExplanation:
-      "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
+      "Pour trier la liste en fonction de plusieurs colonnes : Cliquez sur un en-tête de colonne pour trier par cette colonne, puis appuyez sur la touche Maj pendant que vous cliquez sur un autre en-tête.",
     queryTableMultiSortTooltipTitle: "Trier en fonction de plusieurs colonnes ",
     remarks: "Remarques",
     remove: "Retirer",
@@ -121,6 +121,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     selectLocation: "Sélectionner l’emplacement",
     selected: "sélectionné ",
     showChanges: "Visualiser les modifications ",
+    showHide: "Afficher/Masquer",
     somethingWentWrong: "Un problème est survenu",
     sourceField: "Champ source",
     sourceText: "Texte de départ",
@@ -129,7 +130,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     subjectTermsForPage:
       "information gouvernemental, information scientifique, recherche scientifique",
     submitBtnText: "Enregistrer",
-    tableTotalCount: "Nombre d'enregistrements correspondants : {totalCount}",
+    tableTotalCount: "Nombre d'enregistrements correspondants : {totalCount}",
     targetField: "Champ cible",
     text: "Texte",
     to: "À",
@@ -137,7 +138,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     typeHereToSearch: "Tapez ici pour effectuer une recherche.",
     typeToSearchOrChooseFromNewest:
       "Saisir la recherche ou choisir parmi les plus récents",
-    uiAppVersion: "Version de l’application IU : {version}",
+    uiAppVersion: "Version de l’application IU : {version}",
+    update: "Mise à jour",
     valueLabel: "Valeur",
     valueSourceType: "Type de valeur de départ",
     view: "Visualiser",

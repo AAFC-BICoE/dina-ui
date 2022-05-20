@@ -5,7 +5,7 @@ import {
   useDinaFormContext,
   ToggleField
 } from "common-ui";
-import { DeterminationField } from "..";
+import { DeterminationField } from "../..";
 import { Organism } from "../../../types/collection-api";
 
 /**
@@ -25,6 +25,7 @@ export interface OrganismStateFieldProps {
   individualEntry: boolean;
   namePrefix?: string;
   id?: string;
+  visibleManagedAttributeKeys?: string[];
 
   onTargetChecked: (index: number) => void;
 }
@@ -34,7 +35,8 @@ export function OrganismStateField({
   index,
   namePrefix = "",
   individualEntry,
-  onTargetChecked
+  onTargetChecked,
+  visibleManagedAttributeKeys
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -100,7 +102,10 @@ export function OrganismStateField({
         {determinations =>
           // Hide in read-only mode when there are no determinations:
           readOnly && !determinations?.length ? null : (
-            <DeterminationField {...determinationFieldProps} />
+            <DeterminationField
+              {...determinationFieldProps}
+              visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+            />
           )
         }
       </FieldSpy>

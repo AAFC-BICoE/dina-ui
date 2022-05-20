@@ -12,33 +12,32 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
+import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import {
+  AssociationsField,
+  CollectingEventFormLayout,
   Footer,
   Head,
+  HOSTORGANISM_FIELDS,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
+  MaterialSampleIdentifiersSection,
+  MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
   NotPubliclyReleasableWarning,
   OrganismsField,
-  ProjectSelectSection,
-  StorageLinkerField,
-  TagsAndRestrictionsSection
-} from "../../../components";
-import {
-  CollectingEventFormLayout,
   PreparationField,
   PREPARATION_FIELDS,
+  ProjectSelectSection,
   SamplesView,
   ScheduledActionsField,
+  StorageLinkerField,
+  TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
   withOrganismEditorValues
-} from "../../../components/collection/";
-import {
-  AssociationsField,
-  HOSTORGANISM_FIELDS
-} from "../../../components/collection/AssociationsField";
+} from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -46,10 +45,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
-import {
-  MaterialSampleFormLayout,
-  MaterialSampleIdentifiersFormLayout
-} from "./edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -57,9 +52,19 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const id = router.query.id?.toString();
 
   const materialSampleQuery = useMaterialSampleQuery(id);
+  const highestParentId =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.uuid.toString();
 
+  const highestParentMaterialSample =
+    materialSampleQuery.response?.data.parentMaterialSample &&
+    materialSampleQuery.response?.data.hierarchy?.at(-1)?.name;
+
+  const highestMaterialSampleQuery = useMaterialSampleQuery(highestParentId);
   const colEventQuery = useCollectingEventQuery(
-    materialSampleQuery.response?.data?.collectingEvent?.id
+    highestParentId
+      ? highestMaterialSampleQuery.response?.data?.collectingEvent?.id
+      : materialSampleQuery.response?.data?.collectingEvent?.id
   );
   const acqEventQuery = useAcquisitionEvent(
     materialSampleQuery.response?.data?.acquisitionEvent?.id
@@ -127,9 +132,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               initialValues={materialSample}
               readOnly={true}
             >
-              <NotPubliclyReleasableWarning />
-              <MaterialSampleStateWarning />
               {buttonBar}
+              <MaterialSampleStateWarning />
               <h1 id="wb-cont">
                 <MaterialSampleBreadCrumb
                   materialSample={materialSample}
@@ -140,7 +144,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <TagsAndRestrictionsSection />
                 <ProjectSelectSection />
               </div>
-              <MaterialSampleIdentifiersFormLayout />
+              <MaterialSampleIdentifiersSection />
               {materialSample.parentMaterialSample && (
                 <SamplesView
                   samples={[materialSample.parentMaterialSample]}
@@ -153,9 +157,19 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   fieldSetId={<DinaMessage id="childMaterialSamples" />}
                 />
               )}
-              <MaterialSampleFormLayout />
+              <MaterialSampleInfoSection />
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+                  {materialSample.parentMaterialSample && (
+                    <div>
+                      <DinaMessage id="collectingEventFromParent" />{" "}
+                      <Link
+                        href={`/collection/material-sample/view?id=${highestParentId}`}
+                      >
+                        <a>{highestParentMaterialSample}</a>
+                      </Link>
+                    </div>
+                  )}
                   <DinaForm initialValues={colEvent} readOnly={true}>
                     <div className="mb-3 d-flex justify-content-end align-items-center">
                       <Link

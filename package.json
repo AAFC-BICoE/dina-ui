@@ -37,7 +37,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.3.0",
     "tslint-react": "^5.0.0",
-    "typescript": "^4.5.4",
+    "typescript": "^4.5.5",
     "xlsx": "^0.17.4"
   },
   "resolutions": {
@@ -45,7 +45,10 @@
     "**/lodash": "^4.17.21",
     "**/react-file-viewer/**/three": "^0.125.0",
     "**/react-file-viewer/**/underscore": "^1.13.1",
-    "**/react-file-viewer/**/lodash": "^4.17.21"
+    "**/react-file-viewer/**/lodash": "^4.17.21",
+    "**/minimist": "^1.2.6",
+    "**/async": "^2.6.4",
+    "**/moment": "^2.29.2"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

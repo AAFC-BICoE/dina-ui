@@ -39,7 +39,7 @@ export function FileUploadProviderImpl({ children }) {
       const response = await apiClient.axios.post(
         `/objectstore-api/file/${group}`,
         formData,
-        { transformResponse: fileUploadErrorHandler }
+        { transformResponse: fileUploadErrorHandler, timeout: 0 }
       );
       uploadRespsT.push(response.data);
     }

@@ -43,10 +43,10 @@ export function TagSelectField({
               <div
                 key={index}
                 className="card p-1 flex-row align-items-center gap-1"
-                style={{ background: "rgb(221, 221, 221)" }}
+                style={{ background: "rgb(24, 102, 109)" }}
               >
-                <AiFillTag />
-                <span>{tag}</span>
+                <AiFillTag className="text-white" />
+                <span className="text-white">{tag}</span>
               </div>
             ))}
           </div>

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { CSSProperties, ReactNode, useContext } from "react";
 import {
   ApiClientContext,
   DoOperationsOptions
@@ -11,6 +11,8 @@ import { useModal } from "../modal/modal";
 interface DeleteButtonProps {
   /** Additional button classes. */
   className?: string;
+  children?: ReactNode;
+  style?: CSSProperties;
 
   /** Replaces all classNames */
   replaceClassName?: string;
@@ -45,7 +47,9 @@ export function DeleteButton({
   type,
   withLeadingSlash,
   reload,
-  onDeleted
+  onDeleted,
+  children,
+  style
 }: DeleteButtonProps) {
   const { openModal } = useModal();
   const { doOperations } = useContext(ApiClientContext);
@@ -83,7 +87,7 @@ export function DeleteButton({
       className={
         replaceClassName ?? `btn btn-danger delete-button ${className}`
       }
-      style={{ width: "6rem" }}
+      style={{ width: "6rem", ...style }}
       disabled={disabled}
       onClick={() =>
         openModal(
@@ -95,7 +99,7 @@ export function DeleteButton({
       }
       type="button"
     >
-      <CommonMessage id="deleteButtonText" />
+      {children || <CommonMessage id="deleteButtonText" />}
     </button>
   );
 }

@@ -15,8 +15,33 @@ import { FieldHeader } from "../field-header/FieldHeader";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 
-/** Object types accepted as a column definition. */
-export type ColumnDefinition<TData> = string | Column<TData>;
+/**
+ * Column props with extra props designed specifically for our application on top of it.
+ *
+ * If a type of string is provided, it should just create a ColumnDefinition with accessor only.
+ */
+export type ColumnDefinition<TData> =
+  | (Column<TData> & ElasticSearchColumnProps & InternationalizationProps)
+  | string;
+
+export interface InternationalizationProps {
+  /**
+   * Key used to retrieve the label value from internationalization.
+   */
+  label?: string;
+}
+
+export interface ElasticSearchColumnProps {
+  /**
+   * For elastic search operations, should .keyword appended to the accessor.
+   */
+  keyword?: boolean;
+
+  /**
+   * The relationship type the elastic search field is part of.
+   */
+  relationshipType?: string;
+}
 
 /** QueryTable component's props. */
 export interface QueryTableProps<TData extends KitsuResource> {
@@ -104,6 +129,7 @@ export function QueryTable<TData extends KitsuResource>({
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
+
   // JSONAPI page spec.
   const [page, setPage] = useState<LimitOffsetPageSpec>({
     limit: defaultPageSize,
@@ -200,8 +226,6 @@ export function QueryTable<TData extends KitsuResource>({
   const displayData = lastSuccessfulResponse.current?.data;
   const shouldShowPagination = !!displayData?.length;
 
-  const [visible, setVisible] = useState(false);
-
   // Auto set aria label for react table using part of path
   let autoAriaLabel = path
     .substring(path.lastIndexOf("/") ? path.lastIndexOf("/") + 1 : 0)
@@ -237,20 +261,10 @@ export function QueryTable<TData extends KitsuResource>({
               <span className="mx-3">
                 <Tooltip
                   id="queryTableMultiSortExplanation"
-                  setVisible={setVisible}
-                  visible={visible}
                   visibleElement={
                     <a
                       href="#"
                       aria-describedby={"queryTableMultiSortExplanation"}
-                      onKeyUp={e =>
-                        e.key === "Escape"
-                          ? setVisible(false)
-                          : setVisible(true)
-                      }
-                      onMouseOver={() => setVisible(true)}
-                      onMouseOut={() => setVisible(false)}
-                      onBlur={() => setVisible(false)}
                     >
                       <CommonMessage id="queryTableMultiSortTooltipTitle" />
                     </a>
@@ -328,7 +342,7 @@ export function QueryTable<TData extends KitsuResource>({
   );
 }
 
-function DefaultTBody(props) {
+export function DefaultTBody(props) {
   return <div {...props} className="rt-tbody" />;
 }
 

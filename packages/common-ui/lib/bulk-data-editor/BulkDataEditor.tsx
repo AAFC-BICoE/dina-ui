@@ -25,7 +25,8 @@ export interface BulkDataEditorProps<TRow> {
   onSubmit: (
     changes: RowChange<TRow>[],
     formikValues: any,
-    formikActions: FormikContextType<any>
+    formikActions: FormikContextType<any>,
+    workingTableData?: TRow[]
   ) => Promise<void>;
   applyCustomDefaultValues?: (rows: TRow[]) => Promise<void>;
 
@@ -109,7 +110,7 @@ export function BulkDataEditor<TRow>({
       ? diffs
       : diffs.filter(diff => !isEmpty(diff.changes));
 
-    await onSubmit(editedDiffs, formikValues, formikActions);
+    await onSubmit(editedDiffs, formikValues, formikActions, workingTableData);
 
     setLastSave(Date.now());
   };

@@ -22,9 +22,9 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/loan-transaction/managed-attribute/list",
+    postSaveRedirect: "/managed-attribute/list?tab=transaction",
     apiBaseUrl: "/loan-transaction-api",
-    listHref: "/loan-transaction/managed-attribute/list"
+    listHref: "/managed-attribute/list?tab=transaction"
   };
 
   return (

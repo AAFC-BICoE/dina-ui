@@ -31,7 +31,7 @@ import {
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
   useLastUsedCollection
-} from "..";
+} from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -45,6 +45,11 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
+import {
+  MatrialSampleFormEnabledFields,
+  VisibleManagedAttributesConfig
+} from "./MaterialSampleForm";
+import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 
 export function useMaterialSampleQuery(id?: string | null) {
@@ -114,6 +119,21 @@ export function useMaterialSampleQuery(id?: string | null) {
             )
           );
         }
+        // Convert to seperated list
+        if (data.restrictionFieldsExtension && data.isRestricted) {
+          data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_animal_rg"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[1]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_human_rg"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[2]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "cfia_ppc"
+          )?.[0];
+          data[RESTRICTIONS_FIELDS[3]] = data.restrictionFieldsExtension.filter(
+            ext => ext.extKey === "phac_cl"
+          )?.[0];
+        }
       }
     }
   );
@@ -146,11 +166,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Optionally restrict the form to these enabled fields. */
-  enabledFields?: {
-    materialSample?: string[];
-    collectingEvent?: string[];
-    acquisitionEvent?: string[];
-  };
+  enabledFields?: MatrialSampleFormEnabledFields;
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 
@@ -161,6 +177,8 @@ export interface UseMaterialSampleSaveParams {
   disableNestedFormEdits?: boolean;
 
   showChangedIndicatorsInNestedForms?: boolean;
+
+  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -185,7 +203,8 @@ export function useMaterialSampleSave({
   materialSampleTemplateInitialValues,
   reduceRendering,
   disableNestedFormEdits,
-  showChangedIndicatorsInNestedForms
+  showChangedIndicatorsInNestedForms,
+  visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
 
@@ -238,6 +257,15 @@ export function useMaterialSampleSave({
         materialSampleTemplateInitialValues?.templateCheckboxes,
         (_, key) =>
           key.startsWith("associations[0].") || key.startsWith("hostOrganism.")
+      )
+    );
+
+  const hasRestrictionsTemplate =
+    isTemplate &&
+    !isEmpty(
+      pick(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        ...RESTRICTIONS_FIELDS
       )
     );
 
@@ -314,6 +342,18 @@ export function useMaterialSampleSave({
     )
   );
 
+  const [enableRestrictions, setEnableRestrictions] = useState(
+    Boolean(
+      hasRestrictionsTemplate ||
+        // Show the restriction section if a field is set or the field is enabled:
+        RESTRICTIONS_FIELDS.some(
+          restrictFieldName =>
+            !isEmpty(materialSample?.[restrictFieldName]) ||
+            enabledFields?.materialSample?.includes(restrictFieldName)
+        )
+    )
+  );
+
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
     enableCollectingEvent,
@@ -329,7 +369,9 @@ export function useMaterialSampleSave({
     enableScheduledActions,
     setEnableScheduledActions,
     enableAssociations,
-    setEnableAssociations
+    setEnableAssociations,
+    enableRestrictions,
+    setEnableRestrictions
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
@@ -389,12 +431,23 @@ export function useMaterialSampleSave({
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
+    // Set the restrictedExtensions
+    submittedValues.restrictionFieldsExtension = [
+      ...(submittedValues.cfia_ppc ? [submittedValues.cfia_ppc] : []),
+      ...(submittedValues.phac_animal_rg
+        ? [submittedValues.phac_animal_rg]
+        : []),
+      ...(submittedValues.phac_cl ? [submittedValues.phac_cl] : []),
+      ...(submittedValues.phac_human_rg ? [submittedValues.phac_human_rg] : [])
+    ];
+
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
       ...submittedValues,
 
       // Remove the values from sections that were toggled off:
       ...(!enablePreparations && BLANK_PREPARATION),
+      ...(!enableRestrictions && BLANK_RESTRICTION),
       ...(!enableOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
@@ -411,7 +464,7 @@ export function useMaterialSampleSave({
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-      // Remove the scheduledAction field from the workflow template:
+      // Remove the scheduledAction field from the Custom View:
       ...{ scheduledAction: undefined }
     };
 
@@ -520,6 +573,11 @@ export function useMaterialSampleSave({
         throw error;
       }
     }
+
+    delete materialSampleInput.phac_animal_rg;
+    delete materialSampleInput.phac_cl;
+    delete materialSampleInput.phac_human_rg;
+    delete materialSampleInput.cfia_ppc;
 
     return materialSampleInput;
   }
@@ -765,6 +823,9 @@ export function useMaterialSampleSave({
       ) : (
         <div className={nestedFormClassName}>
           <CollectingEventFormLayout
+            visibleManagedAttributeKeys={
+              visibleManagedAttributeKeys?.collectingEvent
+            }
             attachmentsConfig={collectingEventAttachmentsConfig}
           />
         </div>

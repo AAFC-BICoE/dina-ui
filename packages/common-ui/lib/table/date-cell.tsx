@@ -1,13 +1,15 @@
 import { DateView } from "../date/DateView";
 import { get } from "lodash";
 
-/** Renders a date cell into a tabl in a user-friendly / readable format. */
-export function dateCell(accessor: string) {
+/** Renders a date cell into a table in a user-friendly / readable format. */
+export function dateCell(label: string, accessor?: string) {
   return {
     Cell: ({ original }) => {
-      const value = get(original, accessor);
+      const value = get(original, accessor ?? label);
       return <DateView date={value} />;
     },
-    accessor
+    label,
+    isKeyword: false,
+    accessor: accessor ?? label
   };
 }

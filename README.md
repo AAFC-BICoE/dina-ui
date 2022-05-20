@@ -1,4 +1,4 @@
-## Warning: Run and develop DINA locally using [dina-dev](https://github.com/AAFC-BICoE/dina-dev) instead of directly through this UI repo.
+## Warning: Run and develop DINA locally using [dina-local-deployment](https://aafc-bicoe.github.io/dina-local-deployment/#_developer_environment_setup) instead of directly through this UI repo.
 
 # dina-ui
 

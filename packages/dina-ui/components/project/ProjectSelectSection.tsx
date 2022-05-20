@@ -54,7 +54,7 @@ export function ProjectSelectField({
         readOnlyLink="/collection/project/view?id="
         filter={filterBy(["name"])}
         model={resourcePath as any}
-        className={className}
+        className={"projects " + (className || "")}
         optionLabel={prj => prj.name}
         hideLabel={readOnly}
         removeLabel={readOnly}

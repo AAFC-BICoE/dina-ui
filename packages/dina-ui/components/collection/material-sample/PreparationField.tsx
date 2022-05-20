@@ -106,6 +106,8 @@ export function PreparationField({
                     : { ...filterBy(["name"])(input) }
                 }
                 key={group}
+                tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
+                tooltipLinkText="inspiredBy"
               />
             )}
           </FieldSpy>
@@ -120,9 +122,13 @@ export function PreparationField({
             })}
             alwaysShowSuggestions={true}
             suggestion={sample => sample?.preparationMethod ?? ""}
-            tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
           />
-          <TextField {...fieldProps("preservationType")} />
+          <TextField
+            {...fieldProps("preservationType")}
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preservation-type"
+            tooltipLinkText="inspiredBy"
+          />
           <TextField {...fieldProps("preparationFixative")} />
           <TextField {...fieldProps("preparationMaterials")} />
           <TextField {...fieldProps("preparationSubstrate")} />

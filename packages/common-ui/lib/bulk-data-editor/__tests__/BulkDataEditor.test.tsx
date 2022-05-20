@@ -76,7 +76,8 @@ describe("BulkDataEditor component", () => {
         }
       ],
       { testFormikAttr: "test value" },
-      expect.anything()
+      expect.anything(),
+      workingData
     );
   });
 });
