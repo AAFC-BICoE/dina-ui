@@ -4,12 +4,13 @@ import {
   LoadingSpinner,
   useApiClient
 } from "..";
-import { ESIndexMapping, QueryRow } from "./QueryRow";
+import { QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useSWR from "swr";
+import { ESIndexMapping } from "./types";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;

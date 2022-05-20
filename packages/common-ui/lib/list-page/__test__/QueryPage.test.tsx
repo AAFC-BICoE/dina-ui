@@ -1,9 +1,10 @@
 import Select from "react-select";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { QueryPage, TableColumn } from "../QueryPage";
+import { QueryPage } from "../QueryPage";
 import DatePicker from "react-datepicker";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
+import { TableColumn } from "../types";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {

@@ -7,8 +7,7 @@ import {
   FilterAttribute,
   ListPageLayout,
   QueryPage,
-  stringArrayCell,
-  TableColumn
+  stringArrayCell
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -16,6 +15,7 @@ import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { useState } from "react";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface SampleListLayoutProps {
   onSelect?: (sample: PersistedResource<MaterialSample>) => void;

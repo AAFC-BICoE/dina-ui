@@ -2,7 +2,8 @@ import Select from "react-select";
 import React from "react";
 import { DinaForm } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { ESIndexMapping, QueryRow } from "../QueryRow";
+import { QueryRow } from "../QueryRow";
+import { ESIndexMapping } from "../types";
 
 const testFieldsOptions: ESIndexMapping[] = [
   {
