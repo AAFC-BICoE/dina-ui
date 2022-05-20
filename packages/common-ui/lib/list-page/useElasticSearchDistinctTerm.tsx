@@ -5,6 +5,7 @@ import { useApiClient } from "..";
 
 const TOTAL_SUGGESTIONS: number = 100;
 const AGGREGATION_NAME: string = "term_aggregation";
+const AGGREGATION_FILTER_NAME: string = "included_type_filter";
 const NEST_AGGREGATION_NAME: string = "included_aggregation";
 
 interface QuerySuggestionFieldProps {
@@ -49,24 +50,30 @@ export function useElasticSearchDistinctTerm({
 
     // If the field has a relationship type, we need to do a nested query to filter it.
     if (relationshipType) {
-      builder
-        .query("nested", { path: "included" }, queryBuilder => {
-          return queryBuilder.query("match", "included.type", relationshipType);
-        })
-        .aggregation(
-          "nested",
-          { path: "included" },
-          NEST_AGGREGATION_NAME,
-          agg =>
-            agg.aggregation(
-              "terms",
-              fieldName + ".keyword",
-              {
-                size: TOTAL_SUGGESTIONS
-              },
-              AGGREGATION_NAME
-            )
-        );
+      builder.aggregation(
+        "nested",
+        { path: "included" },
+        NEST_AGGREGATION_NAME,
+        includeAgg =>
+          includeAgg.aggregation(
+            "filter",
+            {
+              bool: {
+                filter: [{ term: { "included.type": relationshipType } }]
+              }
+            },
+            AGGREGATION_FILTER_NAME,
+            agg =>
+              agg.aggregation(
+                "terms",
+                fieldName + ".keyword",
+                {
+                  size: TOTAL_SUGGESTIONS
+                },
+                AGGREGATION_NAME
+              )
+          )
+      );
     } else {
       // If it's an attribute, no need to use nested filters.
       builder.aggregation(
@@ -90,8 +97,8 @@ export function useElasticSearchDistinctTerm({
         if (relationshipType) {
           setSuggestions(
             resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
-              AGGREGATION_NAME
-            ]?.buckets?.map(bucket => bucket.key)
+              AGGREGATION_FILTER_NAME
+            ]?.[AGGREGATION_NAME]?.buckets?.map(bucket => bucket.key)
           );
         } else {
           setSuggestions(
