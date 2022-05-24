@@ -1,26 +1,26 @@
-# This file was copied and modified from the official Next.js Docker example:
-# https://github.com/vercel/next.js/blob/canary/examples/with-docker/Dockerfile
-FROM node:16-alpine
-
+# Step 1 - Install dependencies
+FROM node:16-alpine AS dependencies
 WORKDIR /app
+COPY package.json ./
+RUN yarn install --frozen-lockfile
 
+# Step 2 - Build the dina-ui project.
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY ./packages .
+COPY --from=dependencies /app/node_modules ./node_modules
+RUN yarn build
+
+# Step 3 - Run the nextjs server as PRODUCTION.
+FROM node:16-alpine AS runner
+WORKDIR /app
 ENV NODE_ENV production
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
-
-# Automatically leverage output traces to reduce image size 
-# https://nextjs.org/docs/advanced-features/output-file-tracing
-COPY --chown=nextjs:nodejs ./packages/dina-ui/.next/standalone ./
-COPY --chown=nextjs:nodejs ./packages/dina-ui/.next/static ./packages/dina-ui/.next/static
-
-COPY ./packages/dina-ui/next.config.js ./packages/dina-ui/next.config.js
-COPY ./packages/dina-ui/static ./packages/dina-ui/static
-
-USER nextjs
+COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE 3000
-
-ENV PORT 3000
-
-CMD ["node", "packages/dina-ui/server.js"]
+CMD ["yarn", "start"]

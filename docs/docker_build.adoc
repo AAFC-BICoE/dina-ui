@@ -9,6 +9,8 @@ yarn workspace dina-ui build
 docker build -f Dockerfile -t dina-ui:tag .
 ----
 
+For development purposes, we recommend using the `dev` tag instead of `latest`.
+
 Docker environment variables required to run:
 
 dina-ui:

@@ -3,6 +3,7 @@ import {
   SSRKeycloakProvider,
   useKeycloak
 } from "@react-keycloak/nextjs";
+import { KeycloakConfig } from "keycloak-js";
 import { uniq } from "lodash";
 import { createContext, ReactNode, useContext } from "react";
 import { useQuery } from "..";
@@ -27,11 +28,18 @@ const AccountContext = createContext<AccountContextI | null>(null);
 
 export const AccountProvider = AccountContext.Provider;
 
+// Look at the environment variables to retrieve the keycloak config.
+const KeycloakConfiguration: KeycloakConfig = {
+  url: process.env.KEYCLOAK_PUBLIC_URL,
+  realm: process.env.KEYCLOAK_REALM ?? "",
+  clientId: process.env.KEYCLOAK_CLIENTID ?? ""
+};
+
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   return (
     <SSRKeycloakProvider
       // Loading the config from /keycloak.json, which is served by a Next.js API route.
-      keycloakConfig={"/api/keycloak-json" as any}
+      keycloakConfig={KeycloakConfiguration}
       // Server-side rendering config omitted because we aren't using server-side rendering.
       persistor={Persistors.Cookies({})}
       initConfig={{
