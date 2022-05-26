@@ -1,12 +1,7 @@
-import {
-  Persistors,
-  SSRKeycloakProvider,
-  useKeycloak
-} from "@react-keycloak/nextjs";
 import { uniq } from "lodash";
 import { createContext, ReactNode, useContext } from "react";
-import { useQuery } from "..";
-import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
+// import { useQuery } from "..";
+// import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
 
 export interface AccountContextI {
   agentId?: string;
@@ -29,22 +24,9 @@ export const AccountProvider = AccountContext.Provider;
 
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   return (
-    <SSRKeycloakProvider
-      // Loading the config from /keycloak.json, which is served by Caddy.
-      keycloakConfig={"/keycloak.json" as any}
-      // Server-side rendering config omitted because we aren't using server-side rendering.
-      persistor={Persistors.Cookies({})}
-      initConfig={{
-        onLoad: "check-sso",
-        silentCheckSsoRedirectUri: process.browser
-          ? `${window.location.origin}/static/silent-check-sso.xhtml`
-          : undefined
-      }}
-    >
-      <KeycloakAccountProviderInternal>
-        {children}
-      </KeycloakAccountProviderInternal>
-    </SSRKeycloakProvider>
+    <KeycloakAccountProviderInternal>
+      {children}
+    </KeycloakAccountProviderInternal>
   );
 }
 
@@ -57,52 +39,47 @@ export function useAccount(): AccountContextI {
   return ctx;
 }
 
-/** Converts the Keycloak context to the generic AccountContextI. */
 function KeycloakAccountProviderInternal({
   children
 }: {
   children: ReactNode;
 }) {
-  const [
-    { login, logout, authenticated, token, realmAccess, tokenParsed, subject },
-    initialized
-  ] = useKeycloak();
+  // const [
+  //   { login, logout, authenticated, token, realmAccess, tokenParsed, subject },
+  //   initialized
+  // ] = useKeycloak();
 
-  const {
-    preferred_username: username,
-    groups: keycloakGroups,
-    "agent-identifier": agentId
-  } = (tokenParsed as any) ?? {};
+  // const {
+  //   preferred_username: username,
+  //   groups: keycloakGroups,
+  //   "agent-identifier": agentId
+  // } = (tokenParsed as any) ?? {};
 
-  const groupNames =
-    keycloakGroups &&
-    keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
+  // const groupNames =
+  //   keycloakGroups &&
+  //   keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
-  const userQuery = useQuery<DinaUser>(
-    { path: `user-api/user/${subject}` },
-    { disabled: !subject }
-  );
+  // const userQuery = useQuery<DinaUser>(
+  //   { path: `user-api/user/${subject}` },
+  //   { disabled: !subject }
+  // );
 
-  const rolesPerGroup = userQuery.response?.data?.rolesPerGroup;
+  // const rolesPerGroup = userQuery.response?.data?.rolesPerGroup;
 
-  // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
-  const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
+  // // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
+  // const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
 
   return (
     <AccountProvider
       value={{
-        agentId,
-        authenticated,
-        groupNames,
-        initialized,
-        login,
-        logout,
-        roles: realmAccess?.roles ?? [],
-        token,
-        username,
-        subject,
-        isAdmin,
-        rolesPerGroup
+        login: () => {
+          return undefined;
+        },
+        logout: () => {
+          return undefined;
+        },
+        initialized: false,
+        roles: []
       }}
     >
       {children}
