@@ -98,7 +98,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEvent: "Collecting Event",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
-  collectingEventFromParent: "From parent",
+  collectingEventFromParent: "(from {parentLink})",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
