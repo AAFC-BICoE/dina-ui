@@ -855,7 +855,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-6">
           {!readOnly
             ? geographicPlaceNameSourceComponent
-            : initialValues.geographicPlaceNameSource // if read-only, check for managed attributes
+            : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
             ? geographicPlaceNameSourceComponent
             : null}
         </div>
@@ -866,15 +866,14 @@ export function CollectingEventFormLayout({
       >
         {!readOnly
           ? collectingEventManagedAttributesComponent
-          : initialValues?.managedAttributes !== null &&
-            Object.keys(initialValues?.managedAttributes).length // if read-only, check for managed attributes
+          : initialValues?.managedAttributes?.length // if read-only, check for managed attributes
           ? collectingEventManagedAttributesComponent
           : null}
       </DinaFormSection>
       <div className="mb-3">
         {!readOnly
           ? collectingEventAttachmentsComponent
-          : initialValues.attachment // if read-only, check for attachment
+          : initialValues?.attachment // if read-only, check for attachment
           ? collectingEventAttachmentsComponent
           : null}
       </div>
