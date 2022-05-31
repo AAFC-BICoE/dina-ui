@@ -73,6 +73,24 @@ export function CollectingEventFormLayout({
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
+  // Check if Georeferences are empty
+  const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
+    georeference => {
+      for (const key in georeference) {
+        if (
+          georeference[key] !== null &&
+          key !== "createdOn" &&
+          key !== "isPrimary"
+        )
+          return false;
+      }
+      return true;
+    }
+  );
+  const hideGeoreferences: boolean = georeferencesEmpty.every(
+    element => element === true
+  );
+
   const [geoAssertionTabIdx, setGeoAssertionTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
@@ -824,9 +842,15 @@ export function CollectingEventFormLayout({
 
       <div className="row">
         <div className="col-md-6">
-          <GeoReferenceAssertionField
-            onChangeTabIndex={setGeoAssertionTabIdx}
-          />
+          {!readOnly ? (
+            <GeoReferenceAssertionField
+              onChangeTabIndex={setGeoAssertionTabIdx}
+            />
+          ) : !hideGeoreferences ? ( // if read-only, check for hideGeoreferences
+            <GeoReferenceAssertionField
+              onChangeTabIndex={setGeoAssertionTabIdx}
+            />
+          ) : null}
         </div>
         <div className="col-md-6">
           {!readOnly
@@ -842,7 +866,8 @@ export function CollectingEventFormLayout({
       >
         {!readOnly
           ? collectingEventManagedAttributesComponent
-          : Object.keys(initialValues.managedAttributes).length // if read-only, check for managed attributes
+          : initialValues?.managedAttributes !== null &&
+            Object.keys(initialValues?.managedAttributes).length // if read-only, check for managed attributes
           ? collectingEventManagedAttributesComponent
           : null}
       </DinaFormSection>
