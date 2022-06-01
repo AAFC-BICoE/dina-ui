@@ -553,6 +553,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   projectAttachments: "Pièces jointes liées au projet",
   projectListTitle: "Projets",
   projects: "Projets",
+  protocolListTitle: "Protocoles",
+  protocolViewTitle: "Protocole",
   reception: "Réception",
   removeAssertionLabel: "Supprimer ce géoréférencement",
   removeComponentData: "Suppression des données de {composant}",
