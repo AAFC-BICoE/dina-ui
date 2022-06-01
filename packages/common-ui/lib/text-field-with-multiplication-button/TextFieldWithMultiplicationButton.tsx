@@ -1,5 +1,6 @@
 import React, { ChangeEvent, InputHTMLAttributes, useRef } from "react";
 import { TextField, TextFieldProps } from "../formik-connected/TextField";
+import { Tooltip } from "../tooltip/Tooltip";
 
 /**
  * Shows buttons for degree, minute and second entry.
@@ -54,6 +55,7 @@ export function InputWithMultiplicationButton({
       >
         {symbolToAdd}
       </button>
+      <Tooltip id="insertHybridSymbol" />
     </div>
   );
 }
