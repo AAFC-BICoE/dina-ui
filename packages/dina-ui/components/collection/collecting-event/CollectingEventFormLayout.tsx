@@ -866,7 +866,7 @@ export function CollectingEventFormLayout({
       >
         {!readOnly
           ? collectingEventManagedAttributesComponent
-          : initialValues?.managedAttributes?.length // if read-only, check for managed attributes
+          : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
           ? collectingEventManagedAttributesComponent
           : null}
       </DinaFormSection>
