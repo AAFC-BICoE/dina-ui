@@ -13,5 +13,8 @@ const appVersion = `${require("./package.json").version}${
 }`;
 
 module.exports = withTM({
-  env: { UI_APP_VERSION: appVersion },
+  env: {
+    UI_APP_VERSION: appVersion,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+  },
 });
