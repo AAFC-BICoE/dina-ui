@@ -16,20 +16,21 @@ export interface ClientSideJoinSpec {
  */
 export class ClientSideJoiner {
   /** DataLoader to batch find-by-id requests into a single HTTP request. */
-  private joinLoader: DataLoader<string, PersistedResource<any> | null> =
-    new DataLoader<string, PersistedResource<any> | null>(async paths => {
-      const joinedResources = await this.bulkGet(paths, {
-        apiBaseUrl: this.joinSpec.apiBaseUrl,
+  private joinLoader: DataLoader<string, PersistedResource<any> | null>;
+
+  constructor(
+    bulkGet: ApiClientI["bulkGet"],
+    private resources: any[],
+    private joinSpec: ClientSideJoinSpec
+  ) {
+    this.joinLoader = new DataLoader(async paths => {
+      const joinedResources = await bulkGet(paths, {
+        apiBaseUrl: joinSpec.apiBaseUrl,
         returnNullForMissingResource: true
       });
       return joinedResources;
     });
-
-  constructor(
-    private bulkGet: ApiClientI["bulkGet"],
-    private resources: any[],
-    private joinSpec: ClientSideJoinSpec
-  ) {}
+  }
 
   /** Fetches the joined data and joins it to the  */
   public async join() {

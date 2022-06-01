@@ -53,7 +53,7 @@ export interface ManagedAttributesEditorProps {
    * e.g. when the form's custom view is updated.
    */
   visibleAttributeKeys?: string[];
-  
+
   values?: object;
 }
 
@@ -136,7 +136,7 @@ export function ManagedAttributesEditor({
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
-        
+
         return (
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}

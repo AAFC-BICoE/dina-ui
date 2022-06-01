@@ -44,6 +44,8 @@ include::useQuery_hook_function.adoc[]
 
 include::write_operations.adoc[]
 
+include::api_proxying.adoc[]
+
 :leveloffset: 1
 
 = Internationalization

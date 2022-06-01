@@ -9,6 +9,8 @@ yarn workspace dina-ui build
 docker build -f Dockerfile -t dina-ui:tag .
 ----
 
+For development purposes, we recommend using the `dev` tag instead of `latest`.
+
 Docker environment variables required to run:
 
 dina-ui:
@@ -18,4 +20,9 @@ dina-ui:
 * COLLECTION_API_ADDRESS: The back-end API URL and port. e.g. collection-api:8080
 * AGENT_API_ADDRESS: The back-end API URL and port. e.g. agent-api:8080
 * SEQDB_API_ADDRESS: The back-end API URL and port. e.g. seqdb-api:8080
+* KEYCLOAK_CLIENTID: The Keycloak Client. ID e.g. dina
+* KEYCLOAK_REALM: The Keycloak Realm. e.g. dina
+* KEYCLOAK_PUBLIC_URL: The Keycloak externally-facing url
+(not the internal address used by other Docker containers).
+e.g. http://accounts.example.com/auth
 * DISABLE_BROWSER_CHECK: (optional) Whether to disable the browser check for blocking Internet Explorer. e.g. true

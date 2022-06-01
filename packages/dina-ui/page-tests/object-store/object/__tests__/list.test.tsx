@@ -136,7 +136,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
 
 const USER_PREFERENCE = {
   data: [],
-  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
 };
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {

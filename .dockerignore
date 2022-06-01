@@ -1,7 +1,5 @@
 node_modules
 coverage
-**/node_modules
 **/__tests__
 packages/*/coverage
 packages/*/build
-packages/*/.next

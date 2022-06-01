@@ -71,7 +71,7 @@ export function ManagedAttributeField({
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
-    name: attributePath,
+    name: attributePath
   };
 
   const isSelectAttr = !!(
@@ -104,7 +104,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <StringToggleField {...props}/>
+    <StringToggleField {...props} />
   ) : (
     <TextField {...props} />
   );
