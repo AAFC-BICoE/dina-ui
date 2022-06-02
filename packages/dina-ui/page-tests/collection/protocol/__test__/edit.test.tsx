@@ -95,6 +95,11 @@ describe("protocol edit page", () => {
               name: "updated Name"
             },
             id: "00000000-0000-0000-0000-000000000000",
+            relationships: {
+              attachments: {
+                data: []
+              }
+            },
             type: "protocol"
           }
         }
@@ -159,6 +164,11 @@ describe("protocol edit page", () => {
               name: "test-protocol"
             },
             id: "00000000-0000-0000-0000-000000000000",
+            relationships: {
+              attachments: {
+                data: []
+              }
+            },
             type: "protocol"
           }
         }
