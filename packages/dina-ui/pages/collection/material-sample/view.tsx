@@ -12,8 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import TargetOrganismPrimaryDeterminationSection from "packages/dina-ui/components/collection/material-sample/TargetOrganismPrimaryDeterminationSection";
-import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
+import TargetOrganismPrimaryDeterminationSection from "../../../../dina-ui/components/collection/material-sample/TargetOrganismPrimaryDeterminationSection";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -26,7 +25,6 @@ import {
   MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
-  NotPubliclyReleasableWarning,
   OrganismsField,
   PreparationField,
   PREPARATION_FIELDS,
