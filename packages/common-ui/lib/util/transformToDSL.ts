@@ -73,6 +73,10 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     }
   }
 
+  function getNumericalMatchType(queryRow) {
+    return (queryRow.numericalMatchType as string) ?? "equal";
+  }
+
   function getFieldName(queryRow) {
     if (queryRow.matchType === "term" || queryRow?.distinctTerm)
       return queryRow.fieldName + ".keyword";

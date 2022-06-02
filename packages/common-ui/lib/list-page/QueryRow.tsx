@@ -32,6 +32,7 @@ export interface QueryRowExportProps {
   fieldRangeStart?: string;
   fieldRangeEnd?: string;
   matchType?: string;
+  numericalMatchType?: string;
   compoundQueryType?: string;
   number?: string;
   date?: string;
@@ -47,6 +48,14 @@ const queryRowMatchOptions = [
   { label: "EXACT_MATCH", value: "term" }
 ];
 
+const queryRowNumericalMatchOptions = [
+  { label: "Equal to", value: "equal" },
+  { label: "Greater than", value: "greaterThan" },
+  { label: "Greater than or equal to", value: "greaterThanEqual" },
+  { label: "Less than", value: "lessThan" },
+  { label: "Less than or equal to", value: "lessThanEqual" }
+];
+
 const queryRowBooleanOptions = [
   { label: "TRUE", value: "true" },
   { label: "FALSE", value: "false" }
@@ -60,6 +69,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const initState = {
     matchValue: null,
     matchType: "match",
+    numericalMatchType: "equal",
     date: moment().format("YYYY-MM-DD"),
     boolean: "true",
     number: null
@@ -215,13 +225,36 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               />
             </>
           )}
-          {typeVisibility.isDate && (
-            <DateField
-              name={fieldProps("date", index)}
-              className="me-1 flex-fill"
+
+          {/* Number and Date have there own set of numerical match types */}
+          {(typeVisibility.isDate || typeVisibility.isNumber) && (
+            <SelectField
+              name={fieldProps("numericalMatchType", index)}
+              options={queryRowNumericalMatchOptions}
+              className="me-2 col-sm-5"
               removeLabel={true}
             />
           )}
+
+          {/* Date picker type */}
+          {typeVisibility.isDate && (
+            <DateField
+              name={fieldProps("date", index)}
+              className="me-2 flex-fill"
+              removeLabel={true}
+            />
+          )}
+
+          {/* Number type */}
+          {typeVisibility.isNumber && (
+            <NumberField
+              name={fieldProps("number", index)}
+              className="me-2 flex-fill"
+              removeLabel={true}
+            />
+          )}
+
+          {/* Boolean field (Dropdown with TRUE/FALSE) */}
           {typeVisibility.isBoolean && (
             <SelectField
               name={fieldProps("boolean", index)}
@@ -230,14 +263,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               removeLabel={true}
             />
           )}
-          {typeVisibility.isNumber && (
-            <NumberField
-              name={fieldProps("number", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
-          )}
-
           {/* Disabled text field when no search filter is selected. */}
           {!fieldName && (
             <TextField
