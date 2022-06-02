@@ -73,6 +73,36 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     }
   }
 
+  /**
+   * Depending on the numerical match type, the search query changes.
+   *
+   * Equal is ignored here since it should not be handled like this.
+   *
+   * @param numericalMatchType the operator type (example: greaterThan ---> gt)
+   * @param value The operator value to search against.
+   * @returns numerical operator and value.
+   */
+  function buildRangeObject(numericalMatchType, value) {
+    switch (numericalMatchType) {
+      case "greaterThan":
+        return { gt: value };
+      case "greaterThanEqual":
+        return { gte: value };
+      case "lessThan":
+        return { lt: value };
+      case "lessThanEqual":
+        return { lte: value };
+      default:
+        return value;
+    }
+  }
+
+  /**
+   * Retrieve the numerical match type. Defaults to equal if not applicable.
+   *
+   * @param queryRow The query options.
+   * @returns numerical match type, if not found, equal.
+   */
   function getNumericalMatchType(queryRow) {
     return (queryRow.numericalMatchType as string) ?? "equal";
   }
@@ -109,6 +139,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
+    const numericalType = getNumericalMatchType(rowToBuild);
     const fieldName = getRelationshipFieldName(rowToBuild);
 
     // Create a nested query for each relationship type query.
@@ -116,9 +147,11 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       return queryBuilder
         .andQuery("match", "included.type", rowToBuild.parentName)
         .andQuery(
-          type,
+          numericalType === "equal" ? type : "range",
           fieldName.replace("included.", "included.attributes."),
-          value
+          numericalType === "equal"
+            ? value
+            : buildRangeObject(numericalType, value)
         );
     });
   }
@@ -133,10 +166,15 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
+    const numericalType = getNumericalMatchType(rowToBuild);
     const fieldName = getFieldName(rowToBuild);
 
     // Currently only AND is supported, so this acts just like a AND.
-    builder.query(type, fieldName, value);
+    if (numericalType === "equal") {
+      builder.query(type, fieldName, value);
+    } else {
+      builder.query("range", fieldName, buildRangeObject(numericalType, value));
+    }
   }
 
   // Remove the row that user did not select any field to search on or
