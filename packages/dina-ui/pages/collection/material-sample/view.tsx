@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import TargetOrganismPrimaryDeterminationSection from "../../../../dina-ui/components/collection/material-sample/TargetOrganismPrimaryDeterminationSection";
+import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -124,20 +124,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           org => !isEmpty(org)
         );
 
-        const parentWithTargetOrganismPrimaryDetermination = hasOrganism
+        // Find first parent with targetOrganismPrimaryDetermination in hierachy
+        const parentWithDetermination = hasOrganism
           ? null
           : materialSample?.hierarchy?.find(hierachyItem =>
               hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
             );
 
-        const inheritedTargetOrganismPrimaryDetermination =
-          parentWithTargetOrganismPrimaryDetermination?.targetOrganismPrimaryDetermination;
+        const inheritedDetermination =
+          parentWithDetermination?.targetOrganismPrimaryDetermination;
 
         const targetOrganismPrimaryDeterminationParentLink = (
           <Link
-            href={`/collection/material-sample/view?id=${parentWithTargetOrganismPrimaryDetermination?.uuid}`}
+            href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
           >
-            <a>{parentWithTargetOrganismPrimaryDetermination?.name}</a>
+            <a>{parentWithDetermination?.name}</a>
           </Link>
         );
 
@@ -229,13 +230,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               ))}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismsField name="organism" />}
-              {inheritedTargetOrganismPrimaryDetermination && (
+              {inheritedDetermination && (
                 <div className="row">
                   <div className="col-md-6">
-                    <TargetOrganismPrimaryDeterminationSection
-                      inheritedTargetOrganismPrimaryDetermination={
-                        inheritedTargetOrganismPrimaryDetermination
-                      }
+                    <InheritedDeterminationSection
+                      inheritedDetermination={inheritedDetermination}
                       parentLink={targetOrganismPrimaryDeterminationParentLink}
                       materialSample={materialSample}
                     />

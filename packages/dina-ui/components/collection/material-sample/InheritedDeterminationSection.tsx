@@ -1,20 +1,20 @@
 import { PersistedResource } from "kitsu";
-import { FieldSet, DinaForm } from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { FieldSet, DinaForm } from "common-ui";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { MaterialSample } from "../../../types/collection-api";
 import React from "react";
 
-export interface TargetOrganismPrimaryDeterminationSectionProps {
+export interface InheritiedDeterminationSectionProps {
   materialSample: PersistedResource<MaterialSample>;
   parentLink: JSX.Element;
-  inheritedTargetOrganismPrimaryDetermination: any;
+  inheritedDetermination: any;
 }
 
-export default function TargetOrganismPrimaryDeterminationSection({
+export default function InheritedDeterminationSection({
   materialSample,
   parentLink,
-  inheritedTargetOrganismPrimaryDetermination
-}: TargetOrganismPrimaryDeterminationSectionProps) {
+  inheritedDetermination: inheritedDetermination
+}: InheritiedDeterminationSectionProps) {
   return (
     <FieldSet legend={<DinaMessage id="determination" />}>
       {materialSample.parentMaterialSample && (
@@ -37,7 +37,7 @@ export default function TargetOrganismPrimaryDeterminationSection({
               />
             </strong>
           </div>
-          {inheritedTargetOrganismPrimaryDetermination.scientificName}
+          {inheritedDetermination.scientificName}
         </div>
       </DinaForm>
     </FieldSet>
