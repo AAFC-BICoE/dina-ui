@@ -1,13 +1,6 @@
 import { KitsuResource } from "kitsu";
-
-export interface MultilingualDescription {
-  descriptions?: MultilingualPair[] | null;
-}
-
-export interface MultilingualPair {
-  lang?: string | null;
-  desc?: string | null;
-}
+import { ResourceIdentifierObject } from "jsonapi-typescript";
+import { MultilingualDescription } from "..";
 
 export interface ProtocolAttributes {
   type: "protocol";
@@ -18,4 +11,10 @@ export interface ProtocolAttributes {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type Protocol = KitsuResource & ProtocolAttributes;
+export interface ProtocolRelationships {
+  attachments?: ResourceIdentifierObject[];
+}
+
+export type Protocol = KitsuResource &
+  ProtocolAttributes &
+  ProtocolRelationships;

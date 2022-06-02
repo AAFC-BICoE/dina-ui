@@ -42,7 +42,7 @@ export default function ProtocolEditPage() {
   const title = id ? "editProtocolTitle" : "addProtocolTitle";
 
   const query = useQuery<Protocol>({
-    path: `collection-api/protocol/${id}`
+    path: `collection-api/protocol/${id}?include=attachments`
   });
 
   return (
@@ -98,6 +98,20 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
         )
       }
     };
+
+    // Add attachments if they were selected:
+    (input as any).relationships = {
+      attachments: {
+        data:
+          input.attachments?.map(it => ({
+            id: it.id,
+            type: it.type
+          })) ?? []
+      }
+    };
+
+    // Delete the 'attachments' attribute because it should stay in the relationships field:
+    delete input.attachments;
 
     const [savedProtocol] = await save<Protocol>(
       [
@@ -167,12 +181,12 @@ export function ProtocolFormLayout() {
         />
       </div>
       <AttachmentsField
-        name="attachment"
+        name="attachments"
         title={<DinaMessage id="protocolAttachments" />}
         id="protocol-attachments-section"
         allowNewFieldName="attachmentsConfig.allowNew"
         allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/protocol/${initialValues?.id}/attachment`}
+        attachmentPath={`collection-api/protocol/${initialValues?.id}/attachments`}
         hideAddAttchmentBtn={true}
       />
     </>
