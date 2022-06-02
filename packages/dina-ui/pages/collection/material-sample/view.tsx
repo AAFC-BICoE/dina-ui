@@ -125,7 +125,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           org => !isEmpty(org)
         );
 
-        /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
+        const inheritedTargetOrganismPrimaryDetermination = hasOrganism
+          ? null
+          : materialSample?.hierarchy?.find(hierachyItem =>
+              hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
+            )?.targetOrganismPrimaryDetermination;
+
+        /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
           materialSample?.associations?.some(assct => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
