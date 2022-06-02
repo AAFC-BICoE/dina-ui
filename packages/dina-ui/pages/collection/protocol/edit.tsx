@@ -7,13 +7,19 @@ import {
   SubmitButton,
   TextField,
   useQuery,
-  withResponse
+  withResponse,
+  useDinaFormContext
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { GroupSelectField, Head, Nav } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  AttachmentsField
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api/resources/Protocol";
 
@@ -125,10 +131,11 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
 }
 
 export function ProtocolFormLayout() {
+  const { initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
 
   return (
-    <div>
+    <>
       <div className="row">
         <GroupSelectField
           name="group"
@@ -159,6 +166,15 @@ export function ProtocolFormLayout() {
           multiLines={true}
         />
       </div>
-    </div>
+      <AttachmentsField
+        name="attachment"
+        title={<DinaMessage id="protocolAttachments" />}
+        id="protocol-attachments-section"
+        allowNewFieldName="attachmentsConfig.allowNew"
+        allowExistingFieldName="attachmentsConfig.allowExisting"
+        attachmentPath={`collection-api/protocol/${initialValues?.id}/attachment`}
+        hideAddAttchmentBtn={true}
+      />
+    </>
   );
 }

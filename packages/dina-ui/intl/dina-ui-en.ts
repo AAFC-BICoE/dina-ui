@@ -574,6 +574,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   projectAttachments: "Project Attachments",
   projectListTitle: "Projects",
   projects: "Projects",
+  protocolAttachments: "Protocol Attachments",
   protocolListTitle: "Protocols",
   protocolViewTitle: "Protocol",
   protocolNameLabel: "Protocol Name",
