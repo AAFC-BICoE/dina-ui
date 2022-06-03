@@ -14,6 +14,7 @@ export interface StorageUnitAttributes {
 }
 
 export interface HierarchyItem {
+  targetOrganismPrimaryDetermination?: any;
   uuid: string;
   name: string;
 }

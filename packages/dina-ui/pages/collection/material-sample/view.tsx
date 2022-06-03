@@ -12,7 +12,7 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
+import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -25,7 +25,6 @@ import {
   MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
-  NotPubliclyReleasableWarning,
   OrganismsField,
   PreparationField,
   PREPARATION_FIELDS,
@@ -104,7 +103,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
-  const parentLink = (
+  const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
       <a>{highestParentMaterialSample}</a>
     </Link>
@@ -125,7 +124,25 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           org => !isEmpty(org)
         );
 
-        /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
+        // Find first parent with targetOrganismPrimaryDetermination in hierachy
+        const parentWithDetermination = hasOrganism
+          ? null
+          : materialSample?.hierarchy?.find(hierachyItem =>
+              hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
+            );
+
+        const inheritedDetermination =
+          parentWithDetermination?.targetOrganismPrimaryDetermination;
+
+        const targetOrganismPrimaryDeterminationParentLink = (
+          <Link
+            href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
+          >
+            <a>{parentWithDetermination?.name}</a>
+          </Link>
+        );
+
+        /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
           materialSample?.associations?.some(assct => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
@@ -173,8 +190,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       }}
                     >
                       <DinaMessage
-                        id="collectingEventFromParent"
-                        values={{ parentLink }}
+                        id="fromParent"
+                        values={{ parentLink: collectingEventParentLink }}
                       />
                     </div>
                   )}
@@ -213,6 +230,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               ))}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismsField name="organism" />}
+              {inheritedDetermination && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <InheritedDeterminationSection
+                      inheritedDetermination={inheritedDetermination}
+                      parentLink={targetOrganismPrimaryDeterminationParentLink}
+                      materialSample={materialSample}
+                    />
+                  </div>
+                </div>
+              )}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
