@@ -18,7 +18,7 @@ import { RevisionRowConfig } from "../revision-row-config";
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
     name: ms => (
-      <Link href={`/collection/collecting-event/view?id=${ms.id}`}>
+      <Link href={`/collection/material-sample/view?id=${ms.id}`}>
         <a>{ms.materialSampleName}</a>
       </Link>
     ),
