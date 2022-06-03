@@ -5,24 +5,21 @@ import {
   FieldSpy,
   filterBy,
   ResourceSelectField,
-  TextField,
-  useDinaFormContext
+  TextField
 } from "common-ui";
-import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField, BulkEditTabWarning, PersonSelectField } from "../..";
+import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
+import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
-import { AllowAttachmentsConfig } from "../../object-store";
 
 export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
-  attachmentsConfig?: AllowAttachmentsConfig;
   id?: string;
 }
 
@@ -41,7 +38,7 @@ export const PREPARATION_FIELDS = [
   "preparedBy",
   "preparationRemarks",
   "dwcDegreeOfEstablishment",
-  "preparationAttachment"
+  "preparationProtocol"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -58,17 +55,15 @@ export const BLANK_PREPARATION: Required<
   preparationFixative: null,
   preparationMaterials: null,
   preparationSubstrate: null,
-  preparationAttachment: []
+  preparationProtocol: Object.seal({ id: null, type: "protocol" })
 });
 
 export function PreparationField({
   className,
   namePrefix = "",
-  attachmentsConfig = { allowExisting: true, allowNew: true },
   id = "preparations-section"
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
-  const { initialValues } = useDinaFormContext();
 
   /** Applies name prefix to field props */
   function fieldProps(fieldName: string) {
@@ -78,8 +73,6 @@ export function PreparationField({
       customName: fieldName
     };
   }
-
-  const attachmentsField = "preparationAttachment";
 
   return (
     <FieldSet
@@ -150,27 +143,27 @@ export function PreparationField({
           />
           <PersonSelectField {...fieldProps("preparedBy")} />
           <DateField {...fieldProps("preparationDate")} />
+          <FieldSpy<string> fieldName="group">
+            {group => (
+              <ResourceSelectField<Protocol>
+                {...fieldProps("preparationProtocol")}
+                model="collection-api/protocol"
+                optionLabel={it => it.name}
+                readOnlyLink="/collection/protocol/view?id="
+                className="protocol"
+                filter={input =>
+                  group
+                    ? {
+                        ...filterBy(["name"])(input),
+                        group: { EQ: `${group}` }
+                      }
+                    : { ...filterBy(["name"])(input) }
+                }
+                key={group}
+              />
+            )}
+          </FieldSpy>
         </div>
-      </div>
-      <div>
-        <AttachmentsField
-          {...fieldProps(attachmentsField)}
-          title={<DinaMessage id="preparationProtocols" />}
-          allowNewFieldName="attachmentsConfig.allowNew"
-          allowExistingFieldName="attachmentsConfig.allowExisting"
-          id="preparation-protocols-section"
-          allowAttachmentsConfig={attachmentsConfig}
-          attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
-          // Wrap in the bulk edit tab warning in case this is bulk edit mode:
-          wrapContent={content => (
-            <BulkEditTabWarning
-              targetType="material-sample"
-              fieldName={attachmentsField}
-            >
-              {content}
-            </BulkEditTabWarning>
-          )}
-        />
       </div>
     </FieldSet>
   );

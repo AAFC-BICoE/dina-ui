@@ -240,7 +240,6 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
@@ -317,7 +316,6 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
@@ -618,7 +616,6 @@ describe("Material Sample Edit Page", () => {
               id: "333",
               relationships: {},
               attachment: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               type: "material-sample"
             },
@@ -639,7 +636,6 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           materialSampleName: "test-ms",
-          preparationAttachment: [], // This empty array should be treated as a blank value.
           attachment: [],
           organism: []
         }}
