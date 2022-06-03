@@ -5,24 +5,21 @@ import {
   FieldSpy,
   filterBy,
   ResourceSelectField,
-  TextField,
-  useDinaFormContext
+  TextField
 } from "common-ui";
-import { Field } from "formik";
 import { InputResource } from "kitsu";
-import { AttachmentsField, BulkEditTabWarning, PersonSelectField } from "../..";
+import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
+import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
-import { AllowAttachmentsConfig } from "../../object-store";
 
 export interface PreparationFieldProps {
   className?: string;
   namePrefix?: string;
-  attachmentsConfig?: AllowAttachmentsConfig;
   id?: string;
 }
 
@@ -64,11 +61,9 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  attachmentsConfig = { allowExisting: true, allowNew: true },
   id = "preparations-section"
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
-  const { initialValues } = useDinaFormContext();
 
   /** Applies name prefix to field props */
   function fieldProps(fieldName: string) {
@@ -78,8 +73,6 @@ export function PreparationField({
       customName: fieldName
     };
   }
-
-  const attachmentsField = "preparationAttachment";
 
   return (
     <FieldSet
@@ -150,27 +143,19 @@ export function PreparationField({
           />
           <PersonSelectField {...fieldProps("preparedBy")} />
           <DateField {...fieldProps("preparationDate")} />
+          <AutoSuggestTextField<Protocol>
+            {...fieldProps("preparationProtocol")}
+            query={(search, ctx) => ({
+              path: "collection-api/protocol",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `name==${search}*`
+              }
+            })}
+            alwaysShowSuggestions={true}
+            suggestion={protocol => protocol?.name ?? ""}
+          />
         </div>
-      </div>
-      <div>
-        <AttachmentsField
-          {...fieldProps(attachmentsField)}
-          title={<DinaMessage id="preparationProtocols" />}
-          allowNewFieldName="attachmentsConfig.allowNew"
-          allowExistingFieldName="attachmentsConfig.allowExisting"
-          id="preparation-protocols-section"
-          allowAttachmentsConfig={attachmentsConfig}
-          attachmentPath={`collection-api/${initialValues.type}/${initialValues.id}/preparationAttachment`}
-          // Wrap in the bulk edit tab warning in case this is bulk edit mode:
-          wrapContent={content => (
-            <BulkEditTabWarning
-              targetType="material-sample"
-              fieldName={attachmentsField}
-            >
-              {content}
-            </BulkEditTabWarning>
-          )}
-        />
       </div>
     </FieldSet>
   );
