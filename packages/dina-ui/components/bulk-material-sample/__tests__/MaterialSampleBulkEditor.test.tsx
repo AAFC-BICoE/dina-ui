@@ -279,7 +279,6 @@ const TEST_SAMPLES_DIFFERENT_ARRAY_VALUES: InputResource<MaterialSample>[] = [
     ],
     associations: [{ associatedSample: "500", remarks: "initial remarks" }],
     attachment: [{ id: "initial-attachment-1", type: "metadata" }],
-    preparationAttachment: [{ id: "initial-attachment-2", type: "metadata" }],
     scheduledActions: [
       { actionType: "my-action-type", remarks: "initial action" }
     ]
@@ -922,13 +921,6 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #preparation-protocols-section .multiple-values-warning"
-        )
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
           ".tabpanel-EDIT_ALL #associations-section .multiple-values-warning"
         )
         .exists()
@@ -958,7 +950,6 @@ describe("MaterialSampleBulkEditor", () => {
               type: "material-sample",
               associations: undefined,
               attachment: undefined,
-              preparationAttachment: undefined,
               projects: undefined
             },
             type: "material-sample"
@@ -970,7 +961,6 @@ describe("MaterialSampleBulkEditor", () => {
               relationships: {},
               type: "material-sample",
               attachment: undefined,
-              preparationAttachment: undefined,
               projects: undefined
             },
             type: "material-sample"
@@ -982,7 +972,6 @@ describe("MaterialSampleBulkEditor", () => {
               relationships: {},
               type: "material-sample",
               attachment: undefined,
-              preparationAttachment: undefined,
               projects: undefined
             },
             type: "material-sample"
@@ -1025,7 +1014,6 @@ describe("MaterialSampleBulkEditor", () => {
     for (const section of [
       ".organisms-section",
       "#material-sample-attachments-section",
-      "#preparation-protocols-section",
       "#associations-section",
       "#scheduled-actions-section"
     ]) {
@@ -1048,14 +1036,6 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper
         .find(
           ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
-        )
-        .first()
-        .hasClass("changed-field")
-    ).toEqual(false);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#preparation-protocols-section .legend-wrapper"
         )
         .first()
         .hasClass("changed-field")
@@ -1098,12 +1078,6 @@ describe("MaterialSampleBulkEditor", () => {
       .find(AttachmentsEditor)
       .prop("onChange")([{ id: "new-attachment-id", type: "metadata" }]);
     wrapper
-      .find(".tabpanel-EDIT_ALL #preparation-protocols-section")
-      .find(AttachmentsEditor)
-      .prop("onChange")([
-      { id: "new-preparation-attachment-id", type: "metadata" }
-    ]);
-    wrapper
       .find(".tabpanel-EDIT_ALL #associations-section")
       .find(MaterialSampleSearchHelper)
       .prop("onAssociatedSampleSelected")({
@@ -1137,14 +1111,6 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper
         .find(
           ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
-        )
-        .first()
-        .hasClass("has-bulk-edit-value")
-    ).toEqual(true);
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL fieldset#preparation-protocols-section .legend-wrapper"
         )
         .first()
         .hasClass("has-bulk-edit-value")
@@ -1205,7 +1171,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               type: sample.type,
               associations: [
@@ -1220,11 +1185,6 @@ describe("MaterialSampleBulkEditor", () => {
               relationships: {
                 attachment: {
                   data: [{ id: "new-attachment-id", type: "metadata" }]
-                },
-                preparationAttachment: {
-                  data: [
-                    { id: "new-preparation-attachment-id", type: "metadata" }
-                  ]
                 },
                 organism: {
                   data: [{ id: "11111", type: "organism" }]
@@ -1404,7 +1364,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               relationships: {},
               type: "material-sample"
@@ -1418,7 +1377,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               relationships: {},
               type: "material-sample"
@@ -1488,7 +1446,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               barcode: "edited-barcode",
               relationships: {},
@@ -1503,7 +1460,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               relationships: {},
               type: "material-sample"
@@ -1839,7 +1795,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               type: "material-sample"
             },
@@ -1857,7 +1812,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               type: "material-sample"
             },
@@ -1925,7 +1879,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               relationships: {},
               storageUnit: {
@@ -1943,7 +1896,6 @@ describe("MaterialSampleBulkEditor", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               projects: undefined,
               relationships: {},
               storageUnit: {

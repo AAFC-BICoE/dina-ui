@@ -265,11 +265,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
-              preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
-                organism: { data: [] },
-                preparationAttachment: { data: [] }
+                organism: { data: [] }
               },
               type: "material-sample"
             },
@@ -356,11 +354,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               ...BLANK_RESTRICTION,
-              preparationAttachment: undefined,
               managedAttributes: {},
               relationships: {
-                organism: { data: [] },
-                preparationAttachment: { data: [] }
+                organism: { data: [] }
               },
               type: "material-sample"
             },
@@ -471,7 +467,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               // Preparations are not enabled, so the preparation fields are set to null:
               ...BLANK_PREPARATION,
               ...BLANK_RESTRICTION,
-              preparationAttachment: undefined,
               attachment: undefined,
               scheduledAction: undefined,
               projects: undefined,
@@ -480,8 +475,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               organismsQuantity: undefined,
               managedAttributes: {},
               relationships: {
-                organism: { data: [] },
-                preparationAttachment: { data: [] }
+                organism: { data: [] }
               },
               type: "material-sample"
             },

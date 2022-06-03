@@ -38,7 +38,7 @@ export const PREPARATION_FIELDS = [
   "preparedBy",
   "preparationRemarks",
   "dwcDegreeOfEstablishment",
-  "preparationAttachment"
+  "preparationProtocol"
 ] as const;
 
 /** Blank values for all Preparation fields. */
@@ -55,7 +55,7 @@ export const BLANK_PREPARATION: Required<
   preparationFixative: null,
   preparationMaterials: null,
   preparationSubstrate: null,
-  preparationAttachment: []
+  preparationProtocol: Object.seal({ id: null, type: "protocol" })
 });
 
 export function PreparationField({
@@ -143,18 +143,26 @@ export function PreparationField({
           />
           <PersonSelectField {...fieldProps("preparedBy")} />
           <DateField {...fieldProps("preparationDate")} />
-          <AutoSuggestTextField<Protocol>
-            {...fieldProps("preparationProtocol")}
-            query={(search, ctx) => ({
-              path: "collection-api/protocol",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `name==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={protocol => protocol?.name ?? ""}
-          />
+          <FieldSpy<string> fieldName="group">
+            {group => (
+              <ResourceSelectField<Protocol>
+                {...fieldProps("preparationProtocol")}
+                model="collection-api/protocol"
+                optionLabel={it => it.name}
+                readOnlyLink="/collection/protocol/view?id="
+                className="protocol"
+                filter={input =>
+                  group
+                    ? {
+                        ...filterBy(["name"])(input),
+                        group: { EQ: `${group}` }
+                      }
+                    : { ...filterBy(["name"])(input) }
+                }
+                key={group}
+              />
+            )}
+          </FieldSpy>
         </div>
       </div>
     </FieldSet>

@@ -14,6 +14,7 @@ import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
@@ -52,23 +53,14 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           )}
         </div>
       ),
-      preparationAttachment: ({ original: { value } }) => (
-        <div>
-          {value?.map(
-            relation =>
-              relation && (
-                <div>
-                  <ReferenceLink<Metadata>
-                    baseApiPath="objectstore-api"
-                    type="metadata"
-                    reference={relation}
-                    name={({ originalFilename, id }) => originalFilename || id}
-                    href="/object-store/object/view?id="
-                  />
-                </div>
-              )
-          )}
-        </div>
+      preparationProtocol: ({ original: { value } }) => (
+        <ReferenceLink<Protocol>
+          baseApiPath="collection-api"
+          type="protocol"
+          reference={value}
+          name={protocol => protocol.name}
+          href="/collection/protocol/view?id="
+        />
       ),
       collection: ({ original: { value } }) => (
         <ReferenceLink<Collection>

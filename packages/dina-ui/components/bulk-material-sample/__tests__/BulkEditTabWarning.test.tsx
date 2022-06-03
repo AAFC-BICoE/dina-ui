@@ -331,7 +331,6 @@ describe("BulkEditTabWarning", () => {
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
-            preparationAttachment: undefined,
             projects: undefined,
             id: sample.id,
             type: sample.type,
@@ -412,7 +411,6 @@ describe("BulkEditTabWarning", () => {
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
-            preparationAttachment: undefined,
             projects: undefined,
             relationships: {
               organism: {
@@ -510,7 +508,6 @@ describe("BulkEditTabWarning", () => {
             organism: undefined,
             organismsIndividualEntry: undefined,
             organismsQuantity: undefined,
-            preparationAttachment: undefined,
             projects: undefined,
             id: sample.id,
             relationships: {
