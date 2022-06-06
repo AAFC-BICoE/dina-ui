@@ -16,7 +16,7 @@ export function AuthenticatedApiClientProvider({
   // Redirect to the login page if not logged in:
   useEffect(() => {
     if (initialized && !authenticated) {
-      login();
+      login?.();
     }
   }, [authenticated, initialized]);
 

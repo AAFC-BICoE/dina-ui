@@ -32,7 +32,7 @@ export function NavbarUserControl() {
           <button
             type="button"
             className="btn btn-info logout-button my-auto"
-            onClick={() => logout()}
+            onClick={() => logout?.()}
           >
             <CommonMessage id="logoutBtn" />
           </button>

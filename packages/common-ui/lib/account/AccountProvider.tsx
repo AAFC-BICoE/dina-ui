@@ -1,19 +1,15 @@
-import {
-  Persistors,
-  SSRKeycloakProvider,
-  useKeycloak
-} from "@react-keycloak/nextjs";
+import { keycloakClient } from "../keycloak/KeycloakClient";
 import { uniq } from "lodash";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { useQuery } from "..";
 import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
 
 export interface AccountContextI {
   agentId?: string;
-  authenticated?: boolean;
+  authenticated: boolean;
   groupNames?: string[];
-  login: () => void;
-  logout: () => void;
+  login?: () => void;
+  logout?: () => void;
   initialized: boolean;
   token?: string;
   roles: string[];
@@ -29,22 +25,9 @@ export const AccountProvider = AccountContext.Provider;
 
 export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   return (
-    <SSRKeycloakProvider
-      // Loading the config from /keycloak.json, which is served by Caddy.
-      keycloakConfig={"/keycloak.json" as any}
-      // Server-side rendering config omitted because we aren't using server-side rendering.
-      persistor={Persistors.Cookies({})}
-      initConfig={{
-        onLoad: "check-sso",
-        silentCheckSsoRedirectUri: process.browser
-          ? `${window.location.origin}/static/silent-check-sso.xhtml`
-          : undefined
-      }}
-    >
-      <KeycloakAccountProviderInternal>
-        {children}
-      </KeycloakAccountProviderInternal>
-    </SSRKeycloakProvider>
+    <KeycloakAccountProviderInternal>
+      {children}
+    </KeycloakAccountProviderInternal>
   );
 }
 
@@ -63,10 +46,25 @@ function KeycloakAccountProviderInternal({
 }: {
   children: ReactNode;
 }) {
-  const [
-    { login, logout, authenticated, token, realmAccess, tokenParsed, subject },
-    initialized
-  ] = useKeycloak();
+  const [initialized, setInitialized] = useState(false);
+
+  keycloakClient
+    ?.init({
+      onLoad: "login-required"
+    })
+    .then(() => {
+      setInitialized(true);
+    });
+
+  const token = keycloakClient?.token;
+
+  const tokenParsed = keycloakClient?.tokenParsed;
+
+  const subject = keycloakClient?.subject;
+
+  const roles = keycloakClient?.realmAccess?.roles ?? [];
+
+  const isLoggedIn: boolean = !!keycloakClient?.token;
 
   const {
     preferred_username: username,
@@ -92,12 +90,12 @@ function KeycloakAccountProviderInternal({
     <AccountProvider
       value={{
         agentId,
-        authenticated,
+        authenticated: isLoggedIn,
         groupNames,
         initialized,
-        login,
-        logout,
-        roles: realmAccess?.roles ?? [],
+        login: keycloakClient?.login,
+        logout: keycloakClient?.logout,
+        roles,
         token,
         username,
         subject,
