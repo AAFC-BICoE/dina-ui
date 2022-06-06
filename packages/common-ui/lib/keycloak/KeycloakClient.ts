@@ -1,6 +1,7 @@
-import { KeycloakInstance } from "keycloak-js";
+const isServer = typeof window === "undefined";
 
-const Keycloak = typeof window === "undefined" ? null : require("keycloak-js");
+const Keycloak = isServer ? null : require("keycloak-js").default;
 
-export const keycloakClient: KeycloakInstance | undefined =
-  typeof window === "undefined" ? undefined : Keycloak("/keycloak.json");
+export const keycloakClient: typeof Keycloak | undefined = isServer
+  ? undefined
+  : Keycloak("/keycloak.json");

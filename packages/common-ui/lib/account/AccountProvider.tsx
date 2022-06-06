@@ -50,7 +50,11 @@ function KeycloakAccountProviderInternal({
 
   keycloakClient
     ?.init({
-      onLoad: "login-required"
+      onLoad: "check-sso",
+      silentCheckSsoRedirectUri:
+        typeof window !== "undefined"
+          ? `${window.location.origin}/static/silent-check-sso.xhtml`
+          : undefined
     })
     .then(() => {
       setInitialized(true);
