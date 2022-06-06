@@ -98,7 +98,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEvent: "Collecting Event",
   collectingEventAttachments: "Collecting Event Attachments",
   collectingEventDetails: "Collecting Event Details",
-  collectingEventFromParent: "From parent",
   collectingEventListTitle: "Collecting Event",
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
@@ -223,6 +222,15 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_aliases: "Aliases",
   field_attachment: "Attachments",
   field_attributesTemplate: "Set Attributes Template",
+  field_collectingEventCollectionMethod: "Collection Method",
+  field_collectingEventCollectionMethod_tooltip:
+    "Method used during an Collecting Event. Examples: UV light trap, bottom traw",
+  field_collectingEventHost: "Host",
+  field_collectingEventHost_tooltip:
+    "Observed host of the material-sample at the time of the collecting-event",
+  field_collectingEventSubstrate: "Substrate",
+  field_collectingEventSubstrate_tooltip:
+    "Observed surface on which an organism was collected and understood to have lived",
   field_collectingEvent_endDateTimeError:
     "End event datetime format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_collectingEvent_startDateTimeError:
@@ -245,6 +253,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
   field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",
+  field_dwcCoordinateUncertaintyInMeters_tooltip:
+    "The horizontal distance in meters from the given decimalLatitude and decimalLongitude describing the smallest circle containing the whole of the Location",
   field_dwcCountry: "Country",
   field_dwcCountryCode: "Country Code",
   field_dwcDecimalLatitude: "Decimal Latitude",
@@ -404,6 +414,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   forTestingPurposesOnlyMessage:
     "For testing purpose only. Only unclassified data should be uploaded. Any uploaded data can be deleted at any given moment.",
   formNavigation: "Form Navigation",
+  fromDinaUserGuide: "From DINA User Guide.",
+  fromParent: "(from {parentLink})",
   generateBatch: "Generate Batch",
   generateSeries: "Generate Series",
   geoReferenceAssertion: "Georeference Assertion",
@@ -426,7 +438,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   identifierURI: "Identifier URI",
   identifiers: "Identifiers",
   includeAll: "Include All",
-  inspiredBy: "Inspired by ABCD 3.0.",
+  insertHybridSymbol: "Insert Hybrid Symbol",
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",
@@ -562,6 +574,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   projectAttachments: "Project Attachments",
   projectListTitle: "Projects",
   projects: "Projects",
+  protocolAttachments: "Protocol Attachments",
+  protocolListTitle: "Protocols",
+  protocolViewTitle: "Protocol",
+  protocolNameLabel: "Protocol Name",
   reception: "Reception",
   removeAssertionLabel: "Remove this GeoReference",
   removeComponentData: "Remove {component} data",

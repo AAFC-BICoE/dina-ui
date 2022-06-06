@@ -72,7 +72,12 @@ export function Tooltip({
   const tooltipLink =
     link != null ? (
       <div style={{ marginTop: "10px" }}>
-        <a href={link} style={{ color: "white" }} className={"mrgn-tp-sm"}>
+        <a
+          href={link}
+          target="_blank"
+          style={{ color: "white" }}
+          className={"mrgn-tp-sm"}
+        >
           <FormattedMessage
             id={linkText == null ? "tooltipDefaultLinkMessage" : linkText}
           />

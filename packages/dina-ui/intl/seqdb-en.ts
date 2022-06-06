@@ -69,8 +69,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   productUpcFieldHelpText:
     "Note: Universal Product Code can be read from barcode scanner in keyboard mode",
   productViewTitle: "Product",
-  protocolListTitle: "Protocols",
-  protocolViewTitle: "Protocol",
   regionListTitle: "Regions",
   regionViewTitle: "Region",
   removeShearingDetailsButtonText: "Remove selected Shearing details",

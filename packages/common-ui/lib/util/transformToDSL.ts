@@ -1,8 +1,9 @@
-import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
-import { LimitOffsetPageSpec, TableColumn } from "..";
+import { LimitOffsetPageSpec } from "..";
 import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
+import { QueryRowExportProps } from "../list-page/QueryRow";
+import { TableColumn } from "../list-page/types";
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
@@ -73,15 +74,38 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   function getFieldName(queryRow) {
-    if (queryRow.matchType === "term") return queryRow.fieldName + ".keyword";
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return queryRow.fieldName + ".keyword";
     return queryRow.fieldName;
+  }
+
+  /**
+   * Due to the way the included section is handled, it's an array of the different types.
+   * Two fields from different types could share the same path:
+   *
+   * included.attributes.name = Could be for preparation-type or material-sample for example.
+   *
+   * This method will take the unique value and convert it to the version above.
+   *
+   * preparation-type.name --> included.attributes.name
+   *
+   * The included.type will be used to perform the search on the correct type.
+   */
+  function getRelationshipFieldName(queryRow) {
+    const newFieldName =
+      queryRow.parentPath +
+      "." +
+      queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return newFieldName + ".keyword";
+    return newFieldName;
   }
 
   function buildRelationshipQuery(rowToBuild) {
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
-    const fieldName = getFieldName(rowToBuild);
+    const fieldName = getRelationshipFieldName(rowToBuild);
 
     // Create a nested query for each relationship type query.
     builder.query("nested", { path: "included" }, queryBuilder => {

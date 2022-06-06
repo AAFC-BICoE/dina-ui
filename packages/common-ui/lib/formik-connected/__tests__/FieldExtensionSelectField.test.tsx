@@ -57,7 +57,7 @@ describe("FieldExtensionSelectField component", () => {
 
     expect(mockGet).lastCalledWith("test-path/extension/cfia_ppc", {});
 
-    const option = wrapper.find<any>(Select).prop("options")[0];
+    const option = wrapper.find<any>(Select).prop("options")[1];
 
     expect(option.label).toEqual("Level 1 (PPC-1)");
     expect(option.value).toEqual({

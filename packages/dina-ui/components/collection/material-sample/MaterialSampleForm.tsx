@@ -285,13 +285,7 @@ export function MaterialSampleForm({
       ),
     "preparations-section": id =>
       !reduceRendering &&
-      dataComponentState.enablePreparations && (
-        <PreparationField
-          id={id}
-          // Use the same attachments config for preparations as the Material Sample:
-          attachmentsConfig={attachmentsConfig?.materialSample}
-        />
-      ),
+      dataComponentState.enablePreparations && <PreparationField id={id} />,
     "organisms-section": id =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (

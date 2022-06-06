@@ -4,12 +4,13 @@ import {
   LoadingSpinner,
   useApiClient
 } from "..";
-import { ESIndexMapping, QueryRow } from "./QueryRow";
+import { QueryRow } from "./QueryRow";
 import { FieldArray } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useSWR from "swr";
+import { ESIndexMapping } from "./types";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
@@ -55,7 +56,8 @@ export function QueryBuilder({
             ? "data." + key.name
             : key.name,
           type: key.type,
-          path: key.path
+          path: key.path,
+          distinctTerm: key.distinct_term_agg
         });
       });
 
@@ -73,11 +75,12 @@ export function QueryBuilder({
 
         result.push({
           label: attributeLabel,
-          value: relationship.path + "." + attributeLabel,
+          value: relationship.value + "." + attributeLabel,
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
           parentName: relationship.value,
-          parentPath: relationship.path
+          parentPath: relationship.path,
+          distinctTerm: relationshipAttribute.distinct_term_agg
         });
       });
     });
@@ -134,6 +137,7 @@ export function QueryBuilder({
             fieldArrayProps.push(
               <QueryRow
                 name={fieldArrayProps.name}
+                indexName={indexName}
                 esIndexMapping={sortedData as any}
                 index={elements?.length ?? 0}
                 removeRow={removeRow}
@@ -157,6 +161,7 @@ export function QueryBuilder({
             ? elements?.map((_, index) => (
                 <QueryRow
                   name={fieldArrayProps.name}
+                  indexName={indexName}
                   key={index}
                   index={index}
                   addRow={addRow}

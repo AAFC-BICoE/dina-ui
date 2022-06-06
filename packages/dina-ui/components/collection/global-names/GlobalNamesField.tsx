@@ -103,54 +103,52 @@ export function GlobalNamesReadOnly({
     });
   }
 
-  const paths = scientificNameDetails?.classificationPath?.split("|");
-  const ranks = scientificNameDetails?.classificationRanks?.split("|");
-
-  const pathsReverse = paths?.slice(0).reverse();
-  const ranksReverse = ranks?.slice(0).reverse();
-
-  const genusIdx = ranksReverse?.findIndex(path => path === "genus");
-  const speciesIdx = ranksReverse?.findIndex(path => path === "species");
-
-  const speciesRank =
-    typeof speciesIdx !== "undefined" && speciesIdx >= 0
-      ? pathsReverse?.[speciesIdx]
-      : undefined;
-  const genusRank =
-    typeof genusIdx !== "undefined" && genusIdx >= 0
-      ? pathsReverse?.[genusIdx] + " > "
-      : undefined;
+  const paths = scientificNameDetails?.classificationPath
+    ?.split("|")
+    ?.reverse();
+  const ranks = scientificNameDetails?.classificationRanks
+    ?.split("|")
+    ?.reverse();
+  const pathsInit = paths?.slice(0, 2);
+  const ranksInit = ranks?.slice(0, 2);
 
   const initTaxonTree = (
-    <span>
-      {" "}
-      {speciesRank ? <b>Species : </b> : undefined} {speciesRank}
-      {genusRank ? (
-        <>
-          {" "}
-          &gt; <b> Genus : </b>{" "}
-        </>
-      ) : undefined}{" "}
-      {genusRank}
-    </span>
-  );
-
-  const fullTaxonTree = (
     <>
-      {pathsReverse?.map((path, idx) => {
-        let boldText = ranksReverse?.[idx] && (
+      {pathsInit?.map((path, idx) => {
+        let boldText = ranksInit?.[idx] && (
           <>
             <b>
               {" "}
-              {ranksReverse[idx].charAt(0)?.toUpperCase() +
-                ranksReverse[idx].substring(1)}{" "}
+              {ranksInit[idx].charAt(0)?.toUpperCase() +
+                ranksInit[idx].substring(1)}{" "}
               :
             </b>{" "}
             <>{path}</>{" "}
           </>
         );
 
-        if (idx !== pathsReverse.length - 1 && boldText) {
+        if (idx !== pathsInit.length - 1 && boldText) {
+          boldText = <> {boldText} &gt;</>;
+        }
+        return boldText;
+      })}
+    </>
+  );
+
+  const fullTaxonTree = (
+    <>
+      {paths?.map((path, idx) => {
+        let boldText = ranks?.[idx] && (
+          <>
+            <b>
+              {" "}
+              {ranks[idx].charAt(0)?.toUpperCase() + ranks[idx].substring(1)} :
+            </b>{" "}
+            <>{path}</>{" "}
+          </>
+        );
+
+        if (idx !== paths.length - 1 && boldText) {
           boldText = <> {boldText} &gt;</>;
         }
         return boldText;
@@ -167,7 +165,12 @@ export function GlobalNamesReadOnly({
           <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
         </div>
       )}
-      {paths?.length && ranks?.length && (
+      {paths?.length &&
+      ranks?.length &&
+      paths.length < 3 &&
+      ranks.length < 3 ? (
+        <div className="mt-1">{initTaxonTree}</div>
+      ) : (
         <div className="mt-1">
           {showMore ? fullTaxonTree : initTaxonTree}
           <a

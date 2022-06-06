@@ -72,8 +72,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   productUpcFieldHelpText:
     "Nota : Le code universel de produit peut être lu par un lecteur de codes à barres en mode clavier",
   productViewTitle: "Produit",
-  protocolListTitle: "Protocoles",
-  protocolViewTitle: "Protocole",
   regionListTitle: "Régions",
   regionViewTitle: "Région",
   removeShearingDetailsButtonText:

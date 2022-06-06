@@ -6,7 +6,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { groupCell, Head, Nav } from "../../../components";
-import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/seqdb-api/resources/Protocol";
 
 const PROTOCOL_TABLE_COLUMNS: ColumnDefinition<Protocol>[] = [
@@ -36,7 +36,7 @@ const PROTOCOL_FILTER_ATTRIBUTES = [
 ];
 
 export default function ProtocolListPage() {
-  const { formatMessage } = useSeqdbIntl();
+  const { formatMessage } = useDinaIntl();
 
   return (
     <>
@@ -47,7 +47,7 @@ export default function ProtocolListPage() {
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <SeqdbMessage id="protocolListTitle" />
+          <DinaMessage id="protocolListTitle" />
         </h1>
         <ListPageLayout
           id="protocol-list"
