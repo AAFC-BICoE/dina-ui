@@ -63,7 +63,7 @@ export function useMaterialSampleQuery(id?: string | null) {
         "collectingEvent",
         "acquisitionEvent",
         "attachment",
-        "preparationAttachment",
+        "preparationProtocol",
         "preparationType",
         "preparedBy",
         "storageUnit",
@@ -268,12 +268,13 @@ export function useMaterialSampleSave({
         ...RESTRICTIONS_FIELDS
       )
     );
-  
+
   const [enableCollectingEvent, setEnableCollectingEvent] = useState(
     Boolean(
       hasColEventTemplate ||
         materialSample?.collectingEvent ||
-        enabledFields?.collectingEvent?.length)
+        enabledFields?.collectingEvent?.length
+    )
   );
 
   const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState(
@@ -632,13 +633,6 @@ export function useMaterialSampleSave({
             )
           }
         }),
-        ...(msDiffWithOrganisms.preparationAttachment && {
-          preparationAttachment: {
-            data: msDiffWithOrganisms.preparationAttachment.map(it =>
-              pick(it, "id", "type")
-            )
-          }
-        }),
         ...(msDiffWithOrganisms.projects && {
           projects: {
             data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
@@ -652,7 +646,6 @@ export function useMaterialSampleSave({
       },
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
-      preparationAttachment: undefined,
       projects: undefined,
       organism: undefined
     };
