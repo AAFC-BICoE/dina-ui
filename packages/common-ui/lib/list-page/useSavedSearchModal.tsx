@@ -1,25 +1,16 @@
 import { DinaForm, TextField, useModal } from "common-ui";
-import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FormikButton } from "../formik-connected/FormikButton";
 
 interface SavedSearchModalParams {
-  saveSearch: (
-    isDefault: boolean,
-    userPreferences: UserPreference[],
-    searchName?: string
-  ) => void;
-  userPreferences: UserPreference[];
+  saveSearch: (searchName: string) => void;
 }
 
 export function useSavedSearchModal() {
   const { closeModal, openModal } = useModal();
   const { formatMessage } = useDinaIntl();
 
-  function openSavedSearchModal({
-    saveSearch,
-    userPreferences
-  }: SavedSearchModalParams) {
+  function openSavedSearchModal({ saveSearch }: SavedSearchModalParams) {
     openModal(
       <div className="modal-content">
         <style>{`
@@ -38,11 +29,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-3"
                     onClick={(submittedValues, _) => {
-                      saveSearch(
-                        false,
-                        userPreferences,
-                        submittedValues.searchName
-                      );
+                      saveSearch(submittedValues.searchName);
                       closeModal();
                     }}
                   >
@@ -51,7 +38,7 @@ export function useSavedSearchModal() {
                   <FormikButton
                     className="btn btn-primary order-2"
                     onClick={() => {
-                      saveSearch(true, userPreferences);
+                      saveSearch("default");
                       closeModal();
                     }}
                   >

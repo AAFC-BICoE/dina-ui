@@ -1,6 +1,5 @@
 import { useLocalStorage } from "@rehooks/local-storage";
 import {
-  ColumnDefinition,
   dateCell,
   FilterAttribute,
   filterBy,
@@ -9,13 +8,9 @@ import {
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
-import {
-  GroupSelectField,
-  Head,
-  Nav,
-  thumbnailCell
-} from "../../../components";
+import { Head, Nav, thumbnailCell } from "../../../components";
 import {
   MetadataPreview,
   StoredObjectGallery
@@ -62,7 +57,7 @@ export default function MetadataListPage() {
     ? [8, 4]
     : [12, 0];
 
-  const METADATA_TABLE_COLUMNS: ColumnDefinition<Metadata>[] = [
+  const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
       bucketField: "bucket",
       fileIdentifierField: "fileIdentifier"
@@ -76,12 +71,12 @@ export default function MetadataListPage() {
         ) : null,
       label: "originalFilename",
       accessor: "data.attributes.originalFilename",
-      keyword: true
+      isKeyword: true
     },
     {
       label: "acCaption",
       accessor: "data.attributes.acCaption",
-      keyword: true
+      isKeyword: true
     },
     dateCell("acDigitizationDate", "data.attributes.acDigitizationDate"),
     dateCell("xmpMetadataDate", "data.attributes.xmpMetadataDate"),
@@ -92,7 +87,7 @@ export default function MetadataListPage() {
       label: "acMetadataCreator.displayName",
       relationshipType: "person",
       accessor: "included.attributes.displayName",
-      keyword: true,
+      isKeyword: true,
       sortable: false
     },
     stringArrayCell("acTags", "data.attributes.acTags"),

@@ -24,11 +24,11 @@ yarn --silent export-intl-csv > messages.csv
 == To import from translated csv file
 
 * Go to the translation site and download the target translated file
-* Make sure the column header has french instead of français
-* Open the file in windows excel and save it as csv file
-* Import the file 
+* Make sure the column header has `french` instead of `français`
+* Open the file in windows excel and save it as `CSV (Comma delimited)` file.
+* Import the file into the `/packages/script` directory.
 
-run
+Run the following commands:
 
 [source,bash]
 ----
@@ -37,4 +37,3 @@ CSVFILE=messages.csv yarn import-intl-csv
 ----
 
 * Verify there are no unexpected characters, e.g apostrophe are the same as existing ones etc.
-

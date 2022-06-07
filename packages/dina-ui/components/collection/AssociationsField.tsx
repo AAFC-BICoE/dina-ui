@@ -2,6 +2,7 @@ import { FieldSet, TextField } from "common-ui";
 import { CatalogueOfLifeNameField } from "..";
 import { HostOrganism } from "../../../dina-ui/types/collection-api";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import { AssociationsHostField } from "./AssociationsHostField";
 import { MaterialSampleAssociationsField } from "./MaterialSampleAssociationsField";
 
 /** Type-safe object with all hostotganism fields. */
@@ -23,9 +24,9 @@ export function AssociationsField({ id = "associations-section" }) {
       >
         <div className="row">
           <div className="col-md-6">
-            <CatalogueOfLifeNameField
+            <AssociationsHostField
               name={"hostOrganism.name"}
-              customName="name"
+              customName="host"
               isDetermination={false}
             />
           </div>

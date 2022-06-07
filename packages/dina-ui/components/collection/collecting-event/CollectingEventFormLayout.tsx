@@ -73,6 +73,24 @@ export function CollectingEventFormLayout({
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
+  // Check if Georeferences are empty
+  const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
+    georeference => {
+      for (const key in georeference) {
+        if (
+          georeference[key] !== null &&
+          key !== "createdOn" &&
+          key !== "isPrimary"
+        )
+          return false;
+      }
+      return true;
+    }
+  );
+  const hideGeoreferences: boolean = georeferencesEmpty.every(
+    element => element === true
+  );
+
   const [geoAssertionTabIdx, setGeoAssertionTabIdx] = useState(0);
 
   const [geoSearchValue, setGeoSearchValue] = useState<string>("");
@@ -346,20 +364,199 @@ export function CollectingEventFormLayout({
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
   }
+  const collectingEventAttachmentsComponent = (
+    <AttachmentsField
+      name="attachment"
+      title={<DinaMessage id="collectingEventAttachments" />}
+      allowNewFieldName="attachmentsConfig.allowNew"
+      allowExistingFieldName="attachmentsConfig.allowExisting"
+      allowAttachmentsConfig={attachmentsConfig}
+      attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+    />
+  );
+  const collectingEventManagedAttributesComponent = (
+    <ManagedAttributesEditor
+      valuesPath="managedAttributes"
+      managedAttributeApiPath="collection-api/managed-attribute"
+      managedAttributeComponent="COLLECTING_EVENT"
+      fieldSetProps={{
+        legend: <DinaMessage id="collectingEventManagedAttributes" />
+      }}
+      showCustomViewDropdown={!isTemplate}
+      managedAttributeOrderFieldName="managedAttributesOrder"
+      visibleAttributeKeys={visibleManagedAttributeKeys}
+    />
+  );
+  const geographicPlaceNameSourceComponent = (
+    <FieldSet
+      fieldName="geographicPlaceNameSourceDetail"
+      legend={<DinaMessage id="toponymyLegend" />}
+      className="non-strip"
+    >
+      <div
+        style={{
+          overflowY: "auto",
+          overflowX: "hidden",
+          maxHeight: 520
+        }}
+      >
+        <Field name="geographicPlaceNameSourceDetail">
+          {({ field: { value: detail }, form }) =>
+            detail ? (
+              <div>
+                {!hideCustomPlace && !readOnly && (
+                  <div className="m-3">
+                    <div className="d-flex flex-row">
+                      <label className="p-2" style={{ marginLeft: -20 }}>
+                        <strong>
+                          <DinaMessage id="customPlaceName" />
+                        </strong>
+                      </label>
+                      <input
+                        aria-label="customPlace"
+                        className="p-2 form-control"
+                        style={{ width: "60%" }}
+                        onChange={e => setCustomPlaceValue(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (customPlaceValue?.length > 0) {
+                              addCustomPlaceName(form);
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        className="mb-2 btn btn-primary"
+                        type="button"
+                        onClick={() => addCustomPlaceName(form)}
+                      >
+                        <DinaMessage id="addCustomPlaceName" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+                {detailResultsIsLoading ? (
+                  <LoadingSpinner loading={true} />
+                ) : form.values.srcAdminLevels?.length ? (
+                  <PlaceSectionsSelectionField
+                    name="srcAdminLevels"
+                    hideSelectionCheckBox={hideSelectionCheckBox}
+                  />
+                ) : null}
+                <DinaFormSection horizontal={[3, 9]}>
+                  <TextField
+                    name={`${commonSrcDetailRoot}.stateProvince.name`}
+                    templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
+                    label={formatMessage("stateProvinceLabel")}
+                    readOnly={true}
+                  />
+                  <TextField
+                    name={`${commonSrcDetailRoot}.country.name`}
+                    templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
+                    label={formatMessage("countryLabel")}
+                    readOnly={true}
+                  />
+                </DinaFormSection>
+                <div className="row">
+                  {!readOnly && (
+                    <div className="col-md-4">
+                      <FormikButton
+                        className="btn btn-dark"
+                        onClick={(_, formik) => removeThisPlace(formik)}
+                      >
+                        <DinaMessage id="removeThisPlaceLabel" />
+                      </FormikButton>
+                    </div>
+                  )}
+                  <div className="col-md-4">
+                    {detail.sourceUrl && (
+                      <a href={`${detail.sourceUrl}`} className="btn btn-info">
+                        <DinaMessage id="viewDetailButtonLabel" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : !readOnly ? (
+              <GeographySearchBox
+                inputValue={geoSearchValue}
+                onInputChange={setGeoSearchValue}
+                onSelectSearchResult={selectSearchResult}
+                renderUnderSearchBar={
+                  <Field>
+                    {({ form: { values: formState } }) => {
+                      const colEvent: Partial<CollectingEvent> = formState;
+                      const activeAssertion =
+                        colEvent.geoReferenceAssertions?.[geoAssertionTabIdx];
+
+                      const decimalLat = activeAssertion?.dwcDecimalLatitude;
+                      const decimalLon = activeAssertion?.dwcDecimalLongitude;
+
+                      const hasVerbatimLocality =
+                        !!colEvent.dwcVerbatimLocality;
+                      const hasDecimalCoords = !!(decimalLat && decimalLon);
+
+                      const hasAnyLocation =
+                        hasVerbatimLocality || hasDecimalCoords;
+
+                      return hasAnyLocation ? (
+                        <div className="mb-3 d-flex flex-row align-items-center">
+                          <div className="pe-3">
+                            <DinaMessage id="search" />:
+                          </div>
+                          <FormikButton
+                            className={
+                              hasVerbatimLocality ? "btn btn-link" : "d-none"
+                            }
+                            onClick={state =>
+                              doGeoSearch(state.dwcVerbatimLocality)
+                            }
+                          >
+                            <DinaMessage id="field_dwcVerbatimLocality" />
+                          </FormikButton>
+                          <FormikButton
+                            className={
+                              hasDecimalCoords ? "btn btn-link" : "d-none"
+                            }
+                            onClick={state => {
+                              const assertion =
+                                state.geoReferenceAssertions?.[
+                                  geoAssertionTabIdx
+                                ];
+                              const lat = assertion?.dwcDecimalLatitude;
+                              const lon = assertion?.dwcDecimalLongitude;
+                              doGeoSearch(`${lat}, ${lon}`);
+                            }}
+                          >
+                            <DinaMessage id="decimalLatLong" />
+                          </FormikButton>
+                        </div>
+                      ) : null;
+                    }}
+                  </Field>
+                }
+              />
+            ) : null
+          }
+        </Field>
+      </div>
+    </FieldSet>
+  );
   return (
     <div ref={layoutWrapperRef}>
       <NotPubliclyReleasableWarning />
       {!isTemplate && (
         <DinaFormSection horizontal={[3, 9]}>
           <div className="row">
+            <StringArrayField
+              className="col-md-6"
+              name="dwcOtherRecordNumbers"
+            />
             <GroupSelectField
               className="col-md-6"
               name="group"
               enableStoredDefaultGroup={true}
-            />
-            <StringArrayField
-              className="col-md-6"
-              name="dwcOtherRecordNumbers"
             />
           </div>
         </DinaFormSection>
@@ -596,12 +793,20 @@ export function CollectingEventFormLayout({
             className="non-strip"
           >
             <TextField name="habitat" />
-            <TextField name="host" />
+            <TextField
+              name="host"
+              customName={"collectingEventHost"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_host"
+              tooltipLinkText="fromDinaUserGuide"
+            />
             <Field name="group">
               {({ field: { value: group } }) => (
                 // Collection methods should be filtered by the Collecting Event's group:
                 <CollectionMethodSelectField
                   name="collectionMethod"
+                  customName={"collectingEventCollectionMethod"}
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#collection-method"
+                  tooltipLinkText="fromDinaUserGuide"
                   filter={filterBy(["name"], {
                     extraFilters: group
                       ? [
@@ -618,6 +823,9 @@ export function CollectingEventFormLayout({
             </Field>
             <AutoSuggestTextField<CollectingEvent>
               name="substrate"
+              customName={"collectingEventSubstrate"}
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
+              tooltipLinkText="fromDinaUserGuide"
               query={(searchValue, ctx) => ({
                 path: "collection-api/collecting-event",
                 filter: {
@@ -645,206 +853,40 @@ export function CollectingEventFormLayout({
 
       <div className="row">
         <div className="col-md-6">
-          <GeoReferenceAssertionField
-            onChangeTabIndex={setGeoAssertionTabIdx}
-          />
+          {!readOnly ? (
+            <GeoReferenceAssertionField
+              onChangeTabIndex={setGeoAssertionTabIdx}
+            />
+          ) : !hideGeoreferences ? ( // if read-only, check for hideGeoreferences
+            <GeoReferenceAssertionField
+              onChangeTabIndex={setGeoAssertionTabIdx}
+            />
+          ) : null}
         </div>
         <div className="col-md-6">
-          <FieldSet
-            fieldName="geographicPlaceNameSourceDetail"
-            legend={<DinaMessage id="toponymyLegend" />}
-            className="non-strip"
-          >
-            <div
-              style={{
-                overflowY: "auto",
-                overflowX: "hidden",
-                maxHeight: 520
-              }}
-            >
-              <Field name="geographicPlaceNameSourceDetail">
-                {({ field: { value: detail }, form }) =>
-                  detail ? (
-                    <div>
-                      {!hideCustomPlace && !readOnly && (
-                        <div className="m-3">
-                          <div className="d-flex flex-row">
-                            <label className="p-2" style={{ marginLeft: -20 }}>
-                              <strong>
-                                <DinaMessage id="customPlaceName" />
-                              </strong>
-                            </label>
-                            <input
-                              aria-label="customPlace"
-                              className="p-2 form-control"
-                              style={{ width: "60%" }}
-                              onChange={e =>
-                                setCustomPlaceValue(e.target.value)
-                              }
-                              onKeyDown={e => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault();
-                                  if (customPlaceValue?.length > 0) {
-                                    addCustomPlaceName(form);
-                                  }
-                                }
-                              }}
-                            />
-                            <button
-                              className="mb-2 btn btn-primary"
-                              type="button"
-                              onClick={() => addCustomPlaceName(form)}
-                            >
-                              <DinaMessage id="addCustomPlaceName" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                      {detailResultsIsLoading ? (
-                        <LoadingSpinner loading={true} />
-                      ) : form.values.srcAdminLevels?.length ? (
-                        <PlaceSectionsSelectionField
-                          name="srcAdminLevels"
-                          hideSelectionCheckBox={hideSelectionCheckBox}
-                        />
-                      ) : null}
-                      <DinaFormSection horizontal={[3, 9]}>
-                        <TextField
-                          name={`${commonSrcDetailRoot}.stateProvince.name`}
-                          templateCheckboxFieldName={`${commonSrcDetailRoot}.stateProvince`}
-                          label={formatMessage("stateProvinceLabel")}
-                          readOnly={true}
-                        />
-                        <TextField
-                          name={`${commonSrcDetailRoot}.country.name`}
-                          templateCheckboxFieldName={`${commonSrcDetailRoot}.country`}
-                          label={formatMessage("countryLabel")}
-                          readOnly={true}
-                        />
-                      </DinaFormSection>
-                      <div className="row">
-                        {!readOnly && (
-                          <div className="col-md-4">
-                            <FormikButton
-                              className="btn btn-dark"
-                              onClick={(_, formik) => removeThisPlace(formik)}
-                            >
-                              <DinaMessage id="removeThisPlaceLabel" />
-                            </FormikButton>
-                          </div>
-                        )}
-                        <div className="col-md-4">
-                          {detail.sourceUrl && (
-                            <a
-                              href={`${detail.sourceUrl}`}
-                              className="btn btn-info"
-                            >
-                              <DinaMessage id="viewDetailButtonLabel" />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : !readOnly ? (
-                    <GeographySearchBox
-                      inputValue={geoSearchValue}
-                      onInputChange={setGeoSearchValue}
-                      onSelectSearchResult={selectSearchResult}
-                      renderUnderSearchBar={
-                        <Field>
-                          {({ form: { values: formState } }) => {
-                            const colEvent: Partial<CollectingEvent> =
-                              formState;
-                            const activeAssertion =
-                              colEvent.geoReferenceAssertions?.[
-                                geoAssertionTabIdx
-                              ];
-
-                            const decimalLat =
-                              activeAssertion?.dwcDecimalLatitude;
-                            const decimalLon =
-                              activeAssertion?.dwcDecimalLongitude;
-
-                            const hasVerbatimLocality =
-                              !!colEvent.dwcVerbatimLocality;
-                            const hasDecimalCoords = !!(
-                              decimalLat && decimalLon
-                            );
-
-                            const hasAnyLocation =
-                              hasVerbatimLocality || hasDecimalCoords;
-
-                            return hasAnyLocation ? (
-                              <div className="mb-3 d-flex flex-row align-items-center">
-                                <div className="pe-3">
-                                  <DinaMessage id="search" />:
-                                </div>
-                                <FormikButton
-                                  className={
-                                    hasVerbatimLocality
-                                      ? "btn btn-link"
-                                      : "d-none"
-                                  }
-                                  onClick={state =>
-                                    doGeoSearch(state.dwcVerbatimLocality)
-                                  }
-                                >
-                                  <DinaMessage id="field_dwcVerbatimLocality" />
-                                </FormikButton>
-                                <FormikButton
-                                  className={
-                                    hasDecimalCoords ? "btn btn-link" : "d-none"
-                                  }
-                                  onClick={state => {
-                                    const assertion =
-                                      state.geoReferenceAssertions?.[
-                                        geoAssertionTabIdx
-                                      ];
-                                    const lat = assertion?.dwcDecimalLatitude;
-                                    const lon = assertion?.dwcDecimalLongitude;
-                                    doGeoSearch(`${lat}, ${lon}`);
-                                  }}
-                                >
-                                  <DinaMessage id="decimalLatLong" />
-                                </FormikButton>
-                              </div>
-                            ) : null;
-                          }}
-                        </Field>
-                      }
-                    />
-                  ) : null
-                }
-              </Field>
-            </div>
-          </FieldSet>
+          {!readOnly
+            ? geographicPlaceNameSourceComponent
+            : initialValues?.geographicPlaceNameSource // if read-only, check for managed attributes
+            ? geographicPlaceNameSourceComponent
+            : null}
         </div>
       </div>
       <DinaFormSection
         // Disabled the template's restrictions for this section:
         enabledFields={null}
       >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="COLLECTING_EVENT"
-          fieldSetProps={{
-            legend: <DinaMessage id="collectingEventManagedAttributes" />
-          }}
-          showCustomViewDropdown={!isTemplate}
-          managedAttributeOrderFieldName="managedAttributesOrder"
-          visibleAttributeKeys={visibleManagedAttributeKeys}
-        />
+        {!readOnly
+          ? collectingEventManagedAttributesComponent
+          : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
+          ? collectingEventManagedAttributesComponent
+          : null}
       </DinaFormSection>
       <div className="mb-3">
-        <AttachmentsField
-          name="attachment"
-          title={<DinaMessage id="collectingEventAttachments" />}
-          allowNewFieldName="attachmentsConfig.allowNew"
-          allowExistingFieldName="attachmentsConfig.allowExisting"
-          allowAttachmentsConfig={attachmentsConfig}
-          attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
-        />
+        {!readOnly
+          ? collectingEventAttachmentsComponent
+          : initialValues?.attachment // if read-only, check for attachment
+          ? collectingEventAttachmentsComponent
+          : null}
       </div>
     </div>
   );

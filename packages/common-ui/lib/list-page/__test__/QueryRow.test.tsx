@@ -2,18 +2,52 @@ import Select from "react-select";
 import React from "react";
 import { DinaForm } from "../..";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { ESIndexMapping, QueryRow } from "../QueryRow";
+import { QueryRow } from "../QueryRow";
+import { ESIndexMapping } from "../types";
 
 const testFieldsOptions: ESIndexMapping[] = [
-  { label: "testA", value: "testA", type: "boolean", path: "data.attributes" },
-  { label: "testB", value: "testB", type: "number", path: "data.attributes" }
+  {
+    label: "testA",
+    value: "testA",
+    type: "boolean",
+    path: "data.attributes",
+    distinctTerm: false
+  },
+  {
+    label: "testB",
+    value: "testB",
+    type: "number",
+    path: "data.attributes",
+    distinctTerm: false
+  },
+  {
+    label: "testC",
+    value: "preparation-type.testC",
+    type: "text",
+    path: "data.attributes",
+    distinctTerm: true
+  },
+  {
+    label: "testD",
+    value: "preparation-type.testD",
+    type: "text",
+    path: "attributes",
+    distinctTerm: true,
+    parentName: "preparation-type",
+    parentPath: "included"
+  }
 ];
 
 describe("QueryRow component", () => {
   it("Displays the Query Row with a dropdown whose items matching the input index mapping fields.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <QueryRow esIndexMapping={testFieldsOptions} index={0} name="test" />
+        <QueryRow
+          esIndexMapping={testFieldsOptions}
+          index={0}
+          name="test"
+          indexName="testIndex"
+        />
       </DinaForm>
     );
     expect(wrapper.find(".compoundQueryType0").length).toBe(0);
@@ -34,13 +68,33 @@ describe("QueryRow component", () => {
       {
         label: "testB",
         value: "testB"
+      },
+      {
+        label: "testC",
+        value: "preparation-type.testC"
+      },
+      {
+        label: "preparation-type",
+        options: [
+          {
+            label: "testD",
+            parentName: "preparation-type",
+            value: "preparation-type.testD"
+          }
+        ]
       }
     ]);
   });
+
   it("Select a field from fieldName dropdown of query row, the correspondent fields should be set visible.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
-        <QueryRow esIndexMapping={testFieldsOptions} index={0} name="test" />
+        <QueryRow
+          esIndexMapping={testFieldsOptions}
+          index={0}
+          name="test"
+          indexName="testIndex"
+        />
       </DinaForm>
     );
 

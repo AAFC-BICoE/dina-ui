@@ -1,8 +1,9 @@
-import { QueryRowExportProps } from "../query-builder/QueryRow";
 import Bodybuilder from "bodybuilder";
-import { ColumnDefinition, LimitOffsetPageSpec } from "..";
+import { LimitOffsetPageSpec } from "..";
 import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
+import { QueryRowExportProps } from "../list-page/QueryRow";
+import { TableColumn } from "../list-page/types";
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
@@ -11,11 +12,15 @@ export interface TransformQueryToDSLParams {
 
 export function transformQueryToDSL<TData extends KitsuResource>(
   pagination: LimitOffsetPageSpec,
-  columns: ColumnDefinition<TData>[],
+  columns: TableColumn<TData>[],
   sortingRules: SortingRule[],
   submittedValues: TransformQueryToDSLParams
 ) {
   const builder = Bodybuilder();
+
+  if (!submittedValues) {
+    return;
+  }
 
   /**
    * Formik will store the values in different spots depending on the queryRow type.
@@ -68,25 +73,85 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     }
   }
 
+  /**
+   * Depending on the numerical match type, the search query changes.
+   *
+   * Equal is ignored here since it should not be handled like this.
+   *
+   * @param numericalMatchType the operator type (example: greaterThan ---> gt)
+   * @param value The operator value to search against.
+   * @returns numerical operator and value.
+   */
+  function buildRangeObject(numericalMatchType, value) {
+    switch (numericalMatchType) {
+      case "greaterThan":
+        return { gt: value };
+      case "greaterThanEqual":
+        return { gte: value };
+      case "lessThan":
+        return { lt: value };
+      case "lessThanEqual":
+        return { lte: value };
+      default:
+        return value;
+    }
+  }
+
+  /**
+   * Retrieve the numerical match type. Defaults to equal if not applicable.
+   *
+   * @param queryRow The query options.
+   * @returns numerical match type, if not found, equal.
+   */
+  function getNumericalMatchType(queryRow) {
+    return (queryRow.numericalMatchType as string) ?? "equal";
+  }
+
   function getFieldName(queryRow) {
-    if (queryRow.matchType === "term") return queryRow.fieldName + ".keyword";
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return queryRow.fieldName + ".keyword";
     return queryRow.fieldName;
+  }
+
+  /**
+   * Due to the way the included section is handled, it's an array of the different types.
+   * Two fields from different types could share the same path:
+   *
+   * included.attributes.name = Could be for preparation-type or material-sample for example.
+   *
+   * This method will take the unique value and convert it to the version above.
+   *
+   * preparation-type.name --> included.attributes.name
+   *
+   * The included.type will be used to perform the search on the correct type.
+   */
+  function getRelationshipFieldName(queryRow) {
+    const newFieldName =
+      queryRow.parentPath +
+      "." +
+      queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
+    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+      return newFieldName + ".keyword";
+    return newFieldName;
   }
 
   function buildRelationshipQuery(rowToBuild) {
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
-    const fieldName = getFieldName(rowToBuild);
+    const numericalType = getNumericalMatchType(rowToBuild);
+    const fieldName = getRelationshipFieldName(rowToBuild);
 
     // Create a nested query for each relationship type query.
     builder.query("nested", { path: "included" }, queryBuilder => {
       return queryBuilder
         .andQuery("match", "included.type", rowToBuild.parentName)
         .andQuery(
-          type,
+          numericalType === "equal" ? type : "range",
           fieldName.replace("included.", "included.attributes."),
-          value
+          numericalType === "equal"
+            ? value
+            : buildRangeObject(numericalType, value)
         );
     });
   }
@@ -101,15 +166,20 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
     const type = getMatchType(rowToBuild);
+    const numericalType = getNumericalMatchType(rowToBuild);
     const fieldName = getFieldName(rowToBuild);
 
     // Currently only AND is supported, so this acts just like a AND.
-    builder.query(type, fieldName, value);
+    if (numericalType === "equal") {
+      builder.query(type, fieldName, value);
+    } else {
+      builder.query("range", fieldName, buildRangeObject(numericalType, value));
+    }
   }
 
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
-  submittedValues.queryRows
+  submittedValues?.queryRows
     .filter(
       queryRow =>
         queryRow.fieldName &&
@@ -174,7 +244,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
         const indexPath =
           columnDefinition.accessor +
-          (columnDefinition.keyword && columnDefinition.keyword === true
+          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
             ? ".keyword"
             : "");
 

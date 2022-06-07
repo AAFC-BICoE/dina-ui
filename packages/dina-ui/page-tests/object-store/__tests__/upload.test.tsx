@@ -99,7 +99,7 @@ describe("Upload page", () => {
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
-      { transformResponse: fileUploadErrorHandler }
+      { transformResponse: fileUploadErrorHandler, timeout: 0 }
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.

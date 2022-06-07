@@ -5,7 +5,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  withResponse,
+  withResponse
 } from "common-ui";
 import { Field } from "formik";
 import { isEmpty } from "lodash";
@@ -14,6 +14,7 @@ import Link from "next/link";
 import { withRouter } from "next/router";
 import { GenerateLabelSection } from "../../../../dina-ui/components/collection/material-sample/GenerateLabelSection";
 import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
+import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
   CollectingEventFormLayout,
@@ -26,7 +27,6 @@ import {
   MaterialSampleInfoSection,
   MaterialSampleStateWarning,
   Nav,
-  NotPubliclyReleasableWarning,
   OrganismsField,
   PreparationField,
   PREPARATION_FIELDS,
@@ -37,13 +37,13 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues,
+  withOrganismEditorValues
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent,
+  useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
 
@@ -107,6 +107,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     </ButtonBar>
   );
 
+  const collectingEventParentLink = (
+    <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
+      <a>{highestParentMaterialSample}</a>
+    </Link>
+  );
+
   return (
     <div>
       <Head title={formatMessage("materialSampleViewTitle")} />
@@ -115,18 +121,36 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const materialSample = withOrganismEditorValues(materialSampleData);
 
         const hasPreparations = PREPARATION_FIELDS.some(
-          (fieldName) => !isEmpty(materialSample[fieldName])
+          fieldName => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          (org) => !isEmpty(org)
+          org => !isEmpty(org)
         );
 
-        /* Consider as having association if either host orgnaism any field has value or having any non empty association in the array */
+        // Find first parent with targetOrganismPrimaryDetermination in hierachy
+        const parentWithDetermination = hasOrganism
+          ? null
+          : materialSample?.hierarchy?.find(hierachyItem =>
+              hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
+            );
+
+        const inheritedDetermination =
+          parentWithDetermination?.targetOrganismPrimaryDetermination;
+
+        const targetOrganismPrimaryDeterminationParentLink = (
+          <Link
+            href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
+          >
+            <a>{parentWithDetermination?.name}</a>
+          </Link>
+        );
+
+        /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
+          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
-            (fieldName) => materialSample.hostOrganism?.[fieldName]
+            fieldName => materialSample.hostOrganism?.[fieldName]
           );
 
         return (
@@ -172,13 +196,15 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               {withResponse(colEventQuery, ({ data: colEvent }) => (
                 <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                   {materialSample.parentMaterialSample && (
-                    <div>
-                      <DinaMessage id="collectingEventFromParent" />{" "}
-                      <Link
-                        href={`/collection/material-sample/view?id=${highestParentId}`}
-                      >
-                        <a>{highestParentMaterialSample}</a>
-                      </Link>
+                    <div
+                      style={{
+                        marginLeft: "16px"
+                      }}
+                    >
+                      <DinaMessage
+                        id="fromParent"
+                        values={{ parentLink: collectingEventParentLink }}
+                      />
                     </div>
                   )}
                   <DinaForm initialValues={colEvent} readOnly={true}>
@@ -216,6 +242,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
               ))}
               {hasPreparations && <PreparationField />}
               {hasOrganism && <OrganismsField name="organism" />}
+              {inheritedDetermination && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <InheritedDeterminationSection
+                      inheritedDetermination={inheritedDetermination}
+                      parentLink={targetOrganismPrimaryDeterminationParentLink}
+                      materialSample={materialSample}
+                    />
+                  </div>
+                </div>
+              )}
               {hasAssociations && <AssociationsField />}
               {materialSample.storageUnit && (
                 <div className="card card-body mb-3">
@@ -234,7 +271,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     fieldSetProps={{
                       legend: (
                         <DinaMessage id="materialSampleManagedAttributes" />
-                      ),
+                      )
                     }}
                     valuesPath="managedAttributes"
                     managedAttributeApiPath="collection-api/managed-attribute"

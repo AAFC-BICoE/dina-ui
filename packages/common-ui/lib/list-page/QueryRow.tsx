@@ -6,11 +6,18 @@ import {
   SelectField,
   TextField
 } from "..";
+import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
+import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
+import { ESIndexMapping, TypeVisibility } from "./types";
+
 export interface QueryRowProps {
+  /** Index name passed from the QueryPage component. */
+  indexName: string;
+
   esIndexMapping: ESIndexMapping[];
   index: number;
   addRow?: () => void;
@@ -19,85 +26,13 @@ export interface QueryRowProps {
   formik?: FormikContextType<any>;
 }
 
-/**
- * The full path will be generated for elastic using a combination of the parent path and
- * the value. The path is generated using the following:
- *
- * {parentPath}.{path}.{value}
- *
- * Example: included.attributes.determination.verbatimScientificName
- */
-export interface ESIndexMapping {
-  /**
-   * Name of the attribute.
-   *
-   * Example: verbatimScientificName
-   */
-  value: string;
-
-  /**
-   * Text that is displayed to the user in the Query Filtering option menu.
-   *
-   * This text is a user-friendly generated label, which may show some paths to help the user
-   * understand the relationships better. This is generated from the path.
-   *
-   * Example: determination.verbatimScientificName
-   */
-  label: string;
-
-  /**
-   * The attributes type. This can change how the query row is displayed and the options provided.
-   *
-   * Examples: text, keyword, boolean, date, boolean, long, short, integer...
-   */
-  type: string;
-
-  /**
-   * The path for the attribute without the attribute name. This path does not include the parent
-   * path.
-   *
-   * Example: attribute.determination
-   */
-  path: string;
-
-  /**
-   * If the attribute belongs to a relationship, this is the path for only the parent. When generating
-   * the elastic search query it will use this as the prefix of the path.
-   *
-   * Example: included
-   */
-  parentPath?: string;
-
-  /**
-   * If the attribute belongs to a relationship, this is the name which will be used to group
-   * attributes under the same relationship together in the search. This name will also be used to
-   * display text of the group.
-   *
-   * Example: organism
-   */
-  parentName?: string;
-}
-
-export type QueryRowMatchValue = "match" | "term";
-export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-export type QueryRowBooleanType = "TRUE" | "FALSE";
-export type QueryRowNumberType =
-  | "long"
-  | "short"
-  | "integer"
-  | "byte"
-  | "double"
-  | "float"
-  | "half_float"
-  | "scaled_float"
-  | "unsigned_long";
-
 export interface QueryRowExportProps {
   fieldName: string;
   matchValue?: string;
   fieldRangeStart?: string;
   fieldRangeEnd?: string;
   matchType?: string;
+  numericalMatchType?: string;
   compoundQueryType?: string;
   number?: string;
   date?: string;
@@ -105,18 +40,20 @@ export interface QueryRowExportProps {
   type?: string;
   parentName?: string;
   parentPath?: string;
-}
-
-interface TypeVisibility {
-  isText: boolean;
-  isBoolean: boolean;
-  isNumber: boolean;
-  isDate: boolean;
+  distinctTerm?: boolean;
 }
 
 const queryRowMatchOptions = [
   { label: "PARTIAL_MATCH", value: "match" },
   { label: "EXACT_MATCH", value: "term" }
+];
+
+const queryRowNumericalMatchOptions = [
+  { label: "Equal to", value: "equal" },
+  { label: "Greater than", value: "greaterThan" },
+  { label: "Greater than or equal to", value: "greaterThanEqual" },
+  { label: "Less than", value: "lessThan" },
+  { label: "Less than or equal to", value: "lessThanEqual" }
 ];
 
 const queryRowBooleanOptions = [
@@ -126,11 +63,13 @@ const queryRowBooleanOptions = [
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
-  const { esIndexMapping, index, addRow, removeRow, name } = queryRowProps;
+  const { esIndexMapping, index, addRow, removeRow, name, indexName } =
+    queryRowProps;
 
   const initState = {
     matchValue: null,
     matchType: "match",
+    numericalMatchType: "equal",
     date: moment().format("YYYY-MM-DD"),
     boolean: "true",
     number: null
@@ -144,9 +83,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     attribute => attribute.value === fieldName
   );
 
+  const selectedGroups: string[] = (formikProps.values as any)?.group;
+
   // Depending on the type, it changes what fields need to be displayed.
-  const [typeVisibility, setTypeVisibility] = useState<TypeVisibility>({
-    isText: dataFromIndexMapping?.type === "text",
+  const typeVisibility: TypeVisibility = {
+    isText:
+      dataFromIndexMapping?.type === "text" &&
+      dataFromIndexMapping?.distinctTerm !== true,
+    isSuggestedText: dataFromIndexMapping?.distinctTerm === true,
     isBoolean: dataFromIndexMapping?.type === "boolean",
     isNumber:
       dataFromIndexMapping?.type === "long" ||
@@ -159,7 +103,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       dataFromIndexMapping?.type === "scaled_float" ||
       dataFromIndexMapping?.type === "unsigned",
     isDate: dataFromIndexMapping?.type === "date"
-  });
+  };
 
   function onSelectionChange(value) {
     const newDataFromIndexMapping = esIndexMapping.find(
@@ -171,23 +115,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       fieldName: value,
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
-      parentName: newDataFromIndexMapping?.parentName
-    });
-
-    setTypeVisibility({
-      isText: newDataFromIndexMapping?.type === "text",
-      isBoolean: newDataFromIndexMapping?.type === "boolean",
-      isNumber:
-        newDataFromIndexMapping?.type === "long" ||
-        newDataFromIndexMapping?.type === "short" ||
-        newDataFromIndexMapping?.type === "integer" ||
-        newDataFromIndexMapping?.type === "byte" ||
-        newDataFromIndexMapping?.type === "double" ||
-        newDataFromIndexMapping?.type === "float" ||
-        newDataFromIndexMapping?.type === "half_float" ||
-        newDataFromIndexMapping?.type === "scaled_float" ||
-        newDataFromIndexMapping?.type === "unsigned",
-      isDate: newDataFromIndexMapping?.type === "date"
+      parentName: newDataFromIndexMapping?.parentName,
+      distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
     setFieldName(value);
@@ -257,27 +186,75 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       <div className="col-md-6">
         <div className="d-flex">
           {typeVisibility.isText && (
-            <TextField
-              name={fieldProps("matchValue", index)}
-              className="me-1 flex-fill"
+            <>
+              <TextField
+                name={fieldProps("matchValue", index)}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+              <SelectField
+                name={fieldProps("matchType", index)}
+                options={queryRowMatchOptions}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+            </>
+          )}
+          {typeVisibility.isSuggestedText && (
+            <>
+              <AutoSuggestTextField
+                name={fieldProps("matchValue", index)}
+                removeLabel={true}
+                className="me-1 flex-fill"
+                alwaysShowSuggestions={true}
+                suggestions={value =>
+                  useElasticSearchDistinctTerm({
+                    fieldName:
+                      dataFromIndexMapping?.parentPath +
+                      "." +
+                      dataFromIndexMapping?.path +
+                      "." +
+                      dataFromIndexMapping?.label,
+                    groups: selectedGroups,
+                    relationshipType: dataFromIndexMapping?.parentName,
+                    indexName
+                  })?.filter(suggestion =>
+                    suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+                  )
+                }
+              />
+            </>
+          )}
+
+          {/* Number and Date have there own set of numerical match types */}
+          {(typeVisibility.isDate || typeVisibility.isNumber) && (
+            <SelectField
+              name={fieldProps("numericalMatchType", index)}
+              options={queryRowNumericalMatchOptions}
+              className="me-2 col-sm-5"
               removeLabel={true}
             />
           )}
+
+          {/* Date picker type */}
           {typeVisibility.isDate && (
             <DateField
               name={fieldProps("date", index)}
-              className="me-1 flex-fill"
+              className="me-2 flex-fill"
               removeLabel={true}
             />
           )}
-          {typeVisibility.isText && (
-            <SelectField
-              name={fieldProps("matchType", index)}
-              options={queryRowMatchOptions}
-              className="me-1 flex-fill"
+
+          {/* Number type */}
+          {typeVisibility.isNumber && (
+            <NumberField
+              name={fieldProps("number", index)}
+              className="me-2 flex-fill"
               removeLabel={true}
             />
           )}
+
+          {/* Boolean field (Dropdown with TRUE/FALSE) */}
           {typeVisibility.isBoolean && (
             <SelectField
               name={fieldProps("boolean", index)}
@@ -286,14 +263,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               removeLabel={true}
             />
           )}
-          {typeVisibility.isNumber && (
-            <NumberField
-              name={fieldProps("number", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
-          )}
-
           {/* Disabled text field when no search filter is selected. */}
           {!fieldName && (
             <TextField

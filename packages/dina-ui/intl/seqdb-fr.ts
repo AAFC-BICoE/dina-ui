@@ -43,8 +43,8 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   field_targetBpSize: "Taille de la paire de bases cible",
   indexGridInstructions:
     "La sélection d'un élément de la liste déroulante située dans la partie supérieure définit l'index de cette colonne. La sélection d'un élément de la liste déroulante située dans la partie gauche définit l'index de cette ligne. La sélection de l'option « Aucun » efface l'index.",
-  indexI5: "Indice i5",
-  indexI7: "Indice i7",
+  indexI5: "Indice i5",
+  indexI7: "Indice i7",
   indexSetListTitle: "Ensembles d’indices",
   indexSetMustBeSet: "L’ensemble d’indices doit être défini.",
   indexSetViewTitle: "L'ensemble d’indices",
@@ -67,13 +67,11 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   plpShearingModeLabel: "Détails sur le cisaillement",
   plpSizeModeLabel: "Détails sur la sélection de taille",
   plpStepTitle: "Cisaillement et sélection de taille",
-  plpViewModeSelectorLabel: "Mode d’affichage :",
+  plpViewModeSelectorLabel: "Mode d’affichage :",
   productListTitle: "Produits",
   productUpcFieldHelpText:
-    "Nota : Le code universel de produit peut être lu par un lecteur de codes à barres en mode clavier",
+    "Nota : Le code universel de produit peut être lu par un lecteur de codes à barres en mode clavier",
   productViewTitle: "Produit",
-  protocolListTitle: "Protocoles",
-  protocolViewTitle: "Protocole",
   regionListTitle: "Régions",
   regionViewTitle: "Région",
   removeShearingDetailsButtonText:
@@ -102,6 +100,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   workflowDetails: "Détails du flux de travail",
   workflowDetailsTab: "Détails",
   workflowListTitle: "Flux de SNG",
-  workflowStepTab: "Étape {number} : {name}",
+  workflowStepTab: "Étape {number} : {name}",
   workflowViewTitle: "Flux de SNG"
 };

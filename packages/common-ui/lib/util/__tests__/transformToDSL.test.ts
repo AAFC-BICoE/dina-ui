@@ -1,6 +1,7 @@
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { SortingRule } from "react-table";
-import { ColumnDefinition, LimitOffsetPageSpec } from "../..";
+import { LimitOffsetPageSpec } from "../..";
+import { TableColumn } from "../../list-page/types";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -21,21 +22,21 @@ const defaultSubmittedValues: TransformQueryToDSLParams = {
   queryRows: []
 };
 
-const columnDefinitions: ColumnDefinition<MaterialSample>[] = [
+const columnDefinitions: TableColumn<MaterialSample>[] = [
   {
     label: "materialSampleName",
     accessor: "data.attributes.materialSampleName",
-    keyword: true
+    isKeyword: true
   },
   {
     label: "materialSampleType",
     accessor: "data.attributes.materialSampleType",
-    keyword: true
+    isKeyword: true
   },
   {
     label: "collection.name",
     accessor: "included.attributes.name",
-    keyword: true,
+    isKeyword: true,
     relationshipType: "collection"
   }
 ];
@@ -104,6 +105,96 @@ describe("Transform to DSL query function", () => {
             {
               term: {
                 "data.attributes.createdOn": "2022-04-11"
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("DSL Query for numerical match type queries", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "greaterThan",
+          date: "2022-04-11"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "greaterThanEqual",
+          date: "2022-04-12"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "lessThan",
+          date: "2022-04-13"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "lessThanEqual",
+          date: "2022-04-14"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "equal",
+          date: "2022-04-15"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure that the default pagination and query row filters are added.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  gt: "2022-04-11"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  gte: "2022-04-12"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  lt: "2022-04-13"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  lte: "2022-04-14"
+                }
+              }
+            },
+            {
+              term: {
+                "data.attributes.createdOn": "2022-04-15"
               }
             }
           ]

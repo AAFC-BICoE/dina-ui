@@ -224,11 +224,6 @@ export function Home() {
                     <SeqdbMessage id="productListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/protocol/list">
-                  <a>
-                    <SeqdbMessage id="protocolListTitle" />
-                  </a>
-                </Link>
                 <Link href="/seqdb/region/list">
                   <a>
                     <SeqdbMessage id="regionListTitle" />
@@ -299,6 +294,11 @@ export function Home() {
                   <Link href="/collection/project/list">
                     <a>
                       <DinaMessage id="projectListTitle" />
+                    </a>
+                  </Link>
+                  <Link href="/collection/protocol/list">
+                    <a>
+                      <DinaMessage id="protocolListTitle" />
                     </a>
                   </Link>
                   <Link href="/collection/storage-unit-type/list">
