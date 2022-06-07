@@ -113,6 +113,96 @@ describe("Transform to DSL query function", () => {
     });
   });
 
+  it("DSL Query for numerical match type queries", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "greaterThan",
+          date: "2022-04-11"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "greaterThanEqual",
+          date: "2022-04-12"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "lessThan",
+          date: "2022-04-13"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "lessThanEqual",
+          date: "2022-04-14"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "equal",
+          date: "2022-04-15"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure that the default pagination and query row filters are added.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  gt: "2022-04-11"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  gte: "2022-04-12"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  lt: "2022-04-13"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  lte: "2022-04-14"
+                }
+              }
+            },
+            {
+              term: {
+                "data.attributes.createdOn": "2022-04-15"
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
   it("Group settings to DSL query", async () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "cnc",
