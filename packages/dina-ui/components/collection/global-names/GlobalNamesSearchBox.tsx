@@ -218,10 +218,10 @@ export function GlobalNamesSearchBox({
               const link = document.createElement("a");
               link.setAttribute("href", result.bestResult?.outlink);
 
-              const paths = result.bestResult?.classificationPath.split("|");
-              const ranks = result.bestResult?.classificationRanks.split("|");
+              const paths = result?.bestResult?.classificationPath?.split("|");
+              const ranks = result?.bestResult?.classificationRanks?.split("|");
 
-              const familyIdx = ranks.findIndex(path => path === "family");
+              const familyIdx = ranks?.findIndex(path => path === "family");
               const familyRank =
                 familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
