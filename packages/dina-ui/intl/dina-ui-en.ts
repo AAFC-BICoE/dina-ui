@@ -417,6 +417,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fromDinaUserGuide: "From DINA User Guide.",
   fromParent: "(from {parentLink})",
   generateBatch: "Generate Batch",
+  generateLabel: "Generate Label",
   generateSeries: "Generate Series",
   geoReferenceAssertion: "Georeference Assertion",
   geoReferencing: "Geo-Referencing",
@@ -667,6 +668,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   storagesCreatedByMe: "Storages Created By Me",
   tags: "Tags",
   target: "Target",
+  template: "Template",
+  template_AAFC_Beaver_ZT410: "AAFC_Beaver_ZT410",
+  template_AAFC_Zebra_ZT410: "AAFC_Zebra_ZT410",
   thisWillRemoveYourTemplate:
     "This will remove your selected template fields and default values.",
   thumbnail: "Thumbnail",
