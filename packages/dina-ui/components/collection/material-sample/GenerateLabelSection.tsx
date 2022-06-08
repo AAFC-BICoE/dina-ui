@@ -1,17 +1,13 @@
 import {
-  ButtonBar,
-  BackButton,
   SelectField,
   DinaForm,
-  TextField,
   FieldSet,
-  SubmitButton,
-  FormikButton,
+  FormikButton
 } from "../../../../common-ui/lib";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
 import {
   DinaMessage,
-  useDinaIntl,
+  useDinaIntl
 } from "../../../../dina-ui/intl/dina-ui-intl";
 import React from "react";
 import { ReactNode, useState } from "react";
@@ -27,12 +23,12 @@ const TEMPLATE_TYPE_OPTIONS: {
 }[] = [
   {
     labelKey: "template_AAFC_Beaver_ZT410",
-    value: "AAFC_Beaver_ZT410.twig",
+    value: "AAFC_Beaver_ZT410.twig"
   },
   {
     labelKey: "template_AAFC_Zebra_ZT410",
-    value: "AAFC_Zebra_ZT410.twig",
-  },
+    value: "AAFC_Zebra_ZT410.twig"
+  }
 ];
 
 interface TemplateAttributes<TComponent = string> {
@@ -48,7 +44,7 @@ export interface GenerateLabelSectionProps {
 
 export function GenerateLabelSection({
   title,
-  materialSample,
+  materialSample
 }: GenerateLabelSectionProps) {
   const { formatMessage } = useDinaIntl();
   const ATTRIBUTE_TYPE_OPTIONS = TEMPLATE_TYPE_OPTIONS.map(
@@ -59,29 +55,30 @@ export function GenerateLabelSection({
   const { apiClient } = useApiClient();
 
   // data for POST request
-  const data = [
-    materialSample
-  ];
-  
+  const data = [materialSample];
+
   /**
    * Asynchronous POST request to reports_labels_api. Used to retrieve PDF
    *
    * @param data material sample data for reports_labels_api
    * @param template twig template selected by user
    */
-  async function generateLabel(data, template) {
+  async function generateLabel() {
     // axios post request
     await apiClient.axios
       .post(
-        `/reports-labels-api/labels/v1.0/?template=${template}&format=pdf`,
+        `/report-label-api/labels/v1.0/?template=${template}&format=pdf`,
         data,
         { responseType: "blob" }
       )
-      .then((response) => {
+      .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = url;
-        link.setAttribute('download', `${materialSample?.materialSampleName}.pdf`); //or any other extension
+        link.setAttribute(
+          "download",
+          `${materialSample?.materialSampleName}.pdf`
+        ); // or any other extension
         document.body.appendChild(link);
         link.click();
       });
@@ -100,7 +97,7 @@ export function GenerateLabelSection({
           {template && (
             <FormikButton
               className="btn btn-primary col-md-3 mb-3 "
-              onClick={async () => await generateLabel(data, template)}
+              onClick={async () => await generateLabel()}
             >
               <DinaMessage id="generateLabel" />
             </FormikButton>

@@ -61,8 +61,8 @@ route /api/search-api/* {
 	reverse_proxy {$SEARCH_API_ADDRESS}
 } 
 
-# Proxy to the back-end reports labels API:
-route /api/reports-labels-api/* {
-	uri replace /api/reports-labels-api/ /
-	reverse_proxy {$REPORTS_LABELS_API_ADDRESS}
+# Proxy to the back-end report label API:
+route /api/report-label-api/* {
+	uri replace /api/report-label-api/ /
+	reverse_proxy {$REPORT_LABEL_API_ADDRESS}
 } 
