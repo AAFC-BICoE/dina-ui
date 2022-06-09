@@ -4,10 +4,15 @@ import { FieldWrapper, FieldWrapperProps } from "..";
 
 export interface ToggleFieldProps extends FieldWrapperProps {
   onChangeExternal?: (checked: boolean, formik: FormikContextType<any>) => void;
+  disableSwitch?: boolean;
 }
 
 /** Toggle UI for a boolean field. */
-export function ToggleField({ onChangeExternal, ...props }: ToggleFieldProps) {
+export function ToggleField({
+  onChangeExternal,
+  disableSwitch,
+  ...props
+}: ToggleFieldProps) {
   return (
     <FieldWrapper
       {...props}
@@ -16,6 +21,7 @@ export function ToggleField({ onChangeExternal, ...props }: ToggleFieldProps) {
     >
       {({ value, setValue, formik }) => (
         <Switch
+          disabled={disableSwitch}
           checked={!!value ?? false}
           onChange={checked => {
             setValue(checked);

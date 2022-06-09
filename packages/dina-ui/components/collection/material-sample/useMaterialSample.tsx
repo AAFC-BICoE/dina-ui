@@ -451,8 +451,10 @@ export function useMaterialSampleSave({
       ...(!enableOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
+        useTargetOrganism: undefined,
         organism: []
       }),
+
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),

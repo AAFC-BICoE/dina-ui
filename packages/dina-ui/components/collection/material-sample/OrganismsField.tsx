@@ -21,7 +21,7 @@ import ReactTable, { Column } from "react-table";
 import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
-
+import Switch from "react-switch";
 export interface OrganismsFieldProps {
   /** Organism array field name. */
   name: string;
@@ -38,6 +38,7 @@ export function OrganismsField({
   visibleManagedAttributeKeys
 }: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
+  // const [useTargetOrganism, setUseTargetOrganism] = useState(false);
 
   return (
     <FieldSet
@@ -72,19 +73,23 @@ export function OrganismsField({
               form.values.organismsIndividualEntry ?? false
             );
 
+            const useTargetOrganism: boolean = readOnly
+              ? organisms.some(organism => organism?.isTarget)
+              : !!(form.values.useTargetOrganism ?? false);
+
             function removeOrganism(index: number) {
               remove(index);
               form.setFieldValue("organismsQuantity", organismsQuantity - 1);
             }
 
             /**
-             * Reset all organisms isTarget field to false.
+             * Reset all organisms isTarget field to null.
              *
              * This should be used when switching the editing mode (Individual Organism Entry)
              */
             function resetIsTarget() {
               organisms.forEach((_, idx) => {
-                form.setFieldValue(`${name}[${idx}].isTarget`, false);
+                form.setFieldValue(`${name}[${idx}].isTarget`, null);
               });
             }
 
@@ -113,10 +118,35 @@ export function OrganismsField({
                         min={0}
                       />
                       {!readOnly && (
-                        <ToggleField
-                          name="organismsIndividualEntry"
-                          onChangeExternal={() => resetIsTarget()}
-                        />
+                        <div className="d-flex">
+                          <ToggleField
+                            name="organismsIndividualEntry"
+                            onChangeExternal={checked => {
+                              if (checked === false) {
+                                form.setFieldValue("useTargetOrganism", false);
+                              }
+                              resetIsTarget();
+                            }}
+                          />
+                          {/* <div>
+                            <strong>
+                              <DinaMessage id="field_useTargetOrganism"></DinaMessage>
+                            </strong>
+                            <Switch
+                              disabled={!organismsIndividualEntry}
+                              name="useTargetOrganism"
+                              checked={useTargetOrganism}
+                              onChange={(checked) => {
+                                setUseTargetOrganism(checked);
+                              }}
+                            />
+                          </div> */}
+                          <ToggleField
+                            disableSwitch={!organismsIndividualEntry}
+                            name="useTargetOrganism"
+                            onChangeExternal={() => resetIsTarget()}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -124,6 +154,7 @@ export function OrganismsField({
                 {organismsQuantity > 0 &&
                   (organismsIndividualEntry ? (
                     <OrganismsTable
+                      useTargetOrganism={useTargetOrganism}
                       namePrefix={name}
                       organisms={organisms}
                       organismsQuantity={organismsQuantity}
@@ -156,6 +187,7 @@ interface OrganismsTableProps {
   onRemoveClick: (index: number) => void;
   onTargetChecked: (index: number) => void;
   onRowMove: (from: number, to: number) => void;
+  useTargetOrganism: boolean;
 }
 
 function OrganismsTable({
@@ -164,7 +196,8 @@ function OrganismsTable({
   namePrefix,
   onRemoveClick,
   onTargetChecked,
-  onRowMove
+  onRowMove,
+  useTargetOrganism
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
@@ -222,16 +255,6 @@ function OrganismsTable({
           }
         ]),
     {
-      Header: formatMessage("target"),
-      id: "isTarget",
-      Cell: ({ original: o }) => {
-        const isTarget: boolean = o?.isTarget;
-        const checkMark = isTarget ? <span>True</span> : <span>False</span>;
-
-        return <span className="organism-target-cell">{checkMark}</span>;
-      }
-    },
-    {
       id: "determination",
       Cell: ({ original: o }) => {
         const primaryDet = o?.determination?.find(it => it.isPrimary);
@@ -263,6 +286,29 @@ function OrganismsTable({
       )
     }
   ];
+
+  if (useTargetOrganism) {
+    const checkboxProps = {
+      style: {
+        display: "block",
+        height: "20px",
+        marginLeft: "15px",
+        width: "20px"
+      },
+      type: "checkbox",
+      readOnly: true
+    };
+    tableColumns.splice(1, 0, {
+      Header: formatMessage("isTarget"),
+      id: "isTarget",
+      Cell: ({ original: o }) => {
+        const isTarget: boolean = o?.isTarget;
+        const checkMark = <input {...checkboxProps} checked={isTarget} />;
+
+        return <span className="organism-target-cell">{checkMark}</span>;
+      }
+    });
+  }
 
   /** Only show up to the organismsQuantity number */
   const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
