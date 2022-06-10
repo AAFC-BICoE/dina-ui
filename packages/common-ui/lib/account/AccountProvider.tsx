@@ -9,6 +9,7 @@ import {
 import { useQuery } from "..";
 import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
 import Keycloak from "keycloak-js";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 
 export interface AccountContextI {
   agentId?: string;
@@ -53,19 +54,28 @@ function KeycloakAccountProviderInternal({
   children: ReactNode;
 }) {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
-  const [initialized, setInitialized] = useState<boolean>(false);
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
 
   // Setup keycloak when this is first mounted.
   useEffect(() => {
     const keycloakInstance = new Keycloak("/keycloak.json");
     keycloakInstance
       .init({
-        onLoad: "login-required",
+        onLoad: "check-sso",
+        silentCheckSsoRedirectUri:
+          typeof window !== undefined
+            ? `${window.location.origin}/static/silent-check-sso.xhtml`
+            : undefined,
         checkLoginIframe: false
       })
-      .then(() => {
+      .then(keycloakAuthenticated => {
         setKeycloak(keycloakInstance);
-        setInitialized(true);
+        setAuthenticated(keycloakAuthenticated);
+
+        // The user is not authenticated... Try again.
+        if (keycloakAuthenticated === false) {
+          keycloakInstance.login();
+        }
       });
   }, []);
 
@@ -76,8 +86,6 @@ function KeycloakAccountProviderInternal({
   const subject = keycloak?.subject;
 
   const roles = keycloak?.realmAccess?.roles ?? [];
-
-  const isLoggedIn: boolean = !!keycloak?.token;
 
   const {
     preferred_username: username,
@@ -99,13 +107,18 @@ function KeycloakAccountProviderInternal({
   // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
   const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
 
+  // Non-authenticated users should never see the the full website. Display a loading indicator.
+  if (!authenticated) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
     <AccountProvider
       value={{
         agentId,
-        authenticated: isLoggedIn,
+        authenticated,
         groupNames,
-        initialized,
+        initialized: keycloak !== null,
         login: keycloak?.login,
         logout: keycloak?.logout,
         roles,
