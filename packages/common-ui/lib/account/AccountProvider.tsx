@@ -1,8 +1,14 @@
-import { keycloakClient } from "../keycloak/KeycloakClient";
 import { uniq } from "lodash";
-import { createContext, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect
+} from "react";
 import { useQuery } from "..";
 import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
+import Keycloak from "keycloak-js";
 
 export interface AccountContextI {
   agentId?: string;
@@ -46,29 +52,32 @@ function KeycloakAccountProviderInternal({
 }: {
   children: ReactNode;
 }) {
-  const [initialized, setInitialized] = useState(false);
+  const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
+  const [initialized, setInitialized] = useState<boolean>(false);
 
-  keycloakClient
-    ?.init({
-      onLoad: "check-sso",
-      silentCheckSsoRedirectUri:
-        typeof window !== "undefined"
-          ? `${window.location.origin}/static/silent-check-sso.xhtml`
-          : undefined
-    })
-    .then(() => {
-      setInitialized(true);
-    });
+  // Setup keycloak when this is first mounted.
+  useEffect(() => {
+    const keycloakInstance = new Keycloak("/keycloak.json");
+    keycloakInstance
+      .init({
+        onLoad: "login-required",
+        checkLoginIframe: false
+      })
+      .then(() => {
+        setKeycloak(keycloakInstance);
+        setInitialized(true);
+      });
+  }, []);
 
-  const token = keycloakClient?.token;
+  const token = keycloak?.token;
 
-  const tokenParsed = keycloakClient?.tokenParsed;
+  const tokenParsed = keycloak?.tokenParsed;
 
-  const subject = keycloakClient?.subject;
+  const subject = keycloak?.subject;
 
-  const roles = keycloakClient?.realmAccess?.roles ?? [];
+  const roles = keycloak?.realmAccess?.roles ?? [];
 
-  const isLoggedIn: boolean = !!keycloakClient?.token;
+  const isLoggedIn: boolean = !!keycloak?.token;
 
   const {
     preferred_username: username,
@@ -97,8 +106,8 @@ function KeycloakAccountProviderInternal({
         authenticated: isLoggedIn,
         groupNames,
         initialized,
-        login: keycloakClient?.login,
-        logout: keycloakClient?.logout,
+        login: keycloak?.login,
+        logout: keycloak?.logout,
         roles,
         token,
         username,

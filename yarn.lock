@@ -1911,7 +1911,7 @@ commander@~3.0.2:
     flat "^5.0.2"
     formik "^2.2.7"
     handsontable "6.2.2"
-    keycloak-js "^18.0.0"
+    keycloak-js "18.0.0"
     kitsu "7.0.4"
     kitsu-core "7.0.4"
     lodash "^4.17.21"
@@ -3706,7 +3706,7 @@ jszip@~2.5.0:
   dependencies:
     pako "~0.2.5"
 
-keycloak-js@^18.0.0:
+keycloak-js@18.0.0:
   version "18.0.0"
   resolved "https://registry.yarnpkg.com/keycloak-js/-/keycloak-js-18.0.0.tgz#0825d3e2818aacf9e13cdd41f7eeae6c6114db38"
   integrity sha512-kaD6nrzgYX3NhgwQfVEZiAzaZXua3PSBIBWGWf8fgqPgUdiO8uvYaKV1Ebf43IAB5M8kvubW+2J+eBS+UnWsuw==
