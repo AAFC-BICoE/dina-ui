@@ -38,7 +38,6 @@ export function OrganismsField({
   visibleManagedAttributeKeys
 }: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
-  // const [useTargetOrganism, setUseTargetOrganism] = useState(false);
 
   return (
     <FieldSet
@@ -73,9 +72,15 @@ export function OrganismsField({
               form.values.organismsIndividualEntry ?? false
             );
 
-            const useTargetOrganism: boolean = readOnly
+            const useTargetOrganism = readOnly
               ? organisms.some(organism => organism?.isTarget)
-              : !!(form.values.useTargetOrganism ?? false);
+              : organisms.some(organism => organism?.isTarget)
+              ? true
+              : false;
+
+            if (useTargetOrganism) {
+              form.values.useTargetOrganism = useTargetOrganism;
+            }
 
             function removeOrganism(index: number) {
               remove(index);
@@ -83,13 +88,13 @@ export function OrganismsField({
             }
 
             /**
-             * Reset all organisms isTarget field to null.
+             * Reset all organisms isTarget field to false.
              *
              * This should be used when switching the editing mode (Individual Organism Entry)
              */
             function resetIsTarget() {
               organisms.forEach((_, idx) => {
-                form.setFieldValue(`${name}[${idx}].isTarget`, null);
+                form.setFieldValue(`${name}[${idx}].isTarget`, false);
               });
             }
 
@@ -128,19 +133,6 @@ export function OrganismsField({
                               resetIsTarget();
                             }}
                           />
-                          {/* <div>
-                            <strong>
-                              <DinaMessage id="field_useTargetOrganism"></DinaMessage>
-                            </strong>
-                            <Switch
-                              disabled={!organismsIndividualEntry}
-                              name="useTargetOrganism"
-                              checked={useTargetOrganism}
-                              onChange={(checked) => {
-                                setUseTargetOrganism(checked);
-                              }}
-                            />
-                          </div> */}
                           <ToggleField
                             disableSwitch={!organismsIndividualEntry}
                             name="useTargetOrganism"
@@ -154,7 +146,7 @@ export function OrganismsField({
                 {organismsQuantity > 0 &&
                   (organismsIndividualEntry ? (
                     <OrganismsTable
-                      useTargetOrganism={useTargetOrganism}
+                      useTargetOrganism={form.values.useTargetOrganism}
                       namePrefix={name}
                       organisms={organisms}
                       organismsQuantity={organismsQuantity}

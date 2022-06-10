@@ -451,7 +451,6 @@ export function useMaterialSampleSave({
       ...(!enableOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
-        useTargetOrganism: undefined,
         organism: []
       }),
 
@@ -580,6 +579,7 @@ export function useMaterialSampleSave({
     delete materialSampleInput.phac_cl;
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
+    delete materialSampleInput.useTargetOrganism;
 
     return materialSampleInput;
   }
