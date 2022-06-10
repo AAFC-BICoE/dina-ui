@@ -722,6 +722,7 @@ export function useMaterialSampleSave({
       const savedOrganisms = await save<Organism>(organismSaveArgs, {
         apiBaseUrl: "/collection-api"
       });
+
       return savedOrganisms;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {

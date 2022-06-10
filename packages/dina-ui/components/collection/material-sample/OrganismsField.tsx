@@ -62,12 +62,13 @@ export function OrganismsField({
           {({ form, remove, move }) => {
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
-
+            // console.log(organisms);
             const organismsQuantity = readOnly
               ? organisms.length
               : isTemplate
               ? 1
               : Number(form.values.organismsQuantity ?? 0);
+            // console.log(organismsQuantity);
             const organismsIndividualEntry = !!(
               form.values.organismsIndividualEntry ?? false
             );
