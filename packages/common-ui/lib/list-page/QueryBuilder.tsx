@@ -39,7 +39,7 @@ export function QueryBuilder({
     const result: ESIndexMapping[] = [];
 
     // Read index attributes.
-    resp.data.body?.attributes
+    resp.data?.attributes
       ?.filter(key => key.name !== "type")
       .map(key => {
         const path = key.path;
@@ -62,7 +62,7 @@ export function QueryBuilder({
       });
 
     // Read relationship attributes.
-    resp.data.body?.relationships?.map(relationship => {
+    resp.data?.relationships?.map(relationship => {
       relationship?.attributes?.map(relationshipAttribute => {
         // This is the user-friendly label to display on the search dropdown.
         const attributeLabel = relationshipAttribute.path?.includes(".")

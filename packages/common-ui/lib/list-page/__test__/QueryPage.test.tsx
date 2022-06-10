@@ -9,64 +9,59 @@ import { TableColumn } from "../types";
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    headers: {},
-    body: {
-      indexName: "testIndex",
-      attributes: [
-        {
-          name: "createdOn",
-          type: "date",
-          path: "data.attributes"
-        },
-        {
-          name: "verbatimDeterminer",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "uuid",
-          type: "text",
-          path: "data.attributes.hierarchy"
-        },
-        {
-          name: "publiclyReleasable",
-          type: "boolean",
-          path: "data.attributes"
-        },
-        {
-          name: "materialSampleRemarks",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "dwcOtherCatalogNumbers",
-          type: "text",
-          path: "data.attributes"
-        }
-      ],
-      relationships: [
-        {
-          name: "type",
-          path: "included",
-          value: "preparation-type",
-          attributes: [
-            {
-              name: "name",
-              type: "text",
-              path: "attributes",
-              distinct_term_agg: true
-            },
-            {
-              name: "type",
-              type: "text",
-              path: "attributes"
-            }
-          ]
-        }
-      ]
-    },
-    statusCode: "OK",
-    statusCodeValue: 200
+    indexName: "testIndex",
+    attributes: [
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      },
+      {
+        name: "verbatimDeterminer",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "uuid",
+        type: "text",
+        path: "data.attributes.hierarchy"
+      },
+      {
+        name: "publiclyReleasable",
+        type: "boolean",
+        path: "data.attributes"
+      },
+      {
+        name: "materialSampleRemarks",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "dwcOtherCatalogNumbers",
+        type: "text",
+        path: "data.attributes"
+      }
+    ],
+    relationships: [
+      {
+        name: "type",
+        path: "included",
+        value: "preparation-type",
+        attributes: [
+          {
+            name: "name",
+            type: "text",
+            path: "attributes",
+            distinct_term_agg: true
+          },
+          {
+            name: "type",
+            type: "text",
+            path: "attributes"
+          }
+        ]
+      }
+    ]
   }
 };
 
