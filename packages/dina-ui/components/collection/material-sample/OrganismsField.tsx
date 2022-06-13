@@ -44,6 +44,9 @@ export function OrganismsField({
     if (!readOnly && formik.values.useTargetOrganism) {
       formik.values.organism.length = formik.values.organismsQuantity;
       for (let idx = 0; idx <= formik.values.organismsQuantity; idx++) {
+        if (formik.values.organism[idx]?.isTarget === true) {
+          continue;
+        }
         formik.setFieldValue(`${name}[${idx}].isTarget`, false);
       }
     }
