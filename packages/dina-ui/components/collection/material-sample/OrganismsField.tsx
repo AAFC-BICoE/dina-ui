@@ -52,6 +52,16 @@ export function OrganismsField({
     }
   }, [formik.values.organismsQuantity]);
 
+  const useTargetOrganism = readOnly
+    ? formik.values.organism?.some(organism => organism?.isTarget)
+    : formik.values.organism?.some(organism => organism?.isTarget)
+    ? true
+    : false;
+
+  if (useTargetOrganism) {
+    formik.values.useTargetOrganism = useTargetOrganism;
+  }
+
   return (
     <FieldSet
       id={id}
@@ -86,16 +96,6 @@ export function OrganismsField({
               form.values.organismsIndividualEntry ?? false
             );
 
-            const useTargetOrganism = readOnly
-              ? organisms.some(organism => organism?.isTarget)
-              : organisms.some(organism => organism?.isTarget)
-              ? true
-              : false;
-
-            if (useTargetOrganism) {
-              form.values.useTargetOrganism = useTargetOrganism;
-            }
-
             function removeOrganism(index: number) {
               remove(index);
               form.setFieldValue("organismsQuantity", organismsQuantity - 1);
@@ -106,9 +106,20 @@ export function OrganismsField({
              *
              * This should be used when switching the editing mode (Individual Organism Entry)
              */
-            function resetIsTarget() {
+            function resetIsTargetFalse() {
               organisms.forEach((_, idx) => {
                 form.setFieldValue(`${name}[${idx}].isTarget`, false);
+              });
+            }
+
+            /**
+             * Reset all organisms isTarget field to null.
+             *
+             * This should be used when switching the editing mode (Individual Organism Entry)
+             */
+            function resetIsTargetNull() {
+              organisms.forEach((_, idx) => {
+                form.setFieldValue(`${name}[${idx}].isTarget`, null);
               });
             }
 
@@ -121,7 +132,7 @@ export function OrganismsField({
              * @param index The toggle that was changed.
              */
             function targetChecked(index: number) {
-              resetIsTarget();
+              resetIsTargetFalse();
               form.setFieldValue(`${name}[${index}].isTarget`, true);
             }
 
@@ -144,13 +155,19 @@ export function OrganismsField({
                               if (checked === false) {
                                 form.setFieldValue("useTargetOrganism", false);
                               }
-                              resetIsTarget();
+                              resetIsTargetNull();
                             }}
                           />
                           <ToggleField
                             disableSwitch={!organismsIndividualEntry}
                             name="useTargetOrganism"
-                            onChangeExternal={() => resetIsTarget()}
+                            onChangeExternal={checked => {
+                              if (checked) {
+                                resetIsTargetFalse();
+                              } else {
+                                resetIsTargetNull();
+                              }
+                            }}
                           />
                         </div>
                       )}
