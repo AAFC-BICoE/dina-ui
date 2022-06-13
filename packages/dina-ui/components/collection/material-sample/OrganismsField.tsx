@@ -353,6 +353,7 @@ function OrganismsTable({
                   index={row.index}
                   namePrefix={`${namePrefix}[${row.index}].`}
                   individualEntry={true}
+                  useTargetOrganism={useTargetOrganism}
                   onTargetChecked={onTargetChecked}
                 />
               </div>

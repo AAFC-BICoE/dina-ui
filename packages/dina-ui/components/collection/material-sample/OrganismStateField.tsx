@@ -23,6 +23,7 @@ export const ORGANISM_FIELDS = [
 export interface OrganismStateFieldProps {
   index: number;
   individualEntry: boolean;
+  useTargetOrganism?: boolean;
   namePrefix?: string;
   id?: string;
   visibleManagedAttributeKeys?: string[];
@@ -36,7 +37,8 @@ export function OrganismStateField({
   namePrefix = "",
   individualEntry,
   onTargetChecked,
-  visibleManagedAttributeKeys
+  visibleManagedAttributeKeys,
+  useTargetOrganism
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
 
@@ -54,7 +56,7 @@ export function OrganismStateField({
   return (
     <div className="organism-state-field">
       <div className="row">
-        {individualEntry && !readOnly && (
+        {individualEntry && !readOnly && useTargetOrganism && (
           <ToggleField
             {...fieldProps("isTarget")}
             className="col-sm-1"
