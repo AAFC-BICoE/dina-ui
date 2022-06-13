@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
   SortableContainer,
@@ -21,7 +21,7 @@ import ReactTable, { Column } from "react-table";
 import { BulkEditTabWarning, OrganismStateField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Organism } from "../../../types/collection-api/resources/Organism";
-import Switch from "react-switch";
+
 export interface OrganismsFieldProps {
   /** Organism array field name. */
   name: string;
@@ -38,6 +38,16 @@ export function OrganismsField({
   visibleManagedAttributeKeys
 }: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
+
+  const formik = useFormikContext<any>();
+  useEffect(() => {
+    if (!readOnly && formik.values.useTargetOrganism) {
+      formik.values.organism.length = formik.values.organismsQuantity;
+      for (let idx = 0; idx <= formik.values.organismsQuantity; idx++) {
+        formik.setFieldValue(`${name}[${idx}].isTarget`, false);
+      }
+    }
+  }, [formik.values.organismsQuantity]);
 
   return (
     <FieldSet
@@ -62,13 +72,13 @@ export function OrganismsField({
           {({ form, remove, move }) => {
             const organisms: (Organism | null | undefined)[] =
               get(form.values, name) || [];
-            // console.log(organisms);
+
             const organismsQuantity = readOnly
               ? organisms.length
               : isTemplate
               ? 1
               : Number(form.values.organismsQuantity ?? 0);
-            // console.log(organismsQuantity);
+
             const organismsIndividualEntry = !!(
               form.values.organismsIndividualEntry ?? false
             );
