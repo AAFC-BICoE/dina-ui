@@ -214,11 +214,6 @@ export function Home() {
                     <SeqdbMessage id="pcrBatchListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/seq-batch/list">
-                  <a>
-                    <SeqdbMessage id="seqBatchListTitle" />
-                  </a>
-                </Link>
                 <Link href="/seqdb/pcr-primer/list">
                   <a>
                     <SeqdbMessage id="pcrPrimerListTitle" />
