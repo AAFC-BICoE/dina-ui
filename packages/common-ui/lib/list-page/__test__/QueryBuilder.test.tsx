@@ -13,25 +13,20 @@ const INDEX_NAME = "DINA_EXAMPLE_INDEX";
 /** Options array based on resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    headers: {},
-    body: {
-      indexName: INDEX_NAME,
-      attributes: [
-        {
-          name: "createdOn",
-          path: "data.attributes",
-          type: "date"
-        },
-        {
-          name: "allowDuplicateName",
-          path: "data.attributes",
-          type: "boolean"
-        }
-      ],
-      relationships: []
-    },
-    statusCode: "OK",
-    statusCodeValue: 200
+    indexName: INDEX_NAME,
+    attributes: [
+      {
+        name: "createdOn",
+        path: "data.attributes",
+        type: "date"
+      },
+      {
+        name: "allowDuplicateName",
+        path: "data.attributes",
+        type: "boolean"
+      }
+    ],
+    relationships: []
   }
 };
 
