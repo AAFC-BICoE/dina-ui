@@ -22,6 +22,7 @@ import {
   pickBy,
   range
 } from "lodash";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
@@ -207,6 +208,7 @@ export function useMaterialSampleSave({
   visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -573,6 +575,16 @@ export function useMaterialSampleSave({
         }
         throw error;
       }
+    }
+
+    // Throw error if useTargetOrganism is enabled without a target organism selected
+    if (
+      materialSampleInput.useTargetOrganism &&
+      !materialSampleInput.organism?.some(organism => organism?.isTarget)
+    ) {
+      throw new DoOperationsError(
+        formatMessage("field_useTargetOrganismError")
+      );
     }
 
     delete materialSampleInput.phac_animal_rg;

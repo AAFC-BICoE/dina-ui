@@ -391,6 +391,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_typeStatusEvidence: "Type Status Evidence",
   field_useNextSequence: "Use Next Available Identifier",
   field_useTargetOrganism: "Use Target Organism",
+  field_useTargetOrganismError:
+    "Must select target Organism when Use Target Organism is enabled.",
   field_verbatimDate: "Verbatim Date",
   field_verbatimDeterminer: "Verbatim Determiner",
   field_verbatimEventDateTime: "Verbatim Event Date Time",
