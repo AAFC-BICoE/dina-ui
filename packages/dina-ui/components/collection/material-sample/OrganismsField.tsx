@@ -40,15 +40,22 @@ export function OrganismsField({
   const { isTemplate, readOnly } = useDinaFormContext();
 
   const formik = useFormikContext<any>();
+  /**
+   * Update organism with isTarget flags when organismsQuantity changes
+   */
+  function updateOrganismArray() {
+    formik.values.organism.length = formik.values.organismsQuantity;
+    for (let idx = 0; idx <= formik.values.organismsQuantity; idx++) {
+      if (formik.values.organism[idx]?.isTarget === true) {
+        continue;
+      }
+      formik.setFieldValue(`${name}[${idx}].isTarget`, false);
+    }
+  }
+
   useEffect(() => {
     if (!readOnly && formik.values.useTargetOrganism) {
-      formik.values.organism.length = formik.values.organismsQuantity;
-      for (let idx = 0; idx <= formik.values.organismsQuantity; idx++) {
-        if (formik.values.organism[idx]?.isTarget === true) {
-          continue;
-        }
-        formik.setFieldValue(`${name}[${idx}].isTarget`, false);
-      }
+      updateOrganismArray();
     }
   }, [formik.values.organismsQuantity]);
 
@@ -163,6 +170,7 @@ export function OrganismsField({
                             name="useTargetOrganism"
                             onChangeExternal={checked => {
                               if (checked) {
+                                updateOrganismArray();
                                 resetIsTargetFalse();
                               } else {
                                 resetIsTargetNull();
