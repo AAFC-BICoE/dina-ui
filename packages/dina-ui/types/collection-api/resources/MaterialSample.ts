@@ -67,6 +67,7 @@ export interface MaterialSampleAttributes {
   // Client-side only fields for the organism section:
   organismsQuantity?: number;
   organismsIndividualEntry?: boolean;
+  useTargetOrganism?: boolean;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;

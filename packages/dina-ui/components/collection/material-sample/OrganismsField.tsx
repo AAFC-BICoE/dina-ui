@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
   SortableContainer,
@@ -38,6 +38,36 @@ export function OrganismsField({
   visibleManagedAttributeKeys
 }: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
+
+  const formik = useFormikContext<any>();
+  /**
+   * Update organism with isTarget flags when organismsQuantity changes
+   */
+  function updateOrganismArray() {
+    formik.values.organism.length = formik.values.organismsQuantity;
+    for (let idx = 0; idx <= formik.values.organismsQuantity; idx++) {
+      if (formik.values.organism[idx]?.isTarget === true) {
+        continue;
+      }
+      formik.setFieldValue(`${name}[${idx}].isTarget`, false);
+    }
+  }
+
+  useEffect(() => {
+    if (!readOnly && formik.values.useTargetOrganism) {
+      updateOrganismArray();
+    }
+  }, [formik.values.organismsQuantity]);
+
+  const useTargetOrganism = readOnly
+    ? formik.values.organism?.some(organism => organism?.isTarget)
+    : formik.values.organism?.some(organism => organism?.isTarget)
+    ? true
+    : false;
+
+  if (useTargetOrganism) {
+    formik.values.useTargetOrganism = useTargetOrganism;
+  }
 
   return (
     <FieldSet
@@ -68,6 +98,7 @@ export function OrganismsField({
               : isTemplate
               ? 1
               : Number(form.values.organismsQuantity ?? 0);
+
             const organismsIndividualEntry = !!(
               form.values.organismsIndividualEntry ?? false
             );
@@ -82,9 +113,20 @@ export function OrganismsField({
              *
              * This should be used when switching the editing mode (Individual Organism Entry)
              */
-            function resetIsTarget() {
+            function resetIsTargetFalse() {
               organisms.forEach((_, idx) => {
                 form.setFieldValue(`${name}[${idx}].isTarget`, false);
+              });
+            }
+
+            /**
+             * Reset all organisms isTarget field to null.
+             *
+             * This should be used when switching the editing mode (Individual Organism Entry)
+             */
+            function resetIsTargetNull() {
+              organisms.forEach((_, idx) => {
+                form.setFieldValue(`${name}[${idx}].isTarget`, null);
               });
             }
 
@@ -97,7 +139,7 @@ export function OrganismsField({
              * @param index The toggle that was changed.
              */
             function targetChecked(index: number) {
-              resetIsTarget();
+              resetIsTargetFalse();
               form.setFieldValue(`${name}[${index}].isTarget`, true);
             }
 
@@ -113,10 +155,29 @@ export function OrganismsField({
                         min={0}
                       />
                       {!readOnly && (
-                        <ToggleField
-                          name="organismsIndividualEntry"
-                          onChangeExternal={() => resetIsTarget()}
-                        />
+                        <div className="d-flex">
+                          <ToggleField
+                            name="organismsIndividualEntry"
+                            onChangeExternal={checked => {
+                              if (checked === false) {
+                                form.setFieldValue("useTargetOrganism", false);
+                              }
+                              resetIsTargetNull();
+                            }}
+                          />
+                          <ToggleField
+                            disableSwitch={!organismsIndividualEntry}
+                            name="useTargetOrganism"
+                            onChangeExternal={checked => {
+                              if (checked) {
+                                updateOrganismArray();
+                                resetIsTargetFalse();
+                              } else {
+                                resetIsTargetNull();
+                              }
+                            }}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -124,6 +185,7 @@ export function OrganismsField({
                 {organismsQuantity > 0 &&
                   (organismsIndividualEntry ? (
                     <OrganismsTable
+                      useTargetOrganism={form.values.useTargetOrganism}
                       namePrefix={name}
                       organisms={organisms}
                       organismsQuantity={organismsQuantity}
@@ -156,6 +218,7 @@ interface OrganismsTableProps {
   onRemoveClick: (index: number) => void;
   onTargetChecked: (index: number) => void;
   onRowMove: (from: number, to: number) => void;
+  useTargetOrganism: boolean;
 }
 
 function OrganismsTable({
@@ -164,7 +227,8 @@ function OrganismsTable({
   namePrefix,
   onRemoveClick,
   onTargetChecked,
-  onRowMove
+  onRowMove,
+  useTargetOrganism
 }: OrganismsTableProps) {
   const { formatMessage } = useDinaIntl();
   const { getFieldLabel } = useFieldLabels();
@@ -222,16 +286,6 @@ function OrganismsTable({
           }
         ]),
     {
-      Header: formatMessage("target"),
-      id: "isTarget",
-      Cell: ({ original: o }) => {
-        const isTarget: boolean = o?.isTarget;
-        const checkMark = isTarget ? <span>True</span> : <span>False</span>;
-
-        return <span className="organism-target-cell">{checkMark}</span>;
-      }
-    },
-    {
       id: "determination",
       Cell: ({ original: o }) => {
         const primaryDet = o?.determination?.find(it => it.isPrimary);
@@ -263,6 +317,29 @@ function OrganismsTable({
       )
     }
   ];
+
+  if (useTargetOrganism) {
+    const checkboxProps = {
+      style: {
+        display: "block",
+        height: "20px",
+        marginLeft: "15px",
+        width: "20px"
+      },
+      type: "checkbox",
+      readOnly: true
+    };
+    tableColumns.splice(1, 0, {
+      Header: formatMessage("isTarget"),
+      id: "isTarget",
+      Cell: ({ original: o }) => {
+        const isTarget: boolean = o?.isTarget;
+        const checkMark = <input {...checkboxProps} checked={isTarget} />;
+
+        return <span className="organism-target-cell">{checkMark}</span>;
+      }
+    });
+  }
 
   /** Only show up to the organismsQuantity number */
   const visibleTableData: Organism[] = [...new Array(organismsQuantity)].map(
@@ -301,6 +378,7 @@ function OrganismsTable({
                   index={row.index}
                   namePrefix={`${namePrefix}[${row.index}].`}
                   individualEntry={true}
+                  useTargetOrganism={useTargetOrganism}
                   onTargetChecked={onTargetChecked}
                 />
               </div>
