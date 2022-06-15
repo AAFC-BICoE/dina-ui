@@ -2,7 +2,11 @@ import { get } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
 
-export function thumbnailCell({ fileIdentifierField, bucketField }) {
+export function thumbnailCell({
+  fileIdentifierField,
+  bucketField,
+  resourceExternalURL = null
+}) {
   return {
     Cell: ({ original }) => {
       const fileIdentifier = get<string | undefined>(
