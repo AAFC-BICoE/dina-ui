@@ -31,49 +31,45 @@ const TEST_GROUP: PersistedResource<Group>[] = [
 
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    body: {
-      indexName: "dina_object_store_index",
-      attributes: [
-        {
-          name: "originalFilename",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "bucket",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "createdBy",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "acCaption",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "id",
-          type: "text",
-          path: "data"
-        },
-        {
-          name: "type",
-          type: "text",
-          path: "data"
-        },
-        {
-          name: "createdOn",
-          type: "date",
-          path: "data.attributes"
-        }
-      ],
-      relationships: []
-    },
-    statusCode: "OK",
-    statusCodeValue: 200
+    indexName: "dina_object_store_index",
+    attributes: [
+      {
+        name: "originalFilename",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "bucket",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "createdBy",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "acCaption",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "id",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "type",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
   }
 };
 
@@ -136,7 +132,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
 
 const USER_PREFERENCE = {
   data: [],
-  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
 };
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {
