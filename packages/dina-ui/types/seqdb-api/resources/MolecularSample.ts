@@ -1,7 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { MaterialSample } from "../../collection-api";
 import { Product } from "./Product";
-import { Protocol } from "./Protocol";
 
 export interface MolecularSampleAttributes {
   type: "molecular-sample";
@@ -13,7 +12,6 @@ export interface MolecularSampleAttributes {
 
 export interface MolecularSampleRelationships {
   kit?: Product;
-  protocol?: Protocol;
   materialSample?: MaterialSample;
 }
 

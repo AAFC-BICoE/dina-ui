@@ -15,12 +15,12 @@ import { pick } from "lodash";
 import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext, useState } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
+import { Protocol } from "../../../../types/collection-api";
 import {
   Chain,
   ChainStepTemplate,
   PreLibraryPrep,
   Product,
-  Protocol,
   MolecularSample,
   StepResource
 } from "../../../../types/seqdb-api";
@@ -83,7 +83,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       {
         filter: filterBy(["name"]),
         label: protocol => protocol.name,
-        model: `seqdb-api/protocol`,
+        model: `collection-api/protocol`,
         type: "protocol"
       },
       {
