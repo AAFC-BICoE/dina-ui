@@ -2,7 +2,7 @@ import { KitsuResource } from "kitsu";
 import { ContainerType } from "../ContainerType";
 import { PcrProfile } from "../PcrProfile";
 import { Product } from "../Product";
-import { Protocol } from "../Protocol";
+import { Protocol } from "../../../collection-api";
 import { IndexSet } from "./IndexSet";
 
 interface LibraryPrepBatchAttributes {

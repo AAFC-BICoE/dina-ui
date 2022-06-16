@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { Product, Protocol } from "../..";
+import { Product } from "../..";
+import { Protocol } from "../../../collection-api";
 
 export interface PreLibraryPrepAttributes {
   type: "pre-library-prep";
