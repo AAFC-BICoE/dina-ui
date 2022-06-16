@@ -1,12 +1,9 @@
 import { get } from "lodash";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { FileView } from "../object-store";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
-export function thumbnailCell({
-  fileIdentifierField,
-  bucketField,
-  resourceExternalURL = null
-}) {
+export function thumbnailCell({ fileIdentifierField, bucketField }) {
   return {
     Cell: ({ original }) => {
       const fileIdentifier = get<string | undefined>(
@@ -17,8 +14,17 @@ export function thumbnailCell({
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
+      const resourceExternalURL = original.data.attributes.resourceExternalURL;
 
-      return <SmallThumbnail filePath={filePath} />;
+      return resourceExternalURL ? (
+        <div className="d-flex h-100">
+          <a href={resourceExternalURL} target="_blank" className="m-auto h5">
+            <FaExternalLinkAlt />
+          </a>
+        </div>
+      ) : (
+        <SmallThumbnail filePath={filePath} />
+      );
     },
     sortable: false,
     Header: <DinaMessage id="thumbnail" />

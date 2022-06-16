@@ -60,9 +60,7 @@ export default function MetadataListPage() {
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
       bucketField: "bucket",
-      fileIdentifierField: "fileIdentifier",
-      resourceExternalURL:
-        previewMetadata?.data?.attributes?.resourceExternalURL
+      fileIdentifierField: "fileIdentifier"
     }),
     {
       Cell: ({ original: { id, data } }) =>
