@@ -14,7 +14,8 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
-      const resourceExternalURL = original.data.attributes.resourceExternalURL;
+      const resourceExternalURL =
+        original?.data?.attributes?.resourceExternalURL;
 
       return resourceExternalURL ? (
         <div className="d-flex h-100">
