@@ -1862,7 +1862,9 @@ describe("Material Sample Edit Page", () => {
       .find(".organismsIndividualEntry-field")
       .find(Switch)
       .prop<any>("onChange")(false);
-
+    wrapper.find(".useTargetOrganism-field").find(Switch).prop<any>("onChange")(
+      false
+    );
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -1870,7 +1872,7 @@ describe("Material Sample Edit Page", () => {
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
-      // IsTarget should be reverted to false.
+      // IsTarget should be reverted to null.
       // Organism 1's values with "lifestage 1" are copied to the other organisms:
       [
         [
@@ -1880,7 +1882,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           },
@@ -1890,7 +1892,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-2",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           },
@@ -1900,7 +1902,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-3",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           }

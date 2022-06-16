@@ -22,6 +22,7 @@ import {
   pickBy,
   range
 } from "lodash";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
@@ -194,6 +195,7 @@ export function useMaterialSampleSave({
   visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -440,6 +442,7 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
+
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),
@@ -561,10 +564,21 @@ export function useMaterialSampleSave({
       }
     }
 
+    // Throw error if useTargetOrganism is enabled without a target organism selected
+    if (
+      materialSampleInput.useTargetOrganism &&
+      !materialSampleInput.organism?.some(organism => organism?.isTarget)
+    ) {
+      throw new DoOperationsError(
+        formatMessage("field_useTargetOrganismError")
+      );
+    }
+
     delete materialSampleInput.phac_animal_rg;
     delete materialSampleInput.phac_cl;
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
+    delete materialSampleInput.useTargetOrganism;
 
     return materialSampleInput;
   }
@@ -707,6 +721,7 @@ export function useMaterialSampleSave({
       const savedOrganisms = await save<Organism>(organismSaveArgs, {
         apiBaseUrl: "/collection-api"
       });
+
       return savedOrganisms;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
