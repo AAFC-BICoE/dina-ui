@@ -3,7 +3,8 @@ import {
   FormikButton,
   useAccount,
   useModal,
-  AreYouSureModal
+  AreYouSureModal,
+  setArray
 } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
@@ -16,6 +17,8 @@ import { useFileUpload } from "../../components/object-store/file-upload/FileUpl
 import { DefaultValuesConfigSelectField } from "../../components/object-store/metadata-bulk-editor/custom-default-values/DefaultValueConfigManager";
 import { useDefaultValueRuleEditorModal } from "../../components/object-store/metadata-bulk-editor/custom-default-values/useDefaultValueRuleBuilderModal";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+
+export const BULK_ADD_IDS_KEY = "bulkAddIds";
 
 export interface OnSubmitValues {
   group?: string;
@@ -46,15 +49,15 @@ export default function UploadPage() {
       .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
     const navigateToEditMetadata = async () => {
-      const objectUploadIds = uploadRespsT
-        .map(({ fileIdentifier }) => fileIdentifier)
-        .join(",");
+      const objectUploadIds = uploadRespsT.map(
+        ({ fileIdentifier }) => fileIdentifier
+      );
 
+      setArray(BULK_ADD_IDS_KEY, objectUploadIds);
       await router.push({
         pathname: "/object-store/metadata/edit",
         query: {
           group,
-          objectUploadIds,
           ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
         }
       });

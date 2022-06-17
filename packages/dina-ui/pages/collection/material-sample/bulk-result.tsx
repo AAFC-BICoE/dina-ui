@@ -3,12 +3,12 @@ import {
   ButtonBar,
   useBulkGet,
   useQuery,
-  withResponse
+  withResponse,
+  useLocalStorage
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useLocalStorage } from "common-ui/lib/util/localStorageUtil";
 import React from "react";
 import { Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";

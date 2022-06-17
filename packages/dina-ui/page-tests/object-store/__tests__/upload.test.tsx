@@ -6,7 +6,9 @@ import {
   IMeta
 } from "../../../components/object-store";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
-import UploadPage from "../../../pages/object-store/upload";
+import UploadPage, {
+  BULK_ADD_IDS_KEY
+} from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
@@ -106,14 +108,13 @@ describe("Upload page", () => {
     expect(mockPush).lastCalledWith({
       pathname: "/object-store/metadata/edit",
       query: {
-        group: "example-group",
-        objectUploadIds: [
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"
-        ].join(",")
+        group: "example-group"
       }
     });
+
+    expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
+      '["c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"]'
+    );
   });
 
   it("Throws file upload errors with a readable message.", done => {

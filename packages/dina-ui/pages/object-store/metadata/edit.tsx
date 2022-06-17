@@ -3,13 +3,14 @@ import {
   BackButton,
   LoadingSpinner,
   useAccount,
+  useLocalStorage,
   BULK_EDIT_IDS_KEY
 } from "common-ui";
 import { useRouter } from "next/router";
-import { useLocalStorage } from "common-ui/lib/util/localStorageUtil";
 import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { BULK_ADD_IDS_KEY } from "../upload";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
@@ -22,7 +23,11 @@ export default function EditMetadatasPage() {
     removeAfterRetrieval: true
   });
 
-  const objectUploadIds = router.query.objectUploadIds?.toString().split(",");
+  const objectUploadIds = useLocalStorage({
+    key: BULK_ADD_IDS_KEY,
+    defaultValue: [],
+    removeAfterRetrieval: true
+  });
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;

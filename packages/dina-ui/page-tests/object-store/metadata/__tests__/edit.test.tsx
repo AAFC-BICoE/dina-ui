@@ -1,5 +1,6 @@
 import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
+import { BULK_EDIT_IDS_KEY, setArray } from "common-ui";
 import Select from "react-select/base";
 import {
   BulkMetadataEditRow,
@@ -178,20 +179,24 @@ const TEST_CONFIGS: DefaultValuesConfig[] = [
   }
 ];
 
+const METADATA_IDS = [
+  "6c524135-3c3e-41c1-a057-45afb4e3e7b",
+  "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+  "31ee7848-b5c1-46e1-bbca-68006d9eda3b"
+];
+
 describe("Metadata bulk edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSave.mockImplementation(args => args.map(({ resource }) => resource));
-    mockUseRouter.mockReturnValue({
-      query: {
-        metadataIds:
-          "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
-      }
-    });
+    mockUseRouter.mockReturnValue({});
 
     // Reset "local storage":
     deleteFromStorage(STORAGE_KEY);
     writeStorage(STORAGE_KEY, TEST_CONFIGS);
+
+    localStorage.clear();
+    setArray(BULK_EDIT_IDS_KEY, METADATA_IDS);
   });
 
   it("Renders the bulk edit page (edit existing data mode).", async () => {

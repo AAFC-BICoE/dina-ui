@@ -1,7 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { setArray } from "common-ui/lib/util/localStorageUtil";
 import { useState } from "react";
 import {
   Head,
@@ -13,6 +12,7 @@ import {
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api/resources/MaterialSample";
 import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
+import { setArray } from "common-ui";
 
 export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
