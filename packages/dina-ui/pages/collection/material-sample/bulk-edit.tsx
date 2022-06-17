@@ -1,5 +1,10 @@
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { BULK_EDIT_IDS_KEY } from "packages/common-ui/lib";
+import {
+  useLocalStorage,
+  setArray
+} from "packages/common-ui/lib/util/localStorageUtil";
 import {
   ExistingMaterialSampleBulkEditor,
   Head,
@@ -8,9 +13,20 @@ import {
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 
+/**
+ * Key value where the bulk edit ids will be stored to display as the result.
+ *
+ * This constant is available to use for setting and retrieving the value.
+ */
+export const BULK_EDIT_RESULT_IDS_KEY = "bulkEditResultIds";
+
 export default function MaterialSampleBulkEditPage() {
   const router = useRouter();
-  const ids = router.query.ids?.toString().split(",");
+  const ids = useLocalStorage({
+    key: BULK_EDIT_IDS_KEY,
+    defaultValue: [],
+    removeAfterRetrieval: true
+  });
 
   const { formatMessage } = useDinaIntl();
 
@@ -19,10 +35,13 @@ export default function MaterialSampleBulkEditPage() {
   async function moveToResultPage(
     samples: PersistedResource<MaterialSample>[]
   ) {
-    const savedIds = samples.map(it => it.id).join(",");
+    setArray(
+      BULK_EDIT_RESULT_IDS_KEY,
+      samples.map(it => it.id)
+    );
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { ids: savedIds, actionType: "edited" }
+      query: { actionType: "edited" }
     });
   }
 

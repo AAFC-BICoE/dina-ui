@@ -9,6 +9,7 @@ import {
   useApiClient,
   useModal
 } from "..";
+import { setArray } from "../util/localStorageUtil";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -71,13 +72,24 @@ export function BulkDeleteButton({
 }
 
 export interface BulkEditButtonProps {
-  bulkEditPath: (ids: string[]) => {
-    pathname: string;
-    query: Record<string, string>;
-  };
+  /** Where to perform the request for the bulk edit. */
+  pathname: string;
 }
 
-export function BulkEditButton({ bulkEditPath }: BulkEditButtonProps) {
+/**
+ * Key value where the bulk edit ids will be stored.
+ *
+ * This constant is available to use for setting and retrieving the value.
+ */
+export const BULK_EDIT_IDS_KEY = "bulkEditIds";
+
+/**
+ *
+ *
+ * @param param0
+ * @returns
+ */
+export function BulkEditButton({ pathname }: BulkEditButtonProps) {
   const router = useRouter();
 
   return (
@@ -89,8 +101,8 @@ export function BulkEditButton({ bulkEditPath }: BulkEditButtonProps) {
           .filter(pair => pair[1])
           .map(pair => pair[0]);
 
-        const path = bulkEditPath(ids);
-        await router.push(path);
+        setArray(BULK_EDIT_IDS_KEY, ids);
+        await router.push({ pathname });
       }}
     >
       <CommonMessage id="editSelectedButtonText" />

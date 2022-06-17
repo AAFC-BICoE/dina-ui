@@ -2,18 +2,26 @@ import { useBulkGet, useQuery, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useLocalStorage } from "packages/common-ui/lib/util/localStorageUtil";
 import React from "react";
 import { Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
 
 export default function MaterialSampleBulkResult() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
+  const ids = useLocalStorage({
+    key: BULK_EDIT_RESULT_IDS_KEY,
+    defaultValue: [],
+    removeAfterRetrieval: true
+  });
+
   const parentSampleId = router.query.parentSampleId?.toString?.();
-  const ids = router.query.ids?.toString?.()?.split?.(",") ?? [];
+
   const actionType =
     router.query.actionType?.toString?.() === "edited" ? "edited" : "created";
 

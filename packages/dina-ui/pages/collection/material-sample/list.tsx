@@ -291,10 +291,7 @@ export default function MaterialSampleListPage() {
             typeName: "material-sample",
             apiBaseUrl: "/collection-api"
           }}
-          bulkEditPath={ids => ({
-            pathname: "/collection/material-sample/bulk-edit",
-            query: { ids: ids.join(",") }
-          })}
+          bulkEditPath="/collection/material-sample/bulk-edit"
         />
       </main>
       <Footer />
