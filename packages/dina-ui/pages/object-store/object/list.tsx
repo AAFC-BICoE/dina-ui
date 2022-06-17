@@ -161,10 +161,7 @@ export default function MetadataListPage() {
                   typeName: "metadata",
                   apiBaseUrl: "/objectstore-api"
                 }}
-                bulkEditPath={ids => ({
-                  pathname: "/object-store/metadata/edit",
-                  query: { metadataIds: ids.join(",") }
-                })}
+                bulkEditPath={"/object-store/metadata/edit"}
                 defaultSort={[
                   {
                     desc: true,

@@ -1,5 +1,12 @@
-import { ButtonBar, BackButton, LoadingSpinner, useAccount } from "common-ui";
+import {
+  ButtonBar,
+  BackButton,
+  LoadingSpinner,
+  useAccount,
+  BULK_EDIT_IDS_KEY
+} from "common-ui";
 import { useRouter } from "next/router";
+import { useLocalStorage } from "packages/common-ui/lib/util/localStorageUtil";
 import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -9,7 +16,12 @@ export default function EditMetadatasPage() {
   const { initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
 
-  const metadataIds = router.query.metadataIds?.toString().split(",");
+  const metadataIds = useLocalStorage({
+    key: BULK_EDIT_IDS_KEY,
+    defaultValue: [],
+    removeAfterRetrieval: true
+  });
+
   const objectUploadIds = router.query.objectUploadIds?.toString().split(",");
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {

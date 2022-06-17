@@ -1,4 +1,10 @@
-import { useBulkGet, useQuery, withResponse } from "common-ui";
+import {
+  BackToListButton,
+  ButtonBar,
+  useBulkGet,
+  useQuery,
+  withResponse
+} from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -41,6 +47,9 @@ export default function MaterialSampleBulkResult() {
     <div>
       <Head title={formatMessage("bulkOperationCompleteTitle")} />
       <Nav />
+      <ButtonBar>
+        <BackToListButton entityLink="/collection/material-sample" />
+      </ButtonBar>
       <main className="container ">
         <h1 id="wb-cont">{formatMessage("bulkOperationCompleteTitle")}</h1>
         <div>
