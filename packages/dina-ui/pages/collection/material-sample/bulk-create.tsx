@@ -1,7 +1,7 @@
 import { PersistedResource } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
-import { setArray } from "packages/common-ui/lib/util/localStorageUtil";
+import { setArray } from "common-ui/lib/util/localStorageUtil";
 import { useState } from "react";
 import {
   Head,

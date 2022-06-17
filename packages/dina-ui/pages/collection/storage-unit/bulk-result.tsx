@@ -2,7 +2,7 @@
 import { BULK_EDIT_IDS_KEY, useBulkGet, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { useLocalStorage } from "packages/common-ui/lib/util/localStorageUtil";
+import { useLocalStorage } from "common-ui/lib/util/localStorageUtil";
 import React from "react";
 import { Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";

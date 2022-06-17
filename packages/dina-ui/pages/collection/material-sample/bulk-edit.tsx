@@ -1,10 +1,7 @@
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { BULK_EDIT_IDS_KEY } from "packages/common-ui/lib";
-import {
-  useLocalStorage,
-  setArray
-} from "packages/common-ui/lib/util/localStorageUtil";
+import { BULK_EDIT_IDS_KEY } from "common-ui/lib";
+import { useLocalStorage, setArray } from "common-ui/lib/util/localStorageUtil";
 import {
   ExistingMaterialSampleBulkEditor,
   Head,

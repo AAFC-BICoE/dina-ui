@@ -6,7 +6,7 @@ import {
   BULK_EDIT_IDS_KEY
 } from "common-ui";
 import { useRouter } from "next/router";
-import { useLocalStorage } from "packages/common-ui/lib/util/localStorageUtil";
+import { useLocalStorage } from "common-ui/lib/util/localStorageUtil";
 import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";

@@ -2,6 +2,7 @@ import {
   AreYouSureModal,
   BulkDeleteButton,
   BulkSelectableFormValues,
+  BULK_EDIT_IDS_KEY,
   DinaForm,
   QueryPage
 } from "common-ui";
@@ -98,6 +99,10 @@ const mockPost = jest.fn<any, any>(async path => {
   }
 });
 
+const METADATA_UUID1 = "6c524135-3c3e-41c1-a057-45afb4e3e7be";
+const METADATA_UUID2 = "3849de16-fee2-4bb1-990d-a4f5de19b48d";
+const METADATA_UUID3 = "31ee7848-b5c1-46e1-bbca-68006d9eda3b";
+
 // This will be used in the future with the fallback.
 const TEST_METADATA: PersistedResource<Metadata>[] = [
   {
@@ -106,7 +111,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
-    id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+    id: METADATA_UUID1,
     originalFilename: "file1.png",
     type: "metadata"
   },
@@ -116,7 +121,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
-    id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+    id: METADATA_UUID2,
     originalFilename: "file2.png",
     type: "metadata"
   },
@@ -125,7 +130,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
-    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    id: METADATA_UUID3,
     type: "metadata"
   }
 ];
@@ -145,7 +150,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+              id: METADATA_UUID1,
               type: "metadata",
               attributes: {
                 acTags: ["tag1"],
@@ -161,7 +166,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+              id: METADATA_UUID2,
               type: "metadata",
               attributes: {
                 acTags: ["tag1", "tag2"],
@@ -177,7 +182,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+              id: METADATA_UUID3,
               type: "metadata",
               attributes: {
                 bucket: "testbucket",
@@ -195,7 +200,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
-  id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+  id: METADATA_UUID3,
   fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
   sizeInBytes: 500,
   originalFilename: "test.png",
@@ -289,12 +294,18 @@ describe("Metadata List Page", () => {
 
     // Router push should have been called with the 3 IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/edit",
-      query: {
-        metadataIds:
-          "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
-      }
+      pathname: "/object-store/metadata/edit"
     });
+
+    expect(localStorage.getItem(BULK_EDIT_IDS_KEY)).toEqual(
+      '["' +
+        METADATA_UUID1 +
+        '","' +
+        METADATA_UUID2 +
+        '","' +
+        METADATA_UUID3 +
+        '"]'
+    );
   });
 
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {
