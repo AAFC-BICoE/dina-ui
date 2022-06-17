@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { Product } from "../..";
-import { Protocol } from "../../../collection-api";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface PreLibraryPrepAttributes {
   type: "pre-library-prep";
@@ -15,7 +15,7 @@ export interface PreLibraryPrepAttributes {
 }
 
 export interface PreLibraryPrepRelationships {
-  protocol?: Protocol;
+  protocol?: ResourceIdentifierObject;
   product?: Product;
 }
 
