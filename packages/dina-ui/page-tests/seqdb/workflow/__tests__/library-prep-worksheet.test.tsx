@@ -83,6 +83,7 @@ describe("Library Prep Worksheet page", () => {
             {
               id: "3",
               indexI5: { id: "3", type: "ngs-index", name: "index 3" },
+              indexI7: { id: "6", type: "ngs-index", name: "index 6" },
               molecularSample: {
                 id: "1",
                 type: "molecular-sample",
