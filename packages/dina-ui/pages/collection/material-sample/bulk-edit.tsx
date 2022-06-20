@@ -9,6 +9,7 @@ import {
 } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
+import { useEffect } from "react";
 
 /**
  * Key value where the bulk edit ids will be stored to display as the result.
@@ -19,8 +20,11 @@ export const BULK_EDIT_RESULT_IDS_KEY = "bulkEditResultIds";
 
 export default function MaterialSampleBulkEditPage() {
   const router = useRouter();
-  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
-  localStorage.removeItem(BULK_EDIT_IDS_KEY);
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY, []);
+
+  useEffect(() => {
+    localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
+  }, ids);
 
   const { formatMessage } = useDinaIntl();
 

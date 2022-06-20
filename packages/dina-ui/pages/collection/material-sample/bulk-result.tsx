@@ -8,7 +8,7 @@ import {
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -20,8 +20,11 @@ export default function MaterialSampleBulkResult() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  const [ids] = useLocalStorage<string[]>(BULK_EDIT_RESULT_IDS_KEY);
-  localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_RESULT_IDS_KEY, []);
+
+  useEffect(() => {
+    localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
+  }, ids);
 
   const parentSampleId = router.query.parentSampleId?.toString?.();
 
@@ -36,7 +39,7 @@ export default function MaterialSampleBulkResult() {
   );
 
   const samplesQuery = useBulkGet<MaterialSample>({
-    ids: ids ?? [],
+    ids,
     listPath: "collection-api/material-sample"
   });
 

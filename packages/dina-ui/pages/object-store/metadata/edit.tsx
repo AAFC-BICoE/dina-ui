@@ -11,6 +11,7 @@ import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
+import { useEffect } from "react";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
@@ -19,8 +20,6 @@ export default function EditMetadatasPage() {
 
   const [metadataIds] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
   const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
-  localStorage.removeItem(BULK_EDIT_IDS_KEY);
-  localStorage.removeItem(BULK_ADD_IDS_KEY);
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
@@ -60,8 +59,8 @@ export default function EditMetadatasPage() {
           </>
         </ButtonBar>
         <BulkMetadataEditor
-          metadataIds={metadataIds ?? []}
-          objectUploadIds={objectUploadIds ?? []}
+          metadataIds={metadataIds ?? undefined}
+          objectUploadIds={objectUploadIds ?? undefined}
           group={router?.query?.group as string}
           defaultValuesConfig={
             typeof router?.query?.defaultValuesConfig === "string"
