@@ -1,6 +1,6 @@
 import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
-import { BULK_EDIT_IDS_KEY, setArray } from "common-ui";
+import { BULK_EDIT_IDS_KEY } from "common-ui";
 import Select from "react-select/base";
 import {
   BulkMetadataEditRow,
@@ -10,6 +10,7 @@ import { DefaultValuesConfig } from "../../../../components/object-store/metadat
 import EditMetadatasPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { License, Metadata, Person } from "../../../../types/objectstore-api";
+import { BULK_ADD_IDS_KEY } from "../../../../pages/object-store/upload";
 
 const TEST_METADATAS: PersistedResource<Metadata>[] = [
   {
@@ -189,17 +190,17 @@ describe("Metadata bulk edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSave.mockImplementation(args => args.map(({ resource }) => resource));
-    mockUseRouter.mockReturnValue({});
 
     // Reset "local storage":
     deleteFromStorage(STORAGE_KEY);
-    writeStorage(STORAGE_KEY, TEST_CONFIGS);
+    deleteFromStorage(BULK_EDIT_IDS_KEY);
+    deleteFromStorage(BULK_ADD_IDS_KEY);
 
-    localStorage.clear();
-    setArray(BULK_EDIT_IDS_KEY, METADATA_IDS);
+    writeStorage(STORAGE_KEY, TEST_CONFIGS);
   });
 
   it("Renders the bulk edit page (edit existing data mode).", async () => {
+    writeStorage(BULK_EDIT_IDS_KEY, METADATA_IDS);
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -239,6 +240,7 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Renders the managed attribute columns into the editable table (edit existing data mode).", () => {
+    writeStorage(BULK_EDIT_IDS_KEY, METADATA_IDS);
     const columns = managedAttributeColumns([
       {
         acceptedValues: ["Holotype", "Paratype", "Syntype"],
@@ -283,6 +285,7 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Initializes the editable managed attributes based on what attributes are set on the metadatas (edit existing data mode).", async () => {
+    writeStorage(BULK_EDIT_IDS_KEY, METADATA_IDS);
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -307,6 +310,7 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Submits the changed values (edit existing data mode).", async () => {
+    writeStorage(BULK_EDIT_IDS_KEY, METADATA_IDS);
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -340,7 +344,7 @@ describe("Metadata bulk edit page", () => {
 
     // Only 1 row should have been updated, using 2 operations for the row:
     // - The Metadata is updated with new dcCreator and new tags.
-    // - The metadata's managedAttributes is udpated with a new attribute value.
+    // - The metadata's managedAttributes is updated with a new attribute value.
     expect(mockSave).lastCalledWith(
       [
         {
@@ -366,6 +370,7 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Lets you edit the Metadata's license (edit existing data mode).", async () => {
+    writeStorage(BULK_EDIT_IDS_KEY, METADATA_IDS);
     const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
 
     await new Promise(setImmediate);
@@ -410,9 +415,9 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Loads initial Metadata fields and lets you submit new Metadatas (edit new data mode)", async () => {
+    writeStorage(BULK_ADD_IDS_KEY, ["b4c8d6a6-0332-4f2a-a7b9-68b7898b6486"]);
     mockUseRouter.mockReturnValue({
       query: {
-        objectUploadIds: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
         group: "example-group"
       }
     });
@@ -521,10 +526,11 @@ describe("Metadata bulk edit page", () => {
   });
 
   it("Lets you set custom values from a pre-made config", async () => {
+    writeStorage(BULK_ADD_IDS_KEY, ["b4c8d6a6-0332-4f2a-a7b9-68b7898b6486"]);
     mockUseRouter.mockReturnValue({
       query: {
-        objectUploadIds: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
         group: "example-group",
+
         // The index of the Config to use:
         defaultValuesConfig: "0"
       }

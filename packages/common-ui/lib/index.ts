@@ -71,7 +71,6 @@ export * from "./util/serialize";
 export * from "./util/useThrottledFetch";
 export * from "./util/resourceDifference";
 export * from "./util/isBlankResourceAttribute";
-export * from "./util/localStorageUtil";
 export * from "./button-bar/BackToListButton";
 export * from "./button-bar/ButtonBar";
 export * from "./button-bar/BackButton";

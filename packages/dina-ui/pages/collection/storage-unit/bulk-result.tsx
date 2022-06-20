@@ -1,10 +1,6 @@
 // tslint:disable: no-string-literal
-import {
-  BULK_EDIT_IDS_KEY,
-  useBulkGet,
-  withResponse,
-  useLocalStorage
-} from "common-ui";
+import { BULK_EDIT_IDS_KEY, useBulkGet, withResponse } from "common-ui";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import React from "react";
@@ -16,11 +12,7 @@ import { StorageUnit } from "../../../types/collection-api";
 export default function StorageUnitBulkResult() {
   const { formatMessage } = useDinaIntl();
 
-  const ids = useLocalStorage({
-    key: BULK_EDIT_IDS_KEY,
-    defaultValue: [],
-    removeAfterRetrieval: true
-  });
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY, []);
 
   const unitsQuery = useBulkGet<StorageUnit>({
     ids,

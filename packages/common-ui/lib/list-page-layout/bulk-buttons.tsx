@@ -1,3 +1,4 @@
+import { writeStorage } from "@rehooks/local-storage";
 import { FormikContextType } from "formik";
 import { compact, toPairs } from "lodash";
 import { useRouter } from "next/router";
@@ -9,7 +10,6 @@ import {
   useApiClient,
   useModal
 } from "..";
-import { setArray } from "../util/localStorageUtil";
 
 /** Common button props for the bulk edit/delete buttons */
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
@@ -101,7 +101,7 @@ export function BulkEditButton({ pathname }: BulkEditButtonProps) {
           .filter(pair => pair[1])
           .map(pair => pair[0]);
 
-        setArray(BULK_EDIT_IDS_KEY, ids);
+        writeStorage<string[]>(BULK_EDIT_IDS_KEY, ids);
         await router.push({ pathname });
       }}
     >

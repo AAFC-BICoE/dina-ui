@@ -3,8 +3,7 @@ import {
   ButtonBar,
   useBulkGet,
   useQuery,
-  withResponse,
-  useLocalStorage
+  withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
@@ -15,16 +14,14 @@ import { Head } from "../../../components/head";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export default function MaterialSampleBulkResult() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  const ids = useLocalStorage({
-    key: BULK_EDIT_RESULT_IDS_KEY,
-    defaultValue: [],
-    removeAfterRetrieval: true
-  });
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_RESULT_IDS_KEY);
+  localStorage.removeItem(BULK_EDIT_RESULT_IDS_KEY);
 
   const parentSampleId = router.query.parentSampleId?.toString?.();
 
@@ -39,7 +36,7 @@ export default function MaterialSampleBulkResult() {
   );
 
   const samplesQuery = useBulkGet<MaterialSample>({
-    ids,
+    ids: ids ?? [],
     listPath: "collection-api/material-sample"
   });
 

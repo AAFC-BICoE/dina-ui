@@ -1,6 +1,7 @@
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { useLocalStorage, setArray, BULK_EDIT_IDS_KEY } from "common-ui";
+import { BULK_EDIT_IDS_KEY } from "common-ui";
+import { useLocalStorage, writeStorage } from "@rehooks/local-storage";
 import {
   ExistingMaterialSampleBulkEditor,
   Head,
@@ -18,11 +19,8 @@ export const BULK_EDIT_RESULT_IDS_KEY = "bulkEditResultIds";
 
 export default function MaterialSampleBulkEditPage() {
   const router = useRouter();
-  const ids = useLocalStorage({
-    key: BULK_EDIT_IDS_KEY,
-    defaultValue: [],
-    removeAfterRetrieval: true
-  });
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
+  localStorage.removeItem(BULK_EDIT_IDS_KEY);
 
   const { formatMessage } = useDinaIntl();
 
@@ -31,7 +29,7 @@ export default function MaterialSampleBulkEditPage() {
   async function moveToResultPage(
     samples: PersistedResource<MaterialSample>[]
   ) {
-    setArray(
+    writeStorage(
       BULK_EDIT_RESULT_IDS_KEY,
       samples.map(it => it.id)
     );
@@ -49,7 +47,7 @@ export default function MaterialSampleBulkEditPage() {
         <h1 id="wb-cont">{formatMessage(title)}</h1>
         {ids && (
           <ExistingMaterialSampleBulkEditor
-            ids={ids}
+            ids={ids ?? []}
             onSaved={moveToResultPage}
             onPreviousClick={() =>
               router.push("/collection/material-sample/list")

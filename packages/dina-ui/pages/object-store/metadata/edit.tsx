@@ -3,9 +3,9 @@ import {
   BackButton,
   LoadingSpinner,
   useAccount,
-  useLocalStorage,
   BULK_EDIT_IDS_KEY
 } from "common-ui";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
@@ -17,17 +17,10 @@ export default function EditMetadatasPage() {
   const { initialized: accountInitialized } = useAccount();
   const { formatMessage } = useDinaIntl();
 
-  const metadataIds = useLocalStorage({
-    key: BULK_EDIT_IDS_KEY,
-    defaultValue: [],
-    removeAfterRetrieval: true
-  });
-
-  const objectUploadIds = useLocalStorage({
-    key: BULK_ADD_IDS_KEY,
-    defaultValue: [],
-    removeAfterRetrieval: true
-  });
+  const [metadataIds] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
+  const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
+  localStorage.removeItem(BULK_EDIT_IDS_KEY);
+  localStorage.removeItem(BULK_ADD_IDS_KEY);
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
@@ -67,12 +60,12 @@ export default function EditMetadatasPage() {
           </>
         </ButtonBar>
         <BulkMetadataEditor
-          metadataIds={metadataIds}
-          objectUploadIds={objectUploadIds}
-          group={router.query.group as string}
+          metadataIds={metadataIds ?? []}
+          objectUploadIds={objectUploadIds ?? []}
+          group={router?.query?.group as string}
           defaultValuesConfig={
-            typeof router.query.defaultValuesConfig === "string"
-              ? Number(router.query.defaultValuesConfig)
+            typeof router?.query?.defaultValuesConfig === "string"
+              ? Number(router?.query?.defaultValuesConfig)
               : undefined
           }
           afterMetadatasSaved={afterMetadatasSaved}
