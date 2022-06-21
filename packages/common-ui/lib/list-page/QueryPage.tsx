@@ -75,11 +75,10 @@ export interface QueryPageProps<TData extends KitsuResource> {
 
   /**
    * Adds the bulk edit button and the row checkboxes.
+   *
+   * The query path to perform for bulk editing.
    */
-  bulkEditPath?: (ids: string[]) => {
-    pathname: string;
-    query: Record<string, string>;
-  };
+  bulkEditPath?: string;
 
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
@@ -529,7 +528,7 @@ export function QueryPage<TData extends KitsuResource>({
             )}
 
             <div className="d-flex gap-3">
-              {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+              {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
               {bulkDeleteButtonProps && (
                 <BulkDeleteButton {...bulkDeleteButtonProps} />
               )}

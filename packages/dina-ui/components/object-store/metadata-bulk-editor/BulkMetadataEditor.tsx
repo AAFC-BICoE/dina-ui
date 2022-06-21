@@ -14,7 +14,7 @@ import {
   useResourceSelectCells
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { get, set, keys, merge, cloneDeep, toPairs } from "lodash";
+import { get, set, keys, merge, cloneDeep, toPairs, isEmpty } from "lodash";
 import moment from "moment";
 import { useContext, useState } from "react";
 import { AddPersonButton } from "../../../components";
@@ -312,44 +312,46 @@ export function BulkMetadataEditor({
     } else {
       // Loop through the changes per row to get the data to POST to the bulk operations API:
       editedMetadatas = await Promise.all(
-        changes.map<Promise<SaveArgs<Metadata>>>(async row => {
-          const {
-            changes: { acTags, acSubtype, dcCreator, license, metadata },
-            original: {
-              metadata: { id, type }
-            }
-          } = row;
+        changes
+          .filter(row => !isEmpty(row.changes))
+          .map<Promise<SaveArgs<Metadata>>>(async row => {
+            const {
+              changes: { acTags, acSubtype, dcCreator, license, metadata },
+              original: {
+                metadata: { id, type }
+              }
+            } = row;
 
-          const metadataEdit = {
-            id,
-            type,
-            // When adding new Metadatas, add the required fields from the ObjectUpload:
-            ...(!id ? row.original.metadata : {}),
-            ...metadata,
-            ...(id
-              ? {
-                  managedAttributes: merge(
-                    row.original.metadata.managedAttributes,
-                    metadata?.managedAttributes
-                  )
-                }
-              : {})
-          } as Metadata;
+            const metadataEdit = {
+              id,
+              type,
+              // When adding new Metadatas, add the required fields from the ObjectUpload:
+              ...(!id ? row.original.metadata : {}),
+              ...metadata,
+              ...(id
+                ? {
+                    managedAttributes: merge(
+                      row.original.metadata.managedAttributes,
+                      metadata?.managedAttributes
+                    )
+                  }
+                : {})
+            } as Metadata;
 
-          const bulkMetadataEditRow: BulkMetadataEditRow = {
-            metadata: metadataEdit,
-            dcCreator: dcCreator as any,
-            acSubtype: acSubtype as any,
-            acTags: acTags as any,
-            license: license as any
-          };
+            const bulkMetadataEditRow: BulkMetadataEditRow = {
+              metadata: metadataEdit,
+              dcCreator: dcCreator as any,
+              acSubtype: acSubtype as any,
+              acTags: acTags as any,
+              license: license as any
+            };
 
-          preProcessMetadata(bulkMetadataEditRow);
-          return {
-            resource: metadataEdit,
-            type: "metadata"
-          };
-        })
+            preProcessMetadata(bulkMetadataEditRow);
+            return {
+              resource: metadataEdit,
+              type: "metadata"
+            };
+          })
       );
     }
     if (metadataIds) {
@@ -540,12 +542,11 @@ export function managedAttributeColumns(
           source: attr.acceptedValues,
           type: "dropdown"
         }
-      : attr.managedAttributeType === "BOOL"? {
-          source: [
-            "true",
-            "false",
-          ],
+      : attr.managedAttributeType === "BOOL"
+      ? {
+          source: ["true", "false"],
           type: "dropdown"
-      } : {})
+        }
+      : {})
   }));
 }
