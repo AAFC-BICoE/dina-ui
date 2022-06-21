@@ -1,8 +1,8 @@
 // tslint:disable: no-string-literal
-import { useBulkGet, withResponse } from "common-ui";
+import { BULK_EDIT_IDS_KEY, useBulkGet, withResponse } from "common-ui";
+import { useLocalStorage } from "@rehooks/local-storage";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
 import { Nav } from "../../../components/button-bar/nav/nav";
 import { Head } from "../../../components/head";
@@ -11,9 +11,8 @@ import { StorageUnit } from "../../../types/collection-api";
 
 export default function StorageUnitBulkResult() {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
 
-  const ids = router.query.ids?.toString?.()?.split?.(",") ?? [];
+  const [ids] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY, []);
 
   const unitsQuery = useBulkGet<StorageUnit>({
     ids,

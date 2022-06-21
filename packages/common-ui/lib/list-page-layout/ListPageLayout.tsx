@@ -32,10 +32,8 @@ export interface ListPageLayoutProps<TData extends KitsuResource> {
   wrapTable?: (children: ReactNode) => ReactNode;
 
   /** Adds the bulk edit button and the row checkboxes. */
-  bulkEditPath?: (ids: string[]) => {
-    pathname: string;
-    query: Record<string, string>;
-  };
+  bulkEditPath?: string;
+
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 }
@@ -152,7 +150,7 @@ export function ListPageLayout<TData extends KitsuResource>({
       {...resolvedQueryTableProps}
       topRightCorner={
         <div className="d-flex gap-3">
-          {bulkEditPath && <BulkEditButton bulkEditPath={bulkEditPath} />}
+          {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
           {bulkDeleteButtonProps && (
             <BulkDeleteButton {...bulkDeleteButtonProps} />
           )}

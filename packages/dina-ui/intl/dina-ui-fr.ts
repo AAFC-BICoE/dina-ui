@@ -459,7 +459,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSampleNavTemplateInfo:
     "Cet ordre des éléments de données sera enregistré dans la vue personnalisée.",
   materialSampleTypeListTitle: "Types d’échantillon de matière",
-  materialSampleViewTitle: "Échantillon de matériaux",
+  materialSampleViewTitle: "{primaryID} - Échantillon de matériaux",
   materialSamples: "Échantillons de matériaux",
   materialSamplesBulkFinishLabel: "Échantillons de matériaux",
   materialSamplesCreatedLabel: "Échantillons de matériaux créés",

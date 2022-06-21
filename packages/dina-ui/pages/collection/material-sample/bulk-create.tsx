@@ -2,6 +2,7 @@ import { PersistedResource } from "kitsu";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { withRouter } from "next/router";
 import { useState } from "react";
+import { writeStorage } from "@rehooks/local-storage";
 import {
   Head,
   MaterialSampleBulkEditor,
@@ -11,6 +12,7 @@ import {
 } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api/resources/MaterialSample";
+import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
 
 export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -28,10 +30,14 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   async function moveToResultPage(
     samples: PersistedResource<MaterialSample>[]
   ) {
-    const ids = samples.map(it => it.id).join(",");
+    writeStorage(
+      BULK_EDIT_RESULT_IDS_KEY,
+      samples.map(it => it.id)
+    );
+
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { parentSampleId: splitFromId, ids, actionType: "created" }
+      query: { parentSampleId: splitFromId, actionType: "created" }
     });
   }
 
