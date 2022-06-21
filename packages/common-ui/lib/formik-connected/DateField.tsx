@@ -30,21 +30,22 @@ export function DateField(props: DateFieldProps) {
 
   function validate(value: unknown) {
     if (value && typeof value === "string") {
-      if (partialDate) {
-        // In partial date mode, the following is supported: YYYY-MM-DD, YYYY-MM and YYYY.
-        if (!DATE_REGEX_PARTIAL.test(value)) {
-          return formatMessage({ id: "dateMustBeFormattedPartial" });
-        }
-      } else {
-        if (!props.showTime) {
+      if (!props.showTime) {
+        if (partialDate) {
+          // In partial date mode, the following is supported: YYYY-MM-DD, YYYY-MM and YYYY.
+          if (!DATE_REGEX_PARTIAL.test(value)) {
+            return formatMessage({ id: "dateMustBeFormattedPartial" });
+          }
+        } else {
           if (!DATE_REGEX_NO_TIME.test(value)) {
             return formatMessage({ id: "dateMustBeFormattedYyyyMmDd" });
           }
-          // Check for invalid dates like 2021-02-29
-          const parsed = moment(value, true);
-          if (!parsed.isValid()) {
-            return `${formatMessage({ id: "invalidDate" })}: ${value}`;
-          }
+        }
+
+        // Check for invalid dates like 2021-02-29
+        const parsed = moment(value, true);
+        if (!parsed.isValid()) {
+          return `${formatMessage({ id: "invalidDate" })}: ${value}`;
         }
       }
     }
