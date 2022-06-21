@@ -21,8 +21,6 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: TEST_MOLECULAR_SAMPLE };
     case "user-api/group":
       return { data: [] };
-    case "seqdb-api/protocol":
-      return { data: [] };
     case "collection-api/material-sample":
       return { data: [] };
     case "seqdb-api/product":
@@ -89,13 +87,6 @@ describe("MolecularSampleForm", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Change the protocol:
-    wrapper.find(".protocol-field ResourceSelect").prop<any>("onChange")({
-      id: "111",
-      type: "COLLECTION_EVENT",
-      name: "test-protocol"
-    });
-
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -112,11 +103,6 @@ describe("MolecularSampleForm", () => {
               id: "999",
               materialSampleName: "test-mst",
               type: "material-sample"
-            },
-            protocol: {
-              id: "111",
-              name: "test-protocol",
-              type: "protocol"
             },
             type: "molecular-sample"
           },

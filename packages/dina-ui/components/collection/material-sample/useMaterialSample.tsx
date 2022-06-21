@@ -106,19 +106,6 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
-        if (data.materialSampleChildren) {
-          data.materialSampleChildren = compact(
-            await bulkGet<MaterialSample, true>(
-              data.materialSampleChildren.map(
-                child => `/material-sample/${child.id}`
-              ),
-              {
-                apiBaseUrl: "/collection-api",
-                returnNullForMissingResource: true
-              }
-            )
-          );
-        }
         // Convert to seperated list
         if (data.restrictionFieldsExtension && data.isRestricted) {
           data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
