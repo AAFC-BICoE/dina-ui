@@ -8,19 +8,42 @@ import { DateView } from "../date/DateView";
 import { FieldWrapper } from "./FieldWrapper";
 
 export interface DateFieldProps extends FieldWrapperProps {
+  validate?: (value: unknown) => void;
   showTime?: boolean;
   disabled?: boolean;
 }
+
+/**
+ * All the dates supported for the user to type.
+ *
+ * All these formats will be converted to YYYY-MM-DD automatically.
+ *
+ * For example:
+ *
+ * 2019         -->   2019-01-01
+ * 2019-05      -->   2019-05-01
+ * 2019-05-19   -->   2019-05-19
+ * 2019/05/19   -->   2019-05-19
+ */
+const SUPPORTED_DATE_FORMATS = [
+  "YYYY-MM-DD",
+  "YYYY MM DD",
+  "YYYY/MM/DD",
+  "YYYY-MM",
+  "YYYY MM",
+  "YYYY/MM",
+  "YYYY"
+];
 
 const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
-  const { showTime, disabled } = props;
+  const { showTime, disabled, validate } = props;
 
   const { formatMessage } = useIntl();
 
-  function validate(value: unknown) {
+  function defaultValidate(value: unknown) {
     if (value && typeof value === "string") {
       if (!props.showTime) {
         if (!DATE_REGEX_NO_TIME.test(value)) {
@@ -39,7 +62,7 @@ export function DateField(props: DateFieldProps) {
     <FieldWrapper
       {...props}
       readOnlyRender={val => (showTime ? <DateView date={val} /> : val)}
-      validate={validate}
+      validate={validate ?? defaultValidate}
       disableLabelClick={true} // Stops the datepicker from staying open after choosing a date.
     >
       {({ formik, invalid, setValue, value }) => {
@@ -58,25 +81,23 @@ export function DateField(props: DateFieldProps) {
         function onChangeRaw(event: FocusEvent<HTMLInputElement>) {
           // When typing into the input:
           if (event?.type === "change") {
-            let newText = event.target.value;
-            const dashOccurences = newText.split("-").length - 1;
-            if (newText.length === 8 && dashOccurences === 0) {
-              newText =
-                newText.slice(0, 4) +
-                "-" +
-                newText.slice(4, 6) +
-                "-" +
-                newText.slice(6);
-            }
-            setValue(newText);
+            setValue(event.target.value);
           }
         }
 
         function onBlur(event: FocusEvent<HTMLInputElement, Element>) {
-          const error = validate?.(event.target.value);
+          let newText = event.target.value;
+
+          // Partial date support
+          newText = moment(newText, SUPPORTED_DATE_FORMATS).format(
+            "YYYY-MM-DD"
+          );
+
+          const error = validate?.(newText);
           if (error) {
             formik.setFieldError(props.name, error);
           }
+          setValue(newText);
         }
 
         // Date object or null is needed by datepicker:
@@ -108,6 +129,7 @@ export function DateField(props: DateFieldProps) {
               todayButton="Today"
               disabled={disabled}
               onBlur={onBlur}
+              onFocus={event => event.target.select()}
               selected={dateObject}
               {...datePickerProps}
             />
