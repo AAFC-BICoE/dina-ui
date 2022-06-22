@@ -555,22 +555,22 @@ export function CollectingEventFormLayout({
             className="non-strip"
           >
             <div className="row">
-              <TextField name="dwcRecordNumber" />
-              {!isTemplate && (
-                <DinaFormSection horizontal={[3, 9]}>
-                  <div className="row">
-                    <StringArrayField
-                      className="col-md-6"
-                      name="dwcOtherRecordNumbers"
-                    />
-                    <GroupSelectField
-                      className="col-md-6"
-                      name="group"
-                      enableStoredDefaultGroup={true}
-                    />
-                  </div>
-                </DinaFormSection>
-              )}
+              <div className="col-md-6">
+                <TextField name="dwcRecordNumber" />
+              </div>
+              <div className="col-md-6">
+                {!isTemplate && (
+                  <DinaFormSection horizontal={[3, 9]}>
+                    <div className="row">
+                      <StringArrayField name="dwcOtherRecordNumbers" />
+                      <GroupSelectField
+                        name="group"
+                        enableStoredDefaultGroup={true}
+                      />
+                    </div>
+                  </DinaFormSection>
+                )}
+              </div>
             </div>
           </FieldSet>
         </div>
