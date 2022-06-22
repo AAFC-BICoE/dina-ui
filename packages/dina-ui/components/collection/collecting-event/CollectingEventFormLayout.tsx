@@ -546,23 +546,32 @@ export function CollectingEventFormLayout({
   return (
     <div ref={layoutWrapperRef}>
       <NotPubliclyReleasableWarning />
-      {!isTemplate && (
-        <DinaFormSection horizontal={[3, 9]}>
-          <div className="row">
-            <StringArrayField
-              className="col-md-6"
-              name="dwcOtherRecordNumbers"
-            />
-            <GroupSelectField
-              className="col-md-6"
-              name="group"
-              enableStoredDefaultGroup={true}
-            />
-          </div>
-        </DinaFormSection>
-      )}
       <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       <div className="row">
+        <div>
+          <FieldSet
+            legend={<DinaMessage id="identifiers" />}
+            id="identifiers"
+            className="non-strip"
+          >
+            <TextField name="dwcRecordNumber" />
+            {!isTemplate && (
+              <DinaFormSection horizontal={[3, 9]}>
+                <div className="row">
+                  <StringArrayField
+                    className="col-md-6"
+                    name="dwcOtherRecordNumbers"
+                  />
+                  <GroupSelectField
+                    className="col-md-6"
+                    name="group"
+                    enableStoredDefaultGroup={true}
+                  />
+                </div>
+              </DinaFormSection>
+            )}
+          </FieldSet>
+        </div>
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingDateLegend" />}
@@ -628,7 +637,6 @@ export function CollectingEventFormLayout({
               suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
             />
             <PersonSelectField name="collectors" isMulti={true} />
-            <TextField name="dwcRecordNumber" />
           </FieldSet>
         </div>
       </div>
