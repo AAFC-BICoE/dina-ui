@@ -6,10 +6,13 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
   return {
     Cell: ({ original }) => {
       const fileIdentifier = get<string | undefined>(
-        original,
+        original?.data?.attributes,
         fileIdentifierField
       );
-      const bucket = get<string | undefined>(original, bucketField);
+      const bucket = get<string | undefined>(
+        original?.data?.attributes,
+        bucketField
+      );
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
