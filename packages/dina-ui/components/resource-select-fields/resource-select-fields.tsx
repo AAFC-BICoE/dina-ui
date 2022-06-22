@@ -128,6 +128,7 @@ export function PersonSelectField(
           querySpec,
           indexName: "dina_agent_index",
           searchField: "displayName",
+          documentId: "data.id",
           additionalField: "data.attributes.aliases"
         })
       }

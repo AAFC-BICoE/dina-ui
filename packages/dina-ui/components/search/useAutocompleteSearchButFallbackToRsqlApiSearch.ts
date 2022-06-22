@@ -19,6 +19,7 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   searchQuery,
   querySpec,
   additionalField,
+  documentId,
   searchField
 }: UseAutocompleteSearchButFallbackToRsqlApiSearchProps) {
   const {
@@ -29,7 +30,8 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   } = useAutocompleteSearch<T>({
     indexName,
     searchField,
-    additionalField
+    additionalField,
+    documentId
   });
   // When search result has empty array of hits, it should be considered as normal
   const searchApiFailed = !searchResult || searchApiError;
