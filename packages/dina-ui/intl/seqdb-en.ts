@@ -52,7 +52,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   notShearedStatus: "Not Sheared",
   notSizeSelectedStatus: "No Size Selection",
   pcrBatch: "PCR Batch",
-  pcrBatchListTitle: "PCR Testrrr",
+  pcrBatchListTitle: "PCR Batches",
   pcrBatchName: "PCR Batch Name",
   pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
