@@ -281,6 +281,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcOtherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordNumber: "Collector's Number",
+  field_dwcRecordNumber_tooltip:
+    "An identifier given to the collecting-event at the time it was recorded.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",
