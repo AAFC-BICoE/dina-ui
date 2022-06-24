@@ -288,73 +288,78 @@ export function BulkMetadataEditor({
       }
     }
 
+    // Array of all the records to be included in the operation.
     let editedMetadatas;
-    // Handle when user removing managed attributes
-    if (changes.length === 0) {
-      const managedAttributeNamesInUse =
-        formikValues.editableManagedAttributes.map(maAttr => maAttr.name);
 
-      const copied = cloneDeep(workingTableData);
-
-      copied.map((tableData: BulkMetadataEditRow) =>
-        preProcessMetadata(tableData)
-      );
-      // Remove the managed attributes that are not within the in use list anymore
-      editedMetadatas = copied.map(copy => {
-        toPairs(copy.metadata.managedAttributes).forEach(ma => {
-          if (!managedAttributeNamesInUse.includes(ma[0])) {
-            delete copy.metadata.managedAttributes[ma[0]];
-          }
-        });
-
-        return { resource: copy.metadata, type: "metadata" };
-      });
-    } else {
-      // Loop through the changes per row to get the data to POST to the bulk operations API:
-      editedMetadatas = await Promise.all(
-        changes
-          .filter(row => !isEmpty(row.changes))
-          .map<Promise<SaveArgs<Metadata>>>(async row => {
-            const {
-              changes: { acTags, acSubtype, dcCreator, license, metadata },
-              original: {
-                metadata: { id, type }
-              }
-            } = row;
-
-            const metadataEdit = {
-              id,
-              type,
-              // When adding new Metadatas, add the required fields from the ObjectUpload:
-              ...(!id ? row.original.metadata : {}),
-              ...metadata,
-              ...(id
-                ? {
-                    managedAttributes: merge(
-                      row.original.metadata.managedAttributes,
-                      metadata?.managedAttributes
-                    )
-                  }
-                : {})
-            } as Metadata;
-
-            const bulkMetadataEditRow: BulkMetadataEditRow = {
-              metadata: metadataEdit,
-              dcCreator: dcCreator as any,
-              acSubtype: acSubtype as any,
-              acTags: acTags as any,
-              license: license as any
-            };
-
-            preProcessMetadata(bulkMetadataEditRow);
-            return {
-              resource: metadataEdit,
-              type: "metadata"
-            };
-          })
-      );
-    }
+    // Check if we are updating existing records or creating new records from object ids.
     if (metadataIds) {
+      // If you are editing existing records:
+      // Handle when user removing managed attributes
+      if (changes.length === 0) {
+        const managedAttributeNamesInUse =
+          formikValues.editableManagedAttributes.map(maAttr => maAttr.name);
+
+        const copied = cloneDeep(workingTableData);
+
+        copied.map((tableData: BulkMetadataEditRow) =>
+          preProcessMetadata(tableData)
+        );
+        // Remove the managed attributes that are not within the in use list anymore
+        editedMetadatas = copied.map(copy => {
+          toPairs(copy.metadata.managedAttributes).forEach(ma => {
+            if (!managedAttributeNamesInUse.includes(ma[0])) {
+              delete copy.metadata.managedAttributes[ma[0]];
+            }
+          });
+
+          return { resource: copy.metadata, type: "metadata" };
+        });
+      } else {
+        // Loop through the changes per row to get the data to POST to the bulk operations API:
+        editedMetadatas = await Promise.all(
+          changes
+            .filter(row => !isEmpty(row.changes))
+            .map<Promise<SaveArgs<Metadata>>>(async row => {
+              const {
+                changes: { acTags, acSubtype, dcCreator, license, metadata },
+                original: {
+                  metadata: { id, type }
+                }
+              } = row;
+
+              const metadataEdit = {
+                id,
+                type,
+                // When adding new Metadatas, add the required fields from the ObjectUpload:
+                ...(!id ? row.original.metadata : {}),
+                ...metadata,
+                ...(id
+                  ? {
+                      managedAttributes: merge(
+                        row.original.metadata.managedAttributes,
+                        metadata?.managedAttributes
+                      )
+                    }
+                  : {})
+              } as Metadata;
+
+              const bulkMetadataEditRow: BulkMetadataEditRow = {
+                metadata: metadataEdit,
+                dcCreator: dcCreator as any,
+                acSubtype: acSubtype as any,
+                acTags: acTags as any,
+                license: license as any
+              };
+
+              preProcessMetadata(bulkMetadataEditRow);
+              return {
+                resource: metadataEdit,
+                type: "metadata"
+              };
+            })
+        );
+      }
+
       // When editing existing Metadatas:
       await save(editedMetadatas, { apiBaseUrl: "/objectstore-api" });
 
@@ -368,13 +373,19 @@ export function BulkMetadataEditor({
       );
     } else if (objectUploadIds) {
       // When adding new Metadatas based on existing ObjectUploads:
+
+      const copied = cloneDeep(workingTableData);
+      editedMetadatas = copied.map(copy => {
+        return { resource: copy.metadata, type: "metadata" };
+      });
+
       // Create the Metadatas:
       const createdMetadatas = await save(editedMetadatas, {
         apiBaseUrl: "/objectstore-api"
       });
 
       createdMetadatas.forEach((createdMetadata, index) => {
-        // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadats:
+        // Set the original row's Metadata ID so if the Managed Attribute Map fails, you don't create duplicate Metadatas:
         changes[index].original.metadata.id = createdMetadata.id;
       });
 
