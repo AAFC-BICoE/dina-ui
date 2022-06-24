@@ -229,7 +229,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       listPath: model,
       disabled: !valueIsShallowReference
     }).data ?? valueAsArray;
-
+  let uniqueKeyGen = 0;
   // Convert the field value to react-select option objects:
   const selectedAsArray = selectedResources.map(resource => {
     if (!resource) {
@@ -242,10 +242,11 @@ export function ResourceSelect<TData extends KitsuResource>({
     if (!optionLabel(resource as PersistedResource<TData>)) {
       return null;
     }
+
     return {
       label: optionLabel(resource as PersistedResource<TData>) ?? resource.id,
       resource,
-      value: resource.id
+      value: resource.id + uniqueKeyGen++
     };
   });
   const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;
