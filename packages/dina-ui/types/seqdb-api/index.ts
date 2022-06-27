@@ -4,7 +4,6 @@ export * from "./resources/PcrBatchItem";
 export * from "./resources/PcrPrimer";
 export * from "./resources/PcrProfile";
 export * from "./resources/Product";
-export * from "./resources/Protocol";
 export * from "./resources/Region";
 export * from "./resources/MolecularSample";
 export * from "./resources/workflow/Chain";
