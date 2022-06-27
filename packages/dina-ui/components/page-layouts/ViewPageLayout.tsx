@@ -122,7 +122,7 @@ export function ViewPageLayout<T extends KitsuResource>({
             : true;
 
           const nameFields = castArray(nameField);
-          const title = [...nameFields, "id"].reduce(
+          let title = [...nameFields, "id"].reduce(
             (lastValue, currentField) =>
               lastValue ||
               (typeof currentField === "function"
@@ -132,7 +132,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           );
           // if title is array, only take first element
           if (Array.isArray(title)) {
-            title.length = 1;
+            title = title[0];
           }
 
           return (
