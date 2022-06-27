@@ -130,6 +130,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                 : get(data, currentField)),
             ""
           );
+          // if title is array, only take first element
+          if (Array.isArray(title)) {
+            title.length = 1;
+          }
 
           return (
             <>
