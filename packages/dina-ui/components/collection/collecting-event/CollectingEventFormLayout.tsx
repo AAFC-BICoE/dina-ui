@@ -636,7 +636,11 @@ export function CollectingEventFormLayout({
               suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
             />
             <PersonSelectField name="collectors" isMulti={true} />
-            <TextField name="dwcRecordNumber" />
+            <TextField
+              name="dwcRecordNumber"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collectors_number"
+              tooltipLinkText="fromDinaUserGuide"
+            />
           </FieldSet>
         </div>
       </div>
