@@ -262,6 +262,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcDegreeOfEstablishment: "Degree of Establishment",
   field_dwcDegreeOfEstablishment_tooltip:
     "The degree to which an Organism survives, reproduces, and expands its range at the given place and time.",
+  field_dwcFieldNumber: "Collection Number",
+  field_dwcFieldNumber_tooltip:
+    "An identifier given to the event in the field at the time of collecting one or more samples. Often serves as a link between field notes and the Event.",
   field_dwcGeodeticDatum: "Geodetic Datum",
   field_dwcGeodeticDatum_tooltip:
     "The geodetic datum upon which the geographic coordinates given in decimalLatitude and decimalLongitude is based. Recommended best practice is to use the EPSG code. Examples: EPSG:4326 (EPSG code for WGS84)",
@@ -281,6 +284,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcOtherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordNumber: "Collector's Number",
+  field_dwcRecordNumber_tooltip:
+    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector’s number.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",

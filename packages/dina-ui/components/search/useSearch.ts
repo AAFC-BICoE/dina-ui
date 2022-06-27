@@ -33,12 +33,19 @@ export interface DoSearchParams {
   indexName: string;
   searchValue?: string;
   additionalField?: string;
+  documentId?: string;
 }
 
 /** Does the search against the search API. */
 export async function doSearch<T extends KitsuResource>(
   axios: Pick<AxiosInstance, "get">,
-  { indexName, searchField, searchValue, additionalField = "" }: DoSearchParams
+  {
+    indexName,
+    searchField,
+    searchValue,
+    documentId,
+    additionalField = ""
+  }: DoSearchParams
 ) {
   if (!searchValue) {
     return null;
@@ -51,6 +58,7 @@ export async function doSearch<T extends KitsuResource>(
         prefix: searchValue,
         autoCompleteField: `data.attributes.${searchField}`,
         additionalField,
+        documentId,
         indexName
       }
     }

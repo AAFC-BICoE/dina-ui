@@ -546,23 +546,38 @@ export function CollectingEventFormLayout({
   return (
     <div ref={layoutWrapperRef}>
       <NotPubliclyReleasableWarning />
-      {!isTemplate && (
-        <DinaFormSection horizontal={[3, 9]}>
-          <div className="row">
-            <StringArrayField
-              className="col-md-6"
-              name="dwcOtherRecordNumbers"
-            />
-            <GroupSelectField
-              className="col-md-6"
-              name="group"
-              enableStoredDefaultGroup={true}
-            />
-          </div>
-        </DinaFormSection>
-      )}
       <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       <div className="row">
+        <div>
+          <FieldSet
+            legend={<DinaMessage id="identifiers" />}
+            id="identifiers"
+            className="non-strip"
+          >
+            <div className="row">
+              <div className="col-md-6">
+                <TextField
+                  name="dwcFieldNumber"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
+              </div>
+              <div className="col-md-6">
+                {!isTemplate && (
+                  <DinaFormSection horizontal={[3, 9]}>
+                    <div className="row">
+                      <StringArrayField name="dwcOtherRecordNumbers" />
+                      <GroupSelectField
+                        name="group"
+                        enableStoredDefaultGroup={true}
+                      />
+                    </div>
+                  </DinaFormSection>
+                )}
+              </div>
+            </div>
+          </FieldSet>
+        </div>
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingDateLegend" />}
@@ -628,7 +643,11 @@ export function CollectingEventFormLayout({
               suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
             />
             <PersonSelectField name="collectors" isMulti={true} />
-            <TextField name="dwcRecordNumber" />
+            <TextField
+              name="dwcRecordNumber"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collectors_number"
+              tooltipLinkText="fromDinaUserGuide"
+            />
           </FieldSet>
         </div>
       </div>
