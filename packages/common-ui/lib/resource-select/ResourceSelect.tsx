@@ -231,9 +231,8 @@ export function ResourceSelect<TData extends KitsuResource>({
     }).data ?? valueAsArray;
 
   // Convert the field value to react-select option objects:
-  let uniqueKeyGen = 0;
   const seenKeys = [] as string[];
-  const selectedAsArray = selectedResources.map(resource => {
+  const selectedAsArray = selectedResources.map((resource, index) => {
     if (!resource) {
       return null;
     }
@@ -247,11 +246,10 @@ export function ResourceSelect<TData extends KitsuResource>({
     let id: string;
 
     if (seenKeys.includes(resource.id)) {
-      id = resource.id + uniqueKeyGen++;
+      id = resource.id + index;
     } else {
       seenKeys.push(resource.id);
       id = resource.id;
-      uniqueKeyGen = 0;
     }
 
     return {
