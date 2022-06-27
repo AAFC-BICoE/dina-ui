@@ -556,9 +556,6 @@ export function CollectingEventFormLayout({
           >
             <div className="row">
               <div className="col-md-6">
-                <TextField name="dwcRecordNumber" />
-              </div>
-              <div className="col-md-6">
                 {!isTemplate && (
                   <DinaFormSection horizontal={[3, 9]}>
                     <div className="row">
@@ -639,6 +636,11 @@ export function CollectingEventFormLayout({
               suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
             />
             <PersonSelectField name="collectors" isMulti={true} />
+            <TextField
+              name="dwcRecordNumber"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collectors_number"
+              tooltipLinkText="fromDinaUserGuide"
+            />
           </FieldSet>
         </div>
       </div>
