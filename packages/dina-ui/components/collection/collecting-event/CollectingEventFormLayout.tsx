@@ -556,6 +556,13 @@ export function CollectingEventFormLayout({
           >
             <div className="row">
               <div className="col-md-6">
+                <TextField
+                  name="dwcFieldNumber"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
+              </div>
+              <div className="col-md-6">
                 {!isTemplate && (
                   <DinaFormSection horizontal={[3, 9]}>
                     <div className="row">
