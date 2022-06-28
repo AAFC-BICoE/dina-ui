@@ -280,8 +280,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcGeoreferenceVerificationStatus: "Georeferencing Not Possible",
   field_dwcMunicipality: "Municipality",
   field_dwcOtherCatalogNumbers: "Other Catalog Numbers",
-  field_otherRecordNumbers: "Additional Collection Numbers",
-  field_otherRecordNumbers_tooltip:
+  field_dwcOtherRecordNumbers: "Collection Numbers",
+  field_dwcOtherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordNumber: "Collector's Number",
   field_dwcRecordNumber_tooltip:

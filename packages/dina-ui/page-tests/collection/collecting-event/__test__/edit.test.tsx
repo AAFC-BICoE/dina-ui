@@ -125,10 +125,10 @@ describe("collecting-event edit page", () => {
       }
     });
 
-    // Edit the otherRecordNumbers
-    wrapper.find(".otherRecordNumbers-field textarea").simulate("change", {
+    // Edit the dwcOtherRecordNumbers
+    wrapper.find(".dwcOtherRecordNumbers-field textarea").simulate("change", {
       target: {
-        name: "otherRecordNumbers",
+        name: "dwcOtherRecordNumbers",
         value: "12\n23"
       }
     });
@@ -149,7 +149,7 @@ describe("collecting-event edit page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               publiclyReleasable: true, // Default value
               verbatimEventDateTime: "From 2019,12,21 4pm to 2019,12,22 5pm",
-              otherRecordNumbers: ["12", "23"],
+              dwcOtherRecordNumbers: ["12", "23"],
               geoReferenceAssertions: [{ isPrimary: true }]
             },
             relationships: {
@@ -306,7 +306,7 @@ describe("collecting-event edit page", () => {
           path: "collecting-event/1",
           value: {
             attributes: {
-              otherRecordNumbers: ["12", "13", "14"],
+              dwcOtherRecordNumbers: ["12", "13", "14"],
               endEventDateTime: "2019-11-12",
               geoReferenceAssertions: [
                 {
@@ -491,7 +491,7 @@ function testCollectingEvent(): CollectingEvent {
       { id: "111", type: "agent" },
       { id: "222", type: "agent" }
     ],
-    otherRecordNumbers: ["12", "13", "14"],
+    dwcOtherRecordNumbers: ["12", "13", "14"],
     geoReferenceAssertions: [
       {
         isPrimary: true,

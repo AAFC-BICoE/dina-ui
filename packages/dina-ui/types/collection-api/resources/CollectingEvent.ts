@@ -26,7 +26,7 @@ export interface CollectingEventAttributes {
   dwcVerbatimSRS?: string;
   dwcVerbatimElevation?: string;
   dwcVerbatimDepth?: string;
-  otherRecordNumbers?: string[];
+  dwcOtherRecordNumbers?: string[];
   dwcRecordNumber?: string;
   dwcMinimumElevationInMeters?: number;
   dwcMinimumDepthInMeters?: number;

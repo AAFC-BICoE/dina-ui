@@ -214,7 +214,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
         [
           {
             resource: {
-              otherRecordNumbers: null,
+              dwcOtherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               geoReferenceAssertions: [
                 {

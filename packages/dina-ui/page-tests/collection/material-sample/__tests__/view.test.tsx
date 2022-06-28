@@ -13,7 +13,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   id: "1",
   type: "collecting-event",
   group: "test group",
-  otherRecordNumbers: ["12", "13", "14"]
+  dwcOtherRecordNumbers: ["12", "13", "14"]
 };
 
 const TEST_MATERIAL_SAMPLE: MaterialSample = {

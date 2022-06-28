@@ -26,7 +26,7 @@ export default function CollectingEventListPage() {
       Header: <DinaMessage id="viewDetails" />,
       sortable: false
     },
-    stringArrayCell("otherRecordNumbers"),
+    stringArrayCell("dwcOtherRecordNumbers"),
     "createdBy",
     "startEventDateTime",
     "endEventDateTime",
