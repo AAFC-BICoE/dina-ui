@@ -76,6 +76,8 @@ export function StorageUnitTypeForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<StorageUnitType>) {
+    delete submittedValues.enableGrid;
+
     const [savedStorageType] = await save<StorageUnitType>(
       [
         {
@@ -125,7 +127,8 @@ export function StorageUnitTypeFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <ToggleField className="col-md-6" name="isInseperable" />
+        <ToggleField className="col-md-3" name="isInseperable" />
+        {!readOnly && <ToggleField className="col-md-3" name="enableGrid" />}
       </div>
       {readOnly && (
         <div className="row">
