@@ -19,7 +19,7 @@ import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection, StorageUnitType } from "../../../types/collection-api";
 import { useFormikContext } from "formik";
-import { DINAUI_MESSAGES_ENGLISH } from "packages/dina-ui/intl/dina-ui-en";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export default function StorageUnitTypeEditPage() {
   const router = useRouter();
@@ -122,7 +122,7 @@ export function StorageUnitTypeForm({
 
 export type FillDirectionType = "BY_ROW" | "BY_COLUMN";
 
-export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
+export const FILL_DIRECTION_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
   value: FillDirectionType;
 }[] = [
@@ -141,7 +141,7 @@ export function StorageUnitTypeFormFields() {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
   const formik = useFormikContext<any>();
-  const FILL_DIRECTION_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+  const FILL_DIRECTION_OPTIONS_LABELS = FILL_DIRECTION_OPTIONS.map(
     ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
   );
 
@@ -196,9 +196,9 @@ export function StorageUnitTypeFormFields() {
           <div className="row">
             <SelectField
               name="gridLayoutDefinition.fillDirection"
-              customName="fillDirection"
+              label={formatMessage("fillDirection")}
               className="col-md-6"
-              options={FILL_DIRECTION_OPTIONS}
+              options={FILL_DIRECTION_OPTIONS_LABELS}
             />
           </div>
         </div>
