@@ -561,12 +561,12 @@ export function CollectingEventFormLayout({
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
                   tooltipLinkText="fromDinaUserGuide"
                 />
+                {!isTemplate && <StringArrayField name="otherRecordNumbers" />}
               </div>
               <div className="col-md-6">
                 {!isTemplate && (
                   <DinaFormSection horizontal={[3, 9]}>
                     <div className="row">
-                      <StringArrayField name="dwcOtherRecordNumbers" />
                       <GroupSelectField
                         name="group"
                         enableStoredDefaultGroup={true}

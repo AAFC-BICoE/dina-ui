@@ -11,7 +11,7 @@ const TEST_COLLECTION_EVENT: CollectingEvent = {
   id: "100",
   type: "collecting-event",
   group: "test group",
-  dwcOtherRecordNumbers: ["12", "13", "14"],
+  otherRecordNumbers: ["12", "13", "14"],
   geoReferenceAssertions: [
     {
       isPrimary: true,
@@ -97,7 +97,7 @@ describe("CollectingEvent details page", () => {
     ).toEqual(true);
 
     expect(
-      wrapper.find(".dwcOtherRecordNumbers-field .field-view").text()
+      wrapper.find(".otherRecordNumbers-field .field-view").text()
     ).toEqual("12, 13, 14");
 
     expect(wrapper.containsMatchingElement(<div>12.5</div>)).toEqual(true);
