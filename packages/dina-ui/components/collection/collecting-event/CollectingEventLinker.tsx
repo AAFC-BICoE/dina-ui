@@ -37,7 +37,7 @@ export function CollectingEventLinker({
   const filterFormRef = useRef<FormikProps<any>>(null);
 
   const COLLECTING_EVENT_TABLE_COLUMNS: ColumnDefinition<CollectingEvent>[] = [
-    stringArrayCell("dwcOtherRecordNumbers"),
+    stringArrayCell("otherRecordNumbers"),
     "createdBy",
     {
       Cell: ({ original: { dwcVerbatimLocality } }) => (
