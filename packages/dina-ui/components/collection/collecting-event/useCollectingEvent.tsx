@@ -156,8 +156,8 @@ export function useCollectingEventSave({
     delete submittedValues.collectorGroups;
 
     // Treat empty array or undefined as null:
-    if (!submittedValues.dwcOtherRecordNumbers?.length) {
-      submittedValues.dwcOtherRecordNumbers = null as any;
+    if (!submittedValues.otherRecordNumbers?.length) {
+      submittedValues.otherRecordNumbers = null as any;
     }
 
     // Add attachments if they were selected:
