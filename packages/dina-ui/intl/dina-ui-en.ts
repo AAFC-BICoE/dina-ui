@@ -321,6 +321,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field_gridLayoutDefinition_row_label: "By Row",
+  field_gridLayoutDefinition_column_label: "By Column",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
