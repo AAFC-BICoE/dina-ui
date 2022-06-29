@@ -312,12 +312,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_email: "Email",
+  field_enableGrid: "Enable Grid",
+  field_enableGrid_tooltip:
+    "Create a grid to store contents. Cannot have child storage units.",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field_gridLayoutDefinition_row_label: "By Row",
+  field_gridLayoutDefinition_column_label: "By Column",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",

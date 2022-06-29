@@ -4,6 +4,8 @@ import {
   DateField,
   DinaForm,
   DinaFormSubmitParams,
+  NumberField,
+  SelectField,
   SubmitButton,
   TextField,
   ToggleField,
@@ -16,6 +18,8 @@ import { useRouter } from "next/router";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Collection, StorageUnitType } from "../../../types/collection-api";
+import { useFormikContext } from "formik";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
 
 export default function StorageUnitTypeEditPage() {
   const router = useRouter();
@@ -70,12 +74,24 @@ export function StorageUnitTypeForm({
   storageUnitType,
   onSaved
 }: StorageUnitTypeFormProps) {
+  if (storageUnitType) {
+    storageUnitType.enableGrid = storageUnitType.gridLayoutDefinition
+      ? true
+      : false;
+  }
   const initialValues = storageUnitType || { type: "storage-unit-type" };
-
   async function onSubmit({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<StorageUnitType>) {
+    if (
+      submittedValues.enableGrid === false &&
+      submittedValues.gridLayoutDefinition
+    ) {
+      submittedValues.gridLayoutDefinition = null;
+    }
+    delete submittedValues.enableGrid;
+
     const [savedStorageType] = await save<StorageUnitType>(
       [
         {
@@ -110,9 +126,36 @@ export function StorageUnitTypeForm({
   );
 }
 
+export type FillDirectionType = "BY_ROW" | "BY_COLUMN";
+
+export const FILL_DIRECTION_OPTIONS: {
+  labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  value: FillDirectionType;
+}[] = [
+  {
+    labelKey: "field_gridLayoutDefinition_row_label",
+    value: "BY_ROW"
+  },
+  {
+    labelKey: "field_gridLayoutDefinition_column_label",
+    value: "BY_COLUMN"
+  }
+];
+
 /** Re-usable field layout between edit and view pages. */
 export function StorageUnitTypeFormFields() {
+  const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
+  const formik = useFormikContext<any>();
+  const FILL_DIRECTION_OPTIONS_LABELS = FILL_DIRECTION_OPTIONS.map(
+    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
+  );
+
+  if (readOnly) {
+    formik.values.enableGrid = formik.values.gridLayoutDefinition
+      ? true
+      : false;
+  }
 
   return (
     <div>
@@ -125,8 +168,44 @@ export function StorageUnitTypeFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <ToggleField className="col-md-6" name="isInseperable" />
+        <ToggleField className="col-md-3" name="isInseperable" />
+        <ToggleField className="col-md-3" name="enableGrid" />
       </div>
+      {formik.values.enableGrid && (
+        <div>
+          <div className="row">
+            <NumberField
+              name="gridLayoutDefinition.numberOfRows"
+              customName="rows"
+              className="col-md-6"
+              inputProps={{ type: "number" }}
+              min={1}
+            />
+            <NumberField
+              name="gridLayoutDefinition.numberOfColumns"
+              customName="columns"
+              className="col-md-6"
+              inputProps={{ type: "number" }}
+              min={1}
+            />
+          </div>
+          <div className="row">
+            <SelectField
+              name="gridLayoutDefinition.fillDirection"
+              customName="fillDirection"
+              className="col-md-6"
+              options={FILL_DIRECTION_OPTIONS_LABELS}
+              readOnlyRender={selectedvalue => {
+                const option = FILL_DIRECTION_OPTIONS_LABELS.find(
+                  optionLabel => optionLabel.value.toString() === selectedvalue
+                );
+                return option?.label;
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" />
