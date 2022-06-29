@@ -84,7 +84,10 @@ export function StorageUnitTypeForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<StorageUnitType>) {
-    if (submittedValues.enableGrid === false) {
+    if (
+      submittedValues.enableGrid === false &&
+      submittedValues.gridLayoutDefinition
+    ) {
       submittedValues.gridLayoutDefinition = null;
     }
     delete submittedValues.enableGrid;
