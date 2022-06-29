@@ -30,7 +30,7 @@ export function DateField(props: DateFieldProps) {
 
   function validate(value: unknown) {
     if (value && typeof value === "string") {
-      if (!props.showTime) {
+      if (!showTime) {
         if (partialDate) {
           // In partial date mode, the following is supported: YYYY-MM-DD, YYYY-MM and YYYY.
           if (!DATE_REGEX_PARTIAL.test(value)) {
@@ -93,11 +93,9 @@ export function DateField(props: DateFieldProps) {
           const newText = event.target.value;
 
           const error = validate?.(newText);
-          if (error) {
+          if (error !== undefined) {
             formik.setFieldError(props.name, error);
           }
-
-          setValue(newText);
         }
 
         // Date object or null is needed by datepicker:

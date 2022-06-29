@@ -4,17 +4,26 @@ import { DateField } from "../DateField";
 import { DinaForm } from "../DinaForm";
 
 describe("DateField component", () => {
-  function getWrapper(
-    testDate: string | null = "2019-02-02",
-    partialDate: boolean | undefined = false
-  ) {
+  function getWrapper(testDate: string | null = "2019-02-02") {
     return mountWithAppContext(
       <DinaForm
         initialValues={{
           testField: testDate
         }}
       >
-        <DateField name="testField" partialDate={partialDate} />
+        <DateField name="testField" partialDate={false} />
+      </DinaForm>
+    );
+  }
+
+  function getPartialDateWrapper(testDate: string | null = "2019-02-02") {
+    return mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          testField: testDate
+        }}
+      >
+        <DateField name="testField" partialDate={true} />
       </DinaForm>
     );
   }
@@ -62,7 +71,7 @@ describe("DateField component", () => {
   });
 
   it("Partial date on valid formats.", () => {
-    const wrapper = getWrapper(null, true);
+    const wrapper = getPartialDateWrapper();
 
     // YYYY-MM-DD
     wrapper
@@ -70,23 +79,23 @@ describe("DateField component", () => {
       .simulate("change", { target: { value: "1998-05-19" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(false);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
 
     // YYYY-MM
     wrapper.find("input").simulate("change", { target: { value: "1998-05" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(false);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
 
     // YYYY
     wrapper.find("input").simulate("change", { target: { value: "1998" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(false);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(false);
   });
 
   it("Partial date on invalid formats.", () => {
-    const wrapper = getWrapper(null, true);
+    const wrapper = getPartialDateWrapper();
 
     // Incorrect month
     wrapper
@@ -94,7 +103,7 @@ describe("DateField component", () => {
       .simulate("change", { target: { value: "1998-13-19" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(true);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(true);
 
     // Incorrect day
     wrapper
@@ -102,13 +111,13 @@ describe("DateField component", () => {
       .simulate("change", { target: { value: "1998-05-43" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(true);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(true);
 
     // Incorrect year format
     wrapper.find("input").simulate("change", { target: { value: "98" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(true);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(true);
 
     // Non-supported format
     wrapper
@@ -116,7 +125,7 @@ describe("DateField component", () => {
       .simulate("change", { target: { value: "September 2019" } });
     wrapper.find("input").simulate("blur");
 
-    expect(wrapper.contains(".invalid-feedback")).toEqual(true);
+    expect(wrapper.find(".invalid-feedback").exists()).toEqual(true);
   });
 
   it("Shows an error on invalid date formats.", () => {
