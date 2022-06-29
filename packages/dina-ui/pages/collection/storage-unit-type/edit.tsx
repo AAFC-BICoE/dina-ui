@@ -174,11 +174,6 @@ export function StorageUnitTypeFormFields() {
               className="col-md-6"
               inputProps={{ type: "number" }}
               min={1}
-              placeholder={
-                formik.values.gridLayoutDefinition
-                  ? formik.values.gridLayoutDefinition.numberOfRows
-                  : "1"
-              }
             />
             <NumberField
               name="gridLayoutDefinition.numberOfColumns"
@@ -186,19 +181,20 @@ export function StorageUnitTypeFormFields() {
               className="col-md-6"
               inputProps={{ type: "number" }}
               min={1}
-              placeholder={
-                formik.values.gridLayoutDefinition
-                  ? formik.values.gridLayoutDefinition.numberOfColumns
-                  : "1"
-              }
             />
           </div>
           <div className="row">
             <SelectField
               name="gridLayoutDefinition.fillDirection"
-              label={formatMessage("fillDirection")}
+              customName="fillDirection"
               className="col-md-6"
               options={FILL_DIRECTION_OPTIONS_LABELS}
+              readOnlyRender={selectedvalue => {
+                const option = FILL_DIRECTION_OPTIONS_LABELS.find(
+                  optionLabel => optionLabel.value.toString() === selectedvalue
+                );
+                return option?.label;
+              }}
             />
           </div>
         </div>
