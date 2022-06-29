@@ -172,6 +172,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   duplicateFilesFound: "duplicate files found",
   duplicatePrimaryIdFound: "Duplicate Primary ID Found",
   editAcquisitionEventTitle: "Edit Acquisition Event",
+  editBulkMetadata: "Edit Bulk Metadata",
   editCataloguedObjectTitle: "Edit Catalogued Object",
   editCollectingEventTitle: "Edit Collecting Event",
   editCollectionMethodTitle: "Edit Collection Method",
