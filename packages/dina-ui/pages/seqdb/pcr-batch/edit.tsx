@@ -15,6 +15,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
+import { StorageUnitType } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
   AttachmentsField,
@@ -39,7 +40,7 @@ export function usePcrBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnitType, storageUnit"
     },
     { disabled: !id, deps }
   );
@@ -235,6 +236,15 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection/storage-unit-type"
+          optionLabel={storageUnitType => `${id}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+        />
+        <TextField className="col-md-6" name="storageUnit" />
       </div>
       <AttachmentsField
         name="attachment"
