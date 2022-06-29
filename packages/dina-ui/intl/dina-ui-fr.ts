@@ -272,8 +272,8 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_dwcGeoreferenceVerificationStatus: "Géoréférencement impossible",
   field_dwcMunicipality: "Municipalité",
   field_dwcOtherCatalogNumbers: "Autres numéros de catalogues",
-  field_dwcOtherRecordNumbers: "Numéros de collecte",
-  field_dwcOtherRecordNumbers_tooltip:
+  field_otherRecordNumbers: "Numéros de collecte",
+  field_otherRecordNumbers_tooltip:
     "Autres numéros ou identifiants associés à l’événement de collecte qui permettent de le distinguer. N’incluez PAS les identifiants basés sur les spécimens, tels que les numéros d’accession.",
   field_dwcRecordNumber: "Numéro du collecteur",
   field_dwcRecordedBy: "Collecteurs Verbatim",
