@@ -32,6 +32,8 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   created: "created",
   date: "Date",
   dateMustBeFormattedYyyyMmDd: "Date must be formatted as YYYY-MM-DD",
+  dateMustBeFormattedPartial:
+    "Data must be formatted as one of the following options: YYYY-MM-DD, YYYY-MM, or YYYY",
   deleteAllButtonText: "Delete All",
   deleteButtonText: "Delete",
   deleteSelectedButtonText: "Delete Selected",
