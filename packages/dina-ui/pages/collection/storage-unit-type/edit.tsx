@@ -84,6 +84,9 @@ export function StorageUnitTypeForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<StorageUnitType>) {
+    if (submittedValues.enableGrid === false) {
+      submittedValues.gridLayoutDefinition = null;
+    }
     delete submittedValues.enableGrid;
 
     const [savedStorageType] = await save<StorageUnitType>(
