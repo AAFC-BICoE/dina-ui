@@ -314,7 +314,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_email: "Email",
   field_enableGrid: "Enable Grid",
   field_enableGrid_tooltip:
-    "Create a grid to store conetents. Cannot have child storage units.",
+    "Create a grid to store contents. Cannot have child storage units.",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",
   field_familyNames: "Family Names",
