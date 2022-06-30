@@ -203,6 +203,78 @@ describe("Transform to DSL query function", () => {
     });
   });
 
+  it("DSL Query for numerical match type contains queries", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "contains",
+          date: "2022"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "contains",
+          date: "2022-04"
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          numericalMatchType: "contains",
+          date: "2022-04-13"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure that the default pagination and query row filters are added.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  format: "yyyy",
+                  gte: "2022||/y",
+                  lte: "2022||/y"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  format: "yyyy-MM",
+                  gte: "2022-04||/M",
+                  lte: "2022-04||/M"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.createdOn": {
+                  format: "yyyy-MM-dd",
+                  gte: "2022-04-13||/d",
+                  lte: "2022-04-13||/d"
+                }
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
   it("Group settings to DSL query", async () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "cnc",
