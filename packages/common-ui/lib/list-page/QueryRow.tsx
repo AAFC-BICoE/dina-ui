@@ -50,6 +50,7 @@ const queryRowMatchOptions = [
 
 const queryRowNumericalMatchOptions = [
   { label: "Equal to", value: "equal" },
+  { label: "Contains", value: "contains" },
   { label: "Greater than", value: "greaterThan" },
   { label: "Greater than or equal to", value: "greaterThanEqual" },
   { label: "Less than", value: "lessThan" },
