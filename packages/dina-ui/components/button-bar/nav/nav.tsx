@@ -30,7 +30,7 @@ export function Nav() {
     <>
       <SkipLinks />
 
-      <header className="mb-4">
+      <header>
         <Container fluid={true}>
           <Row xs={1} md={2} className="header-container row d-flex px-5">
             {/* Left section of the header */}

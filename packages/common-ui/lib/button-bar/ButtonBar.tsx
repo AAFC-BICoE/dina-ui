@@ -7,6 +7,12 @@ interface ButtonBarProps {
 
 export function ButtonBar({ children, className }: ButtonBarProps) {
   return (
-    <div className={`button-bar my-3 d-flex ${className}`}>{children}</div>
+    <div className={`button-bar d-flex ${className}`}>
+      <div className="px-5 container-fluid">{children}</div>
+    </div>
   );
+}
+
+export function ButtonBarRight({ children }: ButtonBarProps) {
+  return <div className="button-bar-right">{children}</div>;
 }

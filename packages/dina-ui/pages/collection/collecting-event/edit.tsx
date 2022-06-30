@@ -2,6 +2,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import {
   BackButton,
   ButtonBar,
+  ButtonBarRight,
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
@@ -24,6 +25,7 @@ import { CollectingEvent } from "../../../types/collection-api/resources/Collect
 
 interface CollectingEventFormProps {
   collectingEvent?: PersistedResource<CollectingEvent>;
+  title: "editCollectingEventTitle" | "addCollectingEventTitle";
 }
 
 export default function CollectingEventEditPage() {
@@ -38,34 +40,30 @@ export default function CollectingEventEditPage() {
   const collectingEventQuery = useCollectingEventQuery(id?.toString());
 
   return (
-    <div>
+    <>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
-        {id ? (
-          <div>
-            <h1 id="wb-cont">
-              <DinaMessage id={title} />
-            </h1>
-            {withResponse(collectingEventQuery, ({ data }) => (
-              <CollectingEventForm collectingEvent={data} />
-            ))}
-          </div>
-        ) : (
-          <div>
-            <h1>
-              <DinaMessage id={title} />
-            </h1>
-            <CollectingEventForm />
-          </div>
-        )}
-      </main>
+      {id ? (
+        <>
+          {withResponse(collectingEventQuery, ({ data }) => (
+            <CollectingEventForm
+              collectingEvent={data}
+              title={"editCollectingEventTitle"}
+            />
+          ))}
+        </>
+      ) : (
+        <CollectingEventForm title={"addCollectingEventTitle"} />
+      )}
       <Footer />
-    </div>
+    </>
   );
 }
 
-function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
+function CollectingEventForm({
+  collectingEvent,
+  title
+}: CollectingEventFormProps) {
   const router = useRouter();
 
   const {
@@ -96,16 +94,6 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     );
   };
 
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton
-        entityId={collectingEvent?.id}
-        entityLink="/collection/collecting-event"
-      />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
-
   const initValues = {
     ...collectingEventInitialValues,
     type: "collecting-event" as const
@@ -118,12 +106,24 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       enableReinitialize={true}
       validationSchema={collectingEventFormSchema}
     >
-      {buttonBar}
-      <CollectingEventFormLayout
-        setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
-        setDefaultVerbatimSRS={setDefaultVerbatimSRS}
-      />
-      {buttonBar}
+      <ButtonBar>
+        <BackButton
+          entityId={collectingEvent?.id}
+          entityLink="/collection/collecting-event"
+        />
+        <ButtonBarRight>
+          <SubmitButton className="ms-auto" />
+        </ButtonBarRight>
+      </ButtonBar>
+      <main className="container-fluid px-5">
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
+        <CollectingEventFormLayout
+          setDefaultVerbatimCoordSys={setDefaultVerbatimCoordSys}
+          setDefaultVerbatimSRS={setDefaultVerbatimSRS}
+        />
+      </main>
     </DinaForm>
   );
 }

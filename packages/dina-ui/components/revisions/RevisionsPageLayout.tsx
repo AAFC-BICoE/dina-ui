@@ -186,7 +186,7 @@ export function RevisionsPage({
       <>
         <Head title={pageTitle} />
         <Nav />
-        <main className="container-fluid">
+        <main className="container-fluid px-5">
           <h1 id="wb-cont">{pageTitle}</h1>
           <div className="mb-3">
             <Link

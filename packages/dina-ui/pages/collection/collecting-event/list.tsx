@@ -40,13 +40,13 @@ export default function CollectingEventListPage() {
     <div>
       <Head title={formatMessage("collectingEventListTitle")} />
       <Nav />
-      <main className="container-fluid">
+      <ButtonBar>
+        <CreateButton entityLink="/collection/collecting-event" />
+      </ButtonBar>
+      <main className="px-5 container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="collectingEventListTitle" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/collecting-event" />
-        </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
             // Apply group filter:

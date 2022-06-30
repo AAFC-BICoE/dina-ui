@@ -39,7 +39,7 @@ export function BackButton({
 
   return (
     <Link href={href}>
-      <a className={`my-auto ${className}`}>
+      <a className={`my-2 ${className}`}>
         <CommonMessage id={(buttonMsg as any) ?? message} />
       </a>
     </Link>

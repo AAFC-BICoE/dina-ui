@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  ButtonBarRight,
   DeleteButton,
   EditButton,
   JsonApiQuerySpec,
@@ -102,49 +103,49 @@ export function ViewPageLayout<T extends KitsuResource>({
   return (
     <div>
       <Nav />
-      <main className={mainClass}>
-        {withResponse(resourceQuery, ({ data }) => {
-          const resource = data as PersistedResource<T>;
+      {withResponse(resourceQuery, ({ data }) => {
+        const resource = data as PersistedResource<T>;
 
-          const formProps = {
-            initialValues: resource,
-            readOnly: true
-          };
+        const formProps = {
+          initialValues: resource,
+          readOnly: true
+        };
 
-          // Check the request to see if a permission provider is present.
-          const permissionsProvided = data.meta?.permissionsProvider;
+        // Check the request to see if a permission provider is present.
+        const permissionsProvided = data.meta?.permissionsProvider;
 
-          const canEdit = permissionsProvided
-            ? data.meta?.permissions?.includes("update") ?? false
-            : true;
-          const canDelete = permissionsProvided
-            ? data.meta?.permissions?.includes("delete") ?? false
-            : true;
+        const canEdit = permissionsProvided
+          ? data.meta?.permissions?.includes("update") ?? false
+          : true;
+        const canDelete = permissionsProvided
+          ? data.meta?.permissions?.includes("delete") ?? false
+          : true;
 
-          const nameFields = castArray(nameField);
-          let title = [...nameFields, "id"].reduce(
-            (lastValue, currentField) =>
-              lastValue ||
-              (typeof currentField === "function"
-                ? currentField(resource)
-                : get(data, currentField)),
-            ""
-          );
-          // if title is array, only take first element
-          if (Array.isArray(title)) {
-            title = title[0];
-          }
+        const nameFields = castArray(nameField);
+        let title = [...nameFields, "id"].reduce(
+          (lastValue, currentField) =>
+            lastValue ||
+            (typeof currentField === "function"
+              ? currentField(resource)
+              : get(data, currentField)),
+          ""
+        );
+        // if title is array, only take first element
+        if (Array.isArray(title)) {
+          title = title[0];
+        }
 
-          return (
-            <>
-              <Head title={title} />
-              <ButtonBar className="gap-2">
-                <BackButton
-                  entityId={id}
-                  className="me-auto"
-                  entityLink={entityLink}
-                  byPassView={true}
-                />
+        return (
+          <>
+            <Head title={title} />
+            <ButtonBar className="gap-2">
+              <BackButton
+                entityId={id}
+                className="me-auto"
+                entityLink={entityLink}
+                byPassView={true}
+              />
+              <ButtonBarRight>
                 {canEdit &&
                   (editButton?.(formProps) ?? (
                     <EditButton entityId={id} entityLink={entityLink} />
@@ -167,7 +168,9 @@ export function ViewPageLayout<T extends KitsuResource>({
                       type={type}
                     />
                   ))}
-              </ButtonBar>
+              </ButtonBarRight>
+            </ButtonBar>
+            <main className={mainClass + " px-5 container-fluid"}>
               <h1 id="wb-cont">{title}</h1>
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
@@ -177,10 +180,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                   </a>
                 </Link>
               )}
-            </>
-          );
-        })}
-      </main>
+            </main>
+          </>
+        );
+      })}
       <Footer />
     </div>
   );
