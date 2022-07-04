@@ -50,7 +50,7 @@ export default function ManagedAttributesViewEditPage() {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid px-5">
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />

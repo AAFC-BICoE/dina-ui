@@ -74,13 +74,13 @@ export default function ManagedAttributesViewListPage() {
     <div>
       <Head title={formatMessage("managedAttributesViews")} />
       <Nav />
-      <main className="container-fluid">
+      <ButtonBar>
+        <CreateButton entityLink="/collection/managed-attributes-view" />
+      </ButtonBar>
+      <main className="container-fluid px-5">
         <h1 id="wb-cont">
           <DinaMessage id="managedAttributesViews" />
         </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/managed-attributes-view" />
-        </ButtonBar>
         <ListPageLayout<CustomView>
           filterAttributes={FILTER_ATTRIBUTES}
           id="managed-attributes-view-list"

@@ -86,7 +86,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   nameField = "name",
   editButton,
   deleteButton,
-  mainClass = "container",
+  mainClass,
   showRevisionsLink,
   showRevisionsLinkAtBottom
 }: ViewPageLayoutProps<T>) {
