@@ -159,7 +159,7 @@ export function StorageUnitChildrenViewer({
                   <DinaMessage id="moveAllContent" />
                 </button>
                 <Link
-                  href={`/collection/storage-unit/edit?parentId=${storageUnit?.parentStorageUnit?.id}`}
+                  href={`/collection/storage-unit/edit?parentId=${storageUnit.id}`}
                 >
                   <a className="btn btn-primary add-child-storage-unit">
                     <DinaMessage id="addNewChildStorageUnit" />
@@ -237,9 +237,14 @@ export function StorageUnitContents({
       </div>
       <div className="mb-3">
         <strong>
-          <DinaMessage id="nestedStorageUnits" />
+          <DinaMessage id="childrenStorageUnits" />
         </strong>
-        <StorageTreeList parentId={storageUnit?.id} disabled={true} />
+        <StorageTreeList
+          storageUnitChildren={
+            storageUnit.storageUnitChildren as PersistedResource<StorageUnit>[]
+          }
+          disabled={true}
+        />
       </div>
     </div>
   );
