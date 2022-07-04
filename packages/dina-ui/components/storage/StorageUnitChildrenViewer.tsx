@@ -16,40 +16,40 @@ import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
+import ReactTable from "react-table";
 
 export interface StorageTreeFieldProps {
-  parentId: string;
+  storageUnit: StorageUnit;
 }
 
 export type StorageActionMode = "VIEW" | "MOVE_ALL" | "ADD_EXISTING_AS_CHILD";
 
-export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
+export function StorageUnitChildrenViewer({
+  storageUnit
+}: StorageTreeFieldProps) {
   const { readOnly } = useDinaFormContext();
   const router = useRouter();
   const { apiClient, save } = useApiClient();
-
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
 
-  const childStoragePath = `collection-api/storage-unit/${parentId}?include=storageUnitChildren`;
-
-  const childStorageQuery = useQuery<StorageUnit, MetaWithTotal>({
-    path: childStoragePath
-  });
   const samplesQueryParams = {
     path: "collection-api/material-sample",
-    filter: { rsql: `storageUnit.uuid==${parentId}` }
+    filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
   };
 
-  const samplesQuery = useQuery<MaterialSample[], MetaWithTotal>(
+  const { response } = useQuery<MaterialSample[], MetaWithTotal>(
     samplesQueryParams
   );
+  const materialSamples: MaterialSample[] = response?.data ?? [];
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
+    const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
+
     const {
       data: { storageUnitChildren: nestedStorages }
     } = await apiClient.get<StorageUnit>(
       childStoragePath,
-      // As of writing this code the "limit" is ignored and the API returns all chlidren:
+      // As of writing this code the "limit" is ignored and the API returns all children:
       { page: { limit: 1000 } }
     );
 
@@ -96,7 +96,7 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
     const input: InputResource<StorageUnit> = {
       type: newChild.type,
       id: newChild.id,
-      parentStorageUnit: { type: "storage-unit", id: parentId }
+      parentStorageUnit: { type: "storage-unit", id: storageUnit?.id ?? "" }
     };
     await save([{ resource: input, type: "storage-unit" }], {
       apiBaseUrl: "/collection-api"
@@ -105,113 +105,95 @@ export function StorageUnitChildrenViewer({ parentId }: StorageTreeFieldProps) {
     await router.reload();
   }
 
-  return withResponse(childStorageQuery, ({ data: childStorages }) =>
-    withResponse(samplesQuery, ({ data: samples }) => {
-      const isEmpty = !(
-        (childStorages.storageUnitChildren?.length ?? 0) + samples.length
-      );
-      return (
-        <div className="mb-3">
-          {actionMode !== "VIEW" && (
-            <FieldSet
-              legend={
-                <div className="d-flex align-items-center gap-2 mb-2">
-                  <strong>
-                    {actionMode === "MOVE_ALL" && (
-                      <DinaMessage id="assignContentsToNewStorage" />
-                    )}
-                    {actionMode === "ADD_EXISTING_AS_CHILD" && (
-                      <DinaMessage id="addExistingStorageUnitAsChild" />
-                    )}
-                  </strong>
-                  <button
-                    className="btn btn-dark"
-                    onClick={() => setActionMode("VIEW")}
-                  >
-                    <DinaMessage id="cancelButtonText" />
-                  </button>
-                </div>
-              }
-            >
-              {actionMode === "MOVE_ALL" && (
-                <StorageLinker onChange={moveAllContent} />
-              )}
-              {actionMode === "ADD_EXISTING_AS_CHILD" && (
-                <StorageLinker
-                  actionMode="ADD_EXISTING_AS_CHILD"
-                  onChange={addExistingStorageUnitAsChild}
-                />
-              )}
-            </FieldSet>
-          )}
-          {actionMode === "VIEW" && (
-            <div>
-              <div className="d-flex align-items-center gap-2 mb-2">
-                <strong>
-                  <DinaMessage id="browseContents" />
-                </strong>
-                {readOnly && (
-                  <>
-                    <button
-                      className="btn btn-primary enable-move-content"
-                      onClick={() => setActionMode("MOVE_ALL")}
-                      disabled={isEmpty}
-                    >
-                      <DinaMessage id="moveAllContent" />
-                    </button>
-                    <Link
-                      href={`/collection/storage-unit/edit?parentId=${parentId}`}
-                    >
-                      <a className="btn btn-primary add-child-storage-unit">
-                        <DinaMessage id="addNewChildStorageUnit" />
-                      </a>
-                    </Link>
-                    <button
-                      className="btn btn-primary add-existing-as-child"
-                      onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
-                    >
-                      <DinaMessage id="addExistingStorageUnitAsChild" />
-                    </button>
-                  </>
+  const isEmpty = !(
+    (storageUnit?.storageUnitChildren?.length ?? 0) + materialSamples.length
+  );
+
+  return (
+    <div className="mb-3">
+      {actionMode !== "VIEW" && (
+        <FieldSet
+          legend={
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <strong>
+                {actionMode === "MOVE_ALL" && (
+                  <DinaMessage id="assignContentsToNewStorage" />
                 )}
-              </div>
-              <StorageUnitContents storageId={parentId} />
+                {actionMode === "ADD_EXISTING_AS_CHILD" && (
+                  <DinaMessage id="addExistingStorageUnitAsChild" />
+                )}
+              </strong>
+              <button
+                className="btn btn-dark"
+                onClick={() => setActionMode("VIEW")}
+              >
+                <DinaMessage id="cancelButtonText" />
+              </button>
             </div>
+          }
+        >
+          {actionMode === "MOVE_ALL" && (
+            <StorageLinker onChange={moveAllContent} />
           )}
+          {actionMode === "ADD_EXISTING_AS_CHILD" && (
+            <StorageLinker
+              actionMode="ADD_EXISTING_AS_CHILD"
+              onChange={addExistingStorageUnitAsChild}
+            />
+          )}
+        </FieldSet>
+      )}
+      {actionMode === "VIEW" && (
+        <div>
+          <div className="d-flex align-items-center gap-2 mb-2">
+            <strong>
+              <DinaMessage id="browseContents" />
+            </strong>
+            {readOnly && (
+              <>
+                <button
+                  className="btn btn-primary enable-move-content"
+                  onClick={() => setActionMode("MOVE_ALL")}
+                  disabled={isEmpty}
+                >
+                  <DinaMessage id="moveAllContent" />
+                </button>
+                <Link
+                  href={`/collection/storage-unit/edit?parentId=${storageUnit?.parentStorageUnit?.id}`}
+                >
+                  <a className="btn btn-primary add-child-storage-unit">
+                    <DinaMessage id="addNewChildStorageUnit" />
+                  </a>
+                </Link>
+                <button
+                  className="btn btn-primary add-existing-as-child"
+                  onClick={() => setActionMode("ADD_EXISTING_AS_CHILD")}
+                >
+                  <DinaMessage id="addExistingStorageUnitAsChild" />
+                </button>
+              </>
+            )}
+          </div>
+          <StorageUnitContents
+            materialSamples={materialSamples}
+            storageUnit={storageUnit}
+          />
         </div>
-      );
-    })
+      )}
+    </div>
   );
 }
 
 export interface StorageUnitContentsProps {
-  storageId: string;
-  excludeContentId?: string;
+  storageUnit: StorageUnit;
+  materialSamples: MaterialSample[];
 }
 
 /** Material Sample table and nested Storage Units UI. */
 export function StorageUnitContents({
-  excludeContentId = "00000000-0000-0000-0000-000000000000",
-  storageId
-}) {
-  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
-    {
-      Cell: ({
-        original: { id, materialSampleName, dwcOtherCatalogNumbers }
-      }) => (
-        <Link href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </Link>
-      ),
-      accessor: "materialSampleName"
-    },
-    "materialSampleType",
-    {
-      Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
-      accessor: "tags"
-    }
-  ];
-
+  storageUnit,
+  materialSamples
+}: StorageUnitContentsProps) {
   return (
     <div
       className="p-2 mb-3"
@@ -221,19 +203,43 @@ export function StorageUnitContents({
         <strong>
           <DinaMessage id="materialSamples" />
         </strong>
-        <QueryTable
-          columns={materialSampleColumns}
-          path="collection-api/material-sample"
-          filter={{
-            rsql: `storageUnit.uuid==${storageId} and uuid!=${excludeContentId}`
-          }}
+
+        <ReactTable
+          className="-striped"
+          columns={[
+            {
+              Cell: ({
+                original: { id, materialSampleName, dwcOtherCatalogNumbers }
+              }) => (
+                <Link href={`/collection/material-sample/view?id=${id}`}>
+                  {materialSampleName ||
+                    dwcOtherCatalogNumbers?.join?.(", ") ||
+                    id}
+                </Link>
+              ),
+              accessor: "materialSampleName",
+              Header: <DinaMessage id="materialSampleName" />
+            },
+            {
+              accessor: "materialSampleType",
+              Header: <DinaMessage id="field_materialSampleType.name" />
+            },
+            {
+              Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
+              accessor: "tags",
+              Header: <DinaMessage id="tags" />
+            }
+          ]}
+          data={materialSamples as any}
+          minRows={1}
+          showPagination={false}
         />
       </div>
       <div className="mb-3">
         <strong>
           <DinaMessage id="nestedStorageUnits" />
         </strong>
-        <StorageTreeList parentId={storageId} disabled={true} />
+        <StorageTreeList parentId={storageUnit?.id} disabled={true} />
       </div>
     </div>
   );
