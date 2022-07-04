@@ -11,12 +11,11 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { MaterialSample, StorageUnit } from "../../types/collection-api";
 import { StorageTreeList } from "./BrowseStorageTree";
 import { StorageLinker } from "./StorageLinker";
-import ReactTable from "react-table";
 
 export interface StorageTreeFieldProps {
   storageUnit: StorageUnit;
@@ -31,16 +30,12 @@ export function StorageUnitChildrenViewer({
   const router = useRouter();
   const { apiClient, save } = useApiClient();
   const [actionMode, setActionMode] = useState<StorageActionMode>("VIEW");
+  const [hideMoveContents, setHideMoveContents] = useState<boolean>(false);
 
   const samplesQueryParams = {
     path: "collection-api/material-sample",
     filter: { rsql: `storageUnit.uuid==${storageUnit?.id}` }
   };
-
-  const { response } = useQuery<MaterialSample[], MetaWithTotal>(
-    samplesQueryParams
-  );
-  const materialSamples: MaterialSample[] = response?.data ?? [];
 
   async function moveAllContent(targetUnit: PersistedResource<StorageUnit>) {
     const childStoragePath = `collection-api/storage-unit/${storageUnit?.id}?include=storageUnitChildren`;
@@ -105,10 +100,6 @@ export function StorageUnitChildrenViewer({
     await router.reload();
   }
 
-  const isEmpty = !(
-    (storageUnit?.storageUnitChildren?.length ?? 0) + materialSamples.length
-  );
-
   return (
     <div className="mb-3">
       {actionMode !== "VIEW" && (
@@ -154,7 +145,7 @@ export function StorageUnitChildrenViewer({
                 <button
                   className="btn btn-primary enable-move-content"
                   onClick={() => setActionMode("MOVE_ALL")}
-                  disabled={isEmpty}
+                  disabled={hideMoveContents}
                 >
                   <DinaMessage id="moveAllContent" />
                 </button>
@@ -175,7 +166,7 @@ export function StorageUnitChildrenViewer({
             )}
           </div>
           <StorageUnitContents
-            materialSamples={materialSamples}
+            onEmptyMaterialSamples={() => setHideMoveContents(true)}
             storageUnit={storageUnit}
           />
         </div>
@@ -186,14 +177,32 @@ export function StorageUnitChildrenViewer({
 
 export interface StorageUnitContentsProps {
   storageUnit: StorageUnit;
-  materialSamples: MaterialSample[];
+  onEmptyMaterialSamples: () => void;
 }
 
 /** Material Sample table and nested Storage Units UI. */
 export function StorageUnitContents({
   storageUnit,
-  materialSamples
+  onEmptyMaterialSamples
 }: StorageUnitContentsProps) {
+  const materialSampleColumns: ColumnDefinition<MaterialSample>[] = [
+    {
+      Cell: ({
+        original: { id, materialSampleName, dwcOtherCatalogNumbers }
+      }) => (
+        <Link href={`/collection/material-sample/view?id=${id}`}>
+          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+        </Link>
+      ),
+      accessor: "materialSampleName"
+    },
+    "materialSampleType",
+    {
+      Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
+      accessor: "tags"
+    }
+  ];
+
   return (
     <div
       className="p-2 mb-3"
@@ -204,35 +213,17 @@ export function StorageUnitContents({
           <DinaMessage id="materialSamples" />
         </strong>
 
-        <ReactTable
-          className="-striped"
-          columns={[
-            {
-              Cell: ({
-                original: { id, materialSampleName, dwcOtherCatalogNumbers }
-              }) => (
-                <Link href={`/collection/material-sample/view?id=${id}`}>
-                  {materialSampleName ||
-                    dwcOtherCatalogNumbers?.join?.(", ") ||
-                    id}
-                </Link>
-              ),
-              accessor: "materialSampleName",
-              Header: <DinaMessage id="materialSampleName" />
-            },
-            {
-              accessor: "materialSampleType",
-              Header: <DinaMessage id="field_materialSampleType.name" />
-            },
-            {
-              Cell: ({ original: { tags } }) => <>{tags?.join(", ")}</>,
-              accessor: "tags",
-              Header: <DinaMessage id="tags" />
+        <QueryTable
+          columns={materialSampleColumns}
+          path="collection-api/material-sample"
+          filter={{
+            rsql: `storageUnit.uuid==${storageUnit.id}`
+          }}
+          onSuccess={({ meta }) => {
+            if (meta.totalResourceCount === 0) {
+              onEmptyMaterialSamples();
             }
-          ]}
-          data={materialSamples as any}
-          minRows={1}
-          showPagination={false}
+          }}
         />
       </div>
       <div className="mb-3">
