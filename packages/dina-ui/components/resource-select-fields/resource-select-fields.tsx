@@ -11,7 +11,7 @@ import { useField } from "formik";
 import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Collection, Institution } from "../../types/collection-api";
+import { Collection, Institution, StorageUnit } from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
@@ -153,3 +153,31 @@ export function PersonSelectField(
     />
   );
 }
+
+export function StorageUnitSelectField(
+  props: SetOptional<ResourceSelectFieldProps<StorageUnit>, ProvidedProps>
+  ) {
+  
+    return (
+      <ResourceSelectField<StorageUnit>
+        // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
+        // but fallback to the regular RSQL search if that fails.
+        useCustomQuery={(searchQuery, querySpec) =>
+          useAutocompleteSearchButFallbackToRsqlApiSearch({
+            searchQuery,
+            querySpec,
+            indexName: "dina_storage_index",
+            searchField: "displayName",
+            documentId: "data.id"
+          })
+        }
+        readOnlyLink="/storageUnit/view?id="
+        filter={filterBy(["name"])}
+        model="collection-api/storageUnit"
+        optionLabel={storageUnit => {
+          return storageUnit.name;
+        }}
+        {...props}
+      />
+    );
+  }

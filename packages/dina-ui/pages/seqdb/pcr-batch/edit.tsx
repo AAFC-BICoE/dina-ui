@@ -15,7 +15,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import { StorageUnitType, StorageUnit } from "packages/dina-ui/types/collection-api";
+import { StorageUnitType } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
   AttachmentsField,
@@ -23,6 +23,7 @@ import {
   Head,
   Nav,
   PersonSelectField,
+  StorageUnitSelectField,
   useAddPersonModal
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
@@ -244,7 +245,7 @@ export function PcrBatchFormFields() {
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <TextField className="col-md-6" name="storageUnit" />
+        <StorageUnitSelectField name="storageUnit"/>
       </div>
       <AttachmentsField
         name="attachment"
