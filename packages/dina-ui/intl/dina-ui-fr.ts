@@ -500,11 +500,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   multipleUnits: "Multiples unités",
   mustBeValidDecimalValue: "Doit être une valeur décimale valide.",
   mustBeValidIntegerValue: "Doit être une valeur entière valide.",
-  nestedStorageUnits: "Unités d'entreposage par emboîtement",
   noFileToDisplay: "Aucun fichier à afficher",
   noGroups: "Aucun groupe",
   noManagedAttributeValues: "Aucune valeur d’attribut géré.",
-  noNestedStorageUnits: "Aucune untié de stockage imbriquée",
   noResultsFound: "Aucun résultat trouvé.",
   noneTopLevel: "Aucun (niveau supérieur)",
   notEditableWhenThereAreChildStorageUnits:

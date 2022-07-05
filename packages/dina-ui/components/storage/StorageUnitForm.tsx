@@ -190,7 +190,7 @@ export function StorageUnitFormFields({
           parentIdInURL={parentIdInURL}
         />
       )}
-      {readOnly && <StorageUnitChildrenViewer parentId={initialValues.id} />}
+      {readOnly && <StorageUnitChildrenViewer storageUnit={initialValues} />}
       {readOnly && (
         <div className="row">
           <DateField className="col-md-6" name="createdOn" showTime={true} />

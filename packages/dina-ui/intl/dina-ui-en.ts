@@ -537,11 +537,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multipleUnits: "Multiple Units",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
-  nestedStorageUnits: "Nested Storage Units",
+  childrenStorageUnits: "Children Storage Units",
+  noChildren: "No Children",
   noFileToDisplay: "No file to display",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
-  noNestedStorageUnits: "No Nested Storage Units",
   noResultsFound: "No results found.",
   noneTopLevel: "None (Top-level)",
   notEditableWhenThereAreChildStorageUnits:

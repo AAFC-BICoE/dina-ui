@@ -37,14 +37,6 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   type: "storage-unit"
 };
 
-/** Storage unit with no parent */
-const STORAGE_X: PersistedResource<StorageUnit> = {
-  id: "X",
-  group: "group",
-  name: "X",
-  type: "storage-unit"
-};
-
 // Just return what is passed to it:
 const mockSave = jest.fn(async ops => ops.map(op => op.resource));
 const mockPush = jest.fn();
@@ -94,8 +86,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
         data: STORAGE_A,
         meta: { totalResourceCount: 1 }
       };
-    case "collection-api/storage-unit/X?include=storageUnitChildren":
-      return { data: STORAGE_X };
     case "collection-api/material-sample":
       // Stored material samples:
       if (params?.filter?.rsql === "storageUnit.uuid==A") {
@@ -113,20 +103,31 @@ const apiContext = {
   save: mockSave
 };
 
+const storageUnitA: StorageUnit = {
+  type: "storage-unit",
+  id: "A",
+  name: "testNameA",
+  group: "aafc",
+  storageUnitChildren: STORAGE_UNIT_CHILDREN
+};
+
+const storageUnitX: StorageUnit = {
+  type: "storage-unit",
+  id: "X",
+  name: "testNameX",
+  group: "aafc"
+};
+
 describe("StorageUnitChildrenViewer component", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Shows the storage units chlidren", async () => {
+  it("Shows the storage units children.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer parentId="A" />,
+        <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
       </DinaForm>,
       { apiContext }
     );
-
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
 
     expect(wrapper.find(".storage-unit-name").map(node => node.text())).toEqual(
       ["Box B", "Box C", "Box D"]
@@ -136,14 +137,10 @@ describe("StorageUnitChildrenViewer component", () => {
   it("Lets you move all stored samples and storages to another storage unit.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer parentId="A" />,
+        <StorageUnitChildrenViewer storageUnit={storageUnitA} />,
       </DinaForm>,
       { apiContext }
     );
-
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
 
     wrapper.find("button.enable-move-content").simulate("click");
 
@@ -187,14 +184,10 @@ describe("StorageUnitChildrenViewer component", () => {
     // Render a storage unit with no children:
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}} readOnly={true}>
-        <StorageUnitChildrenViewer parentId="X" />,
+        <StorageUnitChildrenViewer storageUnit={storageUnitX} />,
       </DinaForm>,
       { apiContext }
     );
-
-    await new Promise(setImmediate);
-    await new Promise(setImmediate);
-    wrapper.update();
 
     wrapper.find("button.add-existing-as-child").simulate("click");
 
