@@ -203,11 +203,6 @@ export function MaterialSampleForm({
 
   const navState = useState<MaterialSampleFormSectionId[] | null>(null);
 
-  // Allow either controlled or uncontrolle state for the nav section:
-  const [formSectionOrder, setFormSectionOrder] = onChangeNavOrderProp
-    ? [navOrderProp, onChangeNavOrderProp]
-    : navState;
-
   /**
    * A map where:
    * - The key is the form section ID.
@@ -386,11 +381,7 @@ export function MaterialSampleForm({
   const formSectionPairs = toPairs(formSections);
 
   const sortedFormSectionPairs = uniq([
-    ...compact(
-      (formSectionOrder ?? []).map(id =>
-        formSectionPairs.find(([it]) => it === id)
-      )
-    ),
+    ...compact([].map(id => formSectionPairs.find(([it]) => it === id))),
     ...formSectionPairs
   ]);
 
@@ -405,9 +396,6 @@ export function MaterialSampleForm({
               disableCollectingEventSwitch ||
               initialValues.parentMaterialSample !== undefined
             }
-            hideCustomViewSelect={hideNavCustomViewSelect}
-            navOrder={formSectionOrder}
-            onChangeNavOrder={setFormSectionOrder}
           />
         )}
       </div>

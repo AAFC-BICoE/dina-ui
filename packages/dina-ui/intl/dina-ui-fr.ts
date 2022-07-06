@@ -456,8 +456,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSampleManagedAttributes:
     "Attributs gérés de l’échantillon de matière",
   materialSampleName: "Nom de l’échantillon de matière",
-  materialSampleNavTemplateInfo:
-    "Cet ordre des éléments de données sera enregistré dans la vue personnalisée.",
   materialSampleTypeListTitle: "Types d’échantillon de matière",
   materialSampleViewTitle: "{primaryID} - Échantillon de matériaux",
   materialSamples: "Échantillons de matériaux",

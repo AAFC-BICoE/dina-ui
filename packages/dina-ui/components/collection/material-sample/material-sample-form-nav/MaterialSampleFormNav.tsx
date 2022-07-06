@@ -7,29 +7,18 @@ import {
   useDinaFormContext,
   useModal
 } from "common-ui";
-import { PersistedResource } from "kitsu";
 import { uniq } from "lodash";
 import dynamic from "next/dynamic";
-import { ComponentType, PropsWithChildren, useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-  SortEnd
-} from "react-sortable-hoc";
+import { ComponentType, PropsWithChildren } from "react";
 import Switch, { ReactSwitchProps } from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
-  CustomView,
   MaterialSampleAssociation,
   MaterialSampleFormSectionId,
   MATERIAL_SAMPLE_FORM_SECTIONS,
   Organism
 } from "../../../../types/collection-api";
-import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
 import { useMaterialSampleSave } from "../useMaterialSample";
-import { materialSampleNavOrderSchema } from "./materialSampleNavOrderSchema";
 
 export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
@@ -42,11 +31,7 @@ export interface MaterialSampleFormNavProps {
   // Disables Collecting Event React Switch for child material samples
   disableCollectingEventSwitch?: boolean;
 
-  /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideCustomViewSelect?: boolean;
-
   navOrder?: MaterialSampleFormSectionId[] | null;
-  onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 }
 
 // Don't render the react-scrollspy-nav component during tests because it only works in the browser.
@@ -87,9 +72,7 @@ export function MaterialSampleFormNav({
   dataComponentState,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  hideCustomViewSelect,
-  navOrder,
-  onChangeNavOrder
+  navOrder
 }: MaterialSampleFormNavProps) {
   const { isTemplate } = useDinaFormContext();
 
@@ -97,43 +80,6 @@ export function MaterialSampleFormNav({
     dataComponentState,
     navOrder
   });
-
-  const [customView, setCustomViewWithNoSideEffects] = useState<
-    PersistedResource<CustomView> | { id: null }
-  >();
-
-  function updateCustomView(
-    newView: PersistedResource<CustomView> | { id: null }
-  ) {
-    // Update component state:
-    setCustomViewWithNoSideEffects(newView);
-
-    // Update the nav order:
-    if (newView.id) {
-      if (materialSampleNavOrderSchema.isValidSync(newView.viewConfiguration)) {
-        onChangeNavOrder(newView.viewConfiguration.navOrder ?? []);
-      }
-    } else {
-      onChangeNavOrder(null);
-    }
-  }
-
-  function onSortStart(_, event: unknown) {
-    if (event instanceof MouseEvent) {
-      document.body.style.cursor = "grabbing";
-    }
-  }
-
-  function onSortEnd(sortEnd: SortEnd) {
-    document.body.style.cursor = "inherit";
-
-    const newOrder = arrayMove(
-      sortedScrollTargets,
-      sortEnd.oldIndex,
-      sortEnd.newIndex
-    ).map(it => it.id);
-    onChangeNavOrder?.(newOrder);
-  }
 
   return (
     <div className="sticky-md-top material-sample-nav">
@@ -157,16 +103,11 @@ export function MaterialSampleFormNav({
               <DinaMessage id="dataComponents" />
             </strong>
           </label>
-          <SortableNavGroup
-            axis="y"
-            useDragHandle={true}
-            onSortStart={onSortStart}
-            onSortEnd={onSortEnd}
-          >
-            {sortedScrollTargets.map((section, index) => (
-              <SortableNavItem
+          {/* Display each row of the data components. */}
+          <DataComponentNavGroup>
+            {sortedScrollTargets.map(section => (
+              <DataComponentNavItem
                 key={section.id}
-                index={index}
                 section={section}
                 disableRemovePrompt={disableRemovePrompt}
                 disableSwitch={
@@ -175,19 +116,7 @@ export function MaterialSampleFormNav({
                 }
               />
             ))}
-          </SortableNavGroup>
-          {!hideCustomViewSelect && (
-            <MaterialSampleNavCustomViewSelect
-              onChange={updateCustomView}
-              selectedView={customView}
-              navOrder={navOrder ?? null}
-            />
-          )}
-          {isTemplate && (
-            <div className="alert alert-warning">
-              <DinaMessage id="materialSampleNavTemplateInfo" />
-            </div>
-          )}
+          </DataComponentNavGroup>
         </nav>
       </ScrollSpyNav>
     </div>
@@ -342,11 +271,9 @@ function AssociationsSwitch(props) {
   );
 }
 
-export const SortableNavGroup = SortableContainer(
-  ({ children }: PropsWithChildren<{}>) => (
-    <div className="list-group mb-3">{children}</div>
-  )
-);
+export function DataComponentNavGroup({ children }: PropsWithChildren<{}>) {
+  return <div className="list-group mb-3">{children}</div>;
+}
 
 interface NavItemProps<T extends MaterialSampleFormSectionId> {
   section: ScrollTarget<T>;
@@ -354,85 +281,71 @@ interface NavItemProps<T extends MaterialSampleFormSectionId> {
   disableSwitch?: boolean;
 }
 
-const SortableNavItem = SortableElement(
-  ({
-    section,
-    disableRemovePrompt,
-    disableSwitch
-  }: NavItemProps<MaterialSampleFormSectionId>) => {
-    const { openModal } = useModal();
+function DataComponentNavItem({
+  section,
+  disableRemovePrompt,
+  disableSwitch
+}: NavItemProps<MaterialSampleFormSectionId>) {
+  const { openModal } = useModal();
 
-    const Tag = section.disabled ? "div" : "a";
-    const SwitchComponent = section.customSwitch ?? Switch;
+  const Tag = section.disabled ? "div" : "a";
+  const SwitchComponent = section.customSwitch ?? Switch;
 
-    function toggle(newVal: boolean) {
-      if (!newVal && !disableRemovePrompt) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: section.msg }}
+  function toggle(newVal: boolean) {
+    if (!newVal && !disableRemovePrompt) {
+      // When removing data, ask the user for confirmation first:
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <DinaMessage
+              id="removeComponentData"
+              values={{ component: section.msg }}
+            />
+          }
+          onYesButtonClicked={() => section.setEnabled?.(newVal)}
+        />
+      );
+    } else {
+      section.setEnabled?.(newVal);
+    }
+  }
+
+  return (
+    <div
+      className={classNames(
+        section.className,
+        "list-group-item d-flex gap-2 align-items-center"
+      )}
+      key={section.id}
+      style={{ height: "3rem", zIndex: 1030 }}
+    >
+      <Tag
+        className="flex-grow-1 text-decoration-none"
+        href={section.disabled ? undefined : `#${section.id}`}
+      >
+        {section.msg}
+      </Tag>
+      {section.setEnabled &&
+        (disableSwitch ? (
+          <Tooltip
+            id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+            disableSpanMargin={true}
+            visibleElement={
+              <SwitchComponent
+                className="mt-2"
+                checked={!section.disabled}
+                onChange={toggle}
+                disabled={disableSwitch}
               />
             }
-            onYesButtonClicked={() => section.setEnabled?.(newVal)}
           />
-        );
-      } else {
-        section.setEnabled?.(newVal);
-      }
-    }
-
-    return (
-      <div
-        className={classNames(
-          section.className,
-          "list-group-item d-flex gap-2 align-items-center"
-        )}
-        key={section.id}
-        style={{ height: "3rem", zIndex: 1030 }}
-      >
-        <NavSortHandle />
-        <Tag
-          className="flex-grow-1 text-decoration-none"
-          href={section.disabled ? undefined : `#${section.id}`}
-        >
-          {section.msg}
-        </Tag>
-        {section.setEnabled &&
-          (disableSwitch ? (
-            <Tooltip
-              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-              disableSpanMargin={true}
-              visibleElement={
-                <SwitchComponent
-                  className="mt-2"
-                  checked={!section.disabled}
-                  onChange={toggle}
-                  disabled={disableSwitch}
-                />
-              }
-            />
-          ) : (
-            <SwitchComponent
-              checked={!section.disabled}
-              onChange={toggle}
-              disabled={disableSwitch}
-            />
-          ))}
-      </div>
-    );
-  }
-);
-
-const NavSortHandle = SortableHandle(() => (
-  <GiHamburgerMenu cursor="grab" size="2em" />
-));
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove<T>(array: T[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
+        ) : (
+          <SwitchComponent
+            checked={!section.disabled}
+            onChange={toggle}
+            disabled={disableSwitch}
+          />
+        ))}
+    </div>
+  );
 }
