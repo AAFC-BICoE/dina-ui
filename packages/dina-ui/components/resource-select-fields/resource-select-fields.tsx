@@ -167,13 +167,13 @@ export function StorageUnitSelectField(
             searchQuery,
             querySpec,
             indexName: "dina_storage_index",
-            searchField: "displayName",
+            searchField: "name",
             documentId: "data.id"
           })
         }
         readOnlyLink="/storageUnit/view?id="
         filter={filterBy(["name"])}
-        model="collection-api/storageUnit"
+        model="collection-api/storage-unit"
         optionLabel={storageUnit => {
           return storageUnit.name;
         }}

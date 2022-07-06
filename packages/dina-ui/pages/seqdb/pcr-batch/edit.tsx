@@ -241,7 +241,7 @@ export function PcrBatchFormFields() {
           className="col-md-6"
           name="storageUnitType"
           filter={filterBy(["name"])}
-          model="collection/storage-unit-type"
+          model="collection-api/storage-unit-type"
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />

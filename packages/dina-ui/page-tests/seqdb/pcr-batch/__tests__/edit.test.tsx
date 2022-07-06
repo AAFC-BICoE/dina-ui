@@ -25,14 +25,12 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
     { id: "2", type: "agent", displayName: "agent 2" },
     { id: "3", type: "agent", displayName: "agent 3" }
   ] as any,
-//   storageUnitType: {
-//     id: "123",
-//     type: "test type"
-//  } as PersistedResource<StorageUnitType>,
-//  storageUnit: {
-//   id: "123",
-//   type: "test type"
-// } as PersistedResource<StorageUnit>,
+  storageUnitType: {
+    id: "123"
+  } as PersistedResource<StorageUnitType>,
+  storageUnit: {
+    id: "123"
+} as PersistedResource<StorageUnit>,
   attachment: [{ id: "attach-1", type: "metadata" }]
 };
 
@@ -138,11 +136,9 @@ describe("PcrBatch edit page", () => {
               },
               storageUnitType: {
                 id: "123",
-                type: "test type"
               },
               storageUnit: {
                 id: "123",
-                type: "test type"
               },
               attachment: {
                 data: []
@@ -197,11 +193,9 @@ describe("PcrBatch edit page", () => {
               },
               storageUnitType: {
                 id: "123",
-                type: "test type"
               },
               storageUnit: {
                 id: "123",
-                type: "test type"
               },
               attachment: {
                 data: [{ id: "attach-1", type: "metadata" }]
