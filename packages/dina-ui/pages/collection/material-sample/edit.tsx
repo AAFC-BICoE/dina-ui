@@ -54,8 +54,6 @@ export default function MaterialSampleEditPage() {
   } = useMaterialSampleFormCustomViewSelectState();
 
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
-    navOrder,
-    onChangeNavOrder: setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys,
     enableStoredDefaultGroup: true,

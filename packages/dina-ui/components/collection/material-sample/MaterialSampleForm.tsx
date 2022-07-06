@@ -65,6 +65,7 @@ export interface VisibleManagedAttributesConfig {
   collectingEvent?: string[];
   determination?: string[];
 }
+
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -112,14 +113,9 @@ export interface MaterialSampleFormProps {
 
   /** Hide the use next identifer checkbox, e.g when create multiple new samples */
   hideUseSequence?: boolean;
+
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
-
-  /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideNavCustomViewSelect?: boolean;
-  /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
-  navOrder?: MaterialSampleFormSectionId[] | null;
-  onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 
   /**
    * Toggle to disable the collecting even switch due to a parent containing the collecting event
@@ -150,9 +146,6 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
-  hideNavCustomViewSelect,
-  navOrder: navOrderProp,
-  onChangeNavOrder: onChangeNavOrderProp,
   visibleManagedAttributeKeys,
   disableCollectingEventSwitch,
   buttonBar = (
