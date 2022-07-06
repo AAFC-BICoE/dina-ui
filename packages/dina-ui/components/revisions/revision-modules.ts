@@ -8,6 +8,7 @@ import { MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG } from "./revision-row-confi
 import { MATERIAL_SAMPLE_REVISION_ROW_CONFIG } from "./revision-row-configs/material-sample-revision-configs";
 import { METADATA_REVISION_ROW_CONFIG } from "./revision-row-configs/metadata-revision-config";
 import { ORGANISM_REVISION_ROW_CONFIG } from "./revision-row-configs/organism-revision-config";
+import { PREPARATION_METHOD_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-method-revision-config";
 import { PREPARATION_TYPE_REVISION_ROW_CONFIG } from "./revision-row-configs/preparation-type-revision-config";
 import { PROJECT_REVISION_ROW_CONFIG } from "./revision-row-configs/project-revision-config";
 import { STORAGE_UNIT_REVISION_ROW_CONFIG } from "./revision-row-configs/storage-unit-revision-config";
@@ -28,6 +29,7 @@ export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
   "acquisition-event": ACQUISITION_EVENT_REVISION_ROW_CONFIG,
   "storage-unit": STORAGE_UNIT_REVISION_ROW_CONFIG,
   "collection-method": COLLECTION_METHOD_REVISION_ROW_CONFIG,
+  "preparation-method": PREPARATION_METHOD_REVISION_ROW_CONFIG,
   "preparation-type": PREPARATION_TYPE_REVISION_ROW_CONFIG,
   "managed-attribute": MANAGED_ATTRIBUTE_TYPE_REVISION_ROW_CONFIG,
   "storage-unit-type": STORAGE_UNIT_TYPE_REVISION_ROW_CONFIG,
