@@ -25,15 +25,16 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
     { id: "2", type: "agent", displayName: "agent 2" },
     { id: "3", type: "agent", displayName: "agent 3" }
   ] as any,
-  storageUnitType: {
-    id: "TEST_TYPE",
-    name: "TEST_TYPE"
-  } as PersistedResource<StorageUnitType>,
-  storageUnit: {
-    id: "TEST_STORAGE",
-    type: "storage-unit",
-    name: "TEST_STORAGE"
-  } as PersistedResource<StorageUnit>,
+  storageUnitType: { 
+    id: "TEST_TYPE", 
+    type: "storage-unit-type", 
+    name: "TEST_TYPE" 
+  } as any,
+  storageUnit: { 
+    id: "TEST_STORAGE", 
+    type: "storage-unit", 
+    name: "TEST_STORAGE" 
+  } as any,
   attachment: [{ id: "attach-1", type: "metadata" }]
 };
 
@@ -51,9 +52,9 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "seqdb-api/thermocycler-profile":
       return { data: [] };
-    case "collection-api/storage-unit-type":
-      return { data: [] };
     case "collection-api/storage-unit":
+      return { data: [] };
+    case "collection-api/storage-unit-type":
       return { data: [] };
   }
 });
@@ -137,15 +138,6 @@ describe("PcrBatch edit page", () => {
                   { id: "2", type: "person" }
                 ]
               },
-              storageUnitType: {
-                id: "TEST_TYPE",
-                name: "TEST_TYPE"
-              },
-              storageUnit: {
-                id: "TEST_STORAGE",
-                type: "storage-unit",
-                name: "TEST_STORAGE"
-              },
               attachment: {
                 data: []
               }
@@ -188,6 +180,12 @@ describe("PcrBatch edit page", () => {
               id: "456",
               type: "pcr-primer"
             },
+            storageUnitType: {
+              id: "TEST_TYPE", type: "storage-unit-type", name: "TEST_TYPE" 
+            },
+            storageUnit: {
+               id: "TEST_STORAGE", type: "storage-unit", name: "TEST_STORAGE" 
+            },
             type: "pcr-batch",
             relationships: {
               experimenters: {
@@ -196,15 +194,6 @@ describe("PcrBatch edit page", () => {
                   { id: "2", type: "person" },
                   { id: "3", type: "person" }
                 ]
-              },
-              storageUnitType: {
-                id: "TEST_TYPE",
-                name: "TEST_TYPE"
-              },
-              storageUnit: {
-                id: "TEST_STORAGE",
-                type: "storage-unit",
-                name: "TEST_STORAGE"
               },
               attachment: {
                 data: [{ id: "attach-1", type: "metadata" }]
