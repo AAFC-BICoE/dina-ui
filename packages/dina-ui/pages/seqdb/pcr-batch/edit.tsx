@@ -14,6 +14,7 @@ import {
   withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
+import { useFormikContext } from "formik";
 import { useRouter } from "next/router";
 import { StorageUnitType } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
@@ -179,7 +180,8 @@ export function PcrBatchForm({
 export function PcrBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { openAddPersonModal } = useAddPersonModal();
-
+  const { values } = useFormikContext<any>();
+  console.log(JSON.stringify(values));
   return (
     <div>
       <div className="row">
@@ -245,7 +247,19 @@ export function PcrBatchFormFields() {
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <StorageUnitSelectField name="storageUnit"/>
+        <StorageUnitSelectField 
+          name="storageUnit" 
+          isDisabled={!values?.storageUnitType?.id} 
+          filter={filterBy(["name"], {
+            extraFilters: [
+              {
+                selector: "storageUnitType.uuid",
+                comparison: "==",
+                arguments: values?.storageUnitType?.id ?? ""
+              }
+            ]
+          })}
+        />
       </div>
       <AttachmentsField
         name="attachment"

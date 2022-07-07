@@ -155,7 +155,9 @@ export function PersonSelectField(
 }
 
 export function StorageUnitSelectField(
-  props: SetOptional<ResourceSelectFieldProps<StorageUnit>, ProvidedProps>
+  props: SetOptional<ResourceSelectFieldProps<StorageUnit>, ProvidedProps>,
+  restrictedField: string,
+  restrictedFieldValue: string
   ) {
   
     return (
@@ -168,7 +170,9 @@ export function StorageUnitSelectField(
             querySpec,
             indexName: "dina_storage_index",
             searchField: "name",
-            documentId: "data.id"
+            documentId: "data.id",
+            restrictedField,
+            restrictedFieldValue
           })
         }
         readOnlyLink="/storageUnit/view?id="
