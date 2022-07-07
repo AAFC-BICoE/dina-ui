@@ -34,6 +34,8 @@ export interface DoSearchParams {
   searchValue?: string;
   additionalField?: string;
   documentId?: string;
+  restrictedField?: string;
+  restrictedFieldValue?: string;
 }
 
 /** Does the search against the search API. */
@@ -44,7 +46,9 @@ export async function doSearch<T extends KitsuResource>(
     searchField,
     searchValue,
     documentId,
-    additionalField = ""
+    additionalField = "",
+    restrictedField,
+    restrictedFieldValue
   }: DoSearchParams
 ) {
   if (!searchValue) {
@@ -58,6 +62,8 @@ export async function doSearch<T extends KitsuResource>(
         prefix: searchValue,
         autoCompleteField: `data.attributes.${searchField}`,
         additionalField,
+        restrictedField: `data.attributes.${restrictedField}`,
+        restrictedFieldValue,
         documentId,
         indexName
       }
