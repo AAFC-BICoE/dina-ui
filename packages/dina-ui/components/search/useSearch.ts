@@ -34,6 +34,7 @@ export interface DoSearchParams {
   searchValue?: string;
   additionalField?: string;
   documentId?: string;
+  disabled?: boolean;
 }
 
 /** Does the search against the search API. */
@@ -44,10 +45,11 @@ export async function doSearch<T extends KitsuResource>(
     searchField,
     searchValue,
     documentId,
-    additionalField = ""
+    additionalField = "",
+    disabled = false
   }: DoSearchParams
 ) {
-  if (!searchValue) {
+  if (!searchValue || disabled) {
     return null;
   }
 
