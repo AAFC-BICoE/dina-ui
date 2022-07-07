@@ -17,7 +17,7 @@ import { PersistedResource } from "kitsu";
 import { useFormikContext } from "formik";
 import { useRouter } from "next/router";
 import { StorageUnitType } from "packages/dina-ui/types/collection-api";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -122,6 +122,7 @@ export function PcrBatchForm({
       };
     }
     delete submittedValues.experimenters;
+    delete submittedValues.storageUnitType;
 
     // Add attachments if they were selected:
     (submittedValues as any).relationships.attachment = {
@@ -179,9 +180,16 @@ export function PcrBatchForm({
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const { openAddPersonModal } = useAddPersonModal();
-  const { values } = useFormikContext<any>();
-  console.log(JSON.stringify(values));
+  const { values, setFieldValue } = useFormikContext<any>();
+
+  // If the ID does not exist for the storage unit type and the storage unit
+  // is set, then it should be cleared.
+  useEffect(() => {
+    if (!values?.storageUnitType?.id && values?.storageUnit?.id) {
+      setFieldValue("storageUnit", null);
+    }
+  }, [values?.storageUnitType]);
+
   return (
     <div>
       <div className="row">
@@ -247,9 +255,11 @@ export function PcrBatchFormFields() {
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <StorageUnitSelectField 
-          name="storageUnit" 
-          isDisabled={!values?.storageUnitType?.id} 
+        <StorageUnitSelectField
+          name="storageUnit"
+          isDisabled={!values?.storageUnitType?.id}
+          restrictedField={"storageUnitType"}
+          restrictedFieldValue={values?.storageUnitType?.id}
           filter={filterBy(["name"], {
             extraFilters: [
               {
