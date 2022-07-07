@@ -2360,37 +2360,4 @@ describe("Material Sample Edit Page", () => {
         .prop("value")
     ).toEqual("");
   });
-
-  it("Lets you set a Custom Navigation section order via prop.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleForm
-        materialSample={{
-          type: "material-sample",
-          id: "333",
-          group: "test-group",
-          materialSampleName: "test-ms"
-        }}
-        // Custom navOrder:
-        navOrder={[
-          "managedAttributes-section",
-          "material-sample-info-section",
-          "identifiers-section"
-        ]}
-        onChangeNavOrder={() => undefined}
-        onSaved={mockOnSaved}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Check the first 3 sections for the sections defined in the prop:
-    expect(
-      wrapper
-        .find(".material-sample-nav .list-group-item")
-        .map(node => node.text())
-        .slice(0, 3)
-    ).toEqual(["Managed Attributes", "Material Sample Info", "Identifiers"]);
-  });
 });

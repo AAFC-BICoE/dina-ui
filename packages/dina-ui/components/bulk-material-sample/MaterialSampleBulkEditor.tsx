@@ -50,15 +50,11 @@ export function MaterialSampleBulkEditor({
   const {
     sampleFormCustomView,
     setSampleFormCustomView,
-    navOrder,
-    setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormCustomViewSelectState();
 
   const customViewProps: Partial<MaterialSampleFormProps> = {
-    navOrder,
-    onChangeNavOrder: setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys
   };
