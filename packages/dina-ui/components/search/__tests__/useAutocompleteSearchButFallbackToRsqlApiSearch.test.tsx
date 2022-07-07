@@ -62,7 +62,9 @@ function TestPersonSearchComponent() {
         path: "agent-api/person",
         sort: "-createdOn"
       },
-      searchQuery
+      searchQuery,
+      restrictedField: "testRestrictedField",
+      restrictedFieldValue: "testRestrictedValue"
     });
 
   return (
@@ -101,7 +103,9 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
           additionalField: "",
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
-          prefix: "test-query"
+          prefix: "test-query",
+          restrictedField: "data.attributes.testRestrictedField",
+          restrictedFieldValue: "testRestrictedValue"
         }
       }
     );
@@ -134,7 +138,9 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
           additionalField: "",
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
-          prefix: "test-query"
+          prefix: "test-query",
+          restrictedField: "data.attributes.testRestrictedField",
+          restrictedFieldValue: "testRestrictedValue"
         }
       }
     );

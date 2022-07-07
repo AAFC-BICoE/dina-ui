@@ -55,6 +55,13 @@ export async function doSearch<T extends KitsuResource>(
     return null;
   }
 
+  const restrictedFieldParams = restrictedField
+    ? {
+        restrictedField: `data.attributes.${restrictedField}`,
+        restrictedFieldValue
+      }
+    : {};
+
   const response = await axios.get<AutocompleteSearchResponse>(
     "search-api/search-ws/auto-complete",
     {
@@ -62,10 +69,9 @@ export async function doSearch<T extends KitsuResource>(
         prefix: searchValue,
         autoCompleteField: `data.attributes.${searchField}`,
         additionalField,
-        restrictedField: `data.attributes.${restrictedField}`,
-        restrictedFieldValue,
         documentId,
-        indexName
+        indexName,
+        ...restrictedFieldParams
       }
     }
   );
