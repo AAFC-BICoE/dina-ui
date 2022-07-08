@@ -12,7 +12,8 @@ import {
   useAccount,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  withResponseOrDisabled
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useFormikContext } from "formik";
@@ -125,7 +126,6 @@ export function PcrBatchForm({
       };
     }
     delete submittedValues.experimenters;
-    delete submittedValues.storageUnitType;
 
     // Add attachments if they were selected:
     (submittedValues as any).relationships.attachment = {
@@ -137,6 +137,9 @@ export function PcrBatchForm({
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
+    // Add storage unit if it was selected:
+    delete submittedValues.storageUnitType;
 
     const inputResource = {
       ...submittedValues,
@@ -198,12 +201,16 @@ export function LoadExternalDataForPcrBatchForm({
   );
 
   const initialValues = dinaFormProps.initialValues;
-  initialValues.storageUnitType = {
-    id: storageUnitQuery?.response?.data?.storageUnitType?.id ?? "",
-    type: "storage-unit-type"
-  };
+  initialValues.storageUnitType = storageUnitQuery?.response?.data
+    ?.storageUnitType?.id
+    ? {
+        id: storageUnitQuery.response.data.storageUnitType.id,
+        type: "storage-unit-type"
+      }
+    : undefined;
 
-  return withResponse(storageUnitQuery, () => (
+  // Wait for response or if disabled, just continue with rendering.
+  return withResponseOrDisabled(storageUnitQuery, () => (
     <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
       {buttonBar}
       <PcrBatchFormFields />
@@ -221,7 +228,7 @@ export function PcrBatchFormFields() {
   // If the storage unit type has changed, it should remove the storage unit.
   useEffect(() => {
     if (!readOnly && !firstLoad) {
-      setFieldValue("storageUnit", null);
+      setFieldValue("storageUnit", "");
     }
 
     setFirstLoad(false);
@@ -306,7 +313,7 @@ export function PcrBatchFormFields() {
               ]
             })
           }}
-          restrictedField={"storageUnitType"}
+          restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
         />
       </div>

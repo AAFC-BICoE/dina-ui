@@ -23,7 +23,7 @@ export interface PcrBatchRelationships {
   region?: Region;
   attachment?: ResourceIdentifierObject[];
   storageUnitType?: ResourceIdentifierObject;
-  storageUnit?: StorageUnit;
+  storageUnit?: ResourceIdentifierObject;
 }
 
 export type PcrBatch = KitsuResource &

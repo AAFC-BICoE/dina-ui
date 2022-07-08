@@ -59,7 +59,7 @@ export async function doSearch<T extends KitsuResource>(
 
   const restrictedFieldParams = restrictedField
     ? {
-        restrictedField: `data.attributes.${restrictedField}`,
+        restrictedField,
         restrictedFieldValue
       }
     : {};
