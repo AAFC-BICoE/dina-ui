@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormProps,
   DinaFormSubmitParams,
   filterBy,
   ResourceSelectField,
@@ -16,16 +17,18 @@ import {
 import { PersistedResource } from "kitsu";
 import { useFormikContext } from "formik";
 import { useRouter } from "next/router";
-import { StorageUnitType } from "packages/dina-ui/types/collection-api";
-import { ReactNode, useEffect } from "react";
+import {
+  StorageUnitType,
+  StorageUnit
+} from "packages/dina-ui/types/collection-api";
+import { ReactNode, useEffect, useState } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
   PersonSelectField,
-  StorageUnitSelectField,
-  useAddPersonModal
+  StorageUnitSelectField
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -42,7 +45,7 @@ export function usePcrBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnitType,storageUnit"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit"
     },
     { disabled: !id, deps }
   );
@@ -71,8 +74,8 @@ export default function PcrBatchEditPage() {
           <SeqdbMessage id={title} />
         </h1>
         {id ? (
-          withResponse(resourceQuery, ({ data }) => (
-            <PcrBatchForm pcrBatch={data} onSaved={moveToViewPage} />
+          withResponse(resourceQuery, ({ data: pcrBatchData }) => (
+            <PcrBatchForm pcrBatch={pcrBatchData} onSaved={moveToViewPage} />
           ))
         ) : (
           <PcrBatchForm onSaved={moveToViewPage} />
@@ -166,28 +169,62 @@ export function PcrBatchForm({
   }
 
   return (
-    <DinaForm<Partial<PcrBatch>>
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-    >
+    <LoadExternalDataForPcrBatchForm
+      dinaFormProps={{
+        onSubmit,
+        initialValues: initialValues as any
+      }}
+      buttonBar={buttonBar as any}
+    />
+  );
+}
+
+interface LoadExternalDataForPcrBatchFormProps {
+  dinaFormProps: DinaFormProps<PcrBatch>;
+  buttonBar?: ReactNode;
+}
+
+export function LoadExternalDataForPcrBatchForm({
+  dinaFormProps,
+  buttonBar
+}: LoadExternalDataForPcrBatchFormProps) {
+  // The storage unit type needs to be loaded from the Storage Unit.
+  const storageUnitQuery = useQuery<StorageUnit>(
+    {
+      path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
+      include: "storageUnitType"
+    },
+    { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
+  );
+
+  const initialValues = dinaFormProps.initialValues;
+  initialValues.storageUnitType = {
+    id: storageUnitQuery?.response?.data?.storageUnitType?.id ?? "",
+    type: "storage-unit-type"
+  };
+
+  return withResponse(storageUnitQuery, () => (
+    <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
       {buttonBar}
       <PcrBatchFormFields />
       {buttonBar}
     </DinaForm>
-  );
+  ));
 }
 
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values, setFieldValue } = useFormikContext<any>();
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
-  // If the ID does not exist for the storage unit type and the storage unit
-  // is set, then it should be cleared.
+  // If the storage unit type has changed, it should remove the storage unit.
   useEffect(() => {
-    if (!values?.storageUnitType?.id && values?.storageUnit?.id) {
+    if (!readOnly && !firstLoad) {
       setFieldValue("storageUnit", null);
     }
+
+    setFirstLoad(false);
   }, [values?.storageUnitType]);
 
   return (
