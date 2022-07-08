@@ -13,7 +13,8 @@ import {
   useDinaFormContext,
   useQuery,
   withResponse,
-  withResponseOrDisabled
+  withResponseOrDisabled,
+  FieldSpy
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useFormikContext } from "formik";
@@ -228,7 +229,7 @@ export function PcrBatchFormFields() {
   // If the storage unit type has changed, it should remove the storage unit.
   useEffect(() => {
     if (!readOnly && !firstLoad) {
-      setFieldValue("storageUnit", "");
+      setFieldValue("storageUnit", null);
     }
 
     setFirstLoad(false);
