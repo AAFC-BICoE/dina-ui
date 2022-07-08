@@ -13,11 +13,10 @@ import {
   useDinaFormContext,
   useQuery,
   withResponse,
-  withResponseOrDisabled,
-  FieldSpy
+  withResponseOrDisabled
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useFormikContext } from "formik";
+import { useFormikContext, connect } from "formik";
 import { useRouter } from "next/router";
 import {
   StorageUnitType,
@@ -223,17 +222,26 @@ export function LoadExternalDataForPcrBatchForm({
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const { values, setFieldValue } = useFormikContext<any>();
-  const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const { values } = useFormikContext<any>();
 
-  // If the storage unit type has changed, it should remove the storage unit.
-  useEffect(() => {
-    if (!readOnly && !firstLoad) {
-      setFieldValue("storageUnit", null);
+  // When the storage unit type is changed, the storage unit needs to be cleared.
+  const StorageUnitTypeSelectorComponent = connect(
+    ({ formik: { setFieldValue } }) => {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={storageUnitType => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={() => {
+            setFieldValue("storageUnit.id", null);
+          }}
+        />
+      );
     }
-
-    setFirstLoad(false);
-  }, [values?.storageUnitType]);
+  );
 
   return (
     <div>
@@ -292,14 +300,7 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
-        <ResourceSelectField<StorageUnitType>
-          className="col-md-6"
-          name="storageUnitType"
-          filter={filterBy(["name"])}
-          model="collection-api/storage-unit-type"
-          optionLabel={storageUnitType => `${storageUnitType.name}`}
-          readOnlyLink="/collection/storage-unit-type/view?id="
-        />
+        <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
