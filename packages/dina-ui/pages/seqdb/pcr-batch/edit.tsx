@@ -256,19 +256,21 @@ export function PcrBatchFormFields() {
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
         <StorageUnitSelectField
-          name="storageUnit"
-          isDisabled={!values?.storageUnitType?.id}
+          resourceProps={{
+            name: "storageUnit",
+            isDisabled: !values?.storageUnitType?.id,
+            filter: filterBy(["name"], {
+              extraFilters: [
+                {
+                  selector: "storageUnitType.uuid",
+                  comparison: "==",
+                  arguments: values?.storageUnitType?.id ?? ""
+                }
+              ]
+            })
+          }}
           restrictedField={"storageUnitType"}
           restrictedFieldValue={values?.storageUnitType?.id}
-          filter={filterBy(["name"], {
-            extraFilters: [
-              {
-                selector: "storageUnitType.uuid",
-                comparison: "==",
-                arguments: values?.storageUnitType?.id ?? ""
-              }
-            ]
-          })}
         />
       </div>
       <AttachmentsField
