@@ -7,6 +7,8 @@ export interface StorageUnitTypeAttributes {
   createdBy?: string;
   createdOn?: string;
   isInseperable?: boolean | null;
+  enableGrid?: boolean;
+  gridLayoutDefinition?: any;
 }
 
 export type StorageUnitType = KitsuResource & StorageUnitTypeAttributes;

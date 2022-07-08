@@ -26,16 +26,7 @@ const ONE_PERSON_RESPONSE = {
   }
 };
 
-const EMPTY_SEARCH_RESPONSE = {
-  data: {
-    hits: []
-  }
-};
-
 const mockSearchApiGet = jest.fn<any, any>(async () => ONE_PERSON_RESPONSE);
-const mockSearchApiGetWithEmptyResponse = jest.fn<any, any>(
-  async () => EMPTY_SEARCH_RESPONSE
-);
 const mockSearchApiGetWithError = jest.fn<any, any>(async () => {
   throw new Error("Mock Search Error.");
 });
@@ -51,9 +42,13 @@ const mockAgentApiGet = jest.fn<any, any>(path => {
   }
 });
 
-function TestPersonSearchComponent() {
-  const [searchQuery] = useState("test-query");
+interface TestPersonSearchComponentProps {
+  searchQuery: string;
+}
 
+function TestPersonSearchComponent({
+  searchQuery = ""
+}: TestPersonSearchComponentProps) {
   const { loading, response } =
     useAutocompleteSearchButFallbackToRsqlApiSearch<Person>({
       indexName: "dina_agent_index",
@@ -64,7 +59,8 @@ function TestPersonSearchComponent() {
       },
       searchQuery,
       restrictedField: "testRestrictedField",
-      restrictedFieldValue: "testRestrictedValue"
+      restrictedFieldValue: "testRestrictedValue",
+      documentId: "data.id"
     });
 
   return (
@@ -82,18 +78,44 @@ function TestPersonSearchComponent() {
 describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
   beforeEach(jest.clearAllMocks);
 
-  it("Searches the dina-search-api.", async () => {
-    const wrapper = mountWithAppContext(<TestPersonSearchComponent />, {
-      apiContext: {
-        apiClient: {
-          axios: { get: mockSearchApiGet } as any,
-          get: mockAgentApiGet
+  it("Able to perform searches with elastic search, RSQL should be called for an empty response.", async () => {
+    const wrapper = mountWithAppContext(
+      <TestPersonSearchComponent searchQuery={""} />,
+      {
+        apiContext: {
+          apiClient: {
+            axios: { get: mockSearchApiGet } as any,
+            get: mockAgentApiGet
+          }
         }
       }
-    });
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
+
+    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
+
+    expect(wrapper.find(".person-list li").length).toEqual(1);
+    expect(wrapper.find(".person-list li").first().text()).toEqual(
+      "Person from Agent API"
+    );
+
+    // Try again with a full query
+    const wrapper2 = mountWithAppContext(
+      <TestPersonSearchComponent searchQuery={"test-query"} />,
+      {
+        apiContext: {
+          apiClient: {
+            axios: { get: mockSearchApiGet } as any,
+            get: mockAgentApiGet
+          }
+        }
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper2.update();
 
     expect(mockSearchApiGet).toHaveBeenCalledTimes(1);
     expect(mockSearchApiGet).lastCalledWith(
@@ -105,63 +127,29 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
           indexName: "dina_agent_index",
           prefix: "test-query",
           restrictedField: "data.attributes.testRestrictedField",
-          restrictedFieldValue: "testRestrictedValue"
+          restrictedFieldValue: "testRestrictedValue",
+          documentId: "data.id"
         }
       }
     );
-    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
-
-    expect(wrapper.find(".person-list li").length).toEqual(1);
-    expect(wrapper.find(".person-list li").first().text()).toEqual(
+    expect(wrapper2.find(".person-list li").length).toEqual(1);
+    expect(wrapper2.find(".person-list li").first().text()).toEqual(
       "Person from Search API"
     );
   });
 
-  it("Falls back to the RSQL filter API with disabled query when the search API returns empty hits.", async () => {
-    const wrapper = mountWithAppContext(<TestPersonSearchComponent />, {
-      apiContext: {
-        apiClient: {
-          axios: { get: mockSearchApiGetWithEmptyResponse } as any,
-          get: mockAgentApiGet
-        }
-      }
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockSearchApiGetWithEmptyResponse).toHaveBeenCalledTimes(1);
-    expect(mockSearchApiGetWithEmptyResponse).lastCalledWith(
-      "search-api/search-ws/auto-complete",
+  it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
+    const wrapper = mountWithAppContext(
+      <TestPersonSearchComponent searchQuery={"test-query"} />,
       {
-        params: {
-          additionalField: "",
-          autoCompleteField: "data.attributes.displayName",
-          indexName: "dina_agent_index",
-          prefix: "test-query",
-          restrictedField: "data.attributes.testRestrictedField",
-          restrictedFieldValue: "testRestrictedValue"
+        apiContext: {
+          apiClient: {
+            axios: { get: mockSearchApiGetWithError } as any,
+            get: mockAgentApiGet
+          }
         }
       }
     );
-    expect(mockAgentApiGet).toHaveBeenCalledTimes(1);
-    expect(mockAgentApiGet).lastCalledWith("agent-api/person", {
-      sort: "-createdOn"
-    });
-
-    // The rsql api is called as a disabled query so no field is populated with data
-    expect(wrapper.find(".person-list li").length).toEqual(0);
-  });
-
-  it("Falls back to the RSQL filter API when the search API throws an error.", async () => {
-    const wrapper = mountWithAppContext(<TestPersonSearchComponent />, {
-      apiContext: {
-        apiClient: {
-          axios: { get: mockSearchApiGetWithError } as any,
-          get: mockAgentApiGet
-        }
-      }
-    });
 
     await new Promise(setImmediate);
     wrapper.update();

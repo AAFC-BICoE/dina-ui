@@ -242,6 +242,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               name={fieldProps("date", index)}
               className="me-2 flex-fill"
               removeLabel={true}
+              partialDate={true}
             />
           )}
 

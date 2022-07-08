@@ -8,24 +8,40 @@ import { DateView } from "../date/DateView";
 import { FieldWrapper } from "./FieldWrapper";
 
 export interface DateFieldProps extends FieldWrapperProps {
+  /**
+   * While the date field requires a YYYY-MM-DD format, enabling this option will allow for
+   * partial dates like: YYYY-MM or YYYY by itself.
+   *
+   * This is useful for elasticsearch since it's able to handle these cases.
+   */
+  partialDate?: boolean;
   showTime?: boolean;
   disabled?: boolean;
 }
 
 const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
-  const { showTime, disabled } = props;
+  const { showTime, disabled, partialDate } = props;
 
   const { formatMessage } = useIntl();
 
   function validate(value: unknown) {
     if (value && typeof value === "string") {
-      if (!props.showTime) {
-        if (!DATE_REGEX_NO_TIME.test(value)) {
-          return formatMessage({ id: "dateMustBeFormattedYyyyMmDd" });
+      if (!showTime) {
+        if (partialDate) {
+          // In partial date mode, the following is supported: YYYY-MM-DD, YYYY-MM and YYYY.
+          if (!DATE_REGEX_PARTIAL.test(value)) {
+            return formatMessage({ id: "dateMustBeFormattedPartial" });
+          }
+        } else {
+          if (!DATE_REGEX_NO_TIME.test(value)) {
+            return formatMessage({ id: "dateMustBeFormattedYyyyMmDd" });
+          }
         }
+
         // Check for invalid dates like 2021-02-29
         const parsed = moment(value, true);
         if (!parsed.isValid()) {
@@ -68,13 +84,16 @@ export function DateField(props: DateFieldProps) {
                 "-" +
                 newText.slice(6);
             }
+
             setValue(newText);
           }
         }
 
         function onBlur(event: FocusEvent<HTMLInputElement, Element>) {
-          const error = validate?.(event.target.value);
-          if (error) {
+          const newText = event.target.value;
+
+          const error = validate?.(newText);
+          if (error !== undefined) {
             formik.setFieldError(props.name, error);
           }
         }
@@ -108,6 +127,7 @@ export function DateField(props: DateFieldProps) {
               todayButton="Today"
               disabled={disabled}
               onBlur={onBlur}
+              onFocus={event => event.target.select()}
               selected={dateObject}
               {...datePickerProps}
             />

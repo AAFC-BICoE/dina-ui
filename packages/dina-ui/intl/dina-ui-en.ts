@@ -262,6 +262,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcDegreeOfEstablishment: "Degree of Establishment",
   field_dwcDegreeOfEstablishment_tooltip:
     "The degree to which an Organism survives, reproduces, and expands its range at the given place and time.",
+  field_dwcFieldNumber: "Collection Number",
+  field_dwcFieldNumber_tooltip:
+    "An identifier given to the event in the field at the time of collecting one or more samples. Often serves as a link between field notes and the Event.",
   field_dwcGeodeticDatum: "Geodetic Datum",
   field_dwcGeodeticDatum_tooltip:
     "The geodetic datum upon which the geographic coordinates given in decimalLatitude and decimalLongitude is based. Recommended best practice is to use the EPSG code. Examples: EPSG:4326 (EPSG code for WGS84)",
@@ -277,12 +280,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_dwcGeoreferenceVerificationStatus: "Georeferencing Not Possible",
   field_dwcMunicipality: "Municipality",
   field_dwcOtherCatalogNumbers: "Other Catalog Numbers",
-  field_dwcOtherRecordNumbers: "Collection Numbers",
-  field_dwcOtherRecordNumbers_tooltip:
+  field_otherRecordNumbers: "Additional Collection Numbers",
+  field_otherRecordNumbers_tooltip:
     "Other numbers or identifiers associated with the collecting event that help to distinguish it. Do NOT include specimen-based identifiers such as accession numbers.",
   field_dwcRecordNumber: "Collector's Number",
   field_dwcRecordNumber_tooltip:
-    "An identifier given to the collecting-event at the time it was recorded.",
+    "An identifier given to the Occurrence, by the collector, at the time it was recorded. Often serves as a link between field notes and an Occurrence record, such as a specimen collector’s number.",
   field_dwcRecordedBy: "Verbatim Collectors",
   field_dwcStateProvince: "State/Province",
   field_dwcVerbatimCoordinateSystem: "Verbatim Coordinate System",
@@ -309,12 +312,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "The ellipsoid, geodetic datum, or spatial reference system (SRS) upon which coordinates given in verbatimLatitude and verbatimLongitude, or verbatimCoordinates are based. Recommended best practice is to use the EPSG code of the SRS, if known. Examples: EPSG:4326, WGS84, NAD27",
   field_editableBuiltInAttributes: "Visible Built In Attributes",
   field_email: "Email",
+  field_enableGrid: "Enable Grid",
+  field_enableGrid_tooltip:
+    "Create a grid to store contents. Cannot have child storage units.",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
   field_givenNames_tooltip: "First and all middle names",
+  field_gridLayoutDefinition_row_label: "By Row",
+  field_gridLayoutDefinition_column_label: "By Column",
   field_isFiledAs_tooltip:
     "Make this determination the filed as. Only one determination can be filed as",
   field_isInseperable: "Keep Contents Together",
@@ -529,11 +537,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   multipleUnits: "Multiple Units",
   mustBeValidDecimalValue: "Must be a valid decimal value.",
   mustBeValidIntegerValue: "Must be a valid integer value.",
-  nestedStorageUnits: "Nested Storage Units",
+  childrenStorageUnits: "Children Storage Units",
+  noChildren: "No Children",
   noFileToDisplay: "No file to display",
   noGroups: "No Groups",
   noManagedAttributeValues: "No Managed Attribute values.",
-  noNestedStorageUnits: "No Nested Storage Units",
   noResultsFound: "No results found.",
   noneTopLevel: "None (Top-level)",
   notEditableWhenThereAreChildStorageUnits:

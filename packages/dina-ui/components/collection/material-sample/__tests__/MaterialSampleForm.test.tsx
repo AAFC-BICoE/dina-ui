@@ -193,7 +193,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              dwcOtherRecordNumbers: null,
+              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -424,7 +424,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              dwcOtherRecordNumbers: null,
+              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [

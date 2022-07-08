@@ -43,18 +43,16 @@ export function BrowseStorageTree(props: BrowseStorageTreeProps) {
         )}
         {":"}
       </div>
-      <StorageTreeList
-        {...props}
-        filter={filter}
-        showPathInName={isFiltered}
-        readOnly={props.readOnly}
-      />
+      <StorageTreeList {...props} filter={filter} showPathInName={isFiltered} />
     </div>
   );
 }
 
 export interface StorageTreeListProps {
+  storageUnitChildren?: PersistedResource<StorageUnit>[];
+
   parentId?: string;
+
   onSelect?: (storageUnit: PersistedResource<StorageUnit>) => Promisable<void>;
 
   disabled?: boolean;
@@ -63,62 +61,85 @@ export interface StorageTreeListProps {
 
   /** Show the hierarchy path in the name. (Top-level only). */
   showPathInName?: boolean;
-
-  readOnly?: boolean;
 }
 
 export function StorageTreeList({
+  storageUnitChildren,
   onSelect,
   parentId,
   disabled,
   filter,
-  showPathInName,
-  readOnly
+  showPathInName
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
   const offset = (pageNumber - 1) * limit;
 
-  const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>({
-    path: `collection-api/storage-unit`,
-    include: "hierarchy,storageUnitChildren,storageUnitType",
-    page: { limit, offset },
-    sort: "storageUnitType.name,name",
-    filter: {
-      rsql: rsql({
-        type: "FILTER_GROUP",
-        id: -123,
-        operator: "AND",
-        children: [
-          // For inner storage units:
-          ...(parentId
-            ? [
-                {
-                  id: -321,
-                  type: "FILTER_ROW" as const,
-                  attribute: "parentStorageUnit.uuid",
-                  predicate: "IS" as const,
-                  searchType: "EXACT_MATCH" as const,
-                  value: parentId
-                }
-              ]
-            : []),
-          ...(filter ? [filter] : [])
-        ]
-      }),
-      // For top-level storage units:
-      ...(!filter?.children?.length && !parentId
-        ? { parentStorageUnit: null }
-        : {})
-    }
-  });
+  const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>(
+    {
+      path: `collection-api/storage-unit`,
+      include: "storageUnitChildren,storageUnitType",
+      page: { limit, offset },
+      sort: "storageUnitType.name,name",
+      filter: {
+        rsql: rsql({
+          type: "FILTER_GROUP",
+          id: -123,
+          operator: "AND",
+          children: [
+            // For inner storage units:
+            ...(parentId
+              ? [
+                  {
+                    id: -321,
+                    type: "FILTER_ROW" as const,
+                    attribute: "parentStorageUnit.uuid",
+                    predicate: "IS" as const,
+                    searchType: "EXACT_MATCH" as const,
+                    value: parentId
+                  }
+                ]
+              : []),
+            ...(filter ? [filter] : [])
+          ]
+        }),
+        // For top-level storage units:
+        ...(!filter?.children?.length && !parentId
+          ? { parentStorageUnit: null }
+          : {})
+      }
+    },
+    { disabled: storageUnitChildren !== undefined }
+  );
+
+  // If the children are provided we can skip the query and just display them.
+  if (storageUnitChildren !== undefined) {
+    return (
+      <>
+        {storageUnitChildren.map((unit, index) => (
+          <div
+            className={index === storageUnitChildren.length - 1 ? "" : "my-2"}
+            key={unit.id}
+          >
+            <StorageUnitCollapser
+              showPathInName={showPathInName}
+              storageUnit={unit}
+              onSelect={onSelect}
+              disabled={disabled}
+              checkForChildren={false}
+            />
+          </div>
+        ))}
+      </>
+    );
+  }
 
   return withResponse(
     storageUnitsQuery,
     ({ data: units, meta: { totalResourceCount } }) => (
       <div>
         {totalResourceCount === 0 ? (
-          <DinaMessage id="noNestedStorageUnits" />
+          <DinaMessage id="noChildren" />
         ) : (
           <>
             {units.map((unit, index) => (
@@ -131,7 +152,7 @@ export function StorageTreeList({
                   storageUnit={unit}
                   onSelect={onSelect}
                   disabled={disabled}
-                  readOnly={readOnly}
+                  checkForChildren={true}
                 />
               </div>
             ))}
@@ -159,14 +180,16 @@ interface StorageUnitCollapserProps {
   /** Show the hierarchy path in the name. (This collapser only). */
   showPathInName?: boolean;
 
-  readOnly?: boolean;
+  /** If the storage unit has  */
+  checkForChildren?: boolean;
 }
 
 function StorageUnitCollapser({
   storageUnit,
   onSelect,
   disabled,
-  showPathInName
+  showPathInName,
+  checkForChildren
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -183,7 +206,9 @@ function StorageUnitCollapser({
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
 
-  const hasChildren = !!(storageUnit as any)?.storageUnitChildren?.length;
+  const hasChildren = checkForChildren
+    ? !!(storageUnit as any)?.storageUnitChildren?.length
+    : true;
 
   return (
     <div className={`d-flex flex-row gap-2 collapser-for-${storageUnit.id}`}>
