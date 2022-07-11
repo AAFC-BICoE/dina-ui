@@ -84,11 +84,6 @@ export function Home() {
                     <DinaMessage id="collectingEventListTitle" />
                   </a>
                 </Link>
-                <Link href="/collection/managed-attributes-view/list">
-                  <a>
-                    <DinaMessage id="managedAttributesViews" />
-                  </a>
-                </Link>
                 <Link href="/collection/material-sample/list">
                   <a>
                     <DinaMessage id="materialSampleListTitle" />
@@ -102,11 +97,6 @@ export function Home() {
                 <Link href="/collection/storage-unit/list">
                   <a>
                     <DinaMessage id="storageUnitListTitle" />
-                  </a>
-                </Link>
-                <Link href="/collection/material-sample-custom-view/list">
-                  <a>
-                    <DinaMessage id="workflowTemplates" />
                   </a>
                 </Link>
               </Stack>
@@ -260,14 +250,14 @@ export function Home() {
                       <DinaMessage id="collectionListTitle" />
                     </a>
                   </Link>
-                  <Link href="/collection/managed-attributes-view/list">
-                    <a>
-                      <DinaMessage id="managedAttributesViews" />
-                    </a>
-                  </Link>
                   <Link href="/collection/extension/list">
                     <a>
                       <DinaMessage id="fieldExtensions" />
+                    </a>
+                  </Link>
+                  <Link href="/collection/form-template/list">
+                    <a>
+                      <DinaMessage id="formTemplates" />
                     </a>
                   </Link>
                   <Link href="/collection/institution/list">

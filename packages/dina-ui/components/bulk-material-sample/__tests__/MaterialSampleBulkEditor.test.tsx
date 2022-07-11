@@ -64,19 +64,19 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
   })
 );
 
-/** CustomView with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
+/** FormTemplate with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
 const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
   id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
-  type: "custom-view",
+  type: "form-template",
   createdOn: "2022-03-03T16:36:30.422992Z",
   createdBy: "cnc-cm",
   name: "test view with managed attributes",
   group: "cnc",
   restrictToCreatedBy: false,
   viewConfiguration: {
-    type: "material-sample-form-custom-view",
+    type: "material-sample-form-template",
     navOrder: ["managedAttributes-section", "identifiers-section"],
-    formTemplates: {
+    formTemplate: {
       MATERIAL_SAMPLE: {
         templateFields: {
           materialSampleName: { enabled: true, defaultValue: "default id" },
@@ -145,7 +145,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/acquisition-event":
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
@@ -2132,7 +2132,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Allows selecting a Custom View to show/hide fields in the bulk and single tass.", async () => {
+  it("Allows selecting a Form Template to show/hide fields in the bulk and single tass.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -2146,7 +2146,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Select a custom view:
     wrapper
-      .find(".material-sample-custom-view-select")
+      .find(".form-template-select")
       .find(ResourceSelect)
       .prop<any>("onChange")(TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES);
 
@@ -2170,7 +2170,7 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The bulk edit tab shows the managed attributes from the CustomView:
+    // The bulk edit tab shows the managed attributes from the FormTemplate:
     // For Material Sample:
     expect(
       wrapper
@@ -2218,7 +2218,7 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The individual sample tab tab shows the managed attributes from the CustomView:
+    // The individual sample tab tab shows the managed attributes from the FormTemplate:
     // For Material Sample:
     expect(
       wrapper

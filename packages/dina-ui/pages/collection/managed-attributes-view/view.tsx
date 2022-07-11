@@ -3,12 +3,12 @@ import {
   ManagedAttributesViewFormLayout,
   ViewPageLayout
 } from "../../../components";
-import { CustomView } from "../../../types/collection-api";
+import { FormTemplate } from "../../../types/collection-api";
 import { useManagedAttributesView } from "./edit";
 
 export default function ManagedAttributesViewDetailsPage() {
   return (
-    <ViewPageLayout<CustomView>
+    <ViewPageLayout<FormTemplate>
       form={props => (
         <DinaForm {...props}>
           <ManagedAttributesViewFormLayout />
@@ -16,7 +16,7 @@ export default function ManagedAttributesViewDetailsPage() {
       )}
       customQueryHook={useManagedAttributesView}
       entityLink="/collection/managed-attributes-view"
-      type="custom-view"
+      type="form-template"
       apiBaseUrl="/collection-api"
     />
   );

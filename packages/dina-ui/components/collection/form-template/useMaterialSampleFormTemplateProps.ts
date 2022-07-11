@@ -11,7 +11,7 @@ import {
   MaterialSample
 } from "../../../types/collection-api";
 import {
-  MaterialSampleFormCustomViewConfig,
+  MaterialSampleFormTemplateConfig,
   TemplateFieldMap
 } from "./materialSampleFormViewConfigSchema";
 
@@ -19,7 +19,7 @@ import {
  * The props to pass into the MaterialSampleForm to enable a
  * custom view with restricted field sets and default values.
  */
-export interface MaterialSampleFormCustomViewProps {
+export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
   acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
@@ -31,12 +31,12 @@ export interface MaterialSampleFormCustomViewProps {
  * Gets the initial form values from the template default values.
  * Passing an undefined actionDefinition parameter makes the function return null;
  */
-export function useMaterialSampleFormCustomViewProps<
-  T extends MaterialSampleFormCustomViewConfig | undefined
+export function useMaterialSampleFormTemplateProps<
+  T extends MaterialSampleFormTemplateConfig | undefined
 >(
   actionDefinition?: T
-): T extends MaterialSampleFormCustomViewConfig
-  ? MaterialSampleFormCustomViewProps
+): T extends MaterialSampleFormTemplateConfig
+  ? MaterialSampleFormTemplateProps
   : null {
   return useMemo(() => {
     if (!actionDefinition) {
@@ -46,7 +46,7 @@ export function useMaterialSampleFormCustomViewProps<
     const materialSampleInitialValues =
       getInitialValuesFromTemplateFields<MaterialSample>(
         "material-sample",
-        actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+        actionDefinition.formTemplate.MATERIAL_SAMPLE?.templateFields
       );
 
     /* If no template entrry for determination or there is only one determination, make it primary
@@ -82,12 +82,12 @@ export function useMaterialSampleFormCustomViewProps<
 
     const collectingEvent = getInitialValuesFromTemplateFields<CollectingEvent>(
       "collecting-event",
-      actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
+      actionDefinition.formTemplate.COLLECTING_EVENT?.templateFields
     );
     const acquisitionEvent =
       getInitialValuesFromTemplateFields<AcquisitionEvent>(
         "acquisition-event",
-        actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+        actionDefinition.formTemplate.ACQUISITION_EVENT?.templateFields
       );
 
     if (collectingEvent.id) {
@@ -116,7 +116,7 @@ export function useMaterialSampleFormCustomViewProps<
       materialSample: [
         ...compact(
           toPairs(
-            actionDefinition.formTemplates.MATERIAL_SAMPLE?.templateFields
+            actionDefinition.formTemplate.MATERIAL_SAMPLE?.templateFields
           ).map(([key, val]) => (val?.enabled ? key : null))
         ),
         // The group field should always be enabled:
@@ -124,17 +124,17 @@ export function useMaterialSampleFormCustomViewProps<
       ],
       collectingEvent: compact(
         toPairs(
-          actionDefinition.formTemplates.COLLECTING_EVENT?.templateFields
+          actionDefinition.formTemplate.COLLECTING_EVENT?.templateFields
         ).map(([key, val]) => (val?.enabled ? key : null))
       ),
       acquisitionEvent: compact(
         toPairs(
-          actionDefinition.formTemplates.ACQUISITION_EVENT?.templateFields
+          actionDefinition.formTemplate.ACQUISITION_EVENT?.templateFields
         ).map(([key, val]) => (val?.enabled ? key : null))
       )
     };
 
-    const config: MaterialSampleFormCustomViewProps = {
+    const config: MaterialSampleFormTemplateProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
       acquisitionEventInitialValues,

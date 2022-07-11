@@ -120,7 +120,7 @@ describe("FieldWrapper component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ myField1: "my value", templateCheckboxes: {} }}
-        // enabledField2 uses a custom tempalte field name:
+        // enabledField2 uses a custom template field name:
         enabledFields={["enabledField1", "customTemplateFieldName"]}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >

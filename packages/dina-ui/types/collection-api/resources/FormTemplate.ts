@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 
-export interface CustomView extends KitsuResource {
-  type: "custom-view";
+export interface FormTemplate extends KitsuResource {
+  type: "form-template";
   createdOn?: string;
   createdBy?: string;
   name?: string;
