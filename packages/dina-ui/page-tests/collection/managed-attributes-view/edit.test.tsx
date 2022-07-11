@@ -34,7 +34,7 @@ const TEST_CUSTOM_VIEW: FormTemplate = {
 // Test an existing FormTemplate:
 const TEST_BAD_CUSTOM_VIEW: FormTemplate = {
   type: "form-template",
-  name: "My Custom View",
+  name: "My Form Template",
   viewConfiguration: {
     type: "wrong-type"
   }
@@ -155,7 +155,7 @@ describe("ManagedAttributesViewEditPage", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // New Custom View saved:
+    // New Form Template saved:
     expect(mockOnSaved).lastCalledWith({
       id: "11111111-1111-1111-1111-111111111111",
       name: "test view",
@@ -188,7 +188,7 @@ describe("ManagedAttributesViewEditPage", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Existing Custom View saved:
+    // Existing Form Template saved:
     expect(mockSave).lastCalledWith(
       [
         {

@@ -187,23 +187,17 @@ function NavCollectionDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/collecting-event/list">
         <DinaMessage id="collectingEventListTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/managed-attributes-view/list">
-        <DinaMessage id="managedAttributesViews" />
-      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/material-sample/list">
         <DinaMessage id="materialSampleListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/revisions-by-user">
         <DinaMessage id="revisionsByUserPageTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/storage-unit/list">
-        <DinaMessage id="storageUnitListTitle" />
-      </NavDropdown.Item>
       <NavDropdown.Item
-        href="/collection/form-template/list"
+        href="/collection/storage-unit/list"
         onKeyDown={onKeyDownLastItem}
       >
-        <DinaMessage id="workflowTemplates" />
+        <DinaMessage id="storageUnitListTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );
@@ -352,11 +346,11 @@ function NavDinaManagementDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/collection/list">
         <DinaMessage id="collectionListTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/managed-attributes-view/list">
-        <DinaMessage id="managedAttributesViews" />
-      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/extension/list">
         <DinaMessage id="fieldExtensions" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/form-template/list">
+        <DinaMessage id="formTemplates" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/institution/list">
         <DinaMessage id="institutionListTitle" />

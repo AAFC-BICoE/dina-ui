@@ -454,7 +454,7 @@ export function useMaterialSampleSave({
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-      // Remove the scheduledAction field from the Custom View:
+      // Remove the scheduledAction field from the Form Template:
       ...{ scheduledAction: undefined }
     };
 

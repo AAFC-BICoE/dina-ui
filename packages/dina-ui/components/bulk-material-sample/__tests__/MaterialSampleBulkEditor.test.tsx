@@ -2132,7 +2132,7 @@ describe("MaterialSampleBulkEditor", () => {
     ]);
   });
 
-  it("Allows selecting a Custom View to show/hide fields in the bulk and single tass.", async () => {
+  it("Allows selecting a Form Template to show/hide fields in the bulk and single tass.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}

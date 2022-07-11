@@ -43,7 +43,7 @@ export interface ManagedAttributesEditorProps {
   showFormTemplateDropdown?: boolean;
 
   /**
-   * The formik field name for editing a Custom View's managed attributes order.
+   * The formik field name for editing a Form Template's managed attributes order.
    * Has no effect in editing an actual resource e.g. in the Material Sample form.
    */
   managedAttributeOrderFieldName?: string;
@@ -100,7 +100,7 @@ export function ManagedAttributesEditor({
           );
         }, [visibleAttributeKeysProp]);
 
-        /** Put the Custom View into the dropdown and update the visible attribute keys.  */
+        /** Put the Form Template into the dropdown and update the visible attribute keys.  */
         function updateFormTemplate(newView?: PersistedResource<FormTemplate>) {
           setFormTemplate(newView);
 

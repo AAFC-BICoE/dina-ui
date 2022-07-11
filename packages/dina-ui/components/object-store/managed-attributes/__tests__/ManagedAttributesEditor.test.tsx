@@ -32,7 +32,7 @@ const EXAMPLE_MA_3 = {
 const TEST_COLLECTING_EVENT_CUSTOM_VIEW: PersistedResource<FormTemplate> = {
   id: "existing-view-id",
   type: "form-template",
-  name: "Test existing Custom View",
+  name: "Test existing Form Template",
   viewConfiguration: {
     type: "managed-attributes-view",
     managedAttributeComponent: "COLLECTING_EVENT",
@@ -235,7 +235,7 @@ describe("ManagedAttributesEditor component", () => {
     });
   });
 
-  it("Lets you select a Custom View .", async () => {
+  it("Lets you select a Form Template .", async () => {
     const mockSubmit = jest.fn();
 
     const wrapper = mountWithAppContext(
@@ -328,7 +328,7 @@ describe("ManagedAttributesEditor component", () => {
       .find(Select)
       .prop<any>("options")[1].options;
     const createOption = asyncOptions[0];
-    expect(createOption.label).toEqual("Create Custom View");
+    expect(createOption.label).toEqual("Create Form Template");
 
     // Select the Create option, which should call the callback:
     wrapper
@@ -478,7 +478,7 @@ describe("ManagedAttributesEditor component", () => {
     expect(
       wrapper.find(".managed-attributes-view-select").find(Select).prop("value")
     ).toEqual({
-      label: "Test existing Custom View",
+      label: "Test existing Form Template",
       resource: EXPECTED_SAVED_CUSTOM_VIEW,
       value: "existing-view-id"
     });

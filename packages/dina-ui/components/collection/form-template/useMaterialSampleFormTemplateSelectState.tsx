@@ -8,9 +8,9 @@ import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfig
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 
 /**
- * Manages the state of a MaterialSampleForm Custom View selection
+ * Manages the state of a MaterialSampleForm Form Template selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
- * Only handles Custom Views (e.g. show/hide fields), not default values.
+ * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
 export function useMaterialSampleFormTemplateSelectState() {
   const [sampleFormTemplate, setSampleFormTemplate] =
@@ -36,8 +36,8 @@ export function useMaterialSampleFormTemplateSelectState() {
     MaterialSampleFormSectionId[] | null
   >(null);
 
-  // Effect hook: When the Custom View changes,
-  // update the navOrder to what's stored in the Custom View:
+  // Effect hook: When the Form Template changes,
+  // update the navOrder to what's stored in the Form Template:
   useEffect(() => {
     if (sampleFormTemplate) {
       setNavOrder(formTemplateConfig?.navOrder ?? null);

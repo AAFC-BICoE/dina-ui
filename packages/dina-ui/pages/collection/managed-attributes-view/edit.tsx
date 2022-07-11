@@ -22,7 +22,7 @@ export function useManagedAttributesView(id?: string) {
     { path: `collection-api/form-template/${id}` },
     {
       onSuccess: async ({ data: fetchedView }) => {
-        // Throw an error if the wrong type of Custom View
+        // Throw an error if the wrong type of Form Template
         managedAttributesViewSchema.validateSync(fetchedView.viewConfiguration);
       },
       disabled: !id
