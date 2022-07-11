@@ -2153,14 +2153,6 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Shows the correct nav order in the bulk edit tab:
-    expect(
-      wrapper
-        .find(".tabpanel-EDIT_ALL .material-sample-nav .list-group-item")
-        .map(node => node.text())
-        .slice(0, 2)
-    ).toEqual(["Managed Attributes", "Identifiers"]);
-
     // Enable Collecting Event:
     wrapper
       .find(".tabpanel-EDIT_ALL .enable-collecting-event")
