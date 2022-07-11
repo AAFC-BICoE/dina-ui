@@ -91,15 +91,11 @@ export function CreateMaterialSampleFromWorkflowForm({
 
   type RoutingButtonStrings = "newRun" | "viewSample";
 
-  /* Route to either new workflow run page with the same tempalte id or
+  /* Route to either new workflow run page with the same template id or
   material sample list page based on button clicked */
   function selectOnSaved(routeString: RoutingButtonStrings) {
     return routeString === "newRun" ? moveToNewRunPage : moveToSampleViewPage;
   }
-
-  const [navOrder, setNavOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(actionDefinition.navOrder);
 
   const [onSaveString, setOnSaveString] =
     useState<RoutingButtonStrings>("viewSample");
@@ -148,8 +144,6 @@ export function CreateMaterialSampleFromWorkflowForm({
           "allowExisting"
         )
       }}
-      navOrder={navOrder}
-      onChangeNavOrder={setNavOrder}
       visibleManagedAttributeKeys={visibleManagedAttributeKeys}
     />
   );

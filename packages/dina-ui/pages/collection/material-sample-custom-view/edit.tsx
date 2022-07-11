@@ -132,9 +132,9 @@ export function MaterialSampleCustomViewForm({
   const initialViewConfig =
     materialSampleFormCustomViewSchema.parse(unknownViewConfig);
 
-  const [navOrder, setNavOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(initialViewConfig.navOrder);
+  const [navOrder] = useState<MaterialSampleFormSectionId[] | null>(
+    initialViewConfig.navOrder
+  );
 
   // Initialize the template form default values and checkbox states:
   const colEventTemplateInitialValues = {
@@ -404,9 +404,6 @@ export function MaterialSampleCustomViewForm({
         <MaterialSampleForm
           templateInitialValues={materialSampleTemplateInitialValues}
           materialSampleSaveHook={materialSampleSaveHook}
-          hideNavCustomViewSelect={true}
-          navOrder={navOrder}
-          onChangeNavOrder={setNavOrder}
         />
       </DinaFormSection>
       {buttonBar}

@@ -494,8 +494,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleListTitle: "Material Samples",
   materialSampleManagedAttributes: "Material Sample Managed Attributes",
   materialSampleName: "Material Sample Name",
-  materialSampleNavTemplateInfo:
-    "This Data Component order will be saved into the Custom View.",
   materialSampleTypeListTitle: "Material Sample Types",
   materialSampleViewTitle: "{primaryID} - Material Sample",
   materialSamples: "Material Samples",
