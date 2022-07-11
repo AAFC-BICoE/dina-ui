@@ -382,7 +382,7 @@ export function CollectingEventFormLayout({
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />
       }}
-      showCustomViewDropdown={!isTemplate}
+      showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
     />

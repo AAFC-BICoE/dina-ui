@@ -200,7 +200,7 @@ function NavCollectionDropdown({ formatMessage }) {
         <DinaMessage id="storageUnitListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item
-        href="/collection/material-sample-custom-view/list"
+        href="/collection/form-template/list"
         onKeyDown={onKeyDownLastItem}
       >
         <DinaMessage id="workflowTemplates" />

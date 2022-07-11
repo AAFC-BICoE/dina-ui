@@ -21,13 +21,13 @@ import {
 import Switch, { ReactSwitchProps } from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   MaterialSampleAssociation,
   MaterialSampleFormSectionId,
   MATERIAL_SAMPLE_FORM_SECTIONS,
   Organism
 } from "../../../../types/collection-api";
-import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
+import { MaterialSampleNavFormTemplateSelect } from "./MaterialSampleNavFormTemplateSelect";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { materialSampleNavOrderSchema } from "./materialSampleNavOrderSchema";
 
@@ -43,7 +43,7 @@ export interface MaterialSampleFormNavProps {
   disableCollectingEventSwitch?: boolean;
 
   /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideCustomViewSelect?: boolean;
+  hideFormTemplateSelect?: boolean;
 
   navOrder?: MaterialSampleFormSectionId[] | null;
   onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
@@ -87,7 +87,7 @@ export function MaterialSampleFormNav({
   dataComponentState,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  hideCustomViewSelect,
+  hideFormTemplateSelect,
   navOrder,
   onChangeNavOrder
 }: MaterialSampleFormNavProps) {
@@ -98,15 +98,15 @@ export function MaterialSampleFormNav({
     navOrder
   });
 
-  const [customView, setCustomViewWithNoSideEffects] = useState<
-    PersistedResource<CustomView> | { id: null }
+  const [formTemplate, setFormTemplateWithNoSideEffects] = useState<
+    PersistedResource<FormTemplate> | { id: null }
   >();
 
-  function updateCustomView(
-    newView: PersistedResource<CustomView> | { id: null }
+  function updateFormTemplate(
+    newView: PersistedResource<FormTemplate> | { id: null }
   ) {
     // Update component state:
-    setCustomViewWithNoSideEffects(newView);
+    setFormTemplateWithNoSideEffects(newView);
 
     // Update the nav order:
     if (newView.id) {
@@ -176,10 +176,10 @@ export function MaterialSampleFormNav({
               />
             ))}
           </SortableNavGroup>
-          {!hideCustomViewSelect && (
-            <MaterialSampleNavCustomViewSelect
-              onChange={updateCustomView}
-              selectedView={customView}
+          {!hideFormTemplateSelect && (
+            <MaterialSampleNavFormTemplateSelect
+              onChange={updateFormTemplate}
+              selectedView={formTemplate}
               navOrder={navOrder ?? null}
             />
           )}

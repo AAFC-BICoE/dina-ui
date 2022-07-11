@@ -1,13 +1,13 @@
 import ManagedAttributesViewListPage from "../../../pages/collection/managed-attributes-view/list";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
-  CustomView,
+  FormTemplate,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 
-const TEST_CUSTOM_VIEWS: CustomView[] = [
+const TEST_CUSTOM_VIEWS: FormTemplate[] = [
   {
-    type: "custom-view",
+    type: "form-template",
     createdBy: "poffm",
     createdOn: "2022-02-03",
     group: "test-group",
@@ -24,7 +24,7 @@ const TEST_CUSTOM_VIEWS: CustomView[] = [
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
       return { data: TEST_CUSTOM_VIEWS };
   }
 });
@@ -43,10 +43,10 @@ describe("ManagedAttributesViewListPage", () => {
 
     expect(mockGet.mock.calls).toEqual([
       [
-        "collection-api/custom-view",
+        "collection-api/form-template",
         expect.objectContaining({
           // The important part of the list query:
-          // Filter by "managed-attributes-view" to omit unrelated custom-view records:
+          // Filter by "managed-attributes-view" to omit unrelated form-template records:
           filter: {
             "viewConfiguration.type": "managed-attributes-view"
           }

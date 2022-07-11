@@ -2,7 +2,7 @@ export * from "./resources/AcquisitionEvent";
 export * from "./resources/CollectingEvent";
 export * from "./resources/Collection";
 export * from "./resources/CollectorGroup";
-export * from "./resources/CustomView";
+export * from "./resources/FormTemplate";
 export * from "./resources/Determination";
 export * from "./resources/GeographicPlaceNameSourceDetail";
 export * from "./resources/GeoReferenceAssertion";

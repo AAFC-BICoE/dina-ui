@@ -4,12 +4,12 @@ import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { SortableNavGroup, StorageLinker } from "../../../../components";
-import { MaterialSampleCustomViewForm } from "../../../../pages/collection/material-sample-custom-view/edit";
+import { MaterialSampleFormTemplateForm } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  CustomView,
+  FormTemplate,
   StorageUnit
 } from "../../../../types/collection-api";
 
@@ -118,12 +118,12 @@ const apiContext = {
 
 /** Mount the form and provide test util functions. */
 async function mountForm(
-  existingActionDefinition?: PersistedResource<CustomView>
+  existingActionDefinition?: PersistedResource<FormTemplate>
 ) {
   const wrapper = mountWithAppContext(
-    <MaterialSampleCustomViewForm
+    <MaterialSampleFormTemplateForm
       onSaved={mockOnSaved}
-      fetchedCustomView={existingActionDefinition}
+      fetchedFormTemplate={existingActionDefinition}
     />,
     { apiContext }
   );
@@ -248,11 +248,11 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {},
+        formTemplate: {},
         navOrder: ["material-sample-info-section", "identifiers-section"],
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
 
@@ -270,9 +270,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "managedAttributes.attribute_1": {
@@ -284,7 +284,7 @@ describe("Workflow template edit page", () => {
         },
         navOrder: null,
         managedAttributesOrder: ["attribute_2", "attribute_1"],
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
 
@@ -305,7 +305,7 @@ describe("Workflow template edit page", () => {
       )
     ).toEqual(["attribute_2", "attribute_1"]);
     expect(
-      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplates
+      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplate
         .MATERIAL_SAMPLE.templateFields["managedAttributes.attribute_1"]
     ).toEqual({
       enabled: true,
@@ -319,9 +319,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             templateFields: {
               "managedAttributes.attribute_1": {
@@ -333,7 +333,7 @@ describe("Workflow template edit page", () => {
         },
         navOrder: null,
         collectingEventManagedAttributesOrder: ["attribute_2", "attribute_1"],
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
 
@@ -363,7 +363,7 @@ describe("Workflow template edit page", () => {
       )
     ).toEqual(["attribute_2", "attribute_1"]);
     expect(
-      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplates
+      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplate
         .COLLECTING_EVENT.templateFields["managedAttributes.attribute_1"]
     ).toEqual({
       enabled: true,
@@ -377,9 +377,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "organism[0].determination[0].managedAttributes.attribute_1": {
@@ -391,7 +391,7 @@ describe("Workflow template edit page", () => {
         },
         navOrder: null,
         determinationManagedAttributesOrder: ["attribute_2", "attribute_1"],
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
 
@@ -421,7 +421,7 @@ describe("Workflow template edit page", () => {
       )
     ).toEqual(["attribute_2", "attribute_1"]);
     expect(
-      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplates
+      mockOnSaved.mock.calls[0][0].viewConfiguration.formTemplate
         .MATERIAL_SAMPLE.templateFields[
         "organism[0].determination[0].managedAttributes.attribute_1"
       ]
@@ -468,9 +468,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           ACQUISITION_EVENT: undefined,
           COLLECTING_EVENT: undefined,
           MATERIAL_SAMPLE: {
@@ -478,7 +478,7 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: expect.arrayContaining([]),
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
 
@@ -522,9 +522,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "managedAttributes.attribute_1": {
@@ -538,7 +538,7 @@ describe("Workflow template edit page", () => {
         },
         managedAttributesOrder: ["attribute_1", "attribute_2"],
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
   });
@@ -584,9 +584,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             // Has the default values:
             templateFields: {
@@ -603,7 +603,7 @@ describe("Workflow template edit page", () => {
         },
         managedAttributesOrder: ["attribute_1", "attribute_2"],
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
   });
@@ -652,9 +652,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             templateFields: {
               "managedAttributes.attribute_1": {
@@ -673,7 +673,7 @@ describe("Workflow template edit page", () => {
         },
         collectingEventManagedAttributesOrder: ["attribute_1", "attribute_2"],
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
   });
@@ -722,9 +722,9 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "organism[0].determination[0].managedAttributes.attribute_1": {
@@ -739,7 +739,7 @@ describe("Workflow template edit page", () => {
         },
         determinationManagedAttributesOrder: ["attribute_1", "attribute_2"],
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       }
     });
   });
@@ -770,7 +770,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           // Both data components enabled but no fields defined:
           COLLECTING_EVENT: {
             templateFields: {}
@@ -780,13 +780,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -833,7 +833,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             allowNew: true,
             templateFields: {
@@ -864,13 +864,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -900,7 +900,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             allowNew: true,
             templateFields: {
@@ -916,13 +916,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -952,7 +952,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             allowNew: true,
             templateFields: {
@@ -964,13 +964,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1001,7 +1001,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "associations[0].associatedSample": {
@@ -1015,13 +1015,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1047,7 +1047,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             templateFields: {
               // Only includes the linked collecting event's ID:
@@ -1062,13 +1062,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1095,7 +1095,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               storageUnit: {
@@ -1109,13 +1109,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1145,7 +1145,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               "scheduledAction.remarks": {
@@ -1156,13 +1156,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1192,7 +1192,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {}
           },
@@ -1206,13 +1206,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1237,7 +1237,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               projects: {
@@ -1251,13 +1251,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1294,7 +1294,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             templateFields: {
               notPubliclyReleasableReason: {
@@ -1309,13 +1309,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1345,7 +1345,7 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           ACQUISITION_EVENT: {
             templateFields: {
               // Only includes the linked acquisition event's ID:
@@ -1360,24 +1360,24 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
   it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
     const { colEventSwitch, catalogSwitch, scheduledActionsSwitch } =
       await mountForm({
-        type: "custom-view",
+        type: "form-template",
         viewConfiguration: {
-          formTemplates: {},
+          formTemplate: {},
           navOrder: null,
-          type: "material-sample-form-custom-view"
+          type: "material-sample-form-template"
         },
         group: "test-group-1",
         id: "123",
@@ -1395,12 +1395,12 @@ describe("Workflow template edit page", () => {
     const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
       await mountForm({
         id: "123",
-        type: "custom-view",
+        type: "form-template",
         name: "test-config",
         restrictToCreatedBy: false,
         group: "test-group-1",
         viewConfiguration: {
-          formTemplates: {
+          formTemplate: {
             COLLECTING_EVENT: {
               allowExisting: false,
               allowNew: false,
@@ -1413,7 +1413,7 @@ describe("Workflow template edit page", () => {
             }
           },
           navOrder: null,
-          type: "material-sample-form-custom-view"
+          type: "material-sample-form-template"
         }
       });
 
@@ -1435,7 +1435,7 @@ describe("Workflow template edit page", () => {
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             allowExisting: false,
             allowNew: false,
@@ -1446,20 +1446,20 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
   it("Edits an existing action-definition: Can unlink an existing Acquisition Event.", async () => {
     const { wrapper, acquisitionEventSwitch, submitForm } = await mountForm({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           ACQUISITION_EVENT: {
             allowExisting: true,
             allowNew: true,
@@ -1472,13 +1472,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
 
     expect(acquisitionEventSwitch().prop("checked")).toEqual(true);
@@ -1495,7 +1495,7 @@ describe("Workflow template edit page", () => {
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           ACQUISITION_EVENT: {
             templateFields: {}
           },
@@ -1504,13 +1504,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1518,7 +1518,7 @@ describe("Workflow template edit page", () => {
     const { wrapper, colEventSwitch, catalogSwitch, submitForm } =
       await mountForm({
         viewConfiguration: {
-          formTemplates: {
+          formTemplate: {
             COLLECTING_EVENT: {
               allowNew: true,
               allowExisting: true,
@@ -1549,13 +1549,13 @@ describe("Workflow template edit page", () => {
             }
           },
           navOrder: null,
-          type: "material-sample-form-custom-view"
+          type: "material-sample-form-template"
         },
         group: "test-group-1",
         id: "123",
         name: "test-config",
         restrictToCreatedBy: false,
-        type: "custom-view"
+        type: "form-template"
       });
 
     // Data Component checkboxes are checked:
@@ -1579,7 +1579,7 @@ describe("Workflow template edit page", () => {
     // The template's link was removed:
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             allowExisting: true,
             allowNew: true,
@@ -1607,13 +1607,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
@@ -1632,7 +1632,7 @@ describe("Workflow template edit page", () => {
       submitForm
     } = await mountForm({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           COLLECTING_EVENT: {
             allowNew: true,
             allowExisting: true,
@@ -1677,13 +1677,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
 
     // Data Component checkboxes are checked:
@@ -1705,7 +1705,7 @@ describe("Workflow template edit page", () => {
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
         // Both data components removed:
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             allowNew: true,
             allowExisting: true,
@@ -1713,20 +1713,20 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 
   it("Edits an existing action-definition: Splits the Identifiers and Preparation subforms correctly", async () => {
     const { wrapper, submitForm } = await mountForm({
       viewConfiguration: {
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             allowNew: true,
             allowExisting: true,
@@ -1751,13 +1751,13 @@ describe("Workflow template edit page", () => {
           }
         },
         navOrder: null,
-        type: "material-sample-form-custom-view"
+        type: "material-sample-form-template"
       },
       group: "test-group-1",
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
 
     // The input values should be initialized:
@@ -1783,9 +1783,9 @@ describe("Workflow template edit page", () => {
 
     expect(mockOnSaved).lastCalledWith({
       viewConfiguration: {
-        type: "material-sample-form-custom-view",
+        type: "material-sample-form-template",
         navOrder: null,
-        formTemplates: {
+        formTemplate: {
           MATERIAL_SAMPLE: {
             allowExisting: true,
             allowNew: true,
@@ -1815,7 +1815,7 @@ describe("Workflow template edit page", () => {
       id: "123",
       name: "test-config",
       restrictToCreatedBy: false,
-      type: "custom-view"
+      type: "form-template"
     });
   });
 });

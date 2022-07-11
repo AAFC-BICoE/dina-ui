@@ -16,10 +16,10 @@ import { Promisable } from "type-fest";
 import {
   BulkNavigatorTab,
   MaterialSampleBulkNavigator,
-  MaterialSampleCustomViewSelect,
+  MaterialSampleFormTemplateSelect,
   MaterialSampleForm,
   MaterialSampleFormProps,
-  useMaterialSampleFormCustomViewSelectState,
+  useMaterialSampleFormFormTemplateSelectState,
   useMaterialSampleSave
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -48,15 +48,15 @@ export function MaterialSampleBulkEditor({
 
   // Allow selecting a custom view for the form:
   const {
-    sampleFormCustomView,
-    setSampleFormCustomView,
+    sampleFormFormTemplate,
+    setSampleFormFormTemplate,
     navOrder,
     setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys
-  } = useMaterialSampleFormCustomViewSelectState();
+  } = useMaterialSampleFormFormTemplateSelectState();
 
-  const customViewProps: Partial<MaterialSampleFormProps> = {
+  const formTemplateProps: Partial<MaterialSampleFormProps> = {
     navOrder,
     onChangeNavOrder: setNavOrder,
     enabledFields,
@@ -87,7 +87,7 @@ export function MaterialSampleBulkEditor({
     sampleHooks,
     hideBulkEditTab: !initialized,
     hideUseSequence: true,
-    sampleFormProps: customViewProps
+    sampleFormProps: formTemplateProps
   });
 
   useEffect(() => {
@@ -116,9 +116,9 @@ export function MaterialSampleBulkEditor({
           )}
           <div className="flex-grow-1">
             <div className="mx-auto">
-              <MaterialSampleCustomViewSelect
-                value={sampleFormCustomView}
-                onChange={setSampleFormCustomView}
+              <MaterialSampleFormTemplateSelect
+                value={sampleFormFormTemplate}
+                onChange={setSampleFormFormTemplate}
               />
             </div>
           </div>
@@ -154,7 +154,7 @@ export function MaterialSampleBulkEditor({
               disableAutoNamePrefix={true}
               isOffScreen={!isSelected}
               reduceRendering={!isSelected}
-              {...customViewProps}
+              {...formTemplateProps}
             />
           )}
         />

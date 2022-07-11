@@ -1,36 +1,36 @@
 import { FieldSpy, filterBy, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { CustomView } from "../../../types/collection-api";
+import { FormTemplate } from "../../../types/collection-api";
 
-export interface MaterialSampleCustomViewSelectProps {
-  value?: PersistedResource<CustomView>;
-  onChange: (newValue: PersistedResource<CustomView>) => void;
+export interface MaterialSampleFormTemplateSelectProps {
+  value?: PersistedResource<FormTemplate>;
+  onChange: (newValue: PersistedResource<FormTemplate>) => void;
 }
 
-export function MaterialSampleCustomViewSelect({
+export function MaterialSampleFormTemplateSelect({
   onChange,
   value
-}: MaterialSampleCustomViewSelectProps) {
+}: MaterialSampleFormTemplateSelectProps) {
   return (
-    <label className="d-flex align-items-center gap-2 material-sample-custom-view-select">
+    <label className="d-flex align-items-center gap-2 form-template-select">
       <div className="fw-bold">
         <DinaMessage id="customFormView" />
       </div>
       <div style={{ width: "20rem" }}>
         <FieldSpy<string> fieldName="group">
           {group => (
-            <ResourceSelect<CustomView>
+            <ResourceSelect<FormTemplate>
               filter={input => ({
-                // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
-                "viewConfiguration.type": "material-sample-form-custom-view",
+                // Filter by "material-sample-form-section-order" to omit unrelated form-template records:
+                "viewConfiguration.type": "material-sample-form-template",
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
                 // Filter by the form's group:
                 ...(group && { group: { EQ: `${group}` } })
               })}
               optionLabel={view => view.name || view.id}
-              model="collection-api/custom-view"
+              model="collection-api/form-template"
               onChange={onChange}
               value={value}
             />

@@ -104,7 +104,7 @@ export function Home() {
                     <DinaMessage id="storageUnitListTitle" />
                   </a>
                 </Link>
-                <Link href="/collection/material-sample-custom-view/list">
+                <Link href="/collection/form-template/list">
                   <a>
                     <DinaMessage id="workflowTemplates" />
                   </a>

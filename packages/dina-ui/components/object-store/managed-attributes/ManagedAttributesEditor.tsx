@@ -14,7 +14,7 @@ import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
@@ -38,9 +38,9 @@ export interface ManagedAttributesEditorProps {
   fieldSetProps?: Partial<FieldSetProps>;
 
   /**
-   * Shows the dropdown to select a custom-view for Managed Attributes.
+   * Shows the dropdown to select a form-template for Managed Attributes.
    */
-  showCustomViewDropdown?: boolean;
+  showFormTemplateDropdown?: boolean;
 
   /**
    * The formik field name for editing a Custom View's managed attributes order.
@@ -53,7 +53,7 @@ export interface ManagedAttributesEditorProps {
    * e.g. when the form's custom view is updated.
    */
   visibleAttributeKeys?: string[];
-  
+
   values?: object;
 }
 
@@ -63,7 +63,7 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
-  showCustomViewDropdown,
+  showFormTemplateDropdown,
   managedAttributeOrderFieldName,
   visibleAttributeKeys: visibleAttributeKeysProp,
   values
@@ -71,7 +71,8 @@ export function ManagedAttributesEditor({
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
 
-  const [customView, setCustomView] = useState<PersistedResource<CustomView>>();
+  const [formTemplate, setFormTemplate] =
+    useState<PersistedResource<FormTemplate>>();
   return (
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {currentValue => {
@@ -100,8 +101,8 @@ export function ManagedAttributesEditor({
         }, [visibleAttributeKeysProp]);
 
         /** Put the Custom View into the dropdown and update the visible attribute keys.  */
-        function updateCustomView(newView?: PersistedResource<CustomView>) {
-          setCustomView(newView);
+        function updateFormTemplate(newView?: PersistedResource<FormTemplate>) {
+          setFormTemplate(newView);
 
           if (
             newView?.id &&
@@ -136,20 +137,20 @@ export function ManagedAttributesEditor({
         }
 
         const visibleAttributes = lastFetchedAttributes.current;
-        
+
         return (
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
             {...fieldSetProps}
-            {...(showCustomViewDropdown && {
+            {...(showFormTemplateDropdown && {
               wrapLegend: legend => (
                 <div className="row">
                   <div className="col-sm-6">{legend}</div>
                   <div className="col-sm-6">
                     <ManagedAttributesViewSelect
                       managedAttributeComponent={managedAttributeComponent}
-                      value={customView}
-                      onChange={updateCustomView}
+                      value={formTemplate}
+                      onChange={updateFormTemplate}
                     />
                   </div>
                 </div>

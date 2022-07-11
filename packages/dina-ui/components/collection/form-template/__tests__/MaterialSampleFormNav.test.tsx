@@ -2,16 +2,16 @@ import { deleteFromStorage, writeStorage } from "@rehooks/local-storage";
 import { ResourceSelect } from "common-ui";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SortableNavGroup } from "../../material-sample/material-sample-form-nav/MaterialSampleFormNav";
-import { LAST_USED_ID_STORAGE_KEY } from "../../material-sample/material-sample-form-nav/MaterialSampleNavCustomViewSelect";
+import { LAST_USED_ID_STORAGE_KEY } from "../../material-sample/material-sample-form-nav/MaterialSampleNavFormTemplateSelect";
 import { MaterialSampleForm } from "../../material-sample/MaterialSampleForm";
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/custom-view/123":
+    case "collection-api/form-template/123":
       return {
         data: {
           id: "123",
-          type: "custom-view",
+          type: "form-template",
           name: "persisted-view",
           createdBy: "test-user",
           viewConfiguration: {
@@ -27,7 +27,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/material-sample-type":
     case "collection-api/project":
     case "collection-api/material-sample":
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleState":
       return { data: [] };
   }
@@ -144,13 +144,13 @@ describe("MaterialSampleFormNav", () => {
               group: "test group",
               name: "my new view",
               restrictToCreatedBy: false,
-              type: "custom-view",
+              type: "form-template",
               viewConfiguration: {
                 navOrder: expect.arrayContaining([]),
                 type: "material-sample-form-section-order"
               }
             },
-            type: "custom-view"
+            type: "form-template"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -177,7 +177,7 @@ describe("MaterialSampleFormNav", () => {
       name: "my new view",
       restrictToCreatedBy: false,
       createdBy: "test-user",
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
         navOrder: expect.arrayContaining([]),
         type: "material-sample-form-section-order"
@@ -225,7 +225,7 @@ describe("MaterialSampleFormNav", () => {
     ).toEqual({
       id: "123",
       name: "persisted-view",
-      type: "custom-view",
+      type: "form-template",
       createdBy: "test-user",
       viewConfiguration: {
         navOrder: ["material-sample-info-section", "identifiers-section"],
@@ -304,13 +304,13 @@ describe("MaterialSampleFormNav", () => {
           {
             resource: {
               id: "123",
-              type: "custom-view",
+              type: "form-template",
               viewConfiguration: {
                 navOrder: expect.arrayContaining([]),
                 type: "material-sample-form-section-order"
               }
             },
-            type: "custom-view"
+            type: "form-template"
           }
         ],
         { apiBaseUrl: "/collection-api" }
@@ -365,7 +365,7 @@ describe("MaterialSampleFormNav", () => {
 
     expect(mockDoOperations.mock.calls).toEqual([
       [
-        [{ op: "DELETE", path: "custom-view/123" }],
+        [{ op: "DELETE", path: "form-template/123" }],
         { apiBaseUrl: "/collection-api" }
       ]
     ]);

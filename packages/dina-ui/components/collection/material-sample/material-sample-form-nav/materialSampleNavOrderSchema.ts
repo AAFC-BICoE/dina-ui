@@ -7,7 +7,7 @@ import {
 /** Yup needs this as an array even though it's a single string literal. */
 const typeNameArray = ["material-sample-form-section-order"] as const;
 
-/** Expected shape of the CustomView's viewConfiguration field. */
+/** Expected shape of the FormTemplate's viewConfiguration field. */
 export const materialSampleNavOrderSchema = yup.object({
   type: yup
     .mixed<typeof typeNameArray[number]>()

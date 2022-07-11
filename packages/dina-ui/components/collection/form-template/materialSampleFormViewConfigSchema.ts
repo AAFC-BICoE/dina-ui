@@ -19,8 +19,8 @@ const formTemplateSchema = z.object({
   templateFields: templateFieldMapSchema
 });
 
-export const materialSampleFormCustomViewSchema = z.object({
-  type: z.literal("material-sample-form-custom-view"),
+export const materialSampleFormTemplateSchema = z.object({
+  type: z.literal("material-sample-form-template"),
   navOrder: z
     .enum(MATERIAL_SAMPLE_FORM_SECTIONS)
     .array()
@@ -29,7 +29,7 @@ export const materialSampleFormCustomViewSchema = z.object({
   managedAttributesOrder: z.string().array().optional(),
   determinationManagedAttributesOrder: z.string().array().optional(),
   collectingEventManagedAttributesOrder: z.string().array().optional(),
-  formTemplates: z.object({
+  formTemplate: z.object({
     COLLECTING_EVENT: formTemplateSchema.optional(),
     MATERIAL_SAMPLE: formTemplateSchema.optional(),
     ACQUISITION_EVENT: formTemplateSchema.optional()
@@ -47,6 +47,6 @@ export type TemplateFieldMap = z.infer<typeof templateFieldMapSchema>;
 /** Configures one field in a form template. */
 export type TemplateField = z.infer<typeof templateFieldSchema>;
 
-export type MaterialSampleFormCustomViewConfig = z.infer<
-  typeof materialSampleFormCustomViewSchema
+export type MaterialSampleFormTemplateConfig = z.infer<
+  typeof materialSampleFormTemplateSchema
 >;

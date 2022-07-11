@@ -1,35 +1,35 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
 import {
-  CustomView,
+  FormTemplate,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
-import { materialSampleFormCustomViewSchema } from "./materialSampleFormViewConfigSchema";
-import { useMaterialSampleFormCustomViewProps } from "./useMaterialSampleFormCustomViewProps";
+import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
+import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 
 /**
  * Manages the state of a MaterialSampleForm Custom View selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
  * Only handles Custom Views (e.g. show/hide fields), not default values.
  */
-export function useMaterialSampleFormCustomViewSelectState() {
-  const [sampleFormCustomView, setSampleFormCustomView] =
-    useState<PersistedResource<CustomView>>();
+export function useMaterialSampleFormFormTemplateSelectState() {
+  const [sampleFormFormTemplate, setSampleFormFormTemplate] =
+    useState<PersistedResource<FormTemplate>>();
 
-  const customViewConfig = useMemo(
+  const formTemplateConfig = useMemo(
     () =>
-      sampleFormCustomView?.id
-        ? materialSampleFormCustomViewSchema.parse(
-            sampleFormCustomView?.viewConfiguration
+      sampleFormFormTemplate?.id
+        ? materialSampleFormTemplateSchema.parse(
+            sampleFormFormTemplate?.viewConfiguration
           )
         : undefined,
-    [sampleFormCustomView]
+    [sampleFormFormTemplate]
   );
 
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
   const { enabledFields, visibleManagedAttributeKeys } =
-    useMaterialSampleFormCustomViewProps(customViewConfig) ?? {};
+    useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
 
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<
@@ -39,14 +39,14 @@ export function useMaterialSampleFormCustomViewSelectState() {
   // Effect hook: When the Custom View changes,
   // update the navOrder to what's stored in the Custom View:
   useEffect(() => {
-    if (sampleFormCustomView) {
-      setNavOrder(customViewConfig?.navOrder ?? null);
+    if (sampleFormFormTemplate) {
+      setNavOrder(formTemplateConfig?.navOrder ?? null);
     }
-  }, [customViewConfig]);
+  }, [formTemplateConfig]);
 
   return {
-    sampleFormCustomView,
-    setSampleFormCustomView,
+    sampleFormFormTemplate,
+    setSampleFormFormTemplate,
     navOrder,
     setNavOrder,
     enabledFields,

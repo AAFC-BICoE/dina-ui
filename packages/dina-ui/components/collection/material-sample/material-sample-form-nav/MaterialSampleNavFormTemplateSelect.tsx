@@ -21,7 +21,7 @@ import * as yup from "yup";
 import { materialSampleNavOrderSchema } from "../../..";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   MaterialSampleFormSectionId
 } from "../../../../types/collection-api";
 
@@ -32,9 +32,9 @@ const navSaveFormSchema = yup.object({
 export const LAST_USED_ID_STORAGE_KEY =
   "last-selected-material-sample-form-section-order-id";
 
-export interface MaterialSampleNavCustomViewSelect {
-  onChange: (newVal: PersistedResource<CustomView> | { id: null }) => void;
-  selectedView?: PersistedResource<CustomView> | { id: null };
+export interface MaterialSampleNavFormTemplateSelect {
+  onChange: (newVal: PersistedResource<FormTemplate> | { id: null }) => void;
+  selectedView?: PersistedResource<FormTemplate> | { id: null };
   navOrder: MaterialSampleFormSectionId[] | null;
 }
 
@@ -42,11 +42,11 @@ export interface MaterialSampleNavCustomViewSelect {
  * Dropdown menu for selecting a Material Sample Form custom view order.
  * With controls for create/update/delete.
  */
-export function MaterialSampleNavCustomViewSelect({
+export function MaterialSampleNavFormTemplateSelect({
   onChange: onChangeProp,
   selectedView,
   navOrder
-}: MaterialSampleNavCustomViewSelect) {
+}: MaterialSampleNavFormTemplateSelect) {
   const { username } = useAccount();
   const { openModal, closeModal } = useModal();
   const [lastUpdate, setLastUpdate] = useState(Date.now());
@@ -54,8 +54,8 @@ export function MaterialSampleNavCustomViewSelect({
     LAST_USED_ID_STORAGE_KEY
   );
 
-  const lastUsedViewQuery = useQuery<CustomView>(
-    { path: `collection-api/custom-view/${lastSelectedId}` },
+  const lastUsedViewQuery = useQuery<FormTemplate>(
+    { path: `collection-api/form-template/${lastSelectedId}` },
     { disabled: !lastSelectedId }
   );
   const lastUsedView = lastUsedViewQuery.response?.data;
@@ -68,7 +68,9 @@ export function MaterialSampleNavCustomViewSelect({
 
   const isEdited = navOrder && !isEqual(navOrder, viewConfig?.navOrder);
 
-  function onChange(newSelected: PersistedResource<CustomView> | { id: null }) {
+  function onChange(
+    newSelected: PersistedResource<FormTemplate> | { id: null }
+  ) {
     onChangeProp(newSelected);
     setLastUpdate(Date.now());
     if (newSelected.id) {
@@ -101,13 +103,13 @@ export function MaterialSampleNavCustomViewSelect({
               </FormikButton>
             </div>
           )}
-          <label className="w-100 mb-3 custom-view-select">
+          <label className="w-100 mb-3 form-template-select">
             <div className="mb-2 fw-bold">
               <DinaMessage id="customComponentOrder" />
             </div>
-            <ResourceSelect<CustomView>
+            <ResourceSelect<FormTemplate>
               filter={input => ({
-                // Filter by "material-sample-form-section-order" to omit unrelated custom-view records:
+                // Filter by "material-sample-form-section-order" to omit unrelated form-template records:
                 "viewConfiguration.type": "material-sample-form-section-order",
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
@@ -115,9 +117,9 @@ export function MaterialSampleNavCustomViewSelect({
                 ...(group && { group: { EQ: `${group}` } })
               })}
               optionLabel={view => view.name || view.id}
-              model="collection-api/custom-view"
+              model="collection-api/form-template"
               onChange={newVal =>
-                onChange(newVal as PersistedResource<CustomView>)
+                onChange(newVal as PersistedResource<FormTemplate>)
               }
               value={selectedView}
               // Refresh the query whenever the custom view is changed.
@@ -133,7 +135,7 @@ export function MaterialSampleNavCustomViewSelect({
                   onChange({ id: null });
                   setLastSelectedId(null);
                 }}
-                type="custom-view"
+                type="form-template"
                 replaceClassName="btn btn-outline-danger delete-view"
                 style={{ width: "" }}
               >
@@ -160,8 +162,10 @@ export function MaterialSampleNavCustomViewSelect({
 
 export interface MaterialSampleNavViewModalProps {
   closeModal: () => void;
-  onChange: (newSelected: PersistedResource<CustomView> | { id: null }) => void;
-  selectedView?: PersistedResource<CustomView> | { id: null };
+  onChange: (
+    newSelected: PersistedResource<FormTemplate> | { id: null }
+  ) => void;
+  selectedView?: PersistedResource<FormTemplate> | { id: null };
   navOrder: MaterialSampleFormSectionId[];
   group?: string;
 }
@@ -182,12 +186,12 @@ export function MaterialSampleNavViewModal({
     navOrder
   };
 
-  async function saveView(newView: InputResource<CustomView>) {
-    const [savedView] = await save<CustomView>(
+  async function saveView(newView: InputResource<FormTemplate>) {
+    const [savedView] = await save<FormTemplate>(
       [
         {
           resource: newView,
-          type: "custom-view"
+          type: "form-template"
         }
       ],
       { apiBaseUrl: "/collection-api" }
@@ -199,8 +203,8 @@ export function MaterialSampleNavViewModal({
   async function saveNewView({
     submittedValues
   }: DinaFormSubmitParams<yup.InferType<typeof navSaveFormSchema>>) {
-    const newView: InputResource<CustomView> = {
-      type: "custom-view",
+    const newView: InputResource<FormTemplate> = {
+      type: "form-template",
       name: submittedValues.name,
       group: group ?? undefined,
       restrictToCreatedBy: false,
@@ -210,9 +214,11 @@ export function MaterialSampleNavViewModal({
     await saveView(newView);
   }
 
-  async function saveExistingView(existingView: PersistedResource<CustomView>) {
-    const newView: InputResource<CustomView> = {
-      type: "custom-view",
+  async function saveExistingView(
+    existingView: PersistedResource<FormTemplate>
+  ) {
+    const newView: InputResource<FormTemplate> = {
+      type: "form-template",
       id: existingView.id,
       viewConfiguration: {
         ...viewConfig,

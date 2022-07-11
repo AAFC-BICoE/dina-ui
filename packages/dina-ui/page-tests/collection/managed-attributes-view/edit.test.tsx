@@ -5,7 +5,7 @@ import { SortableAttributesViewList } from "../../../components/object-store/man
 import ManagedAttributesViewEditPage from "../../../pages/collection/managed-attributes-view/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
-  CustomView,
+  FormTemplate,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 
@@ -16,9 +16,9 @@ jest.mock("next/router", () => ({
   useRouter: () => ({ query: mockQueryStringParams, push: mockPush })
 }));
 
-// Test an existing CustomView:
-const TEST_CUSTOM_VIEW: CustomView = {
-  type: "custom-view",
+// Test an existing FormTemplate:
+const TEST_CUSTOM_VIEW: FormTemplate = {
+  type: "form-template",
   createdBy: "poffm",
   createdOn: "2022-02-03",
   group: "test-group",
@@ -31,9 +31,9 @@ const TEST_CUSTOM_VIEW: CustomView = {
     type: "managed-attributes-view"
   })
 };
-// Test an existing CustomView:
-const TEST_BAD_CUSTOM_VIEW: CustomView = {
-  type: "custom-view",
+// Test an existing FormTemplate:
+const TEST_BAD_CUSTOM_VIEW: FormTemplate = {
+  type: "form-template",
   name: "My Custom View",
   viewConfiguration: {
     type: "wrong-type"
@@ -46,9 +46,9 @@ const ATTRIBUTE_3 = { id: "3", key: "attribute_3", name: "Attribute 3" };
 
 const mockGet = jest.fn<any, any>(async path => {
   switch (path) {
-    case "collection-api/custom-view/bad-custom-view":
+    case "collection-api/form-template/bad-form-template":
       return { data: TEST_BAD_CUSTOM_VIEW };
-    case "collection-api/custom-view/123":
+    case "collection-api/form-template/123":
       return { data: TEST_CUSTOM_VIEW };
     case "user-api/group":
     case "collection-api/managed-attribute":
@@ -92,7 +92,7 @@ describe("ManagedAttributesViewEditPage", () => {
     jest.clearAllMocks();
   });
 
-  it("Lets you submit a custom-view for managed attributes", async () => {
+  it("Lets you submit a form-template for managed attributes", async () => {
     const mockOnSaved = jest.fn();
 
     const wrapper = mountWithAppContext(
@@ -160,7 +160,7 @@ describe("ManagedAttributesViewEditPage", () => {
       id: "11111111-1111-1111-1111-111111111111",
       name: "test view",
       restrictToCreatedBy: true,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
         attributeKeys: ["attribute_3", "attribute_1", "attribute_2"],
         managedAttributeComponent: "MATERIAL_SAMPLE",
@@ -169,7 +169,7 @@ describe("ManagedAttributesViewEditPage", () => {
     });
   });
 
-  it("Lets you edit an existing custom-view for managed attributes", async () => {
+  it("Lets you edit an existing form-template for managed attributes", async () => {
     const wrapper = mountWithAppContext(
       <ManagedAttributesViewEditPage />,
       testCtx
@@ -200,14 +200,14 @@ describe("ManagedAttributesViewEditPage", () => {
             // The edited name:
             name: "edited name",
             restrictToCreatedBy: true,
-            type: "custom-view",
+            type: "form-template",
             viewConfiguration: {
               attributeKeys: ["attribute_1", "attribute_2"],
               managedAttributeComponent: "MATERIAL_SAMPLE",
               type: "managed-attributes-view"
             }
           },
-          type: "custom-view"
+          type: "form-template"
         }
       ],
       { apiBaseUrl: "/collection-api" }
@@ -218,8 +218,8 @@ describe("ManagedAttributesViewEditPage", () => {
     );
   });
 
-  it("Throws an error if you try to load a custom-view that is not for a Managed Attribute View", async () => {
-    mockQueryStringParams.id = "bad-custom-view";
+  it("Throws an error if you try to load a form-template that is not for a Managed Attribute View", async () => {
+    mockQueryStringParams.id = "bad-form-template";
 
     const wrapper = mountWithAppContext(
       <ManagedAttributesViewEditPage />,
@@ -230,7 +230,7 @@ describe("ManagedAttributesViewEditPage", () => {
     wrapper.update();
 
     // Bad error message but this should not happen in prod unless an invalid link is followed.
-    // The error is displayed instead of allowing you to edit a non-managed-attribute custom-view in this page.
+    // The error is displayed instead of allowing you to edit a non-managed-attribute form-template in this page.
     expect(wrapper.find(".alert.alert-danger").text()).toEqual(
       "ValidationError: type must be one of the following values: managed-attributes-view"
     );

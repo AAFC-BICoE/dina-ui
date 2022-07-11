@@ -124,19 +124,20 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   countryLabel: "Pays",
   creatNewWorkflow: "Créer nouveau",
   createAndAssign: "Créer et assigner",
-  createCustomView: "Créer une vue personnalisée",
-  createMaterialSampleCustomView:
+  createFormTemplate: "Créer une vue personnalisée",
+  createMaterialSampleFormTemplate:
     "Créer une vue personnalisée pour un échantillon de matériel",
   createNewLabel: "Créer nouveau",
   createNewMaterialSamples: "Créer de nouveaux échantillons de matériaux",
   createNewView: "Créer une nouvelle vue",
-  createSampleWithCustomView: "Créer un échantillon avec une vue personnalisée",
+  createSampleWithFormTemplate:
+    "Créer un échantillon avec une vue personnalisée",
   createSplitWorkflow: "Créer un fractionnement",
   createStorage: "Créer un espace d'entreposage",
   customComponentOrder: "Vue de la commande de pièces personnalisée",
   customFormView: "Vue du formulaire personnalisé",
   customPlaceName: "Nom de lieu personnalisé",
-  customView: "Vue personnalisée",
+  formTemplate: "Vue personnalisée",
   dataComponents: "Éléments de données",
   dataEntryLabel: "Saisie de données",
   dataset: "Ensemble de données",
@@ -185,7 +186,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editInstitutionTitle: "Modifier l’établissement",
   editManagedAttributeTitle: "Modifier l’attribut géré",
   editManagedAttributesViewTitle: "Créer une vue personnalisée",
-  editMaterialSampleCustomView:
+  editMaterialSampleFormTemplate:
     "Modifier une vue personnalisée pour un échantillon de matériel",
   editMaterialSampleTitle: "Modifier l’échantillon de matériaux",
   editMaterialSampleTypeTitle: "Modifier le type d’échantillon de matière",
@@ -200,7 +201,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
     "Modifier les métadonnées de la pièce jointe sélectionnée",
   editStorageUnitTitle: "Modifier l’unité de stockage",
   editStorageUnitTypeTitle: "Modifier le type de stockage",
-  editThisCustomView: "Modifier cette vue personnalisée",
+  editThisFormTemplate: "Modifier cette vue personnalisée",
   editTransactionTitle: "Modifier une transaction",
   elevationInMeters: "Élévation en mètres",
   enableDateRangeLabel: "Activer la plage de dates",
@@ -449,8 +450,9 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   materialSample: "Échantillon de matériaux",
   materialSampleAssociationLegend: "Association d'échantillons de matériaux",
   materialSampleAttachments: "Pièces jointes de l’échantillon de matériaux",
-  materialSampleCustomView: "Vue personnalisée des échantillons de matériel",
-  materialSampleCustomViews: "Vues personnalisées des échantillons de matériel",
+  materialSampleFormTemplate: "Vue personnalisée des échantillons de matériel",
+  materialSampleFormTemplates:
+    "Vues personnalisées des échantillons de matériel",
   materialSampleInfo: "Info sur l'échantillon de matière",
   materialSampleListTitle: "Échantillons de matériaux",
   materialSampleManagedAttributes:

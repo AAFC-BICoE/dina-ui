@@ -4,22 +4,22 @@ import { useRouter } from "next/router";
 import { Head, ManagedAttributesViewForm, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 
 export interface ManagedAttributesViewFormProps {
-  data?: InputResource<CustomView>;
+  data?: InputResource<FormTemplate>;
   /** Default component in the form's initialValues. */
   defaultManagedAttributeComponent?: string;
   /** Disable the attribute component field. */
   disabledAttributeComponent?: boolean;
-  onSaved: (data: PersistedResource<CustomView>) => Promise<void>;
+  onSaved: (data: PersistedResource<FormTemplate>) => Promise<void>;
 }
 
 export function useManagedAttributesView(id?: string) {
-  return useQuery<CustomView>(
-    { path: `collection-api/custom-view/${id}` },
+  return useQuery<FormTemplate>(
+    { path: `collection-api/form-template/${id}` },
     {
       onSuccess: async ({ data: fetchedView }) => {
         // Throw an error if the wrong type of Custom View
@@ -36,7 +36,7 @@ export default function ManagedAttributesViewEditPage() {
   const id = router.query.id?.toString?.();
   const { formatMessage } = useDinaIntl();
 
-  async function goToViewPage(data: PersistedResource<CustomView>) {
+  async function goToViewPage(data: PersistedResource<FormTemplate>) {
     await router.push(`/collection/managed-attributes-view/view?id=${data.id}`);
   }
 
