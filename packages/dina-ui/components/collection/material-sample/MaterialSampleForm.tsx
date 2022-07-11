@@ -65,6 +65,7 @@ export interface VisibleManagedAttributesConfig {
   collectingEvent?: string[];
   determination?: string[];
 }
+
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -112,14 +113,9 @@ export interface MaterialSampleFormProps {
 
   /** Hide the use next identifer checkbox, e.g when create multiple new samples */
   hideUseSequence?: boolean;
+
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
-
-  /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideNavFormTemplateSelect?: boolean;
-  /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
-  navOrder?: MaterialSampleFormSectionId[] | null;
-  onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 
   /**
    * Toggle to disable the collecting even switch due to a parent containing the collecting event
@@ -150,9 +146,6 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
-  hideNavFormTemplateSelect,
-  navOrder: navOrderProp,
-  onChangeNavOrder: onChangeNavOrderProp,
   visibleManagedAttributeKeys,
   disableCollectingEventSwitch,
   buttonBar = (
@@ -202,11 +195,6 @@ export function MaterialSampleForm({
   const attachmentsField = "attachment";
 
   const navState = useState<MaterialSampleFormSectionId[] | null>(null);
-
-  // Allow either controlled or uncontrolle state for the nav section:
-  const [formSectionOrder, setFormSectionOrder] = onChangeNavOrderProp
-    ? [navOrderProp, onChangeNavOrderProp]
-    : navState;
 
   /**
    * A map where:
@@ -386,11 +374,7 @@ export function MaterialSampleForm({
   const formSectionPairs = toPairs(formSections);
 
   const sortedFormSectionPairs = uniq([
-    ...compact(
-      (formSectionOrder ?? []).map(id =>
-        formSectionPairs.find(([it]) => it === id)
-      )
-    ),
+    ...compact([].map(id => formSectionPairs.find(([it]) => it === id))),
     ...formSectionPairs
   ]);
 
@@ -405,9 +389,6 @@ export function MaterialSampleForm({
               disableCollectingEventSwitch ||
               initialValues.parentMaterialSample !== undefined
             }
-            hideFormTemplateSelect={hideNavFormTemplateSelect}
-            navOrder={formSectionOrder}
-            onChangeNavOrder={setFormSectionOrder}
           />
         )}
       </div>

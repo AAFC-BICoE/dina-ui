@@ -19,7 +19,7 @@ import {
   MaterialSampleFormTemplateSelect,
   MaterialSampleForm,
   MaterialSampleFormProps,
-  useMaterialSampleFormFormTemplateSelectState,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleSave
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -48,17 +48,13 @@ export function MaterialSampleBulkEditor({
 
   // Allow selecting a custom view for the form:
   const {
-    sampleFormFormTemplate,
-    setSampleFormFormTemplate,
-    navOrder,
-    setNavOrder,
+    sampleFormTemplate,
+    setSampleFormTemplate,
     enabledFields,
     visibleManagedAttributeKeys
-  } = useMaterialSampleFormFormTemplateSelectState();
+  } = useMaterialSampleFormTemplateSelectState();
 
   const formTemplateProps: Partial<MaterialSampleFormProps> = {
-    navOrder,
-    onChangeNavOrder: setNavOrder,
     enabledFields,
     visibleManagedAttributeKeys
   };
@@ -117,8 +113,8 @@ export function MaterialSampleBulkEditor({
           <div className="flex-grow-1">
             <div className="mx-auto">
               <MaterialSampleFormTemplateSelect
-                value={sampleFormFormTemplate}
-                onChange={setSampleFormFormTemplate}
+                value={sampleFormTemplate}
+                onChange={setSampleFormTemplate}
               />
             </div>
           </div>

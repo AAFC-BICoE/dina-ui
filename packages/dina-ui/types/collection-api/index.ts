@@ -15,6 +15,7 @@ export * from "./resources/Organism";
 export * from "./resources/Project";
 export * from "./resources/Protocol";
 export * from "./resources/PreparationType";
+export * from "./resources/PreparationMethod";
 export * from "./resources/StorageUnit";
 export * from "./resources/StorageUnitType";
 export * from "./resources/VocabularyElement";

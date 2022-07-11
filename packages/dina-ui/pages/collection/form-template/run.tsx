@@ -99,10 +99,6 @@ export function CreateMaterialSampleFromWorkflowForm({
     return routeString === "newRun" ? moveToNewRunPage : moveToSampleViewPage;
   }
 
-  const [navOrder, setNavOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(actionDefinition.navOrder);
-
   const [onSaveString, setOnSaveString] =
     useState<RoutingButtonStrings>("viewSample");
 
@@ -150,8 +146,6 @@ export function CreateMaterialSampleFromWorkflowForm({
           "allowExisting"
         )
       }}
-      navOrder={navOrder}
-      onChangeNavOrder={setNavOrder}
       visibleManagedAttributeKeys={visibleManagedAttributeKeys}
     />
   );

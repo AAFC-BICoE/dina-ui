@@ -368,6 +368,9 @@ function NavDinaManagementDropdown({ formatMessage }) {
         <DinaMessage id="objectSubtypeListTitle" />
       </NavDropdown.Item>
       {/* Permission page here. */}
+      <NavDropdown.Item href="/collection/preparation-method/list">
+        <DinaMessage id="preparationMethodListTitle" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/preparation-type/list">
         <DinaMessage id="preparationTypeListTitle" />
       </NavDropdown.Item>

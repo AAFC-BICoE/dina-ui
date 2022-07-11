@@ -18,7 +18,6 @@ import { InputResource, PersistedResource } from "kitsu";
 import { isEqual } from "lodash";
 import { useState } from "react";
 import * as yup from "yup";
-import { materialSampleNavOrderSchema } from "../../..";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import {
   FormTemplate,

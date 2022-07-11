@@ -3,7 +3,7 @@ import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
-import { SortableNavGroup, StorageLinker } from "../../../../components";
+import { StorageLinker } from "../../../../components";
 import { MaterialSampleFormTemplateForm } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
@@ -429,66 +429,6 @@ describe("Workflow template edit page", () => {
       enabled: true,
       defaultValue: "attribute 1 default value"
     });
-  });
-
-  it("Submits a custom Navigation order.", async () => {
-    const { wrapper, submitForm, fillOutRequiredFields } = await mountForm();
-
-    await fillOutRequiredFields();
-
-    // Initially shows the default order: "Identifiers" then "Material Sample Info":
-    const listItemsBefore = wrapper.find(
-      ".material-sample-nav .list-group-item"
-    );
-    expect(
-      [listItemsBefore.at(0), listItemsBefore.at(1)].map(item => item.text())
-    ).toEqual(["Identifiers", "Material Sample Info"]);
-
-    // Simulate a sort event:
-    wrapper.find(SortableNavGroup).prop<any>("onSortEnd")({
-      oldIndex: 1,
-      newIndex: 0
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Shows the changed order: "Material Sample Info" then "Identifiers":
-    const listItemsAfter = wrapper.find(
-      ".material-sample-nav .list-group-item"
-    );
-    expect(
-      [listItemsAfter.at(0), listItemsAfter.at(1)].map(item => item.text())
-    ).toEqual(["Material Sample Info", "Identifiers"]);
-
-    await submitForm();
-
-    expect(mockOnSaved).lastCalledWith({
-      group: "test-group-1",
-      id: "123",
-      name: "test-config",
-      restrictToCreatedBy: false,
-      type: "form-template",
-      viewConfiguration: {
-        formTemplate: {
-          ACQUISITION_EVENT: undefined,
-          COLLECTING_EVENT: undefined,
-          MATERIAL_SAMPLE: {
-            templateFields: {}
-          }
-        },
-        navOrder: expect.arrayContaining([]),
-        type: "material-sample-form-template"
-      }
-    });
-
-    // The changed nav order was saved:
-    expect(
-      mockOnSaved.mock.calls[0][0].viewConfiguration.navOrder.slice(0, 2)
-    ).toEqual([
-      "material-sample-info-section", // Was Moved
-      "identifiers-section" // Was Moved
-    ]);
   });
 
   it("Submits a custom Managed Attributes order.", async () => {
