@@ -16,9 +16,16 @@ export interface JsonApiQuerySpec extends GetParams {
 
 /** Query hook state. */
 export interface QueryState<TData extends KitsuResponseData, TMeta> {
+  /** Boolean indicating the loading status. */
   loading: boolean;
+
+  /** Undefined if no errors have occurred. Error structure can change depending on the endpoint. */
   error?: DocWithErrors;
+
+  /** Response from the API request. If loading/error/disabled it will be undefined. */
   response?: KitsuResponse<TData, TMeta>;
+
+  /** Has the request been disabled. Disabled requests return undefined results. */
   isDisabled?: boolean;
 }
 

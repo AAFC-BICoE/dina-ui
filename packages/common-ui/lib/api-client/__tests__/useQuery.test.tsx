@@ -398,7 +398,10 @@ describe("useQuery hook", () => {
     expect(mockGet).toHaveBeenCalledTimes(2);
 
     // The loading state is returned when waiting for the second fetch.
-    expect(mockChild).lastCalledWith({ loading: true });
+    expect(mockChild).lastCalledWith({
+      isDisabled: false,
+      loading: true
+    });
 
     // Continue the test after the second request finishes.
     await new Promise(setImmediate);

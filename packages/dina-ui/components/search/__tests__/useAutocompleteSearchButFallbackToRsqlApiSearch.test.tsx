@@ -126,7 +126,7 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
           prefix: "test-query",
-          restrictedField: "data.attributes.testRestrictedField",
+          restrictedField: "testRestrictedField",
           restrictedFieldValue: "testRestrictedValue",
           documentId: "data.id"
         }
