@@ -39,7 +39,7 @@ export const materialSampleFormTemplateSchema = z.object({
 // Export typescript interfaces derived from the Zod schemas:
 
 /** Form template config and default values. */
-export type FormTemplate = z.infer<typeof formTemplateSchema>;
+export type FormTemplateConfig = z.infer<typeof formTemplateSchema>;
 
 /** Map of form field names to template field config. */
 export type TemplateFieldMap = z.infer<typeof templateFieldMapSchema>;

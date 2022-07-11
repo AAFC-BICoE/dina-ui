@@ -20,6 +20,7 @@ import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import {
+  FormTemplateConfig,
   GroupSelectField,
   Head,
   IDENTIFIERS_FIELDS,
@@ -435,7 +436,7 @@ export function getEnabledTemplateFieldsFromForm(
 
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
-  formTemplate?: Partial<FormTemplate>
+  formTemplate?: Partial<FormTemplateConfig>
 ): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   if (!formTemplate) {
     return {};
