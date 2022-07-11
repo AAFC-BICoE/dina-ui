@@ -19,7 +19,7 @@ import {
  * The props to pass into the MaterialSampleForm to enable a
  * custom view with restricted field sets and default values.
  */
-export interface MaterialSampleFormFormTemplateProps {
+export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
   acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
@@ -36,7 +36,7 @@ export function useMaterialSampleFormTemplateProps<
 >(
   actionDefinition?: T
 ): T extends MaterialSampleFormTemplateConfig
-  ? MaterialSampleFormFormTemplateProps
+  ? MaterialSampleFormTemplateProps
   : null {
   return useMemo(() => {
     if (!actionDefinition) {
@@ -134,7 +134,7 @@ export function useMaterialSampleFormTemplateProps<
       )
     };
 
-    const config: MaterialSampleFormFormTemplateProps = {
+    const config: MaterialSampleFormTemplateProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
       acquisitionEventInitialValues,

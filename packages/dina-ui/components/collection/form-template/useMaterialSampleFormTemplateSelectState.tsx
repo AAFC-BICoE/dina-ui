@@ -12,18 +12,18 @@ import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTempl
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
  * Only handles Custom Views (e.g. show/hide fields), not default values.
  */
-export function useMaterialSampleFormFormTemplateSelectState() {
-  const [sampleFormFormTemplate, setSampleFormFormTemplate] =
+export function useMaterialSampleFormTemplateSelectState() {
+  const [sampleFormTemplate, setSampleFormTemplate] =
     useState<PersistedResource<FormTemplate>>();
 
   const formTemplateConfig = useMemo(
     () =>
-      sampleFormFormTemplate?.id
+      sampleFormTemplate?.id
         ? materialSampleFormTemplateSchema.parse(
-            sampleFormFormTemplate?.viewConfiguration
+            sampleFormTemplate?.viewConfiguration
           )
         : undefined,
-    [sampleFormFormTemplate]
+    [sampleFormTemplate]
   );
 
   // Call the custom view hook but don't use the "initialValues" fields
@@ -39,14 +39,14 @@ export function useMaterialSampleFormFormTemplateSelectState() {
   // Effect hook: When the Custom View changes,
   // update the navOrder to what's stored in the Custom View:
   useEffect(() => {
-    if (sampleFormFormTemplate) {
+    if (sampleFormTemplate) {
       setNavOrder(formTemplateConfig?.navOrder ?? null);
     }
   }, [formTemplateConfig]);
 
   return {
-    sampleFormFormTemplate,
-    setSampleFormFormTemplate,
+    sampleFormTemplate,
+    setSampleFormTemplate,
     navOrder,
     setNavOrder,
     enabledFields,

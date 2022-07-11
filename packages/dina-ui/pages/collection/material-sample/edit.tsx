@@ -9,7 +9,7 @@ import {
   MaterialSampleFormProps,
   Nav,
   nextSampleInitialValues,
-  useMaterialSampleFormFormTemplateSelectState,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
@@ -48,10 +48,10 @@ export default function MaterialSampleEditPage() {
     navOrder,
     setNavOrder,
     enabledFields,
-    sampleFormFormTemplate,
-    setSampleFormFormTemplate,
+    sampleFormTemplate,
+    setSampleFormTemplate,
     visibleManagedAttributeKeys
-  } = useMaterialSampleFormFormTemplateSelectState();
+  } = useMaterialSampleFormTemplateSelectState();
 
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     enabledFields,
@@ -63,8 +63,8 @@ export default function MaterialSampleEditPage() {
         <div className="flex-grow-1 d-flex">
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect
-              value={sampleFormFormTemplate}
-              onChange={setSampleFormFormTemplate}
+              value={sampleFormTemplate}
+              onChange={setSampleFormTemplate}
             />
           </div>
         </div>
