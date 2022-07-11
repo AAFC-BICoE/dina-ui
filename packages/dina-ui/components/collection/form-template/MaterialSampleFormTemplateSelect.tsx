@@ -15,7 +15,7 @@ export function MaterialSampleFormTemplateSelect({
   return (
     <label className="d-flex align-items-center gap-2 form-template-select">
       <div className="fw-bold">
-        <DinaMessage id="customFormView" />
+        <DinaMessage id="formTemplateSelection" />
       </div>
       <div style={{ width: "20rem" }}>
         <FieldSpy<string> fieldName="group">
