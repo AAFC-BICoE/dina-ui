@@ -7,13 +7,13 @@ import {
   FieldSpy,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery
 } from "common-ui";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import * as yup from "yup";
 import { GroupSelectField } from "../../..";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { ManagedAttributesViewFormProps } from "../../../../pages/collection/managed-attributes-view/edit";
 import {
   FormTemplate,
   ManagedAttributesView,
@@ -24,6 +24,28 @@ import {
   COLLECTION_MODULE_TYPE_LABELS
 } from "../../../../types/collection-api/resources/ManagedAttribute";
 import { ManagedAttributesSorter } from "./ManagedAttributesSorter";
+
+export interface ManagedAttributesViewFormProps {
+  data?: InputResource<FormTemplate>;
+  /** Default component in the form's initialValues. */
+  defaultManagedAttributeComponent?: string;
+  /** Disable the attribute component field. */
+  disabledAttributeComponent?: boolean;
+  onSaved: (data: PersistedResource<FormTemplate>) => Promise<void>;
+}
+
+export function useManagedAttributesView(id?: string) {
+  return useQuery<FormTemplate>(
+    { path: `collection-api/form-template/${id}` },
+    {
+      onSuccess: async ({ data: fetchedView }) => {
+        // Throw an error if the wrong type of Form Template
+        managedAttributesViewSchema.validateSync(fetchedView.viewConfiguration);
+      },
+      disabled: !id
+    }
+  );
+}
 
 /**
  * Validate the JSON field on the front-end because it's unstructured JSON on the back-end.
