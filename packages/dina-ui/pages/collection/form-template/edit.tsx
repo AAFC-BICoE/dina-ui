@@ -15,17 +15,17 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { get, isNil, mapValues, pick, pickBy, set, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { RESTRICTIONS_FIELDS } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
+import { RESTRICTIONS_FIELDS } from "../../../components/collection/material-sample/RestrictionField";
 import React, { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import * as yup from "yup";
 import {
-  FormTemplate,
+  FormTemplateConfig,
   GroupSelectField,
   Head,
   IDENTIFIERS_FIELDS,
-  materialSampleFormCustomViewSchema,
-  MaterialSampleFormCustomViewConfig,
+  materialSampleFormTemplateSchema,
+  MaterialSampleFormTemplateConfig,
   MATERIALSAMPLE_FIELDSET_FIELDS,
   Nav,
   PREPARATION_FIELDS,
@@ -39,14 +39,14 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  CustomView,
+  FormTemplate,
   MaterialSample,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
 
 /** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
-  // CustomView resource fields:
+  // FormTemplate resource fields:
   id: yup.string(),
   name: yup.string().trim().required(),
   group: yup.string().required(),
@@ -65,22 +65,22 @@ const workflowMainFieldsSchema = yup.object({
 
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
-export default function MaterialSampleCustomViewEditPage() {
+export default function MaterialSampleFormTemplateEditPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const id = router.query.id?.toString();
 
-  const customViewQuery = useQuery<CustomView>(
-    { path: `/collection-api/custom-view/${id}` },
+  const formTemplateQuery = useQuery<FormTemplate>(
+    { path: `/collection-api/form-template/${id}` },
     { disabled: !id }
   );
 
   const pageTitle = id
-    ? "editMaterialSampleCustomView"
-    : "createMaterialSampleCustomView";
+    ? "editMaterialSampleFormTemplate"
+    : "createMaterialSampleFormTemplate";
 
   async function moveToNextPage() {
-    await router.push("/collection/material-sample-custom-view/list");
+    await router.push("/collection/form-template/list");
   }
 
   return (
@@ -92,45 +92,47 @@ export default function MaterialSampleCustomViewEditPage() {
           <DinaMessage id={pageTitle} />
         </h1>
         {id ? (
-          withResponse(customViewQuery, ({ data: fetchedCustomView }) => (
-            <MaterialSampleCustomViewForm
-              fetchedCustomView={fetchedCustomView}
+          withResponse(formTemplateQuery, ({ data: fetchedFormTemplate }) => (
+            <MaterialSampleFormTemplateForm
+              fetchedFormTemplate={fetchedFormTemplate}
               onSaved={moveToNextPage}
             />
           ))
         ) : (
-          <MaterialSampleCustomViewForm onSaved={moveToNextPage} />
+          <MaterialSampleFormTemplateForm onSaved={moveToNextPage} />
         )}
       </main>
     </div>
   );
 }
 
-export interface MaterialSampleCustomViewFormProps {
-  fetchedCustomView?: PersistedResource<CustomView>;
-  onSaved: (savedDefinition: PersistedResource<CustomView>) => Promisable<void>;
+export interface MaterialSampleFormTemplateFormProps {
+  fetchedFormTemplate?: PersistedResource<FormTemplate>;
+  onSaved: (
+    savedDefinition: PersistedResource<FormTemplate>
+  ) => Promisable<void>;
 }
 
-export function MaterialSampleCustomViewForm({
-  fetchedCustomView,
+export function MaterialSampleFormTemplateForm({
+  fetchedFormTemplate,
   onSaved
-}: MaterialSampleCustomViewFormProps) {
+}: MaterialSampleFormTemplateFormProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
 
   const { viewConfiguration: unknownViewConfig, ...initialDefinition } =
-    fetchedCustomView ?? {
-      type: "custom-view",
+    fetchedFormTemplate ?? {
+      type: "form-template",
       restrictToCreatedBy: false,
       publiclyReleasable: true,
       viewConfiguration: {
-        formTemplates: {},
-        type: "material-sample-form-custom-view"
+        formTemplate: {},
+        type: "material-sample-form-template"
       }
     };
 
   const initialViewConfig =
-    materialSampleFormCustomViewSchema.parse(unknownViewConfig);
+    materialSampleFormTemplateSchema.parse(unknownViewConfig);
 
   const [navOrder] = useState<MaterialSampleFormSectionId[] | null>(
     initialViewConfig.navOrder
@@ -139,7 +141,7 @@ export function MaterialSampleCustomViewForm({
   // Initialize the template form default values and checkbox states:
   const colEventTemplateInitialValues = {
     ...getTemplateInitialValuesFromSavedFormTemplate<CollectingEvent>(
-      initialViewConfig.formTemplates?.COLLECTING_EVENT
+      initialViewConfig.formTemplate?.COLLECTING_EVENT
     ),
     managedAttributesOrder:
       initialViewConfig.collectingEventManagedAttributesOrder
@@ -151,12 +153,12 @@ export function MaterialSampleCustomViewForm({
 
   const acqEventTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate<AcquisitionEvent>(
-      initialViewConfig.formTemplates?.ACQUISITION_EVENT
+      initialViewConfig.formTemplate?.ACQUISITION_EVENT
     );
 
   const materialSampleTemplateInitialValues =
     getTemplateInitialValuesFromSavedFormTemplate<MaterialSample>(
-      initialViewConfig.formTemplates?.MATERIAL_SAMPLE
+      initialViewConfig.formTemplate?.MATERIAL_SAMPLE
     );
 
   if (!materialSampleTemplateInitialValues.organism?.length) {
@@ -216,7 +218,7 @@ export function MaterialSampleCustomViewForm({
 
       ...materialSampleTemplateFields
     } = submittedValues;
-    const customViewFields = { id, group, name, restrictToCreatedBy };
+    const formTemplateFields = { id, group, name, restrictToCreatedBy };
 
     const determinationManagedAttributes = (get(
       materialSampleTemplateFields,
@@ -272,8 +274,8 @@ export function MaterialSampleCustomViewForm({
       : {};
 
     // Construct the template definition to persist based on the form values:
-    const newViewConfig: MaterialSampleFormCustomViewConfig = {
-      formTemplates: {
+    const newViewConfig: MaterialSampleFormTemplateConfig = {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           ...materialSampleTemplateFields.attachmentsConfig,
           templateFields: {
@@ -339,20 +341,20 @@ export function MaterialSampleCustomViewForm({
       determinationManagedAttributesOrder,
       collectingEventManagedAttributesOrder:
         collectingEvtFormRef.current?.values?.managedAttributesOrder,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     };
 
     const validatedViewConfig =
-      materialSampleFormCustomViewSchema.parse(newViewConfig);
+      materialSampleFormTemplateSchema.parse(newViewConfig);
 
-    const customView: InputResource<CustomView> = {
-      ...customViewFields,
-      type: "custom-view",
+    const formTemplate: InputResource<FormTemplate> = {
+      ...formTemplateFields,
+      type: "form-template",
       viewConfiguration: validatedViewConfig
     };
 
-    const [savedDefinition] = await save<CustomView>(
-      [{ resource: customView, type: "custom-view" }],
+    const [savedDefinition] = await save<FormTemplate>(
+      [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
     );
 
@@ -363,16 +365,16 @@ export function MaterialSampleCustomViewForm({
     <ButtonBar>
       <div className="container d-flex">
         <BackButton
-          entityId={fetchedCustomView?.id}
+          entityId={fetchedFormTemplate?.id}
           className="me-auto"
-          entityLink="/collection/material-sample-custom-view"
+          entityLink="/collection/form-template"
           byPassView={true}
         />
         <DeleteButton
-          id={fetchedCustomView?.id}
+          id={fetchedFormTemplate?.id}
           options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/material-sample-custom-view/list"
-          type="custom-view"
+          postDeleteRedirect="/collection/form-template/list"
+          type="form-template"
           className="me-5"
         />
         <SubmitButton />
@@ -431,7 +433,7 @@ export function getEnabledTemplateFieldsFromForm(
 
 /** Get the checkbox values for the template form from the persisted form template. */
 export function getTemplateInitialValuesFromSavedFormTemplate<T>(
-  formTemplate?: Partial<FormTemplate>
+  formTemplate?: Partial<FormTemplateConfig>
 ): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   if (!formTemplate) {
     return {};
@@ -461,7 +463,7 @@ export function getTemplateInitialValuesFromSavedFormTemplate<T>(
 }
 
 /**
- * Gets the tempalte fields for the managed attributes,
+ * Gets the template fields for the managed attributes,
  * which are enabled without the usual visibility checkbox.
  */
 function getManagedAttributeTemplate(

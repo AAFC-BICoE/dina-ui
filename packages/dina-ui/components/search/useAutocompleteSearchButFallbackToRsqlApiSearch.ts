@@ -28,7 +28,9 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   querySpec,
   additionalField,
   documentId,
-  searchField
+  searchField,
+  restrictedField,
+  restrictedFieldValue
 }: UseAutocompleteSearchButFallbackToRsqlApiSearchProps) {
   // The mode indicates which API is being used. Either RSQL or Elastic Search.
   const [apiMode, setApiMode] = useState<ApiModeType>("elasticsearch");
@@ -44,6 +46,8 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     searchField,
     additionalField,
     documentId,
+    restrictedField,
+    restrictedFieldValue,
     disabled: searchQuery === "" ? true : apiMode !== "elasticsearch"
   });
 

@@ -349,7 +349,7 @@ export function DeterminationField({
                     enabledFields: null,
                     className: "non-strip"
                   }}
-                  showCustomViewDropdown={!isTemplate}
+                  showFormTemplateDropdown={!isTemplate}
                   managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                   visibleAttributeKeys={visibleManagedAttributeKeys}
                 />

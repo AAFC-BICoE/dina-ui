@@ -1,6 +1,6 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { CustomView } from "../../../../types/collection-api";
+import { FormTemplate } from "../../../../types/collection-api";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 import Select from "react-select/base";
@@ -29,10 +29,10 @@ const EXAMPLE_MA_3 = {
   managedAttributeComponent: "COLLECTING_EVENT"
 };
 
-const TEST_COLLECTING_EVENT_CUSTOM_VIEW: PersistedResource<CustomView> = {
+const TEST_COLLECTING_EVENT_CUSTOM_VIEW: PersistedResource<FormTemplate> = {
   id: "existing-view-id",
-  type: "custom-view",
-  name: "Test existing Custom View",
+  type: "form-template",
+  name: "Test existing Form Template",
   viewConfiguration: {
     type: "managed-attributes-view",
     managedAttributeComponent: "COLLECTING_EVENT",
@@ -57,11 +57,11 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {
     case "collection-api/managed-attribute":
       return { data: [] };
-    case "collection-api/custom-view/existing-view-id":
+    case "collection-api/form-template/existing-view-id":
       return {
         data: TEST_COLLECTING_EVENT_CUSTOM_VIEW
       };
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
       if (
         params?.filter?.["viewConfiguration.type"] ===
           "managed-attributes-view" &&
@@ -78,7 +78,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: EXAMPLE_MA_2 };
     case "collection-api/managed-attribute/COLLECTING_EVENT.example_attribute_3":
       return { data: EXAMPLE_MA_3 };
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "user-api/group":
       return { data: [] };
   }
@@ -235,7 +235,7 @@ describe("ManagedAttributesEditor component", () => {
     });
   });
 
-  it("Lets you select a Custom View .", async () => {
+  it("Lets you select a Form Template .", async () => {
     const mockSubmit = jest.fn();
 
     const wrapper = mountWithAppContext(
@@ -252,7 +252,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showCustomViewDropdown={true}
+          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
@@ -313,7 +313,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showCustomViewDropdown={true}
+          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
@@ -328,7 +328,7 @@ describe("ManagedAttributesEditor component", () => {
       .find(Select)
       .prop<any>("options")[1].options;
     const createOption = asyncOptions[0];
-    expect(createOption.label).toEqual("Create Custom View");
+    expect(createOption.label).toEqual("Create Form Template");
 
     // Select the Create option, which should call the callback:
     wrapper
@@ -366,7 +366,7 @@ describe("ManagedAttributesEditor component", () => {
     const EXPECTED_CREATED_CUSTOM_VIEW = {
       name: "test view",
       restrictToCreatedBy: true,
-      type: "custom-view",
+      type: "form-template",
       viewConfiguration: {
         attributeKeys: ["example_attribute_1"],
         managedAttributeComponent: "COLLECTING_EVENT",
@@ -379,13 +379,13 @@ describe("ManagedAttributesEditor component", () => {
       [
         {
           resource: EXPECTED_CREATED_CUSTOM_VIEW,
-          type: "custom-view"
+          type: "form-template"
         }
       ],
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The new custom-view is set into the managed attributes editor:
+    // The new form-template is set into the managed attributes editor:
     expect(
       wrapper.find(".managed-attributes-view-select").find(Select).prop("value")
     ).toEqual({
@@ -407,7 +407,7 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showCustomViewDropdown={true}
+          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
@@ -426,7 +426,7 @@ describe("ManagedAttributesEditor component", () => {
     wrapper.update();
 
     // Press the edit button
-    wrapper.find("button.custom-view-edit-button").simulate("click");
+    wrapper.find("button.form-template-edit-button").simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -468,17 +468,17 @@ describe("ManagedAttributesEditor component", () => {
       [
         {
           resource: EXPECTED_SAVED_CUSTOM_VIEW,
-          type: "custom-view"
+          type: "form-template"
         }
       ],
       { apiBaseUrl: "/collection-api" }
     );
 
-    // The saved custom-view is set into the managed attributes editor:
+    // The saved form-template is set into the managed attributes editor:
     expect(
       wrapper.find(".managed-attributes-view-select").find(Select).prop("value")
     ).toEqual({
-      label: "Test existing Custom View",
+      label: "Test existing Form Template",
       resource: EXPECTED_SAVED_CUSTOM_VIEW,
       value: "existing-view-id"
     });

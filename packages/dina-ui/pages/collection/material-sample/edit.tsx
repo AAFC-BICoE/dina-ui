@@ -4,12 +4,12 @@ import { useState } from "react";
 import {
   Footer,
   Head,
-  MaterialSampleCustomViewSelect,
+  MaterialSampleFormTemplateSelect,
   MaterialSampleForm,
   MaterialSampleFormProps,
   Nav,
   nextSampleInitialValues,
-  useMaterialSampleFormCustomViewSelectState,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleQuery
 } from "../../../components";
 import { SaveAndCopyToNextSuccessAlert } from "../../../components/collection/SaveAndCopyToNextSuccessAlert";
@@ -48,10 +48,10 @@ export default function MaterialSampleEditPage() {
     navOrder,
     setNavOrder,
     enabledFields,
-    sampleFormCustomView,
-    setSampleFormCustomView,
+    sampleFormTemplate,
+    setSampleFormTemplate,
     visibleManagedAttributeKeys
-  } = useMaterialSampleFormCustomViewSelectState();
+  } = useMaterialSampleFormTemplateSelectState();
 
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     enabledFields,
@@ -62,9 +62,9 @@ export default function MaterialSampleEditPage() {
         <BackButton entityId={id} entityLink="/collection/material-sample" />
         <div className="flex-grow-1 d-flex">
           <div className="mx-auto">
-            <MaterialSampleCustomViewSelect
-              value={sampleFormCustomView}
-              onChange={setSampleFormCustomView}
+            <MaterialSampleFormTemplateSelect
+              value={sampleFormTemplate}
+              onChange={setSampleFormTemplate}
             />
           </div>
         </div>

@@ -6,21 +6,19 @@ import {
   ColumnDefinition
 } from "common-ui";
 import Link from "next/link";
-import { CustomView } from "../../../types/collection-api";
+import { FormTemplate } from "../../../types/collection-api";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const FILTER_ATTRIBUTES = ["name", "createdBy"];
 
-export default function MaterialSampleCustomViewListPage() {
+export default function MaterialSampleFormTemplateListPage() {
   const { formatMessage } = useDinaIntl();
 
-  const TABLE_COLUMNS: ColumnDefinition<CustomView>[] = [
+  const TABLE_COLUMNS: ColumnDefinition<FormTemplate>[] = [
     {
       Cell: ({ original: { id, name } }) => (
-        <Link href={`/collection/material-sample-custom-view/edit?id=${id}`}>
-          {name}
-        </Link>
+        <Link href={`/collection/form-template/edit?id=${id}`}>{name}</Link>
       ),
       accessor: "name"
     },
@@ -30,14 +28,14 @@ export default function MaterialSampleCustomViewListPage() {
     {
       Cell: ({ original: { id } }) => (
         <div className="list-inline">
-          <Link href={`/collection/material-sample-custom-view/edit?id=${id}`}>
+          <Link href={`/collection/form-template/edit?id=${id}`}>
             <a className="list-inline-item btn btn-dark">
               <DinaMessage id="editButtonText" />
             </a>
           </Link>
-          <Link href={`/collection/material-sample-custom-view/run?id=${id}`}>
+          <Link href={`/collection/form-template/run?id=${id}`}>
             <a className="list-inline-item btn btn-primary">
-              <DinaMessage id="createSampleWithCustomView" />
+              <DinaMessage id="createSampleWithFormTemplate" />
             </a>
           </Link>
         </div>
@@ -49,14 +47,14 @@ export default function MaterialSampleCustomViewListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("materialSampleCustomViews")} />
+      <Head title={formatMessage("materialSampleFormTemplates")} />
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <DinaMessage id="materialSampleCustomViews" />
+          <DinaMessage id="materialSampleFormTemplates" />
         </h1>
         <ButtonBar>
-          <CreateButton entityLink="/collection/material-sample-custom-view" />
+          <CreateButton entityLink="/collection/form-template" />
         </ButtonBar>
         <ListPageLayout
           additionalFilters={filterForm => ({
@@ -64,12 +62,12 @@ export default function MaterialSampleCustomViewListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
-          id="material-sample-form-custom-view-list"
+          id="material-sample-form-template-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "collection-api/custom-view",
+            path: "collection-api/form-template",
             filter: {
-              "viewConfiguration.type": "material-sample-form-custom-view"
+              "viewConfiguration.type": "material-sample-form-template"
             }
           }}
           filterFormchildren={({ submitForm }) => (

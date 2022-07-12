@@ -10,15 +10,15 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import {
   Head,
-  materialSampleFormCustomViewSchema,
-  MaterialSampleFormCustomViewConfig,
+  materialSampleFormTemplateSchema,
+  MaterialSampleFormTemplateConfig,
   Nav,
-  useMaterialSampleFormCustomViewProps,
+  useMaterialSampleFormTemplateProps,
   MaterialSampleForm
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
 
@@ -29,13 +29,15 @@ export default function CreateMaterialSampleFromWorkflowPage() {
   } = router;
   const { formatMessage } = useDinaIntl();
 
-  const customViewQuery = useQuery<CustomView>(
-    { path: `collection-api/custom-view/${actionDefinitionId}` },
+  const formTemplateQuery = useQuery<FormTemplate>(
+    { path: `collection-api/form-template/${actionDefinitionId}` },
     { disabled: !actionDefinitionId }
   );
 
-  const pageTitle = `${formatMessage("createSampleWithCustomView")}${
-    customViewQuery.response ? `: ${customViewQuery.response.data.name}` : ""
+  const pageTitle = `${formatMessage("createSampleWithFormTemplate")}${
+    formTemplateQuery.response
+      ? `: ${formTemplateQuery.response.data.name}`
+      : ""
   }`;
 
   async function moveToSampleViewPage(id: string) {
@@ -52,8 +54,8 @@ export default function CreateMaterialSampleFromWorkflowPage() {
       <Nav />
       <div className="container-fluid">
         <h1 id="wb-cont">{pageTitle}</h1>
-        {withResponse(customViewQuery, ({ data }) => {
-          const viewConfig = materialSampleFormCustomViewSchema.parse(
+        {withResponse(formTemplateQuery, ({ data }) => {
+          const viewConfig = materialSampleFormTemplateSchema.parse(
             data.viewConfiguration
           );
 
@@ -71,7 +73,7 @@ export default function CreateMaterialSampleFromWorkflowPage() {
 }
 
 export interface CreateMaterialSampleFromWorkflowForm {
-  actionDefinition: MaterialSampleFormCustomViewConfig;
+  actionDefinition: MaterialSampleFormTemplateConfig;
   moveToSampleViewPage: (id: string) => Promise<void>;
   moveToNewRunPage: () => Promise<void>;
 }
@@ -87,7 +89,7 @@ export function CreateMaterialSampleFromWorkflowForm({
     acquisitionEventInitialValues,
     enabledFields,
     visibleManagedAttributeKeys
-  } = useMaterialSampleFormCustomViewProps(actionDefinition);
+  } = useMaterialSampleFormTemplateProps(actionDefinition);
 
   type RoutingButtonStrings = "newRun" | "viewSample";
 
@@ -106,7 +108,7 @@ export function CreateMaterialSampleFromWorkflowForm({
       buttonBar={
         <ButtonBar className="d-flex">
           <BackButton
-            entityLink="/collection/material-sample-custom-view"
+            entityLink="/collection/form-template"
             className="flex-grow-1"
           />
           <SubmitButton
@@ -134,12 +136,12 @@ export function CreateMaterialSampleFromWorkflowForm({
       enabledFields={enabledFields}
       attachmentsConfig={{
         collectingEvent: pick(
-          actionDefinition.formTemplates.COLLECTING_EVENT,
+          actionDefinition.formTemplate.COLLECTING_EVENT,
           "allowNew",
           "allowExisting"
         ),
         materialSample: pick(
-          actionDefinition.formTemplates.MATERIAL_SAMPLE,
+          actionDefinition.formTemplate.MATERIAL_SAMPLE,
           "allowNew",
           "allowExisting"
         )

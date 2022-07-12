@@ -12,7 +12,7 @@ import {
   BulkNavigatorTab,
   MaterialSampleForm,
   MaterialSampleFormProps,
-  useMaterialSampleFormCustomViewSelectState,
+  useMaterialSampleFormTemplateSelectState,
   useMaterialSampleSave
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";

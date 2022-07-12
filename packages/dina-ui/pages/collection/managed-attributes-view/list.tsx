@@ -11,16 +11,20 @@ import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
-  CustomView,
+  FormTemplate,
   managedAttributesViewSchema
 } from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = ["name"];
 
-/** Renders the list of managed attribute names on a CustomView. */
-function ManagedAttributeNames({ customView }: { customView: CustomView }) {
-  const viewConfig = customView.viewConfiguration;
+/** Renders the list of managed attribute names on a FormTemplate. */
+function ManagedAttributeNames({
+  formTemplate
+}: {
+  formTemplate: FormTemplate;
+}) {
+  const viewConfig = formTemplate.viewConfiguration;
 
   const keys =
     (managedAttributesViewSchema.isValidSync(viewConfig) &&
@@ -50,7 +54,7 @@ function ManagedAttributeNames({ customView }: { customView: CustomView }) {
 export default function ManagedAttributesViewListPage() {
   const { formatMessage } = useDinaIntl();
 
-  const TABLE_COLUMNS: ColumnDefinition<CustomView>[] = [
+  const TABLE_COLUMNS: ColumnDefinition<FormTemplate>[] = [
     {
       Cell: ({ original: { id, name } }) => (
         <Link href={`/collection/managed-attributes-view/view?id=${id}`}>
@@ -60,8 +64,8 @@ export default function ManagedAttributesViewListPage() {
       accessor: "name"
     },
     {
-      Cell: ({ original: customView }) => {
-        return <ManagedAttributeNames customView={customView} />;
+      Cell: ({ original: formTemplate }) => {
+        return <ManagedAttributeNames formTemplate={formTemplate} />;
       },
       accessor: "viewConfiguration.attributeKeys",
       Header: formatMessage("managedAttributes")
@@ -81,12 +85,12 @@ export default function ManagedAttributesViewListPage() {
         <ButtonBar>
           <CreateButton entityLink="/collection/managed-attributes-view" />
         </ButtonBar>
-        <ListPageLayout<CustomView>
+        <ListPageLayout<FormTemplate>
           filterAttributes={FILTER_ATTRIBUTES}
           id="managed-attributes-view-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "collection-api/custom-view",
+            path: "collection-api/form-template",
             filter: { "viewConfiguration.type": "managed-attributes-view" }
           }}
         />

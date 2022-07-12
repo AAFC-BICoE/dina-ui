@@ -339,7 +339,7 @@ export function MaterialSampleForm({
                 }}
                 // Custom view selection is supported for material samples,
                 // but not in template editor mode:
-                showCustomViewDropdown={!isTemplate}
+                showFormTemplateDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
                   visibleManagedAttributeKeys?.materialSample

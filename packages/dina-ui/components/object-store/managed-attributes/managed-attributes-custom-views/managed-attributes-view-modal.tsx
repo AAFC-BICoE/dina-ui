@@ -5,7 +5,7 @@ import {
   useManagedAttributesView
 } from "../../../../pages/collection/managed-attributes-view/edit";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
-import { CustomView } from "../../../../types/collection-api";
+import { FormTemplate } from "../../../../types/collection-api";
 import { ManagedAttributesViewForm } from "./ManagedAttributesViewForm";
 
 export function useManagedAttributesViewEditModal(
@@ -16,11 +16,11 @@ export function useManagedAttributesViewEditModal(
 
   function openManagedAttributesViewEditModal(
     id: string | null,
-    onSaved: (customView: PersistedResource<CustomView>) => void
+    onSaved: (formTemplate: PersistedResource<FormTemplate>) => void
   ) {
-    async function finishModal(customView: PersistedResource<CustomView>) {
+    async function finishModal(formTemplate: PersistedResource<FormTemplate>) {
       closeModal();
-      onSaved(customView);
+      onSaved(formTemplate);
     }
 
     openModal(
@@ -56,7 +56,7 @@ function EditManagedAttributesView({
   defaultManagedAttributeComponent
 }: {
   id: string | null;
-  onSaved: (customView: PersistedResource<CustomView>) => Promise<void>;
+  onSaved: (formTemplate: PersistedResource<FormTemplate>) => Promise<void>;
   defaultManagedAttributeComponent?: string;
 }) {
   const query = useManagedAttributesView(id ?? undefined);
