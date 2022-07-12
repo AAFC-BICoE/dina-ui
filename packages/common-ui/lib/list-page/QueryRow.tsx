@@ -48,13 +48,22 @@ const queryRowMatchOptions = [
   { label: "EXACT_MATCH", value: "term" }
 ];
 
-const queryRowNumericalMatchOptions = [
-  { label: "Equal to", value: "equal" },
-  { label: "Greater than", value: "greaterThan" },
-  { label: "Greater than or equal to", value: "greaterThanEqual" },
-  { label: "Less than", value: "lessThan" },
-  { label: "Less than or equal to", value: "lessThanEqual" }
-];
+const queryRowNumericalMatchOptions = (isDateField: boolean) => {
+  const options = [
+    { label: "Equal to", value: "equal" },
+    { label: "Greater than", value: "greaterThan" },
+    { label: "Greater than or equal to", value: "greaterThanEqual" },
+    { label: "Less than", value: "lessThan" },
+    { label: "Less than or equal to", value: "lessThanEqual" }
+  ];
+
+  // Only the data field should contain this.
+  if (isDateField) {
+    options.splice(1, 0, { label: "Contains", value: "contains" });
+  }
+
+  return options;
+};
 
 const queryRowBooleanOptions = [
   { label: "TRUE", value: "true" },
@@ -230,7 +239,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
           {(typeVisibility.isDate || typeVisibility.isNumber) && (
             <SelectField
               name={fieldProps("numericalMatchType", index)}
-              options={queryRowNumericalMatchOptions}
+              options={queryRowNumericalMatchOptions(typeVisibility.isDate)}
               className="me-2 col-sm-5"
               removeLabel={true}
             />
