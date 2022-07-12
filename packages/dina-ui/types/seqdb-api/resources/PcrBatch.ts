@@ -3,6 +3,7 @@ import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
 import { PcrPrimer } from "./PcrPrimer";
 import { Region } from "./Region";
+import { StorageUnit } from "../../collection-api/resources/StorageUnit";
 
 export interface PcrBatchAttributes {
   type: "pcr-batch";
@@ -21,6 +22,8 @@ export interface PcrBatchRelationships {
   primerReverse?: PcrPrimer;
   region?: Region;
   attachment?: ResourceIdentifierObject[];
+  storageUnitType?: ResourceIdentifierObject;
+  storageUnit?: ResourceIdentifierObject;
 }
 
 export type PcrBatch = KitsuResource &

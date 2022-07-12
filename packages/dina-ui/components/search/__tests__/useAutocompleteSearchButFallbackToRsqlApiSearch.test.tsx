@@ -57,8 +57,10 @@ function TestPersonSearchComponent({
         path: "agent-api/person",
         sort: "-createdOn"
       },
-      documentId: "data.id",
-      searchQuery
+      searchQuery,
+      restrictedField: "testRestrictedField",
+      restrictedFieldValue: "testRestrictedValue",
+      documentId: "data.id"
     });
 
   return (
@@ -124,6 +126,8 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
           prefix: "test-query",
+          restrictedField: "testRestrictedField",
+          restrictedFieldValue: "testRestrictedValue",
           documentId: "data.id"
         }
       }
