@@ -131,7 +131,7 @@ export function PersonSelectField(
           searchQuery,
           querySpec,
           indexName: "dina_agent_index",
-          searchField: "displayName",
+          searchField: "data.attributes.displayName",
           documentId: "data.id",
           additionalField: "data.attributes.aliases"
         })
@@ -181,7 +181,7 @@ export function StorageUnitSelectField({
           searchQuery,
           querySpec,
           indexName: "dina_storage_index",
-          searchField: "name",
+          searchField: "data.attributes.name",
           documentId: "data.id",
           restrictedField,
           restrictedFieldValue

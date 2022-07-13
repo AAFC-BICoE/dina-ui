@@ -13,7 +13,8 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -44,6 +45,7 @@ import {
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
+import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
   nominatimAddressDetailSearch,
@@ -631,17 +633,35 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
-            <AutoSuggestTextField<CollectingEvent>
-              name="dwcRecordedBy"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `dwcRecordedBy==*${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
-            />
+            <FieldSpy<string> fieldName="group">
+              {groupName => (
+                <AutoSuggestTextField<CollectingEvent>
+                  name="dwcRecordedBy"
+                  query={(searchValue, ctx) => ({
+                    path: "collection-api/collecting-event",
+                    filter: {
+                      ...(ctx.values.group && {
+                        group: { EQ: ctx.values.group }
+                      }),
+                      rsql: `dwcRecordedBy==*${searchValue}*`
+                    }
+                  })}
+                  suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
+                  alwaysShowSuggestions={true}
+                  useCustomQuery={(searchQuery, querySpec) =>
+                    useAutocompleteSearchButFallbackToRsqlApiSearch<CollectingEvent>(
+                      {
+                        searchQuery,
+                        querySpec,
+                        indexName: "dina_material_sample_index",
+                        searchField: "data.included.dwcRecordedBy",
+                        groups: groupName ? [groupName] : undefined
+                      }
+                    )
+                  }
+                />
+              )}
+            </FieldSpy>
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
               name="dwcRecordNumber"

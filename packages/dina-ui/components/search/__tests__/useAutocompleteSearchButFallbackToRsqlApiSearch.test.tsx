@@ -52,7 +52,7 @@ function TestPersonSearchComponent({
   const { loading, response } =
     useAutocompleteSearchButFallbackToRsqlApiSearch<Person>({
       indexName: "dina_agent_index",
-      searchField: "displayName",
+      searchField: "data.attributes.displayName",
       querySpec: {
         path: "agent-api/person",
         sort: "-createdOn"
