@@ -78,12 +78,54 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    *
    * Equal is ignored here since it should not be handled like this.
    *
+   * Contains is a special case since it is not a date match, it treats it as a range of dates. For
+   * example:
+   *
+   * "2022" will display all records that contain 2022 in the date field. So the following would be
+   * matched:
+   *    - 2022-01-01
+   *    - 2022-12-02
+   *    - 2022-05-19
+   *    - 2022-07
+   *    - 2022
+   *
+   * When using Equals to search for a date, the following would be matched for "2022":
+   *    - 2022
+   *
    * @param numericalMatchType the operator type (example: greaterThan ---> gt)
    * @param value The operator value to search against.
    * @returns numerical operator and value.
    */
   function buildRangeObject(numericalMatchType, value) {
     switch (numericalMatchType) {
+      case "contains":
+        const YEAR_REGEX = /^\d{4}$/;
+        const MONTH_REGEX = /^\d{4}-\d{2}$/;
+
+        // Check if the value matches the year regex
+        if (YEAR_REGEX.test(value)) {
+          return {
+            gte: `${value}||/y`,
+            lte: `${value}||/y`,
+            format: "yyyy"
+          };
+        }
+
+        // Check if the value matches the month regex
+        if (MONTH_REGEX.test(value)) {
+          return {
+            gte: `${value}||/M`,
+            lte: `${value}||/M`,
+            format: "yyyy-MM"
+          };
+        }
+
+        // Otherwise just try to match the full date provided.
+        return {
+          gte: `${value}||/d`,
+          lte: `${value}||/d`,
+          format: "yyyy-MM-dd"
+        };
       case "greaterThan":
         return { gt: value };
       case "greaterThanEqual":

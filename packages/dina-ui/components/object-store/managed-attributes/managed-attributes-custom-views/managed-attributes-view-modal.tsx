@@ -1,12 +1,12 @@
 import { useModal, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
-import {
-  ManagedAttributesViewFormProps,
-  useManagedAttributesView
-} from "../../../../pages/collection/managed-attributes-view/edit";
 import { DinaMessage } from "../../../../intl/dina-ui-intl";
 import { FormTemplate } from "../../../../types/collection-api";
-import { ManagedAttributesViewForm } from "./ManagedAttributesViewForm";
+import {
+  ManagedAttributesViewForm,
+  ManagedAttributesViewFormProps,
+  useManagedAttributesView
+} from "./ManagedAttributesViewForm";
 
 export function useManagedAttributesViewEditModal(
   /** Default component to use in the modal form. */
