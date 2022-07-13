@@ -13,6 +13,7 @@ import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
+  PreparationMethod,
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
@@ -84,39 +85,46 @@ export function PreparationField({
         <div className="col-md-6">
           <FieldSpy<string> fieldName="group">
             {group => (
-              <ResourceSelectField<PreparationType>
-                {...fieldProps("preparationType")}
-                model="collection-api/preparation-type"
-                optionLabel={it => it.name}
-                readOnlyLink="/collection/preparation-type/view?id="
-                className="preparation-type"
-                filter={input =>
-                  group
-                    ? {
-                        ...filterBy(["name"])(input),
-                        group: { EQ: `${group}` }
-                      }
-                    : { ...filterBy(["name"])(input) }
-                }
-                key={group}
-                tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
-                tooltipLinkText="fromDinaUserGuide"
-              />
+              <div>
+                <ResourceSelectField<PreparationType>
+                  {...fieldProps("preparationType")}
+                  model="collection-api/preparation-type"
+                  optionLabel={it => it.name}
+                  readOnlyLink="/collection/preparation-type/view?id="
+                  className="preparation-type"
+                  filter={input =>
+                    group
+                      ? {
+                          ...filterBy(["name"])(input),
+                          group: { EQ: `${group}` }
+                        }
+                      : { ...filterBy(["name"])(input) }
+                  }
+                  key={group}
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
+                <ResourceSelectField<PreparationMethod>
+                  {...fieldProps("preparationMethod")}
+                  model="collection-api/preparation-method"
+                  optionLabel={it => it.name}
+                  readOnlyLink="/collection/preparation-method/view?id="
+                  className="preparation-method"
+                  filter={input =>
+                    group
+                      ? {
+                          ...filterBy(["name"])(input),
+                          group: { EQ: `${group}` }
+                        }
+                      : { ...filterBy(["name"])(input) }
+                  }
+                  key={group}
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
+              </div>
             )}
           </FieldSpy>
-          <AutoSuggestTextField<MaterialSample>
-            {...fieldProps("preparationMethod")}
-            query={(search, ctx) => ({
-              path: "collection-api/material-sample",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `preparationMethod==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={sample => sample?.preparationMethod ?? ""}
-            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-method"
-          />
           <TextField
             {...fieldProps("preservationType")}
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preservation-type"
