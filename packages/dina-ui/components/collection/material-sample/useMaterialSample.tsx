@@ -66,6 +66,7 @@ export function useMaterialSampleQuery(id?: string | null) {
         "attachment",
         "preparationProtocol",
         "preparationType",
+        "preparationMethod",
         "preparedBy",
         "storageUnit",
         "hierarchy",
