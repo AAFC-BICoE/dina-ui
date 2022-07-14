@@ -316,6 +316,7 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparationMethod: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,

@@ -646,10 +646,12 @@ export function useMaterialSampleSave({
           }
         })
       },
+
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
       projects: undefined,
-      organism: undefined
+      organism: undefined,
+      preparationMethod: undefined
     };
 
     // delete the association if associated sample is left unfilled
