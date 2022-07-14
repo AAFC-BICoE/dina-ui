@@ -40,6 +40,7 @@ import {
   PcrProfile,
   Region
 } from "../../../types/seqdb-api";
+import { any } from "zod";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -137,12 +138,7 @@ export function PcrBatchForm({
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
-
-    if(submittedValues.storageUnitType) {
-      (submittedValues as any).relationships.storageRestriction = {
-
-      }
-    }
+    
     // Add storage unit if it was selected:
     delete submittedValues.storageUnitType;
 
@@ -210,10 +206,11 @@ export function LoadExternalDataForPcrBatchForm({
     ?.storageUnitType?.id
     ? {
         id: storageUnitQuery.response.data.storageUnitType.id,
-        type: "storage-unit-type"
+        type: "storage-unit-type",
       }
     : undefined;
 
+  initialValues.storageRestriction = storageUnitQuery?.response?.data?.storageUnitType?.gridLayoutDefinition;
   // Wait for response or if disabled, just continue with rendering.
   return withResponseOrDisabled(storageUnitQuery, () => (
     <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
