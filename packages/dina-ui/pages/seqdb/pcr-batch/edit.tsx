@@ -138,6 +138,11 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
+    if(submittedValues.storageUnitType) {
+      (submittedValues as any).relationships.storageRestriction = {
+
+      }
+    }
     // Add storage unit if it was selected:
     delete submittedValues.storageUnitType;
 
