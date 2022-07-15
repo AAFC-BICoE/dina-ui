@@ -37,6 +37,11 @@ export interface DoSearchParams {
   restrictedField?: string;
   restrictedFieldValue?: string;
   groups?: string[];
+
+  /**
+   * If the result is coming from the included section, this needs to be turned on.
+   */
+  includedSection?: boolean;
   disabled?: boolean;
 }
 
@@ -52,7 +57,8 @@ export async function doSearch<T extends KitsuResource>(
     restrictedField,
     restrictedFieldValue,
     groups,
-    disabled = false
+    disabled = false,
+    includedSection = false
   }: DoSearchParams
 ) {
   if (!searchValue || disabled) {
@@ -85,8 +91,12 @@ export async function doSearch<T extends KitsuResource>(
 
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(
-    jsonApiDocs.map<Promise<PersistedResource<T>>>(
-      async doc => (await deserialise(doc)).data
+    jsonApiDocs.map<Promise<PersistedResource<T>>>(async doc =>
+      includedSection
+        ? doc?.included?.[0]?.attributes
+        : (
+            await deserialise(doc)
+          ).data
     )
   );
 

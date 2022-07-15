@@ -655,7 +655,8 @@ export function CollectingEventFormLayout({
                         querySpec,
                         indexName: "dina_material_sample_index",
                         searchField: "included.attributes.dwcRecordedBy",
-                        groups: groupName ? [groupName] : undefined
+                        groups: groupName ? [groupName] : undefined,
+                        includedSection: true
                       }
                     )
                   }
