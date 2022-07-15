@@ -244,7 +244,8 @@ describe("Material Sample Edit Page", () => {
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined
+              scheduledAction: undefined,
+              collection: undefined
             },
             type: "material-sample"
           }
