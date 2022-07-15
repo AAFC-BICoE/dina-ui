@@ -264,6 +264,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
               managedAttributes: {},
+              preparationMethod: null,
               relationships: {
                 organism: { data: [] }
               },
@@ -353,6 +354,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               ...BLANK_PREPARATION,
               ...BLANK_RESTRICTION,
               managedAttributes: {},
+              preparationMethod: null,
               relationships: {
                 organism: { data: [] }
               },
@@ -472,6 +474,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
               managedAttributes: {},
+              preparationMethod: null,
               relationships: {
                 organism: { data: [] }
               },
