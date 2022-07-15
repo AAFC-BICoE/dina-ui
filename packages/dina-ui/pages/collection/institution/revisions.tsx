@@ -4,7 +4,7 @@ import { RevisionsPage } from "../../../components/revisions/RevisionsPageLayout
 export default () => (
   <RevisionsPage
     auditSnapshotPath="collection-api/audit-snapshot"
-    detailsPageLink="/collection/institution/view?id="
+    detailsPageLink="/collection/institution/"
     queryPath="collection-api/institution"
     resourceType="institution"
     // The row configs are specific to each module (Collection, Object Store, Agent, etc.)
