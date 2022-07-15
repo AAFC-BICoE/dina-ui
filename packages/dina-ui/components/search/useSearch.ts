@@ -48,7 +48,7 @@ export async function doSearch<T extends KitsuResource>(
     searchField,
     searchValue,
     documentId,
-    additionalField = "",
+    additionalField,
     restrictedField,
     restrictedFieldValue,
     groups,
