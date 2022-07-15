@@ -3,11 +3,10 @@ import { InputResource } from "kitsu";
 import { Metadata } from "../../../dina-ui/types/objectstore-api"; // packages/dina-ui/types/objectstore-api
 import { createContext, MutableRefObject, RefObject, useContext } from "react";
 import type { useMaterialSampleSave } from "../../../dina-ui/components";
-import type { MaterialSample } from "../../../dina-ui/types/collection-api/resources/MaterialSample";
 
 export interface MetadataWithHooks {
   key: string;
-  sample: InputResource<Metadata>;
+  metadata: InputResource<Metadata>;
   saveHook: ReturnType<typeof useMaterialSampleSave>;
   formRef: MutableRefObject<FormikProps<InputResource<Metadata>> | null>;
 }

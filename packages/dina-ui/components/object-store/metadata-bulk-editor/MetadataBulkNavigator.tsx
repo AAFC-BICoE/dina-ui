@@ -1,18 +1,18 @@
 import classNames from "classnames";
-import { SampleWithHooks } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
+import { MetadataWithHooks } from "packages/common-ui/lib/bulk-edit/bulk-context-metadata";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Metadata } from "../../../types/objectstore-api";
 import { SelectNavigation } from "../../bulk-material-sample/SelectNavigation";
 
 export interface MetadataBulkNavigatorProps {
-  metadatas: SampleWithHooks[];
+  metadatas: MetadataWithHooks[];
   renderOneMetadata: (metadataRenderProps: MetadataRenderProps) => ReactNode;
-  selectedTab: BulkNavigatorTab | SampleWithHooks;
-  onSelectTab: (newSelected: SampleWithHooks | BulkNavigatorTab) => void;
+  selectedTab: BulkNavigatorTab | MetadataWithHooks;
+  onSelectTab: (newSelected: MetadataWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
 }
 
@@ -60,7 +60,7 @@ export function MetadataBulkNavigator({
       {tooManyMetadatasForTabs ? (
         <div>
           <div className="d-flex justify-content-center mb-3">
-            <SelectNavigation<BulkNavigatorTab | SampleWithHooks>
+            <SelectNavigation<BulkNavigatorTab | MetadataWithHooks>
               elements={tabElements}
               value={selectedTab}
               onChange={onSelectTab}
@@ -120,15 +120,15 @@ export function MetadataBulkNavigator({
                 </Tab>
               );
             })}
-            {metadatas.map((sample, index) => {
-              const tabHasError = tabsWithErrors.includes(sample);
+            {metadatas.map((metadata, index) => {
+              const tabHasError = tabsWithErrors.includes(metadata);
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {sample.sample.materialSampleName || `#${index + 1}`}
+                    {metadata.metadata.fileIdentifier || `#${index + 1}`}
                   </span>
                 </Tab>
               );
