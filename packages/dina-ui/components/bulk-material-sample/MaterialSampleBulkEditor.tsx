@@ -6,7 +6,6 @@ import {
   FormikButton,
   getBulkEditTabFieldInfo,
   ResourceWithHooks,
-  SampleWithHooks,
   SaveArgs,
   useApiClient
 } from "common-ui";
@@ -15,7 +14,6 @@ import { keys, omit, pick, pickBy } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
-  MaterialSampleBulkNavigator,
   MaterialSampleFormTemplateSelect,
   MaterialSampleForm,
   MaterialSampleFormProps,
