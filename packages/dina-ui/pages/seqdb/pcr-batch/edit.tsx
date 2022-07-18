@@ -206,11 +206,10 @@ export function LoadExternalDataForPcrBatchForm({
     ?.storageUnitType?.id
     ? {
         id: storageUnitQuery.response.data.storageUnitType.id,
-        type: "storage-unit-type",
+        type: "storage-unit-type"
       }
     : undefined;
 
-  initialValues.storageRestriction = storageUnitQuery?.response?.data?.storageUnitType?.gridLayoutDefinition;
   // Wait for response or if disabled, just continue with rendering.
   return withResponseOrDisabled(storageUnitQuery, () => (
     <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
@@ -237,8 +236,14 @@ export function PcrBatchFormFields() {
           model="collection-api/storage-unit-type"
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={() => {
+          onChange={(storageUnitType) => {
             setFieldValue("storageUnit.id", null);
+            if(!Array.isArray(storageUnitType) && storageUnitType?.gridLayoutDefinition != null){
+              setFieldValue("storageRestriction.layout", storageUnitType.gridLayoutDefinition);
+            }
+            else{
+              setFieldValue("storageRestriction", null);
+            }
           }}
         />
       );
