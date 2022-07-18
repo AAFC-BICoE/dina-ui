@@ -51,7 +51,7 @@ export const BLANK_PREPARATION: Required<
   preparedBy: Object.seal({ id: null, type: "person" }),
   preparationRemarks: null,
   dwcDegreeOfEstablishment: null,
-  preparationMethod: null,
+  preparationMethod: Object.seal({ id: null, type: "preparation-method" }),
   preservationType: null,
   preparationFixative: null,
   preparationMaterials: null,

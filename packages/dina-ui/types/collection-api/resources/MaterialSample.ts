@@ -8,6 +8,7 @@ import { Collection } from "./Collection";
 import { ExtensionValue } from "./FieldExtension";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
+import { PreparationMethod } from "./PreparationMethod";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
@@ -43,7 +44,6 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
-  preparationMethod?: string | null;
   preservationType?: string | null;
   preparationFixative?: string | null;
   preparationMaterials?: string | null;
@@ -120,6 +120,7 @@ export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationProtocol?: ResourceIdentifierObject;
+  preparationMethod?: ResourceIdentifierObject;
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
