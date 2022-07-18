@@ -30,8 +30,8 @@ export interface BulkNavigatorTab<T extends KitsuResource = KitsuResource> {
 }
 
 /**
- * Under 10 samples: Shows tabs.
- * 10 or more samples: Shows dropdown navigator with arrow buttons.
+ * Under 10 resources: Shows tabs.
+ * 10 or more resources: Shows dropdown navigator with arrow buttons.
  */
 export function BulkEditNavigator({
   selectedTab,
@@ -119,7 +119,7 @@ export function BulkEditNavigator({
                 </Tab>
               );
             })}
-            {resources.map((resource: any, index) => {
+            {resources.map((resource, index) => {
               const tabHasError = tabsWithErrors.includes(resource);
               return (
                 <Tab
@@ -127,7 +127,7 @@ export function BulkEditNavigator({
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {resource.resource.materialSampleName || `#${index + 1}`}
+                    {`#${index + 1}`}
                   </span>
                 </Tab>
               );

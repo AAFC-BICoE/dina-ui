@@ -13,14 +13,14 @@ export interface SampleWithHooks {
 
 export interface ResourceWithHooks<T extends KitsuResource = KitsuResource> {
   key: string;
-  resource: InputResource<T>;
+  resource: any;
   saveHook: ReturnType<any>;
   formRef: MutableRefObject<FormikProps<InputResource<T>> | null>;
 }
 
 export interface BulkEditTabContextI {
   bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
-  sampleHooks: SampleWithHooks[];
+  resourceHooks: ResourceWithHooks[];
 }
 
 export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(
