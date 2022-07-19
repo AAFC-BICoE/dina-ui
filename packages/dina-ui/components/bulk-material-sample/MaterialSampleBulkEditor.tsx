@@ -26,7 +26,7 @@ import {
   BulkEditNavigator,
   BulkNavigatorTab
 } from "../bulk-edit/BulkEditNavigator";
-import { useBulkEditTab } from "./bulk-edit-tab";
+import { useBulkEditTab } from "./useBulkEditTab";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -81,12 +81,42 @@ export function MaterialSampleBulkEditor({
 
   const [initialized, setInitialized] = useState(false);
 
+  const initialValues: InputResource<MaterialSample> = {
+    type: "material-sample"
+  };
+
+  const bulkEditSampleHook = useMaterialSampleSave({
+    ...formTemplateProps,
+    materialSample: initialValues,
+    showChangedIndicatorsInNestedForms: true
+  });
+
   const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     hideUseSequence: true,
     sampleFormProps: formTemplateProps
   });
+
+  const materialSampleForm = (
+    <MaterialSampleForm
+      {...formTemplateProps}
+      buttonBar={null}
+      hideUseSequence={true}
+      materialSampleFormRef={bulkEditFormRef}
+      materialSampleSaveHook={bulkEditSampleHook}
+      materialSample={initialValues}
+      disableAutoNamePrefix={true}
+      disableSampleNameField={true}
+      disableCollectingEventSwitch={sampleHooks.some(
+        (hook: any) => hook.resource.parentMaterialSample !== undefined
+      )}
+      // isOffScreen={!isSelected}
+      // Disable the nav's Are You Sure prompt when removing components,
+      // because you aren't actually deleting data.
+      disableNavRemovePrompt={true}
+    />
+  );
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:

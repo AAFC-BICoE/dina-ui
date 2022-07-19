@@ -3,7 +3,7 @@ import { InputResource } from "kitsu";
 import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
-import { useBulkEditTab } from "../bulk-edit-tab";
+import { useBulkEditTab } from "../useBulkEditTab";
 
 const mockSubmitOverride = jest.fn();
 

@@ -1,6 +1,6 @@
 export * from "./add-person/PersonForm";
 export * from "./add-person/PersonFormFields";
-export * from "./bulk-material-sample/bulk-edit-tab";
+export * from "./bulk-material-sample/useBulkEditTab";
 export * from "./bulk-material-sample/BulkEditTabWarning";
 export * from "./bulk-material-sample/ExistingMaterialSampleBulkEditor";
 export * from "./bulk-material-sample/MaterialSampleBulkEditor";
