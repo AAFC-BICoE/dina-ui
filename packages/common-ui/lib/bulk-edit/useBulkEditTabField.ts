@@ -27,7 +27,7 @@ export interface BulkEditTabFieldInfoParams {
 
 export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const {
-    bulkEditCtx: { bulkEditFormRef, sampleHooks },
+    bulkEditCtx: { bulkEditFormRef, resourceHooks: sampleHooks },
     fieldName
   } = params;
 
