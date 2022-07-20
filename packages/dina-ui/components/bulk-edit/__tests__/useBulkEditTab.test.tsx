@@ -1,4 +1,8 @@
-import { ResourceSelect, ResourceWithHooks } from "common-ui";
+import {
+  ResourceSelect,
+  ResourceWithHooks,
+  withoutBlankFields
+} from "common-ui";
 import { InputResource } from "kitsu";
 import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
@@ -13,6 +17,7 @@ import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
 import { FormikProps } from "formik";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { isEmpty } from "lodash";
 
 const mockSubmitOverride = jest.fn();
 
@@ -70,6 +75,56 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
+  function sampleBulkOverrider() {
+    /** Sample input including blank/empty fields. */
+    let bulkEditSample: InputResource<MaterialSample> | undefined;
+
+    /** Returns a sample with the overridden values. */
+    return async function withBulkEditOverrides(
+      sample: InputResource<MaterialSample>
+    ) {
+      const formik = bulkEditFormRef.current;
+      // Shouldn't happen, but check for type safety:
+      if (!formik) {
+        throw new Error("Missing Formik ref for Bulk Edit Tab");
+      }
+
+      // Initialize the bulk values once to make sure the same object is used each time.
+      if (!bulkEditSample) {
+        bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
+          formik.values
+        );
+      }
+
+      /** Sample override object with only the non-empty fields. */
+      const overrides = withoutBlankFields(bulkEditSample);
+
+      // Combine the managed attributes dictionaries:
+      const newManagedAttributes = {
+        ...withoutBlankFields(sample.managedAttributes),
+        ...withoutBlankFields(bulkEditSample?.managedAttributes)
+      };
+
+      const newHostOrganism = {
+        ...withoutBlankFields(sample.hostOrganism),
+        ...withoutBlankFields(bulkEditSample?.hostOrganism)
+      };
+
+      const newSample: InputResource<MaterialSample> = {
+        ...sample,
+        ...overrides,
+        ...(!isEmpty(newManagedAttributes) && {
+          managedAttributes: newManagedAttributes
+        }),
+        ...(!isEmpty(newHostOrganism) && {
+          hostOrganism: newHostOrganism
+        })
+      };
+
+      return newSample;
+    };
+  }
+
   const materialSampleForm = (
     <MaterialSampleForm
       {...formTemplateProps}
@@ -89,7 +144,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     />
   );
 
-  const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
+  const { bulkEditTab } = useBulkEditTab({
     resourceHooks: [],
     resourceForm: materialSampleForm
   });
