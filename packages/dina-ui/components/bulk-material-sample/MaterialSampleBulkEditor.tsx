@@ -108,7 +108,6 @@ export function MaterialSampleBulkEditor({
       disableCollectingEventSwitch={sampleHooks.some(
         (hook: any) => hook.resource.parentMaterialSample !== undefined
       )}
-      // isOffScreen={!isSelected}
       // Disable the nav's Are You Sure prompt when removing components,
       // because you aren't actually deleting data.
       disableNavRemovePrompt={true}

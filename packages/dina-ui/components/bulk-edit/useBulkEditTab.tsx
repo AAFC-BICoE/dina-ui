@@ -39,7 +39,8 @@ export function useBulkEditTab({
     content: isSelected =>
       hideBulkEditTab ? null : (
         <BulkEditTabContext.Provider value={ctx}>
-          {React.cloneElement(resourceForm, { isOffScreen: isSelected })}
+          {React.cloneElement(resourceForm, { isOffScreen: !isSelected })}
+          {/* {<resourceForm.type {...resourceForm.props} isOffScreen={!isSelected}/>} */}
           {/* <MaterialSampleForm
             {...sampleFormProps}
             buttonBar={null}
