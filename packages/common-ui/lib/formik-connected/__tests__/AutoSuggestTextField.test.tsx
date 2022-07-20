@@ -8,18 +8,76 @@ interface Person extends KitsuResource {
   name: string;
 }
 
-const mockGet = jest.fn(async () => ({
-  data: [{ name: "person1" }, { name: "person2" }, { name: "person3" }]
-}));
+// JSON API mock response.
+const mockGet = jest.fn(async () => {
+  return {
+    data: [
+      { name: "person1-json-api" },
+      { name: "person2-json-api" },
+      { name: "person3-json-api" }
+    ]
+  };
+});
 
-const apiContext = {
+// Elastic Search mock response.
+const mockGetAxios = jest.fn(async () => {
+  return {
+    data: {
+      hits: {
+        total: {
+          value: 3
+        },
+        hits: [
+          {
+            _source: {
+              data: {
+                attributes: {
+                  name: "person1-elastic-search"
+                }
+              }
+            }
+          },
+          {
+            _source: {
+              data: {
+                attributes: {
+                  name: "person2-elastic-search"
+                }
+              }
+            }
+          },
+          {
+            _source: {
+              data: {
+                attributes: {
+                  name: "person3-elastic-search"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  };
+});
+
+const apiContextJsonAPIOnly = {
   apiClient: {
     get: mockGet
   }
 } as any;
 
+const apiContextElasticSearchOnly = {
+  apiClient: {
+    get: mockGetAxios,
+    axios: {
+      get: mockGetAxios
+    }
+  }
+} as any;
+
 describe("AutoSuggestTextField", () => {
-  it("Fetches the suggestions from the back-end.", async () => {
+  it("JSON API only provided, results are fetched from JSON API", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
@@ -36,7 +94,41 @@ describe("AutoSuggestTextField", () => {
           timeoutMs={0}
         />
       </DinaForm>,
-      { apiContext }
+      { apiContext: apiContextJsonAPIOnly }
+    );
+
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).lastCalledWith("agent-api/person", {
+      filter: { rsql: "name==*p*" },
+      sort: "-createdOn"
+    });
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-json-api",
+      "person2-json-api",
+      "person3-json-api"
+    ]);
+  });
+
+  it("Elastic Search only provided, results are fetched from elastic search.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          elasticSearchBackend={{
+            indexName: "dina_agent_index",
+            searchField: "data.attributes.name",
+            option: person => person?.name
+          }}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextElasticSearchOnly }
     );
 
     wrapper.find("input").simulate("change", { target: { value: "p" } });
@@ -45,18 +137,19 @@ describe("AutoSuggestTextField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    expect(mockGetAxios).lastCalledWith(
+      "search-api/search-ws/auto-complete",
+      {}
+    );
+
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1",
-      "person2",
-      "person3"
+      "person1-elastic-search",
+      "person2-elastic-search",
+      "person3-elastic-search"
     ]);
-    expect(mockGet).lastCalledWith("agent-api/person", {
-      filter: { rsql: "name==*p*" },
-      sort: "-createdOn"
-    });
   });
 
-  it("Can render custom suggestions passed via props.", async () => {
+  it("Custom options only provided, results come from custom options.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
@@ -65,12 +158,28 @@ describe("AutoSuggestTextField", () => {
           timeoutMs={0}
         />
       </DinaForm>,
-      { apiContext }
+      { apiContext: {} }
     );
 
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "suggestion-1",
       "suggestion-2"
     ]);
+  });
+
+  it("Both backend providers are used, preferred backend is used.", async () => {
+    // This test needs to be created.
+  });
+
+  it("Both backend providers are used, preferred backend fails, other backend is used.", async () => {
+    // This test needs to be created.
+  });
+
+  it("Blank search provider not supplied, options do not appear when empty search.", async () => {
+    // This test needs to be created.
+  });
+
+  it("Blank search provider supplied, options come from blank search provider only.", async () => {
+    // This test needs to be created.
   });
 });

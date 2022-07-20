@@ -263,6 +263,14 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     });
   }, []);
 
+  // Boolean to determine if the JSON API should be used.
+  const performJsonApiQuery: boolean =
+    focus && backend === "json-api" && jsonApiBackend !== undefined;
+
+  // Boolean to determine if the Elastic Search should be used.
+  const performElasticSearchQuery: boolean =
+    focus && backend === "elastic-search" && elasticSearchBackend !== undefined;
+
   // Default query specifications for the JSON API search.
   const querySpec: JsonApiQuerySpec = {
     path: "",
@@ -270,45 +278,52 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     ...jsonApiBackend?.query?.(debouncedSearchValue, formik)
   };
 
-  // Boolean to determine if the JSON API should be used.
-  const performJsonApiQuery: boolean =
-    !focus || backend !== "json-api" || jsonApiBackend === undefined;
-
-  // Boolean to determine if the Elastic Search should be used.
-  const performElasticSearchQuery: boolean =
-    !focus ||
-    backend !== "elastic-search" ||
-    elasticSearchBackend === undefined;
-
   // JSON API search. Only used if JSON Api is defined and it's the current backend.
-  const { loading: jsonApiLoading, response: jsonApiResponse } = useQuery<T[]>(
-    querySpec,
-    {
-      disabled: performJsonApiQuery
-    }
-  );
+  const {
+    loading: jsonApiLoading,
+    response: jsonApiResponse,
+    error: jsonApiError,
+    isDisabled: jsonApiIsDisabled
+  } = useQuery<T[]>(querySpec, {
+    disabled: !performJsonApiQuery
+  });
 
   // Elastic search search. Only used if Elastic Search is defined and it's the current backend.
-  const { isLoading: elasticSearchLoading, searchResult: elasticSearchResult } =
-    useAutocompleteSearch<T>({
-      indexName: elasticSearchBackend?.indexName ?? "",
-      searchField: elasticSearchBackend?.searchField ?? "",
-      additionalField: elasticSearchBackend?.additionalSearchField,
-      documentId: elasticSearchBackend?.documentId,
-      restrictedField: elasticSearchBackend?.restrictedField,
-      restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
-      // groups: elasticSearchBackend?.groups, (coming in a future ticket)
-      disabled: performElasticSearchQuery
-    });
+  const {
+    isLoading: elasticSearchLoading,
+    searchResult: elasticSearchResult,
+    error: elasticSearchError
+  } = useAutocompleteSearch<T>({
+    indexName: elasticSearchBackend?.indexName ?? "",
+    searchField: elasticSearchBackend?.searchField ?? "",
+    additionalField: elasticSearchBackend?.additionalSearchField,
+    documentId: elasticSearchBackend?.documentId,
+    restrictedField: elasticSearchBackend?.restrictedField,
+    restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
+    // groups: elasticSearchBackend?.groups, (coming in a future ticket)
+    disabled: !performElasticSearchQuery
+  });
 
-  const isLoading: boolean = elasticSearchLoading || jsonApiLoading;
+  // If any errors occur, switch providers. Only if both providers are set.
+  if (
+    (jsonApiError || elasticSearchError) &&
+    elasticSearchBackend &&
+    jsonApiBackend
+  ) {
+    setBackend(current =>
+      current === "elastic-search" ? "json-api" : "elastic-search"
+    );
+  }
+
+  const isLoading: boolean =
+    elasticSearchLoading || (jsonApiLoading && !jsonApiIsDisabled);
   const searchResult: PersistedResource<T>[] | null | undefined =
     backend === "elastic-search" ? elasticSearchResult : jsonApiResponse?.data;
 
   // Finally, the suggestions to be displayed on the dropdown.
   const allSuggestions = compact([
     ...(customOptions?.(searchValue, formik) || []),
-    ...(searchResult && !isLoading
+    ...(searchResult && !isLoading && focus
       ? uniq(
           castArray(searchResult).flatMap(item => {
             if (performElasticSearchQuery) {
