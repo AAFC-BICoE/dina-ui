@@ -4,20 +4,12 @@ import {
   ResourceWithHooks,
   withoutBlankFields
 } from "common-ui";
-import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
 import React from "react";
-import { useRef } from "react";
-import {
-  MaterialSampleForm,
-  MaterialSampleFormProps,
-  useMaterialSampleFormTemplateSelectState,
-  useMaterialSampleSave
-} from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
+import { BulkNavigatorTab } from "./BulkEditNavigator";
 
 export interface UseBulkEditTabParams {
   resourceHooks: ResourceWithHooks[];

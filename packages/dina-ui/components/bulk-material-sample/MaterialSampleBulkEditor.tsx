@@ -26,7 +26,7 @@ import {
   BulkEditNavigator,
   BulkNavigatorTab
 } from "../bulk-edit/BulkEditNavigator";
-import { useBulkEditTab } from "./useBulkEditTab";
+import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 
 export interface MaterialSampleBulkEditorProps {

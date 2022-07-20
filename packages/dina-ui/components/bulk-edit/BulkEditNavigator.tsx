@@ -5,8 +5,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { SelectNavigation } from "../bulk-material-sample/SelectNavigation";
+import { SelectNavigation } from "./SelectNavigation";
 
 export interface BulkEditNavigatorProps {
   resources: ResourceWithHooks[];
