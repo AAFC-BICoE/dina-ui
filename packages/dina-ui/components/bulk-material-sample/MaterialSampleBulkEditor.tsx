@@ -5,7 +5,7 @@ import {
   DoOperationsError,
   FormikButton,
   getBulkEditTabFieldInfo,
-  SampleWithHooks,
+  ResourceWithHooks,
   SaveArgs,
   useApiClient
 } from "common-ui";
@@ -14,8 +14,6 @@ import { keys, omit, pick, pickBy } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
-  BulkNavigatorTab,
-  MaterialSampleBulkNavigator,
   MaterialSampleFormTemplateSelect,
   MaterialSampleForm,
   MaterialSampleFormProps,
@@ -24,6 +22,10 @@ import {
 } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import {
+  BulkEditNavigator,
+  BulkNavigatorTab
+} from "../bulk-edit/BulkEditNavigator";
 import { useBulkEditTab } from "./bulk-edit-tab";
 
 export interface MaterialSampleBulkEditorProps {
@@ -43,7 +45,7 @@ export function MaterialSampleBulkEditor({
   const samples = useMemo(() => samplesProp, []);
 
   const [selectedTab, setSelectedTab] = useState<
-    BulkNavigatorTab | SampleWithHooks
+    BulkNavigatorTab | ResourceWithHooks
   >();
 
   // Allow selecting a custom view for the form:
@@ -59,13 +61,13 @@ export function MaterialSampleBulkEditor({
     visibleManagedAttributeKeys
   };
 
-  const sampleHooks = samples.map<SampleWithHooks>((sample, index) => {
+  const sampleHooks = samples.map<ResourceWithHooks>((resource, index) => {
     const key = `sample-${index}`;
     return {
       key,
-      sample,
+      resource,
       saveHook: useMaterialSampleSave({
-        materialSample: sample,
+        materialSample: resource,
         // Reduce the off-screen tabs rendering for better performance:
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
@@ -80,7 +82,7 @@ export function MaterialSampleBulkEditor({
   const [initialized, setInitialized] = useState(false);
 
   const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
-    sampleHooks,
+    resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     hideUseSequence: true,
     sampleFormProps: formTemplateProps
@@ -94,7 +96,7 @@ export function MaterialSampleBulkEditor({
   const { saveAll } = useBulkSampleSave({
     onSaved,
     samplePreProcessor: sampleBulkOverrider,
-    bulkEditCtx: { sampleHooks, bulkEditFormRef }
+    bulkEditCtx: { resourceHooks: sampleHooks, bulkEditFormRef }
   });
 
   return (
@@ -128,12 +130,12 @@ export function MaterialSampleBulkEditor({
         </ButtonBar>
       </DinaForm>
       {selectedTab && (
-        <MaterialSampleBulkNavigator
+        <BulkEditNavigator
           selectedTab={selectedTab}
           onSelectTab={setSelectedTab}
-          samples={sampleHooks}
+          resources={sampleHooks}
           extraTabs={[bulkEditTab]}
-          renderOneSample={({ index, isSelected }) => (
+          renderOneResource={({ index, isSelected }) => (
             <MaterialSampleForm
               hideUseSequence={true}
               disableSampleNameField={disableSampleNameField}
@@ -181,7 +183,7 @@ function useBulkSampleSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
-  const { bulkEditFormRef, sampleHooks } = bulkEditCtx;
+  const { bulkEditFormRef, resourceHooks: sampleHooks } = bulkEditCtx;
 
   async function saveAll() {
     setError(null);
@@ -198,13 +200,13 @@ function useBulkSampleSave({
 
       const saveOperations: SaveArgs<MaterialSample>[] = [];
       for (let index = 0; index < sampleHooks.length; index++) {
-        const { formRef, sample, saveHook } = sampleHooks[index];
+        const { formRef, resource, saveHook } = sampleHooks[index];
         const formik = formRef.current;
 
         // These two errors shouldn't happen:
         if (!formik) {
           throw new Error(
-            `Missing Formik ref for sample ${sample.materialSampleName}`
+            `Missing Formik ref for sample ${resource.materialSampleName}`
           );
         }
 

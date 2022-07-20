@@ -1,53 +1,53 @@
 import classNames from "classnames";
-import { SampleWithHooks } from "common-ui";
+import { ResourceWithHooks } from "common-ui";
 import { FormikProps } from "formik";
-import { InputResource } from "kitsu";
+import { InputResource, KitsuResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { SelectNavigation } from "./SelectNavigation";
+import { SelectNavigation } from "../bulk-material-sample/SelectNavigation";
 
-export interface MaterialSampleBulkNavigatorProps {
-  samples: SampleWithHooks[];
-  renderOneSample: (sampleRenderProps: SampleRenderProps) => ReactNode;
-  selectedTab: BulkNavigatorTab | SampleWithHooks;
-  onSelectTab: (newSelected: SampleWithHooks | BulkNavigatorTab) => void;
+export interface BulkEditNavigatorProps {
+  resources: ResourceWithHooks[];
+  renderOneResource: (resourceRenderProps: ResourceRenderProps) => ReactNode;
+  selectedTab: BulkNavigatorTab | ResourceWithHooks;
+  onSelectTab: (newSelected: ResourceWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
 }
 
-export interface SampleRenderProps {
-  sample: InputResource<MaterialSample>;
+export interface ResourceRenderProps<T extends KitsuResource = KitsuResource> {
+  resource: InputResource<T>;
   index: number;
   isSelected: boolean;
 }
 
-export interface BulkNavigatorTab {
+export interface BulkNavigatorTab<T extends KitsuResource = KitsuResource> {
   key: string;
   title: ReactNode;
   content: (isSelected: boolean) => ReactNode;
-  formRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
+  formRef: RefObject<FormikProps<InputResource<T>>>;
 }
 
 /**
- * Under 10 samples: Shows tabs.
- * 10 or more samples: Shows dropdown navigator with arrow buttons.
+ * Under 10 resources: Shows tabs.
+ * 10 or more resources: Shows dropdown navigator with arrow buttons.
  */
-export function MaterialSampleBulkNavigator({
+export function BulkEditNavigator({
   selectedTab,
   onSelectTab,
-  samples,
-  renderOneSample,
+  resources,
+  renderOneResource,
   extraTabs = []
-}: MaterialSampleBulkNavigatorProps) {
-  const tabElements = [...extraTabs, ...samples];
+}: BulkEditNavigatorProps) {
+  const tabElements = [...extraTabs, ...resources];
 
-  const tooManySamplesForTabs = samples.length >= 10;
+  const tooManyResourcesForTabs = resources.length >= 10;
 
-  const tabsWithErrors = [...samples, ...extraTabs].filter(
-    sample =>
-      !!sample.formRef.current?.status ||
-      !isEmpty(sample.formRef.current?.errors)
+  const tabsWithErrors = [...resources, ...extraTabs].filter(
+    resource =>
+      !!resource.formRef.current?.status ||
+      !isEmpty(resource.formRef.current?.errors)
   );
 
   function isSelected(key: string) {
@@ -56,15 +56,15 @@ export function MaterialSampleBulkNavigator({
 
   return (
     <div className="sample-bulk-navigator">
-      {tooManySamplesForTabs ? (
+      {tooManyResourcesForTabs ? (
         <div>
           <div className="d-flex justify-content-center mb-3">
-            <SelectNavigation<BulkNavigatorTab | SampleWithHooks>
+            <SelectNavigation<BulkNavigatorTab | ResourceWithHooks>
               elements={tabElements}
               value={selectedTab}
               onChange={onSelectTab}
               optionLabel={(element: any) =>
-                element.title || element.sample?.materialSampleName
+                element.title || element.resource?.materialSampleName
               }
               invalidElements={tabsWithErrors}
             />
@@ -77,13 +77,13 @@ export function MaterialSampleBulkNavigator({
               {extraTab.content(isSelected(extraTab.key))}
             </div>
           ))}
-          {samples.map((element, index) => (
+          {resources.map((element, index) => (
             <div
               key={index}
               className={selectedTab.key !== element.key ? "d-none" : ""}
             >
-              {renderOneSample({
-                sample: element.sample,
+              {renderOneResource({
+                resource: element.resource,
                 index,
                 isSelected: isSelected(element.key)
               })}
@@ -119,15 +119,15 @@ export function MaterialSampleBulkNavigator({
                 </Tab>
               );
             })}
-            {samples.map((sample, index) => {
-              const tabHasError = tabsWithErrors.includes(sample);
+            {resources.map((resource, index) => {
+              const tabHasError = tabsWithErrors.includes(resource);
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {sample.sample.materialSampleName || `#${index + 1}`}
+                    {`#${index + 1}`}
                   </span>
                 </Tab>
               );
@@ -141,13 +141,13 @@ export function MaterialSampleBulkNavigator({
               {extraTab.content(isSelected(extraTab.key))}
             </TabPanel>
           ))}
-          {samples.map((tab, index) => (
+          {resources.map((tab, index) => (
             <TabPanel
               className={`react-tabs__tab-panel sample-tabpanel-${index}`}
               key={index}
             >
-              {renderOneSample({
-                sample: tab.sample,
+              {renderOneResource({
+                resource: tab.resource,
                 index,
                 isSelected: isSelected(tab.key)
               })}

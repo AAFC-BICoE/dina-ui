@@ -1,7 +1,7 @@
 import {
   BulkEditTabContext,
   BulkEditTabContextI,
-  SampleWithHooks,
+  ResourceWithHooks,
   withoutBlankFields
 } from "common-ui";
 import { FormikProps } from "formik";
@@ -9,7 +9,6 @@ import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { useRef } from "react";
 import {
-  BulkNavigatorTab,
   MaterialSampleForm,
   MaterialSampleFormProps,
   useMaterialSampleFormTemplateSelectState,
@@ -17,9 +16,10 @@ import {
 } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
+import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
 
 export interface UseBulkEditTabParams {
-  sampleHooks: SampleWithHooks[];
+  resourceHooks: ResourceWithHooks[];
   hideBulkEditTab?: boolean;
   hideUseSequence?: boolean;
 
@@ -29,7 +29,7 @@ export interface UseBulkEditTabParams {
 
 export function useBulkEditTab({
   hideBulkEditTab,
-  sampleHooks,
+  resourceHooks,
   hideUseSequence,
   sampleFormProps
 }: UseBulkEditTabParams) {
@@ -47,7 +47,7 @@ export function useBulkEditTab({
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
   const ctx: BulkEditTabContextI = {
-    sampleHooks,
+    resourceHooks,
     bulkEditFormRef
   };
 
@@ -67,8 +67,8 @@ export function useBulkEditTab({
             materialSample={initialValues}
             disableAutoNamePrefix={true}
             disableSampleNameField={true}
-            disableCollectingEventSwitch={sampleHooks.some(
-              hook => hook.sample.parentMaterialSample !== undefined
+            disableCollectingEventSwitch={resourceHooks.some(
+              (hook: any) => hook.resource.parentMaterialSample !== undefined
             )}
             isOffScreen={!isSelected}
             // Disable the nav's Are You Sure prompt when removing components,

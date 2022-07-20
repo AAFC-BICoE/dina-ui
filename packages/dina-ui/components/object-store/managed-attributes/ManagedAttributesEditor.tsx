@@ -77,7 +77,7 @@ export function ManagedAttributesEditor({
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
       {currentValue => {
         function getAttributeKeysInUse() {
-          const managedAttributeMaps = bulkCtx?.sampleHooks.map(sample =>
+          const managedAttributeMaps = bulkCtx?.resourceHooks.map(sample =>
             get(sample.formRef.current?.values, valuesPath)
           ) || [currentValue];
 
