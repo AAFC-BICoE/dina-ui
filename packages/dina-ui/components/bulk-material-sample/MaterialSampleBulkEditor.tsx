@@ -27,6 +27,7 @@ import {
   BulkNavigatorTab
 } from "../bulk-edit/BulkEditNavigator";
 import { useBulkEditTab } from "./useBulkEditTab";
+import { FormikProps } from "formik";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -91,12 +92,8 @@ export function MaterialSampleBulkEditor({
     showChangedIndicatorsInNestedForms: true
   });
 
-  const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
-    resourceHooks: sampleHooks,
-    hideBulkEditTab: !initialized,
-    hideUseSequence: true,
-    sampleFormProps: formTemplateProps
-  });
+  const bulkEditFormRef =
+    useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
   const materialSampleForm = (
     <MaterialSampleForm
@@ -117,6 +114,14 @@ export function MaterialSampleBulkEditor({
       disableNavRemovePrompt={true}
     />
   );
+
+  const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
+    resourceHooks: sampleHooks,
+    hideBulkEditTab: !initialized,
+    resourceForm: materialSampleForm,
+    bulkEditFormRef,
+    bulkEditSampleHook
+  });
 
   useEffect(() => {
     // Set the initial tab to the Edit All tab:

@@ -7,6 +7,7 @@ import {
 import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { isEmpty } from "lodash";
+import React from "react";
 import { useRef } from "react";
 import {
   MaterialSampleForm,
@@ -21,36 +22,24 @@ import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
 export interface UseBulkEditTabParams {
   resourceHooks: ResourceWithHooks[];
   hideBulkEditTab?: boolean;
-  hideUseSequence?: boolean;
-
-  /** Additional props forwarded to the MaterialSampleForm. */
-  sampleFormProps?: Partial<MaterialSampleFormProps>;
+  resourceForm: any;
+  bulkEditFormRef: any;
+  bulkEditSampleHook: any;
 }
 
 export function useBulkEditTab({
   hideBulkEditTab,
   resourceHooks,
-  hideUseSequence,
-  sampleFormProps
+  resourceForm,
+  bulkEditFormRef,
+  bulkEditSampleHook
 }: UseBulkEditTabParams) {
   const { formatMessage } = useDinaIntl();
-
-  const initialValues: InputResource<MaterialSample> = {
-    type: "material-sample"
-  };
-  const bulkEditSampleHook = useMaterialSampleSave({
-    ...sampleFormProps,
-    materialSample: initialValues,
-    showChangedIndicatorsInNestedForms: true
-  });
-  const bulkEditFormRef =
-    useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
   const ctx: BulkEditTabContextI = {
     resourceHooks,
     bulkEditFormRef
   };
-
   const bulkEditTab: BulkNavigatorTab = {
     formRef: bulkEditFormRef,
     key: "EDIT_ALL",
@@ -58,7 +47,8 @@ export function useBulkEditTab({
     content: isSelected =>
       hideBulkEditTab ? null : (
         <BulkEditTabContext.Provider value={ctx}>
-          <MaterialSampleForm
+          {React.cloneElement(resourceForm, { isOffScreen: isSelected })}
+          {/* <MaterialSampleForm
             {...sampleFormProps}
             buttonBar={null}
             hideUseSequence={hideUseSequence}
@@ -74,7 +64,7 @@ export function useBulkEditTab({
             // Disable the nav's Are You Sure prompt when removing components,
             // because you aren't actually deleting data.
             disableNavRemovePrompt={true}
-          />
+          /> */}
         </BulkEditTabContext.Provider>
       )
   };
