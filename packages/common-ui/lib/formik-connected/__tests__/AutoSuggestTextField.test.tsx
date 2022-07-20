@@ -24,13 +24,15 @@ describe("AutoSuggestTextField", () => {
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
-          query={searchValue => ({
-            path: "agent-api/person",
-            filter: {
-              rsql: `name==*${searchValue}*`
-            }
-          })}
-          suggestion={person => person.name}
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
           timeoutMs={0}
         />
       </DinaForm>,
@@ -59,7 +61,7 @@ describe("AutoSuggestTextField", () => {
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
-          suggestions={() => ["suggestion-1", "suggestion-2"]}
+          customOptions={() => ["suggestion-1", "suggestion-2"]}
           timeoutMs={0}
         />
       </DinaForm>,
