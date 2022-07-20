@@ -22,9 +22,9 @@ import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
 export interface UseBulkEditTabParams {
   resourceHooks: ResourceWithHooks[];
   hideBulkEditTab?: boolean;
-  resourceForm: any;
-  bulkEditFormRef: any;
-  bulkEditSampleHook: any;
+  resourceForm?: any;
+  bulkEditFormRef?: any;
+  bulkEditSampleHook?: any;
 }
 
 export function useBulkEditTab({
