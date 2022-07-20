@@ -2,12 +2,12 @@ import {
   JsonApiQuerySpec,
   TextField,
   TextFieldProps,
-  useQuery
+  useQuery,
+  useAutocompleteSearch
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, compact, uniq } from "lodash";
-import { useAutocompleteSearch } from "packages/dina-ui/components/search/useSearch";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import { useIntl } from "react-intl";
@@ -16,8 +16,23 @@ import { OnFormikSubmit } from "./safeSubmit";
 
 type BackendOptions = "elastic-search" | "json-api";
 
+type DropdownItem = string[] | string | null | undefined;
+
 export type AutoSuggestTextFieldProps<T extends KitsuResource> =
   TextFieldProps & AutoSuggestConfig<T>;
+
+export type JsonApiQueryProps = {
+  /**
+   * The search term used to search for the selected object. Can be useful for
+   * displaying custom options.
+   */
+  searchTerm: string;
+
+  /**
+   * The formik context. Can be used to get existing fields on the form.
+   */
+  formikCtx: FormikContextType<any>;
+};
 
 interface AutoSuggestConfig<T extends KitsuResource> {
   /**
@@ -86,7 +101,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
       selected?: PersistedResource<T>,
       selectedNoType?: any,
       searchTerm?: string
-    ) => string | null | undefined;
+    ) => DropdownItem;
   };
 
   /**
@@ -124,7 +139,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
       selected?: PersistedResource<T>,
       selectedNoType?: any,
       searchTerm?: string
-    ) => string | null | undefined;
+    ) => DropdownItem;
   };
 
   /**
@@ -142,9 +157,11 @@ interface AutoSuggestConfig<T extends KitsuResource> {
    * This will override the preferred backend. This can be useful if you have a backend that is
    * for displaying recent items and you want to use it for the initial search.
    *
+   * If both providers can be used then you can use the "preferred" option.
+   *
    * If not defined, then no provider will be used for blank searches.
    */
-  blankSearchBackend?: BackendOptions;
+  blankSearchBackend?: BackendOptions | "preferred";
 
   /**
    * Milliseconds to wait before performing a search. This is used for the query debounce to
@@ -164,7 +181,7 @@ interface AutoSuggestConfig<T extends KitsuResource> {
   customOptions?: (
     searchTerm: string,
     formikCtx: FormikContextType<any>
-  ) => string | string[] | null | undefined;
+  ) => DropdownItem;
 
   /**
    * Event is triggered when a suggestion is selected.

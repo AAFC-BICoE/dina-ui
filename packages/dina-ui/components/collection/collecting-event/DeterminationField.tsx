@@ -19,7 +19,6 @@ import {
   Vocabulary
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import {
   GlobalNamesField,
   SelectedScientificNameView
@@ -164,29 +163,34 @@ export function DeterminationField({
                   />
                   <AutoSuggestTextField<MaterialSample>
                     {...fieldProps("verbatimDeterminer")}
-                    query={() => ({
-                      path: "collection-api/material-sample"
-                    })}
-                    suggestion={sample =>
-                      flatMap(
-                        sample.organism?.map(organism =>
-                          organism?.determination?.map(
-                            det => det?.verbatimDeterminer
+                    jsonApiBackend={{
+                      query: () => ({
+                        path: "collection-api/material-sample"
+                      }),
+                      option: sample =>
+                        flatMap(
+                          sample?.organism?.map(
+                            organism =>
+                              organism?.determination?.map(
+                                det => det?.verbatimDeterminer ?? ""
+                              ) ?? []
                           )
-                        )
-                      ) ?? []
-                    }
-                    alwaysShowSuggestions={true}
-                    useCustomQuery={(searchQuery, querySpec) =>
-                      useAutocompleteSearchButFallbackToRsqlApiSearch<MaterialSample>(
-                        {
-                          searchQuery,
-                          querySpec,
-                          indexName: "dina_material_sample_index",
-                          searchField: "determination.verbatimDeterminer"
-                        }
-                      )
-                    }
+                        ) ?? []
+                    }}
+                    elasticSearchBackend={{
+                      indexName: "dina_material_sample_index",
+                      searchField: "determination.verbatimDeterminer",
+                      option: sample =>
+                        flatMap(
+                          sample?.organism?.map(
+                            organism =>
+                              organism?.determination?.map(
+                                det => det?.verbatimDeterminer ?? ""
+                              ) ?? []
+                          )
+                        ) ?? []
+                    }}
+                    blankSearchBackend={"json-api"}
                   />
                   <TextField {...fieldProps("verbatimDate")} />
                   <TextField
@@ -204,20 +208,21 @@ export function DeterminationField({
                 >
                   <AutoSuggestTextField<Vocabulary>
                     {...fieldProps("typeStatus")}
-                    query={() => ({
-                      path: "collection-api/vocabulary/typeStatus"
-                    })}
-                    suggestion={(vocabElement, searchValue) =>
-                      vocabElement?.vocabularyElements
-                        ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                        .filter(it =>
-                          it?.name
-                            ?.toLowerCase?.()
-                            ?.includes(searchValue?.toLowerCase?.())
-                        )
-                        .map(it => it?.labels?.[locale] ?? "")
-                    }
-                    alwaysShowSuggestions={true}
+                    jsonApiBackend={{
+                      query: () => ({
+                        path: "collection-api/vocabulary/typeStatus"
+                      }),
+                      option: (vocabElement, searchValue) =>
+                        vocabElement?.vocabularyElements
+                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                          .filter(it =>
+                            it?.name
+                              ?.toLowerCase?.()
+                              ?.includes(searchValue?.toLowerCase?.())
+                          )
+                          .map(it => it?.labels?.[locale] ?? "")
+                    }}
+                    blankSearchBackend={"json-api"}
                   />
                   <TextField
                     {...fieldProps("typeStatusEvidence")}

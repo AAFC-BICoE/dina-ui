@@ -138,15 +138,16 @@ export function PreparationField({
           <TextField {...fieldProps("preparationRemarks")} multiLines={true} />
           <AutoSuggestTextField<Vocabulary>
             {...fieldProps("dwcDegreeOfEstablishment")}
-            query={() => ({
-              path: "collection-api/vocabulary/degreeOfEstablishment"
-            })}
-            suggestion={vocabElement =>
-              vocabElement?.vocabularyElements?.map(
-                it => it?.labels?.[locale] ?? ""
-              ) ?? ""
-            }
-            alwaysShowSuggestions={true}
+            jsonApiBackend={{
+              query: () => ({
+                path: "collection-api/vocabulary/degreeOfEstablishment"
+              }),
+              option: vocabElement =>
+                vocabElement?.vocabularyElements?.map(
+                  it => it?.labels?.[locale] ?? ""
+                ) ?? ""
+            }}
+            blankSearchBackend={"json-api"}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
           <PersonSelectField {...fieldProps("preparedBy")} />

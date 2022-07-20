@@ -19,7 +19,6 @@ import {
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 

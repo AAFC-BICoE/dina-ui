@@ -275,18 +275,16 @@ export function ScheduledActionSubForm({
 
   // Fetch the last 50 scheduled actions.
   // No filtering by search text yet due to API limitations. The future search API should provide better autocomplete support.
-  const autoSuggestQuery: AutoSuggestTextFieldProps<MaterialSample>["query"] = (
-    _,
-    ctx
-  ) => ({
-    path: "collection-api/material-sample",
-    fields: { "material-sample": "scheduledActions" },
-    filter: {
-      scheduledActions: { NEQ: "null" },
-      ...(ctx.values.group && { group: { EQ: ctx.values.group } })
-    },
-    page: { limit: 50 }
-  });
+  const autoSuggestQuery: AutoSuggestTextFieldProps<MaterialSample>["jsonApiBackend"]["query"] =
+    (_, ctx) => ({
+      path: "collection-api/material-sample",
+      fields: { "material-sample": "scheduledActions" },
+      filter: {
+        scheduledActions: { NEQ: "null" },
+        ...(ctx.values.group && { group: { EQ: ctx.values.group } })
+      },
+      page: { limit: 50 }
+    });
 
   const defaultInitialValues = {
     date: defaultDate
@@ -305,11 +303,14 @@ export function ScheduledActionSubForm({
           <div className="row">
             <AutoSuggestTextField<MaterialSample>
               {...fieldProps("actionType")}
-              query={autoSuggestQuery}
-              suggestion={matSample =>
-                matSample.scheduledActions?.map(it => it?.actionType)
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: autoSuggestQuery,
+                option: matSample =>
+                  matSample?.scheduledActions?.map(
+                    it => it?.actionType ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               className="col-sm-6"
             />
             <DateField {...fieldProps("date")} className="col-sm-6" />
@@ -317,11 +318,14 @@ export function ScheduledActionSubForm({
           <div className="row">
             <AutoSuggestTextField<MaterialSample>
               {...fieldProps("actionStatus")}
-              query={autoSuggestQuery}
-              suggestion={matSample =>
-                matSample.scheduledActions?.map(it => it?.actionStatus)
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: autoSuggestQuery,
+                option: matSample =>
+                  matSample?.scheduledActions?.map(
+                    it => it?.actionStatus ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               className="col-sm-6"
             />
             <UserSelectField

@@ -90,3 +90,4 @@ export * from "./formik-connected/QueryLogicSwitchField";
 export * from "./list-page/QueryPage";
 export * from "./formik-connected/ControlledVocabularySelectField";
 export * from "./formik-connected/FieldExtensionSelectField";
+export * from "./search/useSearch";
