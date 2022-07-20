@@ -4,6 +4,7 @@ import {
   ResourceSelectField,
   ResourceSelectFieldProps,
   useAccount,
+  useAutocompleteSearchButFallbackToRsqlApiSearch,
   useQuery,
   withResponse
 } from "common-ui";

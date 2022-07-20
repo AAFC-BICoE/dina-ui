@@ -7,6 +7,7 @@ import {
   FieldSet,
   FieldSpy,
   FormikButton,
+  JsonApiQuerySpec,
   OnFormikSubmit,
   TextField,
   useDinaFormContext
@@ -275,16 +276,18 @@ export function ScheduledActionSubForm({
 
   // Fetch the last 50 scheduled actions.
   // No filtering by search text yet due to API limitations. The future search API should provide better autocomplete support.
-  const autoSuggestQuery: AutoSuggestTextFieldProps<MaterialSample>["jsonApiBackend"]["query"] =
-    (_, ctx) => ({
-      path: "collection-api/material-sample",
-      fields: { "material-sample": "scheduledActions" },
-      filter: {
-        scheduledActions: { NEQ: "null" },
-        ...(ctx.values.group && { group: { EQ: ctx.values.group } })
-      },
-      page: { limit: 50 }
-    });
+  const autoSuggestQuery: (
+    searchTerm: string,
+    formikCtx: FormikContextType<any>
+  ) => JsonApiQuerySpec = (_, ctx) => ({
+    path: "collection-api/material-sample",
+    fields: { "material-sample": "scheduledActions" },
+    filter: {
+      scheduledActions: { NEQ: "null" },
+      ...(ctx.values.group && { group: { EQ: ctx.values.group } })
+    },
+    page: { limit: 50 }
+  });
 
   const defaultInitialValues = {
     date: defaultDate
