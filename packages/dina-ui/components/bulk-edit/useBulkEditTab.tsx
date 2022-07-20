@@ -14,7 +14,7 @@ import { BulkNavigatorTab } from "./BulkEditNavigator";
 export interface UseBulkEditTabParams {
   resourceHooks: ResourceWithHooks[];
   hideBulkEditTab?: boolean;
-  resourceForm?: any;
+  resourceForm: any;
   bulkEditFormRef?: any;
   bulkEditSampleHook?: any;
 }

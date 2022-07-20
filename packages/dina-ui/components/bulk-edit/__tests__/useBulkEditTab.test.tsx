@@ -1,9 +1,18 @@
-import { ResourceSelect } from "common-ui";
+import { ResourceSelect, ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
 import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
+import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-template/useMaterialSampleFormTemplateSelectState";
+import {
+  MaterialSampleForm,
+  MaterialSampleFormProps
+} from "../../collection/material-sample/MaterialSampleForm";
+import { useMaterialSampleSave } from "../../collection/material-sample/useMaterialSample";
+import { BulkNavigatorTab } from "../BulkEditNavigator";
 import { useBulkEditTab } from "../useBulkEditTab";
+import { FormikProps } from "formik";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const mockSubmitOverride = jest.fn();
 
@@ -13,8 +22,76 @@ interface BulkEditTabProps {
 
 /** Test component to test the Bulk Edit Tab in isolation. */
 function BulkEditTab({ baseSample }: BulkEditTabProps) {
+  const samples = useMemo(() => [baseSample], []);
+  const [selectedTab, setSelectedTab] = useState<
+    BulkNavigatorTab | ResourceWithHooks
+  >();
+
+  // Allow selecting a custom view for the form:
+  const {
+    sampleFormTemplate,
+    setSampleFormTemplate,
+    enabledFields,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormTemplateSelectState();
+
+  const formTemplateProps: Partial<MaterialSampleFormProps> = {
+    enabledFields,
+    visibleManagedAttributeKeys
+  };
+
+  const sampleHooks = samples.map<ResourceWithHooks>((resource, index) => {
+    const key = `sample-${index}`;
+    return {
+      key,
+      resource,
+      saveHook: useMaterialSampleSave({
+        materialSample: resource,
+        // Reduce the off-screen tabs rendering for better performance:
+        reduceRendering: key !== selectedTab?.key,
+        // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
+        disableNestedFormEdits: true,
+        visibleManagedAttributeKeys,
+        enabledFields
+      }),
+      formRef: useRef(null)
+    };
+  });
+  const initialValues: InputResource<MaterialSample> = {
+    type: "material-sample"
+  };
+
+  const bulkEditSampleHook = useMaterialSampleSave({
+    ...formTemplateProps,
+    materialSample: initialValues,
+    showChangedIndicatorsInNestedForms: true
+  });
+
+  const bulkEditFormRef =
+    useRef<FormikProps<InputResource<MaterialSample>>>(null);
+
+  const materialSampleForm = (
+    <MaterialSampleForm
+      {...formTemplateProps}
+      buttonBar={null}
+      hideUseSequence={true}
+      materialSampleFormRef={bulkEditFormRef}
+      materialSampleSaveHook={bulkEditSampleHook}
+      materialSample={initialValues}
+      disableAutoNamePrefix={true}
+      disableSampleNameField={true}
+      disableCollectingEventSwitch={sampleHooks.some(
+        (hook: any) => hook.resource.parentMaterialSample !== undefined
+      )}
+      // Disable the nav's Are You Sure prompt when removing components,
+      // because you aren't actually deleting data.
+      disableNavRemovePrompt={true}
+    />
+  );
+
   const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
-    resourceHooks: []
+    resourceHooks: [],
+    resourceForm: materialSampleForm
   });
 
   return (
@@ -115,6 +192,7 @@ describe("Material sample bulk edit tab", () => {
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
+    // console.log(wrapper.debug());
 
     await new Promise(setImmediate);
     wrapper.update();
