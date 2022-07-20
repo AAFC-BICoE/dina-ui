@@ -69,7 +69,15 @@ const apiContextJsonAPIOnly = {
 
 const apiContextElasticSearchOnly = {
   apiClient: {
-    get: mockGetAxios,
+    axios: {
+      get: mockGetAxios
+    }
+  }
+} as any;
+
+const apiContextBothProviders = {
+  apiClient: {
+    get: mockGet,
     axios: {
       get: mockGetAxios
     }
@@ -131,8 +139,8 @@ describe("AutoSuggestTextField", () => {
       { apiContext: apiContextElasticSearchOnly }
     );
 
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
     wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -168,7 +176,47 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Both backend providers are used, preferred backend is used.", async () => {
-    // This test needs to be created.
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          elasticSearchBackend={{
+            indexName: "dina_agent_index",
+            searchField: "data.attributes.name",
+            option: person => person?.name
+          }}
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
+          preferredBackend={"json-api"}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextBothProviders }
+    );
+
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).lastCalledWith("agent-api/person", {
+      filter: { rsql: "name==*p*" },
+      sort: "-createdOn"
+    });
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-json-api",
+      "person2-json-api",
+      "person3-json-api"
+    ]);
   });
 
   it("Both backend providers are used, preferred backend fails, other backend is used.", async () => {
@@ -176,7 +224,29 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Blank search provider not supplied, options do not appear when empty search.", async () => {
-    // This test needs to be created.
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextJsonAPIOnly }
+    );
+
+    wrapper.find("input").simulate("focus");
+
+    // Api should not be requested when search is empty since no blank search provider is supplied.
+    expect(mockGet).toHaveBeenCalledTimes(0);
   });
 
   it("Blank search provider supplied, options come from blank search provider only.", async () => {

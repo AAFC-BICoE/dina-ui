@@ -237,7 +237,11 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
   // Backend currently being used, determined by the preferred backend or what is provided.
   const [backend, setBackend] = useState<BackendOptions>(
-    preferredBackend || elasticSearchBackend ? "elastic-search" : "json-api"
+    preferredBackend
+      ? preferredBackend
+      : elasticSearchBackend
+      ? "elastic-search"
+      : "json-api"
   );
 
   // Value of the text field, used to search for suggestions.
@@ -265,11 +269,23 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
   // Boolean to determine if the JSON API should be used.
   const performJsonApiQuery: boolean =
-    focus && backend === "json-api" && jsonApiBackend !== undefined;
+    ((debouncedSearchValue === "" &&
+      (blankSearchBackend === "json-api" ||
+        blankSearchBackend === "preferred")) ||
+      debouncedSearchValue !== "") &&
+    focus &&
+    backend === "json-api" &&
+    !jsonApiBackend;
 
   // Boolean to determine if the Elastic Search should be used.
   const performElasticSearchQuery: boolean =
-    focus && backend === "elastic-search" && elasticSearchBackend !== undefined;
+    (debouncedSearchValue === "" ||
+      blankSearchBackend === "elastic-search" ||
+      blankSearchBackend === "preferred" ||
+      debouncedSearchValue !== "") &&
+    focus &&
+    backend === "elastic-search" &&
+    !elasticSearchBackend;
 
   // Default query specifications for the JSON API search.
   const querySpec: JsonApiQuerySpec = {
@@ -317,8 +333,13 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
   const isLoading: boolean =
     elasticSearchLoading || (jsonApiLoading && !jsonApiIsDisabled);
-  const searchResult: PersistedResource<T>[] | null | undefined =
-    backend === "elastic-search" ? elasticSearchResult : jsonApiResponse?.data;
+
+  const searchResult: PersistedResource<T>[] | undefined =
+    backend === "elastic-search"
+      ? elasticSearchResult !== null
+        ? elasticSearchResult
+        : []
+      : jsonApiResponse?.data;
 
   // Finally, the suggestions to be displayed on the dropdown.
   const allSuggestions = compact([
