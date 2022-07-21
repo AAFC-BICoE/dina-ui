@@ -179,7 +179,8 @@ export function DeterminationField({
                     }}
                     elasticSearchBackend={{
                       indexName: "dina_material_sample_index",
-                      searchField: "determination.verbatimDeterminer",
+                      searchField:
+                        "data.attributes.determination.verbatimDeterminer",
                       option: sample =>
                         flatMap(
                           sample?.organism?.map(

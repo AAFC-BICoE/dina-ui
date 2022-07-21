@@ -267,25 +267,48 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     });
   }, []);
 
-  // Boolean to determine if the JSON API should be used.
-  const performJsonApiQuery: boolean =
-    ((debouncedSearchValue === "" &&
-      (blankSearchBackend === "json-api" ||
-        blankSearchBackend === "preferred")) ||
-      debouncedSearchValue !== "") &&
-    focus &&
-    backend === "json-api" &&
-    !jsonApiBackend;
+  /**
+   * Logic to determine which backend should be searched on.
+   *
+   * 1. Focus must be provided on the text field.
+   * 2. If a blank search is being performed...
+   *   a. If a blank search backend is preferred then use the currently selected backend.
+   *   b. If a blank search backend is not preferred then use the backendProvider only.
+   * 3. If a non-blank search is being performed...
+   *   a. Check if elastic search is currently being used, if it's defined, use that.
+   *   b. If elastic search is not defined, use the JSON Api backend if it's defined.
+   *
+   * @param backendProvider The backend provider to check if it can be used.
+   * @returns boolean indicating if the backend can be used based on the conditions above.
+   */
+  const performProviderSearch = (backendProvider: BackendOptions) => {
+    if (focus) {
+      // Special case for blank searches if blank search backend is provided.
+      if (searchValue === "") {
+        if (
+          blankSearchBackend &&
+          ((blankSearchBackend === "preferred" &&
+            backendProvider === backend) ||
+            blankSearchBackend === backend)
+        ) {
+          return true;
+        }
+      } else {
+        if (backend === backendProvider) {
+          if (
+            (backend === "elastic-search" &&
+              elasticSearchBackend !== undefined) ||
+            (backend === "json-api" && jsonApiBackend !== undefined)
+          ) {
+            return true;
+          }
+        }
+      }
+    }
 
-  // Boolean to determine if the Elastic Search should be used.
-  const performElasticSearchQuery: boolean =
-    (debouncedSearchValue === "" ||
-      blankSearchBackend === "elastic-search" ||
-      blankSearchBackend === "preferred" ||
-      debouncedSearchValue !== "") &&
-    focus &&
-    backend === "elastic-search" &&
-    !elasticSearchBackend;
+    // Do not perform the search if any of the conditions above are not met.
+    return false;
+  };
 
   // Default query specifications for the JSON API search.
   const querySpec: JsonApiQuerySpec = {
@@ -301,11 +324,12 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     error: jsonApiError,
     isDisabled: jsonApiIsDisabled
   } = useQuery<T[]>(querySpec, {
-    disabled: !performJsonApiQuery
+    disabled: !performProviderSearch("json-api")
   });
 
   // Elastic search search. Only used if Elastic Search is defined and it's the current backend.
   const {
+    setInputValue,
     isLoading: elasticSearchLoading,
     searchResult: elasticSearchResult,
     error: elasticSearchError
@@ -316,9 +340,13 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     documentId: elasticSearchBackend?.documentId,
     restrictedField: elasticSearchBackend?.restrictedField,
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
+    timeoutMs: 0, // Timeout is already being handled by our debounce.
     // groups: elasticSearchBackend?.groups, (coming in a future ticket)
-    disabled: !performElasticSearchQuery
+    disabled: !performProviderSearch("elastic-search")
   });
+
+  // Put the ResourceSelect's input into the Search hook's for elastic search.
+  useEffect(() => setInputValue(searchValue), [searchValue]);
 
   // If any errors occur, switch providers. Only if both providers are set.
   if (
@@ -347,14 +375,14 @@ export function AutoSuggestTextField<T extends KitsuResource>({
     ...(searchResult && !isLoading && focus
       ? uniq(
           castArray(searchResult).flatMap(item => {
-            if (performElasticSearchQuery) {
+            if (performProviderSearch("elastic-search")) {
               return elasticSearchBackend?.option(
                 item,
                 item as any,
                 debouncedSearchValue
               );
             }
-            if (performJsonApiQuery) {
+            if (performProviderSearch("json-api")) {
               return jsonApiBackend?.option(
                 item,
                 item as any,

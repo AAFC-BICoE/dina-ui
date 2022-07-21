@@ -116,11 +116,29 @@ describe("AutoSuggestTextField", () => {
       sort: "-createdOn"
     });
 
+    expect(mockGet).toHaveBeenCalledTimes(1);
+
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "person1-json-api",
       "person2-json-api",
       "person3-json-api"
     ]);
+
+    // Test to ensure number of API calls does is not excessive.
+    wrapper.find("input").simulate("change", { target: { value: "pe" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).toHaveBeenCalledTimes(2);
+
+    // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
+    wrapper.find("input").simulate("change", { target: { value: "" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).toHaveBeenCalledTimes(2);
   });
 
   it("Elastic Search only provided, results are fetched from elastic search.", async () => {
@@ -145,16 +163,39 @@ describe("AutoSuggestTextField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGetAxios).lastCalledWith(
-      "search-api/search-ws/auto-complete",
-      {}
-    );
+    expect(mockGetAxios).lastCalledWith("search-api/search-ws/auto-complete", {
+      params: {
+        additionalField: "",
+        indexName: "dina_agent_index",
+        autoCompleteField: "data.attributes.name",
+        prefix: "p",
+        documentId: undefined
+      }
+    });
+
+    expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "person1-elastic-search",
       "person2-elastic-search",
       "person3-elastic-search"
     ]);
+
+    // Test to ensure number of API calls does is not excessive.
+    wrapper.find("input").simulate("change", { target: { value: "pe" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGetAxios).toHaveBeenCalledTimes(2);
+
+    // Try an empty search, since blankSearchProvider is not supplied it should not do any requests.
+    wrapper.find("input").simulate("change", { target: { value: "" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGetAxios).toHaveBeenCalledTimes(2);
   });
 
   it("Custom options only provided, results come from custom options.", async () => {
