@@ -136,7 +136,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
       disableAutoNamePrefix={true}
       disableSampleNameField={true}
       disableCollectingEventSwitch={sampleHooks.some(
-        (hook: any) => hook.resource.parentMaterialSample !== undefined
+        (hook: any) => hook?.resource?.parentMaterialSample !== undefined
       )}
       // Disable the nav's Are You Sure prompt when removing components,
       // because you aren't actually deleting data.
@@ -247,8 +247,6 @@ describe("Material sample bulk edit tab", () => {
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
-    // console.log(wrapper.debug());
-
     await new Promise(setImmediate);
     wrapper.update();
 

@@ -56,7 +56,7 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   const bulkEditValue =
     "currentValue" in params
       ? params.currentValue
-      : get(bulkEditFormRef.current?.values, fieldName);
+      : get(bulkEditFormRef?.current?.values, fieldName);
 
   const hasBulkEditValue =
     !isBlankResourceAttribute(bulkEditValue) &&
