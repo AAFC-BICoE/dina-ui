@@ -19,54 +19,61 @@ const mockGet = jest.fn(async () => {
   };
 });
 
-// Elastic Search mock response.
-const mockGetAxios = jest.fn(async () => {
-  return {
-    data: {
-      hits: {
-        total: {
-          value: 3
-        },
-        hits: [
-          {
-            _source: {
-              data: {
-                attributes: {
-                  name: "person1-elastic-search"
-                }
-              }
-            }
-          },
-          {
-            _source: {
-              data: {
-                attributes: {
-                  name: "person2-elastic-search"
-                }
-              }
-            }
-          },
-          {
-            _source: {
-              data: {
-                attributes: {
-                  name: "person3-elastic-search"
-                }
-              }
-            }
-          }
-        ]
-      }
-    }
-  };
+const mockGetFailure = jest.fn(async () => {
+  throw new Error("Something went wrong!");
 });
 
+const PERSON_TEST_DATA_ELASTICSEARCH = {
+  data: {
+    hits: [
+      {
+        source: {
+          data: {
+            id: "b7b24707-ad21-4957-a7ad-de423ba67094",
+            type: "person",
+            attributes: {
+              name: "person1-elastic-search"
+            }
+          }
+        }
+      },
+      {
+        source: {
+          data: {
+            id: "a5f67abb-d9a5-4c21-8a5a-5339b71f8fd5",
+            type: "person",
+            attributes: {
+              name: "person2-elastic-search"
+            }
+          }
+        }
+      },
+      {
+        source: {
+          data: {
+            id: "a4728a07-ad44-4086-a990-0d4ab7cf2105",
+            type: "person",
+            attributes: {
+              name: "person3-elastic-search"
+            }
+          }
+        }
+      }
+    ]
+  }
+};
+
+// Elastic Search mock response.
+const mockGetAxios = jest.fn(async () => PERSON_TEST_DATA_ELASTICSEARCH);
+
+// JSON API only.
 const apiContextJsonAPIOnly = {
   apiClient: {
     get: mockGet
   }
 } as any;
 
+// Elastic search only.
 const apiContextElasticSearchOnly = {
   apiClient: {
     axios: {
@@ -75,6 +82,7 @@ const apiContextElasticSearchOnly = {
   }
 } as any;
 
+// Both elastic search and JSON are working.
 const apiContextBothProviders = {
   apiClient: {
     get: mockGet,
@@ -84,7 +92,20 @@ const apiContextBothProviders = {
   }
 } as any;
 
+// Elastic search works, but JSON API failure.
+const apiContextJsonAPIFailure = {
+  apiClient: {
+    get: mockGetFailure,
+    axios: {
+      get: mockGetAxios
+    }
+  }
+} as any;
+
 describe("AutoSuggestTextField", () => {
+  // Clear the mocks between tests.
+  beforeEach(jest.clearAllMocks);
+
   it("JSON API only provided, results are fetched from JSON API", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
@@ -258,10 +279,62 @@ describe("AutoSuggestTextField", () => {
       "person2-json-api",
       "person3-json-api"
     ]);
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGetAxios).toHaveBeenCalledTimes(0);
   });
 
   it("Both backend providers are used, preferred backend fails, other backend is used.", async () => {
-    // This test needs to be created.
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          elasticSearchBackend={{
+            indexName: "dina_agent_index",
+            searchField: "data.attributes.name",
+            option: person => person?.name
+          }}
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
+          preferredBackend={"json-api"}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextJsonAPIFailure }
+    );
+
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // JSON API should be tried first but fails.
+    expect(mockGetFailure).toHaveBeenCalledTimes(1);
+    expect(mockGetAxios).toHaveBeenCalledTimes(1);
+
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-elastic-search",
+      "person2-elastic-search",
+      "person3-elastic-search"
+    ]);
+
+    wrapper.find("input").simulate("change", { target: { value: "pe" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // JSON API should not be called again at this point. Already failed and should have switched to
+    // elastic search.
+    expect(mockGetFailure).toHaveBeenCalledTimes(1);
+    expect(mockGetAxios).toHaveBeenCalledTimes(2);
   });
 
   it("Blank search provider not supplied, options do not appear when empty search.", async () => {
@@ -291,6 +364,56 @@ describe("AutoSuggestTextField", () => {
   });
 
   it("Blank search provider supplied, options come from blank search provider only.", async () => {
-    // This test needs to be created.
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          elasticSearchBackend={{
+            indexName: "dina_agent_index",
+            searchField: "data.attributes.name",
+            option: person => person?.name
+          }}
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
+          preferredBackend={"json-api"}
+          blankSearchBackend={"elastic-search"}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextBothProviders }
+    );
+
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Search is currently blank, should be using elastic search instead of JSON API.
+    expect(mockGetAxios).toHaveBeenCalledTimes(1);
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-elastic-search",
+      "person2-elastic-search",
+      "person3-elastic-search"
+    ]);
+
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-json-api",
+      "person2-json-api",
+      "person3-json-api"
+    ]);
   });
 });
