@@ -8,7 +8,12 @@ import {
 import { FormikContextType, useFormikContext } from "formik";
 import { KitsuResource, PersistedResource } from "kitsu";
 import { castArray, compact, uniq } from "lodash";
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, {
+  ChangeEvent,
+  InputHTMLAttributes,
+  useEffect,
+  useState
+} from "react";
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import { useIntl } from "react-intl";
 import { useDebounce } from "use-debounce";
@@ -190,32 +195,6 @@ interface AutoSuggestConfig<T extends KitsuResource> {
 }
 
 /**
- * CSS Styling for the AutoSuggestTextField.
- */
-function AutoSuggestStyles() {
-  return (
-    <style>{`
-      .autosuggest-container {
-        position: relative;
-      }
-      .autosuggest .suggestions-container {
-        display: none;
-      }
-      .autosuggest .suggestions-container-open {
-        display: block;
-        position: absolute;
-        width: 100%;
-        z-index: 20;
-      }
-      .autosuggest .suggestion-highlighted { 
-        background-color: #ddd;
-        cursor: pointer;
-      }
-    `}</style>
-  );
-}
-
-/**
  * Suggests type ahead values based on a back-end query.
  *
  * It can be configured to use Elastic search or JSON Api or both. It will use the preferred backend
@@ -233,6 +212,42 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   ...textFieldProps
 }: AutoSuggestTextFieldProps<T>) {
   const { formatMessage } = useIntl();
+
+  return (
+    <TextField
+      {...textFieldProps}
+      customInput={inputProps => (
+        <AutoSuggestTextFieldInternal
+          elasticSearchBackend={elasticSearchBackend}
+          jsonApiBackend={jsonApiBackend}
+          preferredBackend={preferredBackend}
+          blankSearchBackend={blankSearchBackend}
+          customOptions={customOptions}
+          {...inputProps}
+          placeholder={
+            inputProps.placeholder || formatMessage({ id: "typeHereToSearch" })
+          }
+          autoComplete="none"
+          onSuggestionSelected={onSuggestionSelected}
+          id={textFieldProps.name}
+          timeoutMs={timeoutMs}
+        />
+      )}
+    />
+  );
+}
+
+function AutoSuggestTextFieldInternal<T extends KitsuResource>({
+  elasticSearchBackend,
+  jsonApiBackend,
+  preferredBackend,
+  blankSearchBackend,
+  timeoutMs = 250,
+  customOptions,
+  onSuggestionSelected,
+  id,
+  ...inputProps
+}: InputHTMLAttributes<any> & AutoSuggestConfig<T>) {
   const formik = useFormikContext<any>();
 
   // Backend currently being used, determined by the preferred backend or what is provided.
@@ -245,7 +260,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   );
 
   // Value of the text field, used to search for suggestions.
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
 
   // Debounced version of the search value. This is used to limit the number of queries. The timeout
   // can be configured in the props.
@@ -255,17 +270,6 @@ export function AutoSuggestTextField<T extends KitsuResource>({
 
   // Boolean to determine if the suggestion text field currently being used.
   const [focus, setFocus] = useState<boolean>(false);
-
-  // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517.
-  useEffect(() => {
-    const autosuggestGeneratedDivs =
-      document?.querySelectorAll<any>(".autosuggest div");
-    autosuggestGeneratedDivs?.forEach(element => {
-      if (element.attributes.role) {
-        element.attributes.role.nodeValue = "";
-      }
-    });
-  }, []);
 
   /**
    * Logic to determine which backend should be searched on.
@@ -289,7 +293,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
           blankSearchBackend &&
           ((blankSearchBackend === "preferred" &&
             backendProvider === backend) ||
-            blankSearchBackend === backend)
+            blankSearchBackend === backendProvider)
         ) {
           return true;
         }
@@ -348,6 +352,17 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   // Put the ResourceSelect's input into the Search hook's for elastic search.
   useEffect(() => setInputValue(searchValue), [searchValue]);
 
+  // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517.
+  useEffect(() => {
+    const autosuggestGeneratedDivs =
+      document?.querySelectorAll<any>(".autosuggest div");
+    autosuggestGeneratedDivs?.forEach(element => {
+      if (element.attributes.role) {
+        element.attributes.role.nodeValue = "";
+      }
+    });
+  }, []);
+
   // If any errors occur, switch providers. Only if both providers are set.
   if (
     (jsonApiError || elasticSearchError) &&
@@ -395,51 +410,57 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   ]);
 
   return (
-    <TextField
-      {...textFieldProps}
-      customInput={inputProps => (
-        <>
-          <AutoSuggestStyles />
-          <div className="autosuggest">
-            <AutoSuggest
-              id={textFieldProps.name}
-              autoComplete="none"
-              placeholder={
-                inputProps.placeholder ||
-                formatMessage({ id: "typeHereToSearch" })
-              }
-              suggestions={allSuggestions}
-              getSuggestionValue={s => s}
-              onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
-              onSuggestionSelected={(_, data) => {
-                inputProps.onChange?.({
-                  target: { value: data.suggestion }
-                } as any);
-                onSuggestionSelected?.(data.suggestion, formik);
-              }}
-              onSuggestionsClearRequested={() => setSearchValue("")}
-              renderSuggestion={text => <div>{text}</div>}
-              shouldRenderSuggestions={
-                blankSearchBackend ? () => !!blankSearchBackend : undefined
-              }
-              inputProps={{
-                onFocus: () => setFocus(true),
-                onBlur: () => setFocus(false),
-                ...(inputProps as InputProps<any>)
-              }}
-              theme={{
-                suggestionsList: "list-group",
-                suggestion: "list-group-item",
-                suggestionHighlighted: "suggestion-highlighted",
-                suggestionsContainerOpen: "suggestions-container-open",
-                suggestionsContainer: "suggestions-container",
-                container: "autosuggest-container"
-              }}
-              {...inputProps}
-            />
-          </div>
-        </>
-      )}
-    />
+    <>
+      <style>{`
+        .autosuggest-container {
+          position: relative;
+        }
+        .autosuggest .suggestions-container {
+          display: none;
+        }
+        .autosuggest .suggestions-container-open {
+          display: block;
+          position: absolute;
+          width: 100%;
+          z-index: 20;
+        }
+        .autosuggest .suggestion-highlighted { 
+          background-color: #ddd;
+          cursor: pointer;
+        }
+      `}</style>
+      <div className="autosuggest">
+        <AutoSuggest
+          id={id}
+          suggestions={allSuggestions}
+          getSuggestionValue={s => s}
+          onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
+          onSuggestionSelected={(_, data) => {
+            inputProps.onChange?.({
+              target: { value: data.suggestion }
+            } as any);
+            onSuggestionSelected?.(data.suggestion, formik);
+          }}
+          onSuggestionsClearRequested={() => setSearchValue("")}
+          renderSuggestion={text => <div>{text}</div>}
+          shouldRenderSuggestions={
+            blankSearchBackend ? () => !!blankSearchBackend : undefined
+          }
+          inputProps={{
+            onFocus: () => setFocus(true),
+            onBlur: () => setFocus(false),
+            ...(inputProps as InputProps<any>)
+          }}
+          theme={{
+            suggestionsList: "list-group",
+            suggestion: "list-group-item",
+            suggestionHighlighted: "suggestion-highlighted",
+            suggestionsContainerOpen: "suggestions-container-open",
+            suggestionsContainer: "suggestions-container",
+            container: "autosuggest-container"
+          }}
+        />
+      </div>
+    </>
   );
 }

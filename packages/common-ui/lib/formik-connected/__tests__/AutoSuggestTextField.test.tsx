@@ -8,20 +8,13 @@ interface Person extends KitsuResource {
   name: string;
 }
 
-// JSON API mock response.
-const mockGet = jest.fn(async () => {
-  return {
-    data: [
-      { name: "person1-json-api" },
-      { name: "person2-json-api" },
-      { name: "person3-json-api" }
-    ]
-  };
-});
-
-const mockGetFailure = jest.fn(async () => {
-  throw new Error("Something went wrong!");
-});
+const PERSON_TEST_DATA_JSON_API = {
+  data: [
+    { name: "person1-json-api" },
+    { name: "person2-json-api" },
+    { name: "person3-json-api" }
+  ]
+};
 
 const PERSON_TEST_DATA_ELASTICSEARCH = {
   data: {
@@ -63,8 +56,24 @@ const PERSON_TEST_DATA_ELASTICSEARCH = {
   }
 };
 
+// JSON API mock response.
+const mockGet = jest.fn(async () => PERSON_TEST_DATA_JSON_API);
+
+const mockGetFailure = jest.fn(async () => {
+  throw new Error("Something went wrong!");
+});
+
 // Elastic Search mock response.
 const mockGetAxios = jest.fn(async () => PERSON_TEST_DATA_ELASTICSEARCH);
+
+// JSON API and Elastic Search mock responses.
+const mockGetAll = jest.fn(async path => {
+  if (path === "agent-api/person") {
+    return PERSON_TEST_DATA_JSON_API;
+  } else if (path === "search-api/search-ws/auto-complete") {
+    return PERSON_TEST_DATA_ELASTICSEARCH;
+  }
+});
 
 // JSON API only.
 const apiContextJsonAPIOnly = {
@@ -85,9 +94,9 @@ const apiContextElasticSearchOnly = {
 // Both elastic search and JSON are working.
 const apiContextBothProviders = {
   apiClient: {
-    get: mockGet,
+    get: mockGetAll,
     axios: {
-      get: mockGetAxios
+      get: mockGetAll
     }
   }
 } as any;
@@ -269,7 +278,7 @@ describe("AutoSuggestTextField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet).lastCalledWith("agent-api/person", {
+    expect(mockGetAll).lastCalledWith("agent-api/person", {
       filter: { rsql: "name==*p*" },
       sort: "-createdOn"
     });
@@ -280,8 +289,16 @@ describe("AutoSuggestTextField", () => {
       "person3-json-api"
     ]);
 
-    expect(mockGet).toHaveBeenCalledTimes(1);
-    expect(mockGetAxios).toHaveBeenCalledTimes(0);
+    // Should not have any calls to elastic search.
+    expect(mockGetAll.mock.calls).toEqual([
+      [
+        "agent-api/person",
+        {
+          filter: { rsql: "name==*p*" },
+          sort: "-createdOn"
+        }
+      ]
+    ]);
   });
 
   it("Both backend providers are used, preferred backend fails, other backend is used.", async () => {
@@ -391,13 +408,11 @@ describe("AutoSuggestTextField", () => {
     );
 
     wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "" } });
 
     await new Promise(setImmediate);
     wrapper.update();
 
     // Search is currently blank, should be using elastic search instead of JSON API.
-    expect(mockGetAxios).toHaveBeenCalledTimes(1);
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "person1-elastic-search",
       "person2-elastic-search",
@@ -409,11 +424,14 @@ describe("AutoSuggestTextField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(mockGet).toHaveBeenCalledTimes(1);
+    // Search is no longer blank. Should be using the preferred backend.
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "person1-json-api",
       "person2-json-api",
       "person3-json-api"
     ]);
+
+    // Elastic search should be the first call, followed by JSON API.
+    expect(mockGetAll.mock.calls).toEqual([]);
   });
 });
