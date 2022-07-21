@@ -274,11 +274,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   /**
    * Logic to determine which backend should be searched on.
    *
-   * 1. Focus must be provided on the text field.
-   * 2. If a blank search is being performed...
+   * 1. Do not perform any searches if no backend providers are supplied.
+   * 2. Focus must be provided on the text field.
+   * 3. If a blank search is being performed...
    *   a. If a blank search backend is preferred then use the currently selected backend.
    *   b. If a blank search backend is not preferred then use the backendProvider only.
-   * 3. If a non-blank search is being performed...
+   * 4. If a non-blank search is being performed...
    *   a. Check if elastic search is currently being used, if it's defined, use that.
    *   b. If elastic search is not defined, use the JSON Api backend if it's defined.
    *
@@ -286,26 +287,33 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
    * @returns boolean indicating if the backend can be used based on the conditions above.
    */
   const performProviderSearch = (backendProvider: BackendOptions) => {
-    if (focus) {
-      // Special case for blank searches if blank search backend is provided.
-      if (searchValue === "") {
+    // Don't perform any search if no providers are supplied.
+    if (elasticSearchBackend === undefined && jsonApiBackend === undefined) {
+      return false;
+    }
+
+    // If the text field is not focused, don't perform any search.
+    if (!focus) {
+      return false;
+    }
+
+    // Special case for blank searches if blank search backend is provided.
+    if (searchValue === "") {
+      if (
+        blankSearchBackend &&
+        ((blankSearchBackend === "preferred" && backendProvider === backend) ||
+          blankSearchBackend === backendProvider)
+      ) {
+        return true;
+      }
+    } else {
+      if (backend === backendProvider) {
         if (
-          blankSearchBackend &&
-          ((blankSearchBackend === "preferred" &&
-            backendProvider === backend) ||
-            blankSearchBackend === backendProvider)
+          (backend === "elastic-search" &&
+            elasticSearchBackend !== undefined) ||
+          (backend === "json-api" && jsonApiBackend !== undefined)
         ) {
           return true;
-        }
-      } else {
-        if (backend === backendProvider) {
-          if (
-            (backend === "elastic-search" &&
-              elasticSearchBackend !== undefined) ||
-            (backend === "json-api" && jsonApiBackend !== undefined)
-          ) {
-            return true;
-          }
         }
       }
     }

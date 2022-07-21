@@ -233,17 +233,30 @@ describe("AutoSuggestTextField", () => {
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
-          customOptions={() => ["suggestion-1", "suggestion-2"]}
+          customOptions={value => [
+            "suggestion-1",
+            "suggestion-2",
+            "suggestion-" + value
+          ]}
           timeoutMs={0}
         />
       </DinaForm>,
-      { apiContext: {} }
+      { apiContext: apiContextBothProviders }
     );
+
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "3" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
 
     expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
       "suggestion-1",
-      "suggestion-2"
+      "suggestion-2",
+      "suggestion-3"
     ]);
+
+    expect(mockGetAll).toHaveBeenCalledTimes(0);
   });
 
   it("Both backend providers are used, preferred backend is used.", async () => {
@@ -380,7 +393,7 @@ describe("AutoSuggestTextField", () => {
     expect(mockGet).toHaveBeenCalledTimes(0);
   });
 
-  it("Blank search provider supplied, options come from blank search provider only.", async () => {
+  it("Elastic search for the blank search provider supplied, options come from blank search provider only.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
@@ -429,6 +442,61 @@ describe("AutoSuggestTextField", () => {
       "person1-json-api",
       "person2-json-api",
       "person3-json-api"
+    ]);
+
+    // Elastic search should be the first call, followed by JSON API.
+    expect(mockGetAll.mock.calls).toEqual([]);
+  });
+
+  it("JSON API for the blank search provider supplied, options come from blank search provider only.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          elasticSearchBackend={{
+            indexName: "dina_agent_index",
+            searchField: "data.attributes.name",
+            option: person => person?.name
+          }}
+          jsonApiBackend={{
+            query: searchValue => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: person => person?.name
+          }}
+          preferredBackend={"elastic-search"}
+          blankSearchBackend={"json-api"}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextBothProviders }
+    );
+
+    wrapper.find("input").simulate("focus");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Search is currently blank, should be using elastic search instead of JSON API.
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-json-api",
+      "person2-json-api",
+      "person3-json-api"
+    ]);
+
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Search is no longer blank. Should be using the preferred backend.
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-elastic-search",
+      "person2-elastic-search",
+      "person3-elastic-search"
     ]);
 
     // Elastic search should be the first call, followed by JSON API.
