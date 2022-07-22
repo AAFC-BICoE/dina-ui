@@ -215,8 +215,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                 name={fieldProps("matchValue", index)}
                 removeLabel={true}
                 className="me-1 flex-fill"
-                alwaysShowSuggestions={true}
-                suggestions={value =>
+                blankSearchBackend={"preferred"}
+                customOptions={value =>
                   useElasticSearchDistinctTerm({
                     fieldName:
                       dataFromIndexMapping?.parentPath +
