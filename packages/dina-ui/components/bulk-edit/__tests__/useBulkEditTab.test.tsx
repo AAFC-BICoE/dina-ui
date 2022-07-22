@@ -18,6 +18,7 @@ import { useBulkEditTab } from "../useBulkEditTab";
 import { FormikProps } from "formik";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { isEmpty } from "lodash";
+import { getMaterialSampleForm } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 
 const mockSubmitOverride = jest.fn();
 
@@ -125,28 +126,18 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     };
   }
 
-  const materialSampleForm = (
-    <MaterialSampleForm
-      {...formTemplateProps}
-      buttonBar={null}
-      hideUseSequence={true}
-      materialSampleFormRef={bulkEditFormRef}
-      materialSampleSaveHook={bulkEditSampleHook}
-      materialSample={initialValues}
-      disableAutoNamePrefix={true}
-      disableSampleNameField={true}
-      disableCollectingEventSwitch={sampleHooks.some(
-        (hook: any) => hook?.resource?.parentMaterialSample !== undefined
-      )}
-      // Disable the nav's Are You Sure prompt when removing components,
-      // because you aren't actually deleting data.
-      disableNavRemovePrompt={true}
-    />
+  const materialSampleForm = getMaterialSampleForm(
+    formTemplateProps,
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    initialValues,
+    sampleHooks
   );
 
   const { bulkEditTab } = useBulkEditTab({
     resourceHooks: [],
-    resourceForm: materialSampleForm
+    resourceForm: materialSampleForm,
+    bulkEditFormRef
   });
 
   return (

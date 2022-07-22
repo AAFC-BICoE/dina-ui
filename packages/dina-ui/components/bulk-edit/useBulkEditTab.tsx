@@ -11,8 +11,7 @@ export interface UseBulkEditTabParams {
   resourceHooks: ResourceWithHooks[];
   hideBulkEditTab?: boolean;
   resourceForm: any;
-  bulkEditFormRef?: any;
-  bulkEditSampleHook?: any;
+  bulkEditFormRef: any;
 }
 
 export function useBulkEditTab({

@@ -97,23 +97,12 @@ export function MaterialSampleBulkEditor({
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
-  const materialSampleForm = (
-    <MaterialSampleForm
-      {...formTemplateProps}
-      buttonBar={null}
-      hideUseSequence={true}
-      materialSampleFormRef={bulkEditFormRef}
-      materialSampleSaveHook={bulkEditSampleHook}
-      materialSample={initialValues}
-      disableAutoNamePrefix={true}
-      disableSampleNameField={true}
-      disableCollectingEventSwitch={sampleHooks.some(
-        (hook: any) => hook.resource.parentMaterialSample !== undefined
-      )}
-      // Disable the nav's Are You Sure prompt when removing components,
-      // because you aren't actually deleting data.
-      disableNavRemovePrompt={true}
-    />
+  const materialSampleForm = getMaterialSampleForm(
+    formTemplateProps,
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    initialValues,
+    sampleHooks
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -169,8 +158,7 @@ export function MaterialSampleBulkEditor({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
     resourceForm: materialSampleForm,
-    bulkEditFormRef,
-    bulkEditSampleHook
+    bulkEditFormRef
   });
 
   useEffect(() => {
@@ -252,6 +240,35 @@ interface BulkSampleSaveParams {
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
   bulkEditCtx: BulkEditTabContextI;
+}
+
+export function getMaterialSampleForm(
+  formTemplateProps: Partial<MaterialSampleFormProps>,
+  bulkEditFormRef,
+  bulkEditSampleHook,
+  initialValues,
+  sampleHooks: ResourceWithHooks<
+    import("/home/phanm/Desktop/dina/dina-dev/repos/dina-ui/packages/common-ui/types/kitsu").KitsuResource
+  >[]
+) {
+  return (
+    <MaterialSampleForm
+      {...formTemplateProps}
+      buttonBar={null}
+      hideUseSequence={true}
+      materialSampleFormRef={bulkEditFormRef}
+      materialSampleSaveHook={bulkEditSampleHook}
+      materialSample={initialValues}
+      disableAutoNamePrefix={true}
+      disableSampleNameField={true}
+      disableCollectingEventSwitch={sampleHooks.some(
+        (hook: any) => hook.resource?.parentMaterialSample !== undefined
+      )}
+      // Disable the nav's Are You Sure prompt when removing components,
+      // because you aren't actually deleting data.
+      disableNavRemovePrompt={true}
+    />
+  );
 }
 
 /**
