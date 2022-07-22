@@ -58,15 +58,15 @@ export function SangerSampleSelectionStep({
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
     {
       Cell: ({ original: { id, name } }) => (
-        <Link href={`/seqdb/molecular-sample/view?id=${id}`}>{name}</Link>
+        <Link href={`/collection/material-sample/view?id=${id}`}>{name}</Link>
       ),
       accessor: "name",
       sortable: false
     },
     {
-      Cell: ({ original: molecularSample }) => (
-        <div key={molecularSample.id}>
-          <SampleSelectCheckBox resource={molecularSample} />
+      Cell: ({ original: materialSample }) => (
+        <div key={materialSample.id}>
+          <SampleSelectCheckBox resource={materialSample} />
         </div>
       ),
       Header: SampleSelectCheckBoxHeader,
@@ -78,12 +78,12 @@ export function SangerSampleSelectionStep({
     {
       Cell: ({ original: pcrBatchItem }) => (
         <Link
-          href={`/seqdb/molecular-sample/view?id=${pcrBatchItem?.sample?.id}`}
+          href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
         >
-          {pcrBatchItem?.sample?.name}
+          {pcrBatchItem?.materialSample?.id}
         </Link>
       ),
-      accessor: "sample.name",
+      accessor: "materialSample.id",
       sortable: false
     },
     ...(editMode
@@ -131,11 +131,11 @@ export function SangerSampleSelectionStep({
             }
           ]
         })("")}
-        defaultSort={[{ id: "sample.name", desc: false }]}
+        defaultSort={[{ id: "materialSample.id", desc: false }]}
         reactTableProps={{ sortable: false }}
         onSuccess={response => setRemoveablePcrBatchItems(response.data)}
         path="seqdb-api/pcr-batch-item"
-        include="sample"
+        include="materialSample"
         deps={[lastSave]}
       />
     </div>
@@ -210,7 +210,7 @@ export function SangerSampleSelectionStep({
                   defaultSort={[{ id: "name", desc: false }]}
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
-                  path="seqdb-api/molecular-sample"
+                  path="collection-api/material-sample"
                 />
               </div>
               <div className="col-2" style={{ marginTop: "100px" }}>
@@ -258,7 +258,7 @@ export function useSangerSampleSelection(pcrBatchId: string) {
 
     const newPcrBatchItems = sampleLinks.map<InputResource<PcrBatchItem>>(
       sampleLink => ({
-        sample: sampleLink,
+        materialSample: sampleLink,
         pcrBatch: pick(pcrBatch, "id", "type"),
         group: pcrBatch.group,
         createdBy: username,
@@ -286,12 +286,12 @@ export function useSangerSampleSelection(pcrBatchId: string) {
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    const samples = ids.map(id => ({
+    const materialSamples = ids.map(id => ({
       id,
-      type: "molecular-sample"
+      type: "material-sample"
     }));
 
-    await selectSamples(samples);
+    await selectSamples(materialSamples);
 
     formik.setFieldValue("sampleIdsToSelect", {});
   }
