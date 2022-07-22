@@ -4,6 +4,7 @@ import {
   ResourceSelectField,
   ResourceSelectFieldProps,
   useAccount,
+  useAutocompleteSearchButFallbackToRsqlApiSearch,
   useQuery,
   withResponse
 } from "common-ui";
@@ -19,7 +20,6 @@ import {
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -131,7 +131,7 @@ export function PersonSelectField(
           searchQuery,
           querySpec,
           indexName: "dina_agent_index",
-          searchField: "displayName",
+          searchField: "data.attributes.displayName",
           documentId: "data.id",
           additionalField: "data.attributes.aliases"
         })
@@ -181,7 +181,7 @@ export function StorageUnitSelectField({
           searchQuery,
           querySpec,
           indexName: "dina_storage_index",
-          searchField: "name",
+          searchField: "data.attributes.name",
           documentId: "data.id",
           restrictedField,
           restrictedFieldValue

@@ -43,15 +43,16 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
           {!readOnly ? (
             <AutoSuggestTextField<Vocabulary>
               name="materialSampleState"
-              query={() => ({
-                path: "collection-api/vocabulary/materialSampleState"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/materialSampleState"
+                }),
+                option: vocabElement =>
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onChangeExternal={onMaterialSampleStateChanged}
             />
           ) : (

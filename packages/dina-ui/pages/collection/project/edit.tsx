@@ -1,6 +1,5 @@
 import {
   ApiClientContext,
-  AutoSuggestTextField,
   BackButton,
   ButtonBar,
   DateField,
@@ -170,7 +169,7 @@ export function ProjectFormLayout() {
         />
       </div>
       <div className="row">
-        <AutoSuggestTextField
+        <TextField
           className="col-md-6 status"
           name="status"
           label={formatMessage("field_projectStatus")}
