@@ -103,9 +103,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -141,9 +140,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -354,7 +352,6 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
     group: elasticSearchBackend?.group,
     timeoutMs: 0, // Timeout is already being handled by our debounce.
-    skipDeserialise: true, // This will be done in the options.
     disabled: !performProviderSearch("elastic-search")
   });
 
@@ -400,18 +397,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       ? uniq(
           castArray(searchResult).flatMap(item => {
             if (performProviderSearch("elastic-search")) {
-              return elasticSearchBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return elasticSearchBackend?.option(item, debouncedSearchValue);
             }
             if (performProviderSearch("json-api")) {
-              return jsonApiBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return jsonApiBackend?.option(item, debouncedSearchValue);
             }
           })
         )

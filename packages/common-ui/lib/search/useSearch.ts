@@ -38,7 +38,6 @@ export interface DoSearchParams {
   restrictedFieldValue?: string;
   group?: string;
   disabled?: boolean;
-  skipDeserialise?: boolean;
   timeoutMs?: number;
 }
 
@@ -54,7 +53,6 @@ export async function doSearch<T extends KitsuResource>(
     restrictedField,
     restrictedFieldValue,
     group,
-    skipDeserialise = false,
     disabled = false
   }: DoSearchParams
 ) {
@@ -84,17 +82,21 @@ export async function doSearch<T extends KitsuResource>(
     }
   );
 
-  const jsonApiDocs = compact(response.data.hits?.map(hit => hit.source));
+  const jsonApiDocs = compact(
+    response.data.hits?.map(hit => {
+      if (hit?.source?.included) {
+        return { data: hit?.source?.included?.[0] };
+      } else {
+        return hit?.source;
+      }
+    })
+  );
 
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(
-    jsonApiDocs.map<Promise<PersistedResource<T>>>(async jsonApiDoc => {
-      if (skipDeserialise) {
-        return jsonApiDoc;
-      }
-
-      return await deserialise(jsonApiDoc).data;
-    })
+    jsonApiDocs.map<Promise<PersistedResource<T>>>(
+      async doc => (await deserialise(doc)).data
+    )
   );
 
   return resources;

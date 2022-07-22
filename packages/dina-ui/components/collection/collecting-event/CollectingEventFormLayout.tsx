@@ -652,9 +652,7 @@ export function CollectingEventFormLayout({
                     indexName: "dina_material_sample_index",
                     searchField: "included.attributes.dwcRecordedBy",
                     group: group ?? undefined,
-                    option: (_, collEventNoType) =>
-                      collEventNoType?.included?.[0]?.attributes
-                        ?.dwcRecordedBy ?? ""
+                    option: collEvent => collEvent?.dwcRecordedBy
                   }}
                   preferredBackend={"elastic-search"}
                 />

@@ -8,6 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
+import { KitsuResource } from "kitsu";
 import { flatMap, get, isArray } from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
@@ -161,15 +162,13 @@ export function DeterminationField({
                     {...fieldProps("verbatimScientificName")}
                     className="verbatimScientificName"
                   />
-                  <AutoSuggestTextField<MaterialSample>
+                  <AutoSuggestTextField<KitsuResource & Determination>
                     {...fieldProps("verbatimDeterminer")}
                     elasticSearchBackend={{
                       indexName: "dina_material_sample_index",
                       searchField:
                         "included.attributes.determination.verbatimDeterminer",
-                      option: (_, materialSampleNoType) =>
-                        materialSampleNoType?.included?.[0]?.attributes
-                          ?.determination?.[0]?.verbatimDeterminer ?? ""
+                      option: determination => determination?.verbatimDeterminer
                     }}
                     preferredBackend={"elastic-search"}
                   />
