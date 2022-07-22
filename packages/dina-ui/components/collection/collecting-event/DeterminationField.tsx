@@ -163,35 +163,15 @@ export function DeterminationField({
                   />
                   <AutoSuggestTextField<MaterialSample>
                     {...fieldProps("verbatimDeterminer")}
-                    jsonApiBackend={{
-                      query: () => ({
-                        path: "collection-api/material-sample"
-                      }),
-                      option: sample =>
-                        flatMap(
-                          sample?.organism?.map(
-                            organism =>
-                              organism?.determination?.map(
-                                det => det?.verbatimDeterminer ?? ""
-                              ) ?? []
-                          )
-                        ) ?? []
-                    }}
                     elasticSearchBackend={{
                       indexName: "dina_material_sample_index",
                       searchField:
-                        "data.attributes.determination.verbatimDeterminer",
-                      option: sample =>
-                        flatMap(
-                          sample?.organism?.map(
-                            organism =>
-                              organism?.determination?.map(
-                                det => det?.verbatimDeterminer ?? ""
-                              ) ?? []
-                          )
-                        ) ?? []
+                        "included.attributes.determination.verbatimDeterminer",
+                      option: (_, materialSampleNoType) =>
+                        materialSampleNoType?.included?.[0]?.attributes
+                          ?.determination?.[0]?.verbatimDeterminer ?? ""
                     }}
-                    blankSearchBackend={"json-api"}
+                    preferredBackend={"elastic-search"}
                   />
                   <TextField {...fieldProps("verbatimDate")} />
                   <TextField
