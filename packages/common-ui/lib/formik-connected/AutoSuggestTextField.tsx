@@ -358,7 +358,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   });
 
   // Put the ResourceSelect's input into the Search hook's for elastic search.
-  useEffect(() => setInputValue(searchValue), [searchValue]);
+  useEffect(() => setInputValue(debouncedSearchValue), [debouncedSearchValue]);
 
   // Remove the role from react auto suggest generated div to fix WCAG issues, see #23517.
   useEffect(() => {
