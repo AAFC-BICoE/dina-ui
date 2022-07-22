@@ -86,9 +86,9 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     documentId?: string;
 
     /**
-     * Group names to filter the results by.
+     * Group name to filter the results by.
      */
-    groups?: string[];
+    group?: string;
 
     /**
      * The label and value will be determined by the option returned here.
@@ -352,8 +352,9 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     documentId: elasticSearchBackend?.documentId,
     restrictedField: elasticSearchBackend?.restrictedField,
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
+    group: elasticSearchBackend?.group,
     timeoutMs: 0, // Timeout is already being handled by our debounce.
-    // groups: elasticSearchBackend?.groups, (coming in a future ticket)
+    skipDeserialise: true, // This will be done in the options.
     disabled: !performProviderSearch("elastic-search")
   });
 

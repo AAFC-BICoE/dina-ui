@@ -13,7 +13,8 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -631,21 +632,34 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
-            <AutoSuggestTextField<CollectingEvent>
-              name="dwcRecordedBy"
-              jsonApiBackend={{
-                query: (searchValue, ctx) => ({
-                  path: "collection-api/collecting-event",
-                  filter: {
-                    ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group }
+            <FieldSpy<string> fieldName="group">
+              {group => (
+                <AutoSuggestTextField<CollectingEvent>
+                  name="dwcRecordedBy"
+                  jsonApiBackend={{
+                    query: (searchValue, ctx) => ({
+                      path: "collection-api/collecting-event",
+                      filter: {
+                        ...(ctx.values.group && {
+                          group: { EQ: ctx.values.group }
+                        }),
+                        rsql: `dwcRecordedBy==*${searchValue}*`
+                      }
                     }),
-                    rsql: `dwcRecordedBy==*${searchValue}*`
-                  }
-                }),
-                option: collEvent => collEvent?.dwcRecordedBy ?? ""
-              }}
-            />
+                    option: collEvent => collEvent?.dwcRecordedBy ?? ""
+                  }}
+                  elasticSearchBackend={{
+                    indexName: "dina_material_sample_index",
+                    searchField: "included.attributes.dwcRecordedBy",
+                    group: group ?? undefined,
+                    option: (_, collEventNoType) =>
+                      collEventNoType?.included?.[0]?.attributes
+                        ?.dwcRecordedBy ?? ""
+                  }}
+                  preferredBackend={"elastic-search"}
+                />
+              )}
+            </FieldSpy>
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
               name="dwcRecordNumber"
