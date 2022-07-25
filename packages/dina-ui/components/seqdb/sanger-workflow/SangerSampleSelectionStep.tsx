@@ -59,7 +59,7 @@ export function SangerSampleSelectionStep({
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     {
       Cell: ({ original: materialSample }) => (
-        <Link href={`/collection/material-sample/view?id=${materialSample.id}`}></Link>
+        <Link href={`/collection/material-sample/view?id=${materialSample.id}`}>{materialSample.id}</Link>
       ),
       accessor: "materialSample.id",
       sortable: false
