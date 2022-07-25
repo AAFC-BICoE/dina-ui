@@ -14,10 +14,9 @@ const mockGet = jest.fn<any, any>(async path => {
               type: "pcr-batch",
               name: "test-batch"
             },
-            sample: {
+            materialSample: {
               id: "1",
-              type: "molecular-sample",
-              name: "sample-1"
+              type: "material-sample",
             }
           },
           {
@@ -28,10 +27,9 @@ const mockGet = jest.fn<any, any>(async path => {
               type: "pcr-batch",
               name: "test-batch"
             },
-            sample: {
+            materialSample: {
               id: "2",
-              type: "molecular-sample",
-              name: "sample-3"
+              type: "material-sample",
             }
           },
           {
@@ -42,21 +40,20 @@ const mockGet = jest.fn<any, any>(async path => {
               type: "pcr-batch",
               name: "test-batch"
             },
-            sample: {
+            materialSample: {
               id: "3",
-              type: "molecular-sample",
-              name: "sample-3"
+              type: "material-sample",
             }
           }
         ],
         meta: { totalResourceCount: 3 }
       };
-    case "seqdb-api/molecular-sample":
+    case "collection-api/material-sample":
       return {
         data: [
-          { id: "4", type: "molecular-sample", name: "sample-4" },
-          { id: "5", type: "molecular-sample", name: "sample-5" },
-          { id: "6", type: "molecular-sample", name: "sample-6" }
+          { id: "4", type: "material-sample" },
+          { id: "5", type: "material-sample" },
+          { id: "6", type: "material-sample" }
         ]
       };
     case "seqdb-api/pcr-batch/test-batch-id":
@@ -142,9 +139,9 @@ describe("SangerSampleSelectionStep component", () => {
               id: "test-batch-id",
               type: "pcr-batch"
             },
-            sample: {
+            materialSample: {
               id: "4",
-              type: "molecular-sample"
+              type: "material-sample"
             },
             type: "pcr-batch-item"
           },
@@ -158,9 +155,9 @@ describe("SangerSampleSelectionStep component", () => {
               id: "test-batch-id",
               type: "pcr-batch"
             },
-            sample: {
+            materialSample: {
               id: "5",
-              type: "molecular-sample"
+              type: "material-sample"
             },
             type: "pcr-batch-item"
           },
@@ -174,9 +171,9 @@ describe("SangerSampleSelectionStep component", () => {
               id: "test-batch-id",
               type: "pcr-batch"
             },
-            sample: {
+            materialSample: {
               id: "6",
-              type: "molecular-sample"
+              type: "material-sample"
             },
             type: "pcr-batch-item"
           },

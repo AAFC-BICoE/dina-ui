@@ -12,6 +12,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   addProtocolTitle: "Ajouter un protocole",
   addRegionTitle: "Ajouter une région",
   addWorkflowTitle: "Ajouter un flux de SNG",
+  availableMaterialSamplesTitle: "Échantillons matériaux disponibles",
   availableSamplesTitle: "Échantillons disponibles",
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",

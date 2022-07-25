@@ -60,7 +60,7 @@ export function SangerSampleSelectionStep({
       Cell: ({ original: { id, name } }) => (
         <Link href={`/collection/material-sample/view?id=${id}`}>{name}</Link>
       ),
-      accessor: "name",
+      accessor: "id",
       sortable: false
     },
     {
@@ -199,15 +199,15 @@ export function SangerSampleSelectionStep({
             <div className="row">
               <div className="col-5 available-samples">
                 <strong>
-                  <SeqdbMessage id="availableSamplesTitle" />
+                  <SeqdbMessage id="availableMaterialSamplesTitle" />
                 </strong>
                 <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   defaultPageSize={100}
                   filter={
-                    searchValue ? filterBy(["name"])(searchValue) : undefined
+                    searchValue ? filterBy(["id"])(searchValue) : undefined
                   }
-                  defaultSort={[{ id: "name", desc: false }]}
+                  defaultSort={[{ id: "id", desc: false }]}
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="collection-api/material-sample"
