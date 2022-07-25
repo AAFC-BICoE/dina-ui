@@ -24,7 +24,7 @@ describe("doSearch function", () => {
       { get: mockGet },
       {
         indexName: "dina_agent_index",
-        searchField: "displayName",
+        searchField: "data.attributes.displayName",
         searchValue: "test-search"
       }
     );

@@ -633,14 +633,18 @@ export function CollectingEventFormLayout({
             )}
             <AutoSuggestTextField<CollectingEvent>
               name="dwcRecordedBy"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `dwcRecordedBy==*${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
+              jsonApiBackend={{
+                query: (searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  filter: {
+                    ...(ctx.values.group && {
+                      group: { EQ: ctx.values.group }
+                    }),
+                    rsql: `dwcRecordedBy==*${searchValue}*`
+                  }
+                }),
+                option: collEvent => collEvent?.dwcRecordedBy ?? ""
+              }}
             />
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
@@ -675,16 +679,17 @@ export function CollectingEventFormLayout({
             <TextField name="dwcVerbatimLocality" />
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimCoordinateSystem"
-              query={() => ({
-                path: "collection-api/vocabulary/coordinateSystem"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/coordinateSystem"
+                }),
+                option: vocabElement =>
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}
-              alwaysShowSuggestions={true}
               onChangeExternal={onChangeExternal}
             />
             <Field name="dwcVerbatimCoordinateSystem">
@@ -770,15 +775,16 @@ export function CollectingEventFormLayout({
             </Field>
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimSRS"
-              query={() => ({
-                path: "collection-api/vocabulary/srs"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/srs"
+                }),
+                option: vocabElement =>
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onChangeExternal={onChangeExternal}
             />
             <TextField name="dwcVerbatimElevation" />
@@ -845,14 +851,18 @@ export function CollectingEventFormLayout({
               customName={"collectingEventSubstrate"}
               tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
               tooltipLinkText="fromDinaUserGuide"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `substrate==${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.substrate ?? ""}
+              jsonApiBackend={{
+                query: (searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  filter: {
+                    ...(ctx.values.group && {
+                      group: { EQ: ctx.values.group }
+                    }),
+                    rsql: `substrate==${searchValue}*`
+                  }
+                }),
+                option: collEvent => collEvent?.substrate ?? ""
+              }}
             />
             <NumberRangeFields
               names={[

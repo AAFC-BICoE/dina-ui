@@ -40,6 +40,7 @@ import {
   PcrProfile,
   Region
 } from "../../../types/seqdb-api";
+import { any } from "zod";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -137,7 +138,7 @@ export function PcrBatchForm({
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
-
+    
     // Add storage unit if it was selected:
     delete submittedValues.storageUnitType;
 
@@ -235,8 +236,14 @@ export function PcrBatchFormFields() {
           model="collection-api/storage-unit-type"
           optionLabel={storageUnitType => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={() => {
+          onChange={(storageUnitType) => {
             setFieldValue("storageUnit.id", null);
+            if(!Array.isArray(storageUnitType) && storageUnitType?.gridLayoutDefinition != null){
+              setFieldValue("storageRestriction.layout", storageUnitType.gridLayoutDefinition);
+            }
+            else{
+              setFieldValue("storageRestriction", null);
+            }
           }}
         />
       );

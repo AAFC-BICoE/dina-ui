@@ -1,6 +1,5 @@
-import { useState } from "react";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { Person } from "../../../types/objectstore-api";
+import { Person } from "packages/dina-ui/types/agent-api";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 // Mock out the debounce function to avoid waiting during tests.
@@ -52,7 +51,7 @@ function TestPersonSearchComponent({
   const { loading, response } =
     useAutocompleteSearchButFallbackToRsqlApiSearch<Person>({
       indexName: "dina_agent_index",
-      searchField: "displayName",
+      searchField: "data.attributes.displayName",
       querySpec: {
         path: "agent-api/person",
         sort: "-createdOn"

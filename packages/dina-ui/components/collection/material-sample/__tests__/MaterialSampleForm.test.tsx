@@ -244,7 +244,9 @@ describe("Material Sample Edit Page", () => {
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined
+              scheduledAction: undefined,
+              preparationMethod: undefined,
+              collection: undefined
             },
             type: "material-sample"
           }
@@ -316,6 +318,7 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparationMethod: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,

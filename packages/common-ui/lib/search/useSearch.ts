@@ -24,7 +24,7 @@ export function useAutocompleteSearch<T extends KitsuResource>(
   return useDebouncedFetch({
     fetcher: searchValue =>
       doSearch<T>(apiClient.axios, { ...doSearchParams, searchValue }),
-    timeoutMs: 250
+    timeoutMs: doSearchParams.timeoutMs ?? 250
   });
 }
 
@@ -37,6 +37,7 @@ export interface DoSearchParams {
   restrictedField?: string;
   restrictedFieldValue?: string;
   disabled?: boolean;
+  timeoutMs?: number;
 }
 
 /** Does the search against the search API. */
@@ -69,7 +70,7 @@ export async function doSearch<T extends KitsuResource>(
     {
       params: {
         prefix: searchValue,
-        autoCompleteField: `data.attributes.${searchField}`,
+        autoCompleteField: searchField,
         additionalField,
         documentId,
         indexName,

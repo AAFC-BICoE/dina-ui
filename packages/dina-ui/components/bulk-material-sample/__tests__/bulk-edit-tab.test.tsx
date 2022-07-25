@@ -14,7 +14,7 @@ interface BulkEditTabProps {
 /** Test component to test the Bulk Edit Tab in isolation. */
 function BulkEditTab({ baseSample }: BulkEditTabProps) {
   const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
-    sampleHooks: []
+    resourceHooks: []
   });
 
   return (
