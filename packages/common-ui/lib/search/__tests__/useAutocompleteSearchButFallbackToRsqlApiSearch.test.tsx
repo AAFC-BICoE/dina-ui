@@ -121,7 +121,8 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       "search-api/search-ws/auto-complete",
       {
         params: {
-          additionalField: "",
+          additionalField: undefined,
+          group: undefined,
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
           prefix: "test-query",

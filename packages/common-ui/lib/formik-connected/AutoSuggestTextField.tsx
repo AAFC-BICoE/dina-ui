@@ -86,9 +86,9 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     documentId?: string;
 
     /**
-     * Group names to filter the results by.
+     * Group name to filter the results by.
      */
-    groups?: string[];
+    group?: string;
 
     /**
      * The label and value will be determined by the option returned here.
@@ -103,9 +103,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -141,9 +140,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -352,8 +350,8 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     documentId: elasticSearchBackend?.documentId,
     restrictedField: elasticSearchBackend?.restrictedField,
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
+    group: elasticSearchBackend?.group,
     timeoutMs: 0, // Timeout is already being handled by our debounce.
-    // groups: elasticSearchBackend?.groups, (coming in a future ticket)
     disabled: !performProviderSearch("elastic-search")
   });
 
@@ -399,18 +397,10 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
       ? uniq(
           castArray(searchResult).flatMap(item => {
             if (performProviderSearch("elastic-search")) {
-              return elasticSearchBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return elasticSearchBackend?.option(item, debouncedSearchValue);
             }
             if (performProviderSearch("json-api")) {
-              return jsonApiBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return jsonApiBackend?.option(item, debouncedSearchValue);
             }
           })
         )
