@@ -26,7 +26,50 @@ const MOCK_INDEX_MAPPING_RESP = {
         type: "boolean"
       }
     ],
-    relationships: []
+    relationships: [
+      {
+        referencedBy: "collectingEvent",
+        name: "type",
+        path: "included",
+        value: "collecting-event",
+        attributes: [
+          {
+            name: "createdBy",
+            type: "text",
+            path: "attributes"
+          },
+          {
+            name: "createdOn",
+            type: "date",
+            path: "attributes"
+          },
+          {
+            name: "dwcOtherRecordNumbers",
+            type: "text",
+            path: "attributes"
+          },
+          {
+            name: "dwcRecordNumber",
+            type: "text",
+            path: "attributes"
+          }
+        ]
+      },
+      {
+        referencedBy: "preparationMethod",
+        name: "type",
+        path: "included",
+        value: "preparation-method",
+        attributes: [
+          {
+            name: "name",
+            type: "text",
+            path: "attributes",
+            distinct_term_agg: true
+          }
+        ]
+      }
+    ]
   }
 };
 
@@ -52,6 +95,75 @@ describe("QueryBuilder component", () => {
     jest.clearAllMocks();
   });
 
+  it("Query builder options from index are displayed correctly.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{ queryRows: [{}], group: "" }}>
+        <QueryBuilder
+          name="queryRows"
+          indexName={INDEX_NAME}
+          onGroupChange={() => null}
+        />
+      </DinaForm>,
+      {
+        apiContext
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find("SelectField[name='queryRows[0].fieldName']")
+        .find(Select)
+        .prop("options")
+    ).toEqual([
+      {
+        label: "allowDuplicateName",
+        value: "data.attributes.allowDuplicateName"
+      },
+      {
+        label: "createdOn",
+        value: "data.attributes.createdOn"
+      },
+      {
+        label: "collecting-event",
+        options: [
+          {
+            label: "createdBy",
+            parentName: "collecting-event",
+            value: "collecting-event.createdBy"
+          },
+          {
+            label: "createdOn",
+            parentName: "collecting-event",
+            value: "collecting-event.createdOn"
+          },
+          {
+            label: "dwcOtherRecordNumbers",
+            parentName: "collecting-event",
+            value: "collecting-event.dwcOtherRecordNumbers"
+          },
+          {
+            label: "dwcRecordNumber",
+            parentName: "collecting-event",
+            value: "collecting-event.dwcRecordNumber"
+          }
+        ]
+      },
+      {
+        label: "preparation-method",
+        options: [
+          {
+            label: "name",
+            parentName: "preparation-method",
+            value: "preparation-method.name"
+          }
+        ]
+      }
+    ]);
+  });
+
   it("Displays the Query builder with one Query Row by default.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ queryRows: [{}], group: "" }}>
@@ -75,23 +187,8 @@ describe("QueryBuilder component", () => {
     expect(
       wrapper.find("SelectField[name='queryRows[0].fieldName']").length
     ).toEqual(1);
-
-    expect(
-      wrapper
-        .find("SelectField[name='queryRows[0].fieldName']")
-        .find(Select)
-        .prop("options")
-    ).toEqual([
-      {
-        label: "allowDuplicateName",
-        value: "data.attributes.allowDuplicateName"
-      },
-      {
-        label: "createdOn",
-        value: "data.attributes.createdOn"
-      }
-    ]);
   });
+
   it("Query builder can be used to add rows to aggregate level queries", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{ queryRows: [{}] }}>

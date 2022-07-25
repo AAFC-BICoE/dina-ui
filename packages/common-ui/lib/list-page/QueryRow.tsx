@@ -13,6 +13,7 @@ import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
 import lodash from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
+import { useIntl } from "react-intl";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -74,6 +75,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name, indexName } =
     queryRowProps;
+  const { formatMessage } = useIntl();
 
   const initState = {
     matchValue: null,
@@ -135,7 +137,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
-      label: prop.label,
+      label: formatMessage({ id: "field_" + prop.label }),
       value: prop.value
     }));
 
@@ -170,6 +172,40 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     return `${name}[${idx}].${fldName}`;
   }
 
+  // Custom styling to indent the group option menus.
+  const customStyles = {
+    // Grouped options (relationships) should be indented.
+    option: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          paddingLeft: "25px"
+        };
+      }
+
+      // Default style for everything else.
+      return {
+        ...baseStyle
+      };
+    },
+
+    // When viewing a group item, the parent name should be prefixed on to the value.
+    singleValue: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          ":before": {
+            content: `'${data.parentName}.'`
+          }
+        };
+      }
+
+      return {
+        ...baseStyle
+      };
+    }
+  };
+
   return (
     <div className="row">
       <div className="col-md-6 d-flex">
@@ -189,6 +225,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
             removeLabel={true}
+            styles={customStyles}
           />
         </div>
       </div>
