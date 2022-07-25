@@ -17,6 +17,7 @@ import { Field, FormikContextType } from "formik";
 import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
 import { pick, toPairs } from "lodash";
 import Link from "next/link";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
@@ -55,12 +56,12 @@ export function SangerSampleSelectionStep({
     fieldName: "pcrBatchItemIdsToDelete"
   });
 
-  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<any>[] = [
+  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     {
-      Cell: ({ original: { id, name } }) => (
-        <Link href={`/collection/material-sample/view?id=${id}`}>{name}</Link>
+      Cell: ({ original: materialSample }) => (
+        <Link href={`/collection/material-sample/view?id=${materialSample.id}`}></Link>
       ),
-      accessor: "id",
+      accessor: "materialSample.id",
       sortable: false
     },
     {
