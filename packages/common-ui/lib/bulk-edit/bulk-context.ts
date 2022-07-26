@@ -18,8 +18,8 @@ export interface ResourceWithHooks<T extends KitsuResource = KitsuResource> {
   formRef: MutableRefObject<FormikProps<InputResource<T>> | null>;
 }
 
-export interface BulkEditTabContextI {
-  bulkEditFormRef: RefObject<FormikProps<InputResource<MaterialSample>>>;
+export interface BulkEditTabContextI<T extends KitsuResource = KitsuResource> {
+  bulkEditFormRef: RefObject<FormikProps<InputResource<T>>>;
   resourceHooks: ResourceWithHooks[];
 }
 

@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
-import { flatMap, get, isArray } from "lodash";
+import { get, isArray } from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -16,6 +16,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSample,
+  Organism,
   Vocabulary
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
@@ -161,37 +162,16 @@ export function DeterminationField({
                     {...fieldProps("verbatimScientificName")}
                     className="verbatimScientificName"
                   />
-                  <AutoSuggestTextField<MaterialSample>
+                  <AutoSuggestTextField<Organism>
                     {...fieldProps("verbatimDeterminer")}
-                    jsonApiBackend={{
-                      query: () => ({
-                        path: "collection-api/material-sample"
-                      }),
-                      option: sample =>
-                        flatMap(
-                          sample?.organism?.map(
-                            organism =>
-                              organism?.determination?.map(
-                                det => det?.verbatimDeterminer ?? ""
-                              ) ?? []
-                          )
-                        ) ?? []
-                    }}
                     elasticSearchBackend={{
                       indexName: "dina_material_sample_index",
                       searchField:
-                        "data.attributes.determination.verbatimDeterminer",
-                      option: sample =>
-                        flatMap(
-                          sample?.organism?.map(
-                            organism =>
-                              organism?.determination?.map(
-                                det => det?.verbatimDeterminer ?? ""
-                              ) ?? []
-                          )
-                        ) ?? []
+                        "included.attributes.determination.verbatimDeterminer",
+                      option: determination =>
+                        determination?.determination?.[0]?.verbatimDeterminer
                     }}
-                    blankSearchBackend={"json-api"}
+                    preferredBackend={"elastic-search"}
                   />
                   <TextField {...fieldProps("verbatimDate")} />
                   <TextField

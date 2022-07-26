@@ -36,6 +36,7 @@ export interface DoSearchParams {
   documentId?: string;
   restrictedField?: string;
   restrictedFieldValue?: string;
+  group?: string;
   disabled?: boolean;
   timeoutMs?: number;
 }
@@ -48,9 +49,10 @@ export async function doSearch<T extends KitsuResource>(
     searchField,
     searchValue,
     documentId,
-    additionalField = "",
+    additionalField,
     restrictedField,
     restrictedFieldValue,
+    group,
     disabled = false
   }: DoSearchParams
 ) {
@@ -74,12 +76,21 @@ export async function doSearch<T extends KitsuResource>(
         additionalField,
         documentId,
         indexName,
+        group,
         ...restrictedFieldParams
       }
     }
   );
 
-  const jsonApiDocs = compact(response.data.hits?.map(hit => hit.source));
+  const jsonApiDocs = compact(
+    response.data.hits?.map(hit => {
+      if (hit?.source?.included) {
+        return { data: hit?.source?.included?.[0] };
+      } else {
+        return hit?.source;
+      }
+    })
+  );
 
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(

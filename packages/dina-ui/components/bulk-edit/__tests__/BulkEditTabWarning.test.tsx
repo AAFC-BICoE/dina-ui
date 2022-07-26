@@ -5,7 +5,7 @@ import {
   blankMaterialSample,
   MaterialSample
 } from "../../../types/collection-api";
-import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { isEqual } from "lodash";
 
 const mockGet = jest.fn<any, any>(async path => {

@@ -5,8 +5,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { SelectNavigation } from "../bulk-material-sample/SelectNavigation";
+import { SelectNavigation } from "./SelectNavigation";
 
 export interface BulkEditNavigatorProps {
   resources: ResourceWithHooks[];
@@ -63,9 +62,9 @@ export function BulkEditNavigator({
               elements={tabElements}
               value={selectedTab}
               onChange={onSelectTab}
-              optionLabel={(element: any) =>
-                element.title || element.resource?.materialSampleName
-              }
+              optionLabel={(element: any) => {
+                return element.title || element.resource?.materialSampleName;
+              }}
               invalidElements={tabsWithErrors}
             />
           </div>
@@ -121,16 +120,23 @@ export function BulkEditNavigator({
             })}
             {resources.map((resource, index) => {
               const tabHasError = tabsWithErrors.includes(resource);
+              const tabName = getTabName(resource);
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {`#${index + 1}`}
+                    {tabName || `#${index + 1}`}
                   </span>
                 </Tab>
               );
+
+              function getTabName(tab) {
+                if (tab.resource.type === "material-sample") {
+                  return tab.resource.materialSampleName;
+                }
+              }
             })}
           </TabList>
           {extraTabs.map((extraTab, index) => (

@@ -195,11 +195,12 @@ describe("AutoSuggestTextField", () => {
 
     expect(mockGetAxios).lastCalledWith("search-api/search-ws/auto-complete", {
       params: {
-        additionalField: "",
         indexName: "dina_agent_index",
         autoCompleteField: "data.attributes.name",
         prefix: "p",
-        documentId: undefined
+        documentId: undefined,
+        additionalField: undefined,
+        group: undefined
       }
     });
 
