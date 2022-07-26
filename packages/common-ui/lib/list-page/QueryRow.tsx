@@ -11,7 +11,7 @@ import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
-import lodash from "lodash";
+import lodash, { startCase } from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
 import { useIntl } from "react-intl";
 
@@ -75,7 +75,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name, indexName } =
     queryRowProps;
-  const { formatMessage } = useIntl();
+  const { formatMessage, messages } = useIntl();
 
   const initState = {
     matchValue: null,
@@ -137,9 +137,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
-      label: formatMessage({ id: "field_" + prop.label }),
+      label: messages["field_" + prop.label]
+        ? formatMessage({ id: "field_" + prop.label })
+        : startCase(prop.label),
       value: prop.value
-    }));
+    }))
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
@@ -147,10 +150,13 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     ?.map(prop => {
       return {
         parentName: prop.parentName,
-        label: prop.label,
+        label: messages["field_" + prop.label]
+          ? formatMessage({ id: "field_" + prop.label })
+          : startCase(prop.label),
         value: prop.value
       };
-    });
+    })
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Using the parent name, group the relationships into sections.
   const groupedNestRowOptions = lodash
@@ -158,10 +164,13 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     .groupBy(prop => prop.parentName)
     .map((group, key) => {
       return {
-        label: key,
+        label: messages["title_" + key]
+          ? formatMessage({ id: "title_" + key })
+          : startCase(key),
         options: group
       };
     })
+    .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
     .value();
 
   const queryRowOptions = simpleRowOptions
@@ -195,7 +204,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         return {
           ...baseStyle,
           ":before": {
-            content: `'${data.parentName}.'`
+            content: `'${startCase(data.parentName)} '`
           }
         };
       }

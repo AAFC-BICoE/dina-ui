@@ -119,44 +119,44 @@ describe("QueryBuilder component", () => {
         .prop("options")
     ).toEqual([
       {
-        label: "allowDuplicateName",
+        label: "Allow Duplicate Name",
         value: "data.attributes.allowDuplicateName"
       },
       {
-        label: "createdOn",
+        label: "Created On",
         value: "data.attributes.createdOn"
       },
       {
-        label: "collecting-event",
+        label: "Collecting Event",
         options: [
           {
-            label: "createdBy",
-            parentName: "collecting-event",
+            label: "Created By",
+            parentName: "collectingEvent",
             value: "collecting-event.createdBy"
           },
           {
-            label: "createdOn",
-            parentName: "collecting-event",
+            label: "Created On",
+            parentName: "collectingEvent",
             value: "collecting-event.createdOn"
           },
           {
-            label: "dwcOtherRecordNumbers",
-            parentName: "collecting-event",
+            label: "Dwc Other Record Numbers",
+            parentName: "collectingEvent",
             value: "collecting-event.dwcOtherRecordNumbers"
           },
           {
-            label: "dwcRecordNumber",
-            parentName: "collecting-event",
+            label: "Dwc Record Number",
+            parentName: "collectingEvent",
             value: "collecting-event.dwcRecordNumber"
           }
         ]
       },
       {
-        label: "preparation-method",
+        label: "Preparation Method",
         options: [
           {
-            label: "name",
-            parentName: "preparation-method",
+            label: "Name",
+            parentName: "preparationMethod",
             value: "preparation-method.name"
           }
         ]
