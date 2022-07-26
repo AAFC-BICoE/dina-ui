@@ -79,6 +79,7 @@ export function QueryBuilder({
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
           parentName: relationship.referencedBy,
+          parentType: relationship.value,
           parentPath: relationship.path,
           distinctTerm: relationshipAttribute.distinct_term_agg
         });

@@ -40,6 +40,7 @@ export interface QueryRowExportProps {
   boolean?: string;
   type?: string;
   parentName?: string;
+  parentType?: string;
   parentPath?: string;
   distinctTerm?: boolean;
 }
@@ -127,6 +128,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
       parentName: newDataFromIndexMapping?.parentName,
+      parentType: newDataFromIndexMapping?.parentType,
       distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
@@ -271,7 +273,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                       "." +
                       dataFromIndexMapping?.label,
                     groups: selectedGroups,
-                    relationshipType: dataFromIndexMapping?.parentName,
+                    relationshipType: dataFromIndexMapping?.parentType,
                     indexName
                   })?.filter(suggestion =>
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())

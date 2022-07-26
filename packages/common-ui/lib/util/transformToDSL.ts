@@ -187,7 +187,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     // Create a nested query for each relationship type query.
     builder.query("nested", { path: "included" }, queryBuilder => {
       return queryBuilder
-        .andQuery("match", "included.type", rowToBuild.parentName)
+        .andQuery("match", "included.type", rowToBuild.parentType)
         .andQuery(
           numericalType === "equal" ? type : "range",
           fieldName.replace("included.", "included.attributes."),
@@ -243,7 +243,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     )
     .map(queryRow => {
       // Determine if the attribute is inside a relationship.
-      if (queryRow.parentName) {
+      if (queryRow.parentType) {
         buildRelationshipQuery(queryRow);
       } else {
         buildQuery(queryRow);
