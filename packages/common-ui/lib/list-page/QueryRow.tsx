@@ -46,8 +46,15 @@ export interface QueryRowExportProps {
 }
 
 const queryRowMatchOptions = [
-  { label: "PARTIAL_MATCH", value: "match" },
-  { label: "EXACT_MATCH", value: "term" }
+  { label: "Matches", value: "matches" },
+  { label: "Doesn't Match", value: "noMatches" },
+  { label: "Is Empty", value: "empty" },
+  { label: "Is Not Empty", value: "notEmpty" }
+];
+
+const queryRowMatchesOptions = [
+  { label: "Exact", value: "match" },
+  { label: "Partial", value: "term" }
 ];
 
 const queryRowNumericalMatchOptions = (isDateField: boolean) => {
@@ -68,9 +75,26 @@ const queryRowNumericalMatchOptions = (isDateField: boolean) => {
 };
 
 const queryRowBooleanOptions = [
-  { label: "TRUE", value: "true" },
-  { label: "FALSE", value: "false" }
+  { label: "True", value: "true" },
+  { label: "False", value: "false" }
 ];
+
+/**
+ * Helper function to generate the proper form name.
+ *
+ * @param queryBuilderName the form name of the query builder, all query builder form items need
+ *        to be prefixed with this.
+ * @param fieldName the name of the field in relation to the query builder.
+ * @param index the index of the field in the query builder. Since the QueryBuilder can support
+ *        multiple fields at once, the index is used to determine which query row is used.
+ */
+export function fieldProps(
+  queryBuilderName: string,
+  fldName: string,
+  index: number
+) {
+  return `${queryBuilderName}[${index}].${fldName}`;
+}
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
@@ -179,10 +203,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     ? [...simpleRowOptions, ...groupedNestRowOptions]
     : [];
 
-  function fieldProps(fldName: string, idx: number) {
-    return `${name}[${idx}].${fldName}`;
-  }
-
   // Custom styling to indent the group option menus.
   const customStyles = {
     // Grouped options (relationships) should be indented.
@@ -244,14 +264,14 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         <div className="d-flex">
           {typeVisibility.isText && (
             <>
-              <TextField
-                name={fieldProps("matchValue", index)}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
               <SelectField
                 name={fieldProps("matchType", index)}
                 options={queryRowMatchOptions}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+              <TextField
+                name={fieldProps("matchValue", index)}
                 className="me-1 flex-fill"
                 removeLabel={true}
               />
