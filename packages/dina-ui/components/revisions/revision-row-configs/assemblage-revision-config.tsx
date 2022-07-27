@@ -4,6 +4,7 @@ import { Assemblage } from "../../../types/collection-api";
 import { Metadata } from "../../../types/objectstore-api";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
+import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 
 export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
   name: ({ id, name }) => (
@@ -32,6 +33,16 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
     ),
     multilingualTitle: allLangsTitleCell("multilingualTitle").Cell,
     multilingualDescription: allLangsDescriptionCell("multilingualDescription")
-      .Cell
+      .Cell,
+
+    // Show the entire value of the metadata map in a key-value table:
+    managedAttributes: ({ original: { value } }) => (
+      <ManagedAttributesViewer
+        managedAttributeApiPath={key =>
+          `collection-api/managed-attribute/${key}`
+        }
+        values={value}
+      />
+    )
   }
 };

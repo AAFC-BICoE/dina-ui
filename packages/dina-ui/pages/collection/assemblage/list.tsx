@@ -3,7 +3,8 @@ import {
   CreateButton,
   descriptionCell,
   titleCell,
-  ListPageLayout
+  ListPageLayout,
+  Tooltip
 } from "common-ui";
 import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
@@ -31,6 +32,12 @@ export default function assemblageListPage() {
       <main className="container-fluid">
         <h1 id="wb-cont">
           <DinaMessage id="assemblageListTitle" />
+          <Tooltip
+            id={"assemblage_tooltip"}
+            link={"https://aafc-bicoe.github.io/dina-documentation/#assemblage"}
+            linkText={"fromDinaUserGuide"}
+            placement={"right"}
+          />
         </h1>
         <ButtonBar>
           <CreateButton entityLink="/collection/assemblage" />

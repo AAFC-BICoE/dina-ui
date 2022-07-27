@@ -1,4 +1,4 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, Tooltip } from "common-ui";
 import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { Assemblage } from "../../../types/collection-api/resources/Assemblage";
@@ -30,6 +30,14 @@ export default function AssemblageDetailsPage() {
       type="assemblage"
       apiBaseUrl="/collection-api"
       showRevisionsLink={true}
+      tooltipNode={
+        <Tooltip
+          id={"assemblage_tooltip"}
+          link={"https://aafc-bicoe.github.io/dina-documentation/#assemblage"}
+          linkText={"fromDinaUserGuide"}
+          placement={"right"}
+        />
+      }
     />
   );
 }

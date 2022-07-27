@@ -8,7 +8,8 @@ import {
   TextField,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  Tooltip
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -22,6 +23,7 @@ import {
   Nav
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -53,6 +55,14 @@ export default function AssemblageEditPage() {
         <div>
           <h1 id="wb-cont">
             <DinaMessage id={title} />
+            <Tooltip
+              id={"assemblage_tooltip"}
+              link={
+                "https://aafc-bicoe.github.io/dina-documentation/#assemblage"
+              }
+              linkText={"fromDinaUserGuide"}
+              placement={"right"}
+            />
           </h1>
           {id ? (
             withResponse(query, ({ data }) => (
@@ -201,6 +211,14 @@ export function AssemblageFormLayout() {
           multiLines={true}
         />
       </div>
+      <ManagedAttributesEditor
+        valuesPath="managedAttributes"
+        managedAttributeApiPath="collection-api/managed-attribute"
+        managedAttributeComponent="ASSEMBLAGE"
+        fieldSetProps={{
+          legend: <DinaMessage id="assemblageManagedAttributes" />
+        }}
+      />
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="assemblageAttachments" />}
