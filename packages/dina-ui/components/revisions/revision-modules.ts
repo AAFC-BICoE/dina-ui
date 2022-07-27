@@ -1,5 +1,6 @@
 import { RevisionRowConfigsByType } from "./revision-row-config";
 import { ACQUISITION_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/acquisition-event-revision-config";
+import { ASSEMBLAGE_REVISION_ROW_CONFIG } from "./revision-row-configs/assemblage-revision-config";
 import { COLLECTING_EVENT_REVISION_ROW_CONFIG } from "./revision-row-configs/collectingevent-revision-config";
 import { COLLECTION_METHOD_REVISION_ROW_CONFIG } from "./revision-row-configs/collection-method-revision-config";
 import { COLLECTION_REVISION_ROW_CONFIG } from "./revision-row-configs/collection-revision-config";
@@ -21,6 +22,7 @@ export const OBJECT_STORE_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType =
 
 /** Custom revision row behavior for Collection Module Resources. */
 export const COLLECTION_MODULE_REVISION_ROW_CONFIG: RevisionRowConfigsByType = {
+  assemblage: ASSEMBLAGE_REVISION_ROW_CONFIG,
   "collecting-event": COLLECTING_EVENT_REVISION_ROW_CONFIG,
   "material-sample": MATERIAL_SAMPLE_REVISION_ROW_CONFIG,
   collection: COLLECTION_REVISION_ROW_CONFIG,
