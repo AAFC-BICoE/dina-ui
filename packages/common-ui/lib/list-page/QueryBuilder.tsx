@@ -78,7 +78,8 @@ export function QueryBuilder({
           value: relationship.value + "." + attributeLabel,
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
-          parentName: relationship.value,
+          parentName: relationship.referencedBy,
+          parentType: relationship.value,
           parentPath: relationship.path,
           distinctTerm: relationshipAttribute.distinct_term_agg
         });

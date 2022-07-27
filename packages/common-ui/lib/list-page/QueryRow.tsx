@@ -11,8 +11,9 @@ import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
-import lodash from "lodash";
+import lodash, { startCase } from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
+import { useIntl } from "react-intl";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -39,6 +40,7 @@ export interface QueryRowExportProps {
   boolean?: string;
   type?: string;
   parentName?: string;
+  parentType?: string;
   parentPath?: string;
   distinctTerm?: boolean;
 }
@@ -74,6 +76,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name, indexName } =
     queryRowProps;
+  const { formatMessage, messages } = useIntl();
 
   const initState = {
     matchValue: null,
@@ -125,6 +128,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
       parentName: newDataFromIndexMapping?.parentName,
+      parentType: newDataFromIndexMapping?.parentType,
       distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
@@ -135,9 +139,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const simpleRowOptions = esIndexMapping
     ?.filter(prop => !prop.parentPath)
     ?.map(prop => ({
-      label: prop.label,
+      label: messages["field_" + prop.label]
+        ? formatMessage({ id: "field_" + prop.label })
+        : startCase(prop.label),
       value: prop.value
-    }));
+    }))
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
@@ -145,10 +152,13 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     ?.map(prop => {
       return {
         parentName: prop.parentName,
-        label: prop.label,
+        label: messages["field_" + prop.label]
+          ? formatMessage({ id: "field_" + prop.label })
+          : startCase(prop.label),
         value: prop.value
       };
-    });
+    })
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Using the parent name, group the relationships into sections.
   const groupedNestRowOptions = lodash
@@ -156,10 +166,13 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     .groupBy(prop => prop.parentName)
     .map((group, key) => {
       return {
-        label: key,
+        label: messages["title_" + key]
+          ? formatMessage({ id: "title_" + key })
+          : startCase(key),
         options: group
       };
     })
+    .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
     .value();
 
   const queryRowOptions = simpleRowOptions
@@ -169,6 +182,40 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   function fieldProps(fldName: string, idx: number) {
     return `${name}[${idx}].${fldName}`;
   }
+
+  // Custom styling to indent the group option menus.
+  const customStyles = {
+    // Grouped options (relationships) should be indented.
+    option: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          paddingLeft: "25px"
+        };
+      }
+
+      // Default style for everything else.
+      return {
+        ...baseStyle
+      };
+    },
+
+    // When viewing a group item, the parent name should be prefixed on to the value.
+    singleValue: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          ":before": {
+            content: `'${startCase(data.parentName)} '`
+          }
+        };
+      }
+
+      return {
+        ...baseStyle
+      };
+    }
+  };
 
   return (
     <div className="row">
@@ -189,6 +236,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
             removeLabel={true}
+            styles={customStyles}
           />
         </div>
       </div>
@@ -225,7 +273,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                       "." +
                       dataFromIndexMapping?.label,
                     groups: selectedGroups,
-                    relationshipType: dataFromIndexMapping?.parentName,
+                    relationshipType: dataFromIndexMapping?.parentType,
                     indexName
                   })?.filter(suggestion =>
                     suggestion?.toLowerCase()?.includes(value?.toLowerCase())
