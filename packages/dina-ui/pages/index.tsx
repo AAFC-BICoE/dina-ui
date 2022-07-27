@@ -240,6 +240,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  <Link href="/collection/assemblage/list">
+                    <a>
+                      <DinaMessage id="title_assemblage" />
+                    </a>
+                  </Link>
                   <Link href="/collection/collection-method/list">
                     <a>
                       <DinaMessage id="collectionMethodListTitle" />

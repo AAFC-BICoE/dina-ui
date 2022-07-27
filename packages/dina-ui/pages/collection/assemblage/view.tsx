@@ -1,14 +1,14 @@
 import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
-import { Project } from "../../../types/collection-api/resources/Project";
-import { ProjectFormLayout } from "./edit";
+import { Assemblage } from "../../../types/collection-api/resources/Assemblage";
+import { AssemblageFormLayout } from "./edit";
 
-export default function ProjectDetailsPage() {
+export default function AssemblageDetailsPage() {
   return (
-    <ViewPageLayout<Project>
+    <ViewPageLayout<Assemblage>
       form={props => (
-        <DinaForm<Project>
+        <DinaForm<Assemblage>
           {...props}
           initialValues={{
             ...props.initialValues,
@@ -20,14 +20,14 @@ export default function ProjectDetailsPage() {
             )
           }}
         >
-          <ProjectFormLayout />
+          <AssemblageFormLayout />
         </DinaForm>
       )}
       query={id => ({
-        path: `collection-api/project/${id}?include=attachment`
+        path: `collection-api/assemblage/${id}?include=attachment`
       })}
-      entityLink="/collection/project"
-      type="project"
+      entityLink="/collection/assemblage"
+      type="assemblage"
       apiBaseUrl="/collection-api"
       showRevisionsLink={true}
     />

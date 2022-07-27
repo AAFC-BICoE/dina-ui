@@ -340,6 +340,9 @@ function NavDinaManagementDropdown({ formatMessage }) {
       show={show}
       className="float-right"
     >
+      <NavDropdown.Item href="/collection/assemblage/list">
+        <DinaMessage id="title_assemblage" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/collection-method/list">
         <DinaMessage id="collectionMethodListTitle" />
       </NavDropdown.Item>

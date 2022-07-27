@@ -79,6 +79,11 @@ export function AssemblageForm({
     ? {
         ...fetchedAssemblage,
         // Convert multilingualDescription to editable Dictionary format:
+        multilingualTitle: fromPairs<string | undefined>(
+          fetchedAssemblage.multilingualTitle?.titles?.map(
+            ({ title, lang }) => [lang ?? "", title ?? ""]
+          )
+        ),
         multilingualDescription: fromPairs<string | undefined>(
           fetchedAssemblage.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
@@ -95,6 +100,11 @@ export function AssemblageForm({
     const input: InputResource<Assemblage> = {
       ...submittedValues,
       // Convert the editable format to the stored format:
+      multilingualTitle: {
+        titles: toPairs(submittedValues.multilingualTitle).map(
+          ([lang, title]) => ({ lang, title })
+        )
+      },
       multilingualDescription: {
         descriptions: toPairs(submittedValues.multilingualDescription).map(
           ([lang, desc]) => ({ lang, desc })

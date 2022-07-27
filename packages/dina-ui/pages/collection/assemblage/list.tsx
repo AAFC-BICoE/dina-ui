@@ -9,11 +9,7 @@ import Link from "next/link";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const ASSEMBLAGE_FILTER_ATTRIBUTES = [
-  "name",
-  "multilingualTitle",
-  "multilingualDescription"
-];
+const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
 const ASSEMBLAGE_TABLE_COLUMNS = [
   {
     Cell: ({ original: { id, name } }) => (
