@@ -103,7 +103,8 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               borderColor: "rgb(148, 26, 37)",
               "&:hover": { borderColor: "rgb(148, 26, 37)" }
             })
-          })
+          }),
+          ...styles
         };
 
         return (
@@ -114,7 +115,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               options={options}
               onChange={onChangeInternal}
               value={selectedOption}
-              styles={customStyle}
+              styles={customStyle as any}
               isLoading={isLoading}
               classNamePrefix="react-select"
               ref={forwardedRef as any}

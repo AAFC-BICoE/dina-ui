@@ -21,11 +21,11 @@ export default function preparationMethodListPage() {
 
   return (
     <div>
-      <Head title={formatMessage("preparationMethodListTitle")} />
+      <Head title={formatMessage("title_preparationMethod")} />
       <Nav />
       <main className="container-fluid px-5">
         <h1 id="wb-cont">
-          <DinaMessage id="preparationMethodListTitle" />
+          <DinaMessage id="title_preparationMethod" />
         </h1>
         <ButtonBar>
           <CreateButton entityLink="/collection/preparation-method" />

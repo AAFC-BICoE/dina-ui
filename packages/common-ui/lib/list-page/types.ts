@@ -92,9 +92,20 @@ export interface ESIndexMapping {
    * attributes under the same relationship together in the search. This name will also be used to
    * display text of the group.
    *
-   * Example: organism
+   * This text should match the user-friendly label in the locales files. It will be searched using
+   * title_[parentName].
+   *
+   * Example: preparationMethod (and the label will be `title_preparationMethod`)
    */
   parentName?: string;
+
+  /**
+   * The parent type is the relationship type to be used. This will be used for elastic search
+   * filtering. The reason this is used since the same field can be used for multiple relationships.
+   *
+   * Example: preparation-method
+   */
+  parentType?: string;
 }
 
 /**
