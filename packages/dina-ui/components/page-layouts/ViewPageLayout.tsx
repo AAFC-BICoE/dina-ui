@@ -56,6 +56,9 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
 
     /** Show the link to the "revisions" page at page bottom as link. */
     showRevisionsLinkAtBottom?: boolean;
+
+    /** Pass a react node of a tooltip, recommend setting the placement to the right. */
+    tooltipNode?: ReactNode;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -87,7 +90,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   mainClass = "container",
   showRevisionsLink,
-  showRevisionsLinkAtBottom
+  showRevisionsLinkAtBottom,
+  tooltipNode
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -168,7 +172,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                     />
                   ))}
               </ButtonBar>
-              <h1 id="wb-cont">{title}</h1>
+              <h1 id="wb-cont">
+                {title}
+                {tooltipNode}
+              </h1>
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>

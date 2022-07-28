@@ -1,6 +1,6 @@
-import { MultilingualDescription } from "../../../../dina-ui/types/collection-api/resources/PreparationType";
+import { MultilingualDescription } from "../../../../dina-ui/types/common/";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { descriptionCell, LANGUAGE_BADGE_KEYS } from "../description-cell";
+import { descriptionCell, LANGUAGE_BADGE_KEYS } from "../multilingual-cells";
 
 const fieldName = "myDescriptionField";
 const englishDescription = "English description";
