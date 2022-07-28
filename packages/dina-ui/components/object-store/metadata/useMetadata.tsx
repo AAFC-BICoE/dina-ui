@@ -1,6 +1,5 @@
-import { useApiClient, useQuery } from "../../../../common-ui/lib";
-import { Metadata, License } from "../../../../dina-ui/types/objectstore-api"; // packages/dina-ui/types/objectstore-api"
-import React from "react";
+import { useApiClient, useQuery } from "common-ui";
+import { License, Metadata } from "../../../types/objectstore-api";
 
 export function useMetadataQuery(id?: string | null) {
   const { apiClient } = useApiClient();
@@ -33,6 +32,5 @@ export function useMetadataQuery(id?: string | null) {
       }
     }
   );
-
   return metadataQuery;
 }

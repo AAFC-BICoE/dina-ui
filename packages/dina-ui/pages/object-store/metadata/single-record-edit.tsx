@@ -9,8 +9,6 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useApiClient,
-  useQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -32,6 +30,7 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
+import { useMetadataQuery } from "../../../components/object-store/metadata/useMetadata";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -45,36 +44,7 @@ export default function MetadataEditPage() {
   const id = router.query.id?.toString();
 
   const { formatMessage } = useDinaIntl();
-  const { apiClient } = useApiClient();
-
-  const query = useQuery<Metadata>(
-    {
-      path: `objectstore-api/metadata/${id}`,
-      include: "dcCreator,derivatives"
-    },
-    {
-      joinSpecs: [
-        // Join to persons api:
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        }
-      ],
-      onSuccess: async ({ data: metadata }) => {
-        // Get the License resource based on the Metadata's xmpRightsWebStatement field:
-        if (metadata.xmpRightsWebStatement) {
-          const url = metadata.xmpRightsWebStatement;
-          (metadata as any).license = (
-            await apiClient.get<License[]>("objectstore-api/license", {
-              filter: { url }
-            })
-          ).data[0];
-        }
-      }
-    }
-  );
+  const query = useMetadataQuery(id);
 
   return (
     <div>
