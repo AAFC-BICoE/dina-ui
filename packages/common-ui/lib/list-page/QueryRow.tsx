@@ -14,6 +14,10 @@ import { FormikContextType, useFormikContext } from "formik";
 import lodash, { startCase } from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
 import { useIntl } from "react-intl";
+import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
+import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
+import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
+import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -243,7 +247,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         {index > 0 && (
           <div style={{ width: index > 0 ? "8%" : "100%" }}>
             <QueryLogicSwitchField
-              name={fieldProps("compoundQueryType", index)}
+              name={fieldProps(name, "compoundQueryType", index)}
               removeLabel={true}
               className={"compoundQueryType" + index}
             />
@@ -251,7 +255,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         )}
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
-            name={fieldProps("fieldName", index)}
+            name={fieldProps(name, "fieldName", index)}
             options={queryRowOptions as any}
             onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
@@ -263,24 +267,12 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       <div className="col-md-6">
         <div className="d-flex">
           {typeVisibility.isText && (
-            <>
-              <SelectField
-                name={fieldProps("matchType", index)}
-                options={queryRowMatchOptions}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
-              <TextField
-                name={fieldProps("matchValue", index)}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
-            </>
+            <QueryRowTextSearch queryBuilderName={name} index={index} />
           )}
           {typeVisibility.isSuggestedText && (
             <>
               <AutoSuggestTextField
-                name={fieldProps("matchValue", index)}
+                name={fieldProps(name, "matchValue", index)}
                 removeLabel={true}
                 className="me-1 flex-fill"
                 blankSearchBackend={"preferred"}
@@ -303,48 +295,25 @@ export function QueryRow(queryRowProps: QueryRowProps) {
             </>
           )}
 
-          {/* Number and Date have there own set of numerical match types */}
-          {(typeVisibility.isDate || typeVisibility.isNumber) && (
-            <SelectField
-              name={fieldProps("numericalMatchType", index)}
-              options={queryRowNumericalMatchOptions(typeVisibility.isDate)}
-              className="me-2 col-sm-5"
-              removeLabel={true}
-            />
-          )}
-
           {/* Date picker type */}
           {typeVisibility.isDate && (
-            <DateField
-              name={fieldProps("date", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-              partialDate={true}
-            />
+            <QueryRowDateSearch queryBuilderName={name} index={index} />
           )}
 
           {/* Number type */}
           {typeVisibility.isNumber && (
-            <NumberField
-              name={fieldProps("number", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-            />
+            <QueryRowNumberSearch queryBuilderName={name} index={index} />
           )}
 
           {/* Boolean field (Dropdown with TRUE/FALSE) */}
           {typeVisibility.isBoolean && (
-            <SelectField
-              name={fieldProps("boolean", index)}
-              options={queryRowBooleanOptions}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
+            <QueryRowBooleanSearch queryBuilderName={name} index={index} />
           )}
+
           {/* Disabled text field when no search filter is selected. */}
           {!fieldName && (
             <TextField
-              name={fieldProps("matchValue", index)}
+              name={fieldProps(name, "matchValue", index)}
               className="me-1 flex-fill"
               removeLabel={true}
               readOnly={true}
@@ -359,7 +328,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                   onClick={addRow as any}
                   size="2em"
                   style={{ cursor: "pointer" }}
-                  name={fieldProps("addRow", index)}
+                  name={fieldProps(name, "addRow", index)}
                 />
               )}
             </>
@@ -368,7 +337,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               onClick={() => removeRow?.(index)}
               size="2em"
               style={{ cursor: "pointer" }}
-              name={fieldProps("removeRow", index)}
+              name={fieldProps(name, "removeRow", index)}
             />
           )}
         </div>

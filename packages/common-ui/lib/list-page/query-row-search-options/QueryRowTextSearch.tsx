@@ -11,6 +11,7 @@ import { useIntl } from "react-intl";
  */
 const queryRowMatchOptions = [
   { label: "Equals", value: "equals" },
+  { label: "Not equals", value: "notEquals" },
   { label: "Empty", value: "empty" },
   { label: "Not Empty", value: "notEmpty" }
 ];
@@ -101,8 +102,8 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
           inputRef.current.value = "partial";
         }
         return setBackClassName({
-          exact: "selected-logic",
-          partial: "not-selected-logic"
+          exact: "not-selected-logic",
+          partial: "selected-logic"
         });
       }
     }
@@ -114,44 +115,41 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
         <div
           className="d-flex me-2"
           style={{
-            height: "2.2em",
-            borderColor: "#DCDCDC",
-            borderStyle: "solid",
-            borderWidth: "0px",
-            borderRadius: "4px"
+            height: "2.3em",
+            borderRadius: "5px"
           }}
         >
           <style>
             {`
               .selected-logic {
-                background-color: #0074d9;
-              }       
+                background-color: #008cff;
+                color: white;
+              }
               .not-selected-logic {
                 background-color: #DCDCDC;
-              }                  
+              }
             `}
           </style>
           <span
-            className={`${backClassName.exact} pt-1 px-3 exactSpan`}
+            className={`${backClassName.exact} py-2 px-3 exactSpan`}
             onClick={() =>
               onSwitchClicked("exact", queryLogicSwitchProps.name, formik)
             }
             style={{
-              borderRadius: "4px 0 0 4px",
+              borderRadius: "5px 0 0 5px",
               borderRight: "1px",
               cursor: "pointer"
             }}
           >
             {formatMessage({ id: "Exact" })}
           </span>
-          {/* Hide temporarily before we get more understanding how we like to proceed */}
           <span
-            className={`${backClassName.partial} pt-1 px-3 partialSpan d-none`}
+            className={`${backClassName.partial} py-2 px-3 partialSpan`}
             onClick={() =>
               onSwitchClicked("partial", queryLogicSwitchProps.name, formik)
             }
             style={{
-              borderRadius: "0 4px 4px 0",
+              borderRadius: "0 5px 5px 0",
               cursor: "pointer"
             }}
           >

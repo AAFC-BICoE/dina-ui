@@ -1,4 +1,5 @@
 import React from "react";
+import { FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps } from "../QueryRow";
 
@@ -47,12 +48,22 @@ export default function QueryRowBooleanSearch({
         className="me-1 flex-fill"
         removeLabel={true}
       />
-      <SelectField
-        name={fieldProps(queryBuilderName, "boolean", index)}
-        options={queryRowBooleanOptions}
-        className="me-1 flex-fill"
-        removeLabel={true}
-      />
+
+      {/* Depending on the matchType, it changes the rest of the query row. */}
+      <FieldSpy<string>
+        fieldName={fieldProps(queryBuilderName, "matchType", index)}
+      >
+        {(matchType, _fields) =>
+          matchType === "equals" && (
+            <SelectField
+              name={fieldProps(queryBuilderName, "boolean", index)}
+              options={queryRowBooleanOptions}
+              className="me-1 flex-fill"
+              removeLabel={true}
+            />
+          )
+        }
+      </FieldSpy>
     </>
   );
 }
