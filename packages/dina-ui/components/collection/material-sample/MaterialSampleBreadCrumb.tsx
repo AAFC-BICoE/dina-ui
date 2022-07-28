@@ -38,7 +38,7 @@ export function MaterialSampleBreadCrumb({
       {/* Material Sample Parents */}
       <div className="ms-4">
         <ol
-          className="breadcrumb mb-3"
+          className="breadcrumb mb-2"
           style={{ "--bs-breadcrumb-divider": "'/'" } as any}
         >
           {parentPath.map(node => (

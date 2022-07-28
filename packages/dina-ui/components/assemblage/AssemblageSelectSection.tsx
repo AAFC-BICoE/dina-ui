@@ -68,7 +68,7 @@ export function AssemblageSelectField({
             <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
                 <div
-                  className="card p-1 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                  className="card py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
                   <FaFolderOpen />

@@ -418,7 +418,7 @@ export function MaterialSampleForm({
               resourcePath="collection-api/project"
             />
             <AssemblageSelectSection
-              classNames="mt-3"
+              classNames="mt-2"
               resourcePath="collection-api/assemblage"
             />
           </>
