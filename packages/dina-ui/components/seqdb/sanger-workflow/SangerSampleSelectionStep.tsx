@@ -121,7 +121,7 @@ export function SangerSampleSelectionStep({
       <strong>
         <SeqdbMessage id="selectedSamplesTitle" />
       </strong>
-      <QueryTable
+      {/* <QueryTable
         columns={PCRBATCH_ITEM_COLUMNS}
         defaultPageSize={100}
         filter={filterBy([], {
@@ -139,7 +139,7 @@ export function SangerSampleSelectionStep({
         path="seqdb-api/pcr-batch-item"
         include="materialSample"
         deps={[lastSave]}
-      />
+      /> */}
     </div>
   );
 
@@ -165,17 +165,32 @@ export function SangerSampleSelectionStep({
         </div>
         <div className="mb-3">
           <DinaForm
-            initialValues={{ inputValue: "" }}
-            onSubmit={({ submittedValues: { inputValue } }) =>
-              setSearchValue(inputValue)
-            }
+            initialValues={{ group: "AAFC",
+
+            queryRows: [
+      
+              {
+      
+                fieldName: ""
+      
+              }
+      
+            ] }}
+            // onSubmit={({ submittedValues: {  } }) =>
+            //   // setSearchValue()
+            // }
           >
+                <QueryBuilder
+                  name="queryRows"
+                  indexName="dina_material_sample_index"
+                  onGroupChange={ ()=> {} }
+                />
             <div className="input-group" style={{ width: "30rem" }}>
-              <Field
+              {/* <Field
                 autoComplete="off"
                 name="inputValue"
                 className="form-control"
-              />
+              /> */}
               <SubmitButton className="btn btn-primary">
                 <SeqdbMessage id="search" />
               </SubmitButton>
@@ -203,12 +218,7 @@ export function SangerSampleSelectionStep({
                 <strong>
                   <SeqdbMessage id="availableMaterialSamplesTitle" />
                 </strong>
-                <QueryBuilder
-                  name="queryRows"
-                  indexName="dina_material_sample_index"
-                  onGroupChange={ ()=> void }
-                />
-                {/* <QueryTable
+                <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   defaultPageSize={100}
                   filter={
@@ -218,7 +228,7 @@ export function SangerSampleSelectionStep({
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="collection-api/material-sample"
-                /> */}
+                />
 
               </div>
               <div className="col-2" style={{ marginTop: "100px" }}>
