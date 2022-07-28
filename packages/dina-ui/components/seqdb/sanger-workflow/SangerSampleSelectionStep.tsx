@@ -6,6 +6,7 @@ import {
   FormikButton,
   MetaWithTotal,
   QueryTable,
+  QueryBuilder,
   SubmitButton,
   useAccount,
   useApiClient,
@@ -202,7 +203,12 @@ export function SangerSampleSelectionStep({
                 <strong>
                   <SeqdbMessage id="availableMaterialSamplesTitle" />
                 </strong>
-                <QueryTable
+                <QueryBuilder
+                  name="queryRows"
+                  indexName="dina_material_sample_index"
+                  onGroupChange={ ()=> void }
+                />
+                {/* <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   defaultPageSize={100}
                   filter={
@@ -212,7 +218,8 @@ export function SangerSampleSelectionStep({
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="collection-api/material-sample"
-                />
+                /> */}
+
               </div>
               <div className="col-2" style={{ marginTop: "100px" }}>
                 <div>
