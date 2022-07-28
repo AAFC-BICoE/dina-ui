@@ -22,7 +22,8 @@ import {
   ProjectSelectSection,
   StorageLinkerField,
   TagsAndRestrictionsSection,
-  useCollectingEventQuery
+  useCollectingEventQuery,
+  AssemblageSelectSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -415,6 +416,10 @@ export function MaterialSampleForm({
             <ProjectSelectSection
               classNames="mt-3"
               resourcePath="collection-api/project"
+            />
+            <AssemblageSelectSection
+              classNames="mt-3"
+              resourcePath="collection-api/assemblage"
             />
           </>
         )}

@@ -4,28 +4,28 @@ import {
   ResourceSelectField,
   useDinaFormContext
 } from "common-ui";
-import { FaProjectDiagram } from "react-icons/fa";
-import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
+import { FaFolderOpen } from "react-icons/fa";
+import { Assemblage } from "../../../dina-ui/types/collection-api/resources/Assemblage";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
-export interface ProjectSelectSectionProps {
+export interface AssemblageSelectSectionProps {
   resourcePath?: string;
   classNames?: string;
 }
 
-export function ProjectSelectSection({
+export function AssemblageSelectSection({
   resourcePath,
   classNames
-}: ProjectSelectSectionProps) {
+}: AssemblageSelectSectionProps) {
   const { readOnly } = useDinaFormContext();
   return readOnly ? (
-    <ProjectSelectField resourcePath={resourcePath} />
+    <AssemblageSelectField resourcePath={resourcePath} />
   ) : (
     <div className={`${classNames} row`}>
       <DinaFormSection horizontal="flex">
         <div className="col-md-6">
           <div className="d-flex flex-row gap-1">
-            <ProjectSelectField
+            <AssemblageSelectField
               resourcePath={resourcePath}
               className="flex-grow-1 mb-2"
             />
@@ -36,31 +36,31 @@ export function ProjectSelectSection({
   );
 }
 
-export interface ProjectSelectFieldProps {
+export interface AssemblageSelectFieldProps {
   resourcePath?: string;
   className?: string;
 }
 
-export function ProjectSelectField({
+export function AssemblageSelectField({
   resourcePath,
   className
-}: ProjectSelectFieldProps) {
+}: AssemblageSelectFieldProps) {
   const { readOnly } = useDinaFormContext();
   return (
     <DinaFormSection horizontal={"flex"} readOnly={readOnly}>
-      <ResourceSelectField<Project>
-        name="projects"
+      <ResourceSelectField<Assemblage>
+        name="assemblages"
         isMulti={true}
-        readOnlyLink="/collection/project/view?id="
+        readOnlyLink="/collection/assemblage/view?id="
         filter={filterBy(["name"])}
         model={resourcePath as any}
-        className={"projects " + (className || "")}
-        optionLabel={prj => prj.name}
+        className={"assemblages " + (className || "")}
+        optionLabel={assemblage => assemblage.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
         label={
           <span>
-            <FaProjectDiagram /> <DinaMessage id="projects" />
+            <FaFolderOpen /> <DinaMessage id="assemblages" />
           </span>
         }
         readOnlyRender={(value, _) =>
@@ -71,7 +71,7 @@ export function ProjectSelectField({
                   className="card p-1 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
-                  <FaProjectDiagram />
+                  <FaFolderOpen />
                   <span>{val.name}</span>
                 </div>
               ))}
