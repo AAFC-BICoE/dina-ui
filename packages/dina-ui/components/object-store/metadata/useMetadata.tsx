@@ -1,7 +1,11 @@
 import { useApiClient, useQuery } from "common-ui";
-import { License, Metadata } from "../../../types/objectstore-api";
+import {
+  License,
+  Metadata,
+  ObjectUpload
+} from "../../../types/objectstore-api";
 
-export function useMetadataQuery(id?: string | null) {
+export function useMetadataEditQuery(id?: string | null) {
   const { apiClient } = useApiClient();
 
   const metadataQuery = useQuery<Metadata>(
@@ -33,4 +37,37 @@ export function useMetadataQuery(id?: string | null) {
     }
   );
   return metadataQuery;
+}
+
+export function useMetadataViewQuery(id?: string) {
+  const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
+    {
+      include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
+      path: `objectstore-api/metadata/${id}`
+    },
+    {
+      joinSpecs: [
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "acMetadataCreator",
+          joinField: "acMetadataCreator",
+          path: metadata => `person/${metadata.acMetadataCreator.id}`
+        },
+        {
+          apiBaseUrl: "/agent-api",
+          idField: "dcCreator",
+          joinField: "dcCreator",
+          path: metadata => `person/${metadata.dcCreator.id}`
+        },
+        {
+          apiBaseUrl: "/objectstore-api",
+          idField: "fileIdentifier",
+          joinField: "objectUpload",
+          path: metadata => `object-upload/${metadata.fileIdentifier}`
+        }
+      ]
+    }
+  );
+
+  return query;
 }

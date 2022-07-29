@@ -6,8 +6,9 @@ import {
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExifView } from "../exif-view/ExifView";
-import { MetadataDetails, useMetadataQuery } from "./MetadataDetails";
+import { MetadataDetails } from "./MetadataDetails";
 import { MetadataFileView } from "./MetadataFileView";
+import { useMetadataViewQuery } from "./useMetadata";
 
 interface MetadataPreviewProps {
   metadataId: string;
@@ -23,7 +24,7 @@ const METADATA_PREVIEW_STYLE = `
  * Metadata preview component to be used on the side panel of the Metadata list page.
  */
 export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
-  const { loading, response } = useMetadataQuery(metadataId);
+  const { loading, response } = useMetadataViewQuery(metadataId);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;

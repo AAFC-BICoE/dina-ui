@@ -30,7 +30,7 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import { useMetadataQuery } from "../../../components/object-store/metadata/useMetadata";
+import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -44,7 +44,7 @@ export default function MetadataEditPage() {
   const id = router.query.id?.toString();
 
   const { formatMessage } = useDinaIntl();
-  const query = useMetadataQuery(id);
+  const query = useMetadataEditQuery(id);
 
   return (
     <div>
