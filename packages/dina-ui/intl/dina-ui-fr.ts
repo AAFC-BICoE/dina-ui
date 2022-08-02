@@ -320,12 +320,10 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   field_materialSampleName: "Identifiant Échantillons de matériaux",
   field_materialSampleState_tooltip:
     "Représente l'état d'un échantillon de matériau qui a été détérioré. ",
-  "field_materialSampleType.name": "Type d’échantillon de matière",
-  "field_materialSampleType.uuid": "Types d’échantillons de matière",
+  field_materialSampleType: "Type d’échantillon de matière",
   field_materialSampleType_tooltip:
     "Terme défini par le système qui prescrit les attentes en aval et la logique selon laquelle des échantillons de matériaux dérivés (ou enfants) seront interprétés et gérés numériquement.",
-  field_materialSample_identifierType_catalogueNumber_label:
-    "Numéro de catalogue",
+  field_dwcCatalogNumber: "Numéro de catalogue",
   field_materialSample_identifierType_materialSampleId_label:
     "No ID d’échantillon de matière",
   field_materialToBeReturned: "À retourner",

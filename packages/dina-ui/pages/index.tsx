@@ -283,7 +283,7 @@ export function Home() {
                   {/* Permissions link here */}
                   <Link href="/collection/preparation-method/list">
                     <a>
-                      <DinaMessage id="preparationMethodListTitle" />
+                      <DinaMessage id="title_preparationMethod" />
                     </a>
                   </Link>
                   <Link href="/collection/preparation-type/list">
