@@ -73,7 +73,8 @@ export function useMaterialSampleQuery(id?: string | null) {
         "organism",
         "materialSampleChildren",
         "parentMaterialSample",
-        "projects"
+        "projects",
+        "assemblages"
       ].join(",")
     },
     {
@@ -640,6 +641,13 @@ export function useMaterialSampleSave({
             data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
           }
         }),
+        ...(msDiffWithOrganisms.assemblages && {
+          assemblages: {
+            data: msDiffWithOrganisms.assemblages.map(it =>
+              pick(it, "id", "type")
+            )
+          }
+        }),
         ...(msDiffWithOrganisms.organism && {
           organism: {
             data: msDiffWithOrganisms.organism.map(it => pick(it, "id", "type"))
@@ -650,7 +658,8 @@ export function useMaterialSampleSave({
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
       projects: undefined,
-      organism: undefined
+      organism: undefined,
+      assemblages: undefined
     };
 
     // delete the association if associated sample is left unfilled

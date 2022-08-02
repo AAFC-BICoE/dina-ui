@@ -8,6 +8,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   acquisitionEventListTitle: "Acquisition Events",
   actionType: "Action Type",
   assemblage: "Assemblage",
+  assemblages: "Assemblages",
   assemblageAttachments: "Assemblage Attachments",
   assemblageManagedAttributes: "Assemblage Managed Attributes",
   assemblage_tooltip:
