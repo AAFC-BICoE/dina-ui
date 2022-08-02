@@ -77,11 +77,11 @@ export function useMetadataViewQuery(id?: string) {
 
 export interface UseMetadataSaveParams {
   /** Metadata form initial values. */
-  metadata?: InputResource<Metadata>;
+  metadata?: Metadata;
   router?: NextRouter;
 }
 
-export function useMetadataSave({ metadata, router }: UseMetadataSaveParams) {
+export function useMetadataSave() {
   const { apiClient, save } = useApiClient();
 
   async function onSubmit({ submittedValues }) {
@@ -131,7 +131,9 @@ export function useMetadataSave({ metadata, router }: UseMetadataSaveParams) {
       ],
       { apiBaseUrl: "/objectstore-api" }
     );
-
-    await router?.push(`/object-store/object/view?id=${router?.query}`);
   }
+
+  return {
+    onSubmit
+  };
 }
