@@ -85,7 +85,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
         }
       : undefined
   };
-  const metadataSaveHook = useMetadataSave();
+  const metadataSaveHook = useMetadataSave(initialValues);
   const { onSubmit } = metadataSaveHook;
   const singleEditOnSubmit = async submittedValues => {
     onSubmit(submittedValues);

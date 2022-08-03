@@ -1,11 +1,16 @@
-import { DinaFormSubmitParams, useApiClient, useQuery } from "common-ui";
+import {
+  DinaFormSubmitParams,
+  resourceDifference,
+  SaveArgs,
+  useApiClient,
+  useQuery
+} from "common-ui";
 import { InputResource } from "kitsu";
 import {
   License,
   Metadata,
   ObjectUpload
 } from "../../../types/objectstore-api";
-import { NextRouter } from "next/router";
 import { keys } from "lodash";
 
 export function useMetadataEditQuery(id?: string | null) {
@@ -77,12 +82,40 @@ export function useMetadataViewQuery(id?: string) {
 
 export interface UseMetadataSaveParams {
   /** Metadata form initial values. */
-  metadata?: Metadata;
-  router?: NextRouter;
+  initialValues?: any;
 }
 
-export function useMetadataSave() {
+export interface PrepareMetadataSaveOperationParams {
+  submittedValues: any;
+  preProcessMetadata?: (
+    sample: InputResource<Metadata>
+  ) => Promise<InputResource<Metadata>>;
+}
+
+export function useMetadataSave(initialValues) {
   const { apiClient, save } = useApiClient();
+
+  /**
+   * Gets the diff of the form's initial values to the new sample state,
+   * so only edited values are submitted to the back-end.
+   */
+  async function prepareMetadataSaveOperation({
+    submittedValues,
+    preProcessMetadata
+  }: PrepareMetadataSaveOperationParams): Promise<SaveArgs<Metadata>> {
+    const preprocessed =
+      (await preProcessMetadata?.(submittedValues)) ?? submittedValues;
+
+    // Only submit the changed values to the back-end:
+    const diff = initialValues.id
+      ? resourceDifference({
+          original: initialValues,
+          updated: preprocessed
+        })
+      : preprocessed;
+
+    return diff;
+  }
 
   async function onSubmit({ submittedValues }) {
     const {
@@ -92,6 +125,10 @@ export function useMetadataSave() {
       acSubtype,
       ...metadataValues
     } = submittedValues;
+    // In case of error, return early instead of saving to the back-end:
+    const diff = await prepareMetadataSaveOperation({
+      submittedValues
+    });
 
     if (license) {
       const selectedLicense = license?.id
@@ -134,6 +171,7 @@ export function useMetadataSave() {
   }
 
   return {
-    onSubmit
+    onSubmit,
+    prepareMetadataSaveOperation
   };
 }
