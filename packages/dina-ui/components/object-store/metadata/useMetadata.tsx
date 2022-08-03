@@ -94,6 +94,13 @@ export interface PrepareMetadataSaveOperationParams {
 
 export function useMetadataSave(initialValues) {
   const { apiClient, save } = useApiClient();
+  const {
+    // Don't include derivatives in the form submission:
+    derivatives: initialDerivatives,
+    license: initialLicense,
+    acSubtype: initialAcSubtype,
+    ...initialMetadataValues
+  } = initialValues;
 
   /**
    * Gets the diff of the form's initial values to the new sample state,
@@ -107,14 +114,18 @@ export function useMetadataSave(initialValues) {
       (await preProcessMetadata?.(submittedValues)) ?? submittedValues;
 
     // Only submit the changed values to the back-end:
-    const diff = initialValues.id
+    const diff = initialMetadataValues.id
       ? resourceDifference({
-          original: initialValues,
+          original: initialMetadataValues,
           updated: preprocessed
         })
       : preprocessed;
 
-    return diff;
+    const saveOperation = {
+      resource: diff,
+      type: "metadata"
+    };
+    return saveOperation;
   }
 
   async function onSubmit({ submittedValues }) {
@@ -125,10 +136,6 @@ export function useMetadataSave(initialValues) {
       acSubtype,
       ...metadataValues
     } = submittedValues;
-    // In case of error, return early instead of saving to the back-end:
-    const diff = await prepareMetadataSaveOperation({
-      submittedValues
-    });
 
     if (license) {
       const selectedLicense = license?.id
@@ -145,29 +152,22 @@ export function useMetadataSave(initialValues) {
       metadataValues.xmpRightsUsageTerms = "";
     }
 
-    const metadataEdit = {
-      ...metadataValues,
-      // Convert the object back to a string:
-      acSubtype: acSubtype?.acSubtype ?? null
-    };
+    const saveOperation = await prepareMetadataSaveOperation({
+      submittedValues: metadataValues
+    });
+    saveOperation.resource.acSubtype = acSubtype?.acSubtype ?? null;
 
     // Remove blank managed attribute values from the map:
     const blankValues: any[] = ["", null];
-    for (const maKey of keys(metadataEdit?.managedAttributes)) {
-      if (blankValues.includes(metadataEdit?.managedAttributes?.[maKey])) {
-        delete metadataEdit?.managedAttributes?.[maKey];
+    for (const maKey of keys(saveOperation?.resource.managedAttributes)) {
+      if (
+        blankValues.includes(saveOperation?.resource.managedAttributes?.[maKey])
+      ) {
+        delete saveOperation?.resource.managedAttributes?.[maKey];
       }
     }
 
-    await save(
-      [
-        {
-          resource: metadataEdit,
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
+    await save([saveOperation], { apiBaseUrl: "/objectstore-api" });
   }
 
   return {
