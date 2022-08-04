@@ -88,7 +88,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const metadataSaveHook = useMetadataSave(initialValues);
   const { onSubmit } = metadataSaveHook;
   const singleEditOnSubmit = async submittedValues => {
-    onSubmit(submittedValues);
+    await onSubmit(submittedValues);
     await router?.push(`/object-store/object/view?id=${id}`);
   };
 
