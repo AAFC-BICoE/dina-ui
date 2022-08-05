@@ -14,6 +14,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { TransformQueryToDSLParams } from "../../../../common-ui/lib/util/transformToDSL";
 import { Field, FormikContextType } from "formik";
 import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
 import { pick, toPairs } from "lodash";
@@ -36,7 +37,17 @@ export function SangerSampleSelectionStep({
     // Default to edit mode when there are no items selected:
     async ({ meta: { totalResourceCount } }) => setEditMode(!totalResourceCount)
   );
-
+  const { groupNames, subject } = useAccount();
+  const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
+    {
+      group: groupNames?.[0] ?? "",
+      queryRows: [
+        {
+          fieldName: ""
+        }
+      ]
+    }
+  );
   const [editMode, setEditMode] = useState(false);
 
   const [searchValue, setSearchValue] = useState("");
@@ -165,21 +176,16 @@ export function SangerSampleSelectionStep({
         </div>
         <div className="mb-3">
           <DinaForm
-            initialValues={{ group: "AAFC",
-
-            queryRows: [
-      
-              {
-      
-                fieldName: ""
-      
-              }
-      
-            ] }}
+            initialValues={ searchFilters }
             // onSubmit={({ submittedValues: {  } }) =>
             //   // setSearchValue()
             // }
           >
+            <label
+              style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
+            >
+              <SeqdbMessage id="search" />
+            </label>
                 <QueryBuilder
                   name="queryRows"
                   indexName="dina_material_sample_index"
