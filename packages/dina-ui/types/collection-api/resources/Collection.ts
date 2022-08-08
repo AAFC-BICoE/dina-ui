@@ -1,7 +1,7 @@
 import { KitsuResource } from "kitsu";
 import { Institution } from "..";
+import { MultilingualDescription } from "../../common";
 import { HasDinaMetaInfo } from "../../DinaJsonMetaInfo";
-import { MultilingualDescription } from "./PreparationType";
 
 export interface CollectionAttributes {
   type: "collection" | string;

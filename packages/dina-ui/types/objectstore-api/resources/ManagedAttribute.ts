@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
-import { MultilingualDescription } from "../../collection-api";
+import { MultilingualDescription } from "../../common";
 
 export interface ManagedAttributeAttributes {
   type: string;

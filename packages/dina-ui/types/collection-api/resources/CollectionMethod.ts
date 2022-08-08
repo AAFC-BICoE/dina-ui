@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { MultilingualDescription } from "./PreparationType";
+import { MultilingualDescription } from "../../common";
 
 export interface CollectionMethodAttributes {
   type: "collection-method";

@@ -43,14 +43,6 @@ export function TagsAndRestrictionsSection({
             <div className="flex-grow-1">
               <RestrictionWarning isRestrictionSelect={true} />
             </div>
-            <div>
-              <TagSelectField
-                resourcePath={resourcePath}
-                name={tagsFieldName}
-                removeLabel={true}
-                groupSelectorName={groupSelectorName}
-              />
-            </div>
           </div>
         )}
         {initialValues.restrictionRemarks && (

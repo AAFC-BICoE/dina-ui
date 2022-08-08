@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { MultilingualDescription } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../intl/dina-ui-en";
+import { MultilingualDescription } from "../../common";
 
 export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
@@ -24,7 +24,8 @@ export type ManagedAttributeType =
 export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",
   "MATERIAL_SAMPLE",
-  "DETERMINATION"
+  "DETERMINATION",
+  "ASSEMBLAGE"
 ] as const;
 export type CollectionModuleType = typeof COLLECTION_MODULE_TYPES[number];
 export const COLLECTION_MODULE_TYPE_LABELS: Record<
@@ -33,7 +34,8 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
 > = {
   COLLECTING_EVENT: "collectingEvent",
   MATERIAL_SAMPLE: "materialSample",
-  DETERMINATION: "determination"
+  DETERMINATION: "determination",
+  ASSEMBLAGE: "assemblage"
 };
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
