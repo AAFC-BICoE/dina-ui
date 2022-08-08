@@ -7,11 +7,9 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
 import { Footer, Head, Nav } from "../../../components";
-import {
-  MetadataDetails,
-  useMetadataQuery
-} from "../../../components/object-store";
+import { MetadataDetails } from "../../../components/object-store";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
 export default function ExternalResourceMetadataViewPage() {
@@ -19,7 +17,7 @@ export default function ExternalResourceMetadataViewPage() {
 
   const id = String(router.query.id);
 
-  const { loading, response } = useMetadataQuery(id);
+  const { loading, response } = useMetadataViewQuery(id);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
