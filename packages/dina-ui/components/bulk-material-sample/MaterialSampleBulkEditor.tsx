@@ -135,6 +135,9 @@ export function MaterialSampleBulkEditor({
           onSelectTab={setSelectedTab}
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
+          tabNameConfig={materialSample =>
+            materialSample.resource.materialSampleName
+          }
           renderOneResource={({ index, isSelected }) => (
             <MaterialSampleForm
               hideUseSequence={true}
