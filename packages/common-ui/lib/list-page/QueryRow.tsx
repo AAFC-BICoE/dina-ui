@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  DateField,
-  NumberField,
-  QueryLogicSwitchField,
-  SelectField,
-  TextField
-} from "..";
-import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
-import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
+import { QueryLogicSwitchField, SelectField, TextField } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
@@ -18,6 +10,7 @@ import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSea
 import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
 import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
 import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
+import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -48,40 +41,6 @@ export interface QueryRowExportProps {
   parentPath?: string;
   distinctTerm?: boolean;
 }
-
-const queryRowMatchOptions = [
-  { label: "Matches", value: "matches" },
-  { label: "Doesn't Match", value: "noMatches" },
-  { label: "Is Empty", value: "empty" },
-  { label: "Is Not Empty", value: "notEmpty" }
-];
-
-const queryRowMatchesOptions = [
-  { label: "Exact", value: "match" },
-  { label: "Partial", value: "term" }
-];
-
-const queryRowNumericalMatchOptions = (isDateField: boolean) => {
-  const options = [
-    { label: "Equal to", value: "equal" },
-    { label: "Greater than", value: "greaterThan" },
-    { label: "Greater than or equal to", value: "greaterThanEqual" },
-    { label: "Less than", value: "lessThan" },
-    { label: "Less than or equal to", value: "lessThanEqual" }
-  ];
-
-  // Only the data field should contain this.
-  if (isDateField) {
-    options.splice(1, 0, { label: "Contains", value: "contains" });
-  }
-
-  return options;
-};
-
-const queryRowBooleanOptions = [
-  { label: "True", value: "true" },
-  { label: "False", value: "false" }
-];
 
 /**
  * Helper function to generate the proper form name.
@@ -122,8 +81,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   const dataFromIndexMapping = esIndexMapping?.find(
     attribute => attribute.value === fieldName
   );
-
-  const selectedGroups: string[] = (formikProps.values as any)?.group;
 
   // Depending on the type, it changes what fields need to be displayed.
   const typeVisibility: TypeVisibility = {
@@ -266,33 +223,18 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
+          {/* Text type */}
           {typeVisibility.isText && (
             <QueryRowTextSearch queryBuilderName={name} index={index} />
           )}
+
+          {/* Auto suggestion text type */}
           {typeVisibility.isSuggestedText && (
-            <>
-              <AutoSuggestTextField
-                name={fieldProps(name, "matchValue", index)}
-                removeLabel={true}
-                className="me-1 flex-fill"
-                blankSearchBackend={"preferred"}
-                customOptions={value =>
-                  useElasticSearchDistinctTerm({
-                    fieldName:
-                      dataFromIndexMapping?.parentPath +
-                      "." +
-                      dataFromIndexMapping?.path +
-                      "." +
-                      dataFromIndexMapping?.label,
-                    groups: selectedGroups,
-                    relationshipType: dataFromIndexMapping?.parentType,
-                    indexName
-                  })?.filter(suggestion =>
-                    suggestion?.toLowerCase()?.includes(value?.toLowerCase())
-                  )
-                }
-              />
-            </>
+            <QueryRowAutoSuggestionTextSearch
+              indexName={indexName}
+              queryBuilderName={name}
+              index={index}
+            />
           )}
 
           {/* Date picker type */}
