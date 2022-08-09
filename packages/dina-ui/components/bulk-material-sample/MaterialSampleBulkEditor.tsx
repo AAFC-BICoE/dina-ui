@@ -135,6 +135,9 @@ export function MaterialSampleBulkEditor({
           onSelectTab={setSelectedTab}
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
+          tabNameConfig={(materialSample: ResourceWithHooks<MaterialSample>) =>
+            materialSample.resource.materialSampleName
+          }
           renderOneResource={({ index, isSelected }) => (
             <MaterialSampleForm
               hideUseSequence={true}
@@ -166,7 +169,7 @@ interface BulkSampleSaveParams {
   samplePreProcessor?: () => (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  bulkEditCtx: BulkEditTabContextI;
+  bulkEditCtx: BulkEditTabContextI<MaterialSample>;
 }
 
 export function initializeRefHookFormProps(

@@ -30,7 +30,10 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
+import {
+  useMetadataEditQuery,
+  useMetadataSave
+} from "../../../components/object-store/metadata/useMetadata";
 
 interface SingleMetadataFormProps {
   /** Existing Metadata is required, no new ones are added with this form. */
@@ -80,61 +83,13 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
           type: "object-subtype",
           acSubtype: metadata.acSubtype
         }
-      : null
+      : undefined
   };
-
-  const onSubmit: DinaFormOnSubmit = async ({
-    submittedValues,
-    api: { apiClient, save }
-  }) => {
-    const {
-      // Don't include derivatives in the form submission:
-      derivatives,
-      license,
-      acSubtype,
-      ...metadataValues
-    } = submittedValues;
-
-    if (license) {
-      const selectedLicense = license?.id
-        ? (
-            await apiClient.get<License>(
-              `objectstore-api/license/${license.id}`,
-              {}
-            )
-          ).data
-        : null;
-      // The Metadata's xmpRightsWebStatement field stores the license's url.
-      metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
-      // No need to store this ; The url should be enough.
-      metadataValues.xmpRightsUsageTerms = "";
-    }
-
-    const metadataEdit = {
-      ...metadataValues,
-      // Convert the object back to a string:
-      acSubtype: acSubtype?.acSubtype ?? null
-    };
-
-    // Remove blank managed attribute values from the map:
-    const blankValues: any[] = ["", null];
-    for (const maKey of keys(metadataEdit?.managedAttributes)) {
-      if (blankValues.includes(metadataEdit?.managedAttributes?.[maKey])) {
-        delete metadataEdit?.managedAttributes?.[maKey];
-      }
-    }
-
-    await save(
-      [
-        {
-          resource: metadataEdit,
-          type: "metadata"
-        }
-      ],
-      { apiBaseUrl: "/objectstore-api" }
-    );
-
-    await router.push(`/object-store/object/view?id=${id}`);
+  const metadataSaveHook = useMetadataSave(initialValues);
+  const { onSubmit } = metadataSaveHook;
+  const singleEditOnSubmit = async submittedValues => {
+    await onSubmit(submittedValues);
+    await router?.push(`/object-store/object/view?id=${id}`);
   };
 
   const buttonBar = (
@@ -145,7 +100,7 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   );
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
+    <DinaForm initialValues={initialValues} onSubmit={singleEditOnSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">

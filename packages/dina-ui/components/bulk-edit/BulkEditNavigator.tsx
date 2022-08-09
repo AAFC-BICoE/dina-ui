@@ -13,6 +13,7 @@ export interface BulkEditNavigatorProps {
   selectedTab: BulkNavigatorTab | ResourceWithHooks;
   onSelectTab: (newSelected: ResourceWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
+  tabNameConfig?: (resource: ResourceWithHooks) => string | undefined;
 }
 
 export interface ResourceRenderProps<T extends KitsuResource = KitsuResource> {
@@ -37,7 +38,8 @@ export function BulkEditNavigator({
   onSelectTab,
   resources,
   renderOneResource,
-  extraTabs = []
+  extraTabs = [],
+  tabNameConfig
 }: BulkEditNavigatorProps) {
   const tabElements = [...extraTabs, ...resources];
 
@@ -120,7 +122,7 @@ export function BulkEditNavigator({
             })}
             {resources.map((resource, index) => {
               const tabHasError = tabsWithErrors.includes(resource);
-              const tabName = getTabName(resource);
+              const tabName = tabNameConfig ? tabNameConfig(resource) : null;
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
@@ -131,12 +133,6 @@ export function BulkEditNavigator({
                   </span>
                 </Tab>
               );
-
-              function getTabName(tab) {
-                if (tab.resource.type === "material-sample") {
-                  return tab.resource.materialSampleName;
-                }
-              }
             })}
           </TabList>
           {extraTabs.map((extraTab, index) => (
