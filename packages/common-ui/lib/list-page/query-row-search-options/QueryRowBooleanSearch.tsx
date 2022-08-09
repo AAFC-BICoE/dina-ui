@@ -1,7 +1,7 @@
 import React from "react";
 import { FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps } from "../QueryRow";
+import { fieldProps, QueryRowExportProps } from "../QueryRow";
 
 /**
  * The possible states of a boolean if the Equals match is being used.
@@ -66,4 +66,31 @@ export default function QueryRowBooleanSearch({
       </FieldSpy>
     </>
   );
+}
+
+/**
+ * Using the query row for a boolean search, generate the elastic search request to be made.
+ *
+ * @param builder The elastic search bodybuilder object.
+ * @param queryRow The query row to be used.
+ */
+export function transformBooleanSearchToDSL(
+  builder,
+  queryRow: QueryRowExportProps
+) {
+  const { matchType, boolean: booleanValue, fieldName } = queryRow;
+
+  switch (matchType) {
+    // Exact match for the boolean.
+    case "equals":
+      return builder.filter("term", fieldName, booleanValue);
+
+    // Empty for the boolean.
+    case "empty":
+      break;
+
+    // Not Empty for the boolean.
+    case "notEmpty":
+      break;
+  }
 }

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { FieldSpy, FieldWrapper, TextField } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps } from "../QueryRow";
+import { fieldProps, QueryRowExportProps } from "../QueryRow";
 import { useIntl } from "react-intl";
 
 /**
@@ -165,4 +165,39 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
       )}
     </FieldWrapper>
   );
+}
+
+/**
+ * Using the query row for a text search, generate the elastic search request to be made.
+ *
+ * @param builder The elastic search bodybuilder object.
+ * @param queryRow The query row to be used.
+ */
+export function transformTextSearchToDSL(
+  builder,
+  queryRow: QueryRowExportProps
+) {
+  const { matchType, textMatchType, matchValue, fieldName } = queryRow;
+
+  switch (matchType) {
+    // Equals match type.
+    case "equals":
+      if (textMatchType === "partial") {
+        return builder.filter("match", fieldName, matchValue);
+      } else {
+        return builder.filter("term", fieldName + ".keyword", matchValue);
+      }
+
+    // Not equals match type.
+    case "notEquals":
+      return builder.notFilter(fieldName, matchValue);
+
+    // Empty values only. (only if the value is not mandatory)
+    case "empty":
+      return builder.missing(fieldName);
+
+    // Not empty values only. (only if the value is not mandatory)
+    case "notEmpty":
+      return builder.exists(fieldName);
+  }
 }

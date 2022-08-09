@@ -4,6 +4,8 @@ import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
 import { QueryRowExportProps } from "../list-page/QueryRow";
 import { TableColumn } from "../list-page/types";
+import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
+import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
@@ -61,15 +63,16 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     }
   }
 
-  function getMatchType(queryRow) {
+  function buildInnerQueryBasedOnType(queryRow) {
     switch (queryRow.type) {
-      // Text based input can also have exact or partial matches.
+      // Boolean type
+      case "boolean":
+        return transformBooleanSearchToDSL(builder, queryRow);
+
+      // Text types
       case "text":
       case "keyword":
-        return queryRow.matchType as string;
-
-      default:
-        return "term";
+        return transformTextSearchToDSL(builder, queryRow);
     }
   }
 
@@ -92,12 +95,12 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * When using Equals to search for a date, the following would be matched for "2022":
    *    - 2022
    *
-   * @param numericalMatchType the operator type (example: greaterThan ---> gt)
+   * @param matchType the operator type (example: greaterThan ---> gt)
    * @param value The operator value to search against.
    * @returns numerical operator and value.
    */
-  function buildRangeObject(numericalMatchType, value) {
-    switch (numericalMatchType) {
+  function buildRangeObject(matchType, value) {
+    switch (matchType) {
       case "contains":
         const YEAR_REGEX = /^\d{4}$/;
         const MONTH_REGEX = /^\d{4}-\d{2}$/;
@@ -140,17 +143,14 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   /**
-   * Retrieve the numerical match type. Defaults to equal if not applicable.
+   * Retrieves the field name for elastic search to search against. Sometimes a field name requires
+   * the .keyword property.
    *
-   * @param queryRow The query options.
-   * @returns numerical match type, if not found, equal.
+   * @param queryRow The query row options the user has selected.
+   * @returns the field name, with or without the .keyword property.
    */
-  function getNumericalMatchType(queryRow) {
-    return (queryRow.numericalMatchType as string) ?? "equal";
-  }
-
   function getFieldName(queryRow) {
-    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+    if (queryRow.type === "keyword" || queryRow?.distinctTerm)
       return queryRow.fieldName + ".keyword";
     return queryRow.fieldName;
   }
@@ -172,16 +172,21 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       queryRow.parentPath +
       "." +
       queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-    if (queryRow.matchType === "term" || queryRow?.distinctTerm)
+    if (queryRow.matchType === "keyword" || queryRow?.distinctTerm)
       return newFieldName + ".keyword";
     return newFieldName;
   }
 
+  /**
+   * Used for generated the included section of the query. If using a field directly on the index,
+   * the buildQuery() function should be used instead.
+   *
+   * @param rowToBuild The query row to build the query for.
+   */
   function buildRelationshipQuery(rowToBuild) {
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
-    const type = getMatchType(rowToBuild);
-    const numericalType = getNumericalMatchType(rowToBuild);
+    const matchType = rowToBuild.matchType;
     const fieldName = getRelationshipFieldName(rowToBuild);
 
     // Create a nested query for each relationship type query.
@@ -189,11 +194,13 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       return queryBuilder
         .andQuery("match", "included.type", rowToBuild.parentType)
         .andQuery(
-          numericalType === "equal" ? type : "range",
+          matchType === "equals"
+            ? rowToBuild.type === "keyword"
+              ? "match"
+              : "term"
+            : "range",
           fieldName.replace("included.", "included.attributes."),
-          numericalType === "equal"
-            ? value
-            : buildRangeObject(numericalType, value)
+          matchType === "equals" ? value : buildRangeObject(matchType, value)
         );
     });
   }
@@ -202,21 +209,21 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * Used for attributes directly involved with the index. Relationship queries should be using
    * the buildRelationshipQuery function instead.
    *
-   * @param rowToBuild
+   * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
     // The type can change some of these fields below.
     const value = getValueBasedOnType(rowToBuild);
-    const type = getMatchType(rowToBuild);
-    const numericalType = getNumericalMatchType(rowToBuild);
+    const matchType = rowToBuild.matchType;
     const fieldName = getFieldName(rowToBuild);
 
     // Currently only AND is supported, so this acts just like a AND.
-    if (numericalType === "equal") {
-      builder.query(type, fieldName, value);
-    } else {
-      builder.query("range", fieldName, buildRangeObject(numericalType, value));
-    }
+    buildInnerQueryBasedOnType(rowToBuild);
+    // if (matchType === "equals") {
+    //   builder.query((rowToBuild.type === "keyword" ? "match" : "term"), fieldName, value);
+    // } else {
+    //   builder.query("range", fieldName, buildRangeObject(matchType, value));
+    // }
   }
 
   // Remove the row that user did not select any field to search on or

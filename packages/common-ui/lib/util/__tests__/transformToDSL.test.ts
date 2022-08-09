@@ -49,25 +49,27 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
-          matchType: "term",
+          textMatchType: "partial",
+          matchType: "equals",
           matchValue: "CNC001"
         },
         {
           fieldName: "data.attributes.materialSampleType",
           type: "text",
-          matchType: "match",
+          matchType: "equals",
+          textMatchType: "exact",
           matchValue: "WHOLE_ORGANISM"
         },
         {
           fieldName: "data.attributes.allowDuplicateName",
           type: "boolean",
           boolean: "true",
-          matchType: "match"
+          matchType: "equals"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          matchType: "match",
+          matchType: "equals",
           date: "2022-04-11"
         }
       ]
@@ -86,28 +88,32 @@ describe("Transform to DSL query function", () => {
       from: DEFAULT_OFFSET,
       query: {
         bool: {
-          must: [
-            {
-              term: {
-                "data.attributes.materialSampleName.keyword": "CNC001"
-              }
-            },
-            {
-              match: {
-                "data.attributes.materialSampleType": "WHOLE_ORGANISM"
-              }
-            },
-            {
-              term: {
-                "data.attributes.allowDuplicateName": "true"
-              }
-            },
-            {
-              term: {
-                "data.attributes.createdOn": "2022-04-11"
-              }
+          filter: {
+            bool: {
+              must: [
+                {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "CNC001"
+                  }
+                },
+                {
+                  match: {
+                    "data.attributes.materialSampleType": "WHOLE_ORGANISM"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.allowDuplicateName": "true"
+                  }
+                },
+                {
+                  term: {
+                    "data.attributes.createdOn": "2022-04-11"
+                  }
+                }
+              ]
             }
-          ]
+          }
         }
       }
     });
@@ -120,31 +126,31 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "greaterThan",
+          matchType: "greaterThan",
           date: "2022-04-11"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "greaterThanEqual",
+          matchType: "greaterThanEqual",
           date: "2022-04-12"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "lessThan",
+          matchType: "lessThan",
           date: "2022-04-13"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "lessThanEqual",
+          matchType: "lessThanEqual",
           date: "2022-04-14"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "equal",
+          matchType: "equal",
           date: "2022-04-15"
         }
       ]
@@ -210,19 +216,19 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022-04"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022-04-13"
         }
       ]

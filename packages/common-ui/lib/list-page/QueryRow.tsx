@@ -25,20 +25,87 @@ export interface QueryRowProps {
 }
 
 export interface QueryRowExportProps {
+  /**
+   * Name of the field for the search. Selected from the dropdown menu in the query row.
+   */
   fieldName: string;
+
+  /**
+   * The value being searched on the query row. This is only used for strings. Other types have
+   * their own field where it's stored.
+   */
   matchValue?: string;
-  fieldRangeStart?: string;
-  fieldRangeEnd?: string;
+
+  /**
+   * Changes based on the type of the field.
+   *
+   * Possible Options: "equals", "contains", "notEquals", "empty", "notEmpty", "greaterThan",
+   *                   "lessThan", "greaterThanOrEqualTo", "lessThanOrEqualTo"
+   */
   matchType?: string;
-  numericalMatchType?: string;
+
+  /**
+   * For text based searches you can change the match type to show only when the search is exactly
+   * the same as the matchValue or partial match.
+   *
+   * Possible Options: "exact" and "partial".
+   */
+  textMatchType?: string;
+
+  /**
+   * Currently, only "and" is supported. In the future, "or" can be selected.
+   *
+   * Possible Options: "and" and "or".
+   */
   compoundQueryType?: string;
+
+  /**
+   * When searching numbers, the value will be stored here. Only if the type is "number".
+   */
   number?: string;
+
+  /**
+   * When searching dates, the value will be stored here. Only if the type is "date".
+   */
   date?: string;
+
+  /**
+   * When searching booleans, the value will be stored here. Only if the type is "boolean".
+   */
   boolean?: string;
+
+  /**
+   * Based on the field selected, the type of that field is stored here.
+   *
+   * Possible Options: "string", "number", "date", "boolean", "distinct"
+   */
   type?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship name.
+   *
+   * Example: "author"
+   */
   parentName?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship type.
+   *
+   * Example: "agent"
+   */
   parentType?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship field being used.
+   *
+   * Example: "firstName"
+   */
   parentPath?: string;
+
+  /**
+   * Is the value being searched on a distinct field, if so, suggestions can be provided to help
+   * the user find what they are searching for.
+   */
   distinctTerm?: boolean;
 }
 
@@ -67,8 +134,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   const initState = {
     matchValue: null,
-    matchType: "match",
-    numericalMatchType: "equal",
+    matchType: "equals",
     date: moment().format("YYYY-MM-DD"),
     boolean: "true",
     number: null
