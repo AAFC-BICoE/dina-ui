@@ -7,6 +7,7 @@ import {
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useMetadataViewQuery } from "../../../components/object-store/metadata/useMetadata";
 import {
   Footer,
   Head,
@@ -14,11 +15,7 @@ import {
   NotPubliclyReleasableWarning,
   TagsAndRestrictionsSection
 } from "../../../components";
-import {
-  ExifView,
-  MetadataDetails,
-  useMetadataQuery
-} from "../../../components/object-store";
+import { ExifView, MetadataDetails } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 
@@ -34,7 +31,7 @@ export default function MetadataViewPage() {
 
   const id = String(router.query.id);
 
-  const { loading, response } = useMetadataQuery(id);
+  const { loading, response } = useMetadataViewQuery(id);
 
   const preview = false;
 
