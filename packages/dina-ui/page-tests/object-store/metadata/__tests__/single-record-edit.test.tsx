@@ -159,31 +159,19 @@ describe("Metadata single record edit page.", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Check only the changed values
     expect(mockSave).lastCalledWith(
       [
         {
           resource: {
             acSubtype: "TEST_SUBTYPE",
             acTags: ["new tag 1", "new tag 2"],
-            bucket: "testbucket",
-            dcCreator: {
-              displayName: "Mat Poff",
-              id: "6e80e42a-bcf6-4062-9db3-946e0f26458f",
-              type: "person"
-            },
-            dcType: "Image",
-            orientation: 5,
-            fileExtension: ".png",
-            fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
             id: "25f81de5-bbee-430c-b5fa-71986b70e612",
             managedAttributes: {
               test_managed_attribute: "new-managed-attribute-value"
             },
-            originalFilename: "test-file.png",
             type: "metadata",
-            xmpRightsUsageTerms: "",
-            xmpRightsWebStatement:
-              "https://open.canada.ca/en/open-government-licence-canada"
+            xmpRightsUsageTerms: ""
           },
           type: "metadata"
         }
