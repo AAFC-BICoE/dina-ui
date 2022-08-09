@@ -13,7 +13,7 @@ export interface BulkEditNavigatorProps {
   selectedTab: BulkNavigatorTab | ResourceWithHooks;
   onSelectTab: (newSelected: ResourceWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
-  tabNameConfig?: (resource: ResourceWithHooks) => string;
+  tabNameConfig?: (resource: ResourceWithHooks) => string | undefined;
 }
 
 export interface ResourceRenderProps<T extends KitsuResource = KitsuResource> {
