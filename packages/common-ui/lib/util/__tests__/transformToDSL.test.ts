@@ -88,32 +88,28 @@ describe("Transform to DSL query function", () => {
       from: DEFAULT_OFFSET,
       query: {
         bool: {
-          filter: {
-            bool: {
-              must: [
-                {
-                  term: {
-                    "data.attributes.materialSampleName.keyword": "CNC001"
-                  }
-                },
-                {
-                  match: {
-                    "data.attributes.materialSampleType": "WHOLE_ORGANISM"
-                  }
-                },
-                {
-                  term: {
-                    "data.attributes.allowDuplicateName": "true"
-                  }
-                },
-                {
-                  term: {
-                    "data.attributes.createdOn": "2022-04-11"
-                  }
-                }
-              ]
+          must: [
+            {
+              term: {
+                "data.attributes.materialSampleName.keyword": "CNC001"
+              }
+            },
+            {
+              match: {
+                "data.attributes.materialSampleType": "WHOLE_ORGANISM"
+              }
+            },
+            {
+              term: {
+                "data.attributes.allowDuplicateName": "true"
+              }
+            },
+            {
+              term: {
+                "data.attributes.createdOn": "2022-04-11"
+              }
             }
-          }
+          ]
         }
       }
     });

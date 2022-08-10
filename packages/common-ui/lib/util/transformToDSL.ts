@@ -7,9 +7,89 @@ import { TableColumn } from "../list-page/types";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 
+export interface ElasticSearchQueryParams {
+  queryType: string;
+  fieldName?: string;
+  value?: any;
+}
+
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
   group: string;
+}
+
+/**
+ * Formik will store the values in different spots depending on the queryRow type.
+ *
+ * This helper function will retrieve the value based on the type.
+ *
+ * @param queryRow
+ * @returns value based on the query row type.
+ */
+export function getValueBasedOnType(queryRow) {
+  switch (queryRow.type) {
+    // Boolean type
+    case "boolean":
+      return queryRow.boolean;
+
+    // Number types
+    case "long":
+    case "short":
+    case "integer":
+    case "byte":
+    case "double":
+    case "float":
+    case "scaled_float":
+    case "unsigned_long":
+      return queryRow.number;
+
+    // Date type
+    case "date":
+      return queryRow.date;
+
+    // Text types
+    case "text":
+    case "keyword":
+      return queryRow.matchValue ?? "";
+
+    default:
+      return null;
+  }
+}
+
+/**
+ * Retrieves the field name for elastic search to search against. Sometimes a field name requires
+ * the .keyword property.
+ *
+ * @param queryRow The query row options the user has selected.
+ * @returns the field name, with or without the .keyword property.
+ */
+export function getFieldName(queryRow) {
+  if (queryRow.type === "keyword" || queryRow?.distinctTerm)
+    return queryRow.fieldName + ".keyword";
+  return queryRow.fieldName;
+}
+
+/**
+ * Due to the way the included section is handled, it's an array of the different types.
+ * Two fields from different types could share the same path:
+ *
+ * included.attributes.name = Could be for preparation-type or material-sample for example.
+ *
+ * This method will take the unique value and convert it to the version above.
+ *
+ * preparation-type.name --> included.attributes.name
+ *
+ * The included.type will be used to perform the search on the correct type.
+ */
+export function getRelationshipFieldName(queryRow) {
+  const newFieldName =
+    queryRow.parentPath +
+    "." +
+    queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
+  if (queryRow.matchType === "keyword" || queryRow?.distinctTerm)
+    return newFieldName + ".keyword";
+  return newFieldName;
 }
 
 export function transformQueryToDSL<TData extends KitsuResource>(
@@ -24,55 +104,20 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     return;
   }
 
-  /**
-   * Formik will store the values in different spots depending on the queryRow type.
-   *
-   * This helper function will retrieve the value based on the type.
-   *
-   * @param queryRow
-   * @returns value based on the query row type.
-   */
-  function getValueBasedOnType(queryRow) {
+  function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams {
     switch (queryRow.type) {
       // Boolean type
       case "boolean":
-        return queryRow.boolean;
-
-      // Number types
-      case "long":
-      case "short":
-      case "integer":
-      case "byte":
-      case "double":
-      case "float":
-      case "scaled_float":
-      case "unsigned_long":
-        return queryRow.number;
-
-      // Date type
-      case "date":
-        return queryRow.date;
+        return transformBooleanSearchToDSL(queryRow);
 
       // Text types
       case "text":
       case "keyword":
-        return queryRow.matchValue ?? "";
+        return transformTextSearchToDSL(queryRow);
 
+      // Default just treat it like a text search.
       default:
-        return null;
-    }
-  }
-
-  function buildInnerQueryBasedOnType(queryRow) {
-    switch (queryRow.type) {
-      // Boolean type
-      case "boolean":
-        return transformBooleanSearchToDSL(builder, queryRow);
-
-      // Text types
-      case "text":
-      case "keyword":
-        return transformTextSearchToDSL(builder, queryRow);
+        return transformTextSearchToDSL(queryRow);
     }
   }
 
@@ -143,64 +188,22 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   /**
-   * Retrieves the field name for elastic search to search against. Sometimes a field name requires
-   * the .keyword property.
-   *
-   * @param queryRow The query row options the user has selected.
-   * @returns the field name, with or without the .keyword property.
-   */
-  function getFieldName(queryRow) {
-    if (queryRow.type === "keyword" || queryRow?.distinctTerm)
-      return queryRow.fieldName + ".keyword";
-    return queryRow.fieldName;
-  }
-
-  /**
-   * Due to the way the included section is handled, it's an array of the different types.
-   * Two fields from different types could share the same path:
-   *
-   * included.attributes.name = Could be for preparation-type or material-sample for example.
-   *
-   * This method will take the unique value and convert it to the version above.
-   *
-   * preparation-type.name --> included.attributes.name
-   *
-   * The included.type will be used to perform the search on the correct type.
-   */
-  function getRelationshipFieldName(queryRow) {
-    const newFieldName =
-      queryRow.parentPath +
-      "." +
-      queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-    if (queryRow.matchType === "keyword" || queryRow?.distinctTerm)
-      return newFieldName + ".keyword";
-    return newFieldName;
-  }
-
-  /**
    * Used for generated the included section of the query. If using a field directly on the index,
    * the buildQuery() function should be used instead.
    *
    * @param rowToBuild The query row to build the query for.
    */
   function buildRelationshipQuery(rowToBuild) {
-    // The type can change some of these fields below.
-    const value = getValueBasedOnType(rowToBuild);
-    const matchType = rowToBuild.matchType;
-    const fieldName = getRelationshipFieldName(rowToBuild);
+    const queryParams = buildInnerQueryBasedOnType(rowToBuild);
 
     // Create a nested query for each relationship type query.
     builder.query("nested", { path: "included" }, queryBuilder => {
       return queryBuilder
         .andQuery("match", "included.type", rowToBuild.parentType)
         .andQuery(
-          matchType === "equals"
-            ? rowToBuild.type === "keyword"
-              ? "match"
-              : "term"
-            : "range",
-          fieldName.replace("included.", "included.attributes."),
-          matchType === "equals" ? value : buildRangeObject(matchType, value)
+          queryParams.queryType,
+          queryParams.fieldName ?? getRelationshipFieldName(rowToBuild),
+          queryParams.value
         );
     });
   }
@@ -212,18 +215,12 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
-    // The type can change some of these fields below.
-    const value = getValueBasedOnType(rowToBuild);
-    const matchType = rowToBuild.matchType;
-    const fieldName = getFieldName(rowToBuild);
-
-    // Currently only AND is supported, so this acts just like a AND.
-    buildInnerQueryBasedOnType(rowToBuild);
-    // if (matchType === "equals") {
-    //   builder.query((rowToBuild.type === "keyword" ? "match" : "term"), fieldName, value);
-    // } else {
-    //   builder.query("range", fieldName, buildRangeObject(matchType, value));
-    // }
+    const queryParams = buildInnerQueryBasedOnType(rowToBuild);
+    builder.query(
+      queryParams.queryType,
+      queryParams.fieldName ?? getFieldName(rowToBuild),
+      queryParams.value
+    );
   }
 
   // Remove the row that user did not select any field to search on or
@@ -249,7 +246,6 @@ export function transformQueryToDSL<TData extends KitsuResource>(
             queryRow.matchValue))
     )
     .map(queryRow => {
-      // Determine if the attribute is inside a relationship.
       if (queryRow.parentType) {
         buildRelationshipQuery(queryRow);
       } else {

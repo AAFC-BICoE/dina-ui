@@ -3,6 +3,7 @@ import { FieldSpy, FieldWrapper, TextField } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
 import { useIntl } from "react-intl";
+import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 
 /**
  * The match options when a text search is being performed.
@@ -174,30 +175,37 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
  * @param queryRow The query row to be used.
  */
 export function transformTextSearchToDSL(
-  builder,
   queryRow: QueryRowExportProps
-) {
-  const { matchType, textMatchType, matchValue, fieldName } = queryRow;
+): ElasticSearchQueryParams {
+  const { matchType, textMatchType, matchValue, fieldName, type } = queryRow;
 
   switch (matchType) {
     // Equals match type.
     case "equals":
-      if (textMatchType === "partial") {
-        return builder.filter("match", fieldName, matchValue);
+      if (textMatchType === "partial" && type !== "keyword") {
+        return { queryType: "match", fieldName, value: matchValue };
       } else {
-        return builder.filter("term", fieldName + ".keyword", matchValue);
+        return {
+          queryType: "term",
+          fieldName: fieldName + ".keyword",
+          value: matchValue
+        };
       }
 
     // Not equals match type.
     case "notEquals":
-      return builder.notFilter(fieldName, matchValue);
+      return { queryType: "exists" };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return builder.missing(fieldName);
+      return { queryType: "exists" };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return builder.exists(fieldName);
+      return { queryType: "exists" };
+
+    // Default case
+    default:
+      return { queryType: "match", fieldName, value: matchValue };
   }
 }
