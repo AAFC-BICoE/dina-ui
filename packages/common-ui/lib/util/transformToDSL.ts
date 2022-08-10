@@ -174,13 +174,13 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       buildInnerQueryBasedOnType(rowToBuild);
 
     builder.query("nested", { path: "included" }, queryBuilder => {
-      queryParams.forEach(queryParam => {
-        const query = queryBuilder.andQuery(
-          "match",
-          "included.type",
-          rowToBuild.parentType
-        );
+      const query = queryBuilder.andQuery(
+        "match",
+        "included.type",
+        rowToBuild.parentType
+      );
 
+      queryParams.forEach(queryParam => {
         switch (queryParam.queryOperator) {
           case "must":
             query.andQuery(
@@ -211,9 +211,9 @@ export function transformQueryToDSL<TData extends KitsuResource>(
             );
             break;
         }
-
-        return query;
       });
+
+      return query;
     });
   }
 
