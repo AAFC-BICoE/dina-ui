@@ -39,6 +39,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   addManagedAttributesViewTitle: "Create Form Template",
   addMaterialSampleTitle: "Add Material Sample",
   addMaterialSampleTypeTitle: "Add Material Sample Type",
+  addMetadataTitle: "Add Metadata",
   addNewChildStorageUnit: "Add New Child Storage Unit",
   addNewElement: "Add New {typeName}",
   addNewPerson: "Add New Person",
