@@ -7,9 +7,11 @@ import { TableColumn } from "../list-page/types";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
+import { valueContainerCSS } from "react-select/dist/declarations/src/components/containers";
 
 export interface ElasticSearchQueryParams {
-  queryType: string;
+  queryOperator: "must" | "should" | "must_not" | "filter";
+  queryType: "match" | "term" | "range" | "exists";
   fieldName?: string;
   value?: any;
 }
@@ -66,7 +68,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     return;
   }
 
-  function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams {
+  function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams[] {
     switch (queryRow.type) {
       // Boolean type
       case "boolean":
@@ -104,17 +106,56 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildRelationshipQuery(rowToBuild) {
-    const queryParams = buildInnerQueryBasedOnType(rowToBuild);
+    const queryParams: ElasticSearchQueryParams[] =
+      buildInnerQueryBasedOnType(rowToBuild);
 
-    // Create a nested query for each relationship type query.
-    builder.query("nested", { path: "included" }, queryBuilder => {
-      return queryBuilder
-        .andQuery("match", "included.type", rowToBuild.parentType)
-        .andQuery(
-          queryParams.queryType,
-          queryParams.fieldName ?? getRelationshipFieldName(rowToBuild),
-          queryParams.value
-        );
+    queryParams.forEach(queryParam => {
+      switch (queryParam.queryOperator) {
+        case "must":
+          builder.query("nested", { path: "included" }, queryBuilder => {
+            return queryBuilder
+              .andQuery("match", "included.type", rowToBuild.parentType)
+              .andQuery(
+                queryParam.queryType,
+                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+                queryParam.value
+              );
+          });
+          break;
+        case "should":
+          builder.query("nested", { path: "included" }, queryBuilder => {
+            return queryBuilder
+              .andQuery("match", "included.type", rowToBuild.parentType)
+              .orQuery(
+                queryParam.queryType,
+                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+                queryParam.value
+              );
+          });
+          break;
+        case "must_not":
+          builder.query("nested", { path: "included" }, queryBuilder => {
+            return queryBuilder
+              .andQuery("match", "included.type", rowToBuild.parentType)
+              .notQuery(
+                queryParam.queryType,
+                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+                queryParam.value
+              );
+          });
+          break;
+        case "filter":
+          builder.query("nested", { path: "included" }, queryBuilder => {
+            return queryBuilder
+              .andQuery("match", "included.type", rowToBuild.parentType)
+              .filter(
+                queryParam.queryType,
+                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+                queryParam.value
+              );
+          });
+          break;
+      }
     });
   }
 
@@ -125,12 +166,44 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
-    const queryParams = buildInnerQueryBasedOnType(rowToBuild);
-    builder.query(
-      queryParams.queryType,
-      queryParams.fieldName ?? getFieldName(rowToBuild),
-      queryParams.value
-    );
+    const queryParams: ElasticSearchQueryParams[] =
+      buildInnerQueryBasedOnType(rowToBuild);
+
+    queryParams.forEach(queryParam => {
+      switch (queryParam.queryOperator) {
+        case "must":
+          builder.query(
+            queryParam.queryType,
+            queryParam.fieldName ?? getFieldName(rowToBuild),
+            queryParam.value
+          );
+          break;
+
+        case "should":
+          builder.orQuery(
+            queryParam.queryType,
+            queryParam.fieldName ?? getFieldName(rowToBuild),
+            queryParam.value
+          );
+          break;
+
+        case "must_not":
+          builder.notQuery(
+            queryParam.queryType,
+            queryParam.fieldName ?? getFieldName(rowToBuild),
+            queryParam.value
+          );
+          break;
+
+        case "filter":
+          builder.filter(
+            queryParam.queryType,
+            queryParam.fieldName ?? getFieldName(rowToBuild),
+            queryParam.value
+          );
+          break;
+      }
+    });
   }
 
   // Remove the row that user did not select any field to search on or

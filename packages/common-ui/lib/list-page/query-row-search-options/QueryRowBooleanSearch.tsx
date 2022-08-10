@@ -77,20 +77,22 @@ export default function QueryRowBooleanSearch({
  */
 export function transformBooleanSearchToDSL(
   queryRow: QueryRowExportProps
-): ElasticSearchQueryParams {
+): ElasticSearchQueryParams[] {
   const { matchType, boolean: booleanValue } = queryRow;
 
   switch (matchType) {
     // Empty for the boolean.
     case "empty":
-      return { queryType: "term", value: "NULL" };
+      return [{ queryOperator: "must", queryType: "term", value: "NULL" }];
 
     // Not Empty for the boolean.
     case "notEmpty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Exact match for the boolean.
     default:
-      return { queryType: "term", value: booleanValue };
+      return [
+        { queryOperator: "must", queryType: "term", value: booleanValue }
+      ];
   }
 }

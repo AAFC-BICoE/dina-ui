@@ -176,32 +176,38 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
  */
 export function transformTextSearchToDSL(
   queryRow: QueryRowExportProps
-): ElasticSearchQueryParams {
+): ElasticSearchQueryParams[] {
   const { matchType, textMatchType, matchValue } = queryRow;
 
   switch (matchType) {
     // Equals match type.
     case "equals":
       if (textMatchType === "partial") {
-        return { queryType: "match", value: matchValue };
+        return [
+          { queryOperator: "must", queryType: "match", value: matchValue }
+        ];
       } else {
-        return { queryType: "term", value: matchValue };
+        return [
+          { queryOperator: "must", queryType: "term", value: matchValue }
+        ];
       }
 
     // Not equals match type.
     case "notEquals":
-      return { queryType: "exists" };
+      return [
+        { queryOperator: "must_not", queryType: "term", value: matchValue }
+      ];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Default case
     default:
-      return { queryType: "match", value: matchValue };
+      return [{ queryOperator: "must", queryType: "match", value: matchValue }];
   }
 }

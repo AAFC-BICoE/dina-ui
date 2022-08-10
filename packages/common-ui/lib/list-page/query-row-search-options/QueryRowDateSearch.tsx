@@ -78,7 +78,7 @@ export default function QueryRowDateSearch({
  */
 export function transformDateSearchToDSL(
   queryRow: QueryRowExportProps
-): ElasticSearchQueryParams {
+): ElasticSearchQueryParams[] {
   const { matchType, date } = queryRow;
 
   switch (matchType) {
@@ -88,26 +88,29 @@ export function transformDateSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return {
-        queryType: "range",
-        value: buildDateRangeObject(matchType, date)
-      };
+      return [
+        {
+          queryOperator: "must",
+          queryType: "range",
+          value: buildDateRangeObject(matchType, date)
+        }
+      ];
 
     // Not equals match type.
     case "notEquals":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Equals and default case
     default:
-      return { queryType: "term", value: date };
+      return [{ queryOperator: "must", queryType: "term", value: date }];
   }
 }
 

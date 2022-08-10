@@ -281,7 +281,118 @@ describe("Transform to DSL query function", () => {
     });
   });
 
-  it("Boolean DSL query generation", async () => {
+  it("Text Search DSL query generation", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "partial"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "exact"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "notEmpty"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "empty"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "partial",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "exact",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "notEmpty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "empty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure boolean DSL query generation matches what is expected.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              match: {
+                "data.attributes.materialSampleName": "test"
+              }
+            },
+            {
+              term: {
+                "data.attributes.materialSampleName": "test"
+              }
+            },
+            {
+              exists: {
+                field: "data.attributes.materialSampleName"
+              }
+            },
+            {
+              term: {
+                "data.attributes.materialSampleName": "NULL"
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("Boolean Search DSL query generation", async () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "",
       queryRows: [
