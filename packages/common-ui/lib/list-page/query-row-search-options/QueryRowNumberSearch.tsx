@@ -74,7 +74,7 @@ export default function QueryRowNumberSearch({
  */
 export function transformNumberSearchToDSL(
   queryRow: QueryRowExportProps
-): ElasticSearchQueryParams {
+): ElasticSearchQueryParams[] {
   const { matchType, number: numberValue } = queryRow;
 
   switch (matchType) {
@@ -83,26 +83,29 @@ export function transformNumberSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return {
-        queryType: "range",
-        value: buildNumberRangeObject(matchType, numberValue)
-      };
+      return [
+        {
+          queryOperator: "must",
+          queryType: "range",
+          value: buildNumberRangeObject(matchType, numberValue)
+        }
+      ];
 
     // Not equals match type.
     case "notEquals":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return { queryType: "exists" };
+      return [{ queryOperator: "must", queryType: "exists" }];
 
     // Equals and default case
     default:
-      return { queryType: "term", value: numberValue };
+      return [{ queryOperator: "must", queryType: "term", value: numberValue }];
   }
 }
 

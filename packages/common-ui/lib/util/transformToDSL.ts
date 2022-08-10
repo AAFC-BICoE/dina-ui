@@ -7,7 +7,6 @@ import { TableColumn } from "../list-page/types";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
-import { valueContainerCSS } from "react-select/dist/declarations/src/components/containers";
 
 export interface ElasticSearchQueryParams {
   queryOperator: "must" | "should" | "must_not" | "filter";
@@ -68,6 +67,17 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     return;
   }
 
+  /**
+   * Depending on the data type of the field selected, the query will be transformed to elastic
+   * search DSL. This is done by calling the appropriate function which can be found on each
+   * QuerySearch component.
+   *
+   * For example, the QueryRowBooleanSearch component will transform the query to elastic search DSL
+   * for boolean types.
+   *
+   * @param queryRow The query row options the user has selected.
+   * @returns
+   */
   function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams[] {
     switch (queryRow.type) {
       // Boolean type
@@ -100,6 +110,60 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   /**
+   * There are certain cases where the query should not be performed. For example, if you are
+   * searching on a text type, but the user has not entered any text, then the query should not be
+   * performed.
+   *
+   * The empty search should be used in these cases. In those cases the query should be performed
+   * even if the value is empty.
+   *
+   * @param queryRow The query row options the user has selected.
+   * @returns true if the query should be added to the query DSL. False if it should be ignored.
+   */
+  function shouldQueryRowBeIncluded(queryRow): boolean {
+    // If no field name is selected, it should be ignored.
+    if (!queryRow.fieldName) {
+      return false;
+    }
+
+    // If the match type is empty or not empty, then the search query should be included always.
+    if (queryRow.matchType === "empty" || queryRow.matchType === "not_empty") {
+      return true;
+    }
+
+    // If the field is a number type, do not perform the search if the number value is empty.
+    if (
+      (queryRow.type === "long" ||
+        queryRow.type === "short" ||
+        queryRow.type === "integer" ||
+        queryRow.type === "byte" ||
+        queryRow.type === "double" ||
+        queryRow.type === "float" ||
+        queryRow.type === "half_float" ||
+        queryRow.type === "scaled_float" ||
+        queryRow.type === "unsigned_long") &&
+      !queryRow.number
+    ) {
+      return false;
+    }
+
+    // If the field is a date type, do not perform the search if the date value is empty.
+    if (queryRow.type === "date" && !queryRow.date) {
+      return false;
+    }
+
+    // If the field is a text type, do not perform the search if the text value is empty.
+    if (
+      (queryRow.type === "text" || queryRow.type === "keyword") &&
+      !queryRow.matchValue
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Used for generated the included section of the query. If using a field directly on the index,
    * the buildQuery() function should be used instead.
    *
@@ -109,53 +173,47 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     const queryParams: ElasticSearchQueryParams[] =
       buildInnerQueryBasedOnType(rowToBuild);
 
-    queryParams.forEach(queryParam => {
-      switch (queryParam.queryOperator) {
-        case "must":
-          builder.query("nested", { path: "included" }, queryBuilder => {
-            return queryBuilder
-              .andQuery("match", "included.type", rowToBuild.parentType)
-              .andQuery(
-                queryParam.queryType,
-                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-                queryParam.value
-              );
-          });
-          break;
-        case "should":
-          builder.query("nested", { path: "included" }, queryBuilder => {
-            return queryBuilder
-              .andQuery("match", "included.type", rowToBuild.parentType)
-              .orQuery(
-                queryParam.queryType,
-                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-                queryParam.value
-              );
-          });
-          break;
-        case "must_not":
-          builder.query("nested", { path: "included" }, queryBuilder => {
-            return queryBuilder
-              .andQuery("match", "included.type", rowToBuild.parentType)
-              .notQuery(
-                queryParam.queryType,
-                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-                queryParam.value
-              );
-          });
-          break;
-        case "filter":
-          builder.query("nested", { path: "included" }, queryBuilder => {
-            return queryBuilder
-              .andQuery("match", "included.type", rowToBuild.parentType)
-              .filter(
-                queryParam.queryType,
-                queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-                queryParam.value
-              );
-          });
-          break;
-      }
+    builder.query("nested", { path: "included" }, queryBuilder => {
+      queryParams.forEach(queryParam => {
+        const query = queryBuilder.andQuery(
+          "match",
+          "included.type",
+          rowToBuild.parentType
+        );
+
+        switch (queryParam.queryOperator) {
+          case "must":
+            query.andQuery(
+              queryParam.queryType,
+              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+              queryParam.value
+            );
+            break;
+          case "should":
+            query.orQuery(
+              queryParam.queryType,
+              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+              queryParam.value
+            );
+            break;
+          case "must_not":
+            query.notQuery(
+              queryParam.queryType,
+              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+              queryParam.value
+            );
+            break;
+          case "filter":
+            query.filter(
+              queryParam.queryType,
+              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
+              queryParam.value
+            );
+            break;
+        }
+
+        return query;
+      });
     });
   }
 
@@ -209,25 +267,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
   submittedValues?.queryRows
-    .filter(
-      queryRow =>
-        queryRow.fieldName &&
-        ((queryRow.type === "boolean" && queryRow.boolean) ||
-          ((queryRow.type === "long" ||
-            queryRow.type === "short" ||
-            queryRow.type === "integer" ||
-            queryRow.type === "byte" ||
-            queryRow.type === "double" ||
-            queryRow.type === "float" ||
-            queryRow.type === "half_float" ||
-            queryRow.type === "scaled_float" ||
-            queryRow.type === "unsigned_long") &&
-            queryRow.number) ||
-          (queryRow.type === "date" && queryRow.date) ||
-          ((queryRow.type === "text" || queryRow.type === "keyword") &&
-            queryRow.matchType &&
-            queryRow.matchValue))
-    )
+    .filter(queryRow => shouldQueryRowBeIncluded(queryRow))
     .map(queryRow => {
       if (queryRow.parentType) {
         buildRelationshipQuery(queryRow);

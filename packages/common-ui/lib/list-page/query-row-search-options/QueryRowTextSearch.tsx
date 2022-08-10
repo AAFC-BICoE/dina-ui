@@ -50,12 +50,13 @@ export default function QueryRowTextSearch({
       >
         {(matchType, _fields) => (
           <>
-            <TextField
-              name={fieldProps(queryBuilderName, "matchValue", index)}
-              className="me-1 flex-fill"
-              removeLabel={true}
-              readOnly={matchType === "empty" || matchType === "notEmpty"}
-            />
+            {(matchType === "equals" || matchType === "notEquals") && (
+              <TextField
+                name={fieldProps(queryBuilderName, "matchValue", index)}
+                className="me-1 flex-fill"
+                removeLabel={true}
+              />
+            )}
 
             {matchType === "equals" && (
               <ExactOrPartialSwitch
@@ -195,16 +196,24 @@ export function transformTextSearchToDSL(
     // Not equals match type.
     case "notEquals":
       return [
-        { queryOperator: "must_not", queryType: "term", value: matchValue }
+        { queryOperator: "must_not", queryType: "term", value: matchValue },
+        { queryOperator: "must", queryType: "exists" }
       ];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return [
+        { queryOperator: "must", queryType: "exists" },
+        { queryOperator: "must", queryType: "term", value: "" }
+      ];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return [
+        { queryOperator: "must", queryType: "exists" },
+        { queryOperator: "must_not", queryType: "term", value: "" },
+        { queryOperator: "must_not", queryType: "term", value: "NULL" }
+      ];
 
     // Default case
     default:
