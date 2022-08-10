@@ -34,6 +34,10 @@ const columnDefinitions: TableColumn<MaterialSample>[] = [
     isKeyword: true
   },
   {
+    label: "allowDuplicateName",
+    accessor: "data.attributes.allowDuplicateName"
+  },
+  {
     label: "collection.name",
     accessor: "included.attributes.name",
     isKeyword: true,
@@ -268,6 +272,156 @@ describe("Transform to DSL query function", () => {
                   format: "yyyy-MM-dd",
                   gte: "2022-04-13||/d",
                   lte: "2022-04-13||/d"
+                }
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("Boolean DSL query generation", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "equals"
+        },
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "notEmpty"
+        },
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "empty"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "equals",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "notEmpty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "empty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure boolean DSL query generation matches what is expected.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                "data.attributes.allowDuplicateName": "true"
+              }
+            },
+            {
+              exists: {
+                field: "data.attributes.allowDuplicateName"
+              }
+            },
+            {
+              term: {
+                "data.attributes.allowDuplicateName": "NULL"
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.allowDuplicateName": "true"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        exists: {
+                          field: "included.allowDuplicateName"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.allowDuplicateName": "NULL"
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             }
