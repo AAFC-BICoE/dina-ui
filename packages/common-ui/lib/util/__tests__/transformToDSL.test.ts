@@ -48,16 +48,16 @@ describe("Transform to DSL query function", () => {
       queryRows: [
         {
           fieldName: "data.attributes.materialSampleName",
-          type: "text",
-          textMatchType: "partial",
+          type: "keyword",
           matchType: "equals",
+          textMatchType: "exact",
           matchValue: "CNC001"
         },
         {
           fieldName: "data.attributes.materialSampleType",
           type: "text",
           matchType: "equals",
-          textMatchType: "exact",
+          textMatchType: "partial",
           matchValue: "WHOLE_ORGANISM"
         },
         {
@@ -128,7 +128,7 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          matchType: "greaterThanEqual",
+          matchType: "greaterThanOrEqualTo",
           date: "2022-04-12"
         },
         {
@@ -140,13 +140,13 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          matchType: "lessThanEqual",
+          matchType: "lessThanOrEqualTo",
           date: "2022-04-14"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          matchType: "equal",
+          matchType: "equals",
           date: "2022-04-15"
         }
       ]

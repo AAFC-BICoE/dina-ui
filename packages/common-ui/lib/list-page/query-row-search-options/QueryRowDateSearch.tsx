@@ -1,7 +1,8 @@
 import React from "react";
 import { DateField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps } from "../QueryRow";
+import { ElasticSearchQueryParams } from "../../util/transformToDSL";
+import { fieldProps, QueryRowExportProps } from "../QueryRow";
 
 /**
  * The match options when a date search is being performed.
@@ -67,4 +68,111 @@ export default function QueryRowDateSearch({
       </FieldSpy>
     </>
   );
+}
+
+/**
+ * Using the query row for a date search, generate the elastic search request to be made.
+ *
+ * @param builder The elastic search bodybuilder object.
+ * @param queryRow The query row to be used.
+ */
+export function transformDateSearchToDSL(
+  queryRow: QueryRowExportProps
+): ElasticSearchQueryParams {
+  const { matchType, date } = queryRow;
+
+  switch (matchType) {
+    // Contains / less than / greater than / less than or equal to / greater than or equal to.
+    case "contains":
+    case "greaterThan":
+    case "greaterThanOrEqualTo":
+    case "lessThan":
+    case "lessThanOrEqualTo":
+      return {
+        queryType: "range",
+        value: buildDateRangeObject(matchType, date)
+      };
+
+    // Not equals match type.
+    case "notEquals":
+      return { queryType: "exists" };
+
+    // Empty values only. (only if the value is not mandatory)
+    case "empty":
+      return { queryType: "exists" };
+
+    // Not empty values only. (only if the value is not mandatory)
+    case "notEmpty":
+      return { queryType: "exists" };
+
+    // Equals and default case
+    default:
+      return { queryType: "term", value: date };
+  }
+}
+
+/**
+ * Depending on the numerical match type, the search query changes.
+ *
+ * Equal is ignored here since it should not be handled like this.
+ *
+ * Contains is a special case since it is not a date match, it treats it as a range of dates. For
+ * example:
+ *
+ * "2022" will display all records that contain 2022 in the date field. So the following would be
+ * matched:
+ *    - 2022-01-01
+ *    - 2022-12-02
+ *    - 2022-05-19
+ *    - 2022-07
+ *    - 2022
+ *
+ * When using Equals to search for a date, the following would be matched for "2022":
+ *    - 2022
+ *
+ * @param matchType the operator type (example: greaterThan ---> gt)
+ * @param value The operator value to search against.
+ * @returns numerical operator and value.
+ */
+function buildDateRangeObject(matchType, value) {
+  switch (matchType) {
+    case "contains":
+      const YEAR_REGEX = /^\d{4}$/;
+      const MONTH_REGEX = /^\d{4}-\d{2}$/;
+
+      // Check if the value matches the year regex
+      if (YEAR_REGEX.test(value)) {
+        return {
+          gte: `${value}||/y`,
+          lte: `${value}||/y`,
+          format: "yyyy"
+        };
+      }
+
+      // Check if the value matches the month regex
+      if (MONTH_REGEX.test(value)) {
+        return {
+          gte: `${value}||/M`,
+          lte: `${value}||/M`,
+          format: "yyyy-MM"
+        };
+      }
+
+      // Otherwise just try to match the full date provided.
+      return {
+        gte: `${value}||/d`,
+        lte: `${value}||/d`,
+        format: "yyyy-MM-dd"
+      };
+    case "greaterThan":
+      return { gt: value };
+    case "greaterThanOrEqualTo":
+      return { gte: value };
+    case "lessThan":
+      return { lt: value };
+    case "lessThanOrEqualTo":
+      return { lte: value };
+    default:
+      return value;
+  }
 }

@@ -6,6 +6,7 @@ import { QueryRowExportProps } from "../list-page/QueryRow";
 import { TableColumn } from "../list-page/types";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
+import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
 
 export interface ElasticSearchQueryParams {
   queryType: string;
@@ -16,45 +17,6 @@ export interface ElasticSearchQueryParams {
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
   group: string;
-}
-
-/**
- * Formik will store the values in different spots depending on the queryRow type.
- *
- * This helper function will retrieve the value based on the type.
- *
- * @param queryRow
- * @returns value based on the query row type.
- */
-export function getValueBasedOnType(queryRow) {
-  switch (queryRow.type) {
-    // Boolean type
-    case "boolean":
-      return queryRow.boolean;
-
-    // Number types
-    case "long":
-    case "short":
-    case "integer":
-    case "byte":
-    case "double":
-    case "float":
-    case "scaled_float":
-    case "unsigned_long":
-      return queryRow.number;
-
-    // Date type
-    case "date":
-      return queryRow.date;
-
-    // Text types
-    case "text":
-    case "keyword":
-      return queryRow.matchValue ?? "";
-
-    default:
-      return null;
-  }
 }
 
 /**
@@ -110,6 +72,20 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       case "boolean":
         return transformBooleanSearchToDSL(queryRow);
 
+      // Number types
+      case "long":
+      case "short":
+      case "integer":
+      case "byte":
+      case "double":
+      case "float":
+      case "scaled_float":
+      case "unsigned_long":
+
+      // Date type
+      case "date":
+        return transformDateSearchToDSL(queryRow);
+
       // Text types
       case "text":
       case "keyword":
@@ -118,72 +94,6 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       // Default just treat it like a text search.
       default:
         return transformTextSearchToDSL(queryRow);
-    }
-  }
-
-  /**
-   * Depending on the numerical match type, the search query changes.
-   *
-   * Equal is ignored here since it should not be handled like this.
-   *
-   * Contains is a special case since it is not a date match, it treats it as a range of dates. For
-   * example:
-   *
-   * "2022" will display all records that contain 2022 in the date field. So the following would be
-   * matched:
-   *    - 2022-01-01
-   *    - 2022-12-02
-   *    - 2022-05-19
-   *    - 2022-07
-   *    - 2022
-   *
-   * When using Equals to search for a date, the following would be matched for "2022":
-   *    - 2022
-   *
-   * @param matchType the operator type (example: greaterThan ---> gt)
-   * @param value The operator value to search against.
-   * @returns numerical operator and value.
-   */
-  function buildRangeObject(matchType, value) {
-    switch (matchType) {
-      case "contains":
-        const YEAR_REGEX = /^\d{4}$/;
-        const MONTH_REGEX = /^\d{4}-\d{2}$/;
-
-        // Check if the value matches the year regex
-        if (YEAR_REGEX.test(value)) {
-          return {
-            gte: `${value}||/y`,
-            lte: `${value}||/y`,
-            format: "yyyy"
-          };
-        }
-
-        // Check if the value matches the month regex
-        if (MONTH_REGEX.test(value)) {
-          return {
-            gte: `${value}||/M`,
-            lte: `${value}||/M`,
-            format: "yyyy-MM"
-          };
-        }
-
-        // Otherwise just try to match the full date provided.
-        return {
-          gte: `${value}||/d`,
-          lte: `${value}||/d`,
-          format: "yyyy-MM-dd"
-        };
-      case "greaterThan":
-        return { gt: value };
-      case "greaterThanEqual":
-        return { gte: value };
-      case "lessThan":
-        return { lt: value };
-      case "lessThanEqual":
-        return { lte: value };
-      default:
-        return value;
     }
   }
 

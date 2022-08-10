@@ -177,19 +177,15 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
 export function transformTextSearchToDSL(
   queryRow: QueryRowExportProps
 ): ElasticSearchQueryParams {
-  const { matchType, textMatchType, matchValue, fieldName, type } = queryRow;
+  const { matchType, textMatchType, matchValue } = queryRow;
 
   switch (matchType) {
     // Equals match type.
     case "equals":
-      if (textMatchType === "partial" && type !== "keyword") {
-        return { queryType: "match", fieldName, value: matchValue };
+      if (textMatchType === "partial") {
+        return { queryType: "match", value: matchValue };
       } else {
-        return {
-          queryType: "term",
-          fieldName: fieldName + ".keyword",
-          value: matchValue
-        };
+        return { queryType: "term", value: matchValue };
       }
 
     // Not equals match type.
@@ -206,6 +202,6 @@ export function transformTextSearchToDSL(
 
     // Default case
     default:
-      return { queryType: "match", fieldName, value: matchValue };
+      return { queryType: "match", value: matchValue };
   }
 }
