@@ -8,6 +8,7 @@ import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "./QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
+import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -121,12 +122,17 @@ export function QueryPage<TData extends KitsuResource>({
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
   const { groupNames, subject } = useAccount();
+  const [ selectionMode, setSelectionMode ] = useState<boolean>(false);
+
+  // The selected rMesources from the left table (displayed on the right table)
+  const [selectedResources, setSelectedResources] = useState<TData[]>([]);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
+
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
@@ -377,6 +383,61 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
+  const resultTable = <ReactTable
+  // Column and data props
+  columns={mappedColumns}
+  data={searchResults}
+  minRows={1}
+  // Loading Table props
+  loading={loading}
+  // Pagination props
+  manual={true}
+  pageSize={pagination.limit}
+  pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
+  page={pagination.offset / pagination.limit}
+  onPageChange={onPageChange}
+  onPageSizeChange={onPageSizeChange}
+  pageText={<CommonMessage id="page" />}
+  noDataText={<CommonMessage id="noRowsFound" />}
+  ofText={<CommonMessage id="of" />}
+  rowsText={formatMessage({ id: "rows" })}
+  previousText={<CommonMessage id="previous" />}
+  nextText={<CommonMessage id="next" />}
+  // Sorting props
+  onSortedChange={onSortChange}
+  sorted={sortingRules}
+  // Table customization props
+  {...resolvedReactTableProps}
+  className="-striped"
+  TbodyComponent={
+    error
+      ? () => (
+          <div
+            className="alert alert-danger"
+            style={{
+              whiteSpace: "pre-line"
+            }}
+          >
+            <p>
+              {error.errors?.map(e => e.detail).join("\n") ??
+                String(error)}
+            </p>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                const newSort = defaultSort ?? DEFAULT_SORT;
+                setError(undefined);
+                onSortChange(newSort);
+              }}
+            >
+              <CommonMessage id="resetSort" />
+            </button>
+          </div>
+        )
+      : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+  }
+/>
   /**
    * Reset the search filters to a blank state. Errors are also cleared since a new filter is being
    * performed.
@@ -459,6 +520,52 @@ export function QueryPage<TData extends KitsuResource>({
     setLoading(true);
   }
 
+  async function selectAllCheckedSamples(
+  //   formValues,
+  //   formik: FormikContextType<any>
+  ) {
+  //   const { sampleIdsToSelect } = formValues;
+  //   const ids = toPairs(sampleIdsToSelect)
+  //     .filter(pair => pair[1])
+  //     .map(pair => pair[0]);
+
+  //   const materialSamples = ids.map(id => ({
+  //     id,
+  //     type: "material-sample"
+  //   }));
+
+  //   await selectSamples(materialSamples);
+
+  //   formik.setFieldValue("sampleIdsToSelect", {});
+  }
+
+  async function deleteAllCheckedPcrBatchItems(
+  //   formValues,
+  //   formik: FormikContextType<any>
+  ) {
+  //   const { pcrBatchItemIdsToDelete } = formValues;
+
+  //   const ids = toPairs(pcrBatchItemIdsToDelete)
+  //     .filter(pair => pair[1])
+  //     .map(pair => pair[0]);
+
+  //   const pcrBatchItems = ids.map<KitsuResourceLink>(id => ({
+  //     id,
+  //     type: "pcr-batch-item"
+  //   }));
+
+  //   await deletePcrBatchItems(pcrBatchItems);
+
+  //   formik.setFieldValue("pcrBatchItemIdsToDelete", {});
+  // }
+
+  // return {
+  //   selectAllCheckedSamples,
+  //   deleteAllCheckedPcrBatchItems,
+  //   lastSave
+  // };
+  }
+
   return (
     <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
       <label
@@ -535,61 +642,33 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
           </div>
         </div>
-        <ReactTable
-          // Column and data props
-          columns={mappedColumns}
-          data={searchResults}
-          minRows={1}
-          // Loading Table props
-          loading={loading}
-          // Pagination props
-          manual={true}
-          pageSize={pagination.limit}
-          pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
-          page={pagination.offset / pagination.limit}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          pageText={<CommonMessage id="page" />}
-          noDataText={<CommonMessage id="noRowsFound" />}
-          ofText={<CommonMessage id="of" />}
-          rowsText={formatMessage({ id: "rows" })}
-          previousText={<CommonMessage id="previous" />}
-          nextText={<CommonMessage id="next" />}
-          // Sorting props
-          onSortedChange={onSortChange}
-          sorted={sortingRules}
-          // Table customization props
-          {...resolvedReactTableProps}
-          className="-striped"
-          TbodyComponent={
-            error
-              ? () => (
-                  <div
-                    className="alert alert-danger"
-                    style={{
-                      whiteSpace: "pre-line"
-                    }}
-                  >
-                    <p>
-                      {error.errors?.map(e => e.detail).join("\n") ??
-                        String(error)}
-                    </p>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        const newSort = defaultSort ?? DEFAULT_SORT;
-                        setError(undefined);
-                        onSortChange(newSort);
-                      }}
-                    >
-                      <CommonMessage id="resetSort" />
-                    </button>
-                  </div>
-                )
-              : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
-          }
-        />
+        <>
+        {selectionMode && (
+          <>
+            {resultTable}
+            <div>
+            <FormikButton
+              className="btn btn-primary w-100 mb-5 select-all-checked-button"
+              onClick={selectAllCheckedSamples}
+            >
+              <FiChevronsRight />
+            </FormikButton>
+            </div>
+            <div>
+            <FormikButton
+              className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
+              onClick={deleteAllCheckedPcrBatchItems}
+            >
+              <FiChevronsLeft />
+            </FormikButton>
+            </div>
+            <ReactTable/>
+          </>
+        ) : (
+          {resultTable}
+        )
+        )}
+        </>
       </div>
     </DinaForm>
   );
