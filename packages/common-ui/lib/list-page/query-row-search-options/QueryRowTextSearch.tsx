@@ -85,7 +85,7 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
       {({ value, setValue }) => {
         // Set the default to exact.
         if (value === undefined) {
-          setValue("exact");
+          setValue("partial");
         }
 
         return (
@@ -157,11 +157,18 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
 export function transformTextSearchToDSL(
   queryRow: QueryRowExportProps
 ): ElasticSearchQueryParams[] {
-  const { matchType, textMatchType, matchValue } = queryRow;
+  const { matchType, textMatchType, matchValue, distinctTerm } = queryRow;
 
   switch (matchType) {
     // Equals match type.
     case "equals":
+      // Autocompletion expects to use the full text search.
+      if (distinctTerm) {
+        return [
+          { queryOperator: "must", queryType: "term", value: matchValue }
+        ];
+      }
+
       if (textMatchType === "partial") {
         return [
           { queryOperator: "must", queryType: "match", value: matchValue }

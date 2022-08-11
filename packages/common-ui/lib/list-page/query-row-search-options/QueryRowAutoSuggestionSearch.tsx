@@ -4,6 +4,7 @@ import { ESIndexMapping } from "../types";
 import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
 import { AutoSuggestTextField } from "../../formik-connected/AutoSuggestTextField";
 import { SelectField } from "../../formik-connected/SelectField";
+import { FieldSpy } from "../..";
 
 /**
  * The match options when a suggestion text search is being performed.
@@ -63,27 +64,37 @@ export default function QueryRowAutoSuggestionTextSearch({
         removeLabel={true}
       />
 
-      <AutoSuggestTextField
-        name={fieldProps(queryBuilderName, "matchValue", index)}
-        removeLabel={true}
-        className="me-1 flex-fill"
-        blankSearchBackend={"preferred"}
-        customOptions={value =>
-          useElasticSearchDistinctTerm({
-            fieldName:
-              elasticSearchMapping?.parentPath +
-              "." +
-              elasticSearchMapping?.path +
-              "." +
-              elasticSearchMapping?.label,
-            groups: selectedGroups,
-            relationshipType: elasticSearchMapping?.parentType,
-            indexName
-          })?.filter(suggestion =>
-            suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+      {/* Depending on the matchType, it changes the rest of the query row. */}
+      <FieldSpy<string>
+        fieldName={fieldProps(queryBuilderName, "matchType", index)}
+      >
+        {(matchType, _fields) =>
+          matchType !== "empty" &&
+          matchType !== "notEmpty" && (
+            <AutoSuggestTextField
+              name={fieldProps(queryBuilderName, "matchValue", index)}
+              removeLabel={true}
+              className="me-1 flex-fill"
+              blankSearchBackend={"preferred"}
+              customOptions={value =>
+                useElasticSearchDistinctTerm({
+                  fieldName:
+                    elasticSearchMapping?.parentPath +
+                    "." +
+                    elasticSearchMapping?.path +
+                    "." +
+                    elasticSearchMapping?.label,
+                  groups: selectedGroups,
+                  relationshipType: elasticSearchMapping?.parentType,
+                  indexName
+                })?.filter(suggestion =>
+                  suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+                )
+              }
+            />
           )
         }
-      />
+      </FieldSpy>
     </>
   );
 }

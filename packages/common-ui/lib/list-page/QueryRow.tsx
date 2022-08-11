@@ -307,6 +307,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               indexName={indexName}
               queryBuilderName={name}
               index={index}
+              elasticSearchMapping={dataFromIndexMapping}
             />
           )}
 

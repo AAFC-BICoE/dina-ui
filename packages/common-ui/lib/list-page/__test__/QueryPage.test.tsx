@@ -502,7 +502,7 @@ describe("QueryPage component", () => {
                         }
                       },
                       {
-                        match: {
+                        term: {
                           "included.attributes.name.keyword": "Test value"
                         }
                       }
@@ -576,7 +576,7 @@ describe("QueryPage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the field value of the preparation type query. (Partial match version)
+    // Edit the field value of the preparation type query. (Partial match version (should be default option))
     wrapper
       .find("TextField[name='queryRows[0].matchValue']")
       .find("input")
@@ -602,11 +602,8 @@ describe("QueryPage component", () => {
       .find("input")
       .simulate("change", { target: { value: "Exact Match test" } });
 
-    // Change the match type to be "EXACT MATCH"
-    wrapper
-      .find("SelectField[name='queryRows[1].matchType']")
-      .find(Select)
-      .prop<any>("onChange")({ value: "term" });
+    // For this search, we will need to switch to the exact option.
+    wrapper.find(".exactSpan").at(1).simulate("click");
 
     mockPost.mockClear();
 

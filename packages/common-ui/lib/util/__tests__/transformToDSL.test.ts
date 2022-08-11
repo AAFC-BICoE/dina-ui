@@ -394,7 +394,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         match: {
-                          "included.name": "test"
+                          "included.attributes.name": "test"
                         }
                       }
                     ]
@@ -415,7 +415,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         term: {
-                          "included.name": "test"
+                          "included.attributes.name.keyword": "test"
                         }
                       }
                     ]
@@ -436,7 +436,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         wildcard: {
-                          "included.name": "*"
+                          "included.attributes.name": "*"
                         }
                       }
                     ]
@@ -457,7 +457,7 @@ describe("Transform to DSL query function", () => {
                     must_not: [
                       {
                         wildcard: {
-                          "included.name": "*"
+                          "included.attributes.name": "*"
                         }
                       }
                     ]
@@ -563,7 +563,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         term: {
-                          "included.allowDuplicateName": "true"
+                          "included.attributes.allowDuplicateName": "true"
                         }
                       }
                     ]
@@ -584,7 +584,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         exists: {
-                          field: "included.allowDuplicateName"
+                          field: "included.attributes.allowDuplicateName"
                         }
                       }
                     ]
@@ -605,7 +605,7 @@ describe("Transform to DSL query function", () => {
                     must_not: [
                       {
                         exists: {
-                          field: "included.allowDuplicateName"
+                          field: "included.attributes.allowDuplicateName"
                         }
                       }
                     ]
@@ -769,7 +769,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         term: {
-                          "included.number9": "12345"
+                          "included.attributes.number9": "12345"
                         }
                       }
                     ]
@@ -790,7 +790,7 @@ describe("Transform to DSL query function", () => {
                       },
                       {
                         exists: {
-                          field: "included.number10"
+                          field: "included.attributes.number10"
                         }
                       }
                     ]
@@ -811,7 +811,7 @@ describe("Transform to DSL query function", () => {
                     must_not: [
                       {
                         exists: {
-                          field: "included.number11"
+                          field: "included.attributes.number11"
                         }
                       }
                     ]

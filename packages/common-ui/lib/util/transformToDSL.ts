@@ -49,9 +49,13 @@ export function getFieldName(queryRow) {
 export function getRelationshipFieldName(queryRow) {
   const newFieldName =
     queryRow.parentPath +
-    "." +
+    ".attributes." +
     queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-  if (queryRow.matchType === "keyword" || queryRow?.distinctTerm)
+  if (
+    queryRow.matchType === "keyword" ||
+    queryRow?.distinctTerm ||
+    queryRow.textMatchType === "exact"
+  )
     return newFieldName + ".keyword";
   return newFieldName;
 }
