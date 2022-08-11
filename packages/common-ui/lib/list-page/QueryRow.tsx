@@ -42,7 +42,16 @@ export interface QueryRowExportProps {
    * Possible Options: "equals", "contains", "notEquals", "empty", "notEmpty", "greaterThan",
    *                   "lessThan", "greaterThanOrEqualTo", "lessThanOrEqualTo"
    */
-  matchType?: string;
+  matchType?:
+    | "equals"
+    | "contains"
+    | "notEquals"
+    | "empty"
+    | "notEmpty"
+    | "greaterThan"
+    | "lessThan"
+    | "greaterThanOrEqualTo"
+    | "lessThanOrEqualTo";
 
   /**
    * For text based searches you can change the match type to show only when the search is exactly
@@ -50,14 +59,14 @@ export interface QueryRowExportProps {
    *
    * Possible Options: "exact" and "partial".
    */
-  textMatchType?: string;
+  textMatchType?: "exact" | "partial";
 
   /**
    * Currently, only "and" is supported. In the future, "or" can be selected.
    *
    * Possible Options: "and" and "or".
    */
-  compoundQueryType?: string;
+  compoundQueryType?: "and" | "or";
 
   /**
    * When searching numbers, the value will be stored here. Only if the type is "number".
@@ -76,8 +85,6 @@ export interface QueryRowExportProps {
 
   /**
    * Based on the field selected, the type of that field is stored here.
-   *
-   * Possible Options: "string", "number", "date", "boolean", "distinct"
    */
   type?: string;
 

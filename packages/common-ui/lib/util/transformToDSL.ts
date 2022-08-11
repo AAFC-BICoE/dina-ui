@@ -10,7 +10,7 @@ import { transformDateSearchToDSL } from "../list-page/query-row-search-options/
 
 export interface ElasticSearchQueryParams {
   queryOperator: "must" | "should" | "must_not" | "filter";
-  queryType: "match" | "term" | "range" | "exists";
+  queryType: "match" | "term" | "range" | "exists" | "wildcard" | "regexp";
   fieldName?: string;
   value?: any;
 }
@@ -127,7 +127,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     }
 
     // If the match type is empty or not empty, then the search query should be included always.
-    if (queryRow.matchType === "empty" || queryRow.matchType === "not_empty") {
+    if (queryRow.matchType === "empty" || queryRow.matchType === "notEmpty") {
       return true;
     }
 

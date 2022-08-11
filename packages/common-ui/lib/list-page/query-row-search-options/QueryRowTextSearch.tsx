@@ -62,7 +62,7 @@ export default function QueryRowTextSearch({
               <ExactOrPartialSwitch
                 name={fieldProps(queryBuilderName, "textMatchType", index)}
                 removeLabel={true}
-                className={"compoundQueryType" + index}
+                className={"textMatchType" + index}
               />
             )}
           </>
@@ -79,50 +79,25 @@ export default function QueryRowTextSearch({
  */
 function ExactOrPartialSwitch(queryLogicSwitchProps) {
   const { formatMessage } = useIntl();
-  const [backClassName, setBackClassName] = useState({
-    exact: "selected-logic",
-    partial: "not-selected-logic"
-  });
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  function onSwitchClicked(logicName, fieldName, formik) {
-    switch (logicName) {
-      case "exact": {
-        if (inputRef && inputRef.current) {
-          formik.setFieldValue(fieldName, "exact");
-        }
-        return setBackClassName({
-          exact: "selected-logic",
-          partial: "not-selected-logic"
-        });
-      }
-
-      case "partial": {
-        if (inputRef && inputRef.current) {
-          formik.setFieldValue(fieldName, "partial");
-          inputRef.current.value = "partial";
-        }
-        return setBackClassName({
-          exact: "not-selected-logic",
-          partial: "selected-logic"
-        });
-      }
-    }
-  }
 
   return (
     <FieldWrapper {...queryLogicSwitchProps}>
-      {({ formik, value }) => (
-        <div
-          className="d-flex me-2"
-          style={{
-            height: "2.3em",
-            borderRadius: "5px"
-          }}
-        >
-          <style>
-            {`
+      {({ value, setValue }) => {
+        // Set the default to exact.
+        if (value === undefined) {
+          setValue("exact");
+        }
+
+        return (
+          <div
+            className="d-flex me-2"
+            style={{
+              height: "2.3em",
+              borderRadius: "5px"
+            }}
+          >
+            <style>
+              {`
               .selected-logic {
                 background-color: #008cff;
                 color: white;
@@ -131,40 +106,44 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
                 background-color: #DCDCDC;
               }
             `}
-          </style>
-          <span
-            className={`${backClassName.exact} py-2 px-3 exactSpan`}
-            onClick={() =>
-              onSwitchClicked("exact", queryLogicSwitchProps.name, formik)
-            }
-            style={{
-              borderRadius: "5px 0 0 5px",
-              borderRight: "1px",
-              cursor: "pointer"
-            }}
-          >
-            {formatMessage({ id: "Exact" })}
-          </span>
-          <span
-            className={`${backClassName.partial} py-2 px-3 partialSpan`}
-            onClick={() =>
-              onSwitchClicked("partial", queryLogicSwitchProps.name, formik)
-            }
-            style={{
-              borderRadius: "0 5px 5px 0",
-              cursor: "pointer"
-            }}
-          >
-            {formatMessage({ id: "Partial" })}
-          </span>
-          <input
-            name={queryLogicSwitchProps.name}
-            value={value}
-            type="hidden"
-            ref={inputRef}
-          />
-        </div>
-      )}
+            </style>
+            <span
+              className={`py-2 px-3 exactSpan ${
+                value === "exact" ? "selected-logic" : "not-selected-logic"
+              }`}
+              onClick={() => {
+                setValue("exact");
+              }}
+              style={{
+                borderRadius: "5px 0 0 5px",
+                borderRight: "1px",
+                cursor: "pointer"
+              }}
+            >
+              {formatMessage({ id: "exact" })}
+            </span>
+            <span
+              className={`py-2 px-3 partialSpan ${
+                value === "partial" ? "selected-logic" : "not-selected-logic"
+              }`}
+              onClick={() => {
+                setValue("partial");
+              }}
+              style={{
+                borderRadius: "0 5px 5px 0",
+                cursor: "pointer"
+              }}
+            >
+              {formatMessage({ id: "partial" })}
+            </span>
+            <input
+              name={queryLogicSwitchProps.name}
+              value={value}
+              type="hidden"
+            />
+          </div>
+        );
+      }}
     </FieldWrapper>
   );
 }
@@ -196,24 +175,16 @@ export function transformTextSearchToDSL(
     // Not equals match type.
     case "notEquals":
       return [
-        { queryOperator: "must_not", queryType: "term", value: matchValue },
-        { queryOperator: "must", queryType: "exists" }
+        { queryOperator: "must_not", queryType: "term", value: matchValue }
       ];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [
-        { queryOperator: "must", queryType: "exists" },
-        { queryOperator: "must", queryType: "term", value: "" }
-      ];
+      return [{ queryOperator: "must_not", queryType: "wildcard", value: "*" }];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [
-        { queryOperator: "must", queryType: "exists" },
-        { queryOperator: "must_not", queryType: "term", value: "" },
-        { queryOperator: "must_not", queryType: "term", value: "NULL" }
-      ];
+      return [{ queryOperator: "must", queryType: "wildcard", value: "*" }];
 
     // Default case
     default:
