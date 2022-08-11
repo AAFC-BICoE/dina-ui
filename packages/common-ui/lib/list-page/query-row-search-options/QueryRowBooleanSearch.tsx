@@ -83,7 +83,7 @@ export function transformBooleanSearchToDSL(
   switch (matchType) {
     // Empty for the boolean.
     case "empty":
-      return [{ queryOperator: "must", queryType: "term", value: "NULL" }];
+      return [{ queryOperator: "must_not", queryType: "exists" }];
 
     // Not Empty for the boolean.
     case "notEmpty":
