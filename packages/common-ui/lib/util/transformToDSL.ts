@@ -7,6 +7,7 @@ import { TableColumn } from "../list-page/types";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
+import { transformNumberSearchToDSL } from "../list-page/query-row-search-options/QueryRowNumberSearch";
 
 export interface ElasticSearchQueryParams {
   queryOperator: "must" | "should" | "must_not" | "filter";
@@ -93,6 +94,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       case "float":
       case "scaled_float":
       case "unsigned_long":
+        return transformNumberSearchToDSL(queryRow);
 
       // Date type
       case "date":

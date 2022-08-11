@@ -93,11 +93,13 @@ export function transformNumberSearchToDSL(
 
     // Not equals match type.
     case "notEquals":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return [
+        { queryOperator: "must_not", queryType: "term", value: numberValue }
+      ];
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return [{ queryOperator: "must_not", queryType: "exists" }];
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
