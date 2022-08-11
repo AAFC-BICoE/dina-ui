@@ -44,7 +44,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_IDS_KEY } from "../upload";
 import { PersistedResource } from "kitsu";
 import moment from "moment";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 
 interface SingleMetadataFormProps {
   metadata: Metadata;
@@ -62,6 +62,12 @@ export default function MetadataEditPage() {
   const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
 
   const group = router?.query?.group as string;
+  const [metadata, setMetadata] = useState<Metadata>();
+  useEffect(() => {
+    loadData().then(value => {
+      setMetadata(value);
+    });
+  }, []);
 
   async function loadData() {
     let objectUploads: PersistedResource<ObjectUpload>[] = [];
@@ -111,8 +117,6 @@ export default function MetadataEditPage() {
     return newMetadatas[0];
   }
 
-  const uploadMetadata = loadData();
-
   return (
     <div>
       <Head title={formatMessage("editMetadataTitle")} />
@@ -128,8 +132,9 @@ export default function MetadataEditPage() {
             ))}
           </div>
         ) : (
-          <SingleMetadataForm metadata={uploadMetadata} router={router} />
+          metadata && <SingleMetadataForm metadata={metadata} router={router} />
         )}
+        <LoadingSpinner loading={!!!metadata} />
       </main>
       <Footer />
     </div>
@@ -170,7 +175,9 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
-        <MetadataFileView metadata={metadata} imgHeight="15rem" />
+        {metadata.derivatives && (
+          <MetadataFileView metadata={metadata} imgHeight="15rem" />
+        )}
       </div>
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
