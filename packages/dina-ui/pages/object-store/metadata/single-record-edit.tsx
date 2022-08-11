@@ -134,7 +134,6 @@ export default function MetadataEditPage() {
         ) : (
           metadata && <SingleMetadataForm metadata={metadata} router={router} />
         )}
-        <LoadingSpinner loading={!!!metadata} />
       </main>
       <Footer />
     </div>
@@ -159,8 +158,10 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const metadataSaveHook = useMetadataSave(initialValues);
   const { onSubmit } = metadataSaveHook;
   const singleEditOnSubmit = async submittedValues => {
-    await onSubmit(submittedValues);
-    await router?.push(`/object-store/object/view?id=${id}`);
+    const submittedMetadata = await onSubmit(submittedValues);
+    await router?.push(
+      `/object-store/object/view?id=${submittedMetadata[0].id}`
+    );
   };
 
   const buttonBar = (
