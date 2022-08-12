@@ -643,30 +643,31 @@ export function QueryPage<TData extends KitsuResource>({
           </div>
         </div>
         <>
-        {selectionMode && (
+        {selectionMode ? (
           <>
             {resultTable}
-            <div>
-            <FormikButton
-              className="btn btn-primary w-100 mb-5 select-all-checked-button"
-              onClick={selectAllCheckedSamples}
-            >
-              <FiChevronsRight />
-            </FormikButton>
-            </div>
-            <div>
-            <FormikButton
-              className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
-              onClick={deleteAllCheckedPcrBatchItems}
-            >
-              <FiChevronsLeft />
-            </FormikButton>
+            <div className="col-2" style={{ marginTop: "100px" }}>
+              <div>
+              <FormikButton
+                className="btn btn-primary w-100 mb-5 select-all-checked-button"
+                onClick={selectAllCheckedSamples}
+              >
+                <FiChevronsRight />
+              </FormikButton>
+              </div>
+              <div>
+              <FormikButton
+                className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
+                onClick={deleteAllCheckedPcrBatchItems}
+              >
+                <FiChevronsLeft />
+              </FormikButton>
+              </div>
             </div>
             <ReactTable/>
           </>
         ) : (
           {resultTable}
-        )
         )}
         </>
       </div>

@@ -11,7 +11,8 @@ import {
   useApiClient,
   useGroupedCheckBoxes,
   useQuery,
-  withResponse
+  withResponse,
+  QueryPage
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
@@ -197,12 +198,21 @@ export function SangerSampleSelectionStep({
               pcrBatchItemIdsToDelete: {}
             }}
           >
+            {/* <QueryPage
+          indexName={"dina_material_sample_index"}
+          columns={columns}
+          bulkDeleteButtonProps={{
+            typeName: "material-sample",
+            apiBaseUrl: "/collection-api"
+          }}
+          bulkEditPath="/collection/material-sample/bulk-edit"
+        /> */}
             <div className="row">
               <div className="col-5 available-samples">
                 <strong>
                   <SeqdbMessage id="availableMaterialSamplesTitle" />
                 </strong>
-                <QueryTable
+                {/* <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   defaultPageSize={100}
                   filter={
@@ -212,9 +222,9 @@ export function SangerSampleSelectionStep({
                   reactTableProps={{ sortable: false }}
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="collection-api/material-sample"
-                />
+                /> */}
               </div>
-              <div className="col-2" style={{ marginTop: "100px" }}>
+              {/* <div className="col-2" style={{ marginTop: "100px" }}>
                 <div>
                   <FormikButton
                     className="btn btn-primary w-100 mb-5 select-all-checked-button"
@@ -232,7 +242,7 @@ export function SangerSampleSelectionStep({
                   </FormikButton>
                 </div>
               </div>
-              <div className="col-5 selected-samples">{selectedItemsTable}</div>
+              <div className="col-5 selected-samples">{selectedItemsTable}</div> */}
             </div>
           </DinaForm>
         </div>
