@@ -47,7 +47,9 @@ const SOURCE_FILTERS: string[] = [
   "data.type",
   "data.attributes.materialSampleName",
   "data.attributes.materialSampleType",
-  "included.attributes.name"
+  "included.attributes.name",
+  "included.id",
+  "included.type"
 ];
 
 describe("Transform to DSL query function", () => {
