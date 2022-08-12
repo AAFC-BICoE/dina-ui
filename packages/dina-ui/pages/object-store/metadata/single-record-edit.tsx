@@ -117,13 +117,15 @@ export default function MetadataEditPage() {
     return newMetadatas[0];
   }
 
+  const title = id ? "editMetadataTitle" : "addMetadataTitle";
+
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
         <h1 id="wb-cont">
-          <DinaMessage id="editMetadataTitle" />
+          <DinaMessage id={title} />
         </h1>
         {id ? (
           <div>
