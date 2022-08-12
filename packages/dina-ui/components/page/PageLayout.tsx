@@ -1,4 +1,4 @@
-import { TooltipProps, Tooltip } from "packages/common-ui/lib";
+import { TooltipProps, Tooltip } from "common-ui";
 import { Footer, Head, Nav } from "../../components";
 import { startCase } from "lodash";
 import { useIntl } from "react-intl";
