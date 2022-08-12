@@ -10,9 +10,22 @@ import { useMetadataSave } from "../object-store/metadata/useMetadata";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
-  onSaved: (samples: PersistedResource<Metadata>[]) => Promisable<void>;
+  onSaved: (metadatas: PersistedResource<Metadata>[]) => Promisable<void>;
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
+}
+function getMetadataHooks(metadatas) {
+  return metadatas.map((resource, index) => {
+    const key = `metadata-${index}`;
+    return {
+      key,
+      resource,
+      saveHook: useMetadataSave({
+        initialValues: resource
+      }),
+      formRef: useRef(null)
+    };
+  });
 }
 
 export function MetadataBulkEditor({
@@ -37,5 +50,7 @@ MetadataBulkEditorProps) {
   });
 
   const bulkEditFormRef = useRef<FormikProps<InputResource<Metadata>>>(null);
+
+  const metadataHooks = getMetadataHooks(metadatas);
   return <div>MetadataBulkEditor</div>;
 }
