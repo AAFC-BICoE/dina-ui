@@ -34,6 +34,10 @@ const columnDefinitions: TableColumn<MaterialSample>[] = [
     isKeyword: true
   },
   {
+    label: "allowDuplicateName",
+    accessor: "data.attributes.allowDuplicateName"
+  },
+  {
     label: "collection.name",
     accessor: "included.attributes.name",
     isKeyword: true,
@@ -49,25 +53,27 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
-          matchType: "term",
+          matchType: "equals",
+          textMatchType: "exact",
           matchValue: "CNC001"
         },
         {
           fieldName: "data.attributes.materialSampleType",
           type: "text",
-          matchType: "match",
+          matchType: "equals",
+          textMatchType: "partial",
           matchValue: "WHOLE_ORGANISM"
         },
         {
           fieldName: "data.attributes.allowDuplicateName",
           type: "boolean",
           boolean: "true",
-          matchType: "match"
+          matchType: "equals"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          matchType: "match",
+          matchType: "equals",
           date: "2022-04-11"
         }
       ]
@@ -120,31 +126,31 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "greaterThan",
+          matchType: "greaterThan",
           date: "2022-04-11"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "greaterThanEqual",
+          matchType: "greaterThanOrEqualTo",
           date: "2022-04-12"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "lessThan",
+          matchType: "lessThan",
           date: "2022-04-13"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "lessThanEqual",
+          matchType: "lessThanOrEqualTo",
           date: "2022-04-14"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "equal",
+          matchType: "equals",
           date: "2022-04-15"
         }
       ]
@@ -210,19 +216,19 @@ describe("Transform to DSL query function", () => {
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022-04"
         },
         {
           fieldName: "data.attributes.createdOn",
           type: "date",
-          numericalMatchType: "contains",
+          matchType: "contains",
           date: "2022-04-13"
         }
       ]
@@ -267,6 +273,562 @@ describe("Transform to DSL query function", () => {
                   gte: "2022-04-13||/d",
                   lte: "2022-04-13||/d"
                 }
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("Text Search DSL query generation", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "partial"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "exact"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "notEmpty"
+        },
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "empty"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "partial",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "equals",
+          textMatchType: "exact",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "notEmpty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.name",
+          type: "text",
+          matchValue: "test",
+          matchType: "empty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure boolean DSL query generation matches what is expected.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              match: {
+                "data.attributes.materialSampleName": "test"
+              }
+            },
+            {
+              term: {
+                "data.attributes.materialSampleName.keyword": "test"
+              }
+            },
+            {
+              wildcard: {
+                "data.attributes.materialSampleName": "*"
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        match: {
+                          "included.attributes.name": "test"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.attributes.name.keyword": "test"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        wildcard: {
+                          "included.attributes.name": "*"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: {
+                      match: {
+                        "included.type": "collection"
+                      }
+                    },
+                    must_not: [
+                      {
+                        wildcard: {
+                          "included.attributes.name": "*"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          must_not: [
+            {
+              wildcard: {
+                "data.attributes.materialSampleName": "*"
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("Boolean Search DSL query generation", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "equals"
+        },
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          matchType: "notEmpty"
+        },
+        {
+          fieldName: "data.attributes.allowDuplicateName",
+          type: "boolean",
+          matchType: "empty"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          boolean: "true",
+          matchType: "equals",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          matchType: "notEmpty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.allowDuplicateName",
+          type: "boolean",
+          matchType: "empty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure boolean DSL query generation matches what is expected.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                "data.attributes.allowDuplicateName": "true"
+              }
+            },
+            {
+              exists: {
+                field: "data.attributes.allowDuplicateName"
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.attributes.allowDuplicateName": "true"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        exists: {
+                          field: "included.attributes.allowDuplicateName"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: {
+                      match: {
+                        "included.type": "collection"
+                      }
+                    },
+                    must_not: [
+                      {
+                        exists: {
+                          field: "included.attributes.allowDuplicateName"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          must_not: [
+            {
+              exists: {
+                field: "data.attributes.allowDuplicateName"
+              }
+            }
+          ]
+        }
+      }
+    });
+  });
+
+  it("Number Search DSL query generation", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.number1",
+          type: "byte",
+          number: "1",
+          matchType: "equals"
+        },
+        {
+          fieldName: "data.attributes.number2",
+          type: "integer",
+          number: "1",
+          matchType: "notEquals"
+        },
+        {
+          fieldName: "data.attributes.number3",
+          type: "short",
+          number: "22",
+          matchType: "greaterThan"
+        },
+        {
+          fieldName: "data.attributes.number4",
+          type: "long",
+          number: "333",
+          matchType: "greaterThanOrEqualTo"
+        },
+        {
+          fieldName: "data.attributes.number5",
+          type: "float",
+          number: "4444.3",
+          matchType: "lessThan"
+        },
+        {
+          fieldName: "data.attributes.number6",
+          type: "double",
+          number: "5555.5",
+          matchType: "lessThanOrEqualTo"
+        },
+        {
+          fieldName: "data.attributes.number7",
+          type: "integer",
+          matchType: "notEmpty"
+        },
+        {
+          fieldName: "data.attributes.number8",
+          type: "integer",
+          matchType: "empty"
+        },
+        {
+          fieldName: "collection.number9",
+          type: "integer",
+          number: "12345",
+          matchType: "equals",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.number10",
+          type: "integer",
+          matchType: "notEmpty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        },
+        {
+          fieldName: "collection.number11",
+          type: "integer",
+          matchType: "empty",
+          parentName: "collection",
+          parentType: "collection",
+          parentPath: "included"
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // Ensure boolean DSL query generation matches what is expected.
+    expect(dsl).toEqual({
+      size: DEFAULT_LIMIT,
+      from: DEFAULT_OFFSET,
+      query: {
+        bool: {
+          must: [
+            {
+              term: {
+                "data.attributes.number1": "1"
+              }
+            },
+            {
+              range: {
+                "data.attributes.number3": {
+                  gt: "22"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.number4": {
+                  gte: "333"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.number5": {
+                  lt: "4444.3"
+                }
+              }
+            },
+            {
+              range: {
+                "data.attributes.number6": {
+                  lte: "5555.5"
+                }
+              }
+            },
+            {
+              exists: {
+                field: "data.attributes.number7"
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        term: {
+                          "included.attributes.number9": "12345"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        match: {
+                          "included.type": "collection"
+                        }
+                      },
+                      {
+                        exists: {
+                          field: "included.attributes.number10"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: {
+                      match: {
+                        "included.type": "collection"
+                      }
+                    },
+                    must_not: [
+                      {
+                        exists: {
+                          field: "included.attributes.number11"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ],
+          must_not: [
+            {
+              term: {
+                "data.attributes.number2": "1"
+              }
+            },
+            {
+              exists: {
+                field: "data.attributes.number8"
               }
             }
           ]
@@ -394,6 +956,53 @@ describe("Transform to DSL query function", () => {
           }
         }
       ]
+    });
+  });
+
+  it("Empty values should not generate any queries", async () => {
+    const submittedValues: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "keyword",
+          matchType: "equals",
+          textMatchType: "exact",
+          matchValue: ""
+        },
+        {
+          fieldName: "data.attributes.materialSampleType",
+          type: "text",
+          matchType: "equals",
+          textMatchType: "partial",
+          matchValue: ""
+        },
+        {
+          fieldName: "data.attributes.createdOn",
+          type: "date",
+          matchType: "equals",
+          date: ""
+        },
+        {
+          fieldName: "data.attributes.version",
+          type: "integer",
+          matchType: "equals",
+          number: ""
+        }
+      ]
+    };
+
+    const dsl = transformQueryToDSL(
+      defaultPagination,
+      columnDefinitions,
+      defaultSorting,
+      submittedValues
+    );
+
+    // None of the above should have generated any queries.
+    expect(dsl).toEqual({
+      from: DEFAULT_OFFSET,
+      size: DEFAULT_LIMIT
     });
   });
 });
