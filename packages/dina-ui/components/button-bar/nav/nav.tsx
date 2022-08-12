@@ -16,7 +16,12 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-export function Nav() {
+export interface NavProps {
+  // Temporary prop for transitioning all pages to use the new layout.
+  marginBottom?: boolean;
+}
+
+export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
 
@@ -30,7 +35,7 @@ export function Nav() {
     <>
       <SkipLinks />
 
-      <header className="mb-4">
+      <header className={marginBottom ? "mb-4" : undefined}>
         <Container fluid={true}>
           <Row xs={1} md={2} className="header-container row d-flex px-5">
             {/* Left section of the header */}
