@@ -29,7 +29,7 @@ export interface TransformQueryToDSLParams {
  * @returns the field name, with or without the .keyword property.
  */
 export function getFieldName(queryRow) {
-  if (queryRow.type === "keyword" || queryRow?.distinctTerm)
+  if (queryRow.textMatchType === "exact" || queryRow?.distinctTerm)
     return queryRow.fieldName + ".keyword";
   return queryRow.fieldName;
 }
@@ -51,11 +51,7 @@ export function getRelationshipFieldName(queryRow) {
     queryRow.parentPath +
     ".attributes." +
     queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-  if (
-    queryRow.matchType === "keyword" ||
-    queryRow?.distinctTerm ||
-    queryRow.textMatchType === "exact"
-  )
+  if (queryRow.textMatchType === "exact" || queryRow?.distinctTerm)
     return newFieldName + ".keyword";
   return newFieldName;
 }

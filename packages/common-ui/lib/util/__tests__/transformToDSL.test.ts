@@ -52,7 +52,7 @@ describe("Transform to DSL query function", () => {
       queryRows: [
         {
           fieldName: "data.attributes.materialSampleName",
-          type: "keyword",
+          type: "text",
           matchType: "equals",
           textMatchType: "exact",
           matchValue: "CNC001"
@@ -373,7 +373,7 @@ describe("Transform to DSL query function", () => {
             },
             {
               term: {
-                "data.attributes.materialSampleName": "test"
+                "data.attributes.materialSampleName.keyword": "test"
               }
             },
             {
