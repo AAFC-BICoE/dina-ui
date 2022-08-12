@@ -92,7 +92,7 @@ export interface PrepareMetadataSaveOperationParams {
   ) => Promise<InputResource<Metadata>>;
 }
 
-export function useMetadataSave(initialValues) {
+export function useMetadataSave({ initialValues }: UseMetadataSaveParams) {
   const { apiClient, save } = useApiClient();
   const {
     // Don't include derivatives in the form submission:
