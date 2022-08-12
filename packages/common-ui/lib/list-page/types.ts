@@ -129,21 +129,6 @@ export interface TypeVisibility {
 }
 
 /**
- * The Match Type values. This will be used for dropdown inputs.
- */
-export type QueryRowMatchValue = "match" | "term";
-
-/**
- * The Match Type labels. What will be displayed to the user.
- */
-export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-
-/**
- * Boolean values to be displayed in the dropdown.
- */
-export type QueryRowBooleanType = "TRUE" | "FALSE";
-
-/**
  * The types that will be considered a number and use the number type.
  */
 export type QueryRowNumberType =
