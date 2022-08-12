@@ -55,13 +55,23 @@ export default function UploadPage() {
       );
       deleteFromStorage(BULK_EDIT_IDS_KEY);
       writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
-      await router.push({
-        pathname: "/object-store/metadata/edit",
-        query: {
-          group,
-          ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
-        }
-      });
+      if (objectUploadIds.length === 1) {
+        await router.push({
+          pathname: "/object-store/metadata/single-record-edit",
+          query: {
+            group,
+            ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+          }
+        });
+      } else {
+        await router.push({
+          pathname: "/object-store/metadata/edit",
+          query: {
+            group,
+            ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+          }
+        });
+      }
     };
 
     if (Object.keys(objectUploadDuplicates)?.length === 0) {
