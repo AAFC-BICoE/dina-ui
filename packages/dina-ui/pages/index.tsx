@@ -224,7 +224,7 @@ export function Home() {
                     <SeqdbMessage id="sangerWorkflowListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-profile/list">
+                <Link href="/seqdb/thermocycler-profile/list">
                   <a>
                     <SeqdbMessage id="pcrProfileListTitle" />
                   </a>

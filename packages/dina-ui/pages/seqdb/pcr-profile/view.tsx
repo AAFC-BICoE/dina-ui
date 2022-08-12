@@ -15,7 +15,7 @@ export default function PcrProfileDetailsPage() {
         path: `seqdb-api/thermocycler-profile/${id}`,
         include: "region"
       })}
-      entityLink="/seqdb/pcr-profile"
+      entityLink="/seqdb/thermocycler-profile"
       type="thermocycler-profile"
       apiBaseUrl="/seqdb-api"
     />

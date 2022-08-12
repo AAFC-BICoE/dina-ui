@@ -22,7 +22,7 @@ const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
   groupCell("group"),
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/pcr-profile/view?id=${id}`}>
+      <Link href={`/seqdb/thermocycler-profile/view?id=${id}`}>
         <a>{name}</a>
       </Link>
     ),
@@ -42,7 +42,7 @@ export default function PcrProfileListPage() {
       <Head title={formatMessage("pcrProfileListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/pcr-profile" />
+        <CreateButton entityLink="/seqdb/thermocycler-profile" />
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
@@ -50,7 +50,7 @@ export default function PcrProfileListPage() {
         </h1>
         <ListPageLayout
           filterAttributes={PCRPROFILE_FILTER_ATTRIBUTES}
-          id="pcr-profile-list"
+          id="thermocycler-profile-list"
           queryTableProps={{
             columns: PCRPROFILE_TABLE_COLUMNS,
             include: "region",

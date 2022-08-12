@@ -1,7 +1,7 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
-import { PcrProfileEditPage } from "../../../../pages/seqdb/pcr-profile/edit";
+import { PcrProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
 
@@ -84,7 +84,7 @@ describe("PcrProfile edit page", () => {
       );
 
       // The user should be redirected to the new profile's details page.
-      expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
+      expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
       done();
     });
   });
@@ -194,7 +194,7 @@ describe("PcrProfile edit page", () => {
     );
 
     // The user should be redirected to the existing profile's details page.
-    expect(mockPush).lastCalledWith("/seqdb/pcr-profile/view?id=1");
+    expect(mockPush).lastCalledWith("/seqdb/thermocycler-profile/view?id=1");
   });
 });
 

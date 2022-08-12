@@ -1,4 +1,4 @@
-import PcrProfileDetailsPage from "../../../../pages/seqdb/pcr-profile/view";
+import PcrProfileDetailsPage from "../../../../pages/seqdb/thermocycler-profile/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
 

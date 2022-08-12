@@ -81,14 +81,14 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     );
 
     const newId = response[0].id;
-    await router.push(`/seqdb/pcr-profile/view?id=${newId}`);
+    await router.push(`/seqdb/thermocycler-profile/view?id=${newId}`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <BackButton entityId={id as string} entityLink="/seqdb/pcr-profile" />
+        <BackButton entityId={id as string} entityLink="/seqdb/thermocycler-profile" />
       </ButtonBar>
       <PcrProfileFormFields />
     </DinaForm>
@@ -110,7 +110,7 @@ export function PcrProfileFormFields() {
           className="col-md-2"
           name="region"
           filter={filterBy(["name"])}
-          label="Select Gene Region"
+          label="Gene Region"
           model="seqdb-api/region"
           optionLabel={region => region.name}
         />

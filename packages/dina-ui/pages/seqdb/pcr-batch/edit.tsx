@@ -267,7 +267,7 @@ export function PcrBatchFormFields() {
           filter={filterBy(["name"])}
           model="seqdb-api/thermocycler-profile"
           optionLabel={profile => profile.name}
-          readOnlyLink="/seqdb/pcr-profile/view?id="
+          readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
       </div>
       <div className="row">
