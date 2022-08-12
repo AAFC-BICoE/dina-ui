@@ -56,8 +56,8 @@ export default function MetadataEditPage() {
   const id = router.query.id?.toString();
   const { formatMessage } = useDinaIntl();
   const query = useMetadataEditQuery(id);
-  const { apiClient, bulkGet, save } = useContext(ApiClientContext);
-  const { agentId, initialized: accountInitialized } = useAccount();
+  const { apiClient, bulkGet } = useContext(ApiClientContext);
+  const { agentId } = useAccount();
 
   const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
 
@@ -79,25 +79,25 @@ export default function MetadataEditPage() {
         }
       );
     }
-    // Set default values for the new Metadatas:
-    const {
-      data: { values: defaultValues }
-    } = await apiClient.get<{ values: DefaultValue[] }>(
-      "objectstore-api/config/default-values",
-      {}
-    );
-    const metadataDefaults: Partial<Metadata> = {
-      publiclyReleasable: true
-    };
-    for (const defaultValue of defaultValues.filter(
-      ({ type }) => type === "metadata"
-    )) {
-      metadataDefaults[defaultValue.attribute as keyof Metadata] =
-        defaultValue.value as any;
-    }
+    // // Set default values for the new Metadatas:
+    // const {
+    //   data: { values: defaultValues }
+    // } = await apiClient.get<{ values: DefaultValue[] }>(
+    //   "objectstore-api/config/default-values",
+    //   {}
+    // );
+    // const metadataDefaults: Partial<Metadata> = {
+    //   publiclyReleasable: true
+    // };
+    // for (const defaultValue of defaultValues.filter(
+    //   ({ type }) => type === "metadata"
+    // )) {
+    //   metadataDefaults[defaultValue.attribute as keyof Metadata] =
+    //     defaultValue.value as any;
+    // }
 
     const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
-      ...metadataDefaults,
+      // ...metadataDefaults,
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
         ? moment(objectUpload.dateTimeDigitized).format()
