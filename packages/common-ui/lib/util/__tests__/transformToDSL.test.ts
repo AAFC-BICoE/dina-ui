@@ -41,6 +41,15 @@ const columnDefinitions: TableColumn<MaterialSample>[] = [
   }
 ];
 
+// Based on the column definition above, it will only display these columns in the search results.
+const SOURCE_FILTERS: string[] = [
+  "data.id",
+  "data.type",
+  "data.attributes.materialSampleName",
+  "data.attributes.materialSampleType",
+  "included.attributes.name"
+];
+
 describe("Transform to DSL query function", () => {
   it("Submitted values to DSL query", async () => {
     const submittedValues: TransformQueryToDSLParams = {
@@ -84,6 +93,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -161,6 +171,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -239,6 +250,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -292,6 +304,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           filter: {
@@ -320,7 +333,8 @@ describe("Transform to DSL query function", () => {
     // The only thing added to the DSL should be the pagination.
     expect(dsl).toEqual({
       size: 50,
-      from: 50
+      from: 50,
+      _source: SOURCE_FILTERS
     });
   });
 
@@ -347,6 +361,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       from: DEFAULT_OFFSET,
       size: DEFAULT_LIMIT,
+      _source: SOURCE_FILTERS,
       sort: [
         {
           "data.attributes.materialSampleName.keyword": {
@@ -381,6 +396,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       from: DEFAULT_OFFSET,
       size: DEFAULT_LIMIT,
+      _source: SOURCE_FILTERS,
       sort: [
         {
           "included.attributes.name.keyword": {

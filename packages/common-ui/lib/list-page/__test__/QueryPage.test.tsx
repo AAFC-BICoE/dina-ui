@@ -304,6 +304,16 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: [
+          "data.id",
+          "data.type",
+          "materialSampleName",
+          "collection.name",
+          "dwcOtherCatalogNumbers",
+          "materialSampleType",
+          "createdBy",
+          "createdOn"
+        ],
         query: {
           bool: {
             filter: {
@@ -333,6 +343,16 @@ describe("QueryPage component", () => {
               order: "desc"
             }
           }
+        ],
+        _source: [
+          "data.id",
+          "data.type",
+          "materialSampleName",
+          "collection.name",
+          "dwcOtherCatalogNumbers",
+          "materialSampleType",
+          "createdBy",
+          "createdOn"
         ],
         query: {
           bool: {
@@ -483,6 +503,16 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: [
+          "data.id",
+          "data.type",
+          "materialSampleName",
+          "collection.name",
+          "dwcOtherCatalogNumbers",
+          "materialSampleType",
+          "createdBy",
+          "createdOn"
+        ],
         query: {
           bool: {
             filter: {
@@ -627,6 +657,16 @@ describe("QueryPage component", () => {
               order: "desc"
             }
           }
+        ],
+        _source: [
+          "data.id",
+          "data.type",
+          "materialSampleName",
+          "collection.name",
+          "dwcOtherCatalogNumbers",
+          "materialSampleType",
+          "createdBy",
+          "createdOn"
         ],
         query: {
           bool: {
