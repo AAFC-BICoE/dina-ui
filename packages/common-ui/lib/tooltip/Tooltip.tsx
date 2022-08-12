@@ -2,7 +2,7 @@ import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-interface TooltipProps {
+export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
   id?: string;
 
