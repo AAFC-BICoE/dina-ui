@@ -311,5 +311,16 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     });
   }
 
+  // Display only the fields provided in the columns array.
+  builder.rawOption("_source", [
+    "data.id",
+    "data.type",
+    ...columns
+      .filter(column => column.accessor)
+      .map(column => {
+        return column.accessor;
+      })
+  ]);
+
   return builder.build();
 }
