@@ -130,9 +130,21 @@ export function PreparationField({
             tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preservation-type"
             tooltipLinkText="fromDinaUserGuide"
           />
-          <TextField {...fieldProps("preparationFixative")} />
-          <TextField {...fieldProps("preparationMaterials")} />
-          <TextField {...fieldProps("preparationSubstrate")} />
+          <TextField
+            {...fieldProps("preparationFixative")}
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-fixative"
+            tooltipLinkText="fromDinaUserGuide"
+          />
+          <TextField
+            {...fieldProps("preparationMaterials")}
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-materials"
+            tooltipLinkText="fromDinaUserGuide"
+          />
+          <TextField
+            {...fieldProps("preparationSubstrate")}
+            tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-substrate"
+            tooltipLinkText="fromDinaUserGuide"
+          />
         </div>
         <div className="col-md-6">
           <TextField {...fieldProps("preparationRemarks")} multiLines={true} />
