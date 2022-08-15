@@ -1,12 +1,9 @@
 import {
-  BackButton,
-  ButtonBar,
   DateField,
   DinaForm,
   FieldSet,
   ResourceSelectField,
   SelectField,
-  SubmitButton,
   TextField
 } from "common-ui";
 import { Field } from "formik";
@@ -28,21 +25,20 @@ import {
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
 } from "../../../pages/object-store/metadata/single-record-edit";
-import { NextRouter } from "next/router";
+import { ReactNode } from "react";
 
 export interface SingleMetadataFormProps {
   metadata: Metadata;
-  router: NextRouter;
   onSaved?: (id: string) => Promise<void>;
+  buttonBar?: ReactNode;
 }
 
 export function SingleMetadataForm({
-  router,
   metadata,
-  onSaved
+  onSaved,
+  buttonBar
 }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
-  const { id } = router.query;
 
   const initialValues = {
     ...metadata,
@@ -63,13 +59,6 @@ export function SingleMetadataForm({
   const metadataOnSubmit = async submittedValues => {
     await onSubmit(submittedValues);
   };
-
-  const buttonBar = (
-    <ButtonBar>
-      <BackButton entityId={id as string} entityLink="/object-store/object" />
-      <SubmitButton className="ms-auto" />
-    </ButtonBar>
-  );
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={metadataOnSubmit}>

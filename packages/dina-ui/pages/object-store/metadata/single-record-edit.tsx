@@ -1,4 +1,11 @@
-import { withResponse, ApiClientContext, useAccount } from "common-ui";
+import {
+  withResponse,
+  ApiClientContext,
+  useAccount,
+  BackButton,
+  ButtonBar,
+  SubmitButton
+} from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -78,6 +85,12 @@ export default function MetadataEditPage() {
   }
 
   const title = id ? "editMetadataTitle" : "addMetadataTitle";
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton entityId={id} entityLink="/object-store/object" />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  );
 
   async function redirectToSingleMetadataPage(metadataId: string) {
     await router?.push(`/object-store/object/view?id=${metadataId}`);
@@ -95,8 +108,8 @@ export default function MetadataEditPage() {
             {withResponse(query, ({ data: editMetadata }) => (
               <SingleMetadataForm
                 metadata={editMetadata}
-                router={router}
                 onSaved={redirectToSingleMetadataPage}
+                buttonBar={buttonBar}
               />
             ))}
           </div>
@@ -104,8 +117,8 @@ export default function MetadataEditPage() {
           uploadMetadata && (
             <SingleMetadataForm
               metadata={uploadMetadata}
-              router={router}
               onSaved={redirectToSingleMetadataPage}
+              buttonBar={buttonBar}
             />
           )
         )}
