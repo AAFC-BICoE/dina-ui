@@ -25,19 +25,30 @@ import {
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
 } from "../../../pages/object-store/metadata/single-record-edit";
-import { ReactNode } from "react";
+import { ReactNode, Ref } from "react";
+import { InputResource } from "kitsu";
+import { FormikProps } from "formik";
 
-export interface SingleMetadataFormProps {
+export interface MetadataFormProps {
   metadata: Metadata;
+
+  // Function to redirect to next page after saving metadata
   onSaved?: (id: string) => Promise<void>;
+
   buttonBar?: ReactNode;
+
+  /** Optionally call the hook from the parent component. */
+  metadataSaveHook?: ReturnType<typeof useMetadataSave>;
+
+  // Form ref from parent component
+  metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
 }
 
-export function SingleMetadataForm({
+export function MetadataForm({
   metadata,
   onSaved,
   buttonBar
-}: SingleMetadataFormProps) {
+}: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
   const initialValues = {

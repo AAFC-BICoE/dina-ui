@@ -16,7 +16,7 @@ import { BULK_ADD_IDS_KEY } from "../upload";
 import { PersistedResource } from "kitsu";
 import moment from "moment";
 import { useContext, useState, useEffect } from "react";
-import { SingleMetadataForm } from "../../../components/object-store/metadata/MetadataForm";
+import { MetadataForm } from "../../../components/object-store/metadata/MetadataForm";
 
 export default function MetadataEditPage() {
   const router = useRouter();
@@ -106,7 +106,7 @@ export default function MetadataEditPage() {
         {id ? (
           <div>
             {withResponse(query, ({ data: editMetadata }) => (
-              <SingleMetadataForm
+              <MetadataForm
                 metadata={editMetadata}
                 onSaved={redirectToSingleMetadataPage}
                 buttonBar={buttonBar}
@@ -115,7 +115,7 @@ export default function MetadataEditPage() {
           </div>
         ) : (
           uploadMetadata && (
-            <SingleMetadataForm
+            <MetadataForm
               metadata={uploadMetadata}
               onSaved={redirectToSingleMetadataPage}
               buttonBar={buttonBar}
