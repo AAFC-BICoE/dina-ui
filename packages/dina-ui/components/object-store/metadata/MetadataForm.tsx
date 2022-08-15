@@ -41,13 +41,15 @@ export interface MetadataFormProps {
   metadataSaveHook?: ReturnType<typeof useMetadataSave>;
 
   // Form ref from parent component
-  metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
+  metadataFormRef?: Ref<FormikProps<InputResource<any>>>;
 }
 
 export function MetadataForm({
   metadata,
   onSaved,
-  buttonBar
+  buttonBar,
+  metadataSaveHook,
+  metadataFormRef
 }: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
@@ -62,17 +64,22 @@ export function MetadataForm({
         }
       : undefined
   };
-  const metadataSaveHook = useMetadataSave({
-    initialValues,
-    onSaved
-  });
-  const { onSubmit } = metadataSaveHook;
+  const { onSubmit } =
+    metadataSaveHook ??
+    useMetadataSave({
+      initialValues,
+      onSaved
+    });
   const metadataOnSubmit = async submittedValues => {
     await onSubmit(submittedValues);
   };
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={metadataOnSubmit}>
+    <DinaForm
+      initialValues={initialValues}
+      onSubmit={metadataOnSubmit}
+      innerRef={metadataFormRef}
+    >
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
