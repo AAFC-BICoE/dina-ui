@@ -145,7 +145,7 @@ export function QueryBuilder({
                 addRow={addRow}
               />
             );
-            // initialize the logic switch value to be "and"//
+            // initialize the logic switch value to be "and"
             fieldArrayProps.form.setFieldValue(
               `${fieldArrayProps.name}[${
                 elements?.length ?? 0

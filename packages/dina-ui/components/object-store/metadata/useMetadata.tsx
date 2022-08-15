@@ -167,7 +167,9 @@ export function useMetadataSave(initialValues) {
       }
     }
 
-    await save([saveOperation], { apiBaseUrl: "/objectstore-api" });
+    return await save<Metadata>([saveOperation], {
+      apiBaseUrl: "/objectstore-api"
+    });
   }
 
   return {
