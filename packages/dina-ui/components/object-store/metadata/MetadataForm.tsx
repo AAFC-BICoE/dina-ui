@@ -18,17 +18,28 @@ import {
 import { ManagedAttributesEditor } from "../managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "./MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { License, ObjectSubtype } from "../../../types/objectstore-api";
+import {
+  License,
+  Metadata,
+  ObjectSubtype
+} from "../../../types/objectstore-api";
 import { useMetadataSave } from "./useMetadata";
 import {
-  SingleMetadataFormProps,
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
 } from "../../../pages/object-store/metadata/single-record-edit";
+import { NextRouter } from "next/router";
+
+export interface SingleMetadataFormProps {
+  metadata: Metadata;
+  router: NextRouter;
+  onSaved?: (id: string) => Promise<void>;
+}
 
 export function SingleMetadataForm({
   router,
-  metadata
+  metadata,
+  onSaved
 }: SingleMetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { id } = router.query;
@@ -45,14 +56,12 @@ export function SingleMetadataForm({
       : undefined
   };
   const metadataSaveHook = useMetadataSave({
-    initialValues
+    initialValues,
+    onSaved
   });
   const { onSubmit } = metadataSaveHook;
-  const singleEditOnSubmit = async submittedValues => {
-    const submittedMetadata = await onSubmit(submittedValues);
-    await router?.push(
-      `/object-store/object/view?id=${submittedMetadata[0].id}`
-    );
+  const metadataOnSubmit = async submittedValues => {
+    await onSubmit(submittedValues);
   };
 
   const buttonBar = (
@@ -63,7 +72,7 @@ export function SingleMetadataForm({
   );
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={singleEditOnSubmit}>
+    <DinaForm initialValues={initialValues} onSubmit={metadataOnSubmit}>
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">

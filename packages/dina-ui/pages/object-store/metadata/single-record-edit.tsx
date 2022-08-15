@@ -1,20 +1,8 @@
-import {
-  DinaFormOnSubmit,
-  withResponse,
-  ApiClientContext,
-  useAccount,
-  safeSubmit,
-  LoadingSpinner
-} from "common-ui";
-import { keys } from "lodash";
-import { NextRouter, useRouter } from "next/router";
+import { withResponse, ApiClientContext, useAccount } from "common-ui";
+import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  DefaultValue,
-  Metadata,
-  ObjectUpload
-} from "../../../types/objectstore-api";
+import { Metadata, ObjectUpload } from "../../../types/objectstore-api";
 import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_IDS_KEY } from "../upload";
@@ -22,11 +10,6 @@ import { PersistedResource } from "kitsu";
 import moment from "moment";
 import { useContext, useState, useEffect } from "react";
 import { SingleMetadataForm } from "../../../components/object-store/metadata/MetadataForm";
-
-export interface SingleMetadataFormProps {
-  metadata: Metadata;
-  router: NextRouter;
-}
 
 export default function MetadataEditPage() {
   const router = useRouter();
@@ -50,7 +33,7 @@ export default function MetadataEditPage() {
     let objectUploads: PersistedResource<ObjectUpload>[] = [];
     if (group && objectUploadIds) {
       objectUploads = await bulkGet<ObjectUpload>(
-        objectUploadIds.map(uuid => `/object-upload/${uuid}`),
+        objectUploadIds.map(metadataId => `/object-upload/${metadataId}`),
         {
           apiBaseUrl: "/objectstore-api"
         }
@@ -96,6 +79,9 @@ export default function MetadataEditPage() {
 
   const title = id ? "editMetadataTitle" : "addMetadataTitle";
 
+  async function redirectToSingleMetadataPage(metadataId: string) {
+    await router?.push(`/object-store/object/view?id=${metadataId}`);
+  }
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -107,12 +93,20 @@ export default function MetadataEditPage() {
         {id ? (
           <div>
             {withResponse(query, ({ data: editMetadata }) => (
-              <SingleMetadataForm metadata={editMetadata} router={router} />
+              <SingleMetadataForm
+                metadata={editMetadata}
+                router={router}
+                onSaved={redirectToSingleMetadataPage}
+              />
             ))}
           </div>
         ) : (
           uploadMetadata && (
-            <SingleMetadataForm metadata={uploadMetadata} router={router} />
+            <SingleMetadataForm
+              metadata={uploadMetadata}
+              router={router}
+              onSaved={redirectToSingleMetadataPage}
+            />
           )
         )}
       </main>
