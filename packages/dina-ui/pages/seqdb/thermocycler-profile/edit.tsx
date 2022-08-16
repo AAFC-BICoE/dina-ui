@@ -16,6 +16,7 @@ import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
 import { Region } from "../../../types/seqdb-api/resources/Region";
+import { useState } from "react";
 
 interface PcrProfileFormProps {
   profile?: PcrProfile;
@@ -96,6 +97,20 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
 }
 
 export function PcrProfileFormFields() {
+  const [inputValues, setInputValues] = useState({});
+  const [counter, setCounter] = useState(0);
+
+  const handleClick = () => {
+    setCounter(counter + 1);
+    console.log(counter);
+  };
+
+  const handleOnChange = (e) => {
+    const abc = {};
+    abc[e.target.className] = e.target.value;
+    setInputValues({ ...inputValues, ...abc });
+  };
+
   return (
     <div>
       <div className="row">
@@ -122,6 +137,22 @@ export function PcrProfileFormFields() {
         <TextField className="col-md-2" name="application" />
         <TextField className="col-md-2" name="cycles" />
       </div>
+      <button onClick={handleClick}>Hello</button>
+
+      {Object.keys(inputValues).map((c) => {
+        return <p>{inputValues[c]}</p>;
+      })}
+
+      {Array.from(Array(counter)).map((c, index) => {
+        return (
+          <input
+            onChange={handleOnChange}
+            key={c}
+            className={index}
+            type="text"
+          ></input>
+        );
+      })}
       <div className="row">
         <div className="col-md-6">
           <div className="card-group row" style={{ padding: 15 }}>
