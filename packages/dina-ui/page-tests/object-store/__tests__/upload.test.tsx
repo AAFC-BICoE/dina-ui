@@ -84,7 +84,7 @@ describe("Upload page", () => {
       }
     ];
 
-    // Call the onSubmit funciton with uploaded files:
+    // Call the onSubmit function with uploaded files:
     wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
       {
         acceptedFiles: mockAcceptedFiles,
@@ -101,7 +101,7 @@ describe("Upload page", () => {
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
-      { transformResponse: fileUploadErrorHandler, timeout: 0 }
+      expect.anything()
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
