@@ -23,6 +23,7 @@ import { useState } from "react";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -56,6 +57,25 @@ export function SangerSampleSelectionStep({
   } = useGroupedCheckBoxes({
     fieldName: "pcrBatchItemIdsToDelete"
   });
+
+  const columns: TableColumn<MaterialSample>[] = [
+    {
+    Cell: ({ original: materialSample }) => (
+      <Link href={`/collection/material-sample/view?id=${materialSample.id}`}>{materialSample.id}</Link>
+    ),
+    accessor: "materialSample.id",
+    sortable: false
+  },
+  {
+    Cell: ({ original: materialSample }) => (
+      <div key={materialSample.id}>
+        <SampleSelectCheckBox resource={materialSample} />
+      </div>
+    ),
+    Header: SampleSelectCheckBoxHeader,
+    sortable: false
+  }
+  ];
 
   const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
     {
@@ -163,6 +183,10 @@ export function SangerSampleSelectionStep({
         <div className="alert alert-warning d-inline-block">
           <SeqdbMessage id="sampleSelectionInstructions" />
         </div>
+        <QueryPage
+          indexName={"dina_material_sample_index"}
+          columns={columns}
+        />
         <div className="mb-3">
           <DinaForm
             initialValues={{ inputValue: "" }}
@@ -198,15 +222,10 @@ export function SangerSampleSelectionStep({
               pcrBatchItemIdsToDelete: {}
             }}
           >
-            {/* <QueryPage
+            <QueryPage
           indexName={"dina_material_sample_index"}
           columns={columns}
-          bulkDeleteButtonProps={{
-            typeName: "material-sample",
-            apiBaseUrl: "/collection-api"
-          }}
-          bulkEditPath="/collection/material-sample/bulk-edit"
-        /> */}
+        />
             <div className="row">
               <div className="col-5 available-samples">
                 <strong>
