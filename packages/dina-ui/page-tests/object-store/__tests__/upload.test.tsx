@@ -84,7 +84,7 @@ describe("Upload page", () => {
       }
     ];
 
-    // Call the onSubmit funciton with uploaded files:
+    // Call the onSubmit function with uploaded files:
     wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
       {
         acceptedFiles: mockAcceptedFiles,
@@ -101,7 +101,7 @@ describe("Upload page", () => {
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
-      { transformResponse: fileUploadErrorHandler, timeout: 0 }
+      expect.anything()
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
@@ -120,9 +120,25 @@ describe("Upload page", () => {
   it("Throws file upload errors with a readable message.", done => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
-      fileUploadErrorHandler(exampleErrorResponse);
+      fileUploadErrorHandler(exampleErrorResponse, {
+        name: "fileName"
+      } as File);
     } catch (error) {
       expect(error.message).toEqual("Error from Spring");
+      done();
+    }
+  });
+
+  it("Throws file upload error when unsupported file type is provided.", done => {
+    const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
+    try {
+      fileUploadErrorHandler(exampleErrorResponse, {
+        name: "fileName_test.png"
+      } as File);
+    } catch (error) {
+      expect(error.message).toEqual(
+        "The 'fileName_test.png' file cannot be uploaded since it's an unsupported file type."
+      );
       done();
     }
   });
