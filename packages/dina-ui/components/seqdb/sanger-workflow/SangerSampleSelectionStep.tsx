@@ -60,12 +60,17 @@ export function SangerSampleSelectionStep({
 
   const columns: TableColumn<MaterialSample>[] = [
     {
-    Cell: ({ original: materialSample }) => (
-      <Link href={`/collection/material-sample/view?id=${materialSample.id}`}>{materialSample.id}</Link>
-    ),
-    accessor: "materialSample.id",
-    sortable: false
-  },
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    },
   {
     Cell: ({ original: materialSample }) => (
       <div key={materialSample.id}>
@@ -186,6 +191,7 @@ export function SangerSampleSelectionStep({
         <QueryPage
           indexName={"dina_material_sample_index"}
           columns={columns}
+          selectionMode={true}
         />
         <div className="mb-3">
           <DinaForm
@@ -222,10 +228,6 @@ export function SangerSampleSelectionStep({
               pcrBatchItemIdsToDelete: {}
             }}
           >
-            <QueryPage
-          indexName={"dina_material_sample_index"}
-          columns={columns}
-        />
             <div className="row">
               <div className="col-5 available-samples">
                 <strong>
