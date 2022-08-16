@@ -4,7 +4,7 @@ import { Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 
 export interface MetadataFileViewProps {
-  metadata: InputResource<Metadata>;
+  metadata: Metadata;
   imgHeight?: string;
   preview?: boolean;
 }
