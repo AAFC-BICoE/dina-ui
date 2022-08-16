@@ -83,7 +83,7 @@ export function MaterialSampleFormNav({
 
   return (
     <div className="sticky-md-top material-sample-nav">
-      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
+      <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
       <ScrollSpyNav
         {...(renderNav
           ? {

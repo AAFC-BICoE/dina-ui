@@ -113,7 +113,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   collectorGroupListTitle: "Groupe de collecte",
   collectorGroupNameLabel: "Nom du groupe de collecte",
   components: "Composants",
-  configureAction: "Configurer l’action",
   configureDefaultValues: "Configurer les valeurs par défaut",
   contents: "Table des matières",
   convertToDepthMinMax: "Conversion de la profondeur min/max",

@@ -1,6 +1,5 @@
 import {
   BackButton,
-  ButtonBar,
   DeleteButton,
   DinaForm,
   DinaFormSection,
@@ -22,7 +21,6 @@ import * as yup from "yup";
 import {
   FormTemplateConfig,
   GroupSelectField,
-  Head,
   IDENTIFIERS_FIELDS,
   materialSampleFormTemplateSchema,
   MaterialSampleFormTemplateConfig,
@@ -35,7 +33,7 @@ import {
   useMaterialSampleSave,
   MaterialSampleForm
 } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -43,6 +41,7 @@ import {
   MaterialSample,
   MaterialSampleFormSectionId
 } from "../../../types/collection-api";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
 
 /** The form schema (Not the back-end data model). */
 const workflowMainFieldsSchema = yup.object({
@@ -66,7 +65,6 @@ const workflowMainFieldsSchema = yup.object({
 type WorkflowFormValues = yup.InferType<typeof workflowMainFieldsSchema>;
 
 export default function MaterialSampleFormTemplateEditPage() {
-  const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const id = router.query.id?.toString();
 
@@ -83,14 +81,37 @@ export default function MaterialSampleFormTemplateEditPage() {
     await router.push("/collection/form-template/list");
   }
 
+  const buttonBarContent = (
+    <>
+      <BackButton
+        entityId={id}
+        className="me-auto"
+        entityLink="/collection/form-template"
+        byPassView={true}
+      />
+
+      {id && (
+        <DeleteButton
+          id={id}
+          options={{ apiBaseUrl: "/collection-api" }}
+          postDeleteRedirect="/collection/form-template/list"
+          type="form-template"
+          className="me-5"
+        />
+      )}
+
+      <SubmitButton />
+    </>
+  );
+
   return (
-    <div>
-      <Head title={formatMessage(pageTitle)} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id={pageTitle} />
-        </h1>
+    <DinaForm<Partial<WorkflowFormValues>>
+      initialValues={{ id }}
+      // onSubmit={onSaveTemplateSubmit}
+      validationSchema={workflowMainFieldsSchema}
+    >
+      <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
+        {/* New Form Template or New Form Template */}
         {id ? (
           withResponse(formTemplateQuery, ({ data: fetchedFormTemplate }) => (
             <MaterialSampleFormTemplateForm
@@ -101,8 +122,8 @@ export default function MaterialSampleFormTemplateEditPage() {
         ) : (
           <MaterialSampleFormTemplateForm onSaved={moveToNextPage} />
         )}
-      </main>
-    </div>
+      </PageLayout>
+    </DinaForm>
   );
 }
 
@@ -361,38 +382,12 @@ export function MaterialSampleFormTemplateForm({
     await onSaved(savedDefinition);
   }
 
-  const buttonBar = (
-    <ButtonBar>
-      <div className="container d-flex">
-        <BackButton
-          entityId={fetchedFormTemplate?.id}
-          className="me-auto"
-          entityLink="/collection/form-template"
-          byPassView={true}
-        />
-        <DeleteButton
-          id={fetchedFormTemplate?.id}
-          options={{ apiBaseUrl: "/collection-api" }}
-          postDeleteRedirect="/collection/form-template/list"
-          type="form-template"
-          className="me-5"
-        />
-        <SubmitButton />
-      </div>
-    </ButtonBar>
-  );
-
   return (
-    <DinaForm<Partial<WorkflowFormValues>>
-      initialValues={initialValues}
-      onSubmit={onSaveTemplateSubmit}
-      validationSchema={workflowMainFieldsSchema}
-    >
-      {buttonBar}
-      <div className="container">
+    <>
+      <div className="container-fluid px-0">
         <FieldSet
           className="workflow-main-details"
-          legend={<DinaMessage id="configureAction" />}
+          legend={<DinaMessage id="configureFormTemplate" />}
         >
           <div className="row">
             <div className="col-md-6">
@@ -408,8 +403,7 @@ export function MaterialSampleFormTemplateForm({
           materialSampleSaveHook={materialSampleSaveHook}
         />
       </DinaFormSection>
-      {buttonBar}
-    </DinaForm>
+    </>
   );
 }
 
