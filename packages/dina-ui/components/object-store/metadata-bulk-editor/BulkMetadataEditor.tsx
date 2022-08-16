@@ -405,7 +405,9 @@ export function BulkMetadataEditor({
   return (
     <div>
       <h1>
-        <DinaMessage id="metadataBulkEditTitle" />
+        <DinaMessage
+          id={metadataIds ? "metadataBulkEditTitle" : "addMetadataTitle"}
+        />
       </h1>
       <div className="mb-3">
         <DinaForm<MetadataEditorControls>

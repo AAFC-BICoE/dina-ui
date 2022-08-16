@@ -9,7 +9,11 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  withResponse
+  withResponse,
+  ApiClientContext,
+  useAccount,
+  safeSubmit,
+  LoadingSpinner
 } from "common-ui";
 import { Field } from "formik";
 import { keys } from "lodash";
@@ -26,43 +30,111 @@ import { ManagedAttributesEditor } from "../../../components/object-store/manage
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
+  DefaultValue,
   License,
   Metadata,
-  ObjectSubtype
+  ObjectSubtype,
+  ObjectUpload
 } from "../../../types/objectstore-api";
 import {
   useMetadataEditQuery,
   useMetadataSave
 } from "../../../components/object-store/metadata/useMetadata";
+import { useLocalStorage } from "@rehooks/local-storage";
+import { BULK_ADD_IDS_KEY } from "../upload";
+import { PersistedResource } from "kitsu";
+import moment from "moment";
+import { useContext, useState, useEffect } from "react";
 
 interface SingleMetadataFormProps {
-  /** Existing Metadata is required, no new ones are added with this form. */
   metadata: Metadata;
   router: NextRouter;
 }
 
 export default function MetadataEditPage() {
   const router = useRouter();
-
   const id = router.query.id?.toString();
-
   const { formatMessage } = useDinaIntl();
   const query = useMetadataEditQuery(id);
+  const { apiClient, bulkGet } = useContext(ApiClientContext);
+  const { agentId } = useAccount();
+
+  const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
+
+  const group = router?.query?.group as string;
+  const [metadata, setMetadata] = useState<Metadata>();
+  useEffect(() => {
+    loadData().then(value => {
+      setMetadata(value);
+    });
+  }, []);
+
+  async function loadData() {
+    let objectUploads: PersistedResource<ObjectUpload>[] = [];
+    if (group && objectUploadIds) {
+      objectUploads = await bulkGet<ObjectUpload>(
+        objectUploadIds.map(uuid => `/object-upload/${uuid}`),
+        {
+          apiBaseUrl: "/objectstore-api"
+        }
+      );
+    }
+    // // Set default values for the new Metadatas:
+    // const {
+    //   data: { values: defaultValues }
+    // } = await apiClient.get<{ values: DefaultValue[] }>(
+    //   "objectstore-api/config/default-values",
+    //   {}
+    // );
+    // const metadataDefaults: Partial<Metadata> = {
+    //   publiclyReleasable: true
+    // };
+    // for (const defaultValue of defaultValues.filter(
+    //   ({ type }) => type === "metadata"
+    // )) {
+    //   metadataDefaults[defaultValue.attribute as keyof Metadata] =
+    //     defaultValue.value as any;
+    // }
+
+    const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+      // ...metadataDefaults,
+      acCaption: objectUpload.originalFilename,
+      acDigitizationDate: objectUpload.dateTimeDigitized
+        ? moment(objectUpload.dateTimeDigitized).format()
+        : null,
+      acMetadataCreator: agentId
+        ? {
+            id: agentId,
+            type: "person"
+          }
+        : null,
+      bucket: group,
+      dcType: objectUpload.dcType,
+      fileIdentifier: objectUpload.id,
+      originalFilename: objectUpload.originalFilename,
+      type: "metadata"
+    }));
+    return newMetadatas[0];
+  }
+
+  const title = id ? "editMetadataTitle" : "addMetadataTitle";
 
   return (
     <div>
-      <Head title={formatMessage("editMetadataTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container">
-        {id && (
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
+        {id ? (
           <div>
-            <h1 id="wb-cont">
-              <DinaMessage id="editMetadataTitle" />
-            </h1>
             {withResponse(query, ({ data }) => (
               <SingleMetadataForm metadata={data} router={router} />
             ))}
           </div>
+        ) : (
+          metadata && <SingleMetadataForm metadata={metadata} router={router} />
         )}
       </main>
       <Footer />
@@ -88,8 +160,10 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
   const metadataSaveHook = useMetadataSave(initialValues);
   const { onSubmit } = metadataSaveHook;
   const singleEditOnSubmit = async submittedValues => {
-    await onSubmit(submittedValues);
-    await router?.push(`/object-store/object/view?id=${id}`);
+    const submittedMetadata = await onSubmit(submittedValues);
+    await router?.push(
+      `/object-store/object/view?id=${submittedMetadata[0].id}`
+    );
   };
 
   const buttonBar = (
@@ -104,7 +178,9 @@ function SingleMetadataForm({ router, metadata }: SingleMetadataFormProps) {
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
-        <MetadataFileView metadata={metadata} imgHeight="15rem" />
+        {metadata.derivatives && (
+          <MetadataFileView metadata={metadata} imgHeight="15rem" />
+        )}
       </div>
       <TagsAndRestrictionsSection
         resourcePath="objectstore-api/metadata"
