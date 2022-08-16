@@ -1,9 +1,10 @@
+import { InputResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
 import { DownLoadLinks, FileView } from "../file-view/FileView";
 
 export interface MetadataFileViewProps {
-  metadata: Metadata;
+  metadata: InputResource<Metadata>;
   imgHeight?: string;
   preview?: boolean;
 }

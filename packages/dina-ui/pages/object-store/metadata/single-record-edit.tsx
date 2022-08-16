@@ -13,7 +13,7 @@ import { Metadata, ObjectUpload } from "../../../types/objectstore-api";
 import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_IDS_KEY } from "../upload";
-import { PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import moment from "moment";
 import { useContext, useState, useEffect } from "react";
 import { MetadataForm } from "../../../components/object-store/metadata/MetadataForm";
@@ -107,7 +107,7 @@ export default function MetadataEditPage() {
           <div>
             {withResponse(query, ({ data: editMetadata }) => (
               <MetadataForm
-                metadata={editMetadata}
+                metadata={editMetadata as InputResource<Metadata>}
                 onSaved={redirectToSingleMetadataPage}
                 buttonBar={buttonBar}
               />
@@ -116,7 +116,7 @@ export default function MetadataEditPage() {
         ) : (
           uploadMetadata && (
             <MetadataForm
-              metadata={uploadMetadata}
+              metadata={uploadMetadata as InputResource<Metadata>}
               onSaved={redirectToSingleMetadataPage}
               buttonBar={buttonBar}
             />

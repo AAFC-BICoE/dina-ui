@@ -30,7 +30,7 @@ import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
 
 export interface MetadataFormProps {
-  metadata: Metadata;
+  metadata: InputResource<Metadata>;
 
   // Function to redirect to next page after saving metadata
   onSaved?: (id: string) => Promise<void>;
@@ -53,6 +53,12 @@ export function MetadataForm({
 }: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
+  const { onSubmit } =
+    metadataSaveHook ??
+    useMetadataSave({
+      initialValues: metadata,
+      onSaved
+    });
   const initialValues = {
     ...metadata,
     // Convert the string to an object for the dropdown:
@@ -64,12 +70,6 @@ export function MetadataForm({
         }
       : undefined
   };
-  const { onSubmit } =
-    metadataSaveHook ??
-    useMetadataSave({
-      initialValues,
-      onSaved
-    });
   const metadataOnSubmit = async submittedValues => {
     await onSubmit(submittedValues);
   };

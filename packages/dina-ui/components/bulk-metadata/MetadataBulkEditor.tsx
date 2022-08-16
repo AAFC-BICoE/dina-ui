@@ -59,9 +59,9 @@ MetadataBulkEditorProps) {
 
   const metadataHooks = getMetadataHooks(metadatas);
 
-  // const metadataForm = (
-  //   <MetadataForm metadata={initialValues} buttonBar={null}></MetadataForm>
-  // );
+  const metadataForm = (
+    <MetadataForm metadata={initialValues} buttonBar={null} />
+  );
   return (
     <div>
       {" "}
