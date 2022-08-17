@@ -4,6 +4,7 @@ import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
 import { QueryRowExportProps } from "../list-page/QueryRow";
 import { TableColumn } from "../list-page/types";
+import { uniq } from "lodash";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
@@ -338,6 +339,26 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       }
     });
   }
+
+  // Display only the fields provided in the columns array.
+  const sourceFilteringColumns: string[] = [
+    "data.id",
+    "data.type",
+    ...columns
+      .filter(column => column?.accessor)
+      .map(column => column.accessor as string)
+  ];
+
+  // If the source filtering contains included attributes, we need to also include the id and included type.
+  if (
+    sourceFilteringColumns.filter(columnValue =>
+      columnValue?.startsWith("included.")
+    )
+  ) {
+    sourceFilteringColumns.push("included.id");
+    sourceFilteringColumns.push("included.type");
+  }
+  builder.rawOption("_source", uniq(sourceFilteringColumns));
 
   return builder.build();
 }
