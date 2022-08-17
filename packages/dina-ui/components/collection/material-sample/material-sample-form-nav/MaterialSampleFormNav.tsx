@@ -14,8 +14,7 @@ import Switch, { ReactSwitchProps } from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
   MaterialSampleAssociation,
-  MaterialSampleFormSectionId,
-  MATERIAL_SAMPLE_FORM_SECTIONS,
+  MATERIAL_SAMPLE_FORM_LEGEND,
   Organism
 } from "../../../../types/collection-api";
 import { useMaterialSampleSave } from "../useMaterialSample";
@@ -31,7 +30,7 @@ export interface MaterialSampleFormNavProps {
   // Disables Collecting Event React Switch for child material samples
   disableCollectingEventSwitch?: boolean;
 
-  navOrder?: MaterialSampleFormSectionId[] | null;
+  navOrder?: string[] | null;
 }
 
 // Don't render the react-scrollspy-nav component during tests because it only works in the browser.
@@ -58,8 +57,8 @@ const ScrollSpyNav = renderNav
     )
   : "div";
 
-interface ScrollTarget<T extends MaterialSampleFormSectionId> {
-  id: T;
+interface ScrollTarget {
+  id: string;
   msg: string | JSX.Element;
   className?: string;
   disabled?: boolean;
@@ -111,7 +110,7 @@ export function MaterialSampleFormNav({
                 section={section}
                 disableRemovePrompt={disableRemovePrompt}
                 disableSwitch={
-                  section.id === "collecting-event-section" &&
+                  section.id === "collecting-event-component" &&
                   disableCollectingEventSwitch
                 }
               />
@@ -127,102 +126,75 @@ export interface MaterialSampleSectionOrderParams {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
-  navOrder?: MaterialSampleFormSectionId[] | null;
+  navOrder?: string[] | null;
 }
 
 export function useMaterialSampleSectionOrder({
   dataComponentState,
   navOrder
 }: MaterialSampleSectionOrderParams) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   /** An array with all section IDs, beginning with the user-defined order. */
   const navOrderWithAllSections = uniq([
     ...(navOrder ?? []),
-    ...MATERIAL_SAMPLE_FORM_SECTIONS
+    ...MATERIAL_SAMPLE_FORM_LEGEND.map(component => component.id)
   ]);
 
-  const scrollTargets: { [P in MaterialSampleFormSectionId]: ScrollTarget<P> } =
-    {
-      "identifiers-section": {
-        id: "identifiers-section",
-        msg: <DinaMessage id="identifiers" />
-      },
-      "material-sample-info-section": {
-        id: "material-sample-info-section",
-        msg: <DinaMessage id="materialSampleInfo" />
-      },
-      "collecting-event-section": {
-        id: "collecting-event-section",
-        msg: formatMessage("collectingEvent"),
-        className: "enable-collecting-event",
-        disabled: !dataComponentState.enableCollectingEvent,
-        setEnabled: dataComponentState.setEnableCollectingEvent
-      },
-      "acquisition-event-section": {
-        id: "acquisition-event-section",
-        msg: formatMessage("acquisitionEvent"),
-        className: "enable-acquisition-event",
-        disabled: !dataComponentState.enableAcquisitionEvent,
-        setEnabled: dataComponentState.setEnableAcquisitionEvent
-      },
-      "preparations-section": {
-        id: "preparations-section",
-        msg: formatMessage("preparations"),
-        className: "enable-catalogue-info",
-        disabled: !dataComponentState.enablePreparations,
-        setEnabled: dataComponentState.setEnablePreparations
-      },
-      "organisms-section": {
-        id: "organisms-section",
-        msg: formatMessage("organisms"),
-        className: "enable-organisms",
-        disabled: !dataComponentState.enableOrganisms,
-        setEnabled: dataComponentState.setEnableOrganisms,
-        customSwitch: OrganismsSwitch
-      },
-      "associations-section": {
-        id: "associations-section",
-        msg: formatMessage("associationsLegend"),
-        className: "enable-associations",
-        disabled: !dataComponentState.enableAssociations,
-        setEnabled: dataComponentState.setEnableAssociations,
-        customSwitch: AssociationsSwitch
-      },
-      "storage-section": {
-        id: "storage-section",
-        msg: formatMessage("storage"),
-        className: "enable-storage",
-        disabled: !dataComponentState.enableStorage,
-        setEnabled: dataComponentState.setEnableStorage
-      },
-      "restriction-section": {
-        id: "restriction-section",
-        msg: formatMessage("restrictions"),
-        className: "enable-restrictions",
-        disabled: !dataComponentState.enableRestrictions,
-        setEnabled: dataComponentState.setEnableRestrictions
-      },
-      "scheduled-actions-section": {
-        id: "scheduled-actions-section",
-        msg: formatMessage("scheduledActions"),
-        className: "enable-scheduled-actions",
-        disabled: !dataComponentState.enableScheduledActions,
-        setEnabled: dataComponentState.setEnableScheduledActions
-      },
-      "managedAttributes-section": {
-        id: "managedAttributes-section",
-        msg: formatMessage("managedAttributes")
-      },
-      "material-sample-attachments-section": {
-        id: "material-sample-attachments-section",
-        msg: formatMessage("materialSampleAttachments")
-      }
-    };
+  /** Switch information to apply to the legend. */
+  const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
+    "collecting-event-component": {
+      disabled: !dataComponentState.enableCollectingEvent,
+      setEnabled: dataComponentState.setEnableCollectingEvent
+    },
+    "acquisition-event-component": {
+      disabled: !dataComponentState.enableAcquisitionEvent,
+      setEnabled: dataComponentState.setEnableAcquisitionEvent
+    },
+    "preparations-component": {
+      disabled: !dataComponentState.enablePreparations,
+      setEnabled: dataComponentState.setEnablePreparations
+    },
+    "organisms-component": {
+      disabled: !dataComponentState.enableOrganisms,
+      setEnabled: dataComponentState.setEnableOrganisms,
+      customSwitch: OrganismsSwitch
+    },
+    "associations-component": {
+      disabled: !dataComponentState.enableAssociations,
+      setEnabled: dataComponentState.setEnableAssociations,
+      customSwitch: AssociationsSwitch
+    },
+    "storage-component": {
+      disabled: !dataComponentState.enableStorage,
+      setEnabled: dataComponentState.setEnableStorage
+    },
+    "restriction-component": {
+      disabled: !dataComponentState.enableRestrictions,
+      setEnabled: dataComponentState.setEnableRestrictions
+    },
+    "scheduled-actions-component": {
+      disabled: !dataComponentState.enableScheduledActions,
+      setEnabled: dataComponentState.setEnableScheduledActions
+    }
+  };
+
+  const scrollTargets: ScrollTarget[] = [
+    ...MATERIAL_SAMPLE_FORM_LEGEND.map(component => ({
+      id: component.id,
+      msg: messages[component.labelKey]
+        ? formatMessage(component.labelKey as any)
+        : component.labelKey,
+      className: component.switchClassName,
+      disabled: scrollTargetSwitches[component.id]?.disabled,
+      setEnabled: scrollTargetSwitches[component.id]?.setEnabled,
+      customSwitch: scrollTargetSwitches[component.id]?.customSwitch
+    }))
+  ];
 
   const sortedScrollTargets = uniq([
     ...navOrderWithAllSections.map(id => scrollTargets[id]),
-    ...MATERIAL_SAMPLE_FORM_SECTIONS.map(id => scrollTargets[id])
+    ...MATERIAL_SAMPLE_FORM_LEGEND.map(dataComponent => dataComponent.id)
   ]);
 
   return { sortedScrollTargets };
@@ -275,8 +247,8 @@ export function DataComponentNavGroup({ children }: PropsWithChildren<{}>) {
   return <div className="list-group mb-3">{children}</div>;
 }
 
-interface NavItemProps<T extends MaterialSampleFormSectionId> {
-  section: ScrollTarget<T>;
+interface NavItemProps {
+  section: ScrollTarget;
   disableRemovePrompt?: boolean;
   disableSwitch?: boolean;
 }
@@ -285,7 +257,7 @@ function DataComponentNavItem({
   section,
   disableRemovePrompt,
   disableSwitch
-}: NavItemProps<MaterialSampleFormSectionId>) {
+}: NavItemProps) {
   const { openModal } = useModal();
 
   const Tag = section.disabled ? "div" : "a";

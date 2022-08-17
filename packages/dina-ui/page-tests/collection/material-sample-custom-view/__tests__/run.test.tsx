@@ -777,13 +777,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     expect(
       wrapper
-        .find("#scheduled-actions-section .remarks-field textarea")
+        .find("#scheduled-actions-component .remarks-field textarea")
         .prop("value")
     ).toEqual("default-remarks");
 
     // Add the first scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -791,12 +791,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // Add the second scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-new-button")
+      .find("#scheduled-actions-component button.add-new-button")
       .simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -804,7 +804,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // There should be 2 rows:
     expect(
-      wrapper.find("#scheduled-actions-section .rt-tbody .rt-tr").length
+      wrapper.find("#scheduled-actions-component .rt-tbody .rt-tr").length
     ).toEqual(2);
 
     // Submit the form:
@@ -894,12 +894,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     // The default attribute values are rendered:
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_1-field input")
+        .find("#collecting-event-component .attribute_1-field input")
         .prop("value")
     ).toEqual("attribute 1 default value");
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_2-field input")
+        .find("#collecting-event-component .attribute_2-field input")
         .prop("value")
     ).toEqual("");
   });

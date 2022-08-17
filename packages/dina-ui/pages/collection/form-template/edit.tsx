@@ -2,6 +2,7 @@ import {
   BackButton,
   DeleteButton,
   DinaForm,
+  DinaFormSubmitParams,
   FieldSet,
   SubmitButton,
   TextField,
@@ -15,6 +16,7 @@ import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { MaterialSampleFormTemplateForm } from "packages/dina-ui/components/form-template/form-template-material-sample/MaterialSampleFormTemplate";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
+import { InputResource } from "kitsu";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();

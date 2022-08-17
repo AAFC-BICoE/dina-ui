@@ -251,7 +251,7 @@ describe("Workflow template edit page", () => {
       type: "form-template",
       viewConfiguration: {
         formTemplate: {},
-        navOrder: ["material-sample-info-section", "identifiers-section"],
+        navOrder: ["material-sample-info-component", "identifiers-component"],
         type: "material-sample-form-template"
       }
     });
@@ -261,7 +261,7 @@ describe("Workflow template edit page", () => {
     // The nav order was re-saved:
     expect(
       mockOnSaved.mock.calls[0][0].viewConfiguration.navOrder.slice(0, 2)
-    ).toEqual(["material-sample-info-section", "identifiers-section"]);
+    ).toEqual(["material-sample-info-component", "identifiers-component"]);
   });
 
   it("Renders the template page with a custom Managed Attributes Order.", async () => {
@@ -341,14 +341,14 @@ describe("Workflow template edit page", () => {
     expect(
       wrapper
         .find(
-          "#collecting-event-section .managedAttributes_attribute_1-field input"
+          "#collecting-event-component .managedAttributes_attribute_1-field input"
         )
         .prop("value")
     ).toEqual("attribute 1 default value");
     expect(
       wrapper
         .find(
-          "#collecting-event-section .managedAttributes_attribute_2-field input"
+          "#collecting-event-component .managedAttributes_attribute_2-field input"
         )
         .prop("value")
     ).toEqual("");
@@ -558,7 +558,7 @@ describe("Workflow template edit page", () => {
 
     // Add 2 managed attributes:
     wrapper
-      .find("#collecting-event-section .managed-attributes-select")
+      .find("#collecting-event-component .managed-attributes-select")
       .find(ResourceSelect)
       .prop<any>("onChange")({
       id: "1",
@@ -566,7 +566,7 @@ describe("Workflow template edit page", () => {
       name: "Attribute 1"
     });
     wrapper
-      .find("#collecting-event-section .managed-attributes-select")
+      .find("#collecting-event-component .managed-attributes-select")
       .find(ResourceSelect)
       .prop<any>("onChange")({
       id: "2",
@@ -580,7 +580,7 @@ describe("Workflow template edit page", () => {
     // Set a default value for one attribute:
     wrapper
       .find(
-        "#collecting-event-section .managedAttributes_attribute_1-field input"
+        "#collecting-event-component .managedAttributes_attribute_1-field input"
       )
       .simulate("change", { target: { value: "attribute 1 default" } });
 
@@ -763,7 +763,7 @@ describe("Workflow template edit page", () => {
 
     // Only allow new attachments:
     wrapper
-      .find("#collecting-event-section input.allow-new-checkbox")
+      .find("#collecting-event-component input.allow-new-checkbox")
       .simulate("change", { target: { checked: true } });
 
     await new Promise(setImmediate);
@@ -825,7 +825,7 @@ describe("Workflow template edit page", () => {
 
     // Only allow new attachments:
     wrapper
-      .find("#material-sample-attachments-section input.allow-new-checkbox")
+      .find("#material-sample-attachments-component input.allow-new-checkbox")
       .simulate("change", { target: { checked: true } });
 
     // Set a default prep type:
@@ -877,7 +877,7 @@ describe("Workflow template edit page", () => {
 
     // Only allow new attachments:
     wrapper
-      .find("#material-sample-attachments-section input.allow-new-checkbox")
+      .find("#material-sample-attachments-component input.allow-new-checkbox")
       .simulate("change", { target: { checked: true } });
 
     // Set a default verbatim scientific name:
@@ -1023,7 +1023,7 @@ describe("Workflow template edit page", () => {
 
     // Add a default storage unit:
     wrapper
-      .find("#storage-section input[type='checkbox']")
+      .find("#storage-component input[type='checkbox']")
       .first()
       .simulate("change", { target: { checked: true } });
     wrapper.find(StorageLinker).prop<any>("onChange")({
@@ -1074,11 +1074,11 @@ describe("Workflow template edit page", () => {
 
     // Add default remarks:
     wrapper
-      .find("#scheduled-actions-section input[type='checkbox']")
+      .find("#scheduled-actions-component input[type='checkbox']")
       .last()
       .simulate("change", { target: { checked: true } });
     wrapper
-      .find("#scheduled-actions-section .remarks-field textarea")
+      .find("#scheduled-actions-component .remarks-field textarea")
       .simulate("change", { target: { value: "default-remarks" } });
 
     await submitForm();

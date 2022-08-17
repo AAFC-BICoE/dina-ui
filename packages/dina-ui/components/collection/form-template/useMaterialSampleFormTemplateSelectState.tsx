@@ -1,9 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
-import {
-  FormTemplate,
-  MaterialSampleFormSectionId
-} from "../../../types/collection-api";
+import { FormTemplate } from "../../../types/collection-api";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 
@@ -32,9 +29,7 @@ export function useMaterialSampleFormTemplateSelectState() {
     useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
 
   // Store the nav order in the Page components state:
-  const [navOrder, setNavOrder] = useState<
-    MaterialSampleFormSectionId[] | null
-  >(null);
+  const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
   // Effect hook: When the Form Template changes,
   // update the navOrder to what's stored in the Form Template:

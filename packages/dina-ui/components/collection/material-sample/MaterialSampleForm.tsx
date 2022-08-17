@@ -33,8 +33,7 @@ import {
 import {
   AcquisitionEvent,
   CollectingEvent,
-  MaterialSample,
-  MaterialSampleFormSectionId
+  MaterialSample
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AcquisitionEventLinker } from "../AcquisitionEventLinker";
@@ -195,18 +194,15 @@ export function MaterialSampleForm({
   );
   const attachmentsField = "attachment";
 
-  const navState = useState<MaterialSampleFormSectionId[] | null>(null);
+  const navState = useState<string[] | null>(null);
 
   /**
    * A map where:
    * - The key is the form section ID.
    * - The value is the section's render function given the ID as a param.
    */
-  const formSections: Record<
-    MaterialSampleFormSectionId,
-    (id: string) => ReactNode
-  > = {
-    "identifiers-section": id =>
+  const formSections: Record<string, (id: string) => ReactNode> = {
+    "identifiers-component": id =>
       !reduceRendering && (
         <MaterialSampleIdentifiersSection
           id={id}
@@ -214,9 +210,9 @@ export function MaterialSampleForm({
           hideUseSequence={hideUseSequence}
         />
       ),
-    "material-sample-info-section": id =>
+    "material-sample-info-component": id =>
       !reduceRendering && <MaterialSampleInfoSection id={id} />,
-    "collecting-event-section": id =>
+    "collecting-event-component": id =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
@@ -243,7 +239,7 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    "acquisition-event-section": id =>
+    "acquisition-event-component": id =>
       dataComponentState.enableAcquisitionEvent && (
         <TabbedResourceLinker<AcquisitionEvent>
           fieldSetId={id}
@@ -272,10 +268,10 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    "preparations-section": id =>
+    "preparations-component": id =>
       !reduceRendering &&
       dataComponentState.enablePreparations && <PreparationField id={id} />,
-    "organisms-section": id =>
+    "organisms-component": id =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (
         <OrganismsField
@@ -286,10 +282,10 @@ export function MaterialSampleForm({
           }
         />
       ),
-    "associations-section": id =>
+    "associations-component": id =>
       !reduceRendering &&
       dataComponentState.enableAssociations && <AssociationsField id={id} />,
-    "storage-section": id =>
+    "storage-component": id =>
       !reduceRendering &&
       dataComponentState.enableStorage && (
         <FieldSet
@@ -304,10 +300,10 @@ export function MaterialSampleForm({
           />
         </FieldSet>
       ),
-    "restriction-section": id =>
+    "restriction-component": id =>
       !reduceRendering &&
       dataComponentState.enableRestrictions && <RestrictionField id={id} />,
-    "scheduled-actions-section": id =>
+    "scheduled-actions-component": id =>
       !reduceRendering &&
       dataComponentState.enableScheduledActions && (
         <ScheduledActionsField
@@ -322,7 +318,7 @@ export function MaterialSampleForm({
           )}
         />
       ),
-    "managedAttributes-section": id =>
+    "managedAttributes-component": id =>
       !reduceRendering && (
         <DinaFormSection
           // Disabled the template's restrictions for this section:
@@ -350,7 +346,7 @@ export function MaterialSampleForm({
           </div>
         </DinaFormSection>
       ),
-    "material-sample-attachments-section": id =>
+    "material-sample-attachments-component": id =>
       !reduceRendering && (
         <AttachmentsField
           name={attachmentsField}
