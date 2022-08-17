@@ -51,6 +51,7 @@ const SOURCE_FILTERS: string[] = [
   "data.type",
   "data.attributes.materialSampleName",
   "data.attributes.materialSampleType",
+  "data.attributes.allowDuplicateName",
   "included.attributes.name",
   "included.id",
   "included.type"
@@ -377,6 +378,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -551,6 +553,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -729,6 +732,7 @@ describe("Transform to DSL query function", () => {
     expect(dsl).toEqual({
       size: DEFAULT_LIMIT,
       from: DEFAULT_OFFSET,
+      _source: SOURCE_FILTERS,
       query: {
         bool: {
           must: [
@@ -1020,7 +1024,8 @@ describe("Transform to DSL query function", () => {
     // None of the above should have generated any queries.
     expect(dsl).toEqual({
       from: DEFAULT_OFFSET,
-      size: DEFAULT_LIMIT
+      size: DEFAULT_LIMIT,
+      _source: SOURCE_FILTERS
     });
   });
 });
