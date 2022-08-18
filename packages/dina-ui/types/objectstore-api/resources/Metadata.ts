@@ -1,6 +1,7 @@
 import { KitsuResource, PersistedResource } from "kitsu";
 import { Person } from "../../agent-api/resources/Person";
 import { Derivative } from "./Derivative";
+import { License } from "./License";
 import { ManagedAttributeMap } from "./ManagedAttributeMap";
 import { DcType } from "./ObjectUpload";
 
@@ -14,11 +15,13 @@ export interface MetadataAttributes {
   xmpRightsWebStatement?: string;
   xmpRightsUsageTerms?: string;
   xmpRightsOwner?: string;
+  // Client-side only fields
+  license?: License;
 
   // optional fields
   group?: string;
   dcRights?: string;
-  acSubtype?: string;
+  acSubtype?: any;
   dcType?: DcType;
   acCaption?: string;
   dcFormat?: string;

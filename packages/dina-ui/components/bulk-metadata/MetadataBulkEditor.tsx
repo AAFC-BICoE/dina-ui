@@ -1,12 +1,17 @@
 import React from "react";
-import { Metadata } from "../../types/objectstore-api";
+import { License, Metadata } from "../../types/objectstore-api";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
 import { Promisable } from "type-fest";
 import {
+  BulkEditTabContextI,
   ButtonBar,
   DinaForm,
+  DoOperationsError,
   FormikButton,
+  getBulkEditTabFieldInfo,
   ResourceWithHooks,
+  SaveArgs,
+  useApiClient,
   withoutBlankFields
 } from "common-ui";
 import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
@@ -14,8 +19,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
 import { useMetadataSave } from "../object-store/metadata/useMetadata";
 import { MetadataForm } from "../object-store/metadata/MetadataForm";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { isEmpty } from "lodash";
+import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { isEmpty, keys, omit, pick, pickBy } from "lodash";
+import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
@@ -39,15 +45,14 @@ function getMetadataHooks(metadatas) {
 
 export function MetadataBulkEditor({
   metadatas: metadatasProp,
-  onPreviousClick
-}: // onSaved,
-MetadataBulkEditorProps) {
+  onPreviousClick,
+  onSaved
+}: MetadataBulkEditorProps) {
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
   >();
-  const [initialized, setInitialized] = useState(false);
 
-  // Make sure the samples list doesn't change during this component's lifecycle:
+  // Make sure the metadatas list doesn't change during this component's lifecycle:
   const metadatas = useMemo(() => metadatasProp, []);
 
   const initialValues: InputResource<Metadata> = {
@@ -67,9 +72,30 @@ MetadataBulkEditorProps) {
   );
 
   function metadataBulkOverrider() {
-    /** Sample input including blank/empty fields. */
+    /** Metadata input including blank/empty fields. */
     return getMetadataBulkOverrider(bulkEditFormRef);
   }
+
+  const [initialized, setInitialized] = useState(false);
+
+  const { bulkEditTab } = useBulkEditTab({
+    resourceHooks: metadataHooks,
+    hideBulkEditTab: !initialized,
+    resourceForm: metadataForm,
+    bulkEditFormRef
+  });
+
+  useEffect(() => {
+    // Set the initial tab to the Edit All tab:
+    setSelectedTab(bulkEditTab);
+  }, []);
+
+  const { saveAll } = useBulkMetadataSave({
+    onSaved,
+    metadataPreProcessor: metadataBulkOverrider,
+    bulkEditCtx: { resourceHooks: metadataHooks, bulkEditFormRef }
+  });
+
   return (
     <div>
       {" "}
@@ -100,9 +126,9 @@ MetadataBulkEditorProps) {
 export function getMetadataBulkOverrider(bulkEditFormRef) {
   let bulkEditMetadata: InputResource<Metadata> | undefined;
 
-  /** Returns a sample with the overridden values. */
+  /** Returns an object with the overridden values. */
   return async function withBulkEditOverrides(
-    baseSample: InputResource<Metadata>
+    baseMetadata: InputResource<Metadata>
   ) {
     const formik = bulkEditFormRef.current;
     // Shouldn't happen, but check for type safety:
@@ -115,17 +141,17 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
       bulkEditMetadata = formik.values;
     }
 
-    /** Sample override object with only the non-empty fields. */
+    /** Override object with only the non-empty fields. */
     const overrides = withoutBlankFields(bulkEditMetadata);
 
     // Combine the managed attributes dictionaries:
     const newManagedAttributes = {
-      ...withoutBlankFields(baseSample.managedAttributes),
+      ...withoutBlankFields(baseMetadata.managedAttributes),
       ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
     };
 
     const newMetadata: InputResource<Metadata> = {
-      ...baseSample,
+      ...baseMetadata,
       ...overrides,
       ...(!isEmpty(newManagedAttributes) && {
         managedAttributes: newManagedAttributes
@@ -134,4 +160,168 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
 
     return newMetadata;
   };
+}
+
+interface BulkMetadataSaveParams {
+  onSaved: (metadatas: PersistedResource<Metadata>[]) => Promisable<void>;
+  metadataPreProcessor?: () => (
+    metadata: InputResource<Metadata>
+  ) => Promise<InputResource<Metadata>>;
+  bulkEditCtx: BulkEditTabContextI<Metadata>;
+}
+
+/**
+ * Provides a "save" method to bulk save the in one database transaction
+ * with try/catch error handling to put the error indicators on the correct tab.
+ */
+function useBulkMetadataSave({
+  onSaved,
+  metadataPreProcessor,
+  bulkEditCtx
+}: BulkMetadataSaveParams) {
+  // Force re-render when there is a bulk submission error:
+  const [_error, setError] = useState<unknown | null>(null);
+  const { save, apiClient } = useApiClient();
+  const { formatMessage } = useDinaIntl();
+
+  const { bulkEditFormRef, resourceHooks: metadataHooks } = bulkEditCtx;
+
+  async function saveAll() {
+    setError(null);
+    bulkEditFormRef.current?.setStatus(null);
+    bulkEditFormRef.current?.setErrors({});
+    try {
+      // First clear all tab errors:
+      for (const { formRef } of metadataHooks) {
+        formRef.current?.setStatus(null);
+        formRef.current?.setErrors({});
+      }
+
+      const preProcessMetadata = metadataPreProcessor?.();
+
+      // To be saved to back-end
+      const saveOperations: SaveArgs<Metadata>[] = [];
+      for (let index = 0; index < metadataHooks.length; index++) {
+        const { formRef, resource, saveHook } = metadataHooks[index];
+        const formik = formRef.current;
+
+        // These two errors shouldn't happen:
+        if (!formik) {
+          throw new Error(
+            `Missing Formik ref for ${resource.originalFilename}`
+          );
+        }
+
+        try {
+          const submittedValues = formik.values;
+          const {
+            // Don't include derivatives in the form submission:
+            derivatives,
+            license,
+            acSubtype,
+            ...metadataValues
+          } = submittedValues;
+
+          if (license) {
+            const selectedLicense = license?.id
+              ? (
+                  await apiClient.get<License>(
+                    `objectstore-api/license/${license.id}`,
+                    {}
+                  )
+                ).data
+              : null;
+            // The Metadata's xmpRightsWebStatement field stores the license's url.
+            metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
+            // No need to store this ; The url should be enough.
+            metadataValues.xmpRightsUsageTerms = "";
+          }
+
+          const saveOp = await saveHook.prepareMetadataSaveOperation({
+            submittedValues: metadataValues,
+            preProcessMetadata: async original => {
+              try {
+                return (await preProcessMetadata?.(original)) ?? original;
+              } catch (error: unknown) {
+                if (error instanceof DoOperationsError) {
+                  // Re-throw as Edit All tab error:
+                  throw new DoOperationsError(
+                    error.message,
+                    error.fieldErrors,
+                    error.individualErrors.map(opError => ({
+                      ...opError,
+                      index: "EDIT_ALL"
+                    }))
+                  );
+                }
+                throw error;
+              }
+            }
+          });
+          saveOp.resource.acSubtype = acSubtype?.acSubtype ?? null;
+          saveOperations.push(saveOp);
+        } catch (error: unknown) {
+          if (error instanceof DoOperationsError) {
+            // Rethrow the error with the tab's index:
+            throw new DoOperationsError(
+              error.message,
+              error.fieldErrors,
+              error.individualErrors.map(operationError => ({
+                ...operationError,
+                index:
+                  typeof operationError.index === "number"
+                    ? index
+                    : operationError.index
+              }))
+            );
+          }
+          throw error;
+        }
+      }
+
+      const savedMetadata = await save<Metadata>(saveOperations, {
+        apiBaseUrl: "/objectstore-api"
+      });
+
+      await onSaved(savedMetadata);
+    } catch (error: unknown) {
+      // When there is an error from the bulk save-all operation, put it into the correct form:
+      if (error instanceof DoOperationsError) {
+        for (const opError of error.individualErrors) {
+          const formik =
+            typeof opError.index === "number"
+              ? metadataHooks[opError.index].formRef.current
+              : bulkEditFormRef.current;
+
+          if (formik) {
+            formik.setStatus(opError.errorMessage);
+            formik.setErrors(opError.fieldErrors);
+          }
+        }
+        // Any errored field that was edited in the Edit All tab should
+        // get the red indicator in the Edit All tab.
+        const badBulkEditedFields = keys(
+          pickBy(
+            error.fieldErrors,
+            (_, fieldName) =>
+              getBulkEditTabFieldInfo({ bulkEditCtx, fieldName })
+                .hasBulkEditValue
+          )
+        );
+        bulkEditFormRef.current?.setErrors({
+          ...bulkEditFormRef.current?.errors,
+          ...pick(error.fieldErrors, badBulkEditedFields)
+        });
+        // Don't show the bulk edited fields' errors in the individual tabs
+        // because the user can't fix them there:
+        metadataHooks
+          .map(it => it.formRef?.current)
+          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+      }
+      setError(error);
+      throw new Error(formatMessage("bulkSubmissionErrorInfo"));
+    }
+  }
+
+  return { saveAll };
 }
