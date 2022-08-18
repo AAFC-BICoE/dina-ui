@@ -108,6 +108,25 @@ export function useMetadataSave({
     ...initialMetadataValues
   } = initialValues;
 
+  const defaultValues: InputResource<Metadata> = {
+    type: "metadata",
+    group: ""
+  };
+
+  const metadataInitialValues: InputResource<Metadata> = initialValues
+    ? {
+        ...initialValues,
+        // Convert the string to an object for the dropdown:
+        acSubtype: initialValues?.acSubtype
+          ? {
+              id: "id-unavailable",
+              type: "object-subtype",
+              acSubtype: initialValues.acSubtype
+            }
+          : undefined
+      }
+    : defaultValues;
+
   /**
    * Gets the diff of the form's initial values to the new sample state,
    * so only edited values are submitted to the back-end.
@@ -182,6 +201,7 @@ export function useMetadataSave({
 
   return {
     onSubmit,
-    prepareMetadataSaveOperation
+    prepareMetadataSaveOperation,
+    initialValues: metadataInitialValues
   };
 }

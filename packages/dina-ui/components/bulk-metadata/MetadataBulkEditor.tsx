@@ -14,7 +14,10 @@ import {
   useApiClient,
   withoutBlankFields
 } from "common-ui";
-import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
+import {
+  BulkEditNavigator,
+  BulkNavigatorTab
+} from "../bulk-edit/BulkEditNavigator";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
 import { useMetadataSave } from "../object-store/metadata/useMetadata";
@@ -56,7 +59,8 @@ export function MetadataBulkEditor({
   const metadatas = useMemo(() => metadatasProp, []);
 
   const initialValues: InputResource<Metadata> = {
-    type: "metadata"
+    type: "metadata",
+    group: ""
   };
 
   const bulkEditMetadataHook = useMetadataSave({
@@ -98,7 +102,6 @@ export function MetadataBulkEditor({
 
   return (
     <div>
-      {" "}
       <DinaForm initialValues={{}}>
         <ButtonBar className="gap-4">
           {onPreviousClick && (
@@ -110,15 +113,42 @@ export function MetadataBulkEditor({
               <DinaMessage id="goToThePreviousStep" />
             </FormikButton>
           )}
-          {/* <FormikButton
+          <FormikButton
             className="btn btn-primary bulk-save-button"
             onClick={saveAll}
             buttonProps={() => ({ style: { width: "10rem" } })}
           >
             <DinaMessage id="saveAll" />
-          </FormikButton> */}
+          </FormikButton>
         </ButtonBar>
       </DinaForm>
+      {selectedTab && (
+        <BulkEditNavigator
+          selectedTab={selectedTab}
+          onSelectTab={setSelectedTab}
+          resources={metadataHooks}
+          extraTabs={[bulkEditTab]}
+          tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
+            metadata.resource.originalFilename
+          }
+          renderOneResource={({ index, isSelected }) => (
+            <MetadataForm
+              metadataFormRef={form => {
+                const isLastRefSetter =
+                  metadataHooks.filter(it => !it.formRef.current).length === 1;
+                metadataHooks[index].formRef.current = form;
+                if (isLastRefSetter && form) {
+                  setInitialized(true);
+                }
+              }}
+              metadataSaveHook={metadataHooks[index].saveHook}
+              buttonBar={null}
+              isOffScreen={!isSelected}
+              reduceRendering={!isSelected}
+            />
+          )}
+        />
+      )}
     </div>
   );
 }

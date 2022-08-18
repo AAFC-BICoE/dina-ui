@@ -30,7 +30,7 @@ import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
 
 export interface MetadataFormProps {
-  metadata: InputResource<Metadata>;
+  metadata?: InputResource<Metadata>;
 
   // Function to redirect to next page after saving metadata
   onSaved?: (id: string) => Promise<void>;
@@ -41,7 +41,16 @@ export interface MetadataFormProps {
   metadataSaveHook?: ReturnType<typeof useMetadataSave>;
 
   // Form ref from parent component
-  metadataFormRef?: Ref<FormikProps<InputResource<any>>>;
+  metadataFormRef?: Ref<FormikProps<InputResource<Metadata>>>;
+
+  /**
+   * Removes the html tag IDs from hidden tabs.
+   * This needs to be done for off-screen forms in the bulk editor.
+   */
+  isOffScreen?: boolean;
+
+  /** Reduces the rendering to improve performance when bulk editing many material samples. */
+  reduceRendering?: boolean;
 }
 
 export function MetadataForm({
@@ -53,29 +62,19 @@ export function MetadataForm({
 }: MetadataFormProps) {
   const { formatMessage, locale } = useDinaIntl();
 
-  const { onSubmit } =
+  const { initialValues, onSubmit } =
     metadataSaveHook ??
     useMetadataSave({
       initialValues: metadata,
       onSaved
     });
-  const initialValues = {
-    ...metadata,
-    // Convert the string to an object for the dropdown:
-    acSubtype: metadata.acSubtype
-      ? {
-          id: "id-unavailable",
-          type: "object-subtype",
-          acSubtype: metadata.acSubtype
-        }
-      : undefined
-  };
+
   const metadataOnSubmit = async submittedValues => {
     await onSubmit(submittedValues);
   };
 
   return (
-    <DinaForm
+    <DinaForm<InputResource<Metadata>>
       initialValues={initialValues}
       onSubmit={metadataOnSubmit}
       innerRef={metadataFormRef}
@@ -83,7 +82,7 @@ export function MetadataForm({
       <NotPubliclyReleasableWarning />
       {buttonBar}
       <div className="mb-3">
-        {metadata.derivatives && (
+        {metadata?.derivatives && (
           <MetadataFileView metadata={metadata as Metadata} imgHeight="15rem" />
         )}
       </div>
@@ -160,7 +159,7 @@ export function MetadataForm({
       </FieldSet>
       <ManagedAttributesEditor
         valuesPath="managedAttributes"
-        values={metadata.managedAttributes}
+        values={metadata?.managedAttributes}
         managedAttributeApiPath="objectstore-api/managed-attribute"
         fieldSetProps={{
           legend: <DinaMessage id="managedAttributes" />

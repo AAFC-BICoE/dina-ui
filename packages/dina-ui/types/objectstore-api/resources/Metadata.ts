@@ -15,7 +15,8 @@ export interface MetadataAttributes {
   xmpRightsWebStatement?: string;
   xmpRightsUsageTerms?: string;
   xmpRightsOwner?: string;
-  // Client-side only fields
+
+  // Client-side only fields, delete before submitting to back-end
   license?: License;
 
   // optional fields
