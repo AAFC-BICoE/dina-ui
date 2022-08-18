@@ -6,14 +6,16 @@ import {
   ButtonBar,
   DinaForm,
   FormikButton,
-  ResourceWithHooks
-} from "packages/common-ui/lib";
+  ResourceWithHooks,
+  withoutBlankFields
+} from "common-ui";
 import { BulkNavigatorTab } from "../bulk-edit/BulkEditNavigator";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FormikProps } from "formik";
 import { useMetadataSave } from "../object-store/metadata/useMetadata";
 import { MetadataForm } from "../object-store/metadata/MetadataForm";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { isEmpty } from "lodash";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
@@ -43,6 +45,7 @@ MetadataBulkEditorProps) {
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
   >();
+  const [initialized, setInitialized] = useState(false);
 
   // Make sure the samples list doesn't change during this component's lifecycle:
   const metadatas = useMemo(() => metadatasProp, []);
@@ -62,6 +65,11 @@ MetadataBulkEditorProps) {
   const metadataForm = (
     <MetadataForm metadata={initialValues} buttonBar={null} />
   );
+
+  function metadataBulkOverrider() {
+    /** Sample input including blank/empty fields. */
+    return getMetadataBulkOverrider(bulkEditFormRef);
+  }
   return (
     <div>
       {" "}
@@ -87,4 +95,43 @@ MetadataBulkEditorProps) {
       </DinaForm>
     </div>
   );
+}
+
+export function getMetadataBulkOverrider(bulkEditFormRef) {
+  let bulkEditMetadata: InputResource<Metadata> | undefined;
+
+  /** Returns a sample with the overridden values. */
+  return async function withBulkEditOverrides(
+    baseSample: InputResource<Metadata>
+  ) {
+    const formik = bulkEditFormRef.current;
+    // Shouldn't happen, but check for type safety:
+    if (!formik) {
+      throw new Error("Missing Formik ref for Bulk Edit Tab");
+    }
+
+    // Initialize the bulk values once to make sure the same object is used each time.
+    if (!bulkEditMetadata) {
+      bulkEditMetadata = formik.values;
+    }
+
+    /** Sample override object with only the non-empty fields. */
+    const overrides = withoutBlankFields(bulkEditMetadata);
+
+    // Combine the managed attributes dictionaries:
+    const newManagedAttributes = {
+      ...withoutBlankFields(baseSample.managedAttributes),
+      ...withoutBlankFields(bulkEditMetadata?.managedAttributes)
+    };
+
+    const newMetadata: InputResource<Metadata> = {
+      ...baseSample,
+      ...overrides,
+      ...(!isEmpty(newManagedAttributes) && {
+        managedAttributes: newManagedAttributes
+      })
+    };
+
+    return newMetadata;
+  };
 }
