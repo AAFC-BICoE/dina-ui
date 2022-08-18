@@ -1,5 +1,13 @@
 import { KitsuResource } from "kitsu";
 
+export interface FormTemplateComponents {
+  // Visibility for each of the items.
+  templateCheckboxes: { [key: string]: boolean };
+
+  // Default values are stored directly in the form as well.
+  [key: string]: any;
+}
+
 export interface FormTemplate extends KitsuResource {
   type: "form-template";
   createdOn?: string;

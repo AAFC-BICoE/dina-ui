@@ -16,7 +16,7 @@ export interface MaterialSampleFormComponentInformation {
 export interface MaterialSampleFormSectionInformation {
   id: string;
 
-  labelKey: string;
+  labelKey?: string;
 
   maxGridSizeX: number;
 
@@ -39,10 +39,47 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       maxGridSizeX: 2,
       sections: [
         {
+          id: "tags-section",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "tags"
+            },
+            {
+              id: "projects"
+            },
+            {
+              id: "assemblages"
+            },
+            {
+              id: "publiclyReleasable"
+            },
+            {
+              id: "notPubliclyReleasableReason"
+            }
+          ]
+        },
+        {
           id: "identifiers-section",
           labelKey: "identifiers",
           maxGridSizeX: 2,
-          fields: []
+          fields: [
+            {
+              id: "collection"
+            },
+            {
+              id: "materialSampleName"
+            },
+            {
+              id: "useNextSequence"
+            },
+            {
+              id: "dwcOtherCatalogNumbers"
+            },
+            {
+              id: "barcode"
+            }
+          ]
         }
       ]
     },
@@ -50,7 +87,24 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       id: "material-sample-info-component",
       labelKey: "materialSampleInfo",
       maxGridSizeX: 2,
-      sections: []
+      sections: [
+        {
+          id: "material-sample-info-section",
+          labelKey: "materialSampleInfo",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "materialSampleType"
+            },
+            {
+              id: "materialSampleRemarks"
+            },
+            {
+              id: "materialSampleState"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "collecting-event-component",

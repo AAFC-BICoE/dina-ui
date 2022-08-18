@@ -136,7 +136,7 @@ export function useMaterialSampleSectionOrder({
   const { formatMessage, messages } = useDinaIntl();
 
   /** An array with all section IDs, beginning with the user-defined order. */
-  const navOrderWithAllSections = uniq([
+  const navOrderWithAllSections: string[] = uniq([
     ...(navOrder ?? []),
     ...MATERIAL_SAMPLE_FORM_LEGEND.map(component => component.id)
   ]);
@@ -192,10 +192,11 @@ export function useMaterialSampleSectionOrder({
     }))
   ];
 
-  const sortedScrollTargets = uniq([
-    ...navOrderWithAllSections.map(id => scrollTargets[id]),
-    ...MATERIAL_SAMPLE_FORM_LEGEND.map(dataComponent => dataComponent.id)
-  ]);
+  const sortedScrollTargets: ScrollTarget[] = uniq(
+    navOrderWithAllSections.map(
+      id => scrollTargets.filter(target => target.id === id)[0]
+    )
+  );
 
   return { sortedScrollTargets };
 }
