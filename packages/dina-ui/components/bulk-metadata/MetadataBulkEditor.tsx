@@ -28,7 +28,10 @@ import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
-  onSaved: (metadatas: PersistedResource<Metadata>[]) => Promisable<void>;
+  onSaved: (
+    metadatas: PersistedResource<Metadata>[],
+    isExternalResource?: boolean
+  ) => Promisable<void>;
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
 }
@@ -193,7 +196,10 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
 }
 
 interface BulkMetadataSaveParams {
-  onSaved: (metadatas: PersistedResource<Metadata>[]) => Promisable<void>;
+  onSaved: (
+    metadatas: PersistedResource<Metadata>[],
+    isExternalResource?: boolean
+  ) => Promisable<void>;
   metadataPreProcessor?: () => (
     metadata: InputResource<Metadata>
   ) => Promise<InputResource<Metadata>>;

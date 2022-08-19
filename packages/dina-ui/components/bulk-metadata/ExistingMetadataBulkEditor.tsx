@@ -8,7 +8,10 @@ import { MetadataBulkEditor } from "./MetadataBulkEditor";
 
 export interface ExistingMetadataBulkEditorProps {
   ids: string[];
-  onSaved: (metadatas: PersistedResource<Metadata>[]) => Promisable<void>;
+  onSaved: (
+    metadatas: PersistedResource<Metadata>[],
+    isExternalResource?: boolean
+  ) => Promisable<void>;
   onPreviousClick?: () => void;
 }
 
@@ -43,12 +46,16 @@ export function ExistingMetadataBulkEditor({
     );
   }
 
-  const metadatas = compact(metadataQueries.map(query => query.response?.data));
+  const metadatas = compact(
+    metadataQueries.map(
+      query => query.response?.data as InputResource<Metadata>
+    )
+  );
 
   if (metadatas.length) {
     return (
       <MetadataBulkEditor
-        metadatas={metadatas as InputResource<Metadata>[]}
+        metadatas={metadatas}
         onSaved={onSaved}
         onPreviousClick={onPreviousClick}
       />

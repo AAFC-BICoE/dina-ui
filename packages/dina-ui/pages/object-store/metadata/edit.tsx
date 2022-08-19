@@ -12,6 +12,9 @@ import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
 import { useEffect } from "react";
+import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { PersistedResource } from "kitsu";
+import { ExistingMetadataBulkEditor } from "packages/dina-ui/components/bulk-metadata/ExistingMetadataBulkEditor";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
@@ -27,6 +30,21 @@ export default function EditMetadatasPage() {
 
   async function afterMetadatasSaved(
     ids: string[],
+    isExternalResource?: boolean
+  ) {
+    if (ids.length === 1) {
+      await router.push(
+        `/object-store/object/${
+          isExternalResource ? "external-resource-view" : "view"
+        }?id=${ids[0]}`
+      );
+    } else {
+      await router.push("/object-store/object/list");
+    }
+  }
+
+  async function onSaved(
+    ids: PersistedResource<Metadata>[],
     isExternalResource?: boolean
   ) {
     if (ids.length === 1) {
@@ -58,17 +76,25 @@ export default function EditMetadatasPage() {
             )}
           </>
         </ButtonBar>
-        <BulkMetadataEditor
-          metadataIds={metadataIds ?? undefined}
-          objectUploadIds={objectUploadIds ?? undefined}
-          group={router?.query?.group as string}
-          defaultValuesConfig={
-            typeof router?.query?.defaultValuesConfig === "string"
-              ? Number(router?.query?.defaultValuesConfig)
-              : undefined
-          }
-          afterMetadatasSaved={afterMetadatasSaved}
-        />
+        {metadataIds ? (
+          <ExistingMetadataBulkEditor
+            ids={metadataIds}
+            onSaved={onSaved}
+            onPreviousClick={() => router.push("/object-store/object/list")}
+          />
+        ) : (
+          <BulkMetadataEditor
+            metadataIds={metadataIds ?? undefined}
+            objectUploadIds={objectUploadIds ?? undefined}
+            group={router?.query?.group as string}
+            defaultValuesConfig={
+              typeof router?.query?.defaultValuesConfig === "string"
+                ? Number(router?.query?.defaultValuesConfig)
+                : undefined
+            }
+            afterMetadatasSaved={afterMetadatasSaved}
+          />
+        )}
       </main>
       <Footer />
     </div>
