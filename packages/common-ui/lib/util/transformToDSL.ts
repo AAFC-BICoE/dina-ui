@@ -341,12 +341,25 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   // Display only the fields provided in the columns array.
+
   const sourceFilteringColumns: string[] = [
     "data.id",
     "data.type",
     ...columns
-      .filter(column => column?.accessor)
-      .map(column => column.accessor as string)
+      .map(column => {
+        const accessors: string[] = [];
+
+        if (column?.accessor) {
+          accessors.push(column.accessor as string);
+        }
+
+        if (column?.additionalAccessors) {
+          accessors.push(...(column.additionalAccessors as string[]));
+        }
+
+        return accessors;
+      })
+      .flat()
   ];
 
   // If the source filtering contains included attributes, we need to also include the id and included type.
