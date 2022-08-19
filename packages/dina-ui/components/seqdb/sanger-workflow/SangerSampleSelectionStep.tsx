@@ -82,24 +82,50 @@ export function SangerSampleSelectionStep({
   }
   ];
 
-  const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
+  const secondColumns: TableColumn<any>[] = [
     {
-      Cell: ({ original: materialSample }) => (
-        <Link href={`/collection/material-sample/view?id=${materialSample.id}`}>{materialSample.id}</Link>
+      Cell: ({ original: pcrBatchItem }) => (
+        <Link
+          href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
+        >
+          {pcrBatchItem?.materialSample?.id}
+        </Link>
       ),
       accessor: "materialSample.id",
       sortable: false
     },
-    {
-      Cell: ({ original: materialSample }) => (
-        <div key={materialSample.id}>
-          <SampleSelectCheckBox resource={materialSample} />
-        </div>
-      ),
-      Header: SampleSelectCheckBoxHeader,
-      sortable: false
-    }
+    ...(editMode
+      ? [
+          {
+            Cell: ({ original: pcrBatchItem }) => (
+              <div key={pcrBatchItem.id}>
+                <SampleDeselectCheckBox resource={pcrBatchItem} />
+              </div>
+            ),
+            Header: SampleDeselectCheckBoxHeader,
+            sortable: false
+          }
+        ]
+      : [])
   ];
+  // const SELECTABLE_SAMPLE_COLUMNS: ColumnDefinition<MaterialSample>[] = [
+  //   {
+  //     Cell: ({ original: materialSample }) => (
+  //       <Link href={`/collection/material-sample/view?id=${materialSample.id}`}>{materialSample.id}</Link>
+  //     ),
+  //     accessor: "materialSample.id",
+  //     sortable: false
+  //   },
+  //   {
+  //     Cell: ({ original: materialSample }) => (
+  //       <div key={materialSample.id}>
+  //         <SampleSelectCheckBox resource={materialSample} />
+  //       </div>
+  //     ),
+  //     Header: SampleSelectCheckBoxHeader,
+  //     sortable: false
+  //   }
+  // ];
 
   const PCRBATCH_ITEM_COLUMNS: ColumnDefinition<any>[] = [
     {
@@ -223,6 +249,7 @@ export function SangerSampleSelectionStep({
         <QueryPage
           indexName={"dina_material_sample_index"}
           columns={columns}
+          secondColumns={secondColumns}
           selectionMode={true}
         />
           {/* <DinaForm

@@ -59,6 +59,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   columns: TableColumn<TData>[];
 
+  secondColumns?: TableColumn<TData>[];
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
    * based on the index provided.
