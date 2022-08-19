@@ -188,13 +188,8 @@ export function SangerSampleSelectionStep({
         <div className="alert alert-warning d-inline-block">
           <SeqdbMessage id="sampleSelectionInstructions" />
         </div>
-        <QueryPage
-          indexName={"dina_material_sample_index"}
-          columns={columns}
-          selectionMode={true}
-        />
-        <div className="mb-3">
-          <DinaForm
+        {/* <div className="mb-3"> */}
+          {/* <DinaForm
             initialValues={{ inputValue: "" }}
             onSubmit={({ submittedValues: { inputValue } }) =>
               setSearchValue(inputValue)
@@ -219,20 +214,28 @@ export function SangerSampleSelectionStep({
                 <SeqdbMessage id="resetButtonText" />
               </FormikButton>
             </div>
-          </DinaForm>
-        </div>
+          </DinaForm> */}
+        {/* </div> */}
         <div className="mb-3">
-          <DinaForm
+        <strong>
+          <SeqdbMessage id="availableMaterialSamplesTitle" />
+        </strong>
+        <QueryPage
+          indexName={"dina_material_sample_index"}
+          columns={columns}
+          selectionMode={true}
+        />
+          {/* <DinaForm
             initialValues={{
               sampleIdsToSelect: {},
               pcrBatchItemIdsToDelete: {}
             }}
-          >
-            <div className="row">
+          > */}
+            {/* <div className="row">
               <div className="col-5 available-samples">
                 <strong>
                   <SeqdbMessage id="availableMaterialSamplesTitle" />
-                </strong>
+                </strong> */}
                 {/* <QueryTable
                   columns={SELECTABLE_SAMPLE_COLUMNS}
                   defaultPageSize={100}
@@ -244,7 +247,7 @@ export function SangerSampleSelectionStep({
                   onSuccess={response => setAvailableSamples(response.data)}
                   path="collection-api/material-sample"
                 /> */}
-              </div>
+              {/* </div> */}
               {/* <div className="col-2" style={{ marginTop: "100px" }}>
                 <div>
                   <FormikButton
@@ -264,8 +267,8 @@ export function SangerSampleSelectionStep({
                 </div>
               </div>
               <div className="col-5 selected-samples">{selectedItemsTable}</div> */}
-            </div>
-          </DinaForm>
+            {/* </div>
+          </DinaForm> */}
         </div>
         {buttonBar}
       </div>

@@ -33,6 +33,10 @@ import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
+import { FormikContextType } from "formik";
+import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
+import { pick, toPairs } from "lodash";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -168,6 +172,43 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
+
+  // export function useSangerSampleSelection(pcrBatchId: string) {
+  //   const { apiClient, save } = useApiClient();
+  //   const { username } = useAccount();
+  
+  //   // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+  //   const [lastSave, setLastSave] = useState<number>();
+  
+  //   async function selectSamples(sampleLinks: KitsuResourceLink[]) {
+  //     const { data: pcrBatch } = await apiClient.get<MaterialSample>(
+  //       `seqdb-api/pcr-batch/${pcrBatchId}`,
+  //       {}
+  //     );
+  
+  //     const newPcrBatchItems = sampleLinks.map<InputResource<MaterialSample>>(
+  //       sampleLink => ({
+  //         materialSample: sampleLink,
+  //         pcrBatch: pick(pcrBatch, "id", "type"),
+  //         group: pcrBatch.group,
+  //         createdBy: username,
+  //         type: "material-sample"
+  //       })
+  //     );
+  
+  //     await save(
+  //       newPcrBatchItems.map(item => ({
+  //         resource: item,
+  //         type: "pcr-batch-item"
+  //       })),
+  //       { apiBaseUrl: "/seqdb-api" }
+  //     );
+  
+  //     setLastSave(Date.now());
+  //   }
+  
+  // const { deleteAllCheckedPcrBatchItems, lastSave, selectAllCheckedSamples } =
+  // useSangerSampleSelection(pcrBatchId);
 
   // Query Page error message state
   const [error, setError] = useState<any>();
@@ -467,23 +508,31 @@ export function QueryPage<TData extends KitsuResource>({
     setLoading(true);
   }
 
+  const {
+    CheckBoxHeader: SampleDeselectCheckBoxHeader,
+    CheckBoxField: SampleDeselectCheckBox,
+    setAvailableItems: setRemoveablePcrBatchItems
+  } = useGroupedCheckBoxes({
+    fieldName: "pcrBatchItemIdsToDelete"
+  });
+
   async function selectAllCheckedSamples(
-  //   formValues,
-  //   formik: FormikContextType<any>
+     formValues,
+     formik: FormikContextType<any>
   ) {
-  //   const { sampleIdsToSelect } = formValues;
-  //   const ids = toPairs(sampleIdsToSelect)
-  //     .filter(pair => pair[1])
-  //     .map(pair => pair[0]);
+    //  const { sampleIdsToSelect } = formValues;
+    //  const ids = toPairs(sampleIdsToSelect)
+    //    .filter(pair => pair[1])
+    //    .map(pair => pair[0]);
 
-  //   const materialSamples = ids.map(id => ({
-  //     id,
-  //     type: "material-sample"
-  //   }));
+    //  const materialSamples = ids.map(id => ({
+    //    id,
+    //    type: "material-sample"
+    //  }));
 
-  //   await selectSamples(materialSamples);
+    //  await selectSamples(materialSamples);
 
-  //   formik.setFieldValue("sampleIdsToSelect", {});
+    //  formik.setFieldValue("sampleIdsToSelect", {});
   }
 
   async function deleteAllCheckedPcrBatchItems(
@@ -668,7 +717,7 @@ export function QueryPage<TData extends KitsuResource>({
             </div>
             <div className="col-5"><ReactTable
             columns={mappedColumns}
-            data={searchResults}
+            data={selectedResources}
             minRows={1}
             />
             </div>
