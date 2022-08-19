@@ -65,6 +65,20 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
+// The QueryPage will only display the records in the columns on the table.
+const SOURCE_FILTERS = [
+  "data.id",
+  "data.type",
+  "materialSampleName",
+  "collection.name",
+  "dwcOtherCatalogNumbers",
+  "materialSampleType",
+  "createdBy",
+  "createdOn",
+  "included.id",
+  "included.type"
+];
+
 const TEST_GROUP: PersistedResource<Group>[] = [
   {
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -304,6 +318,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -334,6 +349,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: { term: { "data.attributes.group": "cnc" } },
@@ -483,6 +499,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -625,6 +642,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
