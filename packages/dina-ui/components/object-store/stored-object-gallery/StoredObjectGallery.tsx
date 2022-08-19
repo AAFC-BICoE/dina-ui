@@ -73,8 +73,9 @@ function GalleryItem({
   metadata,
   onSelectPreviewMetadata
 }: GalleryItemProps) {
-  const { id, acCaption, originalFilename, bucket, fileIdentifier } =
+  const { acCaption, originalFilename, bucket, fileIdentifier } =
     metadata?.data?.attributes;
+  const { id } = metadata;
 
   const fileId = `${fileIdentifier}/thumbnail`;
   const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
@@ -128,6 +129,4 @@ function GalleryItem({
       </div>
     </div>
   );
-
-  return null;
 }
