@@ -258,25 +258,8 @@ function useBulkMetadataSave({
           const {
             // Don't include derivatives in the form submission:
             derivatives,
-            license,
-            acSubtype,
             ...metadataValues
           } = submittedValues;
-
-          if (license) {
-            const selectedLicense = license?.id
-              ? (
-                  await apiClient.get<License>(
-                    `objectstore-api/license/${license.id}`,
-                    {}
-                  )
-                ).data
-              : null;
-            // The Metadata's xmpRightsWebStatement field stores the license's url.
-            metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
-            // No need to store this ; The url should be enough.
-            metadataValues.xmpRightsUsageTerms = "";
-          }
 
           const saveOp = await saveHook.prepareMetadataSaveOperation({
             submittedValues: metadataValues,
@@ -299,8 +282,24 @@ function useBulkMetadataSave({
               }
             }
           });
+          if (saveOp.resource.license) {
+            const selectedLicense = saveOp.resource.license
+              ? (
+                  await apiClient.get<License>(
+                    `objectstore-api/license/${saveOp.resource.license.id}`,
+                    {}
+                  )
+                ).data
+              : null;
+            // The Metadata's xmpRightsWebStatement field stores the license's url.
+            saveOp.resource.xmpRightsWebStatement = selectedLicense?.url ?? "";
+            // No need to store this ; The url should be enough.
+            saveOp.resource.xmpRightsUsageTerms = "";
+          }
+          delete saveOp.resource.license;
+          saveOp.resource.acSubtype =
+            saveOp.resource.acSubtype?.acSubtype ?? null;
 
-          saveOp.resource.acSubtype = acSubtype?.acSubtype ?? null;
           saveOperations.push(saveOp);
         } catch (error: unknown) {
           if (error instanceof DoOperationsError) {
