@@ -189,10 +189,16 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
     queryParams.forEach(queryParam => {
       const query = {
-        [queryParam.queryType]: {
-          [queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)]:
-            queryParam.value
-        }
+        [queryParam.queryType]:
+          queryParam.queryType !== "exists"
+            ? {
+                [queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)]:
+                  queryParam.value
+              }
+            : {
+                field:
+                  queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)
+              }
       };
 
       switch (queryParam.queryOperator) {
@@ -251,9 +257,15 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
     queryParams.forEach(queryParam => {
       const query = {
-        [queryParam.queryType]: {
-          [queryParam.fieldName ?? getFieldName(rowToBuild)]: queryParam.value
-        }
+        [queryParam.queryType]:
+          queryParam.queryType !== "exists"
+            ? {
+                [queryParam.fieldName ?? getFieldName(rowToBuild)]:
+                  queryParam.value
+              }
+            : {
+                field: queryParam.fieldName ?? getFieldName(rowToBuild)
+              }
       };
 
       switch (queryParam.queryOperator) {
@@ -311,19 +323,21 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       bool: {
         must: {
           [multipleGroups ? "terms" : "term"]: {
-            group: submittedValues.group
+            "data.attributes.group": submittedValues.group
           }
         }
       }
     });
   }
 
-  // Root query.
-  builder.rawOption("query", {
-    bool: {
-      must: [...queryRowQueries]
-    }
-  });
+  // Root query, only supplied if a query rows are provided (including the group)
+  if (queryRowQueries.length > 0) {
+    builder.rawOption("query", {
+      bool: {
+        must: [...queryRowQueries]
+      }
+    });
+  }
 
   // Apply pagination rules to elastic search query.
   if (pagination) {
