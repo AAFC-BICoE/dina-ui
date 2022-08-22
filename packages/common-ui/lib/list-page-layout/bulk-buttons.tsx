@@ -74,6 +74,7 @@ export function BulkDeleteButton({
 export interface BulkEditButtonProps {
   /** Where to perform the request for the bulk edit. */
   pathname: string;
+  singleEditPathName?: string;
 }
 
 /**
@@ -89,7 +90,10 @@ export const BULK_EDIT_IDS_KEY = "bulkEditIds";
  * @param param0
  * @returns
  */
-export function BulkEditButton({ pathname }: BulkEditButtonProps) {
+export function BulkEditButton({
+  pathname,
+  singleEditPathName
+}: BulkEditButtonProps) {
   const router = useRouter();
 
   return (
@@ -102,7 +106,11 @@ export function BulkEditButton({ pathname }: BulkEditButtonProps) {
           .map(pair => pair[0]);
 
         writeStorage<string[]>(BULK_EDIT_IDS_KEY, ids);
-        await router.push({ pathname });
+        if (singleEditPathName && ids.length === 1) {
+          await router.push(`${singleEditPathName}?id=${ids[0]}`);
+        } else {
+          await router.push({ pathname });
+        }
       }}
     >
       <CommonMessage id="editSelectedButtonText" />

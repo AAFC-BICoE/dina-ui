@@ -99,4 +99,12 @@ export default function EditMetadatasPage() {
       <Footer />
     </div>
   );
+
+  async function redirectSingleEditPage() {
+    if (metadataIds?.length === 1) {
+      await router.push(
+        `/object-store/metadata/single-record-edit?id=${metadataIds[0]}`
+      );
+    }
+  }
 }

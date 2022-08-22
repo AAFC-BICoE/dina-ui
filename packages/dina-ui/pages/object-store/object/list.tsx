@@ -162,6 +162,7 @@ export default function MetadataListPage() {
                   apiBaseUrl: "/objectstore-api"
                 }}
                 bulkEditPath={"/object-store/metadata/edit"}
+                singleEditPath={"/object-store/metadata/single-record-edit"}
                 defaultSort={[
                   {
                     desc: true,
