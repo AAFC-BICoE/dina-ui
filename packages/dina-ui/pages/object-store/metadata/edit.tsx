@@ -11,10 +11,9 @@ import { Footer, Head, Nav } from "../../../components";
 import { BulkMetadataEditor } from "../../../components/object-store";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
-import { useEffect } from "react";
-import { Metadata } from "packages/dina-ui/types/objectstore-api";
+import { Metadata } from "../../../types/objectstore-api";
 import { PersistedResource } from "kitsu";
-import { ExistingMetadataBulkEditor } from "packages/dina-ui/components/bulk-metadata/ExistingMetadataBulkEditor";
+import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
@@ -99,12 +98,4 @@ export default function EditMetadatasPage() {
       <Footer />
     </div>
   );
-
-  async function redirectSingleEditPage() {
-    if (metadataIds?.length === 1) {
-      await router.push(
-        `/object-store/metadata/single-record-edit?id=${metadataIds[0]}`
-      );
-    }
-  }
 }
