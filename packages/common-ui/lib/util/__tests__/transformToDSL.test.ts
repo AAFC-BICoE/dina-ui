@@ -106,24 +106,47 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
-              term: {
-                "data.attributes.materialSampleName.keyword": "CNC001"
+              bool: {
+                must: {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "CNC001"
+                  }
+                }
               }
             },
+
+            // Second Query Row
             {
-              match: {
-                "data.attributes.materialSampleType": "WHOLE_ORGANISM"
+              bool: {
+                must: {
+                  match: {
+                    "data.attributes.materialSampleType": "WHOLE_ORGANISM"
+                  }
+                }
               }
             },
+
+            // Third Query Row
             {
-              term: {
-                "data.attributes.allowDuplicateName": "true"
+              bool: {
+                must: {
+                  term: {
+                    "data.attributes.allowDuplicateName": "true"
+                  }
+                }
               }
             },
+
+            // Forth Query Row
             {
-              term: {
-                "data.attributes.createdOn": "2022-04-11"
+              bool: {
+                must: {
+                  term: {
+                    "data.attributes.createdOn": "2022-04-11"
+                  }
+                }
               }
             }
           ]
@@ -184,37 +207,66 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  gt: "2022-04-11"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      gt: "2022-04-11"
+                    }
+                  }
                 }
               }
             },
+
+            // Second Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  gte: "2022-04-12"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      gte: "2022-04-12"
+                    }
+                  }
                 }
               }
             },
+
+            // Third Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  lt: "2022-04-13"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      lt: "2022-04-13"
+                    }
+                  }
                 }
               }
             },
+
+            // Forth Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  lte: "2022-04-14"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      lte: "2022-04-14"
+                    }
+                  }
                 }
               }
             },
+
+            // Fifth Query Row
             {
-              term: {
-                "data.attributes.createdOn": "2022-04-15"
+              bool: {
+                must: {
+                  term: {
+                    "data.attributes.createdOn": "2022-04-15"
+                  }
+                }
               }
             }
           ]

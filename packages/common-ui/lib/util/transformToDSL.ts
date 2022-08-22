@@ -4,7 +4,7 @@ import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
 import { QueryRowExportProps } from "../list-page/QueryRow";
 import { TableColumn } from "../list-page/types";
-import { uniq } from "lodash";
+import { uniq, groupBy } from "lodash";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
@@ -227,67 +227,56 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
+    const jsonData = {};
+
     const queryParams: ElasticSearchQueryParams[] =
       buildInnerQueryBasedOnType(rowToBuild);
 
     queryParams.forEach(queryParam => {
-      switch (queryParam.queryOperator) {
-        case "must":
-          builder.query(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "should":
-          builder.orQuery(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "must_not":
-          builder.notQuery(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "filter":
-          builder.filter(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-      }
+      jsonData[queryParam.queryOperator] = {
+        [queryParam.queryType]: {
+          [queryParam.fieldName ?? getFieldName(rowToBuild)]: queryParam.value
+        }
+      };
     });
+
+    return { bool: jsonData };
   }
 
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
-  submittedValues?.queryRows
+  const queryRowQueries = submittedValues?.queryRows
     .filter(queryRow => shouldQueryRowBeIncluded(queryRow))
     .map(queryRow => {
       if (queryRow.parentType) {
-        buildRelationshipQuery(queryRow);
+        return buildRelationshipQuery(queryRow);
       } else {
-        buildQuery(queryRow);
+        return buildQuery(queryRow);
       }
-    });
+    })
+    .flat();
 
   // Add the search group filter.
-  if (
-    Array.isArray(submittedValues.group) &&
-    submittedValues.group.length > 0
-  ) {
-    builder.andFilter("terms", "data.attributes.group", submittedValues.group);
-  } else if (!Array.isArray(submittedValues.group) && submittedValues.group) {
-    builder.andFilter("term", "data.attributes.group", submittedValues.group);
+  const multipleGroups: boolean =
+    Array.isArray(submittedValues.group) && submittedValues.group.length > 0;
+  if (submittedValues.group) {
+    queryRowQueries.push({
+      bool: {
+        must: {
+          [multipleGroups ? "terms" : "term"]: {
+            group: submittedValues.group
+          }
+        }
+      }
+    });
   }
+
+  // Root query.
+  builder.rawOption("query", {
+    bool: {
+      must: [...queryRowQueries]
+    }
+  });
 
   // Apply pagination rules to elastic search query.
   if (pagination) {
