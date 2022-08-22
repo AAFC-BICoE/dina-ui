@@ -173,51 +173,66 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildRelationshipQuery(rowToBuild) {
+    const mustQueries: any[] = [];
+    const mustNotQueries: any[] = [];
+    const shouldQueries: any[] = [];
+
     const queryParams: ElasticSearchQueryParams[] =
       buildInnerQueryBasedOnType(rowToBuild);
 
-    builder.query("nested", { path: "included" }, queryBuilder => {
-      const query = queryBuilder.andQuery(
-        "match",
-        "included.type",
-        rowToBuild.parentType
-      );
-
-      queryParams.forEach(queryParam => {
-        switch (queryParam.queryOperator) {
-          case "must":
-            query.andQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "should":
-            query.orQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "must_not":
-            query.notQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "filter":
-            query.filter(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-        }
-      });
-
-      return query;
+    // The included type must match the parent type of the row.
+    mustQueries.push({
+      match: {
+        "included.type": rowToBuild.parentType
+      }
     });
+
+    queryParams.forEach(queryParam => {
+      const query = {
+        [queryParam.queryType]: {
+          [queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)]:
+            queryParam.value
+        }
+      };
+
+      switch (queryParam.queryOperator) {
+        case "must":
+          mustQueries.push(query);
+          break;
+        case "must_not":
+          mustNotQueries.push(query);
+          break;
+        case "should":
+          shouldQueries.push(query);
+          break;
+      }
+    });
+
+    return {
+      nested: {
+        path: "included",
+        query: {
+          bool: {
+            // Must Queries
+            ...(mustQueries.length !== 0 && {
+              must: mustQueries.length === 1 ? mustQueries[0] : mustQueries
+            }),
+
+            // Must_Not Queries
+            ...(mustNotQueries.length !== 0 && {
+              must_not:
+                mustNotQueries.length === 1 ? mustNotQueries[0] : mustNotQueries
+            }),
+
+            // Should Queries
+            ...(shouldQueries.length !== 0 && {
+              should:
+                shouldQueries.length === 1 ? shouldQueries[0] : shouldQueries
+            })
+          }
+        }
+      }
+    };
   }
 
   /**
@@ -227,20 +242,52 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
-    const jsonData = {};
+    const mustQueries: any[] = [];
+    const mustNotQueries: any[] = [];
+    const shouldQueries: any[] = [];
 
     const queryParams: ElasticSearchQueryParams[] =
       buildInnerQueryBasedOnType(rowToBuild);
 
     queryParams.forEach(queryParam => {
-      jsonData[queryParam.queryOperator] = {
+      const query = {
         [queryParam.queryType]: {
           [queryParam.fieldName ?? getFieldName(rowToBuild)]: queryParam.value
         }
       };
+
+      switch (queryParam.queryOperator) {
+        case "must":
+          mustQueries.push(query);
+          break;
+        case "must_not":
+          mustNotQueries.push(query);
+          break;
+        case "should":
+          shouldQueries.push(query);
+          break;
+      }
     });
 
-    return { bool: jsonData };
+    return {
+      bool: {
+        // Must Queries
+        ...(mustQueries.length !== 0 && {
+          must: mustQueries.length === 1 ? mustQueries[0] : mustQueries
+        }),
+
+        // Must_Not Queries
+        ...(mustNotQueries.length !== 0 && {
+          must_not:
+            mustNotQueries.length === 1 ? mustNotQueries[0] : mustNotQueries
+        }),
+
+        // Should Queries
+        ...(shouldQueries.length !== 0 && {
+          should: shouldQueries.length === 1 ? shouldQueries[0] : shouldQueries
+        })
+      }
+    };
   }
 
   // Remove the row that user did not select any field to search on or

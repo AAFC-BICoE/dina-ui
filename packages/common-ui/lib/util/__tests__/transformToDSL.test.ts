@@ -315,30 +315,47 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  format: "yyyy",
-                  gte: "2022||/y",
-                  lte: "2022||/y"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      format: "yyyy",
+                      gte: "2022||/y",
+                      lte: "2022||/y"
+                    }
+                  }
                 }
               }
             },
+
+            // Second Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  format: "yyyy-MM",
-                  gte: "2022-04||/M",
-                  lte: "2022-04||/M"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      format: "yyyy-MM",
+                      gte: "2022-04||/M",
+                      lte: "2022-04||/M"
+                    }
+                  }
                 }
               }
             },
+
+            // Third Query Row
             {
-              range: {
-                "data.attributes.createdOn": {
-                  format: "yyyy-MM-dd",
-                  gte: "2022-04-13||/d",
-                  lte: "2022-04-13||/d"
+              bool: {
+                must: {
+                  range: {
+                    "data.attributes.createdOn": {
+                      format: "yyyy-MM-dd",
+                      gte: "2022-04-13||/d",
+                      lte: "2022-04-13||/d"
+                    }
+                  }
                 }
               }
             }
@@ -352,6 +369,7 @@ describe("Transform to DSL query function", () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "",
       queryRows: [
+        // Query Row #1
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
@@ -359,6 +377,8 @@ describe("Transform to DSL query function", () => {
           matchType: "equals",
           textMatchType: "partial"
         },
+
+        // Query Row #2
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
@@ -366,18 +386,24 @@ describe("Transform to DSL query function", () => {
           matchType: "equals",
           textMatchType: "exact"
         },
+
+        // Query Row #3
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
           matchType: "notEmpty"
         },
+
+        // Query Row #4
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
           matchType: "empty"
         },
+
+        // Query Row #5
         {
           fieldName: "collection.name",
           type: "text",
@@ -388,6 +414,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #6
         {
           fieldName: "collection.name",
           type: "text",
@@ -398,6 +426,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #7
         {
           fieldName: "collection.name",
           type: "text",
@@ -407,6 +437,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #8
         {
           fieldName: "collection.name",
           type: "text",
@@ -434,21 +466,51 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // Query Row #1
             {
-              match: {
-                "data.attributes.materialSampleName": "test"
+              bool: {
+                must: {
+                  match: {
+                    "data.attributes.materialSampleName": "test"
+                  }
+                }
               }
             },
+
+            // Query Row #2
             {
-              term: {
-                "data.attributes.materialSampleName.keyword": "test"
+              bool: {
+                must: {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": "test"
+                  }
+                }
               }
             },
+
+            // Query Row #3
             {
-              wildcard: {
-                "data.attributes.materialSampleName": "*"
+              bool: {
+                must: {
+                  wildcard: {
+                    "data.attributes.materialSampleName": "*"
+                  }
+                }
               }
             },
+
+            // Query Row #4
+            {
+              bool: {
+                must_not: {
+                  wildcard: {
+                    "data.attributes.materialSampleName": "*"
+                  }
+                }
+              }
+            },
+
+            // Query Row #5
             {
               nested: {
                 path: "included",
@@ -470,6 +532,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #6
             {
               nested: {
                 path: "included",
@@ -491,6 +555,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #7
             {
               nested: {
                 path: "included",
@@ -512,6 +578,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #8
             {
               nested: {
                 path: "included",
@@ -522,22 +590,13 @@ describe("Transform to DSL query function", () => {
                         "included.type": "collection"
                       }
                     },
-                    must_not: [
-                      {
-                        wildcard: {
-                          "included.attributes.name": "*"
-                        }
+                    must_not: {
+                      wildcard: {
+                        "included.attributes.name": "*"
                       }
-                    ]
+                    }
                   }
                 }
-              }
-            }
-          ],
-          must_not: [
-            {
-              wildcard: {
-                "data.attributes.materialSampleName": "*"
               }
             }
           ]
