@@ -75,7 +75,12 @@ export function MetadataBulkEditor({
   const metadataHooks = getMetadataHooks(metadatas);
 
   const metadataForm = (
-    <MetadataForm metadata={initialValues} buttonBar={null} />
+    <MetadataForm
+      metadata={initialValues}
+      buttonBar={null}
+      metadataFormRef={bulkEditFormRef}
+      metadataSaveHook={bulkEditMetadataHook}
+    />
   );
 
   function metadataBulkOverrider() {
@@ -294,6 +299,7 @@ function useBulkMetadataSave({
               }
             }
           });
+
           saveOp.resource.acSubtype = acSubtype?.acSubtype ?? null;
           saveOperations.push(saveOp);
         } catch (error: unknown) {

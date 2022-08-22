@@ -51,7 +51,7 @@ export default function EditMetadatasPage() {
       await router.push(
         `/object-store/object/${
           isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0]}`
+        }?id=${ids[0].id}`
       );
     } else {
       await router.push("/object-store/object/list");
