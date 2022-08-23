@@ -22,7 +22,7 @@ export interface MetadataAttributes {
   // optional fields
   group?: string;
   dcRights?: string;
-  acSubtype?: any;
+  acSubtype?: string;
   dcType?: DcType;
   acCaption?: string;
   dcFormat?: string;
