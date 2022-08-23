@@ -97,7 +97,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
     | ((formikProps: FormikProps<Values>) => React.ReactNode)
     | React.ReactNode =
     typeof childrenProp === "function" ? (
-      formikProps => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
+      (formikProps) => <FormWrapper>{childrenProp(formikProps)}</FormWrapper>
     ) : (
       <FormWrapper>{childrenProp}</FormWrapper>
     );
@@ -115,12 +115,12 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
    */
   const withBulkEditCtx = useCallback<(content: JSX.Element) => JSX.Element>(
     isNestedForm
-      ? content => (
+      ? (content) => (
           <BulkEditTabContext.Provider value={null}>
             {content}
           </BulkEditTabContext.Provider>
         )
-      : content => content,
+      : (content) => content,
     [isNestedForm]
   );
 
@@ -177,7 +177,7 @@ function FormWrapper({ children }: PropsWithChildren<{}>) {
     >
       <ErrorViewer />
       <FormikConsumer>
-        {formik => (
+        {(formik) => (
           <>
             <PromptIfDirty formik={formik} />
           </>
