@@ -37,6 +37,7 @@ import { FormikContextType } from "formik";
 import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
 import { pick, toPairs } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { PcrBatch, PcrBatchItem } from "../../../dina-ui/types/seqdb-api";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -59,7 +60,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   columns: TableColumn<TData>[];
 
-  secondColumns?: TableColumn<TData>[];
   /**
    * Used for the listing page to understand which columns can be provided. Filters are generated
    * based on the index provided.
@@ -105,6 +105,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
+
 
 /**
  * Top level component for displaying an elastic-search listing page.
@@ -174,43 +175,6 @@ export function QueryPage<TData extends KitsuResource>({
   // Loading state
   const [loading, setLoading] = useState<boolean>(true);
 
-  // export function useSangerSampleSelection(pcrBatchId: string) {
-  //   const { apiClient, save } = useApiClient();
-  //   const { username } = useAccount();
-  
-  //   // Keep track of the last save operation, so the data is re-fetched immediately after saving.
-  //   const [lastSave, setLastSave] = useState<number>();
-  
-  //   async function selectSamples(sampleLinks: KitsuResourceLink[]) {
-  //     const { data: pcrBatch } = await apiClient.get<MaterialSample>(
-  //       `seqdb-api/pcr-batch/${pcrBatchId}`,
-  //       {}
-  //     );
-  
-  //     const newPcrBatchItems = sampleLinks.map<InputResource<MaterialSample>>(
-  //       sampleLink => ({
-  //         materialSample: sampleLink,
-  //         pcrBatch: pick(pcrBatch, "id", "type"),
-  //         group: pcrBatch.group,
-  //         createdBy: username,
-  //         type: "material-sample"
-  //       })
-  //     );
-  
-  //     await save(
-  //       newPcrBatchItems.map(item => ({
-  //         resource: item,
-  //         type: "pcr-batch-item"
-  //       })),
-  //       { apiBaseUrl: "/seqdb-api" }
-  //     );
-  
-  //     setLastSave(Date.now());
-  //   }
-  
-  // const { deleteAllCheckedPcrBatchItems, lastSave, selectAllCheckedSamples } =
-  // useSangerSampleSelection(pcrBatchId);
-
   // Query Page error message state
   const [error, setError] = useState<any>();
 
@@ -247,7 +211,6 @@ export function QueryPage<TData extends KitsuResource>({
             {}
           )
         }));
-
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
@@ -264,6 +227,8 @@ export function QueryPage<TData extends KitsuResource>({
 
         setAvailableSamples(processedResult);
         setSearchResults(processedResult);
+
+         console.log(processedResult);
       })
       .catch(elasticSearchError => {
         setError(elasticSearchError);
@@ -279,6 +244,46 @@ export function QueryPage<TData extends KitsuResource>({
     loadSavedSearch("default");
   }, []);
 
+  async function selectAllCheckedSamples(
+    formValues,
+    formik: FormikContextType<any>
+  ) {
+    // console.log(formValues.sampleIdsToSelect);
+    // console.log(selectedResources);
+    
+    const { sampleIdsToSelect } = formValues.sampleIdsToSelect;
+    const ids = toPairs(sampleIdsToSelect)
+      .filter(pair => pair[1])
+      .map(pair => pair[0]);
+
+    const materialSamples = ids.map(id => ({
+      id,
+      type: "material-sample",
+    }));
+
+    const test = searchResults.filter(obj => obj.id == id);
+    // console.log(materialSamples);
+    setSelectedResources(test);
+    formik.setFieldValue("sampleIdsToSelect", {});
+  }
+
+  async function deleteAllCheckedPcrBatchItems(
+    formValues,
+    formik: FormikContextType<any>
+  ) {
+    const { pcrBatchItemIdsToDelete } = formValues;
+  
+    const ids = toPairs(pcrBatchItemIdsToDelete)
+      .filter(pair => pair[1])
+      .map(pair => pair[0]);
+  
+    const pcrBatchItems = ids.map<KitsuResourceLink>(id => ({
+      id,
+      type: "pcr-batch-item"
+    }));
+  
+    formik.setFieldValue("pcrBatchItemIdsToDelete", {});
+  }  
   /**
    * Using the user preferences, load the saved search name into the search filters.
    *
@@ -385,6 +390,14 @@ export function QueryPage<TData extends KitsuResource>({
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
     defaultAvailableItems: searchResults ?? []
+  });
+
+  const {
+    CheckBoxHeader: SampleDeselectCheckBoxHeader,
+    CheckBoxField: SampleDeselectCheckBox,
+    setAvailableItems: setRemoveablePcrBatchItems
+  } = useGroupedCheckBoxes({
+    fieldName: "ItemIdsToDelete"
   });
 
   const computedReactTableProps =
@@ -509,62 +522,8 @@ export function QueryPage<TData extends KitsuResource>({
     setLoading(true);
   }
 
-  const {
-    CheckBoxHeader: SampleDeselectCheckBoxHeader,
-    CheckBoxField: SampleDeselectCheckBox,
-    setAvailableItems: setRemoveablePcrBatchItems
-  } = useGroupedCheckBoxes({
-    fieldName: "pcrBatchItemIdsToDelete"
-  });
-
-  async function selectAllCheckedSamples(
-     formValues,
-     formik: FormikContextType<any>
-  ) {
-    //  const { sampleIdsToSelect } = formValues;
-    //  const ids = toPairs(sampleIdsToSelect)
-    //    .filter(pair => pair[1])
-    //    .map(pair => pair[0]);
-
-    //  const materialSamples = ids.map(id => ({
-    //    id,
-    //    type: "material-sample"
-    //  }));
-
-    //  await selectSamples(materialSamples);
-
-    //  formik.setFieldValue("sampleIdsToSelect", {});
-  }
-
-  async function deleteAllCheckedPcrBatchItems(
-  //   formValues,
-  //   formik: FormikContextType<any>
-  ) {
-  //   const { pcrBatchItemIdsToDelete } = formValues;
-
-  //   const ids = toPairs(pcrBatchItemIdsToDelete)
-  //     .filter(pair => pair[1])
-  //     .map(pair => pair[0]);
-
-  //   const pcrBatchItems = ids.map<KitsuResourceLink>(id => ({
-  //     id,
-  //     type: "pcr-batch-item"
-  //   }));
-
-  //   await deletePcrBatchItems(pcrBatchItems);
-
-  //   formik.setFieldValue("pcrBatchItemIdsToDelete", {});
-  // }
-
-  // return {
-  //   selectAllCheckedSamples,
-  //   deleteAllCheckedPcrBatchItems,
-  //   lastSave
-  // };
-  }
-
   return (
-    <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
+    <DinaForm key={uuidv4()} initialValues={{searchFilters, sampleIdsToSelect:{}}} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
@@ -728,4 +687,5 @@ export function QueryPage<TData extends KitsuResource>({
       </div>
     </DinaForm>
   );
+  
 }
