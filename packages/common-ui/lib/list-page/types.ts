@@ -28,6 +28,18 @@ export interface TableColumn<TData extends KitsuResource>
    * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
    */
   isKeyword?: boolean;
+
+  /**
+   * The QueryPage will only display the accessors that are displayed on the result table. However,
+   * if you have custom cells that receive other fields you will need to add them to this list so
+   * elastic search includes the fields in the result.
+   *
+   * Example: `data.attributes.name`
+   *
+   * Please note that duplicate fields are automatically removed so you don't need to worry about
+   * having unique accessors.
+   */
+  additionalAccessors?: string[];
 }
 
 /**

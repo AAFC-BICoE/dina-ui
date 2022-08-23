@@ -26,6 +26,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   License,
+  MediaType,
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
@@ -112,9 +113,17 @@ function ExternalResourceMetatdataForm({
               type: "object-subtype",
               acSubtype: metadata?.acSubtype
             }
+          : null,
+        dcFormat: metadata?.dcFormat
+          ? {
+              id: metadata?.dcFormat,
+              type: "media-type",
+              mediaType: metadata?.dcFormat
+            }
           : null
       }
     : {};
+
   const onSubmit: DinaFormOnSubmit = async ({
     submittedValues,
     api: { apiClient, save }
@@ -146,7 +155,10 @@ function ExternalResourceMetatdataForm({
       ...metadataValues,
       // Convert the object back to a string:
       acSubtype: acSubtype?.acSubtype ?? null,
-      bucket: metadataValues.bucket ?? groupNames?.[0]
+      bucket: metadataValues.bucket ?? groupNames?.[0],
+      dcFormat: metadataValues?.dcFormat
+        ? metadataValues?.dcFormat?.mediaType
+        : undefined
     };
 
     const savedMeta = await save(
@@ -186,7 +198,19 @@ function ExternalResourceMetatdataForm({
             name="resourceExternalURL"
             label={formatMessage("metadataResourceExternalURLLabel")}
           />
-          <TextField className="col-md-6" name="dcFormat" />
+          <ResourceSelectField<MediaType>
+            name="dcFormat"
+            className="col-md-6"
+            filter={input => ({
+              mediaType: {
+                LIKE: `${input}%`
+              }
+            })}
+            model="objectstore-api/media-type"
+            optionLabel={format => format.mediaType}
+            removeDefaultSort={true}
+            omitNullOption={true}
+          />
           <TextField className="col-md-6" name="acCaption" />
           <DateField
             className="col-md-6"

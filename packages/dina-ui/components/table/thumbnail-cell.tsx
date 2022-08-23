@@ -39,7 +39,14 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
       );
     },
     sortable: false,
-    Header: <DinaMessage id="thumbnail" />
+    Header: <DinaMessage id="thumbnail" />,
+
+    // These fields are required in the elastic search response for this cell to work.
+    additionalAccessors: [
+      "data.attributes.resourceExternalURL",
+      "data.attributes." + fileIdentifierField,
+      "data.attributes." + bucketField
+    ]
   };
 }
 
