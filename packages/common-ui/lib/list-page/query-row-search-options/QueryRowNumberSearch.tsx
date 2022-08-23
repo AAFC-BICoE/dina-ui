@@ -1,7 +1,6 @@
 import React from "react";
 import { NumberField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
 
 /**
@@ -73,8 +72,9 @@ export default function QueryRowNumberSearch({
  * @param queryRow The query row to be used.
  */
 export function transformNumberSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
   const { matchType, number: numberValue } = queryRow;
 
   switch (matchType) {
@@ -83,31 +83,63 @@ export function transformNumberSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return [
-        {
-          queryOperator: "must",
-          queryType: "range",
-          value: buildNumberRangeObject(matchType, numberValue)
+      return {
+        must: {
+          range: {
+            [fieldName]: buildNumberRangeObject(matchType, numberValue)
+          }
         }
-      ];
+      };
 
     // Not equals match type.
     case "notEquals":
-      return [
-        { queryOperator: "must_not", queryType: "term", value: numberValue }
-      ];
+      return {
+        must_not: {
+          term: {
+            [fieldName]: numberValue
+          }
+        }
+      };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "exists" }];
+      return {
+        must_not: {
+          exists: {
+            field: [fieldName]
+          }
+        },
+        should: {
+          term: {
+            [fieldName]: ""
+          }
+        }
+      };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return {
+        must: {
+          exists: {
+            field: [fieldName]
+          }
+        },
+        must_not: {
+          term: {
+            [fieldName]: numberValue
+          }
+        }
+      };
 
     // Equals and default case
     default:
-      return [{ queryOperator: "must", queryType: "term", value: numberValue }];
+      return {
+        must: {
+          term: {
+            [fieldName]: numberValue
+          }
+        }
+      };
   }
 }
 

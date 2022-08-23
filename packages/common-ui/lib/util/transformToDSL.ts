@@ -4,18 +4,11 @@ import { SortingRule } from "react-table";
 import { KitsuResource } from "kitsu";
 import { QueryRowExportProps } from "../list-page/QueryRow";
 import { TableColumn } from "../list-page/types";
-import { uniq, groupBy } from "lodash";
+import { uniq } from "lodash";
 import { transformBooleanSearchToDSL } from "../list-page/query-row-search-options/QueryRowBooleanSearch";
 import { transformTextSearchToDSL } from "../list-page/query-row-search-options/QueryRowTextSearch";
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
 import { transformNumberSearchToDSL } from "../list-page/query-row-search-options/QueryRowNumberSearch";
-
-export interface ElasticSearchQueryParams {
-  queryOperator: "must" | "should" | "must_not" | "filter";
-  queryType: "match" | "term" | "range" | "exists" | "wildcard" | "regexp";
-  fieldName?: string;
-  value?: any;
-}
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
@@ -78,13 +71,21 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * for boolean types.
    *
    * @param queryRow The query row options the user has selected.
-   * @returns
+   * @param fieldName The field name being used for the specific query row.
+   * @returns JSON object (any) for elastic search.
    */
-  function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams[] {
+  function buildInnerQueryBasedOnType(
+    queryRow: QueryRowExportProps,
+    isRelationship: boolean
+  ): any {
+    const fieldName = isRelationship
+      ? getRelationshipFieldName(queryRow)
+      : getFieldName(queryRow);
+
     switch (queryRow.type) {
       // Boolean type
       case "boolean":
-        return transformBooleanSearchToDSL(queryRow);
+        return transformBooleanSearchToDSL(queryRow, fieldName);
 
       // Number types
       case "long":
@@ -95,20 +96,20 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       case "float":
       case "scaled_float":
       case "unsigned_long":
-        return transformNumberSearchToDSL(queryRow);
+        return transformNumberSearchToDSL(queryRow, fieldName);
 
       // Date type
       case "date":
-        return transformDateSearchToDSL(queryRow);
+        return transformDateSearchToDSL(queryRow, fieldName);
 
       // Text types
       case "text":
       case "keyword":
-        return transformTextSearchToDSL(queryRow);
+        return transformTextSearchToDSL(queryRow, fieldName);
 
       // Default just treat it like a text search.
       default:
-        return transformTextSearchToDSL(queryRow);
+        return transformTextSearchToDSL(queryRow, fieldName);
     }
   }
 
@@ -173,68 +174,32 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildRelationshipQuery(rowToBuild) {
-    const mustQueries: any[] = [];
-    const mustNotQueries: any[] = [];
-    const shouldQueries: any[] = [];
-
-    const queryParams: ElasticSearchQueryParams[] =
-      buildInnerQueryBasedOnType(rowToBuild);
+    const generatedInnerQuery: any = buildInnerQueryBasedOnType(
+      rowToBuild,
+      true
+    );
 
     // The included type must match the parent type of the row.
-    mustQueries.push({
+    const includedTypeQuery: any = {
       match: {
         "included.type": rowToBuild.parentType
       }
-    });
-
-    queryParams.forEach(queryParam => {
-      const query = {
-        [queryParam.queryType]:
-          queryParam.queryType !== "exists"
-            ? {
-                [queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)]:
-                  queryParam.value
-              }
-            : {
-                field:
-                  queryParam.fieldName ?? getRelationshipFieldName(rowToBuild)
-              }
-      };
-
-      switch (queryParam.queryOperator) {
-        case "must":
-          mustQueries.push(query);
-          break;
-        case "must_not":
-          mustNotQueries.push(query);
-          break;
-        case "should":
-          shouldQueries.push(query);
-          break;
-      }
-    });
+    };
+    if (generatedInnerQuery?.must) {
+      generatedInnerQuery.must = [
+        ...includedTypeQuery,
+        ...generatedInnerQuery.must
+      ];
+    } else {
+      generatedInnerQuery.must = includedTypeQuery;
+    }
 
     return {
       nested: {
         path: "included",
         query: {
           bool: {
-            // Must Queries
-            ...(mustQueries.length !== 0 && {
-              must: mustQueries.length === 1 ? mustQueries[0] : mustQueries
-            }),
-
-            // Must_Not Queries
-            ...(mustNotQueries.length !== 0 && {
-              must_not:
-                mustNotQueries.length === 1 ? mustNotQueries[0] : mustNotQueries
-            }),
-
-            // Should Queries
-            ...(shouldQueries.length !== 0 && {
-              should:
-                shouldQueries.length === 1 ? shouldQueries[0] : shouldQueries
-            })
+            generatedInnerQuery
           }
         }
       }
@@ -248,63 +213,21 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * @param rowToBuild The query row to build the query for.
    */
   function buildQuery(rowToBuild) {
-    const mustQueries: any[] = [];
-    const mustNotQueries: any[] = [];
-    const shouldQueries: any[] = [];
-
-    const queryParams: ElasticSearchQueryParams[] =
-      buildInnerQueryBasedOnType(rowToBuild);
-
-    queryParams.forEach(queryParam => {
-      const query = {
-        [queryParam.queryType]:
-          queryParam.queryType !== "exists"
-            ? {
-                [queryParam.fieldName ?? getFieldName(rowToBuild)]:
-                  queryParam.value
-              }
-            : {
-                field: queryParam.fieldName ?? getFieldName(rowToBuild)
-              }
-      };
-
-      switch (queryParam.queryOperator) {
-        case "must":
-          mustQueries.push(query);
-          break;
-        case "must_not":
-          mustNotQueries.push(query);
-          break;
-        case "should":
-          shouldQueries.push(query);
-          break;
-      }
-    });
+    const generatedInnerQuery: any = buildInnerQueryBasedOnType(
+      rowToBuild,
+      false
+    );
 
     return {
       bool: {
-        // Must Queries
-        ...(mustQueries.length !== 0 && {
-          must: mustQueries.length === 1 ? mustQueries[0] : mustQueries
-        }),
-
-        // Must_Not Queries
-        ...(mustNotQueries.length !== 0 && {
-          must_not:
-            mustNotQueries.length === 1 ? mustNotQueries[0] : mustNotQueries
-        }),
-
-        // Should Queries
-        ...(shouldQueries.length !== 0 && {
-          should: shouldQueries.length === 1 ? shouldQueries[0] : shouldQueries
-        })
+        generatedInnerQuery
       }
     };
   }
 
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
-  const queryRowQueries = submittedValues?.queryRows
+  const queryRowQueries: any = submittedValues?.queryRows
     .filter(queryRow => shouldQueryRowBeIncluded(queryRow))
     .map(queryRow => {
       if (queryRow.parentType) {

@@ -3,7 +3,6 @@ import { FieldSpy, FieldWrapper, TextField } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
 import { useIntl } from "react-intl";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 
 /**
  * The match options when a text search is being performed.
@@ -150,13 +149,11 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
 
 /**
  * Using the query row for a text search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformTextSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
   const { matchType, textMatchType, matchValue, distinctTerm } = queryRow;
 
   switch (matchType) {
@@ -164,37 +161,71 @@ export function transformTextSearchToDSL(
     case "equals":
       // Autocompletion expects to use the full text search.
       if (distinctTerm) {
-        return [
-          { queryOperator: "must", queryType: "term", value: matchValue }
-        ];
+        return {
+          must: {
+            term: {
+              [fieldName]: matchValue
+            }
+          }
+        };
       }
 
       if (textMatchType === "partial") {
-        return [
-          { queryOperator: "must", queryType: "match", value: matchValue }
-        ];
+        return {
+          must: {
+            match: {
+              [fieldName]: matchValue
+            }
+          }
+        };
       } else {
-        return [
-          { queryOperator: "must", queryType: "term", value: matchValue }
-        ];
+        return {
+          must: {
+            term: {
+              [fieldName]: matchValue
+            }
+          }
+        };
       }
 
     // Not equals match type.
     case "notEquals":
-      return [
-        { queryOperator: "must_not", queryType: "term", value: matchValue }
-      ];
+      return {
+        must_not: {
+          term: {
+            [fieldName]: matchValue
+          }
+        }
+      };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "wildcard", value: "*" }];
+      return {
+        must_not: {
+          wildcard: {
+            [fieldName]: "*" // to be replaced.
+          }
+        }
+      };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "wildcard", value: "*" }];
+      return {
+        must: {
+          wildcard: {
+            [fieldName]: "*" // to be replaced.
+          }
+        }
+      };
 
     // Default case
     default:
-      return [{ queryOperator: "must", queryType: "match", value: matchValue }];
+      return {
+        must: {
+          match: {
+            [fieldName]: matchValue
+          }
+        }
+      };
   }
 }

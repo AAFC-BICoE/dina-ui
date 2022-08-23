@@ -1,7 +1,6 @@
 import React from "react";
 import { DateField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
 
 /**
@@ -72,13 +71,11 @@ export default function QueryRowDateSearch({
 
 /**
  * Using the query row for a date search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformDateSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
   const { matchType, date } = queryRow;
 
   switch (matchType) {
@@ -88,29 +85,63 @@ export function transformDateSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return [
-        {
-          queryOperator: "must",
-          queryType: "range",
-          value: buildDateRangeObject(matchType, date)
+      return {
+        must: {
+          range: {
+            [fieldName]: buildDateRangeObject(matchType, date)
+          }
         }
-      ];
+      };
 
     // Not equals match type.
     case "notEquals":
-      return [{ queryOperator: "must_not", queryType: "term", value: date }];
+      return {
+        must_not: {
+          term: {
+            [fieldName]: date
+          }
+        }
+      };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "exists" }];
+      return {
+        must_not: {
+          exists: {
+            field: [fieldName]
+          }
+        },
+        should: {
+          term: {
+            [fieldName]: ""
+          }
+        }
+      };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return {
+        must: {
+          exists: {
+            field: [fieldName]
+          }
+        },
+        must_not: {
+          term: {
+            [fieldName]: ""
+          }
+        }
+      };
 
     // Equals and default case
     default:
-      return [{ queryOperator: "must", queryType: "term", value: date }];
+      return {
+        must: {
+          term: {
+            [fieldName]: date
+          }
+        }
+      };
   }
 }
 
