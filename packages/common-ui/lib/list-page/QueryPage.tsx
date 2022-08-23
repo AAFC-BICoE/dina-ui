@@ -261,7 +261,12 @@ export function QueryPage<TData extends KitsuResource>({
       type: "material-sample",
     }));
 
-    const test = searchResults.filter(obj => obj.id == id);
+    // const test = searchResults.filter(obj.id => !ids.includes(obj.id));
+    const test = searchResults.filter((itemA)=> {
+      return !ids.find((itemB)=> {
+        return itemA.id === itemB;
+      })
+    })
     // console.log(materialSamples);
     setSelectedResources(test);
     formik.setFieldValue("sampleIdsToSelect", {});
