@@ -248,27 +248,24 @@ export function QueryPage<TData extends KitsuResource>({
     formValues,
     formik: FormikContextType<any>
   ) {
-    // console.log(formValues.sampleIdsToSelect);
-    // console.log(selectedResources);
-    
     const { sampleIdsToSelect } = formValues.sampleIdsToSelect;
     const ids = toPairs(sampleIdsToSelect)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    const materialSamples = ids.map(id => ({
-      id,
-      type: "material-sample",
-    }));
-
-    // const test = searchResults.filter(obj.id => !ids.includes(obj.id));
-    const test = searchResults.filter((itemA)=> {
+    const selectedObjects = searchResults.filter((itemA)=> {
       return !ids.find((itemB)=> {
         return itemA.id === itemB;
       })
     })
-    // console.log(materialSamples);
-    setSelectedResources(test);
+
+    // const unselectedObjects = searchResults.filter((itemA)=> {
+    //   return !ids.find((itemB)=> {
+    //     return itemA.id !== itemB;
+    //   })
+    // })
+
+    setSelectedResources(selectedObjects);
     formik.setFieldValue("sampleIdsToSelect", {});
   }
 
@@ -416,7 +413,7 @@ export function QueryPage<TData extends KitsuResource>({
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
   const combinedColumns: TableColumn<TData>[] = [
-    ...(showRowCheckboxes
+    ...((showRowCheckboxes || selectionMode)
       ? [
           {
             Cell: ({ original: resource }) => (
@@ -431,7 +428,37 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
+  const columnsSelected: TableColumn<TData>[] = [
+    ...columns,
+    ...( selectionMode
+      ? [
+          {
+            Cell: ({ original: resource }) => (
+              <CheckBoxField key={resource.id} resource={resource} />
+            ),
+            Header: SampleDeselectCheckBoxHeader,
+            sortable: false,
+            width: 200
+          }
+        ]
+      : [])
+    ];
+
   const mappedColumns = combinedColumns.map(column => {
+    const { fieldName, customHeader } = {
+      customHeader: column.Header,
+      fieldName: String(column.label)
+    };
+
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
+
+    return {
+      Header,
+      ...column
+    };
+  });
+
+  const mappedSelectedColumns = columnsSelected.map(column => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
       fieldName: String(column.label)
@@ -681,7 +708,7 @@ export function QueryPage<TData extends KitsuResource>({
               </div>
             </div>
             <div className="col-5"><ReactTable
-            columns={mappedColumns}
+            columns={mappedSelectedColumns}
             data={selectedResources}
             minRows={1}
             />
