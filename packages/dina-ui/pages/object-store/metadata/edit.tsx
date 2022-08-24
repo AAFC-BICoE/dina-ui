@@ -62,19 +62,6 @@ export default function EditMetadatasPage() {
       <Head title={formatMessage("metadataBulkEditTitle")} />
       <Nav />
       <main className="container-fluid">
-        <ButtonBar>
-          <>
-            {metadataIds?.length === 1 ? (
-              <BackButton
-                entityLink="/object-store/object"
-                entityId={metadataIds[0]}
-                byPassView={false}
-              />
-            ) : (
-              <BackButton entityLink="/object-store/object" />
-            )}
-          </>
-        </ButtonBar>
         {metadataIds ? (
           <ExistingMetadataBulkEditor
             ids={metadataIds}
