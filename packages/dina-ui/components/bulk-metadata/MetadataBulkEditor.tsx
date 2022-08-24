@@ -113,13 +113,17 @@ export function MetadataBulkEditor({
       <DinaForm initialValues={{}}>
         <ButtonBar className="gap-4">
           {onPreviousClick && (
-            <FormikButton
-              className="btn btn-outline-secondary previous-button"
-              onClick={onPreviousClick}
-              buttonProps={() => ({ style: { width: "13rem" } })}
-            >
-              <DinaMessage id="goToThePreviousStep" />
-            </FormikButton>
+            <div className="flex-grow-1">
+              <div className="mx-auto">
+                <FormikButton
+                  className="btn btn-outline-secondary previous-button"
+                  onClick={onPreviousClick}
+                  buttonProps={() => ({ style: { width: "13rem" } })}
+                >
+                  <DinaMessage id="goToThePreviousStep" />
+                </FormikButton>
+              </div>
+            </div>
           )}
           <FormikButton
             className="btn btn-primary bulk-save-button"
@@ -137,13 +141,14 @@ export function MetadataBulkEditor({
           resources={metadataHooks}
           extraTabs={[bulkEditTab]}
           tabNameConfig={(metadata: ResourceWithHooks<Metadata>) =>
-            metadata.resource.originalFilename
+            metadata?.resource?.originalFilename
           }
           renderOneResource={({ index, isSelected }) => (
             <MetadataForm
-              metadataFormRef={form => {
+              metadataFormRef={(form) => {
                 const isLastRefSetter =
-                  metadataHooks.filter(it => !it.formRef.current).length === 1;
+                  metadataHooks.filter((it) => !it.formRef.current).length ===
+                  1;
                 metadataHooks[index].formRef.current = form;
                 if (isLastRefSetter && form) {
                   setInitialized(true);
@@ -263,7 +268,7 @@ function useBulkMetadataSave({
 
           const saveOp = await saveHook.prepareMetadataSaveOperation({
             submittedValues: metadataValues,
-            preProcessMetadata: async original => {
+            preProcessMetadata: async (original) => {
               try {
                 return (await preProcessMetadata?.(original)) ?? original;
               } catch (error: unknown) {
@@ -272,7 +277,7 @@ function useBulkMetadataSave({
                   throw new DoOperationsError(
                     error.message,
                     error.fieldErrors,
-                    error.individualErrors.map(opError => ({
+                    error.individualErrors.map((opError) => ({
                       ...opError,
                       index: "EDIT_ALL"
                     }))
@@ -307,7 +312,7 @@ function useBulkMetadataSave({
             throw new DoOperationsError(
               error.message,
               error.fieldErrors,
-              error.individualErrors.map(operationError => ({
+              error.individualErrors.map((operationError) => ({
                 ...operationError,
                 index:
                   typeof operationError.index === "number"
@@ -356,8 +361,8 @@ function useBulkMetadataSave({
         // Don't show the bulk edited fields' errors in the individual tabs
         // because the user can't fix them there:
         metadataHooks
-          .map(it => it.formRef?.current)
-          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .map((it) => it.formRef?.current)
+          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));
