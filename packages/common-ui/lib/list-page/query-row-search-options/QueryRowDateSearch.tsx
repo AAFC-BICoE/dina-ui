@@ -100,6 +100,11 @@ export function transformDateSearchToDSL(
           term: {
             [fieldName]: date
           }
+        },
+        must: {
+          exists: {
+            field: fieldName
+          }
         }
       };
 
@@ -108,12 +113,7 @@ export function transformDateSearchToDSL(
       return {
         must_not: {
           exists: {
-            field: [fieldName]
-          }
-        },
-        should: {
-          term: {
-            [fieldName]: ""
+            field: fieldName
           }
         }
       };
@@ -123,12 +123,7 @@ export function transformDateSearchToDSL(
       return {
         must: {
           exists: {
-            field: [fieldName]
-          }
-        },
-        must_not: {
-          term: {
-            [fieldName]: ""
+            field: fieldName
           }
         }
       };

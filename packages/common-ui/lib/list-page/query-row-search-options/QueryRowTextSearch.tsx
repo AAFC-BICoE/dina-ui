@@ -154,7 +154,17 @@ export function transformTextSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, textMatchType, matchValue, distinctTerm } = queryRow;
+  const { matchType, textMatchType, matchValue, distinctTerm, parentType } =
+    queryRow;
+
+  // If it's a relationship search, ensure that the included type is being filtered out.
+  const includedTypeQuery: any = parentType
+    ? {
+        term: {
+          "included.type": parentType
+        }
+      }
+    : {};
 
   switch (matchType) {
     // Equals match type.
@@ -162,40 +172,76 @@ export function transformTextSearchToDSL(
       // Autocompletion expects to use the full text search.
       if (distinctTerm) {
         return {
-          must: {
-            term: {
-              [fieldName]: matchValue
-            }
-          }
+          must: [
+            {
+              term: {
+                [fieldName + ".keyword"]: matchValue
+              }
+            },
+            ...(parentType && includedTypeQuery)
+          ]
         };
       }
 
       if (textMatchType === "partial") {
         return {
-          must: {
-            match: {
-              [fieldName]: matchValue
-            }
-          }
+          must: [
+            {
+              match: {
+                [fieldName]: matchValue
+              }
+            },
+            ...(parentType && includedTypeQuery)
+          ]
         };
       } else {
         return {
-          must: {
-            term: {
-              [fieldName]: matchValue
-            }
-          }
+          must: [
+            {
+              term: {
+                [fieldName + ".keyword"]: matchValue
+              }
+            },
+            ...(parentType && includedTypeQuery)
+          ]
         };
       }
 
     // Not equals match type.
     case "notEquals":
       return {
-        must_not: {
-          term: {
-            [fieldName]: matchValue
+        should: [
+          {
+            bool: {
+              must_not: {
+                term: {
+                  [fieldName + ".keyword"]: matchValue
+                }
+              },
+              ...(parentType && {
+                must: includedTypeQuery
+              })
+            }
+          },
+          {
+            bool: {
+              must_not: {
+                exists: {
+                  field: fieldName
+                }
+              }
+            }
+          },
+          parentType && {
+            bool: {
+              must_not: {
+                exists: {
+                  field: "included"
+                }
+              }
+            }
           }
-        }
+        ]
       };
 
     // Empty values only. (only if the value is not mandatory)
@@ -204,18 +250,23 @@ export function transformTextSearchToDSL(
         should: [
           {
             bool: {
-              must_not: [
-                {
-                  exists: {
-                    field: fieldName
-                  }
+              must_not: {
+                exists: {
+                  field: fieldName
                 }
-              ]
+              }
             }
           },
           {
-            term: {
-              [fieldName]: ""
+            bool: {
+              must: [
+                {
+                  term: {
+                    [fieldName + ".keyword"]: ""
+                  }
+                },
+                parentType && includedTypeQuery
+              ]
             }
           }
         ]
@@ -224,14 +275,17 @@ export function transformTextSearchToDSL(
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return {
-        must: {
-          exists: {
-            field: fieldName
-          }
-        },
+        must: [
+          {
+            exists: {
+              field: fieldName
+            }
+          },
+          ...(parentType && includedTypeQuery)
+        ],
         must_not: {
           term: {
-            [fieldName]: ""
+            [fieldName + ".keyword"]: ""
           }
         }
       };
@@ -239,11 +293,14 @@ export function transformTextSearchToDSL(
     // Default case
     default:
       return {
-        must: {
-          match: {
-            [fieldName]: matchValue
-          }
-        }
+        must: [
+          {
+            match: {
+              [fieldName]: matchValue
+            }
+          },
+          ...(parentType && includedTypeQuery)
+        ]
       };
   }
 }

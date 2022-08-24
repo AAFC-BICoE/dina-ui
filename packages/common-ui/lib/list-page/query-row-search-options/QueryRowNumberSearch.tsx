@@ -108,11 +108,6 @@ export function transformNumberSearchToDSL(
           exists: {
             field: fieldName
           }
-        },
-        should: {
-          term: {
-            [fieldName]: ""
-          }
         }
       };
 
@@ -122,11 +117,6 @@ export function transformNumberSearchToDSL(
         must: {
           exists: {
             field: fieldName
-          }
-        },
-        must_not: {
-          term: {
-            [fieldName]: numberValue
           }
         }
       };
