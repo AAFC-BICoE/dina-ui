@@ -106,7 +106,7 @@ export function transformNumberSearchToDSL(
       return {
         must_not: {
           exists: {
-            field: [fieldName]
+            field: fieldName
           }
         },
         should: {
@@ -121,7 +121,7 @@ export function transformNumberSearchToDSL(
       return {
         must: {
           exists: {
-            field: [fieldName]
+            field: fieldName
           }
         },
         must_not: {

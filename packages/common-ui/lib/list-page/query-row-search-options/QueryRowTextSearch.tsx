@@ -201,19 +201,37 @@ export function transformTextSearchToDSL(
     // Empty values only. (only if the value is not mandatory)
     case "empty":
       return {
-        must_not: {
-          wildcard: {
-            [fieldName]: "*" // to be replaced.
+        should: [
+          {
+            bool: {
+              must_not: [
+                {
+                  exists: {
+                    field: fieldName
+                  }
+                }
+              ]
+            }
+          },
+          {
+            term: {
+              [fieldName]: ""
+            }
           }
-        }
+        ]
       };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return {
         must: {
-          wildcard: {
-            [fieldName]: "*" // to be replaced.
+          exists: {
+            field: fieldName
+          }
+        },
+        must_not: {
+          term: {
+            [fieldName]: ""
           }
         }
       };

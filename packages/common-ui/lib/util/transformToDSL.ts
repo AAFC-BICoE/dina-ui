@@ -198,9 +198,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       nested: {
         path: "included",
         query: {
-          bool: {
-            generatedInnerQuery
-          }
+          bool: generatedInnerQuery
         }
       }
     };
@@ -220,7 +218,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
     return {
       bool: {
-        generatedInnerQuery
+        ...generatedInnerQuery
       }
     };
   }
