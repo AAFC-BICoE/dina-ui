@@ -158,13 +158,11 @@ export function transformTextSearchToDSL(
     queryRow;
 
   // If it's a relationship search, ensure that the included type is being filtered out.
-  const includedTypeQuery: any = parentType
-    ? {
-        term: {
-          "included.type": parentType
-        }
-      }
-    : {};
+  const includedTypeQuery: any = {
+    term: {
+      "included.type": parentType
+    }
+  };
 
   switch (matchType) {
     // Equals match type.
@@ -178,7 +176,7 @@ export function transformTextSearchToDSL(
                 [fieldName + ".keyword"]: matchValue
               }
             },
-            ...(parentType && includedTypeQuery)
+            parentType && includedTypeQuery
           ]
         };
       }
@@ -191,7 +189,7 @@ export function transformTextSearchToDSL(
                 [fieldName]: matchValue
               }
             },
-            ...(parentType && includedTypeQuery)
+            parentType && includedTypeQuery
           ]
         };
       } else {
@@ -202,7 +200,7 @@ export function transformTextSearchToDSL(
                 [fieldName + ".keyword"]: matchValue
               }
             },
-            ...(parentType && includedTypeQuery)
+            parentType && includedTypeQuery
           ]
         };
       }
@@ -228,15 +226,6 @@ export function transformTextSearchToDSL(
               must_not: {
                 exists: {
                   field: fieldName
-                }
-              }
-            }
-          },
-          parentType && {
-            bool: {
-              must_not: {
-                exists: {
-                  field: "included"
                 }
               }
             }
@@ -281,7 +270,7 @@ export function transformTextSearchToDSL(
               field: fieldName
             }
           },
-          ...(parentType && includedTypeQuery)
+          parentType && includedTypeQuery
         ],
         must_not: {
           term: {
@@ -299,7 +288,7 @@ export function transformTextSearchToDSL(
               [fieldName]: matchValue
             }
           },
-          ...(parentType && includedTypeQuery)
+          parentType && includedTypeQuery
         ]
       };
   }

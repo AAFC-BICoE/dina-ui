@@ -134,56 +134,23 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     return true;
   }
 
-  /**
-   * Used for generated the included section of the query. If using a field directly on the index,
-   * the buildQuery() function should be used instead.
-   *
-   * @param rowToBuild The query row to build the query for.
-   */
-  function buildRelationshipQuery(rowToBuild) {
-    const generatedInnerQuery: any = buildInnerQueryBasedOnType(
-      rowToBuild,
-      true
-    );
-
-    return {
-      nested: {
-        path: "included",
-        query: {
-          bool: generatedInnerQuery
-        }
-      }
-    };
-  }
-
-  /**
-   * Used for attributes directly involved with the index. Relationship queries should be using
-   * the buildRelationshipQuery function instead.
-   *
-   * @param rowToBuild The query row to build the query for.
-   */
-  function buildQuery(rowToBuild) {
-    const generatedInnerQuery: any = buildInnerQueryBasedOnType(
-      rowToBuild,
-      false
-    );
-
-    return {
-      bool: {
-        ...generatedInnerQuery
-      }
-    };
-  }
-
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
   const queryRowQueries: any = submittedValues?.queryRows
     .filter((queryRow) => shouldQueryRowBeIncluded(queryRow))
     .map((queryRow) => {
       if (queryRow.parentType) {
-        return buildRelationshipQuery(queryRow);
+        return {
+          bool: {
+            ...buildInnerQueryBasedOnType(queryRow, true)
+          }
+        };
       } else {
-        return buildQuery(queryRow);
+        return {
+          bool: {
+            ...buildInnerQueryBasedOnType(queryRow, false)
+          }
+        };
       }
     })
     .flat();

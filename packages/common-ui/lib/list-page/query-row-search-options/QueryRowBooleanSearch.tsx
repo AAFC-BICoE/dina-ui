@@ -75,7 +75,16 @@ export function transformBooleanSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, boolean: booleanValue } = queryRow;
+  const { matchType, boolean: booleanValue, parentType } = queryRow;
+
+  // If it's a relationship search, ensure that the included type is being filtered out.
+  const includedTypeQuery: any = parentType
+    ? {
+        term: {
+          "included.type": parentType
+        }
+      }
+    : {};
 
   switch (matchType) {
     // Empty for the boolean.
@@ -85,27 +94,36 @@ export function transformBooleanSearchToDSL(
           exists: {
             field: fieldName
           }
-        }
+        },
+        ...(parentType && {
+          must: includedTypeQuery
+        })
       };
 
     // Not Empty for the boolean.
     case "notEmpty":
       return {
-        must: {
-          exists: {
-            field: fieldName
-          }
-        }
+        must: [
+          {
+            exists: {
+              field: fieldName
+            }
+          },
+          ...(parentType ? includedTypeQuery : undefined)
+        ]
       };
 
     // Exact match for the boolean.
     default:
       return {
-        must: {
-          term: {
-            [fieldName]: booleanValue
-          }
-        }
+        must: [
+          {
+            term: {
+              [fieldName]: booleanValue
+            }
+          },
+          includedTypeQuery
+        ]
       };
   }
 }

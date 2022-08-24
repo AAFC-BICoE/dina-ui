@@ -75,7 +75,14 @@ export function transformNumberSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, number: numberValue } = queryRow;
+  const { matchType, number: numberValue, parentType } = queryRow;
+
+  // If it's a relationship search, ensure that the included type is being filtered out.
+  const includedTypeQuery: any = {
+    term: {
+      "included.type": parentType
+    }
+  };
 
   switch (matchType) {
     // less than / greater than / less than or equal to / greater than or equal to.
@@ -84,11 +91,14 @@ export function transformNumberSearchToDSL(
     case "lessThan":
     case "lessThanOrEqualTo":
       return {
-        must: {
-          range: {
-            [fieldName]: buildNumberRangeObject(matchType, numberValue)
-          }
-        }
+        must: [
+          {
+            range: {
+              [fieldName]: buildNumberRangeObject(matchType, numberValue)
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
 
     // Not equals match type.
@@ -98,7 +108,10 @@ export function transformNumberSearchToDSL(
           term: {
             [fieldName]: numberValue
           }
-        }
+        },
+        ...(parentType && {
+          must: includedTypeQuery
+        })
       };
 
     // Empty values only. (only if the value is not mandatory)
@@ -108,27 +121,36 @@ export function transformNumberSearchToDSL(
           exists: {
             field: fieldName
           }
-        }
+        },
+        ...(parentType && {
+          must: includedTypeQuery
+        })
       };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return {
-        must: {
-          exists: {
-            field: fieldName
-          }
-        }
+        must: [
+          {
+            exists: {
+              field: fieldName
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
 
     // Equals and default case
     default:
       return {
-        must: {
-          term: {
-            [fieldName]: numberValue
-          }
-        }
+        must: [
+          {
+            term: {
+              [fieldName]: numberValue
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
   }
 }

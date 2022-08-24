@@ -76,7 +76,16 @@ export function transformDateSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, date } = queryRow;
+  const { matchType, date, parentType } = queryRow;
+
+  // If it's a relationship search, ensure that the included type is being filtered out.
+  const includedTypeQuery: any = parentType
+    ? {
+        term: {
+          "included.type": parentType
+        }
+      }
+    : undefined;
 
   switch (matchType) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
@@ -86,34 +95,57 @@ export function transformDateSearchToDSL(
     case "lessThan":
     case "lessThanOrEqualTo":
       return {
-        must: {
-          range: {
-            [fieldName]: buildDateRangeObject(matchType, date)
-          }
-        }
+        must: [
+          {
+            range: {
+              [fieldName]: buildDateRangeObject(matchType, date)
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
 
     // Not equals match type.
     case "notEquals":
       return {
-        must_not: {
-          term: {
-            [fieldName]: date
+        should: [
+          {
+            bool: {
+              must_not: {
+                term: {
+                  [fieldName]: date
+                }
+              },
+              ...(parentType && {
+                must: includedTypeQuery
+              })
+            }
+          },
+          {
+            bool: {
+              must_not: {
+                exists: {
+                  field: fieldName
+                }
+              }
+            }
           }
-        },
-        must: {
-          exists: {
-            field: fieldName
-          }
-        }
+        ]
       };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
       return {
         must_not: {
-          exists: {
-            field: fieldName
+          bool: {
+            must: [
+              {
+                exists: {
+                  field: fieldName
+                }
+              },
+              parentType && includedTypeQuery
+            ]
           }
         }
       };
@@ -121,21 +153,27 @@ export function transformDateSearchToDSL(
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return {
-        must: {
-          exists: {
-            field: fieldName
-          }
-        }
+        must: [
+          {
+            exists: {
+              field: fieldName
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
 
     // Equals and default case
     default:
       return {
-        must: {
-          term: {
-            [fieldName]: date
-          }
-        }
+        must: [
+          {
+            term: {
+              [fieldName]: date
+            }
+          },
+          parentType && includedTypeQuery
+        ]
       };
   }
 }
