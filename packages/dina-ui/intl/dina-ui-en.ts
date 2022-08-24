@@ -269,6 +269,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_determination: "Determinations",
   "field_determination.scientificName": "Scientific Name",
   "field_determination.verbatimScientificName": "Verbatim Scientific Name",
+  "field_determination.typeStatus": "Type Status",
   field_determinationRemarks: "Determination Remarks",
   field_displayName: "Display Name",
   field_dwcCoordinateUncertaintyInMeters: "Coordinate Uncertainty In Meters",

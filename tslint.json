@@ -9,7 +9,7 @@
     "prettier": [
       true,
       {
-        "arrowParens": "avoid",
+        "arrowParens": "always",
         "trailingComma": "none"
       }
     ],
