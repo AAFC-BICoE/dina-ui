@@ -1,23 +1,17 @@
-import {
-  ButtonBar,
-  BackButton,
-  LoadingSpinner,
-  useAccount,
-  BULK_EDIT_IDS_KEY
-} from "common-ui";
+import { LoadingSpinner, useAccount, BULK_EDIT_IDS_KEY } from "common-ui";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { BulkMetadataEditor } from "../../../components/object-store";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
 import { Metadata } from "../../../types/objectstore-api";
 import { PersistedResource } from "kitsu";
 import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
+import { UploadingMetadataBulkEditor } from "packages/dina-ui/components/bulk-metadata/UploadingMetadataBulkEditor";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
-  const { initialized: accountInitialized } = useAccount();
+  const { initialized: accountInitialized, agentId } = useAccount();
   const { formatMessage } = useDinaIntl();
 
   const [metadataIds] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
@@ -25,21 +19,6 @@ export default function EditMetadatasPage() {
 
   if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
     return <LoadingSpinner loading={true} />;
-  }
-
-  async function afterMetadatasSaved(
-    ids: string[],
-    isExternalResource?: boolean
-  ) {
-    if (ids.length === 1) {
-      await router.push(
-        `/object-store/object/${
-          isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0]}`
-      );
-    } else {
-      await router.push("/object-store/object/list");
-    }
   }
 
   async function onSaved(
@@ -57,11 +36,14 @@ export default function EditMetadatasPage() {
     }
   }
 
+  const title = metadataIds ? "editMetadataTitle" : "addMetadataTitle";
+
   return (
     <div>
-      <Head title={formatMessage("metadataBulkEditTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
       <main className="container-fluid">
+        <h1 id="wb-cont">{formatMessage(title)}</h1>
         {metadataIds ? (
           <ExistingMetadataBulkEditor
             ids={metadataIds}
@@ -69,17 +51,13 @@ export default function EditMetadatasPage() {
             onPreviousClick={() => router.push("/object-store/object/list")}
           />
         ) : (
-          <BulkMetadataEditor
-            metadataIds={metadataIds ?? undefined}
-            objectUploadIds={objectUploadIds ?? undefined}
-            group={router?.query?.group as string}
-            defaultValuesConfig={
-              typeof router?.query?.defaultValuesConfig === "string"
-                ? Number(router?.query?.defaultValuesConfig)
-                : undefined
-            }
-            afterMetadatasSaved={afterMetadatasSaved}
-          />
+          objectUploadIds && (
+            <UploadingMetadataBulkEditor
+              objectUploadIds={objectUploadIds}
+              onSaved={onSaved}
+              onPreviousClick={() => router.push("/object-store/object/list")}
+            />
+          )
         )}
       </main>
       <Footer />
