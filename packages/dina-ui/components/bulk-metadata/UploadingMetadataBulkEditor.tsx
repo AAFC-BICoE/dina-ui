@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { InputResource, PersistedResource } from "kitsu";
 import { useState, useEffect, useContext } from "react";
 import moment from "moment";
-import { Metadata, ObjectUpload } from "packages/dina-ui/types/objectstore-api";
+import { Metadata, ObjectUpload } from "../../types/objectstore-api";
 import { Nav, Footer } from "../button-bar/nav/nav";
 import { MetadataBulkEditor } from "./MetadataBulkEditor";
 import { Promisable } from "type-fest";

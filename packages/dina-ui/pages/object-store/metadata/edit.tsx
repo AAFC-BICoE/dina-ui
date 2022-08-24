@@ -2,12 +2,12 @@ import { LoadingSpinner, useAccount, BULK_EDIT_IDS_KEY } from "common-ui";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
 import { Metadata } from "../../../types/objectstore-api";
 import { PersistedResource } from "kitsu";
 import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
-import { UploadingMetadataBulkEditor } from "packages/dina-ui/components/bulk-metadata/UploadingMetadataBulkEditor";
+import { UploadingMetadataBulkEditor } from "../../../components/bulk-metadata/UploadingMetadataBulkEditor";
 
 export default function EditMetadatasPage() {
   const router = useRouter();
