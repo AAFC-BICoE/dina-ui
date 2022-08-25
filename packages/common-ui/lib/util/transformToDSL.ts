@@ -15,6 +15,55 @@ export interface TransformQueryToDSLParams {
   group: string;
 }
 
+// If it's a relationship search, ensure that the included type is being filtered out.
+export function includedTypeQuery(parentType: string): any {
+  return {
+    term: {
+      "included.type": parentType
+    }
+  };
+}
+
+// Query used for exact matches.
+export function termQuery(
+  fieldName: string,
+  matchValue: any,
+  keyword: boolean
+): any {
+  return {
+    term: {
+      [fieldName + (keyword ? ".keyword" : "")]: matchValue
+    }
+  };
+}
+
+// Query used for partial matches.
+export function matchQuery(fieldName: string, matchValue: any): any {
+  return {
+    match: {
+      [fieldName]: matchValue
+    }
+  };
+}
+
+// Query used to see if the field exists.
+export function existsQuery(fieldName: string): any {
+  return {
+    exists: {
+      field: fieldName
+    }
+  };
+}
+
+// Query used for generating ranges.
+export function rangeQuery(fieldName: string, rangeOptions: any): any {
+  return {
+    range: {
+      [fieldName]: rangeOptions
+    }
+  };
+}
+
 export function transformQueryToDSL<TData extends KitsuResource>(
   pagination: LimitOffsetPageSpec,
   columns: TableColumn<TData>[],
@@ -227,7 +276,6 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   // Display only the fields provided in the columns array.
-
   const sourceFilteringColumns: string[] = [
     "data.id",
     "data.type",

@@ -2,6 +2,11 @@ import React from "react";
 import { FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import {
+  includedTypeQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The possible states of a boolean if the Equals match is being used.
@@ -77,53 +82,39 @@ export function transformBooleanSearchToDSL(
 ): any {
   const { matchType, boolean: booleanValue, parentType } = queryRow;
 
-  // If it's a relationship search, ensure that the included type is being filtered out.
-  const includedTypeQuery: any = parentType
-    ? {
-        term: {
-          "included.type": parentType
-        }
-      }
-    : {};
-
   switch (matchType) {
     // Empty for the boolean.
     case "empty":
-      return {
-        must_not: {
-          exists: {
-            field: fieldName
+      return parentType
+        ? {
+            must_not: existsQuery(fieldName),
+            must: includedTypeQuery(parentType)
           }
-        },
-        ...(parentType && {
-          must: includedTypeQuery
-        })
-      };
+        : {
+            must_not: existsQuery(fieldName)
+          };
 
     // Not Empty for the boolean.
     case "notEmpty":
-      return {
-        must: [
-          {
-            exists: {
-              field: fieldName
-            }
-          },
-          ...(parentType ? includedTypeQuery : undefined)
-        ]
-      };
+      return parentType
+        ? {
+            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+          }
+        : {
+            must: existsQuery(fieldName)
+          };
 
     // Exact match for the boolean.
     default:
-      return {
-        must: [
-          {
-            term: {
-              [fieldName]: booleanValue
-            }
-          },
-          includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [
+              termQuery(fieldName, booleanValue, false),
+              includedTypeQuery(parentType)
+            ]
+          }
+        : {
+            must: termQuery(fieldName, booleanValue, false)
+          };
   }
 }

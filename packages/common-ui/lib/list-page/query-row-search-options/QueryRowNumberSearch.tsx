@@ -2,6 +2,12 @@ import React from "react";
 import { NumberField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import {
+  includedTypeQuery,
+  rangeQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The match options when a number search is being performed.
@@ -77,81 +83,73 @@ export function transformNumberSearchToDSL(
 ): any {
   const { matchType, number: numberValue, parentType } = queryRow;
 
-  // If it's a relationship search, ensure that the included type is being filtered out.
-  const includedTypeQuery: any = {
-    term: {
-      "included.type": parentType
-    }
-  };
-
   switch (matchType) {
     // less than / greater than / less than or equal to / greater than or equal to.
     case "greaterThan":
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return {
-        must: [
-          {
-            range: {
-              [fieldName]: buildNumberRangeObject(matchType, numberValue)
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [
+              rangeQuery(
+                fieldName,
+                buildNumberRangeObject(matchType, numberValue)
+              ),
+              includedTypeQuery(parentType)
+            ]
+          }
+        : {
+            must: rangeQuery(
+              fieldName,
+              buildNumberRangeObject(matchType, numberValue)
+            )
+          };
 
     // Not equals match type.
     case "notEquals":
-      return {
-        must_not: {
-          term: {
-            [fieldName]: numberValue
+      return parentType
+        ? {
+            must_not: termQuery(fieldName, numberValue, false),
+            must: includedTypeQuery(parentType)
           }
-        },
-        ...(parentType && {
-          must: includedTypeQuery
-        })
-      };
+        : {
+            must_not: termQuery(fieldName, numberValue, false)
+          };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return {
-        must_not: {
-          exists: {
-            field: fieldName
+      return parentType
+        ? {
+            must_not: existsQuery(fieldName),
+            must: includedTypeQuery(parentType)
           }
-        },
-        ...(parentType && {
-          must: includedTypeQuery
-        })
-      };
+        : {
+            must_not: existsQuery(fieldName)
+          };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return {
-        must: [
-          {
-            exists: {
-              field: fieldName
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+          }
+        : {
+            must: existsQuery(fieldName)
+          };
 
     // Equals and default case
     default:
-      return {
-        must: [
-          {
-            term: {
-              [fieldName]: numberValue
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [
+              termQuery(fieldName, numberValue, false),
+              includedTypeQuery(parentType)
+            ]
+          }
+        : {
+            must: termQuery(fieldName, numberValue, false)
+          };
   }
 }
 

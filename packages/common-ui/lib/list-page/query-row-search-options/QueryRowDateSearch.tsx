@@ -2,6 +2,12 @@ import React from "react";
 import { DateField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import {
+  includedTypeQuery,
+  rangeQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The match options when a date search is being performed.
@@ -78,15 +84,6 @@ export function transformDateSearchToDSL(
 ): any {
   const { matchType, date, parentType } = queryRow;
 
-  // If it's a relationship search, ensure that the included type is being filtered out.
-  const includedTypeQuery: any = parentType
-    ? {
-        term: {
-          "included.type": parentType
-        }
-      }
-    : undefined;
-
   switch (matchType) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
     case "contains":
@@ -94,87 +91,90 @@ export function transformDateSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return {
-        must: [
-          {
-            range: {
-              [fieldName]: buildDateRangeObject(matchType, date)
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [
+              rangeQuery(fieldName, buildDateRangeObject(matchType, date)),
+              includedTypeQuery(parentType)
+            ]
+          }
+        : {
+            must: rangeQuery(fieldName, buildDateRangeObject(matchType, date))
+          };
 
     // Not equals match type.
     case "notEquals":
-      return {
-        should: [
-          {
-            bool: {
-              must_not: {
-                term: {
-                  [fieldName]: date
+      return parentType
+        ? {
+            should: [
+              {
+                bool: {
+                  must_not: termQuery(fieldName, date, false),
+                  must: includedTypeQuery(parentType)
                 }
               },
-              ...(parentType && {
-                must: includedTypeQuery
-              })
-            }
-          },
-          {
-            bool: {
-              must_not: {
-                exists: {
-                  field: fieldName
+              {
+                bool: {
+                  must_not: existsQuery(fieldName)
                 }
               }
-            }
+            ]
           }
-        ]
-      };
+        : {
+            should: [
+              {
+                bool: {
+                  must_not: termQuery(fieldName, date, false)
+                }
+              },
+              {
+                bool: {
+                  must_not: existsQuery(fieldName)
+                }
+              }
+            ]
+          };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return {
-        must_not: {
-          bool: {
-            must: [
-              {
-                exists: {
-                  field: fieldName
-                }
-              },
-              parentType && includedTypeQuery
-            ]
+      return parentType
+        ? {
+            must_not: {
+              bool: {
+                must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+              }
+            }
           }
-        }
-      };
+        : {
+            must_not: {
+              bool: {
+                must: existsQuery(fieldName)
+              }
+            }
+          };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return {
-        must: [
-          {
-            exists: {
-              field: fieldName
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+          }
+        : {
+            must: existsQuery(fieldName)
+          };
 
     // Equals and default case
     default:
-      return {
-        must: [
-          {
-            term: {
-              [fieldName]: date
-            }
-          },
-          parentType && includedTypeQuery
-        ]
-      };
+      return parentType
+        ? {
+            must: [
+              termQuery(fieldName, date, false),
+              includedTypeQuery(parentType)
+            ]
+          }
+        : {
+            must: termQuery(fieldName, date, false)
+          };
   }
 }
 
