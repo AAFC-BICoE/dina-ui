@@ -83,6 +83,9 @@ export function useMetadataViewQuery(id?: string) {
 export interface UseMetadataSaveParams {
   /** Metadata form initial values. */
   initialValues?: any;
+
+  // Redirect to next page
+  onSaved?: (id: string) => Promise<void>;
 }
 
 export interface PrepareMetadataSaveOperationParams {
@@ -92,7 +95,10 @@ export interface PrepareMetadataSaveOperationParams {
   ) => Promise<InputResource<Metadata>>;
 }
 
-export function useMetadataSave(initialValues) {
+export function useMetadataSave({
+  initialValues,
+  onSaved
+}: UseMetadataSaveParams) {
   const { apiClient, save } = useApiClient();
   const {
     // Don't include derivatives in the form submission:
@@ -101,6 +107,25 @@ export function useMetadataSave(initialValues) {
     acSubtype: initialAcSubtype,
     ...initialMetadataValues
   } = initialValues;
+
+  const defaultValues: InputResource<Metadata> = {
+    type: "metadata",
+    group: ""
+  };
+
+  const metadataInitialValues: InputResource<Metadata> = initialValues
+    ? {
+        ...initialValues,
+        // Convert the string to an object for the dropdown:
+        acSubtype: initialValues?.acSubtype
+          ? {
+              id: "id-unavailable",
+              type: "object-subtype",
+              acSubtype: initialValues.acSubtype
+            }
+          : undefined
+      }
+    : defaultValues;
 
   /**
    * Gets the diff of the form's initial values to the new sample state,
@@ -167,13 +192,16 @@ export function useMetadataSave(initialValues) {
       }
     }
 
-    return await save<Metadata>([saveOperation], {
+    const savedMetadata = await save<Metadata>([saveOperation], {
       apiBaseUrl: "/objectstore-api"
     });
+
+    await onSaved?.(savedMetadata[0].id);
   }
 
   return {
     onSubmit,
-    prepareMetadataSaveOperation
+    prepareMetadataSaveOperation,
+    initialValues: metadataInitialValues
   };
 }
