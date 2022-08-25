@@ -136,15 +136,15 @@ export function MaterialSampleBulkEditor({
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
           tabNameConfig={(materialSample: ResourceWithHooks<MaterialSample>) =>
-            materialSample.resource.materialSampleName
+            materialSample?.resource?.materialSampleName
           }
           renderOneResource={({ index, isSelected }) => (
             <MaterialSampleForm
               hideUseSequence={true}
               disableSampleNameField={disableSampleNameField}
-              materialSampleFormRef={form => {
+              materialSampleFormRef={(form) => {
                 const isLastRefSetter =
-                  sampleHooks.filter(it => !it.formRef.current).length === 1;
+                  sampleHooks.filter((it) => !it.formRef.current).length === 1;
                 sampleHooks[index].formRef.current = form;
                 if (isLastRefSetter && form) {
                   setInitialized(true);
@@ -375,7 +375,7 @@ function useBulkSampleSave({
         try {
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
-            preProcessSample: async original => {
+            preProcessSample: async (original) => {
               try {
                 return (await preProcessSample?.(original)) ?? original;
               } catch (error: unknown) {
@@ -384,7 +384,7 @@ function useBulkSampleSave({
                   throw new DoOperationsError(
                     error.message,
                     error.fieldErrors,
-                    error.individualErrors.map(opError => ({
+                    error.individualErrors.map((opError) => ({
                       ...opError,
                       index: "EDIT_ALL"
                     }))
@@ -401,7 +401,7 @@ function useBulkSampleSave({
             throw new DoOperationsError(
               error.message,
               error.fieldErrors,
-              error.individualErrors.map(operationError => ({
+              error.individualErrors.map((operationError) => ({
                 ...operationError,
                 index:
                   typeof operationError.index === "number"
@@ -450,8 +450,8 @@ function useBulkSampleSave({
         // Don't show the bulk edited fields' errors in the individual sample tabs
         // because the user can't fix them there:
         sampleHooks
-          .map(it => it.formRef?.current)
-          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .map((it) => it.formRef?.current)
+          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

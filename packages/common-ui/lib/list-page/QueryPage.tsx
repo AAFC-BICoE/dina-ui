@@ -80,6 +80,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   bulkEditPath?: string;
 
+  /** Query path if user selected only 1 item */
+  singleEditPath?: string;
+
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 
@@ -114,6 +117,7 @@ export function QueryPage<TData extends KitsuResource>({
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
+  singleEditPath,
   reactTableProps,
   defaultSort,
   onSortedChange
@@ -528,7 +532,12 @@ export function QueryPage<TData extends KitsuResource>({
             )}
 
             <div className="d-flex gap-3">
-              {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
+              {bulkEditPath && (
+                <BulkEditButton
+                  pathname={bulkEditPath}
+                  singleEditPathName={singleEditPath}
+                />
+              )}
               {bulkDeleteButtonProps && (
                 <BulkDeleteButton {...bulkDeleteButtonProps} />
               )}
