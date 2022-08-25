@@ -65,7 +65,7 @@ export function UploadingMetadataBulkEditor({
         defaultValue.value as any;
     }
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
-      // ...metadataDefaults,
+      ...metadataDefaults,
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
         ? moment(objectUpload.dateTimeDigitized).format()
