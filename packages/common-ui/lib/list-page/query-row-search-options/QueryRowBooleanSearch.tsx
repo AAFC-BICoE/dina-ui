@@ -80,41 +80,87 @@ export function transformBooleanSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, boolean: booleanValue, parentType } = queryRow;
+  const { matchType, boolean: booleanValue, parentType, parentName } = queryRow;
 
   switch (matchType) {
     // Empty for the boolean.
     case "empty":
       return parentType
         ? {
-            must_not: existsQuery(fieldName),
-            must: includedTypeQuery(parentType)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              existsQuery(fieldName),
+                              includedTypeQuery(parentType)
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
           }
         : {
-            must_not: existsQuery(fieldName)
+            bool: {
+              must_not: existsQuery(fieldName)
+            }
           };
 
     // Not Empty for the boolean.
     case "notEmpty":
       return parentType
         ? {
-            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                }
+              }
+            }
           }
         : {
-            must: existsQuery(fieldName)
+            bool: {
+              must: existsQuery(fieldName)
+            }
           };
 
     // Exact match for the boolean.
     default:
       return parentType
         ? {
-            must: [
-              termQuery(fieldName, booleanValue, false),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldName, booleanValue, false),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: termQuery(fieldName, booleanValue, false)
+            bool: {
+              must: termQuery(fieldName, booleanValue, false)
+            }
           };
   }
 }

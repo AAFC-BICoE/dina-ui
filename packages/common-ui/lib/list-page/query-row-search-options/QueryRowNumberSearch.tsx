@@ -73,15 +73,12 @@ export default function QueryRowNumberSearch({
 
 /**
  * Using the query row for a number search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformNumberSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, number: numberValue, parentType } = queryRow;
+  const { matchType, number: numberValue, parentType, parentName } = queryRow;
 
   switch (matchType) {
     // less than / greater than / less than or equal to / greater than or equal to.
@@ -91,64 +88,168 @@ export function transformNumberSearchToDSL(
     case "lessThanOrEqualTo":
       return parentType
         ? {
-            must: [
-              rangeQuery(
-                fieldName,
-                buildNumberRangeObject(matchType, numberValue)
-              ),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    rangeQuery(
+                      fieldName,
+                      buildNumberRangeObject(matchType, numberValue)
+                    ),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: rangeQuery(
-              fieldName,
-              buildNumberRangeObject(matchType, numberValue)
-            )
+            bool: {
+              must: rangeQuery(
+                fieldName,
+                buildNumberRangeObject(matchType, numberValue)
+              )
+            }
           };
 
     // Not equals match type.
     case "notEquals":
       return parentType
         ? {
-            must_not: termQuery(fieldName, numberValue, false),
-            must: includedTypeQuery(parentType)
+            bool: {
+              should: [
+                // If the field does exist, then search for everything that does NOT match the term.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, numberValue, false),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // If it's included but the field doesn't exist, then it's not equal either.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: existsQuery(fieldName),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // And if it's not included, then it's not equal either.
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
           }
         : {
-            must_not: termQuery(fieldName, numberValue, false)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: termQuery(fieldName, numberValue, false)
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                }
+              ]
+            }
           };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
       return parentType
         ? {
-            must_not: existsQuery(fieldName),
-            must: includedTypeQuery(parentType)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              existsQuery(fieldName),
+                              includedTypeQuery(parentType)
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
           }
         : {
-            must_not: existsQuery(fieldName)
+            bool: {
+              must_not: existsQuery(fieldName)
+            }
           };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return parentType
         ? {
-            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                }
+              }
+            }
           }
         : {
-            must: existsQuery(fieldName)
+            bool: {
+              must: existsQuery(fieldName)
+            }
           };
 
     // Equals and default case
     default:
       return parentType
         ? {
-            must: [
-              termQuery(fieldName, numberValue, false),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldName, numberValue, false),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: termQuery(fieldName, numberValue, false)
+            bool: {
+              must: termQuery(fieldName, numberValue, false)
+            }
           };
   }
 }

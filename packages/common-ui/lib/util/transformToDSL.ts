@@ -189,17 +189,9 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     .filter((queryRow) => shouldQueryRowBeIncluded(queryRow))
     .map((queryRow) => {
       if (queryRow.parentType) {
-        return {
-          bool: {
-            ...buildInnerQueryBasedOnType(queryRow, true)
-          }
-        };
+        return buildInnerQueryBasedOnType(queryRow, true);
       } else {
-        return {
-          bool: {
-            ...buildInnerQueryBasedOnType(queryRow, false)
-          }
-        };
+        return buildInnerQueryBasedOnType(queryRow, false);
       }
     })
     .flat();

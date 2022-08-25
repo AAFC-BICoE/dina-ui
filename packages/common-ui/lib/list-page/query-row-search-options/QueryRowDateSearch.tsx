@@ -82,7 +82,7 @@ export function transformDateSearchToDSL(
   queryRow: QueryRowExportProps,
   fieldName: string
 ): any {
-  const { matchType, date, parentType } = queryRow;
+  const { matchType, date, parentType, parentName } = queryRow;
 
   switch (matchType) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
@@ -93,63 +93,153 @@ export function transformDateSearchToDSL(
     case "lessThanOrEqualTo":
       return parentType
         ? {
-            must: [
-              rangeQuery(fieldName, buildDateRangeObject(matchType, date)),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    rangeQuery(
+                      fieldName,
+                      buildDateRangeObject(matchType, date)
+                    ),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: rangeQuery(fieldName, buildDateRangeObject(matchType, date))
+            bool: {
+              must: rangeQuery(fieldName, buildDateRangeObject(matchType, date))
+            }
           };
 
     // Not equals match type.
     case "notEquals":
       return parentType
         ? {
-            should: [
-              {
-                bool: {
-                  must_not: termQuery(fieldName, date, false),
-                  must: includedTypeQuery(parentType)
+            bool: {
+              should: [
+                // If the field does exist, then search for everything that does NOT match the term.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, date, false),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // If it's included but the field doesn't exist, then it's not equal either.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: existsQuery(fieldName),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // And if it's not included, then it's not equal either.
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
                 }
-              },
-              {
-                bool: {
-                  must_not: existsQuery(fieldName)
-                }
-              }
-            ]
+              ]
+            }
           }
         : {
-            should: [
-              {
-                bool: {
-                  must_not: termQuery(fieldName, date, false)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: termQuery(fieldName, date, false)
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
                 }
-              },
-              {
-                bool: {
-                  must_not: existsQuery(fieldName)
-                }
-              }
-            ]
+              ]
+            }
           };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
       return parentType
         ? {
-            must_not: {
-              bool: {
-                must: [existsQuery(fieldName), includedTypeQuery(parentType)]
-              }
+            bool: {
+              should: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        bool: {
+                          must_not: {
+                            nested: {
+                              path: "included",
+                              query: {
+                                bool: {
+                                  must: [
+                                    existsQuery(fieldName),
+                                    includedTypeQuery(parentType)
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        nested: {
+                          path: "included",
+                          query: {
+                            bool: {
+                              must: [
+                                termQuery(fieldName, "", false),
+                                includedTypeQuery(parentType)
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
             }
           }
         : {
-            must_not: {
-              bool: {
-                must: existsQuery(fieldName)
-              }
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                },
+                {
+                  bool: {
+                    must: termQuery(fieldName, "", false)
+                  }
+                }
+              ]
             }
           };
 
@@ -157,23 +247,62 @@ export function transformDateSearchToDSL(
     case "notEmpty":
       return parentType
         ? {
-            must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+            bool: {
+              should: [
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must: [
+                          existsQuery(fieldName),
+                          includedTypeQuery(parentType)
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, "", false),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                }
+              ]
+            }
           }
         : {
-            must: existsQuery(fieldName)
+            bool: {
+              must: existsQuery(fieldName),
+              must_not: termQuery(fieldName, "", false)
+            }
           };
 
     // Equals and default case
     default:
       return parentType
         ? {
-            must: [
-              termQuery(fieldName, date, false),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldName, date, false),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: termQuery(fieldName, date, false)
+            bool: {
+              must: termQuery(fieldName, date, false)
+            }
           };
   }
 }

@@ -189,7 +189,9 @@ export function transformTextSearchToDSL(
               }
             }
           : {
-              must: termQuery(fieldName, matchValue, true)
+              bool: {
+                must: termQuery(fieldName, matchValue, true)
+              }
             };
       }
 
@@ -209,177 +211,200 @@ export function transformTextSearchToDSL(
             }
           }
         : {
-            must: matchQuery(fieldName, matchValue)
+            bool: {
+              must: matchQuery(fieldName, matchValue)
+            }
           };
 
     // Not equals match type.
     case "notEquals":
       return parentType
         ? {
-            should: [
-              // If the field does exist, then search for everything that does NOT match the term.
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must_not: termQuery(fieldName, matchValue, true),
-                      must: includedTypeQuery(parentType)
+            bool: {
+              should: [
+                // If the field does exist, then search for everything that does NOT match the term.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, matchValue, true),
+                        must: includedTypeQuery(parentType)
+                      }
                     }
                   }
-                }
-              },
+                },
 
-              // If it's included but the field doesn't exist, then it's not equal either.
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must_not: existsQuery(fieldName),
-                      must: includedTypeQuery(parentType)
+                // If it's included but the field doesn't exist, then it's not equal either.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: existsQuery(fieldName),
+                        must: includedTypeQuery(parentType)
+                      }
                     }
                   }
-                }
-              },
+                },
 
-              // And if it's not included, then it's not equal either.
-              {
-                bool: {
-                  must_not: existsQuery(
-                    "data.relationships." + parentName + ".data.id"
-                  )
+                // And if it's not included, then it's not equal either.
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
                 }
-              }
-            ]
+              ]
+            }
           }
         : {
-            should: [
-              {
-                bool: {
-                  must_not: termQuery(fieldName, matchValue, true)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: termQuery(fieldName, matchValue, true)
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
                 }
-              },
-              {
-                bool: {
-                  must_not: existsQuery(fieldName)
-                }
-              }
-            ]
+              ]
+            }
           };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
       return parentType
         ? {
-            should: [
-              {
-                bool: {
-                  should: [
-                    {
-                      bool: {
-                        must_not: {
-                          nested: {
-                            path: "included",
-                            query: {
-                              bool: {
-                                must: [
-                                  existsQuery(fieldName),
-                                  includedTypeQuery(parentType)
-                                ]
+            bool: {
+              should: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        bool: {
+                          must_not: {
+                            nested: {
+                              path: "included",
+                              query: {
+                                bool: {
+                                  must: [
+                                    existsQuery(fieldName),
+                                    includedTypeQuery(parentType)
+                                  ]
+                                }
                               }
                             }
                           }
                         }
-                      }
-                    },
-                    {
-                      nested: {
-                        path: "included",
-                        query: {
-                          bool: {
-                            must: [
-                              termQuery(fieldName, "", true),
-                              includedTypeQuery(parentType)
-                            ]
+                      },
+                      {
+                        nested: {
+                          path: "included",
+                          query: {
+                            bool: {
+                              must: [
+                                termQuery(fieldName, "", true),
+                                includedTypeQuery(parentType)
+                              ]
+                            }
                           }
                         }
                       }
-                    }
-                  ]
+                    ]
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
                 }
-              },
-              {
-                bool: {
-                  must_not: existsQuery(
-                    "data.relationships." + parentName + ".data.id"
-                  )
-                }
-              }
-            ]
+              ]
+            }
           }
         : {
-            should: [
-              {
-                bool: {
-                  must_not: existsQuery(fieldName)
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                },
+                {
+                  bool: {
+                    must: termQuery(fieldName, "", true)
+                  }
                 }
-              },
-              {
-                bool: {
-                  must: termQuery(fieldName, "", true)
-                }
-              }
-            ]
+              ]
+            }
           };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
       return parentType
         ? {
-            should: [
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must: [
-                        existsQuery(fieldName),
-                        includedTypeQuery(parentType)
-                      ]
+            bool: {
+              should: [
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must: [
+                          existsQuery(fieldName),
+                          includedTypeQuery(parentType)
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, "", true),
+                        must: includedTypeQuery(parentType)
+                      }
                     }
                   }
                 }
-              },
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must_not: termQuery(fieldName, "", true),
-                      must: includedTypeQuery(parentType)
-                    }
-                  }
-                }
-              }
-            ]
+              ]
+            }
           }
         : {
-            must: existsQuery(fieldName),
-            must_not: termQuery(fieldName, "", true)
+            bool: {
+              must: existsQuery(fieldName),
+              must_not: termQuery(fieldName, "", true)
+            }
           };
 
     // Default case
     default:
       return parentType
         ? {
-            must: [
-              matchQuery(fieldName, matchValue),
-              includedTypeQuery(parentType)
-            ]
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    matchQuery(fieldName, matchValue),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
           }
         : {
-            must: matchQuery(fieldName, matchValue)
+            bool: {
+              must: matchQuery(fieldName, matchValue)
+            }
           };
   }
 }
