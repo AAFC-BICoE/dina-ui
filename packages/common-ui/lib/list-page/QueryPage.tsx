@@ -227,8 +227,6 @@ export function QueryPage<TData extends KitsuResource>({
 
         setAvailableSamples(processedResult);
         setSearchResults(processedResult);
-
-         console.log(processedResult);
       })
       .catch(elasticSearchError => {
         setError(elasticSearchError);
@@ -255,17 +253,19 @@ export function QueryPage<TData extends KitsuResource>({
 
     const selectedObjects = searchResults.filter((itemA)=> {
       return !ids.find((itemB)=> {
-        return itemA.id === itemB;
+        return itemA.id == itemB;
       })
     })
 
-    // const unselectedObjects = searchResults.filter((itemA)=> {
-    //   return !ids.find((itemB)=> {
-    //     return itemA.id !== itemB;
-    //   })
-    // })
+    const unselectedObjects = searchResults.filter((itemA)=> {
+      return ids.find((itemB)=> {
+        return itemA.id == itemB;
+      })
+    })
 
     setSelectedResources(selectedObjects);
+    setSearchResults(unselectedObjects);
+    setAvailableSamples(unselectedObjects);
     formik.setFieldValue("sampleIdsToSelect", {});
   }
 
@@ -273,18 +273,28 @@ export function QueryPage<TData extends KitsuResource>({
     formValues,
     formik: FormikContextType<any>
   ) {
-    const { pcrBatchItemIdsToDelete } = formValues;
+    const { itemIdsToDelete } = formValues.itemIdsToDelete;
   
-    const ids = toPairs(pcrBatchItemIdsToDelete)
+    const ids = toPairs(itemIdsToDelete)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
   
-    const pcrBatchItems = ids.map<KitsuResourceLink>(id => ({
-      id,
-      type: "pcr-batch-item"
-    }));
-  
-    formik.setFieldValue("pcrBatchItemIdsToDelete", {});
+    const selectedObjects = selectedResources.filter((itemA)=> {
+      return !ids.find((itemB)=> {
+        return itemA.id == itemB;
+      })
+    })
+
+    const unselectedObjects = selectedResources.filter((itemA)=> {
+      return ids.find((itemB)=> {
+        return itemA.id == itemB;
+      })
+    })
+
+    setSelectedResources(unselectedObjects);
+    setSearchResults(selectedObjects);
+    setAvailableSamples(selectedObjects);
+    formik.setFieldValue("itemIdsToDelete", {});
   }  
   /**
    * Using the user preferences, load the saved search name into the search filters.
@@ -387,7 +397,7 @@ export function QueryPage<TData extends KitsuResource>({
 
   const {
     CheckBoxField,
-    CheckBoxHeader,
+    CheckBoxHeader: test,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
     fieldName: "selectedResources",
@@ -395,11 +405,11 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   const {
-    CheckBoxHeader: SampleDeselectCheckBoxHeader,
     CheckBoxField: SampleDeselectCheckBox,
-    setAvailableItems: setRemoveablePcrBatchItems
+    CheckBoxHeader: SampleDeselectCheckBoxHeader,
+    setAvailableItems: setRemoveableItems
   } = useGroupedCheckBoxes({
-    fieldName: "ItemIdsToDelete"
+    fieldName: "itemIdsToDelete"
   });
 
   const computedReactTableProps =
@@ -413,19 +423,19 @@ export function QueryPage<TData extends KitsuResource>({
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
   const combinedColumns: TableColumn<TData>[] = [
+    ...columns,
     ...((showRowCheckboxes || selectionMode)
-      ? [
-          {
-            Cell: ({ original: resource }) => (
-              <CheckBoxField key={resource.id} resource={resource} />
-            ),
-            Header: CheckBoxHeader,
-            sortable: false,
-            width: 200
-          }
-        ]
-      : []),
-    ...columns
+    ? [
+        {
+          Cell: ({ original: resource }) => (
+            <CheckBoxField key={resource.id} resource={resource} />
+          ),
+          Header: test,
+          sortable: false,
+          width: 200
+        }
+      ]
+    : [])
   ];
 
   const columnsSelected: TableColumn<TData>[] = [
@@ -434,7 +444,7 @@ export function QueryPage<TData extends KitsuResource>({
       ? [
           {
             Cell: ({ original: resource }) => (
-              <CheckBoxField key={resource.id} resource={resource} />
+              <SampleDeselectCheckBox key={resource.id} resource={resource} />
             ),
             Header: SampleDeselectCheckBoxHeader,
             sortable: false,
@@ -555,7 +565,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   return (
-    <DinaForm key={uuidv4()} initialValues={{searchFilters, sampleIdsToSelect:{}}} onSubmit={onSubmit}>
+    <DinaForm key={uuidv4()} initialValues={{searchFilters, sampleIdsToSelect:{}, itemIdsToDelete:{}}} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >

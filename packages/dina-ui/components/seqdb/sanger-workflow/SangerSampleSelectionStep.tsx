@@ -42,21 +42,21 @@ export function SangerSampleSelectionStep({
 
   const [searchValue, setSearchValue] = useState("");
 
-  const {
-    CheckBoxHeader: SampleSelectCheckBoxHeader,
-    CheckBoxField: SampleSelectCheckBox,
-    setAvailableItems: setAvailableSamples
-  } = useGroupedCheckBoxes({
-    fieldName: "sampleIdsToSelect"
-  });
+  // const {
+  //   CheckBoxHeader: SampleSelectCheckBoxHeader,
+  //   CheckBoxField: SampleSelectCheckBox,
+  //   setAvailableItems: setAvailableSamples
+  // } = useGroupedCheckBoxes({
+  //   fieldName: "sampleIdsToSelect"
+  // });
 
-  const {
-    CheckBoxHeader: SampleDeselectCheckBoxHeader,
-    CheckBoxField: SampleDeselectCheckBox,
-    setAvailableItems: setRemoveablePcrBatchItems
-  } = useGroupedCheckBoxes({
-    fieldName: "pcrBatchItemIdsToDelete"
-  });
+  // const {
+  //   CheckBoxHeader: SampleDeselectCheckBoxHeader,
+  //   CheckBoxField: SampleDeselectCheckBox,
+  //   setAvailableItems: setRemoveablePcrBatchItems
+  // } = useGroupedCheckBoxes({
+  //   fieldName: "pcrBatchItemIdsToDelete"
+  // });
 
   const columns: TableColumn<MaterialSample>[] = [
     {
@@ -70,16 +70,16 @@ export function SangerSampleSelectionStep({
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
       isKeyword: true
-    },
-  {
-    Cell: ({ original: materialSample }) => (
-      <div key={materialSample.id}>
-        <SampleSelectCheckBox resource={materialSample} />
-      </div>
-    ),
-    Header: SampleSelectCheckBoxHeader,
-    sortable: false
-  }
+    }
+  // {
+  //   Cell: ({ original: materialSample }) => (
+  //     <div key={materialSample.id}>
+  //       <SampleSelectCheckBox resource={materialSample} />
+  //     </div>
+  //   ),
+  //   Header: SampleSelectCheckBoxHeader,
+  //   sortable: false
+  // }
   ];
 
 
@@ -102,72 +102,72 @@ export function SangerSampleSelectionStep({
   //   }
   // ];
 
-  const PCRBATCH_ITEM_COLUMNS: ColumnDefinition<any>[] = [
-    {
-      Cell: ({ original: pcrBatchItem }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
-        >
-          {pcrBatchItem?.materialSample?.id}
-        </Link>
-      ),
-      accessor: "materialSample.id",
-      sortable: false
-    },
-    ...(editMode
-      ? [
-          {
-            Cell: ({ original: pcrBatchItem }) => (
-              <div key={pcrBatchItem.id}>
-                <SampleDeselectCheckBox resource={pcrBatchItem} />
-              </div>
-            ),
-            Header: SampleDeselectCheckBoxHeader,
-            sortable: false
-          }
-        ]
-      : [])
-  ];
+  // const PCRBATCH_ITEM_COLUMNS: ColumnDefinition<any>[] = [
+  //   {
+  //     Cell: ({ original: pcrBatchItem }) => (
+  //       <Link
+  //         href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
+  //       >
+  //         {pcrBatchItem?.materialSample?.id}
+  //       </Link>
+  //     ),
+  //     accessor: "materialSample.id",
+  //     sortable: false
+  //   },
+  //   ...(editMode
+  //     ? [
+  //         {
+  //           Cell: ({ original: pcrBatchItem }) => (
+  //             <div key={pcrBatchItem.id}>
+  //               <SampleDeselectCheckBox resource={pcrBatchItem} />
+  //             </div>
+  //           ),
+  //           Header: SampleDeselectCheckBoxHeader,
+  //           sortable: false
+  //         }
+  //       ]
+  //     : [])
+  // ];
 
-  const { deleteAllCheckedPcrBatchItems, lastSave, selectAllCheckedSamples } =
-    useSangerSampleSelection(pcrBatchId);
+  // const { deleteAllCheckedPcrBatchItems, lastSave, selectAllCheckedSamples } =
+  //   useSangerSampleSelection(pcrBatchId);
 
-  const selectedItemsTable = (
-    <div>
-      <ButtonBar>
-        <button
-          className="btn btn-primary edit-button"
-          type="button"
-          onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
-        >
-          <SeqdbMessage id="editButtonText" />
-        </button>
-      </ButtonBar>
-      <strong>
-        <SeqdbMessage id="selectedSamplesTitle" />
-      </strong>
-      <QueryTable
-        columns={PCRBATCH_ITEM_COLUMNS}
-        defaultPageSize={100}
-        filter={filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })("")}
-        defaultSort={[{ id: "materialSample.id", desc: false }]}
-        reactTableProps={{ sortable: false }}
-        onSuccess={response => setRemoveablePcrBatchItems(response.data)}
-        path="seqdb-api/pcr-batch-item"
-        include="materialSample"
-        deps={[lastSave]}
-      />
-    </div>
-  );
+  // const selectedItemsTable = (
+  //   <div>
+  //     <ButtonBar>
+  //       <button
+  //         className="btn btn-primary edit-button"
+  //         type="button"
+  //         onClick={() => setEditMode(true)}
+  //         style={{ width: "10rem" }}
+  //       >
+  //         <SeqdbMessage id="editButtonText" />
+  //       </button>
+  //     </ButtonBar>
+  //     <strong>
+  //       <SeqdbMessage id="selectedSamplesTitle" />
+  //     </strong>
+  //     <QueryTable
+  //       columns={PCRBATCH_ITEM_COLUMNS}
+  //       defaultPageSize={100}
+  //       filter={filterBy([], {
+  //         extraFilters: [
+  //           {
+  //             selector: "pcrBatch.uuid",
+  //             comparison: "==",
+  //             arguments: pcrBatchId
+  //           }
+  //         ]
+  //       })("")}
+  //       defaultSort={[{ id: "materialSample.id", desc: false }]}
+  //       reactTableProps={{ sortable: false }}
+  //       onSuccess={response => setRemoveablePcrBatchItems(response.data)}
+  //       path="seqdb-api/pcr-batch-item"
+  //       include="materialSample"
+  //       deps={[lastSave]}
+  //     />
+  //   </div>
+  // );
 
   const buttonBar = (
     <ButtonBar>
@@ -183,7 +183,7 @@ export function SangerSampleSelectionStep({
   );
 
   return withResponse(pcrBatchItemQuery, () =>
-    editMode ? (
+    // editMode ? (
       <div>
         {buttonBar}
         <div className="alert alert-warning d-inline-block">
@@ -273,10 +273,11 @@ export function SangerSampleSelectionStep({
         </div>
         {buttonBar}
       </div>
-    ) : (
-      selectedItemsTable
-    )
-  );
+    ) 
+    // : (
+      // selectedItemsTable
+    // )
+  // );
 }
 
 export function useSangerSampleSelection(pcrBatchId: string) {
