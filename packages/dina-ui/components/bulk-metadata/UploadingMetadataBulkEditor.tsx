@@ -3,7 +3,11 @@ import { useRouter } from "next/router";
 import { InputResource, PersistedResource } from "kitsu";
 import { useState, useEffect, useContext } from "react";
 import moment from "moment";
-import { Metadata, ObjectUpload } from "../../types/objectstore-api";
+import {
+  DefaultValue,
+  Metadata,
+  ObjectUpload
+} from "../../types/objectstore-api";
 import { Nav, Footer } from "../button-bar/nav/nav";
 import { MetadataBulkEditor } from "./MetadataBulkEditor";
 import { Promisable } from "type-fest";
@@ -25,7 +29,7 @@ export function UploadingMetadataBulkEditor({
   const router = useRouter();
   const group = router?.query?.group as string;
   const { agentId } = useAccount();
-  const { bulkGet } = useContext(ApiClientContext);
+  const { bulkGet, apiClient } = useContext(ApiClientContext);
 
   const [uploadMetadata, setMetadata] = useState<Metadata[]>();
   useEffect(() => {
@@ -44,22 +48,22 @@ export function UploadingMetadataBulkEditor({
         }
       );
     }
-    // // Set default values for the new Metadatas:
-    // const {
-    //   data: { values: defaultValues }
-    // } = await apiClient.get<{ values: DefaultValue[] }>(
-    //   "objectstore-api/config/default-values",
-    //   {}
-    // );
-    // const metadataDefaults: Partial<Metadata> = {
-    //   publiclyReleasable: true
-    // };
-    // for (const defaultValue of defaultValues.filter(
-    //   ({ type }) => type === "metadata"
-    // )) {
-    //   metadataDefaults[defaultValue.attribute as keyof Metadata] =
-    //     defaultValue.value as any;
-    // }
+    // Set default values for the new Metadatas:
+    const {
+      data: { values: defaultValues }
+    } = await apiClient.get<{ values: DefaultValue[] }>(
+      "objectstore-api/config/default-values",
+      {}
+    );
+    const metadataDefaults: Partial<Metadata> = {
+      publiclyReleasable: true
+    };
+    for (const defaultValue of defaultValues.filter(
+      ({ type }) => type === "metadata"
+    )) {
+      metadataDefaults[defaultValue.attribute as keyof Metadata] =
+        defaultValue.value as any;
+    }
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
       // ...metadataDefaults,
       acCaption: objectUpload.originalFilename,

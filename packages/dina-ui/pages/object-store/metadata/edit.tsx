@@ -9,7 +9,11 @@ import {
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Metadata, ObjectUpload } from "../../../types/objectstore-api";
+import {
+  DefaultValue,
+  Metadata,
+  ObjectUpload
+} from "../../../types/objectstore-api";
 import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { BULK_ADD_IDS_KEY } from "../upload";
@@ -46,25 +50,25 @@ export default function MetadataEditPage() {
         }
       );
     }
-    // // Set default values for the new Metadatas:
-    // const {
-    //   data: { values: defaultValues }
-    // } = await apiClient.get<{ values: DefaultValue[] }>(
-    //   "objectstore-api/config/default-values",
-    //   {}
-    // );
-    // const metadataDefaults: Partial<Metadata> = {
-    //   publiclyReleasable: true
-    // };
-    // for (const defaultValue of defaultValues.filter(
-    //   ({ type }) => type === "metadata"
-    // )) {
-    //   metadataDefaults[defaultValue.attribute as keyof Metadata] =
-    //     defaultValue.value as any;
-    // }
+    // Set default values for the new Metadatas:
+    const {
+      data: { values: defaultValues }
+    } = await apiClient.get<{ values: DefaultValue[] }>(
+      "objectstore-api/config/default-values",
+      {}
+    );
+    const metadataDefaults: Partial<Metadata> = {
+      publiclyReleasable: true
+    };
+    for (const defaultValue of defaultValues.filter(
+      ({ type }) => type === "metadata"
+    )) {
+      metadataDefaults[defaultValue.attribute as keyof Metadata] =
+        defaultValue.value as any;
+    }
 
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
-      // ...metadataDefaults,
+      ...metadataDefaults,
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
         ? moment(objectUpload.dateTimeDigitized).format()
