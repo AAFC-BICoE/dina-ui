@@ -26,7 +26,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep } from "lodash";
+import { cloneDeep, uniq } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -34,10 +34,7 @@ import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
-import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
-import { pick, toPairs } from "lodash";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { PcrBatch, PcrBatchItem } from "../../../dina-ui/types/seqdb-api";
+import { toPairs } from "lodash";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -96,7 +93,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
       ) => Partial<TableProps>);
 
+  /**Boolean */
   selectionMode?: boolean;
+
   /**
    * Event prop triggered when the user changes the sort settings.
    *
@@ -242,58 +241,56 @@ export function QueryPage<TData extends KitsuResource>({
     loadSavedSearch("default");
   }, []);
 
-  async function selectAllCheckedSamples(
+  // select the checked items and display them on the right table
+  function selectAllCheckedItems(
     formValues,
     formik: FormikContextType<any>
   ) {
-    const { sampleIdsToSelect } = formValues.sampleIdsToSelect;
-    const ids = toPairs(sampleIdsToSelect)
+    const itemIdsToSelect  = formValues.itemIdsToSelect;
+
+    const ids = toPairs(itemIdsToSelect)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
     const selectedObjects = searchResults.filter((itemA)=> {
-      return !ids.find((itemB)=> {
-        return itemA.id == itemB;
-      })
-    })
-
-    const unselectedObjects = searchResults.filter((itemA)=> {
       return ids.find((itemB)=> {
         return itemA.id == itemB;
       })
     })
 
-    setSelectedResources(selectedObjects);
-    setSearchResults(unselectedObjects);
-    setAvailableSamples(unselectedObjects);
-    formik.setFieldValue("sampleIdsToSelect", {});
+    setSelectedResources(current => uniq([
+      ...current,
+      ...selectedObjects
+    ]));
+
+    setRemoveableItems(current => uniq([
+      ...current,
+      ...selectedObjects
+    ]));
+
+    formik.setFieldValue("itemIdsToSelect", {});
   }
 
-  async function deleteAllCheckedPcrBatchItems(
+  // delete all the checked items on the right table and display them in the left table
+  function deleteAllCheckedItems(
     formValues,
     formik: FormikContextType<any>
   ) {
-    const { itemIdsToDelete } = formValues.itemIdsToDelete;
+    console.log(formValues);
+    const itemIdsToDelete = formValues.itemIdsToDelete;
   
     const ids = toPairs(itemIdsToDelete)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
-  
-    const selectedObjects = selectedResources.filter((itemA)=> {
+
+    const unselectedObjects = selectedResources.filter((itemA)=> {
       return !ids.find((itemB)=> {
         return itemA.id == itemB;
       })
     })
 
-    const unselectedObjects = selectedResources.filter((itemA)=> {
-      return ids.find((itemB)=> {
-        return itemA.id == itemB;
-      })
-    })
-
+    setRemoveableItems(unselectedObjects);
     setSelectedResources(unselectedObjects);
-    setSearchResults(selectedObjects);
-    setAvailableSamples(selectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
   }  
   /**
@@ -395,18 +392,20 @@ export function QueryPage<TData extends KitsuResource>({
     return resp?.data?.count;
   }
 
+  //Checkbox for the first table that lists the search results
   const {
-    CheckBoxField,
-    CheckBoxHeader: test,
+    CheckBoxField: SelectCheckBox,
+    CheckBoxHeader: SelectCheckBoxHeader,
     setAvailableItems: setAvailableSamples
   } = useGroupedCheckBoxes({
-    fieldName: "selectedResources",
+    fieldName: "itemIdsToSelect",
     defaultAvailableItems: searchResults ?? []
   });
 
+  //Checkbox for second table where selected/to be deleted items are displayed
   const {
-    CheckBoxField: SampleDeselectCheckBox,
-    CheckBoxHeader: SampleDeselectCheckBoxHeader,
+    CheckBoxField: DeselectCheckBox,
+    CheckBoxHeader: DeselectCheckBoxHeader,
     setAvailableItems: setRemoveableItems
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete"
@@ -416,21 +415,21 @@ export function QueryPage<TData extends KitsuResource>({
     typeof reactTableProps === "function"
       ? reactTableProps(
           searchResults as PersistedResource<TData>[],
-          CheckBoxField
+          SelectCheckBox
         )
       : reactTableProps;
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
-  const combinedColumns: TableColumn<TData>[] = [
+  const columnsResults: TableColumn<TData>[] = [
     ...columns,
     ...((showRowCheckboxes || selectionMode)
     ? [
         {
           Cell: ({ original: resource }) => (
-            <CheckBoxField key={resource.id} resource={resource} />
+            <SelectCheckBox key={resource.id} resource={resource} />
           ),
-          Header: test,
+          Header: SelectCheckBoxHeader,
           sortable: false,
           width: 200
         }
@@ -444,9 +443,9 @@ export function QueryPage<TData extends KitsuResource>({
       ? [
           {
             Cell: ({ original: resource }) => (
-              <SampleDeselectCheckBox key={resource.id} resource={resource} />
+              <DeselectCheckBox key={resource.id} resource={resource} />
             ),
-            Header: SampleDeselectCheckBoxHeader,
+            Header: DeselectCheckBoxHeader,
             sortable: false,
             width: 200
           }
@@ -454,7 +453,7 @@ export function QueryPage<TData extends KitsuResource>({
       : [])
     ];
 
-  const mappedColumns = combinedColumns.map(column => {
+  const mappedResultsColumns = columnsResults.map(column => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
       fieldName: String(column.label)
@@ -565,7 +564,7 @@ export function QueryPage<TData extends KitsuResource>({
   }
 
   return (
-    <DinaForm key={uuidv4()} initialValues={{searchFilters, sampleIdsToSelect:{}, itemIdsToDelete:{}}} onSubmit={onSubmit}>
+    <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
       <label
         style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
       >
@@ -643,7 +642,7 @@ export function QueryPage<TData extends KitsuResource>({
         <div className="row">
       <div className={selectionMode ? "col-5": "col-12"}><ReactTable
         // Column and data props
-        columns={mappedColumns}
+        columns={mappedResultsColumns}
         data={searchResults}
         minRows={1}
         // Loading Table props
@@ -703,7 +702,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div>
               <FormikButton
                 className="btn btn-primary w-100 mb-5 select-all-checked-button"
-                onClick={selectAllCheckedSamples}
+                onClick={selectAllCheckedItems}
               >
                 <FiChevronsRight />
               </FormikButton>
@@ -711,7 +710,7 @@ export function QueryPage<TData extends KitsuResource>({
               <div>
               <FormikButton
                 className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
-                onClick={deleteAllCheckedPcrBatchItems}
+                onClick={deleteAllCheckedItems}
               >
                 <FiChevronsLeft />
               </FormikButton>
