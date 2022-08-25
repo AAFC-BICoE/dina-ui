@@ -80,7 +80,7 @@ jest.mock("next/dynamic", () => () => {
   };
 });
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (paths.length === 0) {
     return [];
   }
@@ -189,7 +189,7 @@ const METADATA_IDS = [
 describe("Metadata bulk edit page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockSave.mockImplementation(args => args.map(({ resource }) => resource));
+    mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
 
     // Reset "local storage":
     deleteFromStorage(STORAGE_KEY);
@@ -241,148 +241,6 @@ describe("Metadata bulk edit page", () => {
         data: "metadata.managedAttributes.scientific_name",
         title: "Scientific Name"
       }
-    ]);
-  });
-
-  it("Loads initial Metadata fields and lets you submit new Metadatas (edit new data mode)", async () => {
-    writeStorage(BULK_ADD_IDS_KEY, ["b4c8d6a6-0332-4f2a-a7b9-68b7898b6486"]);
-    mockUseRouter.mockReturnValue({
-      query: {
-        group: "example-group"
-      }
-    });
-
-    mockSave.mockImplementation(args =>
-      args.map(({ resource }) => {
-        const resourceCopy = { ...resource };
-        // When submitting a new resource, give it a new ID:
-        if (!resourceCopy.id) {
-          resourceCopy.id = "00000000-0000-0000-0000-000000000000";
-        }
-        return resourceCopy;
-      })
-    );
-
-    const wrapper = mountWithAppContext(<EditMetadatasPage />, {
-      apiContext,
-      accountContext: {
-        // acMetadataCreator should be set as the logged-in user's agentId:
-        agentId: "6ee06232-e801-4cd5-8fc5-127aa14c3ace"
-      }
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Get the table data to directly edit it for the test to simulate how the Handsontable would
-    // edit the data.
-    const tableData = wrapper
-      .find("MockHotTable")
-      .prop<BulkMetadataEditRow[]>("data");
-
-    // Expect the initial data:
-    expect(tableData).toEqual([
-      {
-        acSubtype: "",
-        acTags: "",
-        dcCreator: "",
-        // Default license is loaded:
-        license:
-          "Open Government Licence - Canada (license/open-government-license-canada)",
-        metadata: {
-          acCaption: "test-file.png",
-          acDigitizationDate: "2020-12-17T23:37:45+00:00",
-          acMetadataCreator: {
-            id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-            type: "person"
-          },
-          bucket: "example-group",
-          dcRights: "default-value",
-          fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
-          originalFilename: "test-file.png",
-          // Default rights fields are loaded from the API endpoint:
-          xmpRightsOwner: "default-value",
-          xmpRightsUsageTerms: "default-value",
-          xmpRightsWebStatement: "default-value",
-          publiclyReleasable: true, // Default Value
-          type: "metadata"
-        },
-        // The ObjectUpload is included in the initial table data to provide values for Default Values Configs:
-        objectUpload: {
-          dateTimeDigitized: "2020-12-17T23:37:45.932Z",
-          id: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
-          originalFilename: "test-file.png"
-        }
-      }
-    ]);
-
-    tableData[0].metadata.acCaption = "test-caption";
-
-    // Submit the spreadsheet:
-    wrapper.find("button.bulk-editor-submit-button").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(mockSave.mock.calls).toEqual([
-      [
-        [
-          {
-            resource: {
-              acCaption: "test-caption",
-              acDigitizationDate: "2020-12-17T23:37:45+00:00",
-              acMetadataCreator: {
-                id: "6ee06232-e801-4cd5-8fc5-127aa14c3ace",
-                type: "person"
-              },
-              dcRights: "default-value",
-              bucket: "example-group",
-              fileIdentifier: "b4c8d6a6-0332-4f2a-a7b9-68b7898b6486",
-              originalFilename: "test-file.png",
-              xmpRightsOwner: "default-value",
-              xmpRightsUsageTerms: "default-value",
-              xmpRightsWebStatement: "default-value",
-              publiclyReleasable: true, // Default Value
-              type: "metadata"
-            },
-            type: "metadata"
-          }
-        ],
-        {
-          apiBaseUrl: "/objectstore-api"
-        }
-      ]
-    ]);
-  });
-
-  it("Lets you set custom values from a pre-made config", async () => {
-    writeStorage(BULK_ADD_IDS_KEY, ["b4c8d6a6-0332-4f2a-a7b9-68b7898b6486"]);
-    mockUseRouter.mockReturnValue({
-      query: {
-        group: "example-group",
-
-        // The index of the Config to use:
-        defaultValuesConfig: "0"
-      }
-    });
-
-    const wrapper = mountWithAppContext(<EditMetadatasPage />, { apiContext });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Get the table data to directly edit it for the test to simulate how the Handsontable would
-    // edit the data.
-    const tableData = wrapper
-      .find("MockHotTable")
-      .prop<BulkMetadataEditRow[]>("data");
-
-    expect(tableData).toEqual([
-      // Custom default values should be set here:
-      expect.objectContaining({
-        acCaption: "test-caption-text",
-        acTags: "test-file.png"
-      })
     ]);
   });
 });
