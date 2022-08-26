@@ -533,7 +533,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   metadataBucketNameLabel: "Bucket Name",
   metadataBuiltInAttributesLabel: "Built-in Attributes",
   metadataBulkEditTagsLabel: "Tags (Comma-separated)",
-  metadataBulkEditTitle: "Edit Metadata",
   metadataDcFormatLabel: "DcFormat",
   metadataExternalResourceDetailsLabel: "External Resource Details",
   metadataFileExtensionLabel: "File Extension",

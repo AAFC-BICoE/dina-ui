@@ -1,88 +1,73 @@
-import {
-  ButtonBar,
-  BackButton,
-  LoadingSpinner,
-  useAccount,
-  BULK_EDIT_IDS_KEY
-} from "common-ui";
-import { useLocalStorage } from "@rehooks/local-storage";
+import { withResponse, BackButton, ButtonBar, SubmitButton } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
-import { BulkMetadataEditor } from "../../../components/object-store";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { BULK_ADD_IDS_KEY } from "../upload";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Metadata } from "../../../types/objectstore-api";
-import { PersistedResource } from "kitsu";
-import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
+import { useMetadataEditQuery } from "../../../components/object-store/metadata/useMetadata";
+import { InputResource } from "kitsu";
+import { MetadataForm } from "../../../components/object-store/metadata/MetadataForm";
+import { MetadataUpload } from "../../../components/object-store/metadata/MetadataUpload";
 
-export default function EditMetadatasPage() {
+export default function MetadataEditPage() {
   const router = useRouter();
-  const { initialized: accountInitialized } = useAccount();
+  const id = router.query.id?.toString();
   const { formatMessage } = useDinaIntl();
+  const query = useMetadataEditQuery(id);
+  const title = id ? "editMetadataTitle" : "addMetadataTitle";
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton entityId={id} entityLink="/object-store/object" />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  );
 
-  const [metadataIds] = useLocalStorage<string[]>(BULK_EDIT_IDS_KEY);
-  const [objectUploadIds] = useLocalStorage<string[]>(BULK_ADD_IDS_KEY);
-
-  if ((!metadataIds && !objectUploadIds) || !accountInitialized) {
-    return <LoadingSpinner loading={true} />;
+  async function redirectToSingleMetadataPage(metadataId: string) {
+    await router?.push(`/object-store/object/view?id=${metadataId}`);
   }
-
-  async function afterMetadatasSaved(
-    ids: string[],
-    isExternalResource?: boolean
-  ) {
-    if (ids.length === 1) {
-      await router.push(
-        `/object-store/object/${
-          isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0]}`
-      );
-    } else {
-      await router.push("/object-store/object/list");
-    }
-  }
-
-  async function onSaved(
-    ids: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) {
-    if (ids.length === 1) {
-      await router.push(
-        `/object-store/object/${
-          isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0].id}`
-      );
-    } else {
-      await router.push("/object-store/object/list");
-    }
-  }
-
   return (
     <div>
-      <Head title={formatMessage("metadataBulkEditTitle")} />
+      <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container-fluid">
-        {metadataIds ? (
-          <ExistingMetadataBulkEditor
-            ids={metadataIds}
-            onSaved={onSaved}
-            onPreviousClick={() => router.push("/object-store/object/list")}
-          />
+      <main className="container">
+        <h1 id="wb-cont">
+          <DinaMessage id={title} />
+        </h1>
+        {id ? (
+          <div>
+            {withResponse(query, ({ data: editMetadata }) => (
+              <MetadataForm
+                metadata={editMetadata as InputResource<Metadata>}
+                onSaved={redirectToSingleMetadataPage}
+                buttonBar={buttonBar}
+              />
+            ))}
+          </div>
         ) : (
-          <BulkMetadataEditor
-            metadataIds={metadataIds ?? undefined}
-            objectUploadIds={objectUploadIds ?? undefined}
-            group={router?.query?.group as string}
-            defaultValuesConfig={
-              typeof router?.query?.defaultValuesConfig === "string"
-                ? Number(router?.query?.defaultValuesConfig)
-                : undefined
-            }
-            afterMetadatasSaved={afterMetadatasSaved}
-          />
+          <MetadataUpload buttonBar={buttonBar} />
         )}
       </main>
       <Footer />
     </div>
   );
 }
+
+export const DCTYPE_OPTIONS = [
+  { label: "Image", value: "IMAGE" },
+  { label: "Moving Image", value: "MOVING_IMAGE" },
+  { label: "Sound", value: "SOUND" },
+  { label: "Text", value: "TEXT" },
+  { label: "Dataset", value: "DATASET" },
+  { label: "Undetermined", value: "UNDETERMINED" }
+];
+
+export const ORIENTATION_OPTIONS = [
+  { label: "1 - Normal", value: 1 },
+  { label: "3 - Rotated 180 degrees", value: 3 },
+  { label: "6 - Rotated 90 degrees CW", value: 6 },
+  { label: "8 - Rotated 90 degrees CCW", value: 8 },
+  { label: "2 - Flipped", value: 2 },
+  { label: "4 - Rotated 180 degrees + Flipped", value: 4 },
+  { label: "5 - Rotated 90 degrees CW + Flipped", value: 5 },
+  { label: "7 - Rotated 90 degrees CCW + Flipped", value: 7 },
+  { label: "Undetermined", value: null }
+];

@@ -48,8 +48,8 @@ describe("Upload page", () => {
       };
     });
 
-    const mockSave = jest.fn(ops =>
-      ops.map(op => ({
+    const mockSave = jest.fn((ops) =>
+      ops.map((op) => ({
         ...op.resource,
         id: "11111111-1111-1111-1111-111111111111"
       }))
@@ -106,7 +106,7 @@ describe("Upload page", () => {
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/edit",
+      pathname: "/object-store/metadata/bulk-edit",
       query: {
         group: "example-group"
       }
@@ -117,7 +117,7 @@ describe("Upload page", () => {
     );
   });
 
-  it("Throws file upload errors with a readable message.", done => {
+  it("Throws file upload errors with a readable message.", (done) => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
       fileUploadErrorHandler(exampleErrorResponse, {
@@ -129,7 +129,7 @@ describe("Upload page", () => {
     }
   });
 
-  it("Throws file upload error when unsupported file type is provided.", done => {
+  it("Throws file upload error when unsupported file type is provided.", (done) => {
     const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
     try {
       fileUploadErrorHandler(exampleErrorResponse, {

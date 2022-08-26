@@ -24,7 +24,7 @@ import { useMetadataSave } from "./useMetadata";
 import {
   DCTYPE_OPTIONS,
   ORIENTATION_OPTIONS
-} from "../../../pages/object-store/metadata/single-record-edit";
+} from "../../../pages/object-store/metadata/edit";
 import { ReactNode, Ref } from "react";
 import { InputResource } from "kitsu";
 import { FormikProps } from "formik";
@@ -69,7 +69,7 @@ export function MetadataForm({
       onSaved
     });
 
-  const metadataOnSubmit = async submittedValues => {
+  const metadataOnSubmit = async (submittedValues) => {
     await onSubmit(submittedValues);
   };
 
@@ -115,13 +115,13 @@ export function MetadataForm({
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
-                filter={input => ({
+                filter={(input) => ({
                   rsql:
                     `acSubtype=='${input}*'` +
                     (dcType ? ` and dcType==${dcType}` : "")
                 })}
                 model="objectstore-api/object-subtype"
-                optionLabel={ost => ost.acSubtype}
+                optionLabel={(ost) => ost.acSubtype}
               />
             )}
           </Field>
@@ -152,7 +152,7 @@ export function MetadataForm({
             name="license"
             filter={() => ({})}
             model="objectstore-api/license"
-            optionLabel={license => license.titles[locale] ?? license.url}
+            optionLabel={(license) => license.titles[locale] ?? license.url}
             removeDefaultSort={true}
           />
         </div>

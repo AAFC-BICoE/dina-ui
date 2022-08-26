@@ -40,9 +40,7 @@ export function MetadataPreview({ metadataId }: MetadataPreviewProps) {
           <div className="metadata-edit-link">
             <Link
               href={`/object-store/metadata/${
-                metadata.resourceExternalURL
-                  ? "external-resource-edit"
-                  : "single-record-edit"
+                metadata.resourceExternalURL ? "external-resource-edit" : "edit"
               }?id=${metadataId}`}
             >
               <a className="btn btn-primary metadata-edit-link">

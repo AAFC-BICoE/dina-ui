@@ -423,7 +423,7 @@ export function BulkMetadataEditor({
       </ButtonBar>
       <h1>
         <DinaMessage
-          id={metadataIds ? "metadataBulkEditTitle" : "addMetadataTitle"}
+          id={metadataIds ? "editMetadataTitle" : "addMetadataTitle"}
         />
       </h1>
       <div className="mb-3">

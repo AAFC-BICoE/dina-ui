@@ -74,7 +74,7 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "objectstore-api/metadata":
       return { data: TEST_METADATA };
@@ -91,7 +91,7 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockPost = jest.fn<any, any>(async path => {
+const mockPost = jest.fn<any, any>(async (path) => {
   switch (path) {
     // Elastic search response with object store mock metadata data.
     case "search-api/search-ws/search":
@@ -257,7 +257,7 @@ describe("Metadata List Page", () => {
     expect(
       wrapper
         .find(".list-layout-selector .list-inline-item")
-        .findWhere(node => node.text().includes("Table"))
+        .findWhere((node) => node.text().includes("Table"))
         .find("input")
         .prop("checked")
     ).toEqual(true);
@@ -268,7 +268,7 @@ describe("Metadata List Page", () => {
     // Switch to gallery view.
     wrapper
       .find(".list-layout-selector .list-inline-item")
-      .findWhere(node => node.text().includes("Gallery"))
+      .findWhere((node) => node.text().includes("Gallery"))
       .find("input")
       .prop<any>("onChange")();
 
@@ -294,7 +294,7 @@ describe("Metadata List Page", () => {
 
     // Router push should have been called with the 3 IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/edit"
+      pathname: "/object-store/metadata/bulk-edit"
     });
 
     expect(localStorage.getItem(BULK_EDIT_IDS_KEY)).toEqual(
