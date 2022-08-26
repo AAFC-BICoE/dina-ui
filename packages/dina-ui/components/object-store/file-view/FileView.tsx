@@ -101,6 +101,9 @@ export function FileView({
                   alt={imgAlt ?? `File path : ${filePath}`}
                   src={authenticatedFilePath}
                   style={{ height: imgHeight }}
+                  onError={event =>
+                    (event.currentTarget.style.display = "none")
+                  }
                 />
               ) : (
                 <FileViewer

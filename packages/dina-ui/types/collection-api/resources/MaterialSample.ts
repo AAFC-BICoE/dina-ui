@@ -3,11 +3,13 @@ import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
 import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { AcquisitionEvent } from "./AcquisitionEvent";
+import { Assemblage } from "./Assemblage";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
 import { ExtensionValue } from "./FieldExtension";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
+import { PreparationMethod } from "./PreparationMethod";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
@@ -43,7 +45,6 @@ export interface MaterialSampleAttributes {
   createdOn?: string;
   createdBy?: string;
   dwcOtherCatalogNumbers?: string[];
-  preparationMethod?: string | null;
   preservationType?: string | null;
   preparationFixative?: string | null;
   preparationMaterials?: string | null;
@@ -67,6 +68,7 @@ export interface MaterialSampleAttributes {
   // Client-side only fields for the organism section:
   organismsQuantity?: number;
   organismsIndividualEntry?: boolean;
+  useTargetOrganism?: boolean;
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
@@ -119,11 +121,13 @@ export interface MaterialSampleRelationships {
   collectingEvent?: CollectingEvent;
   attachment?: ResourceIdentifierObject[];
   preparationProtocol?: ResourceIdentifierObject;
+  preparationMethod?: ResourceIdentifierObject;
   preparationType?: PreparationType;
   preparedBy?: Person;
   parentMaterialSample?: MaterialSample;
   storageUnit?: StorageUnit;
   projects?: Project[];
+  assemblages?: Assemblage[];
   acquisitionEvent?: AcquisitionEvent;
 }
 

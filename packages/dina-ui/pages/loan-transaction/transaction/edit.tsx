@@ -251,15 +251,19 @@ export function TransactionFormLayout() {
           <div className="col-md-6">
             <AutoSuggestTextField<Transaction>
               name="transactionType"
-              query={(search, ctx) => ({
-                path: "loan-transaction-api/transaction",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `transactionType==${search}*`
-                }
-              })}
-              alwaysShowSuggestions={true}
-              suggestion={transaction => transaction?.transactionType}
+              jsonApiBackend={{
+                query: (search, ctx) => ({
+                  path: "loan-transaction-api/transaction",
+                  filter: {
+                    ...(ctx.values.group && {
+                      group: { EQ: ctx.values.group }
+                    }),
+                    rsql: `transactionType==${search}*`
+                  }
+                }),
+                option: transaction => transaction?.transactionType
+              }}
+              blankSearchBackend={"json-api"}
             />
             <TextField name="transactionNumber" />
           </div>
@@ -271,28 +275,32 @@ export function TransactionFormLayout() {
           <AutoSuggestTextField<Transaction>
             className="col-sm-6"
             name="status"
-            query={(search, ctx) => ({
-              path: "loan-transaction-api/transaction",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `status==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={transaction => transaction?.status}
+            jsonApiBackend={{
+              query: (search, ctx) => ({
+                path: "loan-transaction-api/transaction",
+                filter: {
+                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                  rsql: `status==${search}*`
+                }
+              }),
+              option: transaction => transaction?.status
+            }}
+            blankSearchBackend={"json-api"}
           />
           <AutoSuggestTextField<Transaction>
             className="col-sm-6"
             name="purpose"
-            query={(search, ctx) => ({
-              path: "loan-transaction-api/transaction",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `purpose==${search}*`
-              }
-            })}
-            alwaysShowSuggestions={true}
-            suggestion={transaction => transaction?.purpose}
+            jsonApiBackend={{
+              query: (search, ctx) => ({
+                path: "loan-transaction-api/transaction",
+                filter: {
+                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                  rsql: `purpose==${search}*`
+                }
+              }),
+              option: transaction => transaction?.purpose
+            }}
+            blankSearchBackend={"json-api"}
           />
         </div>
         <div className="row">

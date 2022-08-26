@@ -9,66 +9,75 @@ import { TableColumn } from "../types";
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    headers: {},
-    body: {
-      indexName: "testIndex",
-      attributes: [
-        {
-          name: "createdOn",
-          type: "date",
-          path: "data.attributes"
-        },
-        {
-          name: "verbatimDeterminer",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "uuid",
-          type: "text",
-          path: "data.attributes.hierarchy"
-        },
-        {
-          name: "publiclyReleasable",
-          type: "boolean",
-          path: "data.attributes"
-        },
-        {
-          name: "materialSampleRemarks",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "dwcOtherCatalogNumbers",
-          type: "text",
-          path: "data.attributes"
-        }
-      ],
-      relationships: [
-        {
-          name: "type",
-          path: "included",
-          value: "preparation-type",
-          attributes: [
-            {
-              name: "name",
-              type: "text",
-              path: "attributes",
-              distinct_term_agg: true
-            },
-            {
-              name: "type",
-              type: "text",
-              path: "attributes"
-            }
-          ]
-        }
-      ]
-    },
-    statusCode: "OK",
-    statusCodeValue: 200
+    indexName: "testIndex",
+    attributes: [
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      },
+      {
+        name: "verbatimDeterminer",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "uuid",
+        type: "text",
+        path: "data.attributes.hierarchy"
+      },
+      {
+        name: "publiclyReleasable",
+        type: "boolean",
+        path: "data.attributes"
+      },
+      {
+        name: "materialSampleRemarks",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "dwcOtherCatalogNumbers",
+        type: "text",
+        path: "data.attributes"
+      }
+    ],
+    relationships: [
+      {
+        name: "type",
+        path: "included",
+        value: "preparation-type",
+        attributes: [
+          {
+            name: "name",
+            type: "text",
+            path: "attributes",
+            distinct_term_agg: true
+          },
+          {
+            name: "type",
+            type: "text",
+            path: "attributes"
+          }
+        ]
+      }
+    ]
   }
 };
+
+// The QueryPage will only display the records in the columns on the table.
+const SOURCE_FILTERS = [
+  "data.id",
+  "data.type",
+  "materialSampleName",
+  "collection.name",
+  "dwcOtherCatalogNumbers",
+  "materialSampleType",
+  "createdBy",
+  "createdOn",
+  "included.id",
+  "included.type"
+];
 
 const TEST_GROUP: PersistedResource<Group>[] = [
   {
@@ -309,6 +318,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -339,6 +349,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: { term: { "data.attributes.group": "cnc" } },
@@ -488,6 +499,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -507,7 +519,7 @@ describe("QueryPage component", () => {
                         }
                       },
                       {
-                        match: {
+                        term: {
                           "included.attributes.name.keyword": "Test value"
                         }
                       }
@@ -581,7 +593,7 @@ describe("QueryPage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the field value of the preparation type query. (Partial match version)
+    // Edit the field value of the preparation type query. (Partial match version (should be default option))
     wrapper
       .find("TextField[name='queryRows[0].matchValue']")
       .find("input")
@@ -607,11 +619,8 @@ describe("QueryPage component", () => {
       .find("input")
       .simulate("change", { target: { value: "Exact Match test" } });
 
-    // Change the match type to be "EXACT MATCH"
-    wrapper
-      .find("SelectField[name='queryRows[1].matchType']")
-      .find(Select)
-      .prop<any>("onChange")({ value: "term" });
+    // For this search, we will need to switch to the exact option.
+    wrapper.find(".exactSpan").at(1).simulate("click");
 
     mockPost.mockClear();
 
@@ -633,6 +642,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {

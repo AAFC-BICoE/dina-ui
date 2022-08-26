@@ -30,7 +30,6 @@ export default function CollectionDetailsPage() {
       entityLink="/collection/collection"
       type="collection"
       apiBaseUrl="/collection-api"
-      isRestricted={true}
       showRevisionsLink={true}
     />
   );

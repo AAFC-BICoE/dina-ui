@@ -19,7 +19,7 @@ import { Promisable } from "type-fest";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../types/collection-api";
-import { MolecularSample, Product, Protocol } from "../../../types/seqdb-api";
+import { MolecularSample, Product } from "../../../types/seqdb-api";
 
 interface MolecularSampleFormProps {
   molecularSample?: PersistedResource<MolecularSample>;
@@ -30,7 +30,7 @@ export function useMolecularSample(id?: string) {
   return useQuery<MolecularSample>(
     {
       path: `seqdb-api/molecular-sample/${id}`,
-      include: "materialSample,protocol,kit"
+      include: "materialSample,kit"
     },
     {
       disabled: !id,
@@ -104,9 +104,6 @@ export function MolecularSampleForm({
       // Override the "type" attribute with the JSONAPI resource type:
       ...(submittedValues.kit && {
         kit: { ...submittedValues.kit, type: "product" }
-      }),
-      ...(submittedValues.protocol && {
-        protocol: { ...submittedValues.protocol, type: "protocol" }
       })
     };
 
@@ -161,14 +158,6 @@ export function MolecularSampleFields() {
           model="seqdb-api/product"
           optionLabel={it => it.name}
           readOnlyLink="/seqdb/product/view?id="
-        />
-        <ResourceSelectField<Protocol>
-          name="protocol"
-          className="col-md-6"
-          filter={filterBy(["name"])}
-          model="seqdb-api/protocol"
-          optionLabel={it => it.name}
-          readOnlyLink="/seqdb/protocol/view?id="
         />
         <ResourceSelectField<MaterialSample>
           name="materialSample"

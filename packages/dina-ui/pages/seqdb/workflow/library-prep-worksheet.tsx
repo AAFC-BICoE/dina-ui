@@ -83,7 +83,7 @@ export default function LibraryPrepWorksheetPage() {
               <HorizontalField label="Workflow" defaultValue={chain.name} />
               <HorizontalField
                 label="Protocol"
-                defaultValue={batch.protocol ? batch.protocol.name : ""}
+                defaultValue={batch.protocol ? batch.protocol.id : ""}
               />
             </div>
             <div className="col-6">

@@ -2,6 +2,7 @@ import {
   AreYouSureModal,
   BulkDeleteButton,
   BulkSelectableFormValues,
+  BULK_EDIT_IDS_KEY,
   DinaForm,
   QueryPage
 } from "common-ui";
@@ -31,53 +32,49 @@ const TEST_GROUP: PersistedResource<Group>[] = [
 
 const MOCK_INDEX_MAPPING_RESP = {
   data: {
-    body: {
-      indexName: "dina_object_store_index",
-      attributes: [
-        {
-          name: "originalFilename",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "bucket",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "createdBy",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "acCaption",
-          type: "text",
-          path: "data.attributes"
-        },
-        {
-          name: "id",
-          type: "text",
-          path: "data"
-        },
-        {
-          name: "type",
-          type: "text",
-          path: "data"
-        },
-        {
-          name: "createdOn",
-          type: "date",
-          path: "data.attributes"
-        }
-      ],
-      relationships: []
-    },
-    statusCode: "OK",
-    statusCodeValue: 200
+    indexName: "dina_object_store_index",
+    attributes: [
+      {
+        name: "originalFilename",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "bucket",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "createdBy",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "acCaption",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "id",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "type",
+        type: "text",
+        path: "data"
+      },
+      {
+        name: "createdOn",
+        type: "date",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
   }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "objectstore-api/metadata":
       return { data: TEST_METADATA };
@@ -94,13 +91,17 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockPost = jest.fn<any, any>(async path => {
+const mockPost = jest.fn<any, any>(async (path) => {
   switch (path) {
     // Elastic search response with object store mock metadata data.
     case "search-api/search-ws/search":
       return TEST_ELASTIC_SEARCH_RESPONSE;
   }
 });
+
+const METADATA_UUID1 = "6c524135-3c3e-41c1-a057-45afb4e3e7be";
+const METADATA_UUID2 = "3849de16-fee2-4bb1-990d-a4f5de19b48d";
+const METADATA_UUID3 = "31ee7848-b5c1-46e1-bbca-68006d9eda3b";
 
 // This will be used in the future with the fallback.
 const TEST_METADATA: PersistedResource<Metadata>[] = [
@@ -110,7 +111,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "9a85b858-f8f0-4a97-99a8-07b2cb759766",
-    id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+    id: METADATA_UUID1,
     originalFilename: "file1.png",
     type: "metadata"
   },
@@ -120,7 +121,7 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "72b4b907-c486-49a8-ab58-d01541d83eff",
-    id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+    id: METADATA_UUID2,
     originalFilename: "file2.png",
     type: "metadata"
   },
@@ -129,14 +130,14 @@ const TEST_METADATA: PersistedResource<Metadata>[] = [
     dcType: "Image",
     fileExtension: ".png",
     fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
-    id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+    id: METADATA_UUID3,
     type: "metadata"
   }
 ];
 
 const USER_PREFERENCE = {
   data: [],
-  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" },
+  meta: { totalResourceCount: 0, moduleVersion: "0.11-SNAPSHOT" }
 };
 
 const TEST_ELASTIC_SEARCH_RESPONSE = {
@@ -149,7 +150,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "6c524135-3c3e-41c1-a057-45afb4e3e7be",
+              id: METADATA_UUID1,
               type: "metadata",
               attributes: {
                 acTags: ["tag1"],
@@ -165,7 +166,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "3849de16-fee2-4bb1-990d-a4f5de19b48d",
+              id: METADATA_UUID2,
               type: "metadata",
               attributes: {
                 acTags: ["tag1", "tag2"],
@@ -181,7 +182,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
         {
           _source: {
             data: {
-              id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+              id: METADATA_UUID3,
               type: "metadata",
               attributes: {
                 bucket: "testbucket",
@@ -199,7 +200,7 @@ const TEST_ELASTIC_SEARCH_RESPONSE = {
 
 const exifData = new Map().set("date original created", "2000, Jan 8");
 const TEST_OBJECTUPLOAD: PersistedResource<ObjectUpload> = {
-  id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
+  id: METADATA_UUID3,
   fileIdentifier: "54bc37d7-17c4-4f70-8b33-2def722c6e97",
   sizeInBytes: 500,
   originalFilename: "test.png",
@@ -256,7 +257,7 @@ describe("Metadata List Page", () => {
     expect(
       wrapper
         .find(".list-layout-selector .list-inline-item")
-        .findWhere(node => node.text().includes("Table"))
+        .findWhere((node) => node.text().includes("Table"))
         .find("input")
         .prop("checked")
     ).toEqual(true);
@@ -267,7 +268,7 @@ describe("Metadata List Page", () => {
     // Switch to gallery view.
     wrapper
       .find(".list-layout-selector .list-inline-item")
-      .findWhere(node => node.text().includes("Gallery"))
+      .findWhere((node) => node.text().includes("Gallery"))
       .find("input")
       .prop<any>("onChange")();
 
@@ -293,12 +294,18 @@ describe("Metadata List Page", () => {
 
     // Router push should have been called with the 3 IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/edit",
-      query: {
-        metadataIds:
-          "6c524135-3c3e-41c1-a057-45afb4e3e7be,3849de16-fee2-4bb1-990d-a4f5de19b48d,31ee7848-b5c1-46e1-bbca-68006d9eda3b"
-      }
+      pathname: "/object-store/metadata/bulk-edit"
     });
+
+    expect(localStorage.getItem(BULK_EDIT_IDS_KEY)).toEqual(
+      '["' +
+        METADATA_UUID1 +
+        '","' +
+        METADATA_UUID2 +
+        '","' +
+        METADATA_UUID3 +
+        '"]'
+    );
   });
 
   it("Shows a metadata preview when you click the 'Preview' button.", async () => {

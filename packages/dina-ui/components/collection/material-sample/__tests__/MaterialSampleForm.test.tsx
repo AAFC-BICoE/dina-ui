@@ -96,7 +96,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
     case "collection-api/vocabulary/associationType":
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
     case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
@@ -193,7 +193,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              dwcOtherRecordNumbers: null,
+              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -244,7 +244,9 @@ describe("Material Sample Edit Page", () => {
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined
+              scheduledAction: undefined,
+              preparationMethod: undefined,
+              collection: undefined
             },
             type: "material-sample"
           }
@@ -316,6 +318,7 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparationMethod: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
@@ -424,7 +427,7 @@ describe("Material Sample Edit Page", () => {
         [
           {
             resource: {
-              dwcOtherRecordNumbers: null,
+              otherRecordNumbers: null,
               dwcVerbatimCoordinateSystem: null,
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
@@ -1862,7 +1865,9 @@ describe("Material Sample Edit Page", () => {
       .find(".organismsIndividualEntry-field")
       .find(Switch)
       .prop<any>("onChange")(false);
-
+    wrapper.find(".useTargetOrganism-field").find(Switch).prop<any>("onChange")(
+      false
+    );
     wrapper.find("form").simulate("submit");
 
     await new Promise(setImmediate);
@@ -1870,7 +1875,7 @@ describe("Material Sample Edit Page", () => {
 
     // Saves the Material Sample with the 3 SAME organisms:
     expect(mockSave.mock.calls).toEqual([
-      // IsTarget should be reverted to false.
+      // IsTarget should be reverted to null.
       // Organism 1's values with "lifestage 1" are copied to the other organisms:
       [
         [
@@ -1880,7 +1885,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           },
@@ -1890,7 +1895,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-2",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           },
@@ -1900,7 +1905,7 @@ describe("Material Sample Edit Page", () => {
               id: "organism-3",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: false
+              isTarget: null
             },
             type: "organism"
           }
@@ -2357,38 +2362,5 @@ describe("Material Sample Edit Page", () => {
         )
         .prop("value")
     ).toEqual("");
-  });
-
-  it("Lets you set a Custom Navigation section order via prop.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleForm
-        materialSample={{
-          type: "material-sample",
-          id: "333",
-          group: "test-group",
-          materialSampleName: "test-ms"
-        }}
-        // Custom navOrder:
-        navOrder={[
-          "managedAttributes-section",
-          "material-sample-info-section",
-          "identifiers-section"
-        ]}
-        onChangeNavOrder={() => undefined}
-        onSaved={mockOnSaved}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Check the first 3 sections for the sections defined in the prop:
-    expect(
-      wrapper
-        .find(".material-sample-nav .list-group-item")
-        .map(node => node.text())
-        .slice(0, 3)
-    ).toEqual(["Managed Attributes", "Material Sample Info", "Identifiers"]);
   });
 });

@@ -49,7 +49,10 @@ export function RestrictionWarning(props: RestrictionWarningProps) {
       />
     </div>
   ) : isRestrictionRemarks ? (
-    <div className="card text-white bg-danger p-1" style={{ width: "100%" }}>
+    <div
+      className="card text-white bg-danger py-1 px-2"
+      style={{ width: "100%" }}
+    >
       <TextField name="restrictionRemarks" multiLines={true} hideLabel={true} />
     </div>
   ) : null;

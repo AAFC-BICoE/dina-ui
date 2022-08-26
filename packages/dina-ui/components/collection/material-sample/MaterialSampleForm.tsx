@@ -22,7 +22,8 @@ import {
   ProjectSelectSection,
   StorageLinkerField,
   TagsAndRestrictionsSection,
-  useCollectingEventQuery
+  useCollectingEventQuery,
+  AssemblageSelectSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
@@ -65,6 +66,7 @@ export interface VisibleManagedAttributesConfig {
   collectingEvent?: string[];
   determination?: string[];
 }
+
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -112,14 +114,9 @@ export interface MaterialSampleFormProps {
 
   /** Hide the use next identifer checkbox, e.g when create multiple new samples */
   hideUseSequence?: boolean;
+
   /** Sets a default group from local storage when the group is not already set. */
   enableStoredDefaultGroup?: boolean;
-
-  /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideNavCustomViewSelect?: boolean;
-  /** Optional controlled state for the left-side Nav bar (default uncontrolled). */
-  navOrder?: MaterialSampleFormSectionId[] | null;
-  onChangeNavOrder?: (newOrder: MaterialSampleFormSectionId[] | null) => void;
 
   /**
    * Toggle to disable the collecting even switch due to a parent containing the collecting event
@@ -150,9 +147,6 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
-  hideNavCustomViewSelect,
-  navOrder: navOrderProp,
-  onChangeNavOrder: onChangeNavOrderProp,
   visibleManagedAttributeKeys,
   disableCollectingEventSwitch,
   buttonBar = (
@@ -202,11 +196,6 @@ export function MaterialSampleForm({
   const attachmentsField = "attachment";
 
   const navState = useState<MaterialSampleFormSectionId[] | null>(null);
-
-  // Allow either controlled or uncontrolle state for the nav section:
-  const [formSectionOrder, setFormSectionOrder] = onChangeNavOrderProp
-    ? [navOrderProp, onChangeNavOrderProp]
-    : navState;
 
   /**
    * A map where:
@@ -351,7 +340,7 @@ export function MaterialSampleForm({
                 }}
                 // Custom view selection is supported for material samples,
                 // but not in template editor mode:
-                showCustomViewDropdown={!isTemplate}
+                showFormTemplateDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
                   visibleManagedAttributeKeys?.materialSample
@@ -386,11 +375,7 @@ export function MaterialSampleForm({
   const formSectionPairs = toPairs(formSections);
 
   const sortedFormSectionPairs = uniq([
-    ...compact(
-      (formSectionOrder ?? []).map(id =>
-        formSectionPairs.find(([it]) => it === id)
-      )
-    ),
+    ...compact([].map(id => formSectionPairs.find(([it]) => it === id))),
     ...formSectionPairs
   ]);
 
@@ -405,9 +390,6 @@ export function MaterialSampleForm({
               disableCollectingEventSwitch ||
               initialValues.parentMaterialSample !== undefined
             }
-            hideCustomViewSelect={hideNavCustomViewSelect}
-            navOrder={formSectionOrder}
-            onChangeNavOrder={setFormSectionOrder}
           />
         )}
       </div>
@@ -434,6 +416,10 @@ export function MaterialSampleForm({
             <ProjectSelectSection
               classNames="mt-3"
               resourcePath="collection-api/project"
+            />
+            <AssemblageSelectSection
+              classNames="mt-2"
+              resourcePath="collection-api/assemblage"
             />
           </>
         )}

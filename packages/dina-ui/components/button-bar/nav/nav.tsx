@@ -16,7 +16,12 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-export function Nav() {
+export interface NavProps {
+  // Temporary prop for transitioning all pages to use the new layout.
+  marginBottom?: boolean;
+}
+
+export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
 
@@ -30,7 +35,7 @@ export function Nav() {
     <>
       <SkipLinks />
 
-      <header className="mb-4">
+      <header className={marginBottom ? "mb-4" : undefined}>
         <Container fluid={true}>
           <Row xs={1} md={2} className="header-container row d-flex px-5">
             {/* Left section of the header */}
@@ -187,23 +192,17 @@ function NavCollectionDropdown({ formatMessage }) {
       <NavDropdown.Item href="/collection/collecting-event/list">
         <DinaMessage id="collectingEventListTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/managed-attributes-view/list">
-        <DinaMessage id="managedAttributesViews" />
-      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/material-sample/list">
         <DinaMessage id="materialSampleListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/revisions-by-user">
         <DinaMessage id="revisionsByUserPageTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/storage-unit/list">
-        <DinaMessage id="storageUnitListTitle" />
-      </NavDropdown.Item>
       <NavDropdown.Item
-        href="/collection/material-sample-custom-view/list"
+        href="/collection/storage-unit/list"
         onKeyDown={onKeyDownLastItem}
       >
-        <DinaMessage id="workflowTemplates" />
+        <DinaMessage id="storageUnitListTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );
@@ -346,17 +345,20 @@ function NavDinaManagementDropdown({ formatMessage }) {
       show={show}
       className="float-right"
     >
+      <NavDropdown.Item href="/collection/assemblage/list">
+        <DinaMessage id="title_assemblage" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/collection-method/list">
         <DinaMessage id="collectionMethodListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/collection/list">
         <DinaMessage id="collectionListTitle" />
       </NavDropdown.Item>
-      <NavDropdown.Item href="/collection/managed-attributes-view/list">
-        <DinaMessage id="managedAttributesViews" />
-      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/extension/list">
         <DinaMessage id="fieldExtensions" />
+      </NavDropdown.Item>
+      <NavDropdown.Item href="/collection/form-template/list">
+        <DinaMessage id="formTemplates" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/institution/list">
         <DinaMessage id="institutionListTitle" />
@@ -368,6 +370,9 @@ function NavDinaManagementDropdown({ formatMessage }) {
         <DinaMessage id="objectSubtypeListTitle" />
       </NavDropdown.Item>
       {/* Permission page here. */}
+      <NavDropdown.Item href="/collection/preparation-method/list">
+        <DinaMessage id="title_preparationMethod" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/preparation-type/list">
         <DinaMessage id="preparationTypeListTitle" />
       </NavDropdown.Item>

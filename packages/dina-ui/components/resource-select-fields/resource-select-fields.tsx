@@ -4,6 +4,7 @@ import {
   ResourceSelectField,
   ResourceSelectFieldProps,
   useAccount,
+  useAutocompleteSearchButFallbackToRsqlApiSearch,
   useQuery,
   withResponse
 } from "common-ui";
@@ -11,11 +12,14 @@ import { useField } from "formik";
 import { SetOptional } from "type-fest";
 import { useAddPersonModal } from "..";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { Collection, Institution } from "../../types/collection-api";
+import {
+  Collection,
+  Institution,
+  StorageUnit
+} from "../../types/collection-api";
 import { CollectionMethod } from "../../types/collection-api/resources/CollectionMethod";
 import { Person } from "../../types/objectstore-api";
 import { DinaUser } from "../../types/user-api/resources/DinaUser";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 
 type ProvidedProps = "readOnlyLink" | "filter" | "model" | "optionLabel";
 
@@ -127,7 +131,8 @@ export function PersonSelectField(
           searchQuery,
           querySpec,
           indexName: "dina_agent_index",
-          searchField: "displayName",
+          searchField: "data.attributes.displayName",
+          documentId: "data.id",
           additionalField: "data.attributes.aliases"
         })
       }
@@ -135,11 +140,13 @@ export function PersonSelectField(
       filter={filterBy(["displayName"])}
       model="agent-api/person"
       // Show display name, and show aliases if any:
-      optionLabel={person =>
-        `${person.displayName}${
-          person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
-        }`
-      }
+      optionLabel={person => {
+        return person.displayName
+          ? `${person.displayName}${
+              person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
+            }`
+          : null;
+      }}
       asyncOptions={[
         {
           label: <DinaMessage id="addNewPerson" />,
@@ -147,6 +154,46 @@ export function PersonSelectField(
         }
       ]}
       {...props}
+    />
+  );
+}
+
+interface StorageUnitSelectFieldProps {
+  resourceProps: SetOptional<
+    ResourceSelectFieldProps<StorageUnit>,
+    ProvidedProps
+  >;
+  restrictedField: string;
+  restrictedFieldValue: string;
+}
+
+export function StorageUnitSelectField({
+  resourceProps,
+  restrictedField,
+  restrictedFieldValue
+}: StorageUnitSelectFieldProps) {
+  return (
+    <ResourceSelectField<StorageUnit>
+      // Experimental: try to use the dina-search-api autocomplete endpoint to get the data
+      // but fallback to the regular RSQL search if that fails.
+      useCustomQuery={(searchQuery, querySpec) =>
+        useAutocompleteSearchButFallbackToRsqlApiSearch({
+          searchQuery,
+          querySpec,
+          indexName: "dina_storage_index",
+          searchField: "data.attributes.name",
+          documentId: "data.id",
+          restrictedField,
+          restrictedFieldValue
+        })
+      }
+      readOnlyLink="/storageUnit/view?id="
+      filter={filterBy(["name"])}
+      model="collection-api/storage-unit"
+      optionLabel={storageUnit => {
+        return storageUnit.name;
+      }}
+      {...resourceProps}
     />
   );
 }

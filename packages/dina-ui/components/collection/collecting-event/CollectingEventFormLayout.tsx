@@ -13,7 +13,8 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -382,7 +383,7 @@ export function CollectingEventFormLayout({
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />
       }}
-      showCustomViewDropdown={!isTemplate}
+      showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
     />
@@ -546,23 +547,38 @@ export function CollectingEventFormLayout({
   return (
     <div ref={layoutWrapperRef}>
       <NotPubliclyReleasableWarning />
-      {!isTemplate && (
-        <DinaFormSection horizontal={[3, 9]}>
-          <div className="row">
-            <StringArrayField
-              className="col-md-6"
-              name="dwcOtherRecordNumbers"
-            />
-            <GroupSelectField
-              className="col-md-6"
-              name="group"
-              enableStoredDefaultGroup={true}
-            />
-          </div>
-        </DinaFormSection>
-      )}
       <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       <div className="row">
+        <div>
+          <FieldSet
+            legend={<DinaMessage id="identifiers" />}
+            id="identifiers"
+            className="non-strip"
+          >
+            <div className="row">
+              <div className="col-md-6">
+                <TextField
+                  name="dwcFieldNumber"
+                  tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collection_number"
+                  tooltipLinkText="fromDinaUserGuide"
+                />
+                {!isTemplate && <StringArrayField name="otherRecordNumbers" />}
+              </div>
+              <div className="col-md-6">
+                {!isTemplate && (
+                  <DinaFormSection horizontal={[3, 9]}>
+                    <div className="row">
+                      <GroupSelectField
+                        name="group"
+                        enableStoredDefaultGroup={true}
+                      />
+                    </div>
+                  </DinaFormSection>
+                )}
+              </div>
+            </div>
+          </FieldSet>
+        </div>
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingDateLegend" />}
@@ -616,19 +632,38 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
-            <AutoSuggestTextField<CollectingEvent>
-              name="dwcRecordedBy"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `dwcRecordedBy==*${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
-            />
+            <FieldSpy<string> fieldName="group">
+              {group => (
+                <AutoSuggestTextField<CollectingEvent>
+                  name="dwcRecordedBy"
+                  jsonApiBackend={{
+                    query: (searchValue, ctx) => ({
+                      path: "collection-api/collecting-event",
+                      filter: {
+                        ...(ctx.values.group && {
+                          group: { EQ: ctx.values.group }
+                        }),
+                        rsql: `dwcRecordedBy==*${searchValue}*`
+                      }
+                    }),
+                    option: collEvent => collEvent?.dwcRecordedBy ?? ""
+                  }}
+                  elasticSearchBackend={{
+                    indexName: "dina_material_sample_index",
+                    searchField: "included.attributes.dwcRecordedBy",
+                    group: group ?? undefined,
+                    option: collEvent => collEvent?.dwcRecordedBy
+                  }}
+                  preferredBackend={"elastic-search"}
+                />
+              )}
+            </FieldSpy>
             <PersonSelectField name="collectors" isMulti={true} />
-            <TextField name="dwcRecordNumber" />
+            <TextField
+              name="dwcRecordNumber"
+              tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_collectors_number"
+              tooltipLinkText="fromDinaUserGuide"
+            />
           </FieldSet>
         </div>
       </div>
@@ -656,16 +691,17 @@ export function CollectingEventFormLayout({
             <TextField name="dwcVerbatimLocality" />
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimCoordinateSystem"
-              query={() => ({
-                path: "collection-api/vocabulary/coordinateSystem"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/coordinateSystem"
+                }),
+                option: vocabElement =>
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}
-              alwaysShowSuggestions={true}
               onChangeExternal={onChangeExternal}
             />
             <Field name="dwcVerbatimCoordinateSystem">
@@ -751,15 +787,16 @@ export function CollectingEventFormLayout({
             </Field>
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimSRS"
-              query={() => ({
-                path: "collection-api/vocabulary/srs"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/srs"
+                }),
+                option: vocabElement =>
+                  vocabElement?.vocabularyElements?.map(
+                    it => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onChangeExternal={onChangeExternal}
             />
             <TextField name="dwcVerbatimElevation" />
@@ -826,14 +863,18 @@ export function CollectingEventFormLayout({
               customName={"collectingEventSubstrate"}
               tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
               tooltipLinkText="fromDinaUserGuide"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `substrate==${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.substrate ?? ""}
+              jsonApiBackend={{
+                query: (searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  filter: {
+                    ...(ctx.values.group && {
+                      group: { EQ: ctx.values.group }
+                    }),
+                    rsql: `substrate==${searchValue}*`
+                  }
+                }),
+                option: collEvent => collEvent?.substrate ?? ""
+              }}
             />
             <NumberRangeFields
               names={[

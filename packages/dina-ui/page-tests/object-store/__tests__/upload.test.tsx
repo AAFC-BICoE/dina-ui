@@ -6,7 +6,9 @@ import {
   IMeta
 } from "../../../components/object-store";
 import { fileUploadErrorHandler } from "../../../components/object-store/file-upload/FileUploadProvider";
-import UploadPage from "../../../pages/object-store/upload";
+import UploadPage, {
+  BULK_ADD_IDS_KEY
+} from "../../../pages/object-store/upload";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
@@ -46,8 +48,8 @@ describe("Upload page", () => {
       };
     });
 
-    const mockSave = jest.fn(ops =>
-      ops.map(op => ({
+    const mockSave = jest.fn((ops) =>
+      ops.map((op) => ({
         ...op.resource,
         id: "11111111-1111-1111-1111-111111111111"
       }))
@@ -82,7 +84,7 @@ describe("Upload page", () => {
       }
     ];
 
-    // Call the onSubmit funciton with uploaded files:
+    // Call the onSubmit function with uploaded files:
     wrapper.find(FileUploader).prop<OnFormikSubmit>("onSubmit")(
       {
         acceptedFiles: mockAcceptedFiles,
@@ -99,29 +101,44 @@ describe("Upload page", () => {
       // Form data with the file would go here:
       expect.anything(),
       // Passes in the custom error handler:
-      { transformResponse: fileUploadErrorHandler, timeout: 0 }
+      expect.anything()
     );
 
     // You should get redirected to the bulk edit page with the new metadata IDs.
     expect(mockPush).lastCalledWith({
-      pathname: "/object-store/metadata/edit",
+      pathname: "/object-store/metadata/bulk-edit",
       query: {
-        group: "example-group",
-        objectUploadIds: [
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73",
-          "c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"
-        ].join(",")
+        group: "example-group"
       }
     });
+
+    expect(localStorage.getItem(BULK_ADD_IDS_KEY)).toEqual(
+      '["c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73","c0f78fce-1825-4c4e-89c7-92fe0ed9dc73"]'
+    );
   });
 
-  it("Throws file upload errors with a readable message.", done => {
+  it("Throws file upload errors with a readable message.", (done) => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
-      fileUploadErrorHandler(exampleErrorResponse);
+      fileUploadErrorHandler(exampleErrorResponse, {
+        name: "fileName"
+      } as File);
     } catch (error) {
       expect(error.message).toEqual("Error from Spring");
+      done();
+    }
+  });
+
+  it("Throws file upload error when unsupported file type is provided.", (done) => {
+    const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
+    try {
+      fileUploadErrorHandler(exampleErrorResponse, {
+        name: "fileName_test.png"
+      } as File);
+    } catch (error) {
+      expect(error.message).toEqual(
+        "The 'fileName_test.png' file cannot be uploaded since it's an unsupported file type."
+      );
       done();
     }
   });

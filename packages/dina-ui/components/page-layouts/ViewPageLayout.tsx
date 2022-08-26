@@ -48,8 +48,6 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     /** main tag class, defaults to "container" */
     mainClass?: string;
 
-    isRestricted?: boolean;
-
     // Override page elements:
     editButton?: (formProps: ResourceFormProps<T>) => ReactNode;
     deleteButton?: (formProps: ResourceFormProps<T>) => ReactNode;
@@ -58,6 +56,9 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
 
     /** Show the link to the "revisions" page at page bottom as link. */
     showRevisionsLinkAtBottom?: boolean;
+
+    /** Pass a react node of a tooltip, recommend setting the placement to the right. */
+    tooltipNode?: ReactNode;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -65,7 +66,17 @@ export interface ResourceFormProps<T extends KitsuResource> {
   readOnly: boolean;
 }
 
-/** Generic page layout for viewing one record. */
+/**
+ * Generic page layout for viewing one record.
+ *
+ * This component supports the use of queries or custom query hooks.
+ *
+ * For normal queries, it will add the "include-dina-permission" header automatically. For
+ * custom hooks you will need to apply that logic if needed.
+ *
+ * If a permissionProvider is returned with the data then the buttons will disappear automatically
+ * if the user does not have the correct permissions.
+ */
 export function ViewPageLayout<T extends KitsuResource>({
   form,
   query,
@@ -79,8 +90,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   deleteButton,
   mainClass = "container",
   showRevisionsLink,
-  isRestricted,
-  showRevisionsLinkAtBottom
+  showRevisionsLinkAtBottom,
+  tooltipNode
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -104,15 +115,18 @@ export function ViewPageLayout<T extends KitsuResource>({
             readOnly: true
           };
 
-          const canEdit = isRestricted
-            ? data.meta?.permissions?.includes("update")
+          // Check the request to see if a permission provider is present.
+          const permissionsProvided = data.meta?.permissionsProvider;
+
+          const canEdit = permissionsProvided
+            ? data.meta?.permissions?.includes("update") ?? false
             : true;
-          const canDelete = isRestricted
-            ? data.meta?.permissions?.includes("delete")
+          const canDelete = permissionsProvided
+            ? data.meta?.permissions?.includes("delete") ?? false
             : true;
 
           const nameFields = castArray(nameField);
-          const title = [...nameFields, "id"].reduce(
+          let title = [...nameFields, "id"].reduce(
             (lastValue, currentField) =>
               lastValue ||
               (typeof currentField === "function"
@@ -120,6 +134,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                 : get(data, currentField)),
             ""
           );
+          // if title is array, only take first element
+          if (Array.isArray(title)) {
+            title = title[0];
+          }
 
           return (
             <>
@@ -154,7 +172,10 @@ export function ViewPageLayout<T extends KitsuResource>({
                     />
                   ))}
               </ButtonBar>
-              <h1 id="wb-cont">{title}</h1>
+              <h1 id="wb-cont">
+                {title}
+                {tooltipNode}
+              </h1>
               {form(formProps)}
               {showRevisionsLinkAtBottom && (
                 <Link href={`${entityLink}/revisions?id=${id}`}>

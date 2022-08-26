@@ -15,12 +15,12 @@ import { pick } from "lodash";
 import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
 import { useContext, useState } from "react";
 import { SeqdbMessage, useSeqdbIntl } from "../../../../intl/seqdb-intl";
+import { Protocol } from "../../../../types/collection-api";
 import {
   Chain,
   ChainStepTemplate,
   PreLibraryPrep,
   Product,
-  Protocol,
   MolecularSample,
   StepResource
 } from "../../../../types/seqdb-api";
@@ -29,6 +29,7 @@ import {
   PreLibPrepEditModeSelector,
   PreLibraryPrepEditMode
 } from "./PreLibPrepEditModeSelector";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 interface PreLibraryPrepBulkEditRow {
   sampleStepResource: StepResource;
@@ -83,7 +84,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       {
         filter: filterBy(["name"]),
         label: protocol => protocol.name,
-        model: `seqdb-api/protocol`,
+        model: `collection-api/protocol`,
         type: "protocol"
       },
       {
@@ -133,7 +134,6 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       {
         fields: {
           product: "name",
-          protocol: "name",
           "molecular-sample": "name,version"
         },
         filter: {
@@ -167,7 +167,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
             label: product?.name
           }),
           protocol: encodeResourceCell(protocol, {
-            label: protocol?.name
+            label: protocol?.id
           })
         };
       }
@@ -197,7 +197,7 @@ export function PreLibraryPrepBulkEdit(props: StepRendererProps) {
       }
       if (protocol !== undefined) {
         const id = decodeResourceCell(protocol).id as string;
-        plpEdit.protocol = { id, type: "protocol" } as Protocol;
+        plpEdit.protocol = { id, type: "protocol" } as ResourceIdentifierObject;
       }
 
       return {

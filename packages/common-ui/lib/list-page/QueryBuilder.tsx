@@ -39,7 +39,7 @@ export function QueryBuilder({
     const result: ESIndexMapping[] = [];
 
     // Read index attributes.
-    resp.data.body?.attributes
+    resp.data?.attributes
       ?.filter(key => key.name !== "type")
       .map(key => {
         const path = key.path;
@@ -62,7 +62,7 @@ export function QueryBuilder({
       });
 
     // Read relationship attributes.
-    resp.data.body?.relationships?.map(relationship => {
+    resp.data?.relationships?.map(relationship => {
       relationship?.attributes?.map(relationshipAttribute => {
         // This is the user-friendly label to display on the search dropdown.
         const attributeLabel = relationshipAttribute.path?.includes(".")
@@ -78,7 +78,8 @@ export function QueryBuilder({
           value: relationship.value + "." + attributeLabel,
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
-          parentName: relationship.value,
+          parentName: relationship.referencedBy,
+          parentType: relationship.value,
           parentPath: relationship.path,
           distinctTerm: relationshipAttribute.distinct_term_agg
         });
@@ -144,7 +145,7 @@ export function QueryBuilder({
                 addRow={addRow}
               />
             );
-            // initialize the logic switch value to be "and"//
+            // initialize the logic switch value to be "and"
             fieldArrayProps.form.setFieldValue(
               `${fieldArrayProps.name}[${
                 elements?.length ?? 0

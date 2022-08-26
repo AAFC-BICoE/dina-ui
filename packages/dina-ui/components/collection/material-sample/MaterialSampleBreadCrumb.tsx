@@ -11,23 +11,14 @@ export function MaterialSampleBreadCrumb({
   disableLastLink,
   materialSample
 }: MaterialSampleBreadCrumbProps) {
-  const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])].reverse();
-  
+  const parentPath = [...(materialSample.hierarchy?.slice(1) ?? [])];
+
   const displayName = materialSample.materialSampleName;
 
   return (
-    <ol
-      className="breadcrumb mb-3"
-      style={{ "--bs-breadcrumb-divider": "'>'" } as any}
-    >
-      {parentPath.map(node => (
-        <li className="breadcrumb-item" key={node.uuid}>
-          <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
-            <a>{node.name}</a>
-          </Link>
-        </li>
-      ))}
-      <li className="breadcrumb-item">
+    <>
+      {/* Current Material Sample Name */}
+      <h1 id="wb-cont">
         <strong>
           {!disableLastLink ? (
             <Link
@@ -42,7 +33,23 @@ export function MaterialSampleBreadCrumb({
             </div>
           )}
         </strong>
-      </li>
-    </ol>
+      </h1>
+
+      {/* Material Sample Parents */}
+      <div className="ms-4">
+        <ol
+          className="breadcrumb mb-2"
+          style={{ "--bs-breadcrumb-divider": "'/'" } as any}
+        >
+          {parentPath.map(node => (
+            <li className="breadcrumb-item" key={node.uuid}>
+              <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
+                <a>{node.name}</a>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </>
   );
 }

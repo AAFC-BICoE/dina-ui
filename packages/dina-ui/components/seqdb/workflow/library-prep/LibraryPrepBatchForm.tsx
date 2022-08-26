@@ -9,6 +9,7 @@ import {
   TextField
 } from "common-ui";
 import { GroupSelectField } from "../../../../../dina-ui/components/group-select/GroupSelectField";
+import { Protocol } from "../../../../types/collection-api";
 import {
   Chain,
   ChainStepTemplate,
@@ -17,7 +18,6 @@ import {
   LibraryPrepBatch,
   PcrProfile,
   Product,
-  Protocol,
   StepResource
 } from "../../../../types/seqdb-api";
 
@@ -102,7 +102,7 @@ export function LibraryPrepBatchForm({
           className="col-md-2"
           name="protocol"
           filter={filterBy(["name"])}
-          model="seqdb-api/protocol"
+          model="collection-api/protocol"
           optionLabel={protocol => protocol.name}
         />
         <ResourceSelectField<ContainerType>

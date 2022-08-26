@@ -33,7 +33,7 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   model: string;
 
   /** Function to get the option label for each resource. */
-  optionLabel: (resource: PersistedResource<TData>) => string;
+  optionLabel: (resource: PersistedResource<TData>) => string | null;
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
@@ -231,17 +231,31 @@ export function ResourceSelect<TData extends KitsuResource>({
     }).data ?? valueAsArray;
 
   // Convert the field value to react-select option objects:
-  const selectedAsArray = selectedResources.map(resource => {
+  const seenKeys = [] as string[];
+  const selectedAsArray = selectedResources.map((resource, index) => {
     if (!resource) {
       return null;
     }
     if (resource.id === null) {
       return NULL_OPTION;
     }
+
+    if (!optionLabel(resource as PersistedResource<TData>)) {
+      return null;
+    }
+    let id: string;
+
+    if (seenKeys.includes(resource.id)) {
+      id = resource.id + index;
+    } else {
+      seenKeys.push(resource.id);
+      id = resource.id;
+    }
+
     return {
       label: optionLabel(resource as PersistedResource<TData>) ?? resource.id,
       resource,
-      value: resource.id
+      value: id
     };
   });
   const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;

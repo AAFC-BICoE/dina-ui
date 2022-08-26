@@ -42,7 +42,7 @@ export function TagSelectField({
             {(tagsVal ?? []).map((tag, index) => (
               <div
                 key={index}
-                className="card p-1 flex-row align-items-center gap-1"
+                className="card py-1 px-2 flex-row align-items-center gap-1"
                 style={{ background: "rgb(24, 102, 109)" }}
               >
                 <AiFillTag className="text-white" />
@@ -208,3 +208,26 @@ function arrayMove(array: any[], from: number, to: number) {
 }
 const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
 const SortableSelect = SortableContainer(CreatableSelect);
+
+export interface TagSelectReadOnlyProps {
+  resourcePath?: string;
+  tagsFieldName?: string;
+  groupSelectorName?: string;
+}
+
+export function TagSelectReadOnly({
+  resourcePath,
+  tagsFieldName = "tags",
+  groupSelectorName = "group"
+}: TagSelectReadOnlyProps) {
+  return (
+    <div>
+      <TagSelectField
+        resourcePath={resourcePath}
+        name={tagsFieldName}
+        removeLabel={true}
+        groupSelectorName={groupSelectorName}
+      />
+    </div>
+  );
+}

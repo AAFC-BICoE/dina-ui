@@ -27,7 +27,6 @@ export default function InstitutionDetailsPage() {
       entityLink="/collection/institution"
       type="institution"
       apiBaseUrl="/collection-api"
-      isRestricted={true}
       showRevisionsLink={true}
     />
   );

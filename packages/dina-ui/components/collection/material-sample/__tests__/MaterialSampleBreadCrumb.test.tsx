@@ -26,15 +26,19 @@ describe("MaterialSampleBreadCrumb component", () => {
         />
       </DinaForm>
     );
-    /* It will have 3 items , last one is current sample */
+
+    // The currently selected material sample.
+    expect(wrapper.find("#wb-cont").text()).toEqual("A");
+
+    // Under the title, should be all of the parents of this selected record.
     expect(
       wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["C", "B", "A"]);
+    ).toEqual(["B", "C"]);
 
     /* It will have 2 links,  the 3th is plain text for current sample */
     expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
-      "/collection/material-sample/view?id=C",
-      "/collection/material-sample/view?id=B"
+      "/collection/material-sample/view?id=B",
+      "/collection/material-sample/view?id=C"
     ]);
   });
 
@@ -45,13 +49,13 @@ describe("MaterialSampleBreadCrumb component", () => {
     /* It will have 3 items , last one is current sample */
     expect(
       wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["C", "B", "A"]);
+    ).toEqual(["B", "C"]);
 
     /* It will have 3 links */
     expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
-      "/collection/material-sample/view?id=C",
+      "/collection/material-sample/view?id=A",
       "/collection/material-sample/view?id=B",
-      "/collection/material-sample/view?id=A"
+      "/collection/material-sample/view?id=C"
     ]);
   });
 });

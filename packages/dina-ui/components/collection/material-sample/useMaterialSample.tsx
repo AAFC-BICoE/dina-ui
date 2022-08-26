@@ -22,6 +22,7 @@ import {
   pickBy,
   range
 } from "lodash";
+import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState } from "react";
 import {
   BLANK_PREPARATION,
@@ -65,13 +66,15 @@ export function useMaterialSampleQuery(id?: string | null) {
         "attachment",
         "preparationProtocol",
         "preparationType",
+        "preparationMethod",
         "preparedBy",
         "storageUnit",
         "hierarchy",
         "organism",
         "materialSampleChildren",
         "parentMaterialSample",
-        "projects"
+        "projects",
+        "assemblages"
       ].join(",")
     },
     {
@@ -106,19 +109,6 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
-        if (data.materialSampleChildren) {
-          data.materialSampleChildren = compact(
-            await bulkGet<MaterialSample, true>(
-              data.materialSampleChildren.map(
-                child => `/material-sample/${child.id}`
-              ),
-              {
-                apiBaseUrl: "/collection-api",
-                returnNullForMissingResource: true
-              }
-            )
-          );
-        }
         // Convert to seperated list
         if (data.restrictionFieldsExtension && data.isRestricted) {
           data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
@@ -207,6 +197,7 @@ export function useMaterialSampleSave({
   visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
+  const { formatMessage } = useDinaIntl();
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -453,6 +444,7 @@ export function useMaterialSampleSave({
         organismsQuantity: undefined,
         organism: []
       }),
+
       ...(!enableStorage && {
         storageUnit: { id: null, type: "storage-unit" }
       }),
@@ -464,7 +456,7 @@ export function useMaterialSampleSave({
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
-      // Remove the scheduledAction field from the Custom View:
+      // Remove the scheduledAction field from the Form Template:
       ...{ scheduledAction: undefined }
     };
 
@@ -574,10 +566,21 @@ export function useMaterialSampleSave({
       }
     }
 
+    // Throw error if useTargetOrganism is enabled without a target organism selected
+    if (
+      materialSampleInput.useTargetOrganism &&
+      !materialSampleInput.organism?.some(organism => organism?.isTarget)
+    ) {
+      throw new DoOperationsError(
+        formatMessage("field_useTargetOrganismError")
+      );
+    }
+
     delete materialSampleInput.phac_animal_rg;
     delete materialSampleInput.phac_cl;
     delete materialSampleInput.phac_human_rg;
     delete materialSampleInput.cfia_ppc;
+    delete materialSampleInput.useTargetOrganism;
 
     return materialSampleInput;
   }
@@ -638,16 +641,25 @@ export function useMaterialSampleSave({
             data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
           }
         }),
+        ...(msDiffWithOrganisms.assemblages && {
+          assemblages: {
+            data: msDiffWithOrganisms.assemblages.map(it =>
+              pick(it, "id", "type")
+            )
+          }
+        }),
         ...(msDiffWithOrganisms.organism && {
           organism: {
             data: msDiffWithOrganisms.organism.map(it => pick(it, "id", "type"))
           }
         })
       },
+
       // Set the attributes to undefined after they've been moved to "relationships":
       attachment: undefined,
       projects: undefined,
-      organism: undefined
+      organism: undefined,
+      assemblages: undefined
     };
 
     // delete the association if associated sample is left unfilled
@@ -720,6 +732,7 @@ export function useMaterialSampleSave({
       const savedOrganisms = await save<Organism>(organismSaveArgs, {
         apiBaseUrl: "/collection-api"
       });
+
       return savedOrganisms;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {

@@ -42,7 +42,7 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     type: "DROPDOWN",
     resourcePath: "agent-api/person",
     filter: filterBy(["displayName"]),
-    optionLabel: person => (person as Person).displayName ?? person.id
+    optionLabel: (person) => (person as Person).displayName ?? person.id
   }
 ];
 
@@ -139,7 +139,7 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item">
             <ListLayoutSelector
-              onChange={newValue => setListLayoutType(newValue)}
+              onChange={(newValue) => setListLayoutType(newValue)}
               value={listLayoutType ?? undefined}
             />
           </div>
@@ -161,10 +161,8 @@ export default function MetadataListPage() {
                   typeName: "metadata",
                   apiBaseUrl: "/objectstore-api"
                 }}
-                bulkEditPath={ids => ({
-                  pathname: "/object-store/metadata/edit",
-                  query: { metadataIds: ids.join(",") }
-                })}
+                bulkEditPath={"/object-store/metadata/bulk-edit"}
+                singleEditPath={"/object-store/metadata/edit"}
                 defaultSort={[
                   {
                     desc: true,
@@ -209,7 +207,7 @@ export default function MetadataListPage() {
                   <div style={{ height: "2.5rem" }}>
                     <Link
                       href={`/object-store/object/${
-                        previewMetadata.resourceExternalURL
+                        previewMetadata.data?.attributes?.resourceExternalURL
                           ? "external-resource-view"
                           : "view"
                       }?id=${previewMetadata.id}`}

@@ -3,7 +3,8 @@ import {
   FormikButton,
   useAccount,
   useModal,
-  AreYouSureModal
+  AreYouSureModal,
+  BULK_EDIT_IDS_KEY
 } from "common-ui";
 import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../components";
@@ -16,6 +17,9 @@ import { useFileUpload } from "../../components/object-store/file-upload/FileUpl
 import { DefaultValuesConfigSelectField } from "../../components/object-store/metadata-bulk-editor/custom-default-values/DefaultValueConfigManager";
 import { useDefaultValueRuleEditorModal } from "../../components/object-store/metadata-bulk-editor/custom-default-values/useDefaultValueRuleBuilderModal";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { writeStorage, deleteFromStorage } from "@rehooks/local-storage";
+
+export const BULK_ADD_IDS_KEY = "bulkAddIds";
 
 export interface OnSubmitValues {
   group?: string;
@@ -42,22 +46,32 @@ export default function UploadPage() {
     const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
     const objectUploadDuplicates = uploadRespsT
-      .filter(resp => resp.meta?.warnings?.duplicate_found)
+      .filter((resp) => resp.meta?.warnings?.duplicate_found)
       .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
     const navigateToEditMetadata = async () => {
-      const objectUploadIds = uploadRespsT
-        .map(({ fileIdentifier }) => fileIdentifier)
-        .join(",");
-
-      await router.push({
-        pathname: "/object-store/metadata/edit",
-        query: {
-          group,
-          objectUploadIds,
-          ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
-        }
-      });
+      const objectUploadIds = uploadRespsT.map(
+        ({ fileIdentifier }) => fileIdentifier
+      );
+      deleteFromStorage(BULK_EDIT_IDS_KEY);
+      writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
+      if (objectUploadIds.length === 1) {
+        await router.push({
+          pathname: "/object-store/metadata/edit",
+          query: {
+            group,
+            ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+          }
+        });
+      } else {
+        await router.push({
+          pathname: "/object-store/metadata/bulk-edit",
+          query: {
+            group,
+            ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
+          }
+        });
+      }
     };
 
     if (Object.keys(objectUploadDuplicates)?.length === 0) {
@@ -149,7 +163,7 @@ export default function UploadPage() {
                     onClick={({ defaultValuesConfig }, { setFieldValue }) =>
                       openDefaultValuesModal({
                         index: defaultValuesConfig,
-                        onSave: index =>
+                        onSave: (index) =>
                           setFieldValue("defaultValuesConfig", index)
                       })
                     }

@@ -8,7 +8,7 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FormikContextType, useFormikContext } from "formik";
-import { flatMap, get, isArray } from "lodash";
+import { get, isArray } from "lodash";
 import { useState } from "react";
 import { PersonSelectField } from "../..";
 import { TypeStatusEnum } from "../../../../dina-ui/types/collection-api/resources/TypeStatus";
@@ -16,10 +16,10 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   Determination,
   MaterialSample,
+  Organism,
   Vocabulary
 } from "../../../types/collection-api";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
-import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../../search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 import {
   GlobalNamesField,
   SelectedScientificNameView
@@ -162,31 +162,16 @@ export function DeterminationField({
                     {...fieldProps("verbatimScientificName")}
                     className="verbatimScientificName"
                   />
-                  <AutoSuggestTextField<MaterialSample>
+                  <AutoSuggestTextField<Organism>
                     {...fieldProps("verbatimDeterminer")}
-                    query={() => ({
-                      path: "collection-api/material-sample"
-                    })}
-                    suggestion={sample =>
-                      flatMap(
-                        sample.organism?.map(organism =>
-                          organism?.determination?.map(
-                            det => det?.verbatimDeterminer
-                          )
-                        )
-                      ) ?? []
-                    }
-                    alwaysShowSuggestions={true}
-                    useCustomQuery={(searchQuery, querySpec) =>
-                      useAutocompleteSearchButFallbackToRsqlApiSearch<MaterialSample>(
-                        {
-                          searchQuery,
-                          querySpec,
-                          indexName: "dina_material_sample_index",
-                          searchField: "determination.verbatimDeterminer"
-                        }
-                      )
-                    }
+                    elasticSearchBackend={{
+                      indexName: "dina_material_sample_index",
+                      searchField:
+                        "included.attributes.determination.verbatimDeterminer",
+                      option: determination =>
+                        determination?.determination?.[0]?.verbatimDeterminer
+                    }}
+                    preferredBackend={"elastic-search"}
                   />
                   <TextField {...fieldProps("verbatimDate")} />
                   <TextField
@@ -204,20 +189,21 @@ export function DeterminationField({
                 >
                   <AutoSuggestTextField<Vocabulary>
                     {...fieldProps("typeStatus")}
-                    query={() => ({
-                      path: "collection-api/vocabulary/typeStatus"
-                    })}
-                    suggestion={(vocabElement, searchValue) =>
-                      vocabElement?.vocabularyElements
-                        ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                        .filter(it =>
-                          it?.name
-                            ?.toLowerCase?.()
-                            ?.includes(searchValue?.toLowerCase?.())
-                        )
-                        .map(it => it?.labels?.[locale] ?? "")
-                    }
-                    alwaysShowSuggestions={true}
+                    jsonApiBackend={{
+                      query: () => ({
+                        path: "collection-api/vocabulary/typeStatus"
+                      }),
+                      option: (vocabElement, searchValue) =>
+                        vocabElement?.vocabularyElements
+                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
+                          .filter(it =>
+                            it?.name
+                              ?.toLowerCase?.()
+                              ?.includes(searchValue?.toLowerCase?.())
+                          )
+                          .map(it => it?.labels?.[locale] ?? "")
+                    }}
+                    blankSearchBackend={"json-api"}
                   />
                   <TextField
                     {...fieldProps("typeStatusEvidence")}
@@ -349,7 +335,7 @@ export function DeterminationField({
                     enabledFields: null,
                     className: "non-strip"
                   }}
-                  showCustomViewDropdown={!isTemplate}
+                  showFormTemplateDropdown={!isTemplate}
                   managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                   visibleAttributeKeys={visibleManagedAttributeKeys}
                 />
