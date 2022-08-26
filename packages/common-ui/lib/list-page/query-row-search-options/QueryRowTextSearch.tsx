@@ -349,33 +349,14 @@ export function transformTextSearchToDSL(
     case "notEmpty":
       return parentType
         ? {
-            bool: {
-              should: [
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must: [
-                          existsQuery(fieldName),
-                          includedTypeQuery(parentType)
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must_not: termQuery(fieldName, "", true),
-                        must: includedTypeQuery(parentType)
-                      }
-                    }
-                  }
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must_not: termQuery(fieldName, "", true),
+                  must: [includedTypeQuery(parentType), existsQuery(fieldName)]
                 }
-              ]
+              }
             }
           }
         : {

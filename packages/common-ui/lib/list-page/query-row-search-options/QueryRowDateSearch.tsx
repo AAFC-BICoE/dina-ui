@@ -182,38 +182,19 @@ export function transformDateSearchToDSL(
               should: [
                 {
                   bool: {
-                    should: [
-                      {
-                        bool: {
-                          must_not: {
-                            nested: {
-                              path: "included",
-                              query: {
-                                bool: {
-                                  must: [
-                                    existsQuery(fieldName),
-                                    includedTypeQuery(parentType)
-                                  ]
-                                }
-                              }
-                            }
-                          }
-                        }
-                      },
-                      {
-                        nested: {
-                          path: "included",
-                          query: {
-                            bool: {
-                              must: [
-                                termQuery(fieldName, "", false),
-                                includedTypeQuery(parentType)
-                              ]
-                            }
+                    must_not: {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              existsQuery(fieldName),
+                              includedTypeQuery(parentType)
+                            ]
                           }
                         }
                       }
-                    ]
+                    }
                   }
                 },
                 {
@@ -228,18 +209,7 @@ export function transformDateSearchToDSL(
           }
         : {
             bool: {
-              should: [
-                {
-                  bool: {
-                    must_not: existsQuery(fieldName)
-                  }
-                },
-                {
-                  bool: {
-                    must: termQuery(fieldName, "", false)
-                  }
-                }
-              ]
+              must_not: existsQuery(fieldName)
             }
           };
 
@@ -247,39 +217,18 @@ export function transformDateSearchToDSL(
     case "notEmpty":
       return parentType
         ? {
-            bool: {
-              should: [
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must: [
-                          existsQuery(fieldName),
-                          includedTypeQuery(parentType)
-                        ]
-                      }
-                    }
-                  }
-                },
-                {
-                  nested: {
-                    path: "included",
-                    query: {
-                      bool: {
-                        must_not: termQuery(fieldName, "", false),
-                        must: includedTypeQuery(parentType)
-                      }
-                    }
-                  }
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
                 }
-              ]
+              }
             }
           }
         : {
             bool: {
-              must: existsQuery(fieldName),
-              must_not: termQuery(fieldName, "", false)
+              must: existsQuery(fieldName)
             }
           };
 
