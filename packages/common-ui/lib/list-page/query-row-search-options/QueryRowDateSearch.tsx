@@ -108,11 +108,7 @@ export function transformDateSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: rangeQuery(fieldName, buildDateRangeObject(matchType, date))
-            }
-          };
+        : rangeQuery(fieldName, buildDateRangeObject(matchType, date));
 
     // Not equals match type.
     case "notEquals":
@@ -226,11 +222,7 @@ export function transformDateSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: existsQuery(fieldName)
-            }
-          };
+        : existsQuery(fieldName);
 
     // Equals and default case
     default:
@@ -248,11 +240,7 @@ export function transformDateSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: termQuery(fieldName, date, false)
-            }
-          };
+        : termQuery(fieldName, date, false);
   }
 }
 

@@ -188,11 +188,7 @@ export function transformTextSearchToDSL(
                 }
               }
             }
-          : {
-              bool: {
-                must: termQuery(fieldName, matchValue, true)
-              }
-            };
+          : termQuery(fieldName, matchValue, true);
       }
 
       // Otherwise, it's just a partial match search.
@@ -210,11 +206,7 @@ export function transformTextSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: matchQuery(fieldName, matchValue)
-            }
-          };
+        : matchQuery(fieldName, matchValue);
 
     // Not equals match type.
     case "notEquals":
@@ -382,10 +374,6 @@ export function transformTextSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: matchQuery(fieldName, matchValue)
-            }
-          };
+        : matchQuery(fieldName, matchValue);
   }
 }

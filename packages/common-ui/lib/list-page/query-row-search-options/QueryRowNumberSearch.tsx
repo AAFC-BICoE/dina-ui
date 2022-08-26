@@ -103,14 +103,7 @@ export function transformNumberSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: rangeQuery(
-                fieldName,
-                buildNumberRangeObject(matchType, numberValue)
-              )
-            }
-          };
+        : rangeQuery(fieldName, buildNumberRangeObject(matchType, numberValue));
 
     // Not equals match type.
     case "notEquals":
@@ -224,11 +217,7 @@ export function transformNumberSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: existsQuery(fieldName)
-            }
-          };
+        : existsQuery(fieldName);
 
     // Equals and default case
     default:
@@ -246,11 +235,7 @@ export function transformNumberSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: termQuery(fieldName, numberValue, false)
-            }
-          };
+        : termQuery(fieldName, numberValue, false);
   }
 }
 

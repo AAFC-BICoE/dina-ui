@@ -206,7 +206,7 @@ const TEST_COLUMNS: TableColumn<any>[] = [
 describe("QueryPage component", () => {
   it("Query Page is able to aggregate first level queries", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -218,7 +218,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -321,11 +321,13 @@ describe("QueryPage component", () => {
         _source: SOURCE_FILTERS,
         query: {
           bool: {
-            filter: {
-              term: {
-                "data.attributes.group": "aafc"
+            must: [
+              {
+                term: {
+                  "data.attributes.group": "aafc"
+                }
               }
-            }
+            ]
           }
         }
       },
@@ -352,10 +354,22 @@ describe("QueryPage component", () => {
         _source: SOURCE_FILTERS,
         query: {
           bool: {
-            filter: { term: { "data.attributes.group": "cnc" } },
             must: [
-              { term: { "data.attributes.createdOn": "2022-01-25" } },
-              { term: { "data.attributes.publiclyReleasable": "false" } }
+              {
+                term: {
+                  "data.attributes.createdOn": "2022-01-25"
+                }
+              },
+              {
+                term: {
+                  "data.attributes.publiclyReleasable": "false"
+                }
+              },
+              {
+                term: {
+                  "data.attributes.group": "cnc"
+                }
+              }
             ]
           }
         }
@@ -370,7 +384,7 @@ describe("QueryPage component", () => {
 
   it("Query Page is able to aggregate second level queries (relationships) with auto complete suggestions", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -382,7 +396,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -502,32 +516,34 @@ describe("QueryPage component", () => {
         _source: SOURCE_FILTERS,
         query: {
           bool: {
-            filter: {
-              term: {
-                "data.attributes.group": "aafc"
-              }
-            },
-            must: {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: [
-                      {
-                        match: {
-                          "included.type": "preparation-type"
+            must: [
+              {
+                nested: {
+                  path: "included",
+                  query: {
+                    bool: {
+                      must: [
+                        {
+                          term: {
+                            "included.attributes.name.keyword": "Test value"
+                          }
+                        },
+                        {
+                          term: {
+                            "included.type": "preparation-type"
+                          }
                         }
-                      },
-                      {
-                        term: {
-                          "included.attributes.name.keyword": "Test value"
-                        }
-                      }
-                    ]
+                      ]
+                    }
                   }
                 }
+              },
+              {
+                term: {
+                  "data.attributes.group": "aafc"
+                }
               }
-            }
+            ]
           }
         }
       },
@@ -541,7 +557,7 @@ describe("QueryPage component", () => {
 
   it("Query Page is able to aggregate second level queries (relationships) without auto complete suggestions", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -553,7 +569,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -645,11 +661,6 @@ describe("QueryPage component", () => {
         _source: SOURCE_FILTERS,
         query: {
           bool: {
-            filter: {
-              term: {
-                "data.attributes.group": "aafc"
-              }
-            },
             must: [
               {
                 nested: {
@@ -659,12 +670,12 @@ describe("QueryPage component", () => {
                       must: [
                         {
                           match: {
-                            "included.type": "preparation-type"
+                            "included.attributes.type": "Partial Match test"
                           }
                         },
                         {
-                          match: {
-                            "included.attributes.type": "Partial Match test"
+                          term: {
+                            "included.type": "preparation-type"
                           }
                         }
                       ]
@@ -679,19 +690,24 @@ describe("QueryPage component", () => {
                     bool: {
                       must: [
                         {
-                          match: {
-                            "included.type": "preparation-type"
+                          term: {
+                            "included.attributes.type.keyword":
+                              "Exact Match test"
                           }
                         },
                         {
                           term: {
-                            "included.attributes.type.keyword":
-                              "Exact Match test"
+                            "included.type": "preparation-type"
                           }
                         }
                       ]
                     }
                   }
+                }
+              },
+              {
+                term: {
+                  "data.attributes.group": "aafc"
                 }
               }
             ]
@@ -708,7 +724,7 @@ describe("QueryPage component", () => {
 
   it("Query Page switches to use count request for large query sizes", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -720,7 +736,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockCountPost = jest.fn<any, any>(async path => {
+    const mockCountPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response for the count test
         case "search-api/search-ws/search":
@@ -761,11 +777,13 @@ describe("QueryPage component", () => {
       {
         query: {
           bool: {
-            filter: {
-              term: {
-                "data.attributes.group": "aafc"
+            must: [
+              {
+                term: {
+                  "data.attributes.group": "aafc"
+                }
               }
-            }
+            ]
           }
         }
       },

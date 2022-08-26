@@ -135,11 +135,7 @@ export function transformBooleanSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: existsQuery(fieldName)
-            }
-          };
+        : existsQuery(fieldName);
 
     // Exact match for the boolean.
     default:
@@ -157,10 +153,6 @@ export function transformBooleanSearchToDSL(
               }
             }
           }
-        : {
-            bool: {
-              must: termQuery(fieldName, booleanValue, false)
-            }
-          };
+        : termQuery(fieldName, booleanValue, false);
   }
 }
