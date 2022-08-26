@@ -30,10 +30,7 @@ import {
   Metadata,
   ObjectSubtype
 } from "../../../types/objectstore-api";
-import {
-  DCTYPE_OPTIONS,
-  ORIENTATION_OPTIONS
-} from "../metadata/single-record-edit";
+import { DCTYPE_OPTIONS, ORIENTATION_OPTIONS } from "../metadata/edit";
 
 export default function ExternalResourceMetadataPage() {
   const { formatMessage } = useDinaIntl();
@@ -73,7 +70,7 @@ export default function ExternalResourceMetadataPage() {
               <DinaMessage id="editExternalResourceTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <ExternalResourceMetatdataForm metadata={data} router={router} />
+              <ExternalResourceMetadataForm metadata={data} router={router} />
             ))}
           </div>
         ) : (
@@ -81,7 +78,7 @@ export default function ExternalResourceMetadataPage() {
             <h1 id="wb-cont">
               <DinaMessage id="addExternalResourceTitle" />
             </h1>
-            <ExternalResourceMetatdataForm router={router} />
+            <ExternalResourceMetadataForm router={router} />
           </div>
         )}
       </main>
@@ -90,16 +87,16 @@ export default function ExternalResourceMetadataPage() {
   );
 }
 
-interface ExternalResourceMetatdataProps {
+interface ExternalResourceMetadataProps {
   /** Existing Metadata is required, no new ones are added with this form. */
   metadata?: Metadata;
   router: NextRouter;
 }
 
-function ExternalResourceMetatdataForm({
+function ExternalResourceMetadataForm({
   router,
   metadata
-}: ExternalResourceMetatdataProps) {
+}: ExternalResourceMetadataProps) {
   const { locale, formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
 
@@ -201,13 +198,13 @@ function ExternalResourceMetatdataForm({
           <ResourceSelectField<MediaType>
             name="dcFormat"
             className="col-md-6"
-            filter={input => ({
+            filter={(input) => ({
               mediaType: {
                 LIKE: `${input}%`
               }
             })}
             model="objectstore-api/media-type"
-            optionLabel={format => format.mediaType}
+            optionLabel={(format) => format.mediaType}
             removeDefaultSort={true}
             omitNullOption={true}
           />
@@ -229,13 +226,13 @@ function ExternalResourceMetatdataForm({
               <ResourceSelectField<ObjectSubtype>
                 name="acSubtype"
                 className="col-md-6"
-                filter={input => ({
+                filter={(input) => ({
                   rsql:
                     `acSubtype=='${input}*'` +
                     (dcType ? ` and dcType==${dcType}` : "")
                 })}
                 model="objectstore-api/object-subtype"
-                optionLabel={ost => ost.acSubtype}
+                optionLabel={(ost) => ost.acSubtype}
               />
             )}
           </Field>
@@ -268,7 +265,7 @@ function ExternalResourceMetatdataForm({
             name="license"
             filter={() => ({})}
             model="objectstore-api/license"
-            optionLabel={license => license.titles[locale] ?? license.url}
+            optionLabel={(license) => license.titles[locale] ?? license.url}
             removeDefaultSort={true}
           />
         </div>

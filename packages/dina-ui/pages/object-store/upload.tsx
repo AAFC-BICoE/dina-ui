@@ -46,7 +46,7 @@ export default function UploadPage() {
     const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
     const objectUploadDuplicates = uploadRespsT
-      .filter(resp => resp.meta?.warnings?.duplicate_found)
+      .filter((resp) => resp.meta?.warnings?.duplicate_found)
       .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
     const navigateToEditMetadata = async () => {
@@ -57,7 +57,7 @@ export default function UploadPage() {
       writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
       if (objectUploadIds.length === 1) {
         await router.push({
-          pathname: "/object-store/metadata/single-record-edit",
+          pathname: "/object-store/metadata/edit",
           query: {
             group,
             ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
@@ -65,7 +65,7 @@ export default function UploadPage() {
         });
       } else {
         await router.push({
-          pathname: "/object-store/metadata/edit",
+          pathname: "/object-store/metadata/bulk-edit",
           query: {
             group,
             ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
@@ -163,7 +163,7 @@ export default function UploadPage() {
                     onClick={({ defaultValuesConfig }, { setFieldValue }) =>
                       openDefaultValuesModal({
                         index: defaultValuesConfig,
-                        onSave: index =>
+                        onSave: (index) =>
                           setFieldValue("defaultValuesConfig", index)
                       })
                     }
