@@ -12,7 +12,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   addProtocolTitle: "Ajouter un protocole",
   addRegionTitle: "Ajouter une région",
   addWorkflowTitle: "Ajouter un flux de SNG",
-  availableMaterialSamplesTitle: "Échantillons matériaux disponibles",
   availableSamplesTitle: "Échantillons disponibles",
   backToListButtonText: "Retour à la liste",
   cancelButtonText: "Annuler",
@@ -89,7 +88,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
   selectButtonText: "Sélectionner",
-  selectMaterialSamples: "Sélectionner échantillons matériaux",
   selectSamples: "Sélectionner échantillons moléculaires",
   selectedSamplesTitle: "Échantillons sélectionnés",
   seqdbTitle: "Base de données des séquences (fr)",

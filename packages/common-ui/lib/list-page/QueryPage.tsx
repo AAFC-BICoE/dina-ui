@@ -26,7 +26,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep, uniq } from "lodash";
+import { cloneDeep, uniq, toPairs } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -34,7 +34,6 @@ import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
-import { toPairs } from "lodash";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -93,7 +92,13 @@ export interface QueryPageProps<TData extends KitsuResource> {
         CheckBoxField: React.ComponentType<CheckBoxFieldProps<TData>>
       ) => Partial<TableProps>);
 
-  /**Boolean */
+  /**
+   * When enabled, the user will see the results table with a selection table.
+   *
+   * QueryBuilder and Saved Searches will appear as normal.
+   *
+   * Bulk editing mode is disabled in this mode.
+   */
   selectionMode?: boolean;
 
   /**
@@ -104,7 +109,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   onSortedChange?: (newSort: SortingRule[]) => void;
 }
-
 
 /**
  * Top level component for displaying an elastic-search listing page.
@@ -123,15 +127,14 @@ export function QueryPage<TData extends KitsuResource>({
   bulkEditPath,
   reactTableProps,
   defaultSort,
-  selectionMode,
+  selectionMode = false,
   onSortedChange
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
   const { groupNames, subject } = useAccount();
 
-
-  // The selected rMesources from the left table (displayed on the right table)
+  // The selected resources from the left table (displayed on the right table)
   const [selectedResources, setSelectedResources] = useState<TData[]>([]);
 
   // Search results returned by Elastic Search
@@ -139,7 +142,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Total number of records from the query. This is not the total displayed on the screen.
   const [totalRecords, setTotalRecords] = useState<number>(0);
-
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
@@ -224,7 +226,7 @@ export function QueryPage<TData extends KitsuResource>({
           setTotalRecords(result?.total?.value ?? 0);
         }
 
-        setAvailableSamples(processedResult);
+        setAvailableResources(processedResult);
         setSearchResults(processedResult);
       })
       .catch(elasticSearchError => {
@@ -241,58 +243,70 @@ export function QueryPage<TData extends KitsuResource>({
     loadSavedSearch("default");
   }, []);
 
-  // select the checked items and display them on the right table
-  function selectAllCheckedItems(
+  /**
+   * Used for selection mode only.
+   *
+   * Takes all of the checked items from the search results, and moves them to the right table to
+   * mark them as selected.
+   *
+   * @param formValues Current form values.
+   * @param formik Formik Context
+   */
+  function moveSelectedResultsToSelectedResources(
     formValues,
     formik: FormikContextType<any>
   ) {
-    const itemIdsToSelect  = formValues.itemIdsToSelect;
+    const itemIdsToSelect = formValues.itemIdsToSelect;
 
     const ids = toPairs(itemIdsToSelect)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    const selectedObjects = searchResults.filter((itemA)=> {
-      return ids.find((itemB)=> {
-        return itemA.id == itemB;
-      })
-    })
+    const selectedObjects = searchResults.filter(itemA => {
+      return ids.find(itemB => {
+        return itemA.id === itemB;
+      });
+    });
 
-    setSelectedResources(current => uniq([
-      ...current,
+    // Append the newly selected resources with the current resources.
+    const selectedResourcesAppended = uniq([
+      ...selectedResources,
       ...selectedObjects
-    ]));
+    ]);
 
-    setRemoveableItems(current => uniq([
-      ...current,
-      ...selectedObjects
-    ]));
+    setSelectedResources(selectedResourcesAppended);
+    setRemovableItems(selectedResourcesAppended);
 
+    // Deselect the search results.
     formik.setFieldValue("itemIdsToSelect", {});
   }
 
-  // delete all the checked items on the right table and display them in the left table
-  function deleteAllCheckedItems(
-    formValues,
-    formik: FormikContextType<any>
-  ) {
-    console.log(formValues);
+  /**
+   * Used for selection mode only.
+   *
+   * Removes the selected resources checked.
+   *
+   * @param formValues Current form values.
+   * @param formik Formik Context
+   */
+  function removeSelectedResources(formValues, formik: FormikContextType<any>) {
     const itemIdsToDelete = formValues.itemIdsToDelete;
-  
+
     const ids = toPairs(itemIdsToDelete)
       .filter(pair => pair[1])
       .map(pair => pair[0]);
 
-    const unselectedObjects = selectedResources.filter((itemA)=> {
-      return !ids.find((itemB)=> {
-        return itemA.id == itemB;
-      })
-    })
+    const unselectedObjects = selectedResources.filter(itemA => {
+      return !ids.find(itemB => {
+        return itemA.id === itemB;
+      });
+    });
 
-    setRemoveableItems(unselectedObjects);
+    setRemovableItems(unselectedObjects);
     setSelectedResources(unselectedObjects);
     formik.setFieldValue("itemIdsToDelete", {});
-  }  
+  }
+
   /**
    * Using the user preferences, load the saved search name into the search filters.
    *
@@ -392,21 +406,21 @@ export function QueryPage<TData extends KitsuResource>({
     return resp?.data?.count;
   }
 
-  //Checkbox for the first table that lists the search results
+  // Checkbox for the first table that lists the search results
   const {
     CheckBoxField: SelectCheckBox,
     CheckBoxHeader: SelectCheckBoxHeader,
-    setAvailableItems: setAvailableSamples
+    setAvailableItems: setAvailableResources
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToSelect",
     defaultAvailableItems: searchResults ?? []
   });
 
-  //Checkbox for second table where selected/to be deleted items are displayed
+  // Checkbox for second table where selected/to be deleted items are displayed
   const {
     CheckBoxField: DeselectCheckBox,
     CheckBoxHeader: DeselectCheckBoxHeader,
-    setAvailableItems: setRemoveableItems
+    setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete"
   });
@@ -421,37 +435,41 @@ export function QueryPage<TData extends KitsuResource>({
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
+  // Columns generated for the search results.
   const columnsResults: TableColumn<TData>[] = [
     ...columns,
-    ...((showRowCheckboxes || selectionMode)
-    ? [
-        {
-          Cell: ({ original: resource }) => (
-            <SelectCheckBox key={resource.id} resource={resource} />
-          ),
-          Header: SelectCheckBoxHeader,
-          sortable: false,
-          width: 200
-        }
-      ]
-    : [])
-  ];
-
-  const columnsSelected: TableColumn<TData>[] = [
-    ...columns,
-    ...( selectionMode
+    ...(showRowCheckboxes || selectionMode
       ? [
           {
             Cell: ({ original: resource }) => (
-              <DeselectCheckBox key={resource.id} resource={resource} />
+              <SelectCheckBox key={resource.id} resource={resource} />
             ),
-            Header: DeselectCheckBoxHeader,
+            Header: SelectCheckBoxHeader,
             sortable: false,
             width: 200
           }
         ]
       : [])
-    ];
+  ];
+
+  // Columns generated for the selected resources, only in selection mode.
+  const columnsSelected: TableColumn<TData>[] = selectionMode
+    ? [
+        ...columns,
+        ...(selectionMode
+          ? [
+              {
+                Cell: ({ original: resource }) => (
+                  <DeselectCheckBox key={resource.id} resource={resource} />
+                ),
+                Header: DeselectCheckBoxHeader,
+                sortable: false,
+                width: 200
+              }
+            ]
+          : [])
+      ]
+    : [];
 
   const mappedResultsColumns = columnsResults.map(column => {
     const { fieldName, customHeader } = {
@@ -631,102 +649,108 @@ export function QueryPage<TData extends KitsuResource>({
               <MultiSortTooltip />
             )}
 
-            <div className="d-flex gap-3">
-              {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
-              {bulkDeleteButtonProps && (
-                <BulkDeleteButton {...bulkDeleteButtonProps} />
-              )}
-            </div>
+            {/* Bulk edit buttons - Only shown when not in selection mode. */}
+            {!selectionMode && (
+              <div className="d-flex gap-3">
+                {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
+                {bulkDeleteButtonProps && (
+                  <BulkDeleteButton {...bulkDeleteButtonProps} />
+                )}
+              </div>
+            )}
           </div>
         </div>
         <div className="row">
-      <div className={selectionMode ? "col-5": "col-12"}><ReactTable
-        // Column and data props
-        columns={mappedResultsColumns}
-        data={searchResults}
-        minRows={1}
-        // Loading Table props
-        loading={loading}
-        // Pagination props
-        manual={true}
-        pageSize={pagination.limit}
-        pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
-        page={pagination.offset / pagination.limit}
-        onPageChange={onPageChange}
-        onPageSizeChange={onPageSizeChange}
-        pageText={<CommonMessage id="page" />}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage({ id: "rows" })}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
-        // Sorting props
-        onSortedChange={onSortChange}
-        sorted={sortingRules}
-        // Table customization props
-        {...resolvedReactTableProps}
-        className="-striped"
-        TbodyComponent={
-          error
-            ? () => (
-                <div
-                  className="alert alert-danger"
-                  style={{
-                    whiteSpace: "pre-line"
-                  }}
-                >
-                  <p>
-                    {error.errors?.map(e => e.detail).join("\n") ??
-                      String(error)}
-                  </p>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={() => {
-                      const newSort = defaultSort ?? DEFAULT_SORT;
-                      setError(undefined);
-                      onSortChange(newSort);
-                    }}
-                  >
-                    <CommonMessage id="resetSort" />
-                  </button>
-                </div>
-              )
-            : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
-        }
-        />
-        </div>
-        {selectionMode && (
-          <>
-            <div className="col-2" style={{ marginTop: "100px" }}>
-              <div>
-              <FormikButton
-                className="btn btn-primary w-100 mb-5 select-all-checked-button"
-                onClick={selectAllCheckedItems}
-              >
-                <FiChevronsRight />
-              </FormikButton>
-              </div>
-              <div>
-              <FormikButton
-                className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
-                onClick={deleteAllCheckedItems}
-              >
-                <FiChevronsLeft />
-              </FormikButton>
-              </div>
-            </div>
-            <div className="col-5"><ReactTable
-            columns={mappedSelectedColumns}
-            data={selectedResources}
-            minRows={1}
+          <div className={selectionMode ? "col-5" : "col-12"}>
+            <ReactTable
+              // Column and data props
+              columns={mappedResultsColumns}
+              data={searchResults}
+              minRows={1}
+              // Loading Table props
+              loading={loading}
+              // Pagination props
+              manual={true}
+              pageSize={pagination.limit}
+              pages={
+                totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0
+              }
+              page={pagination.offset / pagination.limit}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              pageText={<CommonMessage id="page" />}
+              noDataText={<CommonMessage id="noRowsFound" />}
+              ofText={<CommonMessage id="of" />}
+              rowsText={formatMessage({ id: "rows" })}
+              previousText={<CommonMessage id="previous" />}
+              nextText={<CommonMessage id="next" />}
+              // Sorting props
+              onSortedChange={onSortChange}
+              sorted={sortingRules}
+              // Table customization props
+              {...resolvedReactTableProps}
+              className="-striped"
+              TbodyComponent={
+                error
+                  ? () => (
+                      <div
+                        className="alert alert-danger"
+                        style={{
+                          whiteSpace: "pre-line"
+                        }}
+                      >
+                        <p>
+                          {error.errors?.map(e => e.detail).join("\n") ??
+                            String(error)}
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => {
+                            const newSort = defaultSort ?? DEFAULT_SORT;
+                            setError(undefined);
+                            onSortChange(newSort);
+                          }}
+                        >
+                          <CommonMessage id="resetSort" />
+                        </button>
+                      </div>
+                    )
+                  : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+              }
             />
-            </div>
-          </>
-        )}
-      </div>
+          </div>
+          {selectionMode && (
+            <>
+              <div className="col-2" style={{ marginTop: "100px" }}>
+                <div>
+                  <FormikButton
+                    className="btn btn-primary w-100 mb-5 select-all-checked-button"
+                    onClick={moveSelectedResultsToSelectedResources}
+                  >
+                    <FiChevronsRight />
+                  </FormikButton>
+                </div>
+                <div>
+                  <FormikButton
+                    className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
+                    onClick={removeSelectedResources}
+                  >
+                    <FiChevronsLeft />
+                  </FormikButton>
+                </div>
+              </div>
+              <div className="col-5">
+                <ReactTable
+                  columns={mappedSelectedColumns}
+                  data={selectedResources}
+                  minRows={1}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </DinaForm>
   );
-  
 }

@@ -15,8 +15,8 @@ import {
 function bulkButtonProps(ctx: FormikContextType<BulkSelectableFormValues>) {
   // Disable the button if none are selected:
   const disabled =
-    !ctx.values.selectedResources ||
-    !compact(Object.values(ctx.values.selectedResources)).length;
+    !ctx.values.itemIdsToSelect ||
+    !compact(Object.values(ctx.values.itemIdsToSelect)).length;
   return { disabled };
 }
 
@@ -38,7 +38,7 @@ export function BulkDeleteButton({
       buttonProps={bulkButtonProps}
       className="btn btn-danger bulk-delete-button"
       onClick={(values: BulkSelectableFormValues) => {
-        const resourceIds = toPairs(values.selectedResources)
+        const resourceIds = toPairs(values.itemIdsToSelect)
           .filter(pair => pair[1])
           .map(pair => pair[0]);
 
@@ -83,12 +83,6 @@ export interface BulkEditButtonProps {
  */
 export const BULK_EDIT_IDS_KEY = "bulkEditIds";
 
-/**
- *
- *
- * @param param0
- * @returns
- */
 export function BulkEditButton({ pathname }: BulkEditButtonProps) {
   const router = useRouter();
 
@@ -97,7 +91,7 @@ export function BulkEditButton({ pathname }: BulkEditButtonProps) {
       buttonProps={bulkButtonProps}
       className="btn btn-primary ms-2 bulk-edit-button"
       onClick={async (values: BulkSelectableFormValues) => {
-        const ids = toPairs(values.selectedResources)
+        const ids = toPairs(values.itemIdsToSelect)
           .filter(pair => pair[1])
           .map(pair => pair[0]);
 
