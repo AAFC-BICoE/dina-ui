@@ -96,7 +96,6 @@ export function UploadingMetadataBulkEditor({
           />
         )}
       </main>
-      <Footer />
     </div>
   );
 }
