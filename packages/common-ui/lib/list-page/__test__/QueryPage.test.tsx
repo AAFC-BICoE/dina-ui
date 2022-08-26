@@ -65,6 +65,20 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
+// The QueryPage will only display the records in the columns on the table.
+const SOURCE_FILTERS = [
+  "data.id",
+  "data.type",
+  "materialSampleName",
+  "collection.name",
+  "dwcOtherCatalogNumbers",
+  "materialSampleType",
+  "createdBy",
+  "createdOn",
+  "included.id",
+  "included.type"
+];
+
 const TEST_GROUP: PersistedResource<Group>[] = [
   {
     id: "31ee7848-b5c1-46e1-bbca-68006d9eda3b",
@@ -192,7 +206,7 @@ const TEST_COLUMNS: TableColumn<any>[] = [
 describe("QueryPage component", () => {
   it("Query Page is able to aggregate first level queries", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -204,7 +218,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -304,6 +318,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -334,6 +349,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: { term: { "data.attributes.group": "cnc" } },
@@ -354,7 +370,7 @@ describe("QueryPage component", () => {
 
   it("Query Page is able to aggregate second level queries (relationships) with auto complete suggestions", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -366,7 +382,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -483,6 +499,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -502,7 +519,7 @@ describe("QueryPage component", () => {
                         }
                       },
                       {
-                        match: {
+                        term: {
                           "included.attributes.name.keyword": "Test value"
                         }
                       }
@@ -524,7 +541,7 @@ describe("QueryPage component", () => {
 
   it("Query Page is able to aggregate second level queries (relationships) without auto complete suggestions", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -536,7 +553,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockPost = jest.fn<any, any>(async path => {
+    const mockPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response with material sample mock metadata data.
         case "search-api/search-ws/search":
@@ -576,7 +593,7 @@ describe("QueryPage component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Edit the field value of the preparation type query. (Partial match version)
+    // Edit the field value of the preparation type query. (Partial match version (should be default option))
     wrapper
       .find("TextField[name='queryRows[0].matchValue']")
       .find("input")
@@ -602,11 +619,8 @@ describe("QueryPage component", () => {
       .find("input")
       .simulate("change", { target: { value: "Exact Match test" } });
 
-    // Change the match type to be "EXACT MATCH"
-    wrapper
-      .find("SelectField[name='queryRows[1].matchType']")
-      .find(Select)
-      .prop<any>("onChange")({ value: "term" });
+    // For this search, we will need to switch to the exact option.
+    wrapper.find(".exactSpan").at(1).simulate("click");
 
     mockPost.mockClear();
 
@@ -628,6 +642,7 @@ describe("QueryPage component", () => {
             }
           }
         ],
+        _source: SOURCE_FILTERS,
         query: {
           bool: {
             filter: {
@@ -693,7 +708,7 @@ describe("QueryPage component", () => {
 
   it("Query Page switches to use count request for large query sizes", async () => {
     // Mocked GET requests.
-    const mockGet = jest.fn<any, any>(async path => {
+    const mockGet = jest.fn<any, any>(async (path) => {
       switch (path) {
         case "search-api/search-ws/mapping":
           return MOCK_INDEX_MAPPING_RESP;
@@ -705,7 +720,7 @@ describe("QueryPage component", () => {
     });
 
     // Mocked POST requests.
-    const mockCountPost = jest.fn<any, any>(async path => {
+    const mockCountPost = jest.fn<any, any>(async (path) => {
       switch (path) {
         // Elastic search response for the count test
         case "search-api/search-ws/search":

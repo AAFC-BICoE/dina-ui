@@ -43,14 +43,6 @@ export function TagsAndRestrictionsSection({
             <div className="flex-grow-1">
               <RestrictionWarning isRestrictionSelect={true} />
             </div>
-            <div>
-              <TagSelectField
-                resourcePath={resourcePath}
-                name={tagsFieldName}
-                removeLabel={true}
-                groupSelectorName={groupSelectorName}
-              />
-            </div>
           </div>
         )}
         {initialValues.restrictionRemarks && (
@@ -99,7 +91,7 @@ export function TagsAndRestrictionsSection({
           )}
           <DinaFormSection horizontal={false}>
             <FieldSpy<boolean> fieldName="publiclyReleasable">
-              {pr =>
+              {(pr) =>
                 pr === false ? (
                   <TextField
                     name="notPubliclyReleasableReason"

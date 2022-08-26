@@ -16,7 +16,7 @@ export function Home() {
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
+      ?.flatMap((it) => it)
       ?.includes("collection-manager") || isAdmin;
 
   return (
@@ -240,6 +240,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  <Link href="/collection/assemblage/list">
+                    <a>
+                      <DinaMessage id="title_assemblage" />
+                    </a>
+                  </Link>
                   <Link href="/collection/collection-method/list">
                     <a>
                       <DinaMessage id="collectionMethodListTitle" />
@@ -278,7 +283,7 @@ export function Home() {
                   {/* Permissions link here */}
                   <Link href="/collection/preparation-method/list">
                     <a>
-                      <DinaMessage id="preparationMethodListTitle" />
+                      <DinaMessage id="title_preparationMethod" />
                     </a>
                   </Link>
                   <Link href="/collection/preparation-type/list">

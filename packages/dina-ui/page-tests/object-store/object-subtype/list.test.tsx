@@ -33,7 +33,7 @@ jest.mock("next/router", () => ({
 describe("Object subtype list page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       if (path === "objectstore-api/object-subtype") {
         return { data: TEST_OBJECTSUBTYPES };
       }
@@ -53,7 +53,7 @@ describe("Object subtype list page", () => {
       wrapper
         .find(QueryTable)
         .find(
-          'ForwardRef[href$="/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"]'
+          'ForwardRef(LinkComponent)[href$="/object-subtype/edit?id=6c524135-3c3e-41c1-a057-45afb4e3e7be"]'
         )
         .exists()
     ).toEqual(true);

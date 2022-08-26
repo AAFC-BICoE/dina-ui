@@ -1,9 +1,17 @@
-import { ResourceSelect } from "common-ui";
+import { ResourceSelect, ResourceWithHooks } from "common-ui";
 import { InputResource } from "kitsu";
+import { useState } from "react";
 import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { MaterialSample } from "../../../types/collection-api";
-import { useBulkEditTab } from "../bulk-edit-tab";
+import {
+  getSampleBulkOverrider,
+  initializeRefHookFormProps
+} from "../../bulk-material-sample/MaterialSampleBulkEditor";
+import { useMaterialSampleFormTemplateSelectState } from "../../collection/form-template/useMaterialSampleFormTemplateSelectState";
+import { MaterialSampleFormProps } from "../../collection/material-sample/MaterialSampleForm";
+import { BulkNavigatorTab } from "../BulkEditNavigator";
+import { useBulkEditTab } from "../useBulkEditTab";
 
 const mockSubmitOverride = jest.fn();
 
@@ -13,8 +21,45 @@ interface BulkEditTabProps {
 
 /** Test component to test the Bulk Edit Tab in isolation. */
 function BulkEditTab({ baseSample }: BulkEditTabProps) {
-  const { bulkEditTab, sampleBulkOverrider } = useBulkEditTab({
-    resourceHooks: []
+  // Allow selecting a custom view for the form:
+  const {
+    sampleFormTemplate,
+    setSampleFormTemplate,
+    enabledFields,
+    visibleManagedAttributeKeys
+  } = useMaterialSampleFormTemplateSelectState();
+
+  const [selectedTab, setSelectedTab] = useState<
+    BulkNavigatorTab | ResourceWithHooks
+  >();
+
+  const {
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    sampleHooks,
+    materialSampleForm,
+    formTemplateProps
+  }: {
+    bulkEditFormRef;
+    bulkEditSampleHook;
+    sampleHooks: any;
+    materialSampleForm: JSX.Element;
+    formTemplateProps: Partial<MaterialSampleFormProps>;
+  } = initializeRefHookFormProps(
+    [baseSample],
+    enabledFields,
+    visibleManagedAttributeKeys,
+    selectedTab
+  );
+  function sampleBulkOverrider() {
+    /** Sample input including blank/empty fields. */
+    return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
+  }
+
+  const { bulkEditTab } = useBulkEditTab({
+    resourceHooks: [],
+    resourceForm: materialSampleForm,
+    bulkEditFormRef
   });
 
   return (
@@ -35,7 +80,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   );
 }
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "agent-api/person":
     case "collection-api/collection":
@@ -62,7 +107,7 @@ const mockGet = jest.fn<any, any>(async path => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
-  return paths.map(path => {
+  return paths.map((path) => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.a":
         return {
@@ -95,8 +140,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   });
 });
 
-const mockSave = jest.fn<any, any>(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn<any, any>((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
   }))
@@ -115,7 +160,6 @@ describe("Material sample bulk edit tab", () => {
 
   it("Without changing any fields, overrides nothing", async () => {
     const wrapper = mountWithAppContext(<BulkEditTab />, testCtx);
-
     await new Promise(setImmediate);
     wrapper.update();
 
@@ -180,7 +224,7 @@ describe("Material sample bulk edit tab", () => {
     wrapper
       .find(".material-sample-nav")
       .find(Switch)
-      .forEach(node => node.prop<any>("onChange")(true));
+      .forEach((node) => node.prop<any>("onChange")(true));
 
     await new Promise(setImmediate);
     wrapper.update();

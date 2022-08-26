@@ -3,6 +3,7 @@ import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
 import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
 import { ManagedAttributeValues, Person } from "../../objectstore-api";
 import { AcquisitionEvent } from "./AcquisitionEvent";
+import { Assemblage } from "./Assemblage";
 import { CollectingEvent } from "./CollectingEvent";
 import { Collection } from "./Collection";
 import { ExtensionValue } from "./FieldExtension";
@@ -126,6 +127,7 @@ export interface MaterialSampleRelationships {
   parentMaterialSample?: MaterialSample;
   storageUnit?: StorageUnit;
   projects?: Project[];
+  assemblages?: Assemblage[];
   acquisitionEvent?: AcquisitionEvent;
 }
 

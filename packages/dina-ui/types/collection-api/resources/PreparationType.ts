@@ -1,13 +1,5 @@
 import { KitsuResource } from "kitsu";
-
-export interface MultilingualDescription {
-  descriptions?: MultilingualPair[] | null;
-}
-
-export interface MultilingualPair {
-  lang?: string | null;
-  desc?: string | null;
-}
+import { MultilingualDescription } from "../../common";
 
 export interface PreparationTypeAttributes {
   type: "preparation-type";

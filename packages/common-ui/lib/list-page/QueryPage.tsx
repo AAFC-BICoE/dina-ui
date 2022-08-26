@@ -82,6 +82,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   bulkEditPath?: string;
 
+  /** Query path if user selected only 1 item */
+  singleEditPath?: string;
+
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 
@@ -125,6 +128,7 @@ export function QueryPage<TData extends KitsuResource>({
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
+  singleEditPath,
   reactTableProps,
   defaultSort,
   selectionMode = false,
@@ -198,8 +202,8 @@ export function QueryPage<TData extends KitsuResource>({
     // Fetch data using elastic search.
     // The included section will be transformed from an array to an object with the type name for each relationship.
     elasticSearchRequest(queryDSL)
-      .then(result => {
-        const processedResult = result?.hits.map(rslt => ({
+      .then((result) => {
+        const processedResult = result?.hits.map((rslt) => ({
           id: rslt._source?.data?.id,
           type: rslt._source?.data?.type,
           data: {
@@ -216,10 +220,10 @@ export function QueryPage<TData extends KitsuResource>({
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
           elasticSearchCountRequest(queryDSL)
-            .then(countResult => {
+            .then((countResult) => {
               setTotalRecords(countResult);
             })
-            .catch(elasticSearchError => {
+            .catch((elasticSearchError) => {
               setError(elasticSearchError);
             });
         } else {
@@ -229,7 +233,7 @@ export function QueryPage<TData extends KitsuResource>({
         setAvailableResources(processedResult);
         setSearchResults(processedResult);
       })
-      .catch(elasticSearchError => {
+      .catch((elasticSearchError) => {
         setError(elasticSearchError);
       })
       .finally(() => {
@@ -259,11 +263,11 @@ export function QueryPage<TData extends KitsuResource>({
     const itemIdsToSelect = formValues.itemIdsToSelect;
 
     const ids = toPairs(itemIdsToSelect)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
 
-    const selectedObjects = searchResults.filter(itemA => {
-      return ids.find(itemB => {
+    const selectedObjects = searchResults.filter((itemA) => {
+      return ids.find((itemB) => {
         return itemA.id === itemB;
       });
     });
@@ -293,11 +297,11 @@ export function QueryPage<TData extends KitsuResource>({
     const itemIdsToDelete = formValues.itemIdsToDelete;
 
     const ids = toPairs(itemIdsToDelete)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
 
-    const unselectedObjects = selectedResources.filter(itemA => {
-      return !ids.find(itemB => {
+    const unselectedObjects = selectedResources.filter((itemA) => {
+      return !ids.find((itemB) => {
         return itemA.id === itemB;
       });
     });
@@ -318,7 +322,7 @@ export function QueryPage<TData extends KitsuResource>({
     if (!savedSearchName) return;
 
     // Reload the user preferences incase they have changed.
-    retrieveUserPreferences(userPreference => {
+    retrieveUserPreferences((userPreference) => {
       setLoadedSavedSearch(savedSearchName);
 
       // User preference must be returned.
@@ -352,12 +356,12 @@ export function QueryPage<TData extends KitsuResource>({
           userId: subject as FilterParam
         }
       })
-      .then(response => {
+      .then((response) => {
         // Set the user preferences to be a state for the QueryPage.
         setUserPreferences(response?.data?.[0]);
         callback(response?.data?.[0]);
       })
-      .catch(userPreferenceError => {
+      .catch((userPreferenceError) => {
         setError(userPreferenceError);
         callback(undefined);
       });
@@ -471,7 +475,7 @@ export function QueryPage<TData extends KitsuResource>({
       ]
     : [];
 
-  const mappedResultsColumns = columnsResults.map(column => {
+  const mappedResultsColumns = columnsResults.map((column) => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
       fieldName: String(column.label)
@@ -485,7 +489,7 @@ export function QueryPage<TData extends KitsuResource>({
     };
   });
 
-  const mappedSelectedColumns = columnsSelected.map(column => {
+  const mappedSelectedColumns = columnsSelected.map((column) => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
       fieldName: String(column.label)
@@ -652,7 +656,12 @@ export function QueryPage<TData extends KitsuResource>({
             {/* Bulk edit buttons - Only shown when not in selection mode. */}
             {!selectionMode && (
               <div className="d-flex gap-3">
-                {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
+                {bulkEditPath && (
+                  <BulkEditButton
+                    pathname={bulkEditPath}
+                    singleEditPathName={singleEditPath}
+                  />
+                )}
                 {bulkDeleteButtonProps && (
                   <BulkDeleteButton {...bulkDeleteButtonProps} />
                 )}
@@ -700,7 +709,7 @@ export function QueryPage<TData extends KitsuResource>({
                         }}
                       >
                         <p>
-                          {error.errors?.map(e => e.detail).join("\n") ??
+                          {error.errors?.map((e) => e.detail).join("\n") ??
                             String(error)}
                         </p>
                         <button

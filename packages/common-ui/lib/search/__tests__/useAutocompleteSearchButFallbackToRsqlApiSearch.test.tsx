@@ -4,7 +4,7 @@ import { useAutocompleteSearchButFallbackToRsqlApiSearch } from "../useAutocompl
 
 // Mock out the debounce function to avoid waiting during tests.
 jest.mock("use-debounce", () => ({
-  useDebounce: fn => [fn, { isPending: () => false }]
+  useDebounce: (fn) => [fn, { isPending: () => false }]
 }));
 
 const ONE_PERSON_RESPONSE = {
@@ -30,7 +30,7 @@ const mockSearchApiGetWithError = jest.fn<any, any>(async () => {
   throw new Error("Mock Search Error.");
 });
 
-const mockAgentApiGet = jest.fn<any, any>(path => {
+const mockAgentApiGet = jest.fn<any, any>((path) => {
   switch (path) {
     case "agent-api/person":
       return {
@@ -66,7 +66,7 @@ function TestPersonSearchComponent({
     <div>
       Loading: {String(loading)}
       <ul className="person-list">
-        {response.data.map(it => (
+        {response.data.map((it) => (
           <li key={it.id}>{it.displayName}</li>
         ))}
       </ul>
@@ -121,7 +121,8 @@ describe("useAutocompleteSearchButFallbackToRsqlApiSearch hook", () => {
       "search-api/search-ws/auto-complete",
       {
         params: {
-          additionalField: "",
+          additionalField: undefined,
+          group: undefined,
           autoCompleteField: "data.attributes.displayName",
           indexName: "dina_agent_index",
           prefix: "test-query",

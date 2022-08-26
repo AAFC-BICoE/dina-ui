@@ -13,7 +13,6 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
 import { GenerateLabelSection } from "../../../../dina-ui/components/collection/material-sample/GenerateLabelSection";
-import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
@@ -31,6 +30,8 @@ import {
   PreparationField,
   PREPARATION_FIELDS,
   ProjectSelectSection,
+  AssemblageSelectSection,
+  TagSelectReadOnly,
   SamplesView,
   ScheduledActionsField,
   StorageLinkerField,
@@ -119,17 +120,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const materialSample = withOrganismEditorValues(materialSampleData);
 
         const hasPreparations = PREPARATION_FIELDS.some(
-          fieldName => !isEmpty(materialSample[fieldName])
+          (fieldName) => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          org => !isEmpty(org)
+          (org) => !isEmpty(org)
         );
 
         // Find first parent with targetOrganismPrimaryDetermination in hierachy
         const parentWithDetermination = hasOrganism
           ? null
-          : materialSample?.hierarchy?.find(hierachyItem =>
+          : materialSample?.hierarchy?.find((hierachyItem) =>
               hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
             );
 
@@ -146,9 +147,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
-            fieldName => materialSample.hostOrganism?.[fieldName]
+            (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
         return (
@@ -174,7 +175,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
                 <div className="d-flex flex-row gap-2">
                   <TagsAndRestrictionsSection />
+                </div>
+                <div className="d-flex flex-row gap-2">
+                  <TagSelectReadOnly />
                   <ProjectSelectSection />
+                  <AssemblageSelectSection />
                 </div>
                 <div className="mb-3">
                   <div className="col-md-6">

@@ -16,21 +16,26 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
-export function Nav() {
+export interface NavProps {
+  // Temporary prop for transitioning all pages to use the new layout.
+  marginBottom?: boolean;
+}
+
+export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
+      ?.flatMap((it) => it)
       ?.includes("collection-manager") || isAdmin;
 
   return (
     <>
       <SkipLinks />
 
-      <header className="mb-4">
+      <header className={marginBottom ? "mb-4" : undefined}>
         <Container fluid={true}>
           <Row xs={1} md={2} className="header-container row d-flex px-5">
             {/* Left section of the header */}
@@ -340,6 +345,9 @@ function NavDinaManagementDropdown({ formatMessage }) {
       show={show}
       className="float-right"
     >
+      <NavDropdown.Item href="/collection/assemblage/list">
+        <DinaMessage id="title_assemblage" />
+      </NavDropdown.Item>
       <NavDropdown.Item href="/collection/collection-method/list">
         <DinaMessage id="collectionMethodListTitle" />
       </NavDropdown.Item>
@@ -363,7 +371,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
       </NavDropdown.Item>
       {/* Permission page here. */}
       <NavDropdown.Item href="/collection/preparation-method/list">
-        <DinaMessage id="preparationMethodListTitle" />
+        <DinaMessage id="title_preparationMethod" />
       </NavDropdown.Item>
       <NavDropdown.Item href="/collection/preparation-type/list">
         <DinaMessage id="preparationTypeListTitle" />

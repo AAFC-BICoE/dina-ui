@@ -185,21 +185,8 @@ Providing the type, will make the option section of the component more specific:
 />
 ----
 
-If you would like to ignore the type you can use the no type option:
-
-[source,tsx]
-----
-<AutoSuggestTextField<Person>
-  name="examplePersonNameField"
-  elasticSearchBackend={{
-    indexName: "dina_agent_index",
-    searchField: "data.attributes.name",
-    option: _, noType => noType?.anotherField ?? "" // This part you can now say .name since the type was defined.
-  }}
-/>
-----
-
-With the noType you won't get any type checking, but you will get the full object. This can be useful when dealing with resources from included.
+If you are using an included search field, insure the type being used contains the field you are looking for. If it doesn't exist on the
+type it will not be parsed.
 
 === Default to elastic search, fall back to JSON API example
 

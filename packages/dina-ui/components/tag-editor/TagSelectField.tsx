@@ -36,13 +36,13 @@ export function TagSelectField({
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={tagsVal =>
+      readOnlyRender={(tagsVal) =>
         !!tagsVal?.length && (
           <div className="d-flex flex-wrap gap-2">
             {(tagsVal ?? []).map((tag, index) => (
               <div
                 key={index}
-                className="card p-1 flex-row align-items-center gap-1"
+                className="card py-1 px-2 flex-row align-items-center gap-1"
                 style={{ background: "rgb(24, 102, 109)" }}
               >
                 <AiFillTag className="text-white" />
@@ -129,10 +129,10 @@ function TagSelect({
   const previousTagsOptions = useMemo(
     () =>
       uniq(
-        compact((response?.data ?? []).flatMap(it => get(it, tagsFieldName)))
+        compact((response?.data ?? []).flatMap((it) => get(it, tagsFieldName)))
       )
-        .filter(tag => tag.includes(inputValue))
-        .map(tag => ({ label: tag, value: tag })),
+        .filter((tag) => tag.includes(inputValue))
+        .map((tag) => ({ label: tag, value: tag })),
     [response]
   );
 
@@ -143,9 +143,9 @@ function TagSelect({
   const selectedOptions = (value ?? []).map(toOption);
 
   const customStyle: any = {
-    multiValueLabel: base => ({ ...base, cursor: "move" }),
-    placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
-    control: base => ({
+    multiValueLabel: (base) => ({ ...base, cursor: "move" }),
+    placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+    control: (base) => ({
       ...base,
       ...(invalid && {
         borderColor: "rgb(148, 26, 37)",
@@ -155,7 +155,7 @@ function TagSelect({
   };
 
   function setAsStringArray(selected: TagSelectOption[]) {
-    onChange(selected.map(option => option.value));
+    onChange(selected.map((option) => option.value));
   }
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -166,7 +166,7 @@ function TagSelect({
     <SortableSelect
       // Input value:
       inputValue={inputValue}
-      onInputChange={newVal => setInputValue(newVal)}
+      onInputChange={(newVal) => setInputValue(newVal)}
       // Field value:
       value={selectedOptions}
       onChange={setAsStringArray}
@@ -188,7 +188,7 @@ function TagSelect({
         placeholder || formatMessage("typeNewTagOrSearchPreviousTags")
       }
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
-      formatCreateLabel={input => `${formatMessage("add")} "${input}"`}
+      formatCreateLabel={(input) => `${formatMessage("add")} "${input}"`}
       // react-sortable-hoc config:
       axis="xy"
       onSortEnd={onSortEnd}
@@ -208,3 +208,26 @@ function arrayMove(array: any[], from: number, to: number) {
 }
 const SortableMultiValue = SortableElement(reactSelectComponents.MultiValue);
 const SortableSelect = SortableContainer(CreatableSelect);
+
+export interface TagSelectReadOnlyProps {
+  resourcePath?: string;
+  tagsFieldName?: string;
+  groupSelectorName?: string;
+}
+
+export function TagSelectReadOnly({
+  resourcePath,
+  tagsFieldName = "tags",
+  groupSelectorName = "group"
+}: TagSelectReadOnlyProps) {
+  return (
+    <div>
+      <TagSelectField
+        resourcePath={resourcePath}
+        name={tagsFieldName}
+        removeLabel={true}
+        groupSelectorName={groupSelectorName}
+      />
+    </div>
+  );
+}

@@ -38,7 +38,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
     {
       accessor: "materialSampleType",
       sortable: false,
-      Header: formatMessage("field_materialSampleType.name")
+      Header: formatMessage("field_materialSampleType")
     },
     {
       ...dateCell("createdOn"),

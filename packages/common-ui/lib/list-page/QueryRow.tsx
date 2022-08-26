@@ -1,18 +1,16 @@
 import { useState } from "react";
-import {
-  DateField,
-  NumberField,
-  QueryLogicSwitchField,
-  SelectField,
-  TextField
-} from "..";
-import { useElasticSearchDistinctTerm } from "./useElasticSearchDistinctTerm";
-import { AutoSuggestTextField } from "../formik-connected/AutoSuggestTextField";
+import { QueryLogicSwitchField, SelectField, TextField } from "..";
 import { FaPlus, FaMinus } from "react-icons/fa";
 import moment from "moment";
 import { FormikContextType, useFormikContext } from "formik";
-import lodash from "lodash";
+import lodash, { startCase } from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
+import { useIntl } from "react-intl";
+import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
+import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
+import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
+import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
+import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -27,58 +25,123 @@ export interface QueryRowProps {
 }
 
 export interface QueryRowExportProps {
+  /**
+   * Name of the field for the search. Selected from the dropdown menu in the query row.
+   */
   fieldName: string;
+
+  /**
+   * The value being searched on the query row. This is only used for strings. Other types have
+   * their own field where it's stored.
+   */
   matchValue?: string;
-  fieldRangeStart?: string;
-  fieldRangeEnd?: string;
-  matchType?: string;
-  numericalMatchType?: string;
-  compoundQueryType?: string;
+
+  /**
+   * Changes based on the type of the field.
+   *
+   * Possible Options: "equals", "contains", "notEquals", "empty", "notEmpty", "greaterThan",
+   *                   "lessThan", "greaterThanOrEqualTo", "lessThanOrEqualTo"
+   */
+  matchType?:
+    | "equals"
+    | "contains"
+    | "notEquals"
+    | "empty"
+    | "notEmpty"
+    | "greaterThan"
+    | "lessThan"
+    | "greaterThanOrEqualTo"
+    | "lessThanOrEqualTo";
+
+  /**
+   * For text based searches you can change the match type to show only when the search is exactly
+   * the same as the matchValue or partial match.
+   *
+   * Possible Options: "exact" and "partial".
+   */
+  textMatchType?: "exact" | "partial";
+
+  /**
+   * Currently, only "and" is supported. In the future, "or" can be selected.
+   *
+   * Possible Options: "and" and "or".
+   */
+  compoundQueryType?: "and" | "or";
+
+  /**
+   * When searching numbers, the value will be stored here. Only if the type is "number".
+   */
   number?: string;
+
+  /**
+   * When searching dates, the value will be stored here. Only if the type is "date".
+   */
   date?: string;
+
+  /**
+   * When searching booleans, the value will be stored here. Only if the type is "boolean".
+   */
   boolean?: string;
+
+  /**
+   * Based on the field selected, the type of that field is stored here.
+   */
   type?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship name.
+   *
+   * Example: "author"
+   */
   parentName?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship type.
+   *
+   * Example: "agent"
+   */
+  parentType?: string;
+
+  /**
+   * If the field is a relationship, this is the relationship field being used.
+   *
+   * Example: "firstName"
+   */
   parentPath?: string;
+
+  /**
+   * Is the value being searched on a distinct field, if so, suggestions can be provided to help
+   * the user find what they are searching for.
+   */
   distinctTerm?: boolean;
 }
 
-const queryRowMatchOptions = [
-  { label: "PARTIAL_MATCH", value: "match" },
-  { label: "EXACT_MATCH", value: "term" }
-];
-
-const queryRowNumericalMatchOptions = (isDateField: boolean) => {
-  const options = [
-    { label: "Equal to", value: "equal" },
-    { label: "Greater than", value: "greaterThan" },
-    { label: "Greater than or equal to", value: "greaterThanEqual" },
-    { label: "Less than", value: "lessThan" },
-    { label: "Less than or equal to", value: "lessThanEqual" }
-  ];
-
-  // Only the data field should contain this.
-  if (isDateField) {
-    options.splice(1, 0, { label: "Contains", value: "contains" });
-  }
-
-  return options;
-};
-
-const queryRowBooleanOptions = [
-  { label: "TRUE", value: "true" },
-  { label: "FALSE", value: "false" }
-];
+/**
+ * Helper function to generate the proper form name.
+ *
+ * @param queryBuilderName the form name of the query builder, all query builder form items need
+ *        to be prefixed with this.
+ * @param fieldName the name of the field in relation to the query builder.
+ * @param index the index of the field in the query builder. Since the QueryBuilder can support
+ *        multiple fields at once, the index is used to determine which query row is used.
+ */
+export function fieldProps(
+  queryBuilderName: string,
+  fldName: string,
+  index: number
+) {
+  return `${queryBuilderName}[${index}].${fldName}`;
+}
 
 export function QueryRow(queryRowProps: QueryRowProps) {
   const formikProps = useFormikContext();
   const { esIndexMapping, index, addRow, removeRow, name, indexName } =
     queryRowProps;
+  const { formatMessage, messages } = useIntl();
 
   const initState = {
     matchValue: null,
-    matchType: "match",
-    numericalMatchType: "equal",
+    matchType: "equals",
     date: moment().format("YYYY-MM-DD"),
     boolean: "true",
     number: null
@@ -89,10 +152,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   );
 
   const dataFromIndexMapping = esIndexMapping?.find(
-    attribute => attribute.value === fieldName
+    (attribute) => attribute.value === fieldName
   );
-
-  const selectedGroups: string[] = (formikProps.values as any)?.group;
 
   // Depending on the type, it changes what fields need to be displayed.
   const typeVisibility: TypeVisibility = {
@@ -116,7 +177,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   function onSelectionChange(value) {
     const newDataFromIndexMapping = esIndexMapping.find(
-      attribute => attribute.value === value
+      (attribute) => attribute.value === value
     );
 
     formikProps.setFieldValue(`${name}[${index}]`, {
@@ -125,6 +186,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
       parentName: newDataFromIndexMapping?.parentName,
+      parentType: newDataFromIndexMapping?.parentType,
       distinctTerm: newDataFromIndexMapping?.distinctTerm
     });
 
@@ -133,42 +195,81 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = esIndexMapping
-    ?.filter(prop => !prop.parentPath)
-    ?.map(prop => ({
-      label: prop.label,
+    ?.filter((prop) => !prop.parentPath)
+    ?.map((prop) => ({
+      label: messages["field_" + prop.label]
+        ? formatMessage({ id: "field_" + prop.label })
+        : startCase(prop.label),
       value: prop.value
-    }));
+    }))
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
-    ?.filter(prop => !!prop.parentPath)
-    ?.map(prop => {
+    ?.filter((prop) => !!prop.parentPath)
+    ?.map((prop) => {
       return {
         parentName: prop.parentName,
-        label: prop.label,
+        label: messages["field_" + prop.label]
+          ? formatMessage({ id: "field_" + prop.label })
+          : startCase(prop.label),
         value: prop.value
       };
-    });
+    })
+    ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
   // Using the parent name, group the relationships into sections.
   const groupedNestRowOptions = lodash
     .chain(nestedRowOptions)
-    .groupBy(prop => prop.parentName)
+    .groupBy((prop) => prop.parentName)
     .map((group, key) => {
       return {
-        label: key,
+        label: messages["title_" + key]
+          ? formatMessage({ id: "title_" + key })
+          : startCase(key),
         options: group
       };
     })
+    .sort((aProp, bProp) => aProp.label.localeCompare(bProp.label))
     .value();
 
   const queryRowOptions = simpleRowOptions
     ? [...simpleRowOptions, ...groupedNestRowOptions]
     : [];
 
-  function fieldProps(fldName: string, idx: number) {
-    return `${name}[${idx}].${fldName}`;
-  }
+  // Custom styling to indent the group option menus.
+  const customStyles = {
+    // Grouped options (relationships) should be indented.
+    option: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          paddingLeft: "25px"
+        };
+      }
+
+      // Default style for everything else.
+      return {
+        ...baseStyle
+      };
+    },
+
+    // When viewing a group item, the parent name should be prefixed on to the value.
+    singleValue: (baseStyle, { data }) => {
+      if (data?.parentName) {
+        return {
+          ...baseStyle,
+          ":before": {
+            content: `'${startCase(data.parentName)} '`
+          }
+        };
+      }
+
+      return {
+        ...baseStyle
+      };
+    }
+  };
 
   return (
     <div className="row">
@@ -176,7 +277,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         {index > 0 && (
           <div style={{ width: index > 0 ? "8%" : "100%" }}>
             <QueryLogicSwitchField
-              name={fieldProps("compoundQueryType", index)}
+              name={fieldProps(name, "compoundQueryType", index)}
               removeLabel={true}
               className={"compoundQueryType" + index}
             />
@@ -184,99 +285,51 @@ export function QueryRow(queryRowProps: QueryRowProps) {
         )}
         <div style={{ width: index > 0 ? "92%" : "100%" }}>
           <SelectField
-            name={fieldProps("fieldName", index)}
+            name={fieldProps(name, "fieldName", index)}
             options={queryRowOptions as any}
             onChange={onSelectionChange}
             className={`flex-grow-1 me-2 ps-0`}
             removeLabel={true}
+            styles={customStyles}
           />
         </div>
       </div>
       <div className="col-md-6">
         <div className="d-flex">
+          {/* Text type */}
           {typeVisibility.isText && (
-            <>
-              <TextField
-                name={fieldProps("matchValue", index)}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
-              <SelectField
-                name={fieldProps("matchType", index)}
-                options={queryRowMatchOptions}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
-            </>
-          )}
-          {typeVisibility.isSuggestedText && (
-            <>
-              <AutoSuggestTextField
-                name={fieldProps("matchValue", index)}
-                removeLabel={true}
-                className="me-1 flex-fill"
-                blankSearchBackend={"preferred"}
-                customOptions={value =>
-                  useElasticSearchDistinctTerm({
-                    fieldName:
-                      dataFromIndexMapping?.parentPath +
-                      "." +
-                      dataFromIndexMapping?.path +
-                      "." +
-                      dataFromIndexMapping?.label,
-                    groups: selectedGroups,
-                    relationshipType: dataFromIndexMapping?.parentName,
-                    indexName
-                  })?.filter(suggestion =>
-                    suggestion?.toLowerCase()?.includes(value?.toLowerCase())
-                  )
-                }
-              />
-            </>
+            <QueryRowTextSearch queryBuilderName={name} index={index} />
           )}
 
-          {/* Number and Date have there own set of numerical match types */}
-          {(typeVisibility.isDate || typeVisibility.isNumber) && (
-            <SelectField
-              name={fieldProps("numericalMatchType", index)}
-              options={queryRowNumericalMatchOptions(typeVisibility.isDate)}
-              className="me-2 col-sm-5"
-              removeLabel={true}
+          {/* Auto suggestion text type */}
+          {typeVisibility.isSuggestedText && (
+            <QueryRowAutoSuggestionTextSearch
+              indexName={indexName}
+              queryBuilderName={name}
+              index={index}
+              elasticSearchMapping={dataFromIndexMapping}
             />
           )}
 
           {/* Date picker type */}
           {typeVisibility.isDate && (
-            <DateField
-              name={fieldProps("date", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-              partialDate={true}
-            />
+            <QueryRowDateSearch queryBuilderName={name} index={index} />
           )}
 
           {/* Number type */}
           {typeVisibility.isNumber && (
-            <NumberField
-              name={fieldProps("number", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-            />
+            <QueryRowNumberSearch queryBuilderName={name} index={index} />
           )}
 
           {/* Boolean field (Dropdown with TRUE/FALSE) */}
           {typeVisibility.isBoolean && (
-            <SelectField
-              name={fieldProps("boolean", index)}
-              options={queryRowBooleanOptions}
-              className="me-1 flex-fill"
-              removeLabel={true}
-            />
+            <QueryRowBooleanSearch queryBuilderName={name} index={index} />
           )}
+
           {/* Disabled text field when no search filter is selected. */}
           {!fieldName && (
             <TextField
-              name={fieldProps("matchValue", index)}
+              name={fieldProps(name, "matchValue", index)}
               className="me-1 flex-fill"
               removeLabel={true}
               readOnly={true}
@@ -291,7 +344,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
                   onClick={addRow as any}
                   size="2em"
                   style={{ cursor: "pointer" }}
-                  name={fieldProps("addRow", index)}
+                  name={fieldProps(name, "addRow", index)}
                 />
               )}
             </>
@@ -300,7 +353,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
               onClick={() => removeRow?.(index)}
               size="2em"
               style={{ cursor: "pointer" }}
-              name={fieldProps("removeRow", index)}
+              name={fieldProps(name, "removeRow", index)}
             />
           )}
         </div>

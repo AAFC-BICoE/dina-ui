@@ -13,8 +13,8 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata"
 };
 
-const mockBulkGet = jest.fn(async paths =>
-  paths.map(path => {
+const mockBulkGet = jest.fn(async (paths) =>
+  paths.map((path) => {
     switch (path) {
       case "object-upload/cf99c285-0353-4fed-a15d-ac963e0514f3":
         return {
@@ -43,7 +43,7 @@ describe("MetadataPreview component", () => {
 
     // There should be a link to single-edit a Metadata:
     expect(wrapper.find("a.metadata-edit-link").prop("href")).toEqual(
-      "/object-store/metadata/single-record-edit?id=232eda40-dc97-4255-91c4-f30485e2c707"
+      "/object-store/metadata/edit?id=232eda40-dc97-4255-91c4-f30485e2c707"
     );
 
     // Shows the EXIF data:

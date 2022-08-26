@@ -39,8 +39,8 @@ export function BulkDeleteButton({
       className="btn btn-danger bulk-delete-button"
       onClick={(values: BulkSelectableFormValues) => {
         const resourceIds = toPairs(values.itemIdsToSelect)
-          .filter(pair => pair[1])
-          .map(pair => pair[0]);
+          .filter((pair) => pair[1])
+          .map((pair) => pair[0]);
 
         openModal(
           <AreYouSureModal
@@ -52,7 +52,7 @@ export function BulkDeleteButton({
             }
             onYesButtonClicked={async () => {
               await doOperations(
-                resourceIds.map(id => ({
+                resourceIds.map((id) => ({
                   op: "DELETE",
                   path: `${typeName}/${id}`
                 })),
@@ -74,6 +74,7 @@ export function BulkDeleteButton({
 export interface BulkEditButtonProps {
   /** Where to perform the request for the bulk edit. */
   pathname: string;
+  singleEditPathName?: string;
 }
 
 /**
@@ -83,7 +84,10 @@ export interface BulkEditButtonProps {
  */
 export const BULK_EDIT_IDS_KEY = "bulkEditIds";
 
-export function BulkEditButton({ pathname }: BulkEditButtonProps) {
+export function BulkEditButton({
+  pathname,
+  singleEditPathName
+}: BulkEditButtonProps) {
   const router = useRouter();
 
   return (
@@ -92,11 +96,15 @@ export function BulkEditButton({ pathname }: BulkEditButtonProps) {
       className="btn btn-primary ms-2 bulk-edit-button"
       onClick={async (values: BulkSelectableFormValues) => {
         const ids = toPairs(values.itemIdsToSelect)
-          .filter(pair => pair[1])
-          .map(pair => pair[0]);
+          .filter((pair) => pair[1])
+          .map((pair) => pair[0]);
 
         writeStorage<string[]>(BULK_EDIT_IDS_KEY, ids);
-        await router.push({ pathname });
+        if (singleEditPathName && ids.length === 1) {
+          await router.push(`${singleEditPathName}?id=${ids[0]}`);
+        } else {
+          await router.push({ pathname });
+        }
       }}
     >
       <CommonMessage id="editSelectedButtonText" />
