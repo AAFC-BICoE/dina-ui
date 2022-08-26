@@ -15,7 +15,7 @@
     "flat": "^5.0.2",
     "formik": "^2.2.7",
     "handsontable": "6.2.2",
-    "keycloak-js": "18.0.0",
+    "keycloak-js": "18.0.1",
     "kitsu": "7.0.4",
     "kitsu-core": "7.0.4",
     "lodash": "^4.17.21",
