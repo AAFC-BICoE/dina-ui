@@ -10,51 +10,58 @@ import { transformTextSearchToDSL } from "../list-page/query-row-search-options/
 import { transformDateSearchToDSL } from "../list-page/query-row-search-options/QueryRowDateSearch";
 import { transformNumberSearchToDSL } from "../list-page/query-row-search-options/QueryRowNumberSearch";
 
-export interface ElasticSearchQueryParams {
-  queryOperator: "must" | "should" | "must_not" | "filter";
-  queryType: "match" | "term" | "range" | "exists" | "wildcard" | "regexp";
-  fieldName?: string;
-  value?: any;
-}
-
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
   group: string;
 }
 
-/**
- * Retrieves the field name for elastic search to search against. Sometimes a field name requires
- * the .keyword property.
- *
- * @param queryRow The query row options the user has selected.
- * @returns the field name, with or without the .keyword property.
- */
-export function getFieldName(queryRow) {
-  if (queryRow.textMatchType === "exact" || queryRow?.distinctTerm)
-    return queryRow.fieldName + ".keyword";
-  return queryRow.fieldName;
+// If it's a relationship search, ensure that the included type is being filtered out.
+export function includedTypeQuery(parentType: string): any {
+  return {
+    term: {
+      "included.type": parentType
+    }
+  };
 }
 
-/**
- * Due to the way the included section is handled, it's an array of the different types.
- * Two fields from different types could share the same path:
- *
- * included.attributes.name = Could be for preparation-type or material-sample for example.
- *
- * This method will take the unique value and convert it to the version above.
- *
- * preparation-type.name --> included.attributes.name
- *
- * The included.type will be used to perform the search on the correct type.
- */
-export function getRelationshipFieldName(queryRow) {
-  const newFieldName =
-    queryRow.parentPath +
-    ".attributes." +
-    queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1);
-  if (queryRow.textMatchType === "exact" || queryRow?.distinctTerm)
-    return newFieldName + ".keyword";
-  return newFieldName;
+// Query used for exact matches.
+export function termQuery(
+  fieldName: string,
+  matchValue: any,
+  keyword: boolean
+): any {
+  return {
+    term: {
+      [fieldName + (keyword ? ".keyword" : "")]: matchValue
+    }
+  };
+}
+
+// Query used for partial matches.
+export function matchQuery(fieldName: string, matchValue: any): any {
+  return {
+    match: {
+      [fieldName]: matchValue
+    }
+  };
+}
+
+// Query used to see if the field exists.
+export function existsQuery(fieldName: string): any {
+  return {
+    exists: {
+      field: fieldName
+    }
+  };
+}
+
+// Query used for generating ranges.
+export function rangeQuery(fieldName: string, rangeOptions: any): any {
+  return {
+    range: {
+      [fieldName]: rangeOptions
+    }
+  };
 }
 
 export function transformQueryToDSL<TData extends KitsuResource>(
@@ -78,13 +85,23 @@ export function transformQueryToDSL<TData extends KitsuResource>(
    * for boolean types.
    *
    * @param queryRow The query row options the user has selected.
-   * @returns
+   * @param fieldName The field name being used for the specific query row.
+   * @returns JSON object (any) for elastic search.
    */
-  function buildInnerQueryBasedOnType(queryRow): ElasticSearchQueryParams[] {
+  function buildInnerQueryBasedOnType(
+    queryRow: QueryRowExportProps,
+    isRelationship: boolean
+  ): any {
+    const fieldName = isRelationship
+      ? queryRow.parentPath +
+        ".attributes." +
+        queryRow.fieldName.substring(queryRow.fieldName.indexOf(".") + 1)
+      : queryRow.fieldName;
+
     switch (queryRow.type) {
       // Boolean type
       case "boolean":
-        return transformBooleanSearchToDSL(queryRow);
+        return transformBooleanSearchToDSL(queryRow, fieldName);
 
       // Number types
       case "long":
@@ -95,20 +112,20 @@ export function transformQueryToDSL<TData extends KitsuResource>(
       case "float":
       case "scaled_float":
       case "unsigned_long":
-        return transformNumberSearchToDSL(queryRow);
+        return transformNumberSearchToDSL(queryRow, fieldName);
 
       // Date type
       case "date":
-        return transformDateSearchToDSL(queryRow);
+        return transformDateSearchToDSL(queryRow, fieldName);
 
       // Text types
       case "text":
       case "keyword":
-        return transformTextSearchToDSL(queryRow);
+        return transformTextSearchToDSL(queryRow, fieldName);
 
       // Default just treat it like a text search.
       default:
-        return transformTextSearchToDSL(queryRow);
+        return transformTextSearchToDSL(queryRow, fieldName);
     }
   }
 
@@ -166,127 +183,37 @@ export function transformQueryToDSL<TData extends KitsuResource>(
     return true;
   }
 
-  /**
-   * Used for generated the included section of the query. If using a field directly on the index,
-   * the buildQuery() function should be used instead.
-   *
-   * @param rowToBuild The query row to build the query for.
-   */
-  function buildRelationshipQuery(rowToBuild) {
-    const queryParams: ElasticSearchQueryParams[] =
-      buildInnerQueryBasedOnType(rowToBuild);
-
-    builder.query("nested", { path: "included" }, queryBuilder => {
-      const query = queryBuilder.andQuery(
-        "match",
-        "included.type",
-        rowToBuild.parentType
-      );
-
-      queryParams.forEach(queryParam => {
-        switch (queryParam.queryOperator) {
-          case "must":
-            query.andQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "should":
-            query.orQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "must_not":
-            query.notQuery(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-          case "filter":
-            query.filter(
-              queryParam.queryType,
-              queryParam.fieldName ?? getRelationshipFieldName(rowToBuild),
-              queryParam.value
-            );
-            break;
-        }
-      });
-
-      return query;
-    });
-  }
-
-  /**
-   * Used for attributes directly involved with the index. Relationship queries should be using
-   * the buildRelationshipQuery function instead.
-   *
-   * @param rowToBuild The query row to build the query for.
-   */
-  function buildQuery(rowToBuild) {
-    const queryParams: ElasticSearchQueryParams[] =
-      buildInnerQueryBasedOnType(rowToBuild);
-
-    queryParams.forEach(queryParam => {
-      switch (queryParam.queryOperator) {
-        case "must":
-          builder.query(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "should":
-          builder.orQuery(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "must_not":
-          builder.notQuery(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-
-        case "filter":
-          builder.filter(
-            queryParam.queryType,
-            queryParam.fieldName ?? getFieldName(rowToBuild),
-            queryParam.value
-          );
-          break;
-      }
-    });
-  }
-
   // Remove the row that user did not select any field to search on or
   // no value is put for the selected field
-  submittedValues?.queryRows
-    .filter(queryRow => shouldQueryRowBeIncluded(queryRow))
-    .map(queryRow => {
+  const queryRowQueries: any = submittedValues?.queryRows
+    .filter((queryRow) => shouldQueryRowBeIncluded(queryRow))
+    .map((queryRow) => {
       if (queryRow.parentType) {
-        buildRelationshipQuery(queryRow);
+        return buildInnerQueryBasedOnType(queryRow, true);
       } else {
-        buildQuery(queryRow);
+        return buildInnerQueryBasedOnType(queryRow, false);
       }
-    });
+    })
+    .flat();
 
   // Add the search group filter.
-  if (
-    Array.isArray(submittedValues.group) &&
-    submittedValues.group.length > 0
-  ) {
-    builder.andFilter("terms", "data.attributes.group", submittedValues.group);
-  } else if (!Array.isArray(submittedValues.group) && submittedValues.group) {
-    builder.andFilter("term", "data.attributes.group", submittedValues.group);
+  const multipleGroups: boolean =
+    Array.isArray(submittedValues.group) && submittedValues.group.length > 0;
+  if (submittedValues?.group?.length > 0) {
+    queryRowQueries.push({
+      [multipleGroups ? "terms" : "term"]: {
+        "data.attributes.group": submittedValues.group
+      }
+    });
+  }
+
+  // Root query, only supplied if a query rows are provided (including the group)
+  if (queryRowQueries.length > 0) {
+    builder.rawOption("query", {
+      bool: {
+        must: [...queryRowQueries]
+      }
+    });
   }
 
   // Apply pagination rules to elastic search query.
@@ -297,8 +224,8 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
   // Apply sorting rules to elastic search query.
   if (sortingRules && sortingRules.length > 0) {
-    sortingRules.forEach(sortingRule => {
-      const columnDefinition = columns.find(column => {
+    sortingRules.forEach((sortingRule) => {
+      const columnDefinition = columns.find((column) => {
         // Depending on if it's a string or not.
         if (typeof column === "string") {
           return column === sortingRule.id;
@@ -341,12 +268,11 @@ export function transformQueryToDSL<TData extends KitsuResource>(
   }
 
   // Display only the fields provided in the columns array.
-
   const sourceFilteringColumns: string[] = [
     "data.id",
     "data.type",
     ...columns
-      .map(column => {
+      .map((column) => {
         const accessors: string[] = [];
 
         if (column?.accessor) {
@@ -364,7 +290,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
   // If the source filtering contains included attributes, we need to also include the id and included type.
   if (
-    sourceFilteringColumns.filter(columnValue =>
+    sourceFilteringColumns.filter((columnValue) =>
       columnValue?.startsWith("included.")
     )
   ) {
