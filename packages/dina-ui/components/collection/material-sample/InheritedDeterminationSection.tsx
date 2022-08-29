@@ -19,7 +19,7 @@ export default function InheritedDeterminationSection({
   );
 
   const inheritedDeterminations =
-    parentWithDetermination?.organismPrimaryDetermination.reduce();
+    parentWithDetermination?.organismPrimaryDetermination;
 
   const parentLink = (
     <Link
