@@ -16,15 +16,17 @@ export interface UploadingMetadataBulkEditorProps {
   objectUploadIds: string[];
   onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
+  inputGroup?: string;
 }
 
 export function UploadingMetadataBulkEditor({
   objectUploadIds,
   onSaved,
-  onPreviousClick
+  onPreviousClick,
+  inputGroup
 }: UploadingMetadataBulkEditorProps) {
   const router = useRouter();
-  const group = router?.query?.group as string;
+  const group = inputGroup ? inputGroup : (router?.query?.group as string);
   const { agentId } = useAccount();
   const { bulkGet, apiClient } = useContext(ApiClientContext);
 

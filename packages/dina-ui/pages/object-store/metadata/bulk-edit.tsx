@@ -4,8 +4,6 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
-import { Metadata } from "../../../types/objectstore-api";
-import { PersistedResource } from "kitsu";
 import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
 import { UploadingMetadataBulkEditor } from "../../../components/bulk-metadata/UploadingMetadataBulkEditor";
 

@@ -20,9 +20,9 @@ export function useBulkMetadataEditModal() {
   function openMetadataEditorModal({
     afterMetadatasSaved: afterMetadatasSavedProp,
     objectUploadIds,
-    metadataIds
-  }: // group,
-  BulkMetadataEditModalParams) {
+    metadataIds,
+    group
+  }: BulkMetadataEditModalParams) {
     async function afterMetadatasSavedInternal(ids: string[]) {
       await afterMetadatasSavedProp?.(ids);
       closeModal();
@@ -48,14 +48,13 @@ export function useBulkMetadataEditModal() {
             <ExistingMetadataBulkEditor
               ids={metadataIds}
               onSaved={afterMetadatasSavedInternal}
-              onPreviousClick={() => router.push("/object-store/object/list")}
             />
           ) : (
             objectUploadIds && (
               <UploadingMetadataBulkEditor
                 objectUploadIds={objectUploadIds}
                 onSaved={afterMetadatasSavedInternal}
-                onPreviousClick={() => router.push("/object-store/object/list")}
+                inputGroup={group}
               />
             )
           )}
