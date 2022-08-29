@@ -1,9 +1,14 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 import { FieldSpy, FieldWrapper, TextField } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
 import { useIntl } from "react-intl";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
+import {
+  includedTypeQuery,
+  matchQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The match options when a text search is being performed.
@@ -150,51 +155,225 @@ function ExactOrPartialSwitch(queryLogicSwitchProps) {
 
 /**
  * Using the query row for a text search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformTextSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
-  const { matchType, textMatchType, matchValue, distinctTerm } = queryRow;
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
+  const {
+    matchType,
+    textMatchType,
+    matchValue,
+    distinctTerm,
+    parentType,
+    parentName
+  } = queryRow;
 
   switch (matchType) {
     // Equals match type.
     case "equals":
       // Autocompletion expects to use the full text search.
-      if (distinctTerm) {
-        return [
-          { queryOperator: "must", queryType: "term", value: matchValue }
-        ];
+      if (distinctTerm || textMatchType === "exact") {
+        return parentType
+          ? {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      termQuery(fieldName, matchValue, true),
+                      includedTypeQuery(parentType)
+                    ]
+                  }
+                }
+              }
+            }
+          : termQuery(fieldName, matchValue, true);
       }
 
-      if (textMatchType === "partial") {
-        return [
-          { queryOperator: "must", queryType: "match", value: matchValue }
-        ];
-      } else {
-        return [
-          { queryOperator: "must", queryType: "term", value: matchValue }
-        ];
-      }
+      // Otherwise, it's just a partial match search.
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    matchQuery(fieldName, matchValue),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : matchQuery(fieldName, matchValue);
 
     // Not equals match type.
     case "notEquals":
-      return [
-        { queryOperator: "must_not", queryType: "term", value: matchValue }
-      ];
+      return parentType
+        ? {
+            bool: {
+              should: [
+                // If the field does exist, then search for everything that does NOT match the term.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, matchValue, true),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // If it's included but the field doesn't exist, then it's not equal either.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: existsQuery(fieldName),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // And if it's not included, then it's not equal either.
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
+          }
+        : {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: termQuery(fieldName, matchValue, true)
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                }
+              ]
+            }
+          };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "wildcard", value: "*" }];
+      return parentType
+        ? {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    should: [
+                      {
+                        bool: {
+                          must_not: {
+                            nested: {
+                              path: "included",
+                              query: {
+                                bool: {
+                                  must: [
+                                    existsQuery(fieldName),
+                                    includedTypeQuery(parentType)
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      {
+                        nested: {
+                          path: "included",
+                          query: {
+                            bool: {
+                              must: [
+                                termQuery(fieldName, "", true),
+                                includedTypeQuery(parentType)
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
+          }
+        : {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                },
+                {
+                  bool: {
+                    must: termQuery(fieldName, "", true)
+                  }
+                }
+              ]
+            }
+          };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "wildcard", value: "*" }];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must_not: termQuery(fieldName, "", true),
+                  must: [includedTypeQuery(parentType), existsQuery(fieldName)]
+                }
+              }
+            }
+          }
+        : {
+            bool: {
+              must: existsQuery(fieldName),
+              must_not: termQuery(fieldName, "", true)
+            }
+          };
 
     // Default case
     default:
-      return [{ queryOperator: "must", queryType: "match", value: matchValue }];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    matchQuery(fieldName, matchValue),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : matchQuery(fieldName, matchValue);
   }
 }
