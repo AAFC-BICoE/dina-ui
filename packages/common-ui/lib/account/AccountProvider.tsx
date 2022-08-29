@@ -30,14 +30,6 @@ const AccountContext = createContext<AccountContextI | null>(null);
 
 export const AccountProvider = AccountContext.Provider;
 
-export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
-  return (
-    <KeycloakAccountProviderInternal>
-      {children}
-    </KeycloakAccountProviderInternal>
-  );
-}
-
 /** Exposes the needed features from the identity provider. */
 export function useAccount(): AccountContextI {
   const ctx = useContext(AccountContext);
@@ -48,13 +40,10 @@ export function useAccount(): AccountContextI {
 }
 
 /** Converts the Keycloak context to the generic AccountContextI. */
-function KeycloakAccountProviderInternal({
-  children
-}: {
-  children: ReactNode;
-}) {
+export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
 
   // Setup keycloak when this is first mounted.
   useEffect(() => {
@@ -68,13 +57,15 @@ function KeycloakAccountProviderInternal({
             : undefined,
         checkLoginIframe: false
       })
-      .then(keycloakAuthenticated => {
+      .then((keycloakAuthenticated) => {
         setKeycloak(keycloakInstance);
         setAuthenticated(keycloakAuthenticated);
 
         // The user is not authenticated... Try again.
         if (keycloakAuthenticated === false) {
           keycloakInstance.login();
+        } else {
+          setInitialized(true);
         }
       });
   }, []);
@@ -118,7 +109,7 @@ function KeycloakAccountProviderInternal({
         agentId,
         authenticated,
         groupNames,
-        initialized: keycloak !== null,
+        initialized,
         login: keycloak?.login,
         logout: keycloak?.logout,
         roles,
@@ -141,10 +132,10 @@ export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
   return uniq(
     keycloakGroups
       // Add leading slash if absent:
-      .map(groupName =>
+      .map((groupName) =>
         groupName.startsWith("/") ? groupName : `/${groupName}`
       )
       // Get only the group name immediately after the first slash:
-      .map(groupName => groupName.split("/")[1])
+      .map((groupName) => groupName.split("/")[1])
   );
 }
