@@ -120,17 +120,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         const materialSample = withOrganismEditorValues(materialSampleData);
 
         const hasPreparations = PREPARATION_FIELDS.some(
-          fieldName => !isEmpty(materialSample[fieldName])
+          (fieldName) => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          org => !isEmpty(org)
+          (org) => !isEmpty(org)
         );
 
         // Find first parent with targetOrganismPrimaryDetermination in hierachy
         const parentWithDetermination = hasOrganism
           ? null
-          : materialSample?.hierarchy?.find(hierachyItem =>
+          : materialSample?.hierarchy?.find((hierachyItem) =>
               hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
             );
 
@@ -147,9 +147,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
-            fieldName => materialSample.hostOrganism?.[fieldName]
+            (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
         return (

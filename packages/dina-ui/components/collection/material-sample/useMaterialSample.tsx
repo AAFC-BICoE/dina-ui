@@ -112,16 +112,16 @@ export function useMaterialSampleQuery(id?: string | null) {
         // Convert to seperated list
         if (data.restrictionFieldsExtension && data.isRestricted) {
           data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
-            ext => ext.extKey === "phac_animal_rg"
+            (ext) => ext.extKey === "phac_animal_rg"
           )?.[0];
           data[RESTRICTIONS_FIELDS[1]] = data.restrictionFieldsExtension.filter(
-            ext => ext.extKey === "phac_human_rg"
+            (ext) => ext.extKey === "phac_human_rg"
           )?.[0];
           data[RESTRICTIONS_FIELDS[2]] = data.restrictionFieldsExtension.filter(
-            ext => ext.extKey === "cfia_ppc"
+            (ext) => ext.extKey === "cfia_ppc"
           )?.[0];
           data[RESTRICTIONS_FIELDS[3]] = data.restrictionFieldsExtension.filter(
-            ext => ext.extKey === "phac_cl"
+            (ext) => ext.extKey === "phac_cl"
           )?.[0];
         }
       }
@@ -281,7 +281,7 @@ export function useMaterialSampleSave({
       hasPreparationsTemplate ||
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
-          prepFieldName =>
+          (prepFieldName) =>
             !isEmpty(materialSample?.[prepFieldName]) ||
             enabledFields?.materialSample?.includes(prepFieldName)
         )
@@ -292,7 +292,7 @@ export function useMaterialSampleSave({
     Boolean(
       hasOrganismsTemplate ||
         materialSample?.organism?.length ||
-        enabledFields?.materialSample?.some(enabledField =>
+        enabledFields?.materialSample?.some((enabledField) =>
           enabledField.startsWith("organism[0].")
         )
     )
@@ -312,7 +312,7 @@ export function useMaterialSampleSave({
     Boolean(
       hasScheduledActionsTemplate ||
         materialSample?.scheduledActions?.length ||
-        enabledFields?.materialSample?.some(enabledField =>
+        enabledFields?.materialSample?.some((enabledField) =>
           enabledField.startsWith("scheduledAction.")
         )
     )
@@ -326,7 +326,7 @@ export function useMaterialSampleSave({
         !isEmpty(materialSample?.hostOrganism) ||
         !isEmpty(materialSample?.associations) ||
         enabledFields?.materialSample?.some(
-          enabledField =>
+          (enabledField) =>
             enabledField.startsWith("associations[0].") ||
             enabledField.startsWith("hostOrganism.")
         )
@@ -338,7 +338,7 @@ export function useMaterialSampleSave({
       hasRestrictionsTemplate ||
         // Show the restriction section if a field is set or the field is enabled:
         RESTRICTIONS_FIELDS.some(
-          restrictFieldName =>
+          (restrictFieldName) =>
             !isEmpty(materialSample?.[restrictFieldName]) ||
             enabledFields?.materialSample?.includes(restrictFieldName)
         )
@@ -569,7 +569,7 @@ export function useMaterialSampleSave({
     // Throw error if useTargetOrganism is enabled without a target organism selected
     if (
       materialSampleInput.useTargetOrganism &&
-      !materialSampleInput.organism?.some(organism => organism?.isTarget)
+      !materialSampleInput.organism?.some((organism) => organism?.isTarget)
     ) {
       throw new DoOperationsError(
         formatMessage("field_useTargetOrganismError")
@@ -631,26 +631,30 @@ export function useMaterialSampleSave({
       relationships: {
         ...(msDiffWithOrganisms.attachment && {
           attachment: {
-            data: msDiffWithOrganisms.attachment.map(it =>
+            data: msDiffWithOrganisms.attachment.map((it) =>
               pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.projects && {
           projects: {
-            data: msDiffWithOrganisms.projects.map(it => pick(it, "id", "type"))
+            data: msDiffWithOrganisms.projects.map((it) =>
+              pick(it, "id", "type")
+            )
           }
         }),
         ...(msDiffWithOrganisms.assemblages && {
           assemblages: {
-            data: msDiffWithOrganisms.assemblages.map(it =>
+            data: msDiffWithOrganisms.assemblages.map((it) =>
               pick(it, "id", "type")
             )
           }
         }),
         ...(msDiffWithOrganisms.organism && {
           organism: {
-            data: msDiffWithOrganisms.organism.map(it => pick(it, "id", "type"))
+            data: msDiffWithOrganisms.organism.map((it) =>
+              pick(it, "id", "type")
+            )
           }
         })
       },
@@ -688,7 +692,7 @@ export function useMaterialSampleSave({
       0,
       sample.organismsQuantity ?? undefined
     )
-      .map(index => {
+      .map((index) => {
         const defaults = {
           // Default to the sample's group:
           group: sample.group,
@@ -707,18 +711,18 @@ export function useMaterialSampleSave({
         };
       })
       // Convert determiners from Objects to UUID strings:
-      .map(org => ({
+      .map((org) => ({
         ...org,
-        determination: org.determination?.map(det => ({
+        determination: org.determination?.map((det) => ({
           ...det,
-          determiner: det.determiner?.map(determiner =>
+          determiner: det.determiner?.map((determiner) =>
             typeof determiner === "string" ? determiner : String(determiner.id)
           )
         }))
       }));
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
-      resource => ({
+      (resource) => ({
         resource,
         type: "organism"
       })
@@ -736,7 +740,7 @@ export function useMaterialSampleSave({
       return savedOrganisms;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
-        const newErrors = error.individualErrors.map<OperationError>(err => ({
+        const newErrors = error.individualErrors.map<OperationError>((err) => ({
           fieldErrors: mapKeys(
             err.fieldErrors,
             (_, field) => `organism[${err.index}].${field}`
@@ -783,7 +787,7 @@ export function useMaterialSampleSave({
         collectionId: submittedValues.collection?.id as any,
         amount: 1,
         save
-      }).then(async data => {
+      }).then(async (data) => {
         if (data.result?.lowReservedID && data.result.highReservedID) {
           const prefix = materialSampleSaveOp.resource.collection
             ? (materialSampleSaveOp.resource.collection as Collection).code ??
@@ -893,7 +897,7 @@ export function withOrganismEditorValues<
   T extends InputResource<MaterialSample> | PersistedResource<MaterialSample>
 >(materialSample: T): T {
   // If there are different organisms then initially show the individual organisms edit UI:
-  const hasDifferentOrganisms = materialSample?.organism?.some(org => {
+  const hasDifferentOrganisms = materialSample?.organism?.some((org) => {
     const firstOrg = materialSample?.organism?.[0];
 
     const {

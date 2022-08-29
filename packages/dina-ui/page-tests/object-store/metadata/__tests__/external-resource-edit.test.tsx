@@ -10,7 +10,7 @@ import ExternalResourceMetadataPage from "../../../../pages/object-store/metadat
 import Select from "react-select/base";
 import { ResourceSelectField } from "common-ui";
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   switch (path) {
     case "objectstore-api/metadata/undefined":
       return {};
@@ -27,7 +27,7 @@ const mockGet = jest.fn(async path => {
   }
 });
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (!paths.length) {
     return [];
   }
@@ -205,7 +205,7 @@ describe("Metadata external resource edit page.", () => {
   });
 
   it("Lets you edit an existing external resource metadata.", async () => {
-    mockSave.mockImplementation(args => args.map(({ resource }) => resource));
+    mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
       push: () => undefined,
       query: {

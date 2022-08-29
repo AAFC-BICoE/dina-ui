@@ -41,7 +41,7 @@ export function StoredObjectGallery({
     <div className="stored-object-gallery">
       <style>{GALLERY_STYLE}</style>
       <ul className="m-3 list-inline">
-        {metadatas.map(metadata => {
+        {metadatas.map((metadata) => {
           return (
             <li className="m-1 list-inline-item align-top" key={metadata.id}>
               <GalleryItem

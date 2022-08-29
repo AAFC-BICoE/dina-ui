@@ -1,7 +1,7 @@
 import { AssemblageForm } from "../../../../pages/collection/assemblage/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/333/attachment":
     case "objectstore-api/metadata":
@@ -12,14 +12,14 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn(async saves => {
-  return saves.map(save => ({
+const mockSave = jest.fn(async (saves) => {
+  return saves.map((save) => ({
     ...save.resource,
     id: save.resource.id ?? "123"
   }));
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
+const mockBulkGet = jest.fn<any, any>(async (paths) => {
   if (paths.length === 0) {
     return [];
   }

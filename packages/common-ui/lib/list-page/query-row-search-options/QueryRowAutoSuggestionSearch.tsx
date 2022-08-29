@@ -76,7 +76,7 @@ export default function QueryRowAutoSuggestionTextSearch({
               removeLabel={true}
               className="me-1 flex-fill"
               blankSearchBackend={"preferred"}
-              customOptions={value =>
+              customOptions={(value) =>
                 useElasticSearchDistinctTerm({
                   fieldName:
                     elasticSearchMapping?.parentPath +
@@ -87,7 +87,7 @@ export default function QueryRowAutoSuggestionTextSearch({
                   groups: selectedGroups,
                   relationshipType: elasticSearchMapping?.parentType,
                   indexName
-                })?.filter(suggestion =>
+                })?.filter((suggestion) =>
                   suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                 )
               }

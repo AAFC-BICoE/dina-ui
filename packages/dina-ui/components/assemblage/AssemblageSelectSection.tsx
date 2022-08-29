@@ -55,7 +55,7 @@ export function AssemblageSelectField({
         filter={filterBy(["name"])}
         model={resourcePath as any}
         className={"assemblages " + (className || "")}
-        optionLabel={assemblage => assemblage.name}
+        optionLabel={(assemblage) => assemblage.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
         label={
