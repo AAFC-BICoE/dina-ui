@@ -21,15 +21,12 @@ export default function MetadataBulkEditPage() {
     return <LoadingSpinner loading={true} />;
   }
 
-  async function onSaved(
-    ids: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) {
+  async function onSaved(ids: string[], isExternalResource?: boolean) {
     if (ids.length === 1) {
       await router.push(
         `/object-store/object/${
           isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0].id}`
+        }?id=${ids[0]}`
       );
     } else {
       await router.push("/object-store/object/list");

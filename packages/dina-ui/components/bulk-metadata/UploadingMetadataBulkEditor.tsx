@@ -14,10 +14,7 @@ import { Promisable } from "type-fest";
 
 export interface UploadingMetadataBulkEditorProps {
   objectUploadIds: string[];
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
 }
 
