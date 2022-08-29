@@ -105,6 +105,24 @@ export interface QueryPageProps<TData extends KitsuResource> {
   selectionMode?: boolean;
 
   /**
+   * If selection mode is enabled, this must be set.
+   *
+   * Outside of the QueryPage, a react state must be setup to hold the resources that have been
+   * selected.
+   *
+   * These are the currently selected resources which will be displayed on the right table of the
+   * selection mode QueryPage.
+   */
+  selectionResources?: TData[];
+
+  /**
+   * If selection mode is enabled, this must be set.
+   *
+   * This will be used to set selection mode resources using the ">>" or "<<" options.
+   */
+  setSelectionResources?: React.Dispatch<React.SetStateAction<TData[]>>;
+
+  /**
    * Event prop triggered when the user changes the sort settings.
    *
    * @param SortingRule[] rules for sorting. Contains the id (column name) and
@@ -132,14 +150,13 @@ export function QueryPage<TData extends KitsuResource>({
   reactTableProps,
   defaultSort,
   selectionMode = false,
+  selectionResources: selectedResources,
+  setSelectionResources: setSelectedResources,
   onSortedChange
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
   const { groupNames, subject } = useAccount();
-
-  // The selected resources from the left table (displayed on the right table)
-  const [selectedResources, setSelectedResources] = useState<TData[]>([]);
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -260,6 +277,14 @@ export function QueryPage<TData extends KitsuResource>({
     formValues,
     formik: FormikContextType<any>
   ) {
+    // Ensure selectedResources has been setup correctly.
+    if (!selectedResources || !setSelectedResources) {
+      console.error(
+        "selectionResources and setSelectionResources states must be passed to QueryPage in order to Selection Mode."
+      );
+      return;
+    }
+
     const itemIdsToSelect = formValues.itemIdsToSelect;
 
     const ids = toPairs(itemIdsToSelect)
@@ -294,6 +319,14 @@ export function QueryPage<TData extends KitsuResource>({
    * @param formik Formik Context
    */
   function removeSelectedResources(formValues, formik: FormikContextType<any>) {
+    // Ensure selectedResources has been setup correctly.
+    if (!selectedResources || !setSelectedResources) {
+      console.error(
+        "selectionResources and setSelectionResources states must be passed to QueryPage in order to Selection Mode."
+      );
+      return;
+    }
+
     const itemIdsToDelete = formValues.itemIdsToDelete;
 
     const ids = toPairs(itemIdsToDelete)
@@ -441,7 +474,6 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Columns generated for the search results.
   const columnsResults: TableColumn<TData>[] = [
-    ...columns,
     ...(showRowCheckboxes || selectionMode
       ? [
           {
@@ -453,13 +485,13 @@ export function QueryPage<TData extends KitsuResource>({
             width: 200
           }
         ]
-      : [])
+      : []),
+    ...columns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
   const columnsSelected: TableColumn<TData>[] = selectionMode
     ? [
-        ...columns,
         ...(selectionMode
           ? [
               {
@@ -471,7 +503,8 @@ export function QueryPage<TData extends KitsuResource>({
                 width: 200
               }
             ]
-          : [])
+          : []),
+        ...columns
       ]
     : [];
 
@@ -634,43 +667,41 @@ export function QueryPage<TData extends KitsuResource>({
         role="search"
         aria-label={formatMessage({ id: "queryTable" })}
       >
-        <div className="mb-1">
-          <div className="d-flex align-items-end">
-            <span id="queryPageCount">
-              {/* Loading indicator when total is not calculated yet. */}
-              {loading ? (
-                <LoadingSpinner loading={true} />
-              ) : (
-                <CommonMessage
-                  id="tableTotalCount"
-                  values={{ totalCount: totalRecords }}
-                />
-              )}
-            </span>
-
-            {/* Multi sort tooltip - Only shown if it's possible to sort */}
-            {resolvedReactTableProps?.sortable !== false && (
-              <MultiSortTooltip />
-            )}
-
-            {/* Bulk edit buttons - Only shown when not in selection mode. */}
-            {!selectionMode && (
-              <div className="d-flex gap-3">
-                {bulkEditPath && (
-                  <BulkEditButton
-                    pathname={bulkEditPath}
-                    singleEditPathName={singleEditPath}
-                  />
-                )}
-                {bulkDeleteButtonProps && (
-                  <BulkDeleteButton {...bulkDeleteButtonProps} />
-                )}
-              </div>
-            )}
-          </div>
-        </div>
         <div className="row">
           <div className={selectionMode ? "col-5" : "col-12"}>
+            <div className="d-flex align-items-end">
+              <span id="queryPageCount">
+                {/* Loading indicator when total is not calculated yet. */}
+                {loading ? (
+                  <LoadingSpinner loading={true} />
+                ) : (
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: totalRecords }}
+                  />
+                )}
+              </span>
+
+              {/* Multi sort tooltip - Only shown if it's possible to sort */}
+              {resolvedReactTableProps?.sortable !== false && (
+                <MultiSortTooltip />
+              )}
+
+              {/* Bulk edit buttons - Only shown when not in selection mode. */}
+              {!selectionMode && (
+                <div className="d-flex gap-3 mb-2">
+                  {bulkEditPath && (
+                    <BulkEditButton
+                      pathname={bulkEditPath}
+                      singleEditPathName={singleEditPath}
+                    />
+                  )}
+                  {bulkDeleteButtonProps && (
+                    <BulkDeleteButton {...bulkDeleteButtonProps} />
+                  )}
+                </div>
+              )}
+            </div>
             <ReactTable
               // Column and data props
               columns={mappedResultsColumns}
@@ -731,18 +762,18 @@ export function QueryPage<TData extends KitsuResource>({
           </div>
           {selectionMode && (
             <>
-              <div className="col-2" style={{ marginTop: "100px" }}>
-                <div>
+              <div className="col-2 mt-5">
+                <div className="select-all-checked-button">
                   <FormikButton
-                    className="btn btn-primary w-100 mb-5 select-all-checked-button"
+                    className="btn btn-primary w-100 mb-5"
                     onClick={moveSelectedResultsToSelectedResources}
                   >
                     <FiChevronsRight />
                   </FormikButton>
                 </div>
-                <div>
+                <div className="deselect-all-checked-button">
                   <FormikButton
-                    className="btn btn-dark w-100 mb-5 deselect-all-checked-button"
+                    className="btn btn-dark w-100 mb-5"
                     onClick={removeSelectedResources}
                   >
                     <FiChevronsLeft />
@@ -750,10 +781,22 @@ export function QueryPage<TData extends KitsuResource>({
                 </div>
               </div>
               <div className="col-5">
+                <span id="selectedResourceCount">
+                  <CommonMessage
+                    id="tableSelectedCount"
+                    values={{ totalCount: selectedResources?.length ?? 0 }}
+                  />
+                </span>
                 <ReactTable
                   columns={mappedSelectedColumns}
                   data={selectedResources}
                   minRows={1}
+                  pageText={<CommonMessage id="page" />}
+                  noDataText={<CommonMessage id="noRowsFound" />}
+                  ofText={<CommonMessage id="of" />}
+                  rowsText={formatMessage({ id: "rows" })}
+                  previousText={<CommonMessage id="previous" />}
+                  nextText={<CommonMessage id="next" />}
                 />
               </div>
             </>

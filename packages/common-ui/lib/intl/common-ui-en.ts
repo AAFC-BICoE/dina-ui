@@ -131,6 +131,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
     "government information, scientific information, scientific research",
   submitBtnText: "Save",
   tableTotalCount: "Total matched records: {totalCount}",
+  tableSelectedCount: "Total selected records: {totalCount}",
   targetField: "Target Field",
   text: "Text",
   to: "To",
