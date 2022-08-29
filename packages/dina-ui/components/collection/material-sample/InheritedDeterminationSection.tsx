@@ -3,18 +3,31 @@ import { FieldSet, DinaForm } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api";
 import React from "react";
+import Link from "next/link";
 
 export interface InheritiedDeterminationSectionProps {
   materialSample: PersistedResource<MaterialSample>;
-  parentLink: JSX.Element;
-  inheritedDetermination: any;
 }
 
 export default function InheritedDeterminationSection({
-  materialSample,
-  parentLink,
-  inheritedDetermination: inheritedDetermination
+  materialSample
 }: InheritiedDeterminationSectionProps) {
+  // Find first parent with targetOrganismPrimaryDetermination in hierachy
+  const parentWithDetermination = materialSample.hierarchy?.find(
+    (hierachyItem) =>
+      hierachyItem.hasOwnProperty("organismPrimaryDetermination")
+  );
+
+  const inheritedDeterminations =
+    parentWithDetermination?.organismPrimaryDetermination.reduce();
+
+  const parentLink = (
+    <Link
+      href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
+    >
+      <a>{parentWithDetermination?.name}</a>
+    </Link>
+  );
   return (
     <FieldSet legend={<DinaMessage id="determination" />}>
       {materialSample.parentMaterialSample && (
@@ -37,7 +50,7 @@ export default function InheritedDeterminationSection({
               />
             </strong>
           </div>
-          {inheritedDetermination.scientificName}
+          {inheritedDeterminations[0].scientificName}
         </div>
       </DinaForm>
     </FieldSet>
