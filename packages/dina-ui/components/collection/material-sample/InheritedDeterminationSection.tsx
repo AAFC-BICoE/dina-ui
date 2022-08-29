@@ -17,9 +17,16 @@ export default function InheritedDeterminationSection({
     (hierachyItem) =>
       hierachyItem.hasOwnProperty("organismPrimaryDetermination")
   );
-
-  const inheritedDeterminations =
+  const organismPrimaryDeterminationArray =
     parentWithDetermination?.organismPrimaryDetermination;
+  let inheritedDeterminations =
+    organismPrimaryDeterminationArray[0].scientificName;
+  if (organismPrimaryDeterminationArray.length > 1) {
+    for (let i = 1; i < organismPrimaryDeterminationArray.length; i++) {
+      inheritedDeterminations +=
+        ", " + organismPrimaryDeterminationArray[i].scientificName;
+    }
+  }
 
   const parentLink = (
     <Link
@@ -50,7 +57,7 @@ export default function InheritedDeterminationSection({
               />
             </strong>
           </div>
-          {inheritedDeterminations[0].scientificName}
+          {inheritedDeterminations}
         </div>
       </DinaForm>
     </FieldSet>
