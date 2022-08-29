@@ -25,7 +25,7 @@ export function useStorageUnit(id?: string) {
           apiBaseUrl: "/collection-api",
           idField: "parentStorageUnit.id",
           joinField: "parentStorageUnit",
-          path: storageUnit =>
+          path: (storageUnit) =>
             `storage-unit/${storageUnit.parentStorageUnit?.id}?include=hierarchy`
         }
       ]
@@ -46,7 +46,7 @@ export default function StorageUnitEditPage() {
   const title = id ? "editStorageUnitTitle" : "addStorageUnitTitle";
 
   async function goToViewPage(resources: PersistedResource<StorageUnit>[]) {
-    const ids = resources.map(resource => resource.id);
+    const ids = resources.map((resource) => resource.id);
 
     if (resources.length === 1) {
       await router.push(`/collection/storage-unit/view?id=${resources[0].id}`);

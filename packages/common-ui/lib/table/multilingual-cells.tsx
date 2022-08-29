@@ -43,7 +43,7 @@ export function descriptionCell(accessor: string) {
 
       // Remove any blank descriptions.
       const descriptionPairs = multilingualDescription?.descriptions.filter(
-        description => description.desc !== ""
+        (description) => description.desc !== ""
       );
 
       // Loop through all of the descriptions provided, the preferred one is always the currently used language.
@@ -123,7 +123,7 @@ export function titleCell(accessor: string) {
 
       // Remove any blank titles.
       const titlePairs = multilingualTitle?.titles.filter(
-        titleItem => titleItem.title !== ""
+        (titleItem) => titleItem.title !== ""
       );
 
       // Loop through all of the titles provided, the preferred one is always the currently used language.

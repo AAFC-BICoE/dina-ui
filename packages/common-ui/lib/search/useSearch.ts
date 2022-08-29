@@ -22,7 +22,7 @@ export function useAutocompleteSearch<T extends KitsuResource>(
   const { apiClient } = useApiClient();
 
   return useDebouncedFetch({
-    fetcher: searchValue =>
+    fetcher: (searchValue) =>
       doSearch<T>(apiClient.axios, { ...doSearchParams, searchValue }),
     timeoutMs: doSearchParams.timeoutMs ?? 250
   });
@@ -83,7 +83,7 @@ export async function doSearch<T extends KitsuResource>(
   );
 
   const jsonApiDocs = compact(
-    response.data.hits?.map(hit => {
+    response.data.hits?.map((hit) => {
       if (hit?.source?.included) {
         return { data: hit?.source?.included?.[0] };
       } else {
@@ -95,7 +95,7 @@ export async function doSearch<T extends KitsuResource>(
   // Deserialize the responses to Kitsu format.
   const resources = await Promise.all(
     jsonApiDocs.map<Promise<PersistedResource<T>>>(
-      async doc => (await deserialise(doc)).data
+      async (doc) => (await deserialise(doc)).data
     )
   );
 

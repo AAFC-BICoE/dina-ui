@@ -36,7 +36,7 @@ export function TagSelectField({
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={tagsVal =>
+      readOnlyRender={(tagsVal) =>
         !!tagsVal?.length && (
           <div className="d-flex flex-wrap gap-2">
             {(tagsVal ?? []).map((tag, index) => (
@@ -129,10 +129,10 @@ function TagSelect({
   const previousTagsOptions = useMemo(
     () =>
       uniq(
-        compact((response?.data ?? []).flatMap(it => get(it, tagsFieldName)))
+        compact((response?.data ?? []).flatMap((it) => get(it, tagsFieldName)))
       )
-        .filter(tag => tag.includes(inputValue))
-        .map(tag => ({ label: tag, value: tag })),
+        .filter((tag) => tag.includes(inputValue))
+        .map((tag) => ({ label: tag, value: tag })),
     [response]
   );
 
@@ -143,9 +143,9 @@ function TagSelect({
   const selectedOptions = (value ?? []).map(toOption);
 
   const customStyle: any = {
-    multiValueLabel: base => ({ ...base, cursor: "move" }),
-    placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
-    control: base => ({
+    multiValueLabel: (base) => ({ ...base, cursor: "move" }),
+    placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+    control: (base) => ({
       ...base,
       ...(invalid && {
         borderColor: "rgb(148, 26, 37)",
@@ -155,7 +155,7 @@ function TagSelect({
   };
 
   function setAsStringArray(selected: TagSelectOption[]) {
-    onChange(selected.map(option => option.value));
+    onChange(selected.map((option) => option.value));
   }
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -166,7 +166,7 @@ function TagSelect({
     <SortableSelect
       // Input value:
       inputValue={inputValue}
-      onInputChange={newVal => setInputValue(newVal)}
+      onInputChange={(newVal) => setInputValue(newVal)}
       // Field value:
       value={selectedOptions}
       onChange={setAsStringArray}
@@ -188,7 +188,7 @@ function TagSelect({
         placeholder || formatMessage("typeNewTagOrSearchPreviousTags")
       }
       noOptionsMessage={() => formatMessage("typeNewTagOrSearchPreviousTags")}
-      formatCreateLabel={input => `${formatMessage("add")} "${input}"`}
+      formatCreateLabel={(input) => `${formatMessage("add")} "${input}"`}
       // react-sortable-hoc config:
       axis="xy"
       onSortEnd={onSortEnd}

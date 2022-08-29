@@ -40,7 +40,7 @@ export function FileUploadProviderImpl({ children }) {
         `/objectstore-api/file/${group}`,
         formData,
         {
-          transformResponse: data => fileUploadErrorHandler(data, file),
+          transformResponse: (data) => fileUploadErrorHandler(data, file),
           timeout: 0
         }
       );

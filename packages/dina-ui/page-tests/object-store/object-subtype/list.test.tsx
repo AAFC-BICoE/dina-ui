@@ -33,7 +33,7 @@ jest.mock("next/router", () => ({
 describe("Object subtype list page", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGet.mockImplementation(async path => {
+    mockGet.mockImplementation(async (path) => {
       if (path === "objectstore-api/object-subtype") {
         return { data: TEST_OBJECTSUBTYPES };
       }
