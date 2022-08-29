@@ -127,23 +127,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           (org) => !isEmpty(org)
         );
 
-        // Find first parent with targetOrganismPrimaryDetermination in hierachy
-        const parentWithDetermination = hasOrganism
+        const hasInheritedDetermination = hasOrganism
           ? null
           : materialSample?.hierarchy?.find((hierachyItem) =>
-              hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
+              hierachyItem.hasOwnProperty("organismPrimaryDetermination")
             );
-
-        const inheritedDetermination =
-          parentWithDetermination?.targetOrganismPrimaryDetermination;
-
-        const targetOrganismPrimaryDeterminationParentLink = (
-          <Link
-            href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
-          >
-            <a>{parentWithDetermination?.name}</a>
-          </Link>
-        );
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
@@ -252,14 +240,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 ))}
                 {hasPreparations && <PreparationField />}
                 {hasOrganism && <OrganismsField name="organism" />}
-                {inheritedDetermination && (
+                {hasInheritedDetermination && (
                   <div className="row">
                     <div className="col-md-6">
                       <InheritedDeterminationSection
-                        inheritedDetermination={inheritedDetermination}
-                        parentLink={
-                          targetOrganismPrimaryDeterminationParentLink
-                        }
                         materialSample={materialSample}
                       />
                     </div>
