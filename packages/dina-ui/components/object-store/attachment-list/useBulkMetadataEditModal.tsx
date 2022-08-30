@@ -58,12 +58,6 @@ export function useBulkMetadataEditModal() {
               />
             )
           )}
-          {/* <BulkMetadataEditor
-            objectUploadIds={objectUploadIds}
-            metadataIds={metadataIds}
-            group={group}
-            afterMetadatasSaved={afterMetadatasSavedInternal}
-          /> */}
         </div>
       </div>
     );
