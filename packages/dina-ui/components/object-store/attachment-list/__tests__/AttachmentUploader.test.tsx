@@ -1,3 +1,4 @@
+import { UploadingMetadataBulkEditor } from "../../../bulk-metadata/UploadingMetadataBulkEditor";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   FileUploader,
@@ -18,8 +19,8 @@ const mockPost = jest.fn(() => {
   };
 });
 
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: "11111111-1111-1111-1111-111111111111"
   }))
@@ -77,7 +78,7 @@ describe("AttachmentUploader component", () => {
     wrapper.update();
 
     // Renders the bulk editor with our prop passed in.
-    await wrapper.find(BulkMetadataEditor).prop<any>("afterMetadatasSaved")([
+    await wrapper.find(UploadingMetadataBulkEditor).prop<any>("onSaved")([
       "00000000-0000-0000-0000-000000000000",
       "11111111-1111-1111-1111-111111111111",
       "22222222-2222-2222-2222-222222222222"
