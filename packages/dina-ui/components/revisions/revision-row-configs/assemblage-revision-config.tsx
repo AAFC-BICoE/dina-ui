@@ -16,7 +16,7 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
     attachment: ({ original: { value } }) => (
       <div>
         {value?.map(
-          relation =>
+          (relation) =>
             relation && (
               <div>
                 <ReferenceLink<Metadata>
@@ -38,7 +38,7 @@ export const ASSEMBLAGE_REVISION_ROW_CONFIG: RevisionRowConfig<Assemblage> = {
     // Show the entire value of the metadata map in a key-value table:
     managedAttributes: ({ original: { value } }) => (
       <ManagedAttributesViewer
-        managedAttributeApiPath={key =>
+        managedAttributeApiPath={(key) =>
           `collection-api/managed-attribute/${key}`
         }
         values={value}

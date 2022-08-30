@@ -1,8 +1,12 @@
 import React from "react";
 import { FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import {
+  includedTypeQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The possible states of a boolean if the Equals match is being used.
@@ -71,28 +75,84 @@ export default function QueryRowBooleanSearch({
 
 /**
  * Using the query row for a boolean search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformBooleanSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
-  const { matchType, boolean: booleanValue } = queryRow;
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
+  const { matchType, boolean: booleanValue, parentType, parentName } = queryRow;
 
   switch (matchType) {
     // Empty for the boolean.
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "exists" }];
+      return parentType
+        ? {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              existsQuery(fieldName),
+                              includedTypeQuery(parentType)
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
+          }
+        : {
+            bool: {
+              must_not: existsQuery(fieldName)
+            }
+          };
 
     // Not Empty for the boolean.
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                }
+              }
+            }
+          }
+        : existsQuery(fieldName);
 
     // Exact match for the boolean.
     default:
-      return [
-        { queryOperator: "must", queryType: "term", value: booleanValue }
-      ];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldName, booleanValue, false),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : termQuery(fieldName, booleanValue, false);
   }
 }

@@ -28,7 +28,7 @@ export function Nav({ marginBottom = true }: NavProps) {
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
+      ?.flatMap((it) => it)
       ?.includes("collection-manager") || isAdmin;
 
   return (

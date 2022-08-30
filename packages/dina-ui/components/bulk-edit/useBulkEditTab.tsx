@@ -33,7 +33,7 @@ export function useBulkEditTab({
     formRef: bulkEditFormRef,
     key: "EDIT_ALL",
     title: formatMessage("editAll"),
-    content: isSelected =>
+    content: (isSelected) =>
       hideBulkEditTab ? null : (
         <BulkEditTabContext.Provider value={ctx}>
           {React.cloneElement(resourceForm, { isOffScreen: !isSelected })}

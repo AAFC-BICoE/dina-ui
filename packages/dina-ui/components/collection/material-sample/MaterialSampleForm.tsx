@@ -206,7 +206,7 @@ export function MaterialSampleForm({
     MaterialSampleFormSectionId,
     (id: string) => ReactNode
   > = {
-    "identifiers-section": id =>
+    "identifiers-section": (id) =>
       !reduceRendering && (
         <MaterialSampleIdentifiersSection
           id={id}
@@ -214,20 +214,20 @@ export function MaterialSampleForm({
           hideUseSequence={hideUseSequence}
         />
       ),
-    "material-sample-info-section": id =>
+    "material-sample-info-section": (id) =>
       !reduceRendering && <MaterialSampleInfoSection id={id} />,
-    "collecting-event-section": id =>
+    "collecting-event-section": (id) =>
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
           legend={<DinaMessage id="collectingEvent" />}
-          briefDetails={colEvent => (
+          briefDetails={(colEvent) => (
             <CollectingEventBriefDetails collectingEvent={colEvent} />
           )}
           linkerTabContent={
             reduceRendering ? null : (
               <CollectingEventLinker
-                onCollectingEventSelect={colEventToLink => {
+                onCollectingEventSelect={(colEventToLink) => {
                   setColEventId(colEventToLink.id);
                 }}
               />
@@ -243,12 +243,12 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    "acquisition-event-section": id =>
+    "acquisition-event-section": (id) =>
       dataComponentState.enableAcquisitionEvent && (
         <TabbedResourceLinker<AcquisitionEvent>
           fieldSetId={id}
           legend={<DinaMessage id="acquisitionEvent" />}
-          briefDetails={acqEvent => (
+          briefDetails={(acqEvent) => (
             <DinaForm initialValues={acqEvent} readOnly={true}>
               <AcquisitionEventFormLayout />
             </DinaForm>
@@ -256,7 +256,7 @@ export function MaterialSampleForm({
           linkerTabContent={
             reduceRendering ? null : (
               <AcquisitionEventLinker
-                onAcquisitionEventSelect={acqEventToLink => {
+                onAcquisitionEventSelect={(acqEventToLink) => {
                   setAcqEventId(acqEventToLink.id);
                 }}
               />
@@ -272,10 +272,10 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    "preparations-section": id =>
+    "preparations-section": (id) =>
       !reduceRendering &&
       dataComponentState.enablePreparations && <PreparationField id={id} />,
-    "organisms-section": id =>
+    "organisms-section": (id) =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (
         <OrganismsField
@@ -286,10 +286,10 @@ export function MaterialSampleForm({
           }
         />
       ),
-    "associations-section": id =>
+    "associations-section": (id) =>
       !reduceRendering &&
       dataComponentState.enableAssociations && <AssociationsField id={id} />,
-    "storage-section": id =>
+    "storage-section": (id) =>
       !reduceRendering &&
       dataComponentState.enableStorage && (
         <FieldSet
@@ -304,15 +304,15 @@ export function MaterialSampleForm({
           />
         </FieldSet>
       ),
-    "restriction-section": id =>
+    "restriction-section": (id) =>
       !reduceRendering &&
       dataComponentState.enableRestrictions && <RestrictionField id={id} />,
-    "scheduled-actions-section": id =>
+    "scheduled-actions-section": (id) =>
       !reduceRendering &&
       dataComponentState.enableScheduledActions && (
         <ScheduledActionsField
           id={id}
-          wrapContent={content => (
+          wrapContent={(content) => (
             <BulkEditTabWarning
               targetType="material-sample"
               fieldName="scheduledActions"
@@ -322,7 +322,7 @@ export function MaterialSampleForm({
           )}
         />
       ),
-    "managedAttributes-section": id =>
+    "managedAttributes-section": (id) =>
       !reduceRendering && (
         <DinaFormSection
           // Disabled the template's restrictions for this section:
@@ -350,7 +350,7 @@ export function MaterialSampleForm({
           </div>
         </DinaFormSection>
       ),
-    "material-sample-attachments-section": id =>
+    "material-sample-attachments-section": (id) =>
       !reduceRendering && (
         <AttachmentsField
           name={attachmentsField}
@@ -360,7 +360,7 @@ export function MaterialSampleForm({
           allowExistingFieldName="attachmentsConfig.allowExisting"
           allowAttachmentsConfig={attachmentsConfig?.materialSample}
           attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
-          wrapContent={content => (
+          wrapContent={(content) => (
             <BulkEditTabWarning
               targetType="material-sample"
               fieldName={attachmentsField}
@@ -375,7 +375,7 @@ export function MaterialSampleForm({
   const formSectionPairs = toPairs(formSections);
 
   const sortedFormSectionPairs = uniq([
-    ...compact([].map(id => formSectionPairs.find(([it]) => it === id))),
+    ...compact([].map((id) => formSectionPairs.find(([it]) => it === id))),
     ...formSectionPairs
   ]);
 

@@ -44,7 +44,7 @@ export default function SangerWorkFlowRunPage() {
         <Tabs selectedIndex={stepNumber} onSelect={goToStep}>
           <TabList>
             <Tab>{formatMessage("pcrBatch")}</Tab>
-            <Tab disabled={!pcrBatchId}>{formatMessage("selectSamples")}</Tab>
+            <Tab disabled={!pcrBatchId}>{formatMessage("selectMaterialSamples")}</Tab>
           </TabList>
           <TabPanel>
             <SangerPcrBatchStep

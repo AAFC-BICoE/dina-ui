@@ -28,10 +28,7 @@ import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
 }
@@ -206,10 +203,7 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
 }
 
 interface BulkMetadataSaveParams {
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   metadataPreProcessor?: () => (
     metadata: InputResource<Metadata>
   ) => Promise<InputResource<Metadata>>;
@@ -328,8 +322,9 @@ function useBulkMetadataSave({
       const savedMetadata = await save<Metadata>(saveOperations, {
         apiBaseUrl: "/objectstore-api"
       });
+      const savedMetadataIds = savedMetadata.map((metadata) => metadata.id);
 
-      await onSaved(savedMetadata);
+      await onSaved(savedMetadataIds);
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {

@@ -84,15 +84,15 @@ export function PreparationField({
       <div className="row">
         <div className="col-md-6">
           <FieldSpy<string> fieldName="group">
-            {group => (
+            {(group) => (
               <div>
                 <ResourceSelectField<PreparationType>
                   {...fieldProps("preparationType")}
                   model="collection-api/preparation-type"
-                  optionLabel={it => it.name}
+                  optionLabel={(it) => it.name}
                   readOnlyLink="/collection/preparation-type/view?id="
                   className="preparation-type"
-                  filter={input =>
+                  filter={(input) =>
                     group
                       ? {
                           ...filterBy(["name"])(input),
@@ -107,10 +107,10 @@ export function PreparationField({
                 <ResourceSelectField<PreparationMethod>
                   {...fieldProps("preparationMethod")}
                   model="collection-api/preparation-method"
-                  optionLabel={it => it.name}
+                  optionLabel={(it) => it.name}
                   readOnlyLink="/collection/preparation-method/view?id="
                   className="preparation-method"
-                  filter={input =>
+                  filter={(input) =>
                     group
                       ? {
                           ...filterBy(["name"])(input),
@@ -154,9 +154,9 @@ export function PreparationField({
               query: () => ({
                 path: "collection-api/vocabulary/degreeOfEstablishment"
               }),
-              option: vocabElement =>
+              option: (vocabElement) =>
                 vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
+                  (it) => it?.labels?.[locale] ?? ""
                 ) ?? ""
             }}
             blankSearchBackend={"json-api"}
@@ -165,14 +165,14 @@ export function PreparationField({
           <PersonSelectField {...fieldProps("preparedBy")} />
           <DateField {...fieldProps("preparationDate")} />
           <FieldSpy<string> fieldName="group">
-            {group => (
+            {(group) => (
               <ResourceSelectField<Protocol>
                 {...fieldProps("preparationProtocol")}
                 model="collection-api/protocol"
-                optionLabel={it => it.name}
+                optionLabel={(it) => it.name}
                 readOnlyLink="/collection/protocol/view?id="
                 className="protocol"
-                filter={input =>
+                filter={(input) =>
                   group
                     ? {
                         ...filterBy(["name"])(input),

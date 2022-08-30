@@ -4,8 +4,6 @@ import { useRouter } from "next/router";
 import { Footer, Head, Nav } from "../../../components";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { BULK_ADD_IDS_KEY } from "../upload";
-import { Metadata } from "../../../types/objectstore-api";
-import { PersistedResource } from "kitsu";
 import { ExistingMetadataBulkEditor } from "../../../components/bulk-metadata/ExistingMetadataBulkEditor";
 import { UploadingMetadataBulkEditor } from "../../../components/bulk-metadata/UploadingMetadataBulkEditor";
 
@@ -21,15 +19,12 @@ export default function MetadataBulkEditPage() {
     return <LoadingSpinner loading={true} />;
   }
 
-  async function onSaved(
-    ids: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) {
+  async function onSaved(ids: string[], isExternalResource?: boolean) {
     if (ids.length === 1) {
       await router.push(
         `/object-store/object/${
           isExternalResource ? "external-resource-view" : "view"
-        }?id=${ids[0].id}`
+        }?id=${ids[0]}`
       );
     } else {
       await router.push("/object-store/object/list");

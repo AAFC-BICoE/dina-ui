@@ -19,7 +19,7 @@ export function MetadataFileView({
 
   // If there is a linked "LARGE_IMAGE" Derivative then render it:
   const fileToDisplay =
-    metadata.derivatives?.find(it => it.derivativeType === "LARGE_IMAGE") ??
+    metadata.derivatives?.find((it) => it.derivativeType === "LARGE_IMAGE") ??
     metadata;
 
   const fileId = fileToDisplay.fileIdentifier;
@@ -34,10 +34,10 @@ export function MetadataFileView({
   const COMMON_LINK_ROOT = "/api/objectstore-api/file/";
 
   const largeImgDerivative = metadata.derivatives?.find(
-    it => it.derivativeType === "LARGE_IMAGE"
+    (it) => it.derivativeType === "LARGE_IMAGE"
   );
   const thumbnailImgDerivative = metadata.derivatives?.find(
-    it => it.derivativeType === "THUMBNAIL_IMAGE"
+    (it) => it.derivativeType === "THUMBNAIL_IMAGE"
   );
 
   downloadLinks.original = `${COMMON_LINK_ROOT}${metadata.bucket}/${metadata.fileIdentifier}`;
