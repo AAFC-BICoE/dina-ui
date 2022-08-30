@@ -47,7 +47,7 @@ export function UploadingMetadataBulkEditor({
         }
       );
     }
-    const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
+    const newMetadatas = objectUploads?.map<Metadata>((objectUpload) => ({
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
         ? moment(objectUpload.dateTimeDigitized).format()
