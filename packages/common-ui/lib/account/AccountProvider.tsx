@@ -98,22 +98,9 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     keycloakGroups &&
     keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
-  // Will convert group role paths.
-  // Example ["/group1/role1", "/group1/role2/", "/group2/role1"] -> ["group1": ["role1", "role2"], "group2": ["role1"]]
-  const rolesPerGroup: Record<string, string[] | undefined> =
-    keycloakGroups &&
-    keycloakGroups.reduce((previousValue, currentPath) => {
-      const splitPaths = currentPath.split("/").filter((path) => path);
-
-      // The group (example: "aafc")
-      const group = splitPaths[0];
-
-      // The role (example: "dina-admin")
-      const role = splitPaths[1];
-
-      previousValue[group] = [...(previousValue[group] ?? []), role];
-      return previousValue;
-    }, {} as Record<string, string[] | undefined>);
+  const rolesPerGroup = generateKeycloakRolesPerGroup(
+    keycloakGroups as string[]
+  );
 
   return (
     <AccountProvider
@@ -150,4 +137,45 @@ export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
       // Get only the group name immediately after the first slash:
       .map((groupName) => groupName.split("/")[1])
   );
+}
+
+/**
+ * Takes an array of role group paths and combines it into a unique records.
+ *
+ * If only the role is provided, then it will be ignored.
+ *
+ * Example:
+ * From:
+ * Example ["/group1/role1", "/group1/role2/", "/group2/role1", "role3"]
+ *
+ * To:
+ * ["group1": ["role1", "role2"], "group2": ["role1"]]
+ *
+ * @param keycloakGroups string keycloak paths of the group and role.
+ * @returns unique keys of the group, with the roles for each value.
+ */
+export function generateKeycloakRolesPerGroup(
+  keycloakGroups: string[]
+): Record<string, string[] | undefined> | undefined {
+  if (!keycloakGroups) {
+    return;
+  }
+
+  return keycloakGroups.reduce((previousValue, currentPath) => {
+    const splitPaths = currentPath.split("/").filter((path) => path);
+
+    // If only the role was provided, ignore it.
+    if (splitPaths.length !== 2) {
+      return previousValue;
+    }
+
+    // The group (example: "aafc")
+    const group = splitPaths[0];
+
+    // The role (example: "dina-admin")
+    const role = splitPaths[1];
+
+    previousValue[group] = [...(previousValue[group] ?? []), role];
+    return previousValue;
+  }, {} as Record<string, string[] | undefined>);
 }
