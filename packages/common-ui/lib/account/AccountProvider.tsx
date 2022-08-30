@@ -6,8 +6,6 @@ import {
   useState,
   useEffect
 } from "react";
-import { useQuery } from "..";
-import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
 import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 
@@ -70,6 +68,18 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+  // Non-authenticated users should never see the the full website. Display a loading indicator.
+  if (!authenticated || !initialized) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ marginTop: "calc(50vh - 10px)" }}
+      >
+        <LoadingSpinner loading={true} />
+      </div>
+    );
+  }
+
   const token = keycloak?.token;
 
   const tokenParsed = keycloak?.tokenParsed;
@@ -88,20 +98,22 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     keycloakGroups &&
     keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
-  const userQuery = useQuery<DinaUser>(
-    { path: `user-api/user/${subject}` },
-    { disabled: !subject }
-  );
+  // Will convert group role paths.
+  // Example ["/group1/role1", "/group1/role2/", "/group2/role1"] -> ["group1": ["role1", "role2"], "group2": ["role1"]]
+  const rolesPerGroup: Record<string, string[] | undefined> =
+    keycloakGroups &&
+    keycloakGroups.reduce((previousValue, currentPath) => {
+      const splitPaths = currentPath.split("/").filter((path) => path);
 
-  const rolesPerGroup = userQuery.response?.data?.rolesPerGroup;
+      // The group (example: "aafc")
+      const group = splitPaths[0];
 
-  // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
-  const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
+      // The role (example: "dina-admin")
+      const role = splitPaths[1];
 
-  // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated) {
-    return <LoadingSpinner loading={true} />;
-  }
+      previousValue[group] = [...(previousValue[group] ?? []), role];
+      return previousValue;
+    }, {} as Record<string, string[] | undefined>);
 
   return (
     <AccountProvider
@@ -116,7 +128,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         token,
         username,
         subject,
-        isAdmin,
+        isAdmin: rolesPerGroup?.aafc?.includes("dina-admin") ?? false,
         rolesPerGroup
       }}
     >

@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
@@ -7,8 +7,10 @@ export function AuthenticatedApiClientProvider({
   children
 }: PropsWithChildren<{}>) {
   const apiContext = useApiClient();
-  const { authenticated, initialized, token } = useAccount();
+  const { token } = useAccount();
   const authTokenRef = useRef<string>();
+  const [authSetup, setAuthSetup] = useState<boolean>(false);
+
   // Update the token ref on every render:
   authTokenRef.current = token;
 
@@ -21,7 +23,9 @@ export function AuthenticatedApiClientProvider({
       config.headers.Authorization = `Bearer ${authTokenRef.current}`;
       return config;
     });
+
+    setAuthSetup(true);
   }, [apiContext.apiClient.axios]);
 
-  return <>{authenticated && initialized ? children : null}</>;
+  return <>{authSetup ? children : null}</>;
 }
