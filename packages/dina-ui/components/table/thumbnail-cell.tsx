@@ -8,13 +8,10 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
   return {
     Cell: ({ original }) => {
       const fileIdentifier = get<string | undefined>(
-        original?.data?.attributes,
+        original,
         fileIdentifierField
       );
-      const bucket = get<string | undefined>(
-        original?.data?.attributes,
-        bucketField
-      );
+      const bucket = get<string | undefined>(original, bucketField);
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
@@ -44,8 +41,8 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
     // These fields are required in the elastic search response for this cell to work.
     additionalAccessors: [
       "data.attributes.resourceExternalURL",
-      "data.attributes." + fileIdentifierField,
-      "data.attributes." + bucketField
+      "data.attributes.fileIdentifier",
+      "data.attributes.bucket"
     ]
   };
 }
