@@ -91,7 +91,7 @@ export function TagsAndRestrictionsSection({
           )}
           <DinaFormSection horizontal={false}>
             <FieldSpy<boolean> fieldName="publiclyReleasable">
-              {pr =>
+              {(pr) =>
                 pr === false ? (
                   <TextField
                     name="notPubliclyReleasableReason"

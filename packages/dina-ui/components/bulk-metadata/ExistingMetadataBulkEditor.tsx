@@ -20,7 +20,7 @@ export function ExistingMetadataBulkEditor({
   onSaved,
   onPreviousClick
 }: ExistingMetadataBulkEditorProps) {
-  const metadataQueries = ids.map(id => useMetadataEditQuery(id));
+  const metadataQueries = ids.map((id) => useMetadataEditQuery(id));
 
   /** Whether any query is loading. */
   const isLoading = metadataQueries.reduce(
@@ -28,7 +28,7 @@ export function ExistingMetadataBulkEditor({
     false
   );
 
-  const errors = compact(metadataQueries.map(query => query.error));
+  const errors = compact(metadataQueries.map((query) => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -39,7 +39,7 @@ export function ExistingMetadataBulkEditor({
       <div className="alert alert-danger">
         {errors.map((error, index) => (
           <div key={index}>
-            {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
+            {error?.errors?.map((e) => e.detail).join("\n") ?? String(error)}
           </div>
         ))}
       </div>
@@ -48,7 +48,7 @@ export function ExistingMetadataBulkEditor({
 
   const metadatas = compact(
     metadataQueries.map(
-      query => query.response?.data as InputResource<Metadata>
+      (query) => query.response?.data as InputResource<Metadata>
     )
   );
 

@@ -1,8 +1,13 @@
 import React from "react";
 import { NumberField, FieldSpy } from "../..";
 import { SelectField } from "../../formik-connected/SelectField";
-import { ElasticSearchQueryParams } from "../../util/transformToDSL";
 import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import {
+  includedTypeQuery,
+  rangeQuery,
+  termQuery,
+  existsQuery
+} from "../../util/transformToDSL";
 
 /**
  * The match options when a number search is being performed.
@@ -68,14 +73,12 @@ export default function QueryRowNumberSearch({
 
 /**
  * Using the query row for a number search, generate the elastic search request to be made.
- *
- * @param builder The elastic search bodybuilder object.
- * @param queryRow The query row to be used.
  */
 export function transformNumberSearchToDSL(
-  queryRow: QueryRowExportProps
-): ElasticSearchQueryParams[] {
-  const { matchType, number: numberValue } = queryRow;
+  queryRow: QueryRowExportProps,
+  fieldName: string
+): any {
+  const { matchType, number: numberValue, parentType, parentName } = queryRow;
 
   switch (matchType) {
     // less than / greater than / less than or equal to / greater than or equal to.
@@ -83,31 +86,156 @@ export function transformNumberSearchToDSL(
     case "greaterThanOrEqualTo":
     case "lessThan":
     case "lessThanOrEqualTo":
-      return [
-        {
-          queryOperator: "must",
-          queryType: "range",
-          value: buildNumberRangeObject(matchType, numberValue)
-        }
-      ];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    rangeQuery(
+                      fieldName,
+                      buildNumberRangeObject(matchType, numberValue)
+                    ),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : rangeQuery(fieldName, buildNumberRangeObject(matchType, numberValue));
 
     // Not equals match type.
     case "notEquals":
-      return [
-        { queryOperator: "must_not", queryType: "term", value: numberValue }
-      ];
+      return parentType
+        ? {
+            bool: {
+              should: [
+                // If the field does exist, then search for everything that does NOT match the term.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: termQuery(fieldName, numberValue, false),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // If it's included but the field doesn't exist, then it's not equal either.
+                {
+                  nested: {
+                    path: "included",
+                    query: {
+                      bool: {
+                        must_not: existsQuery(fieldName),
+                        must: includedTypeQuery(parentType)
+                      }
+                    }
+                  }
+                },
+
+                // And if it's not included, then it's not equal either.
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
+          }
+        : {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: termQuery(fieldName, numberValue, false)
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(fieldName)
+                  }
+                }
+              ]
+            }
+          };
 
     // Empty values only. (only if the value is not mandatory)
     case "empty":
-      return [{ queryOperator: "must_not", queryType: "exists" }];
+      return parentType
+        ? {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    must_not: {
+                      nested: {
+                        path: "included",
+                        query: {
+                          bool: {
+                            must: [
+                              existsQuery(fieldName),
+                              includedTypeQuery(parentType)
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    must_not: existsQuery(
+                      "data.relationships." + parentName + ".data.id"
+                    )
+                  }
+                }
+              ]
+            }
+          }
+        : {
+            bool: {
+              must_not: existsQuery(fieldName)
+            }
+          };
 
     // Not empty values only. (only if the value is not mandatory)
     case "notEmpty":
-      return [{ queryOperator: "must", queryType: "exists" }];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                }
+              }
+            }
+          }
+        : existsQuery(fieldName);
 
     // Equals and default case
     default:
-      return [{ queryOperator: "must", queryType: "term", value: numberValue }];
+      return parentType
+        ? {
+            nested: {
+              path: "included",
+              query: {
+                bool: {
+                  must: [
+                    termQuery(fieldName, numberValue, false),
+                    includedTypeQuery(parentType)
+                  ]
+                }
+              }
+            }
+          }
+        : termQuery(fieldName, numberValue, false);
   }
 }
 

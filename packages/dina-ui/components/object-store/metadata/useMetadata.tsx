@@ -28,7 +28,7 @@ export function useMetadataEditQuery(id?: string | null) {
           apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
+          path: (metadata) => `person/${metadata.dcCreator.id}`
         }
       ],
       onSuccess: async ({ data: metadata }) => {
@@ -59,19 +59,19 @@ export function useMetadataViewQuery(id?: string) {
           apiBaseUrl: "/agent-api",
           idField: "acMetadataCreator",
           joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator.id}`
+          path: (metadata) => `person/${metadata.acMetadataCreator.id}`
         },
         {
           apiBaseUrl: "/agent-api",
           idField: "dcCreator",
           joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
+          path: (metadata) => `person/${metadata.dcCreator.id}`
         },
         {
           apiBaseUrl: "/objectstore-api",
           idField: "fileIdentifier",
           joinField: "objectUpload",
-          path: metadata => `object-upload/${metadata.fileIdentifier}`
+          path: (metadata) => `object-upload/${metadata.fileIdentifier}`
         }
       ]
     }

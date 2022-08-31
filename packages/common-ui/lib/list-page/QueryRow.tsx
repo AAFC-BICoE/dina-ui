@@ -152,7 +152,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   );
 
   const dataFromIndexMapping = esIndexMapping?.find(
-    attribute => attribute.value === fieldName
+    (attribute) => attribute.value === fieldName
   );
 
   // Depending on the type, it changes what fields need to be displayed.
@@ -177,7 +177,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   function onSelectionChange(value) {
     const newDataFromIndexMapping = esIndexMapping.find(
-      attribute => attribute.value === value
+      (attribute) => attribute.value === value
     );
 
     formikProps.setFieldValue(`${name}[${index}]`, {
@@ -195,8 +195,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = esIndexMapping
-    ?.filter(prop => !prop.parentPath)
-    ?.map(prop => ({
+    ?.filter((prop) => !prop.parentPath)
+    ?.map((prop) => ({
       label: messages["field_" + prop.label]
         ? formatMessage({ id: "field_" + prop.label })
         : startCase(prop.label),
@@ -206,8 +206,8 @@ export function QueryRow(queryRowProps: QueryRowProps) {
 
   // Get all the relationships for the search dropdown.
   const nestedRowOptions = esIndexMapping
-    ?.filter(prop => !!prop.parentPath)
-    ?.map(prop => {
+    ?.filter((prop) => !!prop.parentPath)
+    ?.map((prop) => {
       return {
         parentName: prop.parentName,
         label: messages["field_" + prop.label]
@@ -221,7 +221,7 @@ export function QueryRow(queryRowProps: QueryRowProps) {
   // Using the parent name, group the relationships into sections.
   const groupedNestRowOptions = lodash
     .chain(nestedRowOptions)
-    .groupBy(prop => prop.parentName)
+    .groupBy((prop) => prop.parentName)
     .map((group, key) => {
       return {
         label: messages["title_" + key]

@@ -80,7 +80,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   );
 }
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "agent-api/person":
     case "collection-api/collection":
@@ -107,7 +107,7 @@ const mockGet = jest.fn<any, any>(async path => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
-  return paths.map(path => {
+  return paths.map((path) => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.a":
         return {
@@ -140,8 +140,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   });
 });
 
-const mockSave = jest.fn<any, any>(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn<any, any>((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
   }))
@@ -224,7 +224,7 @@ describe("Material sample bulk edit tab", () => {
     wrapper
       .find(".material-sample-nav")
       .find(Switch)
-      .forEach(node => node.prop<any>("onChange")(true));
+      .forEach((node) => node.prop<any>("onChange")(true));
 
     await new Promise(setImmediate);
     wrapper.update();

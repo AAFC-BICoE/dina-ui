@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { MolecularSample } from "./MolecularSample";
 import { PcrBatch } from "./PcrBatch";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface PcrBatchItemAttributes {
   type: "pcr-batch-item";
@@ -11,7 +11,7 @@ export interface PcrBatchItemAttributes {
 
 export interface PcrBatchItemRelationships {
   pcrBatch?: PcrBatch;
-  sample?: MolecularSample;
+  materialSample?: ResourceIdentifierObject;
 }
 
 export type PcrBatchItem = KitsuResource &

@@ -23,9 +23,9 @@ export function SelectNavigation<T extends { key: string }>({
     value: element
   }));
 
-  const selectedIndex = options.findIndex(it => it.value.key === value.key);
+  const selectedIndex = options.findIndex((it) => it.value.key === value.key);
 
-  const selectValue = options.find(option => option.value.key === value.key);
+  const selectValue = options.find((option) => option.value.key === value.key);
 
   const leftDisabled = selectedIndex <= 0;
   const rightDisabled = selectedIndex >= elements.length - 1;
@@ -33,8 +33,8 @@ export function SelectNavigation<T extends { key: string }>({
   const invalid = !!invalidElements?.length;
 
   const customStyle = {
-    menu: base => ({ ...base, zIndex: 1050 }),
-    control: base => ({
+    menu: (base) => ({ ...base, zIndex: 1050 }),
+    control: (base) => ({
       ...base,
       ...(invalid && {
         borderColor: "rgb(148, 26, 37)",
@@ -69,7 +69,7 @@ export function SelectNavigation<T extends { key: string }>({
           <div className="fw-bold">Navigation</div>
           <Select
             options={options}
-            onChange={newVal => newVal?.value && onChange(newVal?.value)}
+            onChange={(newVal) => newVal?.value && onChange(newVal?.value)}
             value={selectValue}
             styles={customStyle}
           />

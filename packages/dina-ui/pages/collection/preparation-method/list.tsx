@@ -33,7 +33,7 @@ export default function preparationMethodListPage() {
       buttonBarContent={buttonBarContent}
     >
       <ListPageLayout
-        additionalFilters={filterForm => ({
+        additionalFilters={(filterForm) => ({
           // Apply group filter:
           ...(filterForm.group && { rsql: `group==${filterForm.group}` })
         })}

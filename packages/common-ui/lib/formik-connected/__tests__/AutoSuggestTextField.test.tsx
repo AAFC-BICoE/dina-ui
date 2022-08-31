@@ -67,7 +67,7 @@ const mockGetFailure = jest.fn(async () => {
 const mockGetAxios = jest.fn(async () => PERSON_TEST_DATA_ELASTICSEARCH);
 
 // JSON API and Elastic Search mock responses.
-const mockGetAll = jest.fn(async path => {
+const mockGetAll = jest.fn(async (path) => {
   if (path === "agent-api/person") {
     return PERSON_TEST_DATA_JSON_API;
   } else if (path === "search-api/search-ws/auto-complete") {
@@ -121,13 +121,13 @@ describe("AutoSuggestTextField", () => {
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
           jsonApiBackend={{
-            query: searchValue => ({
+            query: (searchValue) => ({
               path: "agent-api/person",
               filter: {
                 rsql: `name==*${searchValue}*`
               }
             }),
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           timeoutMs={0}
         />
@@ -179,7 +179,7 @@ describe("AutoSuggestTextField", () => {
           elasticSearchBackend={{
             indexName: "dina_agent_index",
             searchField: "data.attributes.name",
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           timeoutMs={0}
         />
@@ -234,7 +234,7 @@ describe("AutoSuggestTextField", () => {
       <DinaForm initialValues={{}}>
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
-          customOptions={value => [
+          customOptions={(value) => [
             "suggestion-1",
             "suggestion-2",
             "suggestion-" + value
@@ -268,16 +268,16 @@ describe("AutoSuggestTextField", () => {
           elasticSearchBackend={{
             indexName: "dina_agent_index",
             searchField: "data.attributes.name",
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           jsonApiBackend={{
-            query: searchValue => ({
+            query: (searchValue) => ({
               path: "agent-api/person",
               filter: {
                 rsql: `name==*${searchValue}*`
               }
             }),
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           preferredBackend={"json-api"}
           timeoutMs={0}
@@ -323,16 +323,16 @@ describe("AutoSuggestTextField", () => {
           elasticSearchBackend={{
             indexName: "dina_agent_index",
             searchField: "data.attributes.name",
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           jsonApiBackend={{
-            query: searchValue => ({
+            query: (searchValue) => ({
               path: "agent-api/person",
               filter: {
                 rsql: `name==*${searchValue}*`
               }
             }),
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           preferredBackend={"json-api"}
           timeoutMs={0}
@@ -374,13 +374,13 @@ describe("AutoSuggestTextField", () => {
         <AutoSuggestTextField<Person>
           name="examplePersonNameField"
           jsonApiBackend={{
-            query: searchValue => ({
+            query: (searchValue) => ({
               path: "agent-api/person",
               filter: {
                 rsql: `name==*${searchValue}*`
               }
             }),
-            option: person => person?.name
+            option: (person) => person?.name
           }}
           timeoutMs={0}
         />

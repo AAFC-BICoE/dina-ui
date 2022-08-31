@@ -106,21 +106,28 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
               term: {
                 "data.attributes.materialSampleName.keyword": "CNC001"
               }
             },
+
+            // Second Query Row
             {
               match: {
                 "data.attributes.materialSampleType": "WHOLE_ORGANISM"
               }
             },
+
+            // Third Query Row
             {
               term: {
                 "data.attributes.allowDuplicateName": "true"
               }
             },
+
+            // Forth Query Row
             {
               term: {
                 "data.attributes.createdOn": "2022-04-11"
@@ -184,6 +191,7 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -191,6 +199,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Second Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -198,6 +208,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Third Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -205,6 +217,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Forth Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -212,6 +226,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Fifth Query Row
             {
               term: {
                 "data.attributes.createdOn": "2022-04-15"
@@ -263,6 +279,7 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // First Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -272,6 +289,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Second Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -281,6 +300,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Third Query Row
             {
               range: {
                 "data.attributes.createdOn": {
@@ -300,6 +321,7 @@ describe("Transform to DSL query function", () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "",
       queryRows: [
+        // Query Row #1
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
@@ -307,6 +329,8 @@ describe("Transform to DSL query function", () => {
           matchType: "equals",
           textMatchType: "partial"
         },
+
+        // Query Row #2
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
@@ -314,18 +338,24 @@ describe("Transform to DSL query function", () => {
           matchType: "equals",
           textMatchType: "exact"
         },
+
+        // Query Row #3
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
           matchType: "notEmpty"
         },
+
+        // Query Row #4
         {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
           matchType: "empty"
         },
+
+        // Query Row #5
         {
           fieldName: "collection.name",
           type: "text",
@@ -336,6 +366,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #6
         {
           fieldName: "collection.name",
           type: "text",
@@ -346,6 +378,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #7
         {
           fieldName: "collection.name",
           type: "text",
@@ -355,6 +389,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #8
         {
           fieldName: "collection.name",
           type: "text",
@@ -382,57 +418,101 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // Query Row #1
             {
               match: {
                 "data.attributes.materialSampleName": "test"
               }
             },
+
+            // Query Row #2
             {
               term: {
                 "data.attributes.materialSampleName.keyword": "test"
               }
             },
+
+            // Query Row #3
             {
-              wildcard: {
-                "data.attributes.materialSampleName": "*"
+              bool: {
+                must: {
+                  exists: {
+                    field: "data.attributes.materialSampleName"
+                  }
+                },
+                must_not: {
+                  term: {
+                    "data.attributes.materialSampleName.keyword": ""
+                  }
+                }
               }
             },
+
+            // Query Row #4
+            {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.attributes.materialSampleName"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      must: {
+                        term: {
+                          "data.attributes.materialSampleName.keyword": ""
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+
+            // Query Row #5
             {
               nested: {
                 path: "included",
                 query: {
                   bool: {
                     must: [
-                      {
-                        match: {
-                          "included.type": "collection"
-                        }
-                      },
                       {
                         match: {
                           "included.attributes.name": "test"
                         }
+                      },
+                      {
+                        term: {
+                          "included.type": "collection"
+                        }
                       }
                     ]
                   }
                 }
               }
             },
+
+            // Query Row #6
             {
               nested: {
                 path: "included",
                 query: {
                   bool: {
                     must: [
-                      {
-                        match: {
-                          "included.type": "collection"
-                        }
-                      },
                       {
                         term: {
                           "included.attributes.name.keyword": "test"
                         }
+                      },
+                      {
+                        term: {
+                          "included.type": "collection"
+                        }
                       }
                     ]
                   }
@@ -446,46 +526,90 @@ describe("Transform to DSL query function", () => {
                   bool: {
                     must: [
                       {
-                        match: {
+                        term: {
                           "included.type": "collection"
                         }
                       },
                       {
-                        wildcard: {
-                          "included.attributes.name": "*"
+                        exists: {
+                          field: "included.attributes.name"
                         }
                       }
-                    ]
+                    ],
+                    must_not: {
+                      term: {
+                        "included.attributes.name.keyword": ""
+                      }
+                    }
                   }
                 }
               }
             },
             {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: {
-                      match: {
-                        "included.type": "collection"
-                      }
-                    },
-                    must_not: [
-                      {
-                        wildcard: {
-                          "included.attributes.name": "*"
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      should: [
+                        {
+                          bool: {
+                            must_not: {
+                              nested: {
+                                path: "included",
+                                query: {
+                                  bool: {
+                                    must: [
+                                      {
+                                        exists: {
+                                          field: "included.attributes.name"
+                                        }
+                                      },
+                                      {
+                                        term: {
+                                          "included.type": "collection"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        {
+                          nested: {
+                            path: "included",
+                            query: {
+                              bool: {
+                                must: [
+                                  {
+                                    term: {
+                                      "included.attributes.name.keyword": ""
+                                    }
+                                  },
+                                  {
+                                    term: {
+                                      "included.type": "collection"
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.relationships.collection.data.id"
                         }
                       }
-                    ]
+                    }
                   }
-                }
-              }
-            }
-          ],
-          must_not: [
-            {
-              wildcard: {
-                "data.attributes.materialSampleName": "*"
+                ]
               }
             }
           ]
@@ -498,22 +622,29 @@ describe("Transform to DSL query function", () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "",
       queryRows: [
+        // Query Row #1
         {
           fieldName: "data.attributes.allowDuplicateName",
           type: "boolean",
           boolean: "true",
           matchType: "equals"
         },
+
+        // Query Row #2
         {
           fieldName: "data.attributes.allowDuplicateName",
           type: "boolean",
           matchType: "notEmpty"
         },
+
+        // Query Row #3
         {
           fieldName: "data.attributes.allowDuplicateName",
           type: "boolean",
           matchType: "empty"
         },
+
+        // Query Row #4
         {
           fieldName: "collection.allowDuplicateName",
           type: "boolean",
@@ -523,6 +654,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #5
         {
           fieldName: "collection.allowDuplicateName",
           type: "boolean",
@@ -531,6 +664,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #6
         {
           fieldName: "collection.allowDuplicateName",
           type: "boolean",
@@ -557,37 +692,55 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // Query Row #1
             {
               term: {
                 "data.attributes.allowDuplicateName": "true"
               }
             },
+
+            // Query Row #2
             {
               exists: {
                 field: "data.attributes.allowDuplicateName"
               }
             },
+
+            // Query Row #3
+            {
+              bool: {
+                must_not: {
+                  exists: {
+                    field: "data.attributes.allowDuplicateName"
+                  }
+                }
+              }
+            },
+
+            // Query Row #4
             {
               nested: {
                 path: "included",
                 query: {
                   bool: {
                     must: [
-                      {
-                        match: {
-                          "included.type": "collection"
-                        }
-                      },
                       {
                         term: {
                           "included.attributes.allowDuplicateName": "true"
                         }
+                      },
+                      {
+                        term: {
+                          "included.type": "collection"
+                        }
                       }
                     ]
                   }
                 }
               }
             },
+
+            // Query Row #5
             {
               nested: {
                 path: "included",
@@ -595,13 +748,13 @@ describe("Transform to DSL query function", () => {
                   bool: {
                     must: [
                       {
-                        match: {
-                          "included.type": "collection"
+                        exists: {
+                          field: "included.attributes.allowDuplicateName"
                         }
                       },
                       {
-                        exists: {
-                          field: "included.attributes.allowDuplicateName"
+                        term: {
+                          "included.type": "collection"
                         }
                       }
                     ]
@@ -609,32 +762,47 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #6
             {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: {
-                      match: {
-                        "included.type": "collection"
-                      }
-                    },
-                    must_not: [
-                      {
-                        exists: {
-                          field: "included.attributes.allowDuplicateName"
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        nested: {
+                          path: "included",
+                          query: {
+                            bool: {
+                              must: [
+                                {
+                                  exists: {
+                                    field:
+                                      "included.attributes.allowDuplicateName"
+                                  }
+                                },
+                                {
+                                  term: {
+                                    "included.type": "collection"
+                                  }
+                                }
+                              ]
+                            }
+                          }
                         }
                       }
-                    ]
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.relationships.collection.data.id"
+                        }
+                      }
+                    }
                   }
-                }
-              }
-            }
-          ],
-          must_not: [
-            {
-              exists: {
-                field: "data.attributes.allowDuplicateName"
+                ]
               }
             }
           ]
@@ -647,52 +815,69 @@ describe("Transform to DSL query function", () => {
     const submittedValues: TransformQueryToDSLParams = {
       group: "",
       queryRows: [
+        // Query Row #1
         {
           fieldName: "data.attributes.number1",
           type: "byte",
           number: "1",
           matchType: "equals"
         },
+
+        // Query Row #2
         {
           fieldName: "data.attributes.number2",
           type: "integer",
           number: "1",
           matchType: "notEquals"
         },
+
+        // Query Row #3
         {
           fieldName: "data.attributes.number3",
           type: "short",
           number: "22",
           matchType: "greaterThan"
         },
+
+        // Query Row #4
         {
           fieldName: "data.attributes.number4",
           type: "long",
           number: "333",
           matchType: "greaterThanOrEqualTo"
         },
+
+        // Query Row #5
         {
           fieldName: "data.attributes.number5",
           type: "float",
           number: "4444.3",
           matchType: "lessThan"
         },
+
+        // Query Row #6
         {
           fieldName: "data.attributes.number6",
           type: "double",
           number: "5555.5",
           matchType: "lessThanOrEqualTo"
         },
+
+        // Query Row #7
         {
           fieldName: "data.attributes.number7",
           type: "integer",
           matchType: "notEmpty"
         },
+
+        // Query Row #8
         {
           fieldName: "data.attributes.number8",
           type: "integer",
           matchType: "empty"
         },
+
+        // Query Row #9
         {
           fieldName: "collection.number9",
           type: "integer",
@@ -702,6 +887,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #10
         {
           fieldName: "collection.number10",
           type: "integer",
@@ -710,6 +897,8 @@ describe("Transform to DSL query function", () => {
           parentType: "collection",
           parentPath: "included"
         },
+
+        // Query Row #11
         {
           fieldName: "collection.number11",
           type: "integer",
@@ -736,11 +925,40 @@ describe("Transform to DSL query function", () => {
       query: {
         bool: {
           must: [
+            // Query Row #1
             {
               term: {
                 "data.attributes.number1": "1"
               }
             },
+
+            // Query Row #2
+            {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        term: {
+                          "data.attributes.number2": "1"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.attributes.number2"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+
+            // Query Row #3
             {
               range: {
                 "data.attributes.number3": {
@@ -748,6 +966,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #4
             {
               range: {
                 "data.attributes.number4": {
@@ -755,6 +975,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #5
             {
               range: {
                 "data.attributes.number5": {
@@ -762,6 +984,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #6
             {
               range: {
                 "data.attributes.number6": {
@@ -769,32 +993,49 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #7
             {
               exists: {
                 field: "data.attributes.number7"
               }
             },
+
+            // Query Row #8
+            {
+              bool: {
+                must_not: {
+                  exists: {
+                    field: "data.attributes.number8"
+                  }
+                }
+              }
+            },
+
+            // Query Row #9
             {
               nested: {
                 path: "included",
                 query: {
                   bool: {
                     must: [
-                      {
-                        match: {
-                          "included.type": "collection"
-                        }
-                      },
                       {
                         term: {
                           "included.attributes.number9": "12345"
                         }
+                      },
+                      {
+                        term: {
+                          "included.type": "collection"
+                        }
                       }
                     ]
                   }
                 }
               }
             },
+
+            // Query Row #10
             {
               nested: {
                 path: "included",
@@ -802,51 +1043,60 @@ describe("Transform to DSL query function", () => {
                   bool: {
                     must: [
                       {
-                        match: {
-                          "included.type": "collection"
-                        }
-                      },
-                      {
                         exists: {
                           field: "included.attributes.number10"
                         }
-                      }
-                    ]
-                  }
-                }
-              }
-            },
-            {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: {
-                      match: {
-                        "included.type": "collection"
-                      }
-                    },
-                    must_not: [
+                      },
                       {
-                        exists: {
-                          field: "included.attributes.number11"
+                        term: {
+                          "included.type": "collection"
                         }
                       }
                     ]
                   }
                 }
               }
-            }
-          ],
-          must_not: [
-            {
-              term: {
-                "data.attributes.number2": "1"
-              }
             },
+
+            // Query Row #11
             {
-              exists: {
-                field: "data.attributes.number8"
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        nested: {
+                          path: "included",
+                          query: {
+                            bool: {
+                              must: [
+                                {
+                                  exists: {
+                                    field: "included.attributes.number11"
+                                  }
+                                },
+                                {
+                                  term: {
+                                    "included.type": "collection"
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.relationships.collection.data.id"
+                        }
+                      }
+                    }
+                  }
+                ]
               }
             }
           ]
@@ -875,11 +1125,14 @@ describe("Transform to DSL query function", () => {
       _source: SOURCE_FILTERS,
       query: {
         bool: {
-          filter: {
-            term: {
-              "data.attributes.group": "cnc"
+          must: [
+            // Group Query Row
+            {
+              term: {
+                "data.attributes.group": "cnc"
+              }
             }
-          }
+          ]
         }
       }
     });
