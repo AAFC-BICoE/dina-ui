@@ -42,6 +42,12 @@ const MOCK_INDEX_MAPPING_RESP = {
         name: "dwcOtherCatalogNumbers",
         type: "text",
         path: "data.attributes"
+      },
+      {
+        name: "materialSampleType",
+        type: "text",
+        path: "data.attributes",
+        distinct_term_agg: true
       }
     ],
     relationships: [
@@ -384,6 +390,103 @@ describe("QueryPage component", () => {
     ]);
   });
 
+  it("Query Page is able to aggregate first level queries with auto complete suggestions", async () => {
+    // Mocked GET requests.
+    const mockGet = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        case "search-api/search-ws/mapping":
+          return MOCK_INDEX_MAPPING_RESP;
+        case "user-api/group":
+          return TEST_GROUP;
+        case "user-api/user-preference":
+          return USER_PREFERENCE;
+      }
+    });
+
+    // Mocked POST requests.
+    const mockPost = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        // Elastic search response with material sample mock metadata data.
+        case "search-api/search-ws/search":
+          return TEST_ELASTIC_SEARCH_RESPONSE;
+        case "search-api/search-ws/count":
+          return TEST_ELASTIC_COUNT_RESPONSE;
+      }
+    });
+
+    // Setup API context with the mocked queries.
+    const apiContext: any = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockPost
+        }
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <QueryPage indexName="testIndex" columns={TEST_COLUMNS} />,
+      {
+        apiContext
+      }
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // select first row to material sample type (an auto-suggestion field)
+    wrapper
+      .find("SelectField[name='queryRows[0].fieldName']")
+      .find(Select)
+      .prop<any>("onChange")({ value: "data.attributes.materialSampleType" });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Verify the aggregation request.
+    expect(mockPost.mock.calls.pop()).toEqual([
+      "search-api/search-ws/search",
+      {
+        aggs: {
+          term_aggregation: {
+            terms: {
+              field: "data.attributes.materialSampleType.keyword",
+              size: 100
+            }
+          }
+        },
+        query: {
+          terms: {
+            "data.attributes.group": ["aafc"]
+          }
+        },
+        size: 0
+      },
+      {
+        params: {
+          indexName: "testIndex"
+        }
+      }
+    ]);
+
+    mockPost.mockClear();
+
+    // Set the search value for the relationship.
+    wrapper
+      .find("AutoSuggestTextField[name='queryRows[0].matchValue']")
+      .find("input")
+      .simulate("change", { target: { value: "Test value" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    wrapper.find("form").simulate("submit");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+  });
+
   it("Query Page is able to aggregate second level queries (relationships) with auto complete suggestions", async () => {
     // Mocked GET requests.
     const mockGet = jest.fn<any, any>(async (path) => {
@@ -478,76 +581,6 @@ describe("QueryPage component", () => {
           }
         },
         size: 0
-      },
-      {
-        params: {
-          indexName: "testIndex"
-        }
-      }
-    ]);
-
-    mockPost.mockClear();
-
-    // Set the search value for the relationship.
-    wrapper
-      .find("AutoSuggestTextField[name='queryRows[0].matchValue']")
-      .find("input")
-      .simulate("change", { target: { value: "Test value" } });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Expecting the actual search request.
-    expect(mockPost.mock.calls[0]).toEqual([
-      "search-api/search-ws/search",
-      {
-        from: 0,
-        size: 25,
-        sort: [
-          {
-            createdOn: {
-              order: "desc"
-            }
-          }
-        ],
-        _source: SOURCE_FILTERS,
-        query: {
-          bool: {
-            must: [
-              {
-                nested: {
-                  path: "included",
-                  query: {
-                    bool: {
-                      must: [
-                        {
-                          term: {
-                            "included.attributes.name.keyword": "Test value"
-                          }
-                        },
-                        {
-                          term: {
-                            "included.type": "preparation-type"
-                          }
-                        }
-                      ]
-                    }
-                  }
-                }
-              },
-              {
-                term: {
-                  "data.attributes.group": "aafc"
-                }
-              }
-            ]
-          }
-        }
       },
       {
         params: {
