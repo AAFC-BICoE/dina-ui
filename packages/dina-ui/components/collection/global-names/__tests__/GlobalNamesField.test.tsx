@@ -73,7 +73,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/%20%20monodon?capitalize=false"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
     );
 
     wrapper.update();
