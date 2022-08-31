@@ -42,29 +42,6 @@ describe("AuthenticatedApiClientProvider", () => {
     expect(wrapper.find("div.test-child").exists()).toEqual(true);
   });
 
-  it("Calls the login function when the identity provider is initialized but not authenticated", () => {
-    const mockLogin = jest.fn();
-
-    mount(
-      <AccountProvider
-        value={{
-          ...MOCK_ACCOUNT_CONTEXT,
-          authenticated: false,
-          initialized: true,
-          login: mockLogin
-        }}
-      >
-        <ApiClientProvider value={apiContext}>
-          <AuthenticatedApiClientProvider>
-            <div className="test-child" />
-          </AuthenticatedApiClientProvider>
-        </ApiClientProvider>
-      </AccountProvider>
-    );
-
-    expect(mockLogin).toHaveBeenCalledTimes(1);
-  });
-
   it("Adds the bearer header to axios requests.", () => {
     mount(
       <AccountProvider
