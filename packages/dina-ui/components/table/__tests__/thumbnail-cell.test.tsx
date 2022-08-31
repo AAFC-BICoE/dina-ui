@@ -16,8 +16,8 @@ describe("Thumbnail cell component", () => {
   it("Using data from the API, display the thumbnail", async () => {
     const wrapper = mountWithAppContext(
       thumbnailCell({
-        bucketField: "bucket",
-        fileIdentifierField: "fileIdentifier"
+        bucketField: "data.attributes.bucket",
+        fileIdentifierField: "data.attributes.fileIdentifier"
       }).Cell({ original: METADATA_RESPONSE })
     );
 

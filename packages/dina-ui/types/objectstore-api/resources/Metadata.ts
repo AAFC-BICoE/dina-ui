@@ -39,7 +39,6 @@ export interface MetadataAttributes {
   acHashValue?: string;
 
   resourceExternalURL?: string;
-  data?: any;
 }
 
 export interface MetadataRelationships {
