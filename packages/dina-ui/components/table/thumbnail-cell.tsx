@@ -41,8 +41,8 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
     // These fields are required in the elastic search response for this cell to work.
     additionalAccessors: [
       "data.attributes.resourceExternalURL",
-      "data.attributes.fileIdentifier",
-      "data.attributes.bucket"
+      fileIdentifierField,
+      bucketField
     ]
   };
 }
