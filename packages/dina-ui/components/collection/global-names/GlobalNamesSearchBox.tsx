@@ -64,8 +64,9 @@ export function GlobalNamesSearchBox({
     searchIsDisabled,
     doThrottledSearch
   } = useThrottledFetch({
-    fetcher: (searchValue) =>
-      globalNamesQuery<GlobalNamesSearchResult[]>({
+    fetcher: (searchValue) => {
+      searchValue = searchValue.replace(/\s+/g, " ").trim();
+      return globalNamesQuery<GlobalNamesSearchResult[]>({
         url: `https://verifier.globalnames.org/api/${
           isVirusName ? "v0" : "v1"
         }/verifications/${
@@ -76,7 +77,8 @@ export function GlobalNamesSearchBox({
         },
         searchValue,
         fetchJson
-      }),
+      });
+    },
     timeoutMs: 1000,
     initSearchValue,
     isVirusName
