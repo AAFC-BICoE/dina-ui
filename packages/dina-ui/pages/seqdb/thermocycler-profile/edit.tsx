@@ -66,12 +66,12 @@ export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
 }
 
 function ThermocyclerProfileForm({
-  thermocyclerProfile: profile,
+  thermocyclerProfile,
   router
 }: ThermocyclerProfileFormProps) {
   const { id } = router.query;
 
-  const initialValues = profile || {
+  const initialValues = thermocyclerProfile || {
     type: "thermocycler-profile"
   };
 

@@ -3,7 +3,7 @@ import { ViewPageLayout } from "../../../components";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { ThermocyclerProfileFormFields } from "./edit";
 
-export default function PcrProfileDetailsPage() {
+export default function ThermocyclerProfileDetailsPage() {
   return (
     <ViewPageLayout<ThermocyclerProfile>
       form={(props) => (

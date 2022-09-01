@@ -226,7 +226,7 @@ export function Home() {
                 </Link>
                 <Link href="/seqdb/thermocycler-profile/list">
                   <a>
-                    <SeqdbMessage id="pcrProfileListTitle" />
+                    <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
               </Stack>

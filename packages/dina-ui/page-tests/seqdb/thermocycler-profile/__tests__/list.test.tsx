@@ -1,4 +1,4 @@
-import PcrProfileListPage from "../../../../pages/seqdb/thermocycler-profile/list";
+import ThermocyclerProfileListPage from "../../../../pages/seqdb/thermocycler-profile/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 
@@ -31,7 +31,9 @@ const apiContext: any = {
 
 describe("PcrProfile list page", () => {
   it("Renders the list page.", async () => {
-    const wrapper = mountWithAppContext(<PcrProfileListPage />, { apiContext });
+    const wrapper = mountWithAppContext(<ThermocyclerProfileListPage />, {
+      apiContext
+    });
 
     await new Promise(setImmediate);
     wrapper.update();

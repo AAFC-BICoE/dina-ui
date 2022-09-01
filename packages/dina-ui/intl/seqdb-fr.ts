@@ -7,6 +7,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   addMolecularSampleTitle: "Ajouter l’échantillon moléculaire",
   addPcrBatchTitle: "Ajouter le lot PCR",
   addPcrPrimerTitle: "Ajouter une amorce PCR",
+  addThermocyclerProfileTitle: "Ajouter un profil de thermocycleur",
   addProductTitle: "Ajouter un produit",
   addProtocolTitle: "Ajouter un protocole",
   addRegionTitle: "Ajouter une région",
@@ -58,7 +59,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   pcrBatchViewTitle: "Visualiser le lot PCR",
   pcrPrimerListTitle: "Amorces PCR",
   pcrPrimerViewTitle: "Amorce PCR",
-  pcrProfileListTitle: "Profils de thermocycleur",
+  thermocyclerProfileListTitle: "Profils de thermocycleur",
   pcrProfileViewTitle: "Profil de thermocycleur",
   plpDetailsFormTitle:
     "Ajouter détails sur le cisaillement ou la sélection de taille",
