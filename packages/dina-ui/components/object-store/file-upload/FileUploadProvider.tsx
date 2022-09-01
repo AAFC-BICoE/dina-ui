@@ -39,7 +39,10 @@ export function FileUploadProviderImpl({ children }) {
       const response = await apiClient.axios.post(
         `/objectstore-api/file/${group}`,
         formData,
-        { transformResponse: fileUploadErrorHandler, timeout: 0 }
+        {
+          transformResponse: (data) => fileUploadErrorHandler(data, file),
+          timeout: 0
+        }
       );
       uploadRespsT.push(response.data);
     }
@@ -53,14 +56,31 @@ export function FileUploadProviderImpl({ children }) {
 }
 
 /** Errors are handled differently here because they come from Spring Boot instead of Crnk. */
-export function fileUploadErrorHandler(data: string) {
+export function fileUploadErrorHandler(data: string, file: File) {
   // Custom spring boot error handling to get the correct error message:
-  const parsed = JSON.parse(data);
-  const errorDetail = parsed?.errors?.[0]?.detail;
+  let parsedData;
+
+  try {
+    parsedData = JSON.parse(data);
+  } catch (e) {
+    // Check if the error is a Unsupported Media Type error.
+    if (data.includes("Unsupported Media Type")) {
+      throw new Error(
+        "The '" +
+          file.name +
+          "' file cannot be uploaded since it's an unsupported file type."
+      );
+    }
+
+    // Otherwise, just display the error message.
+    throw new Error(data);
+  }
+
+  const errorDetail = parsedData?.errors?.[0]?.detail;
   if (errorDetail) {
     throw new Error(errorDetail);
   }
 
   // If no error, proceed as usual:
-  return parsed;
+  return parsedData;
 }

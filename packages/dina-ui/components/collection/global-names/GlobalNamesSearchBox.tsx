@@ -64,8 +64,9 @@ export function GlobalNamesSearchBox({
     searchIsDisabled,
     doThrottledSearch
   } = useThrottledFetch({
-    fetcher: searchValue =>
-      globalNamesQuery<GlobalNamesSearchResult[]>({
+    fetcher: (searchValue) => {
+      searchValue = searchValue.replace(/\s+/g, " ").trim();
+      return globalNamesQuery<GlobalNamesSearchResult[]>({
         url: `https://verifier.globalnames.org/api/${
           isVirusName ? "v0" : "v1"
         }/verifications/${
@@ -76,13 +77,14 @@ export function GlobalNamesSearchBox({
         },
         searchValue,
         fetchJson
-      }),
+      });
+    },
     timeoutMs: 1000,
     initSearchValue,
     isVirusName
   });
 
-  const onInputChange = value => {
+  const onInputChange = (value) => {
     setInputValue(value);
     // Will save the user entry if it is not the determination scientific name
     // use case is for association host organism
@@ -92,7 +94,7 @@ export function GlobalNamesSearchBox({
     }
   };
 
-  const onVirusNameChange = value => {
+  const onVirusNameChange = (value) => {
     setIsVirusName(value.checked);
   };
 
@@ -105,9 +107,9 @@ export function GlobalNamesSearchBox({
               <input
                 aria-label={formatMessage("globalNameSearchLabel")}
                 className="form-control global-name-input"
-                onChange={e => onInputChange(e.target.value)}
-                onFocus={e => e.target.select()}
-                onKeyDown={e => {
+                onChange={(e) => onInputChange(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
                     doThrottledSearch(inputValue);
@@ -126,7 +128,7 @@ export function GlobalNamesSearchBox({
                     marginLeft: "15px",
                     width: "20px"
                   }}
-                  onChange={e => onVirusNameChange(e.target)}
+                  onChange={(e) => onVirusNameChange(e.target)}
                 />
               </label>
               <button
@@ -144,9 +146,9 @@ export function GlobalNamesSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control global-name-input"
-                onChange={e => onInputChange(e.target.value)}
-                onFocus={e => e.target.select()}
-                onKeyDown={e => {
+                onChange={(e) => onInputChange(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
                     doThrottledSearch(inputValue);
@@ -212,8 +214,8 @@ export function GlobalNamesSearchBox({
       {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!searchResult && (
         <div className="list-group">
-          {searchResult
-            ?.filter(result => result.matchType !== "NoMatch")
+          {searchResult.names
+            ?.filter((result) => result.matchType !== "NoMatch")
             ?.map((result, idx) => {
               const link = document.createElement("a");
               link.setAttribute("href", result.bestResult?.outlink);
@@ -221,16 +223,16 @@ export function GlobalNamesSearchBox({
               const paths = result?.bestResult?.classificationPath?.split("|");
               const ranks = result?.bestResult?.classificationRanks?.split("|");
 
-              const familyIdx = ranks?.findIndex(path => path === "family");
+              const familyIdx = ranks?.findIndex((path) => path === "family");
               const familyRank =
                 familyIdx >= 0 ? paths[familyIdx] + ": " : undefined;
 
               let displayText = result.bestResult?.matchedName;
               inputValue
                 .split(" ")
-                .filter(val => !!val?.length)
+                .filter((val) => !!val?.length)
                 .map(
-                  val =>
+                  (val) =>
                     (displayText = displayText.replace(val, `<b>${val}</b>`))
                 );
 
@@ -295,7 +297,7 @@ export async function globalNamesQuery<T>({
   url,
   params,
   searchValue,
-  fetchJson = urlArg => window.fetch(urlArg).then(res => res.json())
+  fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json())
 }: GlobalNamesSearchParams): Promise<T | null> {
   if (!searchValue?.trim()) {
     return null;

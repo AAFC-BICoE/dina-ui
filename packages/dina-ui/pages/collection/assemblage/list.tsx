@@ -1,14 +1,11 @@
 import {
-  ButtonBar,
   CreateButton,
   descriptionCell,
   titleCell,
-  ListPageLayout,
-  Tooltip
+  ListPageLayout
 } from "common-ui";
 import Link from "next/link";
-import { Footer, Head, Nav } from "../../../components";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
+import PageLayout from "../../../components/page/PageLayout";
 
 const ASSEMBLAGE_FILTER_ATTRIBUTES = ["name"];
 const ASSEMBLAGE_TABLE_COLUMNS = [
@@ -23,41 +20,33 @@ const ASSEMBLAGE_TABLE_COLUMNS = [
 ];
 
 export default function assemblageListPage() {
-  const { formatMessage } = useDinaIntl();
+  const buttonBarContent = <CreateButton entityLink="/collection/assemblage" />;
 
   return (
-    <div>
-      <Head title={formatMessage("assemblageListTitle")} />
-      <Nav />
-      <main className="container-fluid">
-        <h1 id="wb-cont">
-          <DinaMessage id="assemblageListTitle" />
-          <Tooltip
-            id={"assemblage_tooltip"}
-            link={"https://aafc-bicoe.github.io/dina-documentation/#assemblage"}
-            linkText={"fromDinaUserGuide"}
-            placement={"right"}
-          />
-        </h1>
-        <ButtonBar>
-          <CreateButton entityLink="/collection/assemblage" />
-        </ButtonBar>
-        <ListPageLayout
-          filterAttributes={ASSEMBLAGE_FILTER_ATTRIBUTES}
-          id="assemblage-list"
-          queryTableProps={{
-            columns: ASSEMBLAGE_TABLE_COLUMNS,
-            path: "collection-api/assemblage",
-            defaultSort: [
-              {
-                id: "name",
-                desc: false
-              }
-            ]
-          }}
-        />
-      </main>
-      <Footer />
-    </div>
+    <PageLayout
+      titleId="assemblageListTitle"
+      headingTooltip={{
+        id: "assemblage_tooltip",
+        link: "https://aafc-bicoe.github.io/dina-documentation/#assemblage",
+        linkText: "fromDinaUserGuide",
+        placement: "right"
+      }}
+      buttonBarContent={buttonBarContent}
+    >
+      <ListPageLayout
+        filterAttributes={ASSEMBLAGE_FILTER_ATTRIBUTES}
+        id="assemblage-list"
+        queryTableProps={{
+          columns: ASSEMBLAGE_TABLE_COLUMNS,
+          path: "collection-api/assemblage",
+          defaultSort: [
+            {
+              id: "name",
+              desc: false
+            }
+          ]
+        }}
+      />
+    </PageLayout>
   );
 }

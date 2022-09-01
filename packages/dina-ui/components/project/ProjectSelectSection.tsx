@@ -55,7 +55,7 @@ export function ProjectSelectField({
         filter={filterBy(["name"])}
         model={resourcePath as any}
         className={"projects " + (className || "")}
-        optionLabel={prj => prj.name}
+        optionLabel={(prj) => prj.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
         label={

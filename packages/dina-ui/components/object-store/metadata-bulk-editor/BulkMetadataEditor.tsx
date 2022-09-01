@@ -1,7 +1,9 @@
 import { HotColumnProps } from "@handsontable/react";
 import {
   ApiClientContext,
+  BackButton,
   BulkDataEditor,
+  ButtonBar,
   decodeResourceCell,
   DinaForm,
   ENCODED_RESOURCE_NAME_MATCHER,
@@ -96,7 +98,7 @@ export function BulkMetadataEditor({
     // When editing existing Metadatas:
     if (metadataIds) {
       const existingMetadatas = await bulkGet<Metadata>(
-        metadataIds.map(id => `/metadata/${id}?include=dcCreator`),
+        metadataIds.map((id) => `/metadata/${id}?include=dcCreator`),
         {
           apiBaseUrl: "/objectstore-api",
           joinSpecs: [
@@ -105,7 +107,7 @@ export function BulkMetadataEditor({
               apiBaseUrl: "/agent-api",
               idField: "dcCreator",
               joinField: "dcCreator",
-              path: metadata => `person/${metadata.dcCreator.id}`
+              path: (metadata) => `person/${metadata.dcCreator.id}`
             }
           ]
         }
@@ -115,7 +117,7 @@ export function BulkMetadataEditor({
       // When adding new Metadatas based on existing ObjectUploads:
     } else if (objectUploadIds && group) {
       objectUploads = await bulkGet<ObjectUpload>(
-        objectUploadIds.map(id => `/object-upload/${id}`),
+        objectUploadIds.map((id) => `/object-upload/${id}`),
         {
           apiBaseUrl: "/objectstore-api"
         }
@@ -138,7 +140,7 @@ export function BulkMetadataEditor({
           defaultValue.value as any;
       }
 
-      const newMetadatas = objectUploads.map<Metadata>(objectUpload => ({
+      const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
         ...metadataDefaults,
         acCaption: objectUpload.originalFilename,
         acDigitizationDate: objectUpload.dateTimeDigitized
@@ -166,7 +168,7 @@ export function BulkMetadataEditor({
     }
 
     const managedAttributesInUse = await getManagedAttributesInUse(
-      metadatas.map(it => it.managedAttributes),
+      metadatas.map((it) => it.managedAttributes),
       bulkGet
     );
     setInitialEditableManagedAttributes(managedAttributesInUse);
@@ -254,7 +256,7 @@ export function BulkMetadataEditor({
       if (metadataEdit.acTags !== undefined) {
         metadataEdit.metadata.acTags = metadataEdit.acTags
           .split(",")
-          .map(t => t.trim());
+          .map((t) => t.trim());
       }
 
       if (metadataEdit.license !== undefined) {
@@ -297,7 +299,7 @@ export function BulkMetadataEditor({
       // Handle when user removing managed attributes
       if (changes.length === 0) {
         const managedAttributeNamesInUse =
-          formikValues.editableManagedAttributes.map(maAttr => maAttr.name);
+          formikValues.editableManagedAttributes.map((maAttr) => maAttr.name);
 
         const copied = cloneDeep(workingTableData);
 
@@ -305,8 +307,8 @@ export function BulkMetadataEditor({
           preProcessMetadata(tableData)
         );
         // Remove the managed attributes that are not within the in use list anymore
-        editedMetadatas = copied.map(copy => {
-          toPairs(copy.metadata.managedAttributes).forEach(ma => {
+        editedMetadatas = copied.map((copy) => {
+          toPairs(copy.metadata.managedAttributes).forEach((ma) => {
             if (!managedAttributeNamesInUse.includes(ma[0])) {
               delete copy.metadata.managedAttributes[ma[0]];
             }
@@ -318,8 +320,8 @@ export function BulkMetadataEditor({
         // Loop through the changes per row to get the data to POST to the bulk operations API:
         editedMetadatas = await Promise.all(
           changes
-            .filter(row => !isEmpty(row.changes))
-            .map<Promise<SaveArgs<Metadata>>>(async row => {
+            .filter((row) => !isEmpty(row.changes))
+            .map<Promise<SaveArgs<Metadata>>>(async (row) => {
               const {
                 changes: { acTags, acSubtype, dcCreator, license, metadata },
                 original: {
@@ -375,7 +377,7 @@ export function BulkMetadataEditor({
       // When adding new Metadatas based on existing ObjectUploads:
 
       const copied = cloneDeep(workingTableData);
-      editedMetadatas = copied.map(copy => {
+      editedMetadatas = copied.map((copy) => {
         return { resource: copy.metadata, type: "metadata" };
       });
 
@@ -389,7 +391,9 @@ export function BulkMetadataEditor({
         changes[index].original.metadata.id = createdMetadata.id;
       });
 
-      await afterMetadatasSaved(createdMetadatas.map(metadata => metadata.id));
+      await afterMetadatasSaved(
+        createdMetadatas.map((metadata) => metadata.id)
+      );
     }
   }
 
@@ -397,24 +401,39 @@ export function BulkMetadataEditor({
     attributesTemplate: null,
     editableBuiltInAttributes: BUILT_IN_ATTRIBUTES_COLUMNS.filter(
       // Omit notPubliclyReleasableReason from the default shown attributes:
-      col => col.data !== "metadata.notPubliclyReleasableReason"
-    ).map(col => col.data),
+      (col) => col.data !== "metadata.notPubliclyReleasableReason"
+    ).map((col) => col.data),
     editableManagedAttributes: initialEditableManagedAttributes
   };
 
   return (
     <div>
+      <ButtonBar>
+        <>
+          {metadataIds?.length === 1 ? (
+            <BackButton
+              entityLink="/object-store/object"
+              entityId={metadataIds[0]}
+              byPassView={false}
+            />
+          ) : (
+            <BackButton entityLink="/object-store/object" />
+          )}
+        </>
+      </ButtonBar>
       <h1>
-        <DinaMessage id="metadataBulkEditTitle" />
+        <DinaMessage
+          id={metadataIds ? "editMetadataTitle" : "addMetadataTitle"}
+        />
       </h1>
       <div className="mb-3">
         <DinaForm<MetadataEditorControls>
           enableReinitialize={true}
           initialValues={initialFormControls}
         >
-          {controlsForm => {
+          {(controlsForm) => {
             const columns = [
-              ...BUILT_IN_ATTRIBUTES_COLUMNS.filter(col =>
+              ...BUILT_IN_ATTRIBUTES_COLUMNS.filter((col) =>
                 controlsForm.values.editableBuiltInAttributes.includes(col.data)
               ),
               ...managedAttributeColumns(
@@ -478,8 +497,8 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
     },
     resourceSelectCell<ObjectSubtype>(
       {
-        filter: input => ({ rsql: `acSubtype==${input}*` }),
-        label: ost => ost.acSubtype,
+        filter: (input) => ({ rsql: `acSubtype==${input}*` }),
+        label: (ost) => ost.acSubtype,
         model: "objectstore-api/object-subtype",
         type: "object-subtype"
       },
@@ -504,8 +523,8 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
     },
     resourceSelectCell<Person>(
       {
-        filter: input => ({ rsql: `displayName==${input}*` }),
-        label: person => person.displayName ?? person.id,
+        filter: (input) => ({ rsql: `displayName==${input}*` }),
+        label: (person) => person.displayName ?? person.id,
         model: "agent-api/person",
         type: "person"
       },
@@ -520,7 +539,7 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
     },
     resourceSelectCell<License>(
       {
-        label: license => license.titles[locale] ?? license.url,
+        label: (license) => license.titles[locale] ?? license.url,
         model: "objectstore-api/license",
         type: "license"
       },
@@ -545,7 +564,7 @@ export function useMetadataBuiltInAttributeColumns(): HotColumnProps[] {
 export function managedAttributeColumns(
   editableManagedAttributes: ManagedAttribute[]
 ) {
-  return editableManagedAttributes.map(attr => ({
+  return editableManagedAttributes.map((attr) => ({
     data: `metadata.managedAttributes.${attr.key}`,
     title: attr.name,
     ...(attr.acceptedValues?.length

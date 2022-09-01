@@ -28,6 +28,18 @@ export interface TableColumn<TData extends KitsuResource>
    * Is this attribute considered a keyword in elastic search. Required for filtering and sorting.
    */
   isKeyword?: boolean;
+
+  /**
+   * The QueryPage will only display the accessors that are displayed on the result table. However,
+   * if you have custom cells that receive other fields you will need to add them to this list so
+   * elastic search includes the fields in the result.
+   *
+   * Example: `data.attributes.name`
+   *
+   * Please note that duplicate fields are automatically removed so you don't need to worry about
+   * having unique accessors.
+   */
+  additionalAccessors?: string[];
 }
 
 /**
@@ -127,21 +139,6 @@ export interface TypeVisibility {
   /** Display a text box with date picker. */
   isDate: boolean;
 }
-
-/**
- * The Match Type values. This will be used for dropdown inputs.
- */
-export type QueryRowMatchValue = "match" | "term";
-
-/**
- * The Match Type labels. What will be displayed to the user.
- */
-export type QueryRowMatchType = "PARTIAL_MATCH" | "EXACT_MATCH" | "BLANK_FIELD";
-
-/**
- * Boolean values to be displayed in the dropdown.
- */
-export type QueryRowBooleanType = "TRUE" | "FALSE";
 
 /**
  * The types that will be considered a number and use the number type.

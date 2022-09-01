@@ -9,7 +9,7 @@ const mockOnChange = jest.fn((val, form) =>
 );
 
 const mockFetchJson = jest.fn(async () => {
-  return TEST_GLOBAL_NAME_SEARCH_RESULT;
+  return { names: TEST_GLOBAL_NAME_SEARCH_RESULT };
 });
 
 const mockOnSubmit = jest.fn();
@@ -46,7 +46,7 @@ describe("GlobalNamesField component", () => {
     wrapper.update();
 
     expect(
-      wrapper.find(".gn-search-result-label").map(node => node.text())
+      wrapper.find(".gn-search-result-label").map((node) => node.text())
     ).toEqual(["Monodontidae: Monodon Linnaeus, 1758"]);
 
     wrapper.find(".global-name-select-button").at(1).simulate("click");
@@ -73,7 +73,7 @@ describe("GlobalNamesField component", () => {
     ]);
 
     expect(mockFetchJson).lastCalledWith(
-      "https://verifier.globalnames.org/api/v1/verifications/%20%20monodon?capitalize=false"
+      "https://verifier.globalnames.org/api/v1/verifications/Monodon?capitalize=false"
     );
 
     wrapper.update();

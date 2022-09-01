@@ -70,3 +70,5 @@ export * from "./tag-editor/NotPubliclyReleasableWarning";
 export * from "./tag-editor/TagsAndRestrictionsSection";
 export * from "./tag-editor/TagSelectField";
 export * from "./collection/material-sample/RestrictionField";
+export * from "./page/PageLayout";
+export * from "./page/ButtonBarLayout";

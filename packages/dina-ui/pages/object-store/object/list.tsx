@@ -42,7 +42,7 @@ export const METADATA_FILTER_ATTRIBUTES: FilterAttribute[] = [
     type: "DROPDOWN",
     resourcePath: "agent-api/person",
     filter: filterBy(["displayName"]),
-    optionLabel: person => (person as Person).displayName ?? person.id
+    optionLabel: (person) => (person as Person).displayName ?? person.id
   }
 ];
 
@@ -52,15 +52,15 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadata, setPreviewMetadata] = useState<Metadata | null>(null);
+  const [previewMetadata, setPreviewMetadata] = useState<any | null>(null);
   const [tableSectionWidth, previewSectionWidth] = previewMetadata?.id
     ? [8, 4]
     : [12, 0];
 
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
-      bucketField: "bucket",
-      fileIdentifierField: "fileIdentifier"
+      bucketField: "data.attributes.bucket",
+      fileIdentifierField: "data.attributes.fileIdentifier"
     }),
     {
       Cell: ({ original: { id, data } }) =>
@@ -139,7 +139,7 @@ export default function MetadataListPage() {
           </div>
           <div className="list-inline-item">
             <ListLayoutSelector
-              onChange={newValue => setListLayoutType(newValue)}
+              onChange={(newValue) => setListLayoutType(newValue)}
               value={listLayoutType ?? undefined}
             />
           </div>
@@ -161,7 +161,8 @@ export default function MetadataListPage() {
                   typeName: "metadata",
                   apiBaseUrl: "/objectstore-api"
                 }}
-                bulkEditPath={"/object-store/metadata/edit"}
+                bulkEditPath={"/object-store/metadata/bulk-edit"}
+                singleEditPath={"/object-store/metadata/edit"}
                 defaultSort={[
                   {
                     desc: true,

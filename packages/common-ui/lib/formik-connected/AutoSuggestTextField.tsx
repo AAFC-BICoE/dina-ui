@@ -214,7 +214,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   return (
     <TextField
       {...textFieldProps}
-      customInput={inputProps => (
+      customInput={(inputProps) => (
         <AutoSuggestTextFieldInternal
           elasticSearchBackend={elasticSearchBackend}
           jsonApiBackend={jsonApiBackend}
@@ -362,7 +362,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   useEffect(() => {
     const autosuggestGeneratedDivs =
       document?.querySelectorAll<any>(".autosuggest div");
-    autosuggestGeneratedDivs?.forEach(element => {
+    autosuggestGeneratedDivs?.forEach((element) => {
       if (element.attributes.role) {
         element.attributes.role.nodeValue = "";
       }
@@ -375,7 +375,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     elasticSearchBackend &&
     jsonApiBackend
   ) {
-    setBackend(current =>
+    setBackend((current) =>
       current === "elastic-search" ? "json-api" : "elastic-search"
     );
   }
@@ -395,7 +395,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     ...(customOptions?.(searchValue, formik) || []),
     ...(searchResult && !isLoading && focus
       ? uniq(
-          castArray(searchResult).flatMap(item => {
+          castArray(searchResult).flatMap((item) => {
             if (performProviderSearch("elastic-search")) {
               return elasticSearchBackend?.option(item, debouncedSearchValue);
             }
@@ -431,7 +431,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
         <AutoSuggest
           id={id}
           suggestions={allSuggestions}
-          getSuggestionValue={s => s}
+          getSuggestionValue={(s) => s}
           onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
           onSuggestionSelected={(_, data) => {
             inputProps.onChange?.({
@@ -440,7 +440,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
             onSuggestionSelected?.(data.suggestion, formik);
           }}
           onSuggestionsClearRequested={() => setSearchValue("")}
-          renderSuggestion={text => <div>{text}</div>}
+          renderSuggestion={(text) => <div>{text}</div>}
           shouldRenderSuggestions={
             blankSearchBackend ? () => !!blankSearchBackend : undefined
           }
