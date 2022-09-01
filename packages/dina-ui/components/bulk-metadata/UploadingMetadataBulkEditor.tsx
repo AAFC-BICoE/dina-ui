@@ -55,7 +55,8 @@ export function UploadingMetadataBulkEditor({
       {}
     );
     const metadataDefaults: Partial<Metadata> = {};
-    for (const defaultValue of defaultValues.filter(
+
+    for (const defaultValue of defaultValues?.filter(
       ({ type }) => type === "metadata"
     )) {
       metadataDefaults[defaultValue.attribute as keyof Metadata] =

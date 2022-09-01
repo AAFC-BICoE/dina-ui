@@ -18,7 +18,13 @@ const mockPost = jest.fn(() => {
     }
   };
 });
-
+const mockGet = jest.fn((path) => {
+  if (path === "objectstore-api/config/default-values") {
+    return {
+      data: { values: [] }
+    };
+  }
+});
 const mockSave = jest.fn((ops) =>
   ops.map((op) => ({
     ...op.resource,
@@ -28,8 +34,9 @@ const mockSave = jest.fn((ops) =>
 
 const apiContext = {
   apiClient: {
-    get: async () => ({ data: [] }),
+    get: mockGet,
     axios: {
+      get: mockGet,
       post: mockPost
     }
   },
