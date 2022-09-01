@@ -7,7 +7,7 @@ import { AssemblageFormLayout } from "./edit";
 export default function AssemblageDetailsPage() {
   return (
     <ViewPageLayout<Assemblage>
-      form={props => (
+      form={(props) => (
         <DinaForm<Assemblage>
           {...props}
           initialValues={{
@@ -23,7 +23,7 @@ export default function AssemblageDetailsPage() {
           <AssemblageFormLayout />
         </DinaForm>
       )}
-      query={id => ({
+      query={(id) => ({
         path: `collection-api/assemblage/${id}?include=attachment`
       })}
       entityLink="/collection/assemblage"

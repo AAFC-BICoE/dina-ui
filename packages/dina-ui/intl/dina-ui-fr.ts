@@ -447,7 +447,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   metadataBucketNameLabel: "Nom de la catégorie",
   metadataBuiltInAttributesLabel: "Attributs intégrés",
   metadataBulkEditTagsLabel: "Balises (séparées par une virgule)",
-  metadataBulkEditTitle: "Modifier les métadonnées",
   metadataDcFormatLabel: "Format de l’élément dc",
   metadataExternalResourceDetailsLabel: "Détails sur les ressources externes",
   metadataFileExtensionLabel: "Extension du fichier",

@@ -53,7 +53,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         >
           <ManagedAttributesViewer
             values={metadata.managedAttributes}
-            managedAttributeApiPath={id =>
+            managedAttributeApiPath={(id) =>
               `objectstore-api/managed-attribute/${id}`
             }
           />
@@ -104,7 +104,7 @@ function MetadataAttributeGroup({
   fields,
   title
 }: MetadataAttributeGroupProps) {
-  const data = fields.map(field => {
+  const data = fields.map((field) => {
     if (typeof field === "string") {
       return { name: field, value: get(metadata, field) };
     }

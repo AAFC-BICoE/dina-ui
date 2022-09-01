@@ -45,7 +45,7 @@ export default function MetadataViewPage() {
     const buttonBar = (
       <ButtonBar>
         <BackToListButton entityLink="/object-store/object" />
-        <Link href={`/object-store/metadata/single-record-edit?id=${id}`}>
+        <Link href={`/object-store/metadata/edit?id=${id}`}>
           <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
             <DinaMessage id="editButtonText" />
           </a>

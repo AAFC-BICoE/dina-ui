@@ -55,6 +55,14 @@ export default function QueryRowAutoSuggestionTextSearch({
   const formikProps = useFormikContext();
   const selectedGroups: string[] = (formikProps.values as any)?.group;
 
+  const fieldName = elasticSearchMapping?.parentPath
+    ? elasticSearchMapping?.parentPath +
+      "." +
+      elasticSearchMapping?.path +
+      "." +
+      elasticSearchMapping?.label
+    : elasticSearchMapping?.path + "." + elasticSearchMapping?.label;
+
   return (
     <>
       <SelectField
@@ -76,18 +84,13 @@ export default function QueryRowAutoSuggestionTextSearch({
               removeLabel={true}
               className="me-1 flex-fill"
               blankSearchBackend={"preferred"}
-              customOptions={value =>
+              customOptions={(value) =>
                 useElasticSearchDistinctTerm({
-                  fieldName:
-                    elasticSearchMapping?.parentPath +
-                    "." +
-                    elasticSearchMapping?.path +
-                    "." +
-                    elasticSearchMapping?.label,
+                  fieldName: fieldName ?? "",
                   groups: selectedGroups,
                   relationshipType: elasticSearchMapping?.parentType,
                   indexName
-                })?.filter(suggestion =>
+                })?.filter((suggestion) =>
                   suggestion?.toLowerCase()?.includes(value?.toLowerCase())
                 )
               }

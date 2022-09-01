@@ -125,7 +125,7 @@ export function AssemblageForm({
     // Add attachments if they were selected:
     (input as any).relationships.attachment = {
       data:
-        input.attachment?.map(it => ({
+        input.attachment?.map((it) => ({
           id: it.id,
           type: it.type
         })) ?? []

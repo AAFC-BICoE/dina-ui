@@ -16,7 +16,7 @@ export function Home() {
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
+      ?.flatMap((it) => it)
       ?.includes("collection-manager") || isAdmin;
 
   return (

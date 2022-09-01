@@ -73,7 +73,7 @@ const MOCK_INDEX_MAPPING_RESP = {
   }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "search-api/search-ws/mapping":
       return MOCK_INDEX_MAPPING_RESP;

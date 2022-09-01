@@ -46,7 +46,7 @@ export function BulkEditNavigator({
   const tooManyResourcesForTabs = resources.length >= 10;
 
   const tabsWithErrors = [...resources, ...extraTabs].filter(
-    resource =>
+    (resource) =>
       !!resource.formRef.current?.status ||
       !isEmpty(resource.formRef.current?.errors)
   );
@@ -65,7 +65,8 @@ export function BulkEditNavigator({
               value={selectedTab}
               onChange={onSelectTab}
               optionLabel={(element: any) => {
-                return element.title || element.resource?.materialSampleName;
+                const tabName = tabNameConfig ? tabNameConfig(element) : null;
+                return element.title || tabName;
               }}
               invalidElements={tabsWithErrors}
             />
@@ -96,9 +97,9 @@ export function BulkEditNavigator({
           // Prevent unmounting the form on tab switch to avoid losing the form state:
           forceRenderTabPanel={true}
           selectedIndex={tabElements.findIndex(
-            element => element.key === selectedTab.key
+            (element) => element.key === selectedTab.key
           )}
-          onSelect={index => onSelectTab(tabElements[index])}
+          onSelect={(index) => onSelectTab(tabElements[index])}
         >
           <TabList>
             {extraTabs.map((extraTab, index) => {

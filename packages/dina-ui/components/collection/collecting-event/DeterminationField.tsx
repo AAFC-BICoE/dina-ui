@@ -76,7 +76,7 @@ export function DeterminationField({
   const initialIndex = Math.max(
     0,
     (get(initialValues, determinationsPath) as Determination[])?.findIndex(
-      dtmntn => dtmntn?.isPrimary
+      (dtmntn) => dtmntn?.isPrimary
     ) ?? 0
   );
 
@@ -168,7 +168,7 @@ export function DeterminationField({
                       indexName: "dina_material_sample_index",
                       searchField:
                         "included.attributes.determination.verbatimDeterminer",
-                      option: determination =>
+                      option: (determination) =>
                         determination?.determination?.[0]?.verbatimDeterminer
                     }}
                     preferredBackend={"elastic-search"}
@@ -195,13 +195,13 @@ export function DeterminationField({
                       }),
                       option: (vocabElement, searchValue) =>
                         vocabElement?.vocabularyElements
-                          ?.filter(it => it?.name !== TypeStatusEnum.NONE)
-                          .filter(it =>
+                          ?.filter((it) => it?.name !== TypeStatusEnum.NONE)
+                          .filter((it) =>
                             it?.name
                               ?.toLowerCase?.()
                               ?.includes(searchValue?.toLowerCase?.())
                           )
-                          .map(it => it?.labels?.[locale] ?? "")
+                          .map((it) => it?.labels?.[locale] ?? "")
                     }}
                     blankSearchBackend={"json-api"}
                   />

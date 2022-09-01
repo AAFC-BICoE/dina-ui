@@ -9,13 +9,14 @@
     "prettier": [
       true,
       {
-        "arrowParens": "avoid",
+        "arrowParens": "always",
         "trailingComma": "none"
       }
     ],
     "no-console": [true, "log", "info"],
     "interface-name": false,
     "jsx-no-lambda": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": false,
+    "no-var-requires": false
   }
 }

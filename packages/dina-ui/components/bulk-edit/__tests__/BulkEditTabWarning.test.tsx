@@ -8,7 +8,7 @@ import {
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { isEqual } from "lodash";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collection/1":
       return {
@@ -31,8 +31,8 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111"
   }))
@@ -325,7 +325,7 @@ describe("BulkEditTabWarning", () => {
     expect(mockSave.mock.calls).toEqual([
       [
         // Keeps the original values:
-        SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map(sample => ({
+        SAMPLES_WITH_DIFFERENT_DETERMINATIONS.map((sample) => ({
           resource: {
             attachment: undefined,
             organism: undefined,
@@ -403,7 +403,7 @@ describe("BulkEditTabWarning", () => {
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
-        SAMPLES_WITHOUT_ORGANISMS.map(sample => ({
+        SAMPLES_WITHOUT_ORGANISMS.map((sample) => ({
           resource: {
             id: sample.id,
             type: sample.type,
@@ -437,7 +437,7 @@ describe("BulkEditTabWarning", () => {
     // Make sure all samples have the sample organism for this test,
     // even though the back-end shouldn't actually alloow this:
     expect(
-      SAMPLES_WITH_SAME_DETERMINATIONS.every(sample =>
+      SAMPLES_WITH_SAME_DETERMINATIONS.every((sample) =>
         isEqual(sample.organism, SAMPLES_WITH_SAME_DETERMINATIONS[0].organism)
       )
     );
@@ -502,7 +502,7 @@ describe("BulkEditTabWarning", () => {
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
-        SAMPLES_WITH_SAME_DETERMINATIONS.map(sample => ({
+        SAMPLES_WITH_SAME_DETERMINATIONS.map((sample) => ({
           resource: {
             attachment: undefined,
             organism: undefined,
