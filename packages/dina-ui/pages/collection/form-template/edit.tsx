@@ -23,13 +23,14 @@ import {
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import { getInitialValuesFromFormTemplate } from "packages/dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
 } from "packages/dina-ui/components";
 import { FormikProps } from "formik";
+import { Promisable } from "type-fest";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
@@ -40,6 +41,10 @@ export default function FormTemplateEditPage() {
     { disabled: !id }
   );
 
+  async function moveToNextPage() {
+    await router.push("/collection/form-template/list");
+  }
+
   return (
     <>
       {/* New Form Template or New Form Template */}
@@ -47,11 +52,12 @@ export default function FormTemplateEditPage() {
         withResponse(formTemplateQuery, ({ data: fetchedFormTemplate }) => (
           <FormTemplateEditPageLoaded
             fetchedFormTemplate={fetchedFormTemplate}
+            onSaved={moveToNextPage}
             id={id}
           />
         ))
       ) : (
-        <FormTemplateEditPageLoaded id={id} />
+        <FormTemplateEditPageLoaded id={id} onSaved={moveToNextPage} />
       )}
     </>
   );
@@ -60,6 +66,9 @@ export default function FormTemplateEditPage() {
 interface FormTemplateEditPageLoadedProps {
   id?: string;
   fetchedFormTemplate?: FormTemplate;
+  onSaved: (
+    savedDefinition: PersistedResource<FormTemplate>
+  ) => Promisable<void>;
 }
 
 /**
@@ -67,7 +76,8 @@ interface FormTemplateEditPageLoadedProps {
  */
 export function FormTemplateEditPageLoaded({
   id,
-  fetchedFormTemplate
+  fetchedFormTemplate,
+  onSaved
 }: FormTemplateEditPageLoadedProps) {
   const router = useRouter();
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
@@ -76,10 +86,6 @@ export function FormTemplateEditPageLoaded({
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-
-  async function moveToNextPage() {
-    await router.push("/collection/form-template/list");
-  }
 
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
@@ -98,10 +104,19 @@ export function FormTemplateEditPageLoaded({
       formTemplate: fetchedFormTemplate
     });
 
+  // The material sample initial values to load.
   const materialSampleTemplateInitialValues =
     getInitialValuesFromFormTemplate<MaterialSample>({
       formTemplate: fetchedFormTemplate
     });
+  if (!materialSampleTemplateInitialValues.organism?.length) {
+    materialSampleTemplateInitialValues.organism = [
+      { type: "organism", determination: [{}] }
+    ];
+  }
+  if (!materialSampleTemplateInitialValues.associations?.length) {
+    materialSampleTemplateInitialValues.associations = [{}];
+  }
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
@@ -120,25 +135,53 @@ export function FormTemplateEditPageLoaded({
     acquisitionEventFormRef: acqEventFormRef
   });
 
+  const {
+    colEventId: attachedColEventId,
+    acqEventId: attachedAcqEventId,
+    dataComponentState: {
+      enableCollectingEvent,
+      enablePreparations,
+      enableStorage,
+      enableOrganisms,
+      enableScheduledActions,
+      enableAssociations,
+      enableAcquisitionEvent,
+      enableRestrictions
+    }
+  } = materialSampleSaveHook;
+
   async function onSaveTemplateSubmit({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
+    // Include the collecting event and acquisition event values.
+    const allSubmittedValues: FormTemplate & FormTemplateComponents = {
+      ...submittedValues,
+      ...(collectingEvtFormRef?.current?.values ?? {}),
+      ...(acqEventFormRef?.current?.values ?? {})
+    };
+
+    // The finished form template to save with all of the visibility, default values for each
+    // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
       type: "form-template",
       name: submittedValues.name,
       group: submittedValues.group,
+      restrictToCreatedBy: false,
+      viewConfiguration: {},
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
           visible: true,
           order: componentIndex,
-          sections: dataComponent.sections.map((section, sectionIndex) => ({
+          sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
-            fields: section.fields.map((field, fieldIndex) => ({
+            fields: section.fields.map((field) => ({
               name: field.id,
-              visible: submittedValues.templateCheckboxes?.[field.id] ?? false
+              visible:
+                allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+              defaultValue: allSubmittedValues?.[field.id]
             }))
           }))
         })
@@ -150,7 +193,7 @@ export function FormTemplateEditPageLoaded({
       { apiBaseUrl: "/collection-api" }
     );
 
-    await moveToNextPage();
+    await onSaved(savedDefinition);
   }
 
   const buttonBarContent = (
@@ -177,7 +220,10 @@ export function FormTemplateEditPageLoaded({
   );
 
   return (
-    <DinaForm initialValues={initialValues} onSubmit={onSaveTemplateSubmit}>
+    <DinaForm<FormTemplate & FormTemplateComponents>
+      initialValues={initialValues}
+      onSubmit={onSaveTemplateSubmit}
+    >
       <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
         {/* Form Template Specific Configuration */}
         <div className="container-fluid px-0">

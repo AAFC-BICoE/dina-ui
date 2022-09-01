@@ -39,7 +39,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       maxGridSizeX: 2,
       sections: [
         {
-          id: "tags-section",
+          id: "general-section",
           maxGridSizeX: 2,
           fields: [
             {
@@ -111,7 +111,145 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       labelKey: "collectingEvent",
       maxGridSizeX: 2,
       switchClassName: "enable-collecting-event",
-      sections: []
+      sections: [
+        {
+          id: "general-section",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "tags"
+            },
+            {
+              id: "publiclyReleasable"
+            },
+            {
+              id: "notPubliclyReleasableReason"
+            }
+          ]
+        },
+        {
+          id: "identifiers-section",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "dwcFieldNumber"
+            }
+          ]
+        },
+        {
+          id: "collecting-date-section",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "verbatimEventDateTime"
+            },
+            {
+              id: "startEventDateTime"
+            },
+            {
+              id: "endEventDateTime"
+            }
+          ]
+        },
+        {
+          id: "collecting-agents-section",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "dwcRecordedBy"
+            },
+            {
+              id: "collectors"
+            },
+            {
+              id: "dwcRecordNumber"
+            }
+          ]
+        },
+        {
+          id: "verbatim-label-section",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "dwcVerbatimLocality"
+            },
+            {
+              id: "dwcVerbatimCoordinateSystem"
+            },
+            {
+              id: "dwcVerbatimCoordinates"
+            },
+            {
+              id: "dwcVerbatimLatitude"
+            },
+            {
+              id: "dwcVerbatimLongitude"
+            },
+            {
+              id: "dwcVerbatimSRS"
+            },
+            {
+              id: "dwcVerbatimElevation"
+            },
+            {
+              id: "dwcVerbatimDepth"
+            }
+          ]
+        },
+        {
+          id: "collecting-event-details",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "habitat"
+            },
+            {
+              id: "host"
+            },
+            {
+              id: "collectionMethod"
+            },
+            {
+              id: "substrate"
+            },
+            {
+              id: "dwcMinimumElevationInMeters"
+            },
+            {
+              id: "dwcMaximumElevationInMeters"
+            },
+            {
+              id: "dwcMinimumDepthInMeters"
+            },
+            {
+              id: "dwcMaximumDepthInMeters"
+            },
+            {
+              id: "remarks"
+            }
+          ]
+        },
+        {
+          id: "georeferencing-section",
+          maxGridSizeX: 1,
+          fields: []
+        },
+        {
+          id: "current-geographic-place",
+          maxGridSizeX: 1,
+          fields: []
+        },
+        {
+          id: "collecting-event-managed-attributes-section",
+          maxGridSizeX: 1,
+          fields: []
+        },
+        {
+          id: "collecting-event-attachments-section",
+          maxGridSizeX: 1,
+          fields: []
+        }
+      ]
     },
     {
       id: "acquisition-event-component",
@@ -125,7 +263,48 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       labelKey: "preparations",
       maxGridSizeX: 2,
       switchClassName: "enable-catalogue-info",
-      sections: []
+      sections: [
+        {
+          id: "general-section",
+          maxGridSizeX: 2,
+          labelKey: "preparations",
+          fields: [
+            {
+              id: "preparationType"
+            },
+            {
+              id: "preparationMethod"
+            },
+            {
+              id: "preservationType"
+            },
+            {
+              id: "preparationFixative"
+            },
+            {
+              id: "preparationMaterials"
+            },
+            {
+              id: "preparationSubstrate"
+            },
+            {
+              id: "preparationRemarks"
+            },
+            {
+              id: "dwcDegreeOfEstablishment"
+            },
+            {
+              id: "preparedBy"
+            },
+            {
+              id: "preparationDate"
+            },
+            {
+              id: "preparationProtocol"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "organisms-component",
