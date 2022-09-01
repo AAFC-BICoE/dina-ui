@@ -37,7 +37,7 @@ import { Person } from "../../../types/agent-api";
 import {
   PcrBatch,
   PcrPrimer,
-  PcrProfile,
+  ThermocyclerProfile,
   Region
 } from "../../../types/seqdb-api";
 import { any } from "zod";
@@ -120,7 +120,7 @@ export function PcrBatchForm({
 
     if (submittedValues.experimenters) {
       (submittedValues as any).relationships.experimenters = {
-        data: submittedValues?.experimenters.map(collector => ({
+        data: submittedValues?.experimenters.map((collector) => ({
           id: (collector as Person).id,
           type: "person"
         }))
@@ -131,14 +131,14 @@ export function PcrBatchForm({
     // Add attachments if they were selected:
     (submittedValues as any).relationships.attachment = {
       data:
-        submittedValues.attachment?.map(it => ({
+        submittedValues.attachment?.map((it) => ({
           id: it.id,
           type: it.type
         })) ?? []
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
-    
+
     // Add storage unit if it was selected:
     delete submittedValues.storageUnitType;
 
@@ -234,14 +234,19 @@ export function PcrBatchFormFields() {
           name="storageUnitType"
           filter={filterBy(["name"])}
           model="collection-api/storage-unit-type"
-          optionLabel={storageUnitType => `${storageUnitType.name}`}
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
           readOnlyLink="/collection/storage-unit-type/view?id="
           onChange={(storageUnitType) => {
             setFieldValue("storageUnit.id", null);
-            if(!Array.isArray(storageUnitType) && storageUnitType?.gridLayoutDefinition != null){
-              setFieldValue("storageRestriction.layout", storageUnitType.gridLayoutDefinition);
-            }
-            else{
+            if (
+              !Array.isArray(storageUnitType) &&
+              storageUnitType?.gridLayoutDefinition != null
+            ) {
+              setFieldValue(
+                "storageRestriction.layout",
+                storageUnitType.gridLayoutDefinition
+              );
+            } else {
               setFieldValue("storageRestriction", null);
             }
           }}
@@ -261,12 +266,12 @@ export function PcrBatchFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <ResourceSelectField<PcrProfile>
+        <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
           filter={filterBy(["name"])}
           model="seqdb-api/thermocycler-profile"
-          optionLabel={profile => profile.name}
+          optionLabel={(profile) => profile.name}
           readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
       </div>
@@ -281,7 +286,7 @@ export function PcrBatchFormFields() {
           name="region"
           filter={filterBy(["name"])}
           model="seqdb-api/region"
-          optionLabel={region => region.name}
+          optionLabel={(region) => region.name}
           readOnlyLink="/seqdb/region/view?id="
         />
       </div>
@@ -291,7 +296,7 @@ export function PcrBatchFormFields() {
           name="primerForward"
           filter={filterBy(["name"])}
           model="seqdb-api/pcr-primer"
-          optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
+          optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
         <ResourceSelectField<PcrPrimer>
@@ -299,7 +304,7 @@ export function PcrBatchFormFields() {
           name="primerReverse"
           filter={filterBy(["name"])}
           model="seqdb-api/pcr-primer"
-          optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
+          optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
         <TextField className="col-md-6" name="thermocycler" />

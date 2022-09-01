@@ -7,9 +7,9 @@ import {
 import Link from "next/link";
 import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
+import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 
-const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<PcrProfile>[] = [
+const PCRPROFILE_TABLE_COLUMNS: ColumnDefinition<ThermocyclerProfile>[] = [
   {
     Cell: ({ original: { region } }) =>
       region ? (

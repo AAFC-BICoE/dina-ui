@@ -14,21 +14,23 @@ import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { PcrProfile } from "../../../types/seqdb-api/resources/PcrProfile";
+import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 import { useState } from "react";
 
-interface PcrProfileFormProps {
-  profile?: PcrProfile;
+interface ThermocyclerProfileFormProps {
+  thermocyclerProfile?: ThermocyclerProfile;
   router: NextRouter;
 }
 
-export function PcrProfileEditPage({ router }: WithRouterProps) {
+export function ThermocyclerProfileEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
-  const title = id ? "editPcrProfileTitle" : "addPcrProfileTitle";
+  const title = id
+    ? "editThermocyclerProfileTitle"
+    : "addThermocyclerProfileTitle";
 
-  const query = useQuery<PcrProfile>({
+  const query = useQuery<ThermocyclerProfile>({
     include: "region",
     path: `seqdb-api/thermocycler-profile/${id}`
   });
@@ -41,18 +43,21 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1 id="wb-cont">
-              <SeqdbMessage id="editPcrProfileTitle" />
+              <SeqdbMessage id="editThermocyclerProfileTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <PcrProfileForm profile={data} router={router} />
+              <ThermocyclerProfileForm
+                thermocyclerProfile={data}
+                router={router}
+              />
             ))}
           </div>
         ) : (
           <div>
             <h1 id="wb-cont">
-              <SeqdbMessage id="addPcrProfileTitle" />
+              <SeqdbMessage id="addThermocyclerProfileTitle" />
             </h1>
-            <PcrProfileForm router={router} />
+            <ThermocyclerProfileForm router={router} />
           </div>
         )}
       </main>
@@ -60,7 +65,10 @@ export function PcrProfileEditPage({ router }: WithRouterProps) {
   );
 }
 
-function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
+function ThermocyclerProfileForm({
+  thermocyclerProfile: profile,
+  router
+}: ThermocyclerProfileFormProps) {
   const { id } = router.query;
 
   const initialValues = profile || {
@@ -89,7 +97,10 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <BackButton entityId={id as string} entityLink="/seqdb/thermocycler-profile" />
+        <BackButton
+          entityId={id as string}
+          entityLink="/seqdb/thermocycler-profile"
+        />
       </ButtonBar>
       <PcrProfileFormFields />
     </DinaForm>
@@ -97,20 +108,6 @@ function PcrProfileForm({ profile, router }: PcrProfileFormProps) {
 }
 
 export function PcrProfileFormFields() {
-  const [inputValues, setInputValues] = useState({});
-  const [counter, setCounter] = useState(0);
-
-  const handleClick = () => {
-    setCounter(counter + 1);
-    console.log(counter);
-  };
-
-  const handleOnChange = (e) => {
-    const abc = {};
-    abc[e.target.className] = e.target.value;
-    setInputValues({ ...inputValues, ...abc });
-  };
-
   return (
     <div>
       <div className="row">
@@ -127,7 +124,7 @@ export function PcrProfileFormFields() {
           filter={filterBy(["name"])}
           label="Gene Region"
           model="seqdb-api/region"
-          optionLabel={region => region.name}
+          optionLabel={(region) => region.name}
         />
         <TextField
           className="col-md-2"
@@ -137,22 +134,6 @@ export function PcrProfileFormFields() {
         <TextField className="col-md-2" name="application" />
         <TextField className="col-md-2" name="cycles" />
       </div>
-      <button onClick={handleClick}>Hello</button>
-
-      {Object.keys(inputValues).map((c) => {
-        return <p>{inputValues[c]}</p>;
-      })}
-
-      {Array.from(Array(counter)).map((c, index) => {
-        return (
-          <input
-            onChange={handleOnChange}
-            key={c}
-            className={index}
-            type="text"
-          ></input>
-        );
-      })}
       <div className="row">
         <div className="col-md-6">
           <div className="card-group row" style={{ padding: 15 }}>
@@ -184,4 +165,4 @@ export function PcrProfileFormFields() {
   );
 }
 
-export default withRouter(PcrProfileEditPage);
+export default withRouter(ThermocyclerProfileEditPage);

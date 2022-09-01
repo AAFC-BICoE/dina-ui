@@ -1,15 +1,15 @@
 import { writeStorage } from "@rehooks/local-storage";
 import { OperationsResponse } from "common-ui";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../../../components/group-select/useStoredDefaultGroup";
-import { PcrProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
+import { ThermocyclerProfileEditPage } from "../../../../pages/seqdb/thermocycler-profile/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
+import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   // The get request will return the existing profile.
   if (path === "seqdb-api/thermocycler-profile/100") {
     // The request for the profile returns the test profile.
@@ -37,7 +37,7 @@ describe("PcrProfile edit page", () => {
     jest.clearAllMocks();
   });
 
-  it("Provides a form to add a PcrProfile.", done => {
+  it("Provides a form to add a PcrProfile.", (done) => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -51,7 +51,9 @@ describe("PcrProfile edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />,
+      <ThermocyclerProfileEditPage
+        router={{ query: {}, push: mockPush } as any}
+      />,
       { apiContext }
     );
 
@@ -89,7 +91,7 @@ describe("PcrProfile edit page", () => {
     });
   });
 
-  it("Renders an error after form submit if one is returned from the back-end.", done => {
+  it("Renders an error after form submit if one is returned from the back-end.", (done) => {
     // The patch request will return an error.
     mockPatch.mockImplementationOnce(() => ({
       data: [
@@ -107,7 +109,9 @@ describe("PcrProfile edit page", () => {
     }));
 
     const wrapper = mountWithAppContext(
-      <PcrProfileEditPage router={{ query: {}, push: mockPush } as any} />,
+      <ThermocyclerProfileEditPage
+        router={{ query: {}, push: mockPush } as any}
+      />,
       { apiContext }
     );
 
@@ -139,7 +143,7 @@ describe("PcrProfile edit page", () => {
     });
 
     const wrapper = mountWithAppContext(
-      <PcrProfileEditPage
+      <ThermocyclerProfileEditPage
         router={{ query: { id: 100 }, push: mockPush } as any}
       />,
       { apiContext }
@@ -199,7 +203,7 @@ describe("PcrProfile edit page", () => {
 });
 
 /** Test Profile with all fields defined. */
-const TEST_PROFILE: Required<PcrProfile> = {
+const TEST_PROFILE: Required<ThermocyclerProfile> = {
   application: "PCR of ITS regions",
   cycles: "cycles",
   group: "aafc",
@@ -213,20 +217,22 @@ const TEST_PROFILE: Required<PcrProfile> = {
     symbol: "ITS",
     type: "region"
   },
-  step1: "step1",
-  step10: null,
-  step11: null,
-  step12: null,
-  step13: null,
-  step14: null,
-  step15: null,
-  step2: "step2",
-  step3: "step3",
-  step4: null,
-  step5: null,
-  step6: null,
-  step7: null,
-  step8: null,
-  step9: null,
+  steps: [
+    "step1",
+    "step2",
+    "step3",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ],
   type: "thermocycler-profile"
 };

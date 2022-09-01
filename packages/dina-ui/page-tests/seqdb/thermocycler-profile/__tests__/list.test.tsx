@@ -1,11 +1,11 @@
 import PcrProfileListPage from "../../../../pages/seqdb/thermocycler-profile/list";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
+import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
-const TEST_PROFILES: PcrProfile[] = [
+const TEST_PROFILES: ThermocyclerProfile[] = [
   {
     id: "4",
     name: "Test Profile 1",
