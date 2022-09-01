@@ -2,6 +2,7 @@ import {
   BackButton,
   DeleteButton,
   DinaForm,
+  DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
   SubmitButton,
@@ -10,17 +11,25 @@ import {
   withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useRef } from "react";
 import {
+  AcquisitionEvent,
+  CollectingEvent,
   FormTemplate,
   FormTemplateComponents,
+  MaterialSample,
   MATERIAL_SAMPLE_FORM_LEGEND
 } from "../../../types/collection-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { MaterialSampleFormTemplateForm } from "packages/dina-ui/components/form-template/form-template-material-sample/MaterialSampleFormTemplate";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
 import { InputResource } from "kitsu";
+import { getInitialValuesFromFormTemplate } from "packages/dina-ui/components/form-template/formTemplateUtils";
+import {
+  MaterialSampleForm,
+  useMaterialSampleSave
+} from "packages/dina-ui/components";
+import { FormikProps } from "formik";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
@@ -61,6 +70,8 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate
 }: FormTemplateEditPageLoadedProps) {
   const router = useRouter();
+  const collectingEvtFormRef = useRef<FormikProps<any>>(null);
+  const acqEventFormRef = useRef<FormikProps<any>>(null);
 
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
@@ -70,12 +81,49 @@ export function FormTemplateEditPageLoaded({
     await router.push("/collection/form-template/list");
   }
 
+  // Collecting Event Initial Values
+  const collectingEventInitialValues = {
+    ...getInitialValuesFromFormTemplate<CollectingEvent>({
+      formTemplate: fetchedFormTemplate
+    }),
+    managedAttributesOrder: []
+  };
+  if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
+    collectingEventInitialValues.geoReferenceAssertions = [{}];
+  }
+
+  // Acquisition Event Initial Values
+  const acquisitionEventInitialValues =
+    getInitialValuesFromFormTemplate<AcquisitionEvent>({
+      formTemplate: fetchedFormTemplate
+    });
+
+  const materialSampleTemplateInitialValues =
+    getInitialValuesFromFormTemplate<MaterialSample>({
+      formTemplate: fetchedFormTemplate
+    });
+
+  // Provide initial values for the material sample form.
+  const initialValues: any = {
+    ...collectingEventInitialValues,
+    id,
+    type: "form-template"
+  };
+
+  // Generate the material sample save hook to use for the form.
+  const materialSampleSaveHook = useMaterialSampleSave({
+    isTemplate: true,
+    acqEventTemplateInitialValues: acquisitionEventInitialValues,
+    colEventTemplateInitialValues: collectingEventInitialValues,
+    materialSampleTemplateInitialValues,
+    colEventFormRef: collectingEvtFormRef,
+    acquisitionEventFormRef: acqEventFormRef
+  });
+
   async function onSaveTemplateSubmit({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
-    // console.log(JSON.stringify(submittedValues));
-
     const formTemplate: InputResource<FormTemplate> = {
       type: "form-template",
       name: submittedValues.name,
@@ -96,8 +144,6 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
-
-    // console.log(JSON.stringify("Form Template to be saved: " + JSON.stringify(formTemplate)));
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
@@ -130,17 +176,8 @@ export function FormTemplateEditPageLoaded({
     </>
   );
 
-  const initialValues = {
-    id,
-    type: "form-template",
-    ...fetchedFormTemplate
-  };
-
   return (
-    <DinaForm<FormTemplate>
-      initialValues={initialValues as any}
-      onSubmit={onSaveTemplateSubmit}
-    >
+    <DinaForm initialValues={initialValues} onSubmit={onSaveTemplateSubmit}>
       <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
         {/* Form Template Specific Configuration */}
         <div className="container-fluid px-0">
@@ -160,14 +197,13 @@ export function FormTemplateEditPageLoaded({
           </FieldSet>
         </div>
 
-        {/* New Form Template or New Form Template */}
-        {id ? (
-          <MaterialSampleFormTemplateForm
-            fetchedFormTemplate={fetchedFormTemplate as any}
+        {/* The Material Sample Form in Template Mode */}
+        <DinaFormSection isTemplate={true}>
+          <MaterialSampleForm
+            templateInitialValues={initialValues}
+            materialSampleSaveHook={materialSampleSaveHook}
           />
-        ) : (
-          <MaterialSampleFormTemplateForm />
-        )}
+        </DinaFormSection>
       </PageLayout>
     </DinaForm>
   );

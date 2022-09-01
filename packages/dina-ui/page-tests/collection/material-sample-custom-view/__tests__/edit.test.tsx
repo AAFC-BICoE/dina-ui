@@ -4,7 +4,7 @@ import { PersistedResource } from "kitsu";
 import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
 import { StorageLinker } from "../../../../components";
-import { MaterialSampleFormTemplateForm } from "../../../../pages/collection/form-template/edit";
+import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -45,7 +45,7 @@ function testAcquisitionEvent(): Partial<AcquisitionEvent> {
   };
 }
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "user-api/group":
       return { data: [TEST_GROUP_1] };
@@ -83,7 +83,7 @@ const mockGet = jest.fn<any, any>(async path => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map(path => {
+  paths.map((path) => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
         return { id: "1", key: "attribute_1", name: "Attribute 1" };
@@ -102,7 +102,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 );
 
 const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
-  saves.map(save => ({
+  saves.map((save) => ({
     ...save.resource,
     id: save.resource.id ?? "123"
   }))
@@ -121,8 +121,7 @@ async function mountForm(
   existingActionDefinition?: PersistedResource<FormTemplate>
 ) {
   const wrapper = mountWithAppContext(
-    <MaterialSampleFormTemplateForm
-      onSaved={mockOnSaved}
+    <FormTemplateEditPageLoaded
       fetchedFormTemplate={existingActionDefinition}
     />,
     { apiContext }
@@ -237,7 +236,7 @@ describe("Workflow template edit page", () => {
     expect(switches.length).not.toEqual(0);
 
     // All switches should be unchecked:
-    expect(switches.map(node => node.prop("checked"))).toEqual(
+    expect(switches.map((node) => node.prop("checked"))).toEqual(
       switches.map(() => false)
     );
   });

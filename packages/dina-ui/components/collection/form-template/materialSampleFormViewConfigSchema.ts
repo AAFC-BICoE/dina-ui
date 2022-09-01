@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MATERIAL_SAMPLE_FORM_SECTIONS } from "../../../types/collection-api";
+import { MATERIAL_SAMPLE_FORM_LEGEND } from "../../../types/collection-api";
 
 // Define as Zod schemas instead of Typescript interfaces to enforce structure at runtime:
 
@@ -22,7 +22,7 @@ const formTemplateSchema = z.object({
 export const materialSampleFormTemplateSchema = z.object({
   type: z.literal("material-sample-form-template"),
   navOrder: z
-    .enum(MATERIAL_SAMPLE_FORM_SECTIONS)
+    .enum(MATERIAL_SAMPLE_FORM_LEGEND)
     .array()
     // Fallback to null:
     .or(z.any().transform(() => null)),
