@@ -17,6 +17,10 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
 import { Region } from "../../../types/seqdb-api/resources/Region";
 import { useState } from "react";
+import { FormikContextType, useFormikContext } from "formik";
+import { useIntl } from "react-intl";
+import { FaPlus, FaMinus } from "react-icons/fa";
+import { FieldArray } from "formik";
 
 interface ThermocyclerProfileFormProps {
   thermocyclerProfile?: ThermocyclerProfile;
@@ -72,7 +76,8 @@ function ThermocyclerProfileForm({
   const { id } = router.query;
 
   const initialValues = thermocyclerProfile || {
-    type: "thermocycler-profile"
+    type: "thermocycler-profile",
+    steps: [""]
   };
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -96,18 +101,66 @@ function ThermocyclerProfileForm({
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
         <BackButton
           entityId={id as string}
           entityLink="/seqdb/thermocycler-profile"
         />
       </ButtonBar>
+      <SubmitButton className="ms-auto" />
       <ThermocyclerProfileFormFields />
     </DinaForm>
   );
 }
+export interface StepRowProps {
+  name: string;
+  index: number;
+  addRow?: () => void;
+  removeRow?: (index) => void;
+}
 
+export function getFieldName(
+  fieldArrayName: string,
+  fieldName: string,
+  index: number
+) {
+  return `${fieldArrayName}[${index}].${fieldName}`;
+}
+
+export function StepRow(stepRowProps: StepRowProps) {
+  const { index, addRow, removeRow, name } = stepRowProps;
+
+  return (
+    <div className="d-flex">
+      <TextField
+        name={getFieldName(name, "step", index)}
+        customName={`Step${index + 1}`}
+      />
+      {index === 0 ? (
+        <>
+          {
+            <FaPlus
+              className="my-auto"
+              onClick={addRow as any}
+              size="2em"
+              style={{ cursor: "pointer" }}
+              name={getFieldName(name, "addRow", index)}
+            />
+          }
+        </>
+      ) : (
+        <FaMinus
+          className="my-auto"
+          onClick={() => removeRow?.(index)}
+          size="2em"
+          style={{ cursor: "pointer" }}
+          name={getFieldName(name, "removeRow", index)}
+        />
+      )}
+    </div>
+  );
+}
 export function ThermocyclerProfileFormFields() {
+  const formik = useFormikContext();
   return (
     <div>
       <div className="row">
@@ -137,27 +190,38 @@ export function ThermocyclerProfileFormFields() {
       <div className="row">
         <div className="col-md-6">
           <div className="card-group row" style={{ padding: 15 }}>
-            <div className="card card-body col-md-4">
-              <TextField name="step1" />
-              <TextField name="step2" />
-              <TextField name="step3" />
-              <TextField name="step4" />
-              <TextField name="step5" />
-            </div>
-            <div className="card card-body col-md-4">
-              <TextField name="step6" />
-              <TextField name="step7" />
-              <TextField name="step8" />
-              <TextField name="step9" />
-              <TextField name="step10" />
-            </div>
-            <div className="card card-body col-md-4">
-              <TextField name="step11" />
-              <TextField name="step12" />
-              <TextField name="step13" />
-              <TextField name="step14" />
-              <TextField name="step15" />
-            </div>
+            <FieldArray name="steps">
+              {(fieldArrayProps) => {
+                const elements: [] = fieldArrayProps.form.values.steps;
+
+                function addRow() {
+                  fieldArrayProps.push(
+                    <StepRow
+                      name={fieldArrayProps.name}
+                      index={elements?.length ?? 0}
+                      removeRow={removeRow}
+                      addRow={addRow}
+                    />
+                  );
+                }
+
+                function removeRow(index) {
+                  fieldArrayProps.remove(index);
+                }
+
+                return elements?.length > 0
+                  ? elements?.map((_, index) => (
+                      <StepRow
+                        name={fieldArrayProps.name}
+                        key={index}
+                        index={index}
+                        addRow={addRow}
+                        removeRow={removeRow}
+                      />
+                    ))
+                  : null;
+              }}
+            </FieldArray>
           </div>
         </div>
       </div>
