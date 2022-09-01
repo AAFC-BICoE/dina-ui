@@ -102,12 +102,12 @@ function ThermocyclerProfileForm({
           entityLink="/seqdb/thermocycler-profile"
         />
       </ButtonBar>
-      <PcrProfileFormFields />
+      <ThermocyclerProfileFormFields />
     </DinaForm>
   );
 }
 
-export function PcrProfileFormFields() {
+export function ThermocyclerProfileFormFields() {
   return (
     <div>
       <div className="row">

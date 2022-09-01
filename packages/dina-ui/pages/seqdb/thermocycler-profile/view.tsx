@@ -1,14 +1,14 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { ThermocyclerProfile } from "../../../types/seqdb-api/resources/ThermocyclerProfile";
-import { PcrProfileFormFields } from "./edit";
+import { ThermocyclerProfileFormFields } from "./edit";
 
 export default function PcrProfileDetailsPage() {
   return (
     <ViewPageLayout<ThermocyclerProfile>
       form={(props) => (
         <DinaForm<ThermocyclerProfile> {...props}>
-          <PcrProfileFormFields />
+          <ThermocyclerProfileFormFields />
         </DinaForm>
       )}
       query={(id) => ({
