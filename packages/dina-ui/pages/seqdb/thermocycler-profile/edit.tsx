@@ -74,16 +74,15 @@ function ThermocyclerProfileForm({
   router
 }: ThermocyclerProfileFormProps) {
   const { id } = router.query;
-
   const initialValues = thermocyclerProfile || {
     type: "thermocycler-profile",
     steps: [""]
   };
-
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
     submittedValues
   }) => {
+    submittedValues.steps = submittedValues.steps.map((value) => value.step);
     const response = await save(
       [
         {
@@ -126,15 +125,11 @@ export function getFieldName(
   return `${fieldArrayName}[${index}].${fieldName}`;
 }
 
-export function StepRow(stepRowProps: StepRowProps) {
-  const { index, addRow, removeRow, name } = stepRowProps;
-
+export function StepRow({ index, addRow, removeRow, name }: StepRowProps) {
+  const textFieldName = getFieldName(name, "step", index);
   return (
     <div className="d-flex">
-      <TextField
-        name={getFieldName(name, "step", index)}
-        customName={`Step${index + 1}`}
-      />
+      <TextField name={textFieldName} customName={`Step${index + 1}`} />
       {index === 0 ? (
         <>
           {
@@ -160,7 +155,7 @@ export function StepRow(stepRowProps: StepRowProps) {
   );
 }
 export function ThermocyclerProfileFormFields() {
-  const formik = useFormikContext();
+  const formik = useFormikContext<ThermocyclerProfile>();
   return (
     <div>
       <div className="row">
@@ -210,15 +205,17 @@ export function ThermocyclerProfileFormFields() {
                 }
 
                 return elements?.length > 0
-                  ? elements?.map((_, index) => (
-                      <StepRow
-                        name={fieldArrayProps.name}
-                        key={index}
-                        index={index}
-                        addRow={addRow}
-                        removeRow={removeRow}
-                      />
-                    ))
+                  ? elements?.map((_, index) => {
+                      return (
+                        <StepRow
+                          name={fieldArrayProps.name}
+                          key={index}
+                          index={index}
+                          addRow={addRow}
+                          removeRow={removeRow}
+                        />
+                      );
+                    })
                   : null;
               }}
             </FieldArray>
