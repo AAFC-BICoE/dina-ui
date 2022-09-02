@@ -52,15 +52,15 @@ export default function MetadataListPage() {
   const [listLayoutType, setListLayoutType] =
     useLocalStorage<MetadataListLayoutType>(LIST_LAYOUT_STORAGE_KEY);
 
-  const [previewMetadata, setPreviewMetadata] = useState<Metadata | null>(null);
+  const [previewMetadata, setPreviewMetadata] = useState<any | null>(null);
   const [tableSectionWidth, previewSectionWidth] = previewMetadata?.id
     ? [8, 4]
     : [12, 0];
 
   const METADATA_TABLE_COLUMNS: TableColumn<Metadata>[] = [
     thumbnailCell({
-      bucketField: "bucket",
-      fileIdentifierField: "fileIdentifier"
+      bucketField: "data.attributes.bucket",
+      fileIdentifierField: "data.attributes.fileIdentifier"
     }),
     {
       Cell: ({ original: { id, data } }) =>
