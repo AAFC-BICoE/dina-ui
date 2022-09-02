@@ -50,7 +50,10 @@ export function FileView({
   shownTypeIndicator,
   preview
 }: FileViewProps) {
-  const { token } = useAccount();
+  const { getCurrentToken, updateToken } = useAccount();
+
+  updateToken();
+  const token = getCurrentToken();
 
   // Add the auth token to the requested file path:
   const authenticatedFilePath = `${filePath}?access_token=${token}`;
@@ -101,7 +104,7 @@ export function FileView({
                   alt={imgAlt ?? `File path : ${filePath}`}
                   src={authenticatedFilePath}
                   style={{ height: imgHeight }}
-                  onError={event =>
+                  onError={(event) =>
                     (event.currentTarget.style.display = "none")
                   }
                 />

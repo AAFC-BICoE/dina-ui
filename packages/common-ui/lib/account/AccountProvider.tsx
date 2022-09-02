@@ -13,16 +13,19 @@ export interface AccountContextI {
   agentId?: string;
   authenticated: boolean;
   groupNames?: string[];
-  login?: () => void;
-  logout?: () => void;
+  login: () => void;
+  logout: () => void;
   initialized: boolean;
-  token?: string;
   roles: string[];
   username?: string;
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
+  updateToken: (successCallback?: any) => void;
+  getCurrentToken: () => string | undefined;
 }
+
+const KEYCLOAK_TOKEN_VALIDITY_SECONDS = 300;
 
 const AccountContext = createContext<AccountContextI | null>(null);
 
@@ -69,7 +72,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized) {
+  if (!authenticated || !initialized || !keycloak) {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
@@ -79,8 +82,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  const token = keycloak?.token;
 
   const tokenParsed = keycloak?.tokenParsed;
 
@@ -102,6 +103,19 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     keycloakGroups as string[]
   );
 
+  const login = keycloak.login;
+
+  const logout = keycloak.logout;
+
+  // Keycloak will only update the token if it has expired.
+  const updateToken = (successCallback) =>
+    keycloak
+      .updateToken(KEYCLOAK_TOKEN_VALIDITY_SECONDS)
+      .then(successCallback)
+      .catch(login);
+
+  const getCurrentToken = () => keycloak?.token ?? undefined;
+
   return (
     <AccountProvider
       value={{
@@ -109,14 +123,15 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         authenticated,
         groupNames,
         initialized,
-        login: keycloak?.login,
-        logout: keycloak?.logout,
+        login,
+        logout,
         roles,
-        token,
         username,
         subject,
         isAdmin: rolesPerGroup?.aafc?.includes("dina-admin") ?? false,
-        rolesPerGroup
+        rolesPerGroup,
+        updateToken,
+        getCurrentToken
       }}
     >
       {children}

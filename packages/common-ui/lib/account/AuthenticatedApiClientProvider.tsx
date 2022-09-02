@@ -7,21 +7,20 @@ export function AuthenticatedApiClientProvider({
   children
 }: PropsWithChildren<{}>) {
   const apiContext = useApiClient();
-  const { token } = useAccount();
-  const authTokenRef = useRef<string>();
+  const { updateToken, getCurrentToken } = useAccount();
   const [authSetup, setAuthSetup] = useState<boolean>(false);
-
-  // Update the token ref on every render:
-  authTokenRef.current = token;
 
   // Include the bearer token with every API request:
   useEffect(() => {
     // 'Interceptors' is nullable here to support the old tests written before authentication was added,
     // but in the running app it should always be available.
     apiContext.apiClient.axios.interceptors?.request.use((config) => {
-      // Get the token from a Ref so the up-to-date one is always used:
-      config.headers.Authorization = `Bearer ${authTokenRef.current}`;
-      return config;
+      const onSuccessfulTokenUpdate = () => {
+        config.headers.Authorization = `Bearer ${getCurrentToken()}`;
+        return Promise.resolve(config);
+      };
+
+      return updateToken(onSuccessfulTokenUpdate);
     });
 
     setAuthSetup(true);
