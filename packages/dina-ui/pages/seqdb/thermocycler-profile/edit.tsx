@@ -111,6 +111,7 @@ function ThermocyclerProfileForm({
   );
 }
 export interface StepRowProps {
+  showPlusIcon?: boolean;
   name: string;
   index: number;
   addRow?: () => void;
@@ -125,12 +126,18 @@ export function getFieldName(
   return `${fieldArrayName}[${index}].${fieldName}`;
 }
 
-export function StepRow({ index, addRow, removeRow, name }: StepRowProps) {
+export function StepRow({
+  index,
+  addRow,
+  removeRow,
+  name,
+  showPlusIcon
+}: StepRowProps) {
   const textFieldName = getFieldName(name, "step", index);
   return (
     <div className="d-flex">
       <TextField name={textFieldName} customName={`Step${index + 1}`} />
-      {index === 0 ? (
+      {index === 0 && showPlusIcon ? (
         <>
           {
             <FaPlus
@@ -204,10 +211,13 @@ export function ThermocyclerProfileFormFields() {
                   fieldArrayProps.remove(index);
                 }
 
+                const showPlusIcon = elements.length < 15;
+
                 return elements?.length > 0
                   ? elements?.map((_, index) => {
                       return (
                         <StepRow
+                          showPlusIcon={showPlusIcon}
                           name={fieldArrayProps.name}
                           key={index}
                           index={index}
