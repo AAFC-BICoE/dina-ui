@@ -30,14 +30,14 @@ const apiContext: any = {
   apiClient: { get: mockGet, axios: { patch: mockPatch } }
 };
 
-describe("PcrProfile edit page", () => {
+describe("ThermocyclerProfile edit page", () => {
   beforeEach(() => {
     // Set the deault group selection:
     writeStorage(DEFAULT_GROUP_STORAGE_KEY, "aafc");
     jest.clearAllMocks();
   });
 
-  it("Provides a form to add a PcrProfile.", (done) => {
+  it("Provides a form to add a ThermocyclerProfile.", (done) => {
     mockPatch.mockReturnValueOnce({
       data: [
         {
@@ -59,7 +59,7 @@ describe("PcrProfile edit page", () => {
 
     // Edit the profile name.
     wrapper.find(".name-field input").simulate("change", {
-      target: { name: "name", value: "New PcrProfile" }
+      target: { name: "name", value: "New ThermocyclerProfile" }
     });
 
     // Submit the form.
@@ -75,7 +75,8 @@ describe("PcrProfile edit page", () => {
             value: {
               attributes: {
                 group: "aafc",
-                name: "New PcrProfile"
+                name: "New ThermocyclerProfile",
+                steps: [null]
               },
               id: "00000000-0000-0000-0000-000000000000",
               type: "thermocycler-profile"
@@ -128,7 +129,7 @@ describe("PcrProfile edit page", () => {
     });
   });
 
-  it("Provides a form to edit a PcrProfile.", async () => {
+  it("Provides a form to edit a ThermocyclerProfile.", async () => {
     // The patch request will be successful.
     mockPatch.mockReturnValueOnce({
       data: [
