@@ -74,9 +74,13 @@ function ThermocyclerProfileForm({
   router
 }: ThermocyclerProfileFormProps) {
   const { id } = router.query;
-  const initialValues = thermocyclerProfile || {
+
+  const initialValues = {
     type: "thermocycler-profile",
-    steps: [""]
+    ...thermocyclerProfile,
+    ...(thermocyclerProfile?.steps
+      ? { steps: thermocyclerProfile.steps.map((value) => ({ step: value })) }
+      : { steps: [] })
   };
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -110,13 +114,6 @@ function ThermocyclerProfileForm({
     </DinaForm>
   );
 }
-export interface StepRowProps {
-  showPlusIcon?: boolean;
-  name: string;
-  index: number;
-  addRow?: () => void;
-  removeRow?: (index) => void;
-}
 
 export function getFieldName(
   fieldArrayName: string,
@@ -124,6 +121,14 @@ export function getFieldName(
   index: number
 ) {
   return `${fieldArrayName}[${index}].${fieldName}`;
+}
+
+export interface StepRowProps {
+  showPlusIcon?: boolean;
+  name: string;
+  index: number;
+  addRow?: () => void;
+  removeRow?: (index) => void;
 }
 
 export function StepRow({
@@ -141,20 +146,20 @@ export function StepRow({
         <>
           {
             <FaPlus
-              className="my-auto"
+              className="ms-1"
               onClick={addRow as any}
               size="2em"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", marginTop: "2rem" }}
               name={getFieldName(name, "addRow", index)}
             />
           }
         </>
       ) : (
         <FaMinus
-          className="my-auto"
+          className="my-auto ml-1"
           onClick={() => removeRow?.(index)}
           size="2em"
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer", marginTop: "2rem" }}
           name={getFieldName(name, "removeRow", index)}
         />
       )}
