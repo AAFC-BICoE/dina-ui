@@ -80,7 +80,7 @@ function ThermocyclerProfileForm({
     ...thermocyclerProfile,
     ...(thermocyclerProfile?.steps
       ? { steps: thermocyclerProfile.steps.map((value) => ({ step: value })) }
-      : { steps: [] })
+      : { steps: [""] })
   };
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -156,7 +156,7 @@ export function StepRow({
         </>
       ) : (
         <FaMinus
-          className="my-auto ml-1"
+          className="ms-1"
           onClick={() => removeRow?.(index)}
           size="2em"
           style={{ cursor: "pointer", marginTop: "2rem" }}
@@ -196,7 +196,7 @@ export function ThermocyclerProfileFormFields() {
       </div>
       <div className="row">
         <div className="col-md-6">
-          <div className="card-group row" style={{ padding: 15 }}>
+          <div>
             <FieldArray name="steps">
               {(fieldArrayProps) => {
                 const elements: [] = fieldArrayProps.form.values.steps;
@@ -217,9 +217,9 @@ export function ThermocyclerProfileFormFields() {
                 }
 
                 const showPlusIcon = elements.length < 15;
-
-                return elements?.length > 0
-                  ? elements?.map((_, index) => {
+                const column1 = (
+                  <div className="card card-body col-md-4">
+                    {elements.slice(0, 5).map((_, index) => {
                       return (
                         <StepRow
                           showPlusIcon={showPlusIcon}
@@ -230,8 +230,49 @@ export function ThermocyclerProfileFormFields() {
                           removeRow={removeRow}
                         />
                       );
-                    })
-                  : null;
+                    })}
+                  </div>
+                );
+                const column2 = (
+                  <div className="card card-body col-md-4">
+                    {elements.slice(5, 10).map((_, index) => {
+                      return (
+                        <StepRow
+                          showPlusIcon={showPlusIcon}
+                          name={fieldArrayProps.name}
+                          key={index + 5}
+                          index={index + 5}
+                          addRow={addRow}
+                          removeRow={removeRow}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+                const column3 = (
+                  <div className="card card-body col-md-4">
+                    {elements.slice(10, 15).map((_, index) => {
+                      return (
+                        <StepRow
+                          showPlusIcon={showPlusIcon}
+                          name={fieldArrayProps.name}
+                          key={index + 10}
+                          index={index + 10}
+                          addRow={addRow}
+                          removeRow={removeRow}
+                        />
+                      );
+                    })}
+                  </div>
+                );
+
+                return elements?.length > 0 ? (
+                  <div className="card-group row" style={{ padding: 15 }}>
+                    {column1}
+                    {column2}
+                    {column3}
+                  </div>
+                ) : null;
               }}
             </FieldArray>
           </div>
