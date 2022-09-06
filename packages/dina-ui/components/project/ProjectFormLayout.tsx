@@ -1,10 +1,55 @@
-import { DateField, TextField, useDinaFormContext } from "common-ui";
+import {
+  dateCell,
+  DateField,
+  DeleteButton,
+  QueryPage,
+  stringArrayCell,
+  TextField,
+  useDinaFormContext
+} from "common-ui";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { Project } from "packages/dina-ui/types/collection-api";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+
+  // Columns for the elastic search list page.
+  const columns: TableColumn<Project>[] = [
+    // Material Sample Name
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    },
+
+    // Action buttons for each row.
+    ...[
+      {
+        Cell: ({ original: sample }) => (
+          <div className="d-flex">
+            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
+              <a className="btn btn-link">
+                <DinaMessage id="view" />
+              </a>
+            </Link>
+          </div>
+        ),
+        Header: "",
+        sortable: false
+      }
+    ]
+  ];
 
   return (
     <div>
@@ -53,6 +98,11 @@ export function ProjectFormLayout() {
           multiLines={true}
         />
       </div>
+      <QueryPage
+        columns={columns}
+        indexName={"dina_project_index"}
+        viewMode={true}
+      />
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}
