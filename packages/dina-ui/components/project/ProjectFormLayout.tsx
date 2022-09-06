@@ -98,11 +98,6 @@ export function ProjectFormLayout() {
           multiLines={true}
         />
       </div>
-      <QueryPage
-        columns={columns}
-        indexName={"dina_project_index"}
-        viewMode={true}
-      />
       <AttachmentsField
         name="attachment"
         title={<DinaMessage id="projectAttachments" />}
@@ -111,6 +106,12 @@ export function ProjectFormLayout() {
         allowExistingFieldName="attachmentsConfig.allowExisting"
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
+      />
+      <QueryPage
+        columns={columns}
+        indexName={"dina_material_sample_index"}
+        viewMode={true}
+        customQuery={"data.relationships.projects.data.id == uuid"}
       />
     </div>
   );

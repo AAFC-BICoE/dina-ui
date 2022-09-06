@@ -134,6 +134,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Boolean flag to display only the result table when true
    */
   viewMode?: boolean;
+
+  /**
+   * Custom elastic search query given by calling component
+   */
+  customQuery?: string;
 }
 
 /**
@@ -266,9 +271,11 @@ export function QueryPage<TData extends KitsuResource>({
   }, [pagination, searchFilters, sortingRules]);
 
   // Actions to perform when the QueryPage is first mounted.
-  useEffect(() => {
-    loadSavedSearch("default");
-  }, []);
+  if (!viewMode) {
+    useEffect(() => {
+      loadSavedSearch("default");
+    }, []);
+  }
 
   /**
    * Used for selection mode only.
