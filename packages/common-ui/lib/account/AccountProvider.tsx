@@ -6,8 +6,9 @@ import {
   useState,
   useEffect
 } from "react";
-import Keycloak from "keycloak-js";
+import Keycloak, { KeycloakPromise } from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { isUndefined } from "util";
 
 export interface AccountContextI {
   agentId?: string;
@@ -21,7 +22,6 @@ export interface AccountContextI {
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
-  updateToken: (successCallback?: any) => any;
   getCurrentToken: () => string | undefined;
 }
 
@@ -107,14 +107,10 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const logout = keycloak.logout;
 
-  // Keycloak will only update the token if it has expired.
-  const updateToken = (successCallback) =>
-    keycloak
-      .updateToken(KEYCLOAK_TOKEN_VALIDITY_SECONDS)
-      .then(successCallback)
-      .catch(login);
-
-  const getCurrentToken = () => keycloak?.token ?? undefined;
+  const getCurrentToken = () => {
+    keycloak.updateToken(KEYCLOAK_TOKEN_VALIDITY_SECONDS).catch(login);
+    return keycloak?.token;
+  };
 
   return (
     <AccountProvider
@@ -130,7 +126,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         subject,
         isAdmin: rolesPerGroup?.aafc?.includes("dina-admin") ?? false,
         rolesPerGroup,
-        updateToken,
         getCurrentToken
       }}
     >
