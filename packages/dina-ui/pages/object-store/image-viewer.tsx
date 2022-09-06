@@ -2,8 +2,11 @@ import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 
 export default function MetadataImagePreviewPage() {
-  const { token } = useAccount();
+  const { getCurrentToken } = useAccount();
   const router = useRouter();
+
+  const token = getCurrentToken();
+
   const fileBucket = router.query.bucket?.toString();
   const isDerivative = router.query.isDerivative?.toString();
   const fileId = router.query.fileId?.toString();
