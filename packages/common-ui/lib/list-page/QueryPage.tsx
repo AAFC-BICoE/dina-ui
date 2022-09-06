@@ -271,11 +271,11 @@ export function QueryPage<TData extends KitsuResource>({
   }, [pagination, searchFilters, sortingRules]);
 
   // Actions to perform when the QueryPage is first mounted.
-  if (!viewMode) {
-    useEffect(() => {
+  useEffect(() => {
+    if (!viewMode) {
       loadSavedSearch("default");
-    }, []);
-  }
+    }
+  }, []);
 
   /**
    * Used for selection mode only.
