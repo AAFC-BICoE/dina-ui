@@ -1,10 +1,10 @@
 import { FormikButton } from "common-ui";
+import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import ReactTable from "react-table";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { BulkMetadataEditor } from "../../metadata-bulk-editor/BulkMetadataEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (paths.length === 0) {
     return [];
   }
@@ -38,7 +38,7 @@ const mockBulkGet = jest.fn(async paths => {
   }
 });
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (
     path ===
     "collection-api/collecting-event/00000000-0000-0000-0000-000000000000/attachment"
@@ -138,7 +138,7 @@ describe("ExistingAttachmentsTable component", () => {
     wrapper.update();
 
     // Renders the bulk editor with our prop passed in.
-    await wrapper.find(BulkMetadataEditor).prop<any>("afterMetadatasSaved")([
+    await wrapper.find(ExistingMetadataBulkEditor).prop<any>("onSaved")([
       "11111111-1111-1111-1111-111111111111"
     ]);
 

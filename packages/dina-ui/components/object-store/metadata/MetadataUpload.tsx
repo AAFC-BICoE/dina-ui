@@ -49,9 +49,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
       "objectstore-api/config/default-values",
       {}
     );
-    const metadataDefaults: Partial<Metadata> = {
-      publiclyReleasable: true
-    };
+    const metadataDefaults: Partial<Metadata> = {};
     for (const defaultValue of defaultValues.filter(
       ({ type }) => type === "metadata"
     )) {
