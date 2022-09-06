@@ -5,7 +5,8 @@ import { BULK_ADD_IDS_KEY } from "../../../pages/object-store/upload";
 import {
   Metadata,
   ObjectUpload,
-  DefaultValue
+  DefaultValue,
+  License
 } from "../../../types/objectstore-api";
 import React from "react";
 import { MetadataForm } from "./MetadataForm";
@@ -56,6 +57,13 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
       metadataDefaults[defaultValue.attribute as keyof Metadata] =
         defaultValue.value as any;
     }
+
+    // const licenseId = metadataDefaults.xmpRightsWebStatement?.split("/").at(-1);
+    const selectedLicense = await apiClient.get<License>(
+      `objectstore-api/license/open-government-license-canada`,
+      {}
+    );
+    metadataDefaults.license = selectedLicense.data;
 
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
       ...metadataDefaults,
