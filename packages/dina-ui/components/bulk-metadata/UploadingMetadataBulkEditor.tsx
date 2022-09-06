@@ -14,20 +14,19 @@ import { Promisable } from "type-fest";
 
 export interface UploadingMetadataBulkEditorProps {
   objectUploadIds: string[];
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
+  inputGroup?: string;
 }
 
 export function UploadingMetadataBulkEditor({
   objectUploadIds,
   onSaved,
-  onPreviousClick
+  onPreviousClick,
+  inputGroup
 }: UploadingMetadataBulkEditorProps) {
   const router = useRouter();
-  const group = router?.query?.group as string;
+  const group = inputGroup ? inputGroup : (router?.query?.group as string);
   const { agentId } = useAccount();
   const { bulkGet, apiClient } = useContext(ApiClientContext);
 
@@ -55,16 +54,15 @@ export function UploadingMetadataBulkEditor({
       "objectstore-api/config/default-values",
       {}
     );
-    const metadataDefaults: Partial<Metadata> = {
-      publiclyReleasable: true
-    };
-    for (const defaultValue of defaultValues.filter(
+    const metadataDefaults: Partial<Metadata> = {};
+
+    for (const defaultValue of defaultValues?.filter(
       ({ type }) => type === "metadata"
     )) {
       metadataDefaults[defaultValue.attribute as keyof Metadata] =
         defaultValue.value as any;
     }
-    const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
+    const newMetadatas = objectUploads?.map<Metadata>((objectUpload) => ({
       ...metadataDefaults,
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
