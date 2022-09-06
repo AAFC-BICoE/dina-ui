@@ -21,7 +21,7 @@ export interface AccountContextI {
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
-  updateToken: (successCallback?: any) => void;
+  updateToken: (successCallback?: any) => any;
   getCurrentToken: () => string | undefined;
 }
 

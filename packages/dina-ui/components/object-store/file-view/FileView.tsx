@@ -52,8 +52,7 @@ export function FileView({
 }: FileViewProps) {
   const { getCurrentToken, updateToken } = useAccount();
 
-  updateToken();
-  const token = getCurrentToken();
+  const token = updateToken(() => getCurrentToken());
 
   // Add the auth token to the requested file path:
   const authenticatedFilePath = `${filePath}?access_token=${token}`;

@@ -44,7 +44,6 @@ export function MockAppContextProvider({
         return callback();
       },
       getCurrentToken: () => "test-token",
-      token: "test-token",
       username: "test-user",
       isAdmin: false
     }),
