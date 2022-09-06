@@ -7,8 +7,8 @@ import {
   TextField,
   useDinaFormContext
 } from "common-ui";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { Project } from "packages/dina-ui/types/collection-api";
+import { TableColumn } from "../../../common-ui/lib/list-page/types";
+import { Project } from "../../../dina-ui/types/collection-api";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import Link from "next/link";
