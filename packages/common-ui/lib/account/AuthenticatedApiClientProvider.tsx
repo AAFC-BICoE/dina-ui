@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef, useState } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
@@ -17,7 +17,7 @@ export function AuthenticatedApiClientProvider({
     apiContext.apiClient.axios.interceptors?.request.use((config) => {
       const onSuccessfulTokenUpdate = () => {
         config.headers.Authorization = `Bearer ${getCurrentToken()}`;
-        return Promise.resolve(config);
+        return config;
       };
 
       return updateToken(onSuccessfulTokenUpdate);
