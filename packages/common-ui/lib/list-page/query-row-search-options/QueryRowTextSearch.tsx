@@ -63,7 +63,7 @@ export default function QueryRowTextSearch({
               />
             )}
 
-            {matchType === "equals" && (
+            {(matchType === "equals" || matchType === "notEquals") && (
               <ExactOrPartialSwitch
                 name={fieldProps(queryBuilderName, "textMatchType", index)}
                 removeLabel={true}
@@ -169,29 +169,13 @@ export function transformTextSearchToDSL(
     parentName
   } = queryRow;
 
+  // Is the "Exact" option selected? (Or if auto suggestions are being used.)
+  const isExactMatch: boolean = distinctTerm || textMatchType === "exact";
+
   switch (matchType) {
     // Equals match type.
     case "equals":
       // Autocompletion expects to use the full text search.
-      if (distinctTerm || textMatchType === "exact") {
-        return parentType
-          ? {
-              nested: {
-                path: "included",
-                query: {
-                  bool: {
-                    must: [
-                      termQuery(fieldName, matchValue, true),
-                      includedTypeQuery(parentType)
-                    ]
-                  }
-                }
-              }
-            }
-          : termQuery(fieldName, matchValue, true);
-      }
-
-      // Otherwise, it's just a partial match search.
       return parentType
         ? {
             nested: {
@@ -199,13 +183,17 @@ export function transformTextSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    matchQuery(fieldName, matchValue),
+                    isExactMatch
+                      ? termQuery(fieldName, matchValue, true)
+                      : matchQuery(fieldName, matchValue),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
+        : isExactMatch
+        ? termQuery(fieldName, matchValue, true)
         : matchQuery(fieldName, matchValue);
 
     // Not equals match type.
@@ -220,7 +208,9 @@ export function transformTextSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldName, matchValue, true),
+                        must_not: isExactMatch
+                          ? termQuery(fieldName, matchValue, true)
+                          : matchQuery(fieldName, matchValue),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -256,7 +246,9 @@ export function transformTextSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldName, matchValue, true)
+                    must_not: isExactMatch
+                      ? termQuery(fieldName, matchValue, true)
+                      : matchQuery(fieldName, matchValue)
                   }
                 },
                 {
