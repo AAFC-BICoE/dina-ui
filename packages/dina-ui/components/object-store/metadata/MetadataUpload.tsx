@@ -58,11 +58,11 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
         defaultValue.value as any;
     }
 
-    // const licenseId = metadataDefaults.xmpRightsWebStatement?.split("/").at(-1);
     const selectedLicense = await apiClient.get<License>(
-      `objectstore-api/license/open-government-license-canada`,
+      `objectstore-api/license?filter[url]=${metadataDefaults.xmpRightsWebStatement}`,
       {}
     );
+
     metadataDefaults.license = selectedLicense.data;
 
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
