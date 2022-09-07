@@ -8,10 +8,7 @@ import { MetadataBulkEditor } from "./MetadataBulkEditor";
 
 export interface ExistingMetadataBulkEditorProps {
   ids: string[];
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   onPreviousClick?: () => void;
 }
 
