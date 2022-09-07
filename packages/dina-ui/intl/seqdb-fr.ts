@@ -60,7 +60,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   pcrPrimerListTitle: "Amorces PCR",
   pcrPrimerViewTitle: "Amorce PCR",
   thermocyclerProfileListTitle: "Profils de thermocycleur",
-  pcrProfileViewTitle: "Profil de thermocycleur",
   plpDetailsFormTitle:
     "Ajouter détails sur le cisaillement ou la sélection de taille",
   plpEditModeLabel: "Modifier",

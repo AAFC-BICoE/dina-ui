@@ -59,7 +59,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
   thermocyclerProfileListTitle: "Thermocycler Profiles",
-  pcrProfileViewTitle: "Thermocycler Profile",
   plpDetailsFormTitle: "Add New Shearing/Size Selection Details",
   plpEditModeLabel: "Edit",
   plpShearingModeLabel: "Shearing Details",
