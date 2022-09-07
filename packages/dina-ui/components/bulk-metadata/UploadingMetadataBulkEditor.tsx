@@ -67,7 +67,7 @@ export function UploadingMetadataBulkEditor({
       {}
     );
 
-    metadataDefaults.license = selectedLicense.data;
+    metadataDefaults.license = selectedLicense?.data;
 
     const newMetadatas = objectUploads?.map<Metadata>((objectUpload) => ({
       ...metadataDefaults,
