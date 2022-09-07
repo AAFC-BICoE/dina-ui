@@ -2,6 +2,13 @@ export interface MaterialSampleFormComponentInformation {
   /** ID/Name of the section. Also used as the scroll target for each section. */
   id: string;
 
+  /**
+   * Sometimes a section can store multiple items but the visibility will apply to all the items.
+   *
+   * Example: organisms
+   */
+  arrayName?: string;
+
   /** Translated label key of the section. */
   labelKey: string;
 
@@ -19,6 +26,13 @@ export interface MaterialSampleFormSectionInformation {
   labelKey?: string;
 
   maxGridSizeX: number;
+
+  /**
+   * Sometimes a section can store multiple items but the visibility will apply to all the items.
+   *
+   * Example: determinations
+   */
+  arrayName?: string;
 
   fields: MaterialSampleFormFieldInformation[];
 }
@@ -232,22 +246,75 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "georeferencing-section",
           maxGridSizeX: 1,
-          fields: []
+          arrayName: "geoReferenceAssertions",
+          fields: [
+            {
+              id: "dwcGeoreferenceVerificationStatus"
+            },
+            {
+              id: "dwcDecimalLatitude"
+            },
+            {
+              id: "dwcDecimalLongitude"
+            },
+            {
+              id: "dwcCoordinateUncertaintyInMeters"
+            },
+            {
+              id: "dwcGeoreferencedDate"
+            },
+            {
+              id: "dwcGeodeticDatum"
+            },
+            {
+              id: "literalGeoreferencedBy"
+            },
+            {
+              id: "georeferencedBy"
+            },
+            {
+              id: "dwcGeoreferenceProtocol"
+            },
+            {
+              id: "dwcGeoreferenceSources"
+            },
+            {
+              id: "dwcGeoreferenceRemarks"
+            }
+          ]
         },
         {
           id: "current-geographic-place",
           maxGridSizeX: 1,
-          fields: []
+          fields: [
+            {
+              id: "srcAdminLevels"
+            },
+            {
+              id: "geographicPlaceNameSourceDetail.stateProvince"
+            },
+            {
+              id: "geographicPlaceNameSourceDetail.country"
+            }
+          ]
         },
         {
           id: "collecting-event-managed-attributes-section",
-          maxGridSizeX: 1,
+          maxGridSizeX: 2,
+          arrayName: "managedAttributes",
           fields: []
         },
         {
           id: "collecting-event-attachments-section",
           maxGridSizeX: 1,
-          fields: []
+          fields: [
+            {
+              id: "attachmentsConfig.allowNew"
+            },
+            {
+              id: "attachmentsConfig.allowExisting"
+            }
+          ]
         }
       ]
     },
@@ -256,7 +323,43 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
       labelKey: "acquisitionEvent",
       maxGridSizeX: 2,
       switchClassName: "enable-acquisition-event",
-      sections: []
+      sections: [
+        {
+          id: "acquisition-event-reception-section",
+          labelKey: "reception",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "group"
+            },
+            {
+              id: "receivedFrom"
+            },
+            {
+              id: "receivedDate"
+            },
+            {
+              id: "receptionRemarks"
+            }
+          ]
+        },
+        {
+          id: "acquisition-event-isolation-section",
+          labelKey: "isolation",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "isolatedBy"
+            },
+            {
+              id: "isolatedOn"
+            },
+            {
+              id: "isolationRemarks"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "preparations-component",
@@ -308,49 +411,246 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
     },
     {
       id: "organisms-component",
+      arrayName: "organism",
       labelKey: "organisms",
       maxGridSizeX: 2,
       switchClassName: "enable-organisms",
-      sections: []
+      sections: [
+        {
+          id: "organisms-general-section",
+          labelKey: "organisms",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "lifeStage"
+            },
+            {
+              id: "sex"
+            },
+            {
+              id: "remarks"
+            }
+          ]
+        },
+        {
+          id: "organism-verbatim-determination-section",
+          arrayName: "determination",
+          labelKey: "verbatimDeterminationLegend",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "verbatimScientificName"
+            },
+            {
+              id: "verbatimDeterminer"
+            },
+            {
+              id: "verbatimDate"
+            },
+            {
+              id: "verbatimRemarks"
+            },
+            {
+              id: "transcriberRemarks"
+            }
+          ]
+        },
+        {
+          id: "organism-determination-section",
+          arrayName: "determination",
+          labelKey: "determination",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "scientificName"
+            },
+            {
+              id: "scientificNameInput"
+            },
+            {
+              id: "determiner"
+            },
+            {
+              id: "determinedOn"
+            },
+            {
+              id: "determinationRemarks"
+            }
+          ]
+        },
+        {
+          id: "organism-type-specimen-section",
+          arrayName: "determination",
+          labelKey: "typeSpecimen",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "typeStatus"
+            },
+            {
+              id: "typeStatusEvidence"
+            }
+          ]
+        },
+        {
+          id: "organism-managed-attributes-section",
+          arrayName: "determination",
+          labelKey: "typeSpecimen",
+          maxGridSizeX: 2,
+          fields: []
+        }
+      ]
     },
     {
       id: "associations-component",
       labelKey: "associationsLegend",
       maxGridSizeX: 2,
       switchClassName: "enable-associations",
-      sections: []
+      sections: [
+        {
+          id: "associations-host-organism-section",
+          labelKey: "hostOrganismLegend",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "hostOrganism.name"
+            },
+            {
+              id: "hostOrganism.remarks"
+            }
+          ]
+        },
+        {
+          id: "associations-material-sample-section",
+          labelKey: "materialSampleAssociationLegend",
+          maxGridSizeX: 2,
+          arrayName: "associations",
+          fields: [
+            {
+              id: "associationType"
+            },
+            {
+              id: "associatedSample"
+            },
+            {
+              id: "remarks"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "storage-component",
       labelKey: "storage",
       maxGridSizeX: 2,
       switchClassName: "enable-storage",
-      sections: []
+      sections: [
+        {
+          id: "storage-selection-section",
+          labelKey: "storage",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "storageUnit"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "restriction-component",
       labelKey: "restrictions",
       maxGridSizeX: 2,
       switchClassName: "enable-restrictions",
-      sections: []
+      sections: [
+        {
+          id: "restriction-general-section",
+          labelKey: "restrictions",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "phac_animal_rg"
+            },
+            {
+              id: "cfia_ppc"
+            },
+            {
+              id: "phac_human_rg"
+            },
+            {
+              id: "phac_cl"
+            },
+            {
+              id: "isRestricted"
+            },
+            {
+              id: "restrictionRemarks"
+            }
+          ]
+        }
+      ]
     },
     {
       id: "scheduled-actions-component",
       labelKey: "scheduledActions",
       maxGridSizeX: 2,
       switchClassName: "enable-scheduled-actions",
-      sections: []
+      sections: [
+        {
+          id: "scheduled-actions-add-section",
+          labelKey: "",
+          maxGridSizeX: 2,
+          fields: [
+            {
+              id: "scheduledAction.actionType"
+            },
+            {
+              id: "scheduledAction.actionStatus"
+            },
+            {
+              id: "scheduledAction.date"
+            },
+            {
+              id: "scheduledAction.assignedTo"
+            },
+            {
+              id: "scheduledAction.remarks"
+            }
+          ]
+        }
+      ]
     },
     {
-      id: "managedAttributes-component",
+      id: "managed-attributes-component",
       labelKey: "managedAttributes",
       maxGridSizeX: 2,
-      sections: []
+      sections: [
+        {
+          id: "managed-attributes-section",
+          labelKey: "managedAttributes",
+          maxGridSizeX: 2,
+          fields: []
+        }
+      ]
     },
     {
       id: "material-sample-attachments-component",
       labelKey: "materialSampleAttachments",
       maxGridSizeX: 2,
-      sections: []
+      sections: [
+        {
+          id: "material-sample-attachments-sections",
+          labelKey: "materialSampleAttachments",
+          maxGridSizeX: 1,
+          fields: [
+            {
+              id: "attachmentsConfig.allowNew"
+            },
+            {
+              id: "attachmentsConfig.allowExisting"
+            }
+          ]
+        }
+      ]
     }
   ];

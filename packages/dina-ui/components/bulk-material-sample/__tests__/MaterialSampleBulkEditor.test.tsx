@@ -50,7 +50,7 @@ const TEST_STORAGE_UNIT: PersistedResource<StorageUnit> = {
 };
 
 const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
-  id => ({
+  (id) => ({
     id,
     type: "storage-unit",
     group: "test-group",
@@ -75,7 +75,7 @@ const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
   restrictToCreatedBy: false,
   viewConfiguration: {
     type: "material-sample-form-template",
-    navOrder: ["managedAttributes-component", "identifiers-component"],
+    navOrder: ["managed-attributes-component", "identifiers-component"],
     formTemplate: {
       MATERIAL_SAMPLE: {
         templateFields: {
@@ -152,7 +152,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
-  return paths.map(path => {
+  return paths.map((path) => {
     switch (path) {
       case "metadata/initial-attachment-1":
         return {
@@ -213,8 +213,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   });
 });
 
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111"
   }))
@@ -322,7 +322,7 @@ const TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[]
 const TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[] = [
   "1",
   "2"
-].map(id => ({
+].map((id) => ({
   ...blankMaterialSample(),
   id,
   type: "material-sample",
@@ -509,7 +509,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The saved samples are mocked by mockSave and are passed into the onSaved callback.
     // Check the IDs to make sure they were saved:
-    expect(mockOnSaved.mock.calls[0][0].map(sample => sample.id)).toEqual([
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
       "11111",
       "11111",
       "11111"
@@ -895,7 +895,7 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach(selector =>
+    ].forEach((selector) =>
       wrapper
         .find(`.tabpanel-EDIT_ALL ${selector}`)
         .find(Switch)
@@ -1002,7 +1002,7 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach(selector =>
+    ].forEach((selector) =>
       wrapper
         .find(`.tabpanel-EDIT_ALL ${selector}`)
         .find(Switch)
@@ -1165,7 +1165,7 @@ describe("MaterialSampleBulkEditor", () => {
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         [
-          ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
+          ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map((sample) => ({
             type: "material-sample",
             resource: {
               id: sample.id,
@@ -1330,7 +1330,7 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper
         .find(".publiclyReleasable-field label")
         // The field is inverted (Not Publicly Releasable) so false -> true:
-        .findWhere(node => node.text().includes("True"))
+        .findWhere((node) => node.text().includes("True"))
         .find("input")
         .prop("checked")
     ).toEqual(true);
@@ -1558,7 +1558,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(
           ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
         )
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual([
       "Managed Attribute 1",
       "Managed Attribute 3",
@@ -2177,7 +2177,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #managedAttributes-component .managedAttributes_sample_attribute_1-field input"
+          ".tabpanel-EDIT_ALL #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2193,7 +2193,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #managedAttributes-component .managedAttributes_sample_attribute_1-field input"
+          ".tabpanel-EDIT_ALL #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2225,7 +2225,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #managedAttributes-component .managedAttributes_sample_attribute_1-field input"
+          ".sample-tabpanel-0 #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2241,7 +2241,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #managedAttributes-component .managedAttributes_sample_attribute_1-field input"
+          ".sample-tabpanel-0 #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);

@@ -318,7 +318,7 @@ export function MaterialSampleForm({
           )}
         />
       ),
-    "managedAttributes-component": (id) =>
+    "managed-attributes-component": (id) =>
       !reduceRendering && (
         <DinaFormSection
           // Disabled the template's restrictions for this section:
