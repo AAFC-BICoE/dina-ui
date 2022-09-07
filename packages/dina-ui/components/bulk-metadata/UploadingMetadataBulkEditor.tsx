@@ -5,12 +5,11 @@ import { useState, useEffect, useContext } from "react";
 import moment from "moment";
 import {
   DefaultValue,
+  License,
   Metadata,
   ObjectUpload
 } from "../../types/objectstore-api";
-import { Nav, Footer } from "../button-bar/nav/nav";
 import { MetadataBulkEditor } from "./MetadataBulkEditor";
-import { Promisable } from "type-fest";
 
 export interface UploadingMetadataBulkEditorProps {
   objectUploadIds: string[];
@@ -62,6 +61,14 @@ export function UploadingMetadataBulkEditor({
       metadataDefaults[defaultValue.attribute as keyof Metadata] =
         defaultValue.value as any;
     }
+
+    const selectedLicense = await apiClient.get<License>(
+      `objectstore-api/license?filter[url]=${metadataDefaults.xmpRightsWebStatement}`,
+      {}
+    );
+
+    metadataDefaults.license = selectedLicense.data;
+
     const newMetadatas = objectUploads?.map<Metadata>((objectUpload) => ({
       ...metadataDefaults,
       acCaption: objectUpload.originalFilename,
