@@ -164,7 +164,7 @@ export function QueryPage<TData extends KitsuResource>({
   setSelectionResources: setSelectedResources,
   onSortedChange,
   viewMode,
-  customViewQuery: customQuery
+  customViewQuery
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -178,8 +178,8 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
-    customQuery
-      ? customQuery
+    customViewQuery
+      ? customViewQuery
       : {
           group: groupNames?.[0] ?? "",
           queryRows: [

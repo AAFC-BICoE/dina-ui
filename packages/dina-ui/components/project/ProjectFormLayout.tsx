@@ -2,6 +2,7 @@ import {
   dateCell,
   DateField,
   DeleteButton,
+  FieldSet,
   QueryPage,
   stringArrayCell,
   TextField,
@@ -23,7 +24,7 @@ export function ProjectFormLayout() {
   const router = useRouter();
   const uuid = String(router?.query?.id);
   const customViewQuery: TransformQueryToDSLParams = {
-    group: "",
+    group: groupNames?.[0] ?? "",
     queryRows: [
       {
         fieldName: "data.relationships.projects.data.id",
@@ -108,15 +109,14 @@ export function ProjectFormLayout() {
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
-      <h2>
-        <DinaMessage id="attachedMaterialSamples" />
-      </h2>
-      <QueryPage
-        columns={columns}
-        indexName={"dina_material_sample_index"}
-        viewMode={readOnly}
-        customViewQuery={customViewQuery}
-      />
+      <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
+        <QueryPage
+          columns={columns}
+          indexName={"dina_material_sample_index"}
+          viewMode={readOnly}
+          customViewQuery={customViewQuery}
+        />
+      </FieldSet>
     </div>
   );
 }
