@@ -5,7 +5,6 @@ import {
   IFileWithMeta,
   IMeta
 } from "../../file-upload/FileUploader";
-import { BulkMetadataEditor } from "../../metadata-bulk-editor/BulkMetadataEditor";
 import { AttachmentUploader } from "../AttachmentUploader";
 
 const mockPost = jest.fn(() => {
