@@ -323,10 +323,10 @@ function NavSequenceDropdown({ formatMessage }) {
         <SeqdbMessage id="sangerWorkflowListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item
-        href="/seqdb/pcr-profile/list"
+        href="/seqdb/thermocycler-profile/list"
         onKeyDown={onKeyDownLastItem}
       >
-        <SeqdbMessage id="pcrProfileListTitle" />
+        <SeqdbMessage id="thermocyclerProfileListTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );

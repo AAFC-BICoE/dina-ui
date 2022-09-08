@@ -2,7 +2,6 @@ import { FormikButton } from "common-ui";
 import { ExistingMetadataBulkEditor } from "../../../bulk-metadata/ExistingMetadataBulkEditor";
 import ReactTable from "react-table";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { BulkMetadataEditor } from "../../metadata-bulk-editor/BulkMetadataEditor";
 import { ExistingAttachmentsTable } from "../ExistingAttachmentsTable";
 
 const mockBulkGet = jest.fn(async (paths) => {

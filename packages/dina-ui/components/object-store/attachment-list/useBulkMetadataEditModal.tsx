@@ -2,7 +2,6 @@ import { useModal } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ExistingMetadataBulkEditor } from "../../bulk-metadata/ExistingMetadataBulkEditor";
 import { UploadingMetadataBulkEditor } from "../../bulk-metadata/UploadingMetadataBulkEditor";
-import { BulkMetadataEditor } from "../metadata-bulk-editor/BulkMetadataEditor";
 import { useRouter } from "next/router";
 
 export interface BulkMetadataEditModalParams {
