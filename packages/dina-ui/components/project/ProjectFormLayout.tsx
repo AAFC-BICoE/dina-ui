@@ -21,22 +21,20 @@ export function ProjectFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { groupNames } = useAccount();
   const router = useRouter();
-  const uuid = String(router.query.id);
+  const uuid = String(router?.query?.id);
   const customViewQuery: TransformQueryToDSLParams = {
     group: "",
     queryRows: [
       {
         fieldName: "data.relationships.projects.data.id",
         matchType: "equals",
-        textMatchType: "exact",
+        textMatchType: "partial",
         type: "text",
-        matchValue: uuid,
-        parentName: "projects",
-        parentPath: "included",
-        parentType: "projects"
+        matchValue: uuid
       }
     ]
   };
+
   // Columns for the elastic search list page.
   const columns: TableColumn<Project>[] = [
     // Material Sample Name
