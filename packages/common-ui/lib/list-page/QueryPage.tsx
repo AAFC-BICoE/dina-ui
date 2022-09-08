@@ -163,8 +163,7 @@ export function QueryPage<TData extends KitsuResource>({
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
-  viewMode,
-  customViewQuery
+  viewMode
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -178,16 +177,14 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
-    customViewQuery
-      ? customViewQuery
-      : {
-          group: groupNames?.[0] ?? "",
-          queryRows: [
-            {
-              fieldName: ""
-            }
-          ]
+    {
+      group: groupNames?.[0] ?? "",
+      queryRows: [
+        {
+          fieldName: ""
         }
+      ]
+    }
   );
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
