@@ -12,11 +12,31 @@ import { Project } from "../../../dina-ui/types/collection-api";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import Link from "next/link";
+import { useAccount } from "common-ui";
+import { useRouter } from "next/router";
+import { TransformQueryToDSLParams } from "../../../common-ui/lib/util/transformToDSL";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-
+  const { groupNames } = useAccount();
+  const router = useRouter();
+  const uuid = String(router.query.id);
+  const customViewQuery: TransformQueryToDSLParams = {
+    group: "",
+    queryRows: [
+      {
+        fieldName: "data.relationships.projects.data.id",
+        matchType: "equals",
+        textMatchType: "exact",
+        type: "text",
+        matchValue: uuid,
+        parentName: "projects",
+        parentPath: "included",
+        parentType: "projects"
+      }
+    ]
+  };
   // Columns for the elastic search list page.
   const columns: TableColumn<Project>[] = [
     // Material Sample Name
@@ -31,24 +51,7 @@ export function ProjectFormLayout() {
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
       isKeyword: true
-    },
-
-    // Action buttons for each row.
-    ...[
-      {
-        Cell: ({ original: sample }) => (
-          <div className="d-flex">
-            <Link href={`/collection/material-sample/view?id=${sample.id}`}>
-              <a className="btn btn-link">
-                <DinaMessage id="view" />
-              </a>
-            </Link>
-          </div>
-        ),
-        Header: "",
-        sortable: false
-      }
-    ]
+    }
   ];
 
   return (
@@ -110,8 +113,8 @@ export function ProjectFormLayout() {
       <QueryPage
         columns={columns}
         indexName={"dina_material_sample_index"}
-        viewMode={true}
-        customQuery={"data.relationships.projects.data.id == uuid"}
+        viewMode={readOnly}
+        customViewQuery={customViewQuery}
       />
     </div>
   );

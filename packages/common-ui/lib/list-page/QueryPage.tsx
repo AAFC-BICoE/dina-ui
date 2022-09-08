@@ -138,7 +138,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Custom elastic search query given by calling component
    */
-  customQuery?: string;
+  customViewQuery?: TransformQueryToDSLParams;
 }
 
 /**
@@ -163,7 +163,8 @@ export function QueryPage<TData extends KitsuResource>({
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
-  viewMode
+  viewMode,
+  customViewQuery: customQuery
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -177,16 +178,17 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
-    {
-      group: groupNames?.[0] ?? "",
-      queryRows: [
-        {
-          fieldName: ""
+    customQuery
+      ? customQuery
+      : {
+          group: groupNames?.[0] ?? "",
+          queryRows: [
+            {
+              fieldName: ""
+            }
+          ]
         }
-      ]
-    }
   );
-
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
@@ -223,7 +225,6 @@ export function QueryPage<TData extends KitsuResource>({
       sortingRules,
       cloneDeep(searchFilters)
     );
-
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) return;
 
