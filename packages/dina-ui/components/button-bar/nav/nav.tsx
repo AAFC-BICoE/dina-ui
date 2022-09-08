@@ -15,7 +15,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import { SUPER_USER } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.

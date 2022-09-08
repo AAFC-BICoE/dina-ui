@@ -2,7 +2,7 @@ import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import Select from "react-select";
-import { SUPER_USER, USER, GUEST } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 
 const mockGet = jest.fn<any, any>(async (path) => {
   if (path === "user-api/group") {

@@ -1,4 +1,4 @@
-import { SUPER_USER, USER } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";

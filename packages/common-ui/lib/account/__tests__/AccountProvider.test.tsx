@@ -1,4 +1,4 @@
-import { DINA_ADMIN, USER } from "packages/common-ui/types/DinaRoles";
+import { DINA_ADMIN, USER } from "../../../types/DinaRoles";
 import {
   keycloakGroupNamesToBareGroupNames,
   generateKeycloakRolesPerGroup

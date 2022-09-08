@@ -10,7 +10,7 @@ import Stack from "react-bootstrap/Stack";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
-import { SUPER_USER } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
   const { isAdmin, rolesPerGroup } = useAccount();

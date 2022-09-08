@@ -10,7 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
-import { SUPER_USER } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";

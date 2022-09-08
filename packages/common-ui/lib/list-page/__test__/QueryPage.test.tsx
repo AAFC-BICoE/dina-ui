@@ -5,9 +5,9 @@ import DatePicker from "react-datepicker";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
 import { TableColumn } from "../types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
-import { DINA_ADMIN } from "packages/common-ui/types/DinaRoles";
+import { DINA_ADMIN } from "../../../types/DinaRoles";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {

@@ -14,7 +14,7 @@ import {
 import { FieldArray } from "formik";
 import { keys, last, omit, uniq } from "lodash";
 import { NextRouter, useRouter } from "next/router";
-import { SUPER_USER, USER, GUEST } from "packages/common-ui/types/DinaRoles";
+import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 import Select from "react-select";
 import {
   GroupLabel,

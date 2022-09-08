@@ -9,7 +9,7 @@ import {
 import Keycloak, { KeycloakPromise } from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { isUndefined } from "util";
-import { DINA_ADMIN } from "packages/common-ui/types/DinaRoles";
+import { DINA_ADMIN } from "../../types/DinaRoles";
 
 export interface AccountContextI {
   agentId?: string;
