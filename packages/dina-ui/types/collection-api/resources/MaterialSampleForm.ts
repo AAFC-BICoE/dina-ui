@@ -2,13 +2,6 @@ export interface MaterialSampleFormComponentInformation {
   /** ID/Name of the section. Also used as the scroll target for each section. */
   id: string;
 
-  /**
-   * Sometimes a section can store multiple items but the visibility will apply to all the items.
-   *
-   * Example: organisms
-   */
-  arrayName?: string;
-
   /** Translated label key of the section. */
   labelKey: string;
 
@@ -26,13 +19,6 @@ export interface MaterialSampleFormSectionInformation {
   labelKey?: string;
 
   maxGridSizeX: number;
-
-  /**
-   * Sometimes a section can store multiple items but the visibility will apply to all the items.
-   *
-   * Example: determinations
-   */
-  arrayName?: string;
 
   fields: MaterialSampleFormFieldInformation[];
 }
@@ -246,40 +232,39 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "georeferencing-section",
           maxGridSizeX: 1,
-          arrayName: "geoReferenceAssertions",
           fields: [
             {
-              id: "dwcGeoreferenceVerificationStatus"
+              id: "geoReferenceAssertions.dwcGeoreferenceVerificationStatus"
             },
             {
-              id: "dwcDecimalLatitude"
+              id: "geoReferenceAssertions.dwcDecimalLatitude"
             },
             {
-              id: "dwcDecimalLongitude"
+              id: "geoReferenceAssertions.dwcDecimalLongitude"
             },
             {
-              id: "dwcCoordinateUncertaintyInMeters"
+              id: "geoReferenceAssertions.dwcCoordinateUncertaintyInMeters"
             },
             {
-              id: "dwcGeoreferencedDate"
+              id: "geoReferenceAssertions.dwcGeoreferencedDate"
             },
             {
-              id: "dwcGeodeticDatum"
+              id: "geoReferenceAssertions.dwcGeodeticDatum"
             },
             {
-              id: "literalGeoreferencedBy"
+              id: "geoReferenceAssertions.literalGeoreferencedBy"
             },
             {
-              id: "georeferencedBy"
+              id: "geoReferenceAssertions.georeferencedBy"
             },
             {
-              id: "dwcGeoreferenceProtocol"
+              id: "geoReferenceAssertions.dwcGeoreferenceProtocol"
             },
             {
-              id: "dwcGeoreferenceSources"
+              id: "geoReferenceAssertions.dwcGeoreferenceSources"
             },
             {
-              id: "dwcGeoreferenceRemarks"
+              id: "geoReferenceAssertions.dwcGeoreferenceRemarks"
             }
           ]
         },
@@ -301,7 +286,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "collecting-event-managed-attributes-section",
           maxGridSizeX: 2,
-          arrayName: "managedAttributes",
           fields: []
         },
         {
@@ -309,10 +293,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           maxGridSizeX: 1,
           fields: [
             {
-              id: "attachmentsConfig.allowNew"
+              id: "managedAttributes.attachmentsConfig.allowNew"
             },
             {
-              id: "attachmentsConfig.allowExisting"
+              id: "managedAttributes.attachmentsConfig.allowExisting"
             }
           ]
         }
@@ -411,7 +395,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
     },
     {
       id: "organisms-component",
-      arrayName: "organism",
       labelKey: "organisms",
       maxGridSizeX: 2,
       switchClassName: "enable-organisms",
@@ -422,79 +405,75 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           maxGridSizeX: 2,
           fields: [
             {
-              id: "lifeStage"
+              id: "organisms.lifeStage"
             },
             {
-              id: "sex"
+              id: "organisms.sex"
             },
             {
-              id: "remarks"
+              id: "organisms.remarks"
             }
           ]
         },
         {
           id: "organism-verbatim-determination-section",
-          arrayName: "determination",
           labelKey: "verbatimDeterminationLegend",
           maxGridSizeX: 1,
           fields: [
             {
-              id: "verbatimScientificName"
+              id: "organisms.determination.verbatimScientificName"
             },
             {
-              id: "verbatimDeterminer"
+              id: "organisms.determination.verbatimDeterminer"
             },
             {
-              id: "verbatimDate"
+              id: "organisms.determination.verbatimDate"
             },
             {
-              id: "verbatimRemarks"
+              id: "organisms.determination.verbatimRemarks"
             },
             {
-              id: "transcriberRemarks"
+              id: "organisms.determination.transcriberRemarks"
             }
           ]
         },
         {
           id: "organism-determination-section",
-          arrayName: "determination",
           labelKey: "determination",
           maxGridSizeX: 1,
           fields: [
             {
-              id: "scientificName"
+              id: "organisms.determination.scientificName"
             },
             {
-              id: "scientificNameInput"
+              id: "organisms.determination.scientificNameInput"
             },
             {
-              id: "determiner"
+              id: "organisms.determination.determiner"
             },
             {
-              id: "determinedOn"
+              id: "organisms.determination.determinedOn"
             },
             {
-              id: "determinationRemarks"
+              id: "organisms.determination.determinationRemarks"
             }
           ]
         },
         {
           id: "organism-type-specimen-section",
-          arrayName: "determination",
           labelKey: "typeSpecimen",
           maxGridSizeX: 1,
           fields: [
             {
-              id: "typeStatus"
+              id: "organisms.determination.typeStatus"
             },
             {
-              id: "typeStatusEvidence"
+              id: "organisms.determination.typeStatusEvidence"
             }
           ]
         },
         {
           id: "organism-managed-attributes-section",
-          arrayName: "determination",
           labelKey: "typeSpecimen",
           maxGridSizeX: 2,
           fields: []
@@ -524,16 +503,15 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "associations-material-sample-section",
           labelKey: "materialSampleAssociationLegend",
           maxGridSizeX: 2,
-          arrayName: "associations",
           fields: [
             {
-              id: "associationType"
+              id: "associations.associationType"
             },
             {
-              id: "associatedSample"
+              id: "associations.associatedSample"
             },
             {
-              id: "remarks"
+              id: "associations.remarks"
             }
           ]
         }

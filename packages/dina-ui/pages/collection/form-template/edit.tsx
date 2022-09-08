@@ -89,9 +89,7 @@ export function FormTemplateEditPageLoaded({
 
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
-    ...getInitialValuesFromFormTemplate<CollectingEvent>({
-      formTemplate: fetchedFormTemplate
-    }),
+    ...getInitialValuesFromFormTemplate<CollectingEvent>(fetchedFormTemplate),
     managedAttributesOrder: []
   };
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
@@ -100,15 +98,11 @@ export function FormTemplateEditPageLoaded({
 
   // Acquisition Event Initial Values
   const acquisitionEventInitialValues =
-    getInitialValuesFromFormTemplate<AcquisitionEvent>({
-      formTemplate: fetchedFormTemplate
-    });
+    getInitialValuesFromFormTemplate<AcquisitionEvent>(fetchedFormTemplate);
 
   // The material sample initial values to load.
   const materialSampleTemplateInitialValues =
-    getInitialValuesFromFormTemplate<MaterialSample>({
-      formTemplate: fetchedFormTemplate
-    });
+    getInitialValuesFromFormTemplate<MaterialSample>(fetchedFormTemplate);
   if (!materialSampleTemplateInitialValues.organism?.length) {
     materialSampleTemplateInitialValues.organism = [
       { type: "organism", determination: [{}] }
@@ -160,6 +154,27 @@ export function FormTemplateEditPageLoaded({
       ...(collectingEvtFormRef?.current?.values ?? {}),
       ...(acqEventFormRef?.current?.values ?? {})
     };
+
+    // console.log(JSON.stringify(allSubmittedValues));
+
+    // All arrays should be removed from the submitted values.
+    const iterateThrough = (object: any) => {
+      Object.keys(object).forEach((key) => {
+        if (Array.isArray(object[key])) {
+          const objects = Object.assign({}, ...object[key]);
+          // console.log(objects);
+          allSubmittedValues[key] = objects;
+          iterateThrough(objects);
+        }
+
+        if (typeof object[key] === "object") {
+          return iterateThrough(object[key]);
+        }
+      });
+    };
+    iterateThrough(allSubmittedValues);
+
+    // console.log(JSON.stringify(allSubmittedValues));
 
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.

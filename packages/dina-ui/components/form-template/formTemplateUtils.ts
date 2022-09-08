@@ -1,43 +1,37 @@
-import { InputResource, KitsuResource } from "kitsu";
+import { KitsuResource } from "kitsu";
 import { FormTemplate } from "packages/dina-ui/types/collection-api";
 
-interface GetInitialValuesFromFormTemplateProps {
-  /**
-   * The form template to search under to find the initial values.
-   */
-  formTemplate?: Partial<FormTemplate>;
-
-  componentName?: string;
-
-  sectionName?: string;
-
-  /**
-   * Before returning the value, this function can be used to do final checks.
-   */
-  finalTransformations?: (initialValues: any) => any;
-}
-
-export function getInitialValuesFromFormTemplate<T extends KitsuResource>({
-  formTemplate,
-  componentName,
-  sectionName,
-  finalTransformations
-}: GetInitialValuesFromFormTemplateProps): Partial<T> & {
-  templateCheckboxes?: Record<string, true | undefined>;
-} {
+export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
+  formTemplate: Partial<FormTemplate> | undefined
+): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
   // No form template data provided. Working on a new form template.
   if (!formTemplate) {
-    return finalTransformations?.({}) ?? {};
+    return {};
   }
 
   const initialValueForResource: Partial<T> = {};
-
-  // if (componentName) {
-  // }
 
   return {
     ...initialValueForResource,
     templateCheckboxes: {} as Record<string, true | undefined>,
     attachmentsConfig: {}
   };
+}
+
+/**
+ * Removes arrays from paths. This is useful for checking if a form template field matches.
+ *
+ * Example:
+ *
+ * organisms[1].determination[2].fieldName --> organisms.determination.fieldName
+ * organisms[2].determination[3].fieldName --> organisms.determination.fieldName
+ *
+ * For visibility, it applies to the fieldName even if there is multiple versions of it. In the case
+ * above, both are talking about the same fieldName.
+ *
+ * @param path string json path.
+ * @returns json path with arrays removed for checking if the fieldName is a match.
+ */
+export function removeArraysFromPath(path: string): string {
+  return path.replace(/ *\[[^\]]*]/g, "");
 }
