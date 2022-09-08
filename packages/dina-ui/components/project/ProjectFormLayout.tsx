@@ -108,6 +108,9 @@ export function ProjectFormLayout() {
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
+      <h2>
+        <DinaMessage id="attachedMaterialSamples" />
+      </h2>
       <QueryPage
         columns={columns}
         indexName={"dina_material_sample_index"}

@@ -81,6 +81,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   attachExistingObjects: "Attach Existing Objects",
   attachSelected: "Attach Selected",
   attachments: "Attachments",
+  attachedMaterialSamples: "Attached Material Samples",
   attributeLabel: "Attribute",
   backToParentUnit: "Back To Parent Unit",
   baseNameLabel: "Base Name",
