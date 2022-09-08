@@ -9,6 +9,7 @@ import {
 import Keycloak, { KeycloakPromise } from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { isUndefined } from "util";
+import { DINA_ADMIN } from "packages/common-ui/types/DinaRoles";
 
 export interface AccountContextI {
   agentId?: string;
@@ -124,7 +125,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         roles,
         username,
         subject,
-        isAdmin: rolesPerGroup?.aafc?.includes("dina-admin") ?? false,
+        isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
         rolesPerGroup,
         getCurrentToken
       }}
@@ -135,7 +136,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Convert from Keycloak's format ( ["/cnc", "/cnc/staff"] to just the group name ["cnc"] )
+ * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */
 export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
   return uniq(
