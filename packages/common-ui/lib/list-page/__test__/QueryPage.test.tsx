@@ -7,6 +7,12 @@ import { Group } from "packages/dina-ui/types/user-api";
 import { TableColumn } from "../types";
 import { useState, useEffect } from "react";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
+import { TransformQueryToDSLParams } from "../../util/transformToDSL";
+import { QueryTable } from "../../table/QueryTable";
+import { SavedSearch } from "../SavedSearch";
+import { SubmitButton } from "../../formik-connected/SubmitButton";
+import { QueryBuilder } from "../QueryBuilder";
+import { FormattedMessage } from "react-intl";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
@@ -55,6 +61,24 @@ const MOCK_INDEX_MAPPING_RESP = {
         name: "type",
         path: "included",
         value: "preparation-type",
+        attributes: [
+          {
+            name: "name",
+            type: "text",
+            path: "attributes",
+            distinct_term_agg: true
+          },
+          {
+            name: "type",
+            type: "text",
+            path: "attributes"
+          }
+        ]
+      },
+      {
+        name: "type",
+        path: "included",
+        value: "projects",
         attributes: [
           {
             name: "name",
@@ -912,5 +936,159 @@ describe("QueryPage component", () => {
     // expect(wrapper.find("#selectedResourceCount").text()).toBe(
     //  "Total selected records: " + TEST_ELASTIC_SEARCH_RESPONSE.data.hits.total.value
     // );
+  });
+
+  it("Query Page is able to make elastic search query using given customViewQuery", async () => {
+    const customViewQuery: TransformQueryToDSLParams = {
+      group: "",
+      queryRows: [
+        {
+          fieldName: "data.relationships.projects.data.id",
+          matchType: "equals",
+          textMatchType: "partial",
+          type: "text",
+          matchValue: "0e32f02e-fb76-49f2-88df-f2352d82fc74"
+        }
+      ]
+    };
+
+    // Mocked GET requests.
+    const mockGet = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        case "search-api/search-ws/mapping":
+          return MOCK_INDEX_MAPPING_RESP;
+        case "user-api/group":
+          return TEST_GROUP;
+        case "user-api/user-preference":
+          return USER_PREFERENCE;
+      }
+    });
+
+    // Mocked POST requests.
+    const mockPost = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        // Elastic search response with material sample mock metadata data.
+        case "search-api/search-ws/search":
+          return TEST_ELASTIC_SEARCH_RESPONSE;
+        case "search-api/search-ws/count":
+          return TEST_ELASTIC_COUNT_RESPONSE;
+      }
+    });
+
+    // Setup API context with the mocked queries.
+    const apiContext: any = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockPost
+        }
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <QueryPage
+        indexName="testIndex"
+        columns={TEST_COLUMNS}
+        customViewQuery={customViewQuery}
+        viewMode={true}
+      />,
+      {
+        apiContext
+      }
+    );
+
+    // Wait for any API call
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(mockPost.mock.calls[0]).toEqual([
+      "search-api/search-ws/search",
+      {
+        from: 0,
+        size: 25,
+        sort: [
+          {
+            createdOn: {
+              order: "desc"
+            }
+          }
+        ],
+        _source: SOURCE_FILTERS,
+        query: {
+          bool: {
+            must: [
+              {
+                match: {
+                  "data.relationships.projects.data.id":
+                    "0e32f02e-fb76-49f2-88df-f2352d82fc74"
+                }
+              }
+            ]
+          }
+        }
+      },
+      {
+        params: {
+          indexName: "testIndex"
+        }
+      }
+    ]);
+  });
+
+  it("Query Page hides certain components if viewMode true", async () => {
+    // Mocked GET requests.
+    const mockGet = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        case "search-api/search-ws/mapping":
+          return MOCK_INDEX_MAPPING_RESP;
+        case "user-api/group":
+          return TEST_GROUP;
+        case "user-api/user-preference":
+          return USER_PREFERENCE;
+      }
+    });
+
+    // Mocked POST requests.
+    const mockPost = jest.fn<any, any>(async (path) => {
+      switch (path) {
+        // Elastic search response with material sample mock metadata data.
+        case "search-api/search-ws/search":
+          return TEST_ELASTIC_SEARCH_RESPONSE;
+        case "search-api/search-ws/count":
+          return TEST_ELASTIC_COUNT_RESPONSE;
+      }
+    });
+
+    // Setup API context with the mocked queries.
+    const apiContext: any = {
+      apiClient: {
+        get: mockGet,
+        axios: {
+          get: mockGet,
+          post: mockPost
+        }
+      }
+    };
+
+    const wrapper = mountWithAppContext(
+      <QueryPage
+        indexName="testIndex"
+        columns={TEST_COLUMNS}
+        viewMode={true}
+      />,
+      {
+        apiContext
+      }
+    );
+
+    // Wait for any API call
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // QueryPage does not show QueryTable in ViewMode
+    expect(wrapper.find(QueryBuilder).exists()).toEqual(false);
+    expect(wrapper.find(SavedSearch).exists()).toEqual(false);
+    expect(wrapper.find(SubmitButton).exists()).toEqual(false);
   });
 });
