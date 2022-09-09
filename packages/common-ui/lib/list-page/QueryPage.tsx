@@ -298,10 +298,10 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     // Append the newly selected resources with the current resources.
-    const selectedResourcesAppended = uniq([
+    const selectedResourcesAppended = [
       ...selectedResources,
       ...selectedObjects
-    ]);
+    ];
 
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
