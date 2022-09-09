@@ -1,10 +1,7 @@
 import {
-  dateCell,
   DateField,
-  DeleteButton,
   FieldSet,
   QueryPage,
-  stringArrayCell,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -12,7 +9,6 @@ import { TableColumn } from "../../../common-ui/lib/list-page/types";
 import { Project } from "../../../dina-ui/types/collection-api";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import Link from "next/link";
 import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { TransformQueryToDSLParams } from "../../../common-ui/lib/util/transformToDSL";
@@ -23,18 +19,20 @@ export function ProjectFormLayout() {
   const { groupNames } = useAccount();
   const router = useRouter();
   const uuid = String(router?.query?.id);
-  const customViewQuery: TransformQueryToDSLParams = {
-    group: groupNames?.[0] ?? "",
-    queryRows: [
-      {
-        fieldName: "data.relationships.projects.data.id",
-        matchType: "equals",
-        textMatchType: "partial",
-        type: "text",
-        matchValue: uuid
+  const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
+    ? {
+        group: groupNames?.[0] ?? "",
+        queryRows: [
+          {
+            fieldName: "data.relationships.projects.data.id",
+            matchType: "equals",
+            textMatchType: "partial",
+            type: "text",
+            matchValue: uuid
+          }
+        ]
       }
-    ]
-  };
+    : undefined;
 
   // Columns for the elastic search list page.
   const columns: TableColumn<Project>[] = [
@@ -109,14 +107,17 @@ export function ProjectFormLayout() {
         attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
-      <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
-        <QueryPage
-          columns={columns}
-          indexName={"dina_material_sample_index"}
-          viewMode={readOnly}
-          customViewQuery={customViewQuery}
-        />
-      </FieldSet>
+
+      {readOnly && (
+        <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
+          <QueryPage
+            columns={columns}
+            indexName={"dina_material_sample_index"}
+            viewMode={readOnly}
+            customViewQuery={customViewQuery}
+          />
+        </FieldSet>
+      )}
     </div>
   );
 }
