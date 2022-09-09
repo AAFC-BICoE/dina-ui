@@ -5,8 +5,9 @@ import DatePicker from "react-datepicker";
 import { PersistedResource } from "kitsu";
 import { Group } from "packages/dina-ui/types/user-api";
 import { TableColumn } from "../types";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { MaterialSample } from "packages/dina-ui/types/collection-api/resources/MaterialSample";
+import { DINA_ADMIN } from "../../../types/DinaRoles";
 
 /** Mock resources returned by elastic search mapping from api. */
 const MOCK_INDEX_MAPPING_RESP = {
@@ -111,7 +112,7 @@ const MATERIAL_SAMPLE_DATA = {
       version: 0,
       group: "aafc",
       createdOn: "2022-03-28T13:04:50.689122Z",
-      createdBy: "dina-admin",
+      createdBy: DINA_ADMIN,
       dwcCatalogNumber: null,
       dwcOtherCatalogNumbers: null,
       materialSampleName: null,
