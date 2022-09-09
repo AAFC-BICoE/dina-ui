@@ -2,7 +2,7 @@ import RcTooltip from "rc-tooltip";
 import { ReactNode } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 
-interface TooltipProps {
+export interface TooltipProps {
   /** The ID of the message to show in the tooltip. */
   id?: string;
 
@@ -30,9 +30,14 @@ interface TooltipProps {
   // add margin to tooltip span if true
   disableSpanMargin?: boolean;
 
+  /** Tooltip placement override, top is the default. */
+  placement?: "top" | "bottom" | "left" | "right";
+
   setVisible?: React.Dispatch<React.SetStateAction<boolean>>;
   visible?: boolean;
 }
+
+export type tooltipPlacements = "top" | "bottom" | "left" | "right";
 
 export function Tooltip({
   id,
@@ -42,7 +47,8 @@ export function Tooltip({
   linkText,
   image,
   altImage,
-  disableSpanMargin
+  disableSpanMargin,
+  placement = "top"
 }: TooltipProps) {
   // Setup the internationalization functions.
   const { messages, formatMessage } = useIntl();
@@ -96,7 +102,7 @@ export function Tooltip({
             {tooltipLink}
           </div>
         }
-        placement="top"
+        placement={placement}
         trigger={["focus", "hover"]}
       >
         <span>

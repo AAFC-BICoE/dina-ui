@@ -8,3 +8,4 @@ export * from "./resources/ManagedAttributeMap";
 export * from "./resources/Metadata";
 export * from "./resources/ObjectSubtype";
 export * from "./resources/ObjectUpload";
+export * from "./resources/MediaType";

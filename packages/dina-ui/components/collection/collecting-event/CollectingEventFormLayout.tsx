@@ -13,7 +13,8 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -75,7 +76,7 @@ export function CollectingEventFormLayout({
 
   // Check if Georeferences are empty
   const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
-    georeference => {
+    (georeference) => {
       for (const key in georeference) {
         if (
           georeference[key] !== null &&
@@ -88,7 +89,7 @@ export function CollectingEventFormLayout({
     }
   );
   const hideGeoreferences: boolean = georeferencesEmpty.every(
-    element => element === true
+    (element) => element === true
   );
 
   const [geoAssertionTabIdx, setGeoAssertionTabIdx] = useState(0);
@@ -198,7 +199,7 @@ export function CollectingEventFormLayout({
   ) {
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
-    detailResults?.address?.map(addr => {
+    detailResults?.address?.map((addr) => {
       // omitting country and state
       if (
         addr.type !== "country" &&
@@ -329,7 +330,7 @@ export function CollectingEventFormLayout({
     }
   };
 
-  const addCustomPlaceName = form => {
+  const addCustomPlaceName = (form) => {
     if (!customPlaceValue || customPlaceValue.length === 0) return;
     // Add user entered custom place in front
     const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
@@ -339,7 +340,7 @@ export function CollectingEventFormLayout({
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
-    srcAdminLevels.map(lev => {
+    srcAdminLevels.map((lev) => {
       lev.shortId = lev.shortId + 1;
     });
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
@@ -359,7 +360,7 @@ export function CollectingEventFormLayout({
   ) {
     layoutWrapperRef.current
       ?.querySelectorAll(`#${id} .templateCheckBox`)
-      ?.forEach(field => {
+      ?.forEach((field) => {
         // tslint:disable-next-line
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
@@ -416,8 +417,8 @@ export function CollectingEventFormLayout({
                         aria-label="customPlace"
                         className="p-2 form-control"
                         style={{ width: "60%" }}
-                        onChange={e => setCustomPlaceValue(e.target.value)}
-                        onKeyDown={e => {
+                        onChange={(e) => setCustomPlaceValue(e.target.value)}
+                        onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
                             if (customPlaceValue?.length > 0) {
@@ -509,7 +510,7 @@ export function CollectingEventFormLayout({
                             className={
                               hasVerbatimLocality ? "btn btn-link" : "d-none"
                             }
-                            onClick={state =>
+                            onClick={(state) =>
                               doGeoSearch(state.dwcVerbatimLocality)
                             }
                           >
@@ -519,7 +520,7 @@ export function CollectingEventFormLayout({
                             className={
                               hasDecimalCoords ? "btn btn-link" : "d-none"
                             }
-                            onClick={state => {
+                            onClick={(state) => {
                               const assertion =
                                 state.geoReferenceAssertions?.[
                                   geoAssertionTabIdx
@@ -631,21 +632,32 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
-            <AutoSuggestTextField<CollectingEvent>
-              name="dwcRecordedBy"
-              jsonApiBackend={{
-                query: (searchValue, ctx) => ({
-                  path: "collection-api/collecting-event",
-                  filter: {
-                    ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group }
+            <FieldSpy<string> fieldName="group">
+              {(group) => (
+                <AutoSuggestTextField<CollectingEvent>
+                  name="dwcRecordedBy"
+                  jsonApiBackend={{
+                    query: (searchValue, ctx) => ({
+                      path: "collection-api/collecting-event",
+                      filter: {
+                        ...(ctx.values.group && {
+                          group: { EQ: ctx.values.group }
+                        }),
+                        rsql: `dwcRecordedBy==*${searchValue}*`
+                      }
                     }),
-                    rsql: `dwcRecordedBy==*${searchValue}*`
-                  }
-                }),
-                option: collEvent => collEvent?.dwcRecordedBy ?? ""
-              }}
-            />
+                    option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
+                  }}
+                  elasticSearchBackend={{
+                    indexName: "dina_material_sample_index",
+                    searchField: "included.attributes.dwcRecordedBy",
+                    group: group ?? undefined,
+                    option: (collEvent) => collEvent?.dwcRecordedBy
+                  }}
+                  preferredBackend={"elastic-search"}
+                />
+              )}
+            </FieldSpy>
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
               name="dwcRecordNumber"
@@ -683,9 +695,9 @@ export function CollectingEventFormLayout({
                 query: () => ({
                   path: "collection-api/vocabulary/coordinateSystem"
                 }),
-                option: vocabElement =>
+                option: (vocabElement) =>
                   vocabElement?.vocabularyElements?.map(
-                    it => it?.labels?.[locale] ?? ""
+                    (it) => it?.labels?.[locale] ?? ""
                   ) ?? ""
               }}
               blankSearchBackend={"json-api"}
@@ -779,9 +791,9 @@ export function CollectingEventFormLayout({
                 query: () => ({
                   path: "collection-api/vocabulary/srs"
                 }),
-                option: vocabElement =>
+                option: (vocabElement) =>
                   vocabElement?.vocabularyElements?.map(
-                    it => it?.labels?.[locale] ?? ""
+                    (it) => it?.labels?.[locale] ?? ""
                   ) ?? ""
               }}
               blankSearchBackend={"json-api"}
@@ -861,7 +873,7 @@ export function CollectingEventFormLayout({
                     rsql: `substrate==${searchValue}*`
                   }
                 }),
-                option: collEvent => collEvent?.substrate ?? ""
+                option: (collEvent) => collEvent?.substrate ?? ""
               }}
             />
             <NumberRangeFields

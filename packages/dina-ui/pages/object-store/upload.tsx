@@ -14,8 +14,6 @@ import {
   FileUploaderOnSubmitArgs
 } from "../../components/object-store";
 import { useFileUpload } from "../../components/object-store/file-upload/FileUploadProvider";
-import { DefaultValuesConfigSelectField } from "../../components/object-store/metadata-bulk-editor/custom-default-values/DefaultValueConfigManager";
-import { useDefaultValueRuleEditorModal } from "../../components/object-store/metadata-bulk-editor/custom-default-values/useDefaultValueRuleBuilderModal";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { writeStorage, deleteFromStorage } from "@rehooks/local-storage";
 
@@ -23,7 +21,6 @@ export const BULK_ADD_IDS_KEY = "bulkAddIds";
 
 export interface OnSubmitValues {
   group?: string;
-  defaultValuesConfig: number | null;
 }
 
 export default function UploadPage() {
@@ -31,13 +28,11 @@ export default function UploadPage() {
   const { formatMessage } = useDinaIntl();
   const { initialized: accountInitialized, groupNames } = useAccount();
   const { uploadFiles } = useFileUpload();
-  const { openDefaultValuesModal } = useDefaultValueRuleEditorModal();
   const { openModal } = useModal();
 
   async function onSubmit({
     acceptedFiles,
-    group,
-    defaultValuesConfig
+    group
   }: FileUploaderOnSubmitArgs<OnSubmitValues>) {
     if (!group) {
       throw new Error(formatMessage("groupMustBeSelected"));
@@ -46,7 +41,7 @@ export default function UploadPage() {
     const uploadRespsT = await uploadFiles({ files: acceptedFiles, group });
 
     const objectUploadDuplicates = uploadRespsT
-      .filter(resp => resp.meta?.warnings?.duplicate_found)
+      .filter((resp) => resp.meta?.warnings?.duplicate_found)
       .map(({ meta, originalFilename }) => ({ originalFilename, meta }));
 
     const navigateToEditMetadata = async () => {
@@ -55,13 +50,21 @@ export default function UploadPage() {
       );
       deleteFromStorage(BULK_EDIT_IDS_KEY);
       writeStorage(BULK_ADD_IDS_KEY, objectUploadIds);
-      await router.push({
-        pathname: "/object-store/metadata/edit",
-        query: {
-          group,
-          ...(defaultValuesConfig !== null ? { defaultValuesConfig } : {})
-        }
-      });
+      if (objectUploadIds.length === 1) {
+        await router.push({
+          pathname: "/object-store/metadata/edit",
+          query: {
+            group
+          }
+        });
+      } else {
+        await router.push({
+          pathname: "/object-store/metadata/bulk-edit",
+          query: {
+            group
+          }
+        });
+      }
     };
 
     if (Object.keys(objectUploadDuplicates)?.length === 0) {
@@ -131,9 +134,7 @@ export default function UploadPage() {
             <DinaMessage id="userMustBelongToGroup" />
           </div>
         ) : (
-          <DinaForm<OnSubmitValues>
-            initialValues={{ defaultValuesConfig: null }}
-          >
+          <DinaForm<OnSubmitValues> initialValues={{}}>
             <div className="container">
               <div className="row">
                 <GroupSelectField
@@ -141,26 +142,6 @@ export default function UploadPage() {
                   name="group"
                   enableStoredDefaultGroup={true}
                 />
-                <DefaultValuesConfigSelectField
-                  allowBlank={true}
-                  name="defaultValuesConfig"
-                  className="offset-md-3 col-md-3"
-                  styles={customStyles}
-                />
-                <div className="col-md-3" style={{ margin: "2em 0em 2em 0em" }}>
-                  <FormikButton
-                    className="btn btn-primary"
-                    onClick={({ defaultValuesConfig }, { setFieldValue }) =>
-                      openDefaultValuesModal({
-                        index: defaultValuesConfig,
-                        onSave: index =>
-                          setFieldValue("defaultValuesConfig", index)
-                      })
-                    }
-                  >
-                    <DinaMessage id="configureDefaultValues" />
-                  </FormikButton>
-                </div>
               </div>
             </div>
             <div>

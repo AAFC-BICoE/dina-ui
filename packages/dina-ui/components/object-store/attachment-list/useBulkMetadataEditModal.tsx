@@ -1,6 +1,8 @@
 import { useModal } from "common-ui";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { BulkMetadataEditor } from "../metadata-bulk-editor/BulkMetadataEditor";
+import { ExistingMetadataBulkEditor } from "../../bulk-metadata/ExistingMetadataBulkEditor";
+import { UploadingMetadataBulkEditor } from "../../bulk-metadata/UploadingMetadataBulkEditor";
+import { useRouter } from "next/router";
 
 export interface BulkMetadataEditModalParams {
   afterMetadatasSaved?: (metadataIds: string[]) => void | Promise<void>;
@@ -12,6 +14,7 @@ export interface BulkMetadataEditModalParams {
 /** Opens the bulk Metadata editor spreadsheet UI in a modal. */
 export function useBulkMetadataEditModal() {
   const { openModal, closeModal } = useModal();
+  const router = useRouter();
 
   function openMetadataEditorModal({
     afterMetadatasSaved: afterMetadatasSavedProp,
@@ -40,12 +43,20 @@ export function useBulkMetadataEditModal() {
           </button>
         </div>
         <div className="modal-body">
-          <BulkMetadataEditor
-            objectUploadIds={objectUploadIds}
-            metadataIds={metadataIds}
-            group={group}
-            afterMetadatasSaved={afterMetadatasSavedInternal}
-          />
+          {metadataIds ? (
+            <ExistingMetadataBulkEditor
+              ids={metadataIds}
+              onSaved={afterMetadatasSavedInternal}
+            />
+          ) : (
+            objectUploadIds && (
+              <UploadingMetadataBulkEditor
+                objectUploadIds={objectUploadIds}
+                onSaved={afterMetadatasSavedInternal}
+                inputGroup={group}
+              />
+            )
+          )}
         </div>
       </div>
     );

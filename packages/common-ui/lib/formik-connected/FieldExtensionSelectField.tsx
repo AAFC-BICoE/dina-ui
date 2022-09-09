@@ -29,7 +29,7 @@ export function FieldExtensionSelectField(
   return withResponse(fieldExtensionQuery, ({ data: fieldExtension }) => {
     const options = [
       { label: "None", value: null }, // none option to deselect field, concatenated with mapped values
-      ...fieldExtension?.extension.fields?.[0]?.acceptedValues?.map(val => {
+      ...fieldExtension?.extension.fields?.[0]?.acceptedValues?.map((val) => {
         const extensionValue: ExtensionValue = {
           extKey: fieldExtension.extension.key,
           extTerm: fieldExtension.extension.fields?.[0]?.term,
@@ -45,9 +45,9 @@ export function FieldExtensionSelectField(
     return (
       <FieldWrapper
         {...fieldExtensionSelectFieldProps}
-        readOnlyRender={value =>
+        readOnlyRender={(value) =>
           value ? (
-            <div className="card p-1 flex-row align-items-center gap-1 bg-danger">
+            <div className="card py-1 px-2 flex-row align-items-center gap-1 bg-danger">
               <GoCircleSlash className="text-white" />
               <span className="text-white">
                 {fieldExtensionSelectFieldProps.label + " : " + value?.value}
@@ -62,7 +62,7 @@ export function FieldExtensionSelectField(
           }
 
           // Display selected value, display default placeholder if None selected
-          const selectedValue = options?.filter(opt =>
+          const selectedValue = options?.filter((opt) =>
             opt.value ? opt.value.value === value?.value : null
           );
 

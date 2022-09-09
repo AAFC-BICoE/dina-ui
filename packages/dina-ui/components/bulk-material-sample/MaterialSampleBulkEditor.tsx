@@ -7,9 +7,11 @@ import {
   getBulkEditTabFieldInfo,
   ResourceWithHooks,
   SaveArgs,
-  useApiClient
+  useApiClient,
+  withoutBlankFields
 } from "common-ui";
-import { InputResource, PersistedResource } from "kitsu";
+import { isEmpty } from "lodash";
+import { InputResource, PersistedResource, KitsuResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
@@ -26,7 +28,10 @@ import {
   BulkEditNavigator,
   BulkNavigatorTab
 } from "../bulk-edit/BulkEditNavigator";
-import { useBulkEditTab } from "./bulk-edit-tab";
+import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
+import { FormikProps } from "formik";
+import { VisibleManagedAttributesConfig } from "..";
+import { MatrialSampleFormEnabledFields } from "../collection/material-sample/MaterialSampleForm";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -41,13 +46,6 @@ export function MaterialSampleBulkEditor({
   onSaved,
   onPreviousClick
 }: MaterialSampleBulkEditorProps) {
-  // Make sure the samples list doesn't change during this component's lifecycle:
-  const samples = useMemo(() => samplesProp, []);
-
-  const [selectedTab, setSelectedTab] = useState<
-    BulkNavigatorTab | ResourceWithHooks
-  >();
-
   // Allow selecting a custom view for the form:
   const {
     sampleFormTemplate,
@@ -56,36 +54,38 @@ export function MaterialSampleBulkEditor({
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateSelectState();
 
-  const formTemplateProps: Partial<MaterialSampleFormProps> = {
+  const [selectedTab, setSelectedTab] = useState<
+    BulkNavigatorTab | ResourceWithHooks
+  >();
+
+  const {
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    sampleHooks,
+    materialSampleForm,
+    formTemplateProps
+  }: {
+    bulkEditFormRef;
+    bulkEditSampleHook;
+    sampleHooks: any;
+    materialSampleForm: JSX.Element;
+    formTemplateProps: Partial<MaterialSampleFormProps>;
+  } = initializeRefHookFormProps(
+    samplesProp,
     enabledFields,
-    visibleManagedAttributeKeys
-  };
-
-  const sampleHooks = samples.map<ResourceWithHooks>((resource, index) => {
-    const key = `sample-${index}`;
-    return {
-      key,
-      resource,
-      saveHook: useMaterialSampleSave({
-        materialSample: resource,
-        // Reduce the off-screen tabs rendering for better performance:
-        reduceRendering: key !== selectedTab?.key,
-        // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
-        disableNestedFormEdits: true,
-        visibleManagedAttributeKeys,
-        enabledFields
-      }),
-      formRef: useRef(null)
-    };
-  });
-
+    visibleManagedAttributeKeys,
+    selectedTab
+  );
+  function sampleBulkOverrider() {
+    /** Sample input including blank/empty fields. */
+    return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
+  }
   const [initialized, setInitialized] = useState(false);
-
-  const { bulkEditTab, sampleBulkOverrider, bulkEditFormRef } = useBulkEditTab({
+  const { bulkEditTab } = useBulkEditTab({
     resourceHooks: sampleHooks,
     hideBulkEditTab: !initialized,
-    hideUseSequence: true,
-    sampleFormProps: formTemplateProps
+    resourceForm: materialSampleForm,
+    bulkEditFormRef
   });
 
   useEffect(() => {
@@ -135,13 +135,16 @@ export function MaterialSampleBulkEditor({
           onSelectTab={setSelectedTab}
           resources={sampleHooks}
           extraTabs={[bulkEditTab]}
+          tabNameConfig={(materialSample: ResourceWithHooks<MaterialSample>) =>
+            materialSample?.resource?.materialSampleName
+          }
           renderOneResource={({ index, isSelected }) => (
             <MaterialSampleForm
               hideUseSequence={true}
               disableSampleNameField={disableSampleNameField}
-              materialSampleFormRef={form => {
+              materialSampleFormRef={(form) => {
                 const isLastRefSetter =
-                  sampleHooks.filter(it => !it.formRef.current).length === 1;
+                  sampleHooks.filter((it) => !it.formRef.current).length === 1;
                 sampleHooks[index].formRef.current = form;
                 if (isLastRefSetter && form) {
                   setInitialized(true);
@@ -166,7 +169,164 @@ interface BulkSampleSaveParams {
   samplePreProcessor?: () => (
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
-  bulkEditCtx: BulkEditTabContextI;
+  bulkEditCtx: BulkEditTabContextI<MaterialSample>;
+}
+
+export function initializeRefHookFormProps(
+  samplesProp,
+  enabledFields: MatrialSampleFormEnabledFields,
+  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
+  selectedTab:
+    | BulkNavigatorTab<KitsuResource>
+    | ResourceWithHooks<KitsuResource>
+    | undefined
+) {
+  // Make sure the samples list doesn't change during this component's lifecycle:
+  const samples = useMemo(() => samplesProp, []);
+
+  const formTemplateProps: Partial<MaterialSampleFormProps> = {
+    enabledFields,
+    visibleManagedAttributeKeys
+  };
+
+  const initialValues: InputResource<MaterialSample> = {
+    type: "material-sample"
+  };
+
+  const bulkEditFormRef =
+    useRef<FormikProps<InputResource<MaterialSample>>>(null);
+
+  const bulkEditSampleHook = useMaterialSampleSave({
+    ...formTemplateProps,
+    materialSample: initialValues,
+    showChangedIndicatorsInNestedForms: true
+  });
+
+  const sampleHooks = getSampleHooks(
+    samples,
+    selectedTab,
+    visibleManagedAttributeKeys,
+    enabledFields
+  );
+
+  const materialSampleForm = getMaterialSampleForm(
+    formTemplateProps,
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    initialValues,
+    sampleHooks
+  );
+  return {
+    bulkEditFormRef,
+    bulkEditSampleHook,
+    sampleHooks,
+    materialSampleForm,
+    formTemplateProps
+  };
+}
+
+function getSampleHooks(
+  samples,
+  selectedTab:
+    | BulkNavigatorTab<KitsuResource>
+    | ResourceWithHooks<KitsuResource>
+    | undefined,
+  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
+  enabledFields: MatrialSampleFormEnabledFields
+) {
+  return samples.map((resource, index) => {
+    const key = `sample-${index}`;
+    return {
+      key,
+      resource,
+      saveHook: useMaterialSampleSave({
+        materialSample: resource,
+        // Reduce the off-screen tabs rendering for better performance:
+        reduceRendering: key !== selectedTab?.key,
+        // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
+        disableNestedFormEdits: true,
+        visibleManagedAttributeKeys,
+        enabledFields
+      }),
+      formRef: useRef(null)
+    };
+  });
+}
+
+export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
+  let bulkEditSample: InputResource<MaterialSample> | undefined;
+
+  /** Returns a sample with the overridden values. */
+  return async function withBulkEditOverrides(
+    baseSample: InputResource<MaterialSample>
+  ) {
+    const formik = bulkEditFormRef.current;
+    // Shouldn't happen, but check for type safety:
+    if (!formik) {
+      throw new Error("Missing Formik ref for Bulk Edit Tab");
+    }
+
+    // Initialize the bulk values once to make sure the same object is used each time.
+    if (!bulkEditSample) {
+      bulkEditSample = await bulkEditSampleHook.prepareSampleInput(
+        formik.values
+      );
+    }
+
+    /** Sample override object with only the non-empty fields. */
+    const overrides = withoutBlankFields(bulkEditSample);
+
+    // Combine the managed attributes dictionaries:
+    const newManagedAttributes = {
+      ...withoutBlankFields(baseSample.managedAttributes),
+      ...withoutBlankFields(bulkEditSample?.managedAttributes)
+    };
+
+    const newHostOrganism = {
+      ...withoutBlankFields(baseSample.hostOrganism),
+      ...withoutBlankFields(bulkEditSample?.hostOrganism)
+    };
+
+    const newSample: InputResource<MaterialSample> = {
+      ...baseSample,
+      ...overrides,
+      ...(!isEmpty(newManagedAttributes) && {
+        managedAttributes: newManagedAttributes
+      }),
+      ...(!isEmpty(newHostOrganism) && {
+        hostOrganism: newHostOrganism
+      })
+    };
+
+    return newSample;
+  };
+}
+
+function getMaterialSampleForm(
+  formTemplateProps: Partial<MaterialSampleFormProps>,
+  bulkEditFormRef,
+  bulkEditSampleHook,
+  initialValues,
+  sampleHooks: ResourceWithHooks<KitsuResource>[]
+) {
+  return (
+    <MaterialSampleForm
+      {...formTemplateProps}
+      buttonBar={null}
+      hideUseSequence={true}
+      materialSampleFormRef={bulkEditFormRef}
+      materialSampleSaveHook={bulkEditSampleHook}
+      materialSample={initialValues}
+      disableAutoNamePrefix={true}
+      disableSampleNameField={true}
+      disableCollectingEventSwitch={sampleHooks.some(
+        (hook: any) => hook.resource?.parentMaterialSample !== undefined
+      )}
+      // Disable the nav's Are You Sure prompt when removing components,
+      // because you aren't actually deleting data.
+      disableNavRemovePrompt={true}
+    />
+  );
 }
 
 /**
@@ -215,7 +375,7 @@ function useBulkSampleSave({
         try {
           const saveOp = await saveHook.prepareSampleSaveOperation({
             submittedValues: formik.values,
-            preProcessSample: async original => {
+            preProcessSample: async (original) => {
               try {
                 return (await preProcessSample?.(original)) ?? original;
               } catch (error: unknown) {
@@ -224,7 +384,7 @@ function useBulkSampleSave({
                   throw new DoOperationsError(
                     error.message,
                     error.fieldErrors,
-                    error.individualErrors.map(opError => ({
+                    error.individualErrors.map((opError) => ({
                       ...opError,
                       index: "EDIT_ALL"
                     }))
@@ -241,7 +401,7 @@ function useBulkSampleSave({
             throw new DoOperationsError(
               error.message,
               error.fieldErrors,
-              error.individualErrors.map(operationError => ({
+              error.individualErrors.map((operationError) => ({
                 ...operationError,
                 index:
                   typeof operationError.index === "number"
@@ -290,8 +450,8 @@ function useBulkSampleSave({
         // Don't show the bulk edited fields' errors in the individual sample tabs
         // because the user can't fix them there:
         sampleHooks
-          .map(it => it.formRef?.current)
-          .forEach(it => it?.setErrors(omit(it.errors, badBulkEditedFields)));
+          .map((it) => it.formRef?.current)
+          .forEach((it) => it?.setErrors(omit(it.errors, badBulkEditedFields)));
       }
       setError(error);
       throw new Error(formatMessage("bulkSubmissionErrorInfo"));

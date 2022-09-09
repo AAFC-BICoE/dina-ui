@@ -5,8 +5,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import { isEmpty } from "lodash";
 import { ReactNode, RefObject } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { MaterialSample } from "../../types/collection-api/resources/MaterialSample";
-import { SelectNavigation } from "../bulk-material-sample/SelectNavigation";
+import { SelectNavigation } from "./SelectNavigation";
 
 export interface BulkEditNavigatorProps {
   resources: ResourceWithHooks[];
@@ -14,6 +13,7 @@ export interface BulkEditNavigatorProps {
   selectedTab: BulkNavigatorTab | ResourceWithHooks;
   onSelectTab: (newSelected: ResourceWithHooks | BulkNavigatorTab) => void;
   extraTabs?: BulkNavigatorTab[];
+  tabNameConfig?: (resource: ResourceWithHooks) => string | undefined;
 }
 
 export interface ResourceRenderProps<T extends KitsuResource = KitsuResource> {
@@ -38,14 +38,15 @@ export function BulkEditNavigator({
   onSelectTab,
   resources,
   renderOneResource,
-  extraTabs = []
+  extraTabs = [],
+  tabNameConfig
 }: BulkEditNavigatorProps) {
   const tabElements = [...extraTabs, ...resources];
 
   const tooManyResourcesForTabs = resources.length >= 10;
 
   const tabsWithErrors = [...resources, ...extraTabs].filter(
-    resource =>
+    (resource) =>
       !!resource.formRef.current?.status ||
       !isEmpty(resource.formRef.current?.errors)
   );
@@ -63,9 +64,10 @@ export function BulkEditNavigator({
               elements={tabElements}
               value={selectedTab}
               onChange={onSelectTab}
-              optionLabel={(element: any) =>
-                element.title || element.resource?.materialSampleName
-              }
+              optionLabel={(element: any) => {
+                const tabName = tabNameConfig ? tabNameConfig(element) : null;
+                return element.title || tabName;
+              }}
               invalidElements={tabsWithErrors}
             />
           </div>
@@ -95,9 +97,9 @@ export function BulkEditNavigator({
           // Prevent unmounting the form on tab switch to avoid losing the form state:
           forceRenderTabPanel={true}
           selectedIndex={tabElements.findIndex(
-            element => element.key === selectedTab.key
+            (element) => element.key === selectedTab.key
           )}
-          onSelect={index => onSelectTab(tabElements[index])}
+          onSelect={(index) => onSelectTab(tabElements[index])}
         >
           <TabList>
             {extraTabs.map((extraTab, index) => {
@@ -121,13 +123,14 @@ export function BulkEditNavigator({
             })}
             {resources.map((resource, index) => {
               const tabHasError = tabsWithErrors.includes(resource);
+              const tabName = tabNameConfig ? tabNameConfig(resource) : null;
               return (
                 <Tab
                   className={`react-tabs__tab sample-tab-${index}`}
                   key={index}
                 >
                   <span className={tabHasError ? "text-danger is-invalid" : ""}>
-                    {`#${index + 1}`}
+                    {tabName || `#${index + 1}`}
                   </span>
                 </Tab>
               );

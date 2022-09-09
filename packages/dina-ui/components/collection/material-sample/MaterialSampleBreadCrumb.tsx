@@ -38,10 +38,10 @@ export function MaterialSampleBreadCrumb({
       {/* Material Sample Parents */}
       <div className="ms-4">
         <ol
-          className="breadcrumb mb-3"
+          className="breadcrumb mb-2"
           style={{ "--bs-breadcrumb-divider": "'/'" } as any}
         >
-          {parentPath.map(node => (
+          {parentPath.map((node) => (
             <li className="breadcrumb-item" key={node.uuid}>
               <Link href={`/collection/material-sample/view?id=${node.uuid}`}>
                 <a>{node.name}</a>

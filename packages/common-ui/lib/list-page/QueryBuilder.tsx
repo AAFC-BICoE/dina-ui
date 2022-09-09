@@ -40,8 +40,8 @@ export function QueryBuilder({
 
     // Read index attributes.
     resp.data?.attributes
-      ?.filter(key => key.name !== "type")
-      .map(key => {
+      ?.filter((key) => key.name !== "type")
+      .map((key) => {
         const path = key.path;
         const prefix = "data.attributes";
         let attrPrefix;
@@ -62,8 +62,8 @@ export function QueryBuilder({
       });
 
     // Read relationship attributes.
-    resp.data?.relationships?.map(relationship => {
-      relationship?.attributes?.map(relationshipAttribute => {
+    resp.data?.relationships?.map((relationship) => {
+      relationship?.attributes?.map((relationshipAttribute) => {
         // This is the user-friendly label to display on the search dropdown.
         const attributeLabel = relationshipAttribute.path?.includes(".")
           ? relationshipAttribute.path.substring(
@@ -78,7 +78,8 @@ export function QueryBuilder({
           value: relationship.value + "." + attributeLabel,
           type: relationshipAttribute.type,
           path: relationshipAttribute.path,
-          parentName: relationship.value,
+          parentName: relationship.referencedBy,
+          parentType: relationship.value,
           parentPath: relationship.path,
           distinctTerm: relationshipAttribute.distinct_term_agg
         });
@@ -125,12 +126,12 @@ export function QueryBuilder({
 
   const sortedData = data
     ?.sort((a, b) => a.label.localeCompare(b.label))
-    .filter(prop => !prop.label.startsWith("group"));
+    .filter((prop) => !prop.label.startsWith("group"));
 
   return (
     <>
       <FieldArray name={name}>
-        {fieldArrayProps => {
+        {(fieldArrayProps) => {
           const elements: [] = fieldArrayProps.form.values.queryRows;
 
           function addRow() {
@@ -144,7 +145,7 @@ export function QueryBuilder({
                 addRow={addRow}
               />
             );
-            // initialize the logic switch value to be "and"//
+            // initialize the logic switch value to be "and"
             fieldArrayProps.form.setFieldValue(
               `${fieldArrayProps.name}[${
                 elements?.length ?? 0

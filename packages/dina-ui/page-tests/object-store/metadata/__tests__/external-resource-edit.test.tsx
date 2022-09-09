@@ -1,13 +1,16 @@
 import { PersistedResource } from "kitsu";
 import {
   License,
+  MediaType,
   Metadata,
   ObjectSubtype
 } from "../../../../types/objectstore-api";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import ExternalResourceMetadataPage from "../../../../pages/object-store/metadata/external-resource-edit";
+import Select from "react-select/base";
+import { ResourceSelectField } from "common-ui";
 
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   switch (path) {
     case "objectstore-api/metadata/undefined":
       return {};
@@ -19,10 +22,12 @@ const mockGet = jest.fn(async path => {
       return { data: TEST_LICENSES[0] };
     case "objectstore-api/object-subtype":
       return { data: TEST_ACSUBTYPE };
+    case "objectstore-api/media-type":
+      return { data: TEST_MEDIATYPE };
   }
 });
 
-const mockBulkGet = jest.fn(async paths => {
+const mockBulkGet = jest.fn(async (paths) => {
   if (!paths.length) {
     return [];
   }
@@ -30,6 +35,19 @@ const mockBulkGet = jest.fn(async paths => {
     return TEST_METADATA;
   }
 });
+
+const TEST_MEDIATYPE: PersistedResource<MediaType>[] = [
+  {
+    id: "image/jpeg",
+    mediaType: "image/jpeg",
+    type: "media-type"
+  },
+  {
+    id: "image/png",
+    mediaType: "image/png",
+    type: "media-type"
+  }
+];
 
 const TEST_ACSUBTYPE: PersistedResource<ObjectSubtype>[] = [
   {
@@ -113,16 +131,29 @@ describe("Metadata external resource edit page.", () => {
       wrapper.find(".acCaption-field input").first().prop("value")
     ).toBeFalsy();
 
-    // Set values:
+    // Type a search into the media format search.
     wrapper
       .find(".dcFormat-field input")
       .first()
       .simulate("change", {
         target: {
-          value: "jpeg"
+          value: "image/jpeg"
         }
       });
 
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Open the dropdown menu.
+    wrapper
+      .find(".dcFormat-field input")
+      .first()
+      .simulate("mouseDown", { button: 0 });
+
+    // Select the first result in the list. Should only be one result.
+    wrapper.find(".react-select__option").first().simulate("click");
+
+    // Set values:
     wrapper
       .find(".fileExtension-field input")
       .first()
@@ -160,7 +191,7 @@ describe("Metadata external resource edit page.", () => {
         {
           resource: {
             bucket: "aafc",
-            dcFormat: "jpeg",
+            dcFormat: "image/jpeg",
             fileExtension: ".jpg",
             acSubtype: null,
             acCaption: "test caption",
@@ -174,7 +205,7 @@ describe("Metadata external resource edit page.", () => {
   });
 
   it("Lets you edit an existing external resource metadata.", async () => {
-    mockSave.mockImplementation(args => args.map(({ resource }) => resource));
+    mockSave.mockImplementation((args) => args.map(({ resource }) => resource));
     mockUseRouter.mockReturnValue({
       push: () => undefined,
       query: {

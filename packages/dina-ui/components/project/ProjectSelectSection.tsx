@@ -4,7 +4,7 @@ import {
   ResourceSelectField,
   useDinaFormContext
 } from "common-ui";
-import { FaFolderOpen } from "react-icons/fa";
+import { IoIosListBox } from "react-icons/io";
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 
@@ -55,12 +55,12 @@ export function ProjectSelectField({
         filter={filterBy(["name"])}
         model={resourcePath as any}
         className={"projects " + (className || "")}
-        optionLabel={prj => prj.name}
+        optionLabel={(prj) => prj.name}
         hideLabel={readOnly}
         removeLabel={readOnly}
         label={
           <span>
-            <FaFolderOpen /> <DinaMessage id="projects" />
+            <IoIosListBox /> <DinaMessage id="projects" />
           </span>
         }
         readOnlyRender={(value, _) =>
@@ -68,10 +68,10 @@ export function ProjectSelectField({
             <div className="d-flex flex-row gap-2">
               {value.map((val, idx) => (
                 <div
-                  className="card p-1 d-flex flex-row align-items-center gap-1 label-default label-outlined"
+                  className="card py-1 px-2 d-flex flex-row align-items-center gap-1 label-default label-outlined"
                   key={idx}
                 >
-                  <FaFolderOpen />
+                  <IoIosListBox />
                   <span>{val.name}</span>
                 </div>
               ))}

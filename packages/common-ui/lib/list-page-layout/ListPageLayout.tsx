@@ -163,9 +163,7 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   /** Wrap the table in a form when checkboxes are enabled. */
   const tableWrappedInForm = showRowCheckboxes ? (
-    <DinaForm<BulkSelectableFormValues>
-      initialValues={{ selectedResources: {} }}
-    >
+    <DinaForm<BulkSelectableFormValues> initialValues={{ itemIdsToSelect: {} }}>
       {tableElement}
     </DinaForm>
   ) : (
@@ -185,5 +183,5 @@ export function ListPageLayout<TData extends KitsuResource>({
 }
 
 export interface BulkSelectableFormValues {
-  selectedResources: Record<string, boolean>;
+  itemIdsToSelect: Record<string, boolean>;
 }

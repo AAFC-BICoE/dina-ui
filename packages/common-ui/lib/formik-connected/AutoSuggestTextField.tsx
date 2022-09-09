@@ -86,9 +86,9 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     documentId?: string;
 
     /**
-     * Group names to filter the results by.
+     * Group name to filter the results by.
      */
-    groups?: string[];
+    group?: string;
 
     /**
      * The label and value will be determined by the option returned here.
@@ -103,9 +103,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -141,9 +140,8 @@ interface AutoSuggestConfig<T extends KitsuResource> {
      * @return The label and value to use for the suggestion.
      */
     option: (
-      selected?: PersistedResource<T>,
-      selectedNoType?: any,
-      searchTerm?: string
+      selected: PersistedResource<T>,
+      searchTerm: string
     ) => DropdownItem;
   };
 
@@ -216,7 +214,7 @@ export function AutoSuggestTextField<T extends KitsuResource>({
   return (
     <TextField
       {...textFieldProps}
-      customInput={inputProps => (
+      customInput={(inputProps) => (
         <AutoSuggestTextFieldInternal
           elasticSearchBackend={elasticSearchBackend}
           jsonApiBackend={jsonApiBackend}
@@ -352,8 +350,8 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     documentId: elasticSearchBackend?.documentId,
     restrictedField: elasticSearchBackend?.restrictedField,
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
+    group: elasticSearchBackend?.group,
     timeoutMs: 0, // Timeout is already being handled by our debounce.
-    // groups: elasticSearchBackend?.groups, (coming in a future ticket)
     disabled: !performProviderSearch("elastic-search")
   });
 
@@ -364,7 +362,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   useEffect(() => {
     const autosuggestGeneratedDivs =
       document?.querySelectorAll<any>(".autosuggest div");
-    autosuggestGeneratedDivs?.forEach(element => {
+    autosuggestGeneratedDivs?.forEach((element) => {
       if (element.attributes.role) {
         element.attributes.role.nodeValue = "";
       }
@@ -377,7 +375,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     elasticSearchBackend &&
     jsonApiBackend
   ) {
-    setBackend(current =>
+    setBackend((current) =>
       current === "elastic-search" ? "json-api" : "elastic-search"
     );
   }
@@ -397,20 +395,12 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     ...(customOptions?.(searchValue, formik) || []),
     ...(searchResult && !isLoading && focus
       ? uniq(
-          castArray(searchResult).flatMap(item => {
+          castArray(searchResult).flatMap((item) => {
             if (performProviderSearch("elastic-search")) {
-              return elasticSearchBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return elasticSearchBackend?.option(item, debouncedSearchValue);
             }
             if (performProviderSearch("json-api")) {
-              return jsonApiBackend?.option(
-                item,
-                item as any,
-                debouncedSearchValue
-              );
+              return jsonApiBackend?.option(item, debouncedSearchValue);
             }
           })
         )
@@ -441,7 +431,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
         <AutoSuggest
           id={id}
           suggestions={allSuggestions}
-          getSuggestionValue={s => s}
+          getSuggestionValue={(s) => s}
           onSuggestionsFetchRequested={({ value }) => setSearchValue(value)}
           onSuggestionSelected={(_, data) => {
             inputProps.onChange?.({
@@ -450,7 +440,7 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
             onSuggestionSelected?.(data.suggestion, formik);
           }}
           onSuggestionsClearRequested={() => setSearchValue("")}
-          renderSuggestion={text => <div>{text}</div>}
+          renderSuggestion={(text) => <div>{text}</div>}
           shouldRenderSuggestions={
             blankSearchBackend ? () => !!blankSearchBackend : undefined
           }
