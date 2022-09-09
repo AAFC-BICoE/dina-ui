@@ -110,12 +110,12 @@ export function ProjectFormLayout() {
         hideAddAttchmentBtn={true}
       />
       <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
-        {/* <QueryPage
+        <QueryPage
           columns={columns}
           indexName={"dina_material_sample_index"}
           viewMode={readOnly}
           customViewQuery={customViewQuery}
-        /> */}
+        />
       </FieldSet>
     </div>
   );
