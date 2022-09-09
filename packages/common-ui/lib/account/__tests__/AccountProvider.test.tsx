@@ -9,7 +9,7 @@ describe("AccountProvider", () => {
   const keycloakGroups = [
     "/cnc/" + DINA_ADMIN,
     "/cnc/" + USER,
-    "/aafc/ + USER",
+    "/aafc/" + USER,
     "/othergroup",
     "no-leading-slash"
   ];
