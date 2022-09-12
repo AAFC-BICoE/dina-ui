@@ -1,3 +1,4 @@
+import { SUPER_USER, USER } from "common-ui/types/DinaRoles";
 import DinaUserDetailsPage from "../../../pages/dina-user/view";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { Person } from "../../../types/objectstore-api";
@@ -8,11 +9,11 @@ const TEST_DINAUSER: DinaUser = {
   username: "cnc-cm",
   emailAddress: "a.b@c.d",
   groups: ["dao", "cnc"],
-  roles: ["/dao/staff", "/cnd/collection-manager"],
+  roles: ["/dao/" + USER, "/cnc/" + SUPER_USER],
   agentId: "e3a18289-4a9d-4ad6-ad06-3c7f1837406e",
   id: "1",
   type: "user",
-  rolesPerGroup: { cnc: ["collection-manager"] }
+  rolesPerGroup: { cnc: [SUPER_USER] }
 };
 
 const TEST_AGENT: Person = {
@@ -28,8 +29,8 @@ const mockGet = jest.fn(async () => {
   return { data: TEST_DINAUSER };
 });
 
-const mockBulkGet = jest.fn(async paths => {
-  return paths.map(path => {
+const mockBulkGet = jest.fn(async (paths) => {
+  return paths.map((path) => {
     if (path.startsWith("person")) {
       return TEST_AGENT;
     }

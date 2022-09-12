@@ -1,3 +1,4 @@
+import { DINA_ADMIN, USER } from "../../../types/DinaRoles";
 import {
   keycloakGroupNamesToBareGroupNames,
   generateKeycloakRolesPerGroup
@@ -6,9 +7,9 @@ import {
 describe("AccountProvider", () => {
   // Keycloak test data
   const keycloakGroups = [
-    "/cnc/admin",
-    "/cnc/staff",
-    "/aafc/staff",
+    "/cnc/" + DINA_ADMIN,
+    "/cnc/" + USER,
+    "/aafc/" + USER,
     "/othergroup",
     "no-leading-slash"
   ];
@@ -28,8 +29,8 @@ describe("AccountProvider", () => {
     const rolesPerGroup = generateKeycloakRolesPerGroup(keycloakGroups);
 
     expect(rolesPerGroup).toEqual({
-      aafc: ["staff"],
-      cnc: ["admin", "staff"]
+      aafc: [USER],
+      cnc: [DINA_ADMIN, USER]
     });
   });
 });
