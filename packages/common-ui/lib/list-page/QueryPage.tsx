@@ -129,6 +129,16 @@ export interface QueryPageProps<TData extends KitsuResource> {
    *        sorting order.
    */
   onSortedChange?: (newSort: SortingRule[]) => void;
+
+  /**
+   * Boolean flag to display only the result table when true
+   */
+  viewMode?: boolean;
+
+  /**
+   * Custom elastic search query given by calling component
+   */
+  customViewQuery?: TransformQueryToDSLParams;
 }
 
 /**
@@ -152,7 +162,9 @@ export function QueryPage<TData extends KitsuResource>({
   selectionMode = false,
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
-  onSortedChange
+  onSortedChange,
+  viewMode,
+  customViewQuery
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -166,16 +178,17 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
-    {
-      group: groupNames?.[0] ?? "",
-      queryRows: [
-        {
-          fieldName: ""
+    customViewQuery
+      ? customViewQuery
+      : {
+          group: groupNames?.[0] ?? "",
+          queryRows: [
+            {
+              fieldName: ""
+            }
+          ]
         }
-      ]
-    }
   );
-
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
@@ -212,7 +225,6 @@ export function QueryPage<TData extends KitsuResource>({
       sortingRules,
       cloneDeep(searchFilters)
     );
-
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) return;
 
@@ -261,7 +273,9 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Actions to perform when the QueryPage is first mounted.
   useEffect(() => {
-    loadSavedSearch("default");
+    if (!viewMode) {
+      loadSavedSearch("default");
+    }
   }, []);
 
   /**
@@ -620,46 +634,54 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
-      <label
-        style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
-      >
-        <DinaMessage id="search" />
-      </label>
+      {!viewMode && (
+        <label
+          style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
+        >
+          <DinaMessage id="search" />
+        </label>
+      )}
 
       {/* Query Filtering Options */}
-      <QueryBuilder
-        name="queryRows"
-        indexName={indexName}
-        onGroupChange={onSubmit}
-      />
+      {!viewMode && (
+        <QueryBuilder
+          name="queryRows"
+          indexName={indexName}
+          onGroupChange={onSubmit}
+        />
+      )}
 
       <div className="d-flex mb-3">
-        <div className="flex-grow-1">
-          {/* Saved Searches */}
-          <label className="group-field d-flex gap-2 align-items-center mb-2">
-            <div className="field-label">
-              <strong>Saved Searches</strong>
-            </div>
-            <div className="flex-grow-1">
-              <SavedSearch
-                indexName={indexName}
-                userPreferences={cloneDeep(userPreferences)}
-                loadedSavedSearch={loadedSavedSearch}
-                loadSavedSearch={loadSavedSearch}
-              />
-            </div>
-          </label>
-        </div>
-        <div>
-          {/* Action Buttons */}
-          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-          <FormikButton
-            className="btn btn-secondary mx-2"
-            onClick={(_, formik) => resetForm(formik)}
-          >
-            <DinaMessage id="resetFilters" />
-          </FormikButton>
-        </div>
+        {!viewMode && (
+          <div className="flex-grow-1">
+            {/* Saved Searches */}
+            <label className="group-field d-flex gap-2 align-items-center mb-2">
+              <div className="field-label">
+                <strong>Saved Searches</strong>
+              </div>
+              <div className="flex-grow-1">
+                <SavedSearch
+                  indexName={indexName}
+                  userPreferences={cloneDeep(userPreferences)}
+                  loadedSavedSearch={loadedSavedSearch}
+                  loadSavedSearch={loadSavedSearch}
+                />
+              </div>
+            </label>
+          </div>
+        )}
+        {!viewMode && (
+          <div>
+            {/* Action Buttons */}
+            <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+            <FormikButton
+              className="btn btn-secondary mx-2"
+              onClick={(_, formik) => resetForm(formik)}
+            >
+              <DinaMessage id="resetFilters" />
+            </FormikButton>
+          </div>
+        )}
       </div>
 
       <div
