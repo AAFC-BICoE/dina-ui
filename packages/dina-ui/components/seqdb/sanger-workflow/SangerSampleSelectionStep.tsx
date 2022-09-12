@@ -6,14 +6,17 @@ import {
   withResponse,
   QueryPage,
   ColumnDefinition,
-  QueryTable
+  QueryTable,
+  useAccount,
+  useApiClient
 } from "common-ui";
-import { KitsuResponse } from "kitsu";
+import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatchItem } from "../../../types/seqdb-api";
+import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { pick, toPairs } from "lodash";
 import Link from "next/link";
 
 export interface SangerSampleSelectionStepProps {
@@ -78,7 +81,7 @@ export function SangerSampleSelectionStep({
         <button
           className="btn btn-primary edit-button"
           type="button"
-          onClick={() => setEditMode(true)}
+          onClick={() => {setEditMode(true); savePcrBatchItems(selectedResources)}}
           style={{ width: "10rem" }}
         >
           <SeqdbMessage id="editButtonText" />
@@ -120,6 +123,37 @@ export function SangerSampleSelectionStep({
     </ButtonBar>
   );
 
+  async function savePcrBatchItems(samples: MaterialSample[]){
+    const { apiClient, save } = useApiClient();
+    const { username } = useAccount();
+    const materialSamples = samples.map(id => ({
+      id,
+      type: "material-sample"
+    }));
+    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${pcrBatchId}`,
+      {}
+    );
+    const newPcrBatchItems = materialSamples.map<InputResource<PcrBatchItem>>(
+      amples => ({
+        materialSample: amples,
+        pcrBatch: pick(pcrBatch, "id", "type"),
+        group: pcrBatch.group,
+        createdBy: username,
+        type: "pcr-batch-item"
+      })
+    );
+    await save(
+      newPcrBatchItems.map(item => ({
+        resource: item,
+        type: "pcr-batch-item"
+      })),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+    // setLastSave(Date.now());
+  }
+  
+
   return editMode ? (
     <div>
       {buttonBar}
@@ -138,6 +172,40 @@ export function SangerSampleSelectionStep({
     withResponse(pcrBatchItemQuery, () => selectedItemsTable)
   );
 }
+
+// export function useSangerSampleSelection(pcrBatchId: string) {
+//   const { apiClient, save } = useApiClient();
+//   const { username } = useAccount();
+//   // Keep track of the last save operation, so the data is re-fetched immediately after saving.
+//   const [lastSave, setLastSave] = useState<number>();
+
+//   async function selectSamples(sampleLinks: KitsuResourceLink[]) {
+//     const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+//       `seqdb-api/pcr-batch/${pcrBatchId}`,
+//       {}
+//     );
+//     const newPcrBatchItems = sampleLinks.map<InputResource<PcrBatchItem>>(
+//       sampleLink => ({
+//         materialSample: sampleLink,
+//         pcrBatch: pick(pcrBatch, "id", "type"),
+//         group: pcrBatch.group,
+//         createdBy: username,
+//         type: "pcr-batch-item"
+//       })
+//     );
+//     await save(
+//       newPcrBatchItems.map(item => ({
+//         resource: item,
+//         type: "pcr-batch-item"
+//       })),
+//       { apiBaseUrl: "/seqdb-api" }
+//     );
+//     setLastSave(Date.now());
+//   }
+//   return {
+//     lastSave
+//   };
+// }
 
 export function usePcrBatchItemQuery(
   pcrBatchId: string,
