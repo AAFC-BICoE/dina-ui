@@ -10,6 +10,7 @@ import {
   withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 import { Footer, GroupLabel, Head, Nav } from "../../components";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
@@ -32,7 +33,7 @@ export default function DinaUserDetailsPage() {
           apiBaseUrl: "/agent-api",
           idField: "agentId",
           joinField: "agent",
-          path: user => `person/${user.agentId}?include=organizations`
+          path: (user) => `person/${user.agentId}?include=organizations`
         }
       ]
     }
@@ -41,8 +42,8 @@ export default function DinaUserDetailsPage() {
   // Editable if current user is dina-admin, or a collection manager of any group:
   const currentUserCanEdit =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
-      ?.includes("collection-manager") || isAdmin;
+      ?.flatMap((it) => it)
+      ?.includes(SUPER_USER) || isAdmin;
 
   return (
     <div>
