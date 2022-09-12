@@ -180,8 +180,15 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       (attribute) => attribute.value === value
     );
 
+    // Get existing value to transfer over.
+    const previousValues = (formikProps.values as any)?.queryRows?.[index];
+
     formikProps.setFieldValue(`${name}[${index}]`, {
-      ...initState,
+      matchType: "equals",
+      boolean: previousValues?.boolean ?? "true",
+      date: previousValues?.date ?? moment().format("YYYY-MM-DD"),
+      matchValue: previousValues?.matchValue ?? null,
+      number: previousValues?.number ?? null,
       fieldName: value,
       type: newDataFromIndexMapping?.type ?? "text",
       parentPath: newDataFromIndexMapping?.parentPath,
