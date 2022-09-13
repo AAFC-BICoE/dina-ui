@@ -175,16 +175,13 @@ export function AssemblageFormLayout() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
   const uuid = String(router?.query?.id);
-  const { groupNames } = useAccount();
+
   const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
     ? {
-        group: groupNames?.[0] ?? "",
         queryRows: [
           {
             fieldName: "data.relationships.assemblages.data.id",
-            matchType: "equals",
-            textMatchType: "partial",
-            type: "text",
+            type: "uuid",
             matchValue: uuid
           }
         ]

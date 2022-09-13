@@ -12,7 +12,7 @@ import { transformNumberSearchToDSL } from "../list-page/query-row-search-option
 
 export interface TransformQueryToDSLParams {
   queryRows: QueryRowExportProps[];
-  group: string;
+  group?: string;
 }
 
 // If it's a relationship search, ensure that the included type is being filtered out.
@@ -119,6 +119,7 @@ export function transformQueryToDSL<TData extends KitsuResource>(
         return transformDateSearchToDSL(queryRow, fieldName);
 
       // Text types
+      case "uuid":
       case "text":
       case "keyword":
         return transformTextSearchToDSL(queryRow, fieldName);
@@ -198,8 +199,8 @@ export function transformQueryToDSL<TData extends KitsuResource>(
 
   // Add the search group filter.
   const multipleGroups: boolean =
-    Array.isArray(submittedValues.group) && submittedValues.group.length > 0;
-  if (submittedValues?.group?.length > 0) {
+    Array.isArray(submittedValues.group) && submittedValues.group?.length > 0;
+  if (submittedValues.group && submittedValues?.group?.length > 0) {
     queryRowQueries.push({
       [multipleGroups ? "terms" : "term"]: {
         "data.attributes.group": submittedValues.group
