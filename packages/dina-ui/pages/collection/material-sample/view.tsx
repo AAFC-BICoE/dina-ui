@@ -47,6 +47,41 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
+import DropdownButton from "react-bootstrap/DropdownButton";
+import Dropdown from "react-bootstrap/Dropdown";
+import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
+
+type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
+
+const TEMPLATE_TYPE_OPTIONS: {
+  labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  value: TemplateType;
+}[] = [
+  {
+    labelKey: "template_AAFC_Beaver_ZT410",
+    value: "AAFC_Beaver_ZT410.twig"
+  },
+  {
+    labelKey: "template_AAFC_Zebra_ZT410",
+    value: "AAFC_Zebra_ZT410.twig"
+  }
+];
+
+function GenerateLabelDropdownButton(materialSample) {
+  return (
+    <DropdownButton
+      id="dropdown-basic-button"
+      title={<DinaMessage id="generateLabel" />}
+    >
+      <Dropdown.Item href="#/action-1">
+        {TEMPLATE_TYPE_OPTIONS[0].labelKey}
+      </Dropdown.Item>
+      <Dropdown.Item href="#/action-2">
+        {TEMPLATE_TYPE_OPTIONS[1].labelKey}
+      </Dropdown.Item>
+    </DropdownButton>
+  );
+}
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -74,40 +109,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     materialSampleQuery.response?.data?.acquisitionEvent?.id
   );
 
-  const buttonBar = id && (
-    <ButtonBar className="flex">
-      <BackButton
-        entityId={id}
-        entityLink="/collection/material-sample"
-        byPassView={true}
-        className="me-auto"
-      />
-      <EditButton entityId={id} entityLink="collection/material-sample" />
-      <Link href={`/collection/material-sample/bulk-create?splitFromId=${id}`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="splitButton" />
-        </a>
-      </Link>
-      <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="duplicate" />
-        </a>
-      </Link>
-      <Link href={`/collection/material-sample/revisions?id=${id}`}>
-        <a className="btn btn-info ms-5">
-          <DinaMessage id="revisionsButtonText" />
-        </a>
-      </Link>
-      <DeleteButton
-        className="ms-5"
-        id={id}
-        options={{ apiBaseUrl: "/collection-api" }}
-        postDeleteRedirect="/collection/material-sample/list"
-        type="material-sample"
-      />
-    </ButtonBar>
-  );
-
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
       <a>{highestParentMaterialSample}</a>
@@ -118,7 +119,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
-
+        const buttonBar = buttonBarComponent(materialSample);
         const hasPreparations = PREPARATION_FIELDS.some(
           (fieldName) => !isEmpty(materialSample[fieldName])
         );
@@ -296,6 +297,47 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Footer />
     </div>
   );
+
+  function buttonBarComponent(materialSample) {
+    return (
+      id && (
+        <ButtonBar className="flex">
+          <BackButton
+            entityId={id}
+            entityLink="/collection/material-sample"
+            byPassView={true}
+            className="me-auto"
+          />
+          <EditButton entityId={id} entityLink="collection/material-sample" />
+          <Link
+            href={`/collection/material-sample/bulk-create?splitFromId=${id}`}
+          >
+            <a className="btn btn-primary">
+              <DinaMessage id="splitButton" />
+            </a>
+          </Link>
+          <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="duplicate" />
+            </a>
+          </Link>
+          <GenerateLabelDropdownButton materialSample={materialSample} />
+          <Link href={`/collection/material-sample/revisions?id=${id}`}>
+            <a className="btn btn-info ms-5">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
+          <DeleteButton
+            className="ms-5"
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/material-sample/list"
+            type="material-sample"
+          />
+        </ButtonBar>
+      )
+    );
+  }
 }
 
 export default withRouter(MaterialSampleViewPage);

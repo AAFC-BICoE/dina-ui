@@ -65,23 +65,30 @@ export function GenerateLabelSection({
    */
   async function generateLabel() {
     // axios post request
-    await apiClient.axios
-      .post(
-        `/report-label-api/labels/v1.0/?template=${template}&format=pdf`,
-        data,
-        { responseType: "blob" }
-      )
-      .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute(
-          "download",
-          `${materialSample?.materialSampleName}.pdf`
-        ); // or any other extension
-        document.body.appendChild(link);
-        link.click();
-      });
+    try {
+      await apiClient.axios
+        .post(
+          `/report-label-api/labels/v1.0/?template=${template}&format=pdf`,
+          data,
+          { responseType: "blob" }
+        )
+        .then((response) => {
+          window.open(URL.createObjectURL(response.data)); // open pdf in new tab
+
+          // Download PDF
+          // const url = window.URL.createObjectURL(new Blob([response.data]));
+          // const link = document.createElement("a");
+          // link.href = url;
+          // link.setAttribute(
+          //   "download",
+          //   `${materialSample?.materialSampleName}.pdf`
+          // ); // or any other extension
+          // document.body.appendChild(link);
+          // link.click();
+        });
+    } catch (error) {
+      return error;
+    }
   }
 
   return (
