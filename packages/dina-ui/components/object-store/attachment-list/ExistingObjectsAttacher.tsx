@@ -39,8 +39,8 @@ export function ExistingObjectsAttacher({
   const submitMetadataIds: OnFormikSubmit<ExistingObjectsAttacherForm> =
     async ({ selectedMetadatas }) => {
       const metadataIds = toPairs(selectedMetadatas)
-        .filter(pair => pair[1])
-        .map(pair => pair[0]);
+        .filter((pair) => pair[1])
+        .map((pair) => pair[0]);
       await onMetadataIdsSubmitted(metadataIds);
     };
 
@@ -59,7 +59,9 @@ export function ExistingObjectsAttacher({
     {
       Cell: ({ original: { id, originalFilename } }) =>
         originalFilename ? (
-          <a href={`/object-store/object/view?id=${id}`}>{originalFilename}</a>
+          <Link href={`/object-store/object/view?id=${id}`}>
+            {originalFilename}
+          </Link>
         ) : null,
       accessor: "originalFilename"
     },
@@ -73,7 +75,7 @@ export function ExistingObjectsAttacher({
 
   return (
     <ListPageLayout
-      additionalFilters={filterForm => ({
+      additionalFilters={(filterForm) => ({
         // Apply group filter:
         ...(filterForm.group && { bucket: filterForm.group })
       })}
@@ -94,9 +96,9 @@ export function ExistingObjectsAttacher({
       queryTableProps={{
         columns: METADATA_TABLE_COLUMNS,
         path: "objectstore-api/metadata",
-        onSuccess: res => setAvailableMetadatas(res.data)
+        onSuccess: (res) => setAvailableMetadatas(res.data)
       }}
-      wrapTable={children => (
+      wrapTable={(children) => (
         <MetadataListWrapper onAttachButtonClick={submitMetadataIds}>
           {children}
         </MetadataListWrapper>

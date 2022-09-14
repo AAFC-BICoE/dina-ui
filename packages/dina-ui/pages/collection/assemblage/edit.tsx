@@ -29,6 +29,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
 import { TransformQueryToDSLParams } from "packages/common-ui/lib/util/transformToDSL";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import Link from "next/link";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -196,11 +197,16 @@ export function AssemblageFormLayout() {
     // Material Sample Name
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
