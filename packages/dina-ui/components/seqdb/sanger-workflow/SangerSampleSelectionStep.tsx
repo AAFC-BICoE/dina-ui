@@ -18,6 +18,7 @@ import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { pick, toPairs } from "lodash";
 import Link from "next/link";
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -40,6 +41,9 @@ export function SangerSampleSelectionStep({
     []
   );
 
+  const { apiClient, save } = useApiClient();
+  const { username } = useAccount();
+  
   // Displayed on edit mode only.
   const columns: TableColumn<MaterialSample>[] = editMode
     ? [
@@ -64,9 +68,9 @@ export function SangerSampleSelectionStep({
         {
           Cell: ({ original: pcrBatchItem }) => (
             <Link
-              href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.materialSampleName}`}
+              href={`/collection/material-sample/view?id=${pcrBatchItem?.relationships?.materialSample?.materialSampleName}`}
             >
-              {pcrBatchItem?.materialSample?.name}
+              {pcrBatchItem.relationships.materialSample?.materialSampleName}
             </Link>
           ),
           accessor: "materialSample.materialSampleName",
@@ -81,7 +85,7 @@ export function SangerSampleSelectionStep({
         <button
           className="btn btn-primary edit-button"
           type="button"
-          onClick={() => {setEditMode(true); savePcrBatchItems(selectedResources)}}
+          onClick={() => setEditMode(true)}
           style={{ width: "10rem" }}
         >
           <SeqdbMessage id="editButtonText" />
@@ -102,10 +106,10 @@ export function SangerSampleSelectionStep({
             }
           ]
         })("")}
-        defaultSort={[{ id: "materialSample.id", desc: false }]}
+        // defaultSort={[{ id: "materialSample.id", desc: false }]}
         reactTableProps={{ sortable: false }}
         path="seqdb-api/pcr-batch-item"
-        include="materialSample"
+        // include="materialSample"
       />
     </div>
   );
@@ -115,7 +119,7 @@ export function SangerSampleSelectionStep({
       <button
         className="btn btn-primary"
         type="button"
-        onClick={() => setEditMode(false)}
+        onClick={() => {setEditMode(false); savePcrBatchItems(selectedResources)}}
         style={{ width: "10rem" }}
       >
         <SeqdbMessage id="done" />
@@ -124,25 +128,35 @@ export function SangerSampleSelectionStep({
   );
 
   async function savePcrBatchItems(samples: MaterialSample[]){
-    const { apiClient, save } = useApiClient();
-    const { username } = useAccount();
-    const materialSamples = samples.map(id => ({
-      id,
-      type: "material-sample"
-    }));
+
     const { data: pcrBatch } = await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
       {}
     );
+    const newSamples: KitsuResourceLink[] = [];
+      // samples.forEach( (sample) => {
+      //   const newSample = (({ id, type }) => ({ id, type }))(sample);
+      //   newSamples.push(newSample);
+      // });
+      const materialSamples = newSamples.map(sample => ({
+        id: sample.id,
+        type: "material-sample"
+      }));
+
+    // const newSamples = (({ , type }) => ({ id, type }))(samples);
     const newPcrBatchItems = materialSamples.map<InputResource<PcrBatchItem>>(
-      amples => ({
-        materialSample: amples,
+      sample => ({
+        materialSample: {
+          id:sample.id,
+          type:sample.type
+        } as ResourceIdentifierObject,
         pcrBatch: pick(pcrBatch, "id", "type"),
         group: pcrBatch.group,
         createdBy: username,
         type: "pcr-batch-item"
       })
     );
+    
     await save(
       newPcrBatchItems.map(item => ({
         resource: item,

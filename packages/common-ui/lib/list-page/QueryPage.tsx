@@ -26,7 +26,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep, uniq, toPairs } from "lodash";
+import { cloneDeep, uniq, toPairs, pick } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -291,6 +291,12 @@ export function QueryPage<TData extends KitsuResource>({
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
 
+    // const materialSamples = ids.map(id => ({
+    //   id,
+    //   type: "material-sample"
+    // }));
+    // console.log(materialSamples);
+    
     const selectedObjects = searchResults.filter((itemA) => {
       return ids.find((itemB) => {
         return itemA.id === itemB;
