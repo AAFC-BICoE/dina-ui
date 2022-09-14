@@ -12,7 +12,6 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { GenerateLabelSection } from "../../../../dina-ui/components/collection/material-sample/GenerateLabelSection";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
@@ -47,41 +46,8 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
-import DropdownButton from "react-bootstrap/DropdownButton";
-import Dropdown from "react-bootstrap/Dropdown";
-import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
-
-type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
-
-const TEMPLATE_TYPE_OPTIONS: {
-  labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
-  value: TemplateType;
-}[] = [
-  {
-    labelKey: "template_AAFC_Beaver_ZT410",
-    value: "AAFC_Beaver_ZT410.twig"
-  },
-  {
-    labelKey: "template_AAFC_Zebra_ZT410",
-    value: "AAFC_Zebra_ZT410.twig"
-  }
-];
-
-function GenerateLabelDropdownButton(materialSample) {
-  return (
-    <DropdownButton
-      id="dropdown-basic-button"
-      title={<DinaMessage id="generateLabel" />}
-    >
-      <Dropdown.Item href="#/action-1">
-        {TEMPLATE_TYPE_OPTIONS[0].labelKey}
-      </Dropdown.Item>
-      <Dropdown.Item href="#/action-2">
-        {TEMPLATE_TYPE_OPTIONS[1].labelKey}
-      </Dropdown.Item>
-    </DropdownButton>
-  );
-}
+import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
+import { PersistedResource } from "kitsu";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -169,14 +135,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <TagSelectReadOnly />
                   <ProjectSelectSection />
                   <AssemblageSelectSection />
-                </div>
-                <div className="mb-3">
-                  <div className="col-md-6">
-                    <GenerateLabelSection
-                      title={<DinaMessage id="generateLabel" />}
-                      materialSample={materialSample}
-                    />
-                  </div>
                 </div>
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
@@ -298,7 +256,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     </div>
   );
 
-  function buttonBarComponent(materialSample) {
+  function buttonBarComponent(
+    materialSample: PersistedResource<MaterialSample>
+  ) {
     return (
       id && (
         <ButtonBar className="flex">
