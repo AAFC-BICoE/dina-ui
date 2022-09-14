@@ -6,9 +6,8 @@ import {
   useState,
   useEffect
 } from "react";
-import Keycloak, { KeycloakPromise } from "keycloak-js";
+import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
-import { isUndefined } from "util";
 import { DINA_ADMIN } from "../../types/DinaRoles";
 
 export interface AccountContextI {
@@ -26,7 +25,12 @@ export interface AccountContextI {
   getCurrentToken: () => string | undefined;
 }
 
-const KEYCLOAK_TOKEN_VALIDITY_SECONDS = 300;
+/**
+ * The amount of seconds to check if the token will be still valid.
+ *
+ * For example, if the token will expire within 10 seconds, then a new one will be requested.
+ */
+const KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS = 10;
 
 const AccountContext = createContext<AccountContextI | null>(null);
 
@@ -109,7 +113,8 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const logout = keycloak.logout;
 
   const getCurrentToken = () => {
-    keycloak.updateToken(KEYCLOAK_TOKEN_VALIDITY_SECONDS).catch(login);
+    // If the token is about to expire, then request a new one.
+    keycloak.updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS).catch(login);
     return keycloak?.token;
   };
 
