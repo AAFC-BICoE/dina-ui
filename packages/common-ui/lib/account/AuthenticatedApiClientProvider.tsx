@@ -15,8 +15,12 @@ export function AuthenticatedApiClientProvider({
     // 'Interceptors' is nullable here to support the old tests written before authentication was added,
     // but in the running app it should always be available.
     apiContext.apiClient.axios.interceptors?.request.use((config) => {
-      config.headers.Authorization = `Bearer ${getCurrentToken() ?? ""}`;
-      return config;
+      const tokenRetrieved = (token: string | undefined) => {
+        config.headers.Authorization = `Bearer ${token ?? ""}`;
+        return Promise.resolve(config);
+      };
+
+      return getCurrentToken(tokenRetrieved);
     });
 
     setAuthSetup(true);

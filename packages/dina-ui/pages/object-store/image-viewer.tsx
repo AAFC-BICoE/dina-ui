@@ -5,7 +5,7 @@ export default function MetadataImagePreviewPage() {
   const { getCurrentToken } = useAccount();
   const router = useRouter();
 
-  const token = getCurrentToken();
+  const token = getCurrentToken((currentToken) => currentToken);
 
   const fileBucket = router.query.bucket?.toString();
   const isDerivative = router.query.isDerivative?.toString();

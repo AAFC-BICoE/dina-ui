@@ -37,7 +37,9 @@ describe("AuthenticatedApiClientProvider", () => {
           ...MOCK_ACCOUNT_CONTEXT,
           authenticated: true,
           initialized: true,
-          getCurrentToken: () => "Mat's-test-token"
+          getCurrentToken: (
+            successCallback: (currentToken: string | undefined) => void
+          ) => Promise.resolve(successCallback("Mat's-test-token"))
         }}
       >
         <ApiClientProvider value={apiContext}>
@@ -62,6 +64,8 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   logout: noop,
   roles: ["user"],
   // Mock for a successful token update.
-  getCurrentToken: () => "test-token",
+  getCurrentToken: (
+    successCallback: (currentToken: string | undefined) => void
+  ) => Promise.resolve(successCallback("test-token")),
   username: "test-user"
 };

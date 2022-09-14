@@ -22,7 +22,9 @@ export interface AccountContextI {
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
-  getCurrentToken: () => string | undefined;
+  getCurrentToken: (
+    successCallback: (currentToken: string | undefined) => void
+  ) => Promise<void>;
 }
 
 /**
@@ -112,11 +114,17 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const logout = keycloak.logout;
 
-  const getCurrentToken = () => {
-    // If the token is about to expire, then request a new one.
-    keycloak.updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS).catch(login);
-    return keycloak?.token;
-  };
+  // If the token is about to expire, then request a new one.
+  const getCurrentToken = (
+    successCallback: (currentToken: string | undefined) => void
+  ) =>
+    keycloak
+      .updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS)
+      .then(() => {
+        // Return the current token to the success callback function.
+        successCallback(keycloak.token);
+      })
+      .catch(login);
 
   return (
     <AccountProvider
