@@ -10,15 +10,14 @@ import {
   useAccount,
   useApiClient
 } from "common-ui";
-import { InputResource, KitsuResourceLink, KitsuResponse } from "kitsu";
+import { InputResource, KitsuResponse } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { pick, toPairs } from "lodash";
+import { pick } from "lodash";
 import Link from "next/link";
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -68,9 +67,9 @@ export function SangerSampleSelectionStep({
         {
           Cell: ({ original: pcrBatchItem }) => (
             <Link
-              href={`/collection/material-sample/view?id=${pcrBatchItem?.relationships?.materialSample?.id}`}
+              href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
             >
-              {pcrBatchItem?.relationships?.materialSample?.id}
+              {pcrBatchItem?.materialSample?.id}
             </Link>
           ),
           accessor: "pcrBatchItem.materialSample.id",
@@ -106,7 +105,6 @@ export function SangerSampleSelectionStep({
             }
           ]
         })("")}
-        defaultSort={[{ id: "materialSample.id", desc: false }]}
         reactTableProps={{ sortable: false }}
         path="seqdb-api/pcr-batch-item"
         include="materialSample"
@@ -133,30 +131,22 @@ export function SangerSampleSelectionStep({
       `seqdb-api/pcr-batch/${pcrBatchId}`,
       {}
     );
-    // const newSamples: KitsuResourceLink[] = [];
-      // samples.forEach( (sample) => {
-      //   const newSample = (({ id, type }) => ({ id, type }))(sample);
-      //   newSamples.push(newSample);
-      // });
-      // const materialSamples = newSamples.map(sample => ({
-      //   id: sample.id,
-      //   type: "material-sample"
-      // }));
 
-    // const newSamples = (({ , type }) => ({ id, type }))(samples);
     const newPcrBatchItems = samples.map<InputResource<PcrBatchItem>>(
       sample => ({
-        materialSample: {
-          id:sample.id,
-          type:sample.type
-        } as ResourceIdentifierObject,
         pcrBatch: pick(pcrBatch, "id", "type"),
         group: pcrBatch.group,
         createdBy: username,
-        type: "pcr-batch-item"
+        type: "pcr-batch-item",
+        relationships: {
+          materialSample: {
+            data: {            
+              id:sample.id,
+              type:sample.type}
+          }},
       })
     );
-    console.log(newPcrBatchItems);
+
     await save(
       newPcrBatchItems.map(item => ({
         resource: item,
@@ -164,8 +154,6 @@ export function SangerSampleSelectionStep({
       })),
       { apiBaseUrl: "/seqdb-api" }
     );
-    console.log("h");
-    // setLastSave(Date.now());
   }
   
 

@@ -290,12 +290,6 @@ export function QueryPage<TData extends KitsuResource>({
     const ids = toPairs(itemIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
-
-    // const materialSamples = ids.map(id => ({
-    //   id,
-    //   type: "material-sample"
-    // }));
-    // console.log(materialSamples);
     
     const selectedObjects = searchResults.filter((itemA) => {
       return ids.find((itemB) => {
