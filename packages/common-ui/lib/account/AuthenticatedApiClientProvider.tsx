@@ -7,7 +7,7 @@ export function AuthenticatedApiClientProvider({
   children
 }: PropsWithChildren<{}>) {
   const apiContext = useApiClient();
-  const { getCurrentToken } = useAccount();
+  const { token } = useAccount();
   const [authSetup, setAuthSetup] = useState<boolean>(false);
 
   // Include the bearer token with every API request:
@@ -15,12 +15,8 @@ export function AuthenticatedApiClientProvider({
     // 'Interceptors' is nullable here to support the old tests written before authentication was added,
     // but in the running app it should always be available.
     apiContext.apiClient.axios.interceptors?.request.use((config) => {
-      const tokenRetrieved = (token: string | undefined) => {
-        config.headers.Authorization = `Bearer ${token ?? ""}`;
-        return Promise.resolve(config);
-      };
-
-      return getCurrentToken(tokenRetrieved);
+      config.headers.Authorization = `Bearer ${token ?? ""}`;
+      return config;
     });
 
     setAuthSetup(true);

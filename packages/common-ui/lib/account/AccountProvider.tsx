@@ -22,9 +22,7 @@ export interface AccountContextI {
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
-  getCurrentToken: (
-    successCallback: (currentToken: string | undefined) => void
-  ) => Promise<void>;
+  token?: string;
 }
 
 /**
@@ -52,6 +50,9 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
+  const [currentToken, setCurrentToken] = useState<string | undefined>(
+    undefined
+  );
 
   // Setup keycloak when this is first mounted.
   useEffect(() => {
@@ -78,8 +79,25 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
+  // Once keycloak is setup, then start watching for the token expired event.
+  // This will also generate a new token.
+  useEffect(() => {
+    if (!keycloak || !authenticated) {
+      return;
+    }
+
+    keycloak.onTokenExpired = () => {
+      keycloak.updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS).catch(login);
+    };
+  }, [authenticated]);
+
+  // Anytime the token has changed, then we can update it to pass it through the account context.
+  useEffect(() => {
+    setCurrentToken(keycloak?.token ?? undefined);
+  }, [keycloak?.token]);
+
   // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized || !keycloak) {
+  if (!authenticated || !initialized || !keycloak || !currentToken) {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
@@ -114,18 +132,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const logout = keycloak.logout;
 
-  // If the token is about to expire, then request a new one.
-  const getCurrentToken = (
-    successCallback: (currentToken: string | undefined) => void
-  ) =>
-    keycloak
-      .updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS)
-      .then(() => {
-        // Return the current token to the success callback function.
-        successCallback(keycloak.token);
-      })
-      .catch(login);
-
   return (
     <AccountProvider
       value={{
@@ -140,7 +146,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         subject,
         isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
         rolesPerGroup,
-        getCurrentToken
+        token: currentToken
       }}
     >
       {children}

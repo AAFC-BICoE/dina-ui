@@ -1,4 +1,4 @@
-import { useAccount } from "common-ui";
+import { LoadingSpinner, useAccount } from "common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode } from "react";
@@ -50,9 +50,7 @@ export function FileView({
   shownTypeIndicator,
   preview
 }: FileViewProps) {
-  const { getCurrentToken } = useAccount();
-
-  const token = getCurrentToken((currentToken) => currentToken);
+  const { token } = useAccount();
 
   // Add the auth token to the requested file path:
   const authenticatedFilePath = `${filePath}?access_token=${token}`;
@@ -75,10 +73,6 @@ export function FileView({
 
   if (preview || !isImage) {
     clickToDownload = false;
-  }
-
-  if (!token) {
-    return null;
   }
 
   return (

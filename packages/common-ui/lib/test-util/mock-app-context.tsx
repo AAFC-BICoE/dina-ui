@@ -36,9 +36,7 @@ export function MockAppContextProvider({
       logout: noop,
       roles: ["user"],
       // Mock for a successful token update.
-      getCurrentToken: (
-        successCallback: (currentToken: string | undefined) => void
-      ) => Promise.resolve(successCallback("test-token")),
+      getCurrentToken: () => Promise.resolve("test-token"),
       username: "test-user",
       isAdmin: false
     }),
