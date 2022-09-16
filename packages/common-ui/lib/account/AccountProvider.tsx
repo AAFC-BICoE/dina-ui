@@ -22,15 +22,8 @@ export interface AccountContextI {
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
-  token?: string;
+  getCurrentToken: () => Promise<string | undefined>;
 }
-
-/**
- * The amount of seconds to check if the token will be still valid.
- *
- * For example, if the token will expire within 10 seconds, then a new one will be requested.
- */
-const KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS = 10;
 
 const AccountContext = createContext<AccountContextI | null>(null);
 
@@ -50,9 +43,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
   const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [initialized, setInitialized] = useState<boolean>(false);
-  const [currentToken, setCurrentToken] = useState<string | undefined>(
-    undefined
-  );
 
   // Setup keycloak when this is first mounted.
   useEffect(() => {
@@ -79,25 +69,8 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  // Once keycloak is setup, then start watching for the token expired event.
-  // This will also generate a new token.
-  useEffect(() => {
-    if (!keycloak || !authenticated) {
-      return;
-    }
-
-    keycloak.onTokenExpired = () => {
-      keycloak.updateToken(KEYCLOAK_TOKEN_MIN_VALIDITY_SECONDS).catch(login);
-    };
-  }, [authenticated]);
-
-  // Anytime the token has changed, then we can update it to pass it through the account context.
-  useEffect(() => {
-    setCurrentToken(keycloak?.token ?? undefined);
-  }, [keycloak?.token]);
-
   // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized || !keycloak || !currentToken) {
+  if (!authenticated || !initialized || !keycloak) {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
@@ -132,6 +105,12 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 
   const logout = keycloak.logout;
 
+  const getCurrentToken = async () => {
+    // If it expires in the next 30 seconds, generate a new one.
+    await keycloak.updateToken(30).catch(login);
+    return keycloak.token;
+  };
+
   return (
     <AccountProvider
       value={{
@@ -146,7 +125,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         subject,
         isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
         rolesPerGroup,
-        token: currentToken
+        getCurrentToken
       }}
     >
       {children}
