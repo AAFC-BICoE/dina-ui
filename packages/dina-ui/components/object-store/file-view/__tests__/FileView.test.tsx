@@ -16,11 +16,6 @@ describe("FileView component", () => {
 
     // Renders the img.
     expect(wrapper.find("img").exists()).toEqual(true);
-
-    // Includes the access token in the img src:
-    expect(wrapper.find("img").prop("src")).toEqual(
-      "image.png?access_token=test-token"
-    );
   });
 
   it("Renders a pdf.", async () => {
@@ -29,8 +24,8 @@ describe("FileView component", () => {
     );
 
     // It should just pass the file path and type to the FileViewer component.
-    expect(wrapper.find("MockDynamicComponent").prop("filePath")).toEqual(
-      "doc.pdf?access_token=test-token"
+    expect(wrapper.find("MockDynamicComponent").prop("filePath")).toContain(
+      "doc.pdf"
     );
     expect(wrapper.find("MockDynamicComponent").prop("fileType")).toEqual(
       "pdf"
