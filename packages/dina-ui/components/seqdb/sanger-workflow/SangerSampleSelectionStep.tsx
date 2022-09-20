@@ -14,10 +14,11 @@ import { InputResource, KitsuResponse } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
+import { PcrBatchItem, PcrBatch, PcrBatchItemRelationships } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { pick } from "lodash";
 import Link from "next/link";
+import { deserialize } from "v8";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -40,9 +41,12 @@ export function SangerSampleSelectionStep({
     []
   );
 
+  const [lastSave, setLastSave] = useState<number>();
+  const [deSelectedResources, setDeSelectedResources] = useState<any[]>(selectedResources);
+
   const { apiClient, save } = useApiClient();
   const { username } = useAccount();
-  
+
   // Displayed on edit mode only.
   const columns: TableColumn<MaterialSample>[] = editMode
     ? [
@@ -72,7 +76,7 @@ export function SangerSampleSelectionStep({
               {pcrBatchItem?.materialSample?.id}
             </Link>
           ),
-          accessor: "pcrBatchItem.materialSample.id",
+          accessor: "materialSample.id",
           sortable: false
         }
       ]
@@ -106,8 +110,10 @@ export function SangerSampleSelectionStep({
           ]
         })("")}
         reactTableProps={{ sortable: false }}
+        // onSuccess={response => setSelectedResources(response.data)}
         path="seqdb-api/pcr-batch-item"
         include="materialSample"
+        deps={[lastSave]}
       />
     </div>
   );
@@ -147,6 +153,18 @@ export function SangerSampleSelectionStep({
       })
     );
 
+    const unSelectedObjects = deSelectedResources.filter((itemA) => {
+      return newPcrBatchItems.find((itemB) => {
+        return itemA.id === itemB.id;
+      });
+    });
+    console.log(deSelectedResources);
+console.log(unSelectedObjects);
+    await save(
+      unSelectedObjects.map(item => ({ delete: item })),
+      { apiBaseUrl: "/seqdb-api" }
+    );
+
     await save(
       newPcrBatchItems.map(item => ({
         resource: item,
@@ -154,6 +172,15 @@ export function SangerSampleSelectionStep({
       })),
       { apiBaseUrl: "/seqdb-api" }
     );
+
+        const test = (deSelectedResources.length >= newPcrBatchItems.length) ? [
+      newPcrBatchItems
+    ] : [...deSelectedResources,
+      newPcrBatchItems];
+
+    setDeSelectedResources(test);
+    console.log(deSelectedResources);
+    setLastSave(Date.now());
   }
   
 

@@ -459,7 +459,8 @@ export function QueryPage<TData extends KitsuResource>({
     CheckBoxHeader: DeselectCheckBoxHeader,
     setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
-    fieldName: "itemIdsToDelete"
+    fieldName: "itemIdsToDelete",
+    defaultAvailableItems: selectedResources ??[]
   });
 
   const computedReactTableProps =
