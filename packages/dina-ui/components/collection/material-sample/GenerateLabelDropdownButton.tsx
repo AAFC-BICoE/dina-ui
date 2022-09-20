@@ -29,7 +29,6 @@ interface GenerateLabelDropdownButtonProps {
 export function GenerateLabelDropdownButton({
   materialSample
 }: GenerateLabelDropdownButtonProps) {
-  // const [template, setTemplate] = useState<TemplateType | null>(null);
   const { apiClient } = useApiClient();
 
   // data for POST request
