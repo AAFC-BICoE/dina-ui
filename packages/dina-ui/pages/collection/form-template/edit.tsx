@@ -79,7 +79,6 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
-  const router = useRouter();
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
 
@@ -128,21 +127,6 @@ export function FormTemplateEditPageLoaded({
     colEventFormRef: collectingEvtFormRef,
     acquisitionEventFormRef: acqEventFormRef
   });
-
-  const {
-    colEventId: attachedColEventId,
-    acqEventId: attachedAcqEventId,
-    dataComponentState: {
-      enableCollectingEvent,
-      enablePreparations,
-      enableStorage,
-      enableOrganisms,
-      enableScheduledActions,
-      enableAssociations,
-      enableAcquisitionEvent,
-      enableRestrictions
-    }
-  } = materialSampleSaveHook;
 
   async function onSaveTemplateSubmit({
     api: { save },
@@ -202,6 +186,8 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
+
+    // console.log("To be saved: " + JSON.stringify(formTemplate));
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],

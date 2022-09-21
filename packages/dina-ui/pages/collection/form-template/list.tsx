@@ -57,7 +57,7 @@ export default function MaterialSampleFormTemplateListPage() {
           <CreateButton entityLink="/collection/form-template" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
@@ -65,10 +65,7 @@ export default function MaterialSampleFormTemplateListPage() {
           id="material-sample-form-template-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "collection-api/form-template",
-            filter: {
-              "viewConfiguration.type": "material-sample-form-template"
-            }
+            path: "collection-api/form-template"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">

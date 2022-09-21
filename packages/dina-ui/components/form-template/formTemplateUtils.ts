@@ -9,11 +9,26 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
     return {};
   }
 
+  let templateCheckboxesValues: Record<string, true | undefined> = {};
+
+  formTemplate.components?.forEach((component) => {
+    component.sections?.forEach((sections) => {
+      sections.items?.forEach((item) => {
+        if (item.name) {
+          templateCheckboxesValues = {
+            ...templateCheckboxesValues,
+            ...{ [item.name]: item.visible ? true : undefined }
+          };
+        }
+      });
+    });
+  });
+
   const initialValueForResource: Partial<T> = {};
 
   return {
     ...initialValueForResource,
-    templateCheckboxes: {} as Record<string, true | undefined>,
+    templateCheckboxes: templateCheckboxesValues,
     attachmentsConfig: {}
   };
 }
