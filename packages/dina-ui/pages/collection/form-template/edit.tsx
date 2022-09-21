@@ -47,7 +47,7 @@ export default function FormTemplateEditPage() {
 
   return (
     <>
-      {/* New Form Template or New Form Template */}
+      {/* Load Form Template or New Form Template */}
       {id ? (
         withResponse(formTemplateQuery, ({ data: fetchedFormTemplate }) => (
           <FormTemplateEditPageLoaded
@@ -81,7 +81,6 @@ export function FormTemplateEditPageLoaded({
 }: FormTemplateEditPageLoadedProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
-
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
@@ -140,14 +139,11 @@ export function FormTemplateEditPageLoaded({
       ...(acqEventFormRef?.current?.values ?? {})
     };
 
-    // console.log(JSON.stringify(allSubmittedValues));
-
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
         if (Array.isArray(object[key])) {
           const objects = Object.assign({}, ...object[key]);
-          // console.log(objects);
           allSubmittedValues[key] = objects;
           iterateThrough(objects);
         }
@@ -159,36 +155,35 @@ export function FormTemplateEditPageLoaded({
     };
     iterateThrough(allSubmittedValues);
 
-    // console.log(JSON.stringify(allSubmittedValues));
-
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
+      id: submittedValues.id,
       type: "form-template",
       name: submittedValues.name,
       group: submittedValues.group,
       restrictToCreatedBy: false,
       viewConfiguration: {},
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
-        (dataComponent, componentIndex) => ({
-          name: dataComponent.id,
-          visible: true,
-          order: componentIndex,
-          sections: dataComponent.sections.map((section) => ({
-            name: section.id,
+        (dataComponent, componentIndex) => {
+          return {
+            name: dataComponent.id,
             visible: true,
-            items: section.items.map((field) => ({
-              name: field.id,
-              visible:
-                allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
-              defaultValue: allSubmittedValues?.[field.id]
+            order: componentIndex,
+            sections: dataComponent.sections.map((section) => ({
+              name: section.id,
+              visible: true,
+              items: section.items.map((field) => ({
+                name: field.id,
+                visible:
+                  allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+                defaultValue: allSubmittedValues?.[field.id]
+              }))
             }))
-          }))
-        })
+          };
+        }
       )
     };
-
-    // console.log("To be saved: " + JSON.stringify(formTemplate));
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
