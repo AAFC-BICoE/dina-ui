@@ -77,13 +77,13 @@ export function SangerSampleSelectionStep({
 
   async function fetchSamples(sampleIds: string[]) {
     // console.log(sampleIds);
-    const materialSamples = await bulkGet<MaterialSample>(
+    await bulkGet<MaterialSample>(
       sampleIds.map((id) => "/collection-api/material-sample/" + id)
-    );
+    ).then((response) => {
+      // console.log(JSON.stringify(response))
 
-    // console.log(JSON.stringify(materialSamples))
-
-    setSelectedResources(materialSamples ?? []);
+      setSelectedResources(response ?? []);
+    });
   }
 
   useEffect(() => {
