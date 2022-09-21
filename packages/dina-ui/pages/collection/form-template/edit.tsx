@@ -176,7 +176,7 @@ export function FormTemplateEditPageLoaded({
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
-            fields: section.fields.map((field) => ({
+            items: section.items.map((field) => ({
               name: field.id,
               visible:
                 allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
