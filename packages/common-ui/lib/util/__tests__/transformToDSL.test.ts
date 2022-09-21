@@ -344,7 +344,8 @@ describe("Transform to DSL query function", () => {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
-          matchType: "notEmpty"
+          matchType: "notEquals",
+          textMatchType: "partial"
         },
 
         // Query Row #4
@@ -352,10 +353,27 @@ describe("Transform to DSL query function", () => {
           fieldName: "data.attributes.materialSampleName",
           type: "text",
           matchValue: "test",
-          matchType: "empty"
+          matchType: "notEquals",
+          textMatchType: "exact"
         },
 
         // Query Row #5
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "notEmpty"
+        },
+
+        // Query Row #6
+        {
+          fieldName: "data.attributes.materialSampleName",
+          type: "text",
+          matchValue: "test",
+          matchType: "empty"
+        },
+
+        // Query Row #7
         {
           fieldName: "collection.name",
           type: "text",
@@ -367,7 +385,7 @@ describe("Transform to DSL query function", () => {
           parentPath: "included"
         },
 
-        // Query Row #6
+        // Query Row #8
         {
           fieldName: "collection.name",
           type: "text",
@@ -379,7 +397,7 @@ describe("Transform to DSL query function", () => {
           parentPath: "included"
         },
 
-        // Query Row #7
+        // Query Row #9
         {
           fieldName: "collection.name",
           type: "text",
@@ -390,7 +408,7 @@ describe("Transform to DSL query function", () => {
           parentPath: "included"
         },
 
-        // Query Row #8
+        // Query Row #10
         {
           fieldName: "collection.name",
           type: "text",
@@ -435,6 +453,58 @@ describe("Transform to DSL query function", () => {
             // Query Row #3
             {
               bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        match: {
+                          "data.attributes.materialSampleName": "test"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.attributes.materialSampleName"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+
+            // Query Row #4
+            {
+              bool: {
+                should: [
+                  {
+                    bool: {
+                      must_not: {
+                        term: {
+                          "data.attributes.materialSampleName.keyword": "test"
+                        }
+                      }
+                    }
+                  },
+                  {
+                    bool: {
+                      must_not: {
+                        exists: {
+                          field: "data.attributes.materialSampleName"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+
+            // Query Row #5
+            {
+              bool: {
                 must: {
                   exists: {
                     field: "data.attributes.materialSampleName"
@@ -448,7 +518,7 @@ describe("Transform to DSL query function", () => {
               }
             },
 
-            // Query Row #4
+            // Query Row #6
             {
               bool: {
                 should: [
@@ -474,7 +544,7 @@ describe("Transform to DSL query function", () => {
               }
             },
 
-            // Query Row #5
+            // Query Row #7
             {
               nested: {
                 path: "included",
@@ -497,7 +567,7 @@ describe("Transform to DSL query function", () => {
               }
             },
 
-            // Query Row #6
+            // Query Row #8
             {
               nested: {
                 path: "included",
@@ -519,6 +589,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #9
             {
               nested: {
                 path: "included",
@@ -545,6 +617,8 @@ describe("Transform to DSL query function", () => {
                 }
               }
             },
+
+            // Query Row #10
             {
               bool: {
                 should: [

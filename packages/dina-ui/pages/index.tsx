@@ -10,6 +10,7 @@ import Stack from "react-bootstrap/Stack";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
   const { isAdmin, rolesPerGroup } = useAccount();
@@ -17,7 +18,7 @@ export function Home() {
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
       ?.flatMap((it) => it)
-      ?.includes("collection-manager") || isAdmin;
+      ?.includes(SUPER_USER) || isAdmin;
 
   return (
     <div>
@@ -224,9 +225,9 @@ export function Home() {
                     <SeqdbMessage id="sangerWorkflowListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-profile/list">
+                <Link href="/seqdb/thermocycler-profile/list">
                   <a>
-                    <SeqdbMessage id="pcrProfileListTitle" />
+                    <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
               </Stack>

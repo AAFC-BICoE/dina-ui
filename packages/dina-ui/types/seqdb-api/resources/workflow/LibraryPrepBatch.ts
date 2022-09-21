@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { ContainerType } from "../ContainerType";
-import { PcrProfile } from "../PcrProfile";
+import { ThermocyclerProfile } from "../ThermocyclerProfile";
 import { Product } from "../Product";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { IndexSet } from "./IndexSet";
@@ -19,7 +19,7 @@ interface LibraryPrepBatchRelationships {
   product?: Product | null;
   protocol?: ResourceIdentifierObject | null;
   indexSet?: IndexSet | null;
-  thermocyclerProfile?: PcrProfile | null;
+  thermocyclerProfile?: ThermocyclerProfile | null;
 }
 
 export type LibraryPrepBatch = KitsuResource &

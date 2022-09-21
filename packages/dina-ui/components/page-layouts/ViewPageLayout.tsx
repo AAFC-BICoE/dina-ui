@@ -59,6 +59,8 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
 
     /** Pass a react node of a tooltip, recommend setting the placement to the right. */
     tooltipNode?: ReactNode;
+
+    alterInitialValues?: (resource: PersistedResource<T>) => any;
   };
 
 export interface ResourceFormProps<T extends KitsuResource> {
@@ -91,7 +93,8 @@ export function ViewPageLayout<T extends KitsuResource>({
   mainClass = "container",
   showRevisionsLink,
   showRevisionsLinkAtBottom,
-  tooltipNode
+  tooltipNode,
+  alterInitialValues
 }: ViewPageLayoutProps<T>) {
   const router = useRouter();
   const id = String(router.query.id);
@@ -111,7 +114,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           const resource = data as PersistedResource<T>;
 
           const formProps = {
-            initialValues: resource,
+            initialValues: alterInitialValues?.(resource) ?? resource,
             readOnly: true
           };
 

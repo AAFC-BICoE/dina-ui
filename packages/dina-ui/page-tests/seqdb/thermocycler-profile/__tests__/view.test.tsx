@@ -1,11 +1,11 @@
-import PcrProfileDetailsPage from "../../../../pages/seqdb/pcr-profile/view";
+import ThermocyclerProfileDetailsPage from "../../../../pages/seqdb/thermocycler-profile/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrProfile } from "../../../../types/seqdb-api/resources/PcrProfile";
+import { ThermocyclerProfile } from "../../../../types/seqdb-api/resources/ThermocyclerProfile";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
 jest.mock("next/link", () => () => <div />);
 
-const TEST_PROFILE: PcrProfile = {
+const TEST_PROFILE: ThermocyclerProfile = {
   id: "5",
   name: "Test Profile",
   type: "thermocycler-profile"
@@ -22,12 +22,12 @@ const apiContext: any = { apiClient: { get: mockGet } };
 
 jest.mock("next/router", () => ({
   useRouter: () => ({ query: { id: "100" } }),
-  withRouter: fn => fn
+  withRouter: (fn) => fn
 }));
 
 describe("PcrProfile details page", () => {
   it("Renders initially with a loading spinner.", () => {
-    const wrapper = mountWithAppContext(<PcrProfileDetailsPage />, {
+    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 
@@ -35,7 +35,7 @@ describe("PcrProfile details page", () => {
   });
 
   it("Renders the PCR profile details", async () => {
-    const wrapper = mountWithAppContext(<PcrProfileDetailsPage />, {
+    const wrapper = mountWithAppContext(<ThermocyclerProfileDetailsPage />, {
       apiContext
     });
 

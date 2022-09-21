@@ -2,12 +2,12 @@ import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
 import { ViewPageLayout } from "../../../components";
 import { Project } from "../../../types/collection-api/resources/Project";
-import { ProjectFormLayout } from "./edit";
+import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 
 export default function ProjectDetailsPage() {
   return (
     <ViewPageLayout<Project>
-      form={props => (
+      form={(props) => (
         <DinaForm<Project>
           {...props}
           initialValues={{
@@ -23,7 +23,7 @@ export default function ProjectDetailsPage() {
           <ProjectFormLayout />
         </DinaForm>
       )}
-      query={id => ({
+      query={(id) => ({
         path: `collection-api/project/${id}?include=attachment`
       })}
       entityLink="/collection/project"
