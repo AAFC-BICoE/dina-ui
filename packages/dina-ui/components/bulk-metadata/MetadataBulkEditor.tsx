@@ -282,16 +282,9 @@ function useBulkMetadataSave({
             }
           });
           if (saveOp.resource.license) {
-            const selectedLicense = saveOp.resource.license
-              ? (
-                  await apiClient.get<License>(
-                    `objectstore-api/license/${saveOp.resource.license.id}`,
-                    {}
-                  )
-                ).data
-              : null;
             // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement = selectedLicense?.url ?? "";
+            saveOp.resource.xmpRightsWebStatement =
+              saveOp.resource.license?.url ?? "";
             // No need to store this ; The url should be enough.
             saveOp.resource.xmpRightsUsageTerms = "";
           }

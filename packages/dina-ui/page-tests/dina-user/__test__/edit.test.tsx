@@ -1,9 +1,10 @@
 import { DinaForm } from "common-ui";
 import { RolesPerGroupEditor } from "../../../pages/dina-user/edit";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import Select, { StylesConfig } from "react-select";
+import Select from "react-select";
+import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   if (path === "user-api/group") {
     return { data: [] };
   }
@@ -21,8 +22,8 @@ describe("User edit page", () => {
 
     const testUserToEdit = {
       rolesPerGroup: {
-        cnc: ["student"],
-        aafc: ["staff"]
+        cnc: [GUEST],
+        aafc: [USER]
       }
     };
 
@@ -41,8 +42,8 @@ describe("User edit page", () => {
           groupNames: ["cnc", "aafc", "test-group"],
           // The logged in user is a collection manager for CNC and test-group:
           rolesPerGroup: {
-            cnc: ["collection-manager"],
-            "test-group": ["collection-manager"]
+            cnc: [SUPER_USER],
+            "test-group": [SUPER_USER]
           }
         }
       }
@@ -53,7 +54,7 @@ describe("User edit page", () => {
     expect(wrapper.find("tr.aafc-row").exists()).toEqual(true);
     expect(wrapper.find("tr.test-group-row").exists()).toEqual(false);
 
-    // The logged in user must be collection-manager to edit a group's row:
+    // The logged in user must be super_user to edit a group's row:
     // Can edit the cnc row:
     expect(wrapper.find("tr.cnc-row .remove-button").exists()).toEqual(true);
     expect(
@@ -90,7 +91,7 @@ describe("User edit page", () => {
       [
         {
           rolesPerGroup: {
-            aafc: ["staff"],
+            aafc: [USER],
             // Only one role at a time is allowed for now:
             "test-group": ["role2"]
           }
