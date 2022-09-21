@@ -8,17 +8,17 @@ import {
   ColumnDefinition,
   QueryTable,
   useAccount,
-  useApiClient
+  useApiClient,
+  useBulkGet
 } from "common-ui";
 import { InputResource, KitsuResponse } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { PcrBatchItem, PcrBatch, PcrBatchItemRelationships } from "../../../types/seqdb-api";
+import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { pick } from "lodash";
 import Link from "next/link";
-import { deserialize } from "v8";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -41,11 +41,57 @@ export function SangerSampleSelectionStep({
     []
   );
 
+  // The material sample ids that have been selected already
+  const [selectedSampleIds, setselectedSampleIds] = useState<any[]>([]);
+
+  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
   const [lastSave, setLastSave] = useState<number>();
-  const [deSelectedResources, setDeSelectedResources] = useState<any[]>(selectedResources);
+
+  // The pcrBatchItems that are going to be deleted before saving the new ones
+  const [deSelectedResources, setDeSelectedResources] = useState<any[]>([]);
 
   const { apiClient, save } = useApiClient();
   const { username } = useAccount();
+
+  async function setSampledIds() {
+    await apiClient.get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "pcrBatch.uuid",
+            comparison: "==",
+            arguments: pcrBatchId
+          }
+        ]
+        })(""),
+        include: "materialSample"
+      })
+      .then((response) => {
+        const materialSampleIds = response?.data?.map(item => item?.materialSample?.id);
+        setselectedSampleIds(materialSampleIds);
+        setDeSelectedResources(response?.data);
+      })
+  }
+
+  async function setSamples() {
+    await apiClient.get<MaterialSample[]>("/collection-api/material-sample", {
+      })
+      .then((response) => {
+        const selectedSamples = response?.data?.filter((itemA) => {
+          return selectedSampleIds.find((itemB) => {
+            return itemA.id === itemB.id;
+          });
+        });
+        setSelectedResources(selectedSamples);
+      })
+  }
+  // Sets the inital value of selected resources.
+    setSampledIds();
+    setSamples();
+  // useEffect(() => {
+  //   setSampledIds();
+  //   setSamples();
+  // });
 
   // Displayed on edit mode only.
   const columns: TableColumn<MaterialSample>[] = editMode
@@ -110,7 +156,6 @@ export function SangerSampleSelectionStep({
           ]
         })("")}
         reactTableProps={{ sortable: false }}
-        // onSuccess={response => setSelectedResources(response.data)}
         path="seqdb-api/pcr-batch-item"
         include="materialSample"
         deps={[lastSave]}
@@ -153,15 +198,8 @@ export function SangerSampleSelectionStep({
       })
     );
 
-    const unSelectedObjects = deSelectedResources.filter((itemA) => {
-      return newPcrBatchItems.find((itemB) => {
-        return itemA.id === itemB.id;
-      });
-    });
-    console.log(deSelectedResources);
-console.log(unSelectedObjects);
     await save(
-      unSelectedObjects.map(item => ({ delete: item })),
+      deSelectedResources.map(item => ({ delete: item })),
       { apiBaseUrl: "/seqdb-api" }
     );
 
@@ -173,13 +211,8 @@ console.log(unSelectedObjects);
       { apiBaseUrl: "/seqdb-api" }
     );
 
-        const test = (deSelectedResources.length >= newPcrBatchItems.length) ? [
-      newPcrBatchItems
-    ] : [...deSelectedResources,
-      newPcrBatchItems];
-
-    setDeSelectedResources(test);
-    console.log(deSelectedResources);
+    setDeSelectedResources(newPcrBatchItems);
+    
     setLastSave(Date.now());
   }
   
