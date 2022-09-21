@@ -115,7 +115,8 @@ export function FormTemplateEditPageLoaded({
   const initialValues: any = {
     ...collectingEventInitialValues,
     id,
-    type: "form-template"
+    type: "form-template",
+    publiclyReleasable: true
   };
 
   // Generate the material sample save hook to use for the form.
