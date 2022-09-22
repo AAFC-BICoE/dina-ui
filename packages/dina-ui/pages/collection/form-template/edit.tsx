@@ -84,7 +84,6 @@ export function FormTemplateEditPageLoaded({
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
     ...getInitialValuesFromFormTemplate<CollectingEvent>(fetchedFormTemplate),
@@ -113,6 +112,7 @@ export function FormTemplateEditPageLoaded({
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...collectingEventInitialValues,
+    ...fetchedFormTemplate,
     id,
     type: "form-template",
     publiclyReleasable: true
