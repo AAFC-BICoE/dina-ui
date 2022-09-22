@@ -1,7 +1,7 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule } from "react-table";
+import ReactTable, { TableProps, SortingRule, Column } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
@@ -104,6 +104,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   selectionMode?: boolean;
 
+  selectionResourceColumns?: Column<TData>[];
+
   /**
    * If selection mode is enabled, this must be set.
    *
@@ -160,6 +162,7 @@ export function QueryPage<TData extends KitsuResource>({
   reactTableProps,
   defaultSort,
   selectionMode = false,
+  selectionResourceColumns,
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
@@ -304,7 +307,7 @@ export function QueryPage<TData extends KitsuResource>({
     const ids = toPairs(itemIdsToSelect)
       .filter((pair) => pair[1])
       .map((pair) => pair[0]);
-    
+
     const selectedObjects = searchResults.filter((itemA) => {
       return ids.find((itemB) => {
         return itemA.id === itemB;
@@ -474,7 +477,7 @@ export function QueryPage<TData extends KitsuResource>({
     setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete",
-    defaultAvailableItems: selectedResources ??[]
+    defaultAvailableItems: selectedResources ?? []
   });
 
   const computedReactTableProps =
@@ -505,7 +508,7 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   // Columns generated for the selected resources, only in selection mode.
-  const columnsSelected: TableColumn<TData>[] = selectionMode
+  const columnsSelected: Column<TData>[] = selectionMode
     ? [
         ...(selectionMode
           ? [
@@ -519,7 +522,7 @@ export function QueryPage<TData extends KitsuResource>({
               }
             ]
           : []),
-        ...columns
+        ...(selectionResourceColumns ?? [])
       ]
     : [];
 
@@ -538,10 +541,17 @@ export function QueryPage<TData extends KitsuResource>({
   });
 
   const mappedSelectedColumns = columnsSelected.map((column) => {
-    const { fieldName, customHeader } = {
-      customHeader: column.Header,
-      fieldName: String(column.label)
-    };
+    // The "columns" prop can be a string or a react-table Column type.
+    const { fieldName, customHeader } =
+      typeof column === "string"
+        ? {
+            customHeader: undefined,
+            fieldName: column
+          }
+        : {
+            customHeader: column.Header,
+            fieldName: String(column.accessor)
+          };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 

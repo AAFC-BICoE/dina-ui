@@ -1,25 +1,22 @@
 import {
   ButtonBar,
   filterBy,
-  MetaWithTotal,
-  useQuery,
-  withResponse,
   QueryPage,
-  ColumnDefinition,
-  QueryTable,
   useAccount,
   useApiClient,
-  useBulkGet,
-  LoadingSpinner
+  LoadingSpinner,
+  CommonMessage,
+  FieldHeader
 } from "common-ui";
-import { InputResource, KitsuResponse } from "kitsu";
+import { InputResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { pick } from "lodash";
-import Link from "next/link";
+import { pick, compact } from "lodash";
+import { useIntl } from "react-intl";
+import ReactTable, { Column } from "react-table";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -28,6 +25,10 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
+  const { apiClient, save, bulkGet } = useApiClient();
+  const { formatMessage } = useIntl();
+  const { username } = useAccount();
+
   // State to keep track if in edit mode.
   const [editMode, setEditMode] = useState(false);
 
@@ -36,21 +37,14 @@ export function SangerSampleSelectionStep({
     MaterialSample[] | undefined
   >(undefined);
 
-  // Keep track of the last save operation, so the data is re-fetched immediately after saving.
-  const [lastSave, setLastSave] = useState<number>();
+  // These items were originally selected but were removed.
+  const [deSelectedResources, setDeselectedResources] = useState<
+    MaterialSample[]
+  >([]);
 
-  // The pcrBatchItems that are going to be deleted before saving the new ones
-  const [deSelectedResources, setDeSelectedResources] = useState<any[]>([]);
-
-  const { apiClient, save, bulkGet } = useApiClient();
-  const { username } = useAccount();
-
-  const pcrBatchItemQuery = usePcrBatchItemQuery(
-    pcrBatchId,
-    // Default to edit mode when there are no items selected:
-    async ({ meta: { totalResourceCount } }) => setEditMode(!totalResourceCount)
-  );
-
+  /**
+   * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
+   */
   async function fetchSampledIds() {
     await apiClient
       .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
@@ -71,94 +65,62 @@ export function SangerSampleSelectionStep({
             ?.filter((item) => item?.materialSample?.id !== undefined)
             ?.map((item) => item?.materialSample?.id as string) ?? [];
         fetchSamples(materialSampleIds);
-        setDeSelectedResources(response?.data);
       });
   }
 
+  /**
+   * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
+   * operation.
+   *
+   * @param sampleIds array of UUIDs.
+   */
   async function fetchSamples(sampleIds: string[]) {
-    // console.log(sampleIds);
-    await bulkGet<MaterialSample>(
-      sampleIds.map((id) => "/collection-api/material-sample/" + id)
+    await bulkGet<MaterialSample, true>(
+      sampleIds.map((id) => "/material-sample/" + id),
+      { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
     ).then((response) => {
-      // console.log(JSON.stringify(response))
-
-      setSelectedResources(response ?? []);
+      // console.log(JSON.stringify(compact(response)))
+      setSelectedResources(compact(response) ?? []);
     });
   }
 
+  /**
+   * When the page is first loaded, check if saved samples has already been chosen and reload them.
+   */
   useEffect(() => {
     fetchSampledIds();
+    setDeselectedResources([]);
   }, [editMode]);
 
   // Displayed on edit mode only.
-  const columns: TableColumn<MaterialSample>[] = editMode
-    ? [
-        {
-          Cell: ({ original: { id, data } }) => (
-            <a href={`/collection/material-sample/view?id=${id}`}>
-              {data?.attributes?.materialSampleName ||
-                data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-                id}
-            </a>
-          ),
-          label: "materialSampleName",
-          accessor: "data.attributes.materialSampleName",
-          isKeyword: true
-        }
-      ]
-    : [];
+  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    }
+  ];
 
-  // Displayed on read only mode.
-  const PCRBATCH_ITEM_COLUMNS: ColumnDefinition<PcrBatchItem>[] = !editMode
-    ? [
-        {
-          Cell: ({ original: pcrBatchItem }) => (
-            <Link
-              href={`/collection/material-sample/view?id=${pcrBatchItem?.materialSample?.id}`}
-            >
-              {pcrBatchItem?.materialSample?.id}
-            </Link>
-          ),
-          accessor: "materialSample.id",
-          sortable: false
-        }
-      ]
-    : [];
-
-  const selectedItemsTable = (
-    <div>
-      <ButtonBar>
-        <button
-          className="btn btn-primary edit-button"
-          type="button"
-          onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
-        >
-          <SeqdbMessage id="editButtonText" />
-        </button>
-      </ButtonBar>
-      <strong>
-        <SeqdbMessage id="selectedSamplesTitle" />
-      </strong>
-      <QueryTable
-        columns={PCRBATCH_ITEM_COLUMNS}
-        defaultPageSize={100}
-        filter={filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })("")}
-        reactTableProps={{ sortable: false }}
-        path="seqdb-api/pcr-batch-item"
-        include="materialSample"
-        deps={[lastSave]}
-      />
-    </div>
-  );
+  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
+    {
+      Cell: ({ original: sample }) => (
+        <a href={`/collection/material-sample/view?id=${sample.id}`}>
+          {sample.materialSampleName ||
+            sample?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            sample.id}
+        </a>
+      ),
+      Header: <FieldHeader name={"materialSampleName"} />,
+      sortable: false
+    }
+  ];
 
   const buttonBar = (
     <ButtonBar>
@@ -200,66 +162,61 @@ export function SangerSampleSelectionStep({
     );
 
     await save(
-      deSelectedResources.map((item) => ({ delete: item })),
-      { apiBaseUrl: "/seqdb-api" }
-    );
-
-    await save(
       newPcrBatchItems.map((item) => ({
         resource: item,
         type: "pcr-batch-item"
       })),
       { apiBaseUrl: "/seqdb-api" }
     );
-
-    setDeSelectedResources(newPcrBatchItems);
-
-    setLastSave(Date.now());
   }
 
   // Wait until selected resources are loaded.
-  if (editMode && selectedResources === undefined) {
+  if (selectedResources === undefined) {
     return <LoadingSpinner loading={true} />;
   }
 
   return editMode ? (
-    <div>
+    <>
       {buttonBar}
       <div className="mb-3">
-        <QueryPage
+        <QueryPage<MaterialSample>
           indexName={"dina_material_sample_index"}
-          columns={columns}
+          columns={ELASTIC_SEARCH_COLUMN}
           selectionMode={true}
-          selectionResources={selectedResources ?? []}
+          selectionResourceColumns={API_SEARCH_COLUMN}
+          selectionResources={selectedResources}
           setSelectionResources={setSelectedResources}
         />
       </div>
       {buttonBar}
-    </div>
+    </>
   ) : (
-    withResponse(pcrBatchItemQuery, () => selectedItemsTable)
-  );
-}
-
-export function usePcrBatchItemQuery(
-  pcrBatchId: string,
-  onSuccess:
-    | ((response: KitsuResponse<PcrBatchItem, MetaWithTotal>) => void)
-    | undefined
-) {
-  return useQuery<PcrBatchItem, MetaWithTotal>(
-    {
-      path: "seqdb-api/pcr-batch-item",
-      filter: filterBy([], {
-        extraFilters: [
-          {
-            selector: "pcrBatch.uuid",
-            comparison: "==",
-            arguments: pcrBatchId
-          }
-        ]
-      })("")
-    },
-    { onSuccess }
+    <>
+      <ButtonBar>
+        <button
+          className="btn btn-primary edit-button"
+          type="button"
+          onClick={() => setEditMode(true)}
+          style={{ width: "10rem" }}
+        >
+          <SeqdbMessage id="editButtonText" />
+        </button>
+      </ButtonBar>
+      <strong>
+        <SeqdbMessage id="selectedSamplesTitle" />
+      </strong>
+      <ReactTable<MaterialSample>
+        columns={API_SEARCH_COLUMN}
+        data={selectedResources}
+        minRows={1}
+        defaultPageSize={100}
+        pageText={<CommonMessage id="page" />}
+        noDataText={<CommonMessage id="noRowsFound" />}
+        ofText={<CommonMessage id="of" />}
+        rowsText={formatMessage({ id: "rows" })}
+        previousText={<CommonMessage id="previous" />}
+        nextText={<CommonMessage id="next" />}
+      />
+    </>
   );
 }
