@@ -5,6 +5,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Footer, Head, Nav } from "../../../components";
 import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
+import { PCRBatchPlatingStep } from "../../../components/seqdb/sanger-workflow/PCRBatchPlatingStep";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
@@ -55,6 +56,11 @@ export default function SangerWorkFlowRunPage() {
           <TabPanel>
             {pcrBatchId && (
               <SangerSampleSelectionStep pcrBatchId={pcrBatchId} />
+            )}
+          </TabPanel>
+          <TabPanel>
+          {pcrBatchId && (
+              <PCRBatchPlatingStep pcrBatchId={pcrBatchId} />
             )}
           </TabPanel>
         </Tabs>
