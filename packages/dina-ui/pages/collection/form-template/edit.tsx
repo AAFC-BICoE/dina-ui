@@ -20,15 +20,15 @@ import {
   MaterialSample,
   MATERIAL_SAMPLE_FORM_LEGEND
 } from "../../../types/collection-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
-import { getInitialValuesFromFormTemplate } from "packages/dina-ui/components/form-template/formTemplateUtils";
+import { getInitialValuesFromFormTemplate } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
-} from "packages/dina-ui/components";
+} from "../../../../dina-ui/components";
 import { FormikProps } from "formik";
 import { Promisable } from "type-fest";
 
