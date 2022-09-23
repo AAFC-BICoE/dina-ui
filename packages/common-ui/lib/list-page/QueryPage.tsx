@@ -26,7 +26,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep, uniq, toPairs, pick } from "lodash";
+import { cloneDeep, toPairs, uniqBy } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
@@ -104,8 +104,6 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   selectionMode?: boolean;
 
-  selectionResourceColumns?: Column<TData>[];
-
   /**
    * If selection mode is enabled, this must be set.
    *
@@ -162,7 +160,6 @@ export function QueryPage<TData extends KitsuResource>({
   reactTableProps,
   defaultSort,
   selectionMode = false,
-  selectionResourceColumns,
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
@@ -315,10 +312,10 @@ export function QueryPage<TData extends KitsuResource>({
     });
 
     // Append the newly selected resources with the current resources.
-    const selectedResourcesAppended = [
-      ...selectedResources,
-      ...selectedObjects
-    ];
+    const selectedResourcesAppended = uniqBy(
+      [...selectedResources, ...selectedObjects],
+      "id"
+    );
 
     setSelectedResources(selectedResourcesAppended);
     setRemovableItems(selectedResourcesAppended);
@@ -508,23 +505,21 @@ export function QueryPage<TData extends KitsuResource>({
   ];
 
   // Columns generated for the selected resources, only in selection mode.
-  const columnsSelected: Column<TData>[] = selectionMode
-    ? [
-        ...(selectionMode
-          ? [
-              {
-                Cell: ({ original: resource }) => (
-                  <DeselectCheckBox key={resource.id} resource={resource} />
-                ),
-                Header: DeselectCheckBoxHeader,
-                sortable: false,
-                width: 200
-              }
-            ]
-          : []),
-        ...(selectionResourceColumns ?? [])
-      ]
-    : [];
+  const columnsSelected: TableColumn<TData>[] = [
+    ...(selectionMode
+      ? [
+          {
+            Cell: ({ original: resource }) => (
+              <DeselectCheckBox key={resource.id} resource={resource} />
+            ),
+            Header: DeselectCheckBoxHeader,
+            sortable: false,
+            width: 200
+          }
+        ]
+      : []),
+    ...columns
+  ];
 
   const mappedResultsColumns = columnsResults.map((column) => {
     const { fieldName, customHeader } = {
@@ -542,16 +537,10 @@ export function QueryPage<TData extends KitsuResource>({
 
   const mappedSelectedColumns = columnsSelected.map((column) => {
     // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
+    const { fieldName, customHeader } = {
+      customHeader: column.Header,
+      fieldName: String(column.label)
+    };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 

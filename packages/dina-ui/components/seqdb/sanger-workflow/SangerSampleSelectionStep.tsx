@@ -6,8 +6,7 @@ import {
   useApiClient,
   LoadingSpinner,
   CommonMessage,
-  FieldHeader,
-  Operation
+  FieldHeader
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
@@ -26,7 +25,7 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
-  const { apiClient, bulkGet, doOperations } = useApiClient();
+  const { apiClient, bulkGet, save } = useApiClient();
   const { formatMessage } = useIntl();
   const { username } = useAccount();
 
@@ -56,7 +55,8 @@ export function SangerSampleSelectionStep({
               arguments: pcrBatchId
             }
           ]
-        })("")
+        })(""),
+        include: "materialSample"
       })
       .then((response) => {
         const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
@@ -82,7 +82,15 @@ export function SangerSampleSelectionStep({
       sampleIds.map((id) => "/material-sample/" + id),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      setSelectedResources(compact(response) ?? []);
+      const materialSamplesTransformed = compact(response).map((resource) => ({
+        data: {
+          attributes: pick(resource, ["materialSampleName"])
+        },
+        id: resource.id,
+        type: resource.type
+      }));
+
+      setSelectedResources(materialSamplesTransformed ?? []);
     });
   }
 
@@ -111,11 +119,11 @@ export function SangerSampleSelectionStep({
 
   const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
     {
-      Cell: ({ original: sample }) => (
-        <a href={`/collection/material-sample/view?id=${sample.id}`}>
-          {sample?.materialSampleName ||
-            sample?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            sample.id}
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
         </a>
       ),
       Header: <FieldHeader name={"materialSampleName"} />,
@@ -158,19 +166,15 @@ export function SangerSampleSelectionStep({
       )
     );
 
-    // Create the operation to perform all the required API calls.
-    await doOperations(
-      [
-        // Create operations
-        ...itemsToCreate.map<Operation>((materialUUID) => ({
-          op: "POST",
-          path: "pcr-batch-item",
-          value: {
-            attributes: {
-              pcrBatch: pick(pcrBatch, "id", "type"),
-              group: pcrBatch.group ?? "",
-              createdBy: username ?? ""
-            },
+    // Perform create
+    if (itemsToCreate.length !== 0) {
+      await save(
+        itemsToCreate.map((materialUUID) => ({
+          resource: {
+            type: "pcr-batch-item",
+            group: pcrBatch.group ?? "",
+            createdBy: username ?? "",
+            pcrBatch: pick(pcrBatch, "id", "type"),
             relationships: {
               materialSample: {
                 data: {
@@ -178,19 +182,26 @@ export function SangerSampleSelectionStep({
                   type: "material-sample"
                 }
               }
-            },
+            }
+          },
+          type: "pcr-batch-item"
+        })),
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    }
+
+    // Perform deletes
+    if (itemsToDelete.length !== 0) {
+      await save(
+        itemsToDelete.map((item) => ({
+          delete: {
+            id: item.pcrBatchItemUUID ?? "",
             type: "pcr-batch-item"
           }
         })),
-
-        // Delete operations
-        ...itemsToDelete.map<Operation>((uuid) => ({
-          op: "DELETE",
-          path: `pcr-batch-item/${uuid.pcrBatchItemUUID}`
-        }))
-      ],
-      { apiBaseUrl: "seqdb-api" }
-    );
+        { apiBaseUrl: "/seqdb-api" }
+      );
+    }
 
     // Clear the previously selected resources.
     setPreviouslySelectedResources([]);
@@ -225,7 +236,6 @@ export function SangerSampleSelectionStep({
           indexName={"dina_material_sample_index"}
           columns={ELASTIC_SEARCH_COLUMN}
           selectionMode={true}
-          selectionResourceColumns={API_SEARCH_COLUMN}
           selectionResources={selectedResources}
           setSelectionResources={setSelectedResources}
         />
