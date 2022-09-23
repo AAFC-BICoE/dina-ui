@@ -17,18 +17,15 @@ import Link from "next/link";
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const { groupNames } = useAccount();
+
   const router = useRouter();
   const uuid = String(router?.query?.id);
   const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
     ? {
-        group: groupNames?.[0] ?? "",
         queryRows: [
           {
             fieldName: "data.relationships.projects.data.id",
-            matchType: "equals",
-            textMatchType: "partial",
-            type: "text",
+            type: "uuid",
             matchValue: uuid
           }
         ]
