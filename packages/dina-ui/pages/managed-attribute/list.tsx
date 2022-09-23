@@ -41,7 +41,7 @@ export default function ManagedAttributesListPage() {
 
           <Tabs
             activeKey={selectedTabKey}
-            onSelect={key => (key ? setSelectedTabKey(key) : null)}
+            onSelect={(key) => (key ? setSelectedTabKey(key) : null)}
             mountOnEnter={true}
             unmountOnExit={true}
             id="managedAttributeListTab"
@@ -81,9 +81,11 @@ function CreateNewSection({ href }: CreateButtonProps) {
   return (
     <Card bg="light" className="mb-4">
       <Card.Body>
-        <Button href={href} variant="info" className="mx-1 my-1">
-          <DinaMessage id="createNewLabel" />
-        </Button>
+        <Link href={href} passHref={true}>
+          <Button variant="info" className="mx-1 my-1">
+            <DinaMessage id="createNewLabel" />
+          </Button>
+        </Link>
       </Card.Body>
     </Card>
   );
@@ -126,7 +128,7 @@ function CollectionAttributeListView() {
           acceptedValues?.length
             ? "field_managedAttributeType_picklist_label"
             : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                option => option.value === managedAttributeType
+                (option) => option.value === managedAttributeType
               )?.labelKey;
 
         return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
@@ -138,7 +140,7 @@ function CollectionAttributeListView() {
     },
     {
       Cell: ({ original: { acceptedValues } }) => (
-        <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
+        <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
       ),
       accessor: "acceptedValues"
     },
@@ -190,7 +192,7 @@ function ObjectStoreAttributeListView() {
             acceptedValues?.length
               ? "field_managedAttributeType_picklist_label"
               : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                  option => option.value === managedAttributeType
+                  (option) => option.value === managedAttributeType
                 )?.labelKey;
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
@@ -202,7 +204,7 @@ function ObjectStoreAttributeListView() {
       },
       {
         Cell: ({ original: { acceptedValues } }) => (
-          <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
+          <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
         ),
         accessor: "acceptedValues"
       }
@@ -250,7 +252,7 @@ function TransactionAttributeListView() {
             acceptedValues?.length
               ? "field_managedAttributeType_picklist_label"
               : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                  option => option.value === managedAttributeType
+                  (option) => option.value === managedAttributeType
                 )?.labelKey;
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
@@ -262,7 +264,7 @@ function TransactionAttributeListView() {
       },
       {
         Cell: ({ original: { acceptedValues } }) => (
-          <div>{acceptedValues?.map(val => `"${val}"`)?.join(", ")}</div>
+          <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
         ),
         accessor: "acceptedValues"
       },

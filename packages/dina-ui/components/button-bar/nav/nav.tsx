@@ -66,9 +66,11 @@ export function Nav({ marginBottom = true }: NavProps) {
         </Container>
         <Navbar className="app-bar" expand="lg">
           <Container fluid={true} className="px-5">
-            <Navbar.Brand href="/" className="app-name">
-              <DinaMessage id="appTitle" />
-            </Navbar.Brand>
+            <Link href="/" passHref={true}>
+              <Navbar.Brand href="/" className="app-name">
+                <DinaMessage id="appTitle" />
+              </Navbar.Brand>
+            </Link>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
               {/* Navigation menu left */}
@@ -112,13 +114,14 @@ function SkipLinks() {
 
 function FeedbackButton() {
   return (
-    <Button
-      variant="link"
-      className="px-0"
+    <Link
       href="https://github.com/AAFC-BICoE/dina-planning/issues/new?labels=demo%20feedback"
+      passHref={true}
     >
-      <DinaMessage id="feedbackButtonText" />
-    </Button>
+      <Button variant="link" className="px-0">
+        <DinaMessage id="feedbackButtonText" />
+      </Button>
+    </Link>
   );
 }
 
