@@ -15,8 +15,8 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { pick, compact, uniq } from "lodash";
-import { useIntl } from "react-intl";
 import ReactTable, { Column } from "react-table";
+import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -26,7 +26,7 @@ export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
-  const { formatMessage } = useIntl();
+  const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
 
   // State to keep track if in edit mode.
@@ -90,6 +90,11 @@ export function SangerSampleSelectionStep({
         type: resource.type
       }));
 
+      // If there is nothing stored yet, automatically go to edit mode.
+      if (materialSamplesTransformed.length === 0) {
+        setEditMode(true);
+      }
+
       setSelectedResources(materialSamplesTransformed ?? []);
     });
   }
@@ -98,7 +103,9 @@ export function SangerSampleSelectionStep({
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
    */
   useEffect(() => {
-    fetchSampledIds();
+    if (editMode || !selectedResources) {
+      fetchSampledIds();
+    }
   }, [editMode]);
 
   // Displayed on edit mode only.
@@ -205,6 +212,7 @@ export function SangerSampleSelectionStep({
 
     // Clear the previously selected resources.
     setPreviouslySelectedResources([]);
+    setEditMode(false);
   }
 
   // Wait until selected resources are loaded.
@@ -214,17 +222,19 @@ export function SangerSampleSelectionStep({
 
   const buttonBar = (
     <ButtonBar>
-      <button
-        className="btn btn-primary"
-        type="button"
-        onClick={() => {
-          setEditMode(false);
-          savePcrBatchItems();
-        }}
-        style={{ width: "10rem" }}
-      >
-        <SeqdbMessage id="done" />
-      </button>
+      <div className="ms-auto">
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => {
+            savePcrBatchItems();
+          }}
+          style={{ width: "10rem" }}
+          disabled={selectedResources.length === 0}
+        >
+          {formatMessage("save")}
+        </button>
+      </div>
     </ButtonBar>
   );
 
@@ -265,7 +275,7 @@ export function SangerSampleSelectionStep({
         pageText={<CommonMessage id="page" />}
         noDataText={<CommonMessage id="noRowsFound" />}
         ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage({ id: "rows" })}
+        rowsText={formatMessage("rows")}
         previousText={<CommonMessage id="previous" />}
         nextText={<CommonMessage id="next" />}
       />
