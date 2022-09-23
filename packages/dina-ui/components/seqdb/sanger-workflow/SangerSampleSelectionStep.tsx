@@ -6,15 +6,16 @@ import {
   useApiClient,
   LoadingSpinner,
   CommonMessage,
-  FieldHeader
+  FieldHeader,
+  Operation
 } from "common-ui";
-import { InputResource } from "kitsu";
+import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { pick, compact } from "lodash";
+import { pick, compact, uniq } from "lodash";
 import { useIntl } from "react-intl";
 import ReactTable, { Column } from "react-table";
 
@@ -25,22 +26,21 @@ export interface SangerSampleSelectionStepProps {
 export function SangerSampleSelectionStep({
   pcrBatchId
 }: SangerSampleSelectionStepProps) {
-  const { apiClient, save, bulkGet } = useApiClient();
+  const { apiClient, bulkGet, doOperations } = useApiClient();
   const { formatMessage } = useIntl();
   const { username } = useAccount();
 
   // State to keep track if in edit mode.
   const [editMode, setEditMode] = useState(false);
 
+  // Keep track of the previously selected resources to compare.
+  const [previouslySelectedResources, setPreviouslySelectedResources] =
+    useState<PcrBatchItem[]>([]);
+
   // The selected resources to be used for the QueryPage.
   const [selectedResources, setSelectedResources] = useState<
     MaterialSample[] | undefined
   >(undefined);
-
-  // These items were originally selected but were removed.
-  const [deSelectedResources, setDeselectedResources] = useState<
-    MaterialSample[]
-  >([]);
 
   /**
    * Retrieve all of the PCR Batch Items that are associated with the PCR Batch from step 1.
@@ -56,14 +56,17 @@ export function SangerSampleSelectionStep({
               arguments: pcrBatchId
             }
           ]
-        })(""),
-        include: "materialSample"
+        })("")
       })
       .then((response) => {
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+          response?.data?.filter(
+            (item) => item?.materialSample?.id !== undefined
+          );
         const materialSampleIds: string[] =
-          response?.data
-            ?.filter((item) => item?.materialSample?.id !== undefined)
-            ?.map((item) => item?.materialSample?.id as string) ?? [];
+          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
+
+        setPreviouslySelectedResources(pcrBatchItems);
         fetchSamples(materialSampleIds);
       });
   }
@@ -75,11 +78,10 @@ export function SangerSampleSelectionStep({
    * @param sampleIds array of UUIDs.
    */
   async function fetchSamples(sampleIds: string[]) {
-    await bulkGet<MaterialSample, true>(
+    await bulkGet<MaterialSample>(
       sampleIds.map((id) => "/material-sample/" + id),
-      { apiBaseUrl: "/collection-api", returnNullForMissingResource: true }
+      { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      // console.log(JSON.stringify(compact(response)))
       setSelectedResources(compact(response) ?? []);
     });
   }
@@ -89,7 +91,6 @@ export function SangerSampleSelectionStep({
    */
   useEffect(() => {
     fetchSampledIds();
-    setDeselectedResources([]);
   }, [editMode]);
 
   // Displayed on edit mode only.
@@ -112,7 +113,7 @@ export function SangerSampleSelectionStep({
     {
       Cell: ({ original: sample }) => (
         <a href={`/collection/material-sample/view?id=${sample.id}`}>
-          {sample.materialSampleName ||
+          {sample?.materialSampleName ||
             sample?.dwcOtherCatalogNumbers?.join?.(", ") ||
             sample.id}
         </a>
@@ -122,6 +123,84 @@ export function SangerSampleSelectionStep({
     }
   ];
 
+  async function savePcrBatchItems() {
+    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${pcrBatchId}`,
+      {}
+    );
+
+    // Convert to UUID arrays to compare the two arrays.
+    const selectedResourceUUIDs = compact(
+      selectedResources?.map((material) => material.id)
+    );
+    const previouslySelectedResourcesUUIDs = compact(
+      previouslySelectedResources?.map((item) => ({
+        materialSampleUUID: item?.materialSample?.id,
+        pcrBatchItemUUID: item?.id
+      }))
+    );
+
+    // UUIDs of PCR Batch Items that need to be created.
+    const itemsToCreate = uniq(
+      selectedResourceUUIDs.filter(
+        (uuid) =>
+          !previouslySelectedResourcesUUIDs.some(
+            (item) => item.materialSampleUUID === uuid
+          )
+      )
+    );
+
+    // UUIDs of PCR Batch Items that need to be deleted.
+    const itemsToDelete = uniq(
+      previouslySelectedResourcesUUIDs.filter(
+        (uuid) =>
+          !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
+      )
+    );
+
+    // Create the operation to perform all the required API calls.
+    await doOperations(
+      [
+        // Create operations
+        ...itemsToCreate.map<Operation>((materialUUID) => ({
+          op: "POST",
+          path: "pcr-batch-item",
+          value: {
+            attributes: {
+              pcrBatch: pick(pcrBatch, "id", "type"),
+              group: pcrBatch.group ?? "",
+              createdBy: username ?? ""
+            },
+            relationships: {
+              materialSample: {
+                data: {
+                  id: materialUUID,
+                  type: "material-sample"
+                }
+              }
+            },
+            type: "pcr-batch-item"
+          }
+        })),
+
+        // Delete operations
+        ...itemsToDelete.map<Operation>((uuid) => ({
+          op: "DELETE",
+          path: `pcr-batch-item/${uuid.pcrBatchItemUUID}`
+        }))
+      ],
+      { apiBaseUrl: "seqdb-api" }
+    );
+
+    // Clear the previously selected resources.
+    setPreviouslySelectedResources([]);
+  }
+
+  // Wait until selected resources are loaded.
+  if (selectedResources === undefined) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   const buttonBar = (
     <ButtonBar>
       <button
@@ -129,7 +208,7 @@ export function SangerSampleSelectionStep({
         type="button"
         onClick={() => {
           setEditMode(false);
-          savePcrBatchItems(selectedResources ?? []);
+          savePcrBatchItems();
         }}
         style={{ width: "10rem" }}
       >
@@ -137,43 +216,6 @@ export function SangerSampleSelectionStep({
       </button>
     </ButtonBar>
   );
-
-  async function savePcrBatchItems(samples: MaterialSample[]) {
-    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
-      `seqdb-api/pcr-batch/${pcrBatchId}`,
-      {}
-    );
-
-    const newPcrBatchItems = samples.map<InputResource<PcrBatchItem>>(
-      (sample) => ({
-        pcrBatch: pick(pcrBatch, "id", "type"),
-        group: pcrBatch.group,
-        createdBy: username,
-        type: "pcr-batch-item",
-        relationships: {
-          materialSample: {
-            data: {
-              id: sample.id,
-              type: sample.type
-            }
-          }
-        }
-      })
-    );
-
-    await save(
-      newPcrBatchItems.map((item) => ({
-        resource: item,
-        type: "pcr-batch-item"
-      })),
-      { apiBaseUrl: "/seqdb-api" }
-    );
-  }
-
-  // Wait until selected resources are loaded.
-  if (selectedResources === undefined) {
-    return <LoadingSpinner loading={true} />;
-  }
 
   return editMode ? (
     <>
