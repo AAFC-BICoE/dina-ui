@@ -1,6 +1,7 @@
 import { TextField, SelectField, SelectOption } from "common-ui";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { Fragment } from "react";
+import Link from "next/link";
 
 export interface IdentifierRowProps {
   index: number;
@@ -24,13 +25,15 @@ export function IdentifierRow({ index, typeOptions }: IdentifierRowProps) {
       <TextField
         name={commonRoot + "uri"}
         label={formatMessage("identifierURI")}
-        readOnlyRender={value => {
+        readOnlyRender={(value) => {
           try {
             const url = new URL(value);
             if (url.protocol === "http:" || url.protocol === "https:") {
               return (
                 <Fragment key={value}>
-                  <a href={value}>{value}</a>
+                  <Link href={value} passHref={true}>
+                    <a>{value}</a>
+                  </Link>
                 </Fragment>
               );
             }

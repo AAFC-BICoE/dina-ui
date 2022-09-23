@@ -20,9 +20,12 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
 
       return resourceExternalURL ? (
         <div className="d-flex h-100">
-          <a href={resourceExternalURL} target="_blank" className="m-auto h5">
-            <FaExternalLinkAlt />
-          </a>
+          <Link href={resourceExternalURL} passHref={true}>
+            <a target="_blank" className="m-auto h5">
+              <FaExternalLinkAlt />
+            </a>
+          </Link>
+
           <Link
             href={`/object-store/object/external-resource-view?id=${original.id}`}
           >

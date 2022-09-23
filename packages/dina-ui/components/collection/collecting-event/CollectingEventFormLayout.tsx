@@ -52,6 +52,7 @@ import {
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import Link from "next/link";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -472,9 +473,11 @@ export function CollectingEventFormLayout({
                   )}
                   <div className="col-md-4">
                     {detail.sourceUrl && (
-                      <a href={`${detail.sourceUrl}`} className="btn btn-info">
-                        <DinaMessage id="viewDetailButtonLabel" />
-                      </a>
+                      <Link href={`${detail.sourceUrl}`} passHref={true}>
+                        <a className="btn btn-info">
+                          <DinaMessage id="viewDetailButtonLabel" />
+                        </a>
+                      </Link>
                     )}
                   </div>
                 </div>

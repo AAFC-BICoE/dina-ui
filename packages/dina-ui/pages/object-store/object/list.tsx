@@ -65,9 +65,9 @@ export default function MetadataListPage() {
     {
       Cell: ({ original: { id, data } }) =>
         data?.attributes?.originalFilename ? (
-          <a href={`/object-store/object/view?id=${id}`} id={`file-name-${id}`}>
-            {data?.attributes?.originalFilename}
-          </a>
+          <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
+            <a id={`file-name-${id}`}>{data?.attributes?.originalFilename}</a>
+          </Link>
         ) : null,
       label: "originalFilename",
       accessor: "data.attributes.originalFilename",

@@ -132,7 +132,9 @@ export function FileView({
                   fileType={fileType}
                   unsupportedComponent={() => (
                     <div>
-                      <a href={authenticatedFilePath}>{filePath}</a>
+                      <Link href={authenticatedFilePath} passHref={true}>
+                        <a>{filePath}</a>
+                      </Link>
                     </div>
                   )}
                 />
