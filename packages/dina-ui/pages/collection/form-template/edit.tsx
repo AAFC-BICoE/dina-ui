@@ -114,8 +114,7 @@ export function FormTemplateEditPageLoaded({
     ...collectingEventInitialValues,
     ...fetchedFormTemplate,
     id,
-    type: "form-template",
-    publiclyReleasable: true
+    type: "form-template"
   };
 
   // Generate the material sample save hook to use for the form.
@@ -142,14 +141,16 @@ export function FormTemplateEditPageLoaded({
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
-        if (Array.isArray(object[key])) {
-          const objects = Object.assign({}, ...object[key]);
-          allSubmittedValues[key] = objects;
-          iterateThrough(objects);
-        }
+        if (object[key]) {
+          if (Array.isArray(object[key])) {
+            const objects = Object.assign({}, ...object[key]);
+            allSubmittedValues[key] = objects;
+            iterateThrough(objects);
+          }
 
-        if (typeof object[key] === "object") {
-          return iterateThrough(object[key]);
+          if (typeof object[key] === "object") {
+            return iterateThrough(object[key]);
+          }
         }
       });
     };
@@ -165,23 +166,21 @@ export function FormTemplateEditPageLoaded({
       restrictToCreatedBy: false,
       viewConfiguration: {},
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
-        (dataComponent, componentIndex) => {
-          return {
-            name: dataComponent.id,
+        (dataComponent, componentIndex) => ({
+          name: dataComponent.id,
+          visible: true,
+          order: componentIndex,
+          sections: dataComponent.sections.map((section) => ({
+            name: section.id,
             visible: true,
-            order: componentIndex,
-            sections: dataComponent.sections.map((section) => ({
-              name: section.id,
-              visible: true,
-              items: section.items.map((field) => ({
-                name: field.id,
-                visible:
-                  allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
-                defaultValue: allSubmittedValues?.[field.id]
-              }))
+            items: section.items.map((field) => ({
+              name: field.id,
+              visible:
+                allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+              defaultValue: allSubmittedValues?.[field.id]
             }))
-          };
-        }
+          }))
+        })
       )
     };
 
