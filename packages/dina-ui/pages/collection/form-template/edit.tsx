@@ -183,7 +183,6 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
-
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }

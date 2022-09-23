@@ -21,11 +21,6 @@ const formTemplateSchema = z.object({
 
 export const materialSampleFormTemplateSchema = z.object({
   type: z.literal("material-sample-form-template"),
-  navOrder: z
-    .enum(MATERIAL_SAMPLE_FORM_LEGEND)
-    .array()
-    // Fallback to null:
-    .or(z.any().transform(() => null)),
   managedAttributesOrder: z.string().array().optional(),
   determinationManagedAttributesOrder: z.string().array().optional(),
   collectingEventManagedAttributesOrder: z.string().array().optional(),
