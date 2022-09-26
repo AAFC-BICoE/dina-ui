@@ -114,8 +114,10 @@ export function FormTemplateEditPageLoaded({
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
-    // ...fetchedFormTemplate,
+    ...fetchedFormTemplate,
+    ...materialSampleTemplateInitialValues,
     ...collectingEventInitialValues,
+    ...acquisitionEventInitialValues,
     id,
     type: "form-template"
   };
@@ -144,14 +146,16 @@ export function FormTemplateEditPageLoaded({
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
-        if (Array.isArray(object[key])) {
-          const objects = Object.assign({}, ...object[key]);
-          allSubmittedValues[key] = objects;
-          iterateThrough(objects);
-        }
+        if (object[key]) {
+          if (Array.isArray(object[key])) {
+            const objects = Object.assign({}, ...object[key]);
+            allSubmittedValues[key] = objects;
+            iterateThrough(objects);
+          }
 
-        if (typeof object[key] === "object") {
-          return iterateThrough(object[key]);
+          if (typeof object[key] === "object") {
+            return iterateThrough(object[key]);
+          }
         }
       });
     };
