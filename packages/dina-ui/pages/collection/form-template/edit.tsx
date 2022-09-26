@@ -206,7 +206,7 @@ export function FormTemplateEditPageLoaded({
           options={{ apiBaseUrl: "/collection-api" }}
           postDeleteRedirect="/collection/form-template/list"
           type="form-template"
-          className="me-5"
+          className="me-3"
         />
       )}
 

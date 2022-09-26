@@ -4,7 +4,7 @@
   min-height: 60px;
   background: #f3f3f3;
   border-bottom: 1px solid #d3d7cf;
-  z-index: 100;
+  z-index: 2000;
   padding: 10px 10px 10px 15px;
 }
 
