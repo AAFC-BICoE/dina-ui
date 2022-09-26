@@ -12,6 +12,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { TransformQueryToDSLParams } from "../../../common-ui/lib/util/transformToDSL";
+import Link from "next/link";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
@@ -36,11 +37,16 @@ export function ProjectFormLayout() {
     // Material Sample Name
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
