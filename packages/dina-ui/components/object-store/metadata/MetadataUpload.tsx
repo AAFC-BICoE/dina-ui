@@ -5,7 +5,8 @@ import { BULK_ADD_IDS_KEY } from "../../../pages/object-store/upload";
 import {
   Metadata,
   ObjectUpload,
-  DefaultValue
+  DefaultValue,
+  License
 } from "../../../types/objectstore-api";
 import React from "react";
 import { MetadataForm } from "./MetadataForm";
@@ -49,15 +50,20 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
       "objectstore-api/config/default-values",
       {}
     );
-    const metadataDefaults: Partial<Metadata> = {
-      publiclyReleasable: true
-    };
+    const metadataDefaults: Partial<Metadata> = {};
     for (const defaultValue of defaultValues.filter(
       ({ type }) => type === "metadata"
     )) {
       metadataDefaults[defaultValue.attribute as keyof Metadata] =
         defaultValue.value as any;
     }
+
+    const selectedLicense = await apiClient.get<License>(
+      `objectstore-api/license?filter[url]=${metadataDefaults.xmpRightsWebStatement}`,
+      {}
+    );
+
+    metadataDefaults.license = selectedLicense.data;
 
     const newMetadatas = objectUploads.map<Metadata>((objectUpload) => ({
       ...metadataDefaults,

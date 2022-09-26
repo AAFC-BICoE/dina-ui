@@ -15,6 +15,7 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -29,7 +30,7 @@ export function Nav({ marginBottom = true }: NavProps) {
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
       ?.flatMap((it) => it)
-      ?.includes("collection-manager") || isAdmin;
+      ?.includes(SUPER_USER) || isAdmin;
 
   return (
     <>
@@ -323,10 +324,10 @@ function NavSequenceDropdown({ formatMessage }) {
         <SeqdbMessage id="sangerWorkflowListTitle" />
       </NavDropdown.Item>
       <NavDropdown.Item
-        href="/seqdb/pcr-profile/list"
+        href="/seqdb/thermocycler-profile/list"
         onKeyDown={onKeyDownLastItem}
       >
-        <SeqdbMessage id="pcrProfileListTitle" />
+        <SeqdbMessage id="thermocyclerProfileListTitle" />
       </NavDropdown.Item>
     </NavDropdown>
   );

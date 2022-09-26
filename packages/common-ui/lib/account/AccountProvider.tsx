@@ -8,20 +8,21 @@ import {
 } from "react";
 import Keycloak from "keycloak-js";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { DINA_ADMIN } from "../../types/DinaRoles";
 
 export interface AccountContextI {
   agentId?: string;
   authenticated: boolean;
   groupNames?: string[];
-  login?: () => void;
-  logout?: () => void;
+  login: () => void;
+  logout: () => void;
   initialized: boolean;
-  token?: string;
   roles: string[];
   username?: string;
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
+  getCurrentToken: () => Promise<string | undefined>;
 }
 
 const AccountContext = createContext<AccountContextI | null>(null);
@@ -69,7 +70,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Non-authenticated users should never see the the full website. Display a loading indicator.
-  if (!authenticated || !initialized) {
+  if (!authenticated || !initialized || !keycloak) {
     return (
       <div
         className="d-flex align-items-center justify-content-center"
@@ -79,8 +80,6 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
-  const token = keycloak?.token;
 
   const tokenParsed = keycloak?.tokenParsed;
 
@@ -102,6 +101,16 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
     keycloakGroups as string[]
   );
 
+  const login = keycloak.login;
+
+  const logout = keycloak.logout;
+
+  const getCurrentToken = async () => {
+    // If it expires in the next 30 seconds, generate a new one.
+    await keycloak.updateToken(30).catch(login);
+    return keycloak.token;
+  };
+
   return (
     <AccountProvider
       value={{
@@ -109,14 +118,14 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
         authenticated,
         groupNames,
         initialized,
-        login: keycloak?.login,
-        logout: keycloak?.logout,
+        login,
+        logout,
         roles,
-        token,
         username,
         subject,
-        isAdmin: rolesPerGroup?.aafc?.includes("dina-admin") ?? false,
-        rolesPerGroup
+        isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
+        rolesPerGroup,
+        getCurrentToken
       }}
     >
       {children}
@@ -125,7 +134,7 @@ export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Convert from Keycloak's format ( ["/cnc", "/cnc/staff"] to just the group name ["cnc"] )
+ * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */
 export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
   return uniq(

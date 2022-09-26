@@ -20,15 +20,15 @@ import {
   MaterialSample,
   MATERIAL_SAMPLE_FORM_LEGEND
 } from "../../../types/collection-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { GroupSelectField } from "packages/dina-ui/components/group-select/GroupSelectField";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
-import { getInitialValuesFromFormTemplate } from "packages/dina-ui/components/form-template/formTemplateUtils";
+import { getInitialValuesFromFormTemplate } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
-} from "packages/dina-ui/components";
+} from "../../../../dina-ui/components";
 import { FormikProps } from "formik";
 import { Promisable } from "type-fest";
 
@@ -47,7 +47,7 @@ export default function FormTemplateEditPage() {
 
   return (
     <>
-      {/* New Form Template or New Form Template */}
+      {/* Load Form Template or New Form Template */}
       {id ? (
         withResponse(formTemplateQuery, ({ data: fetchedFormTemplate }) => (
           <FormTemplateEditPageLoaded
@@ -81,11 +81,9 @@ export function FormTemplateEditPageLoaded({
 }: FormTemplateEditPageLoadedProps) {
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
-
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
     ...getInitialValuesFromFormTemplate<CollectingEvent>(fetchedFormTemplate),
@@ -114,6 +112,7 @@ export function FormTemplateEditPageLoaded({
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...collectingEventInitialValues,
+    ...fetchedFormTemplate,
     id,
     type: "form-template"
   };
@@ -139,30 +138,28 @@ export function FormTemplateEditPageLoaded({
       ...(acqEventFormRef?.current?.values ?? {})
     };
 
-    // console.log(JSON.stringify(allSubmittedValues));
-
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
-        if (Array.isArray(object[key])) {
-          const objects = Object.assign({}, ...object[key]);
-          // console.log(objects);
-          allSubmittedValues[key] = objects;
-          iterateThrough(objects);
-        }
+        if (object[key]) {
+          if (Array.isArray(object[key])) {
+            const objects = Object.assign({}, ...object[key]);
+            allSubmittedValues[key] = objects;
+            iterateThrough(objects);
+          }
 
-        if (typeof object[key] === "object") {
-          return iterateThrough(object[key]);
+          if (typeof object[key] === "object") {
+            return iterateThrough(object[key]);
+          }
         }
       });
     };
     iterateThrough(allSubmittedValues);
 
-    // console.log(JSON.stringify(allSubmittedValues));
-
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
+      id: submittedValues.id,
       type: "form-template",
       name: submittedValues.name,
       group: submittedValues.group,
@@ -176,7 +173,7 @@ export function FormTemplateEditPageLoaded({
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
-            fields: section.fields.map((field) => ({
+            items: section.items.map((field) => ({
               name: field.id,
               visible:
                 allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
@@ -186,9 +183,6 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
-
-    // console.log("To be saved: " + JSON.stringify(formTemplate));
-
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }

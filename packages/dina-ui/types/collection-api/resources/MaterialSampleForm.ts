@@ -20,7 +20,7 @@ export interface MaterialSampleFormSectionInformation {
 
   maxGridSizeX: number;
 
-  fields: MaterialSampleFormFieldInformation[];
+  items: MaterialSampleFormFieldInformation[];
 }
 
 export interface MaterialSampleFormFieldInformation {
@@ -41,7 +41,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "general-section",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "tags"
             },
@@ -63,7 +63,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "identifiers-section",
           labelKey: "identifiers",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "collection"
             },
@@ -92,7 +92,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "material-sample-info-section",
           labelKey: "materialSampleInfo",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "materialSampleType"
             },
@@ -115,7 +115,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "general-section",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "tags"
             },
@@ -130,7 +130,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "identifiers-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "dwcFieldNumber"
             }
@@ -139,7 +139,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "collecting-date-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "verbatimEventDateTime"
             },
@@ -154,7 +154,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "collecting-agents-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "dwcRecordedBy"
             },
@@ -169,7 +169,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "verbatim-label-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "dwcVerbatimLocality"
             },
@@ -199,7 +199,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "collecting-event-details",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "habitat"
             },
@@ -232,7 +232,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "georeferencing-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "geoReferenceAssertions.dwcGeoreferenceVerificationStatus"
             },
@@ -271,7 +271,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "current-geographic-place",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "srcAdminLevels"
             },
@@ -286,12 +286,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
         {
           id: "collecting-event-managed-attributes-section",
           maxGridSizeX: 2,
-          fields: []
+          items: []
         },
         {
           id: "collecting-event-attachments-section",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "managedAttributes.attachmentsConfig.allowNew"
             },
@@ -312,7 +312,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "acquisition-event-reception-section",
           labelKey: "reception",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "group"
             },
@@ -331,7 +331,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "acquisition-event-isolation-section",
           labelKey: "isolation",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "isolatedBy"
             },
@@ -355,7 +355,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "general-section",
           maxGridSizeX: 2,
           labelKey: "preparations",
-          fields: [
+          items: [
             {
               id: "preparationType"
             },
@@ -403,7 +403,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "organisms-general-section",
           labelKey: "organisms",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "organisms.lifeStage"
             },
@@ -419,7 +419,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "organism-verbatim-determination-section",
           labelKey: "verbatimDeterminationLegend",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "organisms.determination.verbatimScientificName"
             },
@@ -441,7 +441,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "organism-determination-section",
           labelKey: "determination",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "organisms.determination.scientificName"
             },
@@ -463,7 +463,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "organism-type-specimen-section",
           labelKey: "typeSpecimen",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "organisms.determination.typeStatus"
             },
@@ -476,7 +476,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "organism-managed-attributes-section",
           labelKey: "typeSpecimen",
           maxGridSizeX: 2,
-          fields: []
+          items: []
         }
       ]
     },
@@ -490,7 +490,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "associations-host-organism-section",
           labelKey: "hostOrganismLegend",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "hostOrganism.name"
             },
@@ -503,7 +503,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "associations-material-sample-section",
           labelKey: "materialSampleAssociationLegend",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "associations.associationType"
             },
@@ -527,7 +527,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "storage-selection-section",
           labelKey: "storage",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "storageUnit"
             }
@@ -545,7 +545,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "restriction-general-section",
           labelKey: "restrictions",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "phac_animal_rg"
             },
@@ -578,7 +578,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "scheduled-actions-add-section",
           labelKey: "",
           maxGridSizeX: 2,
-          fields: [
+          items: [
             {
               id: "scheduledAction.actionType"
             },
@@ -607,7 +607,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "managed-attributes-section",
           labelKey: "managedAttributes",
           maxGridSizeX: 2,
-          fields: []
+          items: []
         }
       ]
     },
@@ -620,7 +620,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: MaterialSampleFormComponentInformation
           id: "material-sample-attachments-sections",
           labelKey: "materialSampleAttachments",
           maxGridSizeX: 1,
-          fields: [
+          items: [
             {
               id: "attachmentsConfig.allowNew"
             },

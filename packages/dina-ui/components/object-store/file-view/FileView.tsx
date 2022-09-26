@@ -1,8 +1,9 @@
 import { useAccount } from "common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ComponentType, ReactNode } from "react";
+import { ComponentType, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export type DownLoadLinks = {
   original?: string;
@@ -50,7 +51,19 @@ export function FileView({
   shownTypeIndicator,
   preview
 }: FileViewProps) {
-  const { token } = useAccount();
+  const router = useRouter();
+  const { getCurrentToken } = useAccount();
+  const [token, setToken] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    async function refreshToken() {
+      const newToken = await getCurrentToken();
+      setToken(newToken);
+    }
+
+    // Get the latest token for the preview.
+    refreshToken();
+  }, []);
 
   // Add the auth token to the requested file path:
   const authenticatedFilePath = `${filePath}?access_token=${token}`;
@@ -75,8 +88,16 @@ export function FileView({
     clickToDownload = false;
   }
 
-  if (!token) {
-    return null;
+  /**
+   * When the user clicks a download link, the current token will be appended.
+   *
+   * @param path The download link.
+   */
+  async function handleDownloadLink(path?: string) {
+    if (path) {
+      const currentToken = await getCurrentToken();
+      router.push(`${path}?access_token=${currentToken}`);
+    }
   }
 
   return (
@@ -101,7 +122,7 @@ export function FileView({
                   alt={imgAlt ?? `File path : ${filePath}`}
                   src={authenticatedFilePath}
                   style={{ height: imgHeight }}
-                  onError={event =>
+                  onError={(event) =>
                     (event.currentTarget.style.display = "none")
                   }
                 />
@@ -127,7 +148,8 @@ export function FileView({
           {downloadLinks?.original && (
             <a
               className="p-2 original"
-              href={`${downloadLinks?.original}?access_token=${token}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleDownloadLink(downloadLinks?.original)}
             >
               <DinaMessage id="originalFile" />
             </a>
@@ -135,7 +157,8 @@ export function FileView({
           {downloadLinks?.thumbNail && (
             <a
               className="p-2 thumbnail"
-              href={`${downloadLinks?.thumbNail}?access_token=${token}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleDownloadLink(downloadLinks?.thumbNail)}
             >
               <DinaMessage id="thumbnail" />
             </a>
@@ -143,7 +166,8 @@ export function FileView({
           {downloadLinks?.largeData && (
             <a
               className="p-2 large"
-              href={`${downloadLinks?.largeData}?access_token=${token}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleDownloadLink(downloadLinks?.largeData)}
             >
               <DinaMessage id="largeImg" />
             </a>

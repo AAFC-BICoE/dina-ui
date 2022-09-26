@@ -28,10 +28,7 @@ import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 
 export interface MetadataBulkEditorProps {
   metadatas: InputResource<Metadata>[];
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   disableMetadataNameField?: boolean;
   onPreviousClick?: () => void;
 }
@@ -206,10 +203,7 @@ export function getMetadataBulkOverrider(bulkEditFormRef) {
 }
 
 interface BulkMetadataSaveParams {
-  onSaved: (
-    metadatas: PersistedResource<Metadata>[],
-    isExternalResource?: boolean
-  ) => Promisable<void>;
+  onSaved: (metadataIds: string[]) => void | Promise<void>;
   metadataPreProcessor?: () => (
     metadata: InputResource<Metadata>
   ) => Promise<InputResource<Metadata>>;
@@ -288,16 +282,9 @@ function useBulkMetadataSave({
             }
           });
           if (saveOp.resource.license) {
-            const selectedLicense = saveOp.resource.license
-              ? (
-                  await apiClient.get<License>(
-                    `objectstore-api/license/${saveOp.resource.license.id}`,
-                    {}
-                  )
-                ).data
-              : null;
             // The Metadata's xmpRightsWebStatement field stores the license's url.
-            saveOp.resource.xmpRightsWebStatement = selectedLicense?.url ?? "";
+            saveOp.resource.xmpRightsWebStatement =
+              saveOp.resource.license?.url ?? "";
             // No need to store this ; The url should be enough.
             saveOp.resource.xmpRightsUsageTerms = "";
           }
@@ -328,8 +315,9 @@ function useBulkMetadataSave({
       const savedMetadata = await save<Metadata>(saveOperations, {
         apiBaseUrl: "/objectstore-api"
       });
+      const savedMetadataIds = savedMetadata.map((metadata) => metadata.id);
 
-      await onSaved(savedMetadata);
+      await onSaved(savedMetadataIds);
     } catch (error: unknown) {
       // When there is an error from the bulk save-all operation, put it into the correct form:
       if (error instanceof DoOperationsError) {

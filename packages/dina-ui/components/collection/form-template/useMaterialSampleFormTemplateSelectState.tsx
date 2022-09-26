@@ -31,14 +31,6 @@ export function useMaterialSampleFormTemplateSelectState() {
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
-  // Effect hook: When the Form Template changes,
-  // update the navOrder to what's stored in the Form Template:
-  useEffect(() => {
-    if (sampleFormTemplate) {
-      setNavOrder(formTemplateConfig?.navOrder ?? null);
-    }
-  }, [formTemplateConfig]);
-
   return {
     sampleFormTemplate,
     setSampleFormTemplate,

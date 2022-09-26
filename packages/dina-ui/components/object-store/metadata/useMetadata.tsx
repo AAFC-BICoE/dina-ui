@@ -163,16 +163,8 @@ export function useMetadataSave({
     } = submittedValues;
 
     if (license) {
-      const selectedLicense = license?.id
-        ? (
-            await apiClient.get<License>(
-              `objectstore-api/license/${license.id}`,
-              {}
-            )
-          ).data
-        : null;
       // The Metadata's xmpRightsWebStatement field stores the license's url.
-      metadataValues.xmpRightsWebStatement = selectedLicense?.url ?? "";
+      metadataValues.xmpRightsWebStatement = license?.url ?? "";
       // No need to store this ; The url should be enough.
       metadataValues.xmpRightsUsageTerms = "";
     }
