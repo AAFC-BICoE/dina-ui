@@ -54,7 +54,7 @@ import { RestrictionField } from "./RestrictionField";
  * The enabled fields if creating from a template.
  * Nested DinaForms (Collecting Event and Acquisition Event) have separate string arrays.
  */
-export interface MatrialSampleFormEnabledFields {
+export interface MaterialSampleFormEnabledFields {
   materialSample: string[];
   collectingEvent: string[];
   acquisitionEvent: string[];
@@ -73,6 +73,17 @@ export interface MaterialSampleFormProps {
 
   onSaved?: (id: string) => Promise<void>;
 
+  /**
+   * Data component navigation order to be used by the form.
+   */
+  navOrder?: string[] | null;
+
+  /**
+   * This should only be used when editing a form template. Returns the new order of the
+   * navigation.
+   */
+  onChangeNavOrder?: (newOrder: string[] | null) => void;
+
   /** Optionally call the hook from the parent component. */
   materialSampleSaveHook?: ReturnType<typeof useMaterialSampleSave>;
 
@@ -82,7 +93,7 @@ export interface MaterialSampleFormProps {
   };
 
   /** The enabled fields if creating from a template. */
-  enabledFields?: MatrialSampleFormEnabledFields;
+  enabledFields?: MaterialSampleFormEnabledFields;
 
   attachmentsConfig?: {
     materialSample: AllowAttachmentsConfig;
@@ -134,6 +145,8 @@ export function MaterialSampleForm({
   materialSample,
   collectingEventInitialValues,
   acquisitionEventInitialValues,
+  navOrder,
+  onChangeNavOrder,
   onSaved,
   materialSampleSaveHook,
   enabledFields,
@@ -193,8 +206,6 @@ export function MaterialSampleForm({
     enabledFields?.acquisitionEvent.includes("id")
   );
   const attachmentsField = "attachment";
-
-  const navState = useState<string[] | null>(null);
 
   /**
    * A map where:
@@ -386,6 +397,8 @@ export function MaterialSampleForm({
               disableCollectingEventSwitch ||
               initialValues.parentMaterialSample !== undefined
             }
+            navOrder={navOrder}
+            onChangeNavOrder={onChangeNavOrder}
           />
         )}
       </div>
