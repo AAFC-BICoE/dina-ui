@@ -18,6 +18,7 @@ import {
 } from "react-sortable-hoc";
 import { useMaterialSampleSave } from "../useMaterialSample";
 import { useMaterialSampleSectionOrder } from "./useMaterialSampleSectionOrder";
+import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../types/collection-api";
 
 export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
@@ -142,7 +143,7 @@ export function MaterialSampleFormNav({
                   index={index}
                   disableRemovePrompt={disableRemovePrompt}
                   disableSwitch={
-                    section.id === "collecting-event-component" &&
+                    section.id === COLLECTING_EVENT_COMPONENT_NAME &&
                     disableCollectingEventSwitch
                   }
                 />

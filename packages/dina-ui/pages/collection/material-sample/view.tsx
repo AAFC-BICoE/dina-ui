@@ -19,7 +19,7 @@ import {
   CollectingEventFormLayout,
   Footer,
   Head,
-  HOSTORGANISM_FIELDS,
+  HOST_ORGANISM_FIELDS,
   ManagedAttributesEditor,
   MaterialSampleBreadCrumb,
   MaterialSampleIdentifiersSection,
@@ -46,7 +46,10 @@ import {
   AcquisitionEventFormLayout,
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  MaterialSample
+} from "../../../types/collection-api";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -136,7 +139,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
           materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
-          HOSTORGANISM_FIELDS.some(
+          HOST_ORGANISM_FIELDS.some(
             (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
@@ -221,7 +224,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 ))}
                 {withResponse(acqEventQuery, ({ data: acqEvent }) => (
                   <FieldSet
-                    id="acquisition-event-component"
+                    id={ACQUISITION_EVENT_COMPONENT_NAME}
                     legend={<DinaMessage id="acquisitionEvent" />}
                   >
                     <DinaForm initialValues={acqEvent} readOnly={true}>

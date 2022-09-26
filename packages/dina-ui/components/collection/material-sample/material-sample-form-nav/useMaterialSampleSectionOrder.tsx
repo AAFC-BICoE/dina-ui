@@ -1,6 +1,16 @@
 import { uniq } from "lodash";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { MATERIAL_SAMPLE_FORM_LEGEND } from "../../../../types/collection-api";
+import {
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MATERIAL_SAMPLE_FORM_LEGEND,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
+} from "../../../../types/collection-api";
 import { ScrollTarget } from "./MaterialSampleFormNav";
 import { AssociationsSwitch } from "./AssociationsSwitch";
 import { OrganismsSwitch } from "./OrganismsSwitch";
@@ -27,37 +37,37 @@ export function useMaterialSampleSectionOrder({
 
   /** Switch information to apply to the legend. */
   const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
-    "collecting-event-component": {
+    [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,
       setEnabled: dataComponentState.setEnableCollectingEvent
     },
-    "acquisition-event-component": {
+    [ACQUISITION_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableAcquisitionEvent,
       setEnabled: dataComponentState.setEnableAcquisitionEvent
     },
-    "preparations-component": {
+    [PREPARATIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enablePreparations,
       setEnabled: dataComponentState.setEnablePreparations
     },
-    "organisms-component": {
+    [ORGANISMS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableOrganisms,
       setEnabled: dataComponentState.setEnableOrganisms,
       customSwitch: OrganismsSwitch
     },
-    "associations-component": {
+    [ASSOCIATIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableAssociations,
       setEnabled: dataComponentState.setEnableAssociations,
       customSwitch: AssociationsSwitch
     },
-    "storage-component": {
+    [STORAGE_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableStorage,
       setEnabled: dataComponentState.setEnableStorage
     },
-    "restriction-component": {
+    [RESTRICTION_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableRestrictions,
       setEnabled: dataComponentState.setEnableRestrictions
     },
-    "scheduled-actions-component": {
+    [SCHEDULED_ACTIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableScheduledActions,
       setEnabled: dataComponentState.setEnableScheduledActions
     }

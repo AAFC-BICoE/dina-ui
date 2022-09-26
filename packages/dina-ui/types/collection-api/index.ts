@@ -10,7 +10,7 @@ export * from "./resources/GeoReferenceAssertion";
 export * from "./resources/Institution";
 export * from "./resources/ManagedAttributesView";
 export * from "./resources/MaterialSample";
-export * from "./resources/MaterialSampleForm";
+export * from "./resources/form-legends/MaterialSampleForm";
 export * from "./resources/MaterialSampleRunConfig";
 export * from "./resources/MaterialSampleType";
 export * from "./resources/Organism";
