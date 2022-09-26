@@ -62,7 +62,7 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  id = "preparations-section"
+  id = "preparations-component"
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
 

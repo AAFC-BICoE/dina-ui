@@ -207,10 +207,10 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".organisms-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-component .multiple-values-warning").exists()
     ).toEqual(true);
     wrapper
-      .find(".organisms-section button.override-all-button")
+      .find(".organisms-component button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);
@@ -313,7 +313,7 @@ describe("BulkEditTabWarning", () => {
 
     // The Override button is there:
     expect(
-      wrapper.find(".organisms-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-component .multiple-values-warning").exists()
     ).toEqual(true);
 
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -366,7 +366,7 @@ describe("BulkEditTabWarning", () => {
 
     // There is no override button:
     expect(
-      wrapper.find(".organisms-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-component .multiple-values-warning").exists()
     ).toEqual(false);
 
     // Override the name in the new determination:
@@ -456,10 +456,10 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".organisms-section .multiple-values-warning").exists()
+      wrapper.find(".organisms-component .multiple-values-warning").exists()
     ).toEqual(true);
     wrapper
-      .find(".organisms-section button.override-all-button")
+      .find(".organisms-component button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);
