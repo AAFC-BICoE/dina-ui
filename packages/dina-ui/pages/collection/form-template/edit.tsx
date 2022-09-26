@@ -24,7 +24,10 @@ import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
-import { getInitialValuesFromFormTemplate } from "../../../../dina-ui/components/form-template/formTemplateUtils";
+import {
+  getInitialValuesFromFormTemplate,
+  removeArraysFromPath
+} from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
@@ -111,8 +114,8 @@ export function FormTemplateEditPageLoaded({
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
+    // ...fetchedFormTemplate,
     ...collectingEventInitialValues,
-    ...fetchedFormTemplate,
     id,
     type: "form-template"
   };
@@ -141,21 +144,18 @@ export function FormTemplateEditPageLoaded({
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
-        if (object[key]) {
-          if (Array.isArray(object[key])) {
-            const objects = Object.assign({}, ...object[key]);
-            allSubmittedValues[key] = objects;
-            iterateThrough(objects);
-          }
+        if (Array.isArray(object[key])) {
+          const objects = Object.assign({}, ...object[key]);
+          allSubmittedValues[key] = objects;
+          iterateThrough(objects);
+        }
 
-          if (typeof object[key] === "object") {
-            return iterateThrough(object[key]);
-          }
+        if (typeof object[key] === "object") {
+          return iterateThrough(object[key]);
         }
       });
     };
     iterateThrough(allSubmittedValues);
-
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
@@ -187,7 +187,6 @@ export function FormTemplateEditPageLoaded({
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
     );
-
     await onSaved(savedDefinition);
   }
 
