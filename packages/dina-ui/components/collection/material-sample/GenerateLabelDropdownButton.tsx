@@ -1,26 +1,37 @@
-import { DinaMessage } from "../../../intl/dina-ui-intl";
-import DropdownButton from "react-bootstrap/DropdownButton";
+import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import Dropdown from "react-bootstrap/Dropdown";
-import { ReactNode, useState } from "react";
+import Button from "react-bootstrap/Button";
+import React, { useState } from "react";
 import { useApiClient } from "../../../../common-ui/lib/api-client/ApiClientContext";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../../dina-ui/intl/dina-ui-en";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import Select from "react-select";
 
 type TemplateType = "AAFC_Beaver_ZT410.twig" | "AAFC_Zebra_ZT410.twig";
-const TEMPLATE_TYPE_OPTIONS: {
-  labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
+
+interface Template {
+  label: keyof typeof DINAUI_MESSAGES_ENGLISH;
   value: TemplateType;
-}[] = [
+}
+
+const TEMPLATE_TYPE_OPTIONS: Template[] = [
   {
-    labelKey: "template_AAFC_Beaver_ZT410",
+    label: "template_AAFC_Beaver_ZT410",
     value: "AAFC_Beaver_ZT410.twig"
   },
   {
-    labelKey: "template_AAFC_Zebra_ZT410",
+    label: "template_AAFC_Zebra_ZT410",
     value: "AAFC_Zebra_ZT410.twig"
   }
 ];
+
+type CustomMenuProps = {
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
+  labeledBy?: string;
+};
 
 interface GenerateLabelDropdownButtonProps {
   materialSample: PersistedResource<MaterialSample>;
@@ -30,6 +41,9 @@ export function GenerateLabelDropdownButton({
   materialSample
 }: GenerateLabelDropdownButtonProps) {
   const { apiClient } = useApiClient();
+  const { formatMessage } = useDinaIntl();
+
+  const [template, setTemplate] = useState<Template | undefined>();
 
   // data for POST request
   const data = [materialSample];
@@ -40,12 +54,16 @@ export function GenerateLabelDropdownButton({
    * @param data material sample data for reports_labels_api
    * @param template twig template selected by user
    */
-  async function generateLabel(template: TemplateType) {
+  async function generateLabel() {
+    if (!template) {
+      return;
+    }
+
     // axios post request
     try {
       await apiClient.axios
         .post(
-          `/report-label-api/labels/v1.0/?template=${template}&format=pdf`,
+          `/report-label-api/labels/v1.0/?template=${template.value}&format=pdf`,
           data,
           { responseType: "blob" }
         )
@@ -67,19 +85,59 @@ export function GenerateLabelDropdownButton({
       return error;
     }
   }
-  return (
-    <DropdownButton
-      title={<DinaMessage id="generateLabel" />}
-      key={"generateLabel"}
-    >
-      {TEMPLATE_TYPE_OPTIONS.map(({ labelKey, value }) => (
-        <Dropdown.Item
-          key={labelKey}
-          onClick={async () => await generateLabel(value)}
+
+  function toOption(templateSelected: Template) {
+    return {
+      label: formatMessage(templateSelected.label),
+      value: templateSelected
+    };
+  }
+
+  const dropdownOptionsTranslated = TEMPLATE_TYPE_OPTIONS.map(toOption) ?? [];
+
+  const CustomMenu = React.forwardRef(
+    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      return (
+        <div
+          ref={ref}
+          style={{
+            ...props.style,
+            width: "400px",
+            padding: "20px"
+          }}
+          className={props.className}
+          aria-labelledby={props.labeledBy}
         >
-          {labelKey}
-        </Dropdown.Item>
-      ))}
-    </DropdownButton>
+          <strong>
+            <DinaMessage id="selectTemplate" />
+          </strong>
+          <Select<{ label: string; value?: Template }>
+            className="mt-2"
+            name="template"
+            options={dropdownOptionsTranslated}
+            onChange={(selection) => setTemplate(selection?.value)}
+            autoFocus={true}
+            value={template && toOption(template)}
+            isClearable={true}
+          />
+          <Button
+            onClick={generateLabel}
+            className="mt-3"
+            disabled={template === undefined}
+          >
+            <DinaMessage id="generateLabel" />
+          </Button>
+        </div>
+      );
+    }
+  );
+
+  return (
+    <Dropdown>
+      <Dropdown.Toggle>
+        <DinaMessage id="generateLabel" />
+      </Dropdown.Toggle>
+      <Dropdown.Menu as={CustomMenu} />
+    </Dropdown>
   );
 }
