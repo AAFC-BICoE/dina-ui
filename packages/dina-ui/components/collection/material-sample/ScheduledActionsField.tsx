@@ -53,7 +53,7 @@ export function ScheduledActionsField({
   // The default date is today:
   defaultDate = new Date().toISOString().slice(0, 10),
   wrapContent = content => content,
-  id = "scheduled-actions-section"
+  id = "scheduled-actions-component"
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 

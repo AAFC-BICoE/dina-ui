@@ -38,7 +38,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
 
   function closeModal() {
     // Remove the outer-most modal:
-    setModals(current => current.slice(0, -1));
+    setModals((current) => current.slice(0, -1));
   }
 
   return (
@@ -52,7 +52,7 @@ export function ModalProvider({ appElement, children }: ModalProviderProps) {
         // Make sure the modal is in front of the Bootstrap nav bar:
         style={{
           overlay: {
-            zIndex: 1040,
+            zIndex: 3000,
             backgroundColor: "rgba(150, 150, 150, 0.75)"
           }
         }}

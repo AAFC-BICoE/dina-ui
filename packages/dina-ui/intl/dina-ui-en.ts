@@ -123,7 +123,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectorGroupListTitle: "Collector Group",
   collectorGroupNameLabel: "Collector Group Name",
   components: "Components",
-  configureAction: "Configure Action",
+  configureFormTemplate: "Configure Form Template",
   configureDefaultValues: "Configure default values",
   contents: "Contents",
   convertToDepthMinMax: "Convert to Depth Min/Max",

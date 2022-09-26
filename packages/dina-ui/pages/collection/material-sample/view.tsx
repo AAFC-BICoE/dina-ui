@@ -221,7 +221,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 ))}
                 {withResponse(acqEventQuery, ({ data: acqEvent }) => (
                   <FieldSet
-                    id="acquisition-event-section"
+                    id="acquisition-event-component"
                     legend={<DinaMessage id="acquisitionEvent" />}
                   >
                     <DinaForm initialValues={acqEvent} readOnly={true}>
