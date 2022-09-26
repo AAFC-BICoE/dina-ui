@@ -1,5 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { FormTemplate } from "packages/dina-ui/types/collection-api";
+import { sortBy } from "lodash";
 
 export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
   formTemplate: Partial<FormTemplate> | undefined
@@ -49,4 +50,23 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
  */
 export function removeArraysFromPath(path: string): string {
   return path.replace(/ *\[[^\]]*]/g, "");
+}
+
+/**
+ * Using the form template components, return a string array of the ids of the data components in
+ * the correct order stored in the template.
+ *
+ * @param template Loaded form template.
+ * @returns string array of the component ids in the specific order. Null if nothing can be retrieved.
+ */
+export function getComponentOrderFromTemplate(
+  template?: FormTemplate
+): string[] | null {
+  if (!template || !template.components) {
+    return null;
+  }
+
+  return sortBy(template.components, "order").map<string>(
+    (component) => component.name ?? ""
+  );
 }

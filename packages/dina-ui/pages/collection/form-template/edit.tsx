@@ -24,7 +24,10 @@ import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
-import { getInitialValuesFromFormTemplate } from "../../../../dina-ui/components/form-template/formTemplateUtils";
+import {
+  getComponentOrderFromTemplate,
+  getInitialValuesFromFormTemplate
+} from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
@@ -79,7 +82,9 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
-  const [navOrder, setNavOrder] = useState<string[] | null>(null);
+  const [navOrder, setNavOrder] = useState<string[] | null>(
+    getComponentOrderFromTemplate(fetchedFormTemplate)
+  );
 
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);

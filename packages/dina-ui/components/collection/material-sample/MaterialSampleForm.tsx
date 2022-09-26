@@ -394,7 +394,9 @@ export function MaterialSampleForm({
   const formSectionPairs = toPairs(formSections);
 
   const sortedFormSectionPairs = uniq([
-    ...compact([].map((id) => formSectionPairs.find(([it]) => it === id))),
+    ...compact(
+      (navOrder ?? []).map((id) => formSectionPairs.find(([it]) => it === id))
+    ),
     ...formSectionPairs
   ]);
 
