@@ -37,9 +37,14 @@ export const getColumnDefinition = () => {
       Cell: ({
         original: { id, materialSampleName, dwcOtherCatalogNumbers }
       }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
-        </a>
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {materialSampleName || dwcOtherCatalogNumbers?.join?.(", ") || id}
+          </a>
+        </Link>
       ),
       accessor: "materialSampleName"
     },
@@ -133,7 +138,7 @@ export function SampleListLayout({
   ];
   return (
     <ListPageLayout
-      additionalFilters={filterForm => ({
+      additionalFilters={(filterForm) => ({
         // Apply group filter:
         ...(filterForm.group && { rsql: `group==${filterForm.group}` })
       })}
@@ -184,11 +189,16 @@ export default function MaterialSampleListPage() {
     // Material Sample Name
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",

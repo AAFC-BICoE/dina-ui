@@ -37,7 +37,7 @@ describe("AuthenticatedApiClientProvider", () => {
           ...MOCK_ACCOUNT_CONTEXT,
           authenticated: true,
           initialized: true,
-          getCurrentToken: () => "Mat's-test-token"
+          getCurrentToken: () => Promise.resolve("Mat's-test-token")
         }}
       >
         <ApiClientProvider value={apiContext}>
@@ -49,9 +49,9 @@ describe("AuthenticatedApiClientProvider", () => {
     );
 
     expect(mockInterceptorUse).toHaveBeenCalledTimes(1);
-    expect(mockInterceptorUse.mock.calls[0][0]({ headers: {} })).toEqual({
-      headers: { Authorization: "Bearer Mat's-test-token" }
-    });
+    expect(mockInterceptorUse.mock.calls[0][0]({ headers: {} })).toEqual(
+      Promise.resolve("Mat's-test-token")
+    );
   });
 });
 
@@ -62,6 +62,6 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   logout: noop,
   roles: ["user"],
   // Mock for a successful token update.
-  getCurrentToken: () => "test-token",
+  getCurrentToken: () => Promise.resolve("test-token"),
   username: "test-user"
 };

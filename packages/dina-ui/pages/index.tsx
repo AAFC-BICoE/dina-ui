@@ -33,41 +33,42 @@ export function Home() {
                 <DinaMessage id="createNewLabel" />:
               </span>
 
-              <Button
-                href="/collection/material-sample/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="materialSample" />
-              </Button>
-              <Button
+              <Link href="/collection/material-sample/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="materialSample" />
+                </Button>
+              </Link>
+
+              <Link
                 href="/collection/material-sample/bulk-create"
-                variant="info"
-                className="mx-1 my-1"
+                passHref={true}
               >
-                <DinaMessage id="multipleMaterialSamples" />
-              </Button>
-              <Button
-                href="/collection/collecting-event/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="collectingEvent" />
-              </Button>
-              <Button
-                href="/loan-transaction/transaction/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="loanTransaction" />
-              </Button>
-              <Button
-                href="/object-store/upload"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="uploadPageTitle" />
-              </Button>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="multipleMaterialSamples" />
+                </Button>
+              </Link>
+
+              <Link href="/collection/collecting-event/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="collectingEvent" />
+                </Button>
+              </Link>
+
+              <Link href="/loan-transaction/transaction/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="loanTransaction" />
+                </Button>
+              </Link>
+
+              <Link href="/object-store/upload" passHref={true}>
+                <Button
+                  href="/object-store/upload"
+                  variant="info"
+                  className="mx-1 my-1"
+                >
+                  <DinaMessage id="uploadPageTitle" />
+                </Button>
+              </Link>
             </Card.Body>
           </Card>
 

@@ -12,22 +12,20 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
 import { TransformQueryToDSLParams } from "../../../common-ui/lib/util/transformToDSL";
+import Link from "next/link";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const { groupNames } = useAccount();
+
   const router = useRouter();
   const uuid = String(router?.query?.id);
   const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
     ? {
-        group: groupNames?.[0] ?? "",
         queryRows: [
           {
             fieldName: "data.relationships.projects.data.id",
-            matchType: "equals",
-            textMatchType: "partial",
-            type: "text",
+            type: "uuid",
             matchValue: uuid
           }
         ]
@@ -39,11 +37,16 @@ export function ProjectFormLayout() {
     // Material Sample Name
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
