@@ -44,7 +44,7 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collecting-event":
       // Populate the linker table:
@@ -82,8 +82,8 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths =>
-  paths.map(path => {
+const mockBulkGet = jest.fn<any, any>(async (paths) =>
+  paths.map((path) => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
         return { id: "1", key: "attribute_1", name: "Attribute 1" };
@@ -101,8 +101,8 @@ const mockBulkGet = jest.fn<any, any>(async paths =>
   })
 );
 
-const mockSave = jest.fn<any, any>(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn<any, any>((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
   }))
@@ -152,7 +152,6 @@ async function getWrapper(actionDefinition?: MaterialSampleFormTemplateConfig) {
               templateFields: {}
             }
           },
-          navOrder: null,
           type: "material-sample-form-template"
         }
       }
@@ -301,7 +300,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -387,7 +385,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -425,8 +422,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
   it("Renders the Material Sample form with no template fields enabled.", async () => {
     const wrapper = await getWrapper({
       formTemplate: {},
-      type: "material-sample-form-template",
-      navOrder: null
+      type: "material-sample-form-template"
     });
 
     // Get the switches:
@@ -434,7 +430,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(switches.length).not.toEqual(0);
 
     // All switches should be unchecked:
-    expect(switches.map(node => node.prop("checked"))).toEqual(
+    expect(switches.map((node) => node.prop("checked"))).toEqual(
       switches.map(() => false)
     );
 
@@ -501,7 +497,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -530,7 +525,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -564,7 +558,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           } as any
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -593,7 +586,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -653,7 +645,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -721,7 +712,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -757,7 +747,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
       type: "material-sample-form-template"
     });
 
@@ -777,13 +766,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     expect(
       wrapper
-        .find("#scheduled-actions-section .remarks-field textarea")
+        .find("#scheduled-actions-component .remarks-field textarea")
         .prop("value")
     ).toEqual("default-remarks");
 
     // Add the first scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -791,12 +780,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // Add the second scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-new-button")
+      .find("#scheduled-actions-component button.add-new-button")
       .simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -804,7 +793,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // There should be 2 rows:
     expect(
-      wrapper.find("#scheduled-actions-section .rt-tbody .rt-tr").length
+      wrapper.find("#scheduled-actions-component .rt-tbody .rt-tr").length
     ).toEqual(2);
 
     // Submit the form:
@@ -857,7 +846,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       managedAttributesOrder: ["attribute_1", "attribute_2"],
       type: "material-sample-form-template"
     });
@@ -886,7 +874,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       collectingEventManagedAttributesOrder: ["attribute_1", "attribute_2"],
       type: "material-sample-form-template"
     });
@@ -894,12 +881,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     // The default attribute values are rendered:
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_1-field input")
+        .find("#collecting-event-component .attribute_1-field input")
         .prop("value")
     ).toEqual("attribute 1 default value");
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_2-field input")
+        .find("#collecting-event-component .attribute_2-field input")
         .prop("value")
     ).toEqual("");
   });
@@ -921,7 +908,6 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       determinationManagedAttributesOrder: ["attribute_1", "attribute_2"],
       type: "material-sample-form-template"
     });

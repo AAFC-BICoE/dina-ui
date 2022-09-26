@@ -15,7 +15,7 @@ export const HOSTORGANISM_FIELDS_OBJECT: Required<
 
 export const HOSTORGANISM_FIELDS = Object.keys(HOSTORGANISM_FIELDS_OBJECT);
 
-export function AssociationsField({ id = "associations-section" }) {
+export function AssociationsField({ id = "associations-component" }) {
   return (
     <FieldSet legend={<DinaMessage id="associationsLegend" />} id={id}>
       <FieldSet

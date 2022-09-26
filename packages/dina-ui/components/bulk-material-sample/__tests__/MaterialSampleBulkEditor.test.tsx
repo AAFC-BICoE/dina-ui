@@ -50,7 +50,7 @@ const TEST_STORAGE_UNIT: PersistedResource<StorageUnit> = {
 };
 
 const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
-  id => ({
+  (id) => ({
     id,
     type: "storage-unit",
     group: "test-group",
@@ -75,7 +75,7 @@ const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
   restrictToCreatedBy: false,
   viewConfiguration: {
     type: "material-sample-form-template",
-    navOrder: ["managedAttributes-section", "identifiers-section"],
+    navOrder: ["managed-attributes-component", "identifiers-component"],
     formTemplate: {
       MATERIAL_SAMPLE: {
         templateFields: {
@@ -152,7 +152,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
-  return paths.map(path => {
+  return paths.map((path) => {
     switch (path) {
       case "metadata/initial-attachment-1":
         return {
@@ -213,8 +213,8 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
   });
 });
 
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111"
   }))
@@ -322,7 +322,7 @@ const TEST_SAMPLES_DIFFERENT_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[]
 const TEST_SAMPLES_SAME_FLAT_FIELDS_VALUES: InputResource<MaterialSample>[] = [
   "1",
   "2"
-].map(id => ({
+].map((id) => ({
   ...blankMaterialSample(),
   id,
   type: "material-sample",
@@ -509,7 +509,7 @@ describe("MaterialSampleBulkEditor", () => {
 
     // The saved samples are mocked by mockSave and are passed into the onSaved callback.
     // Check the IDs to make sure they were saved:
-    expect(mockOnSaved.mock.calls[0][0].map(sample => sample.id)).toEqual([
+    expect(mockOnSaved.mock.calls[0][0].map((sample) => sample.id)).toEqual([
       "11111",
       "11111",
       "11111"
@@ -895,7 +895,7 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach(selector =>
+    ].forEach((selector) =>
       wrapper
         .find(`.tabpanel-EDIT_ALL ${selector}`)
         .find(Switch)
@@ -908,27 +908,29 @@ describe("MaterialSampleBulkEditor", () => {
     // Shows the warnings:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL .organisms-section .multiple-values-warning")
-        .exists()
-    ).toEqual(true);
-    expect(
-      wrapper
         .find(
-          ".tabpanel-EDIT_ALL #material-sample-attachments-section .multiple-values-warning"
+          ".tabpanel-EDIT_ALL .organisms-component .multiple-values-warning"
         )
         .exists()
     ).toEqual(true);
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #associations-section .multiple-values-warning"
+          ".tabpanel-EDIT_ALL #material-sample-attachments-component .multiple-values-warning"
         )
         .exists()
     ).toEqual(true);
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #scheduled-actions-section .multiple-values-warning"
+          ".tabpanel-EDIT_ALL #associations-component .multiple-values-warning"
+        )
+        .exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(
+          ".tabpanel-EDIT_ALL #scheduled-actions-component .multiple-values-warning"
         )
         .exists()
     ).toEqual(true);
@@ -1000,7 +1002,7 @@ describe("MaterialSampleBulkEditor", () => {
       ".enable-catalogue-info",
       ".enable-associations",
       ".enable-scheduled-actions"
-    ].forEach(selector =>
+    ].forEach((selector) =>
       wrapper
         .find(`.tabpanel-EDIT_ALL ${selector}`)
         .find(Switch)
@@ -1012,10 +1014,10 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Click the Override All buttons:
     for (const section of [
-      ".organisms-section",
-      "#material-sample-attachments-section",
-      "#associations-section",
-      "#scheduled-actions-section"
+      ".organisms-component",
+      "#material-sample-attachments-component",
+      "#associations-component",
+      "#scheduled-actions-component"
     ]) {
       wrapper.find(`${section} button.override-all-button`).simulate("click");
       wrapper.find(".are-you-sure-modal form").simulate("submit");
@@ -1026,7 +1028,7 @@ describe("MaterialSampleBulkEditor", () => {
     // Organisms section opens with an initial value, so it has the green indicator on the fieldset:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-component .legend-wrapper")
         .first()
         .hasClass("changed-field")
     ).toEqual(true);
@@ -1035,7 +1037,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-component .legend-wrapper"
         )
         .first()
         .hasClass("changed-field")
@@ -1043,7 +1045,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#associations-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#associations-component .legend-wrapper"
         )
         .first()
         .hasClass("changed-field")
@@ -1052,7 +1054,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#associations-component fieldset.associations-tabs .legend-wrapper"
         )
         .first()
         .hasClass("changed-field")
@@ -1060,7 +1062,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-component .legend-wrapper"
         )
         .first()
         .hasClass("changed-field")
@@ -1074,27 +1076,27 @@ describe("MaterialSampleBulkEditor", () => {
       )
       .simulate("change", { target: { value: "new-scientific-name" } });
     wrapper
-      .find(".tabpanel-EDIT_ALL #material-sample-attachments-section")
+      .find(".tabpanel-EDIT_ALL #material-sample-attachments-component")
       .find(AttachmentsEditor)
       .prop("onChange")([{ id: "new-attachment-id", type: "metadata" }]);
     wrapper
-      .find(".tabpanel-EDIT_ALL #associations-section")
+      .find(".tabpanel-EDIT_ALL #associations-component")
       .find(MaterialSampleSearchHelper)
       .prop("onAssociatedSampleSelected")({
       id: "new-sample-assoc",
       type: "material-sample"
     });
     wrapper
-      .find(".tabpanel-EDIT_ALL #associations-section .associationType-field")
+      .find(".tabpanel-EDIT_ALL #associations-component .associationType-field")
       .find(CreatableSelect)
       .prop<any>("onChange")({ value: "has_host" });
     wrapper
       .find(
-        ".tabpanel-EDIT_ALL #scheduled-actions-section .actionType-field input"
+        ".tabpanel-EDIT_ALL #scheduled-actions-component .actionType-field input"
       )
       .simulate("change", { target: { value: "new-action-type" } });
     wrapper
-      .find(".tabpanel-EDIT_ALL #scheduled-actions-section button.add-button")
+      .find(".tabpanel-EDIT_ALL #scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -1103,14 +1105,14 @@ describe("MaterialSampleBulkEditor", () => {
     // All overridable fieldsets should now have the green bulk edited indicator:
     expect(
       wrapper
-        .find(".tabpanel-EDIT_ALL fieldset#organisms-section .legend-wrapper")
+        .find(".tabpanel-EDIT_ALL fieldset#organisms-component .legend-wrapper")
         .first()
         .hasClass("has-bulk-edit-value")
     ).toEqual(true);
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#material-sample-attachments-component .legend-wrapper"
         )
         .first()
         .hasClass("has-bulk-edit-value")
@@ -1118,7 +1120,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#associations-section fieldset.associations-tabs .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#associations-component fieldset.associations-tabs .legend-wrapper"
         )
         .first()
         .hasClass("has-bulk-edit-value")
@@ -1126,7 +1128,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#scheduled-actions-component .legend-wrapper"
         )
         .first()
         .hasClass("has-bulk-edit-value")
@@ -1163,7 +1165,7 @@ describe("MaterialSampleBulkEditor", () => {
       [[EXPECTED_ORGANISM_SAVE], { apiBaseUrl: "/collection-api" }],
       [
         [
-          ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map(sample => ({
+          ...TEST_SAMPLES_DIFFERENT_ARRAY_VALUES.map((sample) => ({
             type: "material-sample",
             resource: {
               id: sample.id,
@@ -1328,7 +1330,7 @@ describe("MaterialSampleBulkEditor", () => {
       wrapper
         .find(".publiclyReleasable-field label")
         // The field is inverted (Not Publicly Releasable) so false -> true:
-        .findWhere(node => node.text().includes("True"))
+        .findWhere((node) => node.text().includes("True"))
         .find("input")
         .prop("checked")
     ).toEqual(true);
@@ -1556,7 +1558,7 @@ describe("MaterialSampleBulkEditor", () => {
         .find(
           ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
         )
-        .map(node => node.text())
+        .map((node) => node.text())
     ).toEqual([
       "Managed Attribute 1",
       "Managed Attribute 3",
@@ -1617,7 +1619,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-component .legend-wrapper"
         )
         .first()
         .find(".has-bulk-edit-value .field-label")
@@ -1650,7 +1652,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-component .legend-wrapper"
         )
         .first()
         .find(".has-bulk-edit-value .field-label")
@@ -1744,7 +1746,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL fieldset#collecting-event-section .legend-wrapper"
+          ".tabpanel-EDIT_ALL fieldset#collecting-event-component .legend-wrapper"
         )
         .first()
         .find(".has-bulk-edit-value .field-label")
@@ -1994,14 +1996,14 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #collecting-event-section .dwcVerbatimLocality-field input"
+          ".sample-tabpanel-0 #collecting-event-component .dwcVerbatimLocality-field input"
         )
         .exists()
     ).toEqual(false);
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #acquisition-event-section .receptionRemarks-field input"
+          ".sample-tabpanel-0 #acquisition-event-component .receptionRemarks-field input"
         )
         .exists()
     ).toEqual(false);
@@ -2038,12 +2040,12 @@ describe("MaterialSampleBulkEditor", () => {
 
     wrapper
       .find(
-        ".sample-tabpanel-0 #collecting-event-section .dwcVerbatimLocality-field input"
+        ".sample-tabpanel-0 #collecting-event-component .dwcVerbatimLocality-field input"
       )
       .simulate("change", { target: { value: "test locality" } });
     wrapper
       .find(
-        ".sample-tabpanel-0 #acquisition-event-section .receptionRemarks-field textarea"
+        ".sample-tabpanel-0 #acquisition-event-component .receptionRemarks-field textarea"
       )
       .simulate("change", { target: { value: "test remarks" } });
 
@@ -2175,7 +2177,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+          ".tabpanel-EDIT_ALL #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2183,7 +2185,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #collecting-event-section .managedAttributes_collecting_event_attribute_1-field input"
+          ".tabpanel-EDIT_ALL #collecting-event-component .managedAttributes_collecting_event_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2191,7 +2193,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".tabpanel-EDIT_ALL #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+          ".tabpanel-EDIT_ALL #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2223,7 +2225,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+          ".sample-tabpanel-0 #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2231,7 +2233,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #collecting-event-section .managedAttributes_collecting_event_attribute_1-field input"
+          ".sample-tabpanel-0 #collecting-event-component .managedAttributes_collecting_event_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
@@ -2239,7 +2241,7 @@ describe("MaterialSampleBulkEditor", () => {
     expect(
       wrapper
         .find(
-          ".sample-tabpanel-0 #managedAttributes-section .managedAttributes_sample_attribute_1-field input"
+          ".sample-tabpanel-0 #managed-attributes-component .managedAttributes_sample_attribute_1-field input"
         )
         .exists()
     ).toEqual(true);
