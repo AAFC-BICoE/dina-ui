@@ -11,7 +11,7 @@ import {
   withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -79,6 +79,8 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
+  const [navOrder, setNavOrder] = useState<string[] | null>(null);
+
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
   const pageTitle = id
@@ -169,7 +171,7 @@ export function FormTemplateEditPageLoaded({
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
           visible: true,
-          order: componentIndex,
+          order: navOrder?.indexOf(dataComponent.id) ?? componentIndex,
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
@@ -243,6 +245,8 @@ export function FormTemplateEditPageLoaded({
           <MaterialSampleForm
             templateInitialValues={initialValues}
             materialSampleSaveHook={materialSampleSaveHook}
+            navOrder={navOrder}
+            onChangeNavOrder={(newOrder) => setNavOrder(newOrder)}
           />
         </DinaFormSection>
       </PageLayout>

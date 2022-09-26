@@ -72,4 +72,3 @@ export * from "./tag-editor/TagSelectField";
 export * from "./collection/material-sample/RestrictionField";
 export * from "./page/PageLayout";
 export * from "./page/ButtonBarLayout";
-export * from "./form-template/form-template-material-sample/MaterialSampleFormTemplate";
