@@ -96,7 +96,7 @@ const mockGet = jest.fn<any, any>(async path => {
     case "collection-api/storage-unit/76575":
     case "collection-api/project":
     case "collection-api/vocabulary/associationType":
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
     case "collection-api/organism":
       return { data: [], meta: { totalResourceCount: 0 } };
@@ -244,7 +244,9 @@ describe("Material Sample Edit Page", () => {
               isRestricted: false,
               restrictionFieldsExtension: null,
               restrictionRemarks: null,
-              scheduledAction: undefined
+              scheduledAction: undefined,
+              preparationMethod: undefined,
+              collection: undefined
             },
             type: "material-sample"
           }
@@ -316,6 +318,7 @@ describe("Material Sample Edit Page", () => {
               organism: undefined,
               organismsIndividualEntry: undefined,
               organismsQuantity: undefined,
+              preparationMethod: undefined,
               projects: undefined,
               isRestricted: false,
               restrictionFieldsExtension: null,
@@ -397,7 +400,7 @@ describe("Material Sample Edit Page", () => {
     ).toEqual("2021-04-13");
 
     wrapper
-      .find("#collecting-event-section button.detach-resource-button")
+      .find("#collecting-event-component button.detach-resource-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -519,7 +522,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#storage-section").exists()).toEqual(true);
+    expect(wrapper.find("#storage-component").exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Organisms section enabled.", async () => {
@@ -550,7 +553,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
+    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Association section enabled.", async () => {
@@ -576,7 +579,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+    expect(wrapper.find("#associations-component").exists()).toEqual(true);
   });
 
   it("Save association with uuid mapped correctly for saving.", async () => {
@@ -600,7 +603,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#associations-section").exists()).toEqual(true);
+    expect(wrapper.find("#associations-component").exists()).toEqual(true);
 
     wrapper.find("form").simulate("submit");
 
@@ -1020,7 +1023,7 @@ describe("Material Sample Edit Page", () => {
     ).toEqual("test reception remarks");
 
     wrapper
-      .find("#acquisition-event-section button.detach-resource-button")
+      .find("#acquisition-event-component button.detach-resource-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -1284,7 +1287,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
+    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
 
     // Expand all organism sections:
     wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
@@ -1380,7 +1383,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".organisms-section").exists()).toEqual(true);
+    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
 
     // Initially has 2 organisms:
     expect(
@@ -2304,12 +2307,12 @@ describe("Material Sample Edit Page", () => {
     // Attributes 2 and 3 are visible and empty:
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_2-field input")
+        .find("#collecting-event-component .attribute_2-field input")
         .prop("value")
     ).toEqual("");
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_3-field input")
+        .find("#collecting-event-component .attribute_3-field input")
         .prop("value")
     ).toEqual("");
   });
@@ -2359,38 +2362,5 @@ describe("Material Sample Edit Page", () => {
         )
         .prop("value")
     ).toEqual("");
-  });
-
-  it("Lets you set a Custom Navigation section order via prop.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleForm
-        materialSample={{
-          type: "material-sample",
-          id: "333",
-          group: "test-group",
-          materialSampleName: "test-ms"
-        }}
-        // Custom navOrder:
-        navOrder={[
-          "managedAttributes-section",
-          "material-sample-info-section",
-          "identifiers-section"
-        ]}
-        onChangeNavOrder={() => undefined}
-        onSaved={mockOnSaved}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Check the first 3 sections for the sections defined in the prop:
-    expect(
-      wrapper
-        .find(".material-sample-nav .list-group-item")
-        .map(node => node.text())
-        .slice(0, 3)
-    ).toEqual(["Managed Attributes", "Material Sample Info", "Identifiers"]);
   });
 });

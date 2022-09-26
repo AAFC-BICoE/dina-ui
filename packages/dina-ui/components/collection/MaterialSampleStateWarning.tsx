@@ -11,7 +11,7 @@ export function MaterialSampleStateWarning() {
   }
 
   return (
-    <div className="bg-danger card text-white px-1" role="alert">
+    <div className="bg-danger card text-white py-1 px-3" role="alert">
       <div className="d-flex gap-2 align-items-center">
         <BsExclamationTriangle style={{ width: "24px", height: "24px" }} />
         <div style={{ font: "fw-bold", fontSize: "1.2em" }} className="mt-3">

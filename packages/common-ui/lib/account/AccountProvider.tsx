@@ -1,52 +1,33 @@
-import {
-  Persistors,
-  SSRKeycloakProvider,
-  useKeycloak
-} from "@react-keycloak/nextjs";
 import { uniq } from "lodash";
-import { createContext, ReactNode, useContext } from "react";
-import { useQuery } from "..";
-import { DinaUser } from "../../../dina-ui/types/user-api/resources/DinaUser";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
+  useEffect
+} from "react";
+import Keycloak from "keycloak-js";
+import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
+import { DINA_ADMIN } from "../../types/DinaRoles";
 
 export interface AccountContextI {
   agentId?: string;
-  authenticated?: boolean;
+  authenticated: boolean;
   groupNames?: string[];
   login: () => void;
   logout: () => void;
   initialized: boolean;
-  token?: string;
   roles: string[];
   username?: string;
   subject?: string;
   isAdmin?: boolean;
   rolesPerGroup?: Record<string, string[] | undefined>;
+  getCurrentToken: () => Promise<string | undefined>;
 }
 
 const AccountContext = createContext<AccountContextI | null>(null);
 
 export const AccountProvider = AccountContext.Provider;
-
-export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
-  return (
-    <SSRKeycloakProvider
-      // Loading the config from /keycloak.json, which is served by Caddy.
-      keycloakConfig={"/keycloak.json" as any}
-      // Server-side rendering config omitted because we aren't using server-side rendering.
-      persistor={Persistors.Cookies({})}
-      initConfig={{
-        onLoad: "check-sso",
-        silentCheckSsoRedirectUri: process.browser
-          ? `${window.location.origin}/static/silent-check-sso.xhtml`
-          : undefined
-      }}
-    >
-      <KeycloakAccountProviderInternal>
-        {children}
-      </KeycloakAccountProviderInternal>
-    </SSRKeycloakProvider>
-  );
-}
 
 /** Exposes the needed features from the identity provider. */
 export function useAccount(): AccountContextI {
@@ -58,15 +39,53 @@ export function useAccount(): AccountContextI {
 }
 
 /** Converts the Keycloak context to the generic AccountContextI. */
-function KeycloakAccountProviderInternal({
-  children
-}: {
-  children: ReactNode;
-}) {
-  const [
-    { login, logout, authenticated, token, realmAccess, tokenParsed, subject },
-    initialized
-  ] = useKeycloak();
+export function KeycloakAccountProvider({ children }: { children: ReactNode }) {
+  const [keycloak, setKeycloak] = useState<Keycloak | null>(null);
+  const [authenticated, setAuthenticated] = useState<boolean>(false);
+  const [initialized, setInitialized] = useState<boolean>(false);
+
+  // Setup keycloak when this is first mounted.
+  useEffect(() => {
+    const keycloakInstance = new Keycloak("/keycloak.json");
+    keycloakInstance
+      .init({
+        onLoad: "check-sso",
+        silentCheckSsoRedirectUri:
+          typeof window !== undefined
+            ? `${window.location.origin}/static/silent-check-sso.xhtml`
+            : undefined,
+        checkLoginIframe: false
+      })
+      .then((keycloakAuthenticated) => {
+        setKeycloak(keycloakInstance);
+        setAuthenticated(keycloakAuthenticated);
+
+        // The user is not authenticated... Try again.
+        if (keycloakAuthenticated === false) {
+          keycloakInstance.login();
+        } else {
+          setInitialized(true);
+        }
+      });
+  }, []);
+
+  // Non-authenticated users should never see the the full website. Display a loading indicator.
+  if (!authenticated || !initialized || !keycloak) {
+    return (
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ marginTop: "calc(50vh - 10px)" }}
+      >
+        <LoadingSpinner loading={true} />
+      </div>
+    );
+  }
+
+  const tokenParsed = keycloak?.tokenParsed;
+
+  const subject = keycloak?.subject;
+
+  const roles = keycloak?.realmAccess?.roles ?? [];
 
   const {
     preferred_username: username,
@@ -78,15 +97,19 @@ function KeycloakAccountProviderInternal({
     keycloakGroups &&
     keycloakGroupNamesToBareGroupNames(keycloakGroups as string[]);
 
-  const userQuery = useQuery<DinaUser>(
-    { path: `user-api/user/${subject}` },
-    { disabled: !subject }
+  const rolesPerGroup = generateKeycloakRolesPerGroup(
+    keycloakGroups as string[]
   );
 
-  const rolesPerGroup = userQuery.response?.data?.rolesPerGroup;
+  const login = keycloak.login;
 
-  // User is admin if they are a member of Keycloak's /aafc/dina-admin group:
-  const isAdmin = rolesPerGroup?.aafc?.includes?.("dina-admin");
+  const logout = keycloak.logout;
+
+  const getCurrentToken = async () => {
+    // If it expires in the next 30 seconds, generate a new one.
+    await keycloak.updateToken(30).catch(login);
+    return keycloak.token;
+  };
 
   return (
     <AccountProvider
@@ -97,12 +120,12 @@ function KeycloakAccountProviderInternal({
         initialized,
         login,
         logout,
-        roles: realmAccess?.roles ?? [],
-        token,
+        roles,
         username,
         subject,
-        isAdmin,
-        rolesPerGroup
+        isAdmin: rolesPerGroup?.aafc?.includes(DINA_ADMIN) ?? false,
+        rolesPerGroup,
+        getCurrentToken
       }}
     >
       {children}
@@ -111,16 +134,57 @@ function KeycloakAccountProviderInternal({
 }
 
 /**
- * Convert from Keycloak's format ( ["/cnc", "/cnc/staff"] to just the group name ["cnc"] )
+ * Convert from Keycloak's format ( ["/cnc", "/cnc/user"] to just the group name ["cnc"] )
  */
 export function keycloakGroupNamesToBareGroupNames(keycloakGroups: string[]) {
   return uniq(
     keycloakGroups
       // Add leading slash if absent:
-      .map(groupName =>
+      .map((groupName) =>
         groupName.startsWith("/") ? groupName : `/${groupName}`
       )
       // Get only the group name immediately after the first slash:
-      .map(groupName => groupName.split("/")[1])
+      .map((groupName) => groupName.split("/")[1])
   );
+}
+
+/**
+ * Takes an array of role group paths and combines it into a unique records.
+ *
+ * If only the role is provided, then it will be ignored.
+ *
+ * Example:
+ * From:
+ * Example ["/group1/role1", "/group1/role2/", "/group2/role1", "role3"]
+ *
+ * To:
+ * ["group1": ["role1", "role2"], "group2": ["role1"]]
+ *
+ * @param keycloakGroups string keycloak paths of the group and role.
+ * @returns unique keys of the group, with the roles for each value.
+ */
+export function generateKeycloakRolesPerGroup(
+  keycloakGroups: string[]
+): Record<string, string[] | undefined> | undefined {
+  if (!keycloakGroups) {
+    return;
+  }
+
+  return keycloakGroups.reduce((previousValue, currentPath) => {
+    const splitPaths = currentPath.split("/").filter((path) => path);
+
+    // If only the role was provided, ignore it.
+    if (splitPaths.length !== 2) {
+      return previousValue;
+    }
+
+    // The group (example: "aafc")
+    const group = splitPaths[0];
+
+    // The role (example: "dina-admin")
+    const role = splitPaths[1];
+
+    previousValue[group] = [...(previousValue[group] ?? []), role];
+    return previousValue;
+  }, {} as Record<string, string[] | undefined>);
 }

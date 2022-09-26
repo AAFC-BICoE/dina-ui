@@ -62,22 +62,22 @@ describe("QueryRow component", () => {
         .prop("options")
     ).toEqual([
       {
-        label: "testA",
+        label: "Test A",
         value: "testA"
       },
       {
-        label: "testB",
+        label: "Test B",
         value: "testB"
       },
       {
-        label: "testC",
+        label: "Test C",
         value: "preparation-type.testC"
       },
       {
-        label: "preparation-type",
+        label: "Preparation Type",
         options: [
           {
-            label: "testD",
+            label: "Test D",
             parentName: "preparation-type",
             value: "preparation-type.testD"
           }
@@ -119,8 +119,8 @@ describe("QueryRow component", () => {
         .find(Select)
         .prop<any>("options")
     ).toEqual([
-      { label: "TRUE", value: "true" },
-      { label: "FALSE", value: "false" }
+      { label: "True", value: "true" },
+      { label: "False", value: "false" }
     ]);
 
     // Expect the other type dropdown to be invisible

@@ -1,14 +1,10 @@
 import {
   ApiClientContext,
-  AutoSuggestTextField,
   BackButton,
   ButtonBar,
-  DateField,
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
-  TextField,
-  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
@@ -16,14 +12,10 @@ import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import {
-  AttachmentsField,
-  GroupSelectField,
-  Head,
-  Nav
-} from "../../../components";
+import { Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Project } from "../../../types/collection-api/resources/Project";
+import { ProjectFormLayout } from "../../../components/project/ProjectFormLayout";
 
 interface ProjectFormProps {
   fetchedProject?: Project;
@@ -104,7 +96,7 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
     // Add attachments if they were selected:
     (input as any).relationships.attachment = {
       data:
-        input.attachment?.map(it => ({
+        input.attachment?.map((it) => ({
           id: it.id,
           type: it.type
         })) ?? []
@@ -141,69 +133,5 @@ export function ProjectForm({ fetchedProject, onSaved }: ProjectFormProps) {
       </ButtonBar>
       <ProjectFormLayout />
     </DinaForm>
-  );
-}
-
-export function ProjectFormLayout() {
-  const { readOnly, initialValues } = useDinaFormContext();
-  const { formatMessage } = useDinaIntl();
-
-  return (
-    <div>
-      <div className="row">
-        <GroupSelectField
-          name="group"
-          enableStoredDefaultGroup={true}
-          className="col-md-6"
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 name"
-          name="name"
-          label={formatMessage("field_projectName")}
-        />
-        <DateField
-          className="col-md-6 startDate"
-          name="startDate"
-          label={formatMessage("field_startDate")}
-        />
-      </div>
-      <div className="row">
-        <AutoSuggestTextField
-          className="col-md-6 status"
-          name="status"
-          label={formatMessage("field_projectStatus")}
-        />
-        <DateField
-          className="col-md-6 endDate"
-          name="endDate"
-          label={formatMessage("field_endDate")}
-        />
-      </div>
-      <div className="row">
-        <TextField
-          className="col-md-6 english-description"
-          name="multilingualDescription.en"
-          label={formatMessage("field_description.en")}
-          multiLines={true}
-        />
-        <TextField
-          className="col-md-6 french-description"
-          name="multilingualDescription.fr"
-          label={formatMessage("field_description.fr")}
-          multiLines={true}
-        />
-      </div>
-      <AttachmentsField
-        name="attachment"
-        title={<DinaMessage id="projectAttachments" />}
-        id="project-attachments-section"
-        allowNewFieldName="attachmentsConfig.allowNew"
-        allowExistingFieldName="attachmentsConfig.allowExisting"
-        attachmentPath={`collection-api/project/${initialValues?.id}/attachment`}
-        hideAddAttchmentBtn={true}
-      />
-    </div>
   );
 }

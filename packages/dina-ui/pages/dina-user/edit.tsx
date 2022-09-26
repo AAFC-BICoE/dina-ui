@@ -14,6 +14,7 @@ import {
 import { FieldArray } from "formik";
 import { keys, last, omit, uniq } from "lodash";
 import { NextRouter, useRouter } from "next/router";
+import { SUPER_USER, USER, GUEST } from "common-ui/types/DinaRoles";
 import Select from "react-select";
 import {
   GroupLabel,
@@ -46,7 +47,7 @@ export default function DinaUserEditPage() {
           apiBaseUrl: "/agent-api",
           idField: "agentId",
           joinField: "agent",
-          path: user => `person/${user.agentId}`
+          path: (user) => `person/${user.agentId}`
         }
       ]
     }
@@ -60,7 +61,7 @@ export default function DinaUserEditPage() {
         <h1 id="wb-cont">
           <DinaMessage id="editDinaUserTitle" />
         </h1>
-        {withResponse(userQuery, response => (
+        {withResponse(userQuery, (response) => (
           <DinaUserForm dinaUser={response.data} router={router} />
         ))}
       </main>
@@ -143,7 +144,7 @@ export function RolesPerGroupEditor({
   const { rolesPerGroup: editorsRolesPerGroup, isAdmin: editorIsAdmin } =
     useAccount();
 
-  const editableRoles = ["staff", "student", "collection-manager"];
+  const editableRoles = [USER, GUEST, SUPER_USER];
 
   return (
     <label className="w-100">
@@ -156,7 +157,7 @@ export function RolesPerGroupEditor({
             keys((form.values as DinaUser).rolesPerGroup) ?? [];
 
           const unsetGroupOptions = groupSelectOptions.filter(
-            it => !keys(form.values.rolesPerGroup).includes(it.value)
+            (it) => !keys(form.values.rolesPerGroup).includes(it.value)
           );
 
           return (
@@ -174,12 +175,10 @@ export function RolesPerGroupEditor({
               </thead>
               <tbody>
                 {usersGroups.length ? (
-                  usersGroups.map(groupName => {
+                  usersGroups.map((groupName) => {
                     const canEdit =
                       editorIsAdmin ||
-                      editorsRolesPerGroup?.[groupName]?.includes(
-                        "collection-manager"
-                      );
+                      editorsRolesPerGroup?.[groupName]?.includes(SUPER_USER);
 
                     return (
                       <tr key={groupName} className={`${groupName}-row`}>
@@ -203,7 +202,7 @@ export function RolesPerGroupEditor({
                             options={uniq([
                               ...editableRoles,
                               ...(initialRolesPerGroup[groupName] ?? [])
-                            ]).map(it => ({
+                            ]).map((it) => ({
                               label: it,
                               value: it
                             }))}
@@ -243,7 +242,7 @@ export function RolesPerGroupEditor({
                       </strong>
                       <Select
                         value={null}
-                        onChange={option => {
+                        onChange={(option) => {
                           if (option) {
                             form.setFieldValue("rolesPerGroup", {
                               ...form.values.rolesPerGroup,

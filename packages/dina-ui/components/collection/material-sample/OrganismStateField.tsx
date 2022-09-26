@@ -70,28 +70,32 @@ export function OrganismStateField({
         <AutoSuggestTextField<Organism>
           className="col-sm-6"
           {...fieldProps("lifeStage")}
-          query={(search, ctx) => ({
-            path: "collection-api/organism",
-            filter: {
-              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `lifeStage==${search}*`
-            }
-          })}
-          suggestion={org => org.lifeStage}
-          alwaysShowSuggestions={true}
+          jsonApiBackend={{
+            query: (search, ctx) => ({
+              path: "collection-api/organism",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `lifeStage==${search}*`
+              }
+            }),
+            option: org => org?.lifeStage
+          }}
+          blankSearchBackend={"json-api"}
         />
         <AutoSuggestTextField<Organism>
           className={individualEntry ? "col-sm-5" : "col-sm-6"}
           {...fieldProps("sex")}
-          query={(search, ctx) => ({
-            path: "collection-api/organism",
-            filter: {
-              ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-              rsql: `sex==${search}*`
-            }
-          })}
-          suggestion={org => org.sex}
-          alwaysShowSuggestions={true}
+          jsonApiBackend={{
+            query: (search, ctx) => ({
+              path: "collection-api/organism",
+              filter: {
+                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                rsql: `sex==${search}*`
+              }
+            }),
+            option: org => org?.sex
+          }}
+          blankSearchBackend={"json-api"}
         />
         <TextField
           {...fieldProps("remarks")}

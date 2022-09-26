@@ -30,7 +30,8 @@ const MOCK_ACCOUNT_CONTEXT: AccountContextI = {
   login: noop,
   logout: noop,
   roles: [],
-  token: "test-token",
+  // Mock for a successful token update.
+  getCurrentToken: () => Promise.resolve("test-token"),
   username: "test-user"
 };
 

@@ -3,9 +3,9 @@ import ReactSwitch from "react-switch";
 import {
   BLANK_PREPARATION,
   BLANK_RESTRICTION,
-  MaterialSampleFormCustomViewConfig
+  MaterialSampleFormTemplateConfig
 } from "../../../../components";
-import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/material-sample-custom-view/run";
+import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collection/form-template/run";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
@@ -44,7 +44,7 @@ const TEST_COORDINATES: CoordinateSystem = {
   type: "coordinate-system"
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/collecting-event":
       // Populate the linker table:
@@ -76,14 +76,14 @@ const mockGet = jest.fn<any, any>(async path => {
     case "agent-api/person":
     case "objectstore-api/metadata":
     case "collection-api/collection":
-    case "collection-api/custom-view":
+    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths =>
-  paths.map(path => {
+const mockBulkGet = jest.fn<any, any>(async (paths) =>
+  paths.map((path) => {
     switch (path) {
       case "managed-attribute/MATERIAL_SAMPLE.attribute_1":
         return { id: "1", key: "attribute_1", name: "Attribute 1" };
@@ -101,8 +101,8 @@ const mockBulkGet = jest.fn<any, any>(async paths =>
   })
 );
 
-const mockSave = jest.fn<any, any>(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn<any, any>((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111111-1111-1111-1111-111111111111"
   }))
@@ -118,14 +118,12 @@ const apiContext = {
 
 const mockOnSaved = jest.fn();
 
-async function getWrapper(
-  actionDefinition?: MaterialSampleFormCustomViewConfig
-) {
+async function getWrapper(actionDefinition?: MaterialSampleFormTemplateConfig) {
   const wrapper = mountWithAppContext(
     <CreateMaterialSampleFromWorkflowForm
       actionDefinition={
         actionDefinition ?? {
-          formTemplates: {
+          formTemplate: {
             COLLECTING_EVENT: {
               allowExisting: true,
               allowNew: true,
@@ -154,8 +152,7 @@ async function getWrapper(
               templateFields: {}
             }
           },
-          navOrder: null,
-          type: "material-sample-form-custom-view"
+          type: "material-sample-form-template"
         }
       }
       moveToSampleViewPage={mockOnSaved}
@@ -285,7 +282,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample Form with a pre-attached Collecting Event.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         COLLECTING_EVENT: {
           allowExisting: true,
           allowNew: true,
@@ -303,8 +300,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Identifiers fields are disabled:
@@ -371,7 +367,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample Form with a pre-attached Acquisition Event.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         ACQUISITION_EVENT: {
           allowExisting: true,
           allowNew: true,
@@ -389,8 +385,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           templateFields: {}
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // receptionRemarks value is there:
@@ -426,9 +421,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with no template fields enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {},
-      type: "material-sample-form-custom-view",
-      navOrder: null
+      formTemplate: {},
+      type: "material-sample-form-template"
     });
 
     // Get the switches:
@@ -436,7 +430,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     expect(switches.length).not.toEqual(0);
 
     // All switches should be unchecked:
-    expect(switches.map(node => node.prop("checked"))).toEqual(
+    expect(switches.map((node) => node.prop("checked"))).toEqual(
       switches.map(() => false)
     );
 
@@ -491,7 +485,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Preparation section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: true,
           allowNew: true,
@@ -503,8 +497,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Preparation section should be enabled:
@@ -518,7 +511,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Organisms section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: true,
           allowNew: true,
@@ -532,8 +525,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Organisms section should be enabled:
@@ -551,7 +543,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Associations section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: true,
           allowNew: true,
@@ -566,8 +558,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           } as any
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the associations section should be enabled:
@@ -583,7 +574,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Collecting Event section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         COLLECTING_EVENT: {
           allowExisting: true,
           allowNew: true,
@@ -595,8 +586,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Collecting Event section should be enabled:
@@ -643,7 +633,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Acquisition Event section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         ACQUISITION_EVENT: {
           allowExisting: true,
           allowNew: true,
@@ -655,8 +645,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Acquisition Event section should be enabled:
@@ -711,7 +700,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Storage section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: false,
           allowNew: false,
@@ -723,8 +712,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Collecting Event section should be enabled:
@@ -741,7 +729,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with only the Scheduled Action section enabled.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: false,
           allowNew: false,
@@ -759,8 +747,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: null,
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // Only the Scheduled Actions section should be enabled:
@@ -779,13 +766,13 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     expect(
       wrapper
-        .find("#scheduled-actions-section .remarks-field textarea")
+        .find("#scheduled-actions-component .remarks-field textarea")
         .prop("value")
     ).toEqual("default-remarks");
 
     // Add the first scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -793,12 +780,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // Add the second scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-section button.add-new-button")
+      .find("#scheduled-actions-component button.add-new-button")
       .simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper
-      .find("#scheduled-actions-section button.add-button")
+      .find("#scheduled-actions-component button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -806,7 +793,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // There should be 2 rows:
     expect(
-      wrapper.find("#scheduled-actions-section .rt-tbody .rt-tr").length
+      wrapper.find("#scheduled-actions-component .rt-tbody .rt-tr").length
     ).toEqual(2);
 
     // Submit the form:
@@ -845,31 +832,9 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     ]);
   });
 
-  it("Renders the Material Sample form with a custom nav order", async () => {
-    const wrapper = await getWrapper({
-      formTemplates: {
-        MATERIAL_SAMPLE: {
-          allowExisting: false,
-          allowNew: false,
-          templateFields: {}
-        }
-      },
-      navOrder: ["material-sample-info-section", "identifiers-section"],
-      type: "material-sample-form-custom-view"
-    });
-
-    // Shows the custom order: "Material Sample Info" then "Identifiers":
-    const listItemsAfter = wrapper.find(
-      ".material-sample-nav .list-group-item"
-    );
-    expect(
-      [listItemsAfter.at(0), listItemsAfter.at(1)].map(item => item.text())
-    ).toEqual(["Material Sample Info", "Identifiers"]);
-  });
-
   it("Renders the Material Sample form with a custom default managed attributes order.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: false,
           allowNew: false,
@@ -881,9 +846,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       managedAttributesOrder: ["attribute_1", "attribute_2"],
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // The default attribute values are rendered:
@@ -895,7 +859,7 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
   it("Renders the Material Sample form with a custom default Collecting Event managed attributes order.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         COLLECTING_EVENT: {
           allowExisting: false,
           allowNew: false,
@@ -910,27 +874,26 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       collectingEventManagedAttributesOrder: ["attribute_1", "attribute_2"],
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // The default attribute values are rendered:
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_1-field input")
+        .find("#collecting-event-component .attribute_1-field input")
         .prop("value")
     ).toEqual("attribute 1 default value");
     expect(
       wrapper
-        .find("#collecting-event-section .attribute_2-field input")
+        .find("#collecting-event-component .attribute_2-field input")
         .prop("value")
     ).toEqual("");
   });
 
   it("Renders the Material Sample form with a custom default Determination managed attributes order.", async () => {
     const wrapper = await getWrapper({
-      formTemplates: {
+      formTemplate: {
         MATERIAL_SAMPLE: {
           allowExisting: false,
           allowNew: false,
@@ -945,9 +908,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
           }
         }
       },
-      navOrder: [],
       determinationManagedAttributesOrder: ["attribute_1", "attribute_2"],
-      type: "material-sample-form-custom-view"
+      type: "material-sample-form-template"
     });
 
     // The default attribute values are rendered:

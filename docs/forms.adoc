@@ -102,3 +102,229 @@ You are also able to add images and links using the following properties on any 
 | tooltipLink | URL of a link to display at the bottom of the tooltip. | tooltipLink="https//www.google.com"
 | tooltipLinkText | Text identifier to appear in the tooltip link text. Defaults to a generic message if not supplied. | tooltipLinkText="tooltip_link_reference"
 |===
+
+== Text field with dropdown suggestions
+
+Using the `AutoSuggestTextField` component, you can provide a dropdown of suggestions for a text field as the user types.
+
+The `AutoSuggestTextField` component supports JSON API and elastic search for auto-suggestions, you can even provide both and fallback to the JSON API if the elastic search fails for example.
+
+Important: This is used for retrieving text suggestions. The form will be returned a string. Not a UUID for a resource. Checkout the `ResourceSelectField` for that functionality.
+
+=== JSON API example
+
+To configure the JSON API auto-suggestions, you need to setup the `jsonApiBackend` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      filter: {
+        rsql: `name==*${searchValue}*`
+      }
+    }),
+    option: person => person?.name
+  }}
+/>
+----
+
+The `query` defines the path and any filters you wish to use. You can also easily retrieve the current search value to filter by.
+
+The `option` is used to determine the text to display for each suggestion. This is also the value that is returned to the form.
+
+=== Elastic Search example
+
+To configure the Elastic Search auto-suggestions, you need to setup the `elasticSearchBackend` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+/>
+----
+
+`indexName` is the name of the Elastic Search index to use. (required)
+`searchField` is the name of the field to search in, this needs to be the full path. (required)
+`additionalField` is another field to search by in addition to the search field. This also needs to the full path. (optional)
+`restrictedField` is used to filter by a specific field in the index. This also needs to the full path. (optional)
+`restrictedFieldValue` is the value to search against the restricted field. (optional)
+`documentId` can be provided to specify the document id to use for the search. (optional)
+`option` is used to determine the text to display for each suggestion. This is also the value that is returned to the form. (required)
+
+=== Typescript Support
+
+The `AutoSuggestTextField` component supports Typescript.
+To use it, you need to import the `AutoSuggestTextField` component and pass it the type of the resource you are searching for.
+
+For example for a Person (Kitsu Resource):
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person> />
+----
+
+Providing the type, will make the option section of the component more specific:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name // This part you can now say .name since the type was defined.
+  }}
+/>
+----
+
+If you are using an included search field, insure the type being used contains the field you are looking for. If it doesn't exist on the
+type it will not be parsed.
+
+=== Default to elastic search, fall back to JSON API example
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      filter: {
+        rsql: `name==*${searchValue}*`
+      }
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"} // Default to elastic search
+/>
+----
+
+In the example above, both "elastic-search" and "json-api" are supplied. Elastic search will be used first and it will keep using elastic search until any errors occur.
+
+Once an error occurs it will switch to the other available backend, in this case the "json-api".
+
+It's important to make sure both providers work correctly since it will probably be rare that provider will fail.
+
+=== Custom options example
+
+You can provide your own suggestions directly using the `customOptions` prop:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  customOptions={value => [
+    "suggestion-1",
+    "suggestion-2",
+    "suggestion-" + value
+  ]}
+/>
+----
+
+In this example the following suggestions will be provided if the user types "3" into the text field:
+
+* suggestion-1
+* suggestion-2
+* suggestion-3
+
+While you can provide static options, you can also call an API to populate these results or another function:
+
+[source,tsx]
+----
+<AutoSuggestTextField
+  name={fieldProps("matchValue", index)}
+  blankSearchBackend={"preferred"}
+  customOptions={value =>
+    useElasticSearchDistinctTerm({
+      fieldName:
+        dataFromIndexMapping?.parentPath +
+        "." +
+        dataFromIndexMapping?.path +
+        "." +
+        dataFromIndexMapping?.label,
+      groups: selectedGroups,
+      relationshipType: dataFromIndexMapping?.parentName,
+      indexName
+    })?.filter(suggestion =>
+      suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+    )
+  }
+/>
+----
+
+=== Blank Search provider example
+
+You can even provide suggestions even if the text field is blank. Using the `blankSearchProvider` property, you can configure what happens during a blank search.
+
+If you would like blank searches to occur with the current provider you can use the "preferred" option:
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      filter: {
+        rsql: `name==*${searchValue}*`
+      }
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"}
+  blankSearchBackend={"preferred"}
+/>
+----
+
+In this example elastic search is the default provider. On a blank search elastic search is used unless it fails then the JSON API is used.
+
+Preferred is useful if you don't care which backend provider is used for a blank search.
+
+Otherwise you can specify a specific backend to use for blank searches, even if it differs from the currently selected one.
+
+[source,tsx]
+----
+<AutoSuggestTextField<Person>
+  name="examplePersonNameField"
+  elasticSearchBackend={{
+    indexName: "dina_agent_index",
+    searchField: "data.attributes.name",
+    option: person => person?.name
+  }}
+  jsonApiBackend={{
+    query: searchValue => ({
+      path: "agent-api/person",
+      filter: {
+        rsql: `name==*${searchValue}*`
+      }
+    }),
+    option: person => person?.name
+  }}
+  preferredBackend={"elastic-search"}
+  blankSearchBackend={"json-api"}
+/>
+----
+
+In the example above, elastic search is the default provider. On a blank search JSON API is used only if the search is blank.
+
+If elastic search fails, then JSON API will be used for both blank and non-blank searches.
+
+If you wish to not display any suggestions on a blank search, you can just remove the `blankSearchBackend` property and no suggestions will appear until a value is provided.

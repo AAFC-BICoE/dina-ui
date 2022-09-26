@@ -3,6 +3,7 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormProps,
   DinaFormSubmitParams,
   filterBy,
   ResourceSelectField,
@@ -11,18 +12,24 @@ import {
   useAccount,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  withResponseOrDisabled
 } from "common-ui";
 import { PersistedResource } from "kitsu";
+import { useFormikContext, connect } from "formik";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
+import {
+  StorageUnitType,
+  StorageUnit
+} from "packages/dina-ui/types/collection-api";
+import { ReactNode, useEffect, useState } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
   Head,
   Nav,
   PersonSelectField,
-  useAddPersonModal
+  StorageUnitSelectField
 } from "../../../components";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
@@ -30,16 +37,17 @@ import { Person } from "../../../types/agent-api";
 import {
   PcrBatch,
   PcrPrimer,
-  PcrProfile,
+  ThermocyclerProfile,
   Region
 } from "../../../types/seqdb-api";
+import { any } from "zod";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit"
     },
     { disabled: !id, deps }
   );
@@ -68,8 +76,8 @@ export default function PcrBatchEditPage() {
           <SeqdbMessage id={title} />
         </h1>
         {id ? (
-          withResponse(resourceQuery, ({ data }) => (
-            <PcrBatchForm pcrBatch={data} onSaved={moveToViewPage} />
+          withResponse(resourceQuery, ({ data: pcrBatchData }) => (
+            <PcrBatchForm pcrBatch={pcrBatchData} onSaved={moveToViewPage} />
           ))
         ) : (
           <PcrBatchForm onSaved={moveToViewPage} />
@@ -112,7 +120,7 @@ export function PcrBatchForm({
 
     if (submittedValues.experimenters) {
       (submittedValues as any).relationships.experimenters = {
-        data: submittedValues?.experimenters.map(collector => ({
+        data: submittedValues?.experimenters.map((collector) => ({
           id: (collector as Person).id,
           type: "person"
         }))
@@ -123,13 +131,16 @@ export function PcrBatchForm({
     // Add attachments if they were selected:
     (submittedValues as any).relationships.attachment = {
       data:
-        submittedValues.attachment?.map(it => ({
+        submittedValues.attachment?.map((it) => ({
           id: it.id,
           type: it.type
         })) ?? []
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
+    // Add storage unit if it was selected:
+    delete submittedValues.storageUnitType;
 
     const inputResource = {
       ...submittedValues,
@@ -162,21 +173,87 @@ export function PcrBatchForm({
   }
 
   return (
-    <DinaForm<Partial<PcrBatch>>
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-    >
+    <LoadExternalDataForPcrBatchForm
+      dinaFormProps={{
+        onSubmit,
+        initialValues: initialValues as any
+      }}
+      buttonBar={buttonBar as any}
+    />
+  );
+}
+
+interface LoadExternalDataForPcrBatchFormProps {
+  dinaFormProps: DinaFormProps<PcrBatch>;
+  buttonBar?: ReactNode;
+}
+
+export function LoadExternalDataForPcrBatchForm({
+  dinaFormProps,
+  buttonBar
+}: LoadExternalDataForPcrBatchFormProps) {
+  // The storage unit type needs to be loaded from the Storage Unit.
+  const storageUnitQuery = useQuery<StorageUnit>(
+    {
+      path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
+      include: "storageUnitType"
+    },
+    { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
+  );
+
+  const initialValues = dinaFormProps.initialValues;
+  initialValues.storageUnitType = storageUnitQuery?.response?.data
+    ?.storageUnitType?.id
+    ? {
+        id: storageUnitQuery.response.data.storageUnitType.id,
+        type: "storage-unit-type"
+      }
+    : undefined;
+
+  // Wait for response or if disabled, just continue with rendering.
+  return withResponseOrDisabled(storageUnitQuery, () => (
+    <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
       {buttonBar}
       <PcrBatchFormFields />
       {buttonBar}
     </DinaForm>
-  );
+  ));
 }
 
 /** Re-usable field layout between edit and view pages. */
 export function PcrBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
-  const { openAddPersonModal } = useAddPersonModal();
+  const { values } = useFormikContext<any>();
+
+  // When the storage unit type is changed, the storage unit needs to be cleared.
+  const StorageUnitTypeSelectorComponent = connect(
+    ({ formik: { setFieldValue } }) => {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={(storageUnitType) => {
+            setFieldValue("storageUnit.id", null);
+            if (
+              !Array.isArray(storageUnitType) &&
+              storageUnitType?.gridLayoutDefinition != null
+            ) {
+              setFieldValue(
+                "storageRestriction.layout",
+                storageUnitType.gridLayoutDefinition
+              );
+            } else {
+              setFieldValue("storageRestriction", null);
+            }
+          }}
+        />
+      );
+    }
+  );
 
   return (
     <div>
@@ -189,13 +266,13 @@ export function PcrBatchFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <ResourceSelectField<PcrProfile>
+        <ResourceSelectField<ThermocyclerProfile>
           className="col-md-6"
           name="thermocyclerProfile"
           filter={filterBy(["name"])}
           model="seqdb-api/thermocycler-profile"
-          optionLabel={profile => profile.name}
-          readOnlyLink="/seqdb/pcr-profile/view?id="
+          optionLabel={(profile) => profile.name}
+          readOnlyLink="/seqdb/thermocycler-profile/view?id="
         />
       </div>
       <div className="row">
@@ -209,7 +286,7 @@ export function PcrBatchFormFields() {
           name="region"
           filter={filterBy(["name"])}
           model="seqdb-api/region"
-          optionLabel={region => region.name}
+          optionLabel={(region) => region.name}
           readOnlyLink="/seqdb/region/view?id="
         />
       </div>
@@ -219,7 +296,7 @@ export function PcrBatchFormFields() {
           name="primerForward"
           filter={filterBy(["name"])}
           model="seqdb-api/pcr-primer"
-          optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
+          optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
         <ResourceSelectField<PcrPrimer>
@@ -227,7 +304,7 @@ export function PcrBatchFormFields() {
           name="primerReverse"
           filter={filterBy(["name"])}
           model="seqdb-api/pcr-primer"
-          optionLabel={primer => `${primer.name} (#${primer.lotNumber})`}
+          optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
         />
         <TextField className="col-md-6" name="thermocycler" />
@@ -235,6 +312,24 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
+        <StorageUnitTypeSelectorComponent />
+        <StorageUnitSelectField
+          resourceProps={{
+            name: "storageUnit",
+            isDisabled: !values?.storageUnitType?.id,
+            filter: filterBy(["name"], {
+              extraFilters: [
+                {
+                  selector: "storageUnitType.uuid",
+                  comparison: "==",
+                  arguments: values?.storageUnitType?.id ?? ""
+                }
+              ]
+            })
+          }}
+          restrictedField={"data.relationships.storageUnitType.data.id"}
+          restrictedFieldValue={values?.storageUnitType?.id}
+        />
       </div>
       <AttachmentsField
         name="attachment"

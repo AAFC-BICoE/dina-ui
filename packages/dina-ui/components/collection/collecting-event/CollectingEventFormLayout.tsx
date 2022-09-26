@@ -13,7 +13,8 @@ import {
   StringArrayField,
   TextField,
   TextFieldWithCoordButtons,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState } from "react";
@@ -51,6 +52,7 @@ import {
   NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
+import Link from "next/link";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -75,7 +77,7 @@ export function CollectingEventFormLayout({
 
   // Check if Georeferences are empty
   const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(
-    georeference => {
+    (georeference) => {
       for (const key in georeference) {
         if (
           georeference[key] !== null &&
@@ -88,7 +90,7 @@ export function CollectingEventFormLayout({
     }
   );
   const hideGeoreferences: boolean = georeferencesEmpty.every(
-    element => element === true
+    (element) => element === true
   );
 
   const [geoAssertionTabIdx, setGeoAssertionTabIdx] = useState(0);
@@ -198,7 +200,7 @@ export function CollectingEventFormLayout({
   ) {
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
-    detailResults?.address?.map(addr => {
+    detailResults?.address?.map((addr) => {
       // omitting country and state
       if (
         addr.type !== "country" &&
@@ -329,7 +331,7 @@ export function CollectingEventFormLayout({
     }
   };
 
-  const addCustomPlaceName = form => {
+  const addCustomPlaceName = (form) => {
     if (!customPlaceValue || customPlaceValue.length === 0) return;
     // Add user entered custom place in front
     const customPlaceAsInSrcAdmnLevel: SourceAdministrativeLevel = {};
@@ -339,7 +341,7 @@ export function CollectingEventFormLayout({
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
-    srcAdminLevels.map(lev => {
+    srcAdminLevels.map((lev) => {
       lev.shortId = lev.shortId + 1;
     });
     srcAdminLevels.unshift(customPlaceAsInSrcAdmnLevel);
@@ -359,7 +361,7 @@ export function CollectingEventFormLayout({
   ) {
     layoutWrapperRef.current
       ?.querySelectorAll(`#${id} .templateCheckBox`)
-      ?.forEach(field => {
+      ?.forEach((field) => {
         // tslint:disable-next-line
         form.setFieldValue(field.attributes["name"]?.value, e.target.checked);
       });
@@ -382,7 +384,7 @@ export function CollectingEventFormLayout({
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />
       }}
-      showCustomViewDropdown={!isTemplate}
+      showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
     />
@@ -416,8 +418,8 @@ export function CollectingEventFormLayout({
                         aria-label="customPlace"
                         className="p-2 form-control"
                         style={{ width: "60%" }}
-                        onChange={e => setCustomPlaceValue(e.target.value)}
-                        onKeyDown={e => {
+                        onChange={(e) => setCustomPlaceValue(e.target.value)}
+                        onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
                             if (customPlaceValue?.length > 0) {
@@ -471,9 +473,11 @@ export function CollectingEventFormLayout({
                   )}
                   <div className="col-md-4">
                     {detail.sourceUrl && (
-                      <a href={`${detail.sourceUrl}`} className="btn btn-info">
-                        <DinaMessage id="viewDetailButtonLabel" />
-                      </a>
+                      <Link href={`${detail.sourceUrl}`} passHref={true}>
+                        <a className="btn btn-info">
+                          <DinaMessage id="viewDetailButtonLabel" />
+                        </a>
+                      </Link>
                     )}
                   </div>
                 </div>
@@ -509,7 +513,7 @@ export function CollectingEventFormLayout({
                             className={
                               hasVerbatimLocality ? "btn btn-link" : "d-none"
                             }
-                            onClick={state =>
+                            onClick={(state) =>
                               doGeoSearch(state.dwcVerbatimLocality)
                             }
                           >
@@ -519,7 +523,7 @@ export function CollectingEventFormLayout({
                             className={
                               hasDecimalCoords ? "btn btn-link" : "d-none"
                             }
-                            onClick={state => {
+                            onClick={(state) => {
                               const assertion =
                                 state.geoReferenceAssertions?.[
                                   geoAssertionTabIdx
@@ -631,17 +635,32 @@ export function CollectingEventFormLayout({
                 )}
               </Field>
             )}
-            <AutoSuggestTextField<CollectingEvent>
-              name="dwcRecordedBy"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `dwcRecordedBy==*${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.dwcRecordedBy ?? ""}
-            />
+            <FieldSpy<string> fieldName="group">
+              {(group) => (
+                <AutoSuggestTextField<CollectingEvent>
+                  name="dwcRecordedBy"
+                  jsonApiBackend={{
+                    query: (searchValue, ctx) => ({
+                      path: "collection-api/collecting-event",
+                      filter: {
+                        ...(ctx.values.group && {
+                          group: { EQ: ctx.values.group }
+                        }),
+                        rsql: `dwcRecordedBy==*${searchValue}*`
+                      }
+                    }),
+                    option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
+                  }}
+                  elasticSearchBackend={{
+                    indexName: "dina_material_sample_index",
+                    searchField: "included.attributes.dwcRecordedBy",
+                    group: group ?? undefined,
+                    option: (collEvent) => collEvent?.dwcRecordedBy
+                  }}
+                  preferredBackend={"elastic-search"}
+                />
+              )}
+            </FieldSpy>
             <PersonSelectField name="collectors" isMulti={true} />
             <TextField
               name="dwcRecordNumber"
@@ -675,16 +694,17 @@ export function CollectingEventFormLayout({
             <TextField name="dwcVerbatimLocality" />
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimCoordinateSystem"
-              query={() => ({
-                path: "collection-api/vocabulary/coordinateSystem"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/coordinateSystem"
+                }),
+                option: (vocabElement) =>
+                  vocabElement?.vocabularyElements?.map(
+                    (it) => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}
-              alwaysShowSuggestions={true}
               onChangeExternal={onChangeExternal}
             />
             <Field name="dwcVerbatimCoordinateSystem">
@@ -770,15 +790,16 @@ export function CollectingEventFormLayout({
             </Field>
             <AutoSuggestTextField<Vocabulary>
               name="dwcVerbatimSRS"
-              query={() => ({
-                path: "collection-api/vocabulary/srs"
-              })}
-              suggestion={vocabElement =>
-                vocabElement?.vocabularyElements?.map(
-                  it => it?.labels?.[locale] ?? ""
-                ) ?? ""
-              }
-              alwaysShowSuggestions={true}
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/srs"
+                }),
+                option: (vocabElement) =>
+                  vocabElement?.vocabularyElements?.map(
+                    (it) => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
               onChangeExternal={onChangeExternal}
             />
             <TextField name="dwcVerbatimElevation" />
@@ -845,14 +866,18 @@ export function CollectingEventFormLayout({
               customName={"collectingEventSubstrate"}
               tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#_substrate"
               tooltipLinkText="fromDinaUserGuide"
-              query={(searchValue, ctx) => ({
-                path: "collection-api/collecting-event",
-                filter: {
-                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                  rsql: `substrate==${searchValue}*`
-                }
-              })}
-              suggestion={collEvent => collEvent.substrate ?? ""}
+              jsonApiBackend={{
+                query: (searchValue, ctx) => ({
+                  path: "collection-api/collecting-event",
+                  filter: {
+                    ...(ctx.values.group && {
+                      group: { EQ: ctx.values.group }
+                    }),
+                    rsql: `substrate==${searchValue}*`
+                  }
+                }),
+                option: (collEvent) => collEvent?.substrate ?? ""
+              }}
             />
             <NumberRangeFields
               names={[

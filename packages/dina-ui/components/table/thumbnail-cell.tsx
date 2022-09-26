@@ -8,13 +8,10 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
   return {
     Cell: ({ original }) => {
       const fileIdentifier = get<string | undefined>(
-        original?.data?.attributes,
+        original,
         fileIdentifierField
       );
-      const bucket = get<string | undefined>(
-        original?.data?.attributes,
-        bucketField
-      );
+      const bucket = get<string | undefined>(original, bucketField);
 
       const fileId = `${fileIdentifier}/thumbnail`;
       const filePath = `/api/objectstore-api/file/${bucket}/${fileId}`;
@@ -23,9 +20,12 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
 
       return resourceExternalURL ? (
         <div className="d-flex h-100">
-          <a href={resourceExternalURL} target="_blank" className="m-auto h5">
-            <FaExternalLinkAlt />
-          </a>
+          <Link href={resourceExternalURL} passHref={true}>
+            <a target="_blank" className="m-auto h5">
+              <FaExternalLinkAlt />
+            </a>
+          </Link>
+
           <Link
             href={`/object-store/object/external-resource-view?id=${original.id}`}
           >
@@ -39,7 +39,14 @@ export function thumbnailCell({ fileIdentifierField, bucketField }) {
       );
     },
     sortable: false,
-    Header: <DinaMessage id="thumbnail" />
+    Header: <DinaMessage id="thumbnail" />,
+
+    // These fields are required in the elastic search response for this cell to work.
+    additionalAccessors: [
+      "data.attributes.resourceExternalURL",
+      fileIdentifierField,
+      bucketField
+    ]
   };
 }
 

@@ -16,9 +16,17 @@ export interface JsonApiQuerySpec extends GetParams {
 
 /** Query hook state. */
 export interface QueryState<TData extends KitsuResponseData, TMeta> {
+  /** Boolean indicating the loading status. */
   loading: boolean;
+
+  /** Undefined if no errors have occurred. Error structure can change depending on the endpoint. */
   error?: DocWithErrors;
+
+  /** Response from the API request. If loading/error/disabled it will be undefined. */
   response?: KitsuResponse<TData, TMeta>;
+
+  /** Has the request been disabled. Disabled requests return undefined results. */
+  isDisabled?: boolean;
 }
 
 /** Additional query options. */
@@ -108,11 +116,16 @@ export function useQuery<TData extends KitsuResponseData, TMeta = undefined>(
   return {
     error,
     loading,
-    response: disabled || loading ? undefined : apiResponse
+    response: disabled || loading ? undefined : apiResponse,
+    isDisabled: disabled
   };
 }
 
-/** Only render if there is a response, otherwise show generic 'loading' or 'error' indicators. */
+/**
+ * Only render if there is a response, otherwise show generic 'loading' or 'error' indicators.
+ *
+ * If the response is disabled, it will NOT go through with the rendering.
+ */
 export function withResponse<
   TData extends KitsuResponseData,
   TMeta = undefined
@@ -135,6 +148,38 @@ export function withResponse<
   }
   if (response) {
     return responseRenderer(response);
+  }
+  return null;
+}
+
+/**
+ * Only render if there is a response or is disabled, otherwise show generic 'loading' or 'error'
+ * indicators.
+ *
+ * If the response is disabled, it will go through with the rendering. This is great for cases where
+ * you want to render if the response is disabled to be skipped. Only wait to render if it's not
+ * disabled.
+ */
+export function withResponseOrDisabled<
+  TData extends KitsuResponseData,
+  TMeta = undefined
+>(
+  { loading, error, response, isDisabled }: QueryState<TData, TMeta>,
+  responseRenderer: () => JSX.Element | null
+): JSX.Element | null {
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+  if (error) {
+    const message =
+      error instanceof Error
+        ? `${error.name}: ${error.message}`
+        : error?.errors?.map(e => e.detail).join("\n") ?? String(error);
+
+    return <div className="alert alert-danger">{message}</div>;
+  }
+  if (response || isDisabled) {
+    return responseRenderer();
   }
   return null;
 }

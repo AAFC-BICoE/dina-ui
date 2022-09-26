@@ -13,39 +13,6 @@ export interface MetadataDetailsProps {
   metadata: PersistedResource<Metadata>;
 }
 
-export function useMetadataQuery(id?: string) {
-  const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
-    {
-      include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
-      path: `objectstore-api/metadata/${id}`
-    },
-    {
-      joinSpecs: [
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "acMetadataCreator",
-          joinField: "acMetadataCreator",
-          path: metadata => `person/${metadata.acMetadataCreator.id}`
-        },
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "dcCreator",
-          joinField: "dcCreator",
-          path: metadata => `person/${metadata.dcCreator.id}`
-        },
-        {
-          apiBaseUrl: "/objectstore-api",
-          idField: "fileIdentifier",
-          joinField: "objectUpload",
-          path: metadata => `object-upload/${metadata.fileIdentifier}`
-        }
-      ]
-    }
-  );
-
-  return query;
-}
-
 /**
  * Shows the attribute details of a Metadata. Does not include the image or thumbnail.
  * Tha ManagedAttributeMap must b included with the passed Metadata.
@@ -86,7 +53,7 @@ export function MetadataDetails({ metadata }: MetadataDetailsProps) {
         >
           <ManagedAttributesViewer
             values={metadata.managedAttributes}
-            managedAttributeApiPath={id =>
+            managedAttributeApiPath={(id) =>
               `objectstore-api/managed-attribute/${id}`
             }
           />
@@ -137,7 +104,7 @@ function MetadataAttributeGroup({
   fields,
   title
 }: MetadataAttributeGroupProps) {
-  const data = fields.map(field => {
+  const data = fields.map((field) => {
     if (typeof field === "string") {
       return { name: field, value: get(metadata, field) };
     }

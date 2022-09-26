@@ -7,29 +7,17 @@ import {
   useDinaFormContext,
   useModal
 } from "common-ui";
-import { PersistedResource } from "kitsu";
 import { uniq } from "lodash";
 import dynamic from "next/dynamic";
-import { ComponentType, PropsWithChildren, useState } from "react";
-import { GiHamburgerMenu } from "react-icons/gi";
-import {
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-  SortEnd
-} from "react-sortable-hoc";
+import { ComponentType, PropsWithChildren } from "react";
 import Switch, { ReactSwitchProps } from "react-switch";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
-  CustomView,
   MaterialSampleAssociation,
-  MaterialSampleFormSectionId,
-  MATERIAL_SAMPLE_FORM_SECTIONS,
+  MATERIAL_SAMPLE_FORM_LEGEND,
   Organism
 } from "../../../../types/collection-api";
-import { MaterialSampleNavCustomViewSelect } from "./MaterialSampleNavCustomViewSelect";
 import { useMaterialSampleSave } from "../useMaterialSample";
-import { materialSampleNavOrderSchema } from "./materialSampleNavOrderSchema";
 
 export interface MaterialSampleFormNavProps {
   dataComponentState: ReturnType<
@@ -42,11 +30,7 @@ export interface MaterialSampleFormNavProps {
   // Disables Collecting Event React Switch for child material samples
   disableCollectingEventSwitch?: boolean;
 
-  /** Hides the custom view selection, but keeps the drag/drop handles. */
-  hideCustomViewSelect?: boolean;
-
-  navOrder?: MaterialSampleFormSectionId[] | null;
-  onChangeNavOrder: (newOrder: MaterialSampleFormSectionId[] | null) => void;
+  navOrder?: string[] | null;
 }
 
 // Don't render the react-scrollspy-nav component during tests because it only works in the browser.
@@ -73,8 +57,8 @@ const ScrollSpyNav = renderNav
     )
   : "div";
 
-interface ScrollTarget<T extends MaterialSampleFormSectionId> {
-  id: T;
+interface ScrollTarget {
+  id: string;
   msg: string | JSX.Element;
   className?: string;
   disabled?: boolean;
@@ -87,9 +71,7 @@ export function MaterialSampleFormNav({
   dataComponentState,
   disableRemovePrompt,
   disableCollectingEventSwitch,
-  hideCustomViewSelect,
-  navOrder,
-  onChangeNavOrder
+  navOrder
 }: MaterialSampleFormNavProps) {
   const { isTemplate } = useDinaFormContext();
 
@@ -98,46 +80,9 @@ export function MaterialSampleFormNav({
     navOrder
   });
 
-  const [customView, setCustomViewWithNoSideEffects] = useState<
-    PersistedResource<CustomView> | { id: null }
-  >();
-
-  function updateCustomView(
-    newView: PersistedResource<CustomView> | { id: null }
-  ) {
-    // Update component state:
-    setCustomViewWithNoSideEffects(newView);
-
-    // Update the nav order:
-    if (newView.id) {
-      if (materialSampleNavOrderSchema.isValidSync(newView.viewConfiguration)) {
-        onChangeNavOrder(newView.viewConfiguration.navOrder ?? []);
-      }
-    } else {
-      onChangeNavOrder(null);
-    }
-  }
-
-  function onSortStart(_, event: unknown) {
-    if (event instanceof MouseEvent) {
-      document.body.style.cursor = "grabbing";
-    }
-  }
-
-  function onSortEnd(sortEnd: SortEnd) {
-    document.body.style.cursor = "inherit";
-
-    const newOrder = arrayMove(
-      sortedScrollTargets,
-      sortEnd.oldIndex,
-      sortEnd.newIndex
-    ).map(it => it.id);
-    onChangeNavOrder?.(newOrder);
-  }
-
   return (
     <div className="sticky-md-top material-sample-nav">
-      <style>{`.material-sample-nav .active a { color: inherit !important; }`}</style>
+      <style>{`.material-sample-nav .active a { color: inherit !important; } .material-sample-nav { top: 70px; }`}</style>
       <ScrollSpyNav
         {...(renderNav
           ? {
@@ -157,37 +102,20 @@ export function MaterialSampleFormNav({
               <DinaMessage id="dataComponents" />
             </strong>
           </label>
-          <SortableNavGroup
-            axis="y"
-            useDragHandle={true}
-            onSortStart={onSortStart}
-            onSortEnd={onSortEnd}
-          >
-            {sortedScrollTargets.map((section, index) => (
-              <SortableNavItem
+          {/* Display each row of the data components. */}
+          <DataComponentNavGroup>
+            {sortedScrollTargets.map(section => (
+              <DataComponentNavItem
                 key={section.id}
-                index={index}
                 section={section}
                 disableRemovePrompt={disableRemovePrompt}
                 disableSwitch={
-                  section.id === "collecting-event-section" &&
+                  section.id === "collecting-event-component" &&
                   disableCollectingEventSwitch
                 }
               />
             ))}
-          </SortableNavGroup>
-          {!hideCustomViewSelect && (
-            <MaterialSampleNavCustomViewSelect
-              onChange={updateCustomView}
-              selectedView={customView}
-              navOrder={navOrder ?? null}
-            />
-          )}
-          {isTemplate && (
-            <div className="alert alert-warning">
-              <DinaMessage id="materialSampleNavTemplateInfo" />
-            </div>
-          )}
+          </DataComponentNavGroup>
         </nav>
       </ScrollSpyNav>
     </div>
@@ -198,103 +126,77 @@ export interface MaterialSampleSectionOrderParams {
   dataComponentState: ReturnType<
     typeof useMaterialSampleSave
   >["dataComponentState"];
-  navOrder?: MaterialSampleFormSectionId[] | null;
+  navOrder?: string[] | null;
 }
 
 export function useMaterialSampleSectionOrder({
   dataComponentState,
   navOrder
 }: MaterialSampleSectionOrderParams) {
-  const { formatMessage } = useDinaIntl();
+  const { formatMessage, messages } = useDinaIntl();
 
   /** An array with all section IDs, beginning with the user-defined order. */
-  const navOrderWithAllSections = uniq([
+  const navOrderWithAllSections: string[] = uniq([
     ...(navOrder ?? []),
-    ...MATERIAL_SAMPLE_FORM_SECTIONS
+    ...MATERIAL_SAMPLE_FORM_LEGEND.map(component => component.id)
   ]);
 
-  const scrollTargets: { [P in MaterialSampleFormSectionId]: ScrollTarget<P> } =
-    {
-      "identifiers-section": {
-        id: "identifiers-section",
-        msg: <DinaMessage id="identifiers" />
-      },
-      "material-sample-info-section": {
-        id: "material-sample-info-section",
-        msg: <DinaMessage id="materialSampleInfo" />
-      },
-      "collecting-event-section": {
-        id: "collecting-event-section",
-        msg: formatMessage("collectingEvent"),
-        className: "enable-collecting-event",
-        disabled: !dataComponentState.enableCollectingEvent,
-        setEnabled: dataComponentState.setEnableCollectingEvent
-      },
-      "acquisition-event-section": {
-        id: "acquisition-event-section",
-        msg: formatMessage("acquisitionEvent"),
-        className: "enable-acquisition-event",
-        disabled: !dataComponentState.enableAcquisitionEvent,
-        setEnabled: dataComponentState.setEnableAcquisitionEvent
-      },
-      "preparations-section": {
-        id: "preparations-section",
-        msg: formatMessage("preparations"),
-        className: "enable-catalogue-info",
-        disabled: !dataComponentState.enablePreparations,
-        setEnabled: dataComponentState.setEnablePreparations
-      },
-      "organisms-section": {
-        id: "organisms-section",
-        msg: formatMessage("organisms"),
-        className: "enable-organisms",
-        disabled: !dataComponentState.enableOrganisms,
-        setEnabled: dataComponentState.setEnableOrganisms,
-        customSwitch: OrganismsSwitch
-      },
-      "associations-section": {
-        id: "associations-section",
-        msg: formatMessage("associationsLegend"),
-        className: "enable-associations",
-        disabled: !dataComponentState.enableAssociations,
-        setEnabled: dataComponentState.setEnableAssociations,
-        customSwitch: AssociationsSwitch
-      },
-      "storage-section": {
-        id: "storage-section",
-        msg: formatMessage("storage"),
-        className: "enable-storage",
-        disabled: !dataComponentState.enableStorage,
-        setEnabled: dataComponentState.setEnableStorage
-      },
-      "restriction-section": {
-        id: "restriction-section",
-        msg: formatMessage("restrictions"),
-        className: "enable-restrictions",
-        disabled: !dataComponentState.enableRestrictions,
-        setEnabled: dataComponentState.setEnableRestrictions
-      },
-      "scheduled-actions-section": {
-        id: "scheduled-actions-section",
-        msg: formatMessage("scheduledActions"),
-        className: "enable-scheduled-actions",
-        disabled: !dataComponentState.enableScheduledActions,
-        setEnabled: dataComponentState.setEnableScheduledActions
-      },
-      "managedAttributes-section": {
-        id: "managedAttributes-section",
-        msg: formatMessage("managedAttributes")
-      },
-      "material-sample-attachments-section": {
-        id: "material-sample-attachments-section",
-        msg: formatMessage("materialSampleAttachments")
-      }
-    };
+  /** Switch information to apply to the legend. */
+  const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
+    "collecting-event-component": {
+      disabled: !dataComponentState.enableCollectingEvent,
+      setEnabled: dataComponentState.setEnableCollectingEvent
+    },
+    "acquisition-event-component": {
+      disabled: !dataComponentState.enableAcquisitionEvent,
+      setEnabled: dataComponentState.setEnableAcquisitionEvent
+    },
+    "preparations-component": {
+      disabled: !dataComponentState.enablePreparations,
+      setEnabled: dataComponentState.setEnablePreparations
+    },
+    "organisms-component": {
+      disabled: !dataComponentState.enableOrganisms,
+      setEnabled: dataComponentState.setEnableOrganisms,
+      customSwitch: OrganismsSwitch
+    },
+    "associations-component": {
+      disabled: !dataComponentState.enableAssociations,
+      setEnabled: dataComponentState.setEnableAssociations,
+      customSwitch: AssociationsSwitch
+    },
+    "storage-component": {
+      disabled: !dataComponentState.enableStorage,
+      setEnabled: dataComponentState.setEnableStorage
+    },
+    "restriction-component": {
+      disabled: !dataComponentState.enableRestrictions,
+      setEnabled: dataComponentState.setEnableRestrictions
+    },
+    "scheduled-actions-component": {
+      disabled: !dataComponentState.enableScheduledActions,
+      setEnabled: dataComponentState.setEnableScheduledActions
+    }
+  };
 
-  const sortedScrollTargets = uniq([
-    ...navOrderWithAllSections.map(id => scrollTargets[id]),
-    ...MATERIAL_SAMPLE_FORM_SECTIONS.map(id => scrollTargets[id])
-  ]);
+  const scrollTargets: ScrollTarget[] = [
+    ...MATERIAL_SAMPLE_FORM_LEGEND.map(component => ({
+      id: component.id,
+      msg: messages[component.labelKey]
+        ? formatMessage(component.labelKey as any)
+        : component.labelKey,
+      className: component.switchClassName,
+      disabled: scrollTargetSwitches[component.id]?.disabled,
+      setEnabled: scrollTargetSwitches[component.id]?.setEnabled,
+      customSwitch: scrollTargetSwitches[component.id]?.customSwitch
+    }))
+  ];
+
+  const sortedScrollTargets: ScrollTarget[] = uniq(
+    navOrderWithAllSections.map(
+      id => scrollTargets.filter(target => target.id === id)[0]
+    )
+  );
 
   return { sortedScrollTargets };
 }
@@ -342,97 +244,81 @@ function AssociationsSwitch(props) {
   );
 }
 
-export const SortableNavGroup = SortableContainer(
-  ({ children }: PropsWithChildren<{}>) => (
-    <div className="list-group mb-3">{children}</div>
-  )
-);
+export function DataComponentNavGroup({ children }: PropsWithChildren<{}>) {
+  return <div className="list-group mb-3">{children}</div>;
+}
 
-interface NavItemProps<T extends MaterialSampleFormSectionId> {
-  section: ScrollTarget<T>;
+interface NavItemProps {
+  section: ScrollTarget;
   disableRemovePrompt?: boolean;
   disableSwitch?: boolean;
 }
 
-const SortableNavItem = SortableElement(
-  ({
-    section,
-    disableRemovePrompt,
-    disableSwitch
-  }: NavItemProps<MaterialSampleFormSectionId>) => {
-    const { openModal } = useModal();
+function DataComponentNavItem({
+  section,
+  disableRemovePrompt,
+  disableSwitch
+}: NavItemProps) {
+  const { openModal } = useModal();
 
-    const Tag = section.disabled ? "div" : "a";
-    const SwitchComponent = section.customSwitch ?? Switch;
+  const Tag = section.disabled ? "div" : "a";
+  const SwitchComponent = section.customSwitch ?? Switch;
 
-    function toggle(newVal: boolean) {
-      if (!newVal && !disableRemovePrompt) {
-        // When removing data, ask the user for confirmation first:
-        openModal(
-          <AreYouSureModal
-            actionMessage={
-              <DinaMessage
-                id="removeComponentData"
-                values={{ component: section.msg }}
+  function toggle(newVal: boolean) {
+    if (!newVal && !disableRemovePrompt) {
+      // When removing data, ask the user for confirmation first:
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <DinaMessage
+              id="removeComponentData"
+              values={{ component: section.msg }}
+            />
+          }
+          onYesButtonClicked={() => section.setEnabled?.(newVal)}
+        />
+      );
+    } else {
+      section.setEnabled?.(newVal);
+    }
+  }
+
+  return (
+    <div
+      className={classNames(
+        section.className,
+        "list-group-item d-flex gap-2 align-items-center"
+      )}
+      key={section.id}
+      style={{ height: "3rem", zIndex: 1030 }}
+    >
+      <Tag
+        className="flex-grow-1 text-decoration-none"
+        href={section.disabled ? undefined : `#${section.id}`}
+      >
+        {section.msg}
+      </Tag>
+      {section.setEnabled &&
+        (disableSwitch ? (
+          <Tooltip
+            id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
+            disableSpanMargin={true}
+            visibleElement={
+              <SwitchComponent
+                className="mt-2"
+                checked={!section.disabled}
+                onChange={toggle}
+                disabled={disableSwitch}
               />
             }
-            onYesButtonClicked={() => section.setEnabled?.(newVal)}
           />
-        );
-      } else {
-        section.setEnabled?.(newVal);
-      }
-    }
-
-    return (
-      <div
-        className={classNames(
-          section.className,
-          "list-group-item d-flex gap-2 align-items-center"
-        )}
-        key={section.id}
-        style={{ height: "3rem", zIndex: 1030 }}
-      >
-        <NavSortHandle />
-        <Tag
-          className="flex-grow-1 text-decoration-none"
-          href={section.disabled ? undefined : `#${section.id}`}
-        >
-          {section.msg}
-        </Tag>
-        {section.setEnabled &&
-          (disableSwitch ? (
-            <Tooltip
-              id={disableSwitch ? "disabledForChildMaterialSamples" : undefined}
-              disableSpanMargin={true}
-              visibleElement={
-                <SwitchComponent
-                  className="mt-2"
-                  checked={!section.disabled}
-                  onChange={toggle}
-                  disabled={disableSwitch}
-                />
-              }
-            />
-          ) : (
-            <SwitchComponent
-              checked={!section.disabled}
-              onChange={toggle}
-              disabled={disableSwitch}
-            />
-          ))}
-      </div>
-    );
-  }
-);
-
-const NavSortHandle = SortableHandle(() => (
-  <GiHamburgerMenu cursor="grab" size="2em" />
-));
-
-// Drag/drop re-ordering support copied from https://github.com/JedWatson/react-select/pull/3645/files
-function arrayMove<T>(array: T[], from: number, to: number) {
-  array = array.slice();
-  array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
-  return array;
+        ) : (
+          <SwitchComponent
+            checked={!section.disabled}
+            onChange={toggle}
+            disabled={disableSwitch}
+          />
+        ))}
+    </div>
+  );
 }

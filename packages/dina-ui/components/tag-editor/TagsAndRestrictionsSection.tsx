@@ -12,6 +12,7 @@ import { AiFillTags } from "react-icons/ai";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { TagSelectField } from "./TagSelectField";
 import { RestrictionWarning } from "../collection/material-sample/RestrictionWarning";
+import { useFormikContext } from "formik";
 
 export const TAG_SECTION_FIELDS: (keyof MaterialSample)[] = [
   "tags",
@@ -32,6 +33,7 @@ export function TagsAndRestrictionsSection({
 }: TagsAndRestrictionsSection) {
   const { readOnly, initialValues } = useDinaFormContext();
   const isInBulkEditTab = !!useBulkEditTabContext();
+  const formik = useFormikContext<any>();
 
   return readOnly ? (
     <>
@@ -42,14 +44,6 @@ export function TagsAndRestrictionsSection({
           <div className="d-flex flex-row">
             <div className="flex-grow-1">
               <RestrictionWarning isRestrictionSelect={true} />
-            </div>
-            <div>
-              <TagSelectField
-                resourcePath={resourcePath}
-                name={tagsFieldName}
-                removeLabel={true}
-                groupSelectorName={groupSelectorName}
-              />
             </div>
           </div>
         )}
@@ -98,17 +92,13 @@ export function TagsAndRestrictionsSection({
             />
           )}
           <DinaFormSection horizontal={false}>
-            <FieldSpy<boolean> fieldName="publiclyReleasable">
-              {pr =>
-                pr === false ? (
-                  <TextField
-                    name="notPubliclyReleasableReason"
-                    className="flex-grow-1 notPubliclyReleasableReason"
-                    multiLines={true}
-                  />
-                ) : null
-              }
-            </FieldSpy>
+            {!formik.values.publiclyReleasable && (
+              <TextField
+                name="notPubliclyReleasableReason"
+                className="flex-grow-1 notPubliclyReleasableReason"
+                multiLines={true}
+              />
+            )}
           </DinaFormSection>
         </div>
       </DinaFormSection>

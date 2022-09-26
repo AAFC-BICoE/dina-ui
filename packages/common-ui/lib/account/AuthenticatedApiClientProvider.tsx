@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useRef } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { useAccount } from "./AccountProvider";
 
@@ -7,29 +7,21 @@ export function AuthenticatedApiClientProvider({
   children
 }: PropsWithChildren<{}>) {
   const apiContext = useApiClient();
-  const { authenticated, initialized, login, token } = useAccount();
-  const authTokenRef = useRef<string>();
-  // Update the token ref on every render:
-  authTokenRef.current = token;
-
-  // All pages require authentication.
-  // Redirect to the login page if not logged in:
-  useEffect(() => {
-    if (initialized && !authenticated) {
-      login();
-    }
-  }, [authenticated, initialized]);
+  const { getCurrentToken } = useAccount();
+  const [authSetup, setAuthSetup] = useState<boolean>(false);
 
   // Include the bearer token with every API request:
   useEffect(() => {
     // 'Interceptors' is nullable here to support the old tests written before authentication was added,
     // but in the running app it should always be available.
-    apiContext.apiClient.axios.interceptors?.request.use(config => {
-      // Get the token from a Ref so the up-to-date one is always used:
-      config.headers.Authorization = `Bearer ${authTokenRef.current}`;
+    apiContext.apiClient.axios.interceptors?.request.use(async (config) => {
+      const token = await getCurrentToken();
+      config.headers.Authorization = `Bearer ${token ?? ""}`;
       return config;
     });
+
+    setAuthSetup(true);
   }, [apiContext.apiClient.axios]);
 
-  return <>{authenticated && initialized ? children : null}</>;
+  return <>{authSetup ? children : null}</>;
 }

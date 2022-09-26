@@ -53,7 +53,7 @@ export function ListPageLayout<TData extends KitsuResource>({
   filterFormchildren,
   id,
   queryTableProps,
-  wrapTable = children => children,
+  wrapTable = (children) => children,
   bulkDeleteButtonProps,
   bulkEditPath
 }: ListPageLayoutProps<TData>) {
@@ -145,8 +145,8 @@ export function ListPageLayout<TData extends KitsuResource>({
       defaultPageSize={defaultPageSize ?? undefined}
       defaultSort={defaultSort ?? undefined}
       filter={filterParam}
-      onPageSizeChange={newSize => setDefaultPageSize(newSize)}
-      onSortedChange={newSort => setStoredDefaultSort(newSort)}
+      onPageSizeChange={(newSize) => setDefaultPageSize(newSize)}
+      onSortedChange={(newSort) => setStoredDefaultSort(newSort)}
       {...resolvedQueryTableProps}
       topRightCorner={
         <div className="d-flex gap-3">
@@ -163,9 +163,7 @@ export function ListPageLayout<TData extends KitsuResource>({
 
   /** Wrap the table in a form when checkboxes are enabled. */
   const tableWrappedInForm = showRowCheckboxes ? (
-    <DinaForm<BulkSelectableFormValues>
-      initialValues={{ selectedResources: {} }}
-    >
+    <DinaForm<BulkSelectableFormValues> initialValues={{ itemIdsToSelect: {} }}>
       {tableElement}
     </DinaForm>
   ) : (
@@ -185,5 +183,5 @@ export function ListPageLayout<TData extends KitsuResource>({
 }
 
 export interface BulkSelectableFormValues {
-  selectedResources: Record<string, boolean>;
+  itemIdsToSelect: Record<string, boolean>;
 }

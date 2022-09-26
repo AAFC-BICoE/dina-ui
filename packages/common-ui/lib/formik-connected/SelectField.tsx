@@ -55,7 +55,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
           }
 
           const newValue = isArray(change)
-            ? change.map(option => option.value)
+            ? change.map((option) => option.value)
             : change?.value;
           setValue(newValue);
           onChange?.(newValue as any, formik);
@@ -64,18 +64,18 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
         let selectedOption;
 
         if (isMulti) {
-          selectedOption = options?.filter(option =>
+          selectedOption = options?.filter((option) =>
             value?.includes(option.value)
           );
         } else if (value) {
           selectedOption = options
-            .filter(opt => !!opt.value)
-            .find(option => option.value === value) as any;
+            .filter((opt) => !!opt.value)
+            .find((option) => option.value === value) as any;
           // also search in possible nested options
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
-            const optionWithNested = options.filter(opt => !!opt["options"]);
-            optionWithNested.map(option =>
-              option["options"].map(opt => {
+            const optionWithNested = options.filter((opt) => !!opt["options"]);
+            optionWithNested.map((option) =>
+              option["options"].map((opt) => {
                 if (opt.value === value) {
                   selectedOption = opt;
                   return;
@@ -96,14 +96,15 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             ...provided,
             color: "rgb(87,120,94)"
           }),
-          menu: base => ({ ...base, zIndex: 1050 }),
-          control: base => ({
+          menu: (base) => ({ ...base, zIndex: 1050 }),
+          control: (base) => ({
             ...base,
             ...(invalid && {
               borderColor: "rgb(148, 26, 37)",
               "&:hover": { borderColor: "rgb(148, 26, 37)" }
             })
-          })
+          }),
+          ...styles
         };
 
         return (
@@ -114,7 +115,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               options={options}
               onChange={onChangeInternal}
               value={selectedOption}
-              styles={customStyle}
+              styles={customStyle as any}
               isLoading={isLoading}
               classNamePrefix="react-select"
               ref={forwardedRef as any}

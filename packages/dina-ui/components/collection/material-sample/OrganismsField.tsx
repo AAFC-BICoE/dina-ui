@@ -72,7 +72,7 @@ export function OrganismsField({
   return (
     <FieldSet
       id={id}
-      className="organisms-section"
+      className="organisms-component"
       fieldName={name}
       legend={<DinaMessage id="organisms" />}
     >

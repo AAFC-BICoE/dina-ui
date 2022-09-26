@@ -14,6 +14,8 @@ export interface PcrBatchAttributes {
 
   /** UUID array (from the back-end JSON) or Person array (in the form state). */
   experimenters?: Person[];
+
+  storageRestriction?: any;
 }
 
 export interface PcrBatchRelationships {
@@ -21,6 +23,8 @@ export interface PcrBatchRelationships {
   primerReverse?: PcrPrimer;
   region?: Region;
   attachment?: ResourceIdentifierObject[];
+  storageUnitType?: ResourceIdentifierObject;
+  storageUnit?: ResourceIdentifierObject;
 }
 
 export type PcrBatch = KitsuResource &

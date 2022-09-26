@@ -10,14 +10,15 @@ import Stack from "react-bootstrap/Stack";
 import { Footer, Head, Nav } from "../components";
 import { DinaMessage, useDinaIntl } from "../intl/dina-ui-intl";
 import { SeqdbMessage } from "../intl/seqdb-intl";
+import { SUPER_USER } from "common-ui/types/DinaRoles";
 
 export function Home() {
   const { isAdmin, rolesPerGroup } = useAccount();
 
   const showManagementNavigation =
     Object.values(rolesPerGroup ?? {})
-      ?.flatMap(it => it)
-      ?.includes("collection-manager") || isAdmin;
+      ?.flatMap((it) => it)
+      ?.includes(SUPER_USER) || isAdmin;
 
   return (
     <div>
@@ -32,41 +33,42 @@ export function Home() {
                 <DinaMessage id="createNewLabel" />:
               </span>
 
-              <Button
-                href="/collection/material-sample/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="materialSample" />
-              </Button>
-              <Button
+              <Link href="/collection/material-sample/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="materialSample" />
+                </Button>
+              </Link>
+
+              <Link
                 href="/collection/material-sample/bulk-create"
-                variant="info"
-                className="mx-1 my-1"
+                passHref={true}
               >
-                <DinaMessage id="multipleMaterialSamples" />
-              </Button>
-              <Button
-                href="/collection/collecting-event/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="collectingEvent" />
-              </Button>
-              <Button
-                href="/loan-transaction/transaction/edit"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="loanTransaction" />
-              </Button>
-              <Button
-                href="/object-store/upload"
-                variant="info"
-                className="mx-1 my-1"
-              >
-                <DinaMessage id="uploadPageTitle" />
-              </Button>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="multipleMaterialSamples" />
+                </Button>
+              </Link>
+
+              <Link href="/collection/collecting-event/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="collectingEvent" />
+                </Button>
+              </Link>
+
+              <Link href="/loan-transaction/transaction/edit" passHref={true}>
+                <Button variant="info" className="mx-1 my-1">
+                  <DinaMessage id="loanTransaction" />
+                </Button>
+              </Link>
+
+              <Link href="/object-store/upload" passHref={true}>
+                <Button
+                  href="/object-store/upload"
+                  variant="info"
+                  className="mx-1 my-1"
+                >
+                  <DinaMessage id="uploadPageTitle" />
+                </Button>
+              </Link>
             </Card.Body>
           </Card>
 
@@ -84,11 +86,6 @@ export function Home() {
                     <DinaMessage id="collectingEventListTitle" />
                   </a>
                 </Link>
-                <Link href="/collection/managed-attributes-view/list">
-                  <a>
-                    <DinaMessage id="managedAttributesViews" />
-                  </a>
-                </Link>
                 <Link href="/collection/material-sample/list">
                   <a>
                     <DinaMessage id="materialSampleListTitle" />
@@ -102,11 +99,6 @@ export function Home() {
                 <Link href="/collection/storage-unit/list">
                   <a>
                     <DinaMessage id="storageUnitListTitle" />
-                  </a>
-                </Link>
-                <Link href="/collection/material-sample-custom-view/list">
-                  <a>
-                    <DinaMessage id="workflowTemplates" />
                   </a>
                 </Link>
               </Stack>
@@ -234,9 +226,9 @@ export function Home() {
                     <SeqdbMessage id="sangerWorkflowListTitle" />
                   </a>
                 </Link>
-                <Link href="/seqdb/pcr-profile/list">
+                <Link href="/seqdb/thermocycler-profile/list">
                   <a>
-                    <SeqdbMessage id="pcrProfileListTitle" />
+                    <SeqdbMessage id="thermocyclerProfileListTitle" />
                   </a>
                 </Link>
               </Stack>
@@ -250,6 +242,11 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
+                  <Link href="/collection/assemblage/list">
+                    <a>
+                      <DinaMessage id="title_assemblage" />
+                    </a>
+                  </Link>
                   <Link href="/collection/collection-method/list">
                     <a>
                       <DinaMessage id="collectionMethodListTitle" />
@@ -260,14 +257,14 @@ export function Home() {
                       <DinaMessage id="collectionListTitle" />
                     </a>
                   </Link>
-                  <Link href="/collection/managed-attributes-view/list">
-                    <a>
-                      <DinaMessage id="managedAttributesViews" />
-                    </a>
-                  </Link>
                   <Link href="/collection/extension/list">
                     <a>
                       <DinaMessage id="fieldExtensions" />
+                    </a>
+                  </Link>
+                  <Link href="/collection/form-template/list">
+                    <a>
+                      <DinaMessage id="formTemplates" />
                     </a>
                   </Link>
                   <Link href="/collection/institution/list">
@@ -286,6 +283,11 @@ export function Home() {
                     </a>
                   </Link>
                   {/* Permissions link here */}
+                  <Link href="/collection/preparation-method/list">
+                    <a>
+                      <DinaMessage id="title_preparationMethod" />
+                    </a>
+                  </Link>
                   <Link href="/collection/preparation-type/list">
                     <a>
                       <DinaMessage id="preparationTypeListTitle" />

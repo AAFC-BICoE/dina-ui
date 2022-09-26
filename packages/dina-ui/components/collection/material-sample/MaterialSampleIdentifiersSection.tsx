@@ -36,7 +36,7 @@ export function MaterialSampleIdentifiersSection({
   namePrefix = "",
   sampleNamePlaceHolder,
   hideUseSequence,
-  id = "identifiers-section"
+  id = "identifiers-component"
 }: MaterialSampleIdentifiersSectionProps) {
   const [{ value }] = useField("collection");
   const { readOnly, initialValues } = useDinaFormContext();

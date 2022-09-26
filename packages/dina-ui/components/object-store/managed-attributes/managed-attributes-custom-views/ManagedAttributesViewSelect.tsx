@@ -8,17 +8,17 @@ import {
 import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { CustomView } from "../../../../types/collection-api";
+import { FormTemplate } from "../../../../types/collection-api";
 import { useManagedAttributesViewEditModal } from "./managed-attributes-view-modal";
 
 export interface ManagedAttributesViewSelectProps {
   /**
    * The managed attribute component e.g. MATERIAL_SAMPLE.
-   * Passed as a filter to the custom-view query.
+   * Passed as a filter to the form-template query.
    */
   managedAttributeComponent?: string;
-  onChange: (newValue: PersistedResource<CustomView>) => void;
-  value?: PersistedResource<CustomView>;
+  onChange: (newValue: PersistedResource<FormTemplate>) => void;
+  value?: PersistedResource<FormTemplate>;
 }
 
 /** Selector for Managed Attributes Views. Has a button to edit the View in a modal. */
@@ -38,15 +38,15 @@ export function ManagedAttributesViewSelect({
       <label style={{ width: "20rem", marginTop: "15px" }}>
         <div className="mb-2">
           <strong>
-            <DinaMessage id="customView" />
+            <DinaMessage id="formTemplate" />
           </strong>
           <Tooltip id="field_visibleManagedAttributes_tooltip" />
         </div>
         <FieldSpy<string> fieldName="group">
           {group => (
-            <ResourceSelect<CustomView>
+            <ResourceSelect<FormTemplate>
               filter={input => ({
-                // Filter by "managed-attributes-view" to omit unrelated custom-view records:
+                // Filter by "managed-attributes-view" to omit unrelated form-template records:
                 "viewConfiguration.type": "managed-attributes-view",
                 ...(managedAttributeComponent && {
                   "viewConfiguration.managedAttributeComponent":
@@ -58,9 +58,9 @@ export function ManagedAttributesViewSelect({
                 ...(group && { group: { EQ: `${group}` } })
               })}
               optionLabel={view => view.name || view.id}
-              model="collection-api/custom-view"
+              model="collection-api/form-template"
               onChange={newVal => {
-                onChange(newVal as PersistedResource<CustomView>);
+                onChange(newVal as PersistedResource<FormTemplate>);
                 setLastUpdate(Date.now());
               }}
               value={value}
@@ -68,7 +68,7 @@ export function ManagedAttributesViewSelect({
               key={lastUpdate}
               asyncOptions={[
                 {
-                  label: formatMessage("createCustomView"),
+                  label: formatMessage("createFormTemplate"),
                   // Open the modal for creating a new custom view:
                   getResource: () =>
                     new Promise(resolve => {
@@ -82,11 +82,11 @@ export function ManagedAttributesViewSelect({
       </label>
       {value?.id && (
         <FormikButton
-          className="btn btn-outline-secondary custom-view-edit-button"
+          className="btn btn-outline-secondary form-template-edit-button"
           // Open the custom view's editor modal, then
           onClick={() => openManagedAttributesViewEditModal(value.id, onChange)}
         >
-          <DinaMessage id="editThisCustomView" />
+          <DinaMessage id="editThisFormTemplate" />
         </FormikButton>
       )}
     </div>

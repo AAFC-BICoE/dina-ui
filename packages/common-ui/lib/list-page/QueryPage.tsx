@@ -1,13 +1,14 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule } from "react-table";
+import ReactTable, { TableProps, SortingRule, Column } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
 import { QueryBuilder } from "./QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
+import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import {
   transformQueryToDSL,
   TransformQueryToDSLParams
@@ -25,13 +26,14 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep } from "lodash";
+import { cloneDeep, toPairs, uniqBy } from "lodash";
 import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
+import { FormikContextType } from "formik";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -80,6 +82,9 @@ export interface QueryPageProps<TData extends KitsuResource> {
    */
   bulkEditPath?: string;
 
+  /** Query path if user selected only 1 item */
+  singleEditPath?: string;
+
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 
@@ -91,12 +96,49 @@ export interface QueryPageProps<TData extends KitsuResource> {
       ) => Partial<TableProps>);
 
   /**
+   * When enabled, the user will see the results table with a selection table.
+   *
+   * QueryBuilder and Saved Searches will appear as normal.
+   *
+   * Bulk editing mode is disabled in this mode.
+   */
+  selectionMode?: boolean;
+
+  /**
+   * If selection mode is enabled, this must be set.
+   *
+   * Outside of the QueryPage, a react state must be setup to hold the resources that have been
+   * selected.
+   *
+   * These are the currently selected resources which will be displayed on the right table of the
+   * selection mode QueryPage.
+   */
+  selectionResources?: TData[];
+
+  /**
+   * If selection mode is enabled, this must be set.
+   *
+   * This will be used to set selection mode resources using the ">>" or "<<" options.
+   */
+  setSelectionResources?: React.Dispatch<React.SetStateAction<TData[]>>;
+
+  /**
    * Event prop triggered when the user changes the sort settings.
    *
    * @param SortingRule[] rules for sorting. Contains the id (column name) and
    *        sorting order.
    */
   onSortedChange?: (newSort: SortingRule[]) => void;
+
+  /**
+   * Boolean flag to display only the result table when true
+   */
+  viewMode?: boolean;
+
+  /**
+   * Custom elastic search query given by calling component
+   */
+  customViewQuery?: TransformQueryToDSLParams;
 }
 
 /**
@@ -114,9 +156,15 @@ export function QueryPage<TData extends KitsuResource>({
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
+  singleEditPath,
   reactTableProps,
   defaultSort,
-  onSortedChange
+  selectionMode = false,
+  selectionResources: selectedResources,
+  setSelectionResources: setSelectedResources,
+  onSortedChange,
+  viewMode,
+  customViewQuery
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
@@ -130,16 +178,17 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Search filters for elastic search to apply.
   const [searchFilters, setSearchFilters] = useState<TransformQueryToDSLParams>(
-    {
-      group: groupNames?.[0] ?? "",
-      queryRows: [
-        {
-          fieldName: ""
+    customViewQuery
+      ? customViewQuery
+      : {
+          group: groupNames?.[0] ?? "",
+          queryRows: [
+            {
+              fieldName: ""
+            }
+          ]
         }
-      ]
-    }
   );
-
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
@@ -176,15 +225,14 @@ export function QueryPage<TData extends KitsuResource>({
       sortingRules,
       cloneDeep(searchFilters)
     );
-
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) return;
 
     // Fetch data using elastic search.
     // The included section will be transformed from an array to an object with the type name for each relationship.
     elasticSearchRequest(queryDSL)
-      .then(result => {
-        const processedResult = result?.hits.map(rslt => ({
+      .then((result) => {
+        const processedResult = result?.hits.map((rslt) => ({
           id: rslt._source?.data?.id,
           type: rslt._source?.data?.type,
           data: {
@@ -197,25 +245,24 @@ export function QueryPage<TData extends KitsuResource>({
             {}
           )
         }));
-
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
           elasticSearchCountRequest(queryDSL)
-            .then(countResult => {
+            .then((countResult) => {
               setTotalRecords(countResult);
             })
-            .catch(elasticSearchError => {
+            .catch((elasticSearchError) => {
               setError(elasticSearchError);
             });
         } else {
           setTotalRecords(result?.total?.value ?? 0);
         }
 
-        setAvailableSamples(processedResult);
+        setAvailableResources(processedResult);
         setSearchResults(processedResult);
       })
-      .catch(elasticSearchError => {
+      .catch((elasticSearchError) => {
         setError(elasticSearchError);
       })
       .finally(() => {
@@ -226,8 +273,90 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Actions to perform when the QueryPage is first mounted.
   useEffect(() => {
-    loadSavedSearch("default");
+    if (!viewMode) {
+      loadSavedSearch("default");
+    }
   }, []);
+
+  /**
+   * Used for selection mode only.
+   *
+   * Takes all of the checked items from the search results, and moves them to the right table to
+   * mark them as selected.
+   *
+   * @param formValues Current form values.
+   * @param formik Formik Context
+   */
+  function moveSelectedResultsToSelectedResources(
+    formValues,
+    formik: FormikContextType<any>
+  ) {
+    // Ensure selectedResources has been setup correctly.
+    if (!selectedResources || !setSelectedResources) {
+      console.error(
+        "selectionResources and setSelectionResources states must be passed to QueryPage in order to Selection Mode."
+      );
+      return;
+    }
+
+    const itemIdsToSelect = formValues.itemIdsToSelect;
+
+    const ids = toPairs(itemIdsToSelect)
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
+
+    const selectedObjects = searchResults.filter((itemA) => {
+      return ids.find((itemB) => {
+        return itemA.id === itemB;
+      });
+    });
+
+    // Append the newly selected resources with the current resources.
+    const selectedResourcesAppended = uniqBy(
+      [...selectedResources, ...selectedObjects],
+      "id"
+    );
+
+    setSelectedResources(selectedResourcesAppended);
+    setRemovableItems(selectedResourcesAppended);
+
+    // Deselect the search results.
+    formik.setFieldValue("itemIdsToSelect", {});
+  }
+
+  /**
+   * Used for selection mode only.
+   *
+   * Removes the selected resources checked.
+   *
+   * @param formValues Current form values.
+   * @param formik Formik Context
+   */
+  function removeSelectedResources(formValues, formik: FormikContextType<any>) {
+    // Ensure selectedResources has been setup correctly.
+    if (!selectedResources || !setSelectedResources) {
+      console.error(
+        "selectionResources and setSelectionResources states must be passed to QueryPage in order to Selection Mode."
+      );
+      return;
+    }
+
+    const itemIdsToDelete = formValues.itemIdsToDelete;
+
+    const ids = toPairs(itemIdsToDelete)
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
+
+    const unselectedObjects = selectedResources.filter((itemA) => {
+      return !ids.find((itemB) => {
+        return itemA.id === itemB;
+      });
+    });
+
+    setRemovableItems(unselectedObjects);
+    setSelectedResources(unselectedObjects);
+    formik.setFieldValue("itemIdsToDelete", {});
+  }
 
   /**
    * Using the user preferences, load the saved search name into the search filters.
@@ -240,7 +369,7 @@ export function QueryPage<TData extends KitsuResource>({
     if (!savedSearchName) return;
 
     // Reload the user preferences incase they have changed.
-    retrieveUserPreferences(userPreference => {
+    retrieveUserPreferences((userPreference) => {
       setLoadedSavedSearch(savedSearchName);
 
       // User preference must be returned.
@@ -274,12 +403,12 @@ export function QueryPage<TData extends KitsuResource>({
           userId: subject as FilterParam
         }
       })
-      .then(response => {
+      .then((response) => {
         // Set the user preferences to be a state for the QueryPage.
         setUserPreferences(response?.data?.[0]);
         callback(response?.data?.[0]);
       })
-      .catch(userPreferenceError => {
+      .catch((userPreferenceError) => {
         setError(userPreferenceError);
         callback(undefined);
       });
@@ -328,33 +457,45 @@ export function QueryPage<TData extends KitsuResource>({
     return resp?.data?.count;
   }
 
+  // Checkbox for the first table that lists the search results
   const {
-    CheckBoxField,
-    CheckBoxHeader,
-    setAvailableItems: setAvailableSamples
+    CheckBoxField: SelectCheckBox,
+    CheckBoxHeader: SelectCheckBoxHeader,
+    setAvailableItems: setAvailableResources
   } = useGroupedCheckBoxes({
-    fieldName: "selectedResources",
+    fieldName: "itemIdsToSelect",
     defaultAvailableItems: searchResults ?? []
+  });
+
+  // Checkbox for second table where selected/to be deleted items are displayed
+  const {
+    CheckBoxField: DeselectCheckBox,
+    CheckBoxHeader: DeselectCheckBoxHeader,
+    setAvailableItems: setRemovableItems
+  } = useGroupedCheckBoxes({
+    fieldName: "itemIdsToDelete",
+    defaultAvailableItems: selectedResources ?? []
   });
 
   const computedReactTableProps =
     typeof reactTableProps === "function"
       ? reactTableProps(
           searchResults as PersistedResource<TData>[],
-          CheckBoxField
+          SelectCheckBox
         )
       : reactTableProps;
 
   const resolvedReactTableProps = { sortingRules, ...computedReactTableProps };
 
-  const combinedColumns: TableColumn<TData>[] = [
-    ...(showRowCheckboxes
+  // Columns generated for the search results.
+  const columnsResults: TableColumn<TData>[] = [
+    ...(showRowCheckboxes || selectionMode
       ? [
           {
             Cell: ({ original: resource }) => (
-              <CheckBoxField key={resource.id} resource={resource} />
+              <SelectCheckBox key={resource.id} resource={resource} />
             ),
-            Header: CheckBoxHeader,
+            Header: SelectCheckBoxHeader,
             sortable: false,
             width: 200
           }
@@ -363,7 +504,39 @@ export function QueryPage<TData extends KitsuResource>({
     ...columns
   ];
 
-  const mappedColumns = combinedColumns.map(column => {
+  // Columns generated for the selected resources, only in selection mode.
+  const columnsSelected: TableColumn<TData>[] = [
+    ...(selectionMode
+      ? [
+          {
+            Cell: ({ original: resource }) => (
+              <DeselectCheckBox key={resource.id} resource={resource} />
+            ),
+            Header: DeselectCheckBoxHeader,
+            sortable: false,
+            width: 200
+          }
+        ]
+      : []),
+    ...columns
+  ];
+
+  const mappedResultsColumns = columnsResults.map((column) => {
+    const { fieldName, customHeader } = {
+      customHeader: column.Header,
+      fieldName: String(column.label)
+    };
+
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
+
+    return {
+      Header,
+      ...column
+    };
+  });
+
+  const mappedSelectedColumns = columnsSelected.map((column) => {
+    // The "columns" prop can be a string or a react-table Column type.
     const { fieldName, customHeader } = {
       customHeader: column.Header,
       fieldName: String(column.label)
@@ -461,46 +634,54 @@ export function QueryPage<TData extends KitsuResource>({
 
   return (
     <DinaForm key={uuidv4()} initialValues={searchFilters} onSubmit={onSubmit}>
-      <label
-        style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
-      >
-        <DinaMessage id="search" />
-      </label>
+      {!viewMode && (
+        <label
+          style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
+        >
+          <DinaMessage id="search" />
+        </label>
+      )}
 
       {/* Query Filtering Options */}
-      <QueryBuilder
-        name="queryRows"
-        indexName={indexName}
-        onGroupChange={onSubmit}
-      />
+      {!viewMode && (
+        <QueryBuilder
+          name="queryRows"
+          indexName={indexName}
+          onGroupChange={onSubmit}
+        />
+      )}
 
       <div className="d-flex mb-3">
-        <div className="flex-grow-1">
-          {/* Saved Searches */}
-          <label className="group-field d-flex gap-2 align-items-center mb-2">
-            <div className="field-label">
-              <strong>Saved Searches</strong>
-            </div>
-            <div className="flex-grow-1">
-              <SavedSearch
-                indexName={indexName}
-                userPreferences={cloneDeep(userPreferences)}
-                loadedSavedSearch={loadedSavedSearch}
-                loadSavedSearch={loadSavedSearch}
-              />
-            </div>
-          </label>
-        </div>
-        <div>
-          {/* Action Buttons */}
-          <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
-          <FormikButton
-            className="btn btn-secondary mx-2"
-            onClick={(_, formik) => resetForm(formik)}
-          >
-            <DinaMessage id="resetFilters" />
-          </FormikButton>
-        </div>
+        {!viewMode && (
+          <div className="flex-grow-1">
+            {/* Saved Searches */}
+            <label className="group-field d-flex gap-2 align-items-center mb-2">
+              <div className="field-label">
+                <strong>Saved Searches</strong>
+              </div>
+              <div className="flex-grow-1">
+                <SavedSearch
+                  indexName={indexName}
+                  userPreferences={cloneDeep(userPreferences)}
+                  loadedSavedSearch={loadedSavedSearch}
+                  loadSavedSearch={loadSavedSearch}
+                />
+              </div>
+            </label>
+          </div>
+        )}
+        {!viewMode && (
+          <div>
+            {/* Action Buttons */}
+            <SubmitButton>{formatMessage({ id: "search" })}</SubmitButton>
+            <FormikButton
+              className="btn btn-secondary mx-2"
+              onClick={(_, formik) => resetForm(formik)}
+            >
+              <DinaMessage id="resetFilters" />
+            </FormikButton>
+          </div>
+        )}
       </div>
 
       <div
@@ -508,88 +689,141 @@ export function QueryPage<TData extends KitsuResource>({
         role="search"
         aria-label={formatMessage({ id: "queryTable" })}
       >
-        <div className="mb-1">
-          <div className="d-flex align-items-end">
-            <span id="queryPageCount">
-              {/* Loading indicator when total is not calculated yet. */}
-              {loading ? (
-                <LoadingSpinner loading={true} />
-              ) : (
-                <CommonMessage
-                  id="tableTotalCount"
-                  values={{ totalCount: totalRecords }}
-                />
+        <div className="row">
+          <div className={selectionMode ? "col-5" : "col-12"}>
+            <div className="d-flex align-items-end">
+              <span id="queryPageCount">
+                {/* Loading indicator when total is not calculated yet. */}
+                {loading ? (
+                  <LoadingSpinner loading={true} />
+                ) : (
+                  <CommonMessage
+                    id="tableTotalCount"
+                    values={{ totalCount: totalRecords }}
+                  />
+                )}
+              </span>
+
+              {/* Multi sort tooltip - Only shown if it's possible to sort */}
+              {resolvedReactTableProps?.sortable !== false && (
+                <MultiSortTooltip />
               )}
-            </span>
 
-            {/* Multi sort tooltip - Only shown if it's possible to sort */}
-            {resolvedReactTableProps?.sortable !== false && (
-              <MultiSortTooltip />
-            )}
-
-            <div className="d-flex gap-3">
-              {bulkEditPath && <BulkEditButton pathname={bulkEditPath} />}
-              {bulkDeleteButtonProps && (
-                <BulkDeleteButton {...bulkDeleteButtonProps} />
+              {/* Bulk edit buttons - Only shown when not in selection mode. */}
+              {!selectionMode && (
+                <div className="d-flex gap-3 mb-2">
+                  {bulkEditPath && (
+                    <BulkEditButton
+                      pathname={bulkEditPath}
+                      singleEditPathName={singleEditPath}
+                    />
+                  )}
+                  {bulkDeleteButtonProps && (
+                    <BulkDeleteButton {...bulkDeleteButtonProps} />
+                  )}
+                </div>
               )}
             </div>
+            <ReactTable
+              // Column and data props
+              columns={mappedResultsColumns}
+              data={searchResults}
+              minRows={1}
+              // Loading Table props
+              loading={loading}
+              // Pagination props
+              manual={true}
+              pageSize={pagination.limit}
+              pages={
+                totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0
+              }
+              page={pagination.offset / pagination.limit}
+              onPageChange={onPageChange}
+              onPageSizeChange={onPageSizeChange}
+              pageText={<CommonMessage id="page" />}
+              noDataText={<CommonMessage id="noRowsFound" />}
+              ofText={<CommonMessage id="of" />}
+              rowsText={formatMessage({ id: "rows" })}
+              previousText={<CommonMessage id="previous" />}
+              nextText={<CommonMessage id="next" />}
+              // Sorting props
+              onSortedChange={onSortChange}
+              sorted={sortingRules}
+              // Table customization props
+              {...resolvedReactTableProps}
+              className="-striped"
+              TbodyComponent={
+                error
+                  ? () => (
+                      <div
+                        className="alert alert-danger"
+                        style={{
+                          whiteSpace: "pre-line"
+                        }}
+                      >
+                        <p>
+                          {error.errors?.map((e) => e.detail).join("\n") ??
+                            String(error)}
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => {
+                            const newSort = defaultSort ?? DEFAULT_SORT;
+                            setError(undefined);
+                            onSortChange(newSort);
+                          }}
+                        >
+                          <CommonMessage id="resetSort" />
+                        </button>
+                      </div>
+                    )
+                  : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
+              }
+            />
           </div>
-        </div>
-        <ReactTable
-          // Column and data props
-          columns={mappedColumns}
-          data={searchResults}
-          minRows={1}
-          // Loading Table props
-          loading={loading}
-          // Pagination props
-          manual={true}
-          pageSize={pagination.limit}
-          pages={totalRecords ? Math.ceil(totalRecords / pagination.limit) : 0}
-          page={pagination.offset / pagination.limit}
-          onPageChange={onPageChange}
-          onPageSizeChange={onPageSizeChange}
-          pageText={<CommonMessage id="page" />}
-          noDataText={<CommonMessage id="noRowsFound" />}
-          ofText={<CommonMessage id="of" />}
-          rowsText={formatMessage({ id: "rows" })}
-          previousText={<CommonMessage id="previous" />}
-          nextText={<CommonMessage id="next" />}
-          // Sorting props
-          onSortedChange={onSortChange}
-          sorted={sortingRules}
-          // Table customization props
-          {...resolvedReactTableProps}
-          className="-striped"
-          TbodyComponent={
-            error
-              ? () => (
-                  <div
-                    className="alert alert-danger"
-                    style={{
-                      whiteSpace: "pre-line"
-                    }}
+          {selectionMode && (
+            <>
+              <div className="col-2 mt-5">
+                <div className="select-all-checked-button">
+                  <FormikButton
+                    className="btn btn-primary w-100 mb-5"
+                    onClick={moveSelectedResultsToSelectedResources}
                   >
-                    <p>
-                      {error.errors?.map(e => e.detail).join("\n") ??
-                        String(error)}
-                    </p>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        const newSort = defaultSort ?? DEFAULT_SORT;
-                        setError(undefined);
-                        onSortChange(newSort);
-                      }}
-                    >
-                      <CommonMessage id="resetSort" />
-                    </button>
-                  </div>
-                )
-              : resolvedReactTableProps?.TbodyComponent ?? DefaultTBody
-          }
-        />
+                    <FiChevronsRight />
+                  </FormikButton>
+                </div>
+                <div className="deselect-all-checked-button">
+                  <FormikButton
+                    className="btn btn-dark w-100 mb-5"
+                    onClick={removeSelectedResources}
+                  >
+                    <FiChevronsLeft />
+                  </FormikButton>
+                </div>
+              </div>
+              <div className="col-5">
+                <span id="selectedResourceCount">
+                  <CommonMessage
+                    id="tableSelectedCount"
+                    values={{ totalCount: selectedResources?.length ?? 0 }}
+                  />
+                </span>
+                <ReactTable
+                  columns={mappedSelectedColumns}
+                  data={selectedResources}
+                  minRows={1}
+                  pageText={<CommonMessage id="page" />}
+                  noDataText={<CommonMessage id="noRowsFound" />}
+                  ofText={<CommonMessage id="of" />}
+                  rowsText={formatMessage({ id: "rows" })}
+                  previousText={<CommonMessage id="previous" />}
+                  nextText={<CommonMessage id="next" />}
+                />
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </DinaForm>
   );

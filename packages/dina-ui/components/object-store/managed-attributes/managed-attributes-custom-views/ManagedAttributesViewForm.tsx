@@ -7,15 +7,15 @@ import {
   FieldSpy,
   SelectField,
   SubmitButton,
-  TextField
+  TextField,
+  useQuery
 } from "common-ui";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 import * as yup from "yup";
 import { GroupSelectField } from "../../..";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { ManagedAttributesViewFormProps } from "../../../../pages/collection/managed-attributes-view/edit";
 import {
-  CustomView,
+  FormTemplate,
   ManagedAttributesView,
   managedAttributesViewSchema
 } from "../../../../types/collection-api";
@@ -25,10 +25,32 @@ import {
 } from "../../../../types/collection-api/resources/ManagedAttribute";
 import { ManagedAttributesSorter } from "./ManagedAttributesSorter";
 
+export interface ManagedAttributesViewFormProps {
+  data?: InputResource<FormTemplate>;
+  /** Default component in the form's initialValues. */
+  defaultManagedAttributeComponent?: string;
+  /** Disable the attribute component field. */
+  disabledAttributeComponent?: boolean;
+  onSaved: (data: PersistedResource<FormTemplate>) => Promise<void>;
+}
+
+export function useManagedAttributesView(id?: string) {
+  return useQuery<FormTemplate>(
+    { path: `collection-api/form-template/${id}` },
+    {
+      onSuccess: async ({ data: fetchedView }) => {
+        // Throw an error if the wrong type of Form Template
+        managedAttributesViewSchema.validateSync(fetchedView.viewConfiguration);
+      },
+      disabled: !id
+    }
+  );
+}
+
 /**
  * Validate the JSON field on the front-end because it's unstructured JSON on the back-end.
  */
-const customViewSchema = yup.object({
+const formTemplateSchema = yup.object({
   viewConfiguration: managedAttributesViewSchema
 });
 
@@ -45,17 +67,17 @@ export function ManagedAttributesViewForm({
   };
 
   const initialValues = data ?? {
-    type: "custom-view",
+    type: "form-template",
     restrictToCreatedBy: true,
     viewConfiguration: initialViewConfiguration
   };
 
-  const onSubmit: DinaFormOnSubmit<InputResource<CustomView>> = async ({
+  const onSubmit: DinaFormOnSubmit<InputResource<FormTemplate>> = async ({
     submittedValues,
     api: { save }
   }) => {
-    const [savedView] = await save<CustomView>(
-      [{ resource: submittedValues, type: "custom-view" }],
+    const [savedView] = await save<FormTemplate>(
+      [{ resource: submittedValues, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
     );
     await onSaved(savedView);
@@ -76,7 +98,7 @@ export function ManagedAttributesViewForm({
       <DinaForm
         initialValues={initialValues}
         onSubmit={onSubmit}
-        validationSchema={customViewSchema}
+        validationSchema={formTemplateSchema}
       >
         {buttonBar}
         <ManagedAttributesViewFormLayout

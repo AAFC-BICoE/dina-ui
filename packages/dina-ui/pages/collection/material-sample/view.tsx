@@ -12,8 +12,6 @@ import { isEmpty } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { withRouter } from "next/router";
-import { GenerateLabelSection } from "../../../../dina-ui/components/collection/material-sample/GenerateLabelSection";
-import { RestrictionField } from "../../../../dina-ui/components/collection/material-sample/RestrictionField";
 import InheritedDeterminationSection from "../../../components/collection/material-sample/InheritedDeterminationSection";
 import {
   AssociationsField,
@@ -31,6 +29,8 @@ import {
   PreparationField,
   PREPARATION_FIELDS,
   ProjectSelectSection,
+  AssemblageSelectSection,
+  TagSelectReadOnly,
   SamplesView,
   ScheduledActionsField,
   StorageLinkerField,
@@ -46,6 +46,8 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { MaterialSample } from "../../../types/collection-api";
+import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
+import { PersistedResource } from "kitsu";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -73,40 +75,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     materialSampleQuery.response?.data?.acquisitionEvent?.id
   );
 
-  const buttonBar = id && (
-    <ButtonBar className="flex">
-      <BackButton
-        entityId={id}
-        entityLink="/collection/material-sample"
-        byPassView={true}
-        className="me-auto"
-      />
-      <EditButton entityId={id} entityLink="collection/material-sample" />
-      <Link href={`/collection/material-sample/bulk-create?splitFromId=${id}`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="splitButton" />
-        </a>
-      </Link>
-      <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
-        <a className="btn btn-primary">
-          <DinaMessage id="duplicate" />
-        </a>
-      </Link>
-      <Link href={`/collection/material-sample/revisions?id=${id}`}>
-        <a className="btn btn-info ms-5">
-          <DinaMessage id="revisionsButtonText" />
-        </a>
-      </Link>
-      <DeleteButton
-        className="ms-5"
-        id={id}
-        options={{ apiBaseUrl: "/collection-api" }}
-        postDeleteRedirect="/collection/material-sample/list"
-        type="material-sample"
-      />
-    </ButtonBar>
-  );
-
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
       <a>{highestParentMaterialSample}</a>
@@ -117,38 +85,26 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     <div>
       {withResponse(materialSampleQuery, ({ data: materialSampleData }) => {
         const materialSample = withOrganismEditorValues(materialSampleData);
-
+        const buttonBar = buttonBarComponent(materialSample);
         const hasPreparations = PREPARATION_FIELDS.some(
-          fieldName => !isEmpty(materialSample[fieldName])
+          (fieldName) => !isEmpty(materialSample[fieldName])
         );
 
         const hasOrganism = materialSample?.organism?.some(
-          org => !isEmpty(org)
+          (org) => !isEmpty(org)
         );
 
-        // Find first parent with targetOrganismPrimaryDetermination in hierachy
-        const parentWithDetermination = hasOrganism
+        const hasInheritedDetermination = hasOrganism
           ? null
-          : materialSample?.hierarchy?.find(hierachyItem =>
-              hierachyItem.hasOwnProperty("targetOrganismPrimaryDetermination")
+          : materialSample?.hierarchy?.find((hierachyItem) =>
+              hierachyItem.hasOwnProperty("organismPrimaryDetermination")
             );
-
-        const inheritedDetermination =
-          parentWithDetermination?.targetOrganismPrimaryDetermination;
-
-        const targetOrganismPrimaryDeterminationParentLink = (
-          <Link
-            href={`/collection/material-sample/view?id=${parentWithDetermination?.uuid}`}
-          >
-            <a>{parentWithDetermination?.name}</a>
-          </Link>
-        );
 
         /* Consider as having association if either host organism any field has value or having any non empty association in the array */
         const hasAssociations =
-          materialSample?.associations?.some(assct => !isEmpty(assct)) ||
+          materialSample?.associations?.some((assct) => !isEmpty(assct)) ||
           HOSTORGANISM_FIELDS.some(
-            fieldName => materialSample.hostOrganism?.[fieldName]
+            (fieldName) => materialSample.hostOrganism?.[fieldName]
           );
 
         return (
@@ -174,15 +130,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 />
                 <div className="d-flex flex-row gap-2">
                   <TagsAndRestrictionsSection />
-                  <ProjectSelectSection />
                 </div>
-                <div className="mb-3">
-                  <div className="col-md-6">
-                    <GenerateLabelSection
-                      title={<DinaMessage id="generateLabel" />}
-                      materialSample={materialSample}
-                    />
-                  </div>
+                <div className="d-flex flex-row gap-2">
+                  <TagSelectReadOnly />
+                  <ProjectSelectSection />
+                  <AssemblageSelectSection />
                 </div>
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
@@ -228,7 +180,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 ))}
                 {withResponse(acqEventQuery, ({ data: acqEvent }) => (
                   <FieldSet
-                    id="acquisition-event-section"
+                    id="acquisition-event-component"
                     legend={<DinaMessage id="acquisitionEvent" />}
                   >
                     <DinaForm initialValues={acqEvent} readOnly={true}>
@@ -247,14 +199,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 ))}
                 {hasPreparations && <PreparationField />}
                 {hasOrganism && <OrganismsField name="organism" />}
-                {inheritedDetermination && (
+                {hasInheritedDetermination && (
                   <div className="row">
                     <div className="col-md-6">
                       <InheritedDeterminationSection
-                        inheritedDetermination={inheritedDetermination}
-                        parentLink={
-                          targetOrganismPrimaryDeterminationParentLink
-                        }
                         materialSample={materialSample}
                       />
                     </div>
@@ -283,7 +231,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"
                       managedAttributeComponent="MATERIAL_SAMPLE"
-                      showCustomViewDropdown={true}
+                      showFormTemplateDropdown={true}
                     />
                   </div>
                 </div>
@@ -307,6 +255,49 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <Footer />
     </div>
   );
+
+  function buttonBarComponent(
+    materialSample: PersistedResource<MaterialSample>
+  ) {
+    return (
+      id && (
+        <ButtonBar className="flex">
+          <BackButton
+            entityId={id}
+            entityLink="/collection/material-sample"
+            byPassView={true}
+            className="me-auto"
+          />
+          <EditButton entityId={id} entityLink="collection/material-sample" />
+          <Link
+            href={`/collection/material-sample/bulk-create?splitFromId=${id}`}
+          >
+            <a className="btn btn-primary">
+              <DinaMessage id="splitButton" />
+            </a>
+          </Link>
+          <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
+            <a className="btn btn-primary">
+              <DinaMessage id="duplicate" />
+            </a>
+          </Link>
+          <GenerateLabelDropdownButton materialSample={materialSample} />
+          <Link href={`/collection/material-sample/revisions?id=${id}`}>
+            <a className="btn btn-info ms-5">
+              <DinaMessage id="revisionsButtonText" />
+            </a>
+          </Link>
+          <DeleteButton
+            className="ms-5"
+            id={id}
+            options={{ apiBaseUrl: "/collection-api" }}
+            postDeleteRedirect="/collection/material-sample/list"
+            type="material-sample"
+          />
+        </ButtonBar>
+      )
+    );
+  }
 }
 
 export default withRouter(MaterialSampleViewPage);
