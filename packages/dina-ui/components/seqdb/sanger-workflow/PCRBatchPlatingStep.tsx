@@ -1,5 +1,6 @@
 import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { useState, useEffect } from "react";
 
 export interface PCRBatchPlatingStepProps {
     pcrBatchId: string;
@@ -8,7 +9,11 @@ export interface PCRBatchPlatingStepProps {
   export function PCRBatchPlatingStep({
     pcrBatchId
   }: PCRBatchPlatingStepProps) {
-    return(
+
+  // State to keep track if in edit mode.
+  const [editMode, setEditMode] = useState(false);
+
+    return editMode ? (
       <>
       <h2>Library Prep Batch</h2>
       <button
@@ -19,7 +24,7 @@ export interface PCRBatchPlatingStepProps {
         Edit Batch Details
       </button>
       <div className="mb-3">
-        <div>test</div>
+        <p>My First Paragraph</p>
       </div>
       <div className="mb-3 list-inline">
           <a className="list-inline-item btn btn-primary">
@@ -41,7 +46,7 @@ export interface PCRBatchPlatingStepProps {
             <Tab>Substep 3: Index Assignment</Tab>
           </TabList>
           <TabPanel>
-            <div>test</div>
+          <p>My First Paragraph</p>
           </TabPanel>
           <TabPanel>
             {/* <SampleGrid
@@ -58,15 +63,16 @@ export interface PCRBatchPlatingStepProps {
                 <Tab>Assign by table</Tab>
               </TabList>
               <TabPanel>
-              <div>test</div>
+              <p>My First Paragraph</p>
               </TabPanel>
               <TabPanel>
-                <div>test</div>
+                <p>My First Paragraph</p>
               </TabPanel>
             </Tabs>
           </TabPanel>
         </Tabs>
       </div>
     </>
-    ) 
-  }
+    ) : ( <p>My First Paragraph</p>);
+}
+
