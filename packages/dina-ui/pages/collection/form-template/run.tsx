@@ -17,10 +17,7 @@ import {
   MaterialSampleForm
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import {
-  FormTemplate,
-  MaterialSampleFormSectionId
-} from "../../../types/collection-api";
+import { FormTemplate } from "../../../types/collection-api";
 
 export default function CreateMaterialSampleFromWorkflowPage() {
   const router = useRouter();

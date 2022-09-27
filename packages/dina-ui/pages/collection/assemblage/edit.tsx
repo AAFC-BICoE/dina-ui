@@ -9,7 +9,10 @@ import {
   useDinaFormContext,
   useQuery,
   withResponse,
-  Tooltip
+  Tooltip,
+  useAccount,
+  FieldSet,
+  QueryPage
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -24,6 +27,9 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
+import { TransformQueryToDSLParams } from "packages/common-ui/lib/util/transformToDSL";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import Link from "next/link";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -166,8 +172,44 @@ export function AssemblageForm({
 }
 
 export function AssemblageFormLayout() {
-  const { initialValues } = useDinaFormContext();
+  const { initialValues, readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
+  const uuid = String(router?.query?.id);
+
+  const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
+    ? {
+        queryRows: [
+          {
+            fieldName: "data.relationships.assemblages.data.id",
+            type: "uuid",
+            matchValue: uuid
+          }
+        ]
+      }
+    : undefined;
+
+  // Columns for the elastic search list page.
+  const columns: TableColumn<Assemblage>[] = [
+    // Material Sample Name
+    {
+      Cell: ({ original: { id, data } }) => (
+        <Link
+          href={`/collection/material-sample/view?id=${id}`}
+          passHref={true}
+        >
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    }
+  ];
 
   return (
     <div>
@@ -228,6 +270,16 @@ export function AssemblageFormLayout() {
         attachmentPath={`collection-api/assemblage/${initialValues?.id}/attachment`}
         hideAddAttchmentBtn={true}
       />
+      {readOnly && (
+        <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
+          <QueryPage
+            columns={columns}
+            indexName={"dina_material_sample_index"}
+            viewMode={readOnly}
+            customViewQuery={customViewQuery}
+          />
+        </FieldSet>
+      )}
     </div>
   );
 }
