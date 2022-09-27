@@ -2,6 +2,7 @@ import {
   DinaFormSection,
   FieldWrapperProps,
   LoadingSpinner,
+  SelectField,
   useApiClient
 } from "..";
 import { QueryRow } from "./QueryRow";
@@ -11,6 +12,23 @@ import { useMemo } from "react";
 import { v4 as uuidv4 } from "uuid";
 import useSWR from "swr";
 import { ESIndexMapping } from "./types";
+
+import {
+  Query,
+  Builder,
+  Utils as QbUtils,
+  BasicConfig
+} from "react-awesome-query-builder";
+import { useState, useCallback } from "react";
+import {
+  JsonGroup,
+  Config,
+  ImmutableTree,
+  BuilderProps
+} from "react-awesome-query-builder";
+import { Button } from "react-bootstrap";
+
+const queryValue: JsonGroup = { id: QbUtils.uuid(), type: "group" };
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
@@ -23,6 +41,97 @@ export function QueryBuilder({
   onGroupChange
 }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
+
+  const config: Config = {
+    conjunctions: {
+      ...BasicConfig.conjunctions
+    },
+    operators: {
+      equals: {
+        label: "equals"
+      }
+    },
+    widgets: {
+      ...BasicConfig.widgets
+    },
+    types: {
+      ...BasicConfig.types
+    },
+    fields: {
+      test: {
+        label: "test",
+        type: "number"
+      }
+    },
+    settings: {
+      ...BasicConfig.settings,
+      renderButton: (buttonProps) => {
+        if (buttonProps) {
+          switch (buttonProps?.type) {
+            case "addRule":
+            case "addGroup":
+              return (
+                <Button onClick={buttonProps?.onClick} className="ms-1">
+                  {buttonProps.label}
+                </Button>
+              );
+            case "delGroup":
+            case "delRule":
+            case "delRuleGroup":
+              return (
+                <Button
+                  onClick={buttonProps?.onClick}
+                  className="ms-1"
+                  variant="danger"
+                >
+                  Delete
+                </Button>
+              );
+          }
+        }
+
+        return (
+          <Button onClick={buttonProps?.onClick} className="ms-1">
+            {buttonProps?.label}
+          </Button>
+        );
+      },
+      renderField: (fieldDropdownProps) => (
+        <div style={{ width: "100%" }}>
+          <SelectField
+            name={fieldDropdownProps?.id ?? ""}
+            options={[]}
+            className={`flex-grow-1 me-2 ps-0`}
+            removeLabel={true}
+          />
+        </div>
+      ),
+      showNot: false,
+      canRegroup: true,
+      canReorder: true
+    }
+  };
+
+  const [state, setState] = useState({
+    tree: QbUtils.checkTree(QbUtils.loadTree(queryValue), config),
+    config
+  });
+
+  // Placeholder for now.
+  const onChange = () => {
+    return true;
+  };
+
+  const renderBuilder = useCallback(
+    (props: BuilderProps) => (
+      <div className="query-builder-container" style={{ padding: "10px" }}>
+        <div className="query-builder qb-lite">
+          <Builder {...props} />
+        </div>
+      </div>
+    ),
+    []
+  );
 
   /**
    * The query builder options are generated from the elastic search index. This method will
@@ -130,6 +239,12 @@ export function QueryBuilder({
 
   return (
     <>
+      <Query
+        {...config}
+        value={state.tree}
+        onChange={onChange}
+        renderBuilder={renderBuilder}
+      />
       <FieldArray name={name}>
         {(fieldArrayProps) => {
           const elements: [] = fieldArrayProps.form.values.queryRows;
