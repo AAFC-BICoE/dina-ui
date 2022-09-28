@@ -118,8 +118,10 @@ export function FormTemplateEditPageLoaded({
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
-    ...collectingEventInitialValues,
     ...fetchedFormTemplate,
+    ...materialSampleTemplateInitialValues,
+    ...collectingEventInitialValues,
+    ...acquisitionEventInitialValues,
     id,
     type: "form-template"
   };
@@ -162,7 +164,6 @@ export function FormTemplateEditPageLoaded({
       });
     };
     iterateThrough(allSubmittedValues);
-
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
@@ -194,7 +195,6 @@ export function FormTemplateEditPageLoaded({
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
     );
-
     await onSaved(savedDefinition);
   }
 
