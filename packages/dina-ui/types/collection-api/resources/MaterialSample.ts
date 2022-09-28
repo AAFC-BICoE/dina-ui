@@ -9,32 +9,9 @@ import { Collection } from "./Collection";
 import { ExtensionValue } from "./FieldExtension";
 import { MaterialSampleType } from "./MaterialSampleType";
 import { Organism } from "./Organism";
-import { PreparationMethod } from "./PreparationMethod";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
-
-/**
- * All Material Sample form sections in order.
- * This array is the source of truth for the section ID names and their order.
- */
-export const MATERIAL_SAMPLE_FORM_SECTIONS = [
-  "identifiers-section",
-  "material-sample-info-section",
-  "collecting-event-section",
-  "acquisition-event-section",
-  "preparations-section",
-  "organisms-section",
-  "associations-section",
-  "storage-section",
-  "restriction-section",
-  "scheduled-actions-section",
-  "managedAttributes-section",
-  "material-sample-attachments-section"
-] as const;
-
-export type MaterialSampleFormSectionId =
-  typeof MATERIAL_SAMPLE_FORM_SECTIONS[number];
 
 export interface MaterialSampleAttributes {
   type: "material-sample";

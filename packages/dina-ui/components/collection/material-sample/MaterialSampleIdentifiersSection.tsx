@@ -36,7 +36,7 @@ export function MaterialSampleIdentifiersSection({
   namePrefix = "",
   sampleNamePlaceHolder,
   hideUseSequence,
-  id = "identifiers-section"
+  id = "identifiers-component"
 }: MaterialSampleIdentifiersSectionProps) {
   const [{ value }] = useField("collection");
   const { readOnly, initialValues } = useDinaFormContext();
@@ -65,7 +65,7 @@ export function MaterialSampleIdentifiersSection({
             />
             {!readOnly && !hideUseSequence && (
               <CheckBoxField
-                onCheckBoxClick={event =>
+                onCheckBoxClick={(event) =>
                   setPrimaryIdDisabled(event.target.checked)
                 }
                 name="useNextSequence"

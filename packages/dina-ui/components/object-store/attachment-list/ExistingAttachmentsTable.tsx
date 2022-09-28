@@ -71,9 +71,9 @@ export function ExistingAttachmentsTable({
         }
 
         return metadata?.originalFilename ? (
-          <a href={`/object-store/object/view?id=${id}`}>
-            {metadata?.originalFilename}
-          </a>
+          <Link href={`/object-store/object/view?id=${id}`} passHref={true}>
+            <a>{metadata?.originalFilename}</a>
+          </Link>
         ) : null;
       },
       accessor: "metadata.originalFilename",
@@ -110,8 +110,8 @@ export function ExistingAttachmentsTable({
     selectedMetadatas
   }: AttachmentsTableFormValues) {
     const metadataIds = toPairs(selectedMetadatas)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
 
     openMetadataEditorModal({
       afterMetadatasSaved: onMetadatasEdited,
@@ -123,8 +123,8 @@ export function ExistingAttachmentsTable({
     selectedMetadatas
   }: AttachmentsTableFormValues) {
     const metadataIds = toPairs(selectedMetadatas)
-      .filter(pair => pair[1])
-      .map(pair => pair[0]);
+      .filter((pair) => pair[1])
+      .map((pair) => pair[0]);
 
     await onDetachMetadataIds?.(metadataIds);
   }
@@ -163,14 +163,14 @@ export function ExistingAttachmentsTable({
             apiBaseUrl: "/objectstore-api",
             idField: "id",
             joinField: "metadata",
-            path: metadataRef =>
+            path: (metadataRef) =>
               `metadata/${metadataRef.id}?include=acMetadataCreator`
           },
           {
             apiBaseUrl: "/agent-api",
             idField: "metadata.acMetadataCreator.id",
             joinField: "metadata.acMetadataCreator",
-            path: metadataRef =>
+            path: (metadataRef) =>
               `person/${metadataRef.metadata?.acMetadataCreator?.id}`
           }
         ]}
@@ -178,7 +178,7 @@ export function ExistingAttachmentsTable({
         path={attachmentPath}
         reactTableProps={{ sortable: false }}
         defaultPageSize={10000}
-        onSuccess={res => setAvailableMetadatas(res.data)}
+        onSuccess={(res) => setAvailableMetadatas(res.data)}
         ariaLabel="Existing attachments"
       />
     </DinaForm>
