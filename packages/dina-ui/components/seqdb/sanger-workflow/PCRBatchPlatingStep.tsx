@@ -6,25 +6,31 @@ export interface PCRBatchPlatingStepProps {
     pcrBatchId: string;
   }
 
-  export function PCRBatchPlatingStep({
+export function PCRBatchPlatingStep({
     pcrBatchId
-  }: PCRBatchPlatingStepProps) {
+}: PCRBatchPlatingStepProps) {
 
   // State to keep track if in edit mode.
   const [editMode, setEditMode] = useState(false);
 
+    /**
+   * When the page is first loaded, check if saved samples has already been chosen and reload them.
+   */
+     useEffect(() => {setEditMode(true)
+    });
+  
     return editMode ? (
       <>
       <h2>Library Prep Batch</h2>
       <button
         className="btn btn-primary mb-3"
-        onClick={() => null}
+        onClick={() => (true)}
         type="button"
       >
         Edit Batch Details
       </button>
       <div className="mb-3">
-        <p>My First Paragraph</p>
+      <p>My First Paragraph</p>
       </div>
       <div className="mb-3 list-inline">
           <a className="list-inline-item btn btn-primary">
@@ -45,16 +51,21 @@ export interface PCRBatchPlatingStepProps {
             <Tab>Substep 2: Container Grid</Tab>
             <Tab>Substep 3: Index Assignment</Tab>
           </TabList>
+          {/* <TabPanel>
+            <LibraryPrepBulkEditor
+              chain={chain}
+              editMode="DETAILS"
+              libraryPrepBatch={libraryPrepBatch}
+              sampleSelectionStep={sampleSelectionStep}
+            />
+          </TabPanel> */}
           <TabPanel>
           <p>My First Paragraph</p>
-          </TabPanel>
-          <TabPanel>
             {/* <SampleGrid
               chain={chain}
               libraryPrepBatch={libraryPrepBatch}
               sampleSelectionStep={sampleSelectionStep}
             /> */}
-            <div>test</div>
           </TabPanel>
           <TabPanel>
             <Tabs>
@@ -63,16 +74,23 @@ export interface PCRBatchPlatingStepProps {
                 <Tab>Assign by table</Tab>
               </TabList>
               <TabPanel>
-              <p>My First Paragraph</p>
-              </TabPanel>
-              <TabPanel>
                 <p>My First Paragraph</p>
               </TabPanel>
+              {/* <TabPanel>
+                <LibraryPrepBulkEditor
+                  chain={chain}
+                  editMode="INDEX"
+                  libraryPrepBatch={libraryPrepBatch}
+                  sampleSelectionStep={sampleSelectionStep}
+                />
+              </TabPanel> */}
             </Tabs>
           </TabPanel>
         </Tabs>
       </div>
     </>
     ) : ( <p>My First Paragraph</p>);
+
+    
 }
 

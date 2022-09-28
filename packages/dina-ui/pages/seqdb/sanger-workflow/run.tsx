@@ -48,6 +48,9 @@ export default function SangerWorkFlowRunPage() {
             <Tab disabled={!pcrBatchId}>
               {formatMessage("selectMaterialSamples")}
             </Tab>
+            <Tab disabled={!pcrBatchId}>
+              {formatMessage("selectCoodinates")}
+            </Tab>
           </TabList>
           <TabPanel>
             <SangerPcrBatchStep
@@ -61,7 +64,7 @@ export default function SangerWorkFlowRunPage() {
             )}
           </TabPanel>
           <TabPanel>
-          {pcrBatchId && (
+            {pcrBatchId && (
               <PCRBatchPlatingStep pcrBatchId={pcrBatchId} />
             )}
           </TabPanel>
