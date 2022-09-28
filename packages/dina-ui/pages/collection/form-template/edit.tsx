@@ -11,7 +11,7 @@ import {
   withResponse
 } from "common-ui";
 import { useRouter } from "next/router";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -25,8 +25,8 @@ import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
 import {
-  getInitialValuesFromFormTemplate,
-  removeArraysFromPath
+  getComponentOrderFromTemplate,
+  getInitialValuesFromFormTemplate
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
@@ -82,6 +82,10 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
+  const [navOrder, setNavOrder] = useState<string[] | null>(
+    getComponentOrderFromTemplate(fetchedFormTemplate)
+  );
+
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
   const pageTitle = id
@@ -173,7 +177,7 @@ export function FormTemplateEditPageLoaded({
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
           visible: true,
-          order: componentIndex,
+          order: navOrder?.indexOf(dataComponent.id) ?? componentIndex,
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
@@ -246,6 +250,8 @@ export function FormTemplateEditPageLoaded({
           <MaterialSampleForm
             templateInitialValues={initialValues}
             materialSampleSaveHook={materialSampleSaveHook}
+            navOrder={navOrder}
+            onChangeNavOrder={(newOrder) => setNavOrder(newOrder)}
           />
         </DinaFormSection>
       </PageLayout>

@@ -5,9 +5,14 @@ import { MaterialSampleForm, nextSampleInitialValues } from "../../..";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   CollectingEvent,
-  MaterialSample
+  COLLECTING_EVENT_COMPONENT_NAME,
+  MaterialSample,
+  ORGANISMS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 
 // Mock out the dynamic component, which should only be rendered in the browser
@@ -400,7 +405,9 @@ describe("Material Sample Edit Page", () => {
     ).toEqual("2021-04-13");
 
     wrapper
-      .find("#collecting-event-component button.detach-resource-button")
+      .find(
+        "#" + COLLECTING_EVENT_COMPONENT_NAME + " button.detach-resource-button"
+      )
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -522,7 +529,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-storage").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#storage-component").exists()).toEqual(true);
+    expect(wrapper.find("#" + STORAGE_COMPONENT_NAME).exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Organisms section enabled.", async () => {
@@ -553,7 +560,7 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-organisms").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
+    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
   });
 
   it("Renders an existing Material Sample with the Association section enabled.", async () => {
@@ -579,7 +586,9 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#associations-component").exists()).toEqual(true);
+    expect(wrapper.find("#" + ASSOCIATIONS_COMPONENT_NAME).exists()).toEqual(
+      true
+    );
   });
 
   it("Save association with uuid mapped correctly for saving.", async () => {
@@ -603,7 +612,9 @@ describe("Material Sample Edit Page", () => {
     expect(
       wrapper.find(".enable-associations").find(ReactSwitch).prop("checked")
     ).toEqual(true);
-    expect(wrapper.find("#associations-component").exists()).toEqual(true);
+    expect(wrapper.find("#" + ASSOCIATIONS_COMPONENT_NAME).exists()).toEqual(
+      true
+    );
 
     wrapper.find("form").simulate("submit");
 
@@ -1023,7 +1034,11 @@ describe("Material Sample Edit Page", () => {
     ).toEqual("test reception remarks");
 
     wrapper
-      .find("#acquisition-event-component button.detach-resource-button")
+      .find(
+        "#" +
+          ACQUISITION_EVENT_COMPONENT_NAME +
+          " button.detach-resource-button"
+      )
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -1287,7 +1302,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
+    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
 
     // Expand all organism sections:
     wrapper.find("button.expand-organism.not-expanded").at(0).simulate("click");
@@ -1383,7 +1398,7 @@ describe("Material Sample Edit Page", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    expect(wrapper.find(".organisms-component").exists()).toEqual(true);
+    expect(wrapper.find("." + ORGANISMS_COMPONENT_NAME).exists()).toEqual(true);
 
     // Initially has 2 organisms:
     expect(
@@ -2307,12 +2322,16 @@ describe("Material Sample Edit Page", () => {
     // Attributes 2 and 3 are visible and empty:
     expect(
       wrapper
-        .find("#collecting-event-component .attribute_2-field input")
+        .find(
+          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_2-field input"
+        )
         .prop("value")
     ).toEqual("");
     expect(
       wrapper
-        .find("#collecting-event-component .attribute_3-field input")
+        .find(
+          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_3-field input"
+        )
         .prop("value")
     ).toEqual("");
   });

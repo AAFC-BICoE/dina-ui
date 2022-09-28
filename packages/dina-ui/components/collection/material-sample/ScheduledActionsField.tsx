@@ -19,7 +19,11 @@ import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample, ScheduledAction } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  ScheduledAction,
+  SCHEDULED_ACTIONS_COMPONENT_NAME
+} from "../../../types/collection-api";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -53,7 +57,7 @@ export function ScheduledActionsField({
   // The default date is today:
   defaultDate = new Date().toISOString().slice(0, 10),
   wrapContent = (content) => content,
-  id = "scheduled-actions-component"
+  id = SCHEDULED_ACTIONS_COMPONENT_NAME
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 

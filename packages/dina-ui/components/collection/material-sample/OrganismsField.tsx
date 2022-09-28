@@ -9,6 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
+import { ORGANISMS_COMPONENT_NAME } from "../../../types/collection-api";
 import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
@@ -72,7 +73,7 @@ export function OrganismsField({
   return (
     <FieldSet
       id={id}
-      className="organisms-component"
+      className={ORGANISMS_COMPONENT_NAME}
       fieldName={name}
       legend={<DinaMessage id="organisms" />}
     >

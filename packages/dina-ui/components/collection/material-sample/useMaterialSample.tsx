@@ -47,7 +47,7 @@ import {
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
 import {
-  MatrialSampleFormEnabledFields,
+  MaterialSampleFormEnabledFields,
   VisibleManagedAttributesConfig
 } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
@@ -156,7 +156,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Optionally restrict the form to these enabled fields. */
-  enabledFields?: MatrialSampleFormEnabledFields;
+  enabledFields?: MaterialSampleFormEnabledFields;
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 

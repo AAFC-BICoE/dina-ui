@@ -9,7 +9,9 @@ import { CreateMaterialSampleFromWorkflowForm } from "../../../../pages/collecti
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
-  CollectingEvent
+  CollectingEvent,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { CoordinateSystem } from "../../../../types/collection-api/resources/CoordinateSystem";
 import { SRS } from "../../../../types/collection-api/resources/SRS";
@@ -766,13 +768,15 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     expect(
       wrapper
-        .find("#scheduled-actions-component .remarks-field textarea")
+        .find(
+          "#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " .remarks-field textarea"
+        )
         .prop("value")
     ).toEqual("default-remarks");
 
     // Add the first scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-component button.add-button")
+      .find("#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -780,12 +784,12 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // Add the second scheduled action with the default value:
     wrapper
-      .find("#scheduled-actions-component button.add-new-button")
+      .find("#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button.add-new-button")
       .simulate("click");
     await new Promise(setImmediate);
     wrapper.update();
     wrapper
-      .find("#scheduled-actions-component button.add-button")
+      .find("#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " button.add-button")
       .simulate("click");
 
     await new Promise(setImmediate);
@@ -793,7 +797,8 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
 
     // There should be 2 rows:
     expect(
-      wrapper.find("#scheduled-actions-component .rt-tbody .rt-tr").length
+      wrapper.find("#" + SCHEDULED_ACTIONS_COMPONENT_NAME + " .rt-tbody .rt-tr")
+        .length
     ).toEqual(2);
 
     // Submit the form:
@@ -881,12 +886,16 @@ describe("CreateMaterialSampleFromWorkflowPage", () => {
     // The default attribute values are rendered:
     expect(
       wrapper
-        .find("#collecting-event-component .attribute_1-field input")
+        .find(
+          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_1-field input"
+        )
         .prop("value")
     ).toEqual("attribute 1 default value");
     expect(
       wrapper
-        .find("#collecting-event-component .attribute_2-field input")
+        .find(
+          "#" + COLLECTING_EVENT_COMPONENT_NAME + " .attribute_2-field input"
+        )
         .prop("value")
     ).toEqual("");
   });
