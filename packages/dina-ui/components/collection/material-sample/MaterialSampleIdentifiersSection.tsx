@@ -9,7 +9,10 @@ import { useField } from "formik";
 import { useState } from "react";
 import { CollectionSelectField } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { MaterialSample } from "../../../types/collection-api";
+import {
+  IDENTIFIER_COMPONENT_NAME,
+  MaterialSample
+} from "../../../types/collection-api";
 
 export interface MaterialSampleIdentifiersSectionProps {
   disableSampleNameField?: boolean;
@@ -36,7 +39,7 @@ export function MaterialSampleIdentifiersSection({
   namePrefix = "",
   sampleNamePlaceHolder,
   hideUseSequence,
-  id = "identifiers-component"
+  id = IDENTIFIER_COMPONENT_NAME
 }: MaterialSampleIdentifiersSectionProps) {
   const [{ value }] = useField("collection");
   const { readOnly, initialValues } = useDinaFormContext();
@@ -65,7 +68,7 @@ export function MaterialSampleIdentifiersSection({
             />
             {!readOnly && !hideUseSequence && (
               <CheckBoxField
-                onCheckBoxClick={event =>
+                onCheckBoxClick={(event) =>
                   setPrimaryIdDisabled(event.target.checked)
                 }
                 name="useNextSequence"

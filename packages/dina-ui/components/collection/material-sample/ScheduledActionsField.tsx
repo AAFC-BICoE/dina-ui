@@ -19,7 +19,11 @@ import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
 import { UserSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { MaterialSample, ScheduledAction } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  ScheduledAction,
+  SCHEDULED_ACTIONS_COMPONENT_NAME
+} from "../../../types/collection-api";
 
 /** Type-safe object with all ScheduledAction fields. */
 export const SCHEDULEDACTION_FIELDS_OBJECT: Required<
@@ -52,8 +56,8 @@ export function ScheduledActionsField({
   className,
   // The default date is today:
   defaultDate = new Date().toISOString().slice(0, 10),
-  wrapContent = content => content,
-  id = "scheduled-actions-component"
+  wrapContent = (content) => content,
+  id = SCHEDULED_ACTIONS_COMPONENT_NAME
 }: ScheduledActionsFieldProps) {
   const fieldName = "scheduledActions";
 
@@ -93,7 +97,7 @@ export function ScheduledActionsField({
     {
       accessor: "assignedTo",
       Header: formatMessage("assignedTo"),
-      Cell: row => (
+      Cell: (row) => (
         <DinaFormSection readOnly={true}>
           <UserSelectField
             name={`${fieldName}[${row.index}].assignedTo`}
@@ -107,7 +111,7 @@ export function ScheduledActionsField({
       ? []
       : [
           {
-            Cell: row => (
+            Cell: (row) => (
               <div className={`d-flex gap-3 index-${row.index}`}>
                 <FormikButton
                   className="btn btn-primary mb-3 edit-button"
@@ -177,7 +181,7 @@ export function ScheduledActionsField({
                         ? { [actionToEdit?.viewIndex ?? -1]: true }
                         : undefined
                     }
-                    SubComponent={row => (
+                    SubComponent={(row) => (
                       <div className="m-2">
                         <ScheduledActionSubForm
                           actionToEdit={row.original}
@@ -233,7 +237,7 @@ export function ScheduledActionSubForm({
 }: ScheduledActionSubFormProps) {
   const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
 
-  const actionsEnabledFields = enabledFields?.filter(it =>
+  const actionsEnabledFields = enabledFields?.filter((it) =>
     it.startsWith("scheduledAction.")
   );
 
@@ -308,9 +312,9 @@ export function ScheduledActionSubForm({
               {...fieldProps("actionType")}
               jsonApiBackend={{
                 query: autoSuggestQuery,
-                option: matSample =>
+                option: (matSample) =>
                   matSample?.scheduledActions?.map(
-                    it => it?.actionType ?? ""
+                    (it) => it?.actionType ?? ""
                   ) ?? ""
               }}
               blankSearchBackend={"json-api"}
@@ -323,9 +327,9 @@ export function ScheduledActionSubForm({
               {...fieldProps("actionStatus")}
               jsonApiBackend={{
                 query: autoSuggestQuery,
-                option: matSample =>
+                option: (matSample) =>
                   matSample?.scheduledActions?.map(
-                    it => it?.actionStatus ?? ""
+                    (it) => it?.actionStatus ?? ""
                   ) ?? ""
               }}
               blankSearchBackend={"json-api"}

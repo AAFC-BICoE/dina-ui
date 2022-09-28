@@ -9,6 +9,7 @@ import {
 } from "common-ui";
 import { FieldArray, useFormikContext } from "formik";
 import { get, isEmpty, keys } from "lodash";
+import { ORGANISMS_COMPONENT_NAME } from "../../../types/collection-api";
 import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
@@ -60,8 +61,8 @@ export function OrganismsField({
   }, [formik.values.organismsQuantity]);
 
   const useTargetOrganism = readOnly
-    ? formik.values.organism?.some(organism => organism?.isTarget)
-    : formik.values.organism?.some(organism => organism?.isTarget)
+    ? formik.values.organism?.some((organism) => organism?.isTarget)
+    : formik.values.organism?.some((organism) => organism?.isTarget)
     ? true
     : false;
 
@@ -72,14 +73,14 @@ export function OrganismsField({
   return (
     <FieldSet
       id={id}
-      className="organisms-component"
+      className={ORGANISMS_COMPONENT_NAME}
       fieldName={name}
       legend={<DinaMessage id="organisms" />}
     >
       <BulkEditTabWarning
         targetType="material-sample"
         fieldName={name}
-        setDefaultValue={ctx => {
+        setDefaultValue={(ctx) => {
           // Auto-create the first organism:
           ctx.bulkEditFormRef?.current?.setFieldValue("organismsQuantity", 1);
           ctx.bulkEditFormRef?.current?.setFieldValue(name, [{}]);
@@ -158,7 +159,7 @@ export function OrganismsField({
                         <div className="d-flex">
                           <ToggleField
                             name="organismsIndividualEntry"
-                            onChangeExternal={checked => {
+                            onChangeExternal={(checked) => {
                               if (checked === false) {
                                 form.setFieldValue("useTargetOrganism", false);
                               }
@@ -168,7 +169,7 @@ export function OrganismsField({
                           <ToggleField
                             disableSwitch={!organismsIndividualEntry}
                             name="useTargetOrganism"
-                            onChangeExternal={checked => {
+                            onChangeExternal={(checked) => {
                               if (checked) {
                                 updateOrganismArray();
                                 resetIsTargetFalse();
@@ -288,7 +289,7 @@ function OrganismsTable({
     {
       id: "determination",
       Cell: ({ original: o }) => {
-        const primaryDet = o?.determination?.find(it => it.isPrimary);
+        const primaryDet = o?.determination?.find((it) => it.isPrimary);
         const { scientificName, verbatimScientificName } = primaryDet ?? {};
 
         const cellText = verbatimScientificName || scientificName;
@@ -296,7 +297,7 @@ function OrganismsTable({
       },
       Header: formatMessage("determinationPrimary")
     },
-    ...["lifeStage", "sex"].map<Column<Organism>>(accessor => ({
+    ...["lifeStage", "sex"].map<Column<Organism>>((accessor) => ({
       accessor,
       className: `${accessor}-cell`,
       Header: getFieldLabel({ name: accessor }).fieldLabel
@@ -365,7 +366,7 @@ function OrganismsTable({
         getTbodyProps={() => ({ onSortStart, onSortEnd })}
         onExpandedChange={onExpandedChange}
         showPagination={false}
-        SubComponent={row => {
+        SubComponent={(row) => {
           const isOdd = (row.index + 1) % 2 === 1;
 
           // Add zebra striping to the subcomponent background:
@@ -398,7 +399,7 @@ function OrganismExpanderComponent({ isExpanded, index }) {
 
   const hasError =
     !isEmpty(get(errors, prefix)) ||
-    keys(errors).some(key => key.startsWith(prefix));
+    keys(errors).some((key) => key.startsWith(prefix));
 
   return (
     <button

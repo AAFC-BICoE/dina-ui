@@ -2,7 +2,7 @@ import { InputResource, KitsuResource } from "kitsu";
 import { compact, isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
 import {
-  MatrialSampleFormEnabledFields,
+  MaterialSampleFormEnabledFields,
   VisibleManagedAttributesConfig
 } from "../..";
 import {
@@ -23,7 +23,7 @@ export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
   acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
-  enabledFields: MatrialSampleFormEnabledFields;
+  enabledFields: MaterialSampleFormEnabledFields;
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
@@ -52,7 +52,7 @@ export function useMaterialSampleFormTemplateProps<
     /* If no template entrry for determination or there is only one determination, make it primary
      * same as georeference assertion */
     materialSampleInitialValues.organism =
-      materialSampleInitialValues.organism?.map(org => {
+      materialSampleInitialValues.organism?.map((org) => {
         if (!org?.determination?.length) {
           return {
             ...org,

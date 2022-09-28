@@ -31,7 +31,7 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
-import { MatrialSampleFormEnabledFields } from "../collection/material-sample/MaterialSampleForm";
+import { MaterialSampleFormEnabledFields } from "../collection/material-sample/MaterialSampleForm";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -174,7 +174,7 @@ interface BulkSampleSaveParams {
 
 export function initializeRefHookFormProps(
   samplesProp,
-  enabledFields: MatrialSampleFormEnabledFields,
+  enabledFields: MaterialSampleFormEnabledFields,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
@@ -232,7 +232,7 @@ function getSampleHooks(
     | ResourceWithHooks<KitsuResource>
     | undefined,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
-  enabledFields: MatrialSampleFormEnabledFields
+  enabledFields: MaterialSampleFormEnabledFields
 ) {
   return samples.map((resource, index) => {
     const key = `sample-${index}`;
