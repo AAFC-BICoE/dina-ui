@@ -139,14 +139,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
     queryRowProps;
   const { formatMessage, messages } = useIntl();
 
-  const initState = {
-    matchValue: null,
-    matchType: "equals",
-    date: moment().format("YYYY-MM-DD"),
-    boolean: "true",
-    number: null
-  };
-
   const [fieldName, setFieldName] = useState<string>(
     (formikProps.values as any)?.queryRows?.[index].fieldName
   );

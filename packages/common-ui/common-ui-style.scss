@@ -85,3 +85,32 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
 }
+
+/*
+ * Query Builder Custom CSS
+ */
+.qb-lite {
+  margin: 0 !important;
+}
+
+.group-container {
+  padding-right: 0 !important;
+  overflow: visible;
+}
+
+.group--actions--tr {
+  opacity: 1 !important
+}
+
+.rule--drag-handler {
+  opacity: 1 !important;
+}
+
+.group {
+  background: white !important;
+  border: 1px solid #d3d7cf !important;
+}
+
+.rule--field {
+  width: 30%;
+}
