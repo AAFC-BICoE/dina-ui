@@ -81,10 +81,10 @@ export function FileView({
   const isDerivative = filePath.includes("derivative").toString();
   const fileBucket = filePathArray[4];
 
-  // build link to image-viewer page
-  const imageViewerLink = `/object-store/image-viewer?bucket=${fileBucket}&isDerivative=${isDerivative}&fileId=${fileId}`;
+  // build link to file-viewer page
+  const fileViewerLink = `/object-store/file-viewer`;
 
-  if (preview || !isImage) {
+  if (preview || (!isImage && fileType !== "pdf")) {
     clickToDownload = false;
   }
 
@@ -103,7 +103,18 @@ export function FileView({
   return (
     <div className="file-viewer-wrapper text-center">
       {showFile ? (
-        <Link href={imageViewerLink}>
+        <Link
+          href={{
+            pathname: fileViewerLink,
+            query: {
+              bucket: fileBucket,
+              fileId,
+              fileType,
+              isDerivative,
+              isImage
+            }
+          }}
+        >
           <a
             target="_blank"
             style={{
