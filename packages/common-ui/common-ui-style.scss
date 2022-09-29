@@ -93,6 +93,10 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0 !important;
 }
 
+.query-builder {
+  overflow: visible !important;
+}
+
 .group-container {
   padding-right: 0 !important;
   overflow: visible;
@@ -103,6 +107,14 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--drag-handler {
+  opacity: 1 !important;
+}
+
+.rule--header {
+  opacity: 1 !important;
+}
+
+.group--drag-handler {
   opacity: 1 !important;
 }
 

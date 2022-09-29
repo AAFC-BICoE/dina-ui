@@ -2,17 +2,11 @@ import {
   DinaFormSection,
   FieldWrapperProps,
   LoadingSpinner,
-  SelectField,
   useApiClient
 } from "..";
-import { QueryRow } from "./QueryRow";
-import { FieldArray } from "formik";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useEffect, useMemo } from "react";
-import { v4 as uuidv4 } from "uuid";
-import useSWR from "swr";
 import { ESIndexMapping } from "./types";
-
 import {
   Query,
   Builder,
@@ -29,6 +23,9 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { QueryFieldSelector } from "./QueryFieldSelector";
+import { QueryOperatorSelector } from "./QueryOperatorSelector";
+import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
+import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
@@ -48,26 +45,131 @@ export function QueryBuilder({
   // Query Builder Configuration, only needs to update if the index map has changed.
   const config: Config = useMemo(
     () => ({
+      // "AND"/"OR" conjunctions configuration.
       conjunctions: {
         ...BasicConfig.conjunctions
       },
+
+      // All the possible operators.
       operators: {
         equals: {
-          label: "equals"
+          label: "Equals"
+        },
+        notEquals: {
+          label: "Not equals"
+        },
+        empty: {
+          label: "Empty"
+        },
+        notEmpty: {
+          label: "Not empty"
+        },
+        greaterThan: {
+          label: "Greater than"
+        },
+        greaterThanOrEqualTo: {
+          label: "Greater than or equal to"
+        },
+        lessThan: {
+          label: "Less than"
+        },
+        lessThanOrEqualTo: {
+          label: "Less than or equal to"
+        },
+        contains: {
+          label: "Contains"
         }
       },
+
+      // Each type has a custom widget to display, these are defined here.
       widgets: {
-        ...BasicConfig.widgets
-      },
-      types: {
-        ...BasicConfig.types
-      },
-      fields: {
-        test: {
-          label: "test",
-          type: "number"
+        text: {
+          type: "text",
+          factory: (factoryProps) => (
+            <QueryRowTextSearch
+              matchType={factoryProps?.operator}
+              value={factoryProps?.value}
+              setValue={factoryProps?.setValue}
+            />
+          ),
+          formatValue: (val, _fieldDef, _wgtDef, isForDisplay) =>
+            isForDisplay ? val.toString() : JSON.stringify(val)
         }
       },
+
+      // All of the possible types from the index mapping. These are attached to widgets.
+      // The possible operators are also defined here for each type.
+      types: {
+        text: {
+          defaultOperator: "equals",
+          widgets: {
+            text: {
+              operators: ["equals", "notEquals", "empty", "notEmpty"]
+            }
+          }
+        },
+        autoComplete: {
+          defaultOperator: "equals",
+          widgets: {
+            autoComplete: {
+              operators: ["equals", "notEquals", "empty", "notEmpty"]
+            }
+          }
+        },
+        date: {
+          defaultOperator: "equals",
+          widgets: {
+            date: {
+              operators: [
+                "equals",
+                "notEquals",
+                "contains",
+                "greaterThan",
+                "greaterThanOrEquals",
+                "lessThan",
+                "lessThanOrEquals",
+                "empty",
+                "notEmpty"
+              ]
+            }
+          }
+        },
+        number: {
+          defaultOperator: "equals",
+          widgets: {
+            number: {
+              operators: [
+                "equals",
+                "notEquals",
+                "greaterThan",
+                "greaterThanOrEquals",
+                "lessThan",
+                "lessThanOrEquals",
+                "empty",
+                "notEmpty"
+              ]
+            }
+          }
+        },
+        boolean: {
+          defaultOperator: "equals",
+          widgets: {
+            boolean: {
+              operators: ["equals", "empty", "notEmpty"]
+            }
+          }
+        }
+      },
+
+      // All of the possible fields, indicates the type for each field item.
+      fields: {
+        "data.attributes.createdBy": {
+          label: "test",
+          type: "text"
+        }
+      },
+
+      // Query Builder Library settings.
       settings: {
         ...BasicConfig.settings,
         renderButton: (buttonProps) => {
@@ -102,7 +204,22 @@ export function QueryBuilder({
           );
         },
         renderField: (fieldDropdownProps) => (
-          <QueryFieldSelector indexMap={indexMap} />
+          <QueryFieldSelector
+            indexMap={indexMap}
+            setField={fieldDropdownProps?.setField}
+          />
+        ),
+        renderOperator: (operatorDropdownProps) => (
+          <QueryOperatorSelector
+            options={operatorDropdownProps?.items}
+            setField={operatorDropdownProps?.setField}
+          />
+        ),
+        renderConjs: (conjunctionProps) => (
+          <QueryConjunctionSwitch
+            currentConjunction={conjunctionProps?.selectedConjunction}
+            setConjunction={conjunctionProps?.setConjunction}
+          />
         ),
         showNot: false,
         canRegroup: true,
@@ -228,54 +345,11 @@ export function QueryBuilder({
         onChange={onChange}
         renderBuilder={renderBuilder}
       />
-      <FieldArray name={name}>
-        {(fieldArrayProps) => {
-          const elements: [] = fieldArrayProps.form.values.queryRows;
-
-          function addRow() {
-            fieldArrayProps.push(
-              <QueryRow
-                name={fieldArrayProps.name}
-                indexName={indexName}
-                esIndexMapping={sortedData as any}
-                index={elements?.length ?? 0}
-                removeRow={removeRow}
-                addRow={addRow}
-              />
-            );
-            // initialize the logic switch value to be "and"
-            fieldArrayProps.form.setFieldValue(
-              `${fieldArrayProps.name}[${
-                elements?.length ?? 0
-              }].compoundQueryType`,
-              "and"
-            );
-          }
-
-          function removeRow(index) {
-            fieldArrayProps.remove(index);
-          }
-
-          return elements?.length > 0
-            ? elements?.map((_, index) => (
-                <QueryRow
-                  name={fieldArrayProps.name}
-                  indexName={indexName}
-                  key={index}
-                  index={index}
-                  addRow={addRow}
-                  removeRow={removeRow}
-                  esIndexMapping={sortedData as any}
-                />
-              ))
-            : null;
-        }}
-      </FieldArray>
       <DinaFormSection horizontal={"flex"}>
         <GroupSelectField
           isMulti={true}
           name="group"
-          className="col-md-4"
+          className="col-md-4 mt-3"
           onChange={(value, formik) =>
             onGroupChange({
               submittedValues: { ...formik.values, group: value }

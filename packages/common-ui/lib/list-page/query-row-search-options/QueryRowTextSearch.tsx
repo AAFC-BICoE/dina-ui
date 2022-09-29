@@ -1,7 +1,6 @@
 import React from "react";
-import { FieldSpy, FieldWrapper, TextField } from "../..";
-import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import { FieldWrapper } from "../..";
+import { QueryRowExportProps } from "../QueryRow";
 import { useIntl } from "react-intl";
 import {
   includedTypeQuery,
@@ -10,69 +9,43 @@ import {
   existsQuery
 } from "../../util/transformToDSL";
 
-/**
- * The match options when a text search is being performed.
- *
- * Empty and Not Empty can be used if the text value is not mandatory.
- */
-const queryRowMatchOptions = [
-  { label: "Equals", value: "equals" },
-  { label: "Not equals", value: "notEquals" },
-  { label: "Empty", value: "empty" },
-  { label: "Not Empty", value: "notEmpty" }
-];
-
 interface QueryRowTextSearchProps {
   /**
-   * The form name for the whole query builder.
+   * Current match type being used.
    */
-  queryBuilderName: string;
+  matchType?: string;
 
   /**
-   * The index where this search is being performed from.
-   *
-   * This is because you can have multiple QueryRows in the same QueryBuilder.
+   * Retrieve the current value from the Query Builder.
    */
-  index: number;
+  value: string;
+
+  /**
+   * Pass the selected value to the Query Builder to store.
+   */
+  setValue: ((fieldPath: string) => void) | undefined;
 }
 
 export default function QueryRowTextSearch({
-  queryBuilderName,
-  index
+  matchType,
+  value,
+  setValue
 }: QueryRowTextSearchProps) {
   return (
     <>
-      <SelectField
-        name={fieldProps(queryBuilderName, "matchType", index)}
-        options={queryRowMatchOptions}
-        className="me-1 flex-fill"
-        removeLabel={true}
-      />
-
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      <FieldSpy<string>
-        fieldName={fieldProps(queryBuilderName, "matchType", index)}
-      >
-        {(matchType, _fields) => (
-          <>
-            {(matchType === "equals" || matchType === "notEquals") && (
-              <TextField
-                name={fieldProps(queryBuilderName, "matchValue", index)}
-                className="me-1 flex-fill"
-                removeLabel={true}
-              />
-            )}
+      {(matchType === "equals" || matchType === "notEquals") && (
+        <input
+          type="text"
+          value={value}
+          onChange={(newValue) => setValue?.(newValue?.target?.value ?? "")}
+          className="me-1 flex-fill"
+        />
+      )}
 
-            {(matchType === "equals" || matchType === "notEquals") && (
-              <ExactOrPartialSwitch
-                name={fieldProps(queryBuilderName, "textMatchType", index)}
-                removeLabel={true}
-                className={"textMatchType" + index}
-              />
-            )}
-          </>
-        )}
-      </FieldSpy>
+      {(matchType === "equals" || matchType === "notEquals") && (
+        <ExactOrPartialSwitch removeLabel={true} className={"textMatchType"} />
+      )}
     </>
   );
 }

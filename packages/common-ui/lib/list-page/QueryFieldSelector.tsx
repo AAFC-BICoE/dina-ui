@@ -11,10 +11,19 @@ interface QueryFieldSelectorProps {
    * the query field selector.
    */
   indexMap: ESIndexMapping[];
+
+  /**
+   * Pass the selected option to the Query Builder.
+   */
+  setField: ((fieldPath: string) => void) | undefined;
 }
 
-export function QueryFieldSelector({ indexMap }: QueryFieldSelectorProps) {
+export function QueryFieldSelector({
+  indexMap,
+  setField
+}: QueryFieldSelectorProps) {
   const { formatMessage, messages } = useIntl();
+  const [selectedField, setSelectedField] = useState();
 
   // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = indexMap
@@ -108,6 +117,11 @@ export function QueryFieldSelector({ indexMap }: QueryFieldSelectorProps) {
         options={queryRowOptions as any}
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
+        value={selectedField}
+        onChange={(selected) => {
+          setSelectedField(selected);
+          setField?.(selected?.value);
+        }}
       />
     </div>
   );
