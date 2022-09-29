@@ -1,5 +1,9 @@
 import { KitsuResource } from "kitsu";
-import { FormTemplate } from "packages/dina-ui/types/collection-api";
+import {
+  CollectingEvent,
+  FormTemplate,
+  MATERIAL_SAMPLE_FORM_LEGEND
+} from "packages/dina-ui/types/collection-api";
 import { sortBy } from "lodash";
 
 export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
@@ -10,12 +14,28 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
     return {};
   }
 
+  const initialValueForResource: Partial<T> = {};
+
+  return {
+    ...initialValueForResource,
+    attachmentsConfig: {}
+  };
+}
+
+export function getFormTemplateCheckboxes(
+  formTemplate: Partial<FormTemplate> | undefined
+) {
+  // No form template data provided. Working on a new form template.
+  if (!formTemplate) {
+    return {};
+  }
+
   let templateCheckboxesValues: Record<string, true | undefined> = {};
 
   formTemplate.components?.forEach((component) => {
     component.sections?.forEach((sections) => {
       sections.items?.forEach((item) => {
-        if (item.name) {
+        if (item.name && item.visible) {
           templateCheckboxesValues = {
             ...templateCheckboxesValues,
             ...{ [item.name]: item.visible ? true : undefined }
@@ -25,13 +45,49 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
     });
   });
 
-  const initialValueForResource: Partial<T> = {};
-
   return {
-    ...initialValueForResource,
-    templateCheckboxes: templateCheckboxesValues,
-    attachmentsConfig: {}
+    templateCheckboxes: templateCheckboxesValues
   };
+}
+
+export function getCollectingEventValues(
+  formTemplate: FormTemplate | undefined
+): any {
+  let collectingEvent = {};
+  let templateCheckboxes: Record<string, true | undefined> = {};
+  let ret = {};
+  if (formTemplate) {
+    formTemplate.components?.forEach((component) => {
+      if (
+        component.name === "collecting-event-component" &&
+        component.visible
+      ) {
+        component.sections?.forEach((sections) => {
+          sections.items?.forEach((item) => {
+            if (item.name && item.visible) {
+              collectingEvent = {
+                ...collectingEvent,
+                ...{
+                  [item.name]: item.visible ? item.defaultValue : undefined
+                }
+              };
+              templateCheckboxes = {
+                ...templateCheckboxes,
+                ...{ [item.name]: true }
+              };
+            }
+          });
+        });
+      }
+    });
+  }
+
+  ret = { ...collectingEvent };
+  if (Object.keys(templateCheckboxes).length !== 0) {
+    ret = { ...ret, templateCheckboxes };
+  }
+
+  return { collectingEvent, templateCheckboxes };
 }
 
 /**

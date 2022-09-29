@@ -25,7 +25,9 @@ import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
 import {
+  getCollectingEventValues,
   getComponentOrderFromTemplate,
+  getFormTemplateCheckboxes,
   getInitialValuesFromFormTemplate
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
@@ -93,7 +95,7 @@ export function FormTemplateEditPageLoaded({
     : "createMaterialSampleFormTemplate";
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
-    ...getInitialValuesFromFormTemplate<CollectingEvent>(fetchedFormTemplate),
+    ...getCollectingEventValues(fetchedFormTemplate),
     managedAttributesOrder: []
   };
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
@@ -115,17 +117,15 @@ export function FormTemplateEditPageLoaded({
   if (!materialSampleTemplateInitialValues.associations?.length) {
     materialSampleTemplateInitialValues.associations = [{}];
   }
-
+  const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...fetchedFormTemplate,
-    ...materialSampleTemplateInitialValues,
     ...collectingEventInitialValues,
-    ...acquisitionEventInitialValues,
+    ...formTemplateCheckboxes,
     id,
     type: "form-template"
   };
-
   // Generate the material sample save hook to use for the form.
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
@@ -191,6 +191,7 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
+
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
