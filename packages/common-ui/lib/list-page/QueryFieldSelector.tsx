@@ -1,8 +1,6 @@
 import lodash, { startCase } from "lodash";
-import { useState } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { SelectField } from "../formik-connected/SelectField";
 import { ESIndexMapping } from "./types";
 
 interface QueryFieldSelectorProps {
@@ -13,6 +11,11 @@ interface QueryFieldSelectorProps {
   indexMap: ESIndexMapping[];
 
   /**
+   * Field selected from the Query Builder.
+   */
+  currentField?: string;
+
+  /**
    * Pass the selected option to the Query Builder.
    */
   setField: ((fieldPath: string) => void) | undefined;
@@ -20,10 +23,10 @@ interface QueryFieldSelectorProps {
 
 export function QueryFieldSelector({
   indexMap,
+  currentField,
   setField
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages } = useIntl();
-  const [selectedField, setSelectedField] = useState();
 
   // Get all of the attributes from the index for the filter dropdown.
   const simpleRowOptions = indexMap
@@ -111,17 +114,22 @@ export function QueryFieldSelector({
     }
   };
 
+  // Find the selected option in the index map if possible.
+  const selectedOption = queryRowOptions.find((dropdownItem) => {
+    if ((dropdownItem as any)?.value) {
+      return (dropdownItem as any).value === currentField;
+    }
+    return false;
+  });
+
   return (
     <div style={{ width: "100%" }}>
       <Select
         options={queryRowOptions as any}
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
-        value={selectedField}
-        onChange={(selected) => {
-          setSelectedField(selected);
-          setField?.(selected?.value);
-        }}
+        value={selectedOption}
+        onChange={(selected) => setField?.(selected?.value)}
       />
     </div>
   );

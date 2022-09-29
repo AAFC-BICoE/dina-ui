@@ -1,7 +1,5 @@
 import React from "react";
-import { FieldWrapper } from "../..";
 import { QueryRowExportProps } from "../QueryRow";
-import { useIntl } from "react-intl";
 import {
   includedTypeQuery,
   matchQuery,
@@ -39,90 +37,14 @@ export default function QueryRowTextSearch({
           type="text"
           value={value}
           onChange={(newValue) => setValue?.(newValue?.target?.value ?? "")}
-          className="me-1 flex-fill"
+          className="form-control"
         />
       )}
 
-      {(matchType === "equals" || matchType === "notEquals") && (
+      {/* {(matchType === "equals" || matchType === "notEquals") && (
         <ExactOrPartialSwitch removeLabel={true} className={"textMatchType"} />
-      )}
+      )} */}
     </>
-  );
-}
-
-/**
- * Switch used to determine if the text search is being performed on an exact or partial match.
- *
- * @param queryLogicSwitchProps props for the input. This is used to register it with formik.
- */
-function ExactOrPartialSwitch(queryLogicSwitchProps) {
-  const { formatMessage } = useIntl();
-
-  return (
-    <FieldWrapper {...queryLogicSwitchProps}>
-      {({ value, setValue }) => {
-        // Set the default to exact.
-        if (value === undefined) {
-          setValue("partial");
-        }
-
-        return (
-          <div
-            className="d-flex me-2"
-            style={{
-              height: "2.3em",
-              borderRadius: "5px"
-            }}
-          >
-            <style>
-              {`
-              .selected-logic {
-                background-color: #008cff;
-                color: white;
-              }
-              .not-selected-logic {
-                background-color: #DCDCDC;
-              }
-            `}
-            </style>
-            <span
-              className={`py-2 px-3 exactSpan ${
-                value === "exact" ? "selected-logic" : "not-selected-logic"
-              }`}
-              onClick={() => {
-                setValue("exact");
-              }}
-              style={{
-                borderRadius: "5px 0 0 5px",
-                borderRight: "1px",
-                cursor: "pointer"
-              }}
-            >
-              {formatMessage({ id: "exact" })}
-            </span>
-            <span
-              className={`py-2 px-3 partialSpan ${
-                value === "partial" ? "selected-logic" : "not-selected-logic"
-              }`}
-              onClick={() => {
-                setValue("partial");
-              }}
-              style={{
-                borderRadius: "0 5px 5px 0",
-                cursor: "pointer"
-              }}
-            >
-              {formatMessage({ id: "partial" })}
-            </span>
-            <input
-              name={queryLogicSwitchProps.name}
-              value={value}
-              type="hidden"
-            />
-          </div>
-        );
-      }}
-    </FieldWrapper>
   );
 }
 

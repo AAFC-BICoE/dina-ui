@@ -124,5 +124,22 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--field {
-  width: 30%;
+  width: 40%;
+}
+
+.rule--operator {
+  width: 20%;
+}
+
+.flex--value {
+  width: 60%;
+}
+
+.rule--body {
+  display: flex;
+}
+
+.rule--widget, .widget--widget {
+  width: 100%;
+  padding-right:10px;
 }

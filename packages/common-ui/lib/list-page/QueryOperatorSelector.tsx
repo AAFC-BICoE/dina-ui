@@ -1,14 +1,18 @@
 import Select from "react-select";
-import { useState } from "react";
 import { FieldItems } from "react-awesome-query-builder";
 
 interface QueryOperatorSelectorProps {
   options?: FieldItems;
 
   /**
+   * Operator selected from Query Builder.
+   */
+  selectedOperator?: string;
+
+  /**
    * Pass the selected option to the Query Builder.
    */
-  setField: ((fieldPath: string) => void) | undefined;
+  setOperator: ((fieldPath: string) => void) | undefined;
 }
 
 interface QueryOperationOption {
@@ -18,12 +22,9 @@ interface QueryOperationOption {
 
 export function QueryOperatorSelector({
   options,
-  setField
+  selectedOperator,
+  setOperator
 }: QueryOperatorSelectorProps) {
-  const [selectedOperator, setSelectedOperator] = useState<
-    QueryOperationOption | undefined
-  >();
-
   const customStyles = {
     placeholder: (provided, _) => ({
       ...provided,
@@ -40,17 +41,18 @@ export function QueryOperatorSelector({
     value: option.path ?? ""
   }));
 
+  const selectedOption = operationOptions?.find(
+    (dropdownItem) => dropdownItem.value === selectedOperator
+  );
+
   return (
     <div style={{ width: "100%" }}>
       <Select<QueryOperationOption>
         options={operationOptions}
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
-        value={selectedOperator}
-        onChange={(newValue) => {
-          setSelectedOperator(newValue as QueryOperationOption);
-          setField?.(newValue?.value ?? "");
-        }}
+        value={selectedOption}
+        onChange={(newValue) => setOperator?.(newValue?.value ?? "")}
       />
     </div>
   );

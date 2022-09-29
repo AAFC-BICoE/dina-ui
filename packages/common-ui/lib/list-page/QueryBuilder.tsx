@@ -7,36 +7,21 @@ import {
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useEffect, useMemo } from "react";
 import { ESIndexMapping } from "./types";
-import {
-  Query,
-  Builder,
-  Utils as QbUtils,
-  BasicConfig
-} from "react-awesome-query-builder";
+import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 import { useState, useCallback } from "react";
 import {
-  JsonGroup,
   Config,
   ImmutableTree,
   BuilderProps
 } from "react-awesome-query-builder";
-import { Button } from "react-bootstrap";
-import { FaTrash } from "react-icons/fa";
-import { QueryFieldSelector } from "./QueryFieldSelector";
-import { QueryOperatorSelector } from "./QueryOperatorSelector";
-import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
-import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
+import { queryBuilderConfig } from "./QueryBuilderConfig";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
   onGroupChange: (currentSubmittedValues: any) => void;
 }
 
-export function QueryBuilder({
-  name,
-  indexName,
-  onGroupChange
-}: QueryBuilderProps) {
+export function QueryBuilder({ indexName, onGroupChange }: QueryBuilderProps) {
   const { apiClient } = useApiClient();
 
   // State to store the index map after it has been retrieved.
@@ -44,188 +29,7 @@ export function QueryBuilder({
 
   // Query Builder Configuration, only needs to update if the index map has changed.
   const config: Config = useMemo(
-    () => ({
-      // "AND"/"OR" conjunctions configuration.
-      conjunctions: {
-        ...BasicConfig.conjunctions
-      },
-
-      // All the possible operators.
-      operators: {
-        equals: {
-          label: "Equals"
-        },
-        notEquals: {
-          label: "Not equals"
-        },
-        empty: {
-          label: "Empty"
-        },
-        notEmpty: {
-          label: "Not empty"
-        },
-        greaterThan: {
-          label: "Greater than"
-        },
-        greaterThanOrEqualTo: {
-          label: "Greater than or equal to"
-        },
-        lessThan: {
-          label: "Less than"
-        },
-        lessThanOrEqualTo: {
-          label: "Less than or equal to"
-        },
-        contains: {
-          label: "Contains"
-        }
-      },
-
-      // Each type has a custom widget to display, these are defined here.
-      widgets: {
-        text: {
-          type: "text",
-          factory: (factoryProps) => (
-            <QueryRowTextSearch
-              matchType={factoryProps?.operator}
-              value={factoryProps?.value}
-              setValue={factoryProps?.setValue}
-            />
-          ),
-          formatValue: (val, _fieldDef, _wgtDef, isForDisplay) =>
-            isForDisplay ? val.toString() : JSON.stringify(val)
-        }
-      },
-
-      // All of the possible types from the index mapping. These are attached to widgets.
-      // The possible operators are also defined here for each type.
-      types: {
-        text: {
-          defaultOperator: "equals",
-          widgets: {
-            text: {
-              operators: ["equals", "notEquals", "empty", "notEmpty"]
-            }
-          }
-        },
-        autoComplete: {
-          defaultOperator: "equals",
-          widgets: {
-            autoComplete: {
-              operators: ["equals", "notEquals", "empty", "notEmpty"]
-            }
-          }
-        },
-        date: {
-          defaultOperator: "equals",
-          widgets: {
-            date: {
-              operators: [
-                "equals",
-                "notEquals",
-                "contains",
-                "greaterThan",
-                "greaterThanOrEquals",
-                "lessThan",
-                "lessThanOrEquals",
-                "empty",
-                "notEmpty"
-              ]
-            }
-          }
-        },
-        number: {
-          defaultOperator: "equals",
-          widgets: {
-            number: {
-              operators: [
-                "equals",
-                "notEquals",
-                "greaterThan",
-                "greaterThanOrEquals",
-                "lessThan",
-                "lessThanOrEquals",
-                "empty",
-                "notEmpty"
-              ]
-            }
-          }
-        },
-        boolean: {
-          defaultOperator: "equals",
-          widgets: {
-            boolean: {
-              operators: ["equals", "empty", "notEmpty"]
-            }
-          }
-        }
-      },
-
-      // All of the possible fields, indicates the type for each field item.
-      fields: {
-        "data.attributes.createdBy": {
-          label: "test",
-          type: "text"
-        }
-      },
-
-      // Query Builder Library settings.
-      settings: {
-        ...BasicConfig.settings,
-        renderButton: (buttonProps) => {
-          if (buttonProps) {
-            switch (buttonProps?.type) {
-              case "addRule":
-              case "addGroup":
-                return (
-                  <Button onClick={buttonProps?.onClick} className="ms-1">
-                    {buttonProps.label}
-                  </Button>
-                );
-              case "delGroup":
-              case "delRule":
-              case "delRuleGroup":
-                return (
-                  <Button
-                    onClick={buttonProps?.onClick}
-                    className="ms-1"
-                    variant="danger"
-                  >
-                    <FaTrash />
-                  </Button>
-                );
-            }
-          }
-
-          return (
-            <Button onClick={buttonProps?.onClick} className="ms-1">
-              {buttonProps?.label}
-            </Button>
-          );
-        },
-        renderField: (fieldDropdownProps) => (
-          <QueryFieldSelector
-            indexMap={indexMap}
-            setField={fieldDropdownProps?.setField}
-          />
-        ),
-        renderOperator: (operatorDropdownProps) => (
-          <QueryOperatorSelector
-            options={operatorDropdownProps?.items}
-            setField={operatorDropdownProps?.setField}
-          />
-        ),
-        renderConjs: (conjunctionProps) => (
-          <QueryConjunctionSwitch
-            currentConjunction={conjunctionProps?.selectedConjunction}
-            setConjunction={conjunctionProps?.setConjunction}
-          />
-        ),
-        showNot: false,
-        canRegroup: true,
-        canReorder: true
-      }
-    }),
+    () => queryBuilderConfig({ indexMap }),
     [indexMap]
   );
 
@@ -332,10 +136,6 @@ export function QueryBuilder({
   if (!indexMap) {
     return <LoadingSpinner loading={true} />;
   }
-
-  const sortedData = indexMap
-    ?.sort((a, b) => a.label.localeCompare(b.label))
-    .filter((prop) => !prop.label.startsWith("group"));
 
   return (
     <>

@@ -12,7 +12,7 @@ export function QueryConjunctionSwitch({
   setConjunction
 }: QueryConjunctionSwitchProps) {
   return (
-    <ButtonGroup>
+    <ButtonGroup className="mb-1">
       <Button
         variant={currentConjunction === "AND" ? "primary" : "outline-primary"}
         onClick={(_) => setConjunction?.("AND")}
