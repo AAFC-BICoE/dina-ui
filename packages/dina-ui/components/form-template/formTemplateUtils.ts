@@ -50,23 +50,21 @@ export function getFormTemplateCheckboxes(
   };
 }
 
-export function getCollectingEventValues(
+export function getComponentValues(
+  comp: string,
   formTemplate: FormTemplate | undefined
 ): any {
-  let collectingEvent = {};
+  let componentValues = {};
   let templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
-      if (
-        component.name === "collecting-event-component" &&
-        component.visible
-      ) {
+      if (component.name === comp && component.visible) {
         component.sections?.forEach((sections) => {
           sections.items?.forEach((item) => {
             if (item.name && item.visible) {
-              collectingEvent = {
-                ...collectingEvent,
+              componentValues = {
+                ...componentValues,
                 ...{
                   [item.name]: item.visible ? item.defaultValue : undefined
                 }
@@ -82,12 +80,12 @@ export function getCollectingEventValues(
     });
   }
 
-  ret = { ...collectingEvent };
+  ret = { ...componentValues };
   if (Object.keys(templateCheckboxes).length !== 0) {
     ret = { ...ret, templateCheckboxes };
   }
 
-  return { collectingEvent, templateCheckboxes };
+  return { collectingEvent: componentValues, templateCheckboxes };
 }
 
 /**

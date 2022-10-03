@@ -14,7 +14,9 @@ import { useRouter } from "next/router";
 import React, { useRef, useState } from "react";
 import {
   AcquisitionEvent,
+  ACQUISITION_EVENT_COMPONENT_NAME,
   CollectingEvent,
+  COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   FormTemplateComponents,
   MaterialSample,
@@ -25,7 +27,7 @@ import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import { InputResource, PersistedResource } from "kitsu";
 import {
-  getCollectingEventValues,
+  getComponentValues,
   getComponentOrderFromTemplate,
   getFormTemplateCheckboxes,
   getInitialValuesFromFormTemplate
@@ -95,7 +97,7 @@ export function FormTemplateEditPageLoaded({
     : "createMaterialSampleFormTemplate";
   // Collecting Event Initial Values
   const collectingEventInitialValues = {
-    ...getCollectingEventValues(fetchedFormTemplate),
+    ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate),
     managedAttributesOrder: []
   };
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
@@ -103,8 +105,10 @@ export function FormTemplateEditPageLoaded({
   }
 
   // Acquisition Event Initial Values
-  const acquisitionEventInitialValues =
-    getInitialValuesFromFormTemplate<AcquisitionEvent>(fetchedFormTemplate);
+  const acquisitionEventInitialValues = getComponentValues(
+    ACQUISITION_EVENT_COMPONENT_NAME,
+    fetchedFormTemplate
+  );
 
   // The material sample initial values to load.
   const materialSampleTemplateInitialValues =
@@ -122,6 +126,7 @@ export function FormTemplateEditPageLoaded({
   const initialValues: any = {
     ...fetchedFormTemplate,
     ...collectingEventInitialValues,
+    ...acquisitionEventInitialValues,
     ...formTemplateCheckboxes,
     id,
     type: "form-template"
@@ -164,6 +169,7 @@ export function FormTemplateEditPageLoaded({
       });
     };
     iterateThrough(allSubmittedValues);
+
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {

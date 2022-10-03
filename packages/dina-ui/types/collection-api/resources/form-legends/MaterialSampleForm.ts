@@ -226,37 +226,37 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "geoReferenceAssertions.dwcGeoreferenceVerificationStatus"
+            id: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus"
           },
           {
-            id: "geoReferenceAssertions.dwcDecimalLatitude"
+            id: "geoReferenceAssertions[0].dwcDecimalLatitude"
           },
           {
-            id: "geoReferenceAssertions.dwcDecimalLongitude"
+            id: "geoReferenceAssertions[0].dwcDecimalLongitude"
           },
           {
-            id: "geoReferenceAssertions.dwcCoordinateUncertaintyInMeters"
+            id: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters"
           },
           {
-            id: "geoReferenceAssertions.dwcGeoreferencedDate"
+            id: "geoReferenceAssertions[0].dwcGeoreferencedDate"
           },
           {
-            id: "geoReferenceAssertions.dwcGeodeticDatum"
+            id: "geoReferenceAssertions[0].dwcGeodeticDatum"
           },
           {
-            id: "geoReferenceAssertions.literalGeoreferencedBy"
+            id: "geoReferenceAssertions[0].literalGeoreferencedBy"
           },
           {
-            id: "geoReferenceAssertions.georeferencedBy"
+            id: "geoReferenceAssertions[0].georeferencedBy"
           },
           {
-            id: "geoReferenceAssertions.dwcGeoreferenceProtocol"
+            id: "geoReferenceAssertions[0].dwcGeoreferenceProtocol"
           },
           {
-            id: "geoReferenceAssertions.dwcGeoreferenceSources"
+            id: "geoReferenceAssertions[0].dwcGeoreferenceSources"
           },
           {
-            id: "geoReferenceAssertions.dwcGeoreferenceRemarks"
+            id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks"
           }
         ]
       },
