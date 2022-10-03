@@ -295,11 +295,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {/* Date picker type */}
-          {typeVisibility.isDate && (
-            <QueryRowDateSearch queryBuilderName={name} index={index} />
-          )}
-
           {/* Number type */}
           {typeVisibility.isNumber && (
             <QueryRowNumberSearch queryBuilderName={name} index={index} />

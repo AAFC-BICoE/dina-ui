@@ -2,7 +2,6 @@ import {
   BasicConfig,
   Config,
   Conjunctions,
-  Field,
   Fields,
   Operators,
   RenderSettings,
@@ -13,6 +12,7 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
+import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
 import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
 import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./QueryFieldSelector";
@@ -89,6 +89,16 @@ export function queryBuilderConfig({
           setValue={factoryProps?.setValue}
         />
       )
+    },
+    date: {
+      ...BasicConfig.widgets.date,
+      factory: (factoryProps) => (
+        <QueryRowDateSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
     }
   };
 
@@ -114,6 +124,13 @@ export function queryBuilderConfig({
       defaultOperator: "equals",
       widgets: {
         date: {
+          /**
+           * The match options when a date search is being performed.
+           *
+           * Equals is for an exact match. Example: "2020-01-01", then only on that specific date.
+           * Contains is for a partial match. Example: "2020", then on any date that is in 2020 will match.
+           * Empty and Not Empty can be used if the date value is not mandatory.
+           */
           operators: [
             "equals",
             "notEquals",
@@ -197,7 +214,7 @@ export function queryBuilderConfig({
     renderOperator: (operatorDropdownProps) => (
       <QueryOperatorSelector
         options={operatorDropdownProps?.items}
-        selectedOperator={operatorDropdownProps?.selectedLabel ?? ""}
+        selectedOperator={operatorDropdownProps?.selectedKey ?? ""}
         setOperator={operatorDropdownProps?.setField}
       />
     ),

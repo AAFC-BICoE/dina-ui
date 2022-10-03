@@ -38,7 +38,7 @@ export function QueryOperatorSelector({
 
   const operationOptions = options?.map<QueryOperationOption>((option) => ({
     label: option.label,
-    value: option.path ?? ""
+    value: option.key ?? ""
   }));
 
   const selectedOption = operationOptions?.find(
