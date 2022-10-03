@@ -85,7 +85,7 @@ export function getComponentValues(
     ret = { ...ret, templateCheckboxes };
   }
 
-  return { collectingEvent: componentValues, templateCheckboxes };
+  return ret;
 }
 
 /**

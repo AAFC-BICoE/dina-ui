@@ -146,12 +146,17 @@ export function FormTemplateEditPageLoaded({
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
     // Include the collecting event and acquisition event values.
+    const { templateCheckboxes, ...collectinEventFormRefValues } =
+      collectingEvtFormRef?.current?.values;
+    submittedValues.templateCheckboxes = {
+      ...submittedValues.templateCheckboxes,
+      ...templateCheckboxes
+    };
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
       ...submittedValues,
-      ...(collectingEvtFormRef?.current?.values ?? {}),
+      ...(collectinEventFormRefValues ?? {}),
       ...(acqEventFormRef?.current?.values ?? {})
     };
-
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
