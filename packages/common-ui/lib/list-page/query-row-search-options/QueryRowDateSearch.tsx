@@ -35,7 +35,7 @@ export default function QueryRowDateSearch({
       {matchType !== "empty" && matchType !== "notEmpty" && (
         <DateField
           name="this"
-          className="me-2 flex-fill"
+          className="flex-fill"
           removeLabel={true}
           partialDate={true}
         />

@@ -46,6 +46,7 @@ export function QueryBuilder({ indexName, onGroupChange }: QueryBuilderProps) {
 
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryTree(immutableTree);
+    // console.log(JSON.stringify(immutableTree));
   }, []);
 
   const renderBuilder = useCallback(

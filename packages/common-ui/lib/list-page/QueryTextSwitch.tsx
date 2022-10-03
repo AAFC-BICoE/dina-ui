@@ -1,12 +1,10 @@
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
-export type TextOptions = "exact" | "partial";
-
 interface QueryTextSwitchProps {
-  currentTextOption?: TextOptions;
+  currentTextOption?: string;
 
-  setTextOption?: (textOption: TextOptions) => void;
+  setTextOption?: (textOption: string) => void;
 }
 
 export function QueryTextSwitch({

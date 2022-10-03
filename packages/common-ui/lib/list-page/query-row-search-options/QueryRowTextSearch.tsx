@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { QueryRowExportProps } from "../QueryRow";
 import {
   includedTypeQuery,
@@ -6,12 +6,6 @@ import {
   termQuery,
   existsQuery
 } from "../../util/transformToDSL";
-import { QueryTextSwitch, TextOptions } from "../QueryTextSwitch";
-
-interface QueryRowTextValue {
-  searchValue: string;
-  matchType: TextOptions;
-}
 
 interface QueryRowTextSearchProps {
   /**
@@ -22,61 +16,29 @@ interface QueryRowTextSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
-  value: QueryRowTextValue;
+  currentValue: string;
 
   /**
    * Pass the selected value to the Query Builder to store.
    */
-  setValue: ((fieldPath: QueryRowTextValue) => void) | undefined;
+  setValue?: (fieldPath: string) => void;
 }
 
 export default function QueryRowTextSearch({
   matchType,
-  value,
+  currentValue,
   setValue
 }: QueryRowTextSearchProps) {
-  const [textSearchOptions, setTextSearchOptions] = useState<QueryRowTextValue>(
-    value ?? {
-      searchValue: "",
-      matchType: "exact"
-    }
-  );
-
-  useEffect(() => {
-    setValue?.(textSearchOptions);
-  }, [textSearchOptions]);
-
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {(matchType === "equals" || matchType === "notEquals") && (
         <input
           type="text"
-          value={textSearchOptions.searchValue}
-          onChange={(newValue) =>
-            setTextSearchOptions((oldValue) => ({
-              ...oldValue,
-              searchValue: newValue?.target?.value ?? ""
-            }))
-          }
-          style={{
-            borderTopRightRadius: "0px",
-            borderBottomRightRadius: "0px",
-            flex: "fit-content"
-          }}
+          value={currentValue ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value ?? "")}
+          style={{ flex: "fit-content" }}
           className="form-control"
-        />
-      )}
-
-      {(matchType === "equals" || matchType === "notEquals") && (
-        <QueryTextSwitch
-          currentTextOption={textSearchOptions.matchType}
-          setTextOption={(newTextOption) =>
-            setTextSearchOptions((oldValue) => ({
-              ...oldValue,
-              matchType: newTextOption
-            }))
-          }
         />
       )}
     </>

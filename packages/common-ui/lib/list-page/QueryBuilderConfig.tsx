@@ -1,8 +1,11 @@
 import {
   BasicConfig,
+  BasicFuncs,
   Config,
   Conjunctions,
+  Field,
   Fields,
+  Funcs,
   Operators,
   RenderSettings,
   Settings,
@@ -17,6 +20,7 @@ import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
 import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./QueryFieldSelector";
 import { QueryOperatorSelector } from "./QueryOperatorSelector";
+import { QueryTextSwitch } from "./QueryTextSwitch";
 import { ESIndexMapping } from "./types";
 
 interface QueryBuilderConfigProps {
@@ -31,54 +35,72 @@ export function queryBuilderConfig({
   indexMap,
   indexName
 }: QueryBuilderConfigProps): Config {
+  // If the index map doesn't exist, then there is no point of loading the config yet.
+  if (!indexMap) {
+    return {} as any;
+  }
+
   const conjunctions: Conjunctions = {
     ...BasicConfig.conjunctions
   };
 
   const operators: Operators = {
     equals: {
-      label: "Equals"
+      label: "Equals",
+      cardinality: 1
     },
     notEquals: {
-      label: "Not equals"
+      label: "Not equals",
+      cardinality: 1
     },
     empty: {
-      label: "Empty"
+      label: "Empty",
+      cardinality: 0
     },
     notEmpty: {
-      label: "Not empty"
+      label: "Not empty",
+      cardinality: 0
     },
     greaterThan: {
-      label: "Greater than"
+      label: "Greater than",
+      cardinality: 1
     },
     greaterThanOrEqualTo: {
-      label: "Greater than or equal to"
+      label: "Greater than or equal to",
+      cardinality: 1
     },
     lessThan: {
-      label: "Less than"
+      label: "Less than",
+      cardinality: 1
     },
     lessThanOrEqualTo: {
-      label: "Less than or equal to"
+      label: "Less than or equal to",
+      cardinality: 1
     },
     contains: {
-      label: "Contains"
+      label: "Contains",
+      cardinality: 1
     }
   };
 
   const widgets: Widgets = {
     ...BasicConfig.widgets,
     text: {
-      ...BasicConfig.widgets.text,
+      type: "text",
+      valueSrc: "func",
       factory: (factoryProps) => (
         <QueryRowTextSearch
           matchType={factoryProps?.operator}
-          value={factoryProps?.value}
+          currentValue={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
+        JSON.stringify(val)
     },
     autoComplete: {
-      ...BasicConfig.widgets.text,
+      type: "autoComplete",
+      valueSrc: "value",
       factory: (factoryProps) => (
         <QueryRowAutoSuggestionTextSearch
           currentFieldName={factoryProps?.field}
@@ -88,24 +110,29 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
+        JSON.stringify(val)
     },
     date: {
-      ...BasicConfig.widgets.date,
+      type: "date",
+      valueSrc: "value",
       factory: (factoryProps) => (
         <QueryRowDateSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
+        JSON.stringify(val)
     }
   };
 
   const types: Types = {
     text: {
+      valueSources: ["func"],
       defaultOperator: "equals",
-      mainWidget: "text",
       widgets: {
         text: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
@@ -113,6 +140,7 @@ export function queryBuilderConfig({
       }
     },
     autoComplete: {
+      valueSources: ["value"],
       defaultOperator: "equals",
       widgets: {
         autoComplete: {
@@ -121,6 +149,7 @@ export function queryBuilderConfig({
       }
     },
     date: {
+      valueSources: ["value"],
       defaultOperator: "equals",
       widgets: {
         date: {
@@ -146,6 +175,7 @@ export function queryBuilderConfig({
       }
     },
     number: {
+      valueSources: ["value"],
       defaultOperator: "equals",
       widgets: {
         number: {
@@ -163,6 +193,7 @@ export function queryBuilderConfig({
       }
     },
     boolean: {
+      valueSources: ["value"],
       defaultOperator: "equals",
       widgets: {
         boolean: {
@@ -218,6 +249,12 @@ export function queryBuilderConfig({
         setOperator={operatorDropdownProps?.setField}
       />
     ),
+    renderFunc: (funcProps) => (
+      <QueryTextSwitch
+        currentTextOption={funcProps?.selectedKey ?? ""}
+        setTextOption={funcProps?.setField}
+      />
+    ),
     renderConjs: (conjunctionProps) => (
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
@@ -233,19 +270,56 @@ export function queryBuilderConfig({
     canRegroup: true,
     canReorder: true,
     clearValueOnChangeField: false,
-    clearValueOnChangeOp: false
+    clearValueOnChangeOp: false,
+    valueSourcesInfo: {
+      value: {
+        label: "Value"
+      },
+      func: {
+        label: "Function",
+        widget: "func"
+      }
+    }
   };
 
-  let fields: Fields = {};
-  indexMap?.forEach((indexItem: ESIndexMapping) => {
-    fields = {
-      ...fields,
-      [indexItem.path + "." + indexItem.label]: {
+  const fields: Fields = Object.assign(
+    {},
+    ...indexMap?.map((indexItem: ESIndexMapping) => {
+      const field = {};
+      const type = indexItem.distinctTerm ? "autoComplete" : indexItem.type;
+
+      field[indexItem.value] = {
         label: indexItem.label,
-        type: indexItem.distinctTerm ? "autoComplete" : indexItem.type
+        type,
+        valueSources: type === "text" ? ["func"] : ["value"]
+      };
+
+      return field;
+    })
+  );
+
+  const funcs: Funcs = {
+    partial: {
+      label: "partial",
+      returnType: "text",
+      args: {
+        str: {
+          type: "text",
+          valueSources: ["value"]
+        }
       }
-    } as Fields;
-  });
+    },
+    exact: {
+      label: "exact",
+      returnType: "text",
+      args: {
+        str: {
+          type: "text",
+          valueSources: ["value"]
+        }
+      }
+    }
+  };
 
   return {
     conjunctions,
@@ -253,6 +327,7 @@ export function queryBuilderConfig({
     widgets,
     types,
     settings,
-    fields
+    fields,
+    funcs
   };
 }
