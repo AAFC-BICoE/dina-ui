@@ -1,6 +1,8 @@
 import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { useState, useEffect } from "react";
+import { SampleGrid } from "../../workflow/library-prep/container-grid/SampleGrid";
+import { DraggableSampleList } from "./DraggableSampleList";
 
 export interface PCRBatchPlatingStepProps {
     pcrBatchId: string;
@@ -61,11 +63,7 @@ export function PCRBatchPlatingStep({
           </TabPanel> */}
           <TabPanel>
           <p>My First Paragraph</p>
-            {/* <SampleGrid
-              chain={chain}
-              libraryPrepBatch={libraryPrepBatch}
-              sampleSelectionStep={sampleSelectionStep}
-            /> */}
+            {/* <SampleGrid {}/> */}
           </TabPanel>
           <TabPanel>
             <Tabs>
@@ -74,7 +72,13 @@ export function PCRBatchPlatingStep({
                 <Tab>Assign by table</Tab>
               </TabList>
               <TabPanel>
-                <p>My First Paragraph</p>
+                <DraggableSampleList
+                  availableItems={availableSamples}
+                  selectedItems={selectedSamples}
+                  movedItems={movedSamples}
+                  onClick={onSampleClick}
+                  onDrop={onListDrop}
+                />
               </TabPanel>
               {/* <TabPanel>
                 <LibraryPrepBulkEditor

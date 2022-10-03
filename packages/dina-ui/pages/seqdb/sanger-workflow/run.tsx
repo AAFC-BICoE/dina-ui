@@ -5,7 +5,7 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { Footer, Head, Nav } from "../../../components";
 import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
-import { PCRBatchPlatingStep } from "../../../components/seqdb/sanger-workflow/PCRBatchPlatingStep";
+import { PCRBatchPlatingStep } from "../../../components/seqdb/sanger-workflow/pcr-batch-plating-step/PCRBatchPlatingStep";
 import { useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 
