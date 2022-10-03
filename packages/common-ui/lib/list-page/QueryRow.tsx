@@ -295,21 +295,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {/* Text type */}
-          {typeVisibility.isText && (
-            <QueryRowTextSearch queryBuilderName={name} index={index} />
-          )}
-
-          {/* Auto suggestion text type */}
-          {typeVisibility.isSuggestedText && (
-            <QueryRowAutoSuggestionTextSearch
-              indexName={indexName}
-              queryBuilderName={name}
-              index={index}
-              elasticSearchMapping={dataFromIndexMapping}
-            />
-          )}
-
           {/* Date picker type */}
           {typeVisibility.isDate && (
             <QueryRowDateSearch queryBuilderName={name} index={index} />

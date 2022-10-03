@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { QueryRowExportProps } from "../QueryRow";
 import {
   includedTypeQuery,
@@ -6,6 +6,12 @@ import {
   termQuery,
   existsQuery
 } from "../../util/transformToDSL";
+import { QueryTextSwitch, TextOptions } from "../QueryTextSwitch";
+
+interface QueryRowTextValue {
+  searchValue: string;
+  matchType: TextOptions;
+}
 
 interface QueryRowTextSearchProps {
   /**
@@ -16,12 +22,12 @@ interface QueryRowTextSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
-  value: string;
+  value: QueryRowTextValue;
 
   /**
    * Pass the selected value to the Query Builder to store.
    */
-  setValue: ((fieldPath: string) => void) | undefined;
+  setValue: ((fieldPath: QueryRowTextValue) => void) | undefined;
 }
 
 export default function QueryRowTextSearch({
@@ -29,21 +35,50 @@ export default function QueryRowTextSearch({
   value,
   setValue
 }: QueryRowTextSearchProps) {
+  const [textSearchOptions, setTextSearchOptions] = useState<QueryRowTextValue>(
+    value ?? {
+      searchValue: "",
+      matchType: "exact"
+    }
+  );
+
+  useEffect(() => {
+    setValue?.(textSearchOptions);
+  }, [textSearchOptions]);
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {(matchType === "equals" || matchType === "notEquals") && (
         <input
           type="text"
-          value={value}
-          onChange={(newValue) => setValue?.(newValue?.target?.value ?? "")}
+          value={textSearchOptions.searchValue}
+          onChange={(newValue) =>
+            setTextSearchOptions((oldValue) => ({
+              ...oldValue,
+              searchValue: newValue?.target?.value ?? ""
+            }))
+          }
+          style={{
+            borderTopRightRadius: "0px",
+            borderBottomRightRadius: "0px",
+            flex: "fit-content"
+          }}
           className="form-control"
         />
       )}
 
-      {/* {(matchType === "equals" || matchType === "notEquals") && (
-        <ExactOrPartialSwitch removeLabel={true} className={"textMatchType"} />
-      )} */}
+      {(matchType === "equals" || matchType === "notEquals") && (
+        <QueryTextSwitch
+          currentTextOption={textSearchOptions.matchType}
+          setTextOption={(newTextOption) =>
+            setTextSearchOptions((oldValue) => ({
+              ...oldValue,
+              matchType: newTextOption
+            }))
+          }
+        />
+      )}
     </>
   );
 }

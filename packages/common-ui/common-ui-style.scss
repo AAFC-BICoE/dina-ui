@@ -142,4 +142,5 @@ input[type="number"]::-webkit-outer-spin-button {
 .rule--widget, .widget--widget {
   width: 100%;
   padding-right:10px;
+  display: inline-flex !important;
 }

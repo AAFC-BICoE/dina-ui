@@ -29,7 +29,7 @@ export function QueryBuilder({ indexName, onGroupChange }: QueryBuilderProps) {
 
   // Query Builder Configuration, only needs to update if the index map has changed.
   const config: Config = useMemo(
-    () => queryBuilderConfig({ indexMap }),
+    () => queryBuilderConfig({ indexMap, indexName }),
     [indexMap]
   );
 

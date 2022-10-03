@@ -2,6 +2,7 @@ import {
   BasicConfig,
   Config,
   Conjunctions,
+  Field,
   Fields,
   Operators,
   RenderSettings,
@@ -11,6 +12,7 @@ import {
 } from "react-awesome-query-builder";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
+import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
 import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
 import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./QueryFieldSelector";
@@ -20,10 +22,14 @@ import { ESIndexMapping } from "./types";
 interface QueryBuilderConfigProps {
   // The index map is used for generating the field list.
   indexMap: ESIndexMapping[];
+
+  // The index name currently being used.
+  indexName: string;
 }
 
 export function queryBuilderConfig({
-  indexMap
+  indexMap,
+  indexName
 }: QueryBuilderConfigProps): Config {
   const conjunctions: Conjunctions = {
     ...BasicConfig.conjunctions
@@ -66,6 +72,19 @@ export function queryBuilderConfig({
       factory: (factoryProps) => (
         <QueryRowTextSearch
           matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
+    },
+    autoComplete: {
+      ...BasicConfig.widgets.text,
+      factory: (factoryProps) => (
+        <QueryRowAutoSuggestionTextSearch
+          currentFieldName={factoryProps?.field}
+          matchType={factoryProps?.operator}
+          indexName={indexName}
+          indexMap={indexMap}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
@@ -195,15 +214,21 @@ export function queryBuilderConfig({
     ...renderSettings,
     showNot: false,
     canRegroup: true,
-    canReorder: true
+    canReorder: true,
+    clearValueOnChangeField: false,
+    clearValueOnChangeOp: false
   };
 
-  const fields: Fields = {
-    "data.attributes.createdBy": {
-      label: "test",
-      type: "text"
-    }
-  };
+  let fields: Fields = {};
+  indexMap?.forEach((indexItem: ESIndexMapping) => {
+    fields = {
+      ...fields,
+      [indexItem.path + "." + indexItem.label]: {
+        label: indexItem.label,
+        type: indexItem.distinctTerm ? "autoComplete" : indexItem.type
+      }
+    } as Fields;
+  });
 
   return {
     conjunctions,
