@@ -7,6 +7,7 @@ import {
   termQuery,
   existsQuery
 } from "../../util/transformToDSL";
+import { TransformToDSLProps } from "../types";
 
 interface QueryRowDateSearchProps {
   /**
@@ -33,12 +34,7 @@ export default function QueryRowDateSearch({
   return (
     <>
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <DateField
-          name="this"
-          className="flex-fill"
-          removeLabel={true}
-          partialDate={true}
-        />
+        <DateField name="this" removeLabel={true} partialDate={true} />
       )}
     </>
   );
@@ -47,13 +43,19 @@ export default function QueryRowDateSearch({
 /**
  * Using the query row for a date search, generate the elastic search request to be made.
  */
-export function transformDateSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const { matchType, date, parentType, parentName } = queryRow;
+export function transformDateSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
 
-  switch (matchType) {
+  const { parentType, parentName } = fieldInfo;
+
+  switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
     case "contains":
     case "greaterThan":
@@ -68,8 +70,8 @@ export function transformDateSearchToDSL(
                 bool: {
                   must: [
                     rangeQuery(
-                      fieldName,
-                      buildDateRangeObject(matchType, date)
+                      fieldPath,
+                      buildDateRangeObject(fieldPath, value)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -77,7 +79,7 @@ export function transformDateSearchToDSL(
               }
             }
           }
-        : rangeQuery(fieldName, buildDateRangeObject(matchType, date));
+        : rangeQuery(fieldPath, buildDateRangeObject(operation, value));
 
     // Not equals match type.
     case "notEquals":
@@ -91,7 +93,7 @@ export function transformDateSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldName, date, false),
+                        must_not: termQuery(fieldPath, value, false),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -104,7 +106,7 @@ export function transformDateSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: existsQuery(fieldName),
+                        must_not: existsQuery(fieldPath),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -127,12 +129,12 @@ export function transformDateSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldName, date, false)
+                    must_not: termQuery(fieldPath, value, false)
                   }
                 },
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 }
               ]
@@ -153,7 +155,7 @@ export function transformDateSearchToDSL(
                         query: {
                           bool: {
                             must: [
-                              existsQuery(fieldName),
+                              existsQuery(fieldPath),
                               includedTypeQuery(parentType)
                             ]
                           }
@@ -174,7 +176,7 @@ export function transformDateSearchToDSL(
           }
         : {
             bool: {
-              must_not: existsQuery(fieldName)
+              must_not: existsQuery(fieldPath)
             }
           };
 
@@ -186,12 +188,12 @@ export function transformDateSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
                 }
               }
             }
           }
-        : existsQuery(fieldName);
+        : existsQuery(fieldPath);
 
     // Equals and default case
     default:
@@ -202,14 +204,14 @@ export function transformDateSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldName, date, false),
+                    termQuery(fieldPath, value, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldName, date, false);
+        : termQuery(fieldPath, value, false);
   }
 }
 

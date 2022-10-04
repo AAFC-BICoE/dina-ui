@@ -111,6 +111,8 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--header {
+  position: relative;
+  top: -2px;
   opacity: 1 !important;
 }
 
@@ -124,23 +126,30 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--field {
+  min-width: 200px;
   width: 40%;
+  display: inline-block !important;
 }
 
 .rule--operator {
+  min-width: 200px;
   width: 20%;
+  display: inline-block !important;
 }
 
-.flex--value {
-  width: 60%;
-}
-
-.rule--body {
-  display: flex;
+.rule--value {
+  position: relative;
+  min-width: 200px;
+  top: -5px;
+  width: calc(40% - 15px);
+  display: inline-block !important;
 }
 
 .rule--widget, .widget--widget {
   width: 100%;
-  padding-right:10px;
-  display: inline-flex !important;
+  display: inline-block !important;
+}
+
+.group--drag-handler {
+  top: 0px !important;
 }

@@ -7,6 +7,7 @@ import {
   termQuery,
   existsQuery
 } from "../../util/transformToDSL";
+import { TransformToDSLProps } from "../types";
 
 interface QueryRowNumberSearchProps {
   /**
@@ -47,13 +48,19 @@ export default function QueryRowNumberSearch({
 /**
  * Using the query row for a number search, generate the elastic search request to be made.
  */
-export function transformNumberSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const { matchType, number: numberValue, parentType, parentName } = queryRow;
+export function transformNumberSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
 
-  switch (matchType) {
+  const { parentType, parentName } = fieldInfo;
+
+  switch (operation) {
     // less than / greater than / less than or equal to / greater than or equal to.
     case "greaterThan":
     case "greaterThanOrEqualTo":
@@ -67,8 +74,8 @@ export function transformNumberSearchToDSL(
                 bool: {
                   must: [
                     rangeQuery(
-                      fieldName,
-                      buildNumberRangeObject(matchType, numberValue)
+                      fieldPath,
+                      buildNumberRangeObject(operation, value)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -76,7 +83,7 @@ export function transformNumberSearchToDSL(
               }
             }
           }
-        : rangeQuery(fieldName, buildNumberRangeObject(matchType, numberValue));
+        : rangeQuery(fieldPath, buildNumberRangeObject(operation, value));
 
     // Not equals match type.
     case "notEquals":
@@ -90,7 +97,7 @@ export function transformNumberSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldName, numberValue, false),
+                        must_not: termQuery(fieldPath, value, false),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -103,7 +110,7 @@ export function transformNumberSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: existsQuery(fieldName),
+                        must_not: existsQuery(fieldPath),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -126,12 +133,12 @@ export function transformNumberSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldName, numberValue, false)
+                    must_not: termQuery(fieldPath, value, false)
                   }
                 },
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 }
               ]
@@ -152,7 +159,7 @@ export function transformNumberSearchToDSL(
                         query: {
                           bool: {
                             must: [
-                              existsQuery(fieldName),
+                              existsQuery(fieldPath),
                               includedTypeQuery(parentType)
                             ]
                           }
@@ -173,7 +180,7 @@ export function transformNumberSearchToDSL(
           }
         : {
             bool: {
-              must_not: existsQuery(fieldName)
+              must_not: existsQuery(fieldPath)
             }
           };
 
@@ -185,12 +192,12 @@ export function transformNumberSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
                 }
               }
             }
           }
-        : existsQuery(fieldName);
+        : existsQuery(fieldPath);
 
     // Equals and default case
     default:
@@ -201,14 +208,14 @@ export function transformNumberSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldName, numberValue, false),
+                    termQuery(fieldPath, value, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldName, numberValue, false);
+        : termQuery(fieldPath, value, false);
   }
 }
 

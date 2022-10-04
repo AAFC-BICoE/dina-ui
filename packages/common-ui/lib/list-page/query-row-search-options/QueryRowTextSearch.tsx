@@ -41,6 +41,7 @@ export default function QueryRowTextSearch({
           onChange={(newValue) => setValue?.(newValue?.target?.value)}
           style={{ flex: "fit-content" }}
           className="form-control"
+          placeholder="Enter search value..."
         />
       )}
     </>

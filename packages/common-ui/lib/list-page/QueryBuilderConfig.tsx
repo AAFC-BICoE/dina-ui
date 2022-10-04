@@ -12,9 +12,15 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
-import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
-import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
-import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
+import QueryRowBooleanSearch, {
+  transformBooleanSearchToDSL
+} from "./query-row-search-options/QueryRowBooleanSearch";
+import QueryRowDateSearch, {
+  transformDateSearchToDSL
+} from "./query-row-search-options/QueryRowDateSearch";
+import QueryRowNumberSearch, {
+  transformNumberSearchToDSL
+} from "./query-row-search-options/QueryRowNumberSearch";
 import QueryRowTextSearch, {
   transformTextSearchToDSL
 } from "./query-row-search-options/QueryRowTextSearch";
@@ -31,11 +37,56 @@ interface QueryBuilderConfigProps {
   indexName: string;
 }
 
+/**
+ * Helper function to get the index settings for a field path.
+ *
+ * The index settings has more information than what can be stored in the list, especially for
+ * nested fields.
+ */
 export function fieldPathToIndexSettings(
   fieldName: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
   return indexMap.find((indexSettings) => indexSettings.value === fieldName);
+}
+
+/**
+ * Converts elastic search types into query builder types.
+ * @param type The type from elastic search from the index.
+ * @param distinctTerm Boolean to indicate if the field contains a distinct term.
+ * @returns Query builder specific type.
+ */
+function getQueryBuilderTypeFromIndexType(
+  type: string,
+  distinctTerm: boolean
+): string {
+  // If the field is a distinct term, then it's an autocomplete field.
+  if (distinctTerm) {
+    return "autoComplete";
+  }
+
+  switch (type) {
+    // These fields are directly supported.
+    case "text":
+    case "date":
+    case "boolean":
+      return type;
+
+    // Elastic search contains many different number fields.
+    case "long":
+    case "short":
+    case "integer":
+    case "byte":
+    case "double":
+    case "float":
+    case "half_float":
+    case "scaled_float":
+    case "unsigned":
+      return "number";
+  }
+
+  // Unsupported type, this will cause an error with the query builder.
+  return "unsupported";
 }
 
 export function queryBuilderConfig({
@@ -54,58 +105,47 @@ export function queryBuilderConfig({
   const operators: Operators = {
     exactMatch: {
       label: "Exact match",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     partialMatch: {
       label: "Partial match",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     equals: {
       label: "Equals",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     notEquals: {
       label: "Not equals",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     empty: {
       label: "Empty",
-      cardinality: 0,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 0
     },
     notEmpty: {
       label: "Not empty",
-      cardinality: 0,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 0
     },
     greaterThan: {
       label: "Greater than",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     greaterThanOrEqualTo: {
       label: "Greater than or equal to",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     lessThan: {
       label: "Less than",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     lessThanOrEqualTo: {
       label: "Less than or equal to",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     },
     contains: {
       label: "Contains",
-      cardinality: 1,
-      elasticSearchQueryType: "removeNode"
+      cardinality: 1
     }
   };
 
@@ -144,7 +184,15 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
+        transformTextSearchToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
     },
     date: {
       ...BasicConfig.widgets.date,
@@ -156,7 +204,15 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
+        transformDateSearchToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
     },
     number: {
       ...BasicConfig.widgets.text,
@@ -168,7 +224,15 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
+        transformNumberSearchToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
     },
     boolean: {
       ...BasicConfig.widgets.text,
@@ -180,7 +244,15 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
+        transformBooleanSearchToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
     }
   };
 
@@ -332,11 +404,12 @@ export function queryBuilderConfig({
     {},
     ...indexMap?.map((indexItem: ESIndexMapping) => {
       const field = {};
-      const type = indexItem.distinctTerm ? "autoComplete" : indexItem.type;
-
       field[indexItem.value] = {
         label: indexItem.label,
-        type,
+        type: getQueryBuilderTypeFromIndexType(
+          indexItem.type,
+          indexItem.distinctTerm
+        ),
         valueSources: ["value"]
       };
 

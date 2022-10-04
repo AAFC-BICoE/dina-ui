@@ -6,6 +6,7 @@ import {
   existsQuery
 } from "../../util/transformToDSL";
 import Select from "react-select";
+import { TransformToDSLProps } from "../types";
 
 /**
  * The possible states of a boolean if the Equals match is being used.
@@ -58,13 +59,18 @@ export default function QueryRowBooleanSearch({
 /**
  * Using the query row for a boolean search, generate the elastic search request to be made.
  */
-export function transformBooleanSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const { matchType, boolean: booleanValue, parentType, parentName } = queryRow;
+export function transformBooleanSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
 
-  switch (matchType) {
+  const { parentType, parentName } = fieldInfo;
+  switch (operation) {
     // Empty for the boolean.
     case "empty":
       return parentType
@@ -79,7 +85,7 @@ export function transformBooleanSearchToDSL(
                         query: {
                           bool: {
                             must: [
-                              existsQuery(fieldName),
+                              existsQuery(fieldPath),
                               includedTypeQuery(parentType)
                             ]
                           }
@@ -100,7 +106,7 @@ export function transformBooleanSearchToDSL(
           }
         : {
             bool: {
-              must_not: existsQuery(fieldName)
+              must_not: existsQuery(fieldPath)
             }
           };
 
@@ -112,12 +118,12 @@ export function transformBooleanSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
                 }
               }
             }
           }
-        : existsQuery(fieldName);
+        : existsQuery(fieldPath);
 
     // Exact match for the boolean.
     default:
@@ -128,13 +134,13 @@ export function transformBooleanSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldName, booleanValue, false),
+                    termQuery(fieldPath, value, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldName, booleanValue, false);
+        : termQuery(fieldPath, value, false);
   }
 }
