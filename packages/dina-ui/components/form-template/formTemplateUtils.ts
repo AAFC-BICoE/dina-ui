@@ -88,6 +88,43 @@ export function getComponentValues(
   return ret;
 }
 
+export function getAllComponentValues(
+  formTemplate: FormTemplate | undefined
+): any {
+  let componentValues = {};
+  let templateCheckboxes: Record<string, true | undefined> = {};
+  let ret = {};
+  if (formTemplate) {
+    formTemplate.components?.forEach((component) => {
+      if (component.visible) {
+        component.sections?.forEach((sections) => {
+          sections.items?.forEach((item) => {
+            if (item.name && item.visible) {
+              componentValues = {
+                ...componentValues,
+                ...{
+                  [item.name]: item.visible ? item.defaultValue : undefined
+                }
+              };
+              templateCheckboxes = {
+                ...templateCheckboxes,
+                ...{ [item.name]: true }
+              };
+            }
+          });
+        });
+      }
+    });
+  }
+
+  ret = { ...componentValues };
+  if (Object.keys(templateCheckboxes).length !== 0) {
+    ret = { ...ret, templateCheckboxes };
+  }
+
+  return ret;
+}
+
 /**
  * Removes arrays from paths. This is useful for checking if a form template field matches.
  *

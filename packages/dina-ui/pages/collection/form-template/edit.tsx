@@ -15,12 +15,22 @@ import React, { useRef, useState } from "react";
 import {
   AcquisitionEvent,
   ACQUISITION_EVENT_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   FormTemplateComponents,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
-  MATERIAL_SAMPLE_FORM_LEGEND
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_FORM_LEGEND,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -30,7 +40,8 @@ import {
   getComponentValues,
   getComponentOrderFromTemplate,
   getFormTemplateCheckboxes,
-  getInitialValuesFromFormTemplate
+  getInitialValuesFromFormTemplate,
+  getAllComponentValues
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import {
   MaterialSampleForm,
@@ -95,7 +106,15 @@ export function FormTemplateEditPageLoaded({
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-  // Collecting Event Initial Values
+
+  // Get initial values of data components
+  const allMaterialSampleComponentValues =
+    getAllComponentValues(fetchedFormTemplate);
+  if (!allMaterialSampleComponentValues.associations?.length) {
+    allMaterialSampleComponentValues.associations = [{}];
+  }
+
+  // collecting event and acquisition components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues = {
     ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate),
     managedAttributesOrder: []
@@ -104,29 +123,16 @@ export function FormTemplateEditPageLoaded({
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
-  // Acquisition Event Initial Values
   const acquisitionEventInitialValues = getComponentValues(
     ACQUISITION_EVENT_COMPONENT_NAME,
     fetchedFormTemplate
   );
 
-  // The material sample initial values to load.
-  const materialSampleTemplateInitialValues =
-    getInitialValuesFromFormTemplate<MaterialSample>(fetchedFormTemplate);
-  if (!materialSampleTemplateInitialValues.organism?.length) {
-    materialSampleTemplateInitialValues.organism = [
-      { type: "organism", determination: [{}] }
-    ];
-  }
-  if (!materialSampleTemplateInitialValues.associations?.length) {
-    materialSampleTemplateInitialValues.associations = [{}];
-  }
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...fetchedFormTemplate,
-    ...collectingEventInitialValues,
-    ...acquisitionEventInitialValues,
+    ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
     id,
     type: "form-template"
@@ -136,7 +142,7 @@ export function FormTemplateEditPageLoaded({
     isTemplate: true,
     acqEventTemplateInitialValues: acquisitionEventInitialValues,
     colEventTemplateInitialValues: collectingEventInitialValues,
-    materialSampleTemplateInitialValues,
+    materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
     acquisitionEventFormRef: acqEventFormRef
   });
@@ -145,17 +151,31 @@ export function FormTemplateEditPageLoaded({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
-    // Include the collecting event and acquisition event values.
-    const { templateCheckboxes, ...collectinEventFormRefValues } =
-      collectingEvtFormRef?.current?.values;
+    // Get collecting event checkboxes and values
+    const {
+      templateCheckboxes: collectingEventCheckboxes,
+      ...collectinEventFormRefValues
+    } = collectingEvtFormRef?.current?.values || {};
     submittedValues.templateCheckboxes = {
       ...submittedValues.templateCheckboxes,
-      ...templateCheckboxes
+      ...collectingEventCheckboxes
     };
+
+    // Get acquisition event checkboxes and values
+    const {
+      templateCheckboxes: acquisitionEventCheckboxes,
+      ...acquisitionEventFormRefValues
+    } = acqEventFormRef?.current?.values || {};
+    submittedValues.templateCheckboxes = {
+      ...submittedValues.templateCheckboxes,
+      ...acquisitionEventCheckboxes
+    };
+
+    // Include the collecting event and acquisition event values.
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
-      ...submittedValues,
       ...(collectinEventFormRefValues ?? {}),
-      ...(acqEventFormRef?.current?.values ?? {})
+      ...(acquisitionEventFormRefValues ?? {}),
+      ...submittedValues
     };
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
@@ -174,7 +194,6 @@ export function FormTemplateEditPageLoaded({
       });
     };
     iterateThrough(allSubmittedValues);
-
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
