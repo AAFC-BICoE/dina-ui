@@ -16,7 +16,7 @@ interface QueryRowTextSearchProps {
   /**
    * Retrieve the current value from the Query Builder.
    */
-  currentValue: string;
+  value?: string;
 
   /**
    * Pass the selected value to the Query Builder to store.
@@ -26,17 +26,19 @@ interface QueryRowTextSearchProps {
 
 export default function QueryRowTextSearch({
   matchType,
-  currentValue,
+  value,
   setValue
 }: QueryRowTextSearchProps) {
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      {(matchType === "equals" || matchType === "notEquals") && (
+      {(matchType === "exactMatch" ||
+        matchType === "partialMatch" ||
+        matchType === "notEquals") && (
         <input
           type="text"
-          value={currentValue ?? ""}
-          onChange={(newValue) => setValue?.(newValue?.target?.value ?? "")}
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
           style={{ flex: "fit-content" }}
           className="form-control"
         />

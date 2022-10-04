@@ -6,11 +6,6 @@ import { FormikContextType, useFormikContext } from "formik";
 import lodash, { startCase } from "lodash";
 import { ESIndexMapping, TypeVisibility } from "./types";
 import { useIntl } from "react-intl";
-import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
-import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
-import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
-import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
-import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
 
 export interface QueryRowProps {
   /** Index name passed from the QueryPage component. */
@@ -295,16 +290,6 @@ export function QueryRow(queryRowProps: QueryRowProps) {
       </div>
       <div className="col-md-6">
         <div className="d-flex">
-          {/* Number type */}
-          {typeVisibility.isNumber && (
-            <QueryRowNumberSearch queryBuilderName={name} index={index} />
-          )}
-
-          {/* Boolean field (Dropdown with TRUE/FALSE) */}
-          {typeVisibility.isBoolean && (
-            <QueryRowBooleanSearch queryBuilderName={name} index={index} />
-          )}
-
           {/* Disabled text field when no search filter is selected. */}
           {!fieldName && (
             <TextField

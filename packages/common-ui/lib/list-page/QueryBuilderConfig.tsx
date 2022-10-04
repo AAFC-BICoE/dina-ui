@@ -1,11 +1,8 @@
 import {
   BasicConfig,
-  BasicFuncs,
   Config,
   Conjunctions,
-  Field,
   Fields,
-  Funcs,
   Operators,
   RenderSettings,
   Settings,
@@ -15,12 +12,12 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
+import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
 import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
 import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
 import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./QueryFieldSelector";
 import { QueryOperatorSelector } from "./QueryOperatorSelector";
-import { QueryTextSwitch } from "./QueryTextSwitch";
 import { ESIndexMapping } from "./types";
 
 interface QueryBuilderConfigProps {
@@ -45,6 +42,14 @@ export function queryBuilderConfig({
   };
 
   const operators: Operators = {
+    exactMatch: {
+      label: "Exact match",
+      cardinality: 1
+    },
+    partialMatch: {
+      label: "Partial match",
+      cardinality: 1
+    },
     equals: {
       label: "Equals",
       cardinality: 1
@@ -86,19 +91,20 @@ export function queryBuilderConfig({
   const widgets: Widgets = {
     ...BasicConfig.widgets,
     text: {
+      // Multi-select is used here since two values are stored for this type.
+      ...BasicConfig.widgets.text,
       type: "text",
-      valueSrc: "func",
+      valueSrc: "value",
       factory: (factoryProps) => (
         <QueryRowTextSearch
           matchType={factoryProps?.operator}
-          currentValue={factoryProps?.value}
+          value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      ),
-      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
-        JSON.stringify(val)
+      )
     },
     autoComplete: {
+      ...BasicConfig.widgets.text,
       type: "autoComplete",
       valueSrc: "value",
       factory: (factoryProps) => (
@@ -110,11 +116,10 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      ),
-      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
-        JSON.stringify(val)
+      )
     },
     date: {
+      ...BasicConfig.widgets.date,
       type: "date",
       valueSrc: "value",
       factory: (factoryProps) => (
@@ -123,19 +128,35 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      ),
-      formatValue: (val, _fieldDef, _wgtDef, _isForDisplay) =>
-        JSON.stringify(val)
+      )
+    },
+    boolean: {
+      ...BasicConfig.widgets.text,
+      type: "boolean",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowBooleanSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
     }
   };
 
   const types: Types = {
     text: {
-      valueSources: ["func"],
-      defaultOperator: "equals",
+      valueSources: ["value"],
+      defaultOperator: "exactMatch",
       widgets: {
         text: {
-          operators: ["equals", "notEquals", "empty", "notEmpty"]
+          operators: [
+            "exactMatch",
+            "partialMatch",
+            "notEquals",
+            "empty",
+            "notEmpty"
+          ]
         }
       }
     },
@@ -249,12 +270,6 @@ export function queryBuilderConfig({
         setOperator={operatorDropdownProps?.setField}
       />
     ),
-    renderFunc: (funcProps) => (
-      <QueryTextSwitch
-        currentTextOption={funcProps?.selectedKey ?? ""}
-        setTextOption={funcProps?.setField}
-      />
-    ),
     renderConjs: (conjunctionProps) => (
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
@@ -270,16 +285,7 @@ export function queryBuilderConfig({
     canRegroup: true,
     canReorder: true,
     clearValueOnChangeField: false,
-    clearValueOnChangeOp: false,
-    valueSourcesInfo: {
-      value: {
-        label: "Value"
-      },
-      func: {
-        label: "Function",
-        widget: "func"
-      }
-    }
+    clearValueOnChangeOp: false
   };
 
   const fields: Fields = Object.assign(
@@ -291,35 +297,12 @@ export function queryBuilderConfig({
       field[indexItem.value] = {
         label: indexItem.label,
         type,
-        valueSources: type === "text" ? ["func"] : ["value"]
+        valueSources: ["value"]
       };
 
       return field;
     })
   );
-
-  const funcs: Funcs = {
-    partial: {
-      label: "partial",
-      returnType: "text",
-      args: {
-        str: {
-          type: "text",
-          valueSources: ["value"]
-        }
-      }
-    },
-    exact: {
-      label: "exact",
-      returnType: "text",
-      args: {
-        str: {
-          type: "text",
-          valueSources: ["value"]
-        }
-      }
-    }
-  };
 
   return {
     conjunctions,
@@ -327,7 +310,6 @@ export function queryBuilderConfig({
     widgets,
     types,
     settings,
-    fields,
-    funcs
+    fields
   };
 }
