@@ -14,7 +14,10 @@ import { FaTrash } from "react-icons/fa";
 import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
 import QueryRowBooleanSearch from "./query-row-search-options/QueryRowBooleanSearch";
 import QueryRowDateSearch from "./query-row-search-options/QueryRowDateSearch";
-import QueryRowTextSearch from "./query-row-search-options/QueryRowTextSearch";
+import QueryRowNumberSearch from "./query-row-search-options/QueryRowNumberSearch";
+import QueryRowTextSearch, {
+  transformTextSearchToDSL
+} from "./query-row-search-options/QueryRowTextSearch";
 import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./QueryFieldSelector";
 import { QueryOperatorSelector } from "./QueryOperatorSelector";
@@ -26,6 +29,13 @@ interface QueryBuilderConfigProps {
 
   // The index name currently being used.
   indexName: string;
+}
+
+export function fieldPathToIndexSettings(
+  fieldName: string,
+  indexMap: ESIndexMapping[]
+): ESIndexMapping | undefined {
+  return indexMap.find((indexSettings) => indexSettings.value === fieldName);
 }
 
 export function queryBuilderConfig({
@@ -44,54 +54,64 @@ export function queryBuilderConfig({
   const operators: Operators = {
     exactMatch: {
       label: "Exact match",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     partialMatch: {
       label: "Partial match",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     equals: {
       label: "Equals",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     notEquals: {
       label: "Not equals",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     empty: {
       label: "Empty",
-      cardinality: 0
+      cardinality: 0,
+      elasticSearchQueryType: "removeNode"
     },
     notEmpty: {
       label: "Not empty",
-      cardinality: 0
+      cardinality: 0,
+      elasticSearchQueryType: "removeNode"
     },
     greaterThan: {
       label: "Greater than",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     greaterThanOrEqualTo: {
       label: "Greater than or equal to",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     lessThan: {
       label: "Less than",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     lessThanOrEqualTo: {
       label: "Less than or equal to",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     },
     contains: {
       label: "Contains",
-      cardinality: 1
+      cardinality: 1,
+      elasticSearchQueryType: "removeNode"
     }
   };
 
   const widgets: Widgets = {
     ...BasicConfig.widgets,
     text: {
-      // Multi-select is used here since two values are stored for this type.
       ...BasicConfig.widgets.text,
       type: "text",
       valueSrc: "value",
@@ -101,7 +121,15 @@ export function queryBuilderConfig({
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
+        transformTextSearchToDSL({
+          fieldPath: field,
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
     },
     autoComplete: {
       ...BasicConfig.widgets.text,
@@ -124,6 +152,18 @@ export function queryBuilderConfig({
       valueSrc: "value",
       factory: (factoryProps) => (
         <QueryRowDateSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
+    },
+    number: {
+      ...BasicConfig.widgets.text,
+      type: "number",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryRowNumberSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}

@@ -15,6 +15,7 @@ import {
   BuilderProps
 } from "react-awesome-query-builder";
 import { queryBuilderConfig } from "./QueryBuilderConfig";
+import { elasticSearchFormatExport } from "./QueryBuilderElasticSearchExport";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;
@@ -46,7 +47,9 @@ export function QueryBuilder({ indexName, onGroupChange }: QueryBuilderProps) {
 
   const onChange = useCallback((immutableTree: ImmutableTree) => {
     setQueryTree(immutableTree);
-    // console.log(JSON.stringify(immutableTree));
+    // console.log("tree format: " + JSON.stringify(immutableTree));
+    // console.log("Is tree valid: " + QbUtils.isValidTree(immutableTree));
+    // console.log("Elastic Search: " + JSON.stringify(elasticSearchFormatExport(immutableTree, config)));
   }, []);
 
   const renderBuilder = useCallback(

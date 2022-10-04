@@ -1,11 +1,11 @@
 import React from "react";
-import { QueryRowExportProps } from "../QueryRow";
 import {
   includedTypeQuery,
   matchQuery,
   termQuery,
   existsQuery
 } from "../../util/transformToDSL";
+import { TransformToDSLProps } from "../types";
 
 interface QueryRowTextSearchProps {
   /**
@@ -50,25 +50,26 @@ export default function QueryRowTextSearch({
 /**
  * Using the query row for a text search, generate the elastic search request to be made.
  */
-export function transformTextSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const {
-    matchType,
-    textMatchType,
-    matchValue,
-    distinctTerm,
-    parentType,
-    parentName
-  } = queryRow;
+export function transformTextSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
+
+  const { distinctTerm, parentType, parentName } = fieldInfo;
 
   // Is the "Exact" option selected? (Or if auto suggestions are being used.)
-  const isExactMatch: boolean = distinctTerm || textMatchType === "exact";
+  const isExactMatch: boolean = distinctTerm || operation === "exactMatch";
 
-  switch (matchType) {
+  switch (operation) {
     // Equals match type.
     case "equals":
+    case "partialMatch":
+    case "exactMatch":
       // Autocompletion expects to use the full text search.
       return parentType
         ? {
@@ -78,8 +79,8 @@ export function transformTextSearchToDSL(
                 bool: {
                   must: [
                     isExactMatch
-                      ? termQuery(fieldName, matchValue, true)
-                      : matchQuery(fieldName, matchValue),
+                      ? termQuery(fieldPath, value, true)
+                      : matchQuery(fieldPath, value),
                     includedTypeQuery(parentType)
                   ]
                 }
@@ -87,8 +88,8 @@ export function transformTextSearchToDSL(
             }
           }
         : isExactMatch
-        ? termQuery(fieldName, matchValue, true)
-        : matchQuery(fieldName, matchValue);
+        ? termQuery(fieldPath, value, true)
+        : matchQuery(fieldPath, value);
 
     // Not equals match type.
     case "notEquals":
@@ -103,8 +104,8 @@ export function transformTextSearchToDSL(
                     query: {
                       bool: {
                         must_not: isExactMatch
-                          ? termQuery(fieldName, matchValue, true)
-                          : matchQuery(fieldName, matchValue),
+                          ? termQuery(fieldPath, value, true)
+                          : matchQuery(fieldPath, value),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -117,7 +118,7 @@ export function transformTextSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: existsQuery(fieldName),
+                        must_not: existsQuery(fieldPath),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -141,13 +142,13 @@ export function transformTextSearchToDSL(
                 {
                   bool: {
                     must_not: isExactMatch
-                      ? termQuery(fieldName, matchValue, true)
-                      : matchQuery(fieldName, matchValue)
+                      ? termQuery(fieldPath, value, true)
+                      : matchQuery(fieldPath, value)
                   }
                 },
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 }
               ]
@@ -171,7 +172,7 @@ export function transformTextSearchToDSL(
                               query: {
                                 bool: {
                                   must: [
-                                    existsQuery(fieldName),
+                                    existsQuery(fieldPath),
                                     includedTypeQuery(parentType)
                                   ]
                                 }
@@ -186,7 +187,7 @@ export function transformTextSearchToDSL(
                           query: {
                             bool: {
                               must: [
-                                termQuery(fieldName, "", true),
+                                termQuery(fieldPath, "", true),
                                 includedTypeQuery(parentType)
                               ]
                             }
@@ -211,12 +212,12 @@ export function transformTextSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 },
                 {
                   bool: {
-                    must: termQuery(fieldName, "", true)
+                    must: termQuery(fieldPath, "", true)
                   }
                 }
               ]
@@ -231,16 +232,16 @@ export function transformTextSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must_not: termQuery(fieldName, "", true),
-                  must: [includedTypeQuery(parentType), existsQuery(fieldName)]
+                  must_not: termQuery(fieldPath, "", true),
+                  must: [includedTypeQuery(parentType), existsQuery(fieldPath)]
                 }
               }
             }
           }
         : {
             bool: {
-              must: existsQuery(fieldName),
-              must_not: termQuery(fieldName, "", true)
+              must: existsQuery(fieldPath),
+              must_not: termQuery(fieldPath, "", true)
             }
           };
 
@@ -253,13 +254,13 @@ export function transformTextSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    matchQuery(fieldName, matchValue),
+                    matchQuery(fieldPath, value),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : matchQuery(fieldName, matchValue);
+        : matchQuery(fieldPath, value);
   }
 }

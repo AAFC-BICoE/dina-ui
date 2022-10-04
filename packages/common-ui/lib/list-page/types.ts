@@ -153,3 +153,11 @@ export type QueryRowNumberType =
   | "half_float"
   | "scaled_float"
   | "unsigned_long";
+
+export interface TransformToDSLProps {
+  queryType: string;
+  value: string;
+  operation: string;
+  fieldPath: string;
+  fieldInfo?: ESIndexMapping;
+}
