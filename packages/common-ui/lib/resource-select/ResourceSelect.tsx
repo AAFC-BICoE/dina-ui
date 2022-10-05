@@ -253,8 +253,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       id = resource.id;
     }
 
-    selectedAsArray?.filter((selected) => selected !== null || undefined);
-
     return {
       label: optionLabel(resource as PersistedResource<TData>) ?? resource.id,
       resource,
