@@ -7,8 +7,9 @@ import {
   ContainerType,
   LibraryPrep,
   LibraryPrepBatch,
-  MolecularSample
-} from "../../../../../types/seqdb-api";
+  PcrBatchItem
+} from "../../../../types/seqdb-api";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
@@ -18,7 +19,7 @@ interface ContainerGridProps {
 }
 
 interface SampleStepResource {
-  molecularSample: MolecularSample;
+  molecularSample: MaterialSample;
 }
 
 export function useSampleGridControls({
@@ -34,8 +35,8 @@ export function useSampleGridControls({
   const [submitting, setSubmitting] = useState(false);
 
   // Highlighted/selected samples.
-  const [selectedSamples, setSelectedSamples] = useState<MolecularSample[]>([]);
-  const lastSelectedSampleRef = useRef<MolecularSample>();
+  const [selectedSamples, setSelectedSamples] = useState<MaterialSample[]>([]);
+  const lastSelectedSampleRef = useRef<MaterialSample>();
 
   // Grid fill direction when you move multiple samples into the grid.
   const [fillMode, setFillMode] = useState<string>("COLUMN");
@@ -44,16 +45,16 @@ export function useSampleGridControls({
 
   const [gridState, setGridState] = useState({
     // Available samples with no well coordinates.
-    availableSamples: [] as MolecularSample[],
+    availableSamples: [] as MaterialSample[],
     // The grid of samples that have well coordinates.
     cellGrid: {} as CellGrid,
     // Samples that have been moved since data initialization.
-    movedSamples: [] as MolecularSample[]
+    movedSamples: [] as MaterialSample[]
   });
 
   // Library prep and sample queries.
   const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
-    useQuery<LibraryPrep[]>(
+    useQuery<PcrBatchItem[]>(
       {
         // Optimize query speed by reducing the amount of requested fields.
         fields: {
@@ -65,19 +66,19 @@ export function useSampleGridControls({
       },
       {
         deps: [lastSave],
-        onSuccess: async ({ data: libraryPreps }) => {
+        onSuccess: async ({ data: pcrBatchItems }) => {
           setSamplesLoading(true);
 
-          const libraryPrepsWithCoords = libraryPreps.filter(
-            prep => prep.wellRow && prep.wellColumn
+          const pcrBatchItemsWithCoords = pcrBatchItems.filter(
+            item => item.wellRow && item.wellColumn
           );
 
           const newCellGrid: CellGrid = {};
           for (const {
             wellRow,
             wellColumn,
-            molecularSample
-          } of libraryPrepsWithCoords) {
+            materialSample
+          } of pcrBatchItemsWithCoords) {
             newCellGrid[`${wellRow}_${wellColumn}`] = molecularSample;
           }
 
@@ -117,7 +118,7 @@ export function useSampleGridControls({
       }
     );
 
-  function moveSamples(samples: MolecularSample[], coords?: string) {
+  function moveSamples(samples: MaterialSample[], coords?: string) {
     setGridState(({ availableSamples, cellGrid, movedSamples }) => {
       // Remove the sample from the grid.
       const newCellGrid: CellGrid = omitBy(cellGrid, s => samples.includes(s));
@@ -198,7 +199,7 @@ export function useSampleGridControls({
     setSelectedSamples([]);
   }
 
-  function onGridDrop(sample: MolecularSample, coords: string) {
+  function onGridDrop(sample: MaterialSample, coords: string) {
     if (selectedSamples.includes(sample)) {
       moveSamples(selectedSamples, coords);
     } else {
@@ -206,7 +207,7 @@ export function useSampleGridControls({
     }
   }
 
-  function onListDrop(sample: MolecularSample) {
+  function onListDrop(sample: MaterialSample) {
     moveSamples([sample]);
   }
 

@@ -1,23 +1,24 @@
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { ContainerType, MolecularSample } from "../../../../../types/seqdb-api";
+import { ContainerType } from "../../../../types/seqdb-api";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { DraggableSampleBox, SAMPLE_BOX_DRAG_KEY } from "./DraggableSampleBox";
 
 interface ContainerGridProps {
   containerType: ContainerType;
   cellGrid: CellGrid;
-  movedSamples: MolecularSample[];
-  onDrop: (sample: MolecularSample, coords: string) => void;
+  movedSamples: MaterialSample[];
+  onDrop: (sample: MaterialSample, coords: string) => void;
 }
 
 interface GridCellProps {
-  onDrop: (item: { sample: MolecularSample }) => void;
-  movedSamples: MolecularSample[];
-  sample: MolecularSample;
+  onDrop: (item: { sample: MaterialSample }) => void;
+  movedSamples: MaterialSample[];
+  sample: MaterialSample;
 }
 
 export interface CellGrid {
-  [key: string]: MolecularSample;
+  [key: string]: MaterialSample;
 }
 
 export function ContainerGrid({
@@ -47,15 +48,15 @@ export function ContainerGrid({
         const rowLabel = String.fromCharCode(row + 65);
         const coords = `${rowLabel}_${columnLabel}`;
 
-        return (
-          <span className={`well-${coords}`}>
-            <GridCell
-              movedSamples={movedSamples}
-              onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
-              sample={cellGrid[coords]}
-            />
-          </span>
-        );
+        // return (
+        //   <span className={`well-${coords}`}>
+        //     <GridCell
+        //       movedSamples={movedSamples}
+        //       onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
+        //       sample={cellGrid[coords]}
+        //     />
+        //   </span>
+        // );
       },
       Header: columnLabel,
       resizable: false,

@@ -1,8 +1,11 @@
-import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
+import { ButtonBar, DinaForm, filterBy, SubmitButton, useApiClient, withResponse } from "common-ui";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { useState, useEffect } from "react";
 import { SampleGrid } from "../../workflow/library-prep/container-grid/SampleGrid";
-import { DraggableSampleList } from "./DraggableSampleList";
+import { ContainerGrid } from "./ContainerGrid";
+import { DraggableSampleList } from "./DraggablePCRBatchItemList";
+import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
+import { PersistedResource } from "kitsu";
 
 export interface PCRBatchPlatingStepProps {
     pcrBatchId: string;
@@ -14,7 +17,46 @@ export function PCRBatchPlatingStep({
 
   // State to keep track if in edit mode.
   const [editMode, setEditMode] = useState(false);
+  const { apiClient } = useApiClient();
+  const [selectedSamples, setSelectedSamples] = useState<PcrBatchItem[]>([]);
+  const [movedSamples, setMovedSamples] = useState<PcrBatchItem[]>([]);
+  const [availableSamples, setAvailableSamples] = useState<PcrBatchItem[]>([]);
+  function onListDrop(sample: PcrBatchItem) {
+    return null;
+  }
+  function onSampleClick(sample, e) {
+    return null;
+  }
+  async function fetchSampledIds() {
+    await apiClient
+      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId
+            }
+          ]
+        })(""),
+        include: "materialSample"
+      })
+      .then((response) => {
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+          response?.data?.filter(
+            (item) => item?.materialSample?.id !== undefined
+          );
+        const materialSampleIds: string[] =
+          pcrBatchItems.map((item) => item?.materialSample?.id as string) ?? [];
 
+        setAvailableSamples(pcrBatchItems);
+      });
+  }
+
+
+  /**
+   * Taking all of the material sample UUIDs, retrieve the materi
+  
     /**
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
    */
@@ -42,59 +84,19 @@ export function PCRBatchPlatingStep({
             Library Prep Worksheet With Grid
           </a>
       </div>
-      <div
-        className="mb-3"
-        // Give this section enough min height so you don't lose your scroll position when changing tabs:
-        style={{ minHeight: "70rem" }}
-      >
-        <Tabs>
-          <TabList>
-            <Tab>Substep 1: Library Prep Details Table</Tab>
-            <Tab>Substep 2: Container Grid</Tab>
-            <Tab>Substep 3: Index Assignment</Tab>
-          </TabList>
-          {/* <TabPanel>
-            <LibraryPrepBulkEditor
-              chain={chain}
-              editMode="DETAILS"
-              libraryPrepBatch={libraryPrepBatch}
-              sampleSelectionStep={sampleSelectionStep}
-            />
-          </TabPanel> */}
-          <TabPanel>
-          <p>My First Paragraph</p>
-            {/* <SampleGrid {}/> */}
-          </TabPanel>
-          <TabPanel>
-            <Tabs>
-              <TabList>
-                <Tab>Assign by grid</Tab>
-                <Tab>Assign by table</Tab>
-              </TabList>
-              <TabPanel>
-                <DraggableSampleList
-                  availableItems={availableSamples}
-                  selectedItems={selectedSamples}
-                  movedItems={movedSamples}
-                  onClick={onSampleClick}
-                  onDrop={onListDrop}
-                />
-              </TabPanel>
-              {/* <TabPanel>
-                <LibraryPrepBulkEditor
-                  chain={chain}
-                  editMode="INDEX"
-                  libraryPrepBatch={libraryPrepBatch}
-                  sampleSelectionStep={sampleSelectionStep}
-                />
-              </TabPanel> */}
-            </Tabs>
-          </TabPanel>
-        </Tabs>
-      </div>
-    </>
-    ) : ( <p>My First Paragraph</p>);
-
-    
+      <div className="row">
+        <div className="col-2">
+          <strong>Selected samples ({availableSamples.length} in list)</strong>
+          <DraggableSampleList
+            availableItems={availableSamples}
+            selectedItems={selectedSamples}
+            movedItems={movedSamples}
+            onClick={onSampleClick}
+            onDrop={onListDrop}
+          />
+        </div>
+        </div>
+        </>
+    ) : ( <p>My First Paragraph</p>);  
 }
 
