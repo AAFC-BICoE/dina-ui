@@ -29,14 +29,6 @@ import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
 
-interface QueryBuilderConfigProps {
-  // The index map is used for generating the field list.
-  indexMap: ESIndexMapping[];
-
-  // The index name currently being used.
-  indexName: string;
-}
-
 /**
  * Helper function to get the index settings for a field path.
  *
@@ -89,10 +81,17 @@ function getQueryBuilderTypeFromIndexType(
   return "unsupported";
 }
 
-export function queryBuilderConfig({
-  indexMap,
-  indexName
-}: QueryBuilderConfigProps): Config {
+/**
+ * Create the query builder configure using the index map and index name.
+ *
+ * @param indexMap The index map is used for generating the field list.
+ * @param indexName The index name currently being used.
+ * @returns Query Builder configuration.
+ */
+export function generateBuilderConfig(
+  indexMap: ESIndexMapping[],
+  indexName: string
+): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
     return {} as any;

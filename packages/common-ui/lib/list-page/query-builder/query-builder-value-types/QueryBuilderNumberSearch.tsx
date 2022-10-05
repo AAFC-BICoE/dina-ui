@@ -1,5 +1,4 @@
 import React from "react";
-import { NumberField } from "../../..";
 import {
   includedTypeQuery,
   rangeQuery,
@@ -34,10 +33,12 @@ export default function QueryBuilderNumberSearch({
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <NumberField
-          name="thisneedstoberemoved"
-          className="flex-fill"
-          removeLabel={true}
+        <input
+          type="number"
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
+          className="form-control"
+          placeholder="Enter number value..."
         />
       )}
     </>
