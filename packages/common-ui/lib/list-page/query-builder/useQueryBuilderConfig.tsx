@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BasicConfig,
   Config,
@@ -35,7 +36,7 @@ import QueryBuilderTextSearch, {
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-export function fieldPathToIndexSettings(
+function fieldPathToIndexSettings(
   fieldName: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -82,13 +83,32 @@ function getQueryBuilderTypeFromIndexType(
 }
 
 /**
+ * Custom hook for generating the query builder hook. It should only be generated once.
+ */
+export function useQueryBuilderConfig(
+  indexMap: ESIndexMapping[] | undefined,
+  indexName: string
+) {
+  const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
+
+  // When the index map has been provided (or changed) it can be generated.
+  useEffect(() => {
+    if (!indexMap) return;
+
+    setQueryBuilderConfig(generateBuilderConfig(indexMap, indexName));
+  }, [indexMap]);
+
+  return { queryBuilderConfig };
+}
+
+/**
  * Create the query builder configure using the index map and index name.
  *
  * @param indexMap The index map is used for generating the field list.
  * @param indexName The index name currently being used.
  * @returns Query Builder configuration.
  */
-export function generateBuilderConfig(
+function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string
 ): Config {
