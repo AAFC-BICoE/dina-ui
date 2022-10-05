@@ -1,12 +1,11 @@
 import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
 import { useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule, Column } from "react-table";
+import ReactTable, { TableProps, SortingRule } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
-import { defaultQueryTree, QueryBuilder } from "./query-builder/QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import {
@@ -30,10 +29,12 @@ import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
-import { Config, ImmutableTree } from "react-awesome-query-builder";
-import { elasticSearchFormatExport } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { useIndexMapping } from "./useIndexMapping";
-import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
+import { ImmutableTree } from "react-awesome-query-builder";
+import {
+  defaultQueryTree,
+  useQueryBuilder
+} from "./query-builder/useQueryBuilder";
+import { useElasticSearchRequest } from "./useElasticSearchRequest";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -133,7 +134,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /**
    * Boolean flag to display only the result table when true
    */
-  viewMode?: boolean;
+  viewMode: boolean;
 
   /**
    * Custom elastic search query given by calling component
@@ -163,31 +164,22 @@ export function QueryPage<TData extends KitsuResource>({
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
-  viewMode,
+  viewMode = false,
   customViewQuery
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
   const { groupNames, subject } = useAccount();
 
-  // Load index map using the index name.
-  const { indexMap } = useIndexMapping(indexName);
-
-  // Load the query build configuration.
-  const { queryBuilderConfig } = useQueryBuilderConfig(indexMap, indexName);
-
-  // Search results returned by Elastic Search
-  const [searchResults, setSearchResults] = useState<TData[]>([]);
-
-  // Total number of records from the query. This is not the total displayed on the screen.
-  const [totalRecords, setTotalRecords] = useState<number>(0);
-
-  // The submitted query builder tree, when the submit button is clicked the queryBuilderTree should
-  // be changed to this.
-  const [submittedQueryBuilderTree, setSubmittedQueryBuilderTree] =
-    useState<ImmutableTree>(
-      customViewQuery ? customViewQuery : defaultQueryTree()
-    );
+  const {
+    QueryBuilder,
+    getCurrentQueryTree,
+    loadQueryTree,
+    queryBuilderConfig
+  } = useQueryBuilder({
+    indexName,
+    viewMode
+  });
 
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
@@ -213,64 +205,23 @@ export function QueryPage<TData extends KitsuResource>({
   // Query Page error message state
   const [error, setError] = useState<any>();
 
-  // Fetch data if the pagination, sorting or search filters have changed.
+  const { performElasticSearchRequest, searchResults, totalRecords } =
+    useElasticSearchRequest({
+      indexName,
+      maxCountSize: MAX_COUNT_SIZE,
+      setError,
+      setLoading
+    });
+
+  // Fetch data if the pagination, sorting have changed.
   useEffect(() => {
-    if (!submittedQueryBuilderTree || !queryBuilderConfig) return;
-
-    // Reset any error messages since we are trying again.
-    setError(undefined);
-
-    // Elastic search query with pagination settings.
-    const queryDSL = elasticSearchFormatExport(
-      submittedQueryBuilderTree,
-      queryBuilderConfig
-    );
-
-    // Do not search when the query has no content. (It should at least have pagination.)
-    if (!queryDSL || !Object.keys(queryDSL).length) return;
-
-    // Fetch data using elastic search.
-    // The included section will be transformed from an array to an object with the type name for each relationship.
-    elasticSearchRequest(queryDSL)
-      .then((result) => {
-        const processedResult = result?.hits.map((rslt) => ({
-          id: rslt._source?.data?.id,
-          type: rslt._source?.data?.type,
-          data: {
-            attributes: rslt._source?.data?.attributes
-          },
-          included: rslt._source?.included?.reduce(
-            (array, currentIncluded) => (
-              (array[currentIncluded?.type] = currentIncluded), array
-            ),
-            {}
-          )
-        }));
-        // If we have reached the count limit, we will need to perform another request for the true
-        // query size.
-        if (result?.total.value === MAX_COUNT_SIZE) {
-          elasticSearchCountRequest(queryDSL)
-            .then((countResult) => {
-              setTotalRecords(countResult);
-            })
-            .catch((elasticSearchError) => {
-              setError(elasticSearchError);
-            });
-        } else {
-          setTotalRecords(result?.total?.value ?? 0);
-        }
-
-        setAvailableResources(processedResult);
-        setSearchResults(processedResult);
-      })
-      .catch((elasticSearchError) => {
-        setError(elasticSearchError);
-      })
-      .finally(() => {
-        // No matter the end result, loading should stop.
-        setLoading(false);
-      });
-  }, [pagination, submittedQueryBuilderTree, sortingRules]);
+    performElasticSearchRequest({
+      queryBuilderConfig,
+      queryBuilderTree: getCurrentQueryTree(),
+      pagination,
+      sortingRules
+    });
+  }, [pagination, sortingRules]);
 
   // Actions to perform when the QueryPage is first mounted.
   useEffect(() => {
@@ -278,6 +229,10 @@ export function QueryPage<TData extends KitsuResource>({
       loadSavedSearch("default");
     }
   }, []);
+
+  useEffect(() => {
+    setAvailableResources(searchResults);
+  }, [searchResults]);
 
   /**
    * Used for selection mode only.
@@ -318,8 +273,8 @@ export function QueryPage<TData extends KitsuResource>({
       "id"
     );
 
-    setSelectedResources(selectedResourcesAppended);
-    setRemovableItems(selectedResourcesAppended);
+    // setSelectedResources(selectedResourcesAppended);
+    // setRemovableItems(selectedResourcesAppended);
 
     // Deselect the search results.
     formik.setFieldValue("itemIdsToSelect", {});
@@ -413,49 +368,6 @@ export function QueryPage<TData extends KitsuResource>({
         setError(userPreferenceError);
         callback(undefined);
       });
-  }
-
-  /**
-   * Asynchronous POST request for elastic search. Used to retrieve elastic search results against
-   * the indexName in the prop.
-   *
-   * @param queryDSL query containing filters and pagination.
-   * @returns Elastic search response.
-   */
-  async function elasticSearchRequest(queryDSL) {
-    const query = { ...queryDSL };
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/search`,
-      query,
-      {
-        params: {
-          indexName
-        }
-      }
-    );
-    return resp?.data?.hits;
-  }
-
-  /**
-   * Asynchronous POST request for elastic search count API. By default, the elastic search will
-   * only provide the count until `MAX_COUNT_SIZE`. This call is used to get the accurate total
-   * count for larger search sets.
-   *
-   * @param queryDSL query filters are only used, pagination and sorting are ignored.
-   * @returns Elastic search count response.
-   */
-  async function elasticSearchCountRequest(queryDSL) {
-    const query = { query: { ...queryDSL?.query } };
-    const resp = await apiClient.axios.post(
-      `search-api/search-ws/count`,
-      query,
-      {
-        params: {
-          indexName
-        }
-      }
-    );
-    return resp?.data?.count;
   }
 
   // Checkbox for the first table that lists the search results
@@ -556,7 +468,7 @@ export function QueryPage<TData extends KitsuResource>({
    * performed.
    */
   function resetForm() {
-    setSubmittedQueryBuilderTree(defaultQueryTree());
+    loadQueryTree(defaultQueryTree());
     setError(undefined);
     setPagination({
       ...pagination,
@@ -570,7 +482,16 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
-    setSubmittedQueryBuilderTree(queryBuilderTree);
+    performElasticSearchRequest({
+      pagination: {
+        ...pagination,
+        offset: 0
+      },
+      sortingRules,
+      queryBuilderConfig,
+      queryBuilderTree: getCurrentQueryTree()
+    });
+
     setPagination({
       ...pagination,
       offset: 0
@@ -640,15 +561,7 @@ export function QueryPage<TData extends KitsuResource>({
       )}
 
       {/* Query Filtering Options */}
-      {!viewMode && (
-        <QueryBuilder
-          name="queryRows"
-          indexName={indexName}
-          indexMap={indexMap}
-          onGroupChange={onSubmit}
-          queryBuilderConfig={queryBuilderConfig}
-        />
-      )}
+      {!viewMode && QueryBuilder}
 
       <div className="d-flex mb-3">
         {!viewMode && (

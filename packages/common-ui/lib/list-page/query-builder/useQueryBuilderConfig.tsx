@@ -84,16 +84,22 @@ function getQueryBuilderTypeFromIndexType(
 
 /**
  * Custom hook for generating the query builder hook. It should only be generated once.
+ *
+ * @param indexMap Index mapping.
+ * @param indexName The name of the index.
+ * @param viewMode boolean to indicate if the query builder is not displayed.
  */
 export function useQueryBuilderConfig(
   indexMap: ESIndexMapping[] | undefined,
-  indexName: string
+  indexName: string,
+  viewMode: boolean
 ) {
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
 
   // When the index map has been provided (or changed) it can be generated.
   useEffect(() => {
-    if (!indexMap) return;
+    // Do not set the query builder config in view mode.
+    if (!indexMap || viewMode) return;
 
     setQueryBuilderConfig(generateBuilderConfig(indexMap, indexName));
   }, [indexMap]);
