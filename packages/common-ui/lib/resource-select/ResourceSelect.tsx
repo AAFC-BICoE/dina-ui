@@ -232,7 +232,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Convert the field value to react-select option objects:
   const seenKeys = [] as string[];
-  const selectedAsArray = selectedResources.map((resource, index) => {
+  const selectedAsArray: any[] = selectedResources.map((resource, index) => {
     if (!resource) {
       return null;
     }
@@ -252,6 +252,8 @@ export function ResourceSelect<TData extends KitsuResource>({
       seenKeys.push(resource.id);
       id = resource.id;
     }
+
+    selectedAsArray?.filter((selected) => selected !== null || undefined);
 
     return {
       label: optionLabel(resource as PersistedResource<TData>) ?? resource.id,
