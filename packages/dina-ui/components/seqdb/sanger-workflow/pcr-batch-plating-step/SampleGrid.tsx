@@ -2,7 +2,7 @@ import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
-import { DraggableSampleList } from "./DraggableSampleList";
+import { DraggableSampleList } from "./DraggablePCRBatchItemList";
 import { useSampleGridControls } from "./useSampleGridControls";
 
 export interface ContainerGridProps {
