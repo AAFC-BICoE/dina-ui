@@ -1,15 +1,14 @@
 import React from "react";
-import { NumberField } from "../..";
-import { QueryRowExportProps } from "../QueryRow";
+import { NumberField } from "../../..";
 import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
-import { TransformToDSLProps } from "../types";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TransformToDSLProps } from "../../types";
 
-interface QueryRowNumberSearchProps {
+interface QueryBuilderNumberSearchProps {
   /**
    * Current match type being used.
    */
@@ -26,11 +25,11 @@ interface QueryRowNumberSearchProps {
   setValue?: (fieldPath: string) => void;
 }
 
-export default function QueryRowNumberSearch({
+export default function QueryBuilderNumberSearch({
   matchType,
   value,
   setValue
-}: QueryRowNumberSearchProps) {
+}: QueryBuilderNumberSearchProps) {
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}

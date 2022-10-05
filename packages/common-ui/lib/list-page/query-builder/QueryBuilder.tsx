@@ -3,10 +3,10 @@ import {
   FieldWrapperProps,
   LoadingSpinner,
   useApiClient
-} from "..";
-import { GroupSelectField } from "../../../dina-ui/components";
+} from "../..";
+import { GroupSelectField } from "../../../../dina-ui/components";
 import { useEffect, useMemo } from "react";
-import { ESIndexMapping } from "./types";
+import { ESIndexMapping } from "../types";
 import { Query, Builder, Utils as QbUtils } from "react-awesome-query-builder";
 import { useState, useCallback } from "react";
 import {
@@ -15,7 +15,6 @@ import {
   BuilderProps
 } from "react-awesome-query-builder";
 import { queryBuilderConfig } from "./QueryBuilderConfig";
-import { elasticSearchFormatExport } from "./QueryBuilderElasticSearchExport";
 
 interface QueryBuilderProps extends FieldWrapperProps {
   indexName: string;

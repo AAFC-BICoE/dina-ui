@@ -1,22 +1,21 @@
 import React from "react";
-import { QueryRowExportProps } from "../QueryRow";
 import {
   includedTypeQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import Select from "react-select";
-import { TransformToDSLProps } from "../types";
+import { TransformToDSLProps } from "../../types";
 
 /**
  * The possible states of a boolean if the Equals match is being used.
  */
-const queryRowBooleanOptions = [
+const QueryBuilderBooleanOptions = [
   { label: "True", value: "true" },
   { label: "False", value: "false" }
 ];
 
-interface QueryRowBooleanSearchProps {
+interface QueryBuilderBooleanSearchProps {
   /**
    * Current match type being used.
    */
@@ -33,12 +32,12 @@ interface QueryRowBooleanSearchProps {
   setValue?: (fieldPath: string) => void;
 }
 
-export default function QueryRowBooleanSearch({
+export default function QueryBuilderBooleanSearch({
   matchType,
   value,
   setValue
-}: QueryRowBooleanSearchProps) {
-  const selectedOption = queryRowBooleanOptions.find(
+}: QueryBuilderBooleanSearchProps) {
+  const selectedOption = QueryBuilderBooleanOptions.find(
     (option) => option.value === value
   );
 
@@ -47,7 +46,7 @@ export default function QueryRowBooleanSearch({
       {matchType === "equals" && (
         <Select
           value={selectedOption}
-          options={queryRowBooleanOptions as any}
+          options={QueryBuilderBooleanOptions as any}
           className="me-1 flex-fill"
           onChange={(selected) => setValue?.(selected?.value ?? "true")}
         />

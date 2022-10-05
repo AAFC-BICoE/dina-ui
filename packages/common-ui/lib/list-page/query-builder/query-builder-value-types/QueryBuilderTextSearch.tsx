@@ -4,8 +4,8 @@ import {
   matchQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
-import { TransformToDSLProps } from "../types";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TransformToDSLProps } from "../../types";
 
 interface QueryRowTextSearchProps {
   /**

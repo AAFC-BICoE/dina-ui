@@ -6,7 +6,7 @@ import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm } from "../formik-connected/DinaForm";
 import { SubmitButton } from "../formik-connected/SubmitButton";
-import { QueryBuilder } from "./QueryBuilder";
+import { QueryBuilder } from "./query-builder/QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
 import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import {

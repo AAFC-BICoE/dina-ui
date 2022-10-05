@@ -1,9 +1,9 @@
 import { useFormikContext } from "formik";
-import { ESIndexMapping } from "../types";
-import { useElasticSearchDistinctTerm } from "../useElasticSearchDistinctTerm";
-import { AutoSuggestTextField } from "../../formik-connected/AutoSuggestTextField";
+import { ESIndexMapping } from "../../types";
+import { useElasticSearchDistinctTerm } from "../../useElasticSearchDistinctTerm";
+import { AutoSuggestTextField } from "../../../formik-connected/AutoSuggestTextField";
 
-interface QueryRowAutoSuggestionTextSearchProps {
+interface QueryBuilderAutoSuggestionTextSearchProps {
   /**
    * Current field selected in the Query Builder.
    */
@@ -36,14 +36,14 @@ interface QueryRowAutoSuggestionTextSearchProps {
   indexMap?: ESIndexMapping[];
 }
 
-export default function QueryRowAutoSuggestionTextSearch({
+export default function QueryBuilderAutoSuggestionTextSearch({
   currentFieldName,
   matchType,
   value,
   setValue,
   indexName,
   indexMap
-}: QueryRowAutoSuggestionTextSearchProps) {
+}: QueryBuilderAutoSuggestionTextSearchProps) {
   const formikProps = useFormikContext();
   const selectedGroups: string[] = (formikProps.values as any)?.group;
 

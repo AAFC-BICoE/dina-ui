@@ -1,6 +1,6 @@
 import Select from "react-select";
 import React from "react";
-import { QueryBuilder } from "../QueryBuilder";
+import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { DinaForm } from "../../formik-connected/DinaForm";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import DatePicker from "react-datepicker";

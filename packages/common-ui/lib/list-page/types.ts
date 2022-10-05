@@ -121,43 +121,45 @@ export interface ESIndexMapping {
 }
 
 /**
- * Used to determine what type to display for a query row.
+ * Each type on the query builder has a function that is used to transform the query builder row
+ * into elastic search logic.
+ *
+ * @see QueryBuilderElasticSearchExport
+ * @see QueryRowTextSearch
  */
-export interface TypeVisibility {
-  /** Display a text box only */
-  isText: boolean;
-
-  /** Display a text box with a dropdown of suggestions based on distinct elastic search values. */
-  isSuggestedText: boolean;
-
-  /** Display a dropdown with true or false. */
-  isBoolean: boolean;
-
-  /** Display a text box with number input only. */
-  isNumber: boolean;
-
-  /** Display a text box with date picker. */
-  isDate: boolean;
-}
-
-/**
- * The types that will be considered a number and use the number type.
- */
-export type QueryRowNumberType =
-  | "long"
-  | "short"
-  | "integer"
-  | "byte"
-  | "double"
-  | "float"
-  | "half_float"
-  | "scaled_float"
-  | "unsigned_long";
-
 export interface TransformToDSLProps {
+  /**
+   * The query builder type, not really used but required in the function for the QueryBuilder
+   * library.
+   *
+   * For the Elastic Search type you can use the fieldInfo.type instead.
+   */
   queryType: string;
+
+  /**
+   * The value to search against. If the type is "text" then this is the text that will be filtered.
+   */
   value: string;
+
+  /**
+   * The operation being performed.
+   *
+   * For example:
+   * "equals", "notEquals", "contains"
+   *
+   * Operators are defined in the QueryBuilderConfig file.
+   */
   operation: string;
+
+  /**
+   * This field path is the unique path given to each item in the field list.
+   *
+   * For getting the proper absolute field path, use the FieldInfo to generate it.
+   */
   fieldPath: string;
+
+  /**
+   * The elastic search mapping for the field.
+   */
   fieldInfo?: ESIndexMapping;
 }

@@ -11,23 +11,23 @@ import {
 } from "react-awesome-query-builder";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
-import QueryRowAutoSuggestionTextSearch from "./query-row-search-options/QueryRowAutoSuggestionSearch";
-import QueryRowBooleanSearch, {
+import { ESIndexMapping } from "../types";
+import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
+import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
+import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
+import QueryBuilderAutoSuggestionTextSearch from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
+import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
-} from "./query-row-search-options/QueryRowBooleanSearch";
-import QueryRowDateSearch, {
+} from "./query-builder-value-types/QueryBuilderBooleanSearch";
+import QueryBuilderDateSearch, {
   transformDateSearchToDSL
-} from "./query-row-search-options/QueryRowDateSearch";
-import QueryRowNumberSearch, {
+} from "./query-builder-value-types/QueryBuilderDateSearch";
+import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
-} from "./query-row-search-options/QueryRowNumberSearch";
-import QueryRowTextSearch, {
+} from "./query-builder-value-types/QueryBuilderNumberSearch";
+import QueryBuilderTextSearch, {
   transformTextSearchToDSL
-} from "./query-row-search-options/QueryRowTextSearch";
-import { QueryConjunctionSwitch } from "./QueryConjunctionSwitch";
-import { QueryFieldSelector } from "./QueryFieldSelector";
-import { QueryOperatorSelector } from "./QueryOperatorSelector";
-import { ESIndexMapping } from "./types";
+} from "./query-builder-value-types/QueryBuilderTextSearch";
 
 interface QueryBuilderConfigProps {
   // The index map is used for generating the field list.
@@ -156,7 +156,7 @@ export function queryBuilderConfig({
       type: "text",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowTextSearch
+        <QueryBuilderTextSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
@@ -176,7 +176,7 @@ export function queryBuilderConfig({
       type: "autoComplete",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowAutoSuggestionTextSearch
+        <QueryBuilderAutoSuggestionTextSearch
           currentFieldName={factoryProps?.field}
           matchType={factoryProps?.operator}
           indexName={indexName}
@@ -199,7 +199,7 @@ export function queryBuilderConfig({
       type: "date",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowDateSearch
+        <QueryBuilderDateSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
@@ -219,7 +219,7 @@ export function queryBuilderConfig({
       type: "number",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowNumberSearch
+        <QueryBuilderNumberSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
@@ -239,7 +239,7 @@ export function queryBuilderConfig({
       type: "boolean",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryRowBooleanSearch
+        <QueryBuilderBooleanSearch
           matchType={factoryProps?.operator}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}

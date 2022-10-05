@@ -11,7 +11,7 @@ import { TransformQueryToDSLParams } from "../../util/transformToDSL";
 import { QueryTable } from "../../table/QueryTable";
 import { SavedSearch } from "../SavedSearch";
 import { SubmitButton } from "../../formik-connected/SubmitButton";
-import { QueryBuilder } from "../QueryBuilder";
+import { QueryBuilder } from "../query-builder/QueryBuilder";
 import { FormattedMessage } from "react-intl";
 import { DINA_ADMIN } from "../../../types/DinaRoles";
 

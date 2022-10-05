@@ -1,15 +1,14 @@
 import React from "react";
-import { DateField } from "../..";
-import { QueryRowExportProps } from "../QueryRow";
+import { DateField } from "../../..";
 import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
-import { TransformToDSLProps } from "../types";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TransformToDSLProps } from "../../types";
 
-interface QueryRowDateSearchProps {
+interface QueryBuilderDateSearchProps {
   /**
    * Current match type being used.
    */
@@ -26,11 +25,11 @@ interface QueryRowDateSearchProps {
   setValue: ((fieldPath: string) => void) | undefined;
 }
 
-export default function QueryRowDateSearch({
+export default function QueryBuilderDateSearch({
   matchType,
   value,
   setValue
-}: QueryRowDateSearchProps) {
+}: QueryBuilderDateSearchProps) {
   return (
     <>
       {matchType !== "empty" && matchType !== "notEmpty" && (
