@@ -92,9 +92,6 @@ describe("BrowseStorageTree component", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Shows the top-level storage units:
-    expect(wrapper.find("a.storage-unit-name").text()).toEqual("A");
-
     // Open the top-level unit to show the nested units "B" and "C":
     wrapper.find("svg.storage-collapser-icon").simulate("click");
 
