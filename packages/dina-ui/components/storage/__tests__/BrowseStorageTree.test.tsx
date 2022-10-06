@@ -132,8 +132,7 @@ describe("BrowseStorageTree component", () => {
     // With no filter, gets the top-level units:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        parentStorageUnit: null,
-        rsql: ""
+        rsql: "group==aafc;group==cnc"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
@@ -154,7 +153,7 @@ describe("BrowseStorageTree component", () => {
     // With a filter, gets units from any level matching the search text:
     expect(mockGet).lastCalledWith("collection-api/storage-unit", {
       filter: {
-        rsql: "name==*test-search-text*"
+        rsql: "name==*test-search-text*;group==aafc;group==cnc"
       },
       include: "storageUnitChildren,storageUnitType",
       page: {
