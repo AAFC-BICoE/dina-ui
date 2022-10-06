@@ -13,30 +13,28 @@ import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
+  pcrBatchItem: PcrBatchItem;
   chain: Chain;
   sampleSelectionStep: ChainStepTemplate;
   libraryPrepBatch: LibraryPrepBatch;
 }
 
-interface SampleStepResource {
-  molecularSample: MaterialSample;
-}
-
 export function useSampleGridControls({
+  pcrBatchItem,
   chain,
   libraryPrepBatch,
   sampleSelectionStep
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
 
-  const [samplesLoading, setSamplesLoading] = useState<boolean>(true);
+  const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
   // Whether the grid is submitting.
   const [submitting, setSubmitting] = useState(false);
 
   // Highlighted/selected samples.
-  const [selectedSamples, setSelectedSamples] = useState<MaterialSample[]>([]);
-  const lastSelectedSampleRef = useRef<MaterialSample>();
+  const [selectedItems, setSelectedItems] = useState<PcrBatchItem[]>([]);
+  const lastSelectedItemRef = useRef<PcrBatchItem>();
 
   // Grid fill direction when you move multiple samples into the grid.
   const [fillMode, setFillMode] = useState<string>("COLUMN");
@@ -45,11 +43,11 @@ export function useSampleGridControls({
 
   const [gridState, setGridState] = useState({
     // Available samples with no well coordinates.
-    availableSamples: [] as MaterialSample[],
+    availableItems: [] as PcrBatchItem[],
     // The grid of samples that have well coordinates.
     cellGrid: {} as CellGrid,
     // Samples that have been moved since data initialization.
-    movedSamples: [] as MaterialSample[]
+    movedItems: [] as PcrBatchItem[]
   });
 
   // Library prep and sample queries.
@@ -62,12 +60,12 @@ export function useSampleGridControls({
         },
         include: "molecularSample",
         page: { limit: 1000 },
-        path: `seqdb-api/library-prep-batch/${libraryPrepBatch.id}/libraryPreps`
+        path: `/seqdb-api/pcr-batch-items/${libraryPrepBatch.id}/libraryPreps`
       },
       {
         deps: [lastSave],
         onSuccess: async ({ data: pcrBatchItems }) => {
-          setSamplesLoading(true);
+          setItemsLoading(true);
 
           const pcrBatchItemsWithCoords = pcrBatchItems.filter(
             item => item.wellRow && item.wellColumn
@@ -79,179 +77,176 @@ export function useSampleGridControls({
             wellColumn,
             materialSample
           } of pcrBatchItemsWithCoords) {
-            newCellGrid[`${wellRow}_${wellColumn}`] = molecularSample;
+            newCellGrid[`${wellRow}_${wellColumn}`] = materialSample;
           }
 
-          const sampleIdsWithCoords = libraryPrepsWithCoords
-            .map(prep => prep.molecularSample.id)
+          const pcrBatchItemIdsWithCoords = pcrBatchItemsWithCoords
+            .map(item => item.id)
             .join();
 
-          const { data: selectionStepSrsNoCoords } = await apiClient.get<
-            SampleStepResource[]
-          >("seqdb-api/step-resource", {
+          const { data: pcrBatchItemsNoCoords } = await apiClient.get<
+          PcrBatchItem[]
+          >("/seqdb-api/pcr-batch-item", {
             // Get all the sample stepResources from the sample selection step that have no coords.
-            fields: {
-              "molecular-sample": "name"
-            },
             filter: {
-              "chain.uuid": chain.id as string,
-              "chainStepTemplate.uuid": sampleSelectionStep.id as string,
-              rsql: `molecularSample.uuid=out=(${
-                sampleIdsWithCoords || "00000000-0000-0000-0000-000000000000"
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId,
+              rsql: `pcrBatchItems.uuid=out=(${
+                pcrBatchItemIdsWithCoords || "00000000-0000-0000-0000-000000000000"
               })`
             },
-            include: "molecularSample",
             page: { limit: 1000 }
           });
 
-          const newAvailableSamples = selectionStepSrsNoCoords
-            .map(sr => sr.molecularSample)
-            .sort(sampleSort);
+          // const newAvailablepcrItems = pcrBatchItemsNoCoords
+          //   .map(sr => sr.mole)
+          //   .sort(itemSort);
 
           setGridState({
-            availableSamples: newAvailableSamples,
+            availableItems: pcrBatchItemsNoCoords,
             cellGrid: newCellGrid,
-            movedSamples: []
+            movedItems: []
           });
-          setSamplesLoading(false);
+          setItemsLoading(false);
         }
       }
     );
 
-  function moveSamples(samples: MaterialSample[], coords?: string) {
-    setGridState(({ availableSamples, cellGrid, movedSamples }) => {
+  function moveItems(items: PcrBatchItem[], coords?: string) {
+    setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the sample from the grid.
       const newCellGrid: CellGrid = omitBy(cellGrid, s => samples.includes(s));
 
       // Remove the sample from the availables samples.
-      let newAvailableSamples = availableSamples.filter(
-        s => !samples.includes(s)
+      let newAvailableItems = availableItems.filter(
+        s => !items.includes(s)
       );
-      const newMovedSamples = [...movedSamples];
+      const newMovedItems = [...movedItems];
 
       if (coords) {
         const [rowLetter, colNumberString] = coords.split("_");
         const rowNumber = rowLetter.charCodeAt(0) - 64;
-        const { numberOfColumns, numberOfRows } =
-          libraryPrepBatch.containerType as ContainerType;
+        const { wellColumn, wellRow } = pcrBatchItem as PcrBatchItem;
 
+        //double check this part
         let newCellNumber =
           fillMode === "ROW"
-            ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
-            : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
+            ? (rowNumber - 1) * Number(wellColumn) + Number(colNumberString)
+            : (Number(colNumberString) - 1) * Number(wellRow) + rowNumber;
 
-        for (const sample of samples) {
-          let thisSampleRowNumber = -1;
-          let thisSampleColumnNumber = -1;
+        for (const item of items) {
+          let thisItemRowNumber = -1;
+          let thisItemColumnNumber = -1;
 
           if (fillMode === "ROW") {
-            thisSampleRowNumber = Math.ceil(newCellNumber / numberOfColumns);
-            thisSampleColumnNumber =
-              newCellNumber % numberOfColumns || numberOfColumns;
+            thisItemRowNumber = Math.ceil(newCellNumber / wellColumn);
+            thisItemColumnNumber =
+              newCellNumber % wellColumn || wellColumn;
           }
           if (fillMode === "COLUMN") {
-            thisSampleColumnNumber = Math.ceil(newCellNumber / numberOfRows);
-            thisSampleRowNumber = newCellNumber % numberOfRows || numberOfRows;
+            thisItemColumnNumber = Math.ceil(newCellNumber / wellRow);
+            thisItemRowNumber = newCellNumber % wellRow || wellRow;
           }
 
           const thisSampleCoords = `${String.fromCharCode(
-            thisSampleRowNumber + 64
-          )}_${thisSampleColumnNumber}`;
+            thisItemRowNumber + 64
+          )}_${thisItemColumnNumber}`;
 
           // If there is already a sample in this cell, move the existing sample back to the list.
-          const sampleAlreadyInThisCell = newCellGrid[thisSampleCoords];
-          if (sampleAlreadyInThisCell) {
-            newAvailableSamples.push(sampleAlreadyInThisCell);
-            if (!movedSamples.includes(sampleAlreadyInThisCell)) {
-              newMovedSamples.push(sampleAlreadyInThisCell);
+          const itemAlreadyInThisCell = newCellGrid[thisItemCoords];
+          if (itemAlreadyInThisCell) {
+            newAvailableItems.push(itemAlreadyInThisCell);
+            if (!movedItems.includes(itemAlreadyInThisCell)) {
+              newMovedItems.push(itemAlreadyInThisCell);
             }
           }
 
           // Only move the sample into the grid if the well is valid for this container type.
-          if (newCellNumber <= numberOfColumns * numberOfRows) {
+          if (newCellNumber <= wellColumn * wellRow) {
             // Move the sample into the grid.
-            newCellGrid[thisSampleCoords] = sample;
+            newCellGrid[thisSampleCoords] = item;
           } else {
-            newAvailableSamples.push(sample);
+            newAvailableItems.push(item);
           }
 
           newCellNumber++;
         }
       } else {
         // Add the sample to the list.
-        newAvailableSamples = [...newAvailableSamples, ...samples];
+        newAvailableItems = [...newAvailableItems, ...Items];
       }
 
       // Set every sample passed into this function as moved.
-      for (const sample of samples) {
-        if (!movedSamples.includes(sample)) {
-          newMovedSamples.push(sample);
+      for (const item of items) {
+        if (!movedItems.includes(item)) {
+          newMovedItems.push(item);
         }
       }
 
       return {
-        availableSamples: newAvailableSamples.sort(sampleSort),
+        availableSamples: newAvailableItems.sort(itemSort),
         cellGrid: newCellGrid,
-        movedSamples: newMovedSamples
+        movedSamples: newMovedItems
       };
     });
 
-    setSelectedSamples([]);
+    setSelectedItems([]);
   }
 
-  function onGridDrop(sample: MaterialSample, coords: string) {
-    if (selectedSamples.includes(sample)) {
-      moveSamples(selectedSamples, coords);
+  function onGridDrop(item: PcrBatchItem, coords: string) {
+    if (selectedItems.includes(item)) {
+      moveItems(selectedItems, coords);
     } else {
-      moveSamples([sample], coords);
+      moveItems([item], coords);
     }
   }
 
-  function onListDrop(sample: MaterialSample) {
-    moveSamples([sample]);
+  function onListDrop(item: PcrBatchItem) {
+    moveItems([item]);
   }
 
-  function onSampleClick(sample, e) {
-    const { availableSamples } = gridState;
+  function onSampleClick(item, e) {
+    const { availableItems } = gridState;
 
-    if (lastSelectedSampleRef.current && e.shiftKey) {
-      const currentIndex = availableSamples.indexOf(sample);
-      const lastIndex = availableSamples.indexOf(lastSelectedSampleRef.current);
+    if (lastSelectedItemRef.current && e.shiftKey) {
+      const currentIndex = availableItems.indexOf(sample);
+      const lastIndex = availableItems.indexOf(lastSelectedItemRef.current);
 
       const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
         (a, b) => a - b
       );
 
-      const newSelectedSamples = availableSamples.slice(
+      const newSelectedSamples = availableItems.slice(
         lowIndex,
         highIndex + 1
       );
 
-      setSelectedSamples(newSelectedSamples);
+      setSelectedItems(newSelectedItems);
     } else {
-      setSelectedSamples([sample]);
+      setSelectedItems([item]);
     }
 
-    lastSelectedSampleRef.current = sample;
+    lastSelectedItemRef.current = item;
   }
 
   async function gridSubmit() {
     setSubmitting(true);
     try {
-      const { cellGrid, movedSamples } = gridState;
+      const { cellGrid, movedItems } = gridState;
       const existingLibraryPreps = libraryPrepsResponse
         ? libraryPrepsResponse.data
         : [];
 
-      const libraryPrepsToSave = movedSamples.map(movedSample => {
+      const libraryPrepsToSave = movedItems.map(movedItem => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
-          key => cellGrid[key] === movedSample
+          key => cellGrid[key] === movedItem
         );
 
         // Get this sample's library prep, or create a new one if it doesn't exist yet.
         const existingPrep = existingLibraryPreps.find(
-          prep => prep.molecularSample.id === movedSample.id
+          prep => prep.molecul.id === movedSample.id
         );
         const libraryPrep: LibraryPrep = existingPrep
           ? { ...existingPrep }
@@ -290,18 +285,18 @@ export function useSampleGridControls({
   }
 
   function clearGrid() {
-    moveSamples(Object.values(gridState.cellGrid));
+    moveItems(Object.values(gridState.cellGrid));
   }
 
   async function moveAll() {
-    const { availableSamples, cellGrid } = gridState;
-    const samples = [...availableSamples, ...Object.values(cellGrid)].sort(
-      sampleSort
+    const { availableItems, cellGrid } = gridState;
+    const items = [...availableItems, ...Object.values(cellGrid)].sort(
+      itemSort
     );
-    moveSamples(samples, "A_1");
+    moveItems(items, "A_1");
   }
 
-  const loading = libraryPrepsLoading || samplesLoading || submitting;
+  const loading = libraryPrepsLoading || itemsLoading || submitting;
 
   return {
     ...gridState,
@@ -313,12 +308,12 @@ export function useSampleGridControls({
     onGridDrop,
     onListDrop,
     onSampleClick,
-    selectedSamples,
+    selectedItems,
     setFillMode
   };
 }
 
-function sampleSort(a, b) {
+function itemSort(a, b) {
   const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
     s => s.name.match(/[^\d]+|\d+/g) || []
   );

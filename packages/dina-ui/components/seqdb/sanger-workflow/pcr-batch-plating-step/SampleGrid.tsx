@@ -15,18 +15,18 @@ export function SampleGrid(props: ContainerGridProps) {
   const { libraryPrepBatch } = props;
 
   const {
-    availableSamples,
+    availableItems,
     cellGrid,
     clearGrid,
     fillMode,
     gridSubmit,
     loading,
     moveAll,
-    movedSamples,
+    movedItems,
     onGridDrop,
     onListDrop,
     onSampleClick,
-    selectedSamples,
+    selectedItems,
     setFillMode
   } = useSampleGridControls(props);
 
