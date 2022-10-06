@@ -4,6 +4,7 @@ import {
   Config,
   Conjunctions,
   Fields,
+  LocaleSettings,
   Operators,
   RenderSettings,
   Settings,
@@ -13,6 +14,7 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { ESIndexMapping } from "../types";
+import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
@@ -89,12 +91,12 @@ function getQueryBuilderTypeFromIndexType(
  * @param indexName The name of the index.
  * @param viewMode boolean to indicate if the query builder is not displayed.
  */
-export function useQueryBuilderConfig(
-  indexMap: ESIndexMapping[] | undefined,
-  indexName: string,
-  viewMode: boolean
-) {
+export function useQueryBuilderConfig(indexName: string, viewMode: boolean) {
+  // Configuration state.
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
+
+  // Index Map state
+  const { indexMap } = useIndexMapping(indexName);
 
   // When the index map has been provided (or changed) it can be generated.
   useEffect(() => {
@@ -415,9 +417,15 @@ function generateBuilderConfig(
     )
   };
 
+  const localeSettings: LocaleSettings = {
+    addRuleLabel: "Add condition",
+    addGroupLabel: "Add group"
+  };
+
   const settings: Settings = {
     ...BasicConfig.settings,
     ...renderSettings,
+    ...localeSettings,
     showNot: false,
     canRegroup: true,
     canReorder: true,

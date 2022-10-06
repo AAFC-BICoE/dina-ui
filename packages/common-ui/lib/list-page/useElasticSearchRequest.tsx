@@ -44,6 +44,7 @@ export function useElasticSearchRequest<TData extends KitsuResource>({
   }: PerformElasticSearchRequestProps) {
     if (!queryBuilderTree || !queryBuilderConfig) return;
 
+    setLoading(true);
     setError(undefined);
 
     // Elastic search query with pagination settings.

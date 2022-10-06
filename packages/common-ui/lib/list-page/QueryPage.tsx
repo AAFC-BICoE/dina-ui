@@ -30,10 +30,7 @@ import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPr
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
 import { ImmutableTree } from "react-awesome-query-builder";
-import {
-  defaultQueryTree,
-  useQueryBuilder
-} from "./query-builder/useQueryBuilder";
+import { QueryBuilder } from "./query-builder/QueryBuilder";
 import { useElasticSearchRequest } from "./useElasticSearchRequest";
 
 const DEFAULT_PAGE_SIZE: number = 25;
@@ -171,16 +168,6 @@ export function QueryPage<TData extends KitsuResource>({
   const { formatMessage } = useIntl();
   const { groupNames, subject } = useAccount();
 
-  const {
-    QueryBuilder,
-    getCurrentQueryTree,
-    loadQueryTree,
-    queryBuilderConfig
-  } = useQueryBuilder({
-    indexName,
-    viewMode
-  });
-
   // User applied sorting rules for elastic search to use.
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
@@ -215,12 +202,12 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Fetch data if the pagination, sorting have changed.
   useEffect(() => {
-    performElasticSearchRequest({
-      queryBuilderConfig,
-      queryBuilderTree: getCurrentQueryTree(),
-      pagination,
-      sortingRules
-    });
+    // performElasticSearchRequest({
+    //   queryBuilderConfig,
+    //   queryBuilderTree,
+    //   pagination,
+    //   sortingRules
+    // });
   }, [pagination, sortingRules]);
 
   // Actions to perform when the QueryPage is first mounted.
@@ -468,7 +455,6 @@ export function QueryPage<TData extends KitsuResource>({
    * performed.
    */
   function resetForm() {
-    loadQueryTree(defaultQueryTree());
     setError(undefined);
     setPagination({
       ...pagination,
@@ -482,15 +468,15 @@ export function QueryPage<TData extends KitsuResource>({
    * a new search.
    */
   const onSubmit = () => {
-    performElasticSearchRequest({
-      pagination: {
-        ...pagination,
-        offset: 0
-      },
-      sortingRules,
-      queryBuilderConfig,
-      queryBuilderTree: getCurrentQueryTree()
-    });
+    // performElasticSearchRequest({
+    //   pagination: {
+    //     ...pagination,
+    //     offset: 0
+    //   },
+    //   sortingRules,
+    //   queryBuilderConfig,
+    //   queryBuilderTree
+    // });
 
     setPagination({
       ...pagination,
@@ -561,7 +547,7 @@ export function QueryPage<TData extends KitsuResource>({
       )}
 
       {/* Query Filtering Options */}
-      {!viewMode && QueryBuilder}
+      {!viewMode && <QueryBuilder indexName={indexName} viewMode={viewMode} />}
 
       <div className="d-flex mb-3">
         {!viewMode && (
