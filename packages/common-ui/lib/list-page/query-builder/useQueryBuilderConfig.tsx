@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   BasicConfig,
   Config,
@@ -82,31 +81,6 @@ function getQueryBuilderTypeFromIndexType(
 
   // Unsupported type, this will cause an error with the query builder.
   return "unsupported";
-}
-
-/**
- * Custom hook for generating the query builder hook. It should only be generated once.
- *
- * @param indexMap Index mapping.
- * @param indexName The name of the index.
- * @param viewMode boolean to indicate if the query builder is not displayed.
- */
-export function useQueryBuilderConfig(indexName: string, viewMode: boolean) {
-  // Configuration state.
-  const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
-
-  // Index Map state
-  const { indexMap } = useIndexMapping(indexName);
-
-  // When the index map has been provided (or changed) it can be generated.
-  useEffect(() => {
-    // Do not set the query builder config in view mode.
-    if (!indexMap || viewMode) return;
-
-    setQueryBuilderConfig(generateBuilderConfig(indexMap, indexName));
-  }, [indexMap]);
-
-  return { queryBuilderConfig };
 }
 
 /**

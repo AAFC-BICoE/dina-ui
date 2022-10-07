@@ -1,56 +1,70 @@
 import { KitsuResource } from "kitsu";
 import { useState } from "react";
-import { Config, ImmutableTree } from "react-awesome-query-builder";
-import { SortingRule } from "react-table";
-import { LimitOffsetPageSpec, useApiClient } from "..";
+import { useRecoilState } from "recoil";
+import { useApiClient } from "..";
 import {
   applyPagination,
+  applySortingRules,
   elasticSearchFormatExport
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import {
+  paginationState,
+  sortingRulesState,
+  loadingState,
+  searchResultsState,
+  totalRecordsState,
+  queryTreeState,
+  queryConfigState
+} from "./recoil_state";
+import { TableColumn } from "./types";
 
-export interface UseElasticSearchRequestProps {
+/**
+ * Elastic search by default will only count up to 10,000 records. If the search returns 10,000
+ * as the page size, there is a good chance that there is more and the /count endpoint will need
+ * to be used to get the actual total.
+ */
+const MAX_COUNT_SIZE: number = 10000;
+
+export interface UseElasticSearchRequestProps<TData extends KitsuResource> {
   indexName: string;
-  maxCountSize: number;
-  setError: React.Dispatch<any>;
-  setLoading: React.Dispatch<boolean>;
-}
 
-export interface PerformElasticSearchRequestProps {
-  queryBuilderTree?: ImmutableTree;
-  queryBuilderConfig?: Config;
-  pagination: LimitOffsetPageSpec;
-  sortingRules: SortingRule[];
+  /**
+   * Columns to render on the table. This will also be used to map the data to a specific column.
+   */
+  columns: TableColumn<TData>[];
 }
 
 export function useElasticSearchRequest<TData extends KitsuResource>({
   indexName,
-  maxCountSize,
-  setError,
-  setLoading
-}: UseElasticSearchRequestProps) {
+  columns
+}: UseElasticSearchRequestProps<TData>) {
   const { apiClient } = useApiClient();
 
-  // Search results returned by Elastic Search
-  const [searchResults, setSearchResults] = useState<TData[]>([]);
+  const [pagination] = useRecoilState(paginationState);
+  const [sortingRules] = useRecoilState(sortingRulesState);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [searchResults, setSearchResults] = useRecoilState(searchResultsState);
+  const [totalRecords, setTotalRecords] = useRecoilState(totalRecordsState);
+  const [queryTree] = useRecoilState(queryTreeState);
+  const [queryConfig] = useRecoilState(queryConfigState);
 
-  // Total number of records from the query. This is not the total displayed on the screen.
-  const [totalRecords, setTotalRecords] = useState<number>(0);
+  // Query Page error message state
+  const [error, setError] = useState<any>();
 
-  function performElasticSearchRequest({
-    queryBuilderTree,
-    queryBuilderConfig,
-    pagination,
-    sortingRules
-  }: PerformElasticSearchRequestProps) {
-    if (!queryBuilderTree || !queryBuilderConfig) return;
+  function performElasticSearchRequest() {
+    if (!queryTree || !queryConfig) return;
 
     setLoading(true);
     setError(undefined);
 
     // Elastic search query with pagination settings.
-    const queryDSL = applyPagination(
-      elasticSearchFormatExport(queryBuilderTree, queryBuilderConfig),
-      pagination
+    const queryDSL = applySortingRules(
+      applyPagination(
+        elasticSearchFormatExport(queryTree, queryConfig),
+        pagination
+      ),
+      sortingRules,
+      columns
     );
 
     // console.log(JSON.stringify(queryDSL));
@@ -77,7 +91,7 @@ export function useElasticSearchRequest<TData extends KitsuResource>({
         }));
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
-        if (result?.total.value === maxCountSize) {
+        if (result?.total.value === MAX_COUNT_SIZE) {
           elasticSearchCountRequest(queryDSL)
             .then((countResult) => {
               setTotalRecords(countResult);
@@ -143,9 +157,5 @@ export function useElasticSearchRequest<TData extends KitsuResource>({
     return resp?.data?.count;
   }
 
-  return {
-    performElasticSearchRequest,
-    searchResults,
-    totalRecords
-  };
+  return { performElasticSearchRequest };
 }

@@ -29,6 +29,7 @@ import "../components/button-bar/nav/wet-beow-override.css";
 import "react-awesome-query-builder/lib/css/styles.css";
 import { FileUploadProviderImpl } from "../components/object-store/file-upload/FileUploadProvider";
 import { DinaIntlProvider } from "../intl/dina-ui-intl";
+import { RecoilRoot } from "recoil";
 
 /**
  * App component that wraps every page component.
@@ -41,22 +42,24 @@ export default function DinaUiApp({ Component, pageProps }: AppProps) {
     : null;
 
   return (
-    <ApiClientImplProvider>
-      <KeycloakAccountProvider>
-        <AuthenticatedApiClientProvider>
-          <FileUploadProviderImpl>
-            <DinaIntlProvider>
-              <ErrorBoundaryPage>
-                <DndProvider backend={HTML5Backend}>
-                  <ModalProvider appElement={appElement}>
-                    <Component {...pageProps} />
-                  </ModalProvider>
-                </DndProvider>
-              </ErrorBoundaryPage>
-            </DinaIntlProvider>
-          </FileUploadProviderImpl>
-        </AuthenticatedApiClientProvider>
-      </KeycloakAccountProvider>
-    </ApiClientImplProvider>
+    <RecoilRoot>
+      <ApiClientImplProvider>
+        <KeycloakAccountProvider>
+          <AuthenticatedApiClientProvider>
+            <FileUploadProviderImpl>
+              <DinaIntlProvider>
+                <ErrorBoundaryPage>
+                  <DndProvider backend={HTML5Backend}>
+                    <ModalProvider appElement={appElement}>
+                      <Component {...pageProps} />
+                    </ModalProvider>
+                  </DndProvider>
+                </ErrorBoundaryPage>
+              </DinaIntlProvider>
+            </FileUploadProviderImpl>
+          </AuthenticatedApiClientProvider>
+        </KeycloakAccountProvider>
+      </ApiClientImplProvider>
+    </RecoilRoot>
   );
 }
