@@ -397,13 +397,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "organisms.lifeStage"
+            id: "organism[0].lifeStage"
           },
           {
-            id: "organisms.sex"
+            id: "organism[0].sex"
           },
           {
-            id: "organisms.remarks"
+            id: "organism[0].remarks"
           }
         ]
       },
@@ -413,19 +413,19 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organisms.determination.verbatimScientificName"
+            id: "organism[0].determination[0].verbatimScientificName"
           },
           {
-            id: "organisms.determination.verbatimDeterminer"
+            id: "organism[0].determination[0].verbatimDeterminer"
           },
           {
-            id: "organisms.determination.verbatimDate"
+            id: "organism[0].determination[0].verbatimDate"
           },
           {
-            id: "organisms.determination.verbatimRemarks"
+            id: "organism[0].determination[0].verbatimRemarks"
           },
           {
-            id: "organisms.determination.transcriberRemarks"
+            id: "organism[0].determination[0].transcriberRemarks"
           }
         ]
       },
@@ -435,19 +435,19 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organisms.determination.scientificName"
+            id: "organism[0].determination[0].scientificName"
           },
           {
-            id: "organisms.determination.scientificNameInput"
+            id: "organism[0].determination[0].scientificNameInput"
           },
           {
-            id: "organisms.determination.determiner"
+            id: "organism[0].determination[0].determiner"
           },
           {
-            id: "organisms.determination.determinedOn"
+            id: "organism[0].determination[0].determinedOn"
           },
           {
-            id: "organisms.determination.determinationRemarks"
+            id: "organism[0].determination[0].determinationRemarks"
           }
         ]
       },
@@ -457,10 +457,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organisms.determination.typeStatus"
+            id: "organism[0].determination[0].typeStatus"
           },
           {
-            id: "organisms.determination.typeStatusEvidence"
+            id: "organism[0].determination[0].typeStatusEvidence"
           }
         ]
       },
