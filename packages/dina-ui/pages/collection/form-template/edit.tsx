@@ -202,7 +202,7 @@ export function FormTemplateEditPageLoaded({
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
-          visible: true,
+          visible: dataComponentsStateMap[dataComponent.id],
           order: navOrder?.indexOf(dataComponent.id) ?? componentIndex,
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
