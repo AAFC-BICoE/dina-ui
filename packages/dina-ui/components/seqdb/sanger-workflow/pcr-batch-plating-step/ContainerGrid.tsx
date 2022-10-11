@@ -1,30 +1,30 @@
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { ContainerType } from "../../../../types/seqdb-api";
+import { ContainerType, PcrBatchItem } from "../../../../types/seqdb-api";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { DraggableSampleBox, SAMPLE_BOX_DRAG_KEY } from "./DraggableSampleBox";
+import { DraggablePCRBatchItemBox, SAMPLE_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
 
 interface ContainerGridProps {
   containerType: ContainerType;
   cellGrid: CellGrid;
-  movedSamples: MaterialSample[];
-  onDrop: (sample: MaterialSample, coords: string) => void;
+  movedItems: PcrBatchItem[];
+  onDrop: (item: PcrBatchItem, coords: string) => void;
 }
 
 interface GridCellProps {
-  onDrop: (item: { sample: MaterialSample }) => void;
-  movedSamples: MaterialSample[];
-  sample: MaterialSample;
+  onDrop: (item: { item: PcrBatchItem }) => void;
+  movedItems: PcrBatchItem[];
+  pcrBatchItem: PcrBatchItem;
 }
 
 export interface CellGrid {
-  [key: string]: MaterialSample;
+  [key: string]: PcrBatchItem;
 }
 
 export function ContainerGrid({
   containerType,
   cellGrid,
-  movedSamples,
+  movedItems,
   onDrop
 }: ContainerGridProps) {
   const columns: Column[] = [];
@@ -48,15 +48,15 @@ export function ContainerGrid({
         const rowLabel = String.fromCharCode(row + 65);
         const coords = `${rowLabel}_${columnLabel}`;
 
-        // return (
-        //   <span className={`well-${coords}`}>
-        //     <GridCell
-        //       movedSamples={movedSamples}
-        //       onDrop={({ sample: newSample }) => onDrop(newSample, coords)}
-        //       sample={cellGrid[coords]}
-        //     />
-        //   </span>
-        // );
+        return (
+          <span className={`well-${coords}`}>
+            <GridCell
+              movedItems={movedItems}
+              onDrop={({ item: newSample }) => onDrop(newSample, coords)}
+              pcrBatchItem={cellGrid[coords]}
+            />
+          </span>
+        );
       },
       Header: columnLabel,
       resizable: false,
@@ -84,7 +84,7 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, sample, movedSamples }: GridCellProps) {
+function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
   const [, drop] = useDrop({
     accept: SAMPLE_BOX_DRAG_KEY,
     drop: item => onDrop(item as any)
@@ -92,11 +92,11 @@ function GridCell({ onDrop, sample, movedSamples }: GridCellProps) {
 
   return (
     <div ref={drop} className="h-100 w-100">
-      {sample && (
-        <DraggableSampleBox
-          sample={sample}
+      {pcrBatchItem && (
+        <DraggablePCRBatchItemBox
+        pcrBatchItem={pcrBatchItem}
           selected={false}
-          wasMoved={movedSamples.includes(sample)}
+          wasMoved={movedItems.includes(pcrBatchItem)}
         />
       )}
     </div>

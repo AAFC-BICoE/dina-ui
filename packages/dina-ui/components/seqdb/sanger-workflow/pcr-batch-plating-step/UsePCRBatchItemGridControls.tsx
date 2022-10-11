@@ -14,16 +14,10 @@ import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchItem: PcrBatchItem;
-  chain: Chain;
-  sampleSelectionStep: ChainStepTemplate;
-  libraryPrepBatch: LibraryPrepBatch;
 }
 
-export function useSampleGridControls({
-  pcrBatchItem,
-  chain,
-  libraryPrepBatch,
-  sampleSelectionStep
+export function UsePCRBatchItemGridControls({
+  pcrBatchItem
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
 
@@ -74,10 +68,9 @@ export function useSampleGridControls({
           const newCellGrid: CellGrid = {};
           for (const {
             wellRow,
-            wellColumn,
-            materialSample
+            wellColumn
           } of pcrBatchItemsWithCoords) {
-            newCellGrid[`${wellRow}_${wellColumn}`] = materialSample;
+            newCellGrid[`${wellRow}_${wellColumn}`] = pcrBatchItem;
           }
 
           const pcrBatchItemIdsWithCoords = pcrBatchItemsWithCoords
@@ -116,7 +109,7 @@ export function useSampleGridControls({
   function moveItems(items: PcrBatchItem[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the sample from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, s => samples.includes(s));
+      const newCellGrid: CellGrid = omitBy(cellGrid, s => items.includes(s));
 
       // Remove the sample from the availables samples.
       let newAvailableItems = availableItems.filter(
@@ -129,6 +122,7 @@ export function useSampleGridControls({
         const rowNumber = rowLetter.charCodeAt(0) - 64;
         const { wellColumn, wellRow } = pcrBatchItem as PcrBatchItem;
 
+        if(wellColumn !== undefined && wellRow !== undefined){
         //double check this part
         let newCellNumber =
           fillMode === "ROW"
@@ -145,11 +139,11 @@ export function useSampleGridControls({
               newCellNumber % wellColumn || wellColumn;
           }
           if (fillMode === "COLUMN") {
-            thisItemColumnNumber = Math.ceil(newCellNumber / wellRow);
-            thisItemRowNumber = newCellNumber % wellRow || wellRow;
+            thisItemColumnNumber = Math.ceil(newCellNumber / Number(wellRow));
+            thisItemRowNumber = newCellNumber % Number(wellRow) || Number(wellRow);
           }
 
-          const thisSampleCoords = `${String.fromCharCode(
+          const thisItemCoords = `${String.fromCharCode(
             thisItemRowNumber + 64
           )}_${thisItemColumnNumber}`;
 
@@ -163,9 +157,9 @@ export function useSampleGridControls({
           }
 
           // Only move the sample into the grid if the well is valid for this container type.
-          if (newCellNumber <= wellColumn * wellRow) {
+          if (newCellNumber <= wellColumn * Number(wellRow)) {
             // Move the sample into the grid.
-            newCellGrid[thisSampleCoords] = item;
+            newCellGrid[thisItemCoords] = item;
           } else {
             newAvailableItems.push(item);
           }
@@ -174,8 +168,9 @@ export function useSampleGridControls({
         }
       } else {
         // Add the sample to the list.
-        newAvailableItems = [...newAvailableItems, ...Items];
+        newAvailableItems = [...newAvailableItems, ...items];
       }
+    }
 
       // Set every sample passed into this function as moved.
       for (const item of items) {
@@ -185,9 +180,9 @@ export function useSampleGridControls({
       }
 
       return {
-        availableSamples: newAvailableItems.sort(itemSort),
+        availableItems: newAvailableItems.sort(itemSort),
         cellGrid: newCellGrid,
-        movedSamples: newMovedItems
+        movedItems: newMovedItems
       };
     });
 
@@ -210,14 +205,14 @@ export function useSampleGridControls({
     const { availableItems } = gridState;
 
     if (lastSelectedItemRef.current && e.shiftKey) {
-      const currentIndex = availableItems.indexOf(sample);
+      const currentIndex = availableItems.indexOf(item);
       const lastIndex = availableItems.indexOf(lastSelectedItemRef.current);
 
       const [lowIndex, highIndex] = [currentIndex, lastIndex].sort(
         (a, b) => a - b
       );
 
-      const newSelectedSamples = availableItems.slice(
+      const newSelectedItems = availableItems.slice(
         lowIndex,
         highIndex + 1
       );
@@ -238,7 +233,7 @@ export function useSampleGridControls({
         ? libraryPrepsResponse.data
         : [];
 
-      const libraryPrepsToSave = movedItems.map(movedItem => {
+      const pcrBatchItemsToSave = movedItems.map(movedItem => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
           key => cellGrid[key] === movedItem
@@ -256,23 +251,23 @@ export function useSampleGridControls({
               type: "library-prep"
             };
 
-        let newWellColumn: number | null = null;
-        let newWellRow: string | null = null;
+        let newWellColumn: number | undefined;
+        let newWellRow: string | undefined;
         if (coords) {
-          const [row, col] = coords.split("_");
+          const [row , col] = coords.split("_");
           newWellColumn = Number(col);
           newWellRow = row;
         }
 
-        libraryPrep.wellColumn = newWellColumn;
-        libraryPrep.wellRow = newWellRow;
+        pcrBatchItem.wellColumn = newWellColumn;
+        pcrBatchItem.wellRow = newWellRow;
 
-        return libraryPrep;
+        return pcrBatchItem;
       });
 
-      const saveArgs = libraryPrepsToSave.map(prep => ({
-        resource: prep,
-        type: "library-prep"
+      const saveArgs = pcrBatchItemsToSave.map(item => ({
+        resource: item,
+        type: "pcr-batch-item"
       }));
 
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });

@@ -4,7 +4,7 @@ import { MaterialSample } from "../../../../types/collection-api";
 import RcTooltip from "rc-tooltip";
 import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
-interface DraggableSampleBoxProps {
+interface DraggablePCRBatchItemBoxProps {
   onClick?: (e: any) => void;
   pcrBatchItem: PcrBatchItem;
   selected: boolean;
@@ -13,12 +13,12 @@ interface DraggableSampleBoxProps {
 
 export const SAMPLE_BOX_DRAG_KEY = "materialSample";
 
-export function DraggableSampleBox({
+export function DraggablePCRBatchItemBox({
   onClick = noop,
   pcrBatchItem,
   selected,
   wasMoved
-}: DraggableSampleBoxProps) {
+}: DraggablePCRBatchItemBoxProps) {
   const [, drag] = useDrag({
     item: {   pcrBatchItem, type: SAMPLE_BOX_DRAG_KEY }
   });
