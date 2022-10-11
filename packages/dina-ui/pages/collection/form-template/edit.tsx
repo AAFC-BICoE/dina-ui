@@ -10,50 +10,41 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { FormikProps } from "formik";
+import { InputResource, PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
+import { Promisable } from "type-fest";
 import {
-  AcquisitionEvent,
+  MaterialSampleForm,
+  useMaterialSampleSave
+} from "../../../../dina-ui/components";
+import {
+  getAllComponentValues,
+  getComponentOrderFromTemplate,
+  getComponentValues,
+  getFormTemplateCheckboxes
+} from "../../../../dina-ui/components/form-template/formTemplateUtils";
+import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
-  CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   FormTemplateComponents,
-  IDENTIFIER_COMPONENT_NAME,
-  MANAGED_ATTRIBUTES_COMPONENT_NAME,
-  MaterialSample,
-  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MATERIAL_SAMPLE_FORM_LEGEND,
-  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
-import { InputResource, PersistedResource } from "kitsu";
-import {
-  getComponentValues,
-  getComponentOrderFromTemplate,
-  getFormTemplateCheckboxes,
-  getInitialValuesFromFormTemplate,
-  getAllComponentValues
-} from "../../../../dina-ui/components/form-template/formTemplateUtils";
-import {
-  MaterialSampleForm,
-  useMaterialSampleSave
-} from "../../../../dina-ui/components";
-import { FormikProps } from "formik";
-import { Promisable } from "type-fest";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
   const id = router.query.id?.toString();
-
   const formTemplateQuery = useQuery<FormTemplate>(
     { path: `/collection-api/form-template/${id}` },
     { disabled: !id }
@@ -146,6 +137,7 @@ export function FormTemplateEditPageLoaded({
     colEventFormRef: collectingEvtFormRef,
     acquisitionEventFormRef: acqEventFormRef
   });
+  const dataComponentState = materialSampleSaveHook.dataComponentState;
 
   async function onSaveTemplateSubmit({
     api: { save },
@@ -177,6 +169,10 @@ export function FormTemplateEditPageLoaded({
       ...(acquisitionEventFormRefValues ?? {}),
       ...submittedValues
     };
+
+    const dataComponentsStateMap =
+      getDataComponentsStateMap(dataComponentState);
+
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
       Object.keys(object).forEach((key) => {
@@ -288,4 +284,24 @@ export function FormTemplateEditPageLoaded({
       </PageLayout>
     </DinaForm>
   );
+}
+function getDataComponentsStateMap(dataComponentState) {
+  const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =
+    dataComponentState.enableAcquisitionEvent;
+  dataComponentEnabledMap[ASSOCIATIONS_COMPONENT_NAME] =
+    dataComponentState.enableAssociations;
+  dataComponentEnabledMap[COLLECTING_EVENT_COMPONENT_NAME] =
+    dataComponentState.enableCollectingEvent;
+  dataComponentEnabledMap[ORGANISMS_COMPONENT_NAME] =
+    dataComponentState.enableOrganisms;
+  dataComponentEnabledMap[PREPARATIONS_COMPONENT_NAME] =
+    dataComponentState.enablePreparations;
+  dataComponentEnabledMap[RESTRICTION_COMPONENT_NAME] =
+    dataComponentState.enableRestrictions;
+  dataComponentEnabledMap[SCHEDULED_ACTIONS_COMPONENT_NAME] =
+    dataComponentState.enableScheduledActions;
+  dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
+    dataComponentState.enableStorage;
+  return dataComponentEnabledMap;
 }
