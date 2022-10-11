@@ -1,9 +1,9 @@
 import Select from "react-select";
 import React from "react";
-import { DinaForm } from "../../../formik-connected/DinaForm";
-import { mountWithAppContext } from "../../../test-util/mock-app-context";
+import { QueryBuilder } from "../query-builder/QueryBuilder";
+import { DinaForm } from "../../formik-connected/DinaForm";
+import { mountWithAppContext } from "../../test-util/mock-app-context";
 import DatePicker from "react-datepicker";
-import { QueryBuilder } from "../QueryBuilder";
 
 const TEST_SEARCH_DATE =
   "Fri Jan 21 2022 21:05:30 GMT+0000 (Coordinated Universal Time)";

@@ -3,7 +3,6 @@ import {
   Config,
   Conjunctions,
   Fields,
-  LocaleSettings,
   Operators,
   RenderSettings,
   Settings,
@@ -13,7 +12,6 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { ESIndexMapping } from "../types";
-import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
@@ -37,7 +35,7 @@ import QueryBuilderTextSearch, {
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-function fieldPathToIndexSettings(
+export function fieldPathToIndexSettings(
   fieldName: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -90,7 +88,7 @@ function getQueryBuilderTypeFromIndexType(
  * @param indexName The index name currently being used.
  * @returns Query Builder configuration.
  */
-function generateBuilderConfig(
+export function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string
 ): Config {
@@ -391,15 +389,9 @@ function generateBuilderConfig(
     )
   };
 
-  const localeSettings: LocaleSettings = {
-    addRuleLabel: "Add condition",
-    addGroupLabel: "Add group"
-  };
-
   const settings: Settings = {
     ...BasicConfig.settings,
     ...renderSettings,
-    ...localeSettings,
     showNot: false,
     canRegroup: true,
     canReorder: true,
