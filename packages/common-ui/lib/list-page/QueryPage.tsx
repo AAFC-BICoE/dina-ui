@@ -32,7 +32,7 @@ import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
-import { ImmutableTree } from "react-awesome-query-builder";
+import { ImmutableTree, Utils } from "react-awesome-query-builder";
 import {
   applyGroupFilters,
   applyPagination,
@@ -232,7 +232,14 @@ export function QueryPage<TData extends KitsuResource>({
   useEffect(() => {
     setLoading(true);
 
+    // Query builder is not setup yet.
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
+      setLoading(false);
+      return;
+    }
+
+    // Check for any validation issues in the QueryBuilder.
+    if (Utils.checkTree(submittedQueryBuilderTree, queryBuilderConfig)) {
       setLoading(false);
       return;
     }

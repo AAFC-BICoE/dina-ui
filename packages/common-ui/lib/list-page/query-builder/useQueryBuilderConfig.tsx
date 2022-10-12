@@ -13,6 +13,7 @@ import {
 } from "react-awesome-query-builder";
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
+import { useIntl } from "react-intl";
 import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
@@ -23,7 +24,8 @@ import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "./query-builder-value-types/QueryBuilderBooleanSearch";
 import QueryBuilderDateSearch, {
-  transformDateSearchToDSL
+  transformDateSearchToDSL,
+  validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
@@ -85,11 +87,29 @@ function getQueryBuilderTypeFromIndexType(
 }
 
 /**
+ * Depending on the field type, a different validation will need to be performed.
+ *
+ * @param value string value to validate against.
+ * @param type the type of the field, to determine how to validate the value.
+ * @param formatMessage internationalization support.
+ * @returns null if no validation errors or string with the error message.
+ */
+function validateField(value: string, type: string, formatMessage: any) {
+  switch (type) {
+    case "date":
+      return validateDate(value, formatMessage);
+    default:
+      return true;
+  }
+}
+
+/**
  * Custom hook for generating the query builder hook. It should only be generated once.
  */
 export function useQueryBuilderConfig(indexName: string) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping(indexName);
+  const { formatMessage } = useIntl();
 
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
 
@@ -97,7 +117,9 @@ export function useQueryBuilderConfig(indexName: string) {
   useEffect(() => {
     if (!indexMap) return;
 
-    setQueryBuilderConfig(generateBuilderConfig(indexMap, indexName));
+    setQueryBuilderConfig(
+      generateBuilderConfig(indexMap, indexName, formatMessage)
+    );
   }, [indexMap]);
 
   return { queryBuilderConfig };
@@ -112,7 +134,8 @@ export function useQueryBuilderConfig(indexName: string) {
  */
 function generateBuilderConfig(
   indexMap: ESIndexMapping[],
-  indexName: string
+  indexName: string,
+  formatMessage: any
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -424,20 +447,26 @@ function generateBuilderConfig(
     canRegroup: true,
     canReorder: true,
     clearValueOnChangeField: false,
-    clearValueOnChangeOp: false
+    clearValueOnChangeOp: false,
+    showErrorMessage: true
   };
 
   const fields: Fields = Object.assign(
     {},
     ...indexMap?.map((indexItem: ESIndexMapping) => {
       const field = {};
+      const type = getQueryBuilderTypeFromIndexType(
+        indexItem.type,
+        indexItem.distinctTerm
+      );
       field[indexItem.value] = {
         label: indexItem.label,
-        type: getQueryBuilderTypeFromIndexType(
-          indexItem.type,
-          indexItem.distinctTerm
-        ),
-        valueSources: ["value"]
+        type,
+        valueSources: ["value"],
+        fieldSettings: {
+          validateValue: (value, _fieldSettings) =>
+            validateField(value, type, formatMessage)
+        }
       };
 
       return field;

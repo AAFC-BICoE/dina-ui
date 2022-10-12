@@ -1,5 +1,5 @@
 import React from "react";
-import { DateField } from "../../..";
+import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
@@ -7,6 +7,7 @@ import {
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
+import { DATE_REGEX_PARTIAL } from "packages/common-ui/lib";
 
 interface QueryBuilderDateSearchProps {
   /**
@@ -33,7 +34,39 @@ export default function QueryBuilderDateSearch({
   return (
     <>
       {matchType !== "empty" && matchType !== "notEmpty" && (
-        <DateField name="this" removeLabel={true} partialDate={true} />
+        <DatePicker
+          className="form-control"
+          value={value}
+          onChange={(newDate: Date, event) => {
+            if (
+              !event ||
+              event?.type === "click" ||
+              event?.type === "keydown"
+            ) {
+              setValue?.(newDate && newDate.toISOString().slice(0, 10));
+            }
+          }}
+          onChangeRaw={(event) => {
+            if (event?.type === "change") {
+              let newText = event.target.value;
+              const dashOccurrences = newText.split("-").length - 1;
+              if (newText.length === 8 && dashOccurrences === 0) {
+                newText =
+                  newText.slice(0, 4) +
+                  "-" +
+                  newText.slice(4, 6) +
+                  "-" +
+                  newText.slice(6);
+              }
+              setValue?.(newText);
+            }
+          }}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="YYYY-MM-DD"
+          isClearable={true}
+          showYearDropdown={true}
+          todayButton="Today"
+        />
       )}
     </>
   );
@@ -278,4 +311,19 @@ function buildDateRangeObject(matchType, value) {
     default:
       return value;
   }
+}
+
+/**
+ * Validate the date string to ensure it's something elastic search can accept.
+ *
+ * Partial dates are supported here.
+ * @param value date value
+ * @param formatMessage error message translation locale
+ * @return null if valid, string error if not valid.
+ */
+export function validateDate(value, formatMessage): string | null {
+  if (DATE_REGEX_PARTIAL.test(value)) {
+    return null;
+  }
+  return formatMessage({ id: "dateMustBeFormattedPartial" });
 }
