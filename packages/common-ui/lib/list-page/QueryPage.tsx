@@ -5,7 +5,6 @@ import ReactTable, { TableProps, SortingRule, Column } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
-import { SubmitButton } from "../formik-connected/SubmitButton";
 import {
   defaultQueryTree,
   QueryBuilderMemo
@@ -26,15 +25,22 @@ import { v4 as uuidv4 } from "uuid";
 import { SavedSearch } from "./SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
 import { cloneDeep, toPairs, uniqBy } from "lodash";
-import { FormikButton, LimitOffsetPageSpec, useAccount } from "..";
+import { FormikButton, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
 import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
-import { Config, ImmutableTree } from "react-awesome-query-builder";
-import { elasticSearchFormatExport } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { ImmutableTree } from "react-awesome-query-builder";
+import {
+  applyGroupFilters,
+  applyPagination,
+  applyRootQuery,
+  applySortingRules,
+  applySourceFiltering,
+  elasticSearchFormatExport
+} from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
 import React from "react";
 import { GroupSelectField } from "packages/dina-ui/components";
@@ -224,6 +230,8 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    setLoading(true);
+
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
       setLoading(false);
       return;
@@ -233,12 +241,16 @@ export function QueryPage<TData extends KitsuResource>({
     setError(undefined);
 
     // Elastic search query with pagination settings.
-    const queryDSL = elasticSearchFormatExport(
+    let queryDSL = elasticSearchFormatExport(
       submittedQueryBuilderTree,
       queryBuilderConfig
     );
 
-    // console.log(JSON.stringify(queryDSL));
+    queryDSL = applyRootQuery(queryDSL);
+    queryDSL = applyGroupFilters(queryDSL, groups);
+    queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
+    queryDSL = applySortingRules(queryDSL, sortingRules, columns);
+    queryDSL = applySourceFiltering(queryDSL, columns);
 
     // Do not search when the query has no content. (It should at least have pagination.)
     if (!queryDSL || !Object.keys(queryDSL).length) {
@@ -574,7 +586,6 @@ export function QueryPage<TData extends KitsuResource>({
     setQueryBuilderTree(defaultQueryTree());
     setError(undefined);
     setPageOffset(0);
-    setLoading(true);
   }, []);
 
   /**
@@ -584,8 +595,7 @@ export function QueryPage<TData extends KitsuResource>({
   const onSubmit = useCallback(() => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-    setLoading(true);
-  }, []);
+  }, [queryBuilderTree]);
 
   /**
    * When the group filter has changed, store the new value for the search.
@@ -609,24 +619,24 @@ export function QueryPage<TData extends KitsuResource>({
    *
    * @param newPageSize
    */
-  function onPageSizeChange(newPageSize: number) {
+  const onPageSizeChange = useCallback((newPageSize: number) => {
     setPageOffset(0);
     setPageSize(newPageSize);
     setLoading(true);
-  }
+  }, []);
 
   /**
    * When the user changes the react-table page sort, it will trigger this event.
    *
    * This method will cause the useEffect with the search to trigger if the sorting has changed.
    */
-  function onSortChange(newSort: SortingRule[]) {
+  const onSortChange = useCallback((newSort: SortingRule[]) => {
     setSortingRules(newSort);
     setLoading(true);
 
     // Trigger the prop event listener.
     onSortedChange?.(newSort);
-  }
+  }, []);
 
   /**
    * When the user changes the react-table page, it will trigger this event.
@@ -642,10 +652,13 @@ export function QueryPage<TData extends KitsuResource>({
    *
    * @param newPage
    */
-  function onPageChange(newPage: number) {
-    setPageOffset(pageSize * newPage);
-    setLoading(true);
-  }
+  const onPageChange = useCallback(
+    (newPage: number) => {
+      setPageOffset(pageSize * newPage);
+      setLoading(true);
+    },
+    [pageSize]
+  );
 
   return (
     <>

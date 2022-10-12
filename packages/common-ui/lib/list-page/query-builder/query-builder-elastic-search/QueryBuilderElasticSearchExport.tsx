@@ -88,7 +88,7 @@ function buildEsRule(
   // Use the custom logic by default.
   const parameters = elasticSearchFormatValue(
     undefined,
-    value,
+    value[0],
     operator,
     fieldName,
     config
@@ -146,12 +146,13 @@ function buildEsGroup(
  */
 export function applyPagination(
   elasticSearchQuery: any,
-  pagination: LimitOffsetPageSpec
+  pageSize: number,
+  pageOffset: number
 ) {
   return {
     ...elasticSearchQuery,
-    size: pagination.limit,
-    from: pagination.offset
+    size: pageSize,
+    from: pageOffset
   };
 }
 
@@ -288,6 +289,57 @@ export function applySourceFiltering<TData extends KitsuResource>(
   return {
     ...elasticSearchQuery,
     _source: uniq(sourceFilteringColumns)
+  };
+}
+
+/**
+ * Using the existing elastic search query, the groups are added to the query.
+ *
+ * Multiple groups can be searched on.
+ *
+ * @param elasticSearchQuery The root elastic search query to apply group query logic to.
+ * @param groups An array of groups to apply to the query.
+ */
+export function applyGroupFilters(elasticSearchQuery: any, groups: string[]) {
+  // No groups to filter on.
+  if (groups.length === 0) {
+    return elasticSearchQuery;
+  }
+
+  const multipleGroups = groups.length > 1;
+
+  return {
+    query: {
+      bool: {
+        must: [
+          ...(elasticSearchQuery?.query?.bool?.must ?? []),
+          {
+            [multipleGroups ? "terms" : "term"]: {
+              "data.attributes.group": multipleGroups ? groups : groups[0]
+            }
+          }
+        ]
+      }
+    }
+  };
+}
+
+/**
+ * Simply adds the query to the top level and moves the bool logic inside of it.
+ *
+ * This should be applied right after the bool is generated.
+ *
+ * @param elasticSearchQuery The root elastic search query to add to the query.
+ */
+export function applyRootQuery(elasticSearchQuery: any) {
+  if (!elasticSearchQuery?.bool) {
+    return elasticSearchQuery;
+  }
+
+  return {
+    query: {
+      bool: elasticSearchQuery.bool
+    }
   };
 }
 
