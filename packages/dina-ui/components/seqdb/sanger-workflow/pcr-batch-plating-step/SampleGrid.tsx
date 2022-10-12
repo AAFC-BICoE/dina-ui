@@ -2,18 +2,17 @@ import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
-import { DraggableSampleList } from "./DraggablePCRBatchItemList";
-import { useSampleGridControls } from "./useSampleGridControls";
+import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
+import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 
 export interface ContainerGridProps {
-  chain: Chain;
-  sampleSelectionStep: ChainStepTemplate;
-  libraryPrepBatch: LibraryPrepBatch;
+  // chain: Chain;
+  // sampleSelectionStep: ChainStepTemplate;
+  // libraryPrepBatch: LibraryPrepBatch;
 }
 
 export function SampleGrid(props: ContainerGridProps) {
-  const { libraryPrepBatch } = props;
-
+  
   const {
     availableItems,
     cellGrid,
@@ -25,10 +24,10 @@ export function SampleGrid(props: ContainerGridProps) {
     movedItems,
     onGridDrop,
     onListDrop,
-    onSampleClick,
+    onItemClick,
     selectedItems,
     setFillMode
-  } = useSampleGridControls(props);
+  } = usePCRBatchItemGridControls(props);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;

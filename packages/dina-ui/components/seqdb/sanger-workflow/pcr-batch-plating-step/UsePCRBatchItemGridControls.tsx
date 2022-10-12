@@ -1,23 +1,16 @@
-import { ApiClientContext, useQuery } from "common-ui";
+import { ApiClientContext, filterBy, useQuery } from "common-ui";
 import { omitBy } from "lodash";
 import { useContext, useRef, useState } from "react";
-import {
-  Chain,
-  ChainStepTemplate,
-  ContainerType,
-  LibraryPrep,
-  LibraryPrepBatch,
-  PcrBatchItem
-} from "../../../../types/seqdb-api";
+import { PcrBatchItem } from "../../../../types/seqdb-api";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
-  pcrBatchItem: PcrBatchItem;
+  pcrBatchId: string;
 }
 
 export function UsePCRBatchItemGridControls({
-  pcrBatchItem
+  pcrBatchId
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
 
@@ -45,16 +38,20 @@ export function UsePCRBatchItemGridControls({
   });
 
   // Library prep and sample queries.
-  const { loading: libraryPrepsLoading, response: libraryPrepsResponse } =
+  const { loading: pcrBatchItemsLoading, response: pcrBatchItemsResponse } =
     useQuery<PcrBatchItem[]>(
       {
-        // Optimize query speed by reducing the amount of requested fields.
-        fields: {
-          "molecular-sample": "name"
-        },
-        include: "molecularSample",
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId
+            }
+          ]
+        })(""),
         page: { limit: 1000 },
-        path: `/seqdb-api/pcr-batch-items/${libraryPrepBatch.id}/libraryPreps`
+        path: `/seqdb-api/pcr-batch-item`
       },
       {
         deps: [lastSave],
@@ -77,10 +74,9 @@ export function UsePCRBatchItemGridControls({
             .map(item => item.id)
             .join();
 
-          const { data: pcrBatchItemsNoCoords } = await apiClient.get<
-          PcrBatchItem[]
-          >("/seqdb-api/pcr-batch-item", {
-            // Get all the sample stepResources from the sample selection step that have no coords.
+          const { data: pcrBatchItemsNoCoords } = await apiClient.get<PcrBatchItem[]>
+          ("/seqdb-api/pcr-batch-item", {
+            // Get all the PcrBatchItems that have no coords.
             filter: {
               selector: "pcrBatch.uuid",
               comparison: "==",
@@ -201,7 +197,7 @@ export function UsePCRBatchItemGridControls({
     moveItems([item]);
   }
 
-  function onSampleClick(item, e) {
+  function onItemClick(item, e) {
     const { availableItems } = gridState;
 
     if (lastSelectedItemRef.current && e.shiftKey) {
@@ -229,8 +225,9 @@ export function UsePCRBatchItemGridControls({
     setSubmitting(true);
     try {
       const { cellGrid, movedItems } = gridState;
-      const existingLibraryPreps = libraryPrepsResponse
-        ? libraryPrepsResponse.data
+
+      const existingPcrBatchItems = pcrBatchItemsResponse
+        ? pcrBatchItemsResponse.data
         : [];
 
       const pcrBatchItemsToSave = movedItems.map(movedItem => {
@@ -239,17 +236,9 @@ export function UsePCRBatchItemGridControls({
           key => cellGrid[key] === movedItem
         );
 
-        // Get this sample's library prep, or create a new one if it doesn't exist yet.
-        const existingPrep = existingLibraryPreps.find(
-          prep => prep.molecul.id === movedSample.id
+        const existingPcrBatchItem = existingPcrBatchItems.find(
+          item => item.id === movedItem.id
         );
-        const libraryPrep: LibraryPrep = existingPrep
-          ? { ...existingPrep }
-          : {
-              libraryPrepBatch,
-              molecularSample: movedSample,
-              type: "library-prep"
-            };
 
         let newWellColumn: number | undefined;
         let newWellRow: string | undefined;
@@ -259,10 +248,10 @@ export function UsePCRBatchItemGridControls({
           newWellRow = row;
         }
 
-        pcrBatchItem.wellColumn = newWellColumn;
-        pcrBatchItem.wellRow = newWellRow;
+        existingPcrBatchItem.wellColumn = newWellColumn;
+        existingPcrBatchItem.wellRow = newWellRow;
 
-        return pcrBatchItem;
+        return existingPcrBatchItem;
       });
 
       const saveArgs = pcrBatchItemsToSave.map(item => ({
@@ -291,7 +280,7 @@ export function UsePCRBatchItemGridControls({
     moveItems(items, "A_1");
   }
 
-  const loading = libraryPrepsLoading || itemsLoading || submitting;
+  const loading = pcrBatchItemsLoading || itemsLoading || submitting;
 
   return {
     ...gridState,
@@ -302,7 +291,7 @@ export function UsePCRBatchItemGridControls({
     moveAll,
     onGridDrop,
     onListDrop,
-    onSampleClick,
+    onItemClick,
     selectedItems,
     setFillMode
   };
