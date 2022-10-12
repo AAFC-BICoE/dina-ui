@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import {
   BasicConfig,
   Config,
   Conjunctions,
   Fields,
+  LocaleSettings,
   Operators,
   RenderSettings,
   Settings,
@@ -12,6 +14,7 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { ESIndexMapping } from "../types";
+import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
@@ -35,7 +38,7 @@ import QueryBuilderTextSearch, {
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-export function fieldPathToIndexSettings(
+function fieldPathToIndexSettings(
   fieldName: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
@@ -82,13 +85,32 @@ function getQueryBuilderTypeFromIndexType(
 }
 
 /**
+ * Custom hook for generating the query builder hook. It should only be generated once.
+ */
+export function useQueryBuilderConfig(indexName: string) {
+  // Load index map using the index name.
+  const { indexMap } = useIndexMapping(indexName);
+
+  const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
+
+  // When the index map has been provided (or changed) it can be generated.
+  useEffect(() => {
+    if (!indexMap) return;
+
+    setQueryBuilderConfig(generateBuilderConfig(indexMap, indexName));
+  }, [indexMap]);
+
+  return { queryBuilderConfig };
+}
+
+/**
  * Create the query builder configure using the index map and index name.
  *
  * @param indexMap The index map is used for generating the field list.
  * @param indexName The index name currently being used.
  * @returns Query Builder configuration.
  */
-export function generateBuilderConfig(
+function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string
 ): Config {
@@ -389,9 +411,15 @@ export function generateBuilderConfig(
     )
   };
 
+  const localeSettings: LocaleSettings = {
+    addRuleLabel: "Add condition",
+    addGroupLabel: "Add group"
+  };
+
   const settings: Settings = {
     ...BasicConfig.settings,
     ...renderSettings,
+    ...localeSettings,
     showNot: false,
     canRegroup: true,
     canReorder: true,
