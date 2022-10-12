@@ -6,6 +6,7 @@ import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
 import {
+  checkForErrorsInTree,
   defaultQueryTree,
   QueryBuilderMemo
 } from "./query-builder/QueryBuilder";
@@ -44,6 +45,7 @@ import {
 import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
 import React from "react";
 import { GroupSelectField } from "packages/dina-ui/components";
+import { useMemo } from "react";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -228,18 +230,16 @@ export function QueryPage<TData extends KitsuResource>({
   // Query Page error message state
   const [error, setError] = useState<any>();
 
+  const defaultGroups = {
+    group: groupNames ?? []
+  };
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     setLoading(true);
 
     // Query builder is not setup yet.
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
-      setLoading(false);
-      return;
-    }
-
-    // Check for any validation issues in the QueryBuilder.
-    if (Utils.checkTree(submittedQueryBuilderTree, queryBuilderConfig)) {
       setLoading(false);
       return;
     }
@@ -252,7 +252,6 @@ export function QueryPage<TData extends KitsuResource>({
       submittedQueryBuilderTree,
       queryBuilderConfig
     );
-
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
@@ -667,25 +666,32 @@ export function QueryPage<TData extends KitsuResource>({
     [pageSize]
   );
 
+  // Generate the key for the DINA form. It should only be generated once.
+  const formKey = useMemo(() => uuidv4(), []);
+
   return (
     <>
       {!viewMode && (
-        <label
-          style={{ fontSize: 20, fontFamily: "sans-serif", fontWeight: "bold" }}
-        >
-          <DinaMessage id="search" />
-        </label>
+        <>
+          <label
+            style={{
+              fontSize: 20,
+              fontFamily: "sans-serif",
+              fontWeight: "bold"
+            }}
+          >
+            <DinaMessage id="search" />
+          </label>
+          <QueryBuilderMemo
+            queryBuilderTree={queryBuilderTree}
+            setQueryBuilderTree={onQueryBuildTreeChange}
+            queryBuilderConfig={queryBuilderConfig}
+            onSubmit={onSubmit}
+            onReset={onReset}
+          />
+        </>
       )}
-      {!viewMode && (
-        <QueryBuilderMemo
-          queryBuilderTree={queryBuilderTree}
-          setQueryBuilderTree={onQueryBuildTreeChange}
-          queryBuilderConfig={queryBuilderConfig}
-          onSubmit={onSubmit}
-          onReset={onReset}
-        />
-      )}
-      <DinaForm key={uuidv4()} initialValues={{}} onSubmit={onSubmit}>
+      <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>
@@ -693,7 +699,11 @@ export function QueryPage<TData extends KitsuResource>({
               isMulti={true}
               name="group"
               className="col-md-4 mt-3"
-              onChange={(value, _) => onGroupChange(value)}
+              onChange={(newGroups) =>
+                setImmediate(() => {
+                  onGroupChange(newGroups);
+                })
+              }
             />
           </DinaFormSection>
         )}

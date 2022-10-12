@@ -1,6 +1,5 @@
 import { KitsuResource } from "kitsu";
 import { uniq } from "lodash";
-import { LimitOffsetPageSpec } from "packages/common-ui/lib";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { SortingRule } from "react-table";
 import { TableColumn } from "../../types";
@@ -45,6 +44,7 @@ export function elasticSearchFormatExport(
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
+    const errors = properties.get("valueError");
 
     return buildEsRule(field, value, operator, config);
   }
@@ -311,6 +311,7 @@ export function applyGroupFilters(elasticSearchQuery: any, groups: string[]) {
   return {
     query: {
       bool: {
+        ...(elasticSearchQuery?.query?.bool ?? []),
         must: [
           ...(elasticSearchQuery?.query?.bool?.must ?? []),
           {

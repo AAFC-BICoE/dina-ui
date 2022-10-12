@@ -105,4 +105,28 @@ export function defaultQueryTree(): ImmutableTree {
   });
 }
 
+/**
+ * Traverses through the Query Builder tree to find any validation errors.
+ *
+ * @param tree The query builder tree.
+ * @returns true if validation error found, false if no errors are found.
+ */
+export function checkForErrorsInTree(tree: ImmutableTree) {
+  const type = tree.get("type");
+  const children = tree.get("children1");
+  const properties = tree.get("properties") || new Map();
+
+  if (type === "rule" && properties) {
+    const errors = properties.get("valueError");
+    return typeof errors === "string";
+  }
+
+  if ((type === "group" || type === "rule_group") && children) {
+    // If there is nothing in the group, then don't add it to the query.
+    if (!children || !children.size) return undefined;
+    const childrenArray = children.valueSeq().toArray();
+    return childrenArray.map((childTree) => checkForErrorsInTree(childTree));
+  }
+}
+
 export const QueryBuilderMemo = React.memo(QueryBuilder);

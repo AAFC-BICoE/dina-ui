@@ -117,9 +117,7 @@ export function useQueryBuilderConfig(indexName: string) {
   useEffect(() => {
     if (!indexMap) return;
 
-    setQueryBuilderConfig(
-      generateBuilderConfig(indexMap, indexName, formatMessage)
-    );
+    setQueryBuilderConfig(generateBuilderConfig(indexMap, formatMessage));
   }, [indexMap]);
 
   return { queryBuilderConfig };
@@ -134,7 +132,6 @@ export function useQueryBuilderConfig(indexName: string) {
  */
 function generateBuilderConfig(
   indexMap: ESIndexMapping[],
-  indexName: string,
   formatMessage: any
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
@@ -220,11 +217,17 @@ function generateBuilderConfig(
       type: "autoComplete",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryBuilderAutoSuggestionTextSearch
-          currentFieldName={factoryProps?.field}
+        // <QueryBuilderAutoSuggestionTextSearch
+        //   currentFieldName={factoryProps?.field}
+        //   matchType={factoryProps?.operator}
+        //   indexName={indexName}
+        //   indexMap={indexMap}
+        //   value={factoryProps?.value}
+        //   setValue={factoryProps?.setValue}
+        // />
+        // Auto complete will be added back in another ticket.
+        <QueryBuilderTextSearch
           matchType={factoryProps?.operator}
-          indexName={indexName}
-          indexMap={indexMap}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
