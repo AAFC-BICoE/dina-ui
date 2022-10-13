@@ -246,14 +246,14 @@ export function QueryPage<TData extends KitsuResource>({
   useEffect(() => {
     setLoading(true);
 
+    // Reset any error messages since we are trying again.
+    setError(undefined);
+
     // Query builder is not setup yet.
     if (!submittedQueryBuilderTree || !queryBuilderConfig) {
       setLoading(false);
       return;
     }
-
-    // Reset any error messages since we are trying again.
-    setError(undefined);
 
     // Elastic search query with pagination settings.
     let queryDSL = elasticSearchFormatExport(
