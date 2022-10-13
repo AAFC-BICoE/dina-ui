@@ -93,6 +93,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "materialSampleState"
+          },
+          {
+            id: "stateChangeRemarks"
+          },
+          {
+            id: "stateChangedOn"
           }
         ]
       }
