@@ -7,7 +7,7 @@ import {
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
-import { DATE_REGEX_PARTIAL } from "packages/common-ui/lib";
+import { DATE_REGEX_PARTIAL } from "common-ui/lib";
 
 interface QueryBuilderDateSearchProps {
   /**
