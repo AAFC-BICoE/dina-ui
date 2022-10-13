@@ -330,7 +330,9 @@ export function QueryPage<TData extends KitsuResource>({
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
       } else {
-        setQueryBuilderTree(defaultQueryTree(queryBuilderConfig));
+        const newTree = defaultQueryTree(queryBuilderConfig);
+        setQueryBuilderTree(newTree);
+        setSubmittedQueryBuilderTree(newTree);
       }
     }
   }, [queryBuilderConfig]);

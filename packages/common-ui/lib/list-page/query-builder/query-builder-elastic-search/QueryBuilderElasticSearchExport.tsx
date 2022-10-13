@@ -171,68 +171,66 @@ export function applySortingRules<TData extends KitsuResource>(
   columns: TableColumn<TData>[]
 ) {
   if (sortingRules && sortingRules.length > 0) {
-    sortingRules.forEach((sortingRule) => {
-      const columnDefinition = columns.find((column) => {
-        // Depending on if it's a string or not.
-        if (typeof column === "string") {
-          return column === sortingRule.id;
-        } else {
-          return column.accessor === sortingRule.id;
-        }
-      });
+    const sortingQueries = Object.assign(
+      {},
+      ...sortingRules.map((sortingRule) => {
+        const columnDefinition = columns.find((column) => {
+          // Depending on if it's a string or not.
+          if (typeof column === "string") {
+            return column === sortingRule.id;
+          } else {
+            return column.accessor === sortingRule.id;
+          }
+        });
 
-      // Edge case if a string is only provided as the column definition.
-      if (typeof columnDefinition === "string") {
-        return {
-          ...elasticSearchQuery,
-          sort: [
-            {
-              [columnDefinition]: {
-                order: sortingRule.desc ? "desc" : "asc"
-              }
-            }
-          ]
-        };
-      } else {
-        if (!columnDefinition || !columnDefinition?.accessor) return;
-
-        const indexPath =
-          columnDefinition.accessor +
-          (columnDefinition.isKeyword && columnDefinition.isKeyword === true
-            ? ".keyword"
-            : "");
-
-        if (columnDefinition.relationshipType) {
+        // Edge case if a string is only provided as the column definition.
+        if (typeof columnDefinition === "string") {
           return {
-            ...elasticSearchQuery,
-            sort: [
-              {
-                [indexPath]: {
-                  order: sortingRule.desc ? "desc" : "asc",
-                  nested_path: "included",
-                  nested_filter: {
-                    term: {
-                      "included.type": columnDefinition.relationshipType
-                    }
+            [columnDefinition]: {
+              order: sortingRule.desc ? "desc" : "asc"
+            }
+          };
+        } else {
+          if (!columnDefinition || !columnDefinition?.accessor) {
+            return;
+          }
+
+          const indexPath =
+            columnDefinition.accessor +
+            (columnDefinition.isKeyword && columnDefinition.isKeyword === true
+              ? ".keyword"
+              : "");
+
+          if (columnDefinition.relationshipType) {
+            return {
+              [indexPath]: {
+                order: sortingRule.desc ? "desc" : "asc",
+                nested_path: "included",
+                nested_filter: {
+                  term: {
+                    "included.type": columnDefinition.relationshipType
                   }
                 }
               }
-            ]
-          };
-        } else {
-          return {
-            ...elasticSearchQuery,
-            sort: [
-              {
-                [indexPath]: {
-                  order: sortingRule.desc ? "desc" : "asc"
-                }
+            };
+          } else {
+            return {
+              [indexPath]: {
+                order: sortingRule.desc ? "desc" : "asc"
               }
-            ]
-          };
+            };
+          }
         }
-      }
-    });
+      })
+    );
+
+    // Add all of the queries to the existing elastic search query.
+    if (sortingQueries.length !== 0) {
+      return {
+        ...elasticSearchQuery,
+        sort: sortingQueries
+      };
+    }
   }
 
   // No sorting is being applied. Return the query back.

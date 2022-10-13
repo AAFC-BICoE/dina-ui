@@ -126,6 +126,13 @@ export function emptyQueryTree(): ImmutableTree {
   } as JsonTree);
 }
 
+/**
+ * Currently utilized for the custom view queries to show associated records.
+ *
+ * @param uuid UUID to search for.
+ * @param path Relationship path to search against.
+ * @returns QueryBuilder tree which will be translated into elastic search query.
+ */
 export function generateUUIDTree(uuid: string, path: string): JsonTree {
   return {
     id: Utils.uuid(),
