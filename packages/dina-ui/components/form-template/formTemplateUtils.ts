@@ -1,26 +1,5 @@
-import { KitsuResource } from "kitsu";
-import {
-  CollectingEvent,
-  FormTemplate,
-  MATERIAL_SAMPLE_FORM_LEGEND
-} from "packages/dina-ui/types/collection-api";
+import { FormTemplate } from "packages/dina-ui/types/collection-api";
 import { sortBy } from "lodash";
-
-export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
-  formTemplate: Partial<FormTemplate> | undefined
-): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
-  // No form template data provided. Working on a new form template.
-  if (!formTemplate) {
-    return {};
-  }
-
-  const initialValueForResource: Partial<T> = {};
-
-  return {
-    ...initialValueForResource,
-    attachmentsConfig: {}
-  };
-}
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
