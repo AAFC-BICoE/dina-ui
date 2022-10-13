@@ -32,7 +32,8 @@ export default function QueryRowTextSearch({
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      {(matchType === "exactMatch" ||
+      {(matchType === "equals" ||
+        matchType === "exactMatch" ||
         matchType === "partialMatch" ||
         matchType === "notEquals") && (
         <input
