@@ -34,7 +34,11 @@ import {
   COLLECTING_EVENT_COMPONENT_NAME,
   FormTemplate,
   FormTemplateComponents,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MATERIAL_SAMPLE_FORM_LEGEND,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
   ORGANISMS_COMPONENT_NAME,
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
@@ -287,6 +291,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
   dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =
     dataComponentState.enableAcquisitionEvent;
   dataComponentEnabledMap[ASSOCIATIONS_COMPONENT_NAME] =
@@ -303,5 +309,7 @@ function getDataComponentsStateMap(dataComponentState) {
     dataComponentState.enableScheduledActions;
   dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
     dataComponentState.enableStorage;
+  dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
   return dataComponentEnabledMap;
 }
