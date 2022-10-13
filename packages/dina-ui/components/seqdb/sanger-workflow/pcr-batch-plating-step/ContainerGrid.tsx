@@ -1,11 +1,11 @@
+import { useApiClient } from "packages/common-ui/lib";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { ContainerType, PcrBatchItem } from "../../../../types/seqdb-api";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { DraggablePCRBatchItemBox, SAMPLE_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
+import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
 
 interface ContainerGridProps {
-  containerType: ContainerType;
+  pcrBatchId: string;
   cellGrid: CellGrid;
   movedItems: PcrBatchItem[];
   onDrop: (item: PcrBatchItem, coords: string) => void;
@@ -22,11 +22,22 @@ export interface CellGrid {
 }
 
 export function ContainerGrid({
-  containerType,
+  pcrBatchId,
   cellGrid,
   movedItems,
   onDrop
 }: ContainerGridProps) {
+  const { apiClient } = useApiClient();
+  async function getPcrBatch(){
+    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${pcrBatchId}`,
+      {}
+    );
+    return pcrBatch
+  }
+  const { pcrBatch } = getPcrBatch();
+  const { numberOfRows } = pcrBatch.storageRestriction.gridLayout.numberOfRows;
+
   const columns: Column[] = [];
 
   // Add the letter column.
@@ -40,7 +51,7 @@ export function ContainerGrid({
     sortable: false
   });
 
-  for (let col = 0; col < containerType.numberOfColumns; col++) {
+  for (let col = 0; col < numberOfRows; col++) {
     const columnLabel = String(col + 1);
 
     columns.push({
@@ -65,7 +76,7 @@ export function ContainerGrid({
   }
 
   // ReactTable needs a data object in every row.
-  const tableData = new Array(containerType.numberOfRows).fill({});
+  const tableData = new Array(numberOfRows).fill({});
 
   return (
     <div>
@@ -86,7 +97,7 @@ export function ContainerGrid({
 
 function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
   const [, drop] = useDrop({
-    accept: SAMPLE_BOX_DRAG_KEY,
+    accept: ITEM_BOX_DRAG_KEY,
     drop: item => onDrop(item as any)
   });
 

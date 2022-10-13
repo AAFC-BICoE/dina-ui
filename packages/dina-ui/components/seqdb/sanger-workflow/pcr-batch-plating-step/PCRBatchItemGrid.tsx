@@ -1,18 +1,17 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
+import { PcrBatchFormFields } from "packages/dina-ui/pages/seqdb/pcr-batch/edit";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
-import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
+import { UsePCRBatchItemGridControls } from "./UsePCRBatchItemGridControls";
 
-export interface ContainerGridProps {
-  // chain: Chain;
-  // sampleSelectionStep: ChainStepTemplate;
-  // libraryPrepBatch: LibraryPrepBatch;
+export interface PCRBatchItemGridProps {
+    pcrBatchId: string;
 }
 
-export function SampleGrid(props: ContainerGridProps) {
-  
+export function SampleGrid(props: PCRBatchItemGridProps) {
+  const { pcrBatchId } = props;
   const {
     availableItems,
     cellGrid,
@@ -27,19 +26,10 @@ export function SampleGrid(props: ContainerGridProps) {
     onItemClick,
     selectedItems,
     setFillMode
-  } = usePCRBatchItemGridControls(props);
+  } = UsePCRBatchItemGridControls();
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
-  }
-
-  const { containerType } = libraryPrepBatch;
-  if (!containerType) {
-    return (
-      <span className="alert alert-warning">
-        Container Type must be set to use the container grid.
-      </span>
-    );
   }
 
   return (
@@ -95,12 +85,12 @@ export function SampleGrid(props: ContainerGridProps) {
       </div>
       <div className="row">
         <div className="col-2">
-          <strong>Selected samples ({availableSamples.length} in list)</strong>
-          <DraggableSampleList
-            availableSamples={availableSamples}
-            selectedSamples={selectedSamples}
-            movedSamples={movedSamples}
-            onClick={onSampleClick}
+          <strong>Selected samples ({availableItems.length} in list)</strong>
+          <DraggablePCRBatchItemList
+            availableItems={availableItems}
+            selectedItems={selectedItems}
+            movedItems={movedItems}
+            onClick={onItemClick}
             onDrop={onListDrop}
           />
         </div>
@@ -116,9 +106,9 @@ export function SampleGrid(props: ContainerGridProps) {
         <div className="col-9">
           <strong>Container wells</strong>
           <ContainerGrid
-            containerType={containerType}
+            pcrBatchId={pcrBatchId}
             cellGrid={cellGrid}
-            movedSamples={movedSamples}
+            movedItems={movedItems}
             onDrop={onGridDrop}
           />
         </div>

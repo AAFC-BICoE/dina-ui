@@ -1,7 +1,6 @@
 import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 import { useDrop } from "react-dnd-cjs";
-import { MaterialSample } from "../../../../types/collection-api";
-import { DraggablePCRBatchItemBox, SAMPLE_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
 
 interface DraggablePCRBatchItemListProps {
   availableItems: PcrBatchItem[];
@@ -19,7 +18,7 @@ export function DraggablePCRBatchItemList({
   onDrop
 }: DraggablePCRBatchItemListProps) {
   const [, dropRef] = useDrop({
-    accept: SAMPLE_BOX_DRAG_KEY,
+    accept: ITEM_BOX_DRAG_KEY,
     drop: item => onDrop((item as any).sample)
   });
 

@@ -1,6 +1,5 @@
 import { noop } from "lodash";
 import { useDrag } from "react-dnd-cjs";
-import { MaterialSample } from "../../../../types/collection-api";
 import RcTooltip from "rc-tooltip";
 import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
@@ -11,7 +10,7 @@ interface DraggablePCRBatchItemBoxProps {
   wasMoved: boolean;
 }
 
-export const SAMPLE_BOX_DRAG_KEY = "materialSample";
+export const ITEM_BOX_DRAG_KEY = "materialSample";
 
 export function DraggablePCRBatchItemBox({
   onClick = noop,
@@ -20,7 +19,7 @@ export function DraggablePCRBatchItemBox({
   wasMoved
 }: DraggablePCRBatchItemBoxProps) {
   const [, drag] = useDrag({
-    item: {   pcrBatchItem, type: SAMPLE_BOX_DRAG_KEY }
+    item: {   pcrBatchItem, type: ITEM_BOX_DRAG_KEY }
   });
 
   return (
