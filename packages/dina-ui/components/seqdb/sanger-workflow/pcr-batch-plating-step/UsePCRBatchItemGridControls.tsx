@@ -2,15 +2,16 @@ import { ApiClientContext, filterBy, useQuery } from "common-ui";
 import { omitBy } from "lodash";
 import { useContext, useRef, useState } from "react";
 import { PcrBatchItem } from "../../../../types/seqdb-api";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchId: string;
+  pcrBatchItem: PcrBatchItem;
 }
 
 export function UsePCRBatchItemGridControls({
-  pcrBatchId
+  pcrBatchId,
+  pcrBatchItem
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
 
@@ -19,25 +20,25 @@ export function UsePCRBatchItemGridControls({
   // Whether the grid is submitting.
   const [submitting, setSubmitting] = useState(false);
 
-  // Highlighted/selected samples.
+  // Highlighted/selected PcrBatchItems.
   const [selectedItems, setSelectedItems] = useState<PcrBatchItem[]>([]);
   const lastSelectedItemRef = useRef<PcrBatchItem>();
 
-  // Grid fill direction when you move multiple samples into the grid.
+  // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<string>("COLUMN");
 
   const [lastSave, setLastSave] = useState<number>();
 
   const [gridState, setGridState] = useState({
-    // Available samples with no well coordinates.
+    // Available PcrBatchItems with no well coordinates.
     availableItems: [] as PcrBatchItem[],
-    // The grid of samples that have well coordinates.
+    // The grid of PcrBatchItems that have well coordinates.
     cellGrid: {} as CellGrid,
-    // Samples that have been moved since data initialization.
+    // PcrBatchItems that have been moved since data initialization.
     movedItems: [] as PcrBatchItem[]
   });
 
-  // Library prep and sample queries.
+  // PcrBatchItem queries.
   const { loading: pcrBatchItemsLoading, response: pcrBatchItemsResponse } =
     useQuery<PcrBatchItem[]>(
       {
@@ -88,10 +89,6 @@ export function UsePCRBatchItemGridControls({
             page: { limit: 1000 }
           });
 
-          // const newAvailablepcrItems = pcrBatchItemsNoCoords
-          //   .map(sr => sr.mole)
-          //   .sort(itemSort);
-
           setGridState({
             availableItems: pcrBatchItemsNoCoords,
             cellGrid: newCellGrid,
@@ -104,10 +101,10 @@ export function UsePCRBatchItemGridControls({
 
   function moveItems(items: PcrBatchItem[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
-      // Remove the sample from the grid.
+      // Remove the PcrBatchItem from the grid.
       const newCellGrid: CellGrid = omitBy(cellGrid, s => items.includes(s));
 
-      // Remove the sample from the availables samples.
+      // Remove the PcrBatchItem from the availables PcrBatchItems.
       let newAvailableItems = availableItems.filter(
         s => !items.includes(s)
       );
@@ -143,7 +140,7 @@ export function UsePCRBatchItemGridControls({
             thisItemRowNumber + 64
           )}_${thisItemColumnNumber}`;
 
-          // If there is already a sample in this cell, move the existing sample back to the list.
+          // If there is already a PcrBatchItem in this cell, move the existing PcrBatchItem back to the list.
           const itemAlreadyInThisCell = newCellGrid[thisItemCoords];
           if (itemAlreadyInThisCell) {
             newAvailableItems.push(itemAlreadyInThisCell);
@@ -152,9 +149,9 @@ export function UsePCRBatchItemGridControls({
             }
           }
 
-          // Only move the sample into the grid if the well is valid for this container type.
+          // Only move the PcrBatchItem into the grid if the well is valid for this container type.
           if (newCellNumber <= wellColumn * Number(wellRow)) {
-            // Move the sample into the grid.
+            // Move the PcrBatchItem into the grid.
             newCellGrid[thisItemCoords] = item;
           } else {
             newAvailableItems.push(item);
@@ -163,12 +160,12 @@ export function UsePCRBatchItemGridControls({
           newCellNumber++;
         }
       } else {
-        // Add the sample to the list.
+        // Add the PcrBatchItem to the list.
         newAvailableItems = [...newAvailableItems, ...items];
       }
     }
 
-      // Set every sample passed into this function as moved.
+      // Set every PcrBatchItem passed into this function as moved.
       for (const item of items) {
         if (!movedItems.includes(item)) {
           newMovedItems.push(item);
@@ -226,9 +223,9 @@ export function UsePCRBatchItemGridControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
-      const existingPcrBatchItems = pcrBatchItemsResponse
-        ? pcrBatchItemsResponse.data
-        : [];
+      // const existingPcrBatchItems = pcrBatchItemsResponse
+      //   ? pcrBatchItemsResponse.data
+      //   : [];
 
       const pcrBatchItemsToSave = movedItems.map(movedItem => {
         // Get the coords from the cell grid.
@@ -236,22 +233,22 @@ export function UsePCRBatchItemGridControls({
           key => cellGrid[key] === movedItem
         );
 
-        const existingPcrBatchItem = existingPcrBatchItems.find(
-          item => item.id === movedItem.id
-        );
+        // const existingPcrBatchItem = existingPcrBatchItems.find(
+        //   item => item.id === movedItem.id
+        // );
 
-        let newWellColumn: number | undefined;
-        let newWellRow: string | undefined;
-        if (coords) {
-          const [row , col] = coords.split("_");
-          newWellColumn = Number(col);
-          newWellRow = row;
-        }
+        // let newWellColumn: number | undefined;
+        // let newWellRow: string | undefined;
+        // if (coords) {
+        //   const [row , col] = coords.split("_");
+        //   newWellColumn = Number(col);
+        //   newWellRow = row;
+        // }
 
-        existingPcrBatchItem.wellColumn = newWellColumn;
-        existingPcrBatchItem.wellRow = newWellRow;
+        // existingPcrBatchItem.wellColumn = newWellColumn;
+        // existingPcrBatchItem.wellRow = newWellRow;
 
-        return existingPcrBatchItem;
+        return movedItem;
       });
 
       const saveArgs = pcrBatchItemsToSave.map(item => ({
