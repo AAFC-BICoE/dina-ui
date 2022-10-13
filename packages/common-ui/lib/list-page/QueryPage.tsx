@@ -30,7 +30,7 @@ import { FormikButton, useAccount } from "..";
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
-import { UserPreference } from "packages/dina-ui/types/user-api/resources/UserPreference";
+import { UserPreference } from "../../../dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
@@ -44,7 +44,7 @@ import {
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
 import React from "react";
-import { GroupSelectField } from "packages/dina-ui/components";
+import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
 
 const DEFAULT_PAGE_SIZE: number = 25;
