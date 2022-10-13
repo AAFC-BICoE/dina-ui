@@ -33,6 +33,7 @@ import QueryBuilderNumberSearch, {
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
+import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
 
 /**
  * Helper function to get the index settings for a field path.
@@ -106,7 +107,10 @@ function validateField(value: string, type: string, formatMessage: any) {
 /**
  * Custom hook for generating the query builder hook. It should only be generated once.
  */
-export function useQueryBuilderConfig(indexName: string) {
+export function useQueryBuilderConfig(
+  indexName: string,
+  customViewFields?: string[]
+) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping(indexName);
   const { formatMessage } = useIntl();
@@ -117,7 +121,9 @@ export function useQueryBuilderConfig(indexName: string) {
   useEffect(() => {
     if (!indexMap) return;
 
-    setQueryBuilderConfig(generateBuilderConfig(indexMap, formatMessage));
+    setQueryBuilderConfig(
+      generateBuilderConfig(indexMap, formatMessage, customViewFields)
+    );
   }, [indexMap]);
 
   return { queryBuilderConfig };
@@ -132,7 +138,8 @@ export function useQueryBuilderConfig(indexName: string) {
  */
 function generateBuilderConfig(
   indexMap: ESIndexMapping[],
-  formatMessage: any
+  formatMessage: any,
+  customViewFields?: string[]
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -187,6 +194,10 @@ function generateBuilderConfig(
     contains: {
       label: "Contains",
       cardinality: 1
+    },
+    uuid: {
+      label: "UUID",
+      cardinality: 1
     }
   };
 
@@ -239,6 +250,18 @@ function generateBuilderConfig(
           value: val,
           queryType,
           fieldInfo: fieldPathToIndexSettings(field, indexMap)
+        })
+    },
+    // UUID is a special type used for custom views.
+    uuid: {
+      ...BasicConfig.widgets.text,
+      type: "uuid",
+      valueSrc: "value",
+      factory: () => <></>,
+      elasticSearchFormatValue: (_queryType, val, _op, field, _config) =>
+        transformUUIDSearchToDSL({
+          fieldPath: field,
+          value: val
         })
     },
     date: {
@@ -325,6 +348,15 @@ function generateBuilderConfig(
       widgets: {
         autoComplete: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
+        }
+      }
+    },
+    uuid: {
+      valueSources: ["value"],
+      defaultOperator: "uuid",
+      widgets: {
+        uuid: {
+          operators: ["uuid"]
         }
       }
     },
@@ -456,7 +488,8 @@ function generateBuilderConfig(
 
   const fields: Fields = Object.assign(
     {},
-    ...indexMap?.map((indexItem: ESIndexMapping) => {
+    // Support all fields from the index map.
+    ...indexMap.map((indexItem: ESIndexMapping) => {
       const field = {};
       const type = getQueryBuilderTypeFromIndexType(
         indexItem.type,
@@ -471,9 +504,20 @@ function generateBuilderConfig(
             validateField(value, type, formatMessage)
         }
       };
-
       return field;
-    })
+    }),
+    // Support all first level fields from the custom view.
+    ...(customViewFields
+      ? customViewFields.map((fieldName: string) => {
+          const field = {};
+          field[fieldName] = {
+            label: fieldName,
+            type: "uuid",
+            valueSources: ["value"]
+          };
+          return field;
+        })
+      : [])
   );
 
   return {

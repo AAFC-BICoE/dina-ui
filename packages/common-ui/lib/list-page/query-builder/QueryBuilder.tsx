@@ -1,5 +1,5 @@
 import { LoadingSpinner } from "../..";
-import { Query, Builder, Utils } from "react-awesome-query-builder";
+import { Query, Builder, Utils, JsonTree } from "react-awesome-query-builder";
 import { useCallback } from "react";
 import {
   Config,
@@ -86,23 +86,61 @@ function QueryBuilder({
 /**
  * Empty query tree, used as the default when loading the page.
  */
-export function defaultQueryTree(): ImmutableTree {
+export function defaultQueryTree(config: Config): ImmutableTree {
+  return Utils.checkTree(
+    Utils.loadTree({
+      id: "baabbba8-0123-4456-b89a-b183d17aa81f",
+      type: "group",
+      children1: {
+        "9b8889bb-4567-489a-bcde-f183d18abfc3": {
+          type: "rule",
+          id: "9b8889bb-4567-489a-bcde-f183d18abfc3",
+          properties: {
+            field: null,
+            operator: null,
+            value: [],
+            valueSrc: [],
+            valueError: []
+          },
+          path: [
+            "baabbba8-0123-4456-b89a-b183d17aa81f",
+            "9b8889bb-4567-489a-bcde-f183d18abfc3"
+          ]
+        }
+      },
+      properties: { conjunction: "AND" },
+      path: ["baabbba8-0123-4456-b89a-b183d17aa81f"]
+    } as JsonTree),
+    config
+  );
+}
+
+/**
+ * Generate an empty tree, used for resetting.
+ */
+export function emptyQueryTree(): ImmutableTree {
   return Utils.loadTree({
+    id: "baabbba8-0123-4456-b89a-b183d17aa81f",
+    type: "group",
+    children1: {}
+  } as JsonTree);
+}
+
+export function generateUUIDTree(uuid: string, path: string): JsonTree {
+  return {
     id: Utils.uuid(),
     type: "group",
-    children1: [
-      {
+    children1: {
+      [Utils.uuid()]: {
         type: "rule",
         properties: {
-          field: null,
-          operator: null,
-          value: [],
-          valueSrc: [],
-          valueError: []
+          field: path,
+          operator: "uuid",
+          value: [uuid]
         }
       }
-    ]
-  });
+    }
+  };
 }
 
 /**

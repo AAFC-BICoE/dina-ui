@@ -1,7 +1,7 @@
 import lodash, { startCase } from "lodash";
 import { useIntl } from "react-intl";
 import Select from "react-select";
-import { ESIndexMapping } from "./types";
+import { ESIndexMapping } from "../../types";
 
 interface QueryFieldSelectorProps {
   /**

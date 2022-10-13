@@ -10,9 +10,9 @@ import {
   useQuery,
   withResponse,
   Tooltip,
-  useAccount,
   FieldSet,
-  QueryPage
+  QueryPage,
+  generateUUIDTree
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -27,9 +27,9 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { TransformQueryToDSLParams } from "packages/common-ui/lib/util/transformToDSL";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import Link from "next/link";
+import { JsonTree, Utils } from "react-awesome-query-builder";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -177,17 +177,10 @@ export function AssemblageFormLayout() {
   const router = useRouter();
   const uuid = String(router?.query?.id);
 
-  const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
-    ? {
-        queryRows: [
-          {
-            fieldName: "data.relationships.assemblages.data.id",
-            type: "uuid",
-            matchValue: uuid
-          }
-        ]
-      }
-    : undefined;
+  const customViewQuery = generateUUIDTree(
+    uuid,
+    "data.relationships.assemblages.data.id"
+  );
 
   // Columns for the elastic search list page.
   const columns: TableColumn<Assemblage>[] = [
@@ -276,7 +269,10 @@ export function AssemblageFormLayout() {
             columns={columns}
             indexName={"dina_material_sample_index"}
             viewMode={readOnly}
-            customViewQuery={customViewQuery}
+            customViewQuery={readOnly ? customViewQuery : undefined}
+            customViewFields={
+              readOnly ? ["data.relationships.assemblages.data.id"] : undefined
+            }
           />
         </FieldSet>
       )}

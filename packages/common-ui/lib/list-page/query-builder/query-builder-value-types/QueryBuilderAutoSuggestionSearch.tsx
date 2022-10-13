@@ -39,8 +39,8 @@ interface QueryBuilderAutoSuggestionTextSearchProps {
 export default function QueryBuilderAutoSuggestionTextSearch({
   currentFieldName,
   matchType,
-  value,
-  setValue,
+  // value,
+  // setValue,
   indexName,
   indexMap
 }: QueryBuilderAutoSuggestionTextSearchProps) {
