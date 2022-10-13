@@ -12,6 +12,7 @@ import {
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
+import _ from "lodash";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
@@ -194,6 +195,7 @@ export function FormTemplateEditPageLoaded({
       });
     };
     iterateThrough(allSubmittedValues);
+
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
     const formTemplate: InputResource<FormTemplate> = {
@@ -211,12 +213,14 @@ export function FormTemplateEditPageLoaded({
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
-            items: section.items.map((field) => ({
-              name: field.id,
-              visible:
-                allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
-              defaultValue: allSubmittedValues?.[field.id]
-            }))
+            items: section.items.map((field) => {
+              return {
+                name: field.id,
+                visible:
+                  allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+                defaultValue: _.get(allSubmittedValues, field.id)
+              };
+            })
           }))
         })
       )
