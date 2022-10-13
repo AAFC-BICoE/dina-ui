@@ -8,7 +8,7 @@ import {
   stringArrayCell
 } from "common-ui";
 import Link from "next/link";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import { Component, useMemo, useState } from "react";
 import { Head, Nav, thumbnailCell } from "../../../components";
 import {

@@ -1,6 +1,7 @@
 import {
   DateField,
   FieldSet,
+  generateUUIDTree,
   QueryPage,
   TextField,
   useDinaFormContext
@@ -9,9 +10,7 @@ import { TableColumn } from "../../../common-ui/lib/list-page/types";
 import { Project } from "../../../dina-ui/types/collection-api";
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
-import { useAccount } from "common-ui";
 import { useRouter } from "next/router";
-import { TransformQueryToDSLParams } from "../../../common-ui/lib/util/transformToDSL";
 import Link from "next/link";
 
 export function ProjectFormLayout() {
@@ -20,17 +19,10 @@ export function ProjectFormLayout() {
 
   const router = useRouter();
   const uuid = String(router?.query?.id);
-  const customViewQuery: TransformQueryToDSLParams | undefined = readOnly
-    ? {
-        queryRows: [
-          {
-            fieldName: "data.relationships.projects.data.id",
-            type: "uuid",
-            matchValue: uuid
-          }
-        ]
-      }
-    : undefined;
+  const customViewQuery = generateUUIDTree(
+    uuid,
+    "data.relationships.projects.data.id"
+  );
 
   // Columns for the elastic search list page.
   const columns: TableColumn<Project>[] = [
@@ -117,7 +109,10 @@ export function ProjectFormLayout() {
             columns={columns}
             indexName={"dina_material_sample_index"}
             viewMode={readOnly}
-            customViewQuery={customViewQuery}
+            customViewQuery={readOnly ? customViewQuery : undefined}
+            customViewFields={
+              readOnly ? ["data.relationships.projects.data.id"] : undefined
+            }
           />
         </FieldSet>
       )}

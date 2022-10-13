@@ -13,7 +13,7 @@ import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import { pick, compact, uniq } from "lodash";
 import ReactTable, { Column } from "react-table";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";

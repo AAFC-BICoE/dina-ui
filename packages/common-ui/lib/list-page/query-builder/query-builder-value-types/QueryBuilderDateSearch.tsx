@@ -1,76 +1,73 @@
 import React from "react";
-import { DateField, FieldSpy } from "../..";
-import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps, QueryRowExportProps } from "../QueryRow";
+import DatePicker from "react-datepicker";
 import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TransformToDSLProps } from "../../types";
+import { DATE_REGEX_PARTIAL } from "common-ui/lib";
 
-/**
- * The match options when a date search is being performed.
- *
- * Equals is for an exact match. Example: "2020-01-01", then only on that specific date.
- * Contains is for a partial match. Example: "2020", then on any date that is in 2020 will match.
- * Empty and Not Empty can be used if the date value is not mandatory.
- */
-const queryRowMatchOptions = [
-  { label: "Equals", value: "equals" },
-  { label: "Not equals", value: "notEquals" },
-  { label: "Contains", value: "contains" },
-  { label: "Greater than", value: "greaterThan" },
-  { label: "Greater than or equal to", value: "greaterThanOrEqualTo" },
-  { label: "Less than", value: "lessThan" },
-  { label: "Less than or equal to", value: "lessThanOrEqualTo" },
-  { label: "Empty", value: "empty" },
-  { label: "Not Empty", value: "notEmpty" }
-];
-
-interface QueryRowDateSearchProps {
+interface QueryBuilderDateSearchProps {
   /**
-   * The form name for the whole query builder.
+   * Current match type being used.
    */
-  queryBuilderName: string;
+  matchType?: string;
 
   /**
-   * The index where this search is being performed from.
-   *
-   * This is because you can have multiple QueryRows in the same QueryBuilder.
+   * Retrieve the current value from the Query Builder.
    */
-  index: number;
+  value: string;
+
+  /**
+   * Pass the selected value to the Query Builder to store.
+   */
+  setValue: ((fieldPath: string) => void) | undefined;
 }
 
-export default function QueryRowDateSearch({
-  queryBuilderName,
-  index
-}: QueryRowDateSearchProps) {
+export default function QueryBuilderDateSearch({
+  matchType,
+  value,
+  setValue
+}: QueryBuilderDateSearchProps) {
   return (
     <>
-      <SelectField
-        name={fieldProps(queryBuilderName, "matchType", index)}
-        options={queryRowMatchOptions}
-        className="me-1 flex-fill"
-        removeLabel={true}
-      />
-
-      {/* Depending on the matchType, it changes the rest of the query row. */}
-      <FieldSpy<string>
-        fieldName={fieldProps(queryBuilderName, "matchType", index)}
-      >
-        {(matchType, _fields) =>
-          matchType !== "empty" &&
-          matchType !== "notEmpty" && (
-            <DateField
-              name={fieldProps(queryBuilderName, "date", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-              partialDate={true}
-            />
-          )
-        }
-      </FieldSpy>
+      {matchType !== "empty" && matchType !== "notEmpty" && (
+        <DatePicker
+          className="form-control"
+          value={value}
+          onChange={(newDate: Date, event) => {
+            if (
+              !event ||
+              event?.type === "click" ||
+              event?.type === "keydown"
+            ) {
+              setValue?.(newDate && newDate.toISOString().slice(0, 10));
+            }
+          }}
+          onChangeRaw={(event) => {
+            if (event?.type === "change") {
+              let newText = event.target.value;
+              const dashOccurrences = newText.split("-").length - 1;
+              if (newText.length === 8 && dashOccurrences === 0) {
+                newText =
+                  newText.slice(0, 4) +
+                  "-" +
+                  newText.slice(4, 6) +
+                  "-" +
+                  newText.slice(6);
+              }
+              setValue?.(newText);
+            }
+          }}
+          dateFormat="yyyy-MM-dd"
+          placeholderText="YYYY-MM-DD"
+          isClearable={true}
+          showYearDropdown={true}
+          todayButton="Today"
+        />
+      )}
     </>
   );
 }
@@ -78,13 +75,19 @@ export default function QueryRowDateSearch({
 /**
  * Using the query row for a date search, generate the elastic search request to be made.
  */
-export function transformDateSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const { matchType, date, parentType, parentName } = queryRow;
+export function transformDateSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
 
-  switch (matchType) {
+  const { parentType, parentName } = fieldInfo;
+
+  switch (operation) {
     // Contains / less than / greater than / less than or equal to / greater than or equal to.
     case "contains":
     case "greaterThan":
@@ -99,8 +102,8 @@ export function transformDateSearchToDSL(
                 bool: {
                   must: [
                     rangeQuery(
-                      fieldName,
-                      buildDateRangeObject(matchType, date)
+                      fieldPath,
+                      buildDateRangeObject(fieldPath, value)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -108,7 +111,7 @@ export function transformDateSearchToDSL(
               }
             }
           }
-        : rangeQuery(fieldName, buildDateRangeObject(matchType, date));
+        : rangeQuery(fieldPath, buildDateRangeObject(operation, value));
 
     // Not equals match type.
     case "notEquals":
@@ -122,7 +125,7 @@ export function transformDateSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldName, date, false),
+                        must_not: termQuery(fieldPath, value, false),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -135,7 +138,7 @@ export function transformDateSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: existsQuery(fieldName),
+                        must_not: existsQuery(fieldPath),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -158,12 +161,12 @@ export function transformDateSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldName, date, false)
+                    must_not: termQuery(fieldPath, value, false)
                   }
                 },
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 }
               ]
@@ -184,7 +187,7 @@ export function transformDateSearchToDSL(
                         query: {
                           bool: {
                             must: [
-                              existsQuery(fieldName),
+                              existsQuery(fieldPath),
                               includedTypeQuery(parentType)
                             ]
                           }
@@ -205,7 +208,7 @@ export function transformDateSearchToDSL(
           }
         : {
             bool: {
-              must_not: existsQuery(fieldName)
+              must_not: existsQuery(fieldPath)
             }
           };
 
@@ -217,12 +220,12 @@ export function transformDateSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
                 }
               }
             }
           }
-        : existsQuery(fieldName);
+        : existsQuery(fieldPath);
 
     // Equals and default case
     default:
@@ -233,14 +236,14 @@ export function transformDateSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldName, date, false),
+                    termQuery(fieldPath, value, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldName, date, false);
+        : termQuery(fieldPath, value, false);
   }
 }
 
@@ -308,4 +311,19 @@ function buildDateRangeObject(matchType, value) {
     default:
       return value;
   }
+}
+
+/**
+ * Validate the date string to ensure it's something elastic search can accept.
+ *
+ * Partial dates are supported here.
+ * @param value date value
+ * @param formatMessage error message translation locale
+ * @return null if valid, string error if not valid.
+ */
+export function validateDate(value, formatMessage): string | null {
+  if (DATE_REGEX_PARTIAL.test(value)) {
+    return null;
+  }
+  return formatMessage({ id: "dateMustBeFormattedPartial" });
 }
