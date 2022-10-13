@@ -337,7 +337,10 @@ export function applyRootQuery(elasticSearchQuery: any) {
 
   return {
     query: {
-      bool: elasticSearchQuery.bool
+      bool: {
+        ...elasticSearchQuery.bool,
+        ...(elasticSearchQuery?.bool?.should ? { minimum_should_match: 1 } : {})
+      }
     }
   };
 }

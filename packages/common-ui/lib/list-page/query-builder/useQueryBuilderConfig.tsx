@@ -36,16 +36,31 @@ import QueryBuilderTextSearch, {
 import { transformUUIDSearchToDSL } from "./query-builder-value-types/QueryBuilderUUIDSearch";
 
 /**
- * Helper function to get the index settings for a field path.
+ * Helper function to get the index settings for a field value.
  *
  * The index settings has more information than what can be stored in the list, especially for
  * nested fields.
  */
-function fieldPathToIndexSettings(
-  fieldName: string,
+function fieldValueToIndexSettings(
+  fieldPath: string,
   indexMap: ESIndexMapping[]
 ): ESIndexMapping | undefined {
-  return indexMap.find((indexSettings) => indexSettings.value === fieldName);
+  return indexMap.find((indexSettings) => indexSettings.value === fieldPath);
+}
+
+/**
+ * Helper function to get the field path from the index settings.
+ *
+ * @param indexSettings Index settings for the field.
+ */
+function indexSettingsToFieldPath(indexSettings?: ESIndexMapping): string {
+  if (!indexSettings) return "";
+
+  return indexSettings.parentName
+    ? indexSettings.parentPath +
+        ".attributes." +
+        indexSettings.label.substring(indexSettings.label.indexOf(".") + 1)
+    : "data.attributes." + indexSettings.label;
 }
 
 /**
@@ -214,14 +229,16 @@ function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
-        transformTextSearchToDSL({
-          fieldPath: field,
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformTextSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,
           queryType,
-          fieldInfo: fieldPathToIndexSettings(field, indexMap)
-        })
+          fieldInfo: indexSettings
+        });
+      }
     },
     autoComplete: {
       ...BasicConfig.widgets.text,
@@ -243,14 +260,16 @@ function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
-        transformTextSearchToDSL({
-          fieldPath: field,
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformTextSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,
           queryType,
-          fieldInfo: fieldPathToIndexSettings(field, indexMap)
-        })
+          fieldInfo: indexSettings
+        });
+      }
     },
     // UUID is a special type used for custom views.
     uuid: {
@@ -275,14 +294,16 @@ function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
-        transformDateSearchToDSL({
-          fieldPath: field,
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformDateSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,
           queryType,
-          fieldInfo: fieldPathToIndexSettings(field, indexMap)
-        })
+          fieldInfo: indexSettings
+        });
+      }
     },
     number: {
       ...BasicConfig.widgets.text,
@@ -295,14 +316,16 @@ function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
-        transformNumberSearchToDSL({
-          fieldPath: field,
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformNumberSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,
           queryType,
-          fieldInfo: fieldPathToIndexSettings(field, indexMap)
-        })
+          fieldInfo: indexSettings
+        });
+      }
     },
     boolean: {
       ...BasicConfig.widgets.text,
@@ -315,14 +338,16 @@ function generateBuilderConfig(
           setValue={factoryProps?.setValue}
         />
       ),
-      elasticSearchFormatValue: (queryType, val, op, field, _config) =>
-        transformBooleanSearchToDSL({
-          fieldPath: field,
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformBooleanSearchToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
           operation: op,
           value: val,
           queryType,
-          fieldInfo: fieldPathToIndexSettings(field, indexMap)
-        })
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -495,6 +520,9 @@ function generateBuilderConfig(
         indexItem.type,
         indexItem.distinctTerm
       );
+
+      // Value is used for the field name since it's required to be unique. It should not be used
+      // for the path.
       field[indexItem.value] = {
         label: indexItem.label,
         type,
