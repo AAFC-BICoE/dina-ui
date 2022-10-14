@@ -8,7 +8,7 @@ interface ContainerGridProps {
   pcrBatchId: string;
 }
 
-export function UsePCRBatchItemGridControls({
+export function usePCRBatchItemGridControls({
   pcrBatchId
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
@@ -33,6 +33,8 @@ export function UsePCRBatchItemGridControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
+  const [ pcrBatchItem, setPcrBatchItem] = useState<PcrBatchItem>();
+
   async function getPcrBatch(){
     await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
@@ -44,9 +46,9 @@ export function UsePCRBatchItemGridControls({
   }
   getPcrBatch();
   
-  if(pcrBatch !== undefined){
-    setNumberOfColumns(pcrBatch.storageRestriction.StorageGridLayout.numberOfColumns);
-    setNumberOfRows(pcrBatch.storageRestriction.StorageGridLayout.numberOfRows);
+  if(pcrBatch?.storageRestriction !== undefined){
+    setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
+    setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
   }
 
   const [gridState, setGridState] = useState({
@@ -84,6 +86,7 @@ export function UsePCRBatchItemGridControls({
           );
 
           const newCellGrid: CellGrid = {};
+          if(pcrBatchItem != null)
           for (const {
             wellRow,
             wellColumn

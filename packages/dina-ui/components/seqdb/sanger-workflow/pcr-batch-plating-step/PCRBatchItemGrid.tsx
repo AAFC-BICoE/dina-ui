@@ -3,7 +3,7 @@ import { noop } from "lodash";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
-import { UsePCRBatchItemGridControls } from "./UsePCRBatchItemGridControls";
+import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 
 export interface PCRBatchItemGridProps {
     pcrBatchId: string;
@@ -25,7 +25,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     onItemClick,
     selectedItems,
     setFillMode
-  } = UsePCRBatchItemGridControls(props);
+  } = usePCRBatchItemGridControls(props);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;

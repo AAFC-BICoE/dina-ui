@@ -39,7 +39,7 @@ export function ContainerGrid({
     });
   }
   getPcrBatch();
-  const { numberOfRows } = pcrBatch.storageRestriction.StorageGridLayout.numberOfRows;
+  const { numberOfRows } = pcrBatch.storageRestriction.layout.numberOfRows;
 
   const columns: Column[] = [];
 
