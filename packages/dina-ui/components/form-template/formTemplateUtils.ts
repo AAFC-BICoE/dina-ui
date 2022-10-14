@@ -9,16 +9,13 @@ export function getFormTemplateCheckboxes(
     return {};
   }
 
-  let templateCheckboxesValues: Record<string, true | undefined> = {};
+  const templateCheckboxesValues: Record<string, true | undefined> = {};
 
   formTemplate.components?.forEach((component) => {
     component.sections?.forEach((sections) => {
       sections.items?.forEach((item) => {
         if (item.name && item.visible) {
-          templateCheckboxesValues = {
-            ...templateCheckboxesValues,
-            ...{ [item.name]: item.visible ? true : undefined }
-          };
+          templateCheckboxesValues[item.name] = item.visible ? true : undefined;
         }
       });
     });
@@ -33,25 +30,20 @@ export function getComponentValues(
   comp: string,
   formTemplate: FormTemplate | undefined
 ): any {
-  let componentValues = {};
-  let templateCheckboxes: Record<string, true | undefined> = {};
+  const componentValues = {};
+  const templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
       if (component.name === comp && component.visible) {
         component.sections?.forEach((sections) => {
           sections.items?.forEach((item) => {
-            if (item.name && item.visible) {
-              componentValues = {
-                ...componentValues,
-                ...{
-                  [item.name]: item.visible ? item.defaultValue : undefined
-                }
-              };
-              templateCheckboxes = {
-                ...templateCheckboxes,
-                ...{ [item.name]: true }
-              };
+            if (
+              (item.name && item.visible) ||
+              item.name === "geoReferenceAssertions"
+            ) {
+              componentValues[item.name] = item.defaultValue;
+              templateCheckboxes[item.name] = true;
             }
           });
         });
@@ -70,8 +62,8 @@ export function getComponentValues(
 export function getAllComponentValues(
   formTemplate: FormTemplate | undefined
 ): any {
-  let componentValues = {};
-  let templateCheckboxes: Record<string, true | undefined> = {};
+  const componentValues = {};
+  const templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
@@ -79,16 +71,10 @@ export function getAllComponentValues(
         component.sections?.forEach((sections) => {
           sections.items?.forEach((item) => {
             if (item.name && item.visible) {
-              componentValues = {
-                ...componentValues,
-                ...{
-                  [item.name]: item.visible ? item.defaultValue : undefined
-                }
-              };
-              templateCheckboxes = {
-                ...templateCheckboxes,
-                ...{ [item.name]: true }
-              };
+              componentValues[item.name] = item.visible
+                ? item.defaultValue
+                : undefined;
+              templateCheckboxes[item.name] = true;
             }
           });
         });

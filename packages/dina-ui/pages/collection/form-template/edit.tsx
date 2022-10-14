@@ -96,7 +96,6 @@ export function FormTemplateEditPageLoaded({
   const [navOrder, setNavOrder] = useState<string[] | null>(
     getComponentOrderFromTemplate(fetchedFormTemplate)
   );
-
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
   const pageTitle = id
@@ -115,6 +114,7 @@ export function FormTemplateEditPageLoaded({
     ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate),
     managedAttributesOrder: []
   };
+
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
@@ -194,7 +194,7 @@ export function FormTemplateEditPageLoaded({
         }
       });
     };
-    iterateThrough(allSubmittedValues);
+    // iterateThrough(allSubmittedValues);
 
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
