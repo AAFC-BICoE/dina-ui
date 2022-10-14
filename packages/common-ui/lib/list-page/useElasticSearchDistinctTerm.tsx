@@ -10,7 +10,7 @@ const NEST_AGGREGATION_NAME: string = "included_aggregation";
 
 interface QuerySuggestionFieldProps {
   /** The string you want elastic search to use. */
-  fieldName: string;
+  fieldName?: string;
 
   /** If the field is a relationship, we need to know the type to filter it. */
   relationshipType?: string;
@@ -34,6 +34,7 @@ export function useElasticSearchDistinctTerm({
 
   // Every time the textEntered has changed, perform a new request for new suggestions.
   useEffect(() => {
+    if (!fieldName) return;
     queryElasticSearchForSuggestions();
   }, [fieldName, relationshipType, groups]);
 
@@ -54,7 +55,7 @@ export function useElasticSearchDistinctTerm({
         "nested",
         { path: "included" },
         NEST_AGGREGATION_NAME,
-        includeAgg =>
+        (includeAgg) =>
           includeAgg.aggregation(
             "filter",
             {
@@ -63,7 +64,7 @@ export function useElasticSearchDistinctTerm({
               }
             },
             AGGREGATION_FILTER_NAME,
-            agg =>
+            (agg) =>
               agg.aggregation(
                 "terms",
                 fieldName + ".keyword",
@@ -92,18 +93,18 @@ export function useElasticSearchDistinctTerm({
           indexName
         }
       })
-      .then(resp => {
+      .then((resp) => {
         // The path to the results in the response changes if it contains the nested aggregation.
         if (relationshipType) {
           setSuggestions(
             resp?.data?.aggregations?.[NEST_AGGREGATION_NAME]?.[
               AGGREGATION_FILTER_NAME
-            ]?.[AGGREGATION_NAME]?.buckets?.map(bucket => bucket.key)
+            ]?.[AGGREGATION_NAME]?.buckets?.map((bucket) => bucket.key)
           );
         } else {
           setSuggestions(
             resp?.data?.aggregations?.[AGGREGATION_NAME]?.buckets?.map(
-              bucket => bucket.key
+              (bucket) => bucket.key
             )
           );
         }

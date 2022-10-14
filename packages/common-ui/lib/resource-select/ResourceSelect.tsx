@@ -129,7 +129,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   const [searchValue] = useDebounce(inputValue, 250);
 
   // Omit blank/null filters:
-  const filterParam = omitBy(filter(searchValue), val =>
+  const filterParam = omitBy(filter(searchValue), (val) =>
     ["", undefined].includes(val as string)
   );
 
@@ -143,7 +143,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     path: model,
     ...omitBy(
       { filter: filterParam, include, page, sort },
-      val => isUndefined(val) || isEqual(val, {})
+      (val) => isUndefined(val) || isEqual(val, {})
     )
   };
 
@@ -154,7 +154,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   // Build the list of options from the returned resources.
   const resourceOptions =
-    response?.data.map(resource => ({
+    response?.data.map((resource) => ({
       label: optionLabel(resource),
       resource,
       value: resource.id
@@ -194,20 +194,20 @@ export function ResourceSelect<TData extends KitsuResource>({
 
     // If an async option is selected:
     const asyncOption: AsyncOption<TData> | undefined = newSelected?.find(
-      option => option?.getResource
+      (option) => option?.getResource
     );
 
     if (asyncOption && newSelectedRaw) {
       // For callback options, don't set any value:
       const asyncResource = await asyncOption.getResource();
       if (asyncResource) {
-        const newResources = newSelected.map(option =>
+        const newResources = newSelected.map((option) =>
           option === asyncOption ? asyncResource : option.resource
         );
         onChangeProp(isMulti ? newResources : newResources[0], actionMeta);
       }
     } else {
-      const resources = newSelected?.map(o => o.resource) || [];
+      const resources = newSelected?.map((o) => o.resource) || [];
       onChangeProp(isMulti ? resources : resources[0], actionMeta);
     }
   }
@@ -225,14 +225,14 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   const selectedResources =
     useBulkGet<TData>({
-      ids: valueAsArray.map(it => String(it.id)),
+      ids: valueAsArray.map((it) => String(it.id)),
       listPath: model,
       disabled: !valueIsShallowReference
     }).data ?? valueAsArray;
 
   // Convert the field value to react-select option objects:
   const seenKeys = [] as string[];
-  const selectedAsArray = selectedResources.map((resource, index) => {
+  const selectedAsArray: any[] = selectedResources.map((resource, index) => {
     if (!resource) {
       return null;
     }
@@ -247,6 +247,7 @@ export function ResourceSelect<TData extends KitsuResource>({
 
     if (seenKeys.includes(resource.id)) {
       id = resource.id + index;
+      return null;
     } else {
       seenKeys.push(resource.id);
       id = resource.id;
@@ -262,18 +263,18 @@ export function ResourceSelect<TData extends KitsuResource>({
 
   const customStyle: any = {
     ...styles,
-    multiValueLabel: base => ({ ...base, cursor: "move" }),
-    placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
-    control: base => ({
+    multiValueLabel: (base) => ({ ...base, cursor: "move" }),
+    placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
+    control: (base) => ({
       ...base,
       ...(invalid && {
         borderColor: "rgb(148, 26, 37)",
         "&:hover": { borderColor: "rgb(148, 26, 37)" }
       })
     }),
-    menu: base => ({ ...base, zIndex: 1050 }),
+    menu: (base) => ({ ...base, zIndex: 1050 }),
     // Make the menu's height fit the resource options and the action options:
-    menuList: base => ({ ...base, maxHeight: "400px" }),
+    menuList: (base) => ({ ...base, maxHeight: "400px" }),
     group: (base, gProps) => ({
       ...base,
       // Make Action options bold:
@@ -285,7 +286,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     <SortableSelect
       // react-select AsyncSelect props:
       isMulti={isMulti}
-      onInputChange={newVal => setInputValue(newVal)}
+      onInputChange={(newVal) => setInputValue(newVal)}
       inputValue={inputValue}
       onChange={onChange}
       isLoading={isLoading}
