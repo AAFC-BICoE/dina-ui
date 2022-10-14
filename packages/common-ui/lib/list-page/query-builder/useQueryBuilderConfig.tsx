@@ -19,7 +19,6 @@ import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
-import QueryBuilderAutoSuggestionTextSearch from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
 import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "./query-builder-value-types/QueryBuilderBooleanSearch";
@@ -475,7 +474,7 @@ function generateBuilderConfig(
     renderField: (fieldDropdownProps) => (
       <QueryFieldSelector
         indexMap={indexMap}
-        currentField={fieldDropdownProps?.selectedLabel ?? ""}
+        currentField={fieldDropdownProps?.selectedPath?.join(".") ?? ""}
         setField={fieldDropdownProps?.setField}
       />
     ),
