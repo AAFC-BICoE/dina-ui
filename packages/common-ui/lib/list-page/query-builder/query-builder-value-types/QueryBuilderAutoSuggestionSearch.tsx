@@ -3,6 +3,8 @@ import { useElasticSearchDistinctTerm } from "../../useElasticSearchDistinctTerm
 import AutoSuggest, { InputProps } from "react-autosuggest";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
+import { noop } from "lodash";
+import { useAccount } from "packages/common-ui/lib";
 
 interface QueryBuilderAutoSuggestionTextSearchProps {
   /**
@@ -46,15 +48,27 @@ function QueryBuilderAutoSuggestionTextSearch({
   indexMap
 }: QueryBuilderAutoSuggestionTextSearchProps) {
   const { formatMessage } = useIntl();
+  const { groupNames } = useAccount();
 
+  // Index settings for the field currently selected.
   const [fieldSettings, setFieldSettings] = useState<
     ESIndexMapping | undefined
   >();
 
+  // Field name for the field currently selected.
   const [fieldName, setFieldName] = useState<string>();
 
-  // ! Should be retrieved from the query page.
-  const selectedGroups = useMemo(() => ["aafc"], []);
+  // State to store if the text field is focused. Used to determine if suggestions should be
+  // displayed.
+  const [focus, setFocus] = useState<boolean>(false);
+
+  // Retrieve the suggestions using elastic search. Only updates if the field/group change.
+  const suggestions = useElasticSearchDistinctTerm({
+    fieldName,
+    groups: groupNames ?? [],
+    relationshipType: fieldSettings?.parentType,
+    indexName
+  });
 
   // Whenever the current field name changes, retrieve the new field settings for that field.
   useEffect(() => {
@@ -77,31 +91,27 @@ function QueryBuilderAutoSuggestionTextSearch({
     );
   }, [fieldSettings]);
 
-  const suggestions = useElasticSearchDistinctTerm({
-    fieldName,
-    groups: selectedGroups,
-    relationshipType: fieldSettings?.parentType,
-    indexName
-  });
-
-  // console.log(JSON.stringify(suggestions));
-
   const inputProps: InputProps<any> = {
     placeholder: formatMessage({ id: "typeHereToSearch" }) ?? "",
     value: value ?? "",
     onChange: (_event, { newValue }) => {
       setValue?.(newValue);
     },
-    autoComplete: "none"
+    autoComplete: "none",
+    className: "form-control",
+    onFocus: () => setFocus(true),
+    onBlur: () => setFocus(false)
   };
 
   // Filter the suggestion list based on the value.
   const currentSuggestions = useMemo(
     () =>
-      suggestions?.filter((suggestion) =>
-        suggestion?.toLowerCase()?.includes(value?.toLowerCase())
+      suggestions?.filter(
+        (suggestion) =>
+          suggestion?.toLowerCase()?.includes(value?.toLowerCase() ?? "") &&
+          suggestion !== value
       ),
-    [value]
+    [value, suggestions]
   );
 
   return (
@@ -139,9 +149,10 @@ function QueryBuilderAutoSuggestionTextSearch({
               onSuggestionSelected={(_event, data) =>
                 setValue?.(data.suggestion)
               }
-              onSuggestionsClearRequested={() => setValue?.("")}
+              onSuggestionsClearRequested={noop}
               renderSuggestion={(text) => <div>{text}</div>}
               inputProps={inputProps}
+              alwaysRenderSuggestions={focus}
               theme={{
                 suggestionsList: "list-group",
                 suggestion: "list-group-item",
