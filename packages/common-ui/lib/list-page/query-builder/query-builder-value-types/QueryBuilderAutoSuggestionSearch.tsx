@@ -4,7 +4,7 @@ import AutoSuggest, { InputProps } from "react-autosuggest";
 import React, { useEffect, useMemo, useState } from "react";
 import { useIntl } from "react-intl";
 import { noop } from "lodash";
-import { useAccount } from "packages/common-ui/lib";
+import { useAccount } from "common-ui/lib";
 
 interface QueryBuilderAutoSuggestionTextSearchProps {
   /**
