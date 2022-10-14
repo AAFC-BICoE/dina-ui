@@ -19,7 +19,7 @@ import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
-import QueryBuilderAutoSuggestionTextSearch from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
+import { QueryBuilderAutoSuggestionTextSearchMemo } from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
 import QueryBuilderBooleanSearch, {
   transformBooleanSearchToDSL
 } from "./query-builder-value-types/QueryBuilderBooleanSearch";
@@ -137,7 +137,12 @@ export function useQueryBuilderConfig(
     if (!indexMap) return;
 
     setQueryBuilderConfig(
-      generateBuilderConfig(indexMap, formatMessage, customViewFields)
+      generateBuilderConfig(
+        indexMap,
+        indexName,
+        formatMessage,
+        customViewFields
+      )
     );
   }, [indexMap]);
 
@@ -153,6 +158,7 @@ export function useQueryBuilderConfig(
  */
 function generateBuilderConfig(
   indexMap: ESIndexMapping[],
+  indexName: string,
   formatMessage: any,
   customViewFields?: string[]
 ): Config {
@@ -245,17 +251,11 @@ function generateBuilderConfig(
       type: "autoComplete",
       valueSrc: "value",
       factory: (factoryProps) => (
-        // <QueryBuilderAutoSuggestionTextSearch
-        //   currentFieldName={factoryProps?.field}
-        //   matchType={factoryProps?.operator}
-        //   indexName={indexName}
-        //   indexMap={indexMap}
-        //   value={factoryProps?.value}
-        //   setValue={factoryProps?.setValue}
-        // />
-        // Auto complete will be added back in another ticket.
-        <QueryBuilderTextSearch
+        <QueryBuilderAutoSuggestionTextSearchMemo
+          currentFieldName={factoryProps?.field}
           matchType={factoryProps?.operator}
+          indexName={indexName}
+          indexMap={indexMap}
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
