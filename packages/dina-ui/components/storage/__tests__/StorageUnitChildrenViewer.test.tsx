@@ -6,7 +6,7 @@ import { StorageUnitChildrenViewer } from "../StorageUnitChildrenViewer";
 
 const STORAGE_UNIT_CHILDREN = ["B", "C", "D"].map<
   PersistedResource<StorageUnit>
->(letter => ({
+>((letter) => ({
   id: letter,
   group: "group",
   name: letter,
@@ -38,7 +38,7 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
 };
 
 // Just return what is passed to it:
-const mockSave = jest.fn(async ops => ops.map(op => op.resource));
+const mockSave = jest.fn(async (ops) => ops.map((op) => op.resource));
 const mockPush = jest.fn();
 const mockReload = jest.fn();
 
@@ -70,6 +70,7 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
           }
         case "hierarchy,storageUnitType":
           switch (params?.filter?.rsql) {
+            case "group==aafc;group==cnc":
             case "":
               // The searchable table results:
               return {
@@ -129,9 +130,9 @@ describe("StorageUnitChildrenViewer component", () => {
       { apiContext }
     );
 
-    expect(wrapper.find(".storage-unit-name").map(node => node.text())).toEqual(
-      ["Box B", "Box C", "Box D"]
-    );
+    expect(
+      wrapper.find(".storage-unit-name").map((node) => node.text())
+    ).toEqual(["Box B", "Box C", "Box D"]);
   });
 
   it("Lets you move all stored samples and storages to another storage unit.", async () => {
@@ -146,7 +147,6 @@ describe("StorageUnitChildrenViewer component", () => {
 
     await new Promise(setImmediate);
     wrapper.update();
-
     wrapper.find("button.select-storage").simulate("click");
 
     await new Promise(setImmediate);
@@ -154,7 +154,7 @@ describe("StorageUnitChildrenViewer component", () => {
 
     expect(mockSave).lastCalledWith(
       [
-        ...STORAGE_UNIT_CHILDREN.map(unit => ({
+        ...STORAGE_UNIT_CHILDREN.map((unit) => ({
           resource: {
             id: unit.id,
             type: "storage-unit",
