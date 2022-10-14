@@ -18,7 +18,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
   const [storageTypeFilter, setStorageTypeFilter] =
     useState<PersistedResource<StorageUnitType>>();
   const [createdByMeFilter, setCreatedByMeFilter] = useState(false);
-  const { username } = useAccount();
+  const { username, groupNames } = useAccount();
 
   function doSearch() {
     onChange({
@@ -61,6 +61,18 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 value: storageTypeFilter.id
               }
             ]
+          : []),
+        ...(groupNames
+          ? groupNames.map((group, index) => {
+              return {
+                id: -index,
+                type: "FILTER_ROW" as const,
+                attribute: "group",
+                predicate: "IS" as const,
+                searchType: "EXACT_MATCH" as const,
+                value: group
+              };
+            })
           : [])
       ]
     });
@@ -87,7 +99,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
         <div className="d-flex align-items-center gap-2">
           <input
             type="checkbox"
-            onChange={e => setCreatedByMeFilter(e.target.checked)}
+            onChange={(e) => setCreatedByMeFilter(e.target.checked)}
             checked={createdByMeFilter}
             style={{
               height: "20px",
@@ -107,7 +119,7 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
             </strong>
             <ResourceSelect<StorageUnitType>
               model="collection-api/storage-unit-type"
-              optionLabel={it => it.name}
+              optionLabel={(it) => it.name}
               filter={filterBy(["name"])}
               onChange={setStorageTypeFilter as any}
               value={storageTypeFilter}
@@ -124,9 +136,9 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
                 className="storage-tree-search form-control"
                 type="text"
                 value={searchText}
-                onChange={e => setSearchText(e.target.value)}
+                onChange={(e) => setSearchText(e.target.value)}
                 // Pressing enter should set the filter, not submit the form:
-                onKeyDown={e => {
+                onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
                     doSearch();
