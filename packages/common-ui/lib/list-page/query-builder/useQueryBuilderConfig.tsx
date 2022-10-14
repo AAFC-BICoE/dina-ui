@@ -475,7 +475,7 @@ function generateBuilderConfig(
     renderField: (fieldDropdownProps) => (
       <QueryFieldSelector
         indexMap={indexMap}
-        currentField={fieldDropdownProps?.selectedLabel ?? ""}
+        currentField={fieldDropdownProps?.selectedPath?.join(".") ?? ""}
         setField={fieldDropdownProps?.setField}
       />
     ),
