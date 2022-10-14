@@ -85,3 +85,71 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   opacity: 1;
 }
+
+/*
+ * Query Builder Custom CSS
+ */
+.qb-lite {
+  margin: 0 !important;
+}
+
+.query-builder {
+  overflow: visible !important;
+}
+
+.group-container {
+  padding-right: 0 !important;
+  overflow: visible;
+}
+
+.group--actions--tr {
+  opacity: 1 !important
+}
+
+.rule--drag-handler {
+  opacity: 1 !important;
+}
+
+.rule--header {
+  position: relative;
+  top: -2px;
+  opacity: 1 !important;
+}
+
+.group--drag-handler {
+  opacity: 1 !important;
+}
+
+.group {
+  background: white !important;
+  border: 1px solid #d3d7cf !important;
+}
+
+.rule--field {
+  min-width: 200px;
+  width: 40%;
+  display: inline-block !important;
+}
+
+.rule--operator {
+  min-width: 200px;
+  width: 20%;
+  display: inline-block !important;
+}
+
+.rule--value {
+  position: relative;
+  min-width: 200px;
+  top: -5px;
+  width: calc(40% - 15px);
+  display: inline-block !important;
+}
+
+.rule--widget, .widget--widget {
+  width: 100%;
+  display: inline-block !important;
+}
+
+.group--drag-handler {
+  top: 0px !important;
+}

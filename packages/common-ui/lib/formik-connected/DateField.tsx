@@ -19,8 +19,8 @@ export interface DateFieldProps extends FieldWrapperProps {
   disabled?: boolean;
 }
 
-const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
-const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
+export const DATE_REGEX_NO_TIME = /^\d{4}-\d{2}-\d{2}$/;
+export const DATE_REGEX_PARTIAL = /^\d{4}(-\d{2}){0,2}$/;
 
 /** Formik-connected date input. */
 export function DateField(props: DateFieldProps) {
@@ -54,7 +54,7 @@ export function DateField(props: DateFieldProps) {
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={val => (showTime ? <DateView date={val} /> : val)}
+      readOnlyRender={(val) => (showTime ? <DateView date={val} /> : val)}
       validate={validate}
       disableLabelClick={true} // Stops the datepicker from staying open after choosing a date.
     >
@@ -127,7 +127,7 @@ export function DateField(props: DateFieldProps) {
               todayButton="Today"
               disabled={disabled}
               onBlur={onBlur}
-              onFocus={event => event.target.select()}
+              onFocus={(event) => event.target.select()}
               selected={dateObject}
               {...datePickerProps}
             />

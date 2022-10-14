@@ -3,7 +3,8 @@ import Switch from "react-switch";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import {
   blankMaterialSample,
-  MaterialSample
+  MaterialSample,
+  ORGANISMS_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../../bulk-material-sample/MaterialSampleBulkEditor";
 import { isEqual } from "lodash";
@@ -207,10 +208,12 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".organisms-component .multiple-values-warning").exists()
+      wrapper
+        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
+        .exists()
     ).toEqual(true);
     wrapper
-      .find(".organisms-component button.override-all-button")
+      .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);
@@ -313,7 +316,9 @@ describe("BulkEditTabWarning", () => {
 
     // The Override button is there:
     expect(
-      wrapper.find(".organisms-component .multiple-values-warning").exists()
+      wrapper
+        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
+        .exists()
     ).toEqual(true);
 
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -366,7 +371,9 @@ describe("BulkEditTabWarning", () => {
 
     // There is no override button:
     expect(
-      wrapper.find(".organisms-component .multiple-values-warning").exists()
+      wrapper
+        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
+        .exists()
     ).toEqual(false);
 
     // Override the name in the new determination:
@@ -456,10 +463,12 @@ describe("BulkEditTabWarning", () => {
 
     // You must click the override button:
     expect(
-      wrapper.find(".organisms-component .multiple-values-warning").exists()
+      wrapper
+        .find("." + ORGANISMS_COMPONENT_NAME + " .multiple-values-warning")
+        .exists()
     ).toEqual(true);
     wrapper
-      .find(".organisms-component button.override-all-button")
+      .find("." + ORGANISMS_COMPONENT_NAME + " button.override-all-button")
       .simulate("click");
     wrapper.find(".are-you-sure-modal form").simulate("submit");
     await new Promise(setImmediate);

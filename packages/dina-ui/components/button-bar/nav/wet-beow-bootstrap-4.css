@@ -158,11 +158,22 @@ body .btn-primary {
   background-color: #335075;
   border-color: #335075;
 }
+body .btn-outline-primary {
+  color: #335075;
+  border-color: #335075;
+}
 a.btn,
 .nav a {
   text-decoration: none;
 }
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #1c578a;
+  border-color: #091c2d;
+  color: #fff;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
   background-color: #1c578a;
   border-color: #091c2d;
   color: #fff;

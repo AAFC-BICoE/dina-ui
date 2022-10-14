@@ -7,7 +7,7 @@ import {
   BooleanCell
 } from "common-ui";
 import Link from "next/link";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { TableColumn } from "common-ui/lib/list-page/types";
 import { Transaction } from "packages/dina-ui/types/loan-transaction-api";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

@@ -10,35 +10,45 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
-import { useRouter } from "next/router";
-import React, { useRef } from "react";
-import {
-  AcquisitionEvent,
-  CollectingEvent,
-  FormTemplate,
-  FormTemplateComponents,
-  MaterialSample,
-  MATERIAL_SAMPLE_FORM_LEGEND
-} from "../../../types/collection-api";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
+import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
-import {
-  getInitialValuesFromFormTemplate,
-  removeArraysFromPath
-} from "../../../../dina-ui/components/form-template/formTemplateUtils";
+import { useRouter } from "next/router";
+import { useRef, useState } from "react";
+import { Promisable } from "type-fest";
 import {
   MaterialSampleForm,
   useMaterialSampleSave
 } from "../../../../dina-ui/components";
-import { FormikProps } from "formik";
-import { Promisable } from "type-fest";
+import {
+  getAllComponentValues,
+  getComponentOrderFromTemplate,
+  getComponentValues,
+  getFormTemplateCheckboxes
+} from "../../../../dina-ui/components/form-template/formTemplateUtils";
+import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FormTemplate,
+  FormTemplateComponents,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_FORM_LEGEND,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
+} from "../../../types/collection-api";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
   const id = router.query.id?.toString();
-
   const formTemplateQuery = useQuery<FormTemplate>(
     { path: `/collection-api/form-template/${id}` },
     { disabled: !id }
@@ -82,66 +92,90 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
+  const [navOrder, setNavOrder] = useState<string[] | null>(
+    getComponentOrderFromTemplate(fetchedFormTemplate)
+  );
+
   const collectingEvtFormRef = useRef<FormikProps<any>>(null);
   const acqEventFormRef = useRef<FormikProps<any>>(null);
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-  // Collecting Event Initial Values
+
+  // Get initial values of data components
+  const allMaterialSampleComponentValues =
+    getAllComponentValues(fetchedFormTemplate);
+  if (!allMaterialSampleComponentValues.associations?.length) {
+    allMaterialSampleComponentValues.associations = [{}];
+  }
+
+  // collecting event and acquisition components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues = {
-    ...getInitialValuesFromFormTemplate<CollectingEvent>(fetchedFormTemplate),
+    ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate),
     managedAttributesOrder: []
   };
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
-  // Acquisition Event Initial Values
-  const acquisitionEventInitialValues =
-    getInitialValuesFromFormTemplate<AcquisitionEvent>(fetchedFormTemplate);
+  const acquisitionEventInitialValues = getComponentValues(
+    ACQUISITION_EVENT_COMPONENT_NAME,
+    fetchedFormTemplate
+  );
 
-  // The material sample initial values to load.
-  const materialSampleTemplateInitialValues =
-    getInitialValuesFromFormTemplate<MaterialSample>(fetchedFormTemplate);
-  if (!materialSampleTemplateInitialValues.organism?.length) {
-    materialSampleTemplateInitialValues.organism = [
-      { type: "organism", determination: [{}] }
-    ];
-  }
-  if (!materialSampleTemplateInitialValues.associations?.length) {
-    materialSampleTemplateInitialValues.associations = [{}];
-  }
-
+  const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...fetchedFormTemplate,
-    ...materialSampleTemplateInitialValues,
-    ...collectingEventInitialValues,
-    ...acquisitionEventInitialValues,
+    ...allMaterialSampleComponentValues,
+    ...formTemplateCheckboxes,
     id,
     type: "form-template"
   };
-
   // Generate the material sample save hook to use for the form.
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,
     acqEventTemplateInitialValues: acquisitionEventInitialValues,
     colEventTemplateInitialValues: collectingEventInitialValues,
-    materialSampleTemplateInitialValues,
+    materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
     acquisitionEventFormRef: acqEventFormRef
   });
+  const dataComponentState = materialSampleSaveHook.dataComponentState;
 
   async function onSaveTemplateSubmit({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
+    // Get collecting event checkboxes and values
+    const {
+      templateCheckboxes: collectingEventCheckboxes,
+      ...collectinEventFormRefValues
+    } = collectingEvtFormRef?.current?.values || {};
+    submittedValues.templateCheckboxes = {
+      ...submittedValues.templateCheckboxes,
+      ...collectingEventCheckboxes
+    };
+
+    // Get acquisition event checkboxes and values
+    const {
+      templateCheckboxes: acquisitionEventCheckboxes,
+      ...acquisitionEventFormRefValues
+    } = acqEventFormRef?.current?.values || {};
+    submittedValues.templateCheckboxes = {
+      ...submittedValues.templateCheckboxes,
+      ...acquisitionEventCheckboxes
+    };
+
     // Include the collecting event and acquisition event values.
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
-      ...submittedValues,
-      ...(collectingEvtFormRef?.current?.values ?? {}),
-      ...(acqEventFormRef?.current?.values ?? {})
+      ...(collectinEventFormRefValues ?? {}),
+      ...(acquisitionEventFormRefValues ?? {}),
+      ...submittedValues
     };
+
+    const dataComponentsStateMap =
+      getDataComponentsStateMap(dataComponentState);
 
     // All arrays should be removed from the submitted values.
     const iterateThrough = (object: any) => {
@@ -172,8 +206,8 @@ export function FormTemplateEditPageLoaded({
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
-          visible: true,
-          order: componentIndex,
+          visible: dataComponentsStateMap[dataComponent.id],
+          order: navOrder?.indexOf(dataComponent.id) ?? componentIndex,
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
@@ -187,6 +221,7 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
+
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }
@@ -246,9 +281,35 @@ export function FormTemplateEditPageLoaded({
           <MaterialSampleForm
             templateInitialValues={initialValues}
             materialSampleSaveHook={materialSampleSaveHook}
+            navOrder={navOrder}
+            onChangeNavOrder={(newOrder) => setNavOrder(newOrder)}
           />
         </DinaFormSection>
       </PageLayout>
     </DinaForm>
   );
+}
+function getDataComponentsStateMap(dataComponentState) {
+  const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =
+    dataComponentState.enableAcquisitionEvent;
+  dataComponentEnabledMap[ASSOCIATIONS_COMPONENT_NAME] =
+    dataComponentState.enableAssociations;
+  dataComponentEnabledMap[COLLECTING_EVENT_COMPONENT_NAME] =
+    dataComponentState.enableCollectingEvent;
+  dataComponentEnabledMap[ORGANISMS_COMPONENT_NAME] =
+    dataComponentState.enableOrganisms;
+  dataComponentEnabledMap[PREPARATIONS_COMPONENT_NAME] =
+    dataComponentState.enablePreparations;
+  dataComponentEnabledMap[RESTRICTION_COMPONENT_NAME] =
+    dataComponentState.enableRestrictions;
+  dataComponentEnabledMap[SCHEDULED_ACTIONS_COMPONENT_NAME] =
+    dataComponentState.enableScheduledActions;
+  dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
+    dataComponentState.enableStorage;
+  dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
+  return dataComponentEnabledMap;
 }

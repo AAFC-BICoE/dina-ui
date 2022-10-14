@@ -1,9 +1,9 @@
-import { KitsuResource } from "kitsu";
 import { FormTemplate } from "packages/dina-ui/types/collection-api";
+import { sortBy } from "lodash";
 
-export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
+export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
-): Partial<T> & { templateCheckboxes?: Record<string, true | undefined> } {
+) {
   // No form template data provided. Working on a new form template.
   if (!formTemplate) {
     return {};
@@ -14,7 +14,7 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
   formTemplate.components?.forEach((component) => {
     component.sections?.forEach((sections) => {
       sections.items?.forEach((item) => {
-        if (item.name) {
+        if (item.name && item.visible) {
           templateCheckboxesValues = {
             ...templateCheckboxesValues,
             ...{ [item.name]: item.visible ? true : undefined }
@@ -24,13 +24,84 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
     });
   });
 
-  const initialValueForResource: Partial<T> = {};
-
   return {
-    ...initialValueForResource,
-    templateCheckboxes: templateCheckboxesValues,
-    attachmentsConfig: {}
+    templateCheckboxes: templateCheckboxesValues
   };
+}
+
+export function getComponentValues(
+  comp: string,
+  formTemplate: FormTemplate | undefined
+): any {
+  let componentValues = {};
+  let templateCheckboxes: Record<string, true | undefined> = {};
+  let ret = {};
+  if (formTemplate) {
+    formTemplate.components?.forEach((component) => {
+      if (component.name === comp && component.visible) {
+        component.sections?.forEach((sections) => {
+          sections.items?.forEach((item) => {
+            if (item.name && item.visible) {
+              componentValues = {
+                ...componentValues,
+                ...{
+                  [item.name]: item.visible ? item.defaultValue : undefined
+                }
+              };
+              templateCheckboxes = {
+                ...templateCheckboxes,
+                ...{ [item.name]: true }
+              };
+            }
+          });
+        });
+      }
+    });
+  }
+
+  ret = { ...componentValues };
+  if (Object.keys(templateCheckboxes).length !== 0) {
+    ret = { ...ret, templateCheckboxes };
+  }
+
+  return ret;
+}
+
+export function getAllComponentValues(
+  formTemplate: FormTemplate | undefined
+): any {
+  let componentValues = {};
+  let templateCheckboxes: Record<string, true | undefined> = {};
+  let ret = {};
+  if (formTemplate) {
+    formTemplate.components?.forEach((component) => {
+      if (component.visible) {
+        component.sections?.forEach((sections) => {
+          sections.items?.forEach((item) => {
+            if (item.name && item.visible) {
+              componentValues = {
+                ...componentValues,
+                ...{
+                  [item.name]: item.visible ? item.defaultValue : undefined
+                }
+              };
+              templateCheckboxes = {
+                ...templateCheckboxes,
+                ...{ [item.name]: true }
+              };
+            }
+          });
+        });
+      }
+    });
+  }
+
+  ret = { ...componentValues };
+  if (Object.keys(templateCheckboxes).length !== 0) {
+    ret = { ...ret, templateCheckboxes };
+  }
+
+  return ret;
 }
 
 /**
@@ -49,4 +120,23 @@ export function getInitialValuesFromFormTemplate<T extends KitsuResource>(
  */
 export function removeArraysFromPath(path: string): string {
   return path.replace(/ *\[[^\]]*]/g, "");
+}
+
+/**
+ * Using the form template components, return a string array of the ids of the data components in
+ * the correct order stored in the template.
+ *
+ * @param template Loaded form template.
+ * @returns string array of the component ids in the specific order. Null if nothing can be retrieved.
+ */
+export function getComponentOrderFromTemplate(
+  template?: FormTemplate
+): string[] | null {
+  if (!template || !template.components) {
+    return null;
+  }
+
+  return sortBy(template.components, "order").map<string>(
+    (component) => component.name ?? ""
+  );
 }

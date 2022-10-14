@@ -14,6 +14,7 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   MaterialSample,
   PreparationMethod,
+  PREPARATIONS_COMPONENT_NAME,
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
@@ -62,7 +63,7 @@ export const BLANK_PREPARATION: Required<
 export function PreparationField({
   className,
   namePrefix = "",
-  id = "preparations-component"
+  id = PREPARATIONS_COMPONENT_NAME
 }: PreparationFieldProps) {
   const { locale } = useDinaIntl();
 

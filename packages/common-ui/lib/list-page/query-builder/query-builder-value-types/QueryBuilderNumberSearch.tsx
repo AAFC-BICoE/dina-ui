@@ -1,72 +1,46 @@
 import React from "react";
-import { NumberField, FieldSpy } from "../..";
-import { SelectField } from "../../formik-connected/SelectField";
-import { fieldProps, QueryRowExportProps } from "../QueryRow";
 import {
   includedTypeQuery,
   rangeQuery,
   termQuery,
   existsQuery
-} from "../../util/transformToDSL";
+} from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
+import { TransformToDSLProps } from "../../types";
 
-/**
- * The match options when a number search is being performed.
- *
- * Empty and Not Empty can be used if the number value is not mandatory.
- */
-const queryRowMatchOptions = [
-  { label: "Equals", value: "equals" },
-  { label: "Not equals", value: "notEquals" },
-  { label: "Greater than", value: "greaterThan" },
-  { label: "Greater than or equal to", value: "greaterThanOrEqualTo" },
-  { label: "Less than", value: "lessThan" },
-  { label: "Less than or equal to", value: "lessThanOrEqualTo" },
-  { label: "Empty", value: "empty" },
-  { label: "Not Empty", value: "notEmpty" }
-];
-
-interface QueryRowNumberSearchProps {
+interface QueryBuilderNumberSearchProps {
   /**
-   * The form name for the whole query builder.
+   * Current match type being used.
    */
-  queryBuilderName: string;
+  matchType?: string;
 
   /**
-   * The index where this search is being performed from.
-   *
-   * This is because you can have multiple QueryRows in the same QueryBuilder.
+   * Retrieve the current value from the Query Builder.
    */
-  index: number;
+  value?: string;
+
+  /**
+   * Pass the selected value to the Query Builder to store.
+   */
+  setValue?: (fieldPath: string) => void;
 }
 
-export default function QueryRowNumberSearch({
-  queryBuilderName,
-  index
-}: QueryRowNumberSearchProps) {
+export default function QueryBuilderNumberSearch({
+  matchType,
+  value,
+  setValue
+}: QueryBuilderNumberSearchProps) {
   return (
     <>
-      <SelectField
-        name={fieldProps(queryBuilderName, "matchType", index)}
-        options={queryRowMatchOptions}
-        className="me-1 flex-fill"
-        removeLabel={true}
-      />
-
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      <FieldSpy<string>
-        fieldName={fieldProps(queryBuilderName, "matchType", index)}
-      >
-        {(matchType, _fields) =>
-          matchType !== "empty" &&
-          matchType !== "notEmpty" && (
-            <NumberField
-              name={fieldProps(queryBuilderName, "number", index)}
-              className="me-2 flex-fill"
-              removeLabel={true}
-            />
-          )
-        }
-      </FieldSpy>
+      {matchType !== "empty" && matchType !== "notEmpty" && (
+        <input
+          type="number"
+          value={value ?? ""}
+          onChange={(newValue) => setValue?.(newValue?.target?.value)}
+          className="form-control"
+          placeholder="Enter number value..."
+        />
+      )}
     </>
   );
 }
@@ -74,13 +48,19 @@ export default function QueryRowNumberSearch({
 /**
  * Using the query row for a number search, generate the elastic search request to be made.
  */
-export function transformNumberSearchToDSL(
-  queryRow: QueryRowExportProps,
-  fieldName: string
-): any {
-  const { matchType, number: numberValue, parentType, parentName } = queryRow;
+export function transformNumberSearchToDSL({
+  operation,
+  value,
+  fieldInfo,
+  fieldPath
+}: TransformToDSLProps): any {
+  if (!fieldInfo) {
+    return {};
+  }
 
-  switch (matchType) {
+  const { parentType, parentName } = fieldInfo;
+
+  switch (operation) {
     // less than / greater than / less than or equal to / greater than or equal to.
     case "greaterThan":
     case "greaterThanOrEqualTo":
@@ -94,8 +74,8 @@ export function transformNumberSearchToDSL(
                 bool: {
                   must: [
                     rangeQuery(
-                      fieldName,
-                      buildNumberRangeObject(matchType, numberValue)
+                      fieldPath,
+                      buildNumberRangeObject(operation, value)
                     ),
                     includedTypeQuery(parentType)
                   ]
@@ -103,7 +83,7 @@ export function transformNumberSearchToDSL(
               }
             }
           }
-        : rangeQuery(fieldName, buildNumberRangeObject(matchType, numberValue));
+        : rangeQuery(fieldPath, buildNumberRangeObject(operation, value));
 
     // Not equals match type.
     case "notEquals":
@@ -117,7 +97,7 @@ export function transformNumberSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: termQuery(fieldName, numberValue, false),
+                        must_not: termQuery(fieldPath, value, false),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -130,7 +110,7 @@ export function transformNumberSearchToDSL(
                     path: "included",
                     query: {
                       bool: {
-                        must_not: existsQuery(fieldName),
+                        must_not: existsQuery(fieldPath),
                         must: includedTypeQuery(parentType)
                       }
                     }
@@ -153,12 +133,12 @@ export function transformNumberSearchToDSL(
               should: [
                 {
                   bool: {
-                    must_not: termQuery(fieldName, numberValue, false)
+                    must_not: termQuery(fieldPath, value, false)
                   }
                 },
                 {
                   bool: {
-                    must_not: existsQuery(fieldName)
+                    must_not: existsQuery(fieldPath)
                   }
                 }
               ]
@@ -179,7 +159,7 @@ export function transformNumberSearchToDSL(
                         query: {
                           bool: {
                             must: [
-                              existsQuery(fieldName),
+                              existsQuery(fieldPath),
                               includedTypeQuery(parentType)
                             ]
                           }
@@ -200,7 +180,7 @@ export function transformNumberSearchToDSL(
           }
         : {
             bool: {
-              must_not: existsQuery(fieldName)
+              must_not: existsQuery(fieldPath)
             }
           };
 
@@ -212,12 +192,12 @@ export function transformNumberSearchToDSL(
               path: "included",
               query: {
                 bool: {
-                  must: [existsQuery(fieldName), includedTypeQuery(parentType)]
+                  must: [existsQuery(fieldPath), includedTypeQuery(parentType)]
                 }
               }
             }
           }
-        : existsQuery(fieldName);
+        : existsQuery(fieldPath);
 
     // Equals and default case
     default:
@@ -228,14 +208,14 @@ export function transformNumberSearchToDSL(
               query: {
                 bool: {
                   must: [
-                    termQuery(fieldName, numberValue, false),
+                    termQuery(fieldPath, value, false),
                     includedTypeQuery(parentType)
                   ]
                 }
               }
             }
           }
-        : termQuery(fieldName, numberValue, false);
+        : termQuery(fieldPath, value, false);
   }
 }
 
