@@ -28,15 +28,18 @@ export function ContainerGrid({
   onDrop
 }: ContainerGridProps) {
   const { apiClient } = useApiClient();
+  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
   async function getPcrBatch(){
-    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+    await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
       {}
-    );
-    return pcrBatch
+    )
+    .then((response) => {
+      setPcrBatch(response?.data);
+    });
   }
-  const { pcrBatch } = getPcrBatch();
-  const { numberOfRows } = pcrBatch.storageRestriction.gridLayout.numberOfRows;
+  getPcrBatch();
+  const { numberOfRows } = pcrBatch.storageRestriction.StorageGridLayout.numberOfRows;
 
   const columns: Column[] = [];
 
@@ -113,3 +116,7 @@ function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
     </div>
   );
 }
+function useState<T>(): [any, any] {
+  throw new Error("Function not implemented.");
+}
+

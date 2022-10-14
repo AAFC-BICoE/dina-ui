@@ -17,9 +17,10 @@ export function DraggablePCRBatchItemList({
   onClick,
   onDrop
 }: DraggablePCRBatchItemListProps) {
+  //Double check this
   const [, dropRef] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
-    drop: item => onDrop((item as any).sample)
+    drop: item => onDrop((item as any))
   });
 
   return (

@@ -1,17 +1,15 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
 import { omitBy } from "lodash";
 import { useContext, useRef, useState } from "react";
-import { PcrBatchItem } from "../../../../types/seqdb-api";
+import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchId: string;
-  pcrBatchItem: PcrBatchItem;
 }
 
 export function UsePCRBatchItemGridControls({
-  pcrBatchId,
-  pcrBatchItem
+  pcrBatchId
 }: ContainerGridProps) {
   const { apiClient, save } = useContext(ApiClientContext);
 
@@ -28,6 +26,28 @@ export function UsePCRBatchItemGridControls({
   const [fillMode, setFillMode] = useState<string>("COLUMN");
 
   const [lastSave, setLastSave] = useState<number>();
+
+  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
+
+  const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
+
+  const [numberOfRows, setNumberOfRows] = useState<number>(0);
+
+  async function getPcrBatch(){
+    await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${pcrBatchId}`,
+      {}
+    )
+    .then((response) => {
+      setPcrBatch(response?.data);
+    });
+  }
+  getPcrBatch();
+  
+  if(pcrBatch !== undefined){
+    setNumberOfColumns(pcrBatch.storageRestriction.StorageGridLayout.numberOfColumns);
+    setNumberOfRows(pcrBatch.storageRestriction.StorageGridLayout.numberOfRows);
+  }
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.
@@ -113,27 +133,25 @@ export function UsePCRBatchItemGridControls({
       if (coords) {
         const [rowLetter, colNumberString] = coords.split("_");
         const rowNumber = rowLetter.charCodeAt(0) - 64;
-        const { wellColumn, wellRow } = pcrBatchItem as PcrBatchItem;
 
-        if(wellColumn !== undefined && wellRow !== undefined){
         //double check this part
         let newCellNumber =
           fillMode === "ROW"
-            ? (rowNumber - 1) * Number(wellColumn) + Number(colNumberString)
-            : (Number(colNumberString) - 1) * Number(wellRow) + rowNumber;
+            ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
+            : (Number(colNumberString) - 1) * numberOfRows + rowNumber;
 
         for (const item of items) {
           let thisItemRowNumber = -1;
           let thisItemColumnNumber = -1;
 
           if (fillMode === "ROW") {
-            thisItemRowNumber = Math.ceil(newCellNumber / wellColumn);
+            thisItemRowNumber = Math.ceil(newCellNumber / numberOfColumns);
             thisItemColumnNumber =
-              newCellNumber % wellColumn || wellColumn;
+              newCellNumber % numberOfColumns || numberOfColumns;
           }
           if (fillMode === "COLUMN") {
-            thisItemColumnNumber = Math.ceil(newCellNumber / Number(wellRow));
-            thisItemRowNumber = newCellNumber % Number(wellRow) || Number(wellRow);
+            thisItemColumnNumber = Math.ceil(newCellNumber / numberOfRows);
+            thisItemRowNumber = newCellNumber % numberOfRows || numberOfRows;
           }
 
           const thisItemCoords = `${String.fromCharCode(
@@ -150,7 +168,7 @@ export function UsePCRBatchItemGridControls({
           }
 
           // Only move the PcrBatchItem into the grid if the well is valid for this container type.
-          if (newCellNumber <= wellColumn * Number(wellRow)) {
+          if (newCellNumber <= numberOfColumns * numberOfRows) {
             // Move the PcrBatchItem into the grid.
             newCellGrid[thisItemCoords] = item;
           } else {
@@ -163,7 +181,6 @@ export function UsePCRBatchItemGridControls({
         // Add the PcrBatchItem to the list.
         newAvailableItems = [...newAvailableItems, ...items];
       }
-    }
 
       // Set every PcrBatchItem passed into this function as moved.
       for (const item of items) {

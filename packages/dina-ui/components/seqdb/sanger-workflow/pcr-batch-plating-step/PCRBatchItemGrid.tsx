@@ -1,6 +1,5 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
-import { PcrBatchFormFields } from "packages/dina-ui/pages/seqdb/pcr-batch/edit";
 import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
@@ -10,7 +9,7 @@ export interface PCRBatchItemGridProps {
     pcrBatchId: string;
 }
 
-export function SampleGrid(props: PCRBatchItemGridProps) {
+export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
   const { pcrBatchId } = props;
   const {
     availableItems,
@@ -26,7 +25,7 @@ export function SampleGrid(props: PCRBatchItemGridProps) {
     onItemClick,
     selectedItems,
     setFillMode
-  } = UsePCRBatchItemGridControls();
+  } = UsePCRBatchItemGridControls(props);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;

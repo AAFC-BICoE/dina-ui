@@ -10,7 +10,7 @@ interface DraggablePCRBatchItemBoxProps {
   wasMoved: boolean;
 }
 
-export const ITEM_BOX_DRAG_KEY = "materialSample";
+export const ITEM_BOX_DRAG_KEY = "pcrBatchItem";
 
 export function DraggablePCRBatchItemBox({
   onClick = noop,
@@ -19,7 +19,7 @@ export function DraggablePCRBatchItemBox({
   wasMoved
 }: DraggablePCRBatchItemBoxProps) {
   const [, drag] = useDrag({
-    item: {   pcrBatchItem, type: ITEM_BOX_DRAG_KEY }
+    item: { pcrBatchItem, type: ITEM_BOX_DRAG_KEY }
   });
 
   return (
