@@ -255,6 +255,12 @@ export function QueryPage<TData extends KitsuResource>({
       return;
     }
 
+    // Check the tree for any validation issues. Do not submit query if issues exist.
+    if (!Utils.isValidTree(submittedQueryBuilderTree)) {
+      setLoading(false);
+      return;
+    }
+
     // Elastic search query with pagination settings.
     let queryDSL = elasticSearchFormatExport(
       submittedQueryBuilderTree,
