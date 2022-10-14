@@ -101,7 +101,6 @@ export function FormTemplateEditPageLoaded({
   const pageTitle = id
     ? "editMaterialSampleFormTemplate"
     : "createMaterialSampleFormTemplate";
-
   // Get initial values of data components
   const allMaterialSampleComponentValues =
     getAllComponentValues(fetchedFormTemplate);
@@ -133,6 +132,7 @@ export function FormTemplateEditPageLoaded({
     id,
     type: "form-template"
   };
+
   // Generate the material sample save hook to use for the form.
   const materialSampleSaveHook = useMaterialSampleSave({
     isTemplate: true,

@@ -51,10 +51,7 @@ export function getComponentValues(
     });
   }
 
-  ret = { ...componentValues };
-  if (Object.keys(templateCheckboxes).length !== 0) {
-    ret = { ...ret, templateCheckboxes };
-  }
+  ret = { ...componentValues, templateCheckboxes };
 
   return ret;
 }
@@ -70,10 +67,8 @@ export function getAllComponentValues(
       if (component.visible) {
         component.sections?.forEach((sections) => {
           sections.items?.forEach((item) => {
-            if (item.name && item.visible) {
-              componentValues[item.name] = item.visible
-                ? item.defaultValue
-                : undefined;
+            if ((item.name && item.visible) || item.name === "organism") {
+              componentValues[item.name] = item.defaultValue;
               templateCheckboxes[item.name] = true;
             }
           });
@@ -81,12 +76,7 @@ export function getAllComponentValues(
       }
     });
   }
-
-  ret = { ...componentValues };
-  if (Object.keys(templateCheckboxes).length !== 0) {
-    ret = { ...ret, templateCheckboxes };
-  }
-
+  ret = { ...componentValues, templateCheckboxes };
   return ret;
 }
 
