@@ -93,6 +93,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "materialSampleState"
+          },
+          {
+            id: "stateChangeRemarks"
+          },
+          {
+            id: "stateChangedOn"
           }
         ]
       }
@@ -257,6 +263,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks"
+          },
+          {
+            id: "geoReferenceAssertions"
           }
         ]
       },
@@ -404,6 +413,9 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "organism[0].remarks"
+          },
+          {
+            id: "organism"
           }
         ]
       },
