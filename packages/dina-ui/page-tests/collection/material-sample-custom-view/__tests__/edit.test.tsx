@@ -1,19 +1,15 @@
-import { ResourceSelect, SaveArgs } from "common-ui";
+import { SaveArgs } from "common-ui";
 import { ReactWrapper } from "enzyme";
 import { PersistedResource } from "kitsu";
-import CreatableSelect from "react-select/creatable";
 import ReactSwitch from "react-switch";
-import { StorageLinker } from "../../../../components";
+import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";
 import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-template/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  FormTemplate,
-  StorageUnit
+  FormTemplate
 } from "../../../../types/collection-api";
-import { noop } from "lodash";
-import { getComponentOrderFromTemplate } from "../../../../components/form-template/formTemplateUtils";
 
 const mockOnSaved = jest.fn();
 
@@ -229,6 +225,10 @@ async function mountForm(
   };
 }
 
+/**
+ * Form Template used for tests.
+ * Nav Order has collecting event and acquisition event swapped compared to default
+ */
 const formTemplate: PersistedResource<FormTemplate> = {
   id: "123",
   type: "form-template",
