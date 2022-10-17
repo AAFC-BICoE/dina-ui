@@ -8,8 +8,14 @@ import {
 } from "react-awesome-query-builder";
 import React from "react";
 import { Button } from "react-bootstrap";
+import { SavedSearch } from "../SavedSearch";
 
 interface QueryBuilderProps {
+  /**
+   * Index name being used for the QueryPage.
+   */
+  indexName: string;
+
   /**
    * Query Builder Configuration.
    */
@@ -37,6 +43,7 @@ interface QueryBuilderProps {
 }
 
 function QueryBuilder({
+  indexName,
   queryBuilderConfig,
   queryBuilderTree,
   setQueryBuilderTree,
@@ -78,6 +85,7 @@ function QueryBuilder({
         <Button onClick={onReset} variant="secondary">
           Reset
         </Button>
+        <SavedSearch indexName={indexName} />
       </div>
     </>
   );

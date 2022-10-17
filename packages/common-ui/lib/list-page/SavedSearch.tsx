@@ -1,5 +1,5 @@
 import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Select from "react-select";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
@@ -8,6 +8,9 @@ import { useAccount } from "../account/AccountProvider";
 import { useModal } from "../modal/modal";
 import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
 import { AreYouSureModal } from "../modal/AreYouSureModal";
+import { FilterParam } from "kitsu";
+import { Dropdown, Modal, Button, Card, Badge } from "react-bootstrap";
+import { FaRegFrown } from "react-icons/fa";
 
 export interface SavedSearchProps {
   /**
@@ -16,33 +19,37 @@ export interface SavedSearchProps {
    * displayed and where news one's are created.
    */
   indexName: string;
-
-  /**
-   * The user preferences for the selected user. This should only be re-loaded on saving and deleting.
-   */
-  userPreferences?: UserPreference;
-
-  /**
-   * Passes the currently loaded saved search option, when a new loaded saved search is selected, it's
-   * set as the default selected saved search.
-   */
-  loadedSavedSearch?: string;
-
-  /**
-   * When the user clicks the "Load" button, it will trigger this method.
-   */
-  loadSavedSearch: (savedSearchName: string) => void;
 }
 
-export function SavedSearch(props: SavedSearchProps) {
-  const { indexName, userPreferences, loadSavedSearch, loadedSavedSearch } =
-    props;
+type CustomMenuProps = {
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  className?: string;
+  labeledBy?: string;
+};
+
+export function SavedSearch({ indexName }: SavedSearchProps) {
   const { formatMessage } = useDinaIntl();
-  const { save } = useApiClient();
+  const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
   const formik = useFormikContext();
+
+  // Users saved preferences.
+  const [userPreferences, setUserPreferences] = useState<UserPreference>();
+
+  // When the user uses the "load" button, the selected saved search is saved here.
+  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>();
+
+  // When mounted, load in the user preferences.
+  useEffect(() => {
+    retrieveUserPreferences((loadedUserPreferences) => {
+      if (loadedUserPreferences) {
+        setUserPreferences(loadedUserPreferences);
+      }
+    });
+  }, []);
 
   // Reference to the select dropdown element.
   const selectRef = useRef(null);
@@ -57,6 +64,31 @@ export function SavedSearch(props: SavedSearchProps) {
 
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
+
+  /**
+   * Retrieve the user preference for the logged in user. This is used for the SavedSearch
+   * functionality since the saved searches are stored in the user preferences.
+   */
+  async function retrieveUserPreferences(
+    callback: (userPreference?: UserPreference) => void
+  ) {
+    // Retrieve user preferences...
+    await apiClient
+      .get<UserPreference[]>("user-api/user-preference", {
+        filter: {
+          userId: subject as FilterParam
+        }
+      })
+      .then((response) => {
+        // Set the user preferences to be a state for the QueryPage.
+        setUserPreferences(response?.data?.[0]);
+        callback(response?.data?.[0]);
+      })
+      .catch((userPreferenceError) => {
+        // setError(userPreferenceError);
+        callback(undefined);
+      });
+  }
 
   /**
    * Add a new saved search to the user's preferences. Searches will be saved using the following
@@ -74,7 +106,7 @@ export function SavedSearch(props: SavedSearchProps) {
    */
   async function saveSearch(savedSearchName: string) {
     // Before saving, remove irrelevant formik field array properties.
-    (formik.values as any).queryRows?.map(val => {
+    (formik.values as any).queryRows?.map((val) => {
       delete val.props;
       delete val.key;
       delete val._store;
@@ -103,7 +135,7 @@ export function SavedSearch(props: SavedSearchProps) {
     await save([saveArgs], { apiBaseUrl: "/user-api" });
 
     // The newly saved option, should be switched to the selected.
-    loadSavedSearch(savedSearchName);
+    // loadSavedSearch(savedSearchName);
   }
 
   /**
@@ -133,7 +165,7 @@ export function SavedSearch(props: SavedSearchProps) {
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-      loadSavedSearch("default");
+      // loadSavedSearch("default");
     }
 
     // Ask the user if they sure they want to delete the saved search.
@@ -149,57 +181,95 @@ export function SavedSearch(props: SavedSearchProps) {
     );
   }
 
+  const SavedSearchItem = (savedSearchName: string) => {
+    return (
+      <Card key={savedSearchName} className="mt-2">
+        <Card.Body>
+          <Card.Title>
+            {savedSearchName}{" "}
+            <Badge bg="primary" className="ms-2">
+              Default
+            </Badge>
+          </Card.Title>
+          <Card.Link href="#">Load</Card.Link>
+          <Card.Link href="#">Set as default</Card.Link>
+          <Card.Link href="#">Override</Card.Link>
+          <Card.Link href="#">Delete</Card.Link>
+        </Card.Body>
+      </Card>
+    );
+  };
+
   // Take the saved search options and convert to an option list.
-  const dropdownOptions = Object.keys(
-    userPreferences?.savedSearches?.[indexName] ?? {}
-  )
+  // const DropdownOptions = Object.keys(
+  //   userPreferences?.savedSearches?.[indexName] ?? {}
+  // )
+  //   .sort()
+  //   .map((dropdownItem) => SavedSearchItem(dropdownItem));
+
+  // Take the saved search options and convert to an option list.
+  const DropdownOptions = [
+    "Saved Search #1",
+    "Saved Search #2",
+    "Saved Search #3"
+  ]
     .sort()
-    .map(key => ({
-      value: key,
-      label: key
-    }));
+    .map((dropdownItem) => SavedSearchItem(dropdownItem));
+
+  const CustomMenu = React.forwardRef(
+    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
+      return (
+        <div
+          ref={ref}
+          style={{
+            ...props.style,
+            width: "400px",
+            padding: "0px"
+          }}
+          className={props.className}
+          aria-labelledby={props.labeledBy}
+        >
+          <Modal.Header className="float-left">
+            <Modal.Title>Saved Searches</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body
+            style={{
+              maxHeight: "300px",
+              overflowY: "auto",
+              background: "#f9f9f9"
+            }}
+          >
+            {DropdownOptions.length === 0 ? (
+              <div style={{ textAlign: "center" }}>
+                <h2>
+                  <FaRegFrown />
+                </h2>
+                <p>No saved searches have been created yet</p>
+              </div>
+            ) : (
+              DropdownOptions
+            )}
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button
+              variant="success"
+              style={{ width: "100%" }}
+              onClick={() => openSavedSearchModal({ saveSearch })}
+            >
+              Create new saved search
+            </Button>
+          </Modal.Footer>
+        </div>
+      );
+    }
+  );
 
   return (
-    <div className="d-flex gap-2">
-      <div style={{ width: "400px" }}>
-        <Select
-          ref={selectRef}
-          aria-label="Saved Search"
-          className="saved-search"
-          options={dropdownOptions}
-          onChange={selectedOption =>
-            setSelectedSavedSearch(selectedOption?.value ?? "")
-          }
-          value={{ value: selectedSavedSearch, label: selectedSavedSearch }}
-        />
-      </div>
-      <button
-        type="button"
-        className="btn btn-primary"
-        onClick={() => {
-          if (selectRef && selectRef.current) {
-            loadSavedSearch(selectedSavedSearch ?? "");
-          }
-        }}
-        disabled={selectedSavedSearch ? false : true}
-      >
-        {formatMessage("load")}
-      </button>
-      <button
-        type="button"
-        className="btn btn-secondary"
-        onClick={() => openSavedSearchModal({ saveSearch })}
-      >
-        {formatMessage("save")}
-      </button>
-      <button
-        className="btn btn-danger"
-        type="button"
-        onClick={() => deleteSavedSearch(selectedSavedSearch ?? "")}
-        disabled={selectedSavedSearch ? false : true}
-      >
-        {formatMessage("deleteButtonText")}
-      </button>
-    </div>
+    <Dropdown className="float-end">
+      <Dropdown.Toggle>Saved Searches</Dropdown.Toggle>
+      <Dropdown.Menu as={CustomMenu} />
+    </Dropdown>
   );
 }
