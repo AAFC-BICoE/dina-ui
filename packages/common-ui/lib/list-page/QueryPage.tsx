@@ -23,7 +23,7 @@ import {
   useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
 import { v4 as uuidv4 } from "uuid";
-import { SavedSearch } from "./SavedSearch";
+import { SavedSearch } from "./saved-searches/SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
 import { cloneDeep, toPairs, uniqBy } from "lodash";
 import { FormikButton, useAccount } from "..";
@@ -629,25 +629,14 @@ export function QueryPage<TData extends KitsuResource>({
   return (
     <>
       {!viewMode && (
-        <>
-          <label
-            style={{
-              fontSize: 20,
-              fontFamily: "sans-serif",
-              fontWeight: "bold"
-            }}
-          >
-            <DinaMessage id="search" />
-          </label>
-          <QueryBuilderMemo
-            indexName={indexName}
-            queryBuilderTree={queryBuilderTree}
-            setQueryBuilderTree={onQueryBuildTreeChange}
-            queryBuilderConfig={queryBuilderConfig}
-            onSubmit={onSubmit}
-            onReset={onReset}
-          />
-        </>
+        <QueryBuilderMemo
+          indexName={indexName}
+          queryBuilderTree={queryBuilderTree}
+          setQueryBuilderTree={onQueryBuildTreeChange}
+          queryBuilderConfig={queryBuilderConfig}
+          onSubmit={onSubmit}
+          onReset={onReset}
+        />
       )}
       <DinaForm key={formKey} initialValues={defaultGroups} onSubmit={onSubmit}>
         {/* Group Selection */}

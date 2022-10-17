@@ -87,6 +87,14 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
+ * Blank Button CSS, use the light variant with this className.
+ */
+.btn-empty {
+  background: transparent !important;
+  border: transparent !important;
+}
+
+/*
  * Query Builder Custom CSS
  */
 .qb-lite {

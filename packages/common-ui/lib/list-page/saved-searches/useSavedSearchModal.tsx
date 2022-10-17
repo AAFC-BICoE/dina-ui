@@ -1,6 +1,6 @@
 import { DinaForm, TextField, useModal } from "common-ui";
-import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
-import { FormikButton } from "../formik-connected/FormikButton";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
+import { FormikButton } from "../../formik-connected/FormikButton";
 
 interface SavedSearchModalParams {
   saveSearch: (searchName: string) => void;

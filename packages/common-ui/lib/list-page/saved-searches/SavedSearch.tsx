@@ -1,16 +1,20 @@
-import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useRef, useState } from "react";
-import Select from "react-select";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
 import { useFormikContext } from "formik";
-import { useAccount } from "../account/AccountProvider";
-import { useModal } from "../modal/modal";
-import { SaveArgs, useApiClient } from "../api-client/ApiClientContext";
-import { AreYouSureModal } from "../modal/AreYouSureModal";
+import { useAccount } from "../../account/AccountProvider";
+import { useModal } from "../../modal/modal";
+import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
+import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Dropdown, Modal, Button, Card, Badge } from "react-bootstrap";
-import { FaRegFrown } from "react-icons/fa";
+import { FaRegFrown, FaTrash, FaCog } from "react-icons/fa";
+import { LoadingSpinner } from "../..";
+import { ImmutableTree } from "react-awesome-query-builder";
 
 export interface SavedSearchProps {
   /**
@@ -19,6 +23,16 @@ export interface SavedSearchProps {
    * displayed and where news one's are created.
    */
   indexName: string;
+
+  /**
+   * Query Builder local tree, used for saving the saved search.
+   */
+  queryBuilderTree?: ImmutableTree;
+
+  /**
+   * Set the query builder tree, used to to load a saved search.
+   */
+  setQueryBuilderTree: (newTree: ImmutableTree) => void;
 }
 
 type CustomMenuProps = {
@@ -28,7 +42,11 @@ type CustomMenuProps = {
   labeledBy?: string;
 };
 
-export function SavedSearch({ indexName }: SavedSearchProps) {
+export function SavedSearch({
+  indexName,
+  queryBuilderTree,
+  setQueryBuilderTree
+}: SavedSearchProps) {
   const { formatMessage } = useDinaIntl();
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -39,28 +57,16 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
 
-  // When the user uses the "load" button, the selected saved search is saved here.
-  const [loadedSavedSearch, setLoadedSavedSearch] = useState<string>();
+  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>();
+
+  const [currentIsDefault, setCurrentIsDefault] = useState<boolean>(true);
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   // When mounted, load in the user preferences.
   useEffect(() => {
-    retrieveUserPreferences((loadedUserPreferences) => {
-      if (loadedUserPreferences) {
-        setUserPreferences(loadedUserPreferences);
-      }
-    });
+    retrieveUserPreferences();
   }, []);
-
-  // Reference to the select dropdown element.
-  const selectRef = useRef(null);
-
-  // Selected saved search for the saved search dropdown.
-  const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>(
-    loadedSavedSearch &&
-      userPreferences?.savedSearches?.[indexName]?.[loadedSavedSearch]
-      ? loadedSavedSearch
-      : ""
-  );
 
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
@@ -69,9 +75,7 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
    * functionality since the saved searches are stored in the user preferences.
    */
-  async function retrieveUserPreferences(
-    callback: (userPreference?: UserPreference) => void
-  ) {
+  async function retrieveUserPreferences() {
     // Retrieve user preferences...
     await apiClient
       .get<UserPreference[]>("user-api/user-preference", {
@@ -82,11 +86,12 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
       .then((response) => {
         // Set the user preferences to be a state for the QueryPage.
         setUserPreferences(response?.data?.[0]);
-        callback(response?.data?.[0]);
+        setLoading(false);
       })
       .catch((userPreferenceError) => {
         // setError(userPreferenceError);
-        callback(undefined);
+        setUserPreferences(undefined);
+        setLoading(false);
       });
   }
 
@@ -181,20 +186,30 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
     );
   }
 
+  // Wait until the user preferences have been loaded in.
+  if (loading) {
+    return <LoadingSpinner loading={loading} />;
+  }
+
+  const DefaultBadge = () => {
+    return (
+      <Badge bg="primary" className="ms-2">
+        Default
+      </Badge>
+    );
+  };
+
   const SavedSearchItem = (savedSearchName: string) => {
     return (
       <Card key={savedSearchName} className="mt-2">
-        <Card.Body>
+        <Card.Body onClick={() => setSelectedSavedSearch(savedSearchName)}>
           <Card.Title>
-            {savedSearchName}{" "}
-            <Badge bg="primary" className="ms-2">
-              Default
-            </Badge>
+            {savedSearchName}
+            {DefaultBadge}
+            <Button className="float-end" variant="light">
+              <FaTrash />
+            </Button>
           </Card.Title>
-          <Card.Link href="#">Load</Card.Link>
-          <Card.Link href="#">Set as default</Card.Link>
-          <Card.Link href="#">Override</Card.Link>
-          <Card.Link href="#">Delete</Card.Link>
         </Card.Body>
       </Card>
     );
@@ -206,6 +221,8 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
   // )
   //   .sort()
   //   .map((dropdownItem) => SavedSearchItem(dropdownItem));
+
+  // onClick={() => openSavedSearchModal({ saveSearch })}
 
   // Take the saved search options and convert to an option list.
   const DropdownOptions = [
@@ -251,25 +268,23 @@ export function SavedSearch({ indexName }: SavedSearchProps) {
               DropdownOptions
             )}
           </Modal.Body>
-
-          <Modal.Footer>
-            <Button
-              variant="success"
-              style={{ width: "100%" }}
-              onClick={() => openSavedSearchModal({ saveSearch })}
-            >
-              Create new saved search
-            </Button>
-          </Modal.Footer>
         </div>
       );
     }
   );
 
   return (
-    <Dropdown className="float-end">
-      <Dropdown.Toggle>Saved Searches</Dropdown.Toggle>
-      <Dropdown.Menu as={CustomMenu} />
-    </Dropdown>
+    <>
+      <Button className="float-end btn-empty" variant="light">
+        <FaCog />
+      </Button>
+      <Dropdown className="float-end">
+        <Dropdown.Toggle variant="light" className="btn-empty">
+          {selectedSavedSearch ?? "Saved Searches"}
+          {currentIsDefault && DefaultBadge}
+        </Dropdown.Toggle>
+        <Dropdown.Menu as={CustomMenu} />
+      </Dropdown>
+    </>
   );
 }
