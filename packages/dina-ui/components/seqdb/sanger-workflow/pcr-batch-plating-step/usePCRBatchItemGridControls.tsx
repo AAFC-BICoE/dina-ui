@@ -101,21 +101,6 @@ export function usePCRBatchItemGridControls({
             newCellGrid[`${wellRow}_${wellColumn}`] = pcrBatchItem;
           }
 
-          // const pcrBatchItemIdsWithCoords = pcrBatchItemsWithCoords
-          //   .map(item => item.id)
-          //   .join();
-
-          // const { data: pcrBatchItemsNoCoords } = await apiClient.get<PcrBatchItem[]>
-          // ("/seqdb-api/pcr-batch-item", {
-          //   // Get all the PcrBatchItems that have no coords.
-          //   filter: {
-          //     selector: "pcrBatch.uuid",
-          //     comparison: "==",
-          //     arguments: pcrBatchId,
-          //   },
-          //   page: { limit: 1000 }
-          // });
-console.log("test");
           setGridState({
             availableItems: pcrBatchItemsNoCoords,
             cellGrid: newCellGrid,
