@@ -84,7 +84,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
       </div>
       <div className="row">
         <div className="col-2">
-          <strong>Selected samples ({availableItems.length} in list)</strong>
+          <strong>Selected pcr batch items ({availableItems.length} in list)</strong>
           <DraggablePCRBatchItemList
             availableItems={availableItems}
             selectedItems={selectedItems}

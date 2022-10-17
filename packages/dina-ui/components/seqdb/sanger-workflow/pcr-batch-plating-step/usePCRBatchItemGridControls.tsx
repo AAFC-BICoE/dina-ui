@@ -1,6 +1,6 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
 import { omitBy } from "lodash";
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
 
@@ -44,12 +44,15 @@ export function usePCRBatchItemGridControls({
       setPcrBatch(response?.data);
     });
   }
+
+  useEffect(() => {
   getPcrBatch();
   
   if(pcrBatch?.storageRestriction !== undefined){
     setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
     setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
   }
+});
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.
@@ -85,6 +88,10 @@ export function usePCRBatchItemGridControls({
             item => item.wellRow && item.wellColumn
           );
 
+          const pcrBatchItemsNoCoords = pcrBatchItems.filter(
+            item => !item.wellRow && !item.wellColumn
+          );
+
           const newCellGrid: CellGrid = {};
           if(pcrBatchItem != null)
           for (const {
@@ -94,24 +101,21 @@ export function usePCRBatchItemGridControls({
             newCellGrid[`${wellRow}_${wellColumn}`] = pcrBatchItem;
           }
 
-          const pcrBatchItemIdsWithCoords = pcrBatchItemsWithCoords
-            .map(item => item.id)
-            .join();
+          // const pcrBatchItemIdsWithCoords = pcrBatchItemsWithCoords
+          //   .map(item => item.id)
+          //   .join();
 
-          const { data: pcrBatchItemsNoCoords } = await apiClient.get<PcrBatchItem[]>
-          ("/seqdb-api/pcr-batch-item", {
-            // Get all the PcrBatchItems that have no coords.
-            filter: {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId,
-              rsql: `pcrBatchItems.uuid=out=(${
-                pcrBatchItemIdsWithCoords || "00000000-0000-0000-0000-000000000000"
-              })`
-            },
-            page: { limit: 1000 }
-          });
-
+          // const { data: pcrBatchItemsNoCoords } = await apiClient.get<PcrBatchItem[]>
+          // ("/seqdb-api/pcr-batch-item", {
+          //   // Get all the PcrBatchItems that have no coords.
+          //   filter: {
+          //     selector: "pcrBatch.uuid",
+          //     comparison: "==",
+          //     arguments: pcrBatchId,
+          //   },
+          //   page: { limit: 1000 }
+          // });
+console.log("test");
           setGridState({
             availableItems: pcrBatchItemsNoCoords,
             cellGrid: newCellGrid,

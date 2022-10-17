@@ -3,6 +3,7 @@ import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import { useState, useEffect } from "react";
 
 interface ContainerGridProps {
   pcrBatchId: string;
@@ -29,6 +30,8 @@ export function ContainerGrid({
 }: ContainerGridProps) {
   const { apiClient } = useApiClient();
   const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
+  const [ numberOfRows, setNumberOfRows ] = useState<number>(0);
+
   async function getPcrBatch(){
     await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
@@ -38,9 +41,13 @@ export function ContainerGrid({
       setPcrBatch(response?.data);
     });
   }
-  getPcrBatch();
-  const { numberOfRows } = pcrBatch.storageRestriction.layout.numberOfRows;
 
+  useEffect(() => {
+    getPcrBatch();
+    if(pcrBatch?.storageRestriction !== undefined){
+      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+    }
+  });
   const columns: Column[] = [];
 
   // Add the letter column.
@@ -115,8 +122,5 @@ function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
       )}
     </div>
   );
-}
-function useState<T>(): [any, any] {
-  throw new Error("Function not implemented.");
 }
 
