@@ -1,12 +1,12 @@
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 import { useDrop } from "react-dnd-cjs";
 import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 
 interface DraggablePCRBatchItemListProps {
-  availableItems: PcrBatchItem[];
-  movedItems: PcrBatchItem[];
-  onDrop: (item: PcrBatchItem) => void;
-  selectedItems: PcrBatchItem[];
+  availableItems: PcrBatchItemSample[];
+  movedItems: PcrBatchItemSample[];
+  onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
+  selectedItems: PcrBatchItemSample[];
   onClick: (PcrBatchItem, e) => void;
 }
 
@@ -20,7 +20,6 @@ export function DraggablePCRBatchItemList({
   const [, dropRef] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: item => {
-      if (!item) return;
       onDrop((item as any))
     }
   });
@@ -33,9 +32,9 @@ export function DraggablePCRBatchItemList({
     >
       {availableItems.map(item => (
         <DraggablePCRBatchItemBox
-          key={String(item?.id)}
+          key={String(item?.sampleId)}
           wasMoved={movedItems.includes(item)}
-          pcrBatchItem={item}
+          pcrBatchItemSample={item}
           onClick={e => onClick(item, e)}
           selected={selectedItems.includes(item)}
         />

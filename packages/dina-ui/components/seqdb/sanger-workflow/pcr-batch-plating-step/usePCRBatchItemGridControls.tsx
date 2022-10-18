@@ -1,5 +1,6 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { omitBy } from "lodash";
+import { PersistedResource } from "kitsu";
+import { omitBy, compact, pick } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useRef, useState, useEffect } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
@@ -9,10 +10,18 @@ interface ContainerGridProps {
   pcrBatchId: string;
 }
 
+export interface PcrBatchItemSample {
+  pcrBatchItemId?: string;
+  wellRow?: string;
+  wellColumn?: number;
+  sampleId?: string;
+  sampleName?: string;
+}
+
 export function usePCRBatchItemGridControls({
   pcrBatchId
 }: ContainerGridProps) {
-  const { apiClient, save } = useContext(ApiClientContext);
+  const { apiClient, save, bulkGet } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
@@ -20,8 +29,8 @@ export function usePCRBatchItemGridControls({
   const [submitting, setSubmitting] = useState(false);
 
   // Highlighted/selected PcrBatchItems.
-  const [selectedItems, setSelectedItems] = useState<PcrBatchItem[]>([]);
-  const lastSelectedItemRef = useRef<PcrBatchItem>();
+  const [selectedItems, setSelectedItems] = useState<PcrBatchItemSample[]>([]);
+  const lastSelectedItemRef = useRef<PcrBatchItemSample>();
 
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
   const [fillMode, setFillMode] = useState<string>("COLUMN");
@@ -34,9 +43,69 @@ export function usePCRBatchItemGridControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
-  const [ materialSampleItem, setPcrBatchItem] = useState<PcrBatchItem>();
+  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItemSample[]>();
 
   const [ isStorage, setIsStorage ] = useState<boolean>(false);
+
+  const [gridState, setGridState] = useState({
+    // Available PcrBatchItems with no well coordinates.
+    availableItems: [] as PcrBatchItemSample[],
+    // The grid of PcrBatchItems that have well coordinates.
+    cellGrid: {} as CellGrid,
+    // PcrBatchItems that have been moved since data initialization.
+    movedItems: [] as PcrBatchItemSample[]
+  });
+
+  useEffect(() => {
+    if (!pcrBatch) return;
+  
+    if(pcrBatch?.storageRestriction){
+      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
+      setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+      setIsStorage(true);
+    }
+  }, [pcrBatch]);
+
+  useEffect(() => {
+    getPcrBatch();
+  }, []);
+
+  useEffect(() => {
+    if (!pcrBatchItems) return;
+
+    fetchSamples((materialSamples) => {
+      const pcrBatchItemsWithSampleNames = materialSamples.map<PcrBatchItemSample>((sample) => {
+        const batchItem = pcrBatchItems.find((item) => item.sampleId === sample.id);
+        return {
+          pcrBatchItemId: batchItem?.pcrBatchItemId,
+          sampleId: sample.id,
+          sampleName: sample?.materialSampleName ?? sample.id,
+          wellColumn: batchItem?.wellColumn,
+          wellRow: batchItem?.wellRow
+        }
+      });
+
+    const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
+      item => item.wellRow && item.wellColumn
+    );
+
+    const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
+      item => !item.wellRow && !item.wellColumn
+    );
+
+    const newCellGrid: CellGrid = {};
+    pcrBatchItemsWithCoords.forEach((item) => {
+      newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
+    });
+
+    setGridState({
+      availableItems: pcrBatchItemsNoCoords?.sort(itemSort),
+      cellGrid: newCellGrid,
+      movedItems: []
+    });
+    setItemsLoading(false);
+    });
+  }, [pcrBatchItems])
 
   async function getPcrBatch(){
     await apiClient.get<PcrBatch>(
@@ -48,30 +117,27 @@ export function usePCRBatchItemGridControls({
     });
   }
 
-  useEffect(() => {
-  getPcrBatch();
-  
+  /**
+   * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
+   * operation.
+   */
+   async function fetchSamples(callback: (response : MaterialSample[]) => void) {
+    if (!pcrBatchItems) return;
 
-}, []);
+    await bulkGet<MaterialSample>(
+      pcrBatchItems.filter((item) => item.sampleId).map((item) => "/material-sample/" + item.sampleId),
+      { apiBaseUrl: "/collection-api" }
+    ).then((response) => {
+      const materialSamplesTransformed = compact(response).map<MaterialSample>((resource) => ({
+        materialSampleName: resource.materialSampleName,
+        id: resource.id,
+        type: resource.type
+      }));
 
-useEffect(() => {
-  if (!pcrBatch) return;
-
-  if(pcrBatch?.storageRestriction){
-    setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
-    setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-    setIsStorage(true);
+      callback(materialSamplesTransformed);
+    });
   }
-}, [pcrBatch]);
 
-  const [gridState, setGridState] = useState({
-    // Available PcrBatchItems with no well coordinates.
-    availableItems: [] as MaterialSample[],
-    // The grid of PcrBatchItems that have well coordinates.
-    cellGrid: {} as CellGrid,
-    // PcrBatchItems that have been moved since data initialization.
-    movedItems: [] as MaterialSample[]
-  });
 
   // PcrBatchItem queries.
   const { loading: materialSampleItemsLoading, response: materialSampleItemsResponse } =
@@ -87,50 +153,27 @@ useEffect(() => {
           ]
         })(""),
         page: { limit: 1000 },
-        path: `/seqdb-api/pcr-batch-item`
+        path: `/seqdb-api/pcr-batch-item`,
+        include: "materialSample"
       },
       {
         deps: [lastSave],
         onSuccess: async ({ data: pcrBatchItem }) => {
-          console.log("loading...");
           setItemsLoading(true);
-          
-          const pcrBatchItemsWithCoords = pcrBatchItem.filter(
-            item => item.wellRow && item.wellColumn
-          );
-
-          const pcrBatchItemsNoCoords = pcrBatchItem.filter(
-            item => !item.wellRow && !item.wellColumn
-          );
-
-          const newCellGrid: CellGrid = {};
-          materialSampleItemsWithCoords.forEach((item) => {
-            newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item.materialSample;
-          });
-
-          const newAvailableSamples : MaterialSample[] = pcrBatchItemsNoCoords
-          .map(batch => batch.materialSample)
-          .filter(materialSample => materialSample?.id);
-
-// TODO: Retrieve each material sample from the API.
-
-          setGridState({
-            availableItems: newAvailableSamples,
-            cellGrid: newCellGrid,
-            movedItems: []
-          });
-          setItemsLoading(false);
+          setPcrBatchItems(pcrBatchItem.map((item) => ({
+            pcrBatchItemId: item.id,
+            sampleId: item?.materialSample?.id,
+            wellColumn: item.wellColumn,
+            wellRow: item.wellRow
+          })));
         }
       }
     );
 
-  function moveItems(items: PcrBatchItem[], coords?: string) {
-    console.log("coords: " + coords)
-    console.log("being dragged: " + JSON.stringify(items))
+  function moveItems(items: PcrBatchItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the PcrBatchItem from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, item => items.includes(...item));
-      console.log("new grid: " + JSON.stringify(newCellGrid));
+      const newCellGrid: CellGrid = omitBy(cellGrid, item => items.includes(item));
 
       // Remove the PcrBatchItem from the availables PcrBatchItems.
       let newAvailableItems = availableItems.filter(
@@ -187,7 +230,6 @@ useEffect(() => {
         }
       } else {
         // Add the PcrBatchItem to the list.
-        console.log("add to list.");
         newAvailableItems = [...newAvailableItems, ...items];
       }
 
@@ -200,7 +242,7 @@ useEffect(() => {
 
       return {
         // availableItems: newAvailableItems.sort(itemSort),
-        availableItems: newAvailableItems?.filter((item) => item),
+        availableItems: newAvailableItems?.filter((item) => item).sort(itemSort),
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -209,7 +251,7 @@ useEffect(() => {
     setSelectedItems([]);
   }
 
-  function onGridDrop(item: PcrBatchItem, coords: string) {
+  function onGridDrop(item: PcrBatchItemSample, coords: string) {
     if (selectedItems.includes(item)) {
       moveItems(selectedItems, coords);
     } else {
@@ -217,8 +259,8 @@ useEffect(() => {
     }
   }
 
-  function onListDrop(item: PcrBatchItem) {
-    moveItems([item]);
+  function onListDrop(item: { pcrBatchItemSample : PcrBatchItemSample }) {
+    moveItems([item.pcrBatchItemSample]);
   }
 
   function onItemClick(item, e) {
@@ -270,10 +312,17 @@ useEffect(() => {
         return movedItem;
       });
 
-      const saveArgs = materialSampleItemsToSave.map(item => ({
-        resource: item,
-        type: "pcr-batch-item"
-      }));
+      const saveArgs = materialSampleItemsToSave.map(item => {
+        return {
+          resource: {
+            type: "pcr-batch-item",
+            id: item.pcrBatchItemId,
+            wellColumn: item.wellColumn ?? null,
+            wellRow: item.wellRow ?? null
+          } as PcrBatchItem,
+          type: "pcr-batch-item"          
+        }
+      });
 
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
 
@@ -290,10 +339,7 @@ useEffect(() => {
 
   async function moveAll() {
     const { availableItems, cellGrid } = gridState;
-    const items = [...availableItems, ...Object.values(cellGrid)]
-    // const items = [...availableItems, ...Object.values(cellGrid)].sort(
-    //   itemSort
-    // );
+    const items = [...availableItems, ...Object.values(cellGrid)].sort(itemSort);
     moveItems(items, "A_1");
   }
 
@@ -315,14 +361,14 @@ useEffect(() => {
   };
 }
 
-// function itemSort(a, b) {
-//   const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-//     s => s.match(/[^\d]+|\d+/g) || []
-//   );
+function itemSort(a, b) {
+  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
+    s => s.sampleName.match(/[^\d]+|\d+/g) || []
+  );
 
-//   if (aAlpha === bAlpha) {
-//     return Number(aNum) > Number(bNum) ? 1 : -1;
-//   } else {
-//     return aAlpha > bAlpha ? 1 : -1;
-//   }
-// }
+  if (aAlpha === bAlpha) {
+    return Number(aNum) > Number(bNum) ? 1 : -1;
+  } else {
+    return aAlpha > bAlpha ? 1 : -1;
+  }
+}

@@ -4,23 +4,23 @@ import ReactTable, { Column } from "react-table";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
 import { useState, useEffect } from "react";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 
 interface ContainerGridProps {
   pcrBatchId: string;
   cellGrid: CellGrid;
-  movedItems: MaterialSample[];
-  onDrop: (item: MaterialSample, coords: string) => void;
+  movedItems: PcrBatchItemSample[];
+  onDrop: (item: PcrBatchItemSample, coords: string) => void;
 }
 
 interface GridCellProps {
-  onDrop: (item: { item: MaterialSample }) => void;
-  movedItems: MaterialSample[];
-  materialSampleItem: MaterialSample;
+  onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
+  movedItems: PcrBatchItemSample[];
+  pcrBatchItemSample: PcrBatchItemSample;
 }
 
 export interface CellGrid {
-  [key: string]: MaterialSample;
+  [key: string]: PcrBatchItemSample;
 }
 
 export function ContainerGrid({
@@ -80,8 +80,8 @@ export function ContainerGrid({
           <span className={`well-${coords}`}>
             <GridCell
               movedItems={movedItems}
-              onDrop={({ item: newItem }) => onDrop(newItem, coords)}
-              materialSampleItem={cellGrid[coords]}
+              onDrop={({ pcrBatchItemSample: newItem }) => onDrop(newItem, coords)}
+              pcrBatchItemSample={cellGrid[coords]}
             />
           </span>
         );
@@ -112,19 +112,21 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, materialSampleItem, movedItems }: GridCellProps) {
+function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
   const [, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
-    drop: item => onDrop(item as any)
+    drop: item => {
+      onDrop((item as any))
+    }
   });
 
   return (
     <div ref={drop} className="h-100 w-100">
-      {materialSampleItem && (
+      {pcrBatchItemSample && (
         <DraggablePCRBatchItemBox
-          materialSampleItem={materialSampleItem}
+          pcrBatchItemSample={pcrBatchItemSample}
           selected={false}
-          wasMoved={movedItems.includes(materialSampleItem)}
+          wasMoved={movedItems.includes(pcrBatchItemSample)}
         />
       )}
     </div>

@@ -87,7 +87,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
   selectButtonText: "Sélectionner",
-  selectCoodinates: "Sélectionner coordonnées",
   selectSamples: "Sélectionner échantillons moléculaires",
   selectedSamplesTitle: "Échantillons sélectionnés",
   seqdbTitle: "Base de données des séquences (fr)",
