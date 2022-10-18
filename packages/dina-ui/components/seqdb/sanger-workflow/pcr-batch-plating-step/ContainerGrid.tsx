@@ -48,6 +48,7 @@ export function ContainerGrid({
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
     }
   });
+  
   const columns: Column[] = [];
 
   // Add the letter column.

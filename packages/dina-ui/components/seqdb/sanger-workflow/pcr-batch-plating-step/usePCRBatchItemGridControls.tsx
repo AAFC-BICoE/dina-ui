@@ -35,6 +35,8 @@ export function usePCRBatchItemGridControls({
 
   const [ pcrBatchItem, setPcrBatchItem] = useState<PcrBatchItem>();
 
+  const [ isStorage, setIsStorage ] = useState<boolean>(false);
+
   async function getPcrBatch(){
     await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
@@ -48,9 +50,10 @@ export function usePCRBatchItemGridControls({
   useEffect(() => {
   getPcrBatch();
   
-  if(pcrBatch?.storageRestriction !== undefined){
+  if(pcrBatch?.storageRestriction !== undefined && pcrBatch?.storageRestriction !== null){
     setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
     setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+    setIsStorage(true);
   }
 });
 
@@ -182,7 +185,8 @@ export function usePCRBatchItemGridControls({
       }
 
       return {
-        availableItems: newAvailableItems.sort(itemSort),
+        // availableItems: newAvailableItems.sort(itemSort),
+        availableItems: newAvailableItems,
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -232,30 +236,22 @@ export function usePCRBatchItemGridControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
-      // const existingPcrBatchItems = pcrBatchItemsResponse
-      //   ? pcrBatchItemsResponse.data
-      //   : [];
-
       const pcrBatchItemsToSave = movedItems.map(movedItem => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
           key => cellGrid[key] === movedItem
         );
 
-        // const existingPcrBatchItem = existingPcrBatchItems.find(
-        //   item => item.id === movedItem.id
-        // );
+        let newWellColumn: number | undefined;
+        let newWellRow: string | undefined;
+        if (coords) {
+          const [row , col] = coords.split("_");
+          newWellColumn = Number(col);
+          newWellRow = row;
+        }
 
-        // let newWellColumn: number | undefined;
-        // let newWellRow: string | undefined;
-        // if (coords) {
-        //   const [row , col] = coords.split("_");
-        //   newWellColumn = Number(col);
-        //   newWellRow = row;
-        // }
-
-        // existingPcrBatchItem.wellColumn = newWellColumn;
-        // existingPcrBatchItem.wellRow = newWellRow;
+        movedItem.wellColumn = newWellColumn;
+        movedItem.wellRow = newWellRow;
 
         return movedItem;
       });
@@ -280,9 +276,10 @@ export function usePCRBatchItemGridControls({
 
   async function moveAll() {
     const { availableItems, cellGrid } = gridState;
-    const items = [...availableItems, ...Object.values(cellGrid)].sort(
-      itemSort
-    );
+    const items = [...availableItems, ...Object.values(cellGrid)]
+    // const items = [...availableItems, ...Object.values(cellGrid)].sort(
+    //   itemSort
+    // );
     moveItems(items, "A_1");
   }
 
@@ -299,18 +296,19 @@ export function usePCRBatchItemGridControls({
     onListDrop,
     onItemClick,
     selectedItems,
-    setFillMode
+    setFillMode,
+    isStorage
   };
 }
 
-function itemSort(a, b) {
-  const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-    s => s.name.match(/[^\d]+|\d+/g) || []
-  );
+// function itemSort(a, b) {
+//   const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
+//     s => s.match(/[^\d]+|\d+/g) || []
+//   );
 
-  if (aAlpha === bAlpha) {
-    return Number(aNum) > Number(bNum) ? 1 : -1;
-  } else {
-    return aAlpha > bAlpha ? 1 : -1;
-  }
-}
+//   if (aAlpha === bAlpha) {
+//     return Number(aNum) > Number(bNum) ? 1 : -1;
+//   } else {
+//     return aAlpha > bAlpha ? 1 : -1;
+//   }
+// }

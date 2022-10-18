@@ -24,11 +24,18 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     onListDrop,
     onItemClick,
     selectedItems,
-    setFillMode
+    setFillMode,
+    isStorage
   } = usePCRBatchItemGridControls(props);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
+  }
+
+  if(!isStorage){
+    return <span className="alert alert-warning">
+      Storage definition must be set to use the container grid.
+  </span>
   }
 
   return (
@@ -84,7 +91,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
       </div>
       <div className="row">
         <div className="col-2">
-          <strong>Selected pcr batch items ({availableItems.length} in list)</strong>
+          <strong>Selected Material Samples ({availableItems.length} in list)</strong>
           <DraggablePCRBatchItemList
             availableItems={availableItems}
             selectedItems={selectedItems}

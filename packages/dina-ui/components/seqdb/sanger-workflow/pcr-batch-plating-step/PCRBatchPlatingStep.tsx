@@ -32,12 +32,10 @@ export function PCRBatchPlatingStep({
       >
         Edit PCR Batch Item Grid
       </button>
-      <div className="mb-3">
-      <p>My First Paragraph</p>
-      </div>
-          <PCRBatchItemGrid
-            pcrBatchId = {pcrBatchId}
-          />
+      <br/>
+      <PCRBatchItemGrid
+        pcrBatchId = {pcrBatchId}
+      />
         </>
     ) : ( <p>Test</p>);  
 }
