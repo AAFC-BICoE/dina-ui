@@ -83,6 +83,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sangerWorkflowListTitle: "Sanger Workflows",
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
+  selectCoodinates: "Select Coordinates",
   selectMaterialSamples: "Select Material Samples",
   selectSamples: "Select Material Samples",
   selectedSamplesTitle: "Selected Material Samples",

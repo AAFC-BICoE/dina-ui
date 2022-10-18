@@ -7,6 +7,8 @@ export interface PcrBatchItemAttributes {
   createdBy?: string;
   createdOn?: string;
   group?: string;
+  wellRow?: string;
+  wellColumn?: number;
 }
 
 export interface PcrBatchItemRelationships {
