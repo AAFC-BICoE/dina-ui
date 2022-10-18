@@ -1,5 +1,6 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
 import { omitBy } from "lodash";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useRef, useState, useEffect } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
@@ -33,7 +34,7 @@ export function usePCRBatchItemGridControls({
 
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
-  const [ pcrBatchItem, setPcrBatchItem] = useState<PcrBatchItem>();
+  const [ materialSampleItem, setPcrBatchItem] = useState<PcrBatchItem>();
 
   const [ isStorage, setIsStorage ] = useState<boolean>(false);
 
@@ -50,24 +51,30 @@ export function usePCRBatchItemGridControls({
   useEffect(() => {
   getPcrBatch();
   
-  if(pcrBatch?.storageRestriction !== undefined && pcrBatch?.storageRestriction !== null){
+
+}, []);
+
+useEffect(() => {
+  if (!pcrBatch) return;
+
+  if(pcrBatch?.storageRestriction){
     setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
     setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
     setIsStorage(true);
   }
-});
+}, [pcrBatch]);
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.
-    availableItems: [] as PcrBatchItem[],
+    availableItems: [] as MaterialSample[],
     // The grid of PcrBatchItems that have well coordinates.
     cellGrid: {} as CellGrid,
     // PcrBatchItems that have been moved since data initialization.
-    movedItems: [] as PcrBatchItem[]
+    movedItems: [] as MaterialSample[]
   });
 
   // PcrBatchItem queries.
-  const { loading: pcrBatchItemsLoading, response: pcrBatchItemsResponse } =
+  const { loading: materialSampleItemsLoading, response: materialSampleItemsResponse } =
     useQuery<PcrBatchItem[]>(
       {
         filter: filterBy([], {
@@ -84,28 +91,31 @@ export function usePCRBatchItemGridControls({
       },
       {
         deps: [lastSave],
-        onSuccess: async ({ data: pcrBatchItems }) => {
+        onSuccess: async ({ data: pcrBatchItem }) => {
+          console.log("loading...");
           setItemsLoading(true);
-
-          const pcrBatchItemsWithCoords = pcrBatchItems.filter(
+          
+          const pcrBatchItemsWithCoords = pcrBatchItem.filter(
             item => item.wellRow && item.wellColumn
           );
 
-          const pcrBatchItemsNoCoords = pcrBatchItems.filter(
+          const pcrBatchItemsNoCoords = pcrBatchItem.filter(
             item => !item.wellRow && !item.wellColumn
           );
 
           const newCellGrid: CellGrid = {};
-          if(pcrBatchItem != null)
-          for (const {
-            wellRow,
-            wellColumn
-          } of pcrBatchItemsWithCoords) {
-            newCellGrid[`${wellRow}_${wellColumn}`] = pcrBatchItem;
-          }
+          materialSampleItemsWithCoords.forEach((item) => {
+            newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item.materialSample;
+          });
+
+          const newAvailableSamples : MaterialSample[] = pcrBatchItemsNoCoords
+          .map(batch => batch.materialSample)
+          .filter(materialSample => materialSample?.id);
+
+// TODO: Retrieve each material sample from the API.
 
           setGridState({
-            availableItems: pcrBatchItemsNoCoords,
+            availableItems: newAvailableSamples,
             cellGrid: newCellGrid,
             movedItems: []
           });
@@ -115,9 +125,12 @@ export function usePCRBatchItemGridControls({
     );
 
   function moveItems(items: PcrBatchItem[], coords?: string) {
+    console.log("coords: " + coords)
+    console.log("being dragged: " + JSON.stringify(items))
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the PcrBatchItem from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, s => items.includes(s));
+      const newCellGrid: CellGrid = omitBy(cellGrid, item => items.includes(...item));
+      console.log("new grid: " + JSON.stringify(newCellGrid));
 
       // Remove the PcrBatchItem from the availables PcrBatchItems.
       let newAvailableItems = availableItems.filter(
@@ -174,6 +187,7 @@ export function usePCRBatchItemGridControls({
         }
       } else {
         // Add the PcrBatchItem to the list.
+        console.log("add to list.");
         newAvailableItems = [...newAvailableItems, ...items];
       }
 
@@ -186,7 +200,7 @@ export function usePCRBatchItemGridControls({
 
       return {
         // availableItems: newAvailableItems.sort(itemSort),
-        availableItems: newAvailableItems,
+        availableItems: newAvailableItems?.filter((item) => item),
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -236,7 +250,7 @@ export function usePCRBatchItemGridControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
-      const pcrBatchItemsToSave = movedItems.map(movedItem => {
+      const materialSampleItemsToSave = movedItems.map(movedItem => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
           key => cellGrid[key] === movedItem
@@ -256,7 +270,7 @@ export function usePCRBatchItemGridControls({
         return movedItem;
       });
 
-      const saveArgs = pcrBatchItemsToSave.map(item => ({
+      const saveArgs = materialSampleItemsToSave.map(item => ({
         resource: item,
         type: "pcr-batch-item"
       }));
@@ -283,7 +297,7 @@ export function usePCRBatchItemGridControls({
     moveItems(items, "A_1");
   }
 
-  const loading = pcrBatchItemsLoading || itemsLoading || submitting;
+  const loading = materialSampleItemsLoading || itemsLoading || submitting;
 
   return {
     ...gridState,

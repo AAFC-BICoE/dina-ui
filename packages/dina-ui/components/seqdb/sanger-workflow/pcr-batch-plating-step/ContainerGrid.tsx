@@ -4,22 +4,23 @@ import ReactTable, { Column } from "react-table";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
 import { useState, useEffect } from "react";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
 
 interface ContainerGridProps {
   pcrBatchId: string;
   cellGrid: CellGrid;
-  movedItems: PcrBatchItem[];
-  onDrop: (item: PcrBatchItem, coords: string) => void;
+  movedItems: MaterialSample[];
+  onDrop: (item: MaterialSample, coords: string) => void;
 }
 
 interface GridCellProps {
-  onDrop: (item: { item: PcrBatchItem }) => void;
-  movedItems: PcrBatchItem[];
-  pcrBatchItem: PcrBatchItem;
+  onDrop: (item: { item: MaterialSample }) => void;
+  movedItems: MaterialSample[];
+  materialSampleItem: MaterialSample;
 }
 
 export interface CellGrid {
-  [key: string]: PcrBatchItem;
+  [key: string]: MaterialSample;
 }
 
 export function ContainerGrid({
@@ -44,10 +45,15 @@ export function ContainerGrid({
 
   useEffect(() => {
     getPcrBatch();
-    if(pcrBatch?.storageRestriction !== undefined){
+  }, []);
+
+  useEffect(() => {
+    if (!pcrBatch) return;
+
+    if (pcrBatch?.storageRestriction){
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-    }
-  });
+    }  
+  }, [pcrBatch])
   
   const columns: Column[] = [];
 
@@ -74,8 +80,8 @@ export function ContainerGrid({
           <span className={`well-${coords}`}>
             <GridCell
               movedItems={movedItems}
-              onDrop={({ item: newSample }) => onDrop(newSample, coords)}
-              pcrBatchItem={cellGrid[coords]}
+              onDrop={({ item: newItem }) => onDrop(newItem, coords)}
+              materialSampleItem={cellGrid[coords]}
             />
           </span>
         );
@@ -106,7 +112,7 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
+function GridCell({ onDrop, materialSampleItem, movedItems }: GridCellProps) {
   const [, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: item => onDrop(item as any)
@@ -114,11 +120,11 @@ function GridCell({ onDrop, pcrBatchItem, movedItems }: GridCellProps) {
 
   return (
     <div ref={drop} className="h-100 w-100">
-      {pcrBatchItem && (
+      {materialSampleItem && (
         <DraggablePCRBatchItemBox
-        pcrBatchItem={pcrBatchItem}
+          materialSampleItem={materialSampleItem}
           selected={false}
-          wasMoved={movedItems.includes(pcrBatchItem)}
+          wasMoved={movedItems.includes(materialSampleItem)}
         />
       )}
     </div>

@@ -5,28 +5,28 @@ import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
 interface DraggablePCRBatchItemBoxProps {
   onClick?: (e: any) => void;
-  pcrBatchItem: PcrBatchItem;
+  materialSampleItem: PcrBatchItem;
   selected: boolean;
   wasMoved: boolean;
 }
 
-export const ITEM_BOX_DRAG_KEY = "pcrBatchItem";
+export const ITEM_BOX_DRAG_KEY = "materialSampleItem";
 
 export function DraggablePCRBatchItemBox({
   onClick = noop,
-  pcrBatchItem,
+  materialSampleItem,
   selected,
   wasMoved
 }: DraggablePCRBatchItemBoxProps) {
   const [, drag] = useDrag({
-    item: { pcrBatchItem, type: ITEM_BOX_DRAG_KEY }
+    item: { materialSampleItem, type: ITEM_BOX_DRAG_KEY }
   });
 
   return (
     <li className="list-group-item p-0" onClick={onClick} ref={drag}>
       <RcTooltip
         placement="top"
-        overlay={<div style={{ maxWidth: "15rem" }}>{pcrBatchItem.id}</div>}
+        overlay={<div style={{ maxWidth: "15rem" }}>{materialSampleItem.id}</div>}
       >
         <div
           className="move-status-indicator list-group-item"
@@ -39,7 +39,7 @@ export function DraggablePCRBatchItemBox({
             cursor: "move"
           }}
         >
-          <span className="sample-box-text">{pcrBatchItem.id}</span>
+          <span className="sample-box-text">{materialSampleItem.id}</span>
         </div>
       </RcTooltip>
     </li>
