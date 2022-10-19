@@ -15,7 +15,7 @@ const mockOnSaved = jest.fn();
 
 const TEST_GROUP_1 = {
   type: "group",
-  name: "test-group-1",
+  name: "aafc",
   labels: { en: "Test Group 1" }
 };
 
@@ -192,7 +192,7 @@ async function mountForm(
     // Set the name:
     wrapper
       .find(".workflow-main-details .name-field input")
-      .simulate("change", { target: { value: "test-config" } });
+      .simulate("change", { target: { value: "form1" } });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -247,22 +247,23 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "tags",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "projects",
               visible: false
             },
+            { defaultValue: undefined, name: "assemblages", visible: false },
             {
-              name: "assemblages",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "publiclyReleasable",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "notPubliclyReleasableReason",
               visible: false
             }
@@ -272,26 +273,23 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "identifiers-section",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "collection", visible: false },
             {
-              name: "collection",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "materialSampleName",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "useNextSequence",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcOtherCatalogNumbers",
               visible: false
             },
-            {
-              name: "barcode",
-              visible: false
-            }
+            { defaultValue: undefined, name: "barcode", visible: false }
           ]
         }
       ]
@@ -306,25 +304,26 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "materialSampleType",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "materialSampleRemarks",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "materialSampleState",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "stateChangeRemarks",
               visible: false
             },
-            {
-              name: "stateChangedOn",
-              visible: false
-            }
+            { defaultValue: undefined, name: "stateChangedOn", visible: false }
           ]
         }
       ]
@@ -332,21 +331,20 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: "collecting-event-component",
       visible: false,
-      order: 3,
+      order: 2,
       sections: [
         {
           name: "general-section",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "tags", visible: false },
             {
-              name: "tags",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "publiclyReleasable",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "notPubliclyReleasableReason",
               visible: false
             }
@@ -356,10 +354,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "identifiers-section",
           visible: true,
           items: [
-            {
-              name: "dwcFieldNumber",
-              visible: false
-            }
+            { defaultValue: undefined, name: "dwcFieldNumber", visible: false }
           ]
         },
         {
@@ -367,14 +362,17 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "verbatimEventDateTime",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "startEventDateTime",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "endEventDateTime",
               visible: false
             }
@@ -384,15 +382,10 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "collecting-agents-section",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "dwcRecordedBy", visible: false },
+            { defaultValue: undefined, name: "collectors", visible: false },
             {
-              name: "dwcRecordedBy",
-              visible: false
-            },
-            {
-              name: "collectors",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "dwcRecordNumber",
               visible: false
             }
@@ -403,34 +396,38 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "dwcVerbatimLocality",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcVerbatimCoordinateSystem",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcVerbatimCoordinates",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcVerbatimLatitude",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcVerbatimLongitude",
               visible: false
             },
+            { defaultValue: undefined, name: "dwcVerbatimSRS", visible: false },
             {
-              name: "dwcVerbatimSRS",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "dwcVerbatimElevation",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcVerbatimDepth",
               visible: false
             }
@@ -440,42 +437,35 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "collecting-event-details",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "habitat", visible: false },
+            { defaultValue: undefined, name: "host", visible: false },
             {
-              name: "habitat",
-              visible: false
-            },
-            {
-              name: "host",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "collectionMethod",
               visible: false
             },
+            { defaultValue: undefined, name: "substrate", visible: false },
             {
-              name: "substrate",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "dwcMinimumElevationInMeters",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcMaximumElevationInMeters",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcMinimumDepthInMeters",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcMaximumDepthInMeters",
               visible: false
             },
-            {
-              name: "remarks",
-              visible: false
-            }
+            { defaultValue: undefined, name: "remarks", visible: false }
           ]
         },
         {
@@ -483,50 +473,62 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcDecimalLatitude",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcDecimalLongitude",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferencedDate",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeodeticDatum",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].literalGeoreferencedBy",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].georeferencedBy",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceProtocol",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceSources",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geoReferenceAssertions",
               visible: false
             }
@@ -536,15 +538,14 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "current-geographic-place",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "srcAdminLevels", visible: false },
             {
-              name: "srcAdminLevels",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "geographicPlaceNameSourceDetail.stateProvince",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "geographicPlaceNameSourceDetail.country",
               visible: false
             }
@@ -560,10 +561,12 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "managedAttributes.attachmentsConfig.allowNew",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "managedAttributes.attachmentsConfig.allowExisting",
               visible: false
             }
@@ -574,7 +577,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: "acquisition-event-component",
       visible: false,
-      order: 2,
+      order: 3,
       sections: [
         {
           name: "acquisition-event-reception-section",
@@ -585,15 +588,10 @@ const formTemplate: PersistedResource<FormTemplate> = {
               visible: false,
               defaultValue: "aafc"
             },
+            { defaultValue: undefined, name: "receivedFrom", visible: false },
+            { defaultValue: undefined, name: "receivedDate", visible: false },
             {
-              name: "receivedFrom",
-              visible: false
-            },
-            {
-              name: "receivedDate",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "receptionRemarks",
               visible: false
             }
@@ -603,15 +601,10 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "acquisition-event-isolation-section",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "isolatedBy", visible: false },
+            { defaultValue: undefined, name: "isolatedOn", visible: false },
             {
-              name: "isolatedBy",
-              visible: false
-            },
-            {
-              name: "isolatedOn",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "isolationRemarks",
               visible: false
             }
@@ -629,46 +622,53 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "preparationType",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationMethod",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preservationType",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationFixative",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationMaterials",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationSubstrate",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationRemarks",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "dwcDegreeOfEstablishment",
               visible: false
             },
+            { defaultValue: undefined, name: "preparedBy", visible: false },
             {
-              name: "preparedBy",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "preparationDate",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "preparationProtocol",
               visible: false
             }
@@ -686,21 +686,21 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "organism[0].lifeStage",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].sex",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].remarks",
               visible: false
             },
-            {
-              name: "organism",
-              visible: false
-            }
+            { defaultValue: undefined, name: "organism", visible: false }
           ]
         },
         {
@@ -708,22 +708,27 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].verbatimScientificName",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].verbatimDeterminer",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].verbatimDate",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].verbatimRemarks",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].transcriberRemarks",
               visible: false
             }
@@ -734,22 +739,27 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].scientificName",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].scientificNameInput",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].determiner",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].determinedOn",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].determinationRemarks",
               visible: false
             }
@@ -760,10 +770,12 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].typeStatus",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "organism[0].determination[0].typeStatusEvidence",
               visible: false
             }
@@ -786,10 +798,12 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "hostOrganism.name",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "hostOrganism.remarks",
               visible: false
             }
@@ -800,14 +814,17 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "associations.associationType",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "associations.associatedSample",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "associations.remarks",
               visible: false
             }
@@ -824,10 +841,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "storage-selection-section",
           visible: true,
           items: [
-            {
-              name: "storageUnit",
-              visible: false
-            }
+            { defaultValue: undefined, name: "storageUnit", visible: false }
           ]
         }
       ]
@@ -841,27 +855,13 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "restriction-general-section",
           visible: true,
           items: [
+            { defaultValue: undefined, name: "phac_animal_rg", visible: false },
+            { defaultValue: undefined, name: "cfia_ppc", visible: false },
+            { defaultValue: undefined, name: "phac_human_rg", visible: false },
+            { defaultValue: undefined, name: "phac_cl", visible: false },
+            { defaultValue: undefined, name: "isRestricted", visible: false },
             {
-              name: "phac_animal_rg",
-              visible: false
-            },
-            {
-              name: "cfia_ppc",
-              visible: false
-            },
-            {
-              name: "phac_human_rg",
-              visible: false
-            },
-            {
-              name: "phac_cl",
-              visible: false
-            },
-            {
-              name: "isRestricted",
-              visible: false
-            },
-            {
+              defaultValue: undefined,
               name: "restrictionRemarks",
               visible: false
             }
@@ -879,22 +879,27 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "scheduledAction.actionType",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "scheduledAction.actionStatus",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "scheduledAction.date",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "scheduledAction.assignedTo",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "scheduledAction.remarks",
               visible: false
             }
@@ -924,10 +929,12 @@ const formTemplate: PersistedResource<FormTemplate> = {
           visible: true,
           items: [
             {
+              defaultValue: undefined,
               name: "attachmentsConfig.allowNew",
               visible: false
             },
             {
+              defaultValue: undefined,
               name: "attachmentsConfig.allowExisting",
               visible: false
             }
@@ -966,8 +973,8 @@ describe("Workflow template edit page", () => {
     expect(navOrder).toEqual([
       "identifiers-component",
       "material-sample-info-component",
-      "acquisition-event-component",
       "collecting-event-component",
+      "acquisition-event-component",
       "preparations-component",
       "organisms-component",
       "associations-component",
@@ -977,6 +984,94 @@ describe("Workflow template edit page", () => {
       "managed-attributes-component",
       "material-sample-attachments-component"
     ]);
+  });
+
+  it("Submits a new action-definition: Only set collecting event template fields.", async () => {
+    const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
+      await mountForm();
+
+    await fillOutRequiredFields();
+
+    // Enable the component toggles:
+    await toggleColEvent(true);
+
+    // Include all col date fields:
+    wrapper
+      .find("input[name='includeAllCollectingDate']")
+      .simulate("change", { target: { checked: true } });
+    wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
+      target: { value: "test-verbatim-default-datetime" }
+    });
+
+    // Set default geo assertion lat/lng:
+    wrapper
+      .find(".dwcDecimalLatitude input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".dwcDecimalLongitude input[type='checkbox']")
+      .simulate("change", { target: { checked: true } });
+    wrapper
+      .find(".dwcDecimalLatitude input[type='text']")
+      .simulate("change", { target: { value: "1" } });
+    wrapper
+      .find(".dwcDecimalLongitude input[type='text']")
+      .simulate("change", { target: { value: "2" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    await submitForm();
+
+    // Set expected values values
+    const expected = JSON.parse(JSON.stringify(formTemplate));
+    const collectingEventComponent = expected!.components!.find(
+      (component) => component.name === "collecting-event-component"
+    );
+    collectingEventComponent!.visible = true;
+
+    // Hande collecting date section
+    const collectingDateSection = collectingEventComponent!.sections!.find(
+      (section) => section.name === "collecting-date-section"
+    );
+    const verbatimEventDateTime = collectingDateSection!.items!.find(
+      (item) => item.name === "verbatimEventDateTime"
+    );
+    verbatimEventDateTime!.defaultValue = "test-verbatim-default-datetime";
+    verbatimEventDateTime!.visible = true;
+    const startEventDateTime = collectingDateSection!.items!.find(
+      (item) => item.name === "startEventDateTime"
+    );
+    startEventDateTime!.visible = true;
+    const endEventDateTime = collectingDateSection!.items!.find(
+      (item) => item.name === "endEventDateTime"
+    );
+    endEventDateTime!.visible = true;
+
+    // Handle georeference assertions section
+    const georeferencingSection = collectingEventComponent!.sections!.find(
+      (section) => section.name === "georeferencing-section"
+    );
+    const geoReferenceAssertions = georeferencingSection!.items!.find(
+      (item) => item.name === "geoReferenceAssertions"
+    );
+    geoReferenceAssertions!.defaultValue = [
+      {
+        dwcDecimalLatitude: "1",
+        dwcDecimalLongitude: "2"
+      }
+    ];
+    const dwcDecimalLongitude = georeferencingSection!.items!.find(
+      (item) => item.name === "geoReferenceAssertions[0].dwcDecimalLongitude"
+    );
+    dwcDecimalLongitude!.visible = true;
+    dwcDecimalLongitude!.defaultValue = "2";
+    const dwcDecimalLatitude = georeferencingSection!.items!.find(
+      (item) => item.name === "geoReferenceAssertions[0].dwcDecimalLatitude"
+    );
+    dwcDecimalLatitude!.visible = true;
+    dwcDecimalLatitude!.defaultValue = "1";
+
+    expect(mockOnSaved).lastCalledWith(expected);
   });
 
   it("Edits an existing action-definition: Renders the form with minimal data.", async () => {
