@@ -15,7 +15,7 @@ import { FaRegFrown, FaCog, FaRegSadTear } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch } from "./types";
-import { map } from "lodash";
+import { map, cloneDeep } from "lodash";
 import { SavedSearchItem } from "./SavedSearchItem";
 import { DefaultBadge } from "./DefaultBadge";
 
@@ -141,7 +141,9 @@ export function SavedSearch({
     if (!userPreferences) return;
 
     // Look though the saved searches for the indexName to see if any are default.
-    return dropdownOptions.find((savedSearch) => savedSearch.default);
+    return cloneDeep(dropdownOptions).find(
+      (savedSearch) => savedSearch.default
+    );
   }
 
   /**
@@ -155,7 +157,7 @@ export function SavedSearch({
     if (!userPreferences || !savedSearchName) return;
 
     // Look though the saved searches for the indexName to see if any match the saved search name.
-    return dropdownOptions.find(
+    return cloneDeep(dropdownOptions).find(
       (savedSearch) => (savedSearch.savedSearchName = savedSearchName)
     );
   }
@@ -191,9 +193,15 @@ export function SavedSearch({
    * @param savedSearchName The saved search name.
    * @param setAsDefault If the new search should be saved as the default. This will unset any other
    * default saved searches.
+   * @param updateQueryTree This prop is useful for changing just the default value without touching
+   * the query tree already saved to it.
    */
-  const saveSearch = useCallback(
-    async (savedSearchName: string, setAsDefault: boolean) => {
+  const saveSavedSearch = useCallback(
+    async (
+      savedSearchName: string,
+      setAsDefault: boolean,
+      updateQueryTree: boolean
+    ) => {
       if (!queryBuilderTree) return;
 
       // Check if there already exists a saved search with that name.
@@ -296,7 +304,8 @@ export function SavedSearch({
   );
 
   const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
-    saveSearch,
+    saveSearch: (searchName, isDefault) =>
+      saveSavedSearch(searchName, isDefault, true),
     savedSearchNames:
       Object.keys(userPreferences?.savedSearches?.[indexName] ?? {}) ?? []
   });
@@ -347,6 +356,7 @@ export function SavedSearch({
                       return (
                         <SavedSearchItem
                           key={option.savedSearchName}
+                          currentSavedSearchName={selectedSavedSearch ?? ""}
                           onSavedSearchDelete={deleteSavedSearch}
                           onSavedSearchSelected={setSelectedSavedSearch}
                           savedSearch={option}
@@ -365,7 +375,11 @@ export function SavedSearch({
 
   // Wait until the user preferences have been loaded in.
   if (loading) {
-    return <LoadingSpinner loading={loading} />;
+    return (
+      <div className="float-end">
+        <LoadingSpinner loading={loading} />
+      </div>
+    );
   }
 
   return (
@@ -383,14 +397,32 @@ export function SavedSearch({
             <>
               {currentIsDefault ? (
                 <>
-                  <Dropdown.Item>Unset as default</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() =>
+                      saveSavedSearch(selectedSavedSearch, false, true)
+                    }
+                  >
+                    Unset as default
+                  </Dropdown.Item>
                 </>
               ) : (
                 <>
-                  <Dropdown.Item>Set as default</Dropdown.Item>
+                  <Dropdown.Item
+                    onClick={() =>
+                      saveSavedSearch(selectedSavedSearch, true, true)
+                    }
+                  >
+                    Set as default
+                  </Dropdown.Item>
                 </>
               )}
-              <Dropdown.Item>Overwrite</Dropdown.Item>
+              <Dropdown.Item
+                onClick={() =>
+                  saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
+                }
+              >
+                Overwrite
+              </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => deleteSavedSearch(selectedSavedSearch)}
               >

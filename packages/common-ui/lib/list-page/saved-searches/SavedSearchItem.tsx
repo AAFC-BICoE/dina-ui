@@ -5,12 +5,14 @@ import { DefaultBadge } from "./DefaultBadge";
 
 interface SavedSearchItemProps {
   savedSearch?: SingleSavedSearch;
+  currentSavedSearchName: string;
   onSavedSearchSelected: (savedSearchName: string) => void;
   onSavedSearchDelete: (savedSearchName: string) => void;
 }
 
 export function SavedSearchItem({
   savedSearch,
+  currentSavedSearchName,
   onSavedSearchSelected,
   onSavedSearchDelete
 }: SavedSearchItemProps) {
@@ -19,7 +21,15 @@ export function SavedSearchItem({
   }
 
   return (
-    <Card className="mt-2">
+    <Card
+      className="mt-2"
+      style={{
+        border:
+          currentSavedSearchName === savedSearch.savedSearchName
+            ? "2px solid #007bff"
+            : undefined
+      }}
+    >
       <Card.Body
         onClick={() => onSavedSearchSelected(savedSearch.savedSearchName ?? "")}
       >
