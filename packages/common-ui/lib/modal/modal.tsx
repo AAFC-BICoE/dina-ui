@@ -1,11 +1,4 @@
-import {
-  createContext,
-  Fragment,
-  ReactNode,
-  useContext,
-  useRef,
-  useState
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import ReactModal from "react-modal";
 
 interface ModalContextI {

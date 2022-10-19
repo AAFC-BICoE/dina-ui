@@ -52,7 +52,6 @@ export function SavedSearch({
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
-  const { openSavedSearchModal } = useSavedSearchModal();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
@@ -65,13 +64,21 @@ export function SavedSearch({
 
   const [error, setError] = useState<string>();
 
+  const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
+
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
 
-  // When mounted, load in the user preferences.
+  const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
+    saveSearch,
+    savedSearchNames:
+      Object.keys(userPreferences?.savedSearches?.[indexName] ?? {}) ?? []
+  });
+
+  // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
     retrieveUserPreferences();
-  }, []);
+  }, [lastLoaded]);
 
   // When a new saved search is selected.
   useEffect(() => {
@@ -202,6 +209,11 @@ export function SavedSearch({
     // set them as false.
     if (setAsDefault) {
       const currentDefault = getDefaultSavedSearch();
+      if (currentDefault && currentDefault.savedSearchName)
+        newSavedSearchOptions[indexName][currentDefault.savedSearchName] = {
+          ...newSavedSearchOptions[indexName][currentDefault.savedSearchName],
+          default: true
+        };
     }
 
     // Perform saving request.
@@ -214,6 +226,9 @@ export function SavedSearch({
       type: "user-preference"
     };
     await save([saveArgs], { apiBaseUrl: "/user-api" });
+
+    // Trigger a reload of the user preferences.
+    setLastLoaded(Date.now());
 
     // The newly saved option, should be switched to the selected.
     // loadSavedSearch(savedSearchName);
@@ -292,20 +307,9 @@ export function SavedSearch({
   };
 
   // Take the saved search options and convert to an option list.
-  // const DropdownOptions = Object.keys(
-  //   userPreferences?.savedSearches?.[indexName] ?? {}
-  // )
-  //   .sort()
-  //   .map((dropdownItem) => SavedSearchItem(dropdownItem));
-
-  // onClick={() => openSavedSearchModal({ saveSearch })}
-
-  // Take the saved search options and convert to an option list.
-  const DropdownOptions = [
-    "Saved Search #1",
-    "Saved Search #2",
-    "Saved Search #3"
-  ]
+  const DropdownOptions = Object.keys(
+    userPreferences?.savedSearches?.[indexName] ?? {}
+  )
     .sort()
     .map((dropdownItem) => SavedSearchItem(dropdownItem));
 
@@ -362,12 +366,15 @@ export function SavedSearch({
 
   return (
     <>
+      {SavedSearchModal}
       <Dropdown className="float-end" autoClose="outside">
         <Dropdown.Toggle variant="light" className="btn-empty">
           <FaCog />
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <Dropdown.Item href="#">Create new</Dropdown.Item>
+          <Dropdown.Item href="#" onClick={openSavedSearchModal}>
+            Create new
+          </Dropdown.Item>
           {selectedSavedSearch && (
             <>
               <Dropdown.Item href="#">Overwrite</Dropdown.Item>
