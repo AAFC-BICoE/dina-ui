@@ -2,7 +2,7 @@ import {
   DinaMessage,
   useDinaIntl
 } from "../../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
 import { useAccount } from "../../account/AccountProvider";
@@ -10,12 +10,14 @@ import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { Dropdown, Modal, Button, Card, Badge } from "react-bootstrap";
-import { FaRegFrown, FaTrash, FaCog, FaRegSadTear } from "react-icons/fa";
+import { Dropdown, Modal } from "react-bootstrap";
+import { FaRegFrown, FaCog, FaRegSadTear } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch } from "./types";
-import { mapKeys, values } from "lodash";
+import { map } from "lodash";
+import { SavedSearchItem } from "./SavedSearchItem";
+import { DefaultBadge } from "./DefaultBadge";
 
 export interface SavedSearchProps {
   /**
@@ -66,14 +68,22 @@ export function SavedSearch({
 
   const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
 
+  const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
+
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
 
-  const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
-    saveSearch,
-    savedSearchNames:
-      Object.keys(userPreferences?.savedSearches?.[indexName] ?? {}) ?? []
-  });
+  // List of all the saved searches for this index.
+  const dropdownOptions: SingleSavedSearch[] = useMemo(() => {
+    if (!userPreferences) return [];
+
+    return map(userPreferences?.savedSearches?.[indexName], (value, key) => {
+      return {
+        ...value,
+        savedSearchName: key
+      };
+    });
+  }, [userPreferences]);
 
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
@@ -89,7 +99,7 @@ export function SavedSearch({
 
   // User Preferences has been loaded in:
   useEffect(() => {
-    if (!userPreferences) return;
+    if (!userPreferences || defaultLoadedIn) return;
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
@@ -97,6 +107,7 @@ export function SavedSearch({
     if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
       loadSavedSearch(defaultSavedSearch.savedSearchName);
     }
+    setDefaultLoadedIn(true);
   }, [userPreferences]);
 
   /**
@@ -130,12 +141,7 @@ export function SavedSearch({
     if (!userPreferences) return;
 
     // Look though the saved searches for the indexName to see if any are default.
-    return values(
-      mapKeys(userPreferences?.savedSearches?.[indexName], (value, key) => {
-        value.savedSearchName = key;
-        return value;
-      })
-    ).find((savedSearch) => savedSearch.default);
+    return dropdownOptions.find((savedSearch) => savedSearch.default);
   }
 
   /**
@@ -146,15 +152,12 @@ export function SavedSearch({
   function getSavedSearch(
     savedSearchName: string
   ): SingleSavedSearch | undefined {
-    if (!userPreferences) return;
+    if (!userPreferences || !savedSearchName) return;
 
     // Look though the saved searches for the indexName to see if any match the saved search name.
-    return values(
-      mapKeys(userPreferences?.savedSearches?.[indexName], (value, key) => {
-        value.savedSearchName = key;
-        return value;
-      })
-    ).find((savedSearch) => (savedSearch.savedSearchName = savedSearchName));
+    return dropdownOptions.find(
+      (savedSearch) => (savedSearch.savedSearchName = savedSearchName)
+    );
   }
 
   /**
@@ -182,136 +185,121 @@ export function SavedSearch({
    * If an index does not exist yet for a user's saved search, this method will create that level
    * as well.
    *
-   * ! Please note that saving will OVERRIDE existing settings if named exactly the same currently !
+   * Saved Searches with the same name will overwrite existing saved searches. A warning will appear
+   * to let the user know.
    *
    * @param savedSearchName The saved search name.
    * @param setAsDefault If the new search should be saved as the default. This will unset any other
    * default saved searches.
    */
-  async function saveSearch(savedSearchName: string, setAsDefault: boolean) {
-    if (!queryBuilderTree) return;
+  const saveSearch = useCallback(
+    async (savedSearchName: string, setAsDefault: boolean) => {
+      if (!queryBuilderTree) return;
 
-    // Check if there already exists a saved search with that name.
+      // Check if there already exists a saved search with that name.
 
-    // Copy any existing settings, just add/alter the saved search name.
-    const newSavedSearchOptions: SavedSearchStructure = {
-      ...userPreferences?.savedSearches,
-      [indexName]: {
-        ...userPreferences?.savedSearches?.[indexName],
-        [savedSearchName]: {
-          default: setAsDefault,
-          queryTree: Utils.getTree(queryBuilderTree)
+      // Copy any existing settings, just add/alter the saved search name.
+      const newSavedSearchOptions: SavedSearchStructure = {
+        ...userPreferences?.savedSearches,
+        [indexName]: {
+          ...userPreferences?.savedSearches?.[indexName],
+          [savedSearchName]: {
+            default: setAsDefault,
+            queryTree: Utils.getTree(queryBuilderTree)
+          }
+        }
+      };
+
+      // If default is being set, then we must check the other saved searches under this index and
+      // set them as false.
+      if (setAsDefault) {
+        const currentDefault = getDefaultSavedSearch();
+        if (currentDefault && currentDefault.savedSearchName) {
+          newSavedSearchOptions[indexName][currentDefault.savedSearchName] = {
+            ...newSavedSearchOptions[indexName][currentDefault.savedSearchName],
+            default: false
+          };
         }
       }
-    };
 
-    // If default is being set, then we must check the other saved searches under this index and
-    // set them as false.
-    if (setAsDefault) {
-      const currentDefault = getDefaultSavedSearch();
-      if (currentDefault && currentDefault.savedSearchName)
-        newSavedSearchOptions[indexName][currentDefault.savedSearchName] = {
-          ...newSavedSearchOptions[indexName][currentDefault.savedSearchName],
-          default: true
-        };
-    }
-
-    // Perform saving request.
-    const saveArgs: SaveArgs<UserPreference> = {
-      resource: {
-        id: userPreferenceID ?? null,
-        userId: subject,
-        savedSearches: newSavedSearchOptions
-      } as any,
-      type: "user-preference"
-    };
-    await save([saveArgs], { apiBaseUrl: "/user-api" });
-
-    // Trigger a reload of the user preferences.
-    setLastLoaded(Date.now());
-
-    // The newly saved option, should be switched to the selected.
-    // loadSavedSearch(savedSearchName);
-  }
-
-  /**
-   * Delete a saved search from the saved search name. A prompt will appear asking the user they
-   * are sure they want to delete the record.
-   *
-   * Once a saved search is deleted, the user will go back to the default or the first option in the
-   * list.
-   *
-   * @param savedSearchName The saved search name to delete from the the saved search options.
-   */
-  async function deleteSavedSearch(savedSearchName: string) {
-    async function deleteSearch() {
-      // User preference ID needs to be set in order to delete the record.
-      if (!userPreferenceID) return;
-
-      // Delete the key from the search options.
-      delete userPreferences?.savedSearches?.[indexName]?.[savedSearchName];
-
+      // Perform saving request.
       const saveArgs: SaveArgs<UserPreference> = {
         resource: {
-          id: userPreferenceID,
+          id: userPreferenceID ?? null,
           userId: subject,
-          savedSearches: userPreferences?.savedSearches
+          savedSearches: newSavedSearchOptions
         } as any,
         type: "user-preference"
       };
       await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-      // loadSavedSearch("default");
-    }
+      // Trigger a reload of the user preferences.
+      setLastLoaded(Date.now());
 
-    // Ask the user if they sure they want to delete the saved search.
-    openModal(
-      <AreYouSureModal
-        actionMessage={
-          <>
-            <DinaMessage id="removeSavedSearch" /> {`${savedSearchName ?? ""}`}{" "}
-          </>
-        }
-        onYesButtonClicked={deleteSearch}
-      />
-    );
-  }
+      // The newly saved option, should be switched to the selected.
+      setSelectedSavedSearch(savedSearchName);
+      setCurrentIsDefault(setAsDefault);
+    },
+    [userPreferences, queryBuilderTree]
+  );
 
-  // Wait until the user preferences have been loaded in.
-  if (loading) {
-    return <LoadingSpinner loading={loading} />;
-  }
+  /**
+   * Delete a saved search from the saved search name. A prompt will appear asking the user they
+   * are sure they want to delete the record.
+   *
+   * Once a saved search is deleted, the selected saved search is cleared.
+   *
+   * @param savedSearchName The saved search name to delete from the the saved search options.
+   */
+  const deleteSavedSearch = useCallback(
+    async (savedSearchName: string) => {
+      async function deleteSearch() {
+        // User preference ID needs to be set in order to delete the record.
+        if (!userPreferenceID) return;
 
-  const DefaultBadge = () => {
-    return (
-      <Badge bg="secondary" className="ms-2">
-        Default
-      </Badge>
-    );
-  };
+        // Delete the key from the search options.
+        const newSavedSearchStructure =
+          userPreferences?.savedSearches?.[indexName];
+        delete newSavedSearchStructure?.[savedSearchName];
 
-  const SavedSearchItem = (savedSearchName: string) => {
-    return (
-      <Card key={savedSearchName} className="mt-2">
-        <Card.Body onClick={() => setSelectedSavedSearch(savedSearchName)}>
-          <Card.Title>
-            {savedSearchName}
-            {DefaultBadge()}
-            <Button className="float-end" variant="light">
-              <FaTrash />
-            </Button>
-          </Card.Title>
-        </Card.Body>
-      </Card>
-    );
-  };
+        const saveArgs: SaveArgs<UserPreference> = {
+          resource: {
+            id: userPreferenceID,
+            userId: subject,
+            savedSearches: userPreferences?.savedSearches
+          } as any,
+          type: "user-preference"
+        };
+        await save([saveArgs], { apiBaseUrl: "/user-api" });
 
-  // Take the saved search options and convert to an option list.
-  const DropdownOptions = Object.keys(
-    userPreferences?.savedSearches?.[indexName] ?? {}
-  )
-    .sort()
-    .map((dropdownItem) => SavedSearchItem(dropdownItem));
+        // Unselect the saved search.
+        setSelectedSavedSearch(undefined);
+
+        // Reload the user preference list.
+        setLastLoaded(Date.now());
+      }
+
+      // Ask the user if they sure they want to delete the saved search.
+      openModal(
+        <AreYouSureModal
+          actionMessage={
+            <>
+              <DinaMessage id="removeSavedSearch" />{" "}
+              {`${savedSearchName ?? ""}`}{" "}
+            </>
+          }
+          onYesButtonClicked={deleteSearch}
+        />
+      );
+    },
+    [userPreferences]
+  );
+
+  const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
+    saveSearch,
+    savedSearchNames:
+      Object.keys(userPreferences?.savedSearches?.[indexName] ?? {}) ?? []
+  });
 
   const CustomMenu = React.forwardRef(
     (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
@@ -346,7 +334,7 @@ export function SavedSearch({
               </div>
             ) : (
               <>
-                {DropdownOptions.length === 0 ? (
+                {dropdownOptions.length === 0 ? (
                   <div style={{ textAlign: "center" }}>
                     <h2>
                       <FaRegFrown />
@@ -354,7 +342,18 @@ export function SavedSearch({
                     <p>No saved searches have been created yet</p>
                   </div>
                 ) : (
-                  DropdownOptions
+                  <>
+                    {dropdownOptions.map((option) => {
+                      return (
+                        <SavedSearchItem
+                          key={option.savedSearchName}
+                          onSavedSearchDelete={deleteSavedSearch}
+                          onSavedSearchSelected={setSelectedSavedSearch}
+                          savedSearch={option}
+                        />
+                      );
+                    })}
+                  </>
                 )}
               </>
             )}
@@ -364,6 +363,11 @@ export function SavedSearch({
     }
   );
 
+  // Wait until the user preferences have been loaded in.
+  if (loading) {
+    return <LoadingSpinner loading={loading} />;
+  }
+
   return (
     <>
       {SavedSearchModal}
@@ -372,14 +376,26 @@ export function SavedSearch({
           <FaCog />
         </Dropdown.Toggle>
         <Dropdown.Menu>
-          <Dropdown.Item href="#" onClick={openSavedSearchModal}>
+          <Dropdown.Item onClick={openSavedSearchModal}>
             Create new
           </Dropdown.Item>
           {selectedSavedSearch && (
             <>
-              <Dropdown.Item href="#">Overwrite</Dropdown.Item>
-              <Dropdown.Item href="#">Set as default</Dropdown.Item>
-              <Dropdown.Item href="#">Delete</Dropdown.Item>
+              {currentIsDefault ? (
+                <>
+                  <Dropdown.Item>Unset as default</Dropdown.Item>
+                </>
+              ) : (
+                <>
+                  <Dropdown.Item>Set as default</Dropdown.Item>
+                </>
+              )}
+              <Dropdown.Item>Overwrite</Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => deleteSavedSearch(selectedSavedSearch)}
+              >
+                Delete
+              </Dropdown.Item>
             </>
           )}
         </Dropdown.Menu>
@@ -387,7 +403,7 @@ export function SavedSearch({
       <Dropdown className="float-end" autoClose="outside">
         <Dropdown.Toggle variant="light" className="btn-empty">
           {selectedSavedSearch ?? "Saved Searches"}
-          {currentIsDefault && DefaultBadge()}
+          <DefaultBadge displayBadge={currentIsDefault} />
         </Dropdown.Toggle>
         <Dropdown.Menu as={CustomMenu} />
       </Dropdown>
