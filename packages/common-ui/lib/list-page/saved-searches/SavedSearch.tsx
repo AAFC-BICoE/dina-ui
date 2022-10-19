@@ -2,19 +2,20 @@ import {
   DinaMessage,
   useDinaIntl
 } from "../../../../dina-ui/intl/dina-ui-intl";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "packages/dina-ui/types/user-api";
-import { useFormikContext } from "formik";
 import { useAccount } from "../../account/AccountProvider";
 import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
 import { Dropdown, Modal, Button, Card, Badge } from "react-bootstrap";
-import { FaRegFrown, FaTrash, FaCog } from "react-icons/fa";
+import { FaRegFrown, FaTrash, FaCog, FaRegSadTear } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
-import { ImmutableTree } from "react-awesome-query-builder";
+import { ImmutableTree, Utils } from "react-awesome-query-builder";
+import { SavedSearchStructure, SingleSavedSearch } from "./types";
+import { mapKeys, values } from "lodash";
 
 export interface SavedSearchProps {
   /**
@@ -52,24 +53,44 @@ export function SavedSearch({
   const { openModal } = useModal();
   const { subject } = useAccount();
   const { openSavedSearchModal } = useSavedSearchModal();
-  const formik = useFormikContext();
 
   // Users saved preferences.
   const [userPreferences, setUserPreferences] = useState<UserPreference>();
 
   const [selectedSavedSearch, setSelectedSavedSearch] = useState<string>();
 
-  const [currentIsDefault, setCurrentIsDefault] = useState<boolean>(true);
+  const [currentIsDefault, setCurrentIsDefault] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(true);
+
+  const [error, setError] = useState<string>();
+
+  // Using the user preferences get the options and user preferences.
+  const userPreferenceID = userPreferences?.id;
 
   // When mounted, load in the user preferences.
   useEffect(() => {
     retrieveUserPreferences();
   }, []);
 
-  // Using the user preferences get the options and user preferences.
-  const userPreferenceID = userPreferences?.id;
+  // When a new saved search is selected.
+  useEffect(() => {
+    if (!selectedSavedSearch && !userPreferences) return;
+
+    loadSavedSearch(selectedSavedSearch ?? "");
+  }, [selectedSavedSearch]);
+
+  // User Preferences has been loaded in:
+  useEffect(() => {
+    if (!userPreferences) return;
+
+    // User preferences have been loaded in, we can now check for the default saved search if it
+    // exists and pre-load it in.
+    const defaultSavedSearch = getDefaultSavedSearch();
+    if (defaultSavedSearch && defaultSavedSearch.savedSearchName) {
+      loadSavedSearch(defaultSavedSearch.savedSearchName);
+    }
+  }, [userPreferences]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -89,10 +110,60 @@ export function SavedSearch({
         setLoading(false);
       })
       .catch((userPreferenceError) => {
-        // setError(userPreferenceError);
+        setError(userPreferenceError);
         setUserPreferences(undefined);
         setLoading(false);
       });
+  }
+
+  /**
+   * Checks if the user has a default saved search, if one does exist, it will be returned
+   */
+  function getDefaultSavedSearch(): SingleSavedSearch | undefined {
+    if (!userPreferences) return;
+
+    // Look though the saved searches for the indexName to see if any are default.
+    return values(
+      mapKeys(userPreferences?.savedSearches?.[indexName], (value, key) => {
+        value.savedSearchName = key;
+        return value;
+      })
+    ).find((savedSearch) => savedSearch.default);
+  }
+
+  /**
+   * Look through all of the users saved searches for the indexName and find a matching name.
+   *
+   * @param savedSearchName name to search the saved searches against.
+   */
+  function getSavedSearch(
+    savedSearchName: string
+  ): SingleSavedSearch | undefined {
+    if (!userPreferences) return;
+
+    // Look though the saved searches for the indexName to see if any match the saved search name.
+    return values(
+      mapKeys(userPreferences?.savedSearches?.[indexName], (value, key) => {
+        value.savedSearchName = key;
+        return value;
+      })
+    ).find((savedSearch) => (savedSearch.savedSearchName = savedSearchName));
+  }
+
+  /**
+   * Find the saved search in the user preference and loads in the QueryBuilder tree.
+   *
+   * For loading the default search, checkout the `loadDefaultSavedSearch()` instead.
+   *
+   * @param savedSearchName Name of the saved search to load into the query builder.
+   */
+  function loadSavedSearch(savedSearchName: string) {
+    const savedSearchToLoad = getSavedSearch(savedSearchName);
+
+    if (savedSearchToLoad && savedSearchToLoad.savedSearchName) {
+      setSelectedSavedSearch(savedSearchName);
+      setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
+    }
   }
 
   /**
@@ -106,27 +177,32 @@ export function SavedSearch({
    *
    * ! Please note that saving will OVERRIDE existing settings if named exactly the same currently !
    *
-   * @param savedSearchName The saved search name. "default" is a special case, doesn't change how
-   *    it's saved but will load that search automatically.
+   * @param savedSearchName The saved search name.
+   * @param setAsDefault If the new search should be saved as the default. This will unset any other
+   * default saved searches.
    */
-  async function saveSearch(savedSearchName: string) {
-    // Before saving, remove irrelevant formik field array properties.
-    (formik.values as any).queryRows?.map((val) => {
-      delete val.props;
-      delete val.key;
-      delete val._store;
-      delete val._owner;
-      delete val.ref;
-    });
+  async function saveSearch(savedSearchName: string, setAsDefault: boolean) {
+    if (!queryBuilderTree) return;
+
+    // Check if there already exists a saved search with that name.
 
     // Copy any existing settings, just add/alter the saved search name.
-    const newSavedSearchOptions = {
+    const newSavedSearchOptions: SavedSearchStructure = {
       ...userPreferences?.savedSearches,
       [indexName]: {
         ...userPreferences?.savedSearches?.[indexName],
-        [savedSearchName]: formik.values
+        [savedSearchName]: {
+          default: setAsDefault,
+          queryTree: Utils.getTree(queryBuilderTree)
+        }
       }
     };
+
+    // If default is being set, then we must check the other saved searches under this index and
+    // set them as false.
+    if (setAsDefault) {
+      const currentDefault = getDefaultSavedSearch();
+    }
 
     // Perform saving request.
     const saveArgs: SaveArgs<UserPreference> = {
@@ -193,7 +269,7 @@ export function SavedSearch({
 
   const DefaultBadge = () => {
     return (
-      <Badge bg="primary" className="ms-2">
+      <Badge bg="secondary" className="ms-2">
         Default
       </Badge>
     );
@@ -205,7 +281,7 @@ export function SavedSearch({
         <Card.Body onClick={() => setSelectedSavedSearch(savedSearchName)}>
           <Card.Title>
             {savedSearchName}
-            {DefaultBadge}
+            {DefaultBadge()}
             <Button className="float-end" variant="light">
               <FaTrash />
             </Button>
@@ -257,15 +333,26 @@ export function SavedSearch({
               background: "#f9f9f9"
             }}
           >
-            {DropdownOptions.length === 0 ? (
+            {error ? (
               <div style={{ textAlign: "center" }}>
                 <h2>
-                  <FaRegFrown />
+                  <FaRegSadTear />
                 </h2>
-                <p>No saved searches have been created yet</p>
+                <p>Unable to retrieve saved searches, please try again later</p>
               </div>
             ) : (
-              DropdownOptions
+              <>
+                {DropdownOptions.length === 0 ? (
+                  <div style={{ textAlign: "center" }}>
+                    <h2>
+                      <FaRegFrown />
+                    </h2>
+                    <p>No saved searches have been created yet</p>
+                  </div>
+                ) : (
+                  DropdownOptions
+                )}
+              </>
             )}
           </Modal.Body>
         </div>
@@ -275,13 +362,25 @@ export function SavedSearch({
 
   return (
     <>
-      <Button className="float-end btn-empty" variant="light">
-        <FaCog />
-      </Button>
-      <Dropdown className="float-end">
+      <Dropdown className="float-end" autoClose="outside">
+        <Dropdown.Toggle variant="light" className="btn-empty">
+          <FaCog />
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          <Dropdown.Item href="#">Create new</Dropdown.Item>
+          {selectedSavedSearch && (
+            <>
+              <Dropdown.Item href="#">Overwrite</Dropdown.Item>
+              <Dropdown.Item href="#">Set as default</Dropdown.Item>
+              <Dropdown.Item href="#">Delete</Dropdown.Item>
+            </>
+          )}
+        </Dropdown.Menu>
+      </Dropdown>
+      <Dropdown className="float-end" autoClose="outside">
         <Dropdown.Toggle variant="light" className="btn-empty">
           {selectedSavedSearch ?? "Saved Searches"}
-          {currentIsDefault && DefaultBadge}
+          {currentIsDefault && DefaultBadge()}
         </Dropdown.Toggle>
         <Dropdown.Menu as={CustomMenu} />
       </Dropdown>
