@@ -13,5 +13,5 @@ export interface SingleSavedSearch {
   // This field is not saved in the JSON.
   savedSearchName?: string;
   default: boolean;
-  queryTree: JsonTree;
+  queryTree?: JsonTree;
 }

@@ -158,7 +158,7 @@ export function SavedSearch({
 
     // Look though the saved searches for the indexName to see if any match the saved search name.
     return cloneDeep(dropdownOptions).find(
-      (savedSearch) => (savedSearch.savedSearchName = savedSearchName)
+      (savedSearch) => savedSearch.savedSearchName === savedSearchName
     );
   }
 
@@ -172,8 +172,13 @@ export function SavedSearch({
   function loadSavedSearch(savedSearchName: string) {
     const savedSearchToLoad = getSavedSearch(savedSearchName);
 
-    if (savedSearchToLoad && savedSearchToLoad.savedSearchName) {
-      setSelectedSavedSearch(savedSearchName);
+    if (
+      savedSearchToLoad &&
+      savedSearchToLoad.savedSearchName &&
+      savedSearchToLoad.queryTree
+    ) {
+      setSelectedSavedSearch(savedSearchToLoad.savedSearchName);
+      setCurrentIsDefault(savedSearchToLoad.default);
       setQueryBuilderTree(Utils.loadTree(savedSearchToLoad.queryTree));
     }
   }
@@ -204,8 +209,6 @@ export function SavedSearch({
     ) => {
       if (!queryBuilderTree) return;
 
-      // Check if there already exists a saved search with that name.
-
       // Copy any existing settings, just add/alter the saved search name.
       const newSavedSearchOptions: SavedSearchStructure = {
         ...userPreferences?.savedSearches,
@@ -213,7 +216,13 @@ export function SavedSearch({
           ...userPreferences?.savedSearches?.[indexName],
           [savedSearchName]: {
             default: setAsDefault,
-            queryTree: Utils.getTree(queryBuilderTree)
+
+            // If updateQueryTree is true, then we will retrieve the current query tree from the
+            // query builder, otherwise it will remain the same as before.
+            queryTree: updateQueryTree
+              ? Utils.getTree(queryBuilderTree)
+              : userPreferences?.savedSearches?.[indexName]?.[savedSearchName]
+                  ?.queryTree ?? undefined
           }
         }
       };
@@ -282,6 +291,7 @@ export function SavedSearch({
 
         // Unselect the saved search.
         setSelectedSavedSearch(undefined);
+        setCurrentIsDefault(false);
 
         // Reload the user preference list.
         setLastLoaded(Date.now());
@@ -303,11 +313,33 @@ export function SavedSearch({
     [userPreferences]
   );
 
+  const overwriteCurrentSearch = useCallback(async () => {
+    if (!selectedSavedSearch) return;
+
+    // Ask the user if they are sure they want to overwrite the current search.
+    openModal(
+      <AreYouSureModal
+        actionMessage={
+          <>
+            Are you sure you want to overwrite "{selectedSavedSearch}" with the
+            current search?
+          </>
+        }
+        onYesButtonClicked={() =>
+          saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
+        }
+      />
+    );
+  }, [userPreferences]);
+
+  // Setup the create new modal, it's hidden from the user until it's requested.
   const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
     saveSearch: (searchName, isDefault) =>
       saveSavedSearch(searchName, isDefault, true),
     savedSearchNames:
-      Object.keys(userPreferences?.savedSearches?.[indexName] ?? {}) ?? []
+      Object.keys(
+        cloneDeep(userPreferences)?.savedSearches?.[indexName] ?? {}
+      ) ?? []
   });
 
   const CustomMenu = React.forwardRef(
@@ -399,7 +431,7 @@ export function SavedSearch({
                 <>
                   <Dropdown.Item
                     onClick={() =>
-                      saveSavedSearch(selectedSavedSearch, false, true)
+                      saveSavedSearch(selectedSavedSearch, false, false)
                     }
                   >
                     Unset as default
@@ -409,18 +441,14 @@ export function SavedSearch({
                 <>
                   <Dropdown.Item
                     onClick={() =>
-                      saveSavedSearch(selectedSavedSearch, true, true)
+                      saveSavedSearch(selectedSavedSearch, true, false)
                     }
                   >
                     Set as default
                   </Dropdown.Item>
                 </>
               )}
-              <Dropdown.Item
-                onClick={() =>
-                  saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
-                }
-              >
+              <Dropdown.Item onClick={() => overwriteCurrentSearch()}>
                 Overwrite
               </Dropdown.Item>
               <Dropdown.Item

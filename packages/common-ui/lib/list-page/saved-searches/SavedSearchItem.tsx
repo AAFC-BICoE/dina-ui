@@ -1,4 +1,4 @@
-import { Card, Button } from "react-bootstrap";
+import { Card, Button, Stack } from "react-bootstrap";
 import { SingleSavedSearch } from "./types";
 import { FaTrash } from "react-icons/fa";
 import { DefaultBadge } from "./DefaultBadge";
@@ -27,25 +27,37 @@ export function SavedSearchItem({
         border:
           currentSavedSearchName === savedSearch.savedSearchName
             ? "2px solid #007bff"
-            : undefined
+            : undefined,
+        cursor: "pointer"
       }}
     >
       <Card.Body
         onClick={() => onSavedSearchSelected(savedSearch.savedSearchName ?? "")}
       >
-        <Card.Title>
-          {savedSearch?.savedSearchName}
-          <DefaultBadge displayBadge={savedSearch.default} />
-          <Button
-            className="float-end"
-            variant="danger"
-            onClick={() =>
-              onSavedSearchDelete(savedSearch.savedSearchName ?? "")
-            }
-          >
-            <FaTrash />
-          </Button>
-        </Card.Title>
+        <Card.Text>
+          <Stack direction="horizontal" gap={3}>
+            <p
+              className="mt-0 mb-0"
+              style={{
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                whiteSpace: "nowrap"
+              }}
+            >
+              {savedSearch?.savedSearchName}
+            </p>
+            <DefaultBadge displayBadge={savedSearch.default} />
+            <Button
+              className="ms-auto"
+              variant="danger"
+              onClick={() =>
+                onSavedSearchDelete(savedSearch.savedSearchName ?? "")
+              }
+            >
+              <FaTrash />
+            </Button>
+          </Stack>
+        </Card.Text>
       </Card.Body>
     </Card>
   );
