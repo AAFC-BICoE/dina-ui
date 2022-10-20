@@ -19,17 +19,17 @@ export function MaterialSampleFormTemplateSelect({
       </div>
       <div style={{ width: "20rem" }}>
         <FieldSpy<string> fieldName="group">
-          {group => (
+          {(group) => (
             <ResourceSelect<FormTemplate>
-              filter={input => ({
+              filter={(input) => ({
                 // Filter by "material-sample-form-section-order" to omit unrelated form-template records:
-                "viewConfiguration.type": "material-sample-form-template",
+                // "viewConfiguration.type": "material-sample-form-template",
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
                 // Filter by the form's group:
                 ...(group && { group: { EQ: `${group}` } })
               })}
-              optionLabel={view => view.name || view.id}
+              optionLabel={(view) => view.name || view.id}
               model="collection-api/form-template"
               onChange={onChange}
               value={value}

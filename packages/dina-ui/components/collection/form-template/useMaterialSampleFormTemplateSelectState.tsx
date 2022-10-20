@@ -1,6 +1,15 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
-import { FormTemplate } from "../../../types/collection-api";
+import { z } from "zod";
+import {
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FormTemplate
+} from "../../../types/collection-api";
+import {
+  getAllComponentValues,
+  getComponentValues
+} from "../../form-template/formTemplateUtils";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 
@@ -13,12 +22,36 @@ export function useMaterialSampleFormTemplateSelectState() {
   const [sampleFormTemplate, setSampleFormTemplate] =
     useState<PersistedResource<FormTemplate>>();
 
+  // Get initial values of data components
+  const materialSampleComponent = getAllComponentValues(sampleFormTemplate);
+  if (!materialSampleComponent.associations?.length) {
+    materialSampleComponent.associations = [{}];
+  }
+
+  // collecting event and acquisition components need to be isolated for useMaterialSample hook
+  const collectingEventComponent = {
+    ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, sampleFormTemplate),
+    managedAttributesOrder: []
+  };
+
+  const acquisitionEventComponent = getComponentValues(
+    ACQUISITION_EVENT_COMPONENT_NAME,
+    sampleFormTemplate
+  );
+
+  const materialSampleFormTemplate = {
+    formTemplate: {
+      COLLECTING_EVENT: getFormTemplateSchema(collectingEventComponent),
+      MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent),
+      ACQUISITION_EVENT: getFormTemplateSchema(acquisitionEventComponent)
+    },
+    type: "material-sample-form-template"
+  };
+
   const formTemplateConfig = useMemo(
     () =>
       sampleFormTemplate?.id
-        ? materialSampleFormTemplateSchema.parse(
-            sampleFormTemplate?.viewConfiguration
-          )
+        ? materialSampleFormTemplateSchema.parse(materialSampleFormTemplate)
         : undefined,
     [sampleFormTemplate]
   );
@@ -39,4 +72,20 @@ export function useMaterialSampleFormTemplateSelectState() {
     enabledFields,
     visibleManagedAttributeKeys
   };
+}
+function getFormTemplateSchema(component: any) {
+  component.templateFields = {};
+  const schema = {
+    allowExisting: false,
+    allowNew: false,
+    templateFields: {}
+  };
+
+  Object.keys(component).forEach((key) => {
+    schema.templateFields[key] = {
+      defaultValue: component[key],
+      enabled: true
+    };
+  });
+  return schema;
 }
