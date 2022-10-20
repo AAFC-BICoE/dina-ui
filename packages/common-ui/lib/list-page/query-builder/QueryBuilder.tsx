@@ -9,7 +9,7 @@ import {
 import React from "react";
 import { Button } from "react-bootstrap";
 import { SavedSearch } from "../saved-searches/SavedSearch";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 interface QueryBuilderProps {
   /**

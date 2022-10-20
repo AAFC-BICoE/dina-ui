@@ -1,4 +1,7 @@
-import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import { Modal, Button, Form, Alert } from "react-bootstrap";
 import { useState, useMemo } from "react";
 
@@ -43,25 +46,31 @@ export function useSavedSearchModal({
   const SavedSearchModal = (
     <Modal show={displayModal} centered={true}>
       <Modal.Header closeButton={true} onHide={closeSavedSearchModal}>
-        <Modal.Title>Create Saved Search</Modal.Title>
+        <Modal.Title>
+          <DinaMessage id="createSavedSearch" />
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         {overwriteWarning && (
           <Alert variant={"warning"}>
-            There is currently already a saved search named "{savedSearchName}".
-            Creating this saved search will overwrite the existing saved search.
+            <DinaMessage
+              id="savedSearchOverwriteExisting"
+              values={{ savedSearchName }}
+            />
           </Alert>
         )}
 
         <Form>
           <Form.Group className="mb-3" controlId="savedSearchName">
             <Form.Label>
-              <strong>Saved Search Name:</strong>
+              <strong>
+                <DinaMessage id="savedSearchName" />:
+              </strong>
             </Form.Label>
             <Form.Control
               type="text"
-              placeholder="Saved Search Name"
+              placeholder={formatMessage("savedSearchName")}
               required={true}
               defaultValue={savedSearchName}
               onChange={(event) => {
@@ -73,7 +82,7 @@ export function useSavedSearchModal({
           <Form.Group className="mb-3" controlId="isDefault">
             <Form.Check
               type="checkbox"
-              label="Set as default"
+              label={formatMessage("setAsDefault")}
               defaultChecked={isDefault}
               onChange={(event) => {
                 setIsDefault(event?.target.checked);
@@ -85,14 +94,14 @@ export function useSavedSearchModal({
 
       <Modal.Footer>
         <Button variant="secondary" onClick={closeSavedSearchModal}>
-          Close
+          <DinaMessage id="cancelButtonText" />
         </Button>
         <Button
           variant="primary"
           onClick={submit}
           disabled={savedSearchName === ""}
         >
-          Create
+          <DinaMessage id="create" />
         </Button>
       </Modal.Footer>
     </Modal>

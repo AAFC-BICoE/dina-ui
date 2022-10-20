@@ -1,7 +1,7 @@
 import { Card, Button, Stack } from "react-bootstrap";
 import { SingleSavedSearch } from "./types";
 import { FaTrash } from "react-icons/fa";
-import { DefaultBadge } from "./DefaultBadge";
+import { DefaultBadge } from "./SavedSearchBadges";
 
 interface SavedSearchItemProps {
   savedSearch?: SingleSavedSearch;

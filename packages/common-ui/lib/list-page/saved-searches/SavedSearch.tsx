@@ -4,20 +4,20 @@ import {
 } from "../../../../dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSavedSearchModal } from "./useSavedSearchModal";
-import { UserPreference } from "packages/dina-ui/types/user-api";
+import { UserPreference } from "../../../../dina-ui/types/user-api";
 import { useAccount } from "../../account/AccountProvider";
 import { useModal } from "../../modal/modal";
 import { SaveArgs, useApiClient } from "../../api-client/ApiClientContext";
 import { AreYouSureModal } from "../../modal/AreYouSureModal";
 import { FilterParam } from "kitsu";
-import { Dropdown, Modal } from "react-bootstrap";
-import { FaRegFrown, FaCog, FaRegSadTear } from "react-icons/fa";
+import { Dropdown } from "react-bootstrap";
+import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch } from "./types";
 import { map, cloneDeep } from "lodash";
-import { SavedSearchItem } from "./SavedSearchItem";
-import { DefaultBadge } from "./DefaultBadge";
+import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
+import { NotSavedBadge } from "./SavedSearchBadges";
 
 export interface SavedSearchProps {
   /**
@@ -38,13 +38,18 @@ export interface SavedSearchProps {
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
 }
 
-type CustomMenuProps = {
-  children?: React.ReactNode;
-  style?: React.CSSProperties;
-  className?: string;
-  labeledBy?: string;
-};
-
+/**
+ * This component contains the following logic:
+ *
+ * - Ability to create new saved searches
+ * - Delete existing saved searches
+ * - Toggle the isDefault
+ * - Load in saved searches to the Query Builder
+ * - List all of the saved searches for the index name (see SavedSearchListDropdown component)
+ *
+ * The Saved Search contains a couple of dropdown menus and modals to allow the user to manage their
+ * saved searches.
+ */
 export function SavedSearch({
   indexName,
   queryBuilderTree,
@@ -109,6 +114,11 @@ export function SavedSearch({
     }
     setDefaultLoadedIn(true);
   }, [userPreferences]);
+
+  // Detect if any changes have been made to the query tree.
+  // useEffect(() => {
+
+  // }, [queryBuilderTree]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -313,25 +323,6 @@ export function SavedSearch({
     [userPreferences]
   );
 
-  const overwriteCurrentSearch = useCallback(async () => {
-    if (!selectedSavedSearch) return;
-
-    // Ask the user if they are sure they want to overwrite the current search.
-    openModal(
-      <AreYouSureModal
-        actionMessage={
-          <>
-            Are you sure you want to overwrite "{selectedSavedSearch}" with the
-            current search?
-          </>
-        }
-        onYesButtonClicked={() =>
-          saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
-        }
-      />
-    );
-  }, [userPreferences]);
-
   // Setup the create new modal, it's hidden from the user until it's requested.
   const { openSavedSearchModal, SavedSearchModal } = useSavedSearchModal({
     saveSearch: (searchName, isDefault) =>
@@ -341,69 +332,6 @@ export function SavedSearch({
         cloneDeep(userPreferences)?.savedSearches?.[indexName] ?? {}
       ) ?? []
   });
-
-  const CustomMenu = React.forwardRef(
-    (props: CustomMenuProps, ref: React.Ref<HTMLDivElement>) => {
-      return (
-        <div
-          ref={ref}
-          style={{
-            ...props.style,
-            width: "400px",
-            padding: "0px"
-          }}
-          className={props.className}
-          aria-labelledby={props.labeledBy}
-        >
-          <Modal.Header className="float-left">
-            <Modal.Title>Saved Searches</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body
-            style={{
-              maxHeight: "300px",
-              overflowY: "auto",
-              background: "#f9f9f9"
-            }}
-          >
-            {error ? (
-              <div style={{ textAlign: "center" }}>
-                <h2>
-                  <FaRegSadTear />
-                </h2>
-                <p>Unable to retrieve saved searches, please try again later</p>
-              </div>
-            ) : (
-              <>
-                {dropdownOptions.length === 0 ? (
-                  <div style={{ textAlign: "center" }}>
-                    <h2>
-                      <FaRegFrown />
-                    </h2>
-                    <p>No saved searches have been created yet</p>
-                  </div>
-                ) : (
-                  <>
-                    {dropdownOptions.map((option) => {
-                      return (
-                        <SavedSearchItem
-                          key={option.savedSearchName}
-                          currentSavedSearchName={selectedSavedSearch ?? ""}
-                          onSavedSearchDelete={deleteSavedSearch}
-                          onSavedSearchSelected={setSelectedSavedSearch}
-                          savedSearch={option}
-                        />
-                      );
-                    })}
-                  </>
-                )}
-              </>
-            )}
-          </Modal.Body>
-        </div>
-      );
-    }
-  );
 
   // Wait until the user preferences have been loaded in.
   if (loading) {
@@ -420,10 +348,11 @@ export function SavedSearch({
       <Dropdown className="float-end" autoClose="outside">
         <Dropdown.Toggle variant="light" className="btn-empty">
           <FaCog />
+          <NotSavedBadge displayBadge={true} />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item onClick={openSavedSearchModal}>
-            Create new
+            <DinaMessage id="createNew" />
           </Dropdown.Item>
           {selectedSavedSearch && (
             <>
@@ -434,7 +363,7 @@ export function SavedSearch({
                       saveSavedSearch(selectedSavedSearch, false, false)
                     }
                   >
-                    Unset as default
+                    <DinaMessage id="unsetAsDefault" />
                   </Dropdown.Item>
                 </>
               ) : (
@@ -444,29 +373,34 @@ export function SavedSearch({
                       saveSavedSearch(selectedSavedSearch, true, false)
                     }
                   >
-                    Set as default
+                    <DinaMessage id="setAsDefault" />
                   </Dropdown.Item>
                 </>
               )}
-              <Dropdown.Item onClick={() => overwriteCurrentSearch()}>
-                Overwrite
+              <Dropdown.Item
+                onClick={() =>
+                  saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
+                }
+              >
+                <DinaMessage id="saveChanges" />
               </Dropdown.Item>
               <Dropdown.Item
                 onClick={() => deleteSavedSearch(selectedSavedSearch)}
               >
-                Delete
+                <DinaMessage id="deleteButtonText" />
               </Dropdown.Item>
             </>
           )}
         </Dropdown.Menu>
       </Dropdown>
-      <Dropdown className="float-end" autoClose="outside">
-        <Dropdown.Toggle variant="light" className="btn-empty">
-          {selectedSavedSearch ?? "Saved Searches"}
-          <DefaultBadge displayBadge={currentIsDefault} />
-        </Dropdown.Toggle>
-        <Dropdown.Menu as={CustomMenu} />
-      </Dropdown>
+      <SavedSearchListDropdown
+        dropdownOptions={dropdownOptions}
+        selectedSavedSearch={selectedSavedSearch}
+        currentIsDefault={currentIsDefault}
+        error={error}
+        onSavedSearchSelected={setSelectedSavedSearch}
+        onSavedSearchDelete={deleteSavedSearch}
+      />
     </>
   );
 }
