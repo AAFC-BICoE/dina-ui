@@ -1,6 +1,6 @@
 import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Footer,
   Head,
@@ -116,7 +116,13 @@ export default function MaterialSampleEditPage() {
         </h1>
         {id ? (
           withResponse(materialSampleQuery, ({ data: sample }) => (
-            <MaterialSampleForm {...sampleFormProps} materialSample={sample} />
+            <MaterialSampleForm
+              enableReinitialize={true}
+              {...sampleFormProps}
+              materialSample={
+                sampleFormTemplate ? materialSampleInitialValues : sample
+              }
+            />
           ))
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {

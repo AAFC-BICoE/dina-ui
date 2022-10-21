@@ -11,7 +11,14 @@ import {
   LoadingSpinner,
   SubmitButton
 } from "common-ui";
-import { Fragment, ReactNode, Ref, useContext, useState } from "react";
+import {
+  Fragment,
+  ReactNode,
+  Ref,
+  useContext,
+  useState,
+  useEffect
+} from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -151,6 +158,11 @@ export interface MaterialSampleFormProps {
    * e.g. when the form's custom view is updated.
    */
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+
+  /**
+   * When this prop is enabled, formik initialValues can be reinitialized
+   */
+  enableReinitialize?: boolean;
 }
 
 export function MaterialSampleForm({
@@ -173,6 +185,7 @@ export function MaterialSampleForm({
   enableStoredDefaultGroup,
   visibleManagedAttributeKeys,
   disableCollectingEventSwitch,
+  enableReinitialize,
   buttonBar = (
     <ButtonBar>
       <BackButton
@@ -462,6 +475,7 @@ export function MaterialSampleForm({
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
+      enableReinitialize={enableReinitialize}
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}

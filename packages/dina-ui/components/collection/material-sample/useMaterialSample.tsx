@@ -23,7 +23,7 @@ import {
   range
 } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -260,90 +260,109 @@ export function useMaterialSampleSave({
       )
     );
 
-  const [enableCollectingEvent, setEnableCollectingEvent] = useState(
-    Boolean(
-      hasColEventTemplate ||
-        materialSample?.collectingEvent ||
-        enabledFields?.collectingEvent?.length
-    )
-  );
+  const [enableCollectingEvent, setEnableCollectingEvent] =
+    useState<boolean>(false);
 
-  const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState(
-    Boolean(
-      hasAcquisitionEventTemplate ||
-        materialSample?.acquisitionEvent ||
-        enabledFields?.acquisitionEvent?.length
-    )
-  );
+  const [enableAcquisitionEvent, setEnableAcquisitionEvent] =
+    useState<boolean>(false);
 
-  const [enablePreparations, setEnablePreparations] = useState(
-    Boolean(
-      hasPreparationsTemplate ||
-        // Show the preparation section if a field is set or the field is enabled:
-        PREPARATION_FIELDS.some(
-          (prepFieldName) =>
-            !isEmpty(materialSample?.[prepFieldName]) ||
-            enabledFields?.materialSample?.includes(prepFieldName)
-        )
-    )
-  );
+  const [enablePreparations, setEnablePreparations] = useState<boolean>(false);
 
-  const [enableOrganisms, setEnableOrganisms] = useState(
-    Boolean(
-      hasOrganismsTemplate ||
-        materialSample?.organism?.length ||
-        enabledFields?.materialSample?.some((enabledField) =>
-          enabledField.startsWith("organism[0].")
-        )
-    )
-  );
+  const [enableOrganisms, setEnableOrganisms] = useState<boolean>(false);
 
-  const [enableStorage, setEnableStorage] = useState(
-    // Show the Storage section if the storage field is set or the template enables it:
-    Boolean(
-      hasStorageTemplate ||
-        materialSample?.storageUnit?.id ||
-        enabledFields?.materialSample?.includes("storageUnit")
-    )
-  );
+  const [enableStorage, setEnableStorage] = useState<boolean>(false);
 
-  const [enableScheduledActions, setEnableScheduledActions] = useState(
-    // Show the Scheduled Actions section if the field is set or the template enables it:
-    Boolean(
-      hasScheduledActionsTemplate ||
-        materialSample?.scheduledActions?.length ||
-        enabledFields?.materialSample?.some((enabledField) =>
-          enabledField.startsWith("scheduledAction.")
-        )
-    )
-  );
+  const [enableScheduledActions, setEnableScheduledActions] =
+    useState<boolean>(false);
 
-  const [enableAssociations, setEnableAssociations] = useState(
-    // Show the associations section if the field is set or the template enables it:
-    Boolean(
-      hasAssociationsTemplate ||
-        materialSample?.associations?.length ||
-        !isEmpty(materialSample?.hostOrganism) ||
-        !isEmpty(materialSample?.associations) ||
-        enabledFields?.materialSample?.some(
-          (enabledField) =>
-            enabledField.startsWith("associations[0].") ||
-            enabledField.startsWith("hostOrganism.")
-        )
-    )
-  );
+  const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
 
-  const [enableRestrictions, setEnableRestrictions] = useState(
-    Boolean(
-      hasRestrictionsTemplate ||
-        // Show the restriction section if a field is set or the field is enabled:
-        RESTRICTIONS_FIELDS.some(
-          (restrictFieldName) =>
-            !isEmpty(materialSample?.[restrictFieldName]) ||
-            enabledFields?.materialSample?.includes(restrictFieldName)
-        )
-    )
-  );
+  const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
+
+  useEffect(() => {
+    setEnableCollectingEvent(
+      Boolean(
+        hasColEventTemplate ||
+          materialSample?.collectingEvent ||
+          enabledFields?.collectingEvent?.length
+      )
+    );
+    setEnableAcquisitionEvent(
+      Boolean(
+        hasAcquisitionEventTemplate ||
+          materialSample?.acquisitionEvent ||
+          enabledFields?.acquisitionEvent?.length
+      )
+    );
+    setEnablePreparations(
+      Boolean(
+        hasPreparationsTemplate ||
+          // Show the preparation section if a field is set or the field is enabled:
+          PREPARATION_FIELDS.some(
+            (prepFieldName) =>
+              !isEmpty(materialSample?.[prepFieldName]) ||
+              enabledFields?.materialSample?.includes(prepFieldName)
+          )
+      )
+    );
+
+    setEnableOrganisms(
+      Boolean(
+        hasOrganismsTemplate ||
+          materialSample?.organism?.length ||
+          enabledFields?.materialSample?.some((enabledField) =>
+            enabledField.startsWith("organism[0].")
+          )
+      )
+    );
+
+    setEnableStorage(
+      // Show the Storage section if the storage field is set or the template enables it:
+      Boolean(
+        hasStorageTemplate ||
+          materialSample?.storageUnit?.id ||
+          enabledFields?.materialSample?.includes("storageUnit")
+      )
+    );
+
+    setEnableScheduledActions(
+      // Show the Scheduled Actions section if the field is set or the template enables it:
+      Boolean(
+        hasScheduledActionsTemplate ||
+          materialSample?.scheduledActions?.length ||
+          enabledFields?.materialSample?.some((enabledField) =>
+            enabledField.startsWith("scheduledAction.")
+          )
+      )
+    );
+
+    setEnableAssociations(
+      // Show the associations section if the field is set or the template enables it:
+      Boolean(
+        hasAssociationsTemplate ||
+          materialSample?.associations?.length ||
+          !isEmpty(materialSample?.hostOrganism) ||
+          !isEmpty(materialSample?.associations) ||
+          enabledFields?.materialSample?.some(
+            (enabledField) =>
+              enabledField.startsWith("associations[0].") ||
+              enabledField.startsWith("hostOrganism.")
+          )
+      )
+    );
+
+    setEnableRestrictions(
+      Boolean(
+        hasRestrictionsTemplate ||
+          // Show the restriction section if a field is set or the field is enabled:
+          RESTRICTIONS_FIELDS.some(
+            (restrictFieldName) =>
+              !isEmpty(materialSample?.[restrictFieldName]) ||
+              enabledFields?.materialSample?.includes(restrictFieldName)
+          )
+      )
+    );
+  }, [materialSample]);
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {

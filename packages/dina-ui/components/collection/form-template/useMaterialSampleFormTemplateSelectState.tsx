@@ -29,7 +29,7 @@ export function useMaterialSampleFormTemplateSelectState() {
   // Get initial values of data components
   const materialSampleComponent = getAllComponentValues(sampleFormTemplate);
   if (!materialSampleComponent.associations?.length) {
-    materialSampleComponent.associations = [{}];
+    materialSampleComponent.associations = [];
   }
 
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
