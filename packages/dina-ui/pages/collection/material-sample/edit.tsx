@@ -50,12 +50,17 @@ export default function MaterialSampleEditPage() {
     enabledFields,
     sampleFormTemplate,
     setSampleFormTemplate,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
-
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     enabledFields,
     visibleManagedAttributeKeys,
+    materialSample: materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues,
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>

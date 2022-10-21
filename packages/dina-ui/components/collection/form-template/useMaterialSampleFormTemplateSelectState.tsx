@@ -10,6 +10,10 @@ import {
   getAllComponentValues,
   getComponentValues
 } from "../../form-template/formTemplateUtils";
+import {
+  MaterialSampleFormEnabledFields,
+  VisibleManagedAttributesConfig
+} from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 
@@ -40,6 +44,9 @@ export function useMaterialSampleFormTemplateSelectState() {
   );
 
   const materialSampleFormTemplate = {
+    managedAttributesOrder: [],
+    determinationManagedAttributesOrder: [],
+    collectingEventManagedAttributesOrder: [],
     formTemplate: {
       COLLECTING_EVENT: getFormTemplateSchema(collectingEventComponent),
       MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent),
@@ -58,24 +65,41 @@ export function useMaterialSampleFormTemplateSelectState() {
 
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
-  const { enabledFields, visibleManagedAttributeKeys } =
-    useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
+  const {
+    enabledFields,
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
+  }: {
+    enabledFields: MaterialSampleFormEnabledFields;
+    visibleManagedAttributeKeys?: VisibleManagedAttributesConfig | undefined;
+    materialSampleInitialValues: any;
+    collectingEventInitialValues?: any;
+    acquisitionEventInitialValues?: any;
+  } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
+
+  delete materialSampleInitialValues?.templateCheckboxes;
+  delete collectingEventInitialValues?.templateCheckboxes;
+  delete acquisitionEventInitialValues?.templateCheckboxes;
 
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<string[] | null>(null);
-
   return {
     sampleFormTemplate,
     setSampleFormTemplate,
     navOrder,
     setNavOrder,
     enabledFields,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   };
 }
 function getFormTemplateSchema(component: any) {
   component.templateFields = {};
-  const schema = {
+  const schema: any = {
     allowExisting: false,
     allowNew: false,
     templateFields: {}
