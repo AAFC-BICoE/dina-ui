@@ -25,7 +25,14 @@ rewrite @internetexplorer  /static/unsupported-browser.html
 try_files {path}.html {path}
 
 # Provide the Keycloak config to the front-end code:
-respond /keycloak.json "{ \"resource\": \"{$KEYCLOAK_CLIENTID}\", \"realm\": \"{$KEYCLOAK_REALM}\", \"auth-server-url\": \"{$KEYCLOAK_PUBLIC_URL}\" }"
+respond /keycloak.json "{ 
+	\"realm\": \"{$KEYCLOAK_REALM}\", 
+	\"auth-server-url\": \"{$KEYCLOAK_PUBLIC_URL}\",
+	\"resource\": \"{$KEYCLOAK_CLIENTID}\", 
+	\"ssl-required\": \"external\",
+	\"public-client\": true,
+	\"confidential-port\": 0
+}"
 
 # Proxy to the main back-end API:
 route /api/objectstore-api/* {
