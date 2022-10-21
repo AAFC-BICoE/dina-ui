@@ -1,5 +1,10 @@
 http://:8080
 
+# Remove the Added "Server" Response Header
+header /* {
+		-Server
+}
+
 # Serve the unsupported-browser.html page when requesting from IE
 @internetexplorer  {
 	# Allow disabling the IE blocker using the  DISABLE_BROWSER_CHECK environment variable:
