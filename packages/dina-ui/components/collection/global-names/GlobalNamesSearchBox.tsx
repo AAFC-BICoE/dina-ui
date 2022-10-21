@@ -247,7 +247,7 @@ export function GlobalNamesSearchBox({
 
               const detail: ScientificNameSourceDetails = {};
               detail.labelHtml = link.innerHTML ?? "";
-              detail.sourceUrl = link.href;
+              detail.sourceUrl = link.href.replace("undefined", "list");
               detail.recordedOn = dateSupplier();
               detail.classificationPath = result.bestResult?.classificationPath;
               detail.classificationRanks =
@@ -264,7 +264,13 @@ export function GlobalNamesSearchBox({
                   className="list-group-item list-group-item-action d-flex"
                 >
                   <div className="flex-grow-1 d-flex align-items-center gn-search-result-label">
-                    <span dangerouslySetInnerHTML={{ __html: safeHtmlLink }} />
+                    {result.bestResult.outlink ? (
+                      <span
+                        dangerouslySetInnerHTML={{ __html: safeHtmlLink }}
+                      />
+                    ) : (
+                      <span>{detail.currentName}</span>
+                    )}
                   </div>
                   <FormikButton
                     className="btn btn-primary global-name-select-button"
