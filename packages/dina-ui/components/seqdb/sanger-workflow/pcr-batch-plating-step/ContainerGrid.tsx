@@ -2,7 +2,10 @@ import { useApiClient } from "packages/common-ui/lib";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
-import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import {
+  DraggablePCRBatchItemBox,
+  ITEM_BOX_DRAG_KEY
+} from "./DraggablePCRBatchItemBox";
 import { useState, useEffect } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 
@@ -31,16 +34,14 @@ export function ContainerGrid({
 }: ContainerGridProps) {
   const { apiClient } = useApiClient();
   const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
-  const [ numberOfRows, setNumberOfRows ] = useState<number>(0);
+  const [numberOfRows, setNumberOfRows] = useState<number>(0);
 
-  async function getPcrBatch(){
-    await apiClient.get<PcrBatch>(
-      `seqdb-api/pcr-batch/${pcrBatchId}`,
-      {}
-    )
-    .then((response) => {
-      setPcrBatch(response?.data);
-    });
+  async function getPcrBatch() {
+    await apiClient
+      .get<PcrBatch>(`seqdb-api/pcr-batch/${pcrBatchId}`, {})
+      .then((response) => {
+        setPcrBatch(response?.data);
+      });
   }
 
   useEffect(() => {
@@ -50,17 +51,17 @@ export function ContainerGrid({
   useEffect(() => {
     if (!pcrBatch) return;
 
-    if (pcrBatch?.storageRestriction){
+    if (pcrBatch?.storageRestriction) {
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-    }  
-  }, [pcrBatch])
-  
+    }
+  }, [pcrBatch]);
+
   const columns: Column[] = [];
 
   // Add the letter column.
   columns.push({
     Cell: ({ index }) => (
-      <div style={{ padding: "7px 5px" }}>
+      <div style={{ padding: "7px 5px", alignContent: "center" }}>
         {String.fromCharCode(index + 65)}
       </div>
     ),
@@ -80,7 +81,9 @@ export function ContainerGrid({
           <span className={`well-${coords}`}>
             <GridCell
               movedItems={movedItems}
-              onDrop={({ pcrBatchItemSample: newItem }) => onDrop(newItem, coords)}
+              onDrop={({ pcrBatchItemSample: newItem }) =>
+                onDrop(newItem, coords)
+              }
               pcrBatchItemSample={cellGrid[coords]}
             />
           </span>
@@ -115,8 +118,8 @@ export function ContainerGrid({
 function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
   const [, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
-    drop: item => {
-      onDrop((item as any))
+    drop: (item) => {
+      onDrop(item as any);
     }
   });
 
@@ -132,4 +135,3 @@ function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
     </div>
   );
 }
-

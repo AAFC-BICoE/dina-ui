@@ -6,7 +6,7 @@ import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
 import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 
 export interface PCRBatchItemGridProps {
-    pcrBatchId: string;
+  pcrBatchId: string;
 }
 
 export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
@@ -32,17 +32,16 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     return <LoadingSpinner loading={true} />;
   }
 
-  if(!isStorage){
-    return <span className="alert alert-warning">
-      Storage definition must be set to use the container grid.
-  </span>
+  if (!isStorage) {
+    return (
+      <span className="alert alert-warning">
+        Storage definition must be set to use the container grid.
+      </span>
+    );
   }
 
   return (
     <div>
-      <div className="alert alert-warning d-inline-block">
-        <SeqdbMessage id="sampleGridInstructions" />
-      </div>
       <div className="row">
         <div className="col-3" />
         <div className="col-9">
@@ -84,14 +83,16 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
               onClick={gridSubmit}
               type="button"
             >
-              Save changed well coordinates
+              Save
             </button>
           </div>
         </div>
       </div>
       <div className="row">
         <div className="col-2">
-          <strong>Selected Material Samples ({availableItems.length} in list)</strong>
+          <strong>
+            Selected Material Samples ({availableItems.length} in list)
+          </strong>
           <DraggablePCRBatchItemList
             availableItems={availableItems}
             selectedItems={selectedItems}
