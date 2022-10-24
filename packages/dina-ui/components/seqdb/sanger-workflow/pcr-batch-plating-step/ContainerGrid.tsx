@@ -61,7 +61,7 @@ export function ContainerGrid({
   // Add the letter column.
   columns.push({
     Cell: ({ index }) => (
-      <div style={{ padding: "7px 5px", alignContent: "center" }}>
+      <div style={{ padding: "7px 5px" }}>
         {String.fromCharCode(index + 65)}
       </div>
     ),
@@ -70,7 +70,9 @@ export function ContainerGrid({
   });
 
   for (let col = 0; col < numberOfRows; col++) {
-    const columnLabel = String(col + 1);
+    const columnLabel = (
+      <div style={{ textAlign: "center" }}>{String(col + 1)}</div>
+    );
 
     columns.push({
       Cell: ({ index: row }) => {
