@@ -13,9 +13,9 @@ import { FilterParam } from "kitsu";
 import { Dropdown } from "react-bootstrap";
 import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
-import { ImmutableTree, Utils } from "react-awesome-query-builder";
+import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch } from "./types";
-import { map, cloneDeep } from "lodash";
+import { map, cloneDeep, isEqual } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
 
@@ -36,6 +36,12 @@ export interface SavedSearchProps {
    * Set the query builder tree, used to to load a saved search.
    */
   setQueryBuilderTree: (newTree: ImmutableTree) => void;
+
+  /**
+   * Query builder configuration.
+   *
+   */
+  queryBuilderConfig: Config;
 }
 
 /**
@@ -53,9 +59,9 @@ export interface SavedSearchProps {
 export function SavedSearch({
   indexName,
   queryBuilderTree,
-  setQueryBuilderTree
+  setQueryBuilderTree,
+  queryBuilderConfig
 }: SavedSearchProps) {
-  const { formatMessage } = useDinaIntl();
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
   const { subject } = useAccount();
@@ -75,6 +81,8 @@ export function SavedSearch({
 
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
+  const [changesMade, setChangesMade] = useState<boolean>(false);
+
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
 
@@ -90,6 +98,27 @@ export function SavedSearch({
     });
   }, [userPreferences]);
 
+  // Once the selected save search is changed, we generate a string query representation of the
+  // selected saved search query tree. We use this to compare it against the current tree.
+  // The reason we are using a string query is because it does not contain ids and it's better for
+  // performance.
+  const compareChangeSelected: string | undefined = useMemo(() => {
+    if (!selectedSavedSearch || !userPreferences) return undefined;
+
+    const selectedQueryTree =
+      userPreferences?.savedSearches?.[indexName]?.[selectedSavedSearch]
+        ?.queryTree;
+
+    if (selectedQueryTree) {
+      return Utils.queryString(
+        Utils.loadTree(selectedQueryTree),
+        queryBuilderConfig
+      );
+    }
+
+    return undefined;
+  }, [selectedSavedSearch, userPreferences]);
+
   // Every time the last loaded is changed, retrieve the user preferences.
   useEffect(() => {
     retrieveUserPreferences();
@@ -97,9 +126,9 @@ export function SavedSearch({
 
   // When a new saved search is selected.
   useEffect(() => {
-    if (!selectedSavedSearch && !userPreferences) return;
+    if (!selectedSavedSearch || !userPreferences) return;
 
-    loadSavedSearch(selectedSavedSearch ?? "");
+    loadSavedSearch(selectedSavedSearch);
   }, [selectedSavedSearch]);
 
   // User Preferences has been loaded in:
@@ -116,9 +145,24 @@ export function SavedSearch({
   }, [userPreferences]);
 
   // Detect if any changes have been made to the query tree.
-  // useEffect(() => {
+  useEffect(() => {
+    if (!userPreferences || !selectedSavedSearch || !queryBuilderTree) return;
 
-  // }, [queryBuilderTree]);
+    const currentQueryTreeString = Utils.queryString(
+      queryBuilderTree,
+      queryBuilderConfig
+    );
+
+    // Compare against currently selected tree.
+    if (
+      currentQueryTreeString &&
+      compareChangeSelected === currentQueryTreeString
+    ) {
+      setChangesMade(false);
+    } else {
+      setChangesMade(true);
+    }
+  }, [queryBuilderTree]);
 
   /**
    * Retrieve the user preference for the logged in user. This is used for the SavedSearch
@@ -266,6 +310,7 @@ export function SavedSearch({
       // The newly saved option, should be switched to the selected.
       setSelectedSavedSearch(savedSearchName);
       setCurrentIsDefault(setAsDefault);
+      setChangesMade(false);
     },
     [userPreferences, queryBuilderTree]
   );
@@ -348,7 +393,7 @@ export function SavedSearch({
       <Dropdown className="float-end" autoClose="outside">
         <Dropdown.Toggle variant="light" className="btn-empty">
           <FaCog />
-          <NotSavedBadge displayBadge={true} />
+          <NotSavedBadge displayBadge={changesMade} />
         </Dropdown.Toggle>
         <Dropdown.Menu>
           <Dropdown.Item onClick={openSavedSearchModal}>

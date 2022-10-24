@@ -87,6 +87,7 @@ function QueryBuilder({
         indexName={indexName}
         queryBuilderTree={queryBuilderTree}
         setQueryBuilderTree={setQueryBuilderTree}
+        queryBuilderConfig={queryBuilderConfig}
       />
       <Query
         {...queryBuilderConfig}
