@@ -21,7 +21,7 @@ import {
   useMaterialSampleSave
 } from "../../../../dina-ui/components";
 import {
-  getAllComponentValues,
+  getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
   getFormTemplateCheckboxes
@@ -103,7 +103,7 @@ export function FormTemplateEditPageLoaded({
     : "createMaterialSampleFormTemplate";
   // Get initial values of data components
   const allMaterialSampleComponentValues =
-    getAllComponentValues(fetchedFormTemplate);
+    getMaterialSampleComponentValues(fetchedFormTemplate);
   if (!allMaterialSampleComponentValues.associations?.length) {
     allMaterialSampleComponentValues.associations = [{}];
   }

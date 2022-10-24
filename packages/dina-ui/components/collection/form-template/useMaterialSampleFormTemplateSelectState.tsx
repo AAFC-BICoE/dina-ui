@@ -7,7 +7,7 @@ import {
   FormTemplate
 } from "../../../types/collection-api";
 import {
-  getAllComponentValues,
+  getMaterialSampleComponentValues,
   getComponentValues
 } from "../../form-template/formTemplateUtils";
 import {
@@ -27,30 +27,39 @@ export function useMaterialSampleFormTemplateSelectState() {
     useState<PersistedResource<FormTemplate>>();
 
   // Get initial values of data components
-  const materialSampleComponent = getAllComponentValues(sampleFormTemplate);
+  const materialSampleComponent =
+    getMaterialSampleComponentValues(sampleFormTemplate);
   if (!materialSampleComponent.associations?.length) {
     materialSampleComponent.associations = [];
   }
 
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
-  const collectingEventComponent = {
-    ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, sampleFormTemplate),
-    managedAttributesOrder: []
-  };
-
+  const collectingEventComponent = getComponentValues(
+    COLLECTING_EVENT_COMPONENT_NAME,
+    sampleFormTemplate
+  );
   const acquisitionEventComponent = getComponentValues(
     ACQUISITION_EVENT_COMPONENT_NAME,
     sampleFormTemplate
   );
+  const hasAcquisitionEvent =
+    Object.keys(acquisitionEventComponent.templateCheckboxes).length > 0
+      ? true
+      : false;
+  const hasCollectingEvent =
+    Object.keys(collectingEventComponent.templateCheckboxes).length > 0
+      ? true
+      : false;
 
   const materialSampleFormTemplate = {
-    managedAttributesOrder: [],
-    determinationManagedAttributesOrder: [],
-    collectingEventManagedAttributesOrder: [],
     formTemplate: {
-      COLLECTING_EVENT: getFormTemplateSchema(collectingEventComponent),
+      COLLECTING_EVENT: hasCollectingEvent
+        ? getFormTemplateSchema(collectingEventComponent)
+        : undefined,
       MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent),
-      ACQUISITION_EVENT: getFormTemplateSchema(acquisitionEventComponent)
+      ACQUISITION_EVENT: hasAcquisitionEvent
+        ? getFormTemplateSchema(acquisitionEventComponent)
+        : undefined
     },
     type: "material-sample-form-template"
   };
@@ -78,10 +87,12 @@ export function useMaterialSampleFormTemplateSelectState() {
     collectingEventInitialValues?: any;
     acquisitionEventInitialValues?: any;
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
-
   delete materialSampleInitialValues?.templateCheckboxes;
+  delete materialSampleInitialValues?.templateFields;
   delete collectingEventInitialValues?.templateCheckboxes;
+  delete collectingEventInitialValues?.templateFields;
   delete acquisitionEventInitialValues?.templateCheckboxes;
+  delete acquisitionEventInitialValues?.templateFields;
 
   // Store the nav order in the Page components state:
   const [navOrder, setNavOrder] = useState<string[] | null>(null);

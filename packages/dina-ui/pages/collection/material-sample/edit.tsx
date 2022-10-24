@@ -136,7 +136,7 @@ export default function MaterialSampleEditPage() {
             );
           })
         ) : (
-          <MaterialSampleForm {...sampleFormProps} />
+          <MaterialSampleForm enableReinitialize={true} {...sampleFormProps} />
         )}
       </main>
       <Footer />

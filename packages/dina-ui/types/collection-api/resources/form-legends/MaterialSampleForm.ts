@@ -34,6 +34,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         id: "general-section",
         maxGridSizeX: 2,
         items: [
+          { id: "group" },
           {
             id: "tags"
           },
