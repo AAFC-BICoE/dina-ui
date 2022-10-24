@@ -1,7 +1,5 @@
-import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
+import { DinaForm, SubmitButton, withResponse } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useState } from "react";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   PcrBatchForm,
   PcrBatchFormFields,
@@ -12,19 +10,25 @@ import { PcrBatch } from "../../../types/seqdb-api";
 export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+  editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function SangerPcrBatchStep({
   pcrBatchId,
-  onSaved
+  onSaved,
+  editMode,
+  setEditMode,
+  performSave,
+  setPerformSave
 }: SangerPcrBatchStepProps) {
-  const [editMode, setEditMode] = useState(!pcrBatchId);
-
   const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [editMode]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
     await onSaved(resource);
-    setEditMode(false);
+    setPerformSave(false);
   }
 
   return pcrBatchId ? (
@@ -34,31 +38,13 @@ export function SangerPcrBatchStep({
           pcrBatch={pcrBatch}
           onSaved={onSavedInternal}
           buttonBar={
-            <ButtonBar>
-              <button
-                className="btn btn-dark"
-                type="button"
-                onClick={() => setEditMode(false)}
-                style={{ width: "10rem" }}
-              >
-                <SeqdbMessage id="cancelButtonText" />
-              </button>
-              <SubmitButton className="ms-auto" />
-            </ButtonBar>
+            <div>
+              <SubmitButton className="hidden" performSave={performSave} />
+            </div>
           }
         />
       ) : (
         <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
-          <ButtonBar>
-            <button
-              className="btn btn-primary edit-button"
-              type="button"
-              onClick={() => setEditMode(true)}
-              style={{ width: "10rem" }}
-            >
-              <SeqdbMessage id="editButtonText" />
-            </button>
-          </ButtonBar>
           <PcrBatchFormFields />
         </DinaForm>
       )

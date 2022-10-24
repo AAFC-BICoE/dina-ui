@@ -1,16 +1,21 @@
 import { LoadingSpinner } from "common-ui";
 import { noop } from "lodash";
-import { SeqdbMessage } from "../../../../intl/seqdb-intl";
 import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
 import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
+import { useEffect } from "react";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
+  editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
-  const { pcrBatchId } = props;
+  const { pcrBatchId, editMode, setEditMode, performSave, setPerformSave } =
+    props;
   const {
     availableItems,
     cellGrid,
@@ -27,6 +32,18 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     setFillMode,
     isStorage
   } = usePCRBatchItemGridControls(props);
+
+  // Check if a save was requested from the top level button bar.
+  useEffect(() => {
+    async function performSaveInternal() {
+      await gridSubmit();
+      setPerformSave(false);
+    }
+
+    if (performSave) {
+      performSaveInternal();
+    }
+  }, [performSave]);
 
   if (loading) {
     return <LoadingSpinner loading={true} />;
@@ -72,18 +89,11 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
             style={{ marginLeft: "10rem" }}
           >
             <button
-              className="btn btn-dark list-inline-item grid-clear"
+              className="btn btn-dark list-inline-item grid-clear ms-auto"
               onClick={clearGrid}
               type="button"
             >
               Clear Grid
-            </button>
-            <button
-              className="btn btn-primary list-inline-item grid-submit"
-              onClick={gridSubmit}
-              type="button"
-            >
-              Save
             </button>
           </div>
         </div>
