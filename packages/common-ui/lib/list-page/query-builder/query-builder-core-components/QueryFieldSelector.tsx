@@ -1,4 +1,4 @@
-import lodash, { startCase } from "lodash";
+import lodash, { startCase, flatMapDeep } from "lodash";
 import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -122,16 +122,27 @@ export function QueryFieldSelector({
   );
 
   // Find the selected option in the index map if possible.
-  const selectedOption = useMemo(
-    () =>
-      queryRowOptions.find((dropdownItem) => {
+  // Needs to support nested items.
+  const selectedOption = useMemo(() => {
+    const getNestedOptions = (dropdownItem) => {
+      if ((dropdownItem as any)?.options) {
+        return [
+          dropdownItem,
+          flatMapDeep(dropdownItem.options, getNestedOptions)
+        ];
+      }
+      return dropdownItem;
+    };
+
+    return flatMapDeep(queryRowOptions, getNestedOptions).find(
+      (dropdownItem) => {
         if ((dropdownItem as any)?.value) {
           return (dropdownItem as any).value === currentField;
         }
         return false;
-      }),
-    [currentField]
-  );
+      }
+    );
+  }, [currentField]);
 
   return (
     <div style={{ width: "100%" }}>
