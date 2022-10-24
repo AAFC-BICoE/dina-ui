@@ -1,7 +1,4 @@
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSavedSearchModal } from "./useSavedSearchModal";
 import { UserPreference } from "../../../../dina-ui/types/user-api";
@@ -154,10 +151,7 @@ export function SavedSearch({
     );
 
     // Compare against currently selected tree.
-    if (
-      currentQueryTreeString &&
-      compareChangeSelected === currentQueryTreeString
-    ) {
+    if (compareChangeSelected === currentQueryTreeString) {
       setChangesMade(false);
     } else {
       setChangesMade(true);
@@ -285,7 +279,11 @@ export function SavedSearch({
       // set them as false.
       if (setAsDefault) {
         const currentDefault = getDefaultSavedSearch();
-        if (currentDefault && currentDefault.savedSearchName) {
+        if (
+          currentDefault &&
+          currentDefault.savedSearchName &&
+          currentDefault.savedSearchName !== savedSearchName
+        ) {
           newSavedSearchOptions[indexName][currentDefault.savedSearchName] = {
             ...newSavedSearchOptions[indexName][currentDefault.savedSearchName],
             default: false
@@ -422,13 +420,15 @@ export function SavedSearch({
                   </Dropdown.Item>
                 </>
               )}
-              <Dropdown.Item
-                onClick={() =>
-                  saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
-                }
-              >
-                <DinaMessage id="saveChanges" />
-              </Dropdown.Item>
+              {changesMade && (
+                <Dropdown.Item
+                  onClick={() =>
+                    saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
+                  }
+                >
+                  <DinaMessage id="saveChanges" />
+                </Dropdown.Item>
+              )}
               <Dropdown.Item
                 onClick={() => deleteSavedSearch(selectedSavedSearch)}
               >
