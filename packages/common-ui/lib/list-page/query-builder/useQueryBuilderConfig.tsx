@@ -173,47 +173,47 @@ function generateBuilderConfig(
 
   const operators: Operators = {
     exactMatch: {
-      label: "Exact match",
+      label: formatMessage({ id: "queryBuilder_operator_exactMatch" }),
       cardinality: 1
     },
     partialMatch: {
-      label: "Partial match",
+      label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
     equals: {
-      label: "Equals",
+      label: formatMessage({ id: "queryBuilder_operator_equals" }),
       cardinality: 1
     },
     notEquals: {
-      label: "Not equals",
+      label: formatMessage({ id: "queryBuilder_operator_notEquals" }),
       cardinality: 1
     },
     empty: {
-      label: "Empty",
+      label: formatMessage({ id: "queryBuilder_operator_empty" }),
       cardinality: 0
     },
     notEmpty: {
-      label: "Not empty",
+      label: formatMessage({ id: "queryBuilder_operator_notEmpty" }),
       cardinality: 0
     },
     greaterThan: {
-      label: "Greater than",
+      label: formatMessage({ id: "queryBuilder_operator_greaterThan" }),
       cardinality: 1
     },
     greaterThanOrEqualTo: {
-      label: "Greater than or equal to",
+      label: formatMessage({ id: "queryBuilder_operator_greaterThanOrEqual" }),
       cardinality: 1
     },
     lessThan: {
-      label: "Less than",
+      label: formatMessage({ id: "queryBuilder_operator_lessThan" }),
       cardinality: 1
     },
     lessThanOrEqualTo: {
-      label: "Less than or equal to",
+      label: formatMessage({ id: "queryBuilder_operator_lessThanOrEqual" }),
       cardinality: 1
     },
     contains: {
-      label: "Contains",
+      label: formatMessage({ id: "queryBuilder_operator_contains" }),
       cardinality: 1
     },
     uuid: {
@@ -402,9 +402,9 @@ function generateBuilderConfig(
             "notEquals",
             "contains",
             "greaterThan",
-            "greaterThanOrEquals",
+            "greaterThanOrEqualTo",
             "lessThan",
-            "lessThanOrEquals",
+            "lessThanOrEqualTo",
             "empty",
             "notEmpty"
           ]
@@ -420,9 +420,9 @@ function generateBuilderConfig(
             "equals",
             "notEquals",
             "greaterThan",
-            "greaterThanOrEquals",
+            "greaterThanOrEqualTo",
             "lessThan",
-            "lessThanOrEquals",
+            "lessThanOrEqualTo",
             "empty",
             "notEmpty"
           ]
@@ -495,8 +495,8 @@ function generateBuilderConfig(
   };
 
   const localeSettings: LocaleSettings = {
-    addRuleLabel: "Add condition",
-    addGroupLabel: "Add group"
+    addRuleLabel: formatMessage({ id: "queryBuilder_addSearchRule" }),
+    addGroupLabel: formatMessage({ id: "queryBuilder_addSearchGroup" })
   };
 
   const settings: Settings = {

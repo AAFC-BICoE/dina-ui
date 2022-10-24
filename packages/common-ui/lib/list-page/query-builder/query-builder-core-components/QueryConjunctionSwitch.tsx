@@ -1,3 +1,4 @@
+import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
 import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 
@@ -17,13 +18,13 @@ export function QueryConjunctionSwitch({
         variant={currentConjunction === "AND" ? "primary" : "outline-primary"}
         onClick={(_) => setConjunction?.("AND")}
       >
-        AND
+        <DinaMessage id="queryBuilder_conjunction_and" />
       </Button>
       <Button
         variant={currentConjunction === "OR" ? "primary" : "outline-primary"}
         onClick={(_) => setConjunction?.("OR")}
       >
-        OR
+        <DinaMessage id="queryBuilder_conjunction_or" />
       </Button>
     </ButtonGroup>
   );
