@@ -8,8 +8,15 @@ import {
 } from "react-awesome-query-builder";
 import React from "react";
 import { Button } from "react-bootstrap";
+import { SavedSearch } from "../saved-searches/SavedSearch";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 interface QueryBuilderProps {
+  /**
+   * Index name being used for the QueryPage.
+   */
+  indexName: string;
+
   /**
    * Query Builder Configuration.
    */
@@ -37,6 +44,7 @@ interface QueryBuilderProps {
 }
 
 function QueryBuilder({
+  indexName,
   queryBuilderConfig,
   queryBuilderTree,
   setQueryBuilderTree,
@@ -65,6 +73,22 @@ function QueryBuilder({
 
   return (
     <>
+      <label
+        style={{
+          fontSize: 20,
+          fontFamily: "sans-serif",
+          fontWeight: "bold"
+        }}
+        className="mb-2"
+      >
+        <DinaMessage id="search" />
+      </label>
+      <SavedSearch
+        indexName={indexName}
+        queryBuilderTree={queryBuilderTree}
+        setQueryBuilderTree={setQueryBuilderTree}
+        queryBuilderConfig={queryBuilderConfig}
+      />
       <Query
         {...queryBuilderConfig}
         value={queryBuilderTree}
