@@ -111,6 +111,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
             movedItems={movedItems}
             onClick={onItemClick}
             onDrop={onListDrop}
+            editMode={editMode}
           />
         </div>
         <div className="col-1">
@@ -131,6 +132,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}
+            editMode={editMode}
           />
         </div>
       </div>

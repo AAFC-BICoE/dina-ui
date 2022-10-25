@@ -1,7 +1,7 @@
 import { useApiClient } from "packages/common-ui/lib";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
+import { PcrBatch } from "../../../../types/seqdb-api";
 import {
   DraggablePCRBatchItemBox,
   ITEM_BOX_DRAG_KEY
@@ -14,12 +14,14 @@ interface ContainerGridProps {
   cellGrid: CellGrid;
   movedItems: PcrBatchItemSample[];
   onDrop: (item: PcrBatchItemSample, coords: string) => void;
+  editMode: boolean;
 }
 
 interface GridCellProps {
   onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
   movedItems: PcrBatchItemSample[];
   pcrBatchItemSample: PcrBatchItemSample;
+  editMode: boolean;
 }
 
 export interface CellGrid {
@@ -30,7 +32,8 @@ export function ContainerGrid({
   pcrBatchId,
   cellGrid,
   movedItems,
-  onDrop
+  onDrop,
+  editMode
 }: ContainerGridProps) {
   const { apiClient } = useApiClient();
   const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
@@ -61,12 +64,17 @@ export function ContainerGrid({
   // Add the letter column.
   columns.push({
     Cell: ({ index }) => (
-      <div style={{ padding: "7px 5px" }}>
+      <div style={{ padding: "7px 5px", textAlign: "center" }}>
         {String.fromCharCode(index + 65)}
       </div>
     ),
     resizable: false,
-    sortable: false
+    sortable: false,
+    width: 40,
+    style: {
+      background: "white",
+      boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+    }
   });
 
   for (let col = 0; col < numberOfRows; col++) {
@@ -87,6 +95,7 @@ export function ContainerGrid({
                 onDrop(newItem, coords)
               }
               pcrBatchItemSample={cellGrid[coords]}
+              editMode={editMode}
             />
           </span>
         );
@@ -117,7 +126,12 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
+function GridCell({
+  onDrop,
+  pcrBatchItemSample,
+  movedItems,
+  editMode
+}: GridCellProps) {
   const [, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: (item) => {
@@ -132,6 +146,7 @@ function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
           pcrBatchItemSample={pcrBatchItemSample}
           selected={false}
           wasMoved={movedItems.includes(pcrBatchItemSample)}
+          editMode={editMode}
         />
       )}
     </div>

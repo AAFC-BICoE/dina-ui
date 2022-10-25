@@ -1,5 +1,8 @@
 import { useDrop } from "react-dnd-cjs";
-import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
+import {
+  DraggablePCRBatchItemBox,
+  ITEM_BOX_DRAG_KEY
+} from "./DraggablePCRBatchItemBox";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 
 interface DraggablePCRBatchItemListProps {
@@ -8,6 +11,7 @@ interface DraggablePCRBatchItemListProps {
   onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
   selectedItems: PcrBatchItemSample[];
   onClick: (PcrBatchItem, e) => void;
+  editMode: boolean;
 }
 
 export function DraggablePCRBatchItemList({
@@ -15,12 +19,15 @@ export function DraggablePCRBatchItemList({
   movedItems,
   selectedItems,
   onClick,
-  onDrop
+  onDrop,
+  editMode
 }: DraggablePCRBatchItemListProps) {
   const [, dropRef] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
-    drop: item => {
-      onDrop((item as any))
+    drop: (item) => {
+      if (editMode) {
+        onDrop(item as any);
+      }
     }
   });
 
@@ -30,13 +37,14 @@ export function DraggablePCRBatchItemList({
       ref={dropRef}
       style={{ minHeight: "400px", maxHeight: "400px", overflowY: "scroll" }}
     >
-      {availableItems.map(item => (
+      {availableItems.map((item) => (
         <DraggablePCRBatchItemBox
           key={String(item?.sampleId)}
           wasMoved={movedItems.includes(item)}
           pcrBatchItemSample={item}
-          onClick={e => onClick(item, e)}
+          onClick={(e) => onClick(item, e)}
           selected={selectedItems.includes(item)}
+          editMode={editMode}
         />
       ))}
     </ul>
