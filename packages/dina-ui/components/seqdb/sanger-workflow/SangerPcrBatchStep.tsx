@@ -6,6 +6,7 @@ import {
   usePcrBatchQuery
 } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
+import { useEffect } from "react";
 
 export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
@@ -24,12 +25,29 @@ export function SangerPcrBatchStep({
   performSave,
   setPerformSave
 }: SangerPcrBatchStepProps) {
+  // If no PCR Batch has been created, automatically go to edit mode.
+  useEffect(() => {
+    if (!pcrBatchId) {
+      setEditMode(true);
+    }
+  }, [pcrBatchId]);
+
   const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [editMode]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
     await onSaved(resource);
-    setPerformSave(false);
+    setEditMode(false);
   }
+
+  const buttonBar = (
+    <>
+      <SubmitButton
+        className="hidden"
+        performSave={performSave}
+        setPerformSave={setPerformSave}
+      />
+    </>
+  );
 
   return pcrBatchId ? (
     withResponse(pcrBatchQuery, ({ data: pcrBatch }) =>
@@ -37,11 +55,7 @@ export function SangerPcrBatchStep({
         <PcrBatchForm
           pcrBatch={pcrBatch}
           onSaved={onSavedInternal}
-          buttonBar={
-            <div>
-              <SubmitButton className="hidden" performSave={performSave} />
-            </div>
-          }
+          buttonBar={buttonBar}
         />
       ) : (
         <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
@@ -50,6 +64,6 @@ export function SangerPcrBatchStep({
       )
     )
   ) : (
-    <PcrBatchForm onSaved={onSavedInternal} />
+    <PcrBatchForm onSaved={onSavedInternal} buttonBar={buttonBar} />
   );
 }

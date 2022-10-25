@@ -51,53 +51,55 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
 
   if (!isStorage) {
     return (
-      <span className="alert alert-warning">
+      <div className="alert alert-warning mt-3">
         Storage definition must be set to use the container grid.
-      </span>
+      </div>
     );
   }
 
   return (
-    <div>
-      <div className="row">
-        <div className="col-3" />
-        <div className="col-9">
-          <ul className="list-inline d-inline">
-            <li className="list-inline-item">
-              <strong>Fill by:</strong>
-            </li>
-            {[
-              { label: "Row", mode: "ROW" },
-              { label: "Column", mode: "COLUMN" }
-            ].map(({ label, mode }) => (
-              <li className="list-inline-item" key={mode}>
-                <label>
-                  <input
-                    className={`${mode}-radio`}
-                    type="radio"
-                    checked={fillMode === mode}
-                    onChange={noop}
-                    onClick={() => setFillMode(mode)}
-                  />
-                  {label}
-                </label>
+    <div className="mt-3">
+      {editMode && (
+        <div className="row">
+          <div className="col-3" />
+          <div className="col-9">
+            <ul style={{ float: "left" }} className="p-0 mt-3">
+              <li className="list-inline-item">
+                <strong>Fill by:</strong>
               </li>
-            ))}
-          </ul>
-          <div
-            className="list-inline mb-3 d-inline"
-            style={{ marginLeft: "10rem" }}
-          >
-            <button
-              className="btn btn-dark list-inline-item grid-clear ms-auto"
-              onClick={clearGrid}
-              type="button"
-            >
-              Clear Grid
-            </button>
+              {[
+                { label: "Row", mode: "ROW" },
+                { label: "Column", mode: "COLUMN" }
+              ].map(({ label, mode }) => (
+                <li className="list-inline-item" key={mode}>
+                  <label>
+                    <input
+                      className={`${mode}-radio`}
+                      type="radio"
+                      checked={fillMode === mode}
+                      onChange={noop}
+                      onClick={() =>
+                        setFillMode(mode === "ROW" ? "ROW" : "COLUMN")
+                      }
+                    />
+                    {label}
+                  </label>
+                </li>
+              ))}
+            </ul>
+            <div style={{ float: "right" }}>
+              <button
+                className="btn btn-dark list-inline-item grid-clear"
+                onClick={clearGrid}
+                type="button"
+              >
+                Clear Grid
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
       <div className="row">
         <div className="col-2">
           <strong>
@@ -112,13 +114,15 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
           />
         </div>
         <div className="col-1">
-          <button
-            className="btn btn-primary move-all"
-            onClick={moveAll}
-            type="button"
-          >
-            Move All
-          </button>
+          {editMode && (
+            <button
+              className="btn btn-primary move-all w-100"
+              onClick={moveAll}
+              type="button"
+            >
+              Move All
+            </button>
+          )}
         </div>
         <div className="col-9">
           <strong>Container wells</strong>

@@ -25,6 +25,7 @@ export default function SangerWorkFlowRunPage() {
   // Global edit mode state.
   const [editMode, setEditMode] = useState<boolean>(false);
 
+  // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
   // Update the URL to contain the current step.
@@ -35,13 +36,8 @@ export default function SangerWorkFlowRunPage() {
     });
   }, [currentStep]);
 
-  useEffect(() => {
-    if (!performSave) {
-      setEditMode(false);
-    }
-  }, [performSave]);
-
   async function finishPcrBatchStep(pcrBatch: PersistedResource<PcrBatch>) {
+    setCurrentStep(1);
     await router.push({
       pathname: router.pathname,
       query: { ...router.query, pcrBatchId: pcrBatch.id, step: "1" }
@@ -52,27 +48,37 @@ export default function SangerWorkFlowRunPage() {
     <>
       <BackToListButton entityLink="/seqdb/sanger-workflow" />
       {editMode ? (
-        <Button
-          variant={"primary"}
-          className="ms-auto"
-          onClick={() => setPerformSave(true)}
-          style={{ width: "10rem" }}
-        >
-          {performSave ? (
-            <>
-              <Spinner
-                as="span"
-                animation="border"
-                size="sm"
-                role="status"
-                aria-hidden="true"
-              />
-              <span className="visually-hidden">Loading...</span>
-            </>
-          ) : (
-            <>Save</>
-          )}
-        </Button>
+        <>
+          <Button
+            variant="secondary"
+            className="ms-auto"
+            onClick={() => setEditMode(false)}
+            style={{ width: "10rem" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={"primary"}
+            className="ms-2"
+            onClick={() => setPerformSave(true)}
+            style={{ width: "10rem" }}
+          >
+            {performSave ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              <>Save</>
+            )}
+          </Button>
+        </>
       ) : (
         <Button
           variant={"primary"}
@@ -86,15 +92,33 @@ export default function SangerWorkFlowRunPage() {
     </>
   );
 
+  // Helper function to determine if a step should be disabled.
+  const isDisabled = (stepNumber: number, pcrBatchRequired: boolean) => {
+    // While in edit mode, other steps should be disabled.
+    if (editMode && stepNumber !== currentStep) {
+      return true;
+    }
+
+    // If a PCR Batch is required, and not provided then this step should be disabled.
+    if (pcrBatchRequired && !pcrBatchId) {
+      return true;
+    }
+
+    // Not disabled.
+    return false;
+  };
+
   return (
     <PageLayout titleId={"sangerWorkflow"} buttonBarContent={buttonBarContent}>
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
-          <Tab>{formatMessage("pcrBatch")}</Tab>
-          <Tab disabled={!pcrBatchId}>
+          <Tab disabled={isDisabled(0, false)}>{formatMessage("pcrBatch")}</Tab>
+          <Tab disabled={isDisabled(1, true)}>
             {formatMessage("selectMaterialSamples")}
           </Tab>
-          <Tab disabled={!pcrBatchId}>{formatMessage("selectCoordinates")}</Tab>
+          <Tab disabled={isDisabled(2, true)}>
+            {formatMessage("selectCoordinates")}
+          </Tab>
         </TabList>
         <TabPanel>
           <SangerPcrBatchStep

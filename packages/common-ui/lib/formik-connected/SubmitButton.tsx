@@ -13,6 +13,7 @@ interface SubmitButtonProps {
   className?: string;
   hidePrimaryClass?: boolean;
   performSave?: boolean;
+  setPerformSave?: (newValue: boolean) => void;
 
   /** Override internal button props using the formik context. */
   buttonProps?: (
@@ -30,7 +31,8 @@ export const SubmitButton = connect<SubmitButtonProps>(
     className,
     formik,
     hidePrimaryClass,
-    performSave
+    performSave,
+    setPerformSave
   }) {
     const { isNestedForm } = useDinaFormContext();
 
@@ -46,8 +48,14 @@ export const SubmitButton = connect<SubmitButtonProps>(
     };
 
     useEffect(() => {
+      async function tryToSave() {
+        await formik.submitForm().then(() => {
+          setPerformSave?.(false);
+        });
+      }
+
       if (performSave) {
-        formik.submitForm();
+        tryToSave();
       }
     }, [performSave]);
 
