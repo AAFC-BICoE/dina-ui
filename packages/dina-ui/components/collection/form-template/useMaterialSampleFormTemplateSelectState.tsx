@@ -26,7 +26,7 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
  */
 export function useMaterialSampleFormTemplateSelectState() {
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
-    PersistedResource<FormTemplate>
+    PersistedResource<FormTemplate> | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
 
   // Get initial values of data components
