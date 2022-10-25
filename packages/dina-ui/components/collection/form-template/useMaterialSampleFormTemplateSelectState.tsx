@@ -16,15 +16,18 @@ import {
 } from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
+import { useLocalStorage } from "@rehooks/local-storage";
 
+const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
  * Manages the state of a MaterialSampleForm Form Template selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
  * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
 export function useMaterialSampleFormTemplateSelectState() {
-  const [sampleFormTemplate, setSampleFormTemplate] =
-    useState<PersistedResource<FormTemplate>>();
+  const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
+    PersistedResource<FormTemplate>
+  >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
 
   // Get initial values of data components
   const materialSampleComponent =
