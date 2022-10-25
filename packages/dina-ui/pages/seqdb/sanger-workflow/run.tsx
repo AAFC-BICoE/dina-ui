@@ -1,4 +1,4 @@
-import { BackToListButton } from "common-ui";
+import { BackToListButton, ApiClientContext } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -7,12 +7,13 @@ import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-work
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/sanger-workflow/pcr-batch-plating-step/PCRBatchItemGrid";
+import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/sanger-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 
 export default function SangerWorkFlowRunPage() {
   const router = useRouter();
+  const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
 
   const pcrBatchId = router.query.pcrBatchId?.toString();
@@ -28,6 +29,14 @@ export default function SangerWorkFlowRunPage() {
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
+  // Loaded PCR Batch ID.
+  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
+
+  // Load the PCR Batch only once.
+  useEffect(() => {
+    getPcrBatch();
+  }, []);
+
   // Update the URL to contain the current step.
   useEffect(() => {
     router.push({
@@ -36,12 +45,23 @@ export default function SangerWorkFlowRunPage() {
     });
   }, [currentStep]);
 
-  async function finishPcrBatchStep(pcrBatch: PersistedResource<PcrBatch>) {
+  async function finishPcrBatchStep(
+    pcrBatchSaved: PersistedResource<PcrBatch>
+  ) {
     setCurrentStep(1);
+    getPcrBatch();
     await router.push({
       pathname: router.pathname,
-      query: { ...router.query, pcrBatchId: pcrBatch.id, step: "1" }
+      query: { ...router.query, pcrBatchId: pcrBatchSaved.id, step: "1" }
     });
+  }
+
+  async function getPcrBatch() {
+    await apiClient
+      .get<PcrBatch>(`seqdb-api/pcr-batch/${pcrBatchId}`, {})
+      .then((response) => {
+        setPcrBatch(response?.data);
+      });
   }
 
   const buttonBarContent = (
@@ -142,9 +162,10 @@ export default function SangerWorkFlowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {pcrBatchId && (
+          {pcrBatch && pcrBatchId && (
             <PCRBatchItemGrid
               pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatch}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}

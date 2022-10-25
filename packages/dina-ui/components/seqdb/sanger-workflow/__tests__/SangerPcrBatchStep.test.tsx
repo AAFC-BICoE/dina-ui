@@ -1,8 +1,9 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
+import { noop } from "lodash";
 
 const mockOnSaved = jest.fn();
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "seqdb-api/pcr-primer":
     case "objectstore-api/metadata":
@@ -23,8 +24,8 @@ const mockGet = jest.fn<any, any>(async path => {
       };
   }
 });
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: "11111111-1111-1111-1111-111111111111"
   }))
@@ -43,7 +44,13 @@ describe("SangerPcrBatchStep component", () => {
   beforeEach(jest.clearAllMocks);
   it("Creates a new PcrBatch", async () => {
     const wrapper = mountWithAppContext(
-      <SangerPcrBatchStep onSaved={mockOnSaved} />,
+      <SangerPcrBatchStep
+        onSaved={mockOnSaved}
+        editMode={true}
+        setEditMode={noop}
+        performSave={false}
+        setPerformSave={noop}
+      />,
       testCtx
     );
 
@@ -74,7 +81,14 @@ describe("SangerPcrBatchStep component", () => {
 
   it("Edits an existing PcrBatch", async () => {
     const wrapper = mountWithAppContext(
-      <SangerPcrBatchStep onSaved={mockOnSaved} pcrBatchId={"test-batch-id"} />,
+      <SangerPcrBatchStep
+        onSaved={mockOnSaved}
+        pcrBatchId={"test-batch-id"}
+        editMode={false}
+        setEditMode={noop}
+        performSave={false}
+        setPerformSave={noop}
+      />,
       testCtx
     );
 
@@ -86,8 +100,21 @@ describe("SangerPcrBatchStep component", () => {
       "test-batch"
     );
 
+    wrapper.update();
+
     // Go to edit mode:
-    wrapper.find("button.edit-button").simulate("click");
+    wrapper.setProps({
+      children: (
+        <SangerPcrBatchStep
+          onSaved={mockOnSaved}
+          pcrBatchId={"test-batch-id"}
+          editMode={true} // Change to edit mode.
+          setEditMode={noop}
+          performSave={false}
+          setPerformSave={noop}
+        />
+      )
+    });
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -114,10 +141,5 @@ describe("SangerPcrBatchStep component", () => {
       },
       type: "pcr-batch"
     });
-
-    // The form is now in read-only mode:
-    expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test-batch"
-    );
   });
 });

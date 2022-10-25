@@ -1,5 +1,4 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { PersistedResource } from "kitsu";
 import { omitBy, compact, pick } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useContext, useRef, useState, useEffect } from "react";
@@ -8,6 +7,8 @@ import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchId: string;
+  pcrBatch: PcrBatch;
+  editMode: boolean;
 }
 
 export interface PcrBatchItemSample {
@@ -19,9 +20,11 @@ export interface PcrBatchItemSample {
 }
 
 export function usePCRBatchItemGridControls({
-  pcrBatchId
+  pcrBatchId,
+  pcrBatch,
+  editMode
 }: ContainerGridProps) {
-  const { apiClient, save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
@@ -36,8 +39,6 @@ export function usePCRBatchItemGridControls({
   const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
 
   const [lastSave, setLastSave] = useState<number>();
-
-  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
 
   const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
@@ -70,10 +71,6 @@ export function usePCRBatchItemGridControls({
       setIsStorage(true);
     }
   }, [pcrBatch]);
-
-  useEffect(() => {
-    getPcrBatch();
-  }, []);
 
   useEffect(() => {
     if (!pcrBatchItems) return;
@@ -115,14 +112,6 @@ export function usePCRBatchItemGridControls({
     });
   }, [pcrBatchItems]);
 
-  async function getPcrBatch() {
-    await apiClient
-      .get<PcrBatch>(`seqdb-api/pcr-batch/${pcrBatchId}`, {})
-      .then((response) => {
-        setPcrBatch(response?.data);
-      });
-  }
-
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
    * operation.
@@ -149,10 +138,7 @@ export function usePCRBatchItemGridControls({
   }
 
   // PcrBatchItem queries.
-  const {
-    loading: materialSampleItemsLoading,
-    response: materialSampleItemsResponse
-  } = useQuery<PcrBatchItem[]>(
+  const { loading: materialSampleItemsLoading } = useQuery<PcrBatchItem[]>(
     {
       filter: filterBy([], {
         extraFilters: [
@@ -168,7 +154,7 @@ export function usePCRBatchItemGridControls({
       include: "materialSample"
     },
     {
-      deps: [lastSave],
+      deps: [lastSave, editMode],
       onSuccess: async ({ data: pcrBatchItem }) => {
         setItemsLoading(true);
         setPcrBatchItems(
@@ -179,7 +165,8 @@ export function usePCRBatchItemGridControls({
             wellRow: item.wellRow
           }))
         );
-      }
+      },
+      disabled: editMode
     }
   );
 

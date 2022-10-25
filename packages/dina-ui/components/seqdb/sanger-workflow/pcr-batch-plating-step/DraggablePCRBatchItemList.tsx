@@ -45,6 +45,7 @@ export function DraggablePCRBatchItemList({
           onClick={(e) => onClick(item, e)}
           selected={selectedItems.includes(item)}
           editMode={editMode}
+          coordinates={null}
         />
       ))}
     </ul>

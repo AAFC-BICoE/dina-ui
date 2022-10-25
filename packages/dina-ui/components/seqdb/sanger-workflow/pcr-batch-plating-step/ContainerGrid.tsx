@@ -1,4 +1,3 @@
-import { useApiClient } from "packages/common-ui/lib";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
 import { PcrBatch } from "../../../../types/seqdb-api";
@@ -8,9 +7,10 @@ import {
 } from "./DraggablePCRBatchItemBox";
 import { useState, useEffect } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
+import RcTooltip from "rc-tooltip";
 
 interface ContainerGridProps {
-  pcrBatchId: string;
+  pcrBatch: PcrBatch;
   cellGrid: CellGrid;
   movedItems: PcrBatchItemSample[];
   onDrop: (item: PcrBatchItemSample, coords: string) => void;
@@ -21,6 +21,7 @@ interface GridCellProps {
   onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
   movedItems: PcrBatchItemSample[];
   pcrBatchItemSample: PcrBatchItemSample;
+  coordinates: string;
   editMode: boolean;
 }
 
@@ -29,27 +30,13 @@ export interface CellGrid {
 }
 
 export function ContainerGrid({
-  pcrBatchId,
+  pcrBatch,
   cellGrid,
   movedItems,
   onDrop,
   editMode
 }: ContainerGridProps) {
-  const { apiClient } = useApiClient();
-  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
-
-  async function getPcrBatch() {
-    await apiClient
-      .get<PcrBatch>(`seqdb-api/pcr-batch/${pcrBatchId}`, {})
-      .then((response) => {
-        setPcrBatch(response?.data);
-      });
-  }
-
-  useEffect(() => {
-    getPcrBatch();
-  }, []);
 
   useEffect(() => {
     if (!pcrBatch) return;
@@ -78,14 +65,13 @@ export function ContainerGrid({
   });
 
   for (let col = 0; col < numberOfRows; col++) {
-    const columnLabel = (
-      <div style={{ textAlign: "center" }}>{String(col + 1)}</div>
-    );
+    const column = String(col + 1);
+    const columnLabel = <div style={{ textAlign: "center" }}>{column}</div>;
 
     columns.push({
       Cell: ({ index: row }) => {
         const rowLabel = String.fromCharCode(row + 65);
-        const coords = `${rowLabel}_${columnLabel}`;
+        const coords = `${rowLabel}_${column}`;
 
         return (
           <span className={`well-${coords}`}>
@@ -96,6 +82,7 @@ export function ContainerGrid({
               }
               pcrBatchItemSample={cellGrid[coords]}
               editMode={editMode}
+              coordinates={coords.replace("_", "")}
             />
           </span>
         );
@@ -129,26 +116,49 @@ export function ContainerGrid({
 function GridCell({
   onDrop,
   pcrBatchItemSample,
+  coordinates,
   movedItems,
   editMode
 }: GridCellProps) {
-  const [, drop] = useDrop({
+  const [hover, setHover] = useState<boolean>(false);
+
+  const [{ dragHover }, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: (item) => {
       onDrop(item as any);
-    }
+    },
+    collect: (monitor) => ({
+      dragHover: monitor.isOver()
+    })
   });
 
   return (
-    <div ref={drop} className="h-100 w-100">
-      {pcrBatchItemSample && (
-        <DraggablePCRBatchItemBox
-          pcrBatchItemSample={pcrBatchItemSample}
-          selected={false}
-          wasMoved={movedItems.includes(pcrBatchItemSample)}
-          editMode={editMode}
-        />
-      )}
-    </div>
+    <RcTooltip
+      placement="top"
+      trigger={"hover"}
+      visible={(dragHover || hover) && pcrBatchItemSample === undefined}
+      overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
+    >
+      <div
+        ref={drop}
+        className="h-100 w-100"
+        style={{
+          border: dragHover ? "3px dashed #1C6EA4" : undefined,
+          background: dragHover ? "#f7fbff" : undefined
+        }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {pcrBatchItemSample && (
+          <DraggablePCRBatchItemBox
+            pcrBatchItemSample={pcrBatchItemSample}
+            selected={false}
+            wasMoved={movedItems.includes(pcrBatchItemSample)}
+            editMode={editMode}
+            coordinates={coordinates}
+          />
+        )}
+      </div>
+    </RcTooltip>
   );
 }

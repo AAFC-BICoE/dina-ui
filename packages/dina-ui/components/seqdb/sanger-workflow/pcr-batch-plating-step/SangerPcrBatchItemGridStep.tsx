@@ -4,9 +4,11 @@ import { ContainerGrid } from "./ContainerGrid";
 import { DraggablePCRBatchItemList } from "./DraggablePCRBatchItemList";
 import { usePCRBatchItemGridControls } from "./usePCRBatchItemGridControls";
 import { useEffect } from "react";
+import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
 
 export interface PCRBatchItemGridProps {
   pcrBatchId: string;
+  pcrBatch: PcrBatch;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -14,8 +16,14 @@ export interface PCRBatchItemGridProps {
 }
 
 export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
-  const { pcrBatchId, editMode, setEditMode, performSave, setPerformSave } =
-    props;
+  const {
+    pcrBatchId,
+    pcrBatch,
+    editMode,
+    setEditMode,
+    performSave,
+    setPerformSave
+  } = props;
   const {
     availableItems,
     cellGrid,
@@ -31,13 +39,18 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     selectedItems,
     setFillMode,
     isStorage
-  } = usePCRBatchItemGridControls(props);
+  } = usePCRBatchItemGridControls({
+    pcrBatchId,
+    pcrBatch,
+    editMode
+  });
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
     async function performSaveInternal() {
       await gridSubmit();
       setPerformSave(false);
+      setEditMode(false);
     }
 
     if (performSave) {
@@ -128,7 +141,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
         <div className="col-9">
           <strong>Container wells</strong>
           <ContainerGrid
-            pcrBatchId={pcrBatchId}
+            pcrBatch={pcrBatch}
             cellGrid={cellGrid}
             movedItems={movedItems}
             onDrop={onGridDrop}
