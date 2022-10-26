@@ -6,6 +6,7 @@ import {
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
+import { useIntl } from "react-intl";
 
 interface QueryBuilderNumberSearchProps {
   /**
@@ -29,6 +30,8 @@ export default function QueryBuilderNumberSearch({
   value,
   setValue
 }: QueryBuilderNumberSearchProps) {
+  const { formatMessage } = useIntl();
+
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
@@ -38,7 +41,9 @@ export default function QueryBuilderNumberSearch({
           value={value ?? ""}
           onChange={(newValue) => setValue?.(newValue?.target?.value)}
           className="form-control"
-          placeholder="Enter number value..."
+          placeholder={formatMessage({
+            id: "queryBuilder_value_number_placeholder"
+          })}
         />
       )}
     </>

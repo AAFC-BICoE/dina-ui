@@ -6,14 +6,7 @@ import {
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import Select from "react-select";
 import { TransformToDSLProps } from "../../types";
-
-/**
- * The possible states of a boolean if the Equals match is being used.
- */
-const QueryBuilderBooleanOptions = [
-  { label: "True", value: "true" },
-  { label: "False", value: "false" }
-];
+import { useIntl } from "react-intl";
 
 interface QueryBuilderBooleanSearchProps {
   /**
@@ -37,6 +30,16 @@ export default function QueryBuilderBooleanSearch({
   value,
   setValue
 }: QueryBuilderBooleanSearchProps) {
+  const { formatMessage } = useIntl();
+
+  /**
+   * The possible states of a boolean if the Equals match is being used.
+   */
+  const QueryBuilderBooleanOptions = [
+    { label: formatMessage({ id: "queryBuilder_value_true" }), value: "true" },
+    { label: formatMessage({ id: "queryBuilder_value_false" }), value: "false" }
+  ];
+
   const selectedOption = QueryBuilderBooleanOptions.find(
     (option) => option.value === value
   );

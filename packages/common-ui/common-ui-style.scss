@@ -87,6 +87,14 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 /*
+ * Blank Button CSS, use the light variant with this className.
+ */
+.btn-empty {
+  background: transparent !important;
+  border: transparent !important;
+}
+
+/*
  * Query Builder Custom CSS
  */
 .qb-lite {
@@ -112,7 +120,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 .rule--header {
   position: relative;
-  top: -2px;
   opacity: 1 !important;
 }
 
@@ -126,23 +133,21 @@ input[type="number"]::-webkit-outer-spin-button {
 }
 
 .rule--field {
+  float: left;
   min-width: 200px;
   width: 40%;
-  display: inline-block !important;
 }
 
 .rule--operator {
+  float: left;
   min-width: 200px;
   width: 20%;
-  display: inline-block !important;
 }
 
 .rule--value {
-  position: relative;
+  float: left;
   min-width: 200px;
-  top: -5px;
   width: calc(40% - 15px);
-  display: inline-block !important;
 }
 
 .rule--widget, .widget--widget {

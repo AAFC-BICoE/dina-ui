@@ -1,4 +1,5 @@
-import lodash, { startCase } from "lodash";
+import lodash, { startCase, flatMapDeep } from "lodash";
+import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
 import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
@@ -27,7 +28,7 @@ export function QueryFieldSelector({
   currentField,
   setField
 }: QueryFieldSelectorProps) {
-  const { formatMessage, messages } = useIntl();
+  const { formatMessage, messages, locale } = useIntl();
 
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
@@ -74,7 +75,7 @@ export function QueryFieldSelector({
     return simpleRowOptions
       ? [...simpleRowOptions, ...groupedNestRowOptions]
       : [];
-  }, [indexMap]);
+  }, [indexMap, locale]);
 
   // Custom styling to indent the group option menus.
   const customStyles = useMemo(
@@ -118,20 +119,31 @@ export function QueryFieldSelector({
         };
       }
     }),
-    [indexMap]
+    [indexMap, locale]
   );
 
   // Find the selected option in the index map if possible.
-  const selectedOption = useMemo(
-    () =>
-      queryRowOptions.find((dropdownItem) => {
+  // Needs to support nested items.
+  const selectedOption = useMemo(() => {
+    const getNestedOptions = (dropdownItem) => {
+      if ((dropdownItem as any)?.options) {
+        return [
+          dropdownItem,
+          flatMapDeep(dropdownItem.options, getNestedOptions)
+        ];
+      }
+      return dropdownItem;
+    };
+
+    return flatMapDeep(queryRowOptions, getNestedOptions).find(
+      (dropdownItem) => {
         if ((dropdownItem as any)?.value) {
           return (dropdownItem as any).value === currentField;
         }
         return false;
-      }),
-    [currentField]
-  );
+      }
+    );
+  }, [currentField, locale]);
 
   return (
     <div style={{ width: "100%" }}>
@@ -140,6 +152,7 @@ export function QueryFieldSelector({
         className={`flex-grow-1 me-2 ps-0`}
         styles={customStyles}
         value={selectedOption}
+        placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
         onChange={(selected) => setField?.(selected?.value)}
       />
     </div>
