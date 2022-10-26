@@ -1,7 +1,7 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { omitBy, compact, pick } from "lodash";
+import { omitBy, compact, isEmpty } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useRef, useState, useEffect, useMemo } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
 
@@ -56,6 +56,12 @@ export function usePCRBatchItemGridControls({
     // PcrBatchItems that have been moved since data initialization.
     movedItems: [] as PcrBatchItemSample[]
   });
+
+  // Boolean if the grid contains any of items.
+  const gridIsPopulated = useMemo(
+    () => !isEmpty(gridState.cellGrid),
+    [gridState]
+  );
 
   useEffect(() => {
     if (!pcrBatch) return;
@@ -337,6 +343,10 @@ export function usePCRBatchItemGridControls({
   }
 
   async function moveAll() {
+    // Do not perform the move if the grid contains anything.
+    // Eventually we should be able to handle this case properly.
+    if (gridIsPopulated) return;
+
     const { availableItems, cellGrid } = gridState;
     const items = [...availableItems, ...Object.values(cellGrid)].sort(
       itemSort
@@ -358,7 +368,8 @@ export function usePCRBatchItemGridControls({
     onItemClick,
     selectedItems,
     setFillMode,
-    isStorage
+    isStorage,
+    gridIsPopulated
   };
 }
 

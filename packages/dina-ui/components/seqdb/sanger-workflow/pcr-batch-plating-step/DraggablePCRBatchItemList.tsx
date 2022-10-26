@@ -22,20 +22,34 @@ export function DraggablePCRBatchItemList({
   onDrop,
   editMode
 }: DraggablePCRBatchItemListProps) {
-  const [, dropRef] = useDrop({
+  const [{ dragHover, dragging }, dropRef] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
     drop: (item) => {
       if (editMode) {
         onDrop(item as any);
       }
-    }
+    },
+    collect: (monitor) => ({
+      dragHover: monitor.isOver(),
+      dragging: monitor.canDrop()
+    })
   });
 
   return (
     <ul
       className="list-group available-sample-list"
       ref={dropRef}
-      style={{ minHeight: "400px", maxHeight: "400px", overflowY: "scroll" }}
+      style={{
+        minHeight: "400px",
+        maxHeight: "400px",
+        overflowY: "scroll",
+        border: dragHover
+          ? "3px dashed #1C6EA4"
+          : dragging
+          ? "3px dashed #78909c"
+          : undefined,
+        background: dragHover ? "#f7fbff" : dragging ? "#f2f2f2" : undefined
+      }}
     >
       {availableItems.map((item) => (
         <DraggablePCRBatchItemBox

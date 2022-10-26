@@ -38,7 +38,8 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
     onItemClick,
     selectedItems,
     setFillMode,
-    isStorage
+    isStorage,
+    gridIsPopulated
   } = usePCRBatchItemGridControls({
     pcrBatchId,
     pcrBatch,
@@ -133,6 +134,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
               className="btn btn-primary move-all w-100"
               onClick={moveAll}
               type="button"
+              disabled={gridIsPopulated}
             >
               Move All
             </button>
