@@ -155,6 +155,38 @@ input[type="number"]::-webkit-outer-spin-button {
   display: inline-block !important;
 }
 
-.group--drag-handler {
-  top: 0px !important;
+.group--drag-handler:not(:only-child) {
+  top: 19px !important;
+}
+
+/* 
+ * Toggle Group Styles
+ */
+.toggleGroup {
+  position: relative;
+  background: white;
+  border: 2px solid #dadada;
+  border-radius: 10px;
+  padding: 3px;
+  float: left;
+  top: 5px;
+}
+
+.toggleButton:last-child {
+  margin-left: 5px;
+}
+
+.toggleButton {
+  position: relative;
+  background: none !important;
+  color: #335075 !important;
+  border-radius: 6px;
+  border: none;
+  box-shadow: none !important;
+  transition: background 0.3s, color 0.3s;
+}
+
+.activeToggle {
+  background: #335075 !important;
+  color: white !important;
 }
