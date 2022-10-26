@@ -115,15 +115,22 @@ export default function MaterialSampleEditPage() {
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(materialSampleQuery, ({ data: sample }) => (
-            <MaterialSampleForm
-              enableReinitialize={true}
-              {...sampleFormProps}
-              materialSample={
-                sampleFormTemplate ? materialSampleInitialValues : sample
-              }
-            />
-          ))
+          withResponse(materialSampleQuery, ({ data: sample }) => {
+            if (sampleFormTemplate?.id) {
+              Object.keys(materialSampleInitialValues).forEach((key) => {
+                if (!sample[key]) {
+                  sample[key] = materialSampleInitialValues[key];
+                }
+              });
+            }
+            return (
+              <MaterialSampleForm
+                enableReinitialize={true}
+                {...sampleFormProps}
+                materialSample={sample}
+              />
+            );
+          })
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {
             const initialValues = nextSampleInitialValues(originalSample);

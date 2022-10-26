@@ -1029,7 +1029,7 @@ describe("Workflow template edit page", () => {
       name: "form1",
       group: "aafc",
       restrictToCreatedBy: false,
-      viewConfiguration: {},
+      viewConfiguration: { type: "material-sample-form-template" },
       components: [
         {
           name: "identifiers-component",
@@ -1767,7 +1767,18 @@ describe("Workflow template edit page", () => {
             {
               name: "managed-attributes-section",
               visible: true,
-              items: []
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "managedAttributes",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "managedAttributesOrder",
+                  visible: true
+                }
+              ]
             }
           ]
         },
