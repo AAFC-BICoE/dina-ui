@@ -1,6 +1,17 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
 import { noop } from "lodash";
+import { PcrBatch } from "../../../../../dina-ui/types/seqdb-api";
+
+const PCR_BATCH_ID = "test-batch-id";
+const PCR_BATCH_NAME = "test-batch";
+
+const PCR_BATCH: PcrBatch = {
+  name: PCR_BATCH_NAME,
+  type: "pcr-batch",
+  id: PCR_BATCH_ID,
+  createdBy: "test-user"
+};
 
 const mockOnSaved = jest.fn();
 const mockGet = jest.fn<any, any>(async (path) => {
@@ -11,14 +22,14 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "agent-api/person":
     case "seqdb-api/thermocycler-profile":
     case "user-api/group":
-    case "seqdb-api/pcr-batch/test-batch-id/attachment":
+    case "seqdb-api/pcr-batch/" + PCR_BATCH_ID + "/attachment":
       return { data: [] };
-    case "seqdb-api/pcr-batch/test-batch-id":
+    case "seqdb-api/pcr-batch/" + PCR_BATCH_ID:
       return {
         data: {
           createdBy: "test-user",
-          id: "test-batch-id",
-          name: "test-batch",
+          id: PCR_BATCH_ID,
+          name: PCR_BATCH_NAME,
           type: "pcr-batch"
         }
       };
@@ -59,7 +70,7 @@ describe("SangerPcrBatchStep component", () => {
 
     wrapper
       .find(".name-field input")
-      .simulate("change", { target: { value: "test-batch" } });
+      .simulate("change", { target: { value: PCR_BATCH_NAME } });
 
     wrapper.find("form").simulate("submit");
 
@@ -69,7 +80,7 @@ describe("SangerPcrBatchStep component", () => {
     expect(mockOnSaved).lastCalledWith({
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
-      name: "test-batch",
+      name: PCR_BATCH_NAME,
       relationships: {
         attachment: {
           data: []
@@ -83,7 +94,8 @@ describe("SangerPcrBatchStep component", () => {
     const wrapper = mountWithAppContext(
       <SangerPcrBatchStep
         onSaved={mockOnSaved}
-        pcrBatchId={"test-batch-id"}
+        pcrBatchId={PCR_BATCH_ID}
+        pcrBatch={PCR_BATCH}
         editMode={false}
         setEditMode={noop}
         performSave={false}
@@ -97,7 +109,7 @@ describe("SangerPcrBatchStep component", () => {
 
     // The form is initially in read-only mode:
     expect(wrapper.find(".name-field .field-view").text()).toEqual(
-      "test-batch"
+      PCR_BATCH_NAME
     );
 
     wrapper.update();
@@ -107,7 +119,8 @@ describe("SangerPcrBatchStep component", () => {
       children: (
         <SangerPcrBatchStep
           onSaved={mockOnSaved}
-          pcrBatchId={"test-batch-id"}
+          pcrBatchId={PCR_BATCH_ID}
+          pcrBatch={PCR_BATCH}
           editMode={true} // Change to edit mode.
           setEditMode={noop}
           performSave={false}
@@ -132,7 +145,7 @@ describe("SangerPcrBatchStep component", () => {
     expect(mockOnSaved).lastCalledWith({
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
-      name: "test-batch",
+      name: PCR_BATCH_NAME,
       objective: "test-objective",
       relationships: {
         attachment: {

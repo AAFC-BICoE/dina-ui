@@ -1,15 +1,15 @@
-import { DinaForm, SubmitButton, withResponse } from "common-ui";
+import { DinaForm, SubmitButton } from "common-ui";
 import { PersistedResource } from "kitsu";
 import {
   PcrBatchForm,
-  PcrBatchFormFields,
-  usePcrBatchQuery
+  PcrBatchFormFields
 } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
 import { useEffect } from "react";
 
 export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
+  pcrBatch?: PcrBatch;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
@@ -19,6 +19,7 @@ export interface SangerPcrBatchStepProps {
 
 export function SangerPcrBatchStep({
   pcrBatchId,
+  pcrBatch,
   onSaved,
   editMode,
   setEditMode,
@@ -31,8 +32,6 @@ export function SangerPcrBatchStep({
       setEditMode(true);
     }
   }, [pcrBatchId]);
-
-  const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [editMode]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
     await onSaved(resource);
@@ -49,19 +48,17 @@ export function SangerPcrBatchStep({
     </>
   );
 
-  return pcrBatchId ? (
-    withResponse(pcrBatchQuery, ({ data: pcrBatch }) =>
-      editMode ? (
-        <PcrBatchForm
-          pcrBatch={pcrBatch}
-          onSaved={onSavedInternal}
-          buttonBar={buttonBar}
-        />
-      ) : (
-        <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
-          <PcrBatchFormFields />
-        </DinaForm>
-      )
+  return pcrBatch ? (
+    editMode ? (
+      <PcrBatchForm
+        pcrBatch={pcrBatch as any}
+        onSaved={onSavedInternal}
+        buttonBar={buttonBar}
+      />
+    ) : (
+      <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
+        <PcrBatchFormFields />
+      </DinaForm>
     )
   ) : (
     <PcrBatchForm onSaved={onSavedInternal} buttonBar={buttonBar} />

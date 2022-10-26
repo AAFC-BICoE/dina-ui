@@ -77,7 +77,7 @@ export function PCRBatchItemGrid(props: PCRBatchItemGridProps) {
           <div className="col-3" />
           <div className="col-9">
             <ul style={{ float: "left" }} className="p-0 mt-3">
-              <li className="list-inline-item">
+              <li className="list-inline-item fill-by">
                 <strong>Fill by:</strong>
               </li>
               {[

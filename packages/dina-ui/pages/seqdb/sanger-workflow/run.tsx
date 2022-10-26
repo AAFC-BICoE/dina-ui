@@ -16,8 +16,6 @@ export default function SangerWorkFlowRunPage() {
   const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
 
-  const pcrBatchId = router.query.pcrBatchId?.toString();
-
   // Current step being used.
   const [currentStep, setCurrentStep] = useState<number>(
     router.query.step ? Number(router.query.step) : 0
@@ -30,12 +28,19 @@ export default function SangerWorkFlowRunPage() {
   const [performSave, setPerformSave] = useState<boolean>(false);
 
   // Loaded PCR Batch ID.
+  const [pcrBatchId, setPcrBatchId] = useState<string | undefined>(
+    router.query.pcrBatchId?.toString()
+  );
+
+  // Loaded PCR Batch.
   const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
 
   // Load the PCR Batch only once.
   useEffect(() => {
-    getPcrBatch();
-  }, []);
+    if (pcrBatchId) {
+      getPcrBatch();
+    }
+  }, [pcrBatchId]);
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -49,7 +54,7 @@ export default function SangerWorkFlowRunPage() {
     pcrBatchSaved: PersistedResource<PcrBatch>
   ) {
     setCurrentStep(1);
-    getPcrBatch();
+    setPcrBatchId(pcrBatchSaved.id);
     await router.push({
       pathname: router.pathname,
       query: { ...router.query, pcrBatchId: pcrBatchSaved.id, step: "1" }
@@ -143,6 +148,7 @@ export default function SangerWorkFlowRunPage() {
         <TabPanel>
           <SangerPcrBatchStep
             pcrBatchId={pcrBatchId}
+            pcrBatch={pcrBatch}
             onSaved={finishPcrBatchStep}
             editMode={editMode}
             setEditMode={setEditMode}

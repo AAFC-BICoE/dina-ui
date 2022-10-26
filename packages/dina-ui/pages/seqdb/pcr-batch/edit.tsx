@@ -215,7 +215,6 @@ export function LoadExternalDataForPcrBatchForm({
     <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
       {buttonBar}
       <PcrBatchFormFields />
-      {buttonBar}
     </DinaForm>
   ));
 }

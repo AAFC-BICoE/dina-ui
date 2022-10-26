@@ -5,7 +5,7 @@ import {
   DraggablePCRBatchItemBox,
   ITEM_BOX_DRAG_KEY
 } from "./DraggablePCRBatchItemBox";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
 import RcTooltip from "rc-tooltip";
 
@@ -37,61 +37,68 @@ export function ContainerGrid({
   editMode
 }: ContainerGridProps) {
   const [numberOfRows, setNumberOfRows] = useState<number>(0);
+  const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
   useEffect(() => {
     if (!pcrBatch) return;
 
     if (pcrBatch?.storageRestriction) {
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
     }
   }, [pcrBatch]);
 
-  const columns: Column[] = [];
+  // Generate table columns, only when the row/column number changes.
+  const tableColumns: Column[] = useMemo(() => {
+    const columns: Column[] = [];
 
-  // Add the letter column.
-  columns.push({
-    Cell: ({ index }) => (
-      <div style={{ padding: "7px 5px", textAlign: "center" }}>
-        {String.fromCharCode(index + 65)}
-      </div>
-    ),
-    resizable: false,
-    sortable: false,
-    width: 40,
-    style: {
-      background: "white",
-      boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
-    }
-  });
-
-  for (let col = 0; col < numberOfRows; col++) {
-    const column = String(col + 1);
-    const columnLabel = <div style={{ textAlign: "center" }}>{column}</div>;
-
+    // Add the letter column.
     columns.push({
-      Cell: ({ index: row }) => {
-        const rowLabel = String.fromCharCode(row + 65);
-        const coords = `${rowLabel}_${column}`;
-
-        return (
-          <span className={`well-${coords}`}>
-            <GridCell
-              movedItems={movedItems}
-              onDrop={({ pcrBatchItemSample: newItem }) =>
-                onDrop(newItem, coords)
-              }
-              pcrBatchItemSample={cellGrid[coords]}
-              editMode={editMode}
-              coordinates={coords.replace("_", "")}
-            />
-          </span>
-        );
-      },
-      Header: columnLabel,
+      Cell: ({ index }) => (
+        <div style={{ padding: "7px 5px", textAlign: "center" }}>
+          {String.fromCharCode(index + 65)}
+        </div>
+      ),
       resizable: false,
-      sortable: false
+      sortable: false,
+      width: 40,
+      style: {
+        background: "white",
+        boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+      }
     });
-  }
+
+    for (let col = 0; col < numberOfColumns; col++) {
+      const column = String(col + 1);
+      const columnLabel = <div style={{ textAlign: "center" }}>{column}</div>;
+
+      columns.push({
+        Cell: ({ index: row }) => {
+          const rowLabel = String.fromCharCode(row + 65);
+          const coords = `${rowLabel}_${column}`;
+
+          return (
+            <span className={`well-${coords}`}>
+              <GridCell
+                movedItems={movedItems}
+                onDrop={({ pcrBatchItemSample: newItem }) =>
+                  onDrop(newItem, coords)
+                }
+                pcrBatchItemSample={cellGrid[coords]}
+                editMode={editMode}
+                coordinates={coords.replace("_", "")}
+              />
+            </span>
+          );
+        },
+        Header: columnLabel,
+        resizable: false,
+        sortable: false
+      });
+    }
+
+    return columns;
+  }, [numberOfRows, numberOfColumns, movedItems, editMode]);
 
   // ReactTable needs a data object in every row.
   const tableData = new Array(numberOfRows).fill({});
@@ -104,7 +111,7 @@ export function ContainerGrid({
         }
       `}</style>
       <ReactTable
-        columns={columns}
+        columns={tableColumns}
         data={tableData}
         minRows={0}
         showPagination={false}
