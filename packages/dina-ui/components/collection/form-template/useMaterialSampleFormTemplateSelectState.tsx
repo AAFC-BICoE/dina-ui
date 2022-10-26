@@ -54,7 +54,13 @@ export function useMaterialSampleFormTemplateSelectState() {
       ? true
       : false;
 
+  // Re-using viewConfiguration object structure for now
   const materialSampleFormTemplate = {
+    managedAttributesOrder: materialSampleComponent.managedAttributesOrder,
+    determinationManagedAttributesOrder:
+      materialSampleComponent.determinationManagedAttributesOrder,
+    collectingEventManagedAttributesOrder:
+      materialSampleComponent.collectingEventManagedAttributesOrder,
     formTemplate: {
       COLLECTING_EVENT: hasCollectingEvent
         ? getFormTemplateSchema(collectingEventComponent)
@@ -92,6 +98,7 @@ export function useMaterialSampleFormTemplateSelectState() {
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
   delete materialSampleInitialValues?.templateCheckboxes;
   delete materialSampleInitialValues?.templateFields;
+  delete materialSampleInitialValues?.managedAttributesOrder;
   delete collectingEventInitialValues?.templateCheckboxes;
   delete collectingEventInitialValues?.templateFields;
   delete acquisitionEventInitialValues?.templateCheckboxes;

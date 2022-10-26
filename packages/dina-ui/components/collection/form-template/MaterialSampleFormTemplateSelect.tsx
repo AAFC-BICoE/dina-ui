@@ -23,7 +23,7 @@ export function MaterialSampleFormTemplateSelect({
             <ResourceSelect<FormTemplate>
               filter={(input) => ({
                 // Filter by "material-sample-form-section-order" to omit unrelated form-template records:
-                // "viewConfiguration.type": "material-sample-form-template",
+                "viewConfiguration.type": "material-sample-form-template",
                 // Filter by view name typed into the dropdown:
                 ...filterBy(["name"])(input),
                 // Filter by the form's group:

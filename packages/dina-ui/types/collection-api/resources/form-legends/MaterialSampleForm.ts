@@ -612,7 +612,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         id: "managed-attributes-section",
         labelKey: "managedAttributes",
         maxGridSizeX: 2,
-        items: []
+        items: [
+          {
+            id: "managedAttributes",
+            visible: true
+          },
+          { id: "managedAttributesOrder", visible: true }
+        ]
       }
     ]
   },
