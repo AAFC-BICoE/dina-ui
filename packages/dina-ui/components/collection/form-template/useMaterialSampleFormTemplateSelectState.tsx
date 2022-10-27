@@ -17,8 +17,7 @@ import {
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { PcrBatch } from "packages/dina-ui/types/seqdb-api";
-import { useApiClient } from "packages/common-ui/lib";
+import { useApiClient } from "../../../../common-ui/lib";
 
 const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
