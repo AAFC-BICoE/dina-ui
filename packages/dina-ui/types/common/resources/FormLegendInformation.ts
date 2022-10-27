@@ -45,4 +45,5 @@ export interface FormLegendSectionInformation {
  */
 export interface FormLegendFieldInformation {
   id: string;
+  visible?: boolean;
 }

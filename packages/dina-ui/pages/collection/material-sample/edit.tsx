@@ -1,6 +1,6 @@
 import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Footer,
   Head,
@@ -50,12 +50,17 @@ export default function MaterialSampleEditPage() {
     enabledFields,
     sampleFormTemplate,
     setSampleFormTemplate,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
-
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     enabledFields,
     visibleManagedAttributeKeys,
+    materialSample: materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues,
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
@@ -110,9 +115,22 @@ export default function MaterialSampleEditPage() {
           <DinaMessage id={title} />
         </h1>
         {id ? (
-          withResponse(materialSampleQuery, ({ data: sample }) => (
-            <MaterialSampleForm {...sampleFormProps} materialSample={sample} />
-          ))
+          withResponse(materialSampleQuery, ({ data: sample }) => {
+            if (sampleFormTemplate?.id) {
+              Object.keys(materialSampleInitialValues).forEach((key) => {
+                if (!sample[key]) {
+                  sample[key] = materialSampleInitialValues[key];
+                }
+              });
+            }
+            return (
+              <MaterialSampleForm
+                enableReinitialize={true}
+                {...sampleFormProps}
+                materialSample={sample}
+              />
+            );
+          })
         ) : copyFromId ? (
           withResponse(copyFromQuery, ({ data: originalSample }) => {
             const initialValues = nextSampleInitialValues(originalSample);
@@ -125,7 +143,7 @@ export default function MaterialSampleEditPage() {
             );
           })
         ) : (
-          <MaterialSampleForm {...sampleFormProps} />
+          <MaterialSampleForm enableReinitialize={true} {...sampleFormProps} />
         )}
       </main>
       <Footer />
