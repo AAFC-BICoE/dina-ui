@@ -140,7 +140,17 @@ export function PcrBatchForm({
     delete submittedValues.attachment;
 
     // Add storage unit if it was selected:
-    delete submittedValues.storageUnitType;
+    if (submittedValues.storageUnit && submittedValues.storageUnitType) {
+      delete submittedValues.storageUnitType;
+    } else {
+      (submittedValues as any).relationships.storageUnitType = {
+        data:
+          ((it) => ({
+            id: it.id,
+            type: it.type
+          })) ?? []
+      };
+    }
 
     const inputResource = {
       ...submittedValues,
@@ -316,7 +326,6 @@ export function PcrBatchFormFields() {
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
-            isDisabled: !values?.storageUnitType?.id,
             filter: filterBy(["name"], {
               extraFilters: [
                 {
