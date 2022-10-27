@@ -1,4 +1,8 @@
-import { FormTemplate } from "packages/dina-ui/types/collection-api";
+import {
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FormTemplate
+} from "../../types/collection-api";
 import { sortBy } from "lodash";
 
 export function getFormTemplateCheckboxes(
@@ -56,23 +60,28 @@ export function getComponentValues(
   return ret;
 }
 
-export function getAllComponentValues(
+export function getMaterialSampleComponentValues(
   formTemplate: FormTemplate | undefined
 ): any {
-  const componentValues = {};
+  const componentValues = { group: formTemplate?.group };
   const templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
-      if (component.visible) {
-        component.sections?.forEach((sections) => {
-          sections.items?.forEach((item) => {
-            if ((item.name && item.visible) || item.name === "organism") {
-              componentValues[item.name] = item.defaultValue;
-              templateCheckboxes[item.name] = true;
-            }
+      if (
+        component.name !== COLLECTING_EVENT_COMPONENT_NAME &&
+        component.name !== ACQUISITION_EVENT_COMPONENT_NAME
+      ) {
+        if (component.visible) {
+          component.sections?.forEach((sections) => {
+            sections.items?.forEach((item) => {
+              if ((item.name && item.visible) || item.name === "organism") {
+                componentValues[item.name] = item.defaultValue;
+                templateCheckboxes[item.name] = true;
+              }
+            });
           });
-        });
+        }
       }
     });
   }

@@ -21,7 +21,7 @@ import {
   useMaterialSampleSave
 } from "../../../../dina-ui/components";
 import {
-  getAllComponentValues,
+  getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
   getFormTemplateCheckboxes
@@ -103,16 +103,15 @@ export function FormTemplateEditPageLoaded({
     : "createMaterialSampleFormTemplate";
   // Get initial values of data components
   const allMaterialSampleComponentValues =
-    getAllComponentValues(fetchedFormTemplate);
+    getMaterialSampleComponentValues(fetchedFormTemplate);
   if (!allMaterialSampleComponentValues.associations?.length) {
     allMaterialSampleComponentValues.associations = [{}];
   }
-
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
-  const collectingEventInitialValues = {
-    ...getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate),
-    managedAttributesOrder: []
-  };
+  const collectingEventInitialValues = getComponentValues(
+    COLLECTING_EVENT_COMPONENT_NAME,
+    fetchedFormTemplate
+  );
 
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
@@ -204,7 +203,7 @@ export function FormTemplateEditPageLoaded({
       name: submittedValues.name,
       group: submittedValues.group,
       restrictToCreatedBy: false,
-      viewConfiguration: {},
+      viewConfiguration: { type: "material-sample-form-template" },
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
           name: dataComponent.id,
@@ -216,8 +215,9 @@ export function FormTemplateEditPageLoaded({
             items: section.items.map((field) => {
               return {
                 name: field.id,
-                visible:
-                  allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+                visible: field.visible
+                  ? true
+                  : allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
                 defaultValue: _.get(allSubmittedValues, field.id)
               };
             })
