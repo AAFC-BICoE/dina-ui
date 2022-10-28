@@ -28,10 +28,6 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
 
-  // const [formTemplateUUID, setFormTemplateUUID] = useLocalStorage<
-  //   string | undefined
-  // >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
-
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
     PersistedResource<FormTemplate> | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
