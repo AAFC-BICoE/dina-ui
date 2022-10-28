@@ -17,6 +17,7 @@ import {
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { useApiClient } from "../../../../common-ui/lib";
 
 const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
@@ -25,9 +26,28 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
  * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
 export function useMaterialSampleFormTemplateSelectState() {
+  const { apiClient } = useApiClient();
+
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
     PersistedResource<FormTemplate> | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
+
+  useEffect(() => {
+    if (sampleFormTemplate?.id) {
+      getFormTemplate();
+    }
+  }, [sampleFormTemplate]);
+
+  async function getFormTemplate() {
+    await apiClient
+      .get<FormTemplate>(
+        `collection-api/form-template/${sampleFormTemplate?.id}`,
+        {}
+      )
+      .then((response) => {
+        setSampleFormTemplate(response?.data);
+      });
+  }
 
   // Get initial values of data components
   const materialSampleComponent =
