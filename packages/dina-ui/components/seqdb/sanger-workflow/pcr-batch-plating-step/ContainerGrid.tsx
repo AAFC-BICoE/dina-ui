@@ -1,22 +1,28 @@
-import { useApiClient } from "packages/common-ui/lib";
 import { useDrop } from "react-dnd-cjs";
 import ReactTable, { Column } from "react-table";
-import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
-import { DraggablePCRBatchItemBox, ITEM_BOX_DRAG_KEY } from "./DraggablePCRBatchItemBox";
-import { useState, useEffect } from "react";
+import { PcrBatch } from "../../../../types/seqdb-api";
+import {
+  DraggablePCRBatchItemBox,
+  ITEM_BOX_DRAG_KEY
+} from "./DraggablePCRBatchItemBox";
+import { useState, useEffect, useMemo } from "react";
 import { PcrBatchItemSample } from "./usePCRBatchItemGridControls";
+import RcTooltip from "rc-tooltip";
 
 interface ContainerGridProps {
-  pcrBatchId: string;
+  pcrBatch: PcrBatch;
   cellGrid: CellGrid;
   movedItems: PcrBatchItemSample[];
   onDrop: (item: PcrBatchItemSample, coords: string) => void;
+  editMode: boolean;
 }
 
 interface GridCellProps {
   onDrop: (item: { pcrBatchItemSample: PcrBatchItemSample }) => void;
   movedItems: PcrBatchItemSample[];
   pcrBatchItemSample: PcrBatchItemSample;
+  coordinates: string;
+  editMode: boolean;
 }
 
 export interface CellGrid {
@@ -24,73 +30,75 @@ export interface CellGrid {
 }
 
 export function ContainerGrid({
-  pcrBatchId,
+  pcrBatch,
   cellGrid,
   movedItems,
-  onDrop
+  onDrop,
+  editMode
 }: ContainerGridProps) {
-  const { apiClient } = useApiClient();
-  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
-  const [ numberOfRows, setNumberOfRows ] = useState<number>(0);
-
-  async function getPcrBatch(){
-    await apiClient.get<PcrBatch>(
-      `seqdb-api/pcr-batch/${pcrBatchId}`,
-      {}
-    )
-    .then((response) => {
-      setPcrBatch(response?.data);
-    });
-  }
-
-  useEffect(() => {
-    getPcrBatch();
-  }, []);
+  const [numberOfRows, setNumberOfRows] = useState<number>(0);
+  const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
   useEffect(() => {
     if (!pcrBatch) return;
 
-    if (pcrBatch?.storageRestriction){
+    if (pcrBatch?.storageRestriction) {
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
-    }  
-  }, [pcrBatch])
-  
-  const columns: Column[] = [];
+      setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
+    }
+  }, [pcrBatch]);
 
-  // Add the letter column.
-  columns.push({
-    Cell: ({ index }) => (
-      <div style={{ padding: "7px 5px" }}>
-        {String.fromCharCode(index + 65)}
-      </div>
-    ),
-    resizable: false,
-    sortable: false
-  });
+  // Generate table columns, only when the row/column number changes.
+  const tableColumns: Column[] = useMemo(() => {
+    const columns: Column[] = [];
 
-  for (let col = 0; col < numberOfRows; col++) {
-    const columnLabel = String(col + 1);
-
+    // Add the letter column.
     columns.push({
-      Cell: ({ index: row }) => {
-        const rowLabel = String.fromCharCode(row + 65);
-        const coords = `${rowLabel}_${columnLabel}`;
-
-        return (
-          <span className={`well-${coords}`}>
-            <GridCell
-              movedItems={movedItems}
-              onDrop={({ pcrBatchItemSample: newItem }) => onDrop(newItem, coords)}
-              pcrBatchItemSample={cellGrid[coords]}
-            />
-          </span>
-        );
-      },
-      Header: columnLabel,
+      Cell: ({ index }) => (
+        <div style={{ padding: "7px 5px", textAlign: "center" }}>
+          {String.fromCharCode(index + 65)}
+        </div>
+      ),
       resizable: false,
-      sortable: false
+      sortable: false,
+      width: 40,
+      style: {
+        background: "white",
+        boxShadow: "11px 0px 9px 0px rgba(0,0,0,0.1)"
+      }
     });
-  }
+
+    for (let col = 0; col < numberOfColumns; col++) {
+      const column = String(col + 1);
+      const columnLabel = <div style={{ textAlign: "center" }}>{column}</div>;
+
+      columns.push({
+        Cell: ({ index: row }) => {
+          const rowLabel = String.fromCharCode(row + 65);
+          const coords = `${rowLabel}_${column}`;
+
+          return (
+            <span className={`well-${coords}`}>
+              <GridCell
+                movedItems={movedItems}
+                onDrop={({ pcrBatchItemSample: newItem }) =>
+                  onDrop(newItem, coords)
+                }
+                pcrBatchItemSample={cellGrid[coords]}
+                editMode={editMode}
+                coordinates={coords.replace("_", "")}
+              />
+            </span>
+          );
+        },
+        Header: columnLabel,
+        resizable: false,
+        sortable: false
+      });
+    }
+
+    return columns;
+  }, [numberOfRows, numberOfColumns, movedItems, editMode]);
 
   // ReactTable needs a data object in every row.
   const tableData = new Array(numberOfRows).fill({});
@@ -103,7 +111,7 @@ export function ContainerGrid({
         }
       `}</style>
       <ReactTable
-        columns={columns}
+        columns={tableColumns}
         data={tableData}
         minRows={0}
         showPagination={false}
@@ -112,24 +120,52 @@ export function ContainerGrid({
   );
 }
 
-function GridCell({ onDrop, pcrBatchItemSample, movedItems }: GridCellProps) {
-  const [, drop] = useDrop({
+function GridCell({
+  onDrop,
+  pcrBatchItemSample,
+  coordinates,
+  movedItems,
+  editMode
+}: GridCellProps) {
+  const [hover, setHover] = useState<boolean>(false);
+
+  const [{ dragHover }, drop] = useDrop({
     accept: ITEM_BOX_DRAG_KEY,
-    drop: item => {
-      onDrop((item as any))
-    }
+    drop: (item) => {
+      onDrop(item as any);
+    },
+    collect: (monitor) => ({
+      dragHover: monitor.isOver()
+    })
   });
 
   return (
-    <div ref={drop} className="h-100 w-100">
-      {pcrBatchItemSample && (
-        <DraggablePCRBatchItemBox
-          pcrBatchItemSample={pcrBatchItemSample}
-          selected={false}
-          wasMoved={movedItems.includes(pcrBatchItemSample)}
-        />
-      )}
-    </div>
+    <RcTooltip
+      placement="top"
+      trigger={"hover"}
+      visible={(dragHover || hover) && pcrBatchItemSample === undefined}
+      overlay={<div style={{ maxWidth: "15rem" }}>{coordinates}</div>}
+    >
+      <div
+        ref={drop}
+        className="h-100 w-100"
+        style={{
+          border: dragHover ? "3px dashed #1C6EA4" : undefined,
+          background: dragHover ? "#f7fbff" : undefined
+        }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+      >
+        {pcrBatchItemSample && (
+          <DraggablePCRBatchItemBox
+            pcrBatchItemSample={pcrBatchItemSample}
+            selected={false}
+            wasMoved={movedItems.includes(pcrBatchItemSample)}
+            editMode={editMode}
+            coordinates={coordinates}
+          />
+        )}
+      </div>
+    </RcTooltip>
   );
 }
-
