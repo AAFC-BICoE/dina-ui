@@ -10,7 +10,7 @@ import {
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
 import { get } from "lodash";
-import { COLLECTING_EVENT_COMPONENT_NAME } from "packages/dina-ui/types/collection-api";
+import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
 import { useRef, useState } from "react";
 import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";

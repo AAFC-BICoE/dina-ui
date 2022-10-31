@@ -139,6 +139,8 @@ export function ScheduledActionsField({
       id={id}
       legend={<DinaMessage id="scheduledActions" />}
       fieldName={fieldName}
+      componentName={SCHEDULED_ACTIONS_COMPONENT_NAME}
+      sectionName="scheduled-actions-add-section"
     >
       {wrapContent(
         <FieldSpy fieldName={fieldName}>

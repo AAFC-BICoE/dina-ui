@@ -328,6 +328,8 @@ export function MaterialSampleForm({
           id={id}
           legend={<DinaMessage id="storage" />}
           fieldName="storageUnit"
+          componentName={STORAGE_COMPONENT_NAME}
+          sectionName="storage-selection-section"
         >
           <StorageLinkerField
             name="storageUnit"
@@ -359,6 +361,8 @@ export function MaterialSampleForm({
         <DinaFormSection
           // Disabled the template's restrictions for this section:
           enabledFields={null}
+          componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
+          sectionName="managed-attributes-section"
         >
           <div className="row">
             <div className="col-md-6">
@@ -384,23 +388,28 @@ export function MaterialSampleForm({
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
-        <AttachmentsField
-          name={attachmentsField}
-          title={<DinaMessage id="materialSampleAttachments" />}
-          id={id}
-          allowNewFieldName="attachmentsConfig.allowNew"
-          allowExistingFieldName="attachmentsConfig.allowExisting"
-          allowAttachmentsConfig={attachmentsConfig?.materialSample}
-          attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
-          wrapContent={(content) => (
-            <BulkEditTabWarning
-              targetType="material-sample"
-              fieldName={attachmentsField}
-            >
-              {content}
-            </BulkEditTabWarning>
-          )}
-        />
+        <DinaFormSection
+          componentName={MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME}
+          sectionName="material-sample-attachments-sections"
+        >
+          <AttachmentsField
+            name={attachmentsField}
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id={id}
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+            wrapContent={(content) => (
+              <BulkEditTabWarning
+                targetType="material-sample"
+                fieldName={attachmentsField}
+              >
+                {content}
+              </BulkEditTabWarning>
+            )}
+          />
+        </DinaFormSection>
       )
   };
 
