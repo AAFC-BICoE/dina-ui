@@ -144,7 +144,8 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate } = useDinaFormContext();
+  const { horizontal, isTemplate, componentName, sectionName } =
+    useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
@@ -166,13 +167,13 @@ function LabelWrapper({
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : (horizontal || []).map(col => `col-sm-${col}`) ||
+      : (horizontal || []).map((col) => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   // Replace dots and square brackets with underscores so the classes are selectable in tests and CSS:
   // e.g. organism.lifeStage-field -> organism_lifeStage-field
   const fieldNameClasses = [name, customName].map(
-    it => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
+    (it) => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
   );
 
   return (
@@ -186,7 +187,9 @@ function LabelWrapper({
     >
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
+          name={`templateCheckboxes['${componentName}.${sectionName}.${
+            templateCheckboxFieldName ?? name
+          }']`}
           className={`col-sm-1 templateCheckBox ${
             horizontal === "flex" && "mt-2"
           }`}

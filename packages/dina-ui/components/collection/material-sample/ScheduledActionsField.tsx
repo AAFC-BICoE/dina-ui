@@ -308,6 +308,8 @@ export function ScheduledActionSubForm({
             actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
           }
           enabledFields={actionsEnabledFields}
+          componentName={SCHEDULED_ACTIONS_COMPONENT_NAME}
+          sectionName="scheduled-actions-add-section"
         >
           <div className="row">
             <AutoSuggestTextField<MaterialSample>
