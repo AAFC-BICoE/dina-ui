@@ -1,10 +1,7 @@
 import { InputResource, KitsuResource } from "kitsu";
 import { compact, isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
-import {
-  MaterialSampleFormEnabledFields,
-  VisibleManagedAttributesConfig
-} from "../..";
+import { VisibleManagedAttributesConfig } from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -23,7 +20,6 @@ export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
   acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
-  enabledFields: MaterialSampleFormEnabledFields;
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
@@ -106,33 +102,10 @@ export function useMaterialSampleFormTemplateProps<
       ? undefined
       : acquisitionEvent;
 
-    const enabledFields = {
-      materialSample: [
-        ...compact(
-          toPairs(
-            actionDefinition.formTemplate.MATERIAL_SAMPLE?.templateFields
-          ).map(([key, val]) => (val?.enabled ? key : null))
-        ),
-        // The group field should always be enabled:
-        "group"
-      ],
-      collectingEvent: compact(
-        toPairs(
-          actionDefinition.formTemplate.COLLECTING_EVENT?.templateFields
-        ).map(([key, val]) => (val?.enabled ? key : null))
-      ),
-      acquisitionEvent: compact(
-        toPairs(
-          actionDefinition.formTemplate.ACQUISITION_EVENT?.templateFields
-        ).map(([key, val]) => (val?.enabled ? key : null))
-      )
-    };
-
     const config: MaterialSampleFormTemplateProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
       acquisitionEventInitialValues,
-      enabledFields,
       visibleManagedAttributeKeys: {
         materialSample: actionDefinition.managedAttributesOrder,
         collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,

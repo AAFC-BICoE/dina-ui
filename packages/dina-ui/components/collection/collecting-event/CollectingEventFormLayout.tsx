@@ -915,10 +915,7 @@ export function CollectingEventFormLayout({
             : null}
         </div>
       </div>
-      <DinaFormSection
-        // Disabled the template's restrictions for this section:
-        enabledFields={null}
-      >
+      <DinaFormSection>
         {!readOnly
           ? collectingEventManagedAttributesComponent
           : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes

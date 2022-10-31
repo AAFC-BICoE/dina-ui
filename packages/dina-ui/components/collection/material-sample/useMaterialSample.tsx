@@ -37,6 +37,7 @@ import {
   AcquisitionEvent,
   CollectingEvent,
   Collection,
+  FormTemplate,
   MaterialSample,
   Organism
 } from "../../../../dina-ui/types/collection-api";
@@ -46,10 +47,7 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
-import {
-  MaterialSampleFormEnabledFields,
-  VisibleManagedAttributesConfig
-} from "./MaterialSampleForm";
+import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 
@@ -145,6 +143,8 @@ export interface UseMaterialSampleSaveParams {
 
   isTemplate?: boolean;
 
+  formTemplate?: FormTemplate;
+
   acqEventTemplateInitialValues?: Partial<AcquisitionEvent> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
@@ -154,9 +154,6 @@ export interface UseMaterialSampleSaveParams {
   materialSampleTemplateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-
-  /** Optionally restrict the form to these enabled fields. */
-  enabledFields?: MaterialSampleFormEnabledFields;
 
   collectingEventAttachmentsConfig?: AllowAttachmentsConfig;
 
@@ -186,7 +183,7 @@ export function useMaterialSampleSave({
   colEventFormRef: colEventFormRefProp,
   acquisitionEventFormRef: acquisitionEventFormRefProp,
   isTemplate,
-  enabledFields,
+  formTemplate,
   collectingEventAttachmentsConfig,
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
@@ -261,19 +258,11 @@ export function useMaterialSampleSave({
     );
 
   const [enableCollectingEvent, setEnableCollectingEvent] = useState<boolean>(
-    Boolean(
-      hasColEventTemplate ||
-        materialSample?.collectingEvent ||
-        enabledFields?.collectingEvent?.length
-    )
+    Boolean(hasColEventTemplate || materialSample?.collectingEvent)
   );
 
   const [enableAcquisitionEvent, setEnableAcquisitionEvent] = useState<boolean>(
-    Boolean(
-      hasAcquisitionEventTemplate ||
-        materialSample?.acquisitionEvent ||
-        enabledFields?.acquisitionEvent?.length
-    )
+    Boolean(hasAcquisitionEventTemplate || materialSample?.acquisitionEvent)
   );
 
   const [enablePreparations, setEnablePreparations] = useState<boolean>(
@@ -281,38 +270,22 @@ export function useMaterialSampleSave({
       hasPreparationsTemplate ||
         // Show the preparation section if a field is set or the field is enabled:
         PREPARATION_FIELDS.some(
-          (prepFieldName) =>
-            !isEmpty(materialSample?.[prepFieldName]) ||
-            enabledFields?.materialSample?.includes(prepFieldName)
+          (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
         )
     )
   );
 
   const [enableOrganisms, setEnableOrganisms] = useState<boolean>(
-    Boolean(
-      hasOrganismsTemplate ||
-        materialSample?.organism?.length ||
-        enabledFields?.materialSample?.some((enabledField) =>
-          enabledField.startsWith("organism[0].")
-        )
-    )
+    Boolean(hasOrganismsTemplate || materialSample?.organism?.length)
   );
 
   const [enableStorage, setEnableStorage] = useState<boolean>( // Show the Storage section if the storage field is set or the template enables it:
-    Boolean(
-      hasStorageTemplate ||
-        materialSample?.storageUnit?.id ||
-        enabledFields?.materialSample?.includes("storageUnit")
-    )
+    Boolean(hasStorageTemplate || materialSample?.storageUnit?.id)
   );
 
   const [enableScheduledActions, setEnableScheduledActions] = useState<boolean>( // Show the Scheduled Actions section if the field is set or the template enables it:
     Boolean(
-      hasScheduledActionsTemplate ||
-        materialSample?.scheduledActions?.length ||
-        enabledFields?.materialSample?.some((enabledField) =>
-          enabledField.startsWith("scheduledAction.")
-        )
+      hasScheduledActionsTemplate || materialSample?.scheduledActions?.length
     )
   );
 
@@ -321,12 +294,7 @@ export function useMaterialSampleSave({
       hasAssociationsTemplate ||
         materialSample?.associations?.length ||
         !isEmpty(materialSample?.hostOrganism) ||
-        !isEmpty(materialSample?.associations) ||
-        enabledFields?.materialSample?.some(
-          (enabledField) =>
-            enabledField.startsWith("associations[0].") ||
-            enabledField.startsWith("hostOrganism.")
-        )
+        !isEmpty(materialSample?.associations)
     )
   );
 
@@ -335,67 +303,41 @@ export function useMaterialSampleSave({
       hasRestrictionsTemplate ||
         // Show the restriction section if a field is set or the field is enabled:
         RESTRICTIONS_FIELDS.some(
-          (restrictFieldName) =>
-            !isEmpty(materialSample?.[restrictFieldName]) ||
-            enabledFields?.materialSample?.includes(restrictFieldName)
+          (restrictFieldName) => !isEmpty(materialSample?.[restrictFieldName])
         )
     )
   );
 
   useEffect(() => {
     setEnableCollectingEvent(
-      Boolean(
-        hasColEventTemplate ||
-          materialSample?.collectingEvent ||
-          enabledFields?.collectingEvent?.length
-      )
+      Boolean(hasColEventTemplate || materialSample?.collectingEvent)
     );
     setEnableAcquisitionEvent(
-      Boolean(
-        hasAcquisitionEventTemplate ||
-          materialSample?.acquisitionEvent ||
-          enabledFields?.acquisitionEvent?.length
-      )
+      Boolean(hasAcquisitionEventTemplate || materialSample?.acquisitionEvent)
     );
     setEnablePreparations(
       Boolean(
         hasPreparationsTemplate ||
           // Show the preparation section if a field is set or the field is enabled:
           PREPARATION_FIELDS.some(
-            (prepFieldName) =>
-              !isEmpty(materialSample?.[prepFieldName]) ||
-              enabledFields?.materialSample?.includes(prepFieldName)
+            (prepFieldName) => !isEmpty(materialSample?.[prepFieldName])
           )
       )
     );
 
     setEnableOrganisms(
-      Boolean(
-        hasOrganismsTemplate ||
-          materialSample?.organism?.length ||
-          enabledFields?.materialSample?.some((enabledField) =>
-            enabledField.startsWith("organism[0].")
-          )
-      )
+      Boolean(hasOrganismsTemplate || materialSample?.organism?.length)
     );
 
     setEnableStorage(
       // Show the Storage section if the storage field is set or the template enables it:
-      Boolean(
-        hasStorageTemplate ||
-          materialSample?.storageUnit?.id ||
-          enabledFields?.materialSample?.includes("storageUnit")
-      )
+      Boolean(hasStorageTemplate || materialSample?.storageUnit?.id)
     );
 
     setEnableScheduledActions(
       // Show the Scheduled Actions section if the field is set or the template enables it:
       Boolean(
-        hasScheduledActionsTemplate ||
-          materialSample?.scheduledActions?.length ||
-          enabledFields?.materialSample?.some((enabledField) =>
-            enabledField.startsWith("scheduledAction.")
-          )
+        hasScheduledActionsTemplate || materialSample?.scheduledActions?.length
       )
     );
 
@@ -405,12 +347,7 @@ export function useMaterialSampleSave({
         hasAssociationsTemplate ||
           materialSample?.associations?.length ||
           !isEmpty(materialSample?.hostOrganism) ||
-          !isEmpty(materialSample?.associations) ||
-          enabledFields?.materialSample?.some(
-            (enabledField) =>
-              enabledField.startsWith("associations[0].") ||
-              enabledField.startsWith("hostOrganism.")
-          )
+          !isEmpty(materialSample?.associations)
       )
     );
 
@@ -419,13 +356,11 @@ export function useMaterialSampleSave({
         hasRestrictionsTemplate ||
           // Show the restriction section if a field is set or the field is enabled:
           RESTRICTIONS_FIELDS.some(
-            (restrictFieldName) =>
-              !isEmpty(materialSample?.[restrictFieldName]) ||
-              enabledFields?.materialSample?.includes(restrictFieldName)
+            (restrictFieldName) => !isEmpty(materialSample?.[restrictFieldName])
           )
       )
     );
-  }, [enabledFields]);
+  }, [formTemplate]);
 
   // The state describing which Data components (Form sections) are enabled:
   const dataComponentState = {
@@ -908,7 +843,6 @@ export function useMaterialSampleSave({
       isTemplate,
       // In bulk-edit and workflow run, disable editing existing Col events:
       readOnly: disableNestedFormEdits || isTemplate ? !!colEventId : false,
-      enabledFields: enabledFields?.collectingEvent,
       children: reduceRendering ? (
         <div />
       ) : (
@@ -939,7 +873,6 @@ export function useMaterialSampleSave({
       isTemplate,
       // In bulk-edit and workflow run, disable editing existing Acq events:
       readOnly: disableNestedFormEdits || isTemplate ? !!acqEventId : false,
-      enabledFields: enabledFields?.acquisitionEvent,
       children: reduceRendering ? (
         <div />
       ) : (

@@ -84,7 +84,6 @@ export function CreateMaterialSampleFromWorkflowForm({
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues,
-    enabledFields,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateProps(actionDefinition);
 
@@ -130,7 +129,6 @@ export function CreateMaterialSampleFromWorkflowForm({
       collectingEventInitialValues={collectingEventInitialValues}
       acquisitionEventInitialValues={acquisitionEventInitialValues}
       onSaved={selectOnSaved(onSaveString)}
-      enabledFields={enabledFields}
       attachmentsConfig={{
         collectingEvent: pick(
           actionDefinition.formTemplate.COLLECTING_EVENT,

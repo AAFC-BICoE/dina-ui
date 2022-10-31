@@ -31,7 +31,6 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
-import { MaterialSampleFormEnabledFields } from "../collection/material-sample/MaterialSampleForm";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -50,7 +49,6 @@ export function MaterialSampleBulkEditor({
   const {
     sampleFormTemplate,
     setSampleFormTemplate,
-    enabledFields,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateSelectState();
 
@@ -72,7 +70,6 @@ export function MaterialSampleBulkEditor({
     formTemplateProps: Partial<MaterialSampleFormProps>;
   } = initializeRefHookFormProps(
     samplesProp,
-    enabledFields,
     visibleManagedAttributeKeys,
     selectedTab
   );
@@ -174,7 +171,6 @@ interface BulkSampleSaveParams {
 
 export function initializeRefHookFormProps(
   samplesProp,
-  enabledFields: MaterialSampleFormEnabledFields,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
@@ -185,7 +181,6 @@ export function initializeRefHookFormProps(
   const samples = useMemo(() => samplesProp, []);
 
   const formTemplateProps: Partial<MaterialSampleFormProps> = {
-    enabledFields,
     visibleManagedAttributeKeys
   };
 
@@ -205,8 +200,7 @@ export function initializeRefHookFormProps(
   const sampleHooks = getSampleHooks(
     samples,
     selectedTab,
-    visibleManagedAttributeKeys,
-    enabledFields
+    visibleManagedAttributeKeys
   );
 
   const materialSampleForm = getMaterialSampleForm(
@@ -231,8 +225,7 @@ function getSampleHooks(
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
     | undefined,
-  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
-  enabledFields: MaterialSampleFormEnabledFields
+  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined
 ) {
   return samples.map((resource, index) => {
     const key = `sample-${index}`;
@@ -245,8 +238,7 @@ function getSampleHooks(
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
         disableNestedFormEdits: true,
-        visibleManagedAttributeKeys,
-        enabledFields
+        visibleManagedAttributeKeys
       }),
       formRef: useRef(null)
     };

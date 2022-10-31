@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
 import { isArray } from "lodash";
+import { getFieldFromFormTemplate } from "../../../dina-ui/components/form-template/formTemplateUtils";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -53,14 +54,6 @@ export interface FieldWrapperProps {
   /** The text that appears for the link. */
   tooltipLinkText?: string;
 
-  /**
-   * Custom field name for the template checkbox.
-   * e.g. passing "srcAdminLevels[0]" will change the default
-   * "templateCheckboxes['srcAdminLevels[0].name']"
-   * to "templateCheckboxes['srcAdminLevels[0]']".
-   */
-  templateCheckboxFieldName?: string;
-
   validate?: (value: any) => string | void;
   children?:
     | JSX.Element
@@ -85,20 +78,23 @@ export interface FieldWrapperRenderProps {
  * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
 export function FieldWrapper(props: FieldWrapperProps) {
-  const { name, templateCheckboxFieldName, validate } = props;
+  const { name, validate } = props;
 
-  const { enabledFields } = useDinaFormContext();
+  const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
-  /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
-  const disabledByFormTemplate = useMemo(
-    () =>
-      enabledFields
-        ? !enabledFields.includes(templateCheckboxFieldName || name)
-        : false,
-    [enabledFields]
-  );
+  const formTemplateInfo = useMemo(() => {
+    if (!formTemplate || !componentName || !sectionName) return;
 
-  if (disabledByFormTemplate) {
+    return getFieldFromFormTemplate(
+      formTemplate,
+      componentName,
+      sectionName,
+      name
+    );
+  }, [formTemplate, componentName, sectionName, name]);
+
+  // If the form template field is not visible, just render nothing.
+  if (formTemplateInfo?.visible === false) {
     return null;
   }
 
@@ -133,7 +129,6 @@ function LabelWrapper({
     removeBottomMargin,
     removeLabel,
     tooltipImage,
-    templateCheckboxFieldName,
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText
@@ -166,13 +161,13 @@ function LabelWrapper({
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : (horizontal || []).map(col => `col-sm-${col}`) ||
+      : (horizontal || []).map((col) => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   // Replace dots and square brackets with underscores so the classes are selectable in tests and CSS:
   // e.g. organism.lifeStage-field -> organism_lifeStage-field
   const fieldNameClasses = [name, customName].map(
-    it => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
+    (it) => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
   );
 
   return (
@@ -186,7 +181,7 @@ function LabelWrapper({
     >
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
+          name={`templateCheckboxes['${name}']`}
           className={`col-sm-1 templateCheckBox ${
             horizontal === "flex" && "mt-2"
           }`}

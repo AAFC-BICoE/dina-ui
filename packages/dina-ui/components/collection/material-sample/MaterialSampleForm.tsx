@@ -11,14 +11,7 @@ import {
   LoadingSpinner,
   SubmitButton
 } from "common-ui";
-import {
-  Fragment,
-  ReactNode,
-  Ref,
-  useContext,
-  useState,
-  useEffect
-} from "react";
+import { Fragment, ReactNode, Ref, useContext } from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -69,16 +62,6 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 
-/**
- * The enabled fields if creating from a template.
- * Nested DinaForms (Collecting Event and Acquisition Event) have separate string arrays.
- */
-export interface MaterialSampleFormEnabledFields {
-  materialSample: string[];
-  collectingEvent: string[];
-  acquisitionEvent: string[];
-}
-
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
   collectingEvent?: string[];
@@ -110,9 +93,6 @@ export interface MaterialSampleFormProps {
   templateInitialValues?: Partial<MaterialSample> & {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
-
-  /** The enabled fields if creating from a template. */
-  enabledFields?: MaterialSampleFormEnabledFields;
 
   attachmentsConfig?: {
     materialSample: AllowAttachmentsConfig;
@@ -173,7 +153,6 @@ export function MaterialSampleForm({
   onChangeNavOrder,
   onSaved,
   materialSampleSaveHook,
-  enabledFields,
   attachmentsConfig,
   disableAutoNamePrefix,
   materialSampleFormRef,
@@ -217,19 +196,18 @@ export function MaterialSampleForm({
       acquisitionEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields,
       reduceRendering,
       visibleManagedAttributeKeys
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
-  const templateAttachesCollectingEvent = Boolean(
-    enabledFields?.collectingEvent.includes("id")
-  );
-  const templateAttachesAcquisitionEvent = Boolean(
-    enabledFields?.acquisitionEvent.includes("id")
-  );
+  // const templateAttachesCollectingEvent = Boolean(
+  //   enabledFields?.collectingEvent.includes("id")
+  // );
+  // const templateAttachesAcquisitionEvent = Boolean(
+  //   enabledFields?.acquisitionEvent.includes("id")
+  // );
   const attachmentsField = "attachment";
 
   /**
@@ -268,7 +246,7 @@ export function MaterialSampleForm({
           nestedForm={nestedCollectingEventForm}
           useResourceQuery={useCollectingEventQuery}
           setResourceId={setColEventId}
-          disableLinkerTab={templateAttachesCollectingEvent}
+          // disableLinkerTab={templateAttachesCollectingEvent}
           readOnlyLink="/collection/collecting-event/view?id="
           resourceId={colEventId}
           fieldName="collectingEvent"
@@ -297,7 +275,7 @@ export function MaterialSampleForm({
           nestedForm={nestedAcqEventForm}
           useResourceQuery={useAcquisitionEvent}
           setResourceId={setAcqEventId}
-          disableLinkerTab={templateAttachesAcquisitionEvent}
+          // disableLinkerTab={templateAttachesAcquisitionEvent}
           readOnlyLink="/collection/acquisition-event/view?id="
           resourceId={acqEventId}
           fieldName="acquisitionEvent"
@@ -356,10 +334,7 @@ export function MaterialSampleForm({
       ),
     [MANAGED_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
-        <DinaFormSection
-          // Disabled the template's restrictions for this section:
-          enabledFields={null}
-        >
+        <DinaFormSection>
           <div className="row">
             <div className="col-md-6">
               <ManagedAttributesEditor
@@ -479,7 +454,7 @@ export function MaterialSampleForm({
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
-      enabledFields={enabledFields?.materialSample}
+      formTemplate={}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}

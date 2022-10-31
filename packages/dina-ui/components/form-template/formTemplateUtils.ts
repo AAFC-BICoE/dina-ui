@@ -1,9 +1,11 @@
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
-  FormTemplate
+  FormTemplate,
+  FormTemplateComponent,
+  FormTemplateSectionItem
 } from "../../types/collection-api";
-import { sortBy } from "lodash";
+import { sortBy, get } from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -124,4 +126,26 @@ export function getComponentOrderFromTemplate(
   return sortBy(template.components, "order").map<string>(
     (component) => component.name ?? ""
   );
+}
+
+/**
+ * Retrieve field information using lodash get function to navigate the tree to retrieve the field
+ * information.
+ *
+ * @param template The form template to search against.
+ * @param componentName The data component name.
+ * @param sectionName The section name within the component.
+ * @param fieldName The field name within the section.
+ * @returns FormTemplateSectionItem if found, undefined if not.
+ */
+export function getFieldFromFormTemplate(
+  formTemplateComponents: FormTemplateComponent[],
+  componentName: string,
+  sectionName: string,
+  fieldName: string
+): FormTemplateSectionItem | undefined {
+  return get(
+    formTemplateComponents,
+    [componentName, sectionName, fieldName].join(",")
+  ) as FormTemplateSectionItem;
 }

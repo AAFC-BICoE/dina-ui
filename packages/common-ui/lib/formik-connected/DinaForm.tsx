@@ -8,6 +8,7 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
+import { FormTemplateComponent } from "packages/dina-ui/types/collection-api";
 import {
   createContext,
   PropsWithChildren,
@@ -44,8 +45,27 @@ export interface DinaFormContextI {
   /** Add a checkbox beside the wrapper field if true */
   isTemplate?: boolean;
 
-  /** Optionally restrict the writable fields to this list. */
-  enabledFields?: string[] | null;
+  /**
+   * Form template to apply to the current form. This is used to define the visibility and position
+   * of fields.
+   */
+  formTemplate?: FormTemplateComponent[];
+
+  /**
+   * The form template component name where the fields are located. Using the <DinaFormSection> you
+   * can override these values to change them throughout the form.
+   *
+   * This needs to be provided (and the sectionName) for form template features to work properly.
+   */
+  componentName?: string;
+
+  /**
+   * The form template section name where the fields are located. Using the <DinaFormSection> you
+   * can override these values to change them throughout the form.
+   *
+   * This needs to be provided (and the componentName) for form template features to work properly.
+   */
+  sectionName?: string;
 
   /**
    * @deperecated

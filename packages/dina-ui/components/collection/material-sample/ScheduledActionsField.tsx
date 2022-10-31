@@ -1,6 +1,5 @@
 import {
   AutoSuggestTextField,
-  AutoSuggestTextFieldProps,
   DateField,
   DinaForm,
   DinaFormSection,
@@ -13,7 +12,6 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { FastField, FormikContextType } from "formik";
-import { isEmpty } from "lodash";
 import { Fragment, ReactNode, useState } from "react";
 import ReactTable, { CellInfo, Column } from "react-table";
 import * as yup from "yup";
@@ -235,15 +233,7 @@ export function ScheduledActionSubForm({
   actionToEdit,
   defaultDate
 }: ScheduledActionSubFormProps) {
-  const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
-
-  const actionsEnabledFields = enabledFields?.filter((it) =>
-    it.startsWith("scheduledAction.")
-  );
-
-  const actionTemplateInitialValues = enabledFields
-    ? initialValues.scheduledAction
-    : undefined;
+  const { initialValues, isTemplate } = useDinaFormContext();
 
   function disableEnterToSubmitOuterForm(e) {
     // Pressing enter should not submit the outer form:
@@ -305,7 +295,6 @@ export function ScheduledActionSubForm({
           initialValues={
             actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
           }
-          enabledFields={actionsEnabledFields}
         >
           <div className="row">
             <AutoSuggestTextField<MaterialSample>

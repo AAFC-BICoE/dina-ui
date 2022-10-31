@@ -1,6 +1,6 @@
 import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Footer,
   Head,
@@ -47,7 +47,6 @@ export default function MaterialSampleEditPage() {
   const {
     navOrder,
     setNavOrder,
-    enabledFields,
     sampleFormTemplate,
     setSampleFormTemplate,
     visibleManagedAttributeKeys,
@@ -55,8 +54,8 @@ export default function MaterialSampleEditPage() {
     collectingEventInitialValues,
     acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
+
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
-    enabledFields,
     visibleManagedAttributeKeys,
     materialSample: materialSampleInitialValues,
     collectingEventInitialValues,

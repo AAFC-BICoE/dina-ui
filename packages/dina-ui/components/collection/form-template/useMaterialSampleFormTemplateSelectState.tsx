@@ -1,6 +1,5 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
-import { z } from "zod";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -10,16 +9,14 @@ import {
   getMaterialSampleComponentValues,
   getComponentValues
 } from "../../form-template/formTemplateUtils";
-import {
-  MaterialSampleFormEnabledFields,
-  VisibleManagedAttributesConfig
-} from "../material-sample/MaterialSampleForm";
+import { VisibleManagedAttributesConfig } from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
 
 const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
+
 /**
  * Manages the state of a MaterialSampleForm Form Template selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
@@ -27,6 +24,9 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
  */
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
+
+  // Store the nav order in the Page components state:
+  const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
     PersistedResource<FormTemplate> | undefined
@@ -105,18 +105,17 @@ export function useMaterialSampleFormTemplateSelectState() {
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
   const {
-    enabledFields,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   }: {
-    enabledFields: MaterialSampleFormEnabledFields;
     visibleManagedAttributeKeys?: VisibleManagedAttributesConfig | undefined;
     materialSampleInitialValues: any;
     collectingEventInitialValues?: any;
     acquisitionEventInitialValues?: any;
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
+
   delete materialSampleInitialValues?.templateCheckboxes;
   delete materialSampleInitialValues?.templateFields;
   delete materialSampleInitialValues?.managedAttributesOrder;
@@ -125,20 +124,18 @@ export function useMaterialSampleFormTemplateSelectState() {
   delete acquisitionEventInitialValues?.templateCheckboxes;
   delete acquisitionEventInitialValues?.templateFields;
 
-  // Store the nav order in the Page components state:
-  const [navOrder, setNavOrder] = useState<string[] | null>(null);
   return {
     sampleFormTemplate,
     setSampleFormTemplate,
     navOrder,
     setNavOrder,
-    enabledFields,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   };
 }
+
 function getFormTemplateSchema(component: any) {
   component.templateFields = {};
   const schema: any = {

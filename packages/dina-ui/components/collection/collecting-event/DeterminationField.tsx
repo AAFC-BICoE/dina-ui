@@ -332,7 +332,6 @@ export function DeterminationField({
                   attributeSelectorWidth={12}
                   fieldSetProps={{
                     legend: <DinaMessage id="determinationManagedAttributes" />,
-                    enabledFields: null,
                     className: "non-strip"
                   }}
                   showFormTemplateDropdown={!isTemplate}
