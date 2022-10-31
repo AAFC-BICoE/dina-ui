@@ -429,43 +429,48 @@ export function MaterialSampleForm({
           />
         )}
       </div>
-      <div className="flex-grow-1 container-fluid">
-        {!reduceRendering && (
-          <>
-            {!isTemplate && materialSample && (
-              <MaterialSampleBreadCrumb
-                disableLastLink={true}
-                materialSample={materialSample as any}
-              />
-            )}
-            {!isTemplate && (
-              <div className="row">
-                <div className="col-md-6">
-                  <GroupSelectField
-                    name="group"
-                    enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  />
+      <DinaFormSection
+        componentName={IDENTIFIER_COMPONENT_NAME}
+        sectionName="general-section"
+      >
+        <div className="flex-grow-1 container-fluid">
+          {!reduceRendering && (
+            <>
+              {!isTemplate && materialSample && (
+                <MaterialSampleBreadCrumb
+                  disableLastLink={true}
+                  materialSample={materialSample as any}
+                />
+              )}
+              {!isTemplate && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <GroupSelectField
+                      name="group"
+                      enableStoredDefaultGroup={enableStoredDefaultGroup}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-            <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-            <ProjectSelectSection
-              classNames="mt-3"
-              resourcePath="collection-api/project"
-            />
-            <AssemblageSelectSection
-              classNames="mt-2"
-              resourcePath="collection-api/assemblage"
-            />
-          </>
-        )}
-        {/* The toggleable / re-arrangeable form sections: */}
-        <div className="data-components">
-          {sortedFormSectionPairs.map(([id, renderFn]) => (
-            <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
-          ))}
+              )}
+              <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+              <ProjectSelectSection
+                classNames="mt-3"
+                resourcePath="collection-api/project"
+              />
+              <AssemblageSelectSection
+                classNames="mt-2"
+                resourcePath="collection-api/assemblage"
+              />
+            </>
+          )}
+          {/* The toggleable / re-arrangeable form sections: */}
+          <div className="data-components">
+            {sortedFormSectionPairs.map(([id, renderFn]) => (
+              <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
+            ))}
+          </div>
         </div>
-      </div>
+      </DinaFormSection>
     </div>
   );
 

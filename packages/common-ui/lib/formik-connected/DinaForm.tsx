@@ -48,6 +48,18 @@ export interface DinaFormContextI {
   enabledFields?: string[] | null;
 
   /**
+   * The component name for all of the fields within this dina form. Using DinaFormContext you can
+   * override it.
+   */
+  componentName?: string;
+
+  /**
+   * The section name for all of the fields within this dina form. Using the DinaFormContext you can
+   * override it.
+   */
+  sectionName?: string;
+
+  /**
    * @deperecated
    * Whether this DinaForm is nested in another DinaForm. Nested forms are bad so avoid this.
    */
