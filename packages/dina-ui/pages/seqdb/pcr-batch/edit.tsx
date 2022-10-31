@@ -140,7 +140,11 @@ export function PcrBatchForm({
     delete submittedValues.attachment;
 
     // Add storage unit if it was selected:
-    if (submittedValues.storageUnit && submittedValues.storageUnitType) {
+    if (
+      (submittedValues.storageUnit?.id &&
+        submittedValues.storageUnitType?.id) ||
+      (!submittedValues.storageUnit?.id && !submittedValues.storageUnitType?.id)
+    ) {
       delete submittedValues.storageUnitType;
     } else {
       (submittedValues as any).relationships.storageUnitType = {
