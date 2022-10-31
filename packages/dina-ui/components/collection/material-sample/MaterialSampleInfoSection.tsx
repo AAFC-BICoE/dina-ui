@@ -35,64 +35,64 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
   };
 
   return (
-    <DinaFormSection
+    <FieldSet
+      id={id}
+      legend={<DinaMessage id="materialSampleInfo" />}
       componentName={MATERIAL_SAMPLE_INFO_COMPONENT_NAME}
       sectionName="material-sample-info-section"
     >
-      <FieldSet id={id} legend={<DinaMessage id="materialSampleInfo" />}>
-        <div className="row">
-          <div className="col-md-6">
-            <ControlledVocabularySelectField
-              name="materialSampleType"
-              query={() => ({
-                path: "collection-api/vocabulary/materialSampleType"
-              })}
+      <div className="row">
+        <div className="col-md-6">
+          <ControlledVocabularySelectField
+            name="materialSampleType"
+            query={() => ({
+              path: "collection-api/vocabulary/materialSampleType"
+            })}
+          />
+          {!readOnly ? (
+            <AutoSuggestTextField<Vocabulary>
+              name="materialSampleState"
+              jsonApiBackend={{
+                query: () => ({
+                  path: "collection-api/vocabulary/materialSampleState"
+                }),
+                option: (vocabElement) =>
+                  vocabElement?.vocabularyElements?.map(
+                    (it) => it?.labels?.[locale] ?? ""
+                  ) ?? ""
+              }}
+              blankSearchBackend={"json-api"}
+              onChangeExternal={onMaterialSampleStateChanged}
             />
-            {!readOnly ? (
-              <AutoSuggestTextField<Vocabulary>
-                name="materialSampleState"
-                jsonApiBackend={{
-                  query: () => ({
-                    path: "collection-api/vocabulary/materialSampleState"
-                  }),
-                  option: (vocabElement) =>
-                    vocabElement?.vocabularyElements?.map(
-                      (it) => it?.labels?.[locale] ?? ""
-                    ) ?? ""
-                }}
-                blankSearchBackend={"json-api"}
-                onChangeExternal={onMaterialSampleStateChanged}
-              />
-            ) : (
-              <MaterialSampleStateReadOnlyRender removeLabel={false} />
-            )}
-          </div>
-          <div className="col-md-6">
-            <TextField name="materialSampleRemarks" multiLines={true} />
-          </div>
+          ) : (
+            <MaterialSampleStateReadOnlyRender removeLabel={false} />
+          )}
         </div>
-        {!readOnly && (
-          <FieldSpy fieldName="materialSampleState">
-            {(materialSampleState) =>
-              materialSampleState ? (
-                <div className="row">
-                  <DateField
-                    className="col-md-6"
-                    name="stateChangedOn"
-                    label={formatMessage("date")}
-                  />
-                  <TextField
-                    className="col-md-6"
-                    name="stateChangeRemarks"
-                    multiLines={true}
-                    label={formatMessage("additionalRemarks")}
-                  />
-                </div>
-              ) : null
-            }
-          </FieldSpy>
-        )}
-      </FieldSet>
-    </DinaFormSection>
+        <div className="col-md-6">
+          <TextField name="materialSampleRemarks" multiLines={true} />
+        </div>
+      </div>
+      {!readOnly && (
+        <FieldSpy fieldName="materialSampleState">
+          {(materialSampleState) =>
+            materialSampleState ? (
+              <div className="row">
+                <DateField
+                  className="col-md-6"
+                  name="stateChangedOn"
+                  label={formatMessage("date")}
+                />
+                <TextField
+                  className="col-md-6"
+                  name="stateChangeRemarks"
+                  multiLines={true}
+                  label={formatMessage("additionalRemarks")}
+                />
+              </div>
+            ) : null
+          }
+        </FieldSpy>
+      )}
+    </FieldSet>
   );
 }

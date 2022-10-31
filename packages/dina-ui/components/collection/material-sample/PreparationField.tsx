@@ -81,6 +81,8 @@ export function PreparationField({
       className={className}
       id={id}
       legend={<DinaMessage id="preparations" />}
+      componentName={PREPARATIONS_COMPONENT_NAME}
+      sectionName="general-section"
     >
       <div className="row">
         <div className="col-md-6">

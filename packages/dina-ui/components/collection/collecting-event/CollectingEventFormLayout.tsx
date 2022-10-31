@@ -30,7 +30,10 @@ import {
   TagsAndRestrictionsSection
 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Vocabulary } from "../../../types/collection-api";
+import {
+  COLLECTING_EVENT_COMPONENT_NAME,
+  Vocabulary
+} from "../../../types/collection-api";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -367,14 +370,19 @@ export function CollectingEventFormLayout({
       });
   }
   const collectingEventAttachmentsComponent = (
-    <AttachmentsField
-      name="attachment"
-      title={<DinaMessage id="collectingEventAttachments" />}
-      allowNewFieldName="attachmentsConfig.allowNew"
-      allowExistingFieldName="attachmentsConfig.allowExisting"
-      allowAttachmentsConfig={attachmentsConfig}
-      attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
-    />
+    <DinaFormSection
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="collecting-event-attachments-section"
+    >
+      <AttachmentsField
+        name="attachment"
+        title={<DinaMessage id="collectingEventAttachments" />}
+        allowNewFieldName="attachmentsConfig.allowNew"
+        allowExistingFieldName="attachmentsConfig.allowExisting"
+        allowAttachmentsConfig={attachmentsConfig}
+        attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+      />
+    </DinaFormSection>
   );
   const collectingEventManagedAttributesComponent = (
     <ManagedAttributesEditor
@@ -382,7 +390,9 @@ export function CollectingEventFormLayout({
       managedAttributeApiPath="collection-api/managed-attribute"
       managedAttributeComponent="COLLECTING_EVENT"
       fieldSetProps={{
-        legend: <DinaMessage id="collectingEventManagedAttributes" />
+        legend: <DinaMessage id="collectingEventManagedAttributes" />,
+        componentName: COLLECTING_EVENT_COMPONENT_NAME,
+        sectionName: "collecting-event-managed-attributes-section"
       }}
       showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
@@ -394,6 +404,8 @@ export function CollectingEventFormLayout({
       fieldName="geographicPlaceNameSourceDetail"
       legend={<DinaMessage id="toponymyLegend" />}
       className="non-strip"
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="current-geographic-place"
     >
       <div
         style={{
@@ -549,14 +561,21 @@ export function CollectingEventFormLayout({
   );
   return (
     <div ref={layoutWrapperRef}>
-      <NotPubliclyReleasableWarning />
-      <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
+      <DinaFormSection
+        componentName={COLLECTING_EVENT_COMPONENT_NAME}
+        sectionName="general-section"
+      >
+        <NotPubliclyReleasableWarning />
+        <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
+      </DinaFormSection>
       <div className="row">
         <div>
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
             id="identifiers"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="identifiers-section"
           >
             <div className="row">
               <div className="col-md-6">
@@ -587,6 +606,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingDateLegend" />}
             id="collectingDateLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-date-section"
           >
             {isTemplate && (
               <Field name="includeAllCollectingDate">
@@ -622,6 +643,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingAgentsLegend" />}
             id="collectingAgentsLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-agents-section"
           >
             {isTemplate && (
               <Field name="includeAllCollectingAgent">
@@ -676,6 +699,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="verbatimLabelLegend" />}
             id="verbatimLabelLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="verbatim-label-section"
           >
             {isTemplate && (
               <Field name="includeAllVerbatimCoordinates">
@@ -831,6 +856,8 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-event-details"
           >
             <TextField name="habitat" />
             <TextField

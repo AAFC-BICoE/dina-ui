@@ -47,58 +47,55 @@ export function MaterialSampleIdentifiersSection({
   const [primaryIdDisabled, setPrimaryIdDisabled] = useState(false);
 
   return (
-    <DinaFormSection
+    <FieldSet
+      id={id}
+      legend={<DinaMessage id="identifiers" />}
+      className={className}
       componentName={IDENTIFIER_COMPONENT_NAME}
       sectionName="identifiers-section"
     >
-      <FieldSet
-        id={id}
-        legend={<DinaMessage id="identifiers" />}
-        className={className}
-      >
-        <div className="row">
-          <div className="col-md-6">
-            <CollectionSelectField
-              name={`${namePrefix}collection`}
-              customName="collection"
+      <div className="row">
+        <div className="col-md-6">
+          <CollectionSelectField
+            name={`${namePrefix}collection`}
+            customName="collection"
+          />
+          <div className="d-flex">
+            <TextField
+              name={`${namePrefix}materialSampleName`}
+              inputProps={{ disabled: primaryIdDisabled }}
+              customName="materialSampleName"
+              className="materialSampleName flex-grow-1"
+              readOnly={disableSampleNameField}
+              placeholder={sampleNamePlaceHolder}
             />
-            <div className="d-flex">
-              <TextField
-                name={`${namePrefix}materialSampleName`}
-                inputProps={{ disabled: primaryIdDisabled }}
-                customName="materialSampleName"
-                className="materialSampleName flex-grow-1"
-                readOnly={disableSampleNameField}
-                placeholder={sampleNamePlaceHolder}
-              />
-              {!readOnly && !hideUseSequence && (
-                <CheckBoxField
-                  onCheckBoxClick={(event) =>
-                    setPrimaryIdDisabled(event.target.checked)
+            {!readOnly && !hideUseSequence && (
+              <CheckBoxField
+                onCheckBoxClick={(event) =>
+                  setPrimaryIdDisabled(event.target.checked)
+                }
+                name="useNextSequence"
+                className="ms-2 mt-1"
+                // only enabled when add new sample and collection is selected
+                disabled={initialValues.id || !value?.id}
+                overridecheckboxProps={{
+                  style: {
+                    height: "30px",
+                    width: "30px"
                   }
-                  name="useNextSequence"
-                  className="ms-2 mt-1"
-                  // only enabled when add new sample and collection is selected
-                  disabled={initialValues.id || !value?.id}
-                  overridecheckboxProps={{
-                    style: {
-                      height: "30px",
-                      width: "30px"
-                    }
-                  }}
-                />
-              )}
-            </div>
-            <TextField name={`${namePrefix}barcode`} customName="barcode" />
+                }}
+              />
+            )}
           </div>
-          <div className="col-md-6">
-            <StringArrayField
-              name={`${namePrefix}dwcOtherCatalogNumbers`}
-              customName="dwcOtherCatalogNumbers"
-            />
-          </div>
+          <TextField name={`${namePrefix}barcode`} customName="barcode" />
         </div>
-      </FieldSet>
-    </DinaFormSection>
+        <div className="col-md-6">
+          <StringArrayField
+            name={`${namePrefix}dwcOtherCatalogNumbers`}
+            customName="dwcOtherCatalogNumbers"
+          />
+        </div>
+      </div>
+    </FieldSet>
   );
 }
