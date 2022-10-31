@@ -1,5 +1,4 @@
 import {
-  ButtonBar,
   filterBy,
   QueryPage,
   useAccount,
@@ -20,17 +19,34 @@ import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
+  editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function SangerSampleSelectionStep({
-  pcrBatchId
+  pcrBatchId,
+  editMode,
+  setEditMode,
+  performSave,
+  setPerformSave
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
 
-  // State to keep track if in edit mode.
-  const [editMode, setEditMode] = useState(false);
+  // Check if a save was requested from the top level button bar.
+  useEffect(() => {
+    async function performSaveInternal() {
+      await savePcrBatchItems();
+      setPerformSave(false);
+    }
+
+    if (performSave) {
+      performSaveInternal();
+    }
+  }, [performSave]);
 
   // Keep track of the previously selected resources to compare.
   const [previouslySelectedResources, setPreviouslySelectedResources] =
@@ -220,50 +236,18 @@ export function SangerSampleSelectionStep({
     return <LoadingSpinner loading={true} />;
   }
 
-  const buttonBar = (
-    <ButtonBar>
-      <div className="ms-auto">
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={() => {
-            savePcrBatchItems();
-          }}
-          style={{ width: "10rem" }}
-          disabled={selectedResources.length === 0}
-        >
-          {formatMessage("save")}
-        </button>
-      </div>
-    </ButtonBar>
-  );
-
   return editMode ? (
-    <>
-      {buttonBar}
-      <div className="mb-3">
-        <QueryPage<MaterialSample>
-          indexName={"dina_material_sample_index"}
-          columns={ELASTIC_SEARCH_COLUMN}
-          selectionMode={true}
-          selectionResources={selectedResources}
-          setSelectionResources={setSelectedResources}
-        />
-      </div>
-      {buttonBar}
-    </>
+    <div className="mb-3">
+      <QueryPage<MaterialSample>
+        indexName={"dina_material_sample_index"}
+        columns={ELASTIC_SEARCH_COLUMN}
+        selectionMode={true}
+        selectionResources={selectedResources}
+        setSelectionResources={setSelectedResources}
+      />
+    </div>
   ) : (
     <>
-      <ButtonBar>
-        <button
-          className="btn btn-primary edit-button"
-          type="button"
-          onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
-        >
-          <SeqdbMessage id="editButtonText" />
-        </button>
-      </ButtonBar>
       <strong>
         <SeqdbMessage id="selectedSamplesTitle" />
       </strong>
