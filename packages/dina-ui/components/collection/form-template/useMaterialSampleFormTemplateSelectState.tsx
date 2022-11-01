@@ -29,7 +29,7 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
   const router = useRouter();
-  const formTemplateId = router.query.formTemplateId?.toString();
+  const formTemplateId = router?.query?.formTemplateId?.toString();
 
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
     PersistedResource<FormTemplate> | undefined
