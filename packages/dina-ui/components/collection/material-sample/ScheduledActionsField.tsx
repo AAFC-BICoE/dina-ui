@@ -237,7 +237,10 @@ export function ScheduledActionSubForm({
   actionToEdit,
   defaultDate
 }: ScheduledActionSubFormProps) {
-  const { enabledFields, initialValues, isTemplate } = useDinaFormContext();
+  const { formTemplate, initialValues, isTemplate } = useDinaFormContext();
+
+  // TODO: This needs to be fixed.
+  const enabledFields: string[] = [];
 
   const actionsEnabledFields = enabledFields?.filter((it) =>
     it.startsWith("scheduledAction.")
@@ -307,7 +310,6 @@ export function ScheduledActionSubForm({
           initialValues={
             actionToEdit ?? actionTemplateInitialValues ?? defaultInitialValues
           }
-          enabledFields={actionsEnabledFields}
           componentName={SCHEDULED_ACTIONS_COMPONENT_NAME}
           sectionName="scheduled-actions-add-section"
         >

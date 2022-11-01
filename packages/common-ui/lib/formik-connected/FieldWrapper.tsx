@@ -87,20 +87,20 @@ export interface FieldWrapperRenderProps {
 export function FieldWrapper(props: FieldWrapperProps) {
   const { name, templateCheckboxFieldName, validate } = props;
 
-  const { enabledFields } = useDinaFormContext();
+  const { formTemplate } = useDinaFormContext();
 
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
-  const disabledByFormTemplate = useMemo(
-    () =>
-      enabledFields
-        ? !enabledFields.includes(templateCheckboxFieldName || name)
-        : false,
-    [enabledFields]
-  );
+  // const disabledByFormTemplate = useMemo(
+  //   () =>
+  //     enabledFields
+  //       ? !enabledFields.includes(templateCheckboxFieldName || name)
+  //       : false,
+  //   [enabledFields]
+  // );
 
-  if (disabledByFormTemplate) {
-    return null;
-  }
+  // if (disabledByFormTemplate) {
+  //   return null;
+  // }
 
   return (
     <FieldSpy fieldName={name} validate={validate}>

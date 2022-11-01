@@ -8,6 +8,7 @@ import {
   FormikValues
 } from "formik";
 import { cloneDeep } from "lodash";
+import { FormTemplate } from "../../../dina-ui/types/collection-api";
 import {
   createContext,
   PropsWithChildren,
@@ -44,8 +45,10 @@ export interface DinaFormContextI {
   /** Add a checkbox beside the wrapper field if true */
   isTemplate?: boolean;
 
-  /** Optionally restrict the writable fields to this list. */
-  enabledFields?: string[] | null;
+  /**
+   * Form template with all restrictions to place on the form.
+   */
+  formTemplate?: FormTemplate;
 
   /**
    * The component name for all of the fields within this dina form. Using DinaFormContext you can
