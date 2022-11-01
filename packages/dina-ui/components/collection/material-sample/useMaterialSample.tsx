@@ -35,10 +35,16 @@ import {
 } from "../..";
 import {
   AcquisitionEvent,
+  ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   Collection,
   MaterialSample,
-  Organism
+  Organism,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import {
@@ -213,9 +219,9 @@ export function useMaterialSampleSave({
   const hasPreparationsTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ...PREPARATION_FIELDS
+        (_, key) => key.startsWith(PREPARATIONS_COMPONENT_NAME)
       )
     );
 
@@ -224,20 +230,25 @@ export function useMaterialSampleSave({
     !isEmpty(
       pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        (_, key) => key.startsWith("organism[0].")
+        (_, key) => key.startsWith(ORGANISMS_COMPONENT_NAME)
       )
     );
 
   const hasStorageTemplate =
     isTemplate &&
-    materialSampleTemplateInitialValues?.templateCheckboxes?.storageUnit;
+    !isEmpty(
+      pickBy(
+        materialSampleTemplateInitialValues?.templateCheckboxes,
+        (_, key) => key.startsWith(STORAGE_COMPONENT_NAME)
+      )
+    );
 
   const hasScheduledActionsTemplate =
     isTemplate &&
     !isEmpty(
       pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        (_, key) => key.startsWith("scheduledAction.")
+        (_, key) => key.startsWith(SCHEDULED_ACTIONS_COMPONENT_NAME)
       )
     );
 
@@ -246,17 +257,16 @@ export function useMaterialSampleSave({
     !isEmpty(
       pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        (_, key) =>
-          key.startsWith("associations[0].") || key.startsWith("hostOrganism.")
+        (_, key) => key.startsWith(ASSOCIATIONS_COMPONENT_NAME)
       )
     );
 
   const hasRestrictionsTemplate =
     isTemplate &&
     !isEmpty(
-      pick(
+      pickBy(
         materialSampleTemplateInitialValues?.templateCheckboxes,
-        ...RESTRICTIONS_FIELDS
+        (_, key) => key.startsWith(RESTRICTION_COMPONENT_NAME)
       )
     );
 

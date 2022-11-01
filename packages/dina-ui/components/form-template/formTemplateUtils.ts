@@ -16,10 +16,12 @@ export function getFormTemplateCheckboxes(
   const templateCheckboxesValues: Record<string, true | undefined> = {};
 
   formTemplate.components?.forEach((component) => {
-    component.sections?.forEach((sections) => {
-      sections.items?.forEach((item) => {
+    component.sections?.forEach((section) => {
+      section.items?.forEach((item) => {
         if (item.name && item.visible) {
-          templateCheckboxesValues[item.name] = item.visible ? true : undefined;
+          templateCheckboxesValues[
+            component.name + "." + section.name + "." + item.name
+          ] = item.visible ? true : undefined;
         }
       });
     });
@@ -40,14 +42,16 @@ export function getComponentValues(
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
       if (component.name === comp && component.visible) {
-        component.sections?.forEach((sections) => {
-          sections.items?.forEach((item) => {
+        component.sections?.forEach((section) => {
+          section.items?.forEach((item) => {
             if (
               (item.name && item.visible) ||
               item.name === "geoReferenceAssertions"
             ) {
               componentValues[item.name] = item.defaultValue;
-              templateCheckboxes[item.name] = true;
+              templateCheckboxes[
+                component.name + "." + section.name + "." + item.name
+              ] = true;
             }
           });
         });
@@ -73,11 +77,13 @@ export function getMaterialSampleComponentValues(
         component.name !== ACQUISITION_EVENT_COMPONENT_NAME
       ) {
         if (component.visible) {
-          component.sections?.forEach((sections) => {
-            sections.items?.forEach((item) => {
+          component.sections?.forEach((section) => {
+            section.items?.forEach((item) => {
               if ((item.name && item.visible) || item.name === "organism") {
                 componentValues[item.name] = item.defaultValue;
-                templateCheckboxes[item.name] = true;
+                templateCheckboxes[
+                  component.name + "." + section.name + "." + item.name
+                ] = true;
               }
             });
           });

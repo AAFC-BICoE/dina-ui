@@ -217,7 +217,9 @@ export function FormTemplateEditPageLoaded({
                 name: field.id,
                 visible: field.visible
                   ? true
-                  : allSubmittedValues?.templateCheckboxes?.[field.id] ?? false,
+                  : allSubmittedValues?.templateCheckboxes?.[
+                      dataComponent.id + "." + section.id + "." + field.id
+                    ] ?? false,
                 defaultValue: _.get(allSubmittedValues, field.id)
               };
             })

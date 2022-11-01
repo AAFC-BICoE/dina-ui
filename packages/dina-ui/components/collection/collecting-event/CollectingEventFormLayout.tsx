@@ -160,11 +160,15 @@ export function CollectingEventFormLayout({
     if (isTemplate) {
       // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSource']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSource']",
         true
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -264,24 +268,32 @@ export function CollectingEventFormLayout({
     if (isTemplate) {
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSource']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSource']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.country']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.country']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.stateProvince']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.stateProvince']",
         false
       );
       for (let idx = 0; idx <= 10; idx++) {
         formik.setFieldValue(
-          `templateCheckboxes['srcAdminLevels[${idx}]']`,
+          `templateCheckboxes['${COLLECTING_EVENT_COMPONENT_NAME}.current-geographic-place.srcAdminLevels[${idx}]']`,
           false
         );
       }
