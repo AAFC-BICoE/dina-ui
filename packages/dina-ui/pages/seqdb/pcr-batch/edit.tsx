@@ -22,7 +22,7 @@ import {
   StorageUnitType,
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useRef, useEffect } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -40,7 +40,7 @@ import {
   ThermocyclerProfile,
   Region
 } from "../../../types/seqdb-api";
-import { any } from "zod";
+import { FormikValues } from "formik";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -215,7 +215,6 @@ export function LoadExternalDataForPcrBatchForm({
     <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
       {buttonBar}
       <PcrBatchFormFields />
-      {buttonBar}
     </DinaForm>
   ));
 }

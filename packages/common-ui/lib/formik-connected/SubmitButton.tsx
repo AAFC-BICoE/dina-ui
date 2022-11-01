@@ -1,4 +1,5 @@
 import { connect, FormikContextType } from "formik";
+import { useEffect } from "react";
 import {
   FormikButton,
   LoadingSpinner,
@@ -11,6 +12,8 @@ interface SubmitButtonProps {
   children?: React.ReactNode;
   className?: string;
   hidePrimaryClass?: boolean;
+  performSave?: boolean;
+  setPerformSave?: (newValue: boolean) => void;
 
   /** Override internal button props using the formik context. */
   buttonProps?: (
@@ -27,7 +30,9 @@ export const SubmitButton = connect<SubmitButtonProps>(
     children,
     className,
     formik,
-    hidePrimaryClass
+    hidePrimaryClass,
+    performSave,
+    setPerformSave
   }) {
     const { isNestedForm } = useDinaFormContext();
 
@@ -36,11 +41,23 @@ export const SubmitButton = connect<SubmitButtonProps>(
       ...passedButtonProps,
       className: `btn ${className} ${hidePrimaryClass ? "" : "btn-primary"}`,
       style: { width: "10rem", ...passedButtonProps?.style },
-      onClick: e => {
+      onClick: (e) => {
         passedButtonProps?.onClick?.(e);
         scrollToError();
       }
     };
+
+    useEffect(() => {
+      async function tryToSave() {
+        await formik.submitForm().then(() => {
+          setPerformSave?.(false);
+        });
+      }
+
+      if (performSave) {
+        tryToSave();
+      }
+    }, [performSave]);
 
     return formik.isSubmitting ? (
       <LoadingSpinner loading={formik.isSubmitting} />

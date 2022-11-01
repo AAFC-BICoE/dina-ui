@@ -53,13 +53,7 @@ export function useMaterialSampleFormTemplateProps<
      * same as georeference assertion */
     materialSampleInitialValues.organism =
       materialSampleInitialValues.organism?.map((org) => {
-        if (!org?.determination?.length) {
-          return {
-            ...org,
-            type: "organism",
-            determination: [{ isPrimary: true }]
-          };
-        } else if (org?.determination.length === 1) {
+        if (org?.determination?.length === 1) {
           return {
             ...org,
             type: "organism",

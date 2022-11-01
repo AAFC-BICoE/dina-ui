@@ -15,7 +15,7 @@ export default function ButtonBarLayout({ children }) {
             min-width: 60px;
             background: #f3f3f3;
             border-bottom: 1px solid #d3d7cf;
-            z-index: 2000;
+            z-index: 900;
             padding: 10px;
           }
         `}
