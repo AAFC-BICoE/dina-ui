@@ -147,12 +147,9 @@ export function PcrBatchForm({
     ) {
       delete submittedValues.storageUnitType;
     } else {
-      (submittedValues as any).relationships.storageUnitType = {
-        data:
-          ((it) => ({
-            id: it.id,
-            type: it.type
-          })) ?? []
+      (submittedValues as any).storageUnitType = {
+        id: submittedValues?.storageUnitType?.id,
+        type: "storage-unit-type"
       };
     }
 
@@ -173,7 +170,6 @@ export function PcrBatchForm({
         }
       })
     };
-
     const [savedResource] = await save<PcrBatch>(
       [
         {
@@ -206,7 +202,7 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
-  // The storage unit type needs to be loaded from the Storage Unit.
+  // The storage unit type needs to be loaded from the Storage Unit if it exists.
   const storageUnitQuery = useQuery<StorageUnit>(
     {
       path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
@@ -242,30 +238,57 @@ export function PcrBatchFormFields() {
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
     ({ formik: { setFieldValue } }) => {
-      return (
-        <ResourceSelectField<StorageUnitType>
-          className="col-md-6"
-          name="storageUnitType"
-          filter={filterBy(["name"])}
-          model="collection-api/storage-unit-type"
-          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
-          readOnlyLink="/collection/storage-unit-type/view?id="
-          onChange={(storageUnitType) => {
-            setFieldValue("storageUnit.id", null);
-            if (
-              !Array.isArray(storageUnitType) &&
-              storageUnitType?.gridLayoutDefinition != null
-            ) {
-              setFieldValue(
-                "storageRestriction.layout",
-                storageUnitType.gridLayoutDefinition
-              );
-            } else {
-              setFieldValue("storageRestriction", null);
-            }
-          }}
-        />
-      );
+      if (initialValues.storageUnit.id) {
+        return (
+          <ResourceSelectField<StorageUnitType>
+            className="col-md-6"
+            name="storageUnitType"
+            filter={filterBy(["name"])}
+            model="collection-api/storage-unit-type"
+            optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+            readOnlyLink="/collection/storage-unit/view?id="
+            onChange={(storageUnitType) => {
+              setFieldValue("storageUnit.id", null);
+              if (
+                !Array.isArray(storageUnitType) &&
+                storageUnitType?.gridLayoutDefinition != null
+              ) {
+                setFieldValue(
+                  "storageRestriction.layout",
+                  storageUnitType.gridLayoutDefinition
+                );
+              } else {
+                setFieldValue("storageRestriction", null);
+              }
+            }}
+          />
+        );
+      } else {
+        return (
+          <ResourceSelectField<StorageUnitType>
+            className="col-md-6"
+            name="storageUnitType"
+            filter={filterBy(["name"])}
+            model="collection-api/storage-unit-type"
+            optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+            readOnlyLink="/collection/storage-unit-type/view?id="
+            onChange={(storageUnitType) => {
+              setFieldValue("storageUnit.id", null);
+              if (
+                !Array.isArray(storageUnitType) &&
+                storageUnitType?.gridLayoutDefinition != null
+              ) {
+                setFieldValue(
+                  "storageRestriction.layout",
+                  storageUnitType.gridLayoutDefinition
+                );
+              } else {
+                setFieldValue("storageRestriction", null);
+              }
+            }}
+          />
+        );
+      }
     }
   );
 
