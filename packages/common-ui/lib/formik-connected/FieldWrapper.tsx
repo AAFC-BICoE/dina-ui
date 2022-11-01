@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
 import { isArray } from "lodash";
+import { getFormTemplateField } from "../../../dina-ui/components/form-template/formTemplateUtils";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -87,20 +88,25 @@ export interface FieldWrapperRenderProps {
 export function FieldWrapper(props: FieldWrapperProps) {
   const { name, templateCheckboxFieldName, validate } = props;
 
-  const { formTemplate } = useDinaFormContext();
+  const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
-  // const disabledByFormTemplate = useMemo(
-  //   () =>
-  //     enabledFields
-  //       ? !enabledFields.includes(templateCheckboxFieldName || name)
-  //       : false,
-  //   [enabledFields]
-  // );
+  const disabledByFormTemplate: boolean = useMemo(() => {
+    if (!formTemplate || !componentName || !sectionName) return false;
 
-  // if (disabledByFormTemplate) {
-  //   return null;
-  // }
+    return (
+      getFormTemplateField(
+        formTemplate,
+        componentName,
+        sectionName,
+        templateCheckboxFieldName ?? name
+      )?.visible ?? false
+    );
+  }, [formTemplate]);
+
+  if (disabledByFormTemplate) {
+    return null;
+  }
 
   return (
     <FieldSpy fieldName={name} validate={validate}>
