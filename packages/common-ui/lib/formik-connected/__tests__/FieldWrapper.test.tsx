@@ -120,7 +120,6 @@ describe("FieldWrapper component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ myField1: "my value", templateCheckboxes: {} }}
-        // enabledField2 uses a custom template field name:
         formTemplate={{
           type: "form-template",
           components: [
@@ -148,11 +147,11 @@ describe("FieldWrapper component.", () => {
                   visible: true,
                   items: [
                     {
-                      name: "enabledField1",
+                      name: "disabledField1",
                       visible: false
                     },
                     {
-                      name: "customTemplateFieldName",
+                      name: "disabledCustomTemplateFieldName",
                       visible: false
                     }
                   ]
