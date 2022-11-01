@@ -18,6 +18,7 @@ import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfig
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
+import { useRouter } from "next/router";
 
 const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
@@ -27,23 +28,24 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
  */
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
+  const router = useRouter();
+  const formTemplateId = router.query.formTemplateId?.toString();
 
   const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
     PersistedResource<FormTemplate> | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
 
   useEffect(() => {
-    if (sampleFormTemplate?.id) {
-      getFormTemplate();
+    if (formTemplateId) {
+      getFormTemplate(formTemplateId);
+    } else if (sampleFormTemplate?.id) {
+      getFormTemplate(sampleFormTemplate?.id);
     }
   }, [sampleFormTemplate]);
 
-  async function getFormTemplate() {
+  async function getFormTemplate(id) {
     await apiClient
-      .get<FormTemplate>(
-        `collection-api/form-template/${sampleFormTemplate?.id}`,
-        {}
-      )
+      .get<FormTemplate>(`collection-api/form-template/${id}`, {})
       .then((response) => {
         setSampleFormTemplate(response?.data);
       });
