@@ -2,13 +2,16 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
+  CommonMessage,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
   DinaFormSection,
+  FieldHeader,
   FieldSet,
   FieldSpy,
   NumberField,
+  QueryPage,
   RadioButtonsField,
   StringArrayField,
   SubmitButton,
@@ -37,6 +40,10 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import ReactTable, { Column } from "react-table";
 import Link from "next/link";
+import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { useState, useEffect } from "react";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -135,7 +142,7 @@ export function TransactionForm({
       relationships: {
         ...(submittedValues.attachment && {
           attachment: {
-            data: submittedValues.attachment.map(it => ({
+            data: submittedValues.attachment.map((it) => ({
               id: it.id,
               type: it.type
             }))
@@ -144,7 +151,7 @@ export function TransactionForm({
       },
 
       // Convert the Agent objects to UUIDs for submission to the back-end:
-      agentRoles: submittedValues.agentRoles?.map(agentRole => ({
+      agentRoles: submittedValues.agentRoles?.map((agentRole) => ({
         ...agentRole,
         agent:
           typeof agentRole.agent === "object"
@@ -191,6 +198,41 @@ export function TransactionFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
 
+  // Displayed on edit mode only.
+  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    }
+  ];
+
+  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      Header: <FieldHeader name={"materialSampleName"} />,
+      sortable: false
+    }
+  ];
+
+  // The selected resources to be used for the QueryPage.
+  const [selectedResources, setSelectedResources] = useState<
+    MaterialSample[] | undefined
+  >(undefined);
+
   return (
     <div>
       <div className="row">
@@ -204,7 +246,7 @@ export function TransactionFormLayout() {
         {readOnly ? (
           <div className="d-flex gap-2 mb-3">
             <FieldSpy<string> fieldName="materialDirection">
-              {direction => (
+              {(direction) => (
                 <h2 className="my-0">
                   <div className="badge bg-primary">
                     {direction === "IN" ? (
@@ -219,7 +261,7 @@ export function TransactionFormLayout() {
               )}
             </FieldSpy>
             <FieldSpy<boolean> fieldName="materialToBeReturned">
-              {toBeReturned =>
+              {(toBeReturned) =>
                 toBeReturned && (
                   <h2 className="my-0">
                     <span className="badge bg-primary">
@@ -261,7 +303,7 @@ export function TransactionFormLayout() {
                     rsql: `transactionType==${search}*`
                   }
                 }),
-                option: transaction => transaction?.transactionType
+                option: (transaction) => transaction?.transactionType
               }}
               blankSearchBackend={"json-api"}
             />
@@ -283,7 +325,7 @@ export function TransactionFormLayout() {
                   rsql: `status==${search}*`
                 }
               }),
-              option: transaction => transaction?.status
+              option: (transaction) => transaction?.status
             }}
             blankSearchBackend={"json-api"}
           />
@@ -298,7 +340,7 @@ export function TransactionFormLayout() {
                   rsql: `purpose==${search}*`
                 }
               }),
-              option: transaction => transaction?.purpose
+              option: (transaction) => transaction?.purpose
             }}
             blankSearchBackend={"json-api"}
           />
@@ -316,17 +358,17 @@ export function TransactionFormLayout() {
       </FieldSet>
       {readOnly ? (
         <FieldSpy<AgentRole[]> fieldName="agentRoles">
-          {agentRoles => {
+          {(agentRoles) => {
             const tableColumns: Column<AgentRole>[] = [
               {
                 id: "roles",
-                accessor: it => it.roles?.join(", "),
+                accessor: (it) => it.roles?.join(", "),
                 Header: <strong>{formatMessage("agentRole")}</strong>,
                 width: 300
               },
               {
                 id: "agentName",
-                accessor: it =>
+                accessor: (it) =>
                   typeof it.agent === "object" && it?.agent?.id ? (
                     <Link href={`/person/view?id=${it.agent.id}`}>
                       <a>
@@ -439,6 +481,35 @@ export function TransactionFormLayout() {
           attachmentPath={`loan-transaction-api/transaction/${initialValues.id}/attachment`}
         />
       </div>
+      {readOnly ? (
+        <div className="mb-3">
+          <QueryPage<MaterialSample>
+            indexName={"dina_material_sample_index"}
+            columns={ELASTIC_SEARCH_COLUMN}
+            selectionMode={true}
+            selectionResources={selectedResources}
+            setSelectionResources={setSelectedResources}
+          />
+        </div>
+      ) : (
+        <>
+          <strong>
+            <SeqdbMessage id="selectedSamplesTitle" />
+          </strong>
+          <ReactTable<MaterialSample>
+            columns={API_SEARCH_COLUMN}
+            data={selectedResources}
+            minRows={1}
+            defaultPageSize={100}
+            pageText={<CommonMessage id="page" />}
+            noDataText={<CommonMessage id="noRowsFound" />}
+            ofText={<CommonMessage id="of" />}
+            rowsText={formatMessage("rows")}
+            previousText={<CommonMessage id="previous" />}
+            nextText={<CommonMessage id="next" />}
+          />
+        </>
+      )}
     </div>
   );
 }
@@ -472,7 +543,7 @@ function ShipmentDetailsFieldSet({ fieldName }: ShipmentDetailsFieldSetProps) {
             {...fieldProps("value")}
             className="col-sm-6"
             label={<DinaMessage id="valueCad" />}
-            readOnlyRender={val =>
+            readOnlyRender={(val) =>
               typeof val === "string" ? `$${numberWithCommas(val)}` : val
             }
           />
