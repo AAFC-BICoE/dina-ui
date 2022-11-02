@@ -48,7 +48,7 @@ export function useMaterialSampleFormTemplateSelectState() {
     if (formTemplateId) {
       setSampleFormTemplateUUID(formTemplateId);
     }
-  }, [router.query.formTemplateId]);
+  }, []);
 
   async function getFormTemplate() {
     await apiClient

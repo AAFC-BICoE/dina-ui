@@ -47,7 +47,8 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   } = initializeRefHookFormProps(
     [baseSample],
     visibleManagedAttributeKeys,
-    selectedTab
+    selectedTab,
+    sampleFormTemplate
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
