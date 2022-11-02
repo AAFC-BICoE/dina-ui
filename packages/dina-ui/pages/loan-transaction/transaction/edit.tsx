@@ -229,9 +229,9 @@ export function TransactionFormLayout() {
   ];
 
   // The selected resources to be used for the QueryPage.
-  const [selectedResources, setSelectedResources] = useState<
-    MaterialSample[] | undefined
-  >(undefined);
+  const [selectedResources, setSelectedResources] = useState<MaterialSample[]>(
+    []
+  );
 
   return (
     <div>
@@ -482,16 +482,6 @@ export function TransactionFormLayout() {
         />
       </div>
       {readOnly ? (
-        <div className="mb-3">
-          <QueryPage<MaterialSample>
-            indexName={"dina_material_sample_index"}
-            columns={ELASTIC_SEARCH_COLUMN}
-            selectionMode={true}
-            selectionResources={selectedResources}
-            setSelectionResources={setSelectedResources}
-          />
-        </div>
-      ) : (
         <>
           <strong>
             <SeqdbMessage id="selectedSamplesTitle" />
@@ -509,6 +499,16 @@ export function TransactionFormLayout() {
             nextText={<CommonMessage id="next" />}
           />
         </>
+      ) : (
+        <div className="mb-3">
+          <QueryPage<MaterialSample>
+            indexName={"dina_material_sample_index"}
+            columns={ELASTIC_SEARCH_COLUMN}
+            selectionMode={true}
+            selectionResources={selectedResources}
+            setSelectionResources={setSelectedResources}
+          />
+        </div>
       )}
     </div>
   );
