@@ -1,16 +1,10 @@
-import {
-  FormikButton,
-  LoadingSpinner,
-  Tooltip,
-  useThrottledFetch
-} from "common-ui";
+import { FormikButton, LoadingSpinner, useThrottledFetch } from "common-ui";
 import DOMPurify from "dompurify";
 import { Field, FormikProps } from "formik";
 import moment from "moment";
 import { ScientificNameSourceDetails } from "../../../../dina-ui/types/collection-api/resources/Determination";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { GlobalNamesSearchResult } from "./global-names-search-result-type";
-import { useState } from "react";
 
 export type Selection =
   | string
