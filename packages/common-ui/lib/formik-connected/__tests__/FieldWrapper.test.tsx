@@ -1,5 +1,3 @@
-import { mount } from "enzyme";
-import { divide } from "lodash";
 import { IntlProvider } from "react-intl";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm, DinaFormSection } from "../DinaForm";
@@ -89,12 +87,17 @@ describe("FieldWrapper component.", () => {
         isTemplate={true}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
-        <FieldWrapper
-          templateCheckboxFieldName="customTemplateFieldName"
-          name="myField"
+        <DinaFormSection
+          componentName="componentName"
+          sectionName="sectionName"
         >
-          {({ value }) => <>{value}</>}
-        </FieldWrapper>
+          <FieldWrapper
+            templateCheckboxFieldName="customTemplateFieldName"
+            name="myField"
+          >
+            {({ value }) => <>{value}</>}
+          </FieldWrapper>
+        </DinaFormSection>
       </DinaForm>
     );
 
@@ -111,7 +114,7 @@ describe("FieldWrapper component.", () => {
     expect(mockSubmit).lastCalledWith({
       myField: "my value",
       templateCheckboxes: {
-        customTemplateFieldName: true
+        "componentName.sectionName.customTemplateFieldName": true
       }
     });
   });

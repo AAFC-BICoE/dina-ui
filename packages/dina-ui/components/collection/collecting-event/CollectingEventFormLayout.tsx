@@ -954,13 +954,13 @@ export function CollectingEventFormLayout({
             : null}
         </div>
       </div>
-      <DinaFormSection>
+      <>
         {!readOnly
           ? collectingEventManagedAttributesComponent
           : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
           ? collectingEventManagedAttributesComponent
           : null}
-      </DinaFormSection>
+      </>
       <div className="mb-3">
         {!readOnly
           ? collectingEventAttachmentsComponent

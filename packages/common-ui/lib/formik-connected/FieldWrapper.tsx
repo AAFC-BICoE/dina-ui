@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray } from "lodash";
-import { getFormTemplateField } from "../../../dina-ui/components/form-template/formTemplateUtils";
+import { isArray, find } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -94,14 +93,24 @@ export function FieldWrapper(props: FieldWrapperProps) {
   const disabledByFormTemplate: boolean = useMemo(() => {
     if (!formTemplate || !componentName || !sectionName) return false;
 
-    return (
-      getFormTemplateField(
-        formTemplate,
-        componentName,
-        sectionName,
-        templateCheckboxFieldName ?? name
-      )?.visible ?? false
-    );
+    // First find the component we are looking for.
+    const componentFound = find(formTemplate?.components, {
+      name: componentName
+    });
+    if (componentFound) {
+      // Next find the right section.
+      const sectionFound = find(componentFound?.sections, {
+        name: sectionName
+      });
+      if (sectionFound) {
+        return (
+          !find(sectionFound.items, {
+            name: templateCheckboxFieldName ?? name
+          })?.visible ?? false
+        );
+      }
+    }
+    return false;
   }, [formTemplate]);
 
   if (disabledByFormTemplate) {

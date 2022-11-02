@@ -1,12 +1,9 @@
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
-  FormTemplate,
-  FormTemplateComponent,
-  FormTemplateSection,
-  FormTemplateSectionItem
+  FormTemplate
 } from "../../types/collection-api";
-import { sortBy, find } from "lodash";
+import { sortBy } from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -133,22 +130,4 @@ export function getComponentOrderFromTemplate(
   return sortBy(template.components, "order").map<string>(
     (component) => component.name ?? ""
   );
-}
-
-export function getFormTemplateField(
-  template: FormTemplate,
-  componentName: string,
-  sectionName: string,
-  fieldName: string
-): FormTemplateSectionItem | undefined {
-  // First find the component we are looking for.
-  const componentFound = find(template?.components, { name: componentName });
-  if (componentFound) {
-    // Next find the right section.
-    const sectionFound = find(componentFound?.sections, { name: sectionName });
-    if (sectionFound) {
-      return find(sectionFound.items, { name: fieldName });
-    }
-  }
-  return undefined;
 }

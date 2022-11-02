@@ -24,10 +24,12 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
 
+  // UUID stored in local storage.
   const [sampleFormTemplateUUID, setSampleFormTemplateUUID] = useLocalStorage<
     string | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
 
+  // The retrieved form template, changes when the UUID has changed.
   const [sampleFormTemplate, setSampleFormTemplate] =
     useState<PersistedResource<FormTemplate>>();
 

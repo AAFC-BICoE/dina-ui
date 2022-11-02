@@ -201,6 +201,7 @@ export function MaterialSampleForm({
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
+      formTemplate,
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
       materialSample,
       collectingEventInitialValues,
@@ -435,7 +436,7 @@ export function MaterialSampleForm({
         <div className="flex-grow-1 container-fluid">
           {!reduceRendering && (
             <>
-              {!isTemplate && materialSample && (
+              {!isTemplate && materialSample?.materialSampleName && (
                 <MaterialSampleBreadCrumb
                   disableLastLink={true}
                   materialSample={materialSample as any}

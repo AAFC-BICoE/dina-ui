@@ -20,7 +20,8 @@ import {
   mapKeys,
   pick,
   pickBy,
-  range
+  range,
+  find
 } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
@@ -289,14 +290,20 @@ export function useMaterialSampleSave({
       Boolean(
         hasColEventTemplate ||
           materialSample?.collectingEvent ||
-          formTemplate?.components?.[COLLECTING_EVENT_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: COLLECTING_EVENT_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
     setEnableAcquisitionEvent(
       Boolean(
         hasAcquisitionEventTemplate ||
           materialSample?.acquisitionEvent ||
-          formTemplate?.components?.[ACQUISITION_EVENT_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: ACQUISITION_EVENT_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
     setEnablePreparations(
@@ -306,7 +313,10 @@ export function useMaterialSampleSave({
           PREPARATION_FIELDS.some(
             (prepFieldName) =>
               !isEmpty(materialSample?.[prepFieldName]) ||
-              formTemplate?.components?.[PREPARATIONS_COMPONENT_NAME].visible
+              (find(formTemplate?.components, {
+                name: PREPARATIONS_COMPONENT_NAME
+              })?.visible ??
+                false)
           )
       )
     );
@@ -315,7 +325,10 @@ export function useMaterialSampleSave({
       Boolean(
         hasOrganismsTemplate ||
           materialSample?.organism?.length ||
-          formTemplate?.components?.[ORGANISMS_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: ORGANISMS_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
 
@@ -324,7 +337,10 @@ export function useMaterialSampleSave({
       Boolean(
         hasStorageTemplate ||
           materialSample?.storageUnit?.id ||
-          formTemplate?.components?.[STORAGE_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: STORAGE_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
 
@@ -333,7 +349,10 @@ export function useMaterialSampleSave({
       Boolean(
         hasScheduledActionsTemplate ||
           materialSample?.scheduledActions?.length ||
-          formTemplate?.components?.[SCHEDULED_ACTIONS_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: SCHEDULED_ACTIONS_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
 
@@ -344,7 +363,10 @@ export function useMaterialSampleSave({
           materialSample?.associations?.length ||
           !isEmpty(materialSample?.hostOrganism) ||
           !isEmpty(materialSample?.associations) ||
-          formTemplate?.components?.[ASSOCIATIONS_COMPONENT_NAME].visible
+          (find(formTemplate?.components, {
+            name: ASSOCIATIONS_COMPONENT_NAME
+          })?.visible ??
+            false)
       )
     );
 
@@ -355,7 +377,10 @@ export function useMaterialSampleSave({
           RESTRICTIONS_FIELDS.some(
             (restrictFieldName) =>
               !isEmpty(materialSample?.[restrictFieldName]) ||
-              formTemplate?.components?.[RESTRICTION_COMPONENT_NAME].visible
+              (find(formTemplate?.components, {
+                name: RESTRICTION_COMPONENT_NAME
+              })?.visible ??
+                false)
           )
       )
     );
