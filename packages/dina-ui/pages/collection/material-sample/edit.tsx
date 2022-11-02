@@ -47,16 +47,15 @@ export default function MaterialSampleEditPage() {
   const {
     navOrder,
     setNavOrder,
-    enabledFields,
     sampleFormTemplate,
-    setSampleFormTemplate,
+    setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
-    enabledFields,
+    formTemplate: sampleFormTemplate,
     visibleManagedAttributeKeys,
     materialSample: materialSampleInitialValues,
     collectingEventInitialValues,
@@ -69,7 +68,7 @@ export default function MaterialSampleEditPage() {
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect
               value={sampleFormTemplate}
-              onChange={setSampleFormTemplate}
+              onChange={setSampleFormTemplateUUID}
             />
           </div>
         </div>

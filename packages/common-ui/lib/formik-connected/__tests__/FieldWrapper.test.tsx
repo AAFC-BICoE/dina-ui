@@ -1,8 +1,6 @@
-import { mount } from "enzyme";
-import { divide } from "lodash";
 import { IntlProvider } from "react-intl";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { DinaForm } from "../DinaForm";
+import { DinaForm, DinaFormSection } from "../DinaForm";
 import { FieldWrapper } from "../FieldWrapper";
 
 const mockSubmit = jest.fn();
@@ -74,7 +72,7 @@ describe("FieldWrapper component.", () => {
       <DinaForm initialValues={{ myField: "my value" }} readOnly={true}>
         <FieldWrapper
           name="myField"
-          readOnlyRender={value => <div className="custom-div">{value}</div>}
+          readOnlyRender={(value) => <div className="custom-div">{value}</div>}
         />
       </DinaForm>
     );
@@ -89,12 +87,17 @@ describe("FieldWrapper component.", () => {
         isTemplate={true}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
-        <FieldWrapper
-          templateCheckboxFieldName="customTemplateFieldName"
-          name="myField"
+        <DinaFormSection
+          componentName="componentName"
+          sectionName="sectionName"
         >
-          {({ value }) => <>{value}</>}
-        </FieldWrapper>
+          <FieldWrapper
+            templateCheckboxFieldName="customTemplateFieldName"
+            name="myField"
+          >
+            {({ value }) => <>{value}</>}
+          </FieldWrapper>
+        </DinaFormSection>
       </DinaForm>
     );
 
@@ -111,7 +114,7 @@ describe("FieldWrapper component.", () => {
     expect(mockSubmit).lastCalledWith({
       myField: "my value",
       templateCheckboxes: {
-        customTemplateFieldName: true
+        "componentName.sectionName.customTemplateFieldName": true
       }
     });
   });
@@ -120,31 +123,75 @@ describe("FieldWrapper component.", () => {
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{ myField1: "my value", templateCheckboxes: {} }}
-        // enabledField2 uses a custom template field name:
-        enabledFields={["enabledField1", "customTemplateFieldName"]}
+        formTemplate={{
+          type: "form-template",
+          components: [
+            {
+              name: "testComponent",
+              visible: true,
+              order: 0,
+              sections: [
+                {
+                  name: "enabledSection",
+                  visible: true,
+                  items: [
+                    {
+                      name: "enabledField1",
+                      visible: true
+                    },
+                    {
+                      name: "customTemplateFieldName",
+                      visible: true
+                    }
+                  ]
+                },
+                {
+                  name: "disabledSection",
+                  visible: true,
+                  items: [
+                    {
+                      name: "disabledField1",
+                      visible: false
+                    },
+                    {
+                      name: "disabledCustomTemplateFieldName",
+                      visible: false
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
-        {/* Enabled Fields: */}
-        <FieldWrapper name="enabledField1">
-          {() => <div className="enabledField1" />}
-        </FieldWrapper>
-        <FieldWrapper
-          templateCheckboxFieldName="customTemplateFieldName"
-          name="enabledField2"
-        >
-          {() => <div className="enabledField2" />}
-        </FieldWrapper>
+        <DinaFormSection componentName="testComponent">
+          <DinaFormSection sectionName="enabledSection">
+            {/* Enabled Fields: */}
+            <FieldWrapper name="enabledField1">
+              {() => <div className="enabledField1" />}
+            </FieldWrapper>
+            <FieldWrapper
+              templateCheckboxFieldName="customTemplateFieldName"
+              name="enabledField2"
+            >
+              {() => <div className="enabledField2" />}
+            </FieldWrapper>
+          </DinaFormSection>
 
-        {/* Disabled Fields: */}
-        <FieldWrapper name="disabledField1">
-          {() => <div className="disabledField1" />}
-        </FieldWrapper>
-        <FieldWrapper
-          templateCheckboxFieldName="disabledCustomTemplateFieldName"
-          name="disabledField2"
-        >
-          {() => <div className="disabledField2" />}
-        </FieldWrapper>
+          <DinaFormSection sectionName="disabledSection">
+            {/* Disabled Fields: */}
+            <FieldWrapper name="disabledField1">
+              {() => <div className="disabledField1" />}
+            </FieldWrapper>
+            <FieldWrapper
+              templateCheckboxFieldName="disabledCustomTemplateFieldName"
+              name="disabledField2"
+            >
+              {() => <div className="disabledField2" />}
+            </FieldWrapper>
+          </DinaFormSection>
+        </DinaFormSection>
       </DinaForm>
     );
 

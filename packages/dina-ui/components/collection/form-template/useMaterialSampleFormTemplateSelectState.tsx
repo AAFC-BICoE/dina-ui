@@ -1,6 +1,5 @@
 import { PersistedResource } from "kitsu";
 import { useEffect, useMemo, useState } from "react";
-import { z } from "zod";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
@@ -10,10 +9,7 @@ import {
   getMaterialSampleComponentValues,
   getComponentValues
 } from "../../form-template/formTemplateUtils";
-import {
-  MaterialSampleFormEnabledFields,
-  VisibleManagedAttributesConfig
-} from "../material-sample/MaterialSampleForm";
+import { VisibleManagedAttributesConfig } from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -31,21 +27,35 @@ export function useMaterialSampleFormTemplateSelectState() {
   const router = useRouter();
   const formTemplateId = router?.query?.formTemplateId?.toString();
 
-  const [sampleFormTemplate, setSampleFormTemplate] = useLocalStorage<
-    PersistedResource<FormTemplate> | undefined
+  // UUID stored in local storage.
+  const [sampleFormTemplateUUID, setSampleFormTemplateUUID] = useLocalStorage<
+    string | undefined
   >(SAMPLE_FORM_TEMPLATE_KEY, undefined);
+
+  // The retrieved form template, changes when the UUID has changed.
+  const [sampleFormTemplate, setSampleFormTemplate] =
+    useState<PersistedResource<FormTemplate>>();
+
+  useEffect(() => {
+    if (sampleFormTemplateUUID) {
+      getFormTemplate();
+    } else {
+      setSampleFormTemplate(undefined);
+    }
+  }, [sampleFormTemplateUUID]);
 
   useEffect(() => {
     if (formTemplateId) {
-      getFormTemplate(formTemplateId);
-    } else if (sampleFormTemplate?.id) {
-      getFormTemplate(sampleFormTemplate?.id);
+      setSampleFormTemplateUUID(formTemplateId);
     }
-  }, [sampleFormTemplate]);
+  }, []);
 
-  async function getFormTemplate(id) {
+  async function getFormTemplate() {
     await apiClient
-      .get<FormTemplate>(`collection-api/form-template/${id}`, {})
+      .get<FormTemplate>(
+        `collection-api/form-template/${sampleFormTemplateUUID}`,
+        {}
+      )
       .then((response) => {
         setSampleFormTemplate(response?.data);
       });
@@ -107,18 +117,18 @@ export function useMaterialSampleFormTemplateSelectState() {
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
   const {
-    enabledFields,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   }: {
-    enabledFields: MaterialSampleFormEnabledFields;
     visibleManagedAttributeKeys?: VisibleManagedAttributesConfig | undefined;
     materialSampleInitialValues: any;
     collectingEventInitialValues?: any;
     acquisitionEventInitialValues?: any;
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
+
+  // Delete unused variables from the initial values.
   delete materialSampleInitialValues?.templateCheckboxes;
   delete materialSampleInitialValues?.templateFields;
   delete materialSampleInitialValues?.managedAttributesOrder;
@@ -131,10 +141,9 @@ export function useMaterialSampleFormTemplateSelectState() {
   const [navOrder, setNavOrder] = useState<string[] | null>(null);
   return {
     sampleFormTemplate,
-    setSampleFormTemplate,
+    setSampleFormTemplateUUID,
     navOrder,
     setNavOrder,
-    enabledFields,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,

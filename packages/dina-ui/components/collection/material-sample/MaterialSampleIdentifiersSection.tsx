@@ -1,5 +1,6 @@
 import {
   CheckBoxField,
+  DinaFormSection,
   FieldSet,
   StringArrayField,
   TextField,
@@ -50,6 +51,8 @@ export function MaterialSampleIdentifiersSection({
       id={id}
       legend={<DinaMessage id="identifiers" />}
       className={className}
+      componentName={IDENTIFIER_COMPONENT_NAME}
+      sectionName="identifiers-section"
     >
       <div className="row">
         <div className="col-md-6">

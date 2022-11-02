@@ -76,6 +76,7 @@ export function OrganismsField({
       className={ORGANISMS_COMPONENT_NAME}
       fieldName={name}
       legend={<DinaMessage id="organisms" />}
+      componentName={ORGANISMS_COMPONENT_NAME}
     >
       <BulkEditTabWarning
         targetType="material-sample"

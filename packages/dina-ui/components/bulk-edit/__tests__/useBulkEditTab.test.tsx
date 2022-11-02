@@ -24,8 +24,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   // Allow selecting a custom view for the form:
   const {
     sampleFormTemplate,
-    setSampleFormTemplate,
-    enabledFields,
+    setSampleFormTemplateUUID,
     visibleManagedAttributeKeys
   } = useMaterialSampleFormTemplateSelectState();
 
@@ -47,9 +46,9 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     formTemplateProps: Partial<MaterialSampleFormProps>;
   } = initializeRefHookFormProps(
     [baseSample],
-    enabledFields,
     visibleManagedAttributeKeys,
-    selectedTab
+    selectedTab,
+    sampleFormTemplate
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
