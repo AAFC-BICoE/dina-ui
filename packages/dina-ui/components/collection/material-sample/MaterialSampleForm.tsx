@@ -216,7 +216,6 @@ export function MaterialSampleForm({
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
     // enabledFields?.collectingEvent.includes("id")
-    // TODO: This needs to be fixed to point to the ID.
     false
   );
   const templateAttachesAcquisitionEvent = Boolean(

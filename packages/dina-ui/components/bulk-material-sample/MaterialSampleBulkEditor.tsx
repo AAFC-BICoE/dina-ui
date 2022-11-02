@@ -31,6 +31,7 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
+import { FormTemplate } from "packages/dina-ui/types/collection-api";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -71,7 +72,8 @@ export function MaterialSampleBulkEditor({
   } = initializeRefHookFormProps(
     samplesProp,
     visibleManagedAttributeKeys,
-    selectedTab
+    selectedTab,
+    sampleFormTemplate
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -175,13 +177,15 @@ export function initializeRefHookFormProps(
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
-    | undefined
+    | undefined,
+  formTemplate: FormTemplate | undefined
 ) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
 
   const formTemplateProps: Partial<MaterialSampleFormProps> = {
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    formTemplate
   };
 
   const initialValues: InputResource<MaterialSample> = {

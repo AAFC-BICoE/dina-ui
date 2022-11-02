@@ -14,6 +14,7 @@ import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfig
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
+import { useRouter } from "next/router";
 
 const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
@@ -23,6 +24,8 @@ const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
  */
 export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
+  const router = useRouter();
+  const formTemplateId = router?.query?.formTemplateId?.toString();
 
   // UUID stored in local storage.
   const [sampleFormTemplateUUID, setSampleFormTemplateUUID] = useLocalStorage<
@@ -40,6 +43,12 @@ export function useMaterialSampleFormTemplateSelectState() {
       setSampleFormTemplate(undefined);
     }
   }, [sampleFormTemplateUUID]);
+
+  useEffect(() => {
+    if (formTemplateId) {
+      setSampleFormTemplateUUID(formTemplateId);
+    }
+  }, [router.query.formTemplateId]);
 
   async function getFormTemplate() {
     await apiClient
