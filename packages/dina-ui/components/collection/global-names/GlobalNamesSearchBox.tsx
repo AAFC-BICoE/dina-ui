@@ -86,7 +86,7 @@ export function GlobalNamesSearchBox({
 
   return (
     <div className="card card-body">
-      <div className="d-flex align-items-center mb-3">
+      <div className="d-flex align-items-center">
         <div className="flex-grow-1">
           {isDetermination ? (
             <div className="input-group">
@@ -106,7 +106,7 @@ export function GlobalNamesSearchBox({
               <button
                 style={{ width: "10rem" }}
                 onClick={doThrottledSearch}
-                className="btn btn-primary mx-2 global-name-search-button"
+                className="btn btn-primary global-name-search-button"
                 type="button"
                 disabled={searchIsDisabled}
               >
@@ -185,7 +185,7 @@ export function GlobalNamesSearchBox({
       )}
       {searchIsLoading && <LoadingSpinner loading={true} />}
       {!!searchResult && (
-        <div className="list-group">
+        <div className="list-group mt-3">
           {searchResult.names
             ?.filter((result) => result.matchType !== "NoMatch")
             ?.map((result, idx) => {
