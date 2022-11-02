@@ -48,7 +48,9 @@
     "**/react-file-viewer/**/lodash": "^4.17.21",
     "**/minimist": "^1.2.6",
     "**/async": "^2.6.4",
-    "**/moment": "^2.29.2"
+    "**/moment": "^2.29.4",
+    "**/node-fetch": "^2.6.7",
+    "**/minimatch": "^3.0.5"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
