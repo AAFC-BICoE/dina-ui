@@ -23,7 +23,10 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { Person } from "../../../types/agent-api";
-import { AcquisitionEvent } from "../../../types/collection-api";
+import {
+  AcquisitionEvent,
+  ACQUISITION_EVENT_COMPONENT_NAME
+} from "../../../types/collection-api";
 
 export default function AcquisitionEventEditPage() {
   const router = useRouter();
@@ -119,7 +122,12 @@ export function AcquisitionEventFormLayout() {
 
   return (
     <div>
-      <FieldSet legend={<DinaMessage id="reception" />} className="non-strip">
+      <FieldSet
+        legend={<DinaMessage id="reception" />}
+        className="non-strip"
+        componentName={ACQUISITION_EVENT_COMPONENT_NAME}
+        sectionName="acquisition-event-reception-section"
+      >
         <div className="row">
           <GroupSelectField
             className="col-sm-6"
@@ -134,7 +142,7 @@ export function AcquisitionEventFormLayout() {
               readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => person.displayName ?? person.id}
+              optionLabel={(person) => person.displayName ?? person.id}
               asyncOptions={[
                 {
                   label: <DinaMessage id="addNewPerson" />,
@@ -149,7 +157,12 @@ export function AcquisitionEventFormLayout() {
           </div>
         </div>
       </FieldSet>
-      <FieldSet legend={<DinaMessage id="isolation" />} className="non-strip">
+      <FieldSet
+        legend={<DinaMessage id="isolation" />}
+        className="non-strip"
+        componentName={ACQUISITION_EVENT_COMPONENT_NAME}
+        sectionName="acquisition-event-isolation-section"
+      >
         <div className="row">
           <div className="col-sm-6">
             <ResourceSelectField<Person>
@@ -157,7 +170,7 @@ export function AcquisitionEventFormLayout() {
               readOnlyLink="/person/view?id="
               filter={filterBy(["displayName"])}
               model="agent-api/person"
-              optionLabel={person => person.displayName ?? person.id}
+              optionLabel={(person) => person.displayName ?? person.id}
               asyncOptions={[
                 {
                   label: <DinaMessage id="addNewPerson" />,

@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import {
   AssociatedMaterialSampleSearchBoxField,
+  DinaFormSection,
   MaterialSampleSearchHelper,
   TextField,
   useQuery,
@@ -21,6 +22,7 @@ import {
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { TabbedArrayField, TabPanelCtx } from "./TabbedArrayField";
 import { useFormikContext } from "formik";
+import { ASSOCIATIONS_COMPONENT_NAME } from "../../../dina-ui/types/collection-api";
 
 export interface MaterialSampleAssociationsFieldProps {
   className?: string;
@@ -41,11 +43,11 @@ export function MaterialSampleAssociationsField({
       sectionId="associations-tabs"
       className={classNames(className, "non-strip")}
       // Wrap in the bulk edit tab warning in case this is bulk edit mode:
-      wrapContent={content => (
+      wrapContent={(content) => (
         <BulkEditTabWarning
           targetType="material-sample"
           fieldName={fieldName}
-          setDefaultValue={ctx =>
+          setDefaultValue={(ctx) =>
             // Auto-create the first association:
             ctx.bulkEditFormRef?.current?.setFieldValue(fieldName, [{}])
           }
@@ -77,7 +79,7 @@ export function MaterialSampleAssociationsField({
           index + 1
         );
       }}
-      renderTabPanel={props => <AssociationTabPanel {...props} />}
+      renderTabPanel={(props) => <AssociationTabPanel {...props} />}
     />
   );
 }
@@ -107,7 +109,10 @@ function AssociationTabPanel({
     setShowSearchBtn(false);
   }
   return (
-    <div>
+    <DinaFormSection
+      componentName={ASSOCIATIONS_COMPONENT_NAME}
+      sectionName="associations-material-sample-section"
+    >
       <div className="row">
         <div className="col-sm-6">
           <div className="association-type">
@@ -135,7 +140,7 @@ function AssociationTabPanel({
         onAssociatedSampleSelected={onAssociatedSampleSelected}
         onCloseClicked={resetSearchState}
       />
-    </div>
+    </DinaFormSection>
   );
 }
 

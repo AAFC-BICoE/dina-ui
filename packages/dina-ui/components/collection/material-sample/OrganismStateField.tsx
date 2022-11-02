@@ -3,7 +3,8 @@ import {
   FieldSpy,
   TextField,
   useDinaFormContext,
-  ToggleField
+  ToggleField,
+  DinaFormSection
 } from "common-ui";
 import { DeterminationField } from "../..";
 import { Organism } from "../../../types/collection-api";
@@ -54,67 +55,69 @@ export function OrganismStateField({
   const determinationFieldProps = fieldProps("determination");
 
   return (
-    <div className="organism-state-field">
-      <div className="row">
-        {individualEntry && !readOnly && useTargetOrganism && (
-          <ToggleField
-            {...fieldProps("isTarget")}
-            className="col-sm-1"
-            onChangeExternal={checked => {
-              if (checked) {
-                onTargetChecked(index);
-              }
-            }}
-          />
-        )}
-        <AutoSuggestTextField<Organism>
-          className="col-sm-6"
-          {...fieldProps("lifeStage")}
-          jsonApiBackend={{
-            query: (search, ctx) => ({
-              path: "collection-api/organism",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `lifeStage==${search}*`
-              }
-            }),
-            option: org => org?.lifeStage
-          }}
-          blankSearchBackend={"json-api"}
-        />
-        <AutoSuggestTextField<Organism>
-          className={individualEntry ? "col-sm-5" : "col-sm-6"}
-          {...fieldProps("sex")}
-          jsonApiBackend={{
-            query: (search, ctx) => ({
-              path: "collection-api/organism",
-              filter: {
-                ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
-                rsql: `sex==${search}*`
-              }
-            }),
-            option: org => org?.sex
-          }}
-          blankSearchBackend={"json-api"}
-        />
-        <TextField
-          {...fieldProps("remarks")}
-          customName="organismRemarks"
-          className="col-sm-12"
-          multiLines={true}
-        />
-      </div>
-      <FieldSpy<[]> fieldName={determinationFieldProps.name}>
-        {determinations =>
-          // Hide in read-only mode when there are no determinations:
-          readOnly && !determinations?.length ? null : (
-            <DeterminationField
-              {...determinationFieldProps}
-              visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+    <DinaFormSection sectionName="organisms-general-section">
+      <div className="organism-state-field">
+        <div className="row">
+          {individualEntry && !readOnly && useTargetOrganism && (
+            <ToggleField
+              {...fieldProps("isTarget")}
+              className="col-sm-1"
+              onChangeExternal={(checked) => {
+                if (checked) {
+                  onTargetChecked(index);
+                }
+              }}
             />
-          )
-        }
-      </FieldSpy>
-    </div>
+          )}
+          <AutoSuggestTextField<Organism>
+            className="col-sm-6"
+            {...fieldProps("lifeStage")}
+            jsonApiBackend={{
+              query: (search, ctx) => ({
+                path: "collection-api/organism",
+                filter: {
+                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                  rsql: `lifeStage==${search}*`
+                }
+              }),
+              option: (org) => org?.lifeStage
+            }}
+            blankSearchBackend={"json-api"}
+          />
+          <AutoSuggestTextField<Organism>
+            className={individualEntry ? "col-sm-5" : "col-sm-6"}
+            {...fieldProps("sex")}
+            jsonApiBackend={{
+              query: (search, ctx) => ({
+                path: "collection-api/organism",
+                filter: {
+                  ...(ctx.values.group && { group: { EQ: ctx.values.group } }),
+                  rsql: `sex==${search}*`
+                }
+              }),
+              option: (org) => org?.sex
+            }}
+            blankSearchBackend={"json-api"}
+          />
+          <TextField
+            {...fieldProps("remarks")}
+            customName="organismRemarks"
+            className="col-sm-12"
+            multiLines={true}
+          />
+        </div>
+        <FieldSpy<[]> fieldName={determinationFieldProps.name}>
+          {(determinations) =>
+            // Hide in read-only mode when there are no determinations:
+            readOnly && !determinations?.length ? null : (
+              <DeterminationField
+                {...determinationFieldProps}
+                visibleManagedAttributeKeys={visibleManagedAttributeKeys}
+              />
+            )
+          }
+        </FieldSpy>
+      </div>
+    </DinaFormSection>
   );
 }

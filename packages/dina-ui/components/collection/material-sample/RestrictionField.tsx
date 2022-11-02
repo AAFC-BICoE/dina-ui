@@ -6,7 +6,10 @@ import {
 } from "common-ui";
 import { InputResource } from "kitsu";
 import { DinaMessage, useDinaIntl } from "../../..//intl/dina-ui-intl";
-import { MaterialSample } from "../../..//types/collection-api";
+import {
+  MaterialSample,
+  RESTRICTION_COMPONENT_NAME
+} from "../../..//types/collection-api";
 
 export const RESTRICTIONS_FIELDS = [
   "phac_animal_rg",
@@ -31,7 +34,12 @@ export const BLANK_RESTRICTION: Pick<
 export function RestrictionField({ id }: { id?: string }) {
   const { formatMessage } = useDinaIntl();
   return (
-    <FieldSet id={id} legend={<DinaMessage id="restrictions" />}>
+    <FieldSet
+      id={id}
+      legend={<DinaMessage id="restrictions" />}
+      componentName={RESTRICTION_COMPONENT_NAME}
+      sectionName="restriction-general-section"
+    >
       <div className="row">
         <FieldExtensionSelectField
           name="phac_animal_rg"

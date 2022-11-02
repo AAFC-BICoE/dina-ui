@@ -5,7 +5,7 @@ import { FormTemplate } from "../../../types/collection-api";
 
 export interface MaterialSampleFormTemplateSelectProps {
   value?: PersistedResource<FormTemplate>;
-  onChange: (newValue: PersistedResource<FormTemplate>) => void;
+  onChange: (newValue: string) => void;
 }
 
 export function MaterialSampleFormTemplateSelect({
@@ -31,7 +31,9 @@ export function MaterialSampleFormTemplateSelect({
               })}
               optionLabel={(view) => view.name || view.id}
               model="collection-api/form-template"
-              onChange={onChange}
+              onChange={(selectedFormTemplate) =>
+                onChange((selectedFormTemplate as any).id)
+              }
               value={value}
             />
           )}
