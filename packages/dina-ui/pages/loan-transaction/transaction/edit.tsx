@@ -43,7 +43,8 @@ import Link from "next/link";
 import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
-import { useState, useEffect } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
+import { pick, compact, uniq } from "lodash";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -54,7 +55,7 @@ export function useTransactionQuery(id?: string, showPermissions?: boolean) {
   return useQuery<Transaction>(
     {
       path: `loan-transaction-api/transaction/${id}`,
-      include: "attachment",
+      include: "attachment,materialSamples",
       ...(showPermissions && { header: { "include-dina-permission": "true" } })
     },
     {
@@ -88,7 +89,6 @@ export default function TransactionEditPage() {
   const title = id ? "editTransactionTitle" : "addTransactionTitle";
 
   const query = useTransactionQuery(id);
-
   return (
     <div>
       <Head title={formatMessage(title)} />
@@ -128,6 +128,10 @@ export function TransactionForm({
         materialToBeReturned: false,
         agentRoles: []
       };
+  // The selected resources to be used for the QueryPage.
+  const [selectedResources, setSelectedResources] = useState<MaterialSample[]>(
+    []
+  );
 
   const onSubmit: DinaFormOnSubmit<InputResource<Transaction>> = async ({
     submittedValues
@@ -139,12 +143,21 @@ export function TransactionForm({
 
       // Convert the attachments to a 'relationships' array so it works with JSONAPI:
       attachment: undefined,
+      materialSamples: undefined,
       relationships: {
         ...(submittedValues.attachment && {
           attachment: {
             data: submittedValues.attachment.map((it) => ({
               id: it.id,
               type: it.type
+            }))
+          }
+        }),
+        ...(selectedResources.length > 0 && {
+          materialSamples: {
+            data: selectedResources.map((it) => ({
+              id: it.id,
+              type: "material-sample"
             }))
           }
         })
@@ -188,15 +201,30 @@ export function TransactionForm({
       onSubmit={onSubmit}
     >
       {buttonBar}
-      <TransactionFormLayout />
+      <TransactionFormLayout
+        selectedResources={selectedResources}
+        setSelectedResources={setSelectedResources}
+      />
       {buttonBar}
     </DinaForm>
   );
 }
 
-export function TransactionFormLayout() {
+export interface TransactionFormLayoutProps {
+  selectedResources?: MaterialSample[];
+  setSelectedResources?: Dispatch<SetStateAction<MaterialSample[]>>;
+}
+
+export function TransactionFormLayout({
+  selectedResources,
+  setSelectedResources
+}: TransactionFormLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
+  const { bulkGet } = useApiClient();
+  const [selectedResourcesView, setSelectedResourcesView] = useState<
+    MaterialSample[]
+  >([]);
 
   // Displayed on edit mode only.
   const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
@@ -228,10 +256,42 @@ export function TransactionFormLayout() {
     }
   ];
 
-  // The selected resources to be used for the QueryPage.
-  const [selectedResources, setSelectedResources] = useState<MaterialSample[]>(
-    []
-  );
+  /**
+   * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
+   * operation.
+   *
+   * @param sampleIds array of UUIDs.
+   */
+  async function fetchSamples(sampleIds: string[]) {
+    await bulkGet<MaterialSample>(
+      sampleIds.map((id) => "/material-sample/" + id),
+      { apiBaseUrl: "/collection-api" }
+    ).then((response) => {
+      const materialSamplesTransformed = compact(response).map((resource) => ({
+        data: {
+          attributes: pick(resource, ["materialSampleName"])
+        },
+        id: resource.id,
+        type: resource.type
+      }));
+
+      if (setSelectedResources !== undefined) {
+        setSelectedResources(materialSamplesTransformed ?? []);
+      }
+      setSelectedResourcesView(materialSamplesTransformed ?? []);
+    });
+  }
+
+  useEffect(() => {
+    if (initialValues.materialSamples.length > 0) {
+      const materialSampleIds = initialValues.materialSamples.map(
+        (materialSample) => {
+          return materialSample.id;
+        }
+      );
+      fetchSamples(materialSampleIds);
+    }
+  }, []);
 
   return (
     <div>
@@ -488,7 +548,7 @@ export function TransactionFormLayout() {
           </strong>
           <ReactTable<MaterialSample>
             columns={API_SEARCH_COLUMN}
-            data={selectedResources}
+            data={selectedResourcesView}
             minRows={1}
             defaultPageSize={100}
             pageText={<CommonMessage id="page" />}
