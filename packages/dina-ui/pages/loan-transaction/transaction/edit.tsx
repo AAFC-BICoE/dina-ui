@@ -40,11 +40,11 @@ import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { AgentRole, Transaction } from "../../../types/loan-transaction-api";
 import ReactTable, { Column } from "react-table";
 import Link from "next/link";
-import { SeqdbMessage } from "packages/dina-ui/intl/seqdb-intl";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { TableColumn } from "packages/common-ui/lib/list-page/types";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
-import { pick, compact, uniq } from "lodash";
+import { pick, compact } from "lodash";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
