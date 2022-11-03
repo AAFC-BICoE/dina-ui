@@ -58,6 +58,9 @@ export function useMaterialSampleFormTemplateSelectState() {
       )
       .then((response) => {
         setSampleFormTemplate(response?.data);
+      })
+      .catch(() => {
+        setSampleFormTemplate(undefined);
       });
   }
 
