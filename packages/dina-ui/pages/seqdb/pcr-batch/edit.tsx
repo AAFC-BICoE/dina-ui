@@ -139,18 +139,13 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    // Add storage unit if it was selected:
+    // Delete storage unit type if storage unit has been selected
     if (
       (submittedValues.storageUnit?.id &&
         submittedValues.storageUnitType?.id) ||
       (!submittedValues.storageUnit?.id && !submittedValues.storageUnitType?.id)
     ) {
       delete submittedValues.storageUnitType;
-    } else {
-      (submittedValues as any).storageUnitType = {
-        id: submittedValues?.storageUnitType?.id,
-        type: "storage-unit-type"
-      };
     }
 
     const inputResource = {
@@ -170,6 +165,7 @@ export function PcrBatchForm({
         }
       })
     };
+
     const [savedResource] = await save<PcrBatch>(
       [
         {
@@ -181,7 +177,6 @@ export function PcrBatchForm({
     );
     await onSaved(savedResource);
   }
-
   return (
     <LoadExternalDataForPcrBatchForm
       dinaFormProps={{
@@ -203,31 +198,58 @@ export function LoadExternalDataForPcrBatchForm({
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
   // The storage unit type needs to be loaded from the Storage Unit if it exists.
-  const storageUnitQuery = useQuery<StorageUnit>(
-    {
-      path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
-      include: "storageUnitType"
-    },
-    { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
-  );
-
   const initialValues = dinaFormProps.initialValues;
-  initialValues.storageUnitType = storageUnitQuery?.response?.data
-    ?.storageUnitType?.id
-    ? {
-        id: storageUnitQuery.response.data.storageUnitType.id,
-        type: "storage-unit-type"
-      }
-    : undefined;
+
+  if (
+    dinaFormProps?.initialValues?.storageUnit?.id === undefined &&
+    dinaFormProps?.initialValues?.storageUnitType?.id !== undefined
+  ) {
+    const storageUnitQuery = useQuery<StorageUnit>({
+      path: `collection-api/storage-unit-type/${dinaFormProps?.initialValues?.storageUnitType?.id}`
+    });
+
+    initialValues.storageUnitType = storageUnitQuery?.response?.data
+      ?.storageUnitType?.id
+      ? {
+          id: storageUnitQuery.response.data.storageUnitType.id,
+          type: "storage-unit-type"
+        }
+      : undefined;
+
+    return withResponseOrDisabled(storageUnitQuery, () => (
+      <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
+        {buttonBar}
+        <PcrBatchFormFields />
+        {buttonBar}
+      </DinaForm>
+    ));
+  } else {
+    const storageUnitQuery = useQuery<StorageUnit>(
+      {
+        path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
+        include: "storageUnitType"
+      },
+      { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
+    );
+
+    initialValues.storageUnitType = storageUnitQuery?.response?.data
+      ?.storageUnitType?.id
+      ? {
+          id: storageUnitQuery.response.data.storageUnitType.id,
+          type: "storage-unit-type"
+        }
+      : undefined;
+
+    return withResponseOrDisabled(storageUnitQuery, () => (
+      <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
+        {buttonBar}
+        <PcrBatchFormFields />
+        {buttonBar}
+      </DinaForm>
+    ));
+  }
 
   // Wait for response or if disabled, just continue with rendering.
-  return withResponseOrDisabled(storageUnitQuery, () => (
-    <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
-      {buttonBar}
-      <PcrBatchFormFields />
-      {buttonBar}
-    </DinaForm>
-  ));
 }
 
 /** Re-usable field layout between edit and view pages. */
@@ -238,57 +260,57 @@ export function PcrBatchFormFields() {
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
     ({ formik: { setFieldValue } }) => {
-      if (initialValues.storageUnit.id) {
-        return (
-          <ResourceSelectField<StorageUnitType>
-            className="col-md-6"
-            name="storageUnitType"
-            filter={filterBy(["name"])}
-            model="collection-api/storage-unit-type"
-            optionLabel={(storageUnitType) => `${storageUnitType.name}`}
-            readOnlyLink="/collection/storage-unit/view?id="
-            onChange={(storageUnitType) => {
-              setFieldValue("storageUnit.id", null);
-              if (
-                !Array.isArray(storageUnitType) &&
-                storageUnitType?.gridLayoutDefinition != null
-              ) {
-                setFieldValue(
-                  "storageRestriction.layout",
-                  storageUnitType.gridLayoutDefinition
-                );
-              } else {
-                setFieldValue("storageRestriction", null);
-              }
-            }}
-          />
-        );
-      } else {
-        return (
-          <ResourceSelectField<StorageUnitType>
-            className="col-md-6"
-            name="storageUnitType"
-            filter={filterBy(["name"])}
-            model="collection-api/storage-unit-type"
-            optionLabel={(storageUnitType) => `${storageUnitType.name}`}
-            readOnlyLink="/collection/storage-unit-type/view?id="
-            onChange={(storageUnitType) => {
-              setFieldValue("storageUnit.id", null);
-              if (
-                !Array.isArray(storageUnitType) &&
-                storageUnitType?.gridLayoutDefinition != null
-              ) {
-                setFieldValue(
-                  "storageRestriction.layout",
-                  storageUnitType.gridLayoutDefinition
-                );
-              } else {
-                setFieldValue("storageRestriction", null);
-              }
-            }}
-          />
-        );
-      }
+      // if (initialValues.storageUnit.id) {
+      //   return (
+      //     <ResourceSelectField<StorageUnitType>
+      //       className="col-md-6"
+      //       name="storageUnitType"
+      //       filter={filterBy(["name"])}
+      //       model="collection-api/storage-unit-type"
+      //       optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+      //       readOnlyLink="/collection/storage-unit/view?id="
+      //       onChange={(storageUnitType) => {
+      //         setFieldValue("storageUnit.id", null);
+      //         if (
+      //           !Array.isArray(storageUnitType) &&
+      //           storageUnitType?.gridLayoutDefinition != null
+      //         ) {
+      //           setFieldValue(
+      //             "storageRestriction.layout",
+      //             storageUnitType.gridLayoutDefinition
+      //           );
+      //         } else {
+      //           setFieldValue("storageRestriction", null);
+      //         }
+      //       }}
+      //     />
+      //   );
+      // } else {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          className="col-md-6"
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={(storageUnitType) => {
+            setFieldValue("storageUnit.id", null);
+            if (
+              !Array.isArray(storageUnitType) &&
+              storageUnitType?.gridLayoutDefinition != null
+            ) {
+              setFieldValue(
+                "storageRestriction.layout",
+                storageUnitType.gridLayoutDefinition
+              );
+            } else {
+              setFieldValue("storageRestriction", null);
+            }
+          }}
+        />
+      );
+      // }
     }
   );
 
