@@ -47,7 +47,7 @@ export function usePcrBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -138,15 +138,18 @@ export function PcrBatchForm({
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
-
-    // Delete storage unit type if storage unit has been selected
+    // Delete storage unit type if only storage unit has been selected
     if (
       (submittedValues.storageUnit?.id &&
         submittedValues.storageUnitType?.id) ||
       (!submittedValues.storageUnit?.id && !submittedValues.storageUnitType?.id)
     ) {
-      delete submittedValues.storageUnitType;
+      // delete submittedValues.storageUnitType;
+      submittedValues.storageUnitType = undefined;
     }
+    // if(submittedValues?.storageUnitType !== undefined && pcrBatch?.storageUnitType?.id){
+    //   delete submittedValues.storageUnitType;
+    // }
 
     const inputResource = {
       ...submittedValues,
@@ -197,9 +200,7 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
-  // The storage unit type needs to be loaded from the Storage Unit if it exists.
   const initialValues = dinaFormProps.initialValues;
-
   if (
     dinaFormProps?.initialValues?.storageUnit?.id === undefined &&
     dinaFormProps?.initialValues?.storageUnitType?.id !== undefined
@@ -216,6 +217,7 @@ export function LoadExternalDataForPcrBatchForm({
         }
       : undefined;
 
+    // Wait for response or if disabled, just continue with rendering.
     return withResponseOrDisabled(storageUnitQuery, () => (
       <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
         {buttonBar}
@@ -224,6 +226,7 @@ export function LoadExternalDataForPcrBatchForm({
       </DinaForm>
     ));
   } else {
+    // The storage unit type needs to be loaded from the Storage Unit if it exists.
     const storageUnitQuery = useQuery<StorageUnit>(
       {
         path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
@@ -239,7 +242,7 @@ export function LoadExternalDataForPcrBatchForm({
           type: "storage-unit-type"
         }
       : undefined;
-
+    // Wait for response or if disabled, just continue with rendering.
     return withResponseOrDisabled(storageUnitQuery, () => (
       <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
         {buttonBar}
@@ -248,8 +251,6 @@ export function LoadExternalDataForPcrBatchForm({
       </DinaForm>
     ));
   }
-
-  // Wait for response or if disabled, just continue with rendering.
 }
 
 /** Re-usable field layout between edit and view pages. */
