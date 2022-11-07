@@ -1,8 +1,9 @@
 import classNames from "classnames";
-import { CSSProperties } from "react";
+import { CSSProperties, useMemo } from "react";
 import { useContext } from "react";
 import { DinaFormContext, FieldSpy, FieldSpyRenderProps } from "..";
 import { DinaFormSection, DinaFormSectionProps } from "./DinaForm";
+import { find } from "lodash";
 
 export interface FieldSetProps extends DinaFormSectionProps {
   /** fieldset title. */
@@ -30,7 +31,33 @@ export function FieldSet({
   wrapLegend,
   ...formSectionProps
 }: FieldSetProps) {
-  const isInForm = !!useContext(DinaFormContext);
+  const context = useContext(DinaFormContext);
+  const { componentName, sectionName } = formSectionProps;
+
+  // Check the section to see if it should be visible or not.
+  const disableSection = useMemo(() => {
+    if (!context?.formTemplate || !componentName || !sectionName) return false;
+
+    // First find the component we are looking for.
+    const componentFound = find(context?.formTemplate?.components, {
+      name: componentName
+    });
+    if (componentFound) {
+      // Next find the right section.
+      const sectionFound = find(componentFound?.sections, {
+        name: sectionName
+      });
+      if (sectionFound) {
+        // Check if any of the items are not visible.
+        return sectionFound.items?.every((item) => item.visible === false);
+      }
+    }
+    return false;
+  }, [context?.formTemplate]);
+
+  if (disableSection) {
+    return null;
+  }
 
   const legendElement = (
     <legend className={classNames("w-auto", fieldName && "field-label")}>
@@ -58,7 +85,7 @@ export function FieldSet({
     )
   });
 
-  return isInForm ? (
+  return !!context ? (
     // Show the green fieldset legend/title when the field is bulk edited:
     <FieldSpy fieldName={fieldName ?? "notAField"}>
       {(_value, fieldSpyProps) => (
