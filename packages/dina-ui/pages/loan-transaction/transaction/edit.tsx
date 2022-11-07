@@ -417,6 +417,37 @@ export function TransactionFormLayout({
           multiLines={true}
         />
       </FieldSet>
+      <FieldSet legend={<DinaMessage id="materialSampleListTitle" />}>
+        {readOnly ? (
+          <>
+            <strong>
+              <SeqdbMessage id="selectedSamplesTitle" />
+            </strong>
+            <ReactTable<MaterialSample>
+              columns={API_SEARCH_COLUMN}
+              data={selectedResourcesView}
+              minRows={1}
+              defaultPageSize={100}
+              pageText={<CommonMessage id="page" />}
+              noDataText={<CommonMessage id="noRowsFound" />}
+              ofText={<CommonMessage id="of" />}
+              rowsText={formatMessage("rows")}
+              previousText={<CommonMessage id="previous" />}
+              nextText={<CommonMessage id="next" />}
+            />
+          </>
+        ) : (
+          <div className="mb-3">
+            <QueryPage<MaterialSample>
+              indexName={"dina_material_sample_index"}
+              columns={ELASTIC_SEARCH_COLUMN}
+              selectionMode={true}
+              selectionResources={selectedResources}
+              setSelectionResources={setSelectedResources}
+            />
+          </div>
+        )}
+      </FieldSet>
       {readOnly ? (
         <FieldSpy<AgentRole[]> fieldName="agentRoles">
           {(agentRoles) => {
@@ -542,35 +573,6 @@ export function TransactionFormLayout({
           attachmentPath={`loan-transaction-api/transaction/${initialValues.id}/attachment`}
         />
       </div>
-      {readOnly ? (
-        <>
-          <strong>
-            <SeqdbMessage id="selectedSamplesTitle" />
-          </strong>
-          <ReactTable<MaterialSample>
-            columns={API_SEARCH_COLUMN}
-            data={selectedResourcesView}
-            minRows={1}
-            defaultPageSize={100}
-            pageText={<CommonMessage id="page" />}
-            noDataText={<CommonMessage id="noRowsFound" />}
-            ofText={<CommonMessage id="of" />}
-            rowsText={formatMessage("rows")}
-            previousText={<CommonMessage id="previous" />}
-            nextText={<CommonMessage id="next" />}
-          />
-        </>
-      ) : (
-        <div className="mb-3">
-          <QueryPage<MaterialSample>
-            indexName={"dina_material_sample_index"}
-            columns={ELASTIC_SEARCH_COLUMN}
-            selectionMode={true}
-            selectionResources={selectedResources}
-            setSelectionResources={setSelectedResources}
-          />
-        </div>
-      )}
     </div>
   );
 }
