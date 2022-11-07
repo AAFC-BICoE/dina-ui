@@ -238,6 +238,7 @@ export function TransactionFormLayout({
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",
+      additionalAccessors: ["data.attributes.dwcOtherCatalogNumbers"],
       isKeyword: true
     }
   ];
