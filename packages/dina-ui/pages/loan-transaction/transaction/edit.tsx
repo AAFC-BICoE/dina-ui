@@ -283,7 +283,7 @@ export function TransactionFormLayout({
   }
 
   useEffect(() => {
-    if (initialValues.materialSamples.length > 0) {
+    if (initialValues.materialSamples?.length > 0) {
       const materialSampleIds = initialValues.materialSamples.map(
         (materialSample) => {
           return materialSample.id;
