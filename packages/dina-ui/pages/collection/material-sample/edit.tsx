@@ -125,6 +125,7 @@ export default function MaterialSampleEditPage() {
             return (
               <MaterialSampleForm
                 enableReinitialize={true}
+                navOrder={navOrder}
                 {...sampleFormProps}
                 materialSample={sample}
               />
@@ -142,7 +143,11 @@ export default function MaterialSampleEditPage() {
             );
           })
         ) : (
-          <MaterialSampleForm enableReinitialize={true} {...sampleFormProps} />
+          <MaterialSampleForm
+            enableReinitialize={true}
+            navOrder={navOrder}
+            {...sampleFormProps}
+          />
         )}
       </main>
       <Footer />
