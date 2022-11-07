@@ -97,7 +97,10 @@ const apiContext = {
   save: mockSave,
   bulkGet: mockBulkGet,
   apiClient: {
-    get: mockGet
+    get: mockGet,
+    axios: {
+      get: mockGet
+    }
   }
 };
 
@@ -111,7 +114,7 @@ describe("Transaction Form", () => {
   it("Submits a Transaction", async () => {
     const wrapper = mountWithAppContext(
       <TransactionForm onSaved={mockOnSaved} />,
-      testCtx
+      testCtx as any
     );
 
     // Fill out all fields:
@@ -307,7 +310,10 @@ describe("Transaction Form", () => {
 
   it("Edits an existing Transaction", async () => {
     // The Next.js router is mocked to provide the existing Transaction's ID
-    const wrapper = mountWithAppContext(<TransactionEditPage />, testCtx);
+    const wrapper = mountWithAppContext(
+      <TransactionEditPage />,
+      testCtx as any
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
