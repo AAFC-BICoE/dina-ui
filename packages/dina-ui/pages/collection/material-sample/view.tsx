@@ -223,21 +223,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />
                 )}
-                <div className="row">
-                  <div className="col-md-6">
-                    <ManagedAttributesEditor
-                      fieldSetProps={{
-                        legend: (
-                          <DinaMessage id="materialSampleManagedAttributes" />
-                        )
-                      }}
-                      valuesPath="managedAttributes"
-                      managedAttributeApiPath="collection-api/managed-attribute"
-                      managedAttributeComponent="MATERIAL_SAMPLE"
-                      showFormTemplateDropdown={true}
-                    />
-                  </div>
-                </div>
+                <ManagedAttributesEditor
+                  fieldSetProps={{
+                    legend: <DinaMessage id="materialSampleManagedAttributes" />
+                  }}
+                  valuesPath="managedAttributes"
+                  managedAttributeApiPath="collection-api/managed-attribute"
+                  managedAttributeComponent="MATERIAL_SAMPLE"
+                />
                 <div className="mb-3">
                   <Field name="id">
                     {({ field: { value: materialSampleId } }) => (

@@ -354,26 +354,17 @@ export function MaterialSampleForm({
           componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
           sectionName="managed-attributes-section"
         >
-          <div className="row">
-            <div className="col-md-6">
-              <ManagedAttributesEditor
-                valuesPath="managedAttributes"
-                managedAttributeApiPath="collection-api/managed-attribute"
-                managedAttributeComponent="MATERIAL_SAMPLE"
-                fieldSetProps={{
-                  id,
-                  legend: <DinaMessage id="materialSampleManagedAttributes" />
-                }}
-                // Custom view selection is supported for material samples,
-                // but not in template editor mode:
-                showFormTemplateDropdown={!isTemplate}
-                managedAttributeOrderFieldName="managedAttributesOrder"
-                visibleAttributeKeys={
-                  visibleManagedAttributeKeys?.materialSample
-                }
-              />
-            </div>
-          </div>
+          <ManagedAttributesEditor
+            valuesPath="managedAttributes"
+            managedAttributeApiPath="collection-api/managed-attribute"
+            managedAttributeComponent="MATERIAL_SAMPLE"
+            fieldSetProps={{
+              id,
+              legend: <DinaMessage id="materialSampleManagedAttributes" />
+            }}
+            managedAttributeOrderFieldName="managedAttributesOrder"
+            visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+          />
         </DinaFormSection>
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>

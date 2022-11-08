@@ -41,7 +41,7 @@ const TEST_COLLECTING_EVENT_CUSTOM_VIEW: PersistedResource<FormTemplate> = {
 };
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map(path => {
+  paths.map((path) => {
     switch (path) {
       case "managed-attribute/COLLECTING_EVENT.example_attribute_1":
         return EXAMPLE_MA_1;
@@ -84,8 +84,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
   }
 });
 
-const mockSave = jest.fn(ops =>
-  ops.map(op => ({
+const mockSave = jest.fn((ops) =>
+  ops.map((op) => ({
     ...op.resource,
     id: op.resource.id ?? "11111"
   }))
@@ -252,7 +252,6 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
@@ -313,7 +312,6 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
@@ -407,7 +405,6 @@ describe("ManagedAttributesEditor component", () => {
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="COLLECTING_EVENT"
-          showFormTemplateDropdown={true}
         />
       </DinaForm>,
       { apiContext }
