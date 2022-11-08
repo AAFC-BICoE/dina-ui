@@ -18,6 +18,8 @@ export interface TabbedArrayFieldProps<T> {
   initialIndex?: number;
   name: string;
   legend: JSX.Element;
+  componentName?: string;
+  sectionName?: string;
   onChangeTabIndex?: (newIndex: number) => void;
   makeNewElement: (elements: T[]) => T;
   renderTabPanel: (panelCtx: TabPanelCtx<T>) => ReactNode;
@@ -43,11 +45,13 @@ export function TabbedArrayField<T>({
   sectionId,
   initialIndex = 0,
   legend,
+  componentName,
+  sectionName,
   onChangeTabIndex,
   renderTabPanel,
   renderTab,
   renderAboveTabs,
-  wrapContent = content => content
+  wrapContent = (content) => content
 }: TabbedArrayFieldProps<T>) {
   const { readOnly, isTemplate } = useDinaFormContext();
 
@@ -59,7 +63,7 @@ export function TabbedArrayField<T>({
 
   return (
     <FieldArray name={name}>
-      {fieldArrayProps => {
+      {(fieldArrayProps) => {
         const elements = (fieldArrayProps.form.getFieldMeta(name).value ||
           []) as T[];
 
@@ -70,7 +74,7 @@ export function TabbedArrayField<T>({
 
         function removeElement(index: number) {
           fieldArrayProps.remove(index); // Stay on the current tab number, or reduce if removeing the last element:
-          setActiveTabIdx(current => clamp(current, 0, elements.length - 2));
+          setActiveTabIdx((current) => clamp(current, 0, elements.length - 2));
         }
 
         function elementInternal(index: number) {
@@ -98,6 +102,8 @@ export function TabbedArrayField<T>({
             id={sectionId}
             legend={legend}
             fieldName={name}
+            componentName={componentName}
+            sectionName={sectionName}
           >
             {wrapContent(
               <>
@@ -118,7 +124,7 @@ export function TabbedArrayField<T>({
                         <Tab key={index}>
                           {showTabs ? (
                             <TabErrorIndicator index={index} name={name}>
-                              {hasError => (
+                              {(hasError) => (
                                 <div>
                                   {renderTab(element, index)}
                                   {hasError && (
