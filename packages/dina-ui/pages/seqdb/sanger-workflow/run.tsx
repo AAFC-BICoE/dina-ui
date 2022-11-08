@@ -1,4 +1,4 @@
-import { BackToListButton, ApiClientContext } from "common-ui";
+import { BackToListButton, ApiClientContext, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -10,10 +10,10 @@ import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { useState, useEffect, useContext } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/sanger-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import { usePcrBatchQuery } from "../pcr-batch/edit";
 
 export default function SangerWorkFlowRunPage() {
   const router = useRouter();
-  const { apiClient } = useContext(ApiClientContext);
   const { formatMessage } = useSeqdbIntl();
 
   // Current step being used.
@@ -33,14 +33,7 @@ export default function SangerWorkFlowRunPage() {
   );
 
   // Loaded PCR Batch.
-  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
-
-  // Load the PCR Batch only once.
-  useEffect(() => {
-    if (pcrBatchId) {
-      getPcrBatch();
-    }
-  }, [pcrBatchId]);
+  const pcrBatch = usePcrBatchQuery(pcrBatchId, [pcrBatchId, currentStep]);
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -61,12 +54,8 @@ export default function SangerWorkFlowRunPage() {
     });
   }
 
-  async function getPcrBatch() {
-    await apiClient
-      .get<PcrBatch>(`seqdb-api/pcr-batch/${pcrBatchId}`, {})
-      .then((response) => {
-        setPcrBatch(response?.data);
-      });
+  if (pcrBatch.loading) {
+    return <LoadingSpinner loading={true} />;
   }
 
   const buttonBarContent = (
@@ -148,7 +137,7 @@ export default function SangerWorkFlowRunPage() {
         <TabPanel>
           <SangerPcrBatchStep
             pcrBatchId={pcrBatchId}
-            pcrBatch={pcrBatch}
+            pcrBatch={pcrBatch.response?.data}
             onSaved={finishPcrBatchStep}
             editMode={editMode}
             setEditMode={setEditMode}
@@ -168,10 +157,10 @@ export default function SangerWorkFlowRunPage() {
           )}
         </TabPanel>
         <TabPanel>
-          {pcrBatch && pcrBatchId && (
+          {pcrBatch.response?.data && pcrBatchId && (
             <PCRBatchItemGrid
               pcrBatchId={pcrBatchId}
-              pcrBatch={pcrBatch}
+              pcrBatch={pcrBatch.response.data}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}

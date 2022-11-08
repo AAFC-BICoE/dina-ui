@@ -6,6 +6,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   filterBy,
+  LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
   TextField,
@@ -22,7 +23,7 @@ import {
   StorageUnitType,
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
-import { ReactNode, useRef, useEffect } from "react";
+import { ReactNode } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -40,14 +41,14 @@ import {
   ThermocyclerProfile,
   Region
 } from "../../../types/seqdb-api";
-import { FormikValues } from "formik";
+import { cloneDeep } from "lodash";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -91,6 +92,7 @@ export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
+  readOnlyOverride?: boolean;
 }
 
 export function PcrBatchForm({
@@ -101,7 +103,8 @@ export function PcrBatchForm({
       <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  )
+  ),
+  readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
 
@@ -139,8 +142,28 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    // Add storage unit if it was selected:
-    delete submittedValues.storageUnitType;
+    // Storage Unit or Storage Unit Type can be set but not both.
+    if (submittedValues.storageUnit?.id) {
+      (submittedValues as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
+    } else if (submittedValues.storageUnitType?.id) {
+      (submittedValues as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+    } else {
+      // Clear both in this case.
+      (submittedValues as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+      (submittedValues as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
+    }
 
     const inputResource = {
       ...submittedValues,
@@ -171,12 +194,12 @@ export function PcrBatchForm({
     );
     await onSaved(savedResource);
   }
-
   return (
     <LoadExternalDataForPcrBatchForm
       dinaFormProps={{
         onSubmit,
-        initialValues: initialValues as any
+        initialValues: initialValues as any,
+        readOnly: readOnlyOverride
       }}
       buttonBar={buttonBar as any}
     />
@@ -192,27 +215,42 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
-  // The storage unit type needs to be loaded from the Storage Unit.
+  // Create a copy of the initial value so we don't change the prop version.
+  const initialValues = cloneDeep(dinaFormProps.initialValues);
+
+  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
   const storageUnitQuery = useQuery<StorageUnit>(
     {
-      path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
+      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
       include: "storageUnitType"
     },
-    { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
+    {
+      disabled: !initialValues?.storageUnit?.id
+    }
   );
 
-  const initialValues = dinaFormProps.initialValues;
-  initialValues.storageUnitType = storageUnitQuery?.response?.data
-    ?.storageUnitType?.id
-    ? {
-        id: storageUnitQuery.response.data.storageUnitType.id,
-        type: "storage-unit-type"
-      }
-    : undefined;
+  // Add the storage unit type to the initial values.
+  if (storageUnitQuery?.response?.data) {
+    initialValues.storageUnitType = storageUnitQuery?.response?.data
+      ?.storageUnitType?.id
+      ? {
+          id: storageUnitQuery?.response.data.storageUnitType.id,
+          type: "storage-unit-type"
+        }
+      : undefined;
+  }
+
+  // Display loading indicator if not ready.
+  if (storageUnitQuery.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
 
   // Wait for response or if disabled, just continue with rendering.
   return withResponseOrDisabled(storageUnitQuery, () => (
-    <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
+    <DinaForm<Partial<PcrBatch>>
+      {...dinaFormProps}
+      initialValues={initialValues}
+    >
       {buttonBar}
       <PcrBatchFormFields />
     </DinaForm>
@@ -315,16 +353,18 @@ export function PcrBatchFormFields() {
         <StorageUnitSelectField
           resourceProps={{
             name: "storageUnit",
-            isDisabled: !values?.storageUnitType?.id,
             filter: filterBy(["name"], {
-              extraFilters: [
-                {
-                  selector: "storageUnitType.uuid",
-                  comparison: "==",
-                  arguments: values?.storageUnitType?.id ?? ""
-                }
-              ]
-            })
+              extraFilters: values?.storageUnitType?.id
+                ? [
+                    {
+                      selector: "storageUnitType.uuid",
+                      comparison: "==",
+                      arguments: values?.storageUnitType?.id ?? ""
+                    }
+                  ]
+                : undefined
+            }),
+            isDisabled: !values?.storageUnitType?.id
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
