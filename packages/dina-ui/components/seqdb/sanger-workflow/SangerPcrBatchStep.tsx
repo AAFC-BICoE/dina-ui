@@ -3,6 +3,7 @@ import { PersistedResource } from "kitsu";
 import { useState } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
+  LoadExternalDataForPcrBatchForm,
   PcrBatchForm,
   PcrBatchFormFields,
   usePcrBatchQuery
@@ -59,7 +60,9 @@ export function SangerPcrBatchStep({
               <SeqdbMessage id="editButtonText" />
             </button>
           </ButtonBar>
-          <PcrBatchFormFields />
+          <LoadExternalDataForPcrBatchForm
+            dinaFormProps={{ initialValues: pcrBatch, readOnly: true }}
+          />
         </DinaForm>
       )
     )

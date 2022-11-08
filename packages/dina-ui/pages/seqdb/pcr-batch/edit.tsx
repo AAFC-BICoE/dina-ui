@@ -40,7 +40,7 @@ import {
   ThermocyclerProfile,
   Region
 } from "../../../types/seqdb-api";
-import { any } from "zod";
+import { cloneDeep } from "lodash";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -138,18 +138,23 @@ export function PcrBatchForm({
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
+
     // Delete storage unit type if only storage unit has been selected
     if (
       (submittedValues.storageUnit?.id &&
         submittedValues.storageUnitType?.id) ||
       (!submittedValues.storageUnit?.id && !submittedValues.storageUnitType?.id)
     ) {
-      // delete submittedValues.storageUnitType;
-      submittedValues.storageUnitType = undefined;
+      (submittedValues as any).storageUnitType = {
+        id: null
+      };
     }
-    // if(submittedValues?.storageUnitType !== undefined && pcrBatch?.storageUnitType?.id){
-    //   delete submittedValues.storageUnitType;
-    // }
+    // Delete storage unit if it is not selected
+    if (submittedValues.storageUnitType?.id) {
+      (submittedValues as any).storageUnit = {
+        id: null
+      };
+    }
 
     const inputResource = {
       ...submittedValues,
@@ -200,13 +205,14 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
-  const initialValues = dinaFormProps.initialValues;
+  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  // If storage unit has not been set and storage unit type has been set, then retrieve directly from collection api
   if (
-    dinaFormProps?.initialValues?.storageUnit?.id === undefined &&
-    dinaFormProps?.initialValues?.storageUnitType?.id !== undefined
+    initialValues?.storageUnit?.id === undefined &&
+    initialValues?.storageUnitType?.id !== undefined
   ) {
     const storageUnitQuery = useQuery<StorageUnit>({
-      path: `collection-api/storage-unit-type/${dinaFormProps?.initialValues?.storageUnitType?.id}`
+      path: `collection-api/storage-unit-type/${initialValues?.storageUnitType?.id}`
     });
 
     initialValues.storageUnitType = storageUnitQuery?.response?.data
@@ -242,9 +248,13 @@ export function LoadExternalDataForPcrBatchForm({
           type: "storage-unit-type"
         }
       : undefined;
+
     // Wait for response or if disabled, just continue with rendering.
     return withResponseOrDisabled(storageUnitQuery, () => (
-      <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
+      <DinaForm<Partial<PcrBatch>>
+        {...dinaFormProps}
+        initialValues={initialValues}
+      >
         {buttonBar}
         <PcrBatchFormFields />
         {buttonBar}
@@ -261,32 +271,6 @@ export function PcrBatchFormFields() {
   // When the storage unit type is changed, the storage unit needs to be cleared.
   const StorageUnitTypeSelectorComponent = connect(
     ({ formik: { setFieldValue } }) => {
-      // if (initialValues.storageUnit.id) {
-      //   return (
-      //     <ResourceSelectField<StorageUnitType>
-      //       className="col-md-6"
-      //       name="storageUnitType"
-      //       filter={filterBy(["name"])}
-      //       model="collection-api/storage-unit-type"
-      //       optionLabel={(storageUnitType) => `${storageUnitType.name}`}
-      //       readOnlyLink="/collection/storage-unit/view?id="
-      //       onChange={(storageUnitType) => {
-      //         setFieldValue("storageUnit.id", null);
-      //         if (
-      //           !Array.isArray(storageUnitType) &&
-      //           storageUnitType?.gridLayoutDefinition != null
-      //         ) {
-      //           setFieldValue(
-      //             "storageRestriction.layout",
-      //             storageUnitType.gridLayoutDefinition
-      //           );
-      //         } else {
-      //           setFieldValue("storageRestriction", null);
-      //         }
-      //       }}
-      //     />
-      //   );
-      // } else {
       return (
         <ResourceSelectField<StorageUnitType>
           className="col-md-6"
