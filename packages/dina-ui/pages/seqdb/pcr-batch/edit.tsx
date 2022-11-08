@@ -6,6 +6,7 @@ import {
   DinaFormProps,
   DinaFormSubmitParams,
   filterBy,
+  LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
   TextField,
@@ -139,21 +140,15 @@ export function PcrBatchForm({
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
 
-    // Delete storage unit type if only storage unit has been selected
-    if (
-      (submittedValues.storageUnit?.id &&
-        submittedValues.storageUnitType?.id) ||
-      (!submittedValues.storageUnit?.id && !submittedValues.storageUnitType?.id)
-    ) {
-      (submittedValues as any).storageUnitType = {
-        id: null
-      };
-    }
-    // Delete storage unit if it is not selected
-    if (submittedValues.storageUnitType?.id) {
-      (submittedValues as any).storageUnit = {
-        id: null
-      };
+    // Storage Unit or Storage Unit Type can be set but not both.
+    if (submittedValues.storageUnit?.id) {
+      (submittedValues as any).storageUnitType.id = null;
+    } else if (submittedValues.storageUnitType?.id) {
+      (submittedValues as any).storageUnit.id = null;
+    } else {
+      // Clear both in this case.
+      (submittedValues as any).storageUnit.id = null;
+      (submittedValues as any).storageUnitType.id = null;
     }
 
     const inputResource = {
@@ -205,62 +200,47 @@ export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
   buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
+  // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
-  // If storage unit has not been set and storage unit type has been set, then retrieve directly from collection api
-  if (
-    initialValues?.storageUnit?.id === undefined &&
-    initialValues?.storageUnitType?.id !== undefined
-  ) {
-    const storageUnitQuery = useQuery<StorageUnit>({
-      path: `collection-api/storage-unit-type/${initialValues?.storageUnitType?.id}`
-    });
 
+  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
+  const storageUnitQuery = useQuery<StorageUnit>(
+    {
+      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
+      include: "storageUnitType"
+    },
+    {
+      disabled: !initialValues?.storageUnit?.id
+    }
+  );
+
+  // Add the storage unit type to the initial values.
+  if (storageUnitQuery?.response?.data) {
     initialValues.storageUnitType = storageUnitQuery?.response?.data
       ?.storageUnitType?.id
       ? {
-          id: storageUnitQuery.response.data.storageUnitType.id,
+          id: storageUnitQuery?.response.data.storageUnitType.id,
           type: "storage-unit-type"
         }
       : undefined;
-
-    // Wait for response or if disabled, just continue with rendering.
-    return withResponseOrDisabled(storageUnitQuery, () => (
-      <DinaForm<Partial<PcrBatch>> {...dinaFormProps}>
-        {buttonBar}
-        <PcrBatchFormFields />
-        {buttonBar}
-      </DinaForm>
-    ));
-  } else {
-    // The storage unit type needs to be loaded from the Storage Unit if it exists.
-    const storageUnitQuery = useQuery<StorageUnit>(
-      {
-        path: `collection-api/storage-unit/${dinaFormProps?.initialValues?.storageUnit?.id}`,
-        include: "storageUnitType"
-      },
-      { disabled: dinaFormProps?.initialValues?.storageUnit?.id === undefined }
-    );
-
-    initialValues.storageUnitType = storageUnitQuery?.response?.data
-      ?.storageUnitType?.id
-      ? {
-          id: storageUnitQuery.response.data.storageUnitType.id,
-          type: "storage-unit-type"
-        }
-      : undefined;
-
-    // Wait for response or if disabled, just continue with rendering.
-    return withResponseOrDisabled(storageUnitQuery, () => (
-      <DinaForm<Partial<PcrBatch>>
-        {...dinaFormProps}
-        initialValues={initialValues}
-      >
-        {buttonBar}
-        <PcrBatchFormFields />
-        {buttonBar}
-      </DinaForm>
-    ));
   }
+
+  // Display loading indicator if not ready.
+  if (storageUnitQuery.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
+  // Wait for response or if disabled, just continue with rendering.
+  return withResponseOrDisabled(storageUnitQuery, () => (
+    <DinaForm<Partial<PcrBatch>>
+      {...dinaFormProps}
+      initialValues={initialValues}
+    >
+      {buttonBar}
+      <PcrBatchFormFields />
+      {buttonBar}
+    </DinaForm>
+  ));
 }
 
 /** Re-usable field layout between edit and view pages. */
@@ -295,7 +275,6 @@ export function PcrBatchFormFields() {
           }}
         />
       );
-      // }
     }
   );
 
