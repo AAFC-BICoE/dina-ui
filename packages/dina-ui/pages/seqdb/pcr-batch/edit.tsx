@@ -144,13 +144,25 @@ export function PcrBatchForm({
 
     // Storage Unit or Storage Unit Type can be set but not both.
     if (submittedValues.storageUnit?.id) {
-      (submittedValues as any).storageUnitType.id = null;
+      (submittedValues as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
     } else if (submittedValues.storageUnitType?.id) {
-      (submittedValues as any).storageUnit.id = null;
+      (submittedValues as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
     } else {
       // Clear both in this case.
-      (submittedValues as any).storageUnit.id = null;
-      (submittedValues as any).storageUnitType.id = null;
+      (submittedValues as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+      (submittedValues as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
     }
 
     const inputResource = {
@@ -342,14 +354,17 @@ export function PcrBatchFormFields() {
           resourceProps={{
             name: "storageUnit",
             filter: filterBy(["name"], {
-              extraFilters: [
-                {
-                  selector: "storageUnitType.uuid",
-                  comparison: "==",
-                  arguments: values?.storageUnitType?.id ?? ""
-                }
-              ]
-            })
+              extraFilters: values?.storageUnitType?.id
+                ? [
+                    {
+                      selector: "storageUnitType.uuid",
+                      comparison: "==",
+                      arguments: values?.storageUnitType?.id ?? ""
+                    }
+                  ]
+                : undefined
+            }),
+            isDisabled: !values?.storageUnitType?.id
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
