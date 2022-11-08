@@ -7,7 +7,8 @@ import {
 } from "../../../types/collection-api";
 import {
   getMaterialSampleComponentValues,
-  getComponentValues
+  getComponentValues,
+  getComponentOrderFromTemplate
 } from "../../form-template/formTemplateUtils";
 import { VisibleManagedAttributesConfig } from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
@@ -26,6 +27,8 @@ export function useMaterialSampleFormTemplateSelectState() {
   const { apiClient } = useApiClient();
   const router = useRouter();
   const formTemplateId = router?.query?.formTemplateId?.toString();
+  // Store the nav order in the Page components state:
+  const [navOrder, setNavOrder] = useState<string[] | null>(null);
 
   // UUID stored in local storage.
   const [sampleFormTemplateUUID, setSampleFormTemplateUUID] = useLocalStorage<
@@ -41,6 +44,7 @@ export function useMaterialSampleFormTemplateSelectState() {
       getFormTemplate();
     } else {
       setSampleFormTemplate(undefined);
+      setNavOrder(null);
     }
   }, [sampleFormTemplateUUID]);
 
@@ -58,9 +62,11 @@ export function useMaterialSampleFormTemplateSelectState() {
       )
       .then((response) => {
         setSampleFormTemplate(response?.data);
+        setNavOrder(getComponentOrderFromTemplate(response?.data));
       })
       .catch(() => {
         setSampleFormTemplate(undefined);
+        setNavOrder(null);
       });
   }
 
@@ -140,8 +146,6 @@ export function useMaterialSampleFormTemplateSelectState() {
   delete acquisitionEventInitialValues?.templateCheckboxes;
   delete acquisitionEventInitialValues?.templateFields;
 
-  // Store the nav order in the Page components state:
-  const [navOrder, setNavOrder] = useState<string[] | null>(null);
   return {
     sampleFormTemplate,
     setSampleFormTemplateUUID,
