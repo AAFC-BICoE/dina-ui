@@ -27,7 +27,7 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
   attachment: [{ id: "attach-1", type: "metadata" }]
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "seqdb-api/pcr-batch/123":
       return { data: TEST_PCRBATCH };
@@ -41,11 +41,15 @@ const mockGet = jest.fn<any, any>(async path => {
       return { data: [] };
     case "seqdb-api/thermocycler-profile":
       return { data: [] };
+    case "collection-api/storage-unit":
+      return { data: [] };
+    case "collection-api/storage-unit-type":
+      return { data: [] };
   }
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map(path => {
+  paths.map((path) => {
     switch (path) {
       case "agent/1":
         return { id: "1", type: "agent", displayName: "agent 1" };
@@ -57,7 +61,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
   })
 );
 
-const mockSave = jest.fn(async ops => {
+const mockSave = jest.fn(async (ops) => {
   return ops.map(({ resource }) => ({ ...resource, id: "123" }));
 });
 
@@ -113,9 +117,16 @@ describe("PcrBatch edit page", () => {
             name: "test new batch",
             // TODO let the back-end set "createdBy" instead of the front-end:
             createdBy: "test-user",
-            primerForward: undefined,
-            primerReverse: undefined,
             type: "pcr-batch",
+            // Storage Unit / Storage Unit type are always set for each request.
+            storageUnit: {
+              id: null,
+              type: "storage-unit"
+            },
+            storageUnitType: {
+              id: null,
+              type: "storage-unit-type"
+            },
             relationships: {
               experimenters: {
                 data: [
@@ -164,6 +175,14 @@ describe("PcrBatch edit page", () => {
             primerReverse: {
               id: "456",
               type: "pcr-primer"
+            },
+            storageUnit: {
+              id: null,
+              type: "storage-unit"
+            },
+            storageUnitType: {
+              id: null,
+              type: "storage-unit-type"
             },
             type: "pcr-batch",
             relationships: {

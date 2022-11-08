@@ -1,9 +1,6 @@
-import { DinaForm, SubmitButton } from "common-ui";
+import { SubmitButton } from "common-ui";
 import { PersistedResource } from "kitsu";
-import {
-  PcrBatchForm,
-  PcrBatchFormFields
-} from "../../../pages/seqdb/pcr-batch/edit";
+import { PcrBatchForm } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
 import { useEffect } from "react";
 
@@ -48,19 +45,12 @@ export function SangerPcrBatchStep({
     </>
   );
 
-  return pcrBatch ? (
-    editMode ? (
-      <PcrBatchForm
-        pcrBatch={pcrBatch as any}
-        onSaved={onSavedInternal}
-        buttonBar={buttonBar}
-      />
-    ) : (
-      <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
-        <PcrBatchFormFields />
-      </DinaForm>
-    )
-  ) : (
-    <PcrBatchForm onSaved={onSavedInternal} buttonBar={buttonBar} />
+  return (
+    <PcrBatchForm
+      pcrBatch={pcrBatch as any}
+      onSaved={onSavedInternal}
+      buttonBar={buttonBar}
+      readOnlyOverride={!editMode}
+    />
   );
 }
