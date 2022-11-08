@@ -3,6 +3,7 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
+import { SangerPcrReactionStep } from "../../../components/seqdb/sanger-workflow/SangerPcrReactionStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
@@ -159,6 +160,18 @@ export default function SangerWorkFlowRunPage() {
         <TabPanel>
           {pcrBatch.response?.data && pcrBatchId && (
             <PCRBatchItemGrid
+              pcrBatchId={pcrBatchId}
+              pcrBatch={pcrBatch.response.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {pcrBatch.response?.data && pcrBatchId && (
+            <SangerPcrReactionStep
               pcrBatchId={pcrBatchId}
               pcrBatch={pcrBatch.response.data}
               editMode={editMode}
