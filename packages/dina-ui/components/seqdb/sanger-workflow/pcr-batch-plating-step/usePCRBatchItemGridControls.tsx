@@ -1,13 +1,14 @@
 import { ApiClientContext, filterBy, useQuery } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { omitBy, compact, pick } from "lodash";
+import { omitBy, compact, isEmpty } from "lodash";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useRef, useState, useEffect, useMemo } from "react";
 import { PcrBatch, PcrBatchItem } from "../../../../types/seqdb-api";
 import { CellGrid } from "./ContainerGrid";
 
 interface ContainerGridProps {
   pcrBatchId: string;
+  pcrBatch: PcrBatch;
+  editMode: boolean;
 }
 
 export interface PcrBatchItemSample {
@@ -19,9 +20,11 @@ export interface PcrBatchItemSample {
 }
 
 export function usePCRBatchItemGridControls({
-  pcrBatchId
+  pcrBatchId,
+  pcrBatch,
+  editMode
 }: ContainerGridProps) {
-  const { apiClient, save, bulkGet } = useContext(ApiClientContext);
+  const { save, bulkGet } = useContext(ApiClientContext);
 
   const [itemsLoading, setItemsLoading] = useState<boolean>(true);
 
@@ -33,11 +36,9 @@ export function usePCRBatchItemGridControls({
   const lastSelectedItemRef = useRef<PcrBatchItemSample>();
 
   // Grid fill direction when you move multiple PcrBatchItems into the grid.
-  const [fillMode, setFillMode] = useState<string>("COLUMN");
+  const [fillMode, setFillMode] = useState<"COLUMN" | "ROW">("COLUMN");
 
   const [lastSave, setLastSave] = useState<number>();
-
-  const [pcrBatch, setPcrBatch] = useState<PcrBatch>();
 
   const [numberOfColumns, setNumberOfColumns] = useState<number>(0);
 
@@ -45,7 +46,7 @@ export function usePCRBatchItemGridControls({
 
   const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItemSample[]>();
 
-  const [ isStorage, setIsStorage ] = useState<boolean>(false);
+  const [isStorage, setIsStorage] = useState<boolean>(false);
 
   const [gridState, setGridState] = useState({
     // Available PcrBatchItems with no well coordinates.
@@ -56,136 +57,141 @@ export function usePCRBatchItemGridControls({
     movedItems: [] as PcrBatchItemSample[]
   });
 
+  // Boolean if the grid contains any of items.
+  const gridIsPopulated = useMemo(
+    () => !isEmpty(gridState.cellGrid),
+    [gridState]
+  );
+
   useEffect(() => {
     if (!pcrBatch) return;
-  
-    if(pcrBatch?.storageRestriction){
+
+    if (pcrBatch?.storageRestriction) {
       setNumberOfColumns(pcrBatch.storageRestriction.layout.numberOfColumns);
       setNumberOfRows(pcrBatch.storageRestriction.layout.numberOfRows);
+      setFillMode(
+        pcrBatch.storageRestriction.layout.fillDirection === "BY_ROW"
+          ? "ROW"
+          : "COLUMN"
+      );
       setIsStorage(true);
     }
   }, [pcrBatch]);
 
   useEffect(() => {
-    getPcrBatch();
-  }, []);
-
-  useEffect(() => {
     if (!pcrBatchItems) return;
 
     fetchSamples((materialSamples) => {
-      const pcrBatchItemsWithSampleNames = materialSamples.map<PcrBatchItemSample>((sample) => {
-        const batchItem = pcrBatchItems.find((item) => item.sampleId === sample.id);
-        return {
-          pcrBatchItemId: batchItem?.pcrBatchItemId,
-          sampleId: sample.id,
-          sampleName: sample?.materialSampleName ?? sample.id,
-          wellColumn: batchItem?.wellColumn,
-          wellRow: batchItem?.wellRow
-        }
+      const pcrBatchItemsWithSampleNames =
+        materialSamples.map<PcrBatchItemSample>((sample) => {
+          const batchItem = pcrBatchItems.find(
+            (item) => item.sampleId === sample.id
+          );
+          return {
+            pcrBatchItemId: batchItem?.pcrBatchItemId,
+            sampleId: sample.id,
+            sampleName: sample?.materialSampleName ?? sample.id,
+            wellColumn: batchItem?.wellColumn,
+            wellRow: batchItem?.wellRow
+          };
+        });
+
+      const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
+        (item) => item.wellRow && item.wellColumn
+      );
+
+      const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
+        (item) => !item.wellRow && !item.wellColumn
+      );
+
+      const newCellGrid: CellGrid = {};
+      pcrBatchItemsWithCoords.forEach((item) => {
+        newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
       });
 
-    const pcrBatchItemsWithCoords = pcrBatchItemsWithSampleNames.filter(
-      item => item.wellRow && item.wellColumn
-    );
-
-    const pcrBatchItemsNoCoords = pcrBatchItemsWithSampleNames.filter(
-      item => !item.wellRow && !item.wellColumn
-    );
-
-    const newCellGrid: CellGrid = {};
-    pcrBatchItemsWithCoords.forEach((item) => {
-      newCellGrid[`${item.wellRow}_${item.wellColumn}`] = item;
+      setGridState({
+        availableItems: pcrBatchItemsNoCoords?.sort(itemSort),
+        cellGrid: newCellGrid,
+        movedItems: []
+      });
+      setItemsLoading(false);
     });
-
-    setGridState({
-      availableItems: pcrBatchItemsNoCoords?.sort(itemSort),
-      cellGrid: newCellGrid,
-      movedItems: []
-    });
-    setItemsLoading(false);
-    });
-  }, [pcrBatchItems])
-
-  async function getPcrBatch(){
-    await apiClient.get<PcrBatch>(
-      `seqdb-api/pcr-batch/${pcrBatchId}`,
-      {}
-    )
-    .then((response) => {
-      setPcrBatch(response?.data);
-    });
-  }
+  }, [pcrBatchItems]);
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
    * operation.
    */
-   async function fetchSamples(callback: (response : MaterialSample[]) => void) {
+  async function fetchSamples(callback: (response: MaterialSample[]) => void) {
     if (!pcrBatchItems) return;
 
     await bulkGet<MaterialSample>(
-      pcrBatchItems.filter((item) => item.sampleId).map((item) => "/material-sample/" + item.sampleId),
+      pcrBatchItems
+        .filter((item) => item.sampleId)
+        .map((item) => "/material-sample/" + item.sampleId),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map<MaterialSample>((resource) => ({
-        materialSampleName: resource.materialSampleName,
-        id: resource.id,
-        type: resource.type
-      }));
+      const materialSamplesTransformed = compact(response).map<MaterialSample>(
+        (resource) => ({
+          materialSampleName: resource.materialSampleName,
+          id: resource.id,
+          type: resource.type
+        })
+      );
 
       callback(materialSamplesTransformed);
     });
   }
 
-
   // PcrBatchItem queries.
-  const { loading: materialSampleItemsLoading, response: materialSampleItemsResponse } =
-    useQuery<PcrBatchItem[]>(
-      {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
-        page: { limit: 1000 },
-        path: `/seqdb-api/pcr-batch-item`,
-        include: "materialSample"
-      },
-      {
-        deps: [lastSave],
-        onSuccess: async ({ data: pcrBatchItem }) => {
-          setItemsLoading(true);
-          setPcrBatchItems(pcrBatchItem.map((item) => ({
+  const { loading: materialSampleItemsLoading } = useQuery<PcrBatchItem[]>(
+    {
+      filter: filterBy([], {
+        extraFilters: [
+          {
+            selector: "pcrBatch.uuid",
+            comparison: "==",
+            arguments: pcrBatchId
+          }
+        ]
+      })(""),
+      page: { limit: 1000 },
+      path: `/seqdb-api/pcr-batch-item`,
+      include: "materialSample"
+    },
+    {
+      deps: [lastSave, editMode],
+      onSuccess: async ({ data: pcrBatchItem }) => {
+        setItemsLoading(true);
+        setPcrBatchItems(
+          pcrBatchItem.map((item) => ({
             pcrBatchItemId: item.id,
             sampleId: item?.materialSample?.id,
             wellColumn: item.wellColumn,
             wellRow: item.wellRow
-          })));
-        }
-      }
-    );
+          }))
+        );
+      },
+      disabled: editMode
+    }
+  );
 
   function moveItems(items: PcrBatchItemSample[], coords?: string) {
     setGridState(({ availableItems, cellGrid, movedItems }) => {
       // Remove the PcrBatchItem from the grid.
-      const newCellGrid: CellGrid = omitBy(cellGrid, item => items.includes(item));
-
-      // Remove the PcrBatchItem from the availables PcrBatchItems.
-      let newAvailableItems = availableItems.filter(
-        s => !items.includes(s)
+      const newCellGrid: CellGrid = omitBy(cellGrid, (item) =>
+        items.includes(item)
       );
+
+      // Remove the PcrBatchItem from the available PcrBatchItems.
+      let newAvailableItems = availableItems.filter((s) => !items.includes(s));
       const newMovedItems = [...movedItems];
 
       if (coords) {
         const [rowLetter, colNumberString] = coords.split("_");
         const rowNumber = rowLetter.charCodeAt(0) - 64;
 
-        //double check this part
+        // Double check this part
         let newCellNumber =
           fillMode === "ROW"
             ? (rowNumber - 1) * numberOfColumns + Number(colNumberString)
@@ -242,7 +248,9 @@ export function usePCRBatchItemGridControls({
 
       return {
         // availableItems: newAvailableItems.sort(itemSort),
-        availableItems: newAvailableItems?.filter((item) => item).sort(itemSort),
+        availableItems: newAvailableItems
+          ?.filter((item) => item)
+          .sort(itemSort),
         cellGrid: newCellGrid,
         movedItems: newMovedItems
       };
@@ -259,7 +267,7 @@ export function usePCRBatchItemGridControls({
     }
   }
 
-  function onListDrop(item: { pcrBatchItemSample : PcrBatchItemSample }) {
+  function onListDrop(item: { pcrBatchItemSample: PcrBatchItemSample }) {
     moveItems([item.pcrBatchItemSample]);
   }
 
@@ -274,10 +282,7 @@ export function usePCRBatchItemGridControls({
         (a, b) => a - b
       );
 
-      const newSelectedItems = availableItems.slice(
-        lowIndex,
-        highIndex + 1
-      );
+      const newSelectedItems = availableItems.slice(lowIndex, highIndex + 1);
 
       setSelectedItems(newSelectedItems);
     } else {
@@ -292,16 +297,16 @@ export function usePCRBatchItemGridControls({
     try {
       const { cellGrid, movedItems } = gridState;
 
-      const materialSampleItemsToSave = movedItems.map(movedItem => {
+      const materialSampleItemsToSave = movedItems.map((movedItem) => {
         // Get the coords from the cell grid.
         const coords = Object.keys(cellGrid).find(
-          key => cellGrid[key] === movedItem
+          (key) => cellGrid[key] === movedItem
         );
 
         let newWellColumn: number | undefined;
         let newWellRow: string | undefined;
         if (coords) {
-          const [row , col] = coords.split("_");
+          const [row, col] = coords.split("_");
           newWellColumn = Number(col);
           newWellRow = row;
         }
@@ -312,7 +317,7 @@ export function usePCRBatchItemGridControls({
         return movedItem;
       });
 
-      const saveArgs = materialSampleItemsToSave.map(item => {
+      const saveArgs = materialSampleItemsToSave.map((item) => {
         return {
           resource: {
             type: "pcr-batch-item",
@@ -320,8 +325,8 @@ export function usePCRBatchItemGridControls({
             wellColumn: item.wellColumn ?? null,
             wellRow: item.wellRow ?? null
           } as PcrBatchItem,
-          type: "pcr-batch-item"          
-        }
+          type: "pcr-batch-item"
+        };
       });
 
       await save(saveArgs, { apiBaseUrl: "/seqdb-api" });
@@ -338,8 +343,14 @@ export function usePCRBatchItemGridControls({
   }
 
   async function moveAll() {
+    // Do not perform the move if the grid contains anything.
+    // Eventually we should be able to handle this case properly.
+    if (gridIsPopulated) return;
+
     const { availableItems, cellGrid } = gridState;
-    const items = [...availableItems, ...Object.values(cellGrid)].sort(itemSort);
+    const items = [...availableItems, ...Object.values(cellGrid)].sort(
+      itemSort
+    );
     moveItems(items, "A_1");
   }
 
@@ -357,13 +368,14 @@ export function usePCRBatchItemGridControls({
     onItemClick,
     selectedItems,
     setFillMode,
-    isStorage
+    isStorage,
+    gridIsPopulated
   };
 }
 
 function itemSort(a, b) {
   const [[aAlpha, aNum], [bAlpha, bNum]] = [a, b].map(
-    s => s.sampleName.match(/[^\d]+|\d+/g) || []
+    (s) => s.sampleName.match(/[^\d]+|\d+/g) || []
   );
 
   if (aAlpha === bAlpha) {

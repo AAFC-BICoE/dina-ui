@@ -23,7 +23,7 @@ import {
   StorageUnitType,
   StorageUnit
 } from "packages/dina-ui/types/collection-api";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -92,6 +92,7 @@ export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
+  readOnlyOverride?: boolean;
 }
 
 export function PcrBatchForm({
@@ -102,7 +103,8 @@ export function PcrBatchForm({
       <BackButton entityId={pcrBatch?.id} entityLink="/seqdb/pcr-batch" />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  )
+  ),
+  readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
 
@@ -184,7 +186,8 @@ export function PcrBatchForm({
     <LoadExternalDataForPcrBatchForm
       dinaFormProps={{
         onSubmit,
-        initialValues: initialValues as any
+        initialValues: initialValues as any,
+        readOnly: readOnlyOverride
       }}
       buttonBar={buttonBar as any}
     />
@@ -238,7 +241,6 @@ export function LoadExternalDataForPcrBatchForm({
     >
       {buttonBar}
       <PcrBatchFormFields />
-      {buttonBar}
     </DinaForm>
   ));
 }

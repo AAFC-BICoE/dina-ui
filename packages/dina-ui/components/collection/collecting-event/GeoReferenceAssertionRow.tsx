@@ -10,6 +10,7 @@ import {
 } from "common-ui";
 import { connect, Field, FormikContextType } from "formik";
 import { get } from "lodash";
+import { COLLECTING_EVENT_COMPONENT_NAME } from "../../../../dina-ui/types/collection-api";
 import { useRef, useState } from "react";
 import { PersonSelectField } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -127,7 +128,11 @@ export function GeoReferenceAssertionRow({
 
   return (
     <div>
-      <DinaFormSection horizontal={true}>
+      <DinaFormSection
+        horizontal={true}
+        componentName={COLLECTING_EVENT_COMPONENT_NAME}
+        sectionName="georeferencing-section"
+      >
         {readOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
@@ -135,7 +140,7 @@ export function GeoReferenceAssertionRow({
           <div className="mb-3">
             <FormikButton
               className="btn btn-primary primary-assertion-button"
-              buttonProps={ctx => {
+              buttonProps={(ctx) => {
                 const isPrimary =
                   get(ctx.values, commonRoot + "isPrimary") ?? false;
                 return {

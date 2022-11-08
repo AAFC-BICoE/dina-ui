@@ -11,7 +11,7 @@ import {
   QueryBuilderMemo
 } from "./query-builder/QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
-import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
@@ -765,7 +765,7 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-primary w-100 mb-5"
                       onClick={moveSelectedResultsToSelectedResources}
                     >
-                      <FiChevronsRight />
+                      <FiChevronRight />
                     </FormikButton>
                   </div>
                   <div className="deselect-all-checked-button">
@@ -773,7 +773,7 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-dark w-100 mb-5"
                       onClick={removeSelectedResources}
                     >
-                      <FiChevronsLeft />
+                      <FiChevronLeft />
                     </FormikButton>
                   </div>
                 </div>

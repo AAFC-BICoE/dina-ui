@@ -33,7 +33,7 @@ export default function MaterialSampleFormTemplateListPage() {
               <DinaMessage id="editButtonText" />
             </a>
           </Link>
-          <Link href={`/collection/form-template/run?id=${id}`}>
+          <Link href={`/collection/material-sample/edit/?formTemplateId=${id}`}>
             <a className="list-inline-item btn btn-primary">
               <DinaMessage id="createSampleWithFormTemplate" />
             </a>
