@@ -1,7 +1,6 @@
 import classNames from "classnames";
 import {
   AssociatedMaterialSampleSearchBoxField,
-  DinaFormSection,
   MaterialSampleSearchHelper,
   TextField,
   useQuery,
@@ -9,7 +8,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import {
   BulkEditTabWarning,
   VocabularyReadOnlyView,
@@ -37,6 +36,8 @@ export function MaterialSampleAssociationsField({
   return (
     <TabbedArrayField<MaterialSampleAssociation>
       legend={<DinaMessage id="materialSampleAssociationLegend" />}
+      componentName={ASSOCIATIONS_COMPONENT_NAME}
+      sectionName="associations-material-sample-section"
       typeName={formatMessage("association")}
       makeNewElement={() => ({})}
       name={fieldName}
@@ -109,10 +110,7 @@ function AssociationTabPanel({
     setShowSearchBtn(false);
   }
   return (
-    <DinaFormSection
-      componentName={ASSOCIATIONS_COMPONENT_NAME}
-      sectionName="associations-material-sample-section"
-    >
+    <>
       <div className="row">
         <div className="col-sm-6">
           <div className="association-type">
@@ -140,7 +138,7 @@ function AssociationTabPanel({
         onAssociatedSampleSelected={onAssociatedSampleSelected}
         onCloseClicked={resetSearchState}
       />
-    </DinaFormSection>
+    </>
   );
 }
 

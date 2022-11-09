@@ -128,11 +128,7 @@ export function GeoReferenceAssertionRow({
 
   return (
     <div>
-      <DinaFormSection
-        horizontal={true}
-        componentName={COLLECTING_EVENT_COMPONENT_NAME}
-        sectionName="georeferencing-section"
-      >
+      <DinaFormSection horizontal={true}>
         {readOnly && (
           <ViewInMapButton assertionPath={`geoReferenceAssertions.${index}`} />
         )}
