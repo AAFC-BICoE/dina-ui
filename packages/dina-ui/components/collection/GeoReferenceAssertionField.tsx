@@ -10,7 +10,6 @@ import { GeoReferenceAssertionRow } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   CollectingEvent,
-  COLLECTING_EVENT_COMPONENT_NAME,
   GeoReferenceAssertion
 } from "../../types/collection-api";
 import { TabbedArrayField } from "./TabbedArrayField";
@@ -53,8 +52,6 @@ export function GeoReferenceAssertionField({
       <FieldSet
         legend={<DinaMessage id="geoReferencingLegend" />}
         id="geoReferencingLegend"
-        componentName={COLLECTING_EVENT_COMPONENT_NAME}
-        sectionName="georeferencing-section"
         className="non-strip"
       >
         <TabbedArrayField<GeoReferenceAssertion>

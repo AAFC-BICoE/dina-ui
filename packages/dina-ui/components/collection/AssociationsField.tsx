@@ -19,11 +19,14 @@ export const HOST_ORGANISM_FIELDS = Object.keys(HOST_ORGANISM_FIELDS_OBJECT);
 
 export function AssociationsField({ id = ASSOCIATIONS_COMPONENT_NAME }) {
   return (
-    <FieldSet legend={<DinaMessage id="associationsLegend" />} id={id}>
+    <FieldSet
+      legend={<DinaMessage id="associationsLegend" />}
+      id={id}
+      componentName={ASSOCIATIONS_COMPONENT_NAME}
+    >
       <FieldSet
         legend={<DinaMessage id="hostOrganismLegend" />}
         className="non-strip"
-        componentName={ASSOCIATIONS_COMPONENT_NAME}
         sectionName="associations-host-organism-section"
       >
         <div className="row">
