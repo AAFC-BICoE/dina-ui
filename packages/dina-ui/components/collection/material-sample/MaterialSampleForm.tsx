@@ -350,22 +350,17 @@ export function MaterialSampleForm({
       ),
     [MANAGED_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
-        <DinaFormSection
-          componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
-          sectionName="managed-attributes-section"
-        >
-          <ManagedAttributesEditor
-            valuesPath="managedAttributes"
-            managedAttributeApiPath="collection-api/managed-attribute"
-            managedAttributeComponent="MATERIAL_SAMPLE"
-            fieldSetProps={{
-              id,
-              legend: <DinaMessage id="materialSampleManagedAttributes" />
-            }}
-            managedAttributeOrderFieldName="managedAttributesOrder"
-            visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
-          />
-        </DinaFormSection>
+        <ManagedAttributesEditor
+          valuesPath="managedAttributes"
+          managedAttributeApiPath="collection-api/managed-attribute"
+          managedAttributeComponent="MATERIAL_SAMPLE"
+          fieldSetProps={{
+            id,
+            legend: <DinaMessage id="materialSampleManagedAttributes" />
+          }}
+          managedAttributeOrderFieldName="managedAttributesOrder"
+          visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
+        />
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
