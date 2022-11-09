@@ -28,6 +28,7 @@ export interface TabbedResourceLinkerProps<T extends KitsuResource> {
   fieldSetId: string;
   /** FieldSet legend */
   legend: JSX.Element;
+  hideLinkerTab?: boolean;
 }
 
 /** Tabbed view for a nested form where you can either add/edit a resource or link an existing one. */
@@ -43,7 +44,8 @@ export function TabbedResourceLinker<T extends KitsuResource>({
   fieldName,
   targetType,
   fieldSetId,
-  legend
+  legend,
+  hideLinkerTab
 }: TabbedResourceLinkerProps<T>) {
   const { isTemplate } = useDinaFormContext();
 
@@ -101,9 +103,11 @@ export function TabbedResourceLinker<T extends KitsuResource>({
               <DinaMessage id="createNew" />
             )}
           </Tab>
-          <Tab disabled={disableLinkerTab}>
-            <DinaMessage id="attachExisting" />
-          </Tab>
+          {!hideLinkerTab && (
+            <Tab disabled={disableLinkerTab}>
+              <DinaMessage id="attachExisting" />
+            </Tab>
+          )}
         </TabList>
         <TabPanel>
           {
