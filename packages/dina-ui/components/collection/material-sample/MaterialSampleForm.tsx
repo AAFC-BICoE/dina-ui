@@ -223,7 +223,7 @@ export function MaterialSampleForm({
     false
   );
   const attachmentsField = "attachment";
-  const hideLinkerTab = formTemplate || isTemplate ? true : false;
+  const hideLinkerTab = isTemplate ? true : false;
 
   /**
    * A map where:
