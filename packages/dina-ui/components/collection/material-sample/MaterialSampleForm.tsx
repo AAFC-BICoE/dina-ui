@@ -223,6 +223,7 @@ export function MaterialSampleForm({
     false
   );
   const attachmentsField = "attachment";
+  const hideLinkerTab = isTemplate ? true : false;
 
   /**
    * A map where:
@@ -244,6 +245,7 @@ export function MaterialSampleForm({
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
+          hideLinkerTab={hideLinkerTab}
           legend={<DinaMessage id="collectingEvent" />}
           briefDetails={(colEvent) => (
             <CollectingEventBriefDetails collectingEvent={colEvent} />
@@ -294,6 +296,7 @@ export function MaterialSampleForm({
           resourceId={acqEventId}
           fieldName="acquisitionEvent"
           targetType="materialSample"
+          hideLinkerTab={hideLinkerTab}
         />
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
