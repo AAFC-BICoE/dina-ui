@@ -3039,7 +3039,7 @@ describe("MaterialSampleBulkEditor", () => {
   //   ).toEqual(true);
   // });
 
-  it("Allows selecting a Form Template to show/hide fields in the bulk and single task, no Managed Attributes.", async () => {
+  it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
     const wrapper = mountWithAppContext(
       <MaterialSampleBulkEditor
         onSaved={mockOnSaved}
@@ -3060,15 +3060,6 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // Enable Collecting Event:
-    // TODO: should be enabled by default when Form Template has it enabled
-    // wrapper
-    //   .find(".tabpanel-EDIT_ALL .enable-collecting-event")
-    //   .find(ReactSwitch)
-    //   .prop<any>("onChange")(true);
-    // await new Promise(setImmediate);
-    // wrapper.update();
-
     // The bulk edit tab shows the managed attributes from the FormTemplate:
     // For Material Sample:
     expect(
@@ -3080,33 +3071,8 @@ describe("MaterialSampleBulkEditor", () => {
         .exists()
     ).toEqual(false);
 
-    // For Collecting Event:
-    // TODO: should be enabled by default when Form Template has it enabled
-    // expect(
-    //   wrapper.find(".tabpanel-EDIT_ALL .dwcFieldNumber-field input").exists()
-    // ).toEqual(true);
-    // expect(
-    //   wrapper.find(".tabpanel-EDIT_ALL .verbatimEventDateTime-field input").exists()
-    // ).toEqual(false);
-
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
-
-    // // Enable Collecting Event:
-    // wrapper
-    //   .find(".sample-tabpanel-0 .enable-collecting-event")
-    //   .find(ReactSwitch)
-    //   .prop<any>("onChange")(true);
-    // // Enable Organism and Determination:
-    // wrapper
-    //   .find(".sample-tabpanel-0 .enable-organisms")
-    //   .find(ReactSwitch)
-    //   .prop<any>("onChange")(true);
-    // await new Promise(setImmediate);
-    // wrapper.update();
-    // wrapper
-    //   .find(".sample-tabpanel-0 .determination-section button.add-button")
-    //   .simulate("click");
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -3119,37 +3085,5 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
         .exists()
     ).toEqual(false);
-
-    // The individual sample tab tab shows the managed attributes from the FormTemplate:
-    // For Material Sample:
-    // expect(
-    //   wrapper
-    //     .find(
-    //       ".sample-tabpanel-0 #" +
-    //         MANAGED_ATTRIBUTES_COMPONENT_NAME +
-    //         " .managedAttributes_sample_attribute_1-field input"
-    //     )
-    //     .exists()
-    // ).toEqual(true);
-    // // For Collecting Event:
-    // expect(
-    //   wrapper
-    //     .find(
-    //       ".sample-tabpanel-0 #" +
-    //         COLLECTING_EVENT_COMPONENT_NAME +
-    //         " .managedAttributes_collecting_event_attribute_1-field input"
-    //     )
-    //     .exists()
-    // ).toEqual(true);
-    // // For Determination:
-    // expect(
-    //   wrapper
-    //     .find(
-    //       ".sample-tabpanel-0 #" +
-    //         MANAGED_ATTRIBUTES_COMPONENT_NAME +
-    //         " .managedAttributes_sample_attribute_1-field input"
-    //     )
-    //     .exists()
-    // ).toEqual(true);
   });
 });
