@@ -28,16 +28,9 @@ export interface OrganismsFieldProps {
   name: string;
   /** FieldSet id */
   id?: string;
-
-  /** Forwarded to ManagedAttributesEditor. */
-  visibleManagedAttributeKeys?: string[];
 }
 
-export function OrganismsField({
-  name,
-  id,
-  visibleManagedAttributeKeys
-}: OrganismsFieldProps) {
+export function OrganismsField({ name, id }: OrganismsFieldProps) {
   const { isTemplate, readOnly } = useDinaFormContext();
 
   const formik = useFormikContext<any>();
@@ -201,7 +194,6 @@ export function OrganismsField({
                       namePrefix={`${name}[0].`}
                       individualEntry={false}
                       onTargetChecked={targetChecked}
-                      visibleManagedAttributeKeys={visibleManagedAttributeKeys}
                     />
                   ))}
               </div>

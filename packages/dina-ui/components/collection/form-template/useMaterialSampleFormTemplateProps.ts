@@ -1,7 +1,6 @@
 import { InputResource, KitsuResource } from "kitsu";
 import { isNil, set, toPairs } from "lodash";
 import { useMemo } from "react";
-import { VisibleManagedAttributesConfig } from "../..";
 import {
   AcquisitionEvent,
   CollectingEvent,
@@ -20,7 +19,6 @@ export interface MaterialSampleFormTemplateProps {
   materialSampleInitialValues: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
   acquisitionEventInitialValues?: InputResource<AcquisitionEvent>;
-  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 /**
@@ -59,17 +57,6 @@ export function useMaterialSampleFormTemplateProps<
         return org;
       });
 
-    // Create a blank managed attribute map from the template's attribute order:
-    const defaultManagedAttributes: Record<string, string> = {};
-    for (const key of actionDefinition.managedAttributesOrder ?? []) {
-      defaultManagedAttributes[key] = "";
-    }
-
-    materialSampleInitialValues.managedAttributes = {
-      ...defaultManagedAttributes,
-      ...materialSampleInitialValues.managedAttributes
-    };
-
     const collectingEvent = getInitialValuesFromTemplateFields<CollectingEvent>(
       "collecting-event",
       actionDefinition.formTemplate.COLLECTING_EVENT?.templateFields
@@ -102,15 +89,19 @@ export function useMaterialSampleFormTemplateProps<
       ? undefined
       : acquisitionEvent;
 
+    // Delete unused variables from the initial values.
+    delete (materialSampleInitialValues as any)?.templateCheckboxes;
+    delete (materialSampleInitialValues as any)?.templateFields;
+    delete (materialSampleInitialValues as any)?.managedAttributesOrder;
+    delete (collectingEventInitialValues as any)?.templateCheckboxes;
+    delete (collectingEventInitialValues as any)?.templateFields;
+    delete (acquisitionEventInitialValues as any)?.templateCheckboxes;
+    delete (acquisitionEventInitialValues as any)?.templateFields;
+
     const config: MaterialSampleFormTemplateProps = {
       materialSampleInitialValues,
       collectingEventInitialValues,
-      acquisitionEventInitialValues,
-      visibleManagedAttributeKeys: {
-        materialSample: actionDefinition.managedAttributesOrder,
-        collectingEvent: actionDefinition.collectingEventManagedAttributesOrder,
-        determination: actionDefinition.determinationManagedAttributesOrder
-      }
+      acquisitionEventInitialValues
     };
 
     return config;

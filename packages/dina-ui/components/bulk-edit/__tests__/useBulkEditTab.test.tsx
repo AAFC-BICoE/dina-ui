@@ -22,11 +22,8 @@ interface BulkEditTabProps {
 /** Test component to test the Bulk Edit Tab in isolation. */
 function BulkEditTab({ baseSample }: BulkEditTabProps) {
   // Allow selecting a custom view for the form:
-  const {
-    sampleFormTemplate,
-    setSampleFormTemplateUUID,
-    visibleManagedAttributeKeys
-  } = useMaterialSampleFormTemplateSelectState();
+  const { sampleFormTemplate, setSampleFormTemplateUUID } =
+    useMaterialSampleFormTemplateSelectState();
 
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
@@ -44,12 +41,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     sampleHooks: any;
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
-  } = initializeRefHookFormProps(
-    [baseSample],
-    visibleManagedAttributeKeys,
-    selectedTab,
-    sampleFormTemplate
-  );
+  } = initializeRefHookFormProps([baseSample], selectedTab, sampleFormTemplate);
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
     return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);

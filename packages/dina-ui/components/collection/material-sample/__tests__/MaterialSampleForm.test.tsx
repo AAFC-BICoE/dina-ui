@@ -2240,9 +2240,6 @@ describe("Material Sample Edit Page", () => {
             attribute_2: "attribute 2 value"
           }
         }}
-        visibleManagedAttributeKeys={{
-          materialSample: ["attribute_2", "attribute_3"]
-        }}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -2301,9 +2298,6 @@ describe("Material Sample Edit Page", () => {
           group: "test-group",
           materialSampleName: "test-ms"
         }}
-        visibleManagedAttributeKeys={{
-          collectingEvent: ["attribute_2", "attribute_3"]
-        }}
         onSaved={mockOnSaved}
       />,
       testCtx
@@ -2344,9 +2338,6 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           group: "test-group",
           materialSampleName: "test-ms"
-        }}
-        visibleManagedAttributeKeys={{
-          determination: ["attribute_2", "attribute_3"]
         }}
         onSaved={mockOnSaved}
       />,

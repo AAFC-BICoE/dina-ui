@@ -27,8 +27,6 @@ export interface OrganismStateFieldProps {
   useTargetOrganism?: boolean;
   namePrefix?: string;
   id?: string;
-  visibleManagedAttributeKeys?: string[];
-
   onTargetChecked: (index: number) => void;
 }
 
@@ -38,7 +36,6 @@ export function OrganismStateField({
   namePrefix = "",
   individualEntry,
   onTargetChecked,
-  visibleManagedAttributeKeys,
   useTargetOrganism
 }: OrganismStateFieldProps) {
   const { readOnly } = useDinaFormContext();
@@ -110,10 +107,7 @@ export function OrganismStateField({
           {(determinations) =>
             // Hide in read-only mode when there are no determinations:
             readOnly && !determinations?.length ? null : (
-              <DeterminationField
-                {...determinationFieldProps}
-                visibleManagedAttributeKeys={visibleManagedAttributeKeys}
-              />
+              <DeterminationField {...determinationFieldProps} />
             )
           }
         </FieldSpy>

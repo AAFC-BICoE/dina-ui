@@ -238,6 +238,7 @@ describe("ManagedAttributesEditor component", () => {
   it("Lets you select a Form Template .", async () => {
     const mockSubmit = jest.fn();
 
+    // Form template is passed down from the form itself.
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{
@@ -245,6 +246,10 @@ describe("ManagedAttributesEditor component", () => {
             example_attribute_1: "initial value 1",
             example_attribute_2: "initial value 2"
           }
+        }}
+        formTemplate={{
+          type: "form-template",
+          components: []
         }}
         onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
       >
@@ -256,15 +261,6 @@ describe("ManagedAttributesEditor component", () => {
       </DinaForm>,
       { apiContext }
     );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Select the custom view:
-    wrapper
-      .find(".managed-attributes-view-select")
-      .find(ResourceSelect)
-      .prop<any>("onChange")(TEST_COLLECTING_EVENT_CUSTOM_VIEW);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -297,187 +293,6 @@ describe("ManagedAttributesEditor component", () => {
         example_attribute_2: "initial value 2",
         example_attribute_3: "new attribute #3 value"
       }
-    });
-  });
-
-  it("Lets you create a new custom view from a dropdown menu 'Create' option.", async () => {
-    const mockSubmit = jest.fn();
-
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{ managedAttributes: {} }}
-        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
-      >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="COLLECTING_EVENT"
-        />
-      </DinaForm>,
-      { apiContext }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The dropdown has the "Create" option:
-    const asyncOptions = wrapper
-      .find(".managed-attributes-view-select")
-      .find(Select)
-      .prop<any>("options")[1].options;
-    const createOption = asyncOptions[0];
-    expect(createOption.label).toEqual("Create Form Template");
-
-    // Select the Create option, which should call the callback:
-    wrapper
-      .find(".managed-attributes-view-select")
-      .find(Select)
-      .prop<any>("onChange")(createOption);
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Set the name:
-    wrapper
-      .find(".name-field input")
-      .simulate("change", { target: { value: "test view" } });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Add a managed attribute for the new view:
-    wrapper
-      .find(".managed-attributes-select")
-      .find(ResourceSelect)
-      .prop<any>("onChange")({
-      key: "example_attribute_1"
-    });
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    wrapper.find(".managed-attributes-view-form form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    const EXPECTED_CREATED_CUSTOM_VIEW = {
-      name: "test view",
-      restrictToCreatedBy: true,
-      type: "form-template",
-      viewConfiguration: {
-        attributeKeys: ["example_attribute_1"],
-        managedAttributeComponent: "COLLECTING_EVENT",
-        type: "managed-attributes-view"
-      }
-    };
-
-    // The new view is created:
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: EXPECTED_CREATED_CUSTOM_VIEW,
-          type: "form-template"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    // The new form-template is set into the managed attributes editor:
-    expect(
-      wrapper.find(".managed-attributes-view-select").find(Select).prop("value")
-    ).toEqual({
-      label: "test view",
-      resource: { ...EXPECTED_CREATED_CUSTOM_VIEW, id: "11111" },
-      value: "11111"
-    });
-  });
-
-  it("Lets you edit an existing custom view from an 'Edit' button.", async () => {
-    const mockSubmit = jest.fn();
-
-    const wrapper = mountWithAppContext(
-      <DinaForm
-        initialValues={{ managedAttributes: {} }}
-        onSubmit={({ submittedValues }) => mockSubmit(submittedValues)}
-      >
-        <ManagedAttributesEditor
-          valuesPath="managedAttributes"
-          managedAttributeApiPath="collection-api/managed-attribute"
-          managedAttributeComponent="COLLECTING_EVENT"
-        />
-      </DinaForm>,
-      { apiContext }
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Select the custom view:
-    wrapper
-      .find(".managed-attributes-view-select")
-      .find(ResourceSelect)
-      .prop<any>("onChange")(TEST_COLLECTING_EVENT_CUSTOM_VIEW);
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Press the edit button
-    wrapper.find("button.form-template-edit-button").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // The managedAttributeComponent field is disabled in the modal form:
-    expect(
-      wrapper
-        .find(".viewConfiguration_managedAttributeComponent-field")
-        .find(Select)
-        .prop("isDisabled")
-    ).toEqual(true);
-
-    // Remove the second attribute (attribute #3):
-    wrapper
-      .find(".managed-attributes-view-form button.remove-attribute")
-      .at(1)
-      .simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Submit the form:
-    wrapper.find(".managed-attributes-view-form form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    const EXPECTED_SAVED_CUSTOM_VIEW = {
-      ...TEST_COLLECTING_EVENT_CUSTOM_VIEW,
-      viewConfiguration: {
-        ...(TEST_COLLECTING_EVENT_CUSTOM_VIEW.viewConfiguration as any),
-        // Attribute #3 was removed:
-        attributeKeys: ["example_attribute_1"]
-      }
-    };
-
-    // The new view is created:
-    expect(mockSave).lastCalledWith(
-      [
-        {
-          resource: EXPECTED_SAVED_CUSTOM_VIEW,
-          type: "form-template"
-        }
-      ],
-      { apiBaseUrl: "/collection-api" }
-    );
-
-    // The saved form-template is set into the managed attributes editor:
-    expect(
-      wrapper.find(".managed-attributes-view-select").find(Select).prop("value")
-    ).toEqual({
-      label: "Test existing Form Template",
-      resource: EXPECTED_SAVED_CUSTOM_VIEW,
-      value: "existing-view-id"
     });
   });
 });

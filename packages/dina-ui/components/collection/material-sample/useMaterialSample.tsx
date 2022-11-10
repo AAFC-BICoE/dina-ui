@@ -56,7 +56,6 @@ import {
   useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
-import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
 
@@ -174,8 +173,6 @@ export interface UseMaterialSampleSaveParams {
   disableNestedFormEdits?: boolean;
 
   showChangedIndicatorsInNestedForms?: boolean;
-
-  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -200,8 +197,7 @@ export function useMaterialSampleSave({
   materialSampleTemplateInitialValues,
   reduceRendering,
   disableNestedFormEdits,
-  showChangedIndicatorsInNestedForms,
-  visibleManagedAttributeKeys
+  showChangedIndicatorsInNestedForms
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -406,6 +402,7 @@ export function useMaterialSampleSave({
     setEnableRestrictions
   };
 
+  // Retrieve the last used collection to populate in the field.
   const { loading, lastUsedCollection } = useLastUsedCollection();
 
   const defaultValues: InputResource<MaterialSample> = {
@@ -873,9 +870,6 @@ export function useMaterialSampleSave({
       ) : (
         <div className={nestedFormClassName}>
           <CollectingEventFormLayout
-            visibleManagedAttributeKeys={
-              visibleManagedAttributeKeys?.collectingEvent
-            }
             attachmentsConfig={collectingEventAttachmentsConfig}
           />
         </div>

@@ -70,12 +70,6 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 
-export interface VisibleManagedAttributesConfig {
-  materialSample?: string[];
-  collectingEvent?: string[];
-  determination?: string[];
-}
-
 export interface MaterialSampleFormProps {
   materialSample?: InputResource<MaterialSample>;
   collectingEventInitialValues?: InputResource<CollectingEvent>;
@@ -144,12 +138,6 @@ export interface MaterialSampleFormProps {
   disableCollectingEventSwitch?: boolean;
 
   /**
-   * When this prop is changed, the visible managed attributes state is updated in useEffect.
-   * e.g. when the form's custom view is updated.
-   */
-  visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
-
-  /**
    * When this prop is enabled, formik initialValues can be reinitialized
    */
   enableReinitialize?: boolean;
@@ -173,7 +161,6 @@ export function MaterialSampleForm({
   reduceRendering,
   hideUseSequence,
   enableStoredDefaultGroup,
-  visibleManagedAttributeKeys,
   disableCollectingEventSwitch,
   enableReinitialize,
   buttonBar = (
@@ -208,8 +195,7 @@ export function MaterialSampleForm({
       acquisitionEventInitialValues,
       onSaved,
       isTemplate,
-      reduceRendering,
-      visibleManagedAttributeKeys
+      reduceRendering
     });
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -302,13 +288,7 @@ export function MaterialSampleForm({
     [ORGANISMS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       dataComponentState.enableOrganisms && (
-        <OrganismsField
-          id={id}
-          name="organism"
-          visibleManagedAttributeKeys={
-            visibleManagedAttributeKeys?.determination
-          }
-        />
+        <OrganismsField id={id} name="organism" />
       ),
     [ASSOCIATIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
@@ -359,7 +339,6 @@ export function MaterialSampleForm({
             legend: <DinaMessage id="materialSampleManagedAttributes" />
           }}
           managedAttributeOrderFieldName="managedAttributesOrder"
-          visibleAttributeKeys={visibleManagedAttributeKeys?.materialSample}
         />
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>

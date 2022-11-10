@@ -49,14 +49,12 @@ export default function MaterialSampleEditPage() {
     setNavOrder,
     sampleFormTemplate,
     setSampleFormTemplateUUID,
-    visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     formTemplate: sampleFormTemplate,
-    visibleManagedAttributeKeys,
     materialSample: materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues,

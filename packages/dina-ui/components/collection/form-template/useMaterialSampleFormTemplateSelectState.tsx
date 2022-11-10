@@ -10,7 +10,6 @@ import {
   getComponentValues,
   getComponentOrderFromTemplate
 } from "../../form-template/formTemplateUtils";
-import { VisibleManagedAttributesConfig } from "../material-sample/MaterialSampleForm";
 import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
 import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -126,32 +125,20 @@ export function useMaterialSampleFormTemplateSelectState() {
   // Call the custom view hook but don't use the "initialValues" fields
   // because we're not creating a sample from a template:
   const {
-    visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   }: {
-    visibleManagedAttributeKeys?: VisibleManagedAttributesConfig | undefined;
     materialSampleInitialValues: any;
     collectingEventInitialValues?: any;
     acquisitionEventInitialValues?: any;
   } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
-
-  // Delete unused variables from the initial values.
-  delete materialSampleInitialValues?.templateCheckboxes;
-  delete materialSampleInitialValues?.templateFields;
-  delete materialSampleInitialValues?.managedAttributesOrder;
-  delete collectingEventInitialValues?.templateCheckboxes;
-  delete collectingEventInitialValues?.templateFields;
-  delete acquisitionEventInitialValues?.templateCheckboxes;
-  delete acquisitionEventInitialValues?.templateFields;
 
   return {
     sampleFormTemplate,
     setSampleFormTemplateUUID,
     navOrder,
     setNavOrder,
-    visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues

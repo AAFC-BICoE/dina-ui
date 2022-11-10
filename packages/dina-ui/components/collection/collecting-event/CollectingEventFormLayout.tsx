@@ -62,16 +62,13 @@ interface CollectingEventFormLayoutProps {
   setDefaultVerbatimSRS?: (newValue: string | undefined | null) => void;
   initialValuesForTemplate?: any;
   attachmentsConfig?: AllowAttachmentsConfig;
-  /** Forwarded to ManagedAttributesEditor */
-  visibleManagedAttributeKeys?: string[];
 }
 
 /** Layout of fields which is re-useable between the edit page and the read-only view. */
 export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
-  attachmentsConfig,
-  visibleManagedAttributeKeys
+  attachmentsConfig
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
@@ -407,7 +404,6 @@ export function CollectingEventFormLayout({
         sectionName: "collecting-event-managed-attributes-section"
       }}
       managedAttributeOrderFieldName="managedAttributesOrder"
-      visibleAttributeKeys={visibleManagedAttributeKeys}
     />
   );
   const geographicPlaceNameSourceComponent = (

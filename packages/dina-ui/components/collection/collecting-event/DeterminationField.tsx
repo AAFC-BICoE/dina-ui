@@ -57,13 +57,11 @@ export const DETERMINATION_FIELDS = Object.keys(DETERMINATION_FIELDS_OBJECT);
 export interface DeterminationFieldProps {
   id?: string;
   name?: string;
-  visibleManagedAttributeKeys?: string[];
 }
 
 export function DeterminationField({
   id = "determination-section",
-  name,
-  visibleManagedAttributeKeys
+  name
 }: DeterminationFieldProps) {
   const { formatMessage, locale } = useDinaIntl();
   const { readOnly, isTemplate, initialValues } = useDinaFormContext();
@@ -339,7 +337,6 @@ export function DeterminationField({
                     sectionName: "organism-managed-attributes-section"
                   }}
                   managedAttributeOrderFieldName="determinationManagedAttributesOrder"
-                  visibleAttributeKeys={visibleManagedAttributeKeys}
                 />
               </div>
             </div>

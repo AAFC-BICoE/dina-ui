@@ -30,7 +30,6 @@ import {
 } from "../bulk-edit/BulkEditNavigator";
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
-import { VisibleManagedAttributesConfig } from "..";
 import { FormTemplate } from "packages/dina-ui/types/collection-api";
 
 export interface MaterialSampleBulkEditorProps {
@@ -47,11 +46,8 @@ export function MaterialSampleBulkEditor({
   onPreviousClick
 }: MaterialSampleBulkEditorProps) {
   // Allow selecting a custom view for the form:
-  const {
-    sampleFormTemplate,
-    setSampleFormTemplateUUID,
-    visibleManagedAttributeKeys
-  } = useMaterialSampleFormTemplateSelectState();
+  const { sampleFormTemplate, setSampleFormTemplateUUID } =
+    useMaterialSampleFormTemplateSelectState();
 
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
@@ -69,12 +65,7 @@ export function MaterialSampleBulkEditor({
     sampleHooks: any;
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
-  } = initializeRefHookFormProps(
-    samplesProp,
-    visibleManagedAttributeKeys,
-    selectedTab,
-    sampleFormTemplate
-  );
+  } = initializeRefHookFormProps(samplesProp, selectedTab, sampleFormTemplate);
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
     return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
@@ -173,7 +164,6 @@ interface BulkSampleSaveParams {
 
 export function initializeRefHookFormProps(
   samplesProp,
-  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
@@ -184,7 +174,6 @@ export function initializeRefHookFormProps(
   const samples = useMemo(() => samplesProp, []);
 
   const formTemplateProps: Partial<MaterialSampleFormProps> = {
-    visibleManagedAttributeKeys,
     formTemplate
   };
 
@@ -201,11 +190,7 @@ export function initializeRefHookFormProps(
     showChangedIndicatorsInNestedForms: true
   });
 
-  const sampleHooks = getSampleHooks(
-    samples,
-    selectedTab,
-    visibleManagedAttributeKeys
-  );
+  const sampleHooks = getSampleHooks(samples, selectedTab);
 
   const materialSampleForm = getMaterialSampleForm(
     formTemplateProps,
@@ -228,8 +213,7 @@ function getSampleHooks(
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
-    | undefined,
-  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined
+    | undefined
 ) {
   return samples.map((resource, index) => {
     const key = `sample-${index}`;
@@ -241,8 +225,7 @@ function getSampleHooks(
         // Reduce the off-screen tabs rendering for better performance:
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
-        disableNestedFormEdits: true,
-        visibleManagedAttributeKeys
+        disableNestedFormEdits: true
       }),
       formRef: useRef(null)
     };
