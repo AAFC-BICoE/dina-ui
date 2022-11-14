@@ -1,16 +1,14 @@
 import {
   FieldSet,
   FieldSetProps,
-  FieldSpy,
   filterBy,
   ResourceSelect,
   Tooltip,
-  useBulkEditTabContext,
   useBulkGet,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
+import { castArray, compact, get, find } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
@@ -18,8 +16,20 @@ import { ManagedAttributesSorter } from "./managed-attributes-custom-views/Manag
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 
 export interface ManagedAttributesEditorProps {
-  /** Formik path to the ManagedAttribute values field. */
+  /**
+   * Formik path to the ManagedAttribute values field.
+   */
   valuesPath: string;
+
+  /**
+   * Formik Values.
+   */
+  values?: object;
+
+  /**
+   * The API end point to use in order to find the managed attribute information.
+   * Such as the values allowed in a pick list.
+   */
   managedAttributeApiPath: string;
 
   /**
@@ -30,143 +40,140 @@ export interface ManagedAttributesEditorProps {
   /** Bootstrap column width of the "Managed Attributes In Use selector. e.g. 6 or 12. */
   attributeSelectorWidth?: number;
 
+  /**
+   * The FieldSet is the card group to display in the form. Information like the legend and the
+   * form template details should be stored here.
+   */
   fieldSetProps?: Partial<FieldSetProps>;
 
   /**
-   * The formik field name for editing a Form Template's managed attributes order.
-   * Has no effect in editing an actual resource e.g. in the Material Sample form.
+   * What component is currently storing the managed attributes. (Form Template)
    */
-  managedAttributeOrderFieldName?: string;
+  componentName?: string;
 
   /**
-   * When this prop is changed, the visible managed attributes state is updated in useEffect.
-   * e.g. when the form's custom view is updated.
+   * What section is currently storing the managed attributes. (Form Template)
    */
-  visibleAttributeKeys?: string[];
-
-  values?: object;
+  sectionName?: string;
 }
 
 export function ManagedAttributesEditor({
   valuesPath,
+  values,
   managedAttributeApiPath,
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
-  managedAttributeOrderFieldName,
-  visibleAttributeKeys: visibleAttributeKeysProp,
-  values
+  componentName,
+  sectionName
 }: ManagedAttributesEditorProps) {
-  const bulkCtx = useBulkEditTabContext();
-  const { readOnly, isTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, formTemplate } = useDinaFormContext();
+
+  const [visibleAttributeKeys, setVisibleAttributeKeys] = useState<string[]>(
+    []
+  );
+
+  // When the form template has changed, then the visible managed attributes need to be
+  // changed.
+  useEffect(() => {
+    if (!formTemplate || !componentName || !sectionName) return;
+
+    // First find the component we are looking for.
+    const componentFound = find(formTemplate?.components, {
+      name: componentName
+    });
+    if (componentFound) {
+      // Next find the right section.
+      const sectionFound = find(componentFound?.sections, {
+        name: sectionName
+      });
+      if (sectionFound) {
+        // Now, get a list of all of the managed attributes to be displayed.
+        setVisibleAttributeKeys(
+          sectionFound.items
+            ?.filter((item) => item.visible)
+            ?.map<string>((item) => item?.name ?? "") ?? []
+        );
+      }
+    }
+  }, [formTemplate]);
+
+  // Fetch the attributes, but omit any that are missing e.g. were deleted.
+  const { dataWithNullForMissing: fetchedAttributes, loading } =
+    useBulkGet<ManagedAttribute>({
+      ids: visibleAttributeKeys.map((key) =>
+        // Use the component prefix if needed by the back-end:
+        compact([managedAttributeComponent, key]).join(".")
+      ),
+      listPath: managedAttributeApiPath
+    });
+
+  // Store the last fetched Attributes in a ref instead of showing a
+  // loading state when the visible attributes change.
+  const lastFetchedAttributes = useRef<PersistedResource<ManagedAttribute>[]>(
+    []
+  );
+  if (fetchedAttributes) {
+    lastFetchedAttributes.current = compact(fetchedAttributes);
+  }
+
+  const visibleAttributes = lastFetchedAttributes.current;
 
   return (
-    <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
-      {(currentValue) => {
-        function getAttributeKeysInUse() {
-          const managedAttributeMaps = bulkCtx?.resourceHooks.map((sample) =>
-            get(sample.formRef.current?.values, valuesPath)
-          ) || [currentValue];
-
-          // Get all unique ManagedAttribute keys in the given value maps:
-          const initialVisibleKeys = uniq(
-            flatMap(managedAttributeMaps.map(keys))
-          );
-
-          return initialVisibleKeys;
-        }
-
-        const [visibleAttributeKeys, setVisibleAttributeKeys] = useState(
-          getAttributeKeysInUse
-        );
-
-        // When the visibleAttributeKeys prop changes, update the internal visible keys state:
-        useEffect(() => {
-          setVisibleAttributeKeys(
-            visibleAttributeKeysProp ?? getAttributeKeysInUse()
-          );
-        }, [visibleAttributeKeysProp]);
-
-        // Fetch the attributes, but omit any that are missing e.g. were deleted.
-        const { dataWithNullForMissing: fetchedAttributes, loading } =
-          useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map((key) =>
-              // Use the component prefix if needed by the back-end:
-              compact([managedAttributeComponent, key]).join(".")
-            ),
-            listPath: managedAttributeApiPath
-          });
-
-        // Store the last fetched Attributes in a ref instead of showing a
-        // loading state when the visible attributes change.
-        const lastFetchedAttributes = useRef<
-          PersistedResource<ManagedAttribute>[]
-        >([]);
-        if (fetchedAttributes) {
-          lastFetchedAttributes.current = compact(fetchedAttributes);
-        }
-
-        const visibleAttributes = lastFetchedAttributes.current;
-
-        return (
-          <FieldSet
-            legend={<DinaMessage id="managedAttributes" />}
-            {...fieldSetProps}
-          >
-            <div className="mb-3 managed-attributes-editor">
-              {isTemplate && managedAttributeOrderFieldName ? (
-                <ManagedAttributesSorter
-                  managedAttributeComponent={managedAttributeComponent}
-                  name={managedAttributeOrderFieldName}
-                  managedAttributeApiPath={managedAttributeApiPath}
-                  valuesPath={valuesPath}
-                />
-              ) : (
-                <div>
-                  {!readOnly && (
-                    <div className="row">
-                      <label
-                        className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
-                      >
-                        <div className="mb-2">
-                          <strong>
-                            <DinaMessage id="field_visibleManagedAttributes" />
-                          </strong>
-                          <Tooltip id="field_visibleManagedAttributes_tooltip" />
-                        </div>
-                        <ManagedAttributeMultiSelect
-                          managedAttributeApiPath={managedAttributeApiPath}
-                          managedAttributeComponent={managedAttributeComponent}
-                          onChange={setVisibleAttributeKeys}
-                          visibleAttributes={visibleAttributes}
-                          loading={loading}
-                        />
-                      </label>
-                    </div>
-                  )}
-                  {!!visibleAttributes.length && <hr />}
-                  <div className="row">
-                    {visibleAttributes.map((attribute) => (
-                      <ManagedAttributeFieldWithLabel
-                        key={attribute.key}
-                        attribute={attribute}
-                        values={values}
-                        valuesPath={valuesPath}
-                        onRemoveClick={(attributeKey) =>
-                          setVisibleAttributeKeys((current) =>
-                            current.filter((it) => it !== attributeKey)
-                          )
-                        }
-                      />
-                    ))}
+    <FieldSet
+      legend={<DinaMessage id="managedAttributes" />}
+      {...fieldSetProps}
+    >
+      <div className="mb-3 managed-attributes-editor">
+        {isTemplate ? (
+          <ManagedAttributesSorter
+            managedAttributeComponent={managedAttributeComponent}
+            managedAttributeApiPath={managedAttributeApiPath}
+            valuesPath={valuesPath}
+          />
+        ) : (
+          <>
+            {!readOnly && !formTemplate && (
+              <div className="row">
+                <label
+                  className={`visible-attribute-menu col-sm-${attributeSelectorWidth} mb-3`}
+                >
+                  <div className="mb-2">
+                    <strong>
+                      <DinaMessage id="field_visibleManagedAttributes" />
+                    </strong>
+                    <Tooltip id="field_visibleManagedAttributes_tooltip" />
                   </div>
-                </div>
-              )}
+                  <ManagedAttributeMultiSelect
+                    managedAttributeApiPath={managedAttributeApiPath}
+                    managedAttributeComponent={managedAttributeComponent}
+                    onChange={setVisibleAttributeKeys}
+                    visibleAttributes={visibleAttributes}
+                    loading={loading}
+                  />
+                </label>
+              </div>
+            )}
+            {!!visibleAttributes.length && <hr />}
+            <div className="row">
+              {visibleAttributes.map((attribute) => (
+                <ManagedAttributeFieldWithLabel
+                  key={attribute.key}
+                  attribute={attribute}
+                  values={values}
+                  valuesPath={valuesPath}
+                  onRemoveClick={(attributeKey) =>
+                    setVisibleAttributeKeys((current) =>
+                      current.filter((it) => it !== attributeKey)
+                    )
+                  }
+                />
+              ))}
             </div>
-          </FieldSet>
-        );
-      }}
-    </FieldSpy>
+          </>
+        )}
+      </div>
+    </FieldSet>
   );
 }
 

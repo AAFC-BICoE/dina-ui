@@ -23,17 +23,24 @@ import { ManagedAttribute } from "../../../../types/objectstore-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
 
 export interface ManagedAttributeSorterProps {
+  /**
+   * For some forms, they support multiple types of components. Such as COLLECTING_EVENT.
+   */
   managedAttributeComponent?: string;
-  /** Field name for the managed attribute key array. */
-  name: string;
-  /** If inputa are editable, this is the path to the managedAttributes field in the form. */
+
+  /**
+   * If input are editable, this is the path to the managedAttributes field in the form.
+   */
   valuesPath?: string;
+
+  /**
+   * API Path for where the managed attributes information can be retrieved.
+   */
   managedAttributeApiPath: string;
 }
 
 export function ManagedAttributesSorter({
   managedAttributeComponent,
-  name,
   managedAttributeApiPath,
   valuesPath
 }: ManagedAttributeSorterProps) {
@@ -41,7 +48,7 @@ export function ManagedAttributesSorter({
   const { formatMessage } = useDinaIntl();
 
   return (
-    <FieldArray name={name}>
+    <FieldArray name={"managedAttributesOrder"}>
       {({ push, remove, form, move }) => {
         function onSortStart(_, event: unknown) {
           if (event instanceof MouseEvent) {
@@ -53,7 +60,8 @@ export function ManagedAttributesSorter({
           move(se.oldIndex, se.newIndex);
         }
 
-        const attributeKeys = (get(form.values, name) ?? []) as string[];
+        const attributeKeys = (get(form.values, "managedAttributesOrder") ??
+          []) as string[];
 
         return (
           <div>
@@ -63,14 +71,14 @@ export function ManagedAttributesSorter({
                 style={{ maxWidth: "30rem" }}
               >
                 <ResourceSelect<ManagedAttribute>
-                  filter={input => ({
+                  filter={(input) => ({
                     ...filterBy(["name"])(input),
                     ...(managedAttributeComponent
                       ? { managedAttributeComponent }
                       : {})
                   })}
                   model={managedAttributeApiPath}
-                  onChange={ma => {
+                  onChange={(ma) => {
                     if (
                       !Array.isArray(ma) &&
                       !attributeKeys.includes?.(ma.key)
@@ -78,7 +86,7 @@ export function ManagedAttributesSorter({
                       push(ma.key);
                     }
                   }}
-                  optionLabel={ma => ma.name}
+                  optionLabel={(ma) => ma.name}
                   placeholder={formatMessage("addManagedAttribute")}
                   omitNullOption={true}
                 />
@@ -113,8 +121,8 @@ export function ManagedAttributesSorter({
               </div>
             )}
             <div>
-              <FieldSpy<string[]> fieldName={name}>
-                {keys => (
+              <FieldSpy<string[]> fieldName={"managedAttributesOrder"}>
+                {(keys) => (
                   <SortableAttributesViewList
                     axis="xy"
                     onSortStart={onSortStart}
@@ -125,7 +133,7 @@ export function ManagedAttributesSorter({
                     keys={keys ?? []}
                     managedAttributeApiPath={managedAttributeApiPath}
                     managedAttributeComponent={managedAttributeComponent}
-                    onRemoveClick={index => remove(index)}
+                    onRemoveClick={(index) => remove(index)}
                     valuesPath={valuesPath}
                   />
                 )}
@@ -159,7 +167,7 @@ function AttributesViewList({
   // Fetch the attributes, but omit any that are missing e.g. were deleted.
   const { dataWithNullForMissing: fetchedAttributes, loading } =
     useBulkGet<ManagedAttribute>({
-      ids: keys.map(key =>
+      ids: keys.map((key) =>
         // Use the component prefix if needed by the back-end:
         compact([managedAttributeComponent, key]).join(".")
       ),

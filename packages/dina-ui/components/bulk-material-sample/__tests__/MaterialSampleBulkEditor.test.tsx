@@ -1,9 +1,5 @@
 import Cleave from "cleave.js/react";
-import {
-  DoOperationsError,
-  MaterialSampleSearchHelper,
-  ResourceSelect
-} from "common-ui";
+import { DoOperationsError, MaterialSampleSearchHelper } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import Select from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -15,8 +11,6 @@ import {
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   COLLECTING_EVENT_COMPONENT_NAME,
-  IDENTIFIER_COMPONENT_NAME,
-  MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   ORGANISMS_COMPONENT_NAME,
@@ -71,45 +65,6 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
     }
   })
 );
-
-/** FormTemplate with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
-const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
-  id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
-  type: "form-template",
-  createdOn: "2022-03-03T16:36:30.422992Z",
-  createdBy: "cnc-cm",
-  name: "test view with managed attributes",
-  group: "cnc",
-  restrictToCreatedBy: false,
-  viewConfiguration: {
-    type: "material-sample-form-template",
-    navOrder: [MANAGED_ATTRIBUTES_COMPONENT_NAME, IDENTIFIER_COMPONENT_NAME],
-    formTemplate: {
-      MATERIAL_SAMPLE: {
-        templateFields: {
-          materialSampleName: { enabled: true, defaultValue: "default id" },
-          "organism[0].determination[0].managedAttributes.attribute_1": {
-            enabled: true
-          },
-          "managedAttributes.sample_attribute_1": {
-            enabled: true,
-            defaultValue: "sample attribute default value"
-          }
-        }
-      },
-      COLLECTING_EVENT: {
-        templateFields: {
-          "managedAttributes.collecting_event_attribute_1": {
-            enabled: true
-          }
-        }
-      }
-    },
-    managedAttributesOrder: ["sample_attribute_1"],
-    collectingEventManagedAttributesOrder: ["collecting_event_attribute_1"],
-    determinationManagedAttributesOrder: ["determination_attribute_1"]
-  }
-};
 
 const mockGet = jest.fn<any, any>(async (path, params) => {
   switch (path) {

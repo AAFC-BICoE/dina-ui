@@ -334,11 +334,14 @@ export function MaterialSampleForm({
           valuesPath="managedAttributes"
           managedAttributeApiPath="collection-api/managed-attribute"
           managedAttributeComponent="MATERIAL_SAMPLE"
+          componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
+          sectionName="managed-attributes-section"
           fieldSetProps={{
             id,
-            legend: <DinaMessage id="materialSampleManagedAttributes" />
+            legend: <DinaMessage id="materialSampleManagedAttributes" />,
+            componentName: MANAGED_ATTRIBUTES_COMPONENT_NAME,
+            sectionName: "managed-attributes-section"
           }}
-          managedAttributeOrderFieldName="managedAttributesOrder"
         />
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>

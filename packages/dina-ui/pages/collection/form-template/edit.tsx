@@ -228,6 +228,9 @@ export function FormTemplateEditPageLoaded({
       )
     };
 
+    // Inject the managed attributes into the form template.
+    // TODO Managed attributes are not stored to the legend.
+
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
       { apiBaseUrl: "/collection-api" }

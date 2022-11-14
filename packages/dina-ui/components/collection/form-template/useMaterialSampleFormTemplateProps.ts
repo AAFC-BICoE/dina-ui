@@ -92,7 +92,6 @@ export function useMaterialSampleFormTemplateProps<
     // Delete unused variables from the initial values.
     delete (materialSampleInitialValues as any)?.templateCheckboxes;
     delete (materialSampleInitialValues as any)?.templateFields;
-    delete (materialSampleInitialValues as any)?.managedAttributesOrder;
     delete (collectingEventInitialValues as any)?.templateCheckboxes;
     delete (collectingEventInitialValues as any)?.templateFields;
     delete (acquisitionEventInitialValues as any)?.templateCheckboxes;

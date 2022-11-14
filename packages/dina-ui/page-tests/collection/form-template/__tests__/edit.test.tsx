@@ -1767,18 +1767,7 @@ describe("Workflow template edit page", () => {
             {
               name: "managed-attributes-section",
               visible: true,
-              items: [
-                {
-                  defaultValue: undefined,
-                  name: "managedAttributes",
-                  visible: true
-                },
-                {
-                  defaultValue: undefined,
-                  name: "managedAttributesOrder",
-                  visible: true
-                }
-              ]
+              items: []
             }
           ]
         },

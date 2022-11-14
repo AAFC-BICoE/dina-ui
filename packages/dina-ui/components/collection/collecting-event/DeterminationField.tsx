@@ -336,7 +336,6 @@ export function DeterminationField({
                     className: "non-strip",
                     sectionName: "organism-managed-attributes-section"
                   }}
-                  managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                 />
               </div>
             </div>

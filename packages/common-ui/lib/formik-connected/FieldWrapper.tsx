@@ -112,11 +112,6 @@ export function FieldWrapper(props: FieldWrapperProps) {
         name: sectionName
       });
       if (sectionFound) {
-        // console.debug(
-        //   !find(sectionFound.items, {
-        //     name: templateCheckboxFieldName ?? name
-        //   })?.visible ?? false
-        // );
         return (
           !find(sectionFound.items, {
             name: templateCheckboxFieldName ?? name
@@ -128,7 +123,6 @@ export function FieldWrapper(props: FieldWrapperProps) {
   }, [formTemplate]);
 
   if (disabledByFormTemplate) {
-    // console.debug("Do not render...");
     return null;
   }
 

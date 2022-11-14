@@ -96,12 +96,6 @@ export function useMaterialSampleFormTemplateSelectState() {
 
   // Re-using viewConfiguration object structure for now
   const materialSampleFormTemplate = {
-    managedAttributesOrder:
-      materialSampleComponent.managedAttributesOrder ?? [],
-    determinationManagedAttributesOrder:
-      materialSampleComponent.determinationManagedAttributesOrder ?? [],
-    collectingEventManagedAttributesOrder:
-      materialSampleComponent.collectingEventManagedAttributesOrder ?? [],
     formTemplate: {
       COLLECTING_EVENT: hasCollectingEvent
         ? getFormTemplateSchema(collectingEventComponent)
