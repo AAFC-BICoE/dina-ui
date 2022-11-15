@@ -176,7 +176,6 @@ export default function SangerWorkFlowRunPage() {
           {pcrBatch.response?.data && pcrBatchId && (
             <SangerPcrReactionStep
               pcrBatchId={pcrBatchId}
-              pcrBatch={pcrBatch.response.data}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}

@@ -1,10 +1,8 @@
-import { PersistedResource } from "kitsu";
 import {
-  PcrBatch,
   PcrBatchItem,
   PCR_BATCH_ITEM_RESULT_INFO
 } from "../../../types/seqdb-api";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Ref } from "react";
 import {
   filterBy,
   FieldHeader,
@@ -12,20 +10,15 @@ import {
   DinaForm,
   LoadingSpinner,
   SelectField,
-  SelectOption
+  SelectOption,
+  Operation
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
-
-// interface PcrBatchItemReactionStep {
-// pcrBatchItem: PcrBatchItem;
-// materialSample?: MaterialSample;
-// determination?: Determination;
-// }
+import { FormikProps } from "formik";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
-  pcrBatch?: PcrBatch;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
   performSave: boolean;
@@ -34,15 +27,16 @@ export interface SangerPcrReactionProps {
 
 export function SangerPcrReactionStep({
   pcrBatchId,
-  pcrBatch,
   editMode,
   setEditMode,
   performSave,
   setPerformSave
 }: SangerPcrReactionProps) {
-  const { apiClient, bulkGet } = useApiClient();
+  const { apiClient, bulkGet, doOperations } = useApiClient();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const formRef: Ref<FormikProps<Partial<PcrBatchItem>>> = useRef(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
   const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
     []
   );
@@ -59,17 +53,11 @@ export function SangerPcrReactionStep({
 
   useEffect(() => {
     // fetchMaterialSamples();
-    fetchPcrBatchItems();
+    // fetchPcrBatchItems();
   }, [selectedResources]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
-    async function performSaveInternal() {
-      // console.log("Saved click!");
-      // setPerformSave(false);
-      // setEditMode(false);
-    }
-
     if (performSave) {
       performSaveInternal();
     }
@@ -96,6 +84,7 @@ export function SangerPcrReactionStep({
         //   );
 
         setSelectedResources(response?.data);
+        setLoading(false);
         // setSelectedResources(
         //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
         //     pcrBatchItem: item as any,
@@ -127,9 +116,41 @@ export function SangerPcrReactionStep({
   //   });
   // }
 
-  const PCR_REACTION_COLUMN: (inEditMode: boolean) => Column<PcrBatchItem>[] = (
-    inEditMode
-  ) => [
+  async function performSaveInternal() {
+    if (formRef && (formRef as any)?.current?.values?.results) {
+      // Currently the results look like this:
+      // { "ec067d28-8a66-43a3-8193-eefe13dec4bb": "No Band" }
+      const results = (formRef as any)?.current.values.results;
+
+      // Transform to an array with the ids as well:
+      // [{ id: "ec067d28-8a66-43a3-8193-eefe13dec4bb" value: "No Band" }]
+      const resultsWithId = Object.keys(results).map((id) => ({
+        id,
+        value: results[id]
+      }));
+
+      // Using the results, generate the operations.
+      const operations = resultsWithId.map<Operation>((result) => ({
+        op: "PATCH",
+        path: "pcr-batch-item/" + result.id,
+        value: {
+          id: result.id,
+          type: "pcr-batch-item",
+          attributes: {
+            result: result.value
+          }
+        }
+      }));
+
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+    }
+
+    // Leave edit mode...
+    setPerformSave(false);
+    setEditMode(false);
+  }
+
+  const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
     {
       Cell: ({ original }) => {
         if (original?.wellRow === null || original?.wellColumn === null)
@@ -146,6 +167,7 @@ export function SangerPcrReactionStep({
 
         return <>{original.cellNumber}</>;
       },
+      id: "tubeNumber",
       Header: <FieldHeader name={"tubeNumber"} />,
       sortable: false
     },
@@ -176,19 +198,15 @@ export function SangerPcrReactionStep({
       sortable: false
     },
     {
-      Cell: ({ original }) => {
-        return inEditMode ? (
-          <SelectField
-            name={"results[" + original?.id + "]"}
-            hideLabel={true}
-            options={PCR_BATCH_ITEM_RESULT_INFO.map<
-              SelectOption<string | undefined>
-            >((option) => ({ label: option.option, value: option.option }))}
-          />
-        ) : (
-          <>{original?.result ?? "No Band"}</>
-        );
-      },
+      Cell: ({ original }) => (
+        <SelectField
+          name={"results[" + original?.id + "]"}
+          hideLabel={true}
+          options={PCR_BATCH_ITEM_RESULT_INFO.map<
+            SelectOption<string | undefined>
+          >((option) => ({ label: option.option, value: option.option }))}
+        />
+      ),
       Header: <FieldHeader name={"result"} />,
       sortable: false
     }
@@ -199,11 +217,22 @@ export function SangerPcrReactionStep({
     return <LoadingSpinner loading={true} />;
   }
 
+  // Load the result based on the API request with the pcr-batch-item.
+  const initialValues = {
+    results: Object.fromEntries(
+      selectedResources.map((obj) => [obj.id, obj.result])
+    )
+  };
+
   return (
-    <DinaForm<Partial<PcrBatchItem>> initialValues={{}}>
+    <DinaForm<Partial<PcrBatchItem>>
+      initialValues={initialValues as any}
+      innerRef={formRef}
+      readOnly={!editMode}
+    >
       <ReactTable<PcrBatchItem>
-        columns={PCR_REACTION_COLUMN(editMode)}
-        defaultSorted={[{ id: "date", desc: true }]}
+        columns={PCR_REACTION_COLUMN}
+        defaultSorted={[{ id: "tubeNumber", desc: true }]}
         data={selectedResources}
         minRows={1}
         showPagination={false}
