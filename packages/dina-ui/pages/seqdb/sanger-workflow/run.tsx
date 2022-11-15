@@ -134,6 +134,7 @@ export default function SangerWorkFlowRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("selectCoordinates")}
           </Tab>
+          <Tab disabled={isDisabled(3, true)}>Reaction Step</Tab>
         </TabList>
         <TabPanel>
           <SangerPcrBatchStep

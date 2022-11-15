@@ -9,6 +9,8 @@ export interface PcrBatchItemAttributes {
   group?: string;
   wellRow?: string;
   wellColumn?: number;
+  cellNumber?: number;
+  result?: string;
 }
 
 export interface PcrBatchItemRelationships {

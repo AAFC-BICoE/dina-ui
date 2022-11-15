@@ -1,11 +1,10 @@
 import { PersistedResource } from "kitsu";
-import { PcrBatchForm } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useState, useEffect } from "react";
 import { SubmitButton, filterBy, FieldHeader, useApiClient } from "common-ui";
-import Link from "next/link";
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
+import { compact } from "lodash";
 
 interface PcrBatchItemReactionStep {
   pcrBatchItem: PcrBatchItem;
@@ -60,19 +59,23 @@ export function SangerPcrReactionStep({
       })
       .then((response) => {
         const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-          response?.data?.filter(
+          response.data?.filter(
             (item) => item?.materialSample?.id !== undefined
           );
 
         setSelectedResources(
-          pcrBatchItems.map((pcrBatchItem) => {
-            return { pcrBatchItem };
-          })
+          pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
+            pcrBatchItem: item as any,
+            determination: undefined,
+            materialSample: undefined
+          }))
         );
       });
   }
 
   async function fetchMaterialSamples() {
+    if (!selectedResources) return;
+
     await bulkGet<MaterialSample>(
       selectedResources.map(
         (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
@@ -86,7 +89,7 @@ export function SangerPcrReactionStep({
       //   id: resource.id,
       //   type: resource.type
       // }));
-      // console.log(JSON.stringify(response));
+      // console.log("got here: " + JSON.stringify(response));
       // setSelectedResources(materialSamplesTransformed ?? []);
     });
   }
