@@ -2,10 +2,9 @@ import { PersistedResource } from "kitsu";
 import { PcrBatchForm } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useState, useEffect } from "react";
-import { SubmitButton, ColumnDefinition, FieldHeader } from "common-ui";
+import { SubmitButton, filterBy, FieldHeader, useApiClient } from "common-ui";
 import Link from "next/link";
 import ReactTable, { Column } from "react-table";
-import { TableColumn } from "common-ui/lib/list-page/types";
 
 export interface SangerPcrReactionProps {
   pcrBatchId?: string;
@@ -24,22 +23,45 @@ export function SangerPcrReactionStep({
   performSave,
   setPerformSave
 }: SangerPcrReactionProps) {
-  // If no PCR Batch has been created, automatically go to edit mode.
-  useEffect(() => {
-    if (!pcrBatchId) {
-      setEditMode(true);
-    }
-  }, [pcrBatchId]);
+  const { apiClient } = useApiClient();
 
-  const [SelectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
+  useEffect(() => {
+    fetchPcrBatchItems();
+  }, []);
+
+  const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
     []
   );
+
+  async function fetchPcrBatchItems() {
+    await apiClient
+      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId
+            }
+          ]
+        })(""),
+        include: "materialSample"
+      })
+      .then((response) => {
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+          response?.data?.filter(
+            (item) => item?.materialSample?.id !== undefined
+          );
+
+        setSelectedResources(pcrBatchItems);
+      });
+  }
 
   const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
     {
       Cell: ({ original: { id, data } }) => (
         <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
-          {data?.attributes?.column + data?.attributes?.row}
+          {data?.attributes?.wellRow + data?.attributes?.wellColumn}
         </a>
       ),
 
@@ -48,7 +70,7 @@ export function SangerPcrReactionStep({
     },
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
+        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
           {data?.attributes?.materialSampleName ||
             data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
             id}
@@ -59,8 +81,8 @@ export function SangerPcrReactionStep({
     },
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
+        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
+          {data?.attributes?.materialSample.materialSampleName ||
             data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
             id}
         </a>
@@ -106,7 +128,7 @@ export function SangerPcrReactionStep({
     <ReactTable
       columns={PCR_REACTION_COLUMN}
       defaultSorted={[{ id: "date", desc: true }]}
-      data={SelectedResources}
+      data={selectedResources}
       minRows={1}
       showPagination={false}
       sortable={false}
