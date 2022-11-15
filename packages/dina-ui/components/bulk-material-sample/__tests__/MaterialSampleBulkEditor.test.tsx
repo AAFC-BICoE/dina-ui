@@ -25,6 +25,8 @@ import {
   StorageUnit
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { deleteFromStorage } from "@rehooks/local-storage";
+import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -1151,6 +1153,7 @@ const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
 ];
 
 describe("MaterialSampleBulkEditor", () => {
+  beforeEach(() => deleteFromStorage(SAMPLE_FORM_TEMPLATE_KEY));
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
