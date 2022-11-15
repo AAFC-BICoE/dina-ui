@@ -6,11 +6,11 @@ import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
 import { compact } from "lodash";
 
-interface PcrBatchItemReactionStep {
-  pcrBatchItem: PcrBatchItem;
-  materialSample?: MaterialSample;
-  determination?: Determination;
-}
+// interface PcrBatchItemReactionStep {
+// pcrBatchItem: PcrBatchItem;
+// materialSample?: MaterialSample;
+// determination?: Determination;
+// }
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -31,16 +31,23 @@ export function SangerPcrReactionStep({
 }: SangerPcrReactionProps) {
   const { apiClient, bulkGet } = useApiClient();
 
-  const [selectedResources, setSelectedResources] = useState<
-    PcrBatchItemReactionStep[]
-  >([]);
+  const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
+    []
+  );
+  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
+  const [determination, setDetermination] = useState<Determination>();
+
+  // const [selectedResources, setSelectedResources] = useState<
+  //   PcrBatchItemReactionStep[]
+  // >([]);
 
   useEffect(() => {
     fetchPcrBatchItems();
   }, []);
 
   useEffect(() => {
-    fetchMaterialSamples();
+    // fetchMaterialSamples();
+    fetchPcrBatchItems();
   }, [selectedResources]);
 
   async function fetchPcrBatchItems() {
@@ -63,36 +70,37 @@ export function SangerPcrReactionStep({
             (item) => item?.materialSample?.id !== undefined
           );
 
-        setSelectedResources(
-          pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
-            pcrBatchItem: item as any,
-            determination: undefined,
-            materialSample: undefined
-          }))
-        );
+        setSelectedResources(pcrBatchItems);
+        // setSelectedResources(
+        //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
+        //     pcrBatchItem: item as any,
+        //     determination: undefined,
+        //     materialSample: undefined
+        //   }))
+        // );
       });
   }
 
-  async function fetchMaterialSamples() {
-    if (!selectedResources) return;
+  // async function fetchMaterialSamples() {
+  //   if (!selectedResources) return;
 
-    await bulkGet<MaterialSample>(
-      selectedResources.map(
-        (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
-      ),
-      { apiBaseUrl: "/collection-api" }
-    ).then((response) => {
-      // const materialSamplesTransformed = compact(response).map((resource) => ({
-      //   data: {
-      //     attributes: pick(resource, ["materialSampleName"])
-      //   },
-      //   id: resource.id,
-      //   type: resource.type
-      // }));
-      // console.log("got here: " + JSON.stringify(response));
-      // setSelectedResources(materialSamplesTransformed ?? []);
-    });
-  }
+  //   await bulkGet<MaterialSample>(
+  //     selectedResources.map(
+  //       (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
+  //     ),
+  //     { apiBaseUrl: "/collection-api" }
+  //   ).then((response) => {
+  //     // const materialSamplesTransformed = compact(response).map((resource) => ({
+  //     //   data: {
+  //     //     attributes: pick(resource, ["materialSampleName"])
+  //     //   },
+  //     //   id: resource.id,
+  //     //   type: resource.type
+  //     // }));
+  //     // console.log("got here: " + JSON.stringify(response));
+  //     // setSelectedResources(materialSamplesTransformed ?? []);
+  //   });
+  // }
 
   const PCR_REACTION_COLUMN: Column<PcrBatchItemReactionStep>[] = [
     {
