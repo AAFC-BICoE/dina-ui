@@ -79,7 +79,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
   name: "test view with managed attributes",
   group: "cnc",
   restrictToCreatedBy: false,
-  viewConfiguration: {},
+  viewConfiguration: { type: "material-sample-form-template" },
   components: [
     {
       name: "identifiers-component",
@@ -851,6 +851,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNIT };
     case "collection-api/storage-unit/C":
       return { data: TEST_STORAGE_UNITS[2] };
+    case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
+      return { data: formTemplate };
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -870,7 +872,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/acquisition-event":
-    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
@@ -3051,6 +3052,15 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(true);
+
     // Select a form template:
     wrapper
       .find(".form-template-select")
@@ -3060,7 +3070,14 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // The bulk edit tab shows the managed attributes from the FormTemplate:
+    expect(
+      wrapper
+        .find(".form-template-select")
+        .find(ResourceSelect)
+        .prop<any>("value").id
+    ).toEqual(formTemplate.id);
+
+    // The bulk edit tab shows the barcode field from the FormTemplate:
     // For Material Sample:
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
@@ -3085,5 +3102,67 @@ describe("MaterialSampleBulkEditor", () => {
         .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
         .exists()
     ).toEqual(false);
+  });
+
+  it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(true);
+
+    // Select a form template:
+    wrapper
+      .find(".form-template-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")(formTemplate);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".form-template-select")
+        .find(ResourceSelect)
+        .prop<any>("value").id
+    ).toEqual(formTemplate.id);
+
+    // The bulk edit tab shows the default values from the FormTemplate:
+    // For Material Sample:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(false);
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("1111");
+
+    // Switch to the first individual sample tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".sample-tabpanel-0 .barcode-field input").prop("value")
+    ).toEqual("");
   });
 });
