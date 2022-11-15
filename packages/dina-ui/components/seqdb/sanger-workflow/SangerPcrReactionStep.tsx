@@ -1,12 +1,18 @@
 import { PersistedResource } from "kitsu";
-import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
+import {
+  PcrBatch,
+  PcrBatchItem,
+  PCR_BATCH_ITEM_RESULT_INFO
+} from "../../../types/seqdb-api";
 import { useState, useEffect } from "react";
 import {
   filterBy,
   FieldHeader,
   useApiClient,
   DinaForm,
-  LoadingSpinner
+  LoadingSpinner,
+  SelectField,
+  SelectOption
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
@@ -56,6 +62,19 @@ export function SangerPcrReactionStep({
     fetchPcrBatchItems();
   }, [selectedResources]);
 
+  // Check if a save was requested from the top level button bar.
+  useEffect(() => {
+    async function performSaveInternal() {
+      // console.log("Saved click!");
+      // setPerformSave(false);
+      // setEditMode(false);
+    }
+
+    if (performSave) {
+      performSaveInternal();
+    }
+  }, [performSave]);
+
   async function fetchPcrBatchItems() {
     await apiClient
       .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
@@ -71,12 +90,12 @@ export function SangerPcrReactionStep({
         include: "materialSample"
       })
       .then((response) => {
-        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-          response.data?.filter(
-            (item) => item?.materialSample?.id !== undefined
-          );
+        // const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+        //   response.data?.filter(
+        //     (item) => item?.materialSample?.id !== undefined
+        //   );
 
-        setSelectedResources(pcrBatchItems);
+        setSelectedResources(response?.data);
         // setSelectedResources(
         //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
         //     pcrBatchItem: item as any,
@@ -113,7 +132,8 @@ export function SangerPcrReactionStep({
   ) => [
     {
       Cell: ({ original }) => {
-        if (!original?.wellRow || !original?.wellColumn) return <></>;
+        if (original?.wellRow === null || original?.wellColumn === null)
+          return <></>;
 
         return <>{original.wellRow + "" + original.wellColumn}</>;
       },
@@ -122,7 +142,7 @@ export function SangerPcrReactionStep({
     },
     {
       Cell: ({ original }) => {
-        if (!original?.cellNumber) return <></>;
+        if (original?.cellNumber === undefined) return <></>;
 
         return <>{original.cellNumber}</>;
       },
@@ -158,7 +178,13 @@ export function SangerPcrReactionStep({
     {
       Cell: ({ original }) => {
         return inEditMode ? (
-          <>edit mode</>
+          <SelectField
+            name={"results[" + original?.id + "]"}
+            hideLabel={true}
+            options={PCR_BATCH_ITEM_RESULT_INFO.map<
+              SelectOption<string | undefined>
+            >((option) => ({ label: option.option, value: option.option }))}
+          />
         ) : (
           <>{original?.result ?? "No Band"}</>
         );
@@ -168,21 +194,13 @@ export function SangerPcrReactionStep({
     }
   ];
 
-  async function onSavedInternal(resource) {
-    setPerformSave(true);
-    setEditMode(false);
-  }
-
   // Wait until the PcrBatchItems have been loaded in before displaying the table.
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
 
   return (
-    <DinaForm<Partial<PcrBatchItem>>
-      initialValues={{}}
-      onSubmit={onSavedInternal}
-    >
+    <DinaForm<Partial<PcrBatchItem>> initialValues={{}}>
       <ReactTable<PcrBatchItem>
         columns={PCR_REACTION_COLUMN(editMode)}
         defaultSorted={[{ id: "date", desc: true }]}
@@ -190,6 +208,7 @@ export function SangerPcrReactionStep({
         minRows={1}
         showPagination={false}
         sortable={false}
+        style={{ overflow: "visible" }}
       />
     </DinaForm>
   );
