@@ -1,10 +1,15 @@
 import { PersistedResource } from "kitsu";
 import { PcrBatch, PcrBatchItem } from "../../../types/seqdb-api";
 import { useState, useEffect } from "react";
-import { SubmitButton, filterBy, FieldHeader, useApiClient } from "common-ui";
+import {
+  filterBy,
+  FieldHeader,
+  useApiClient,
+  DinaForm,
+  LoadingSpinner
+} from "common-ui";
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
-import { compact } from "lodash";
 
 interface PcrBatchItemReactionStep {
   pcrBatchItem: PcrBatchItem;
@@ -31,9 +36,11 @@ export function SangerPcrReactionStep({
 }: SangerPcrReactionProps) {
   const { apiClient, bulkGet } = useApiClient();
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [selectedResources, setSelectedResources] = useState<
     PcrBatchItemReactionStep[]
-  >([]);
+  >([{ pcrBatchItem: { type: "pcr-batch-item" } }]);
 
   useEffect(() => {
     fetchPcrBatchItems();
@@ -63,13 +70,13 @@ export function SangerPcrReactionStep({
             (item) => item?.materialSample?.id !== undefined
           );
 
-        setSelectedResources(
-          pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
-            pcrBatchItem: item as any,
-            determination: undefined,
-            materialSample: undefined
-          }))
-        );
+        // setSelectedResources(
+        //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
+        //     pcrBatchItem: item as any,
+        //     determination: undefined,
+        //     materialSample: undefined
+        //   }))
+        // );
       });
   }
 
@@ -94,81 +101,97 @@ export function SangerPcrReactionStep({
     });
   }
 
-  const PCR_REACTION_COLUMN: Column<PcrBatchItemReactionStep>[] = [
+  const PCR_REACTION_COLUMN: (
+    inEditMode: boolean
+  ) => Column<PcrBatchItemReactionStep>[] = (inEditMode) => [
     {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
-          {data.attributes?.wellRow + data?.attributes?.wellColumn}
-        </a>
-      ),
+      Cell: ({ original }) => {
+        if (
+          !original?.pcrBatchItem?.wellRow ||
+          !original?.pcrBatchItem?.wellColumn
+        )
+          return <></>;
 
+        return (
+          <>
+            {original.pcrBatchItem.wellRow +
+              "" +
+              original.pcrBatchItem.wellColumn}
+          </>
+        );
+      },
       Header: <FieldHeader name={"wellCoordinates"} />,
       sortable: false
     },
     {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
+      Cell: ({ original }) => {
+        if (!original?.pcrBatchItem?.cellNumber) return <></>;
+
+        return <>{original.pcrBatchItem.cellNumber}</>;
+      },
       Header: <FieldHeader name={"tubeNumber"} />,
       sortable: false
     },
     {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
-          {data?.attributes?.materialSample.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
+      Cell: ({ original }) => (
+        <a
+          href={`/seqdb/pcr-batch-item/view?id=${original?.materialSample?.id}`}
+        >
+          {original?.materialSample?.materialSampleName ||
+            original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            original?.materialSample?.id}
         </a>
       ),
       Header: <FieldHeader name={"materialSampleName"} />,
       sortable: false
     },
     {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.organism}
+      Cell: ({ original }) => (
+        <a
+          href={`/collection/material-sample/view?id=${original?.determination?.id}`}
+        >
+          {original?.determination}
         </a>
       ),
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
     },
     {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/seqdb/pcr-batch-item/view?id=${id}`}>
-          {data?.attributes?.result}
-        </a>
-      ),
+      Cell: ({ original }) => {
+        return inEditMode ? (
+          <>edit mode</>
+        ) : (
+          <>{original?.pcrBatchItem?.result ?? "No Band"}</>
+        );
+      },
       Header: <FieldHeader name={"result"} />,
       sortable: false
     }
   ];
 
-  async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
+  async function onSavedInternal(resource) {
+    setPerformSave(true);
     setEditMode(false);
   }
 
-  const buttonBar = (
-    <>
-      <SubmitButton
-        className="hidden"
-        performSave={performSave}
-        setPerformSave={setPerformSave}
-      />
-    </>
-  );
+  // Wait until the PcrBatchItems have been loaded in before displaying the table.
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
 
   return (
-    <ReactTable<PcrBatchItemReactionStep>
-      columns={PCR_REACTION_COLUMN}
-      defaultSorted={[{ id: "date", desc: true }]}
-      data={selectedResources}
-      minRows={1}
-      showPagination={false}
-      sortable={false}
-    />
+    <DinaForm<Partial<PcrBatchItem>>
+      initialValues={{}}
+      onSubmit={onSavedInternal}
+    >
+      <ReactTable<PcrBatchItemReactionStep>
+        columns={PCR_REACTION_COLUMN(editMode)}
+        defaultSorted={[{ id: "date", desc: true }]}
+        data={selectedResources}
+        minRows={1}
+        showPagination={false}
+        sortable={false}
+      />
+    </DinaForm>
   );
 }
