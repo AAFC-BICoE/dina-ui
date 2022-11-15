@@ -11,11 +11,11 @@ import {
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
 
-interface PcrBatchItemReactionStep {
-  pcrBatchItem: PcrBatchItem;
-  materialSample?: MaterialSample;
-  determination?: Determination;
-}
+// interface PcrBatchItemReactionStep {
+// pcrBatchItem: PcrBatchItem;
+// materialSample?: MaterialSample;
+// determination?: Determination;
+// }
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -37,17 +37,23 @@ export function SangerPcrReactionStep({
   const { apiClient, bulkGet } = useApiClient();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
+    []
+  );
+  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
+  const [determination, setDetermination] = useState<Determination>();
 
-  const [selectedResources, setSelectedResources] = useState<
-    PcrBatchItemReactionStep[]
-  >([{ pcrBatchItem: { type: "pcr-batch-item" } }]);
+  // const [selectedResources, setSelectedResources] = useState<
+  //   PcrBatchItemReactionStep[]
+  // >([]);
 
   useEffect(() => {
     fetchPcrBatchItems();
   }, []);
 
   useEffect(() => {
-    fetchMaterialSamples();
+    // fetchMaterialSamples();
+    fetchPcrBatchItems();
   }, [selectedResources]);
 
   async function fetchPcrBatchItems() {
@@ -70,6 +76,7 @@ export function SangerPcrReactionStep({
             (item) => item?.materialSample?.id !== undefined
           );
 
+        setSelectedResources(pcrBatchItems);
         // setSelectedResources(
         //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
         //     pcrBatchItem: item as any,
@@ -80,78 +87,70 @@ export function SangerPcrReactionStep({
       });
   }
 
-  async function fetchMaterialSamples() {
-    if (!selectedResources) return;
+  // async function fetchMaterialSamples() {
+  //   if (!selectedResources) return;
 
-    await bulkGet<MaterialSample>(
-      selectedResources.map(
-        (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
-      ),
-      { apiBaseUrl: "/collection-api" }
-    ).then((response) => {
-      // const materialSamplesTransformed = compact(response).map((resource) => ({
-      //   data: {
-      //     attributes: pick(resource, ["materialSampleName"])
-      //   },
-      //   id: resource.id,
-      //   type: resource.type
-      // }));
-      // console.log("got here: " + JSON.stringify(response));
-      // setSelectedResources(materialSamplesTransformed ?? []);
-    });
-  }
+  //   await bulkGet<MaterialSample>(
+  //     selectedResources.map(
+  //       (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
+  //     ),
+  //     { apiBaseUrl: "/collection-api" }
+  //   ).then((response) => {
+  //     // const materialSamplesTransformed = compact(response).map((resource) => ({
+  //     //   data: {
+  //     //     attributes: pick(resource, ["materialSampleName"])
+  //     //   },
+  //     //   id: resource.id,
+  //     //   type: resource.type
+  //     // }));
+  //     // console.log("got here: " + JSON.stringify(response));
+  //     // setSelectedResources(materialSamplesTransformed ?? []);
+  //   });
+  // }
 
-  const PCR_REACTION_COLUMN: (
-    inEditMode: boolean
-  ) => Column<PcrBatchItemReactionStep>[] = (inEditMode) => [
+  const PCR_REACTION_COLUMN: (inEditMode: boolean) => Column<PcrBatchItem>[] = (
+    inEditMode
+  ) => [
     {
       Cell: ({ original }) => {
-        if (
-          !original?.pcrBatchItem?.wellRow ||
-          !original?.pcrBatchItem?.wellColumn
-        )
-          return <></>;
+        if (!original?.wellRow || !original?.wellColumn) return <></>;
 
-        return (
-          <>
-            {original.pcrBatchItem.wellRow +
-              "" +
-              original.pcrBatchItem.wellColumn}
-          </>
-        );
+        return <>{original.wellRow + "" + original.wellColumn}</>;
       },
       Header: <FieldHeader name={"wellCoordinates"} />,
       sortable: false
     },
     {
       Cell: ({ original }) => {
-        if (!original?.pcrBatchItem?.cellNumber) return <></>;
+        if (!original?.cellNumber) return <></>;
 
-        return <>{original.pcrBatchItem.cellNumber}</>;
+        return <>{original.cellNumber}</>;
       },
       Header: <FieldHeader name={"tubeNumber"} />,
       sortable: false
     },
     {
       Cell: ({ original }) => (
-        <a
-          href={`/seqdb/pcr-batch-item/view?id=${original?.materialSample?.id}`}
-        >
-          {original?.materialSample?.materialSampleName ||
-            original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            original?.materialSample?.id}
-        </a>
+        // <a
+        //   href={`/seqdb/pcr-batch-item/view?id=${original?.materialSample?.id}`}
+        // >
+        //   {original?.materialSampleName ||
+        //     original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+        //     original?.materialSample?.id}
+        // </a>
+        <></>
       ),
       Header: <FieldHeader name={"materialSampleName"} />,
       sortable: false
     },
     {
       Cell: ({ original }) => (
-        <a
-          href={`/collection/material-sample/view?id=${original?.determination?.id}`}
-        >
-          {original?.determination}
-        </a>
+        // <a
+        //   href={`/collection/material-sample/view?id=${original?.determination?.id}`}
+        // >
+        //   {original?.determination}
+        // </a>
+        <></>
       ),
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
@@ -161,7 +160,7 @@ export function SangerPcrReactionStep({
         return inEditMode ? (
           <>edit mode</>
         ) : (
-          <>{original?.pcrBatchItem?.result ?? "No Band"}</>
+          <>{original?.result ?? "No Band"}</>
         );
       },
       Header: <FieldHeader name={"result"} />,
@@ -184,7 +183,7 @@ export function SangerPcrReactionStep({
       initialValues={{}}
       onSubmit={onSavedInternal}
     >
-      <ReactTable<PcrBatchItemReactionStep>
+      <ReactTable<PcrBatchItem>
         columns={PCR_REACTION_COLUMN(editMode)}
         defaultSorted={[{ id: "date", desc: true }]}
         data={selectedResources}
