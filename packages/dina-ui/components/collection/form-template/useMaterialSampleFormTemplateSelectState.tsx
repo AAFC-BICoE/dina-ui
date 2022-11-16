@@ -17,7 +17,7 @@ import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
 import { useRouter } from "next/router";
 
-const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
+export const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
 /**
  * Manages the state of a MaterialSampleForm Form Template selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
