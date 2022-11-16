@@ -270,6 +270,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             entityLink="/collection/material-sample"
             byPassView={true}
             className="me-auto"
+            reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
           <Link
@@ -294,7 +295,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             className="ms-5"
             id={id}
             options={{ apiBaseUrl: "/collection-api" }}
-            postDeleteRedirect="/collection/material-sample/list"
+            postDeleteRedirect="/collection/material-sample/list?reloadLastSearch"
             type="material-sample"
           />
         </ButtonBar>

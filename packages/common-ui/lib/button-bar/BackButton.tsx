@@ -14,6 +14,9 @@ interface BackButtonProps {
 
   className?: string;
   buttonMsg?: string;
+
+  /** If going back to a query page, enable to to reload the last performed query. */
+  reloadLastSearch?: boolean;
 }
 
 /**
@@ -24,14 +27,21 @@ export function BackButton({
   entityLink,
   byPassView,
   className,
-  buttonMsg
+  buttonMsg,
+  reloadLastSearch
 }: BackButtonProps) {
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
   // When placed in view page, will accept url to navigate to
   const { href, message } =
     byPassView || !entityId
-      ? { href: `${entityLink}/list`, message: "backToList" as const }
+      ? {
+          href:
+            entityLink +
+            "/list" +
+            (reloadLastSearch ? "?reloadLastSearch" : ""),
+          message: "backToList" as const
+        }
       : {
           href: `${entityLink}/view?id=${entityId}`,
           message: "backToReadOnlyPage" as const
@@ -39,7 +49,7 @@ export function BackButton({
 
   return (
     <Link href={href}>
-      <a className={`my-auto ${className}`}>
+      <a className={`back-button my-auto ${className ? className : ""}`}>
         <CommonMessage id={(buttonMsg as any) ?? message} />
       </a>
     </Link>

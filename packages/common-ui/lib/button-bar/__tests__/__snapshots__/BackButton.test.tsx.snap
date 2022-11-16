@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BackButton Back to entity button 1`] = `"<div><a class=\\"back-button my-auto \\" href=\\"/collection/material-sample/view?id=108559ed-e000-49c4-95e0-03dee7bfce9b\\">Back to read-only page</a></div>"`;
+
+exports[`BackButton Back to entity button 2`] = `"<div><a class=\\"back-button my-auto class-name-test\\" href=\\"/collection/material-sample/view?id=108559ed-e000-49c4-95e0-03dee7bfce9b\\">Back to read-only page</a></div>"`;
+
+exports[`BackButton Back to list button 1`] = `"<div><a class=\\"back-button my-auto \\" href=\\"/collection/material-sample/list?reloadLastSearch\\">Back to list page</a></div>"`;
+
+exports[`BackButton Back to list button 2`] = `"<div><a class=\\"back-button my-auto \\" href=\\"/collection/material-sample/list\\">Back to list page</a></div>"`;
+
+exports[`BackButton Back to list button 3`] = `"<div><a class=\\"back-button my-auto \\" href=\\"/collection/material-sample/list?reloadLastSearch\\">Back to list page</a></div>"`;
