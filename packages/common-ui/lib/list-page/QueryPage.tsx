@@ -1,15 +1,11 @@
-import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule, Column } from "react-table";
+import ReactTable, { TableProps, SortingRule } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
-import {
-  defaultQueryTree,
-  emptyQueryTree,
-  QueryBuilderMemo
-} from "./query-builder/QueryBuilder";
+import { emptyQueryTree, QueryBuilderMemo } from "./query-builder/QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import {
@@ -23,14 +19,11 @@ import {
   useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
 import { v4 as uuidv4 } from "uuid";
-import { SavedSearch } from "./saved-searches/SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep, toPairs, uniqBy } from "lodash";
+import { toPairs, uniqBy } from "lodash";
 import { FormikButton, useAccount } from "..";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
-import { UserPreference } from "../../../dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
@@ -322,10 +315,6 @@ export function QueryPage<TData extends KitsuResource>({
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
-      } else {
-        const newTree = defaultQueryTree(queryBuilderConfig);
-        setQueryBuilderTree(newTree);
-        setSubmittedQueryBuilderTree(newTree);
       }
     }
   }, [queryBuilderConfig]);
@@ -561,10 +550,10 @@ export function QueryPage<TData extends KitsuResource>({
    * On search filter submit. This will also update the pagination to go back to the first page on
    * a new search.
    */
-  const onSubmit = useCallback(() => {
+  const onSubmit = () => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-  }, [queryBuilderTree]);
+  };
 
   /**
    * When the group filter has changed, store the new value for the search.
