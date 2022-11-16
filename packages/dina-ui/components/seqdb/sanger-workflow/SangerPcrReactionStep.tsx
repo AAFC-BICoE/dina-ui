@@ -14,7 +14,11 @@ import {
   Operation
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
-import { MaterialSample, Determination } from "../../../types/collection-api";
+import {
+  MaterialSample,
+  Determination,
+  Organism
+} from "../../../types/collection-api";
 import { FormikProps } from "formik";
 
 export interface SangerPcrReactionProps {
@@ -49,12 +53,13 @@ export function SangerPcrReactionStep({
 
   useEffect(() => {
     fetchPcrBatchItems();
+    fetchDetermination();
   }, []);
 
-  useEffect(() => {
-    // fetchMaterialSamples();
-    // fetchPcrBatchItems();
-  }, [selectedResources]);
+  // useEffect(() => {
+  // fetchMaterialSamples();
+  // fetchPcrBatchItems();
+  // }, [selectedResources]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -62,6 +67,30 @@ export function SangerPcrReactionStep({
       performSaveInternal();
     }
   }, [performSave]);
+
+  async function fetchDetermination() {
+    await apiClient
+      .get<MaterialSample[]>("/collection-api/material-sample", {
+        filter: filterBy([], {
+          extraFilters: [
+            {
+              selector: "pcrBatch.uuid",
+              comparison: "==",
+              arguments: pcrBatchId
+            }
+          ]
+        })("")
+      })
+      .then((response) => {
+        // console.log(response);
+        // console.log("j");
+        // const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+        //   response.data?.filter(
+        //     (item) => item?.materialSample?.id !== undefined
+        //   );
+        // setSelectedResources(response?.data);
+      });
+  }
 
   async function fetchPcrBatchItems() {
     await apiClient
@@ -173,14 +202,13 @@ export function SangerPcrReactionStep({
     },
     {
       Cell: ({ original }) => (
-        // <a
-        //   href={`/seqdb/pcr-batch-item/view?id=${original?.materialSample?.id}`}
-        // >
-        //   {original?.materialSampleName ||
-        //     original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-        //     original?.materialSample?.id}
-        // </a>
-        <></>
+        <a
+          href={`/collection/material-sample/view?id=${original?.materialSample?.id}`}
+        >
+          {original?.materialSample?.attributes?.materialSampleName ||
+            original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            original?.materialSample?.id}
+        </a>
       ),
       Header: <FieldHeader name={"materialSampleName"} />,
       sortable: false
