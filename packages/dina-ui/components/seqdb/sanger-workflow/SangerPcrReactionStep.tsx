@@ -1,6 +1,6 @@
 import {
   PcrBatchItem,
-  PCR_BATCH_ITEM_RESULT_INFO
+  PcrBatchItemDropdownResults
 } from "../../../types/seqdb-api";
 import { useState, useEffect, useRef, Ref } from "react";
 import {
@@ -11,11 +11,13 @@ import {
   LoadingSpinner,
   SelectField,
   SelectOption,
-  Operation
+  Operation,
+  AutoSuggestTextField
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
 import { MaterialSample, Determination } from "../../../types/collection-api";
 import { FormikProps } from "formik";
+import { sortBy } from "lodash";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -48,8 +50,9 @@ export function SangerPcrReactionStep({
   // >([]);
 
   useEffect(() => {
+    setLoading(true);
     fetchPcrBatchItems();
-  }, []);
+  }, [editMode]);
 
   useEffect(() => {
     // fetchMaterialSamples();
@@ -198,15 +201,41 @@ export function SangerPcrReactionStep({
       sortable: false
     },
     {
-      Cell: ({ original }) => (
-        <SelectField
-          name={"results[" + original?.id + "]"}
-          hideLabel={true}
-          options={PCR_BATCH_ITEM_RESULT_INFO.map<
-            SelectOption<string | undefined>
-          >((option) => ({ label: option.option, value: option.option }))}
-        />
-      ),
+      Cell: ({ original }) => {
+        return editMode ? (
+          <div>
+            <AutoSuggestTextField
+              name={"results[" + original?.id + "]"}
+              hideLabel={true}
+              removeBottomMargin={true}
+              customOptions={(searchTerm, _) => {
+                return Object.values(PcrBatchItemDropdownResults).filter(
+                  (resultString) =>
+                    searchTerm
+                      ? resultString
+                          .toLowerCase()
+                          .startsWith(searchTerm.toLowerCase())
+                      : true
+                );
+              }}
+              blankSearchBackend={"json-api"}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              backgroundColor:
+                "#" +
+                // getResultTypeByName(original?.result ?? undefined)?.color ??
+                "FFFFFF",
+              borderRadius: "5px",
+              paddingLeft: "5px"
+            }}
+          >
+            {original?.result ?? ""}
+          </div>
+        );
+      },
       Header: <FieldHeader name={"result"} />,
       sortable: false
     }
@@ -231,13 +260,12 @@ export function SangerPcrReactionStep({
       readOnly={!editMode}
     >
       <ReactTable<PcrBatchItem>
+        className="react-table-overflow"
         columns={PCR_REACTION_COLUMN}
-        defaultSorted={[{ id: "tubeNumber", desc: true }]}
-        data={selectedResources}
+        data={sortBy(selectedResources, "cellNumber")}
         minRows={1}
         showPagination={false}
         sortable={false}
-        style={{ overflow: "visible" }}
       />
     </DinaForm>
   );
