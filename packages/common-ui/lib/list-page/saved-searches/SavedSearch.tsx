@@ -15,7 +15,7 @@ import { SavedSearchStructure, SingleSavedSearch } from "./types";
 import { map, cloneDeep } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
-import { useLastSavedSearch } from "./useLastSavedSearch";
+import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 
 export interface SavedSearchProps {
   /**

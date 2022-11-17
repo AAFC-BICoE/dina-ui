@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
+import { useBackButtonReloadLastSearch } from "../list-page/reload-last-search/useBackButtonReloadLastSearch";
 
 interface BackButtonProps {
   /** If the id is set, it will return to the view. If it's not, it will return to the list. */
@@ -30,6 +31,9 @@ export function BackButton({
   buttonMsg,
   reloadLastSearch
 }: BackButtonProps) {
+  // If reload last search is activated, intercept the back button of the browser to inject the param.
+  useBackButtonReloadLastSearch(!reloadLastSearch);
+
   // When editing an existing entity, the link points to the entity details page.
   // When editing a new entity, the link points to the list page.
   // When placed in view page, will accept url to navigate to

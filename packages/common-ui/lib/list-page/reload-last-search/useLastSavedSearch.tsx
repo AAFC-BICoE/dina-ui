@@ -60,9 +60,7 @@ export function useLastSavedSearch({
 
   // Once the query builder tree has been loaded in, perform a submit.
   useEffect(() => {
-    if (loadLastUsed && queryLoaded) {
-      performSubmit();
-    }
+    performSubmit();
   }, [queryLoaded]);
 
   // Every time the tree has been changed, save it to local storage.
