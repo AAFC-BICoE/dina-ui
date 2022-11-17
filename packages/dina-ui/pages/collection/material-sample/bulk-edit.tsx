@@ -35,7 +35,7 @@ export default function MaterialSampleBulkEditPage() {
   ) {
     writeStorage(
       BULK_EDIT_RESULT_IDS_KEY,
-      samples.map(it => it.id)
+      samples.map((it) => it.id)
     );
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
@@ -54,7 +54,7 @@ export default function MaterialSampleBulkEditPage() {
             ids={ids ?? []}
             onSaved={moveToResultPage}
             onPreviousClick={() =>
-              router.push("/collection/material-sample/list")
+              router.push("/collection/material-sample/list?reloadLastSearch")
             }
           />
         )}
