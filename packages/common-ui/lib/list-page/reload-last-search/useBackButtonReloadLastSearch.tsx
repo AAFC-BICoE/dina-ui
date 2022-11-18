@@ -21,6 +21,8 @@ export function useBackButtonReloadLastSearch(disabled: boolean) {
   const router = useRouter();
 
   useEffect(() => {
+    if (disabled) return;
+
     router.beforePopState(({ as }) => {
       return backButtonAddReloadLastSearchParam(
         router,

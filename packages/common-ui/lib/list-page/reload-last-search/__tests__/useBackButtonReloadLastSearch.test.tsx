@@ -1,4 +1,3 @@
-import { Router, useRouter } from "next/router";
 import { backButtonAddReloadLastSearchParam } from "../useBackButtonReloadLastSearch";
 
 const mockPush = jest.fn();
