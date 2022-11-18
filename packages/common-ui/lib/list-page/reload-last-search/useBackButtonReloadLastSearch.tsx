@@ -71,8 +71,6 @@ export function backButtonAddReloadLastSearchParam(
         return false;
       }
     }
-
-    // Add the url param to the end.
   }
   return true;
 }
