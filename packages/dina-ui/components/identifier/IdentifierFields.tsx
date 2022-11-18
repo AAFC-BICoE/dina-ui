@@ -12,14 +12,12 @@ import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { IdentifierRow } from "./IdentifierRow";
 
 export interface IdentifierFieldsProps {
-  typeOptions: SelectOption<string | undefined>[];
   divClassName?: string;
   fieldClassName?: string;
   width?: string;
 }
 
 export function IdentifierFields({
-  typeOptions,
   width,
   divClassName,
   fieldClassName
@@ -45,7 +43,7 @@ export function IdentifierFields({
               function removeIdentifier(index: number) {
                 remove(index);
                 // Stay on the current tab number, or reduce if removeing the last element:
-                setActiveTabIdx(current =>
+                setActiveTabIdx((current) =>
                   clamp(current, 0, identifiers.length - 2)
                 );
               }
@@ -68,10 +66,7 @@ export function IdentifierFields({
                     }
                     {identifiers.map((_, index) => (
                       <TabPanel key={index}>
-                        <IdentifierRow
-                          index={index}
-                          typeOptions={typeOptions}
-                        />
+                        <IdentifierRow index={index} />
                         {!readOnly && (
                           <div className="list-inline mb-3">
                             <FormikButton

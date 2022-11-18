@@ -1,14 +1,14 @@
-import { TextField, SelectField, SelectOption } from "common-ui";
+import { TextField } from "common-ui";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { Fragment } from "react";
 import Link from "next/link";
+import { VocabularySelectField } from "../collection/VocabularySelectField";
 
 export interface IdentifierRowProps {
   index: number;
-  typeOptions: SelectOption<string | undefined>[];
 }
 
-export function IdentifierRow({ index, typeOptions }: IdentifierRowProps) {
+export function IdentifierRow({ index }: IdentifierRowProps) {
   const identifiersPath = "identifiers";
   const identifierPath = `${identifiersPath}[${index}]`;
   const commonRoot = identifierPath + ".";
@@ -17,9 +17,9 @@ export function IdentifierRow({ index, typeOptions }: IdentifierRowProps) {
 
   return (
     <>
-      <SelectField
+      <VocabularySelectField
         name={commonRoot + "type"}
-        options={typeOptions as any}
+        path="agent-api/vocabulary/identifiers"
         label={formatMessage("identifierType")}
       />
       <TextField
