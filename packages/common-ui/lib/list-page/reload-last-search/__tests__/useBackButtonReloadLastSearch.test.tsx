@@ -56,7 +56,7 @@ describe("useBackButtonReloadLastSearch", () => {
     );
 
     expect(performNormalBack).toEqual(true);
-    expect(mockPush).toBeCalledWith(MATERIAL_SAMPLE_VIEW);
+    expect(mockPush).toBeCalledTimes(0);
   });
 
   it("Disabled prop is activated, do not append anything to the URL", async () => {
