@@ -22,6 +22,7 @@ import {
 } from "../../../types/collection-api";
 import { FormikProps } from "formik";
 import { sortBy } from "lodash";
+import { pick, compact, uniq } from "lodash";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -57,6 +58,7 @@ export function SangerPcrReactionStep({
     setLoading(true);
     fetchPcrBatchItems();
     fetchDetermination();
+    fetchMaterialSamples();
   }, [editMode]);
 
   // useEffect(() => {
@@ -127,26 +129,31 @@ export function SangerPcrReactionStep({
       });
   }
 
-  // async function fetchMaterialSamples() {
-  //   if (!selectedResources) return;
+  async function fetchMaterialSamples() {
+    //   if (!selectedResources) return;
 
-  //   await bulkGet<MaterialSample>(
-  //     selectedResources.map(
-  //       (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
-  //     ),
-  //     { apiBaseUrl: "/collection-api" }
-  //   ).then((response) => {
-  //     // const materialSamplesTransformed = compact(response).map((resource) => ({
-  //     //   data: {
-  //     //     attributes: pick(resource, ["materialSampleName"])
-  //     //   },
-  //     //   id: resource.id,
-  //     //   type: resource.type
-  //     // }));
-  //     // console.log("got here: " + JSON.stringify(response));
-  //     // setSelectedResources(materialSamplesTransformed ?? []);
-  //   });
-  // }
+    await bulkGet<MaterialSample>(
+      selectedResources.map(
+        (item) => "/material-sample/" + item?.materialSample?.id
+      ),
+      { apiBaseUrl: "/collection-api" }
+    ).then((response) => {
+      const materialSamplesTransformed = compact(response).map((resource) => ({
+        data: {
+          attributes: pick(resource, ["materialSampleName"])
+        },
+        id: resource.id,
+        type: resource.type
+      }));
+
+      // If there is nothing stored yet, automatically go to edit mode.
+      // if (materialSamplesTransformed.length === 0) {
+      //   setEditMode(true);
+      // }
+
+      setMaterialSamples(materialSamplesTransformed ?? []);
+    });
+  }
 
   async function performSaveInternal() {
     if (formRef && (formRef as any)?.current?.values?.results) {
@@ -204,17 +211,33 @@ export function SangerPcrReactionStep({
       sortable: false
     },
     {
-      Cell: ({ original }) => (
-        <a
-          href={`/collection/material-sample/view?id=${original?.materialSample?.id}`}
-        >
-          {original?.materialSample?.attributes?.materialSampleName ||
-            original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            original?.materialSample?.id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
+      // Cell: ({ original }) => (
+      //   <a
+      //     href={`/collection/material-sample/view?id=${original?.materialSample?.id}`}
+      //   >
+      //     {original?.materialSample?.attributes?.materialSampleName ||
+      //       original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+      //       original?.materialSample?.id}
+      //   </a>
+      // ),
+      // Header: <FieldHeader name={"materialSampleName"} />,
+      // sortable: false
+      Cell: ({ original }) => {
+        const materialSample = materialSamples.find(
+          (item) => item.id === original.materialSample.id
+        );
+        // console.log(materialSample);
+        return <>{materialSample?.materialSampleName}</>;
+      }
+      // Cell: ({ original: { id, data } }) => (
+      //   <a href={`/seqdb/pcr-batch-item/view?id=${data?.materialSample?.id}`}>
+      //     {data?.attributes?.materialSampleName ||
+      //       data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+      //       id}
+      //   </a>
+      // ),
+      // Header: <FieldHeader name={"materialSampleName"} />,
+      // sortable: false
     },
     {
       Cell: ({ original }) => (
