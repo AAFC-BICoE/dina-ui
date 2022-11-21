@@ -140,7 +140,6 @@ export function TransactionForm({
       relationships: any;
     } = {
       ...submittedValues,
-
       // Convert the attachments to a 'relationships' array so it works with JSONAPI:
       attachment: undefined,
       materialSamples: undefined,
@@ -153,14 +152,14 @@ export function TransactionForm({
             }))
           }
         }),
-        ...(selectedResources.length > 0 && {
+        ...{
           materialSamples: {
             data: selectedResources.map((it) => ({
               id: it.id,
               type: "material-sample"
             }))
           }
-        })
+        }
       },
 
       // Convert the Agent objects to UUIDs for submission to the back-end:
