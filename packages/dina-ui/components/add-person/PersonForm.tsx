@@ -19,17 +19,7 @@ import { Organization } from "../../../dina-ui/types/agent-api/resources/Organiz
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
-import {
-  cloneDeep,
-  compact,
-  isEmpty,
-  isEqual,
-  mapKeys,
-  pick,
-  pickBy,
-  range,
-  find
-} from "lodash";
+import { mapKeys, pick } from "lodash";
 
 interface PersonFormProps {
   person?: Person;
@@ -50,17 +40,11 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   async function saveIdentifiers(
     submitted: InputResource<Person>
   ): Promise<PersistedResource<Identifier>[]> {
-    const preparedIdentifiers: Identifier[] = submitted.identifiers
-      ? submitted.identifiers?.map((identifier) => {
-          return identifier;
-        })
-      : [];
-    const identifierSaveArgs: SaveArgs<Identifier>[] = preparedIdentifiers.map(
-      (resource) => ({
+    const identifierSaveArgs: SaveArgs<Identifier>[] | undefined =
+      submitted.identifiers?.map((resource) => ({
         resource,
         type: "identifier"
-      })
-    );
+      }));
 
     // createOperations = newIdentifiers.map<Operation>((identifier) => ({
     //   op: "POST",
@@ -80,7 +64,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
     try {
       // Don't call the API with an empty Save array:
-      if (!identifierSaveArgs.length) {
+      if (!identifierSaveArgs) {
         return [];
       }
       const savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
@@ -147,7 +131,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         apiBaseUrl: "/agent-api"
       }
     );
-
     await onSubmitSuccess?.(savedPerson);
   };
 
