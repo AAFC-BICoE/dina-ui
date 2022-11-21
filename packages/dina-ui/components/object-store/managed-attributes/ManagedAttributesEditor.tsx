@@ -8,7 +8,8 @@ import {
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { castArray, compact, get, find } from "lodash";
+import { castArray, compact, get } from "lodash";
+import { getFormTemplateSection } from "common-ui/lib/form-template/formTemplateUtils";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ManagedAttribute } from "../../../types/objectstore-api";
@@ -76,25 +77,19 @@ export function ManagedAttributesEditor({
   // When the form template has changed, then the visible managed attributes need to be
   // changed.
   useEffect(() => {
-    if (!formTemplate || !componentName || !sectionName) return;
+    const sectionFound = getFormTemplateSection(
+      formTemplate,
+      componentName,
+      sectionName
+    );
 
-    // First find the component we are looking for.
-    const componentFound = find(formTemplate?.components, {
-      name: componentName
-    });
-    if (componentFound) {
-      // Next find the right section.
-      const sectionFound = find(componentFound?.sections, {
-        name: sectionName
-      });
-      if (sectionFound) {
-        // Now, get a list of all of the managed attributes to be displayed.
-        setVisibleAttributeKeys(
-          sectionFound.items
-            ?.filter((item) => item.visible)
-            ?.map<string>((item) => item?.name ?? "") ?? []
-        );
-      }
+    if (sectionFound) {
+      // Now, get a list of all of the managed attributes to be displayed.
+      setVisibleAttributeKeys(
+        sectionFound.items
+          ?.filter((item) => item.visible)
+          ?.map<string>((item) => item?.name ?? "") ?? []
+      );
     }
   }, [formTemplate]);
 

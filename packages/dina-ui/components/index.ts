@@ -36,8 +36,6 @@ export * from "./collection/material-sample/SetDefaultSampleName";
 export * from "./collection/material-sample/useDuplicateSampleNameDetection";
 export * from "./collection/material-sample/useLastUsedCollection";
 export * from "./collection/material-sample/useMaterialSample";
-export * from "./collection/form-template/materialSampleFormViewConfigSchema";
-export * from "./collection/form-template/useMaterialSampleFormTemplateProps";
 export * from "./collection/form-template/useMaterialSampleFormTemplateSelectState";
 export * from "./collection/form-template/MaterialSampleFormTemplateSelect";
 export * from "./collection/MaterialSampleStateWarning";

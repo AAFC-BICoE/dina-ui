@@ -1,0 +1,54 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Form Template Utils getFormTemplateComponent helper function If the component does exist, the component properties should be returned 1`] = `
+Object {
+  "name": "component1",
+  "order": 0,
+  "sections": Array [
+    Object {
+      "gridPositionX": 0,
+      "gridPositionY": 0,
+      "items": Array [
+        Object {
+          "defaultValue": "defaultValue1",
+          "gridPositionX": 0,
+          "gridPositionY": 0,
+          "name": "field1",
+          "visible": true,
+        },
+      ],
+      "name": "section1",
+      "visible": true,
+    },
+  ],
+  "visible": true,
+}
+`;
+
+exports[`Form Template Utils getFormTemplateField helper function If the field does exist, the field properties should be returned 1`] = `
+Object {
+  "defaultValue": "defaultValue1",
+  "gridPositionX": 0,
+  "gridPositionY": 0,
+  "name": "field1",
+  "visible": true,
+}
+`;
+
+exports[`Form Template Utils getFormTemplateSection helper function If the section does exist, the section properties should be returned 1`] = `
+Object {
+  "gridPositionX": 0,
+  "gridPositionY": 0,
+  "items": Array [
+    Object {
+      "defaultValue": "defaultValue1",
+      "gridPositionX": 0,
+      "gridPositionY": 0,
+      "name": "field1",
+      "visible": true,
+    },
+  ],
+  "name": "section1",
+  "visible": true,
+}
+`;

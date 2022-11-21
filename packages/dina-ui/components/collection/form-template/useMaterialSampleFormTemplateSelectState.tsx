@@ -1,17 +1,7 @@
 import { PersistedResource } from "kitsu";
-import { useEffect, useMemo, useState } from "react";
-import {
-  ACQUISITION_EVENT_COMPONENT_NAME,
-  COLLECTING_EVENT_COMPONENT_NAME,
-  FormTemplate
-} from "../../../types/collection-api";
-import {
-  getMaterialSampleComponentValues,
-  getComponentValues,
-  getComponentOrderFromTemplate
-} from "../../form-template/formTemplateUtils";
-import { materialSampleFormTemplateSchema } from "./materialSampleFormViewConfigSchema";
-import { useMaterialSampleFormTemplateProps } from "./useMaterialSampleFormTemplateProps";
+import { useEffect, useState } from "react";
+import { FormTemplate } from "../../../types/collection-api";
+import { getComponentOrderFromTemplate } from "../../form-template/formTemplateUtils";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useApiClient } from "../../../../common-ui/lib";
 import { useRouter } from "next/router";
@@ -69,88 +59,10 @@ export function useMaterialSampleFormTemplateSelectState() {
       });
   }
 
-  // Get initial values of data components
-  const materialSampleComponent =
-    getMaterialSampleComponentValues(sampleFormTemplate);
-  if (!materialSampleComponent.associations?.length) {
-    materialSampleComponent.associations = [];
-  }
-
-  // collecting event and acquisition components need to be isolated for useMaterialSample hook
-  const collectingEventComponent = getComponentValues(
-    COLLECTING_EVENT_COMPONENT_NAME,
-    sampleFormTemplate
-  );
-  const acquisitionEventComponent = getComponentValues(
-    ACQUISITION_EVENT_COMPONENT_NAME,
-    sampleFormTemplate
-  );
-  const hasAcquisitionEvent =
-    Object.keys(acquisitionEventComponent.templateCheckboxes).length > 0
-      ? true
-      : false;
-  const hasCollectingEvent =
-    Object.keys(collectingEventComponent.templateCheckboxes).length > 0
-      ? true
-      : false;
-
-  // Re-using viewConfiguration object structure for now
-  const materialSampleFormTemplate = {
-    formTemplate: {
-      COLLECTING_EVENT: hasCollectingEvent
-        ? getFormTemplateSchema(collectingEventComponent)
-        : undefined,
-      MATERIAL_SAMPLE: getFormTemplateSchema(materialSampleComponent),
-      ACQUISITION_EVENT: hasAcquisitionEvent
-        ? getFormTemplateSchema(acquisitionEventComponent)
-        : undefined
-    },
-    type: "material-sample-form-template"
-  };
-
-  const formTemplateConfig = useMemo(
-    () =>
-      sampleFormTemplate?.id
-        ? materialSampleFormTemplateSchema.parse(materialSampleFormTemplate)
-        : undefined,
-    [sampleFormTemplate]
-  );
-
-  // Call the custom view hook but don't use the "initialValues" fields
-  // because we're not creating a sample from a template:
-  const {
-    materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
-  }: {
-    materialSampleInitialValues: any;
-    collectingEventInitialValues?: any;
-    acquisitionEventInitialValues?: any;
-  } = useMaterialSampleFormTemplateProps(formTemplateConfig) ?? {};
-
   return {
     sampleFormTemplate,
     setSampleFormTemplateUUID,
     navOrder,
-    setNavOrder,
-    materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
+    setNavOrder
   };
-}
-function getFormTemplateSchema(component: any) {
-  component.templateFields = {};
-  const schema: any = {
-    allowExisting: false,
-    allowNew: false,
-    templateFields: {}
-  };
-
-  Object.keys(component).forEach((key) => {
-    schema.templateFields[key] = {
-      defaultValue: component[key],
-      enabled: true
-    };
-  });
-  return schema;
 }

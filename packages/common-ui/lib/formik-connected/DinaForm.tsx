@@ -46,6 +46,16 @@ export interface DinaFormContextI {
   isTemplate?: boolean;
 
   /**
+   * Is the form being used in a bulk editing setup or is it an individual edit.
+   */
+  isBulkEdit?: boolean | undefined;
+
+  /**
+   * If the form editing an existing record, or is it creating a new record.
+   */
+  isExistingRecord?: boolean | undefined;
+
+  /**
    * Form template with all restrictions to place on the form.
    */
   formTemplate?: FormTemplate;

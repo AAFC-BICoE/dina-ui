@@ -1,4 +1,5 @@
 import {
+  BulkEditContext,
   BulkEditTabContextI,
   ButtonBar,
   DinaForm,
@@ -91,7 +92,7 @@ export function MaterialSampleBulkEditor({
   });
 
   return (
-    <div>
+    <BulkEditContext.Provider value={true}>
       <DinaForm initialValues={{}}>
         <ButtonBar className="gap-4">
           {onPreviousClick && (
@@ -151,7 +152,7 @@ export function MaterialSampleBulkEditor({
           )}
         />
       )}
-    </div>
+    </BulkEditContext.Provider>
   );
 }
 
@@ -169,10 +170,7 @@ export function initializeRefHookFormProps(
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
     | undefined,
-  formTemplate: FormTemplate | undefined,
-  materialSampleInitialValues,
-  collectingEventInitialValues,
-  acquisitionEventInitialValues
+  formTemplate: FormTemplate | undefined
 ) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
@@ -189,12 +187,8 @@ export function initializeRefHookFormProps(
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
   // don't use form template's materialSampleName default value for bulk edit
-  delete materialSampleInitialValues?.materialSampleName;
   const bulkEditSampleHook = useMaterialSampleSave({
     ...formTemplateProps,
-    materialSample: materialSampleInitialValues ?? initialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues,
     showChangedIndicatorsInNestedForms: true
   });
 

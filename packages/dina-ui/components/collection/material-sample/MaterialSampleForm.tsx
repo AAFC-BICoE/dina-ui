@@ -456,6 +456,7 @@ export function MaterialSampleForm({
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
+      isExistingRecord={!!initialValues.id}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}

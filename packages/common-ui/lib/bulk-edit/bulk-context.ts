@@ -31,3 +31,14 @@ export const BulkEditTabContext = createContext<BulkEditTabContextI | null>(
 export function useBulkEditTabContext() {
   return useContext(BulkEditTabContext);
 }
+
+export const BulkEditContext = createContext(false);
+
+/**
+ * Used to indicate to the form if this form is in a bulk edit.
+ *
+ * This applies to the "Edit All" and all of the individual forms.
+ */
+export function useBulkEditContext() {
+  return useContext(BulkEditContext);
+}

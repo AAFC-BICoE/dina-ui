@@ -1,11 +1,16 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray, find } from "lodash";
-import { PropsWithChildren, ReactNode, useMemo } from "react";
+import { isArray } from "lodash";
+import { PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
-import { FieldSpyRenderProps } from "..";
+import {
+  FieldSpyRenderProps,
+  useBulkEditContext,
+  useBulkEditTabContext
+} from "..";
 import { useBulkEditTabFieldIndicators } from "../bulk-edit/useBulkEditTabField";
 import { FieldHeader } from "../field-header/FieldHeader";
+import { getFormTemplateField } from "../form-template/formTemplateUtils";
 import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
@@ -89,36 +94,19 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
   const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
-  // console.debug(
-  //   "FieldWrapper: " +
-  //     name +
-  //     " in component: " +
-  //     componentName +
-  //     " in section " +
-  //     sectionName
-  // );
-
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
   const disabledByFormTemplate: boolean = useMemo(() => {
-    if (!formTemplate || !componentName || !sectionName) return false;
+    const fieldProps = getFormTemplateField(
+      formTemplate,
+      componentName,
+      sectionName,
+      templateCheckboxFieldName ?? name
+    );
 
-    // First find the component we are looking for.
-    const componentFound = find(formTemplate?.components, {
-      name: componentName
-    });
-    if (componentFound) {
-      // Next find the right section.
-      const sectionFound = find(componentFound?.sections, {
-        name: sectionName
-      });
-      if (sectionFound) {
-        return (
-          !find(sectionFound.items, {
-            name: templateCheckboxFieldName ?? name
-          })?.visible ?? false
-        );
-      }
+    if (fieldProps) {
+      return !fieldProps.visible;
     }
+
     return false;
   }, [formTemplate]);
 
@@ -286,7 +274,17 @@ function FormikConnectedField({
   },
   fieldWrapperProps: { readOnlyRender, link, children }
 }: FieldWrapperInternalProps) {
-  const { readOnly } = useDinaFormContext();
+  const {
+    readOnly,
+    formTemplate,
+    componentName,
+    sectionName,
+    isExistingRecord
+  } = useDinaFormContext();
+
+  const isBulkEditing = !!useBulkEditContext();
+  const isOnBulkEditAllTab = !!useBulkEditTabContext();
+
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: formikValue
@@ -316,6 +314,37 @@ function FormikConnectedField({
     // Only used within the bulk editor's "Edit All" tab:
     placeholder: bulkTab?.placeholder
   };
+
+  /**
+   * Default values will be retrieved from the form template here. Only load the default value if
+   * the form template has just been loaded and the value is undefined.
+   */
+  useEffect(() => {
+    // If editing an existing record, do not apply default values.
+    if (isExistingRecord) return;
+
+    // If editing in a bulk edit context, only apply the default values to the edit all tab.
+    if (isBulkEditing && !isOnBulkEditAllTab) return;
+
+    if (!isExistingRecord) {
+      if (!formTemplate) {
+        setValue(undefined);
+      }
+
+      const fieldProps = getFormTemplateField(
+        formTemplate,
+        componentName,
+        sectionName,
+        name
+      );
+
+      // Check if a default value exists to be applied. In bulk edit mode, it should only be applied
+      // in the edit mode part.
+      if (fieldProps) {
+        setValue(fieldProps.defaultValue);
+      }
+    }
+  }, [formTemplate]);
 
   return (
     <ErrorBoundary
