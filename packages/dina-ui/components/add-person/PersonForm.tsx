@@ -7,13 +7,29 @@ import {
   TextField,
   useModal,
   StringArrayField,
-  ResourceSelectField
+  ResourceSelectField,
+  DoOperationsError,
+  OperationError,
+  SaveArgs,
+  useApiClient
 } from "common-ui";
-import { PersistedResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
+import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
 import { Organization } from "../../../dina-ui/types/agent-api/resources/Organization";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { Person } from "../../types/objectstore-api";
 import { PersonFormFields } from "./PersonFormFields";
+import {
+  cloneDeep,
+  compact,
+  isEmpty,
+  isEqual,
+  mapKeys,
+  pick,
+  pickBy,
+  range,
+  find
+} from "lodash";
 
 interface PersonFormProps {
   person?: Person;
@@ -26,24 +42,99 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     type: "person"
   };
   const id = person?.id;
+  const { save } = useApiClient();
+
+  /**
+   * Handle creating, updating, deleting Identifiers in back-end
+   */
+  async function saveIdentifiers(
+    submitted: InputResource<Person>
+  ): Promise<PersistedResource<Identifier>[]> {
+    const preparedIdentifiers: Identifier[] = submitted.identifiers
+      ? submitted.identifiers?.map((identifier) => {
+          return identifier;
+        })
+      : [];
+    const identifierSaveArgs: SaveArgs<Identifier>[] = preparedIdentifiers.map(
+      (resource) => ({
+        resource,
+        type: "identifier"
+      })
+    );
+
+    // createOperations = newIdentifiers.map<Operation>((identifier) => ({
+    //   op: "POST",
+    //   ...
+    // }));
+
+    // updateOperations = existingIdentifiers.map<Operation>((identifier) => ({
+    //   op: "PATCH"
+    // }));
+
+    // deleteOperations = deletedIdentifiers.map<Operation>((identifier) => ({
+    //   op: "DELETE"
+    // }));
+
+    // Merge all of them together
+    // const operations = [ ...createOperations, ...updateOperations, ...deleteOperations ];
+
+    try {
+      // Don't call the API with an empty Save array:
+      if (!identifierSaveArgs.length) {
+        return [];
+      }
+      const savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
+        apiBaseUrl: "/agent-api"
+      });
+
+      return savedIdentifiers;
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>((err) => ({
+          fieldErrors: mapKeys(
+            err.fieldErrors,
+            (_, field) => `identifier[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
+    }
+  }
 
   const onSubmit: DinaFormOnSubmit = async ({
-    api: { save },
     submittedValues: { ...submittedPerson }
   }) => {
-    const submitCopy = { ...submittedPerson };
-    if (submitCopy.organizations) {
-      submittedPerson.relationships = {};
-      submittedPerson.relationships.organizations = {};
-      submittedPerson.relationships.organizations.data = [];
-      submitCopy.organizations.map(org =>
-        submittedPerson.relationships.organizations.data.push({
-          id: org.id,
-          type: "organization"
-        })
-      );
-      delete submittedPerson.organizations;
-    }
+    submittedPerson.relationships = {
+      ...(submittedPerson.organizations && {
+        organizations: {
+          data: submittedPerson.organizations.map((it) => {
+            return {
+              id: it.id,
+              type: "organization"
+            };
+          })
+        }
+      }),
+      ...(submittedPerson.identifiers && {
+        identifiers: {
+          data: (await saveIdentifiers(submittedPerson)).map((it) => {
+            return pick(it, "id", "type");
+          })
+        }
+      })
+    };
+    delete submittedPerson.organizations;
+    delete submittedPerson.identifiers;
 
     const [savedPerson] = await save<Person>(
       [
@@ -83,7 +174,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
           filter={filterBy(["names[0].name"])}
           model="agent-api/organization"
           isMulti={true}
-          optionLabel={organization => organization.names?.[0].name}
+          optionLabel={(organization) => organization.names?.[0].name}
         />
       </div>
       <PersonFormFields width="30rem" />
@@ -129,7 +220,7 @@ export function useAddPersonModal() {
   const { closeModal, openModal } = useModal();
 
   function openAddPersonModal() {
-    return new Promise<PersistedResource<Person> | undefined>(resolve => {
+    return new Promise<PersistedResource<Person> | undefined>((resolve) => {
       function finishModal(newPerson?: PersistedResource<Person>) {
         closeModal();
         resolve(newPerson);

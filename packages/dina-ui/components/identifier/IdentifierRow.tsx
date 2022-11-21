@@ -18,12 +18,12 @@ export function IdentifierRow({ index }: IdentifierRowProps) {
   return (
     <>
       <VocabularySelectField
-        name={commonRoot + "type"}
+        name={commonRoot + "namespace"}
         path="agent-api/vocabulary/identifiers"
         label={formatMessage("identifierType")}
       />
       <TextField
-        name={commonRoot + "uri"}
+        name={commonRoot + "value"}
         label={formatMessage("identifierURI")}
         readOnlyRender={(value) => {
           try {
