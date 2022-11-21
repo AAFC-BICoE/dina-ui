@@ -33,7 +33,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   };
   const id = person?.id;
   const { save } = useApiClient();
-
   /**
    * Handle creating, updating, deleting Identifiers in back-end
    */
