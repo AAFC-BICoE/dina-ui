@@ -3,7 +3,10 @@ import {
   ButtonBar,
   DeleteButton,
   DinaForm,
-  LoadingSpinner
+  LoadingSpinner,
+  generateUUIDTree,
+  FieldSet,
+  QueryPage
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -18,6 +21,8 @@ import {
 import { ExifView, MetadataDetails } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { TableColumn } from "../../../../common-ui/lib/list-page/types";
+import { Metadata } from "../../../../dina-ui/types/objectstore-api";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -29,9 +34,9 @@ const OBJECT_DETAILS_PAGE_CSS = `
 export default function MetadataViewPage() {
   const router = useRouter();
 
-  const id = String(router.query.id);
+  const uuid = String(router.query.id);
 
-  const { loading, response } = useMetadataViewQuery(id);
+  const { loading, response } = useMetadataViewQuery(uuid);
 
   const preview = false;
 
@@ -41,23 +46,48 @@ export default function MetadataViewPage() {
 
   if (response) {
     const metadata = response.data;
+    const customViewQuery = metadata?.id
+      ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
+      : undefined;
+
+    // Columns for the elastic search list page.
+    const columns: TableColumn<Metadata>[] = [
+      // Material Sample Name
+      {
+        Cell: ({ original: { id, data } }) => (
+          <Link
+            href={`/collection/material-sample/view?id=${id}`}
+            passHref={true}
+          >
+            <a>
+              {data?.attributes?.materialSampleName ||
+                data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+                id}
+            </a>
+          </Link>
+        ),
+        label: "materialSampleName",
+        accessor: "data.attributes.materialSampleName",
+        isKeyword: true
+      }
+    ];
 
     const buttonBar = (
       <ButtonBar>
         <BackToListButton entityLink="/object-store/object" />
-        <Link href={`/object-store/metadata/edit?id=${id}`}>
+        <Link href={`/object-store/metadata/edit?id=${uuid}`}>
           <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
             <DinaMessage id="editButtonText" />
           </a>
         </Link>
-        <Link href={`/object-store/metadata/revisions?id=${id}`}>
+        <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
           <a className="btn btn-info">
             <DinaMessage id="revisionsButtonText" />
           </a>
         </Link>
         <DeleteButton
           className="ms-5"
-          id={id}
+          id={uuid}
           options={{ apiBaseUrl: "/objectstore-api" }}
           postDeleteRedirect="/object-store/object/list"
           type="metadata"
@@ -86,6 +116,23 @@ export default function MetadataViewPage() {
                   />
                   <MetadataDetails metadata={metadata} />
                   <ExifView objectUpload={metadata.objectUpload} />
+                  {customViewQuery && (
+                    <FieldSet
+                      legend={<DinaMessage id="attachedMaterialSamples" />}
+                    >
+                      <QueryPage
+                        columns={columns}
+                        indexName={"dina_material_sample_index"}
+                        viewMode={customViewQuery ? true : false}
+                        customViewQuery={customViewQuery ?? undefined}
+                        customViewFields={
+                          customViewQuery
+                            ? ["data.relationships.attachment.data.id"]
+                            : undefined
+                        }
+                      />
+                    </FieldSet>
+                  )}
                 </DinaForm>
               </div>
             </div>

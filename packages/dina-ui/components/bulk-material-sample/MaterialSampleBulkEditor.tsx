@@ -66,6 +66,7 @@ export function MaterialSampleBulkEditor({
     materialSampleForm: JSX.Element;
     formTemplateProps: Partial<MaterialSampleFormProps>;
   } = initializeRefHookFormProps(samplesProp, selectedTab, sampleFormTemplate);
+
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
     return getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook);
@@ -168,7 +169,10 @@ export function initializeRefHookFormProps(
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
     | undefined,
-  formTemplate: FormTemplate | undefined
+  formTemplate: FormTemplate | undefined,
+  materialSampleInitialValues,
+  collectingEventInitialValues,
+  acquisitionEventInitialValues
 ) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
@@ -184,9 +188,13 @@ export function initializeRefHookFormProps(
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
+  // don't use form template's materialSampleName default value for bulk edit
+  delete materialSampleInitialValues?.materialSampleName;
   const bulkEditSampleHook = useMaterialSampleSave({
     ...formTemplateProps,
-    materialSample: initialValues,
+    materialSample: materialSampleInitialValues ?? initialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues,
     showChangedIndicatorsInNestedForms: true
   });
 
@@ -291,6 +299,7 @@ function getMaterialSampleForm(
   return (
     <MaterialSampleForm
       {...formTemplateProps}
+      enableReinitialize={formTemplateProps.formTemplate ? true : false}
       buttonBar={null}
       hideUseSequence={true}
       materialSampleFormRef={bulkEditFormRef}
