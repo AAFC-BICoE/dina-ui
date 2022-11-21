@@ -127,12 +127,6 @@ export function InstitutionForm({
 export function InstitutionFormLayout() {
   const { formatMessage } = useDinaIntl();
   const { readOnly } = useDinaFormContext();
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: InstitutionIdentifierType.GRSCICOLL,
-      value: InstitutionIdentifierType.GRSCICOLL
-    }
-  ];
 
   return (
     <div>
@@ -165,9 +159,9 @@ export function InstitutionFormLayout() {
       <Field name="identifiers">
         {({ form: { values: formState } }) =>
           !readOnly ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <IdentifierFields />
           ) : !!formState.identifiers?.length ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <IdentifierFields />
           ) : null
         }
       </Field>

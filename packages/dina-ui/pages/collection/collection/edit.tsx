@@ -134,16 +134,6 @@ export function CollectionForm({ collection, router }: CollectionFormProps) {
 export function CollectionFormFields({ title }) {
   const { readOnly } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: CollectionIdentifierType.GRSCICOLL,
-      value: CollectionIdentifierType.GRSCICOLL
-    },
-    {
-      label: CollectionIdentifierType.INDEX_HERBARIORUM,
-      value: CollectionIdentifierType.INDEX_HERBARIORUM
-    }
-  ];
 
   const filter = filterBy(["name"], {
     nullValueFilters: { parentCollection: null }
@@ -176,7 +166,7 @@ export function CollectionFormFields({ title }) {
           readOnlyLink="/collection/collection/view?id="
           filter={filter}
           model="collection-api/collection"
-          optionLabel={collection => collection.name as any}
+          optionLabel={(collection) => collection.name as any}
           className="col-md-6"
           label={formatMessage("parentCollectionLabel")}
         />
@@ -210,9 +200,9 @@ export function CollectionFormFields({ title }) {
       <Field name="identifiers">
         {({ form: { values: formState } }) =>
           !readOnly ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <IdentifierFields />
           ) : !!formState.identifiers?.length ? (
-            <IdentifierFields typeOptions={typeOptions} />
+            <IdentifierFields />
           ) : null
         }
       </Field>
