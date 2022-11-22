@@ -189,6 +189,7 @@ export function initializeRefHookFormProps(
   // don't use form template's materialSampleName default value for bulk edit
   const bulkEditSampleHook = useMaterialSampleSave({
     ...formTemplateProps,
+    materialSample: initialValues,
     showChangedIndicatorsInNestedForms: true
   });
 

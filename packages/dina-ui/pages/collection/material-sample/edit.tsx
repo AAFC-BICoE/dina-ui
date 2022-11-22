@@ -1,6 +1,6 @@
 import { BackButton, ButtonBar, SubmitButton, withResponse } from "common-ui";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Footer,
   Head,
@@ -44,20 +44,10 @@ export default function MaterialSampleEditPage() {
 
   const title = id ? "editMaterialSampleTitle" : "addMaterialSampleTitle";
 
-  const {
-    navOrder,
-    setNavOrder,
-    sampleFormTemplate,
-    setSampleFormTemplateUUID,
-    materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues
-  } = useMaterialSampleFormTemplateSelectState();
+  const { navOrder, sampleFormTemplate, setSampleFormTemplateUUID } =
+    useMaterialSampleFormTemplateSelectState();
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     formTemplate: sampleFormTemplate,
-    materialSample: materialSampleInitialValues,
-    collectingEventInitialValues,
-    acquisitionEventInitialValues,
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
@@ -117,13 +107,6 @@ export default function MaterialSampleEditPage() {
         </h1>
         {id ? (
           withResponse(materialSampleQuery, ({ data: sample }) => {
-            if (sampleFormTemplate?.id) {
-              Object.keys(materialSampleInitialValues).forEach((key) => {
-                if (!sample[key]) {
-                  sample[key] = materialSampleInitialValues[key];
-                }
-              });
-            }
             return (
               <MaterialSampleForm
                 enableReinitialize={true}
