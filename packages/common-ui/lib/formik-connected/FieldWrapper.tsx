@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray } from "lodash";
+import { get, isArray } from "lodash";
 import { PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -279,7 +279,8 @@ function FormikConnectedField({
     formTemplate,
     componentName,
     sectionName,
-    isExistingRecord
+    isExistingRecord,
+    initialValues
   } = useDinaFormContext();
 
   const isBulkEditing = !!useBulkEditContext();
@@ -327,8 +328,9 @@ function FormikConnectedField({
     if (isBulkEditing && !isOnBulkEditAllTab) return;
 
     if (!isExistingRecord) {
+      // Apply initial values default value if possible.
       if (!formTemplate) {
-        setValue(undefined);
+        setValue(get(initialValues, name, undefined));
       }
 
       const fieldProps = getFormTemplateField(
