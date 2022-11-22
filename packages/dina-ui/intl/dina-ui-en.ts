@@ -483,7 +483,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   hostOrganismLegend: "Host Organism",
   identifierLegend: "Identifiers",
   identifierType: "Identifier Type",
-  identifierURI: "Identifier URI",
+  identifierURI: "Identifier",
   identifiers: "Identifiers",
   includeAll: "Include All",
   insertHybridSymbol: "Insert Hybrid Symbol",

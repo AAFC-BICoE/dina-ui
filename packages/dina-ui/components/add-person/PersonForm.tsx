@@ -60,7 +60,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
 
     // Merge all of them together
     // const operations = [ ...createOperations, ...updateOperations, ...deleteOperations ];
-
+    delete submitted.identifiers;
     try {
       // Don't call the API with an empty Save array:
       if (!identifierSaveArgs) {
@@ -117,7 +117,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       })
     };
     delete submittedPerson.organizations;
-    delete submittedPerson.identifiers;
 
     const [savedPerson] = await save<Person>(
       [
