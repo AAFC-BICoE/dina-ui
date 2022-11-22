@@ -23,6 +23,14 @@ import {
 import { FormikProps } from "formik";
 import { sortBy } from "lodash";
 import { pick, compact, uniq } from "lodash";
+import { PersistedResource } from "kitsu";
+
+
+interface PcrBatchItemReactionStep {
+  pcrBatchItem: PcrBatchItem;
+  materialSample?: MaterialSample;
+  determination?: Determination;
+}
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -47,12 +55,12 @@ export function SangerPcrReactionStep({
   const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
     []
   );
-  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
-  const [determination, setDetermination] = useState<Determination>();
+  // const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
+  // const [determination, setDetermination] = useState<Determination>();
 
-  // const [selectedResources, setSelectedResources] = useState<
-  //   PcrBatchItemReactionStep[]
-  // >([]);
+  const [selectedReactionItems, setSelectedReactionItems] = useState<
+    PcrBatchItemReactionStep[]
+  >([]);
 
   useEffect(() => {
     setLoading(true);
@@ -74,19 +82,19 @@ export function SangerPcrReactionStep({
   }, [performSave]);
 
   async function fetchDetermination() {
-    await apiClient
-      .get<MaterialSample[]>("/collection-api/material-sample", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })("")
-      })
-      .then((response) => {
+    // await apiClient
+    //   .get<MaterialSample[]>("/collection-api/material-sample", {
+    //     filter: filterBy([], {
+    //       extraFilters: [
+    //         {
+    //           selector: "pcrBatch.uuid",
+    //           comparison: "==",
+    //           arguments: pcrBatchId
+    //         }
+    //       ]
+    //     })("")
+    //   })
+    //   .then((response) => {
         // console.log(response);
         // console.log("j");
         // const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
@@ -94,7 +102,7 @@ export function SangerPcrReactionStep({
         //     (item) => item?.materialSample?.id !== undefined
         //   );
         // setSelectedResources(response?.data);
-      });
+      // });
   }
 
   async function fetchPcrBatchItems() {
@@ -112,12 +120,17 @@ export function SangerPcrReactionStep({
         include: "materialSample"
       })
       .then((response) => {
-        // const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
-        //   response.data?.filter(
-        //     (item) => item?.materialSample?.id !== undefined
-        //   );
+        const pcrBatchItems: PersistedResource<PcrBatchItem>[] =
+          response.data?.filter(
+            (item) => item?.materialSample?.id !== undefined
+          );
 
-        setSelectedResources(response?.data);
+        // setSelectedResources(response?.data);
+        setSelectedReactionItems(
+          pcrBatchItems.map((pcrBatchItem) => {
+            return { pcrBatchItem };
+          })
+        );
         setLoading(false);
         // setSelectedResources(
         //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
@@ -133,26 +146,42 @@ export function SangerPcrReactionStep({
     //   if (!selectedResources) return;
 
     await bulkGet<MaterialSample>(
-      selectedResources.map(
-        (item) => "/material-sample/" + item?.materialSample?.id
+      selectedReactionItems.map(
+        (item) => "/material-sample/" + item.pcrBatchItem?.materialSample?.id
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
-      const materialSamplesTransformed = compact(response).map((resource) => ({
-        data: {
-          attributes: pick(resource, ["materialSampleName"])
-        },
-        id: resource.id,
-        type: resource.type
-      }));
+      // const materialSamplesTransformed = compact(response).map((resource) => ({
+      //   data: {
+      //     attributes: pick(resource, ["materialSampleName"])
+      //   },
+      //   id: resource.id,
+      //   type: resource.type
+      // }));
+      // console.log(JSON.stringify(response));
+      // setSelectedResources(materialSamplesTransformed ?? []);
+    });
+    // await bulkGet<MaterialSample>(
+    //   selectedResources.map(
+    //     (item) => "/material-sample/" + item?.materialSample?.id
+    //   ),
+    //   { apiBaseUrl: "/collection-api" }
+    // ).then((response) => {
+    //   const materialSamplesTransformed = compact(response).map((resource) => ({
+    //     data: {
+    //       attributes: pick(resource, ["materialSampleName"])
+    //     },
+    //     id: resource.id,
+    //     type: resource.type
+    //   }));
 
       // If there is nothing stored yet, automatically go to edit mode.
       // if (materialSamplesTransformed.length === 0) {
       //   setEditMode(true);
       // }
 
-      setMaterialSamples(materialSamplesTransformed ?? []);
-    });
+    //   setMaterialSamples(materialSamplesTransformed ?? []);
+    // });
   }
 
   async function performSaveInternal() {
@@ -189,7 +218,27 @@ export function SangerPcrReactionStep({
     setEditMode(false);
   }
 
-  const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
+  function getColor(result: any) {
+    switch (result) {
+      case "No Band":
+        return "FFC0CB";
+      case "Good Band":
+        return "DEFCDE";
+      case "Weak Band":
+        return "FFFACD";
+      case "Multiple Bands":
+        return "EACEDE";
+      case "Contaminated":
+        return "FFC0CB";
+      case "Smear":
+        return "DCDCDC";
+      default:
+        return "92a8d1";
+    }
+  }
+
+  // const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
+    const PCR_REACTION_COLUMN: Column<PcrBatchItemReactionStep>[] = [
     {
       Cell: ({ original }) => {
         if (original?.wellRow === null || original?.wellColumn === null)
@@ -222,22 +271,22 @@ export function SangerPcrReactionStep({
       // ),
       // Header: <FieldHeader name={"materialSampleName"} />,
       // sortable: false
-      Cell: ({ original }) => {
-        const materialSample = materialSamples.find(
-          (item) => item.id === original.materialSample.id
-        );
-        // console.log(materialSample);
-        return <>{materialSample?.materialSampleName}</>;
-      }
-      // Cell: ({ original: { id, data } }) => (
-      //   <a href={`/seqdb/pcr-batch-item/view?id=${data?.materialSample?.id}`}>
-      //     {data?.attributes?.materialSampleName ||
-      //       data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-      //       id}
-      //   </a>
-      // ),
-      // Header: <FieldHeader name={"materialSampleName"} />,
-      // sortable: false
+      // Cell: ({ original }) => {
+      //   const materialSample = materialSamples.find(
+      //     (item) => item.id === original.materialSample.id
+      //   );
+      //   // console.log(materialSample);
+      //   return <>{materialSample?.materialSampleName}</>;
+      // }
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/seqdb/pcr-batch-item/view?id=${data?.materialSample?.id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      Header: <FieldHeader name={"materialSampleName"} />,
+      sortable: false
     },
     {
       Cell: ({ original }) => (
@@ -276,9 +325,7 @@ export function SangerPcrReactionStep({
           <div
             style={{
               backgroundColor:
-                "#" +
-                // getResultTypeByName(original?.result ?? undefined)?.color ??
-                "FFFFFF",
+                "#" + getColor(original?.result),
               borderRadius: "5px",
               paddingLeft: "5px"
             }}
@@ -310,7 +357,8 @@ export function SangerPcrReactionStep({
       innerRef={formRef}
       readOnly={!editMode}
     >
-      <ReactTable<PcrBatchItem>
+      {/* <ReactTable<PcrBatchItem> */}
+      <ReactTable<PcrBatchItemReactionStep>
         className="react-table-overflow"
         columns={PCR_REACTION_COLUMN}
         data={sortBy(selectedResources, "cellNumber")}
