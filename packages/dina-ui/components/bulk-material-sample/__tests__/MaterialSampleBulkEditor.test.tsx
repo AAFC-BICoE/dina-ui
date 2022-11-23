@@ -1112,8 +1112,10 @@ const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
 ];
 
 describe("MaterialSampleBulkEditor", () => {
-  beforeEach(() => deleteFromStorage(SAMPLE_FORM_TEMPLATE_KEY));
-  beforeEach(jest.clearAllMocks);
+  beforeEach(() => {
+    jest.clearAllMocks();
+    window.localStorage.clear();
+  });
 
   it("Bulk creates material samples.", async () => {
     const wrapper = mountWithAppContext(
@@ -3053,9 +3055,6 @@ describe("MaterialSampleBulkEditor", () => {
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
 
-    await new Promise(setImmediate);
-    wrapper.update();
-
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
     ).toEqual(true);
@@ -3119,9 +3118,6 @@ describe("MaterialSampleBulkEditor", () => {
 
     // Switch to the first individual sample tab:
     wrapper.find("li.sample-tab-0").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
 
     expect(
       wrapper.find(".sample-tabpanel-0 .barcode-field input").prop("value")

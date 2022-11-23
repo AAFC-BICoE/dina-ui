@@ -148,6 +148,7 @@ export function OrganismsField({ name, id }: OrganismsFieldProps) {
                         className="flex-grow-1"
                         inputProps={{ type: "number" }}
                         min={0}
+                        disableFormTemplateDefaultValue={true}
                       />
                       {!readOnly && (
                         <div className="d-flex">
