@@ -1,6 +1,10 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
 import { get, isArray } from "lodash";
+import {
+  FormTemplate,
+  FormTemplateSectionItem
+} from "../../../dina-ui/types/collection-api";
 import { PropsWithChildren, ReactNode, useEffect, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import {
@@ -15,6 +19,31 @@ import { CheckBoxWithoutWrapper } from "./CheckBoxWithoutWrapper";
 import { useDinaFormContext } from "./DinaForm";
 import { FieldSpy } from "./FieldSpy";
 import { ReadOnlyValue } from "./FieldView";
+
+export interface CustomHandleDefaultValueProps {
+  /** The whole form template object. */
+  formTemplate: FormTemplate | undefined;
+
+  /** This is the current item received from the form template. */
+  formTemplateItem: FormTemplateSectionItem | undefined;
+
+  /** Once you ran your custom logic to get the default value, it can be set for the field here. */
+  setDefaultValue: (value: any) => void;
+
+  /**
+   * The full formik context for changing parts all parts of the form.
+   * Please note that if you are changing parts of the form you should disable the form template
+   * default value since it's being handled here.
+   *
+   * The default values are also passed to the CustomHandleDefaultValue callback function.
+   */
+  formikContext: FormikProps<any>;
+
+  /**
+   * Default values provided from the DinaForm itself.
+   */
+  initialValues: any;
+}
 
 export interface FieldWrapperProps {
   /** The CSS classes of the div wrapper. */
@@ -67,6 +96,17 @@ export interface FieldWrapperProps {
   templateCheckboxFieldName?: string;
 
   validate?: (value: any) => string | void;
+
+  /**
+   * If custom processing needs to be done on the default fields value from the form template this
+   * function can be used.
+   *
+   * This method will not be ran if the disableFormTemplateDefaultValue is enabled.
+   */
+  customHandleDefaultValue?: (props: CustomHandleDefaultValueProps) => void;
+
+  disableFormTemplateDefaultValue?: boolean;
+
   children?:
     | JSX.Element
     | ((renderProps: FieldWrapperRenderProps) => JSX.Element);
@@ -272,7 +312,13 @@ function FormikConnectedField({
     field: { name, value: formikValue },
     meta: { error }
   },
-  fieldWrapperProps: { readOnlyRender, link, children }
+  fieldWrapperProps: {
+    readOnlyRender,
+    link,
+    children,
+    customHandleDefaultValue,
+    disableFormTemplateDefaultValue
+  }
 }: FieldWrapperInternalProps) {
   const {
     readOnly,
@@ -321,28 +367,40 @@ function FormikConnectedField({
    * the form template has just been loaded and the value is undefined.
    */
   useEffect(() => {
+    // Check if default value retrieval is disabled for this field.
+    if (disableFormTemplateDefaultValue) return;
+
     // If editing an existing record, do not apply default values.
     if (isExistingRecord) return;
 
     // If editing in a bulk edit context, only apply the default values to the edit all tab.
     if (isBulkEditing && !isOnBulkEditAllTab) return;
 
-    if (!isExistingRecord) {
-      // Apply initial values default value if possible.
-      if (!formTemplate) {
-        setValue(get(initialValues, name, undefined));
-      }
+    // Apply initial values default value if possible.
+    if (!formTemplate) {
+      setValue(get(initialValues, name, undefined));
+    }
 
-      const fieldProps = getFormTemplateField(
-        formTemplate,
-        componentName,
-        sectionName,
-        name
-      );
+    const fieldProps = getFormTemplateField(
+      formTemplate,
+      componentName,
+      sectionName,
+      name
+    );
 
-      // Check if a default value exists to be applied. In bulk edit mode, it should only be applied
-      // in the edit mode part.
-      if (fieldProps) {
+    // Check if a default value exists to be applied. In bulk edit mode, it should only be applied
+    // in the edit mode part.
+    if (fieldProps) {
+      // Check if custom logic for setting the default value is supplied.
+      if (customHandleDefaultValue) {
+        customHandleDefaultValue({
+          formTemplate,
+          formTemplateItem: fieldProps,
+          formikContext: form,
+          setDefaultValue: setValue,
+          initialValues
+        });
+      } else {
         setValue(fieldProps.defaultValue);
       }
     }

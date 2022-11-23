@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FieldWrapper component. Field wrapper display props Displays a custom label. 1`] = `"<div class=\\"\\"><label class=\\"group_groupName-field mb-2 w-100 mb-3\\"><div class=\\"field-label mb-2\\"><strong>The Group's Name</strong></div><div style=\\"cursor: auto;\\"><div></div></div></label></div>"`;
+
+exports[`FieldWrapper component. Field wrapper display props Displays horizontal custom label. 1`] = `"<div class=\\"\\"><label class=\\"group_groupName-field align-items-center row mb-3\\"><div class=\\"field-label col-sm-6\\"><strong>The Group's Name</strong></div><div class=\\"col-sm-6\\" style=\\"cursor: auto;\\"><div></div></div></label></div>"`;
+
+exports[`FieldWrapper component. Form Template functionality Custom default value handling support for fields 1`] = `"<div class=\\"testField3\\">{\\"type\\":\\"form-template\\",\\"components\\":[{\\"name\\":\\"testComponent\\",\\"visible\\":true,\\"order\\":0,\\"sections\\":[{\\"name\\":\\"testSection1\\",\\"visible\\":true,\\"items\\":[{\\"name\\":\\"testField1\\",\\"visible\\":true,\\"defaultValue\\":1},{\\"name\\":\\"testField2\\",\\"visible\\":true,\\"defaultValue\\":true}]},{\\"name\\":\\"testSection2\\",\\"visible\\":true,\\"items\\":[{\\"name\\":\\"testField3\\",\\"visible\\":true,\\"defaultValue\\":\\"defaultValue1\\"},{\\"name\\":\\"testField4\\",\\"visible\\":true,\\"defaultValue\\":\\"defaultValue2\\"}]}]}]}</div>"`;
+
+exports[`FieldWrapper component. Form Template functionality Custom default value handling support for fields 2`] = `"<div class=\\"testField4\\">{\\"testField2\\":false}</div>"`;
