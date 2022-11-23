@@ -11,7 +11,8 @@ import {
   DoOperationsError,
   OperationError,
   SaveArgs,
-  useApiClient
+  useApiClient,
+  DeleteArgs
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { Identifier } from "packages/dina-ui/types/agent-api/resources/Identifier";
@@ -34,43 +35,81 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   const id = person?.id;
   const { save } = useApiClient();
   /**
-   * Handle creating, updating, deleting Identifiers in back-end
+   * Handle creating, updating Identifiers
    */
   async function saveIdentifiers(
     submitted: InputResource<Person>
   ): Promise<PersistedResource<Identifier>[]> {
-    const identifierSaveArgs: SaveArgs<Identifier>[] | undefined =
-      submitted.identifiers?.map((resource) => ({
-        resource,
-        type: "identifier"
-      }));
+    // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
+    const identifierSaveArgs: SaveArgs<Identifier>[] =
+      submitted.identifiers?.map((resource) => {
+        return {
+          resource,
+          type: "identifier"
+        };
+      }) ?? [];
 
-    // createOperations = newIdentifiers.map<Operation>((identifier) => ({
-    //   op: "POST",
-    //   ...
-    // }));
-
-    // updateOperations = existingIdentifiers.map<Operation>((identifier) => ({
-    //   op: "PATCH"
-    // }));
-
-    // deleteOperations = deletedIdentifiers.map<Operation>((identifier) => ({
-    //   op: "DELETE"
-    // }));
-
-    // Merge all of them together
-    // const operations = [ ...createOperations, ...updateOperations, ...deleteOperations ];
     delete submitted.identifiers;
     try {
+      let savedIdentifiers: PersistedResource<Identifier>[] = [];
       // Don't call the API with an empty Save array:
-      if (!identifierSaveArgs) {
-        return [];
+      if (identifierSaveArgs.length) {
+        savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
+          apiBaseUrl: "/agent-api"
+        });
       }
-      const savedIdentifiers = await save<Identifier>(identifierSaveArgs, {
-        apiBaseUrl: "/agent-api"
-      });
 
       return savedIdentifiers;
+    } catch (error: unknown) {
+      if (error instanceof DoOperationsError) {
+        const newErrors = error.individualErrors.map<OperationError>((err) => ({
+          fieldErrors: mapKeys(
+            err.fieldErrors,
+            (_, field) => `identifier[${err.index}].${field}`
+          ),
+          errorMessage: err.errorMessage,
+          index: err.index
+        }));
+
+        const overallFieldErrors = newErrors.reduce(
+          (total, curr) => ({ ...total, ...curr.fieldErrors }),
+          {}
+        );
+
+        throw new DoOperationsError(error.message, overallFieldErrors);
+      } else {
+        throw error;
+      }
+    }
+  }
+
+  async function deleteIdentifiers(submitted: InputResource<Person>) {
+    const submittedIdentifierIds =
+      submitted.identifiers?.map((identifier) => {
+        return identifier.id;
+      }) ?? [];
+
+    const identifierDeleteArgs: any[] =
+      initialValues.identifiers
+        ?.map((identifier) => {
+          return {
+            delete: identifier
+          };
+        })
+        .filter((deleteArg) => {
+          return !submittedIdentifierIds.includes(deleteArg.delete.id);
+        }) ?? [];
+
+    try {
+      let deletedIdentifiers: PersistedResource<Identifier>[] = [];
+      // Don't call the API with an empty Save array:
+      if (identifierDeleteArgs.length) {
+        deletedIdentifiers = await save<Identifier>(identifierDeleteArgs, {
+          apiBaseUrl: "/agent-api"
+        });
+      }
+
+      return deletedIdentifiers;
     } catch (error: unknown) {
       if (error instanceof DoOperationsError) {
         const newErrors = error.individualErrors.map<OperationError>((err) => ({
@@ -129,6 +168,9 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         apiBaseUrl: "/agent-api"
       }
     );
+
+    // delete Identifier after unlinking from Person
+    await deleteIdentifiers(submittedPerson);
     await onSubmitSuccess?.(savedPerson);
   };
 

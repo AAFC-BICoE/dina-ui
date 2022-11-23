@@ -1,6 +1,6 @@
 export interface PersonIdentifierAttributes {
   type: "identifier";
-  uuid?: string | undefined;
+  id?: string | undefined;
   createdBy?: string;
   createdOn?: string;
   namespace?: string;
