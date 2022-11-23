@@ -156,6 +156,9 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
       })
     };
     delete submittedPerson.organizations;
+    if (Object.keys(submittedPerson.relationships).length === 0) {
+      delete submittedPerson.relationships;
+    }
 
     const [savedPerson] = await save<Person>(
       [

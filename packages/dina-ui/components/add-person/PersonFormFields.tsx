@@ -69,7 +69,10 @@ export function PersonFormFields({
                     }
                     {identifiers.map((_, index) => (
                       <TabPanel key={index}>
-                        <IdentifierRow index={index} />
+                        <IdentifierRow
+                          index={index}
+                          vocabularyOptionsEndpoint="agent-api/vocabulary/identifiers"
+                        />
                         {!readOnly && (
                           <div className="list-inline mb-3">
                             <FormikButton

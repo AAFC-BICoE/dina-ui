@@ -1,4 +1,4 @@
-import { TextField } from "common-ui";
+import { SelectOption, TextField, SelectField } from "common-ui";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { Fragment } from "react";
 import Link from "next/link";
@@ -6,9 +6,15 @@ import { VocabularySelectField } from "../collection/VocabularySelectField";
 
 export interface IdentifierRowProps {
   index: number;
+  typeOptions?: SelectOption<string | undefined>[];
+  vocabularyOptionsEndpoint?: string;
 }
 
-export function IdentifierRow({ index }: IdentifierRowProps) {
+export function IdentifierRow({
+  index,
+  typeOptions,
+  vocabularyOptionsEndpoint
+}: IdentifierRowProps) {
   const identifiersPath = "identifiers";
   const identifierPath = `${identifiersPath}[${index}]`;
   const commonRoot = identifierPath + ".";
@@ -17,13 +23,22 @@ export function IdentifierRow({ index }: IdentifierRowProps) {
 
   return (
     <>
-      <VocabularySelectField
-        name={commonRoot + "namespace"}
-        path="agent-api/vocabulary/identifiers"
-        label={formatMessage("identifierType")}
-      />
+      {typeOptions && (
+        <SelectField
+          name={commonRoot + "type"}
+          options={typeOptions as any}
+          label={formatMessage("identifierType")}
+        />
+      )}
+      {vocabularyOptionsEndpoint && (
+        <VocabularySelectField
+          name={commonRoot + "namespace"}
+          path={vocabularyOptionsEndpoint}
+          label={formatMessage("identifierType")}
+        />
+      )}
       <TextField
-        name={commonRoot + "value"}
+        name={commonRoot + (vocabularyOptionsEndpoint ? "value" : "uri")}
         label={formatMessage("identifierURI")}
         readOnlyRender={(value) => {
           try {
