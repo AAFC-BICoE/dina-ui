@@ -236,33 +236,21 @@ export function SangerSampleSelectionStep({
     return <LoadingSpinner loading={true} />;
   }
 
-  return editMode ? (
-    <div className="mb-3">
+  return (
+    <div>
+      {!editMode && (
+        <strong>
+          <SeqdbMessage id="selectedSamplesTitle" />
+        </strong>
+      )}
       <QueryPage<MaterialSample>
         indexName={"dina_material_sample_index"}
         columns={ELASTIC_SEARCH_COLUMN}
-        selectionMode={true}
+        selectionMode={editMode}
         selectionResources={selectedResources}
         setSelectionResources={setSelectedResources}
+        viewMode={!editMode}
       />
     </div>
-  ) : (
-    <>
-      <strong>
-        <SeqdbMessage id="selectedSamplesTitle" />
-      </strong>
-      <ReactTable<MaterialSample>
-        columns={API_SEARCH_COLUMN}
-        data={selectedResources}
-        minRows={1}
-        defaultPageSize={100}
-        pageText={<CommonMessage id="page" />}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage("rows")}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
-      />
-    </>
   );
 }

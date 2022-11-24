@@ -242,20 +242,6 @@ export function TransactionFormLayout({
     }
   ];
 
-  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
-    }
-  ];
-
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
    * operation.
@@ -417,35 +403,25 @@ export function TransactionFormLayout({
         />
       </FieldSet>
       <FieldSet legend={<DinaMessage id="materialSampleListTitle" />}>
-        {readOnly ? (
+        {readOnly && (
           <>
             <strong>
               <SeqdbMessage id="selectedSamplesTitle" />
             </strong>
-            <ReactTable<MaterialSample>
-              columns={API_SEARCH_COLUMN}
-              data={selectedResourcesView}
-              minRows={1}
-              defaultPageSize={100}
-              pageText={<CommonMessage id="page" />}
-              noDataText={<CommonMessage id="noRowsFound" />}
-              ofText={<CommonMessage id="of" />}
-              rowsText={formatMessage("rows")}
-              previousText={<CommonMessage id="previous" />}
-              nextText={<CommonMessage id="next" />}
-            />
           </>
-        ) : (
-          <div className="mb-3">
-            <QueryPage<MaterialSample>
-              indexName={"dina_material_sample_index"}
-              columns={ELASTIC_SEARCH_COLUMN}
-              selectionMode={true}
-              selectionResources={selectedResources}
-              setSelectionResources={setSelectedResources}
-            />
-          </div>
         )}
+        <div className="mb-3">
+          <QueryPage<MaterialSample>
+            indexName={"dina_material_sample_index"}
+            columns={ELASTIC_SEARCH_COLUMN}
+            selectionMode={!readOnly}
+            selectionResources={
+              readOnly ? selectedResourcesView : selectedResources
+            }
+            setSelectionResources={setSelectedResources}
+            viewMode={readOnly}
+          />
+        </div>
       </FieldSet>
       {readOnly ? (
         <FieldSpy<AgentRole[]> fieldName="agentRoles">

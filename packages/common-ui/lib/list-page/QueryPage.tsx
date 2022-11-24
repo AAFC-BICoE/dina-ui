@@ -693,7 +693,10 @@ export function QueryPage<TData extends KitsuResource>({
               <ReactTable
                 // Column and data props
                 columns={mappedResultsColumns}
-                data={searchResults}
+                data={[
+                  ...searchResults,
+                  ...(selectedResources ? selectedResources : [])
+                ]}
                 minRows={1}
                 // Loading Table props
                 loading={loading}
