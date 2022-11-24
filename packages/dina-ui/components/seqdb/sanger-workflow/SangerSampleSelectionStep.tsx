@@ -3,19 +3,16 @@ import {
   QueryPage,
   useAccount,
   useApiClient,
-  LoadingSpinner,
-  CommonMessage,
-  FieldHeader
+  LoadingSpinner
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { TableColumn } from "common-ui/lib/list-page/types";
 import { pick, compact, uniq } from "lodash";
-import ReactTable, { Column } from "react-table";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { ELASTIC_SEARCH_COLUMN } from "../../material-sample/RelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
@@ -123,36 +120,6 @@ export function SangerSampleSelectionStep({
       fetchSampledIds();
     }
   }, [editMode]);
-
-  // Displayed on edit mode only.
-  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      isKeyword: true
-    }
-  ];
-
-  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
-    }
-  ];
 
   async function savePcrBatchItems() {
     const { data: pcrBatch } = await apiClient.get<PcrBatch>(

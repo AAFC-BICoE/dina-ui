@@ -2,12 +2,9 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
-  CommonMessage,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  DinaFormSection,
-  FieldHeader,
   FieldSet,
   FieldSpy,
   NumberField,
@@ -19,7 +16,6 @@ import {
   ToggleField,
   useApiClient,
   useDinaFormContext,
-  useFieldLabels,
   useQuery,
   withResponse
 } from "common-ui";
@@ -42,9 +38,9 @@ import ReactTable, { Column } from "react-table";
 import Link from "next/link";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { pick, compact } from "lodash";
+import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/material-sample/RelationshipColumns";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -224,23 +220,6 @@ export function TransactionFormLayout({
   const [selectedResourcesView, setSelectedResourcesView] = useState<
     MaterialSample[]
   >([]);
-
-  // Displayed on edit mode only.
-  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      additionalAccessors: ["data.attributes.dwcOtherCatalogNumbers"],
-      isKeyword: true
-    }
-  ];
 
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
