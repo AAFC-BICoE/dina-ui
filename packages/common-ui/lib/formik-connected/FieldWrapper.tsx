@@ -367,6 +367,9 @@ function FormikConnectedField({
    * the form template has just been loaded and the value is undefined.
    */
   useEffect(() => {
+    // If the form template is null, it contains no form template support.
+    if (formTemplate === null) return;
+
     // Check if default value retrieval is disabled for this field.
     if (disableFormTemplateDefaultValue) return;
 
@@ -377,7 +380,7 @@ function FormikConnectedField({
     if (isBulkEditing && !isOnBulkEditAllTab) return;
 
     // Apply initial values default value if possible.
-    if (!formTemplate) {
+    if (formTemplate === undefined) {
       setValue(get(initialValues, name, undefined));
     }
 

@@ -57,8 +57,11 @@ export interface DinaFormContextI {
 
   /**
    * Form template with all restrictions to place on the form.
+   *
+   * If null the form template features are turned off. Undefined is when the form supports form
+   * templates but one has not been selected.
    */
-  formTemplate?: FormTemplate;
+  formTemplate?: FormTemplate | null;
 
   /**
    * The component name for all of the fields within this dina form. Using DinaFormContext you can
@@ -152,6 +155,7 @@ export function DinaForm<Values extends FormikValues = FormikValues>(
   return withBulkEditCtx(
     <DinaFormContext.Provider
       value={{
+        formTemplate: null, // By default it's null unless provided or undefined.
         ...props,
         isNestedForm,
         readOnly: props.readOnly ?? false
