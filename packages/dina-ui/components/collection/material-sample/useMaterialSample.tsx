@@ -86,14 +86,6 @@ export function useMaterialSampleQuery(id?: string | null) {
     },
     {
       disabled: !id,
-      joinSpecs: [
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "preparedBy",
-          joinField: "preparedBy",
-          path: (ms: MaterialSample) => `person/${ms.preparedBy?.id}`
-        }
-      ],
       onSuccess: async ({ data }) => {
         for (const organism of data.organism ?? []) {
           if (organism?.determination) {
@@ -635,7 +627,8 @@ export function useMaterialSampleSave({
     preProcessSample
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
-
+    const preparedBy = materialSampleInput.preparedBy || [];
+    delete materialSampleInput.preparedBy;
     const msPreprocessed =
       (await preProcessSample?.(materialSampleInput)) ?? materialSampleInput;
 
@@ -697,7 +690,10 @@ export function useMaterialSampleSave({
               pick(it, "id", "type")
             )
           }
-        })
+        }),
+        preparedBy: {
+          data: preparedBy.map((it) => pick(it, "id", "type"))
+        }
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
