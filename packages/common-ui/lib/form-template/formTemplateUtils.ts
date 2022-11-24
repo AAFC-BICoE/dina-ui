@@ -14,7 +14,7 @@ import {
  * @returns If a result is found, the FormTemplateComponent type. Otherwise, undefined.
  */
 export function getFormTemplateComponent(
-  formTemplate: FormTemplate | undefined,
+  formTemplate: FormTemplate | undefined | null,
   componentName: string | undefined
 ): FormTemplateComponent | undefined {
   if (!formTemplate || !componentName) return undefined;
@@ -33,7 +33,7 @@ export function getFormTemplateComponent(
  * @returns If a result is found, the FormTemplateComponent type. Otherwise, undefined.
  */
 export function getFormTemplateSection(
-  formTemplate: FormTemplate | undefined,
+  formTemplate: FormTemplate | undefined | null,
   componentName: string | undefined,
   sectionName: string | undefined
 ): FormTemplateSection | undefined {
@@ -59,7 +59,7 @@ export function getFormTemplateSection(
  * @returns If a result is found, the FormTemplateSectionItem type. Otherwise, undefined.
  */
 export function getFormTemplateField(
-  formTemplate: FormTemplate | undefined,
+  formTemplate: FormTemplate | undefined | null,
   componentName: string | undefined,
   sectionName: string | undefined,
   fieldName: string | undefined
