@@ -37,6 +37,7 @@ import {
   FormTemplateComponents,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_SECTION_NAME,
   MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
   MATERIAL_SAMPLE_FORM_LEGEND,
   MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
@@ -193,7 +194,6 @@ export function FormTemplateEditPageLoaded({
         }
       });
     };
-    // iterateThrough(allSubmittedValues);
 
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
@@ -212,24 +212,36 @@ export function FormTemplateEditPageLoaded({
           sections: dataComponent.sections.map((section) => ({
             name: section.id,
             visible: true,
-            items: section.items.map((field) => {
-              return {
-                name: field.id,
-                visible: field.visible
-                  ? true
-                  : allSubmittedValues?.templateCheckboxes?.[
-                      dataComponent.id + "." + section.id + "." + field.id
-                    ] ?? false,
-                defaultValue: _.get(allSubmittedValues, field.id)
-              };
-            })
+            items:
+              section.id === MANAGED_ATTRIBUTES_SECTION_NAME
+                ? allSubmittedValues?.managedAttributesOrder?.map(
+                    (managedAttribute) => {
+                      // Inject the managed attributes here.
+                      return {
+                        name: managedAttribute,
+                        visible: true,
+                        defaultValue:
+                          allSubmittedValues?.managedAttributes?.[
+                            managedAttribute
+                          ]
+                      };
+                    }
+                  )
+                : section.items.map((field) => {
+                    return {
+                      name: field.id,
+                      visible: field.visible
+                        ? true
+                        : allSubmittedValues?.templateCheckboxes?.[
+                            dataComponent.id + "." + section.id + "." + field.id
+                          ] ?? false,
+                      defaultValue: _.get(allSubmittedValues, field.id)
+                    };
+                  })
           }))
         })
       )
     };
-
-    // Inject the managed attributes into the form template.
-    // TODO Managed attributes are not stored to the legend.
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],

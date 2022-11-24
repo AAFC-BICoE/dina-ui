@@ -20,6 +20,9 @@ export const MANAGED_ATTRIBUTES_COMPONENT_NAME: string =
 export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
   "material-sample-attachments-component";
 
+export const MANAGED_ATTRIBUTES_SECTION_NAME: string =
+  "managed-attributes-section";
+
 /**
  * All Material Sample form data component in order.
  * This array is the source of truth for the section ID names and their order.
