@@ -269,19 +269,43 @@ export function QueryPage<TData extends KitsuResource>({
     // The included section will be transformed from an array to an object with the type name for each relationship.
     elasticSearchRequest(queryDSL)
       .then((result) => {
-        const processedResult = result?.hits.map((rslt) => ({
-          id: rslt._source?.data?.id,
-          type: rslt._source?.data?.type,
-          data: {
-            attributes: rslt._source?.data?.attributes
-          },
-          included: rslt._source?.included?.reduce(
-            (array, currentIncluded) => (
-              (array[currentIncluded?.type] = currentIncluded), array
-            ),
-            {}
-          )
-        }));
+        const processedResult = result?.hits.map((rslt) => {
+          return {
+            id: rslt._source?.data?.id,
+            type: rslt._source?.data?.type,
+            data: {
+              attributes: rslt._source?.data?.attributes
+            },
+            included: rslt._source?.included?.reduce(
+              (includedAccumulator, currentIncluded) => {
+                if (currentIncluded?.type === "organism") {
+                  if (!includedAccumulator[currentIncluded?.type]) {
+                    return (
+                      (includedAccumulator[currentIncluded?.type] = [
+                        currentIncluded
+                      ]),
+                      includedAccumulator
+                    );
+                  } else {
+                    return (
+                      includedAccumulator[currentIncluded?.type].push(
+                        currentIncluded
+                      ),
+                      includedAccumulator
+                    );
+                  }
+                } else {
+                  return (
+                    (includedAccumulator[currentIncluded?.type] =
+                      currentIncluded),
+                    includedAccumulator
+                  );
+                }
+              },
+              {}
+            )
+          };
+        });
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
