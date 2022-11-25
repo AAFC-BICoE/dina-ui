@@ -381,7 +381,12 @@ function FormikConnectedField({
 
     // Apply initial values default value if possible.
     if (formTemplate === undefined) {
-      setValue(get(initialValues, name, undefined));
+      // Edit all tab being used, with no form template selected.
+      if (bulkTab) {
+        setValue(undefined);
+      } else {
+        setValue(get(initialValues, name, undefined));
+      }
     }
 
     const fieldProps = getFormTemplateField(
@@ -404,7 +409,7 @@ function FormikConnectedField({
           initialValues
         });
       } else {
-        setValue(fieldProps.defaultValue);
+        setValue(fieldProps.defaultValue ?? undefined);
       }
     }
   }, [formTemplate]);

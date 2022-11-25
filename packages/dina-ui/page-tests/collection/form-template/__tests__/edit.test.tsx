@@ -945,7 +945,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
   ]
 };
 
-describe("Workflow template edit page", () => {
+describe("Form Template Edit Page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
@@ -986,7 +986,7 @@ describe("Workflow template edit page", () => {
     ]);
   });
 
-  it("Submits a new action-definition: Only set collecting event template fields.", async () => {
+  it("Submits a new form template: Only set collecting event template fields.", async () => {
     const { wrapper, toggleColEvent, fillOutRequiredFields, submitForm } =
       await mountForm();
 
@@ -1767,7 +1767,7 @@ describe("Workflow template edit page", () => {
             {
               name: "managed-attributes-section",
               visible: true,
-              items: []
+              items: undefined
             }
           ]
         },

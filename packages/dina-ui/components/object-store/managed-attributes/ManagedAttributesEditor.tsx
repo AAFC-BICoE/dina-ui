@@ -68,7 +68,8 @@ export function ManagedAttributesEditor({
   componentName,
   sectionName
 }: ManagedAttributesEditorProps) {
-  const { readOnly, isTemplate, formTemplate } = useDinaFormContext();
+  const { readOnly, isTemplate, formTemplate, initialValues } =
+    useDinaFormContext();
 
   const [visibleAttributeKeys, setVisibleAttributeKeys] = useState<string[]>(
     []
@@ -77,6 +78,12 @@ export function ManagedAttributesEditor({
   // When the form template has changed, then the visible managed attributes need to be
   // changed.
   useEffect(() => {
+    // If no form template is applied, just list all the managed attributes attached to the entity.
+    if (!formTemplate) {
+      setVisibleAttributeKeys(Object.keys(initialValues?.[valuesPath] ?? []));
+      return;
+    }
+
     const sectionFound = getFormTemplateSection(
       formTemplate,
       componentName,
@@ -88,7 +95,7 @@ export function ManagedAttributesEditor({
       setVisibleAttributeKeys(
         sectionFound.items
           ?.filter((item) => item.visible)
-          ?.map<string>((item) => item?.name ?? "") ?? []
+          ?.map<string>((item) => item?.name?.split(".")[1] ?? "") ?? []
       );
     }
   }, [formTemplate]);

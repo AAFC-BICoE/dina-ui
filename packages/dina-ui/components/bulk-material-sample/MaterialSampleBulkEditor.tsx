@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { isEmpty } from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
-import { keys, omit, pick, pickBy } from "lodash";
+import { keys, omit, pick, pickBy, merge } from "lodash";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -179,8 +179,17 @@ export function initializeRefHookFormProps(
     formTemplate
   };
 
+  // This will return an array of all of the unique managed attributes used between all of the
+  // material samples.
+  const allManagedAttributes =
+    Object.assign.apply(
+      Object,
+      samples?.map((sample) => sample?.managedAttributes)
+    ) ?? undefined;
+
   const initialValues: InputResource<MaterialSample> = {
-    type: "material-sample"
+    type: "material-sample",
+    managedAttributes: allManagedAttributes as any
   };
 
   const bulkEditFormRef =
