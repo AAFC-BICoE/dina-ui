@@ -34,12 +34,19 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
   };
   const id = person?.id;
   const { save } = useApiClient();
+  let submittedIdentifierIds: any[] = [];
+
   /**
    * Handle creating, updating Identifiers
    */
   async function saveIdentifiers(
     submitted: InputResource<Person>
   ): Promise<PersistedResource<Identifier>[]> {
+    submittedIdentifierIds =
+      submitted.identifiers?.map((identifier) => {
+        return identifier.id;
+      }) ?? [];
+
     // get save arguments. save() already automatically POSTs for new resources and PATCH for existing resources
     const identifierSaveArgs: SaveArgs<Identifier>[] =
       submitted.identifiers?.map((resource) => {
@@ -83,12 +90,14 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     }
   }
 
-  async function deleteIdentifiers(submitted: InputResource<Person>) {
-    const submittedIdentifierIds =
-      submitted.identifiers?.map((identifier) => {
-        return identifier.id;
-      }) ?? [];
-
+  async function deleteIdentifiers() {
+    const initialValuesIdentifiers = initialValues.identifiers?.map(
+      (identifier) => {
+        return {
+          delete: identifier
+        };
+      }
+    );
     const identifierDeleteArgs: any[] =
       initialValues.identifiers
         ?.map((identifier) => {
@@ -99,7 +108,6 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
         .filter((deleteArg) => {
           return !submittedIdentifierIds.includes(deleteArg.delete.id);
         }) ?? [];
-
     try {
       let deletedIdentifiers: PersistedResource<Identifier>[] = [];
       // Don't call the API with an empty Save array:
@@ -173,7 +181,7 @@ export function PersonForm({ onSubmitSuccess, person }: PersonFormProps) {
     );
 
     // delete Identifier after unlinking from Person
-    await deleteIdentifiers(submittedPerson);
+    await deleteIdentifiers();
     await onSubmitSuccess?.(savedPerson);
   };
 
