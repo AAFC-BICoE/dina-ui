@@ -24,6 +24,8 @@ import { FormikProps } from "formik";
 import { sortBy } from "lodash";
 import { pick, compact, uniq } from "lodash";
 import { PersistedResource } from "kitsu";
+import { isGeneratorFunction } from "util/types";
+import { OrganismsField } from "../../collection/material-sample/OrganismsField";
 
 
 interface PcrBatchItemReactionStep {
@@ -54,44 +56,44 @@ export function SangerPcrReactionStep({
   const [loading, setLoading] = useState<boolean>(true);
 
   const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
-    [{
-      type: "pcr-batch-item",
-      id: "2",
-      materialSample: {
-        id: "1",
-        type: "material-sample",
-      },
-      wellColumn: 1,
-      wellRow: "A",
-      cellNumber: 1
-    }]
+    [
+      // type: "pcr-batch-item",
+      // id: "2",
+      // materialSample: {
+      //   id: "1",
+      //   type: "material-sample",
+      // },
+      // wellColumn: 1,
+      // wellRow: "A",
+      // cellNumber: 1
+    ]
   );
   const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([
-    {
-      type: "material-sample",
-      id: "1",
-      materialSampleName: "test",
-      organism: [
-        {
-          type: "organism",
-          determination: [
-            {
-              verbatimScientificName: "test123"
-            },
-          ]
-        }
-      ]
-    }
+    // {
+    //   type: "material-sample",
+    //   id: "1",
+    //   materialSampleName: "test",
+    //   organism: [
+    //     {
+    //       type: "organism",
+    //       determination: [
+    //         {
+    //           verbatimScientificName: "test123"
+    //         },
+    //       ]
+    //     }
+    //   ]
+    // }
   ]);
 
   useEffect(() => {
     setLoading(false);
-    // fetchPcrBatchItems();
+    fetchPcrBatchItems();
   }, [editMode]);
 
   useEffect(() => {
     if (selectedResources.length !== 0) {
-      // fetchMaterialSamples();
+      fetchMaterialSamples();
     }
   }, [selectedResources]);
 
@@ -124,7 +126,6 @@ export function SangerPcrReactionStep({
 
         // setSelectedResources(response?.data);
         setSelectedResources(pcrBatchItems);
-        setLoading(false);
         // setSelectedResources(
         //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
         //     pcrBatchItem: item as any,
@@ -136,15 +137,16 @@ export function SangerPcrReactionStep({
   }
 
   async function fetchMaterialSamples() {
-    //   if (!selectedResources) return;
+      if (!selectedResources) return;
 
     await bulkGet<MaterialSample>(
       selectedResources.map(
-        (item) => "/material-sample/" + item?.materialSample?.id
+        (item) => "/material-sample/" + item?.materialSample?.id + "?includes=organism"
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       setMaterialSamples(response);
+      setLoading(false);
     });
     // await bulkGet<MaterialSample>(
     //   selectedResources.map(
@@ -245,27 +247,8 @@ export function SangerPcrReactionStep({
       sortable: false
     },
     {
-      // Cell: ({ original }) => (
-      //   <a
-      //     href={`/collection/material-sample/view?id=${original?.materialSample?.id}`}
-      //   >
-      //     {original?.materialSample?.attributes?.materialSampleName ||
-      //       original?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-      //       original?.materialSample?.id}
-      //   </a>
-      // ),
-      // Header: <FieldHeader name={"materialSampleName"} />,
-      // sortable: false
-      // Cell: ({ original }) => {
-      //   const materialSample = materialSamples.find(
-      //     (item) => item.id === original.materialSample.id
-      //   );
-      //   // console.log(materialSample);
-      //   return <>{materialSample?.materialSampleName}</>;
-      // }
       Cell: ({ original }) => {
         const fetchedMaterialSample = materialSamples.find((materialSample) => materialSample.id === original?.materialSample?.id);
-        console.log(JSON.stringify(fetchedMaterialSample))
         
         if (!fetchedMaterialSample) return <></>;
       
@@ -277,14 +260,25 @@ export function SangerPcrReactionStep({
       sortable: false
     },
     {
-      Cell: ({ original }) => (
+      Cell: ({ original }) => {
+        const fetchedMaterialSample = materialSamples.find((materialSample) => materialSample.id === original?.materialSample?.id);
+
+        if (!fetchedMaterialSample) return <></>;
+
+        const organisms = fetchedMaterialSample.organism;
+        console.log(fetchedMaterialSample);
+        if (!organisms) return <></>;
+
+        const targetOrganism = organisms.filter((organism) => organism?.isTarget === true);
+        console.log(targetOrganism);
+
+        return <></>;
         // <a
         //   href={`/collection/material-sample/view?id=${original?.determination?.id}`}
         // >
         //   {original?.determination}
         // </a>
-        <></>
-      ),
+      },
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
     },
