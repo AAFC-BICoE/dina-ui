@@ -100,7 +100,6 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
               name={({ displayName }) => displayName}
               href="/person/view?id="
             />
-            )
           </div>
         )),
       collectingEvent: ({ original: { value } }) => (
