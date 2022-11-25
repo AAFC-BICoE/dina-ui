@@ -86,14 +86,6 @@ export function useMaterialSampleQuery(id?: string | null) {
     },
     {
       disabled: !id,
-      joinSpecs: [
-        {
-          apiBaseUrl: "/agent-api",
-          idField: "preparedBy",
-          joinField: "preparedBy",
-          path: (ms: MaterialSample) => `person/${ms.preparedBy?.id}`
-        }
-      ],
       onSuccess: async ({ data }) => {
         for (const organism of data.organism ?? []) {
           if (organism?.determination) {
@@ -697,6 +689,13 @@ export function useMaterialSampleSave({
               pick(it, "id", "type")
             )
           }
+        }),
+        ...(msDiffWithOrganisms.preparedBy && {
+          preparedBy: {
+            data: msDiffWithOrganisms.preparedBy.map((it) =>
+              pick(it, "id", "type")
+            )
+          }
         })
       },
 
@@ -704,7 +703,8 @@ export function useMaterialSampleSave({
       attachment: undefined,
       projects: undefined,
       organism: undefined,
-      assemblages: undefined
+      assemblages: undefined,
+      preparedBy: undefined
     };
 
     // delete the association if associated sample is left unfilled
