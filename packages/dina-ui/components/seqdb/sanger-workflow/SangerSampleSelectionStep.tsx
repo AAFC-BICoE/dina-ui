@@ -92,7 +92,7 @@ export function SangerSampleSelectionStep({
    */
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
-      sampleIds.map((id) => "/material-sample/" + id),
+      sampleIds.map((id) => `/material-sample/${id}?include=organism`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       const materialSamplesTransformed = compact(response).map((resource) => ({
@@ -100,7 +100,10 @@ export function SangerSampleSelectionStep({
           attributes: pick(resource, ["materialSampleName"])
         },
         id: resource.id,
-        type: resource.type
+        type: resource.type,
+        included: {
+          organism: resource.organism
+        }
       }));
 
       // If there is nothing stored yet, automatically go to edit mode.

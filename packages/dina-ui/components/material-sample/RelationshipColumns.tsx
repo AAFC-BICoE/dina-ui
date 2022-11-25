@@ -13,5 +13,14 @@ export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
     label: "materialSampleName",
     accessor: "data.attributes.materialSampleName",
     isKeyword: true
+  },
+  {
+    Cell: ({ original }) => {
+      const organisms: any[] | undefined = original.included?.organism;
+      return <div />;
+    },
+    label: "determination.scientificName",
+    accessor: "included"
+    // isKeyword: true
   }
 ];
