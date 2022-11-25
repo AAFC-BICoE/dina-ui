@@ -141,7 +141,7 @@ export function SangerPcrReactionStep({
 
     await bulkGet<MaterialSample>(
       selectedResources.map(
-        (item) => "/material-sample/" + item?.materialSample?.id + "?includes=organism"
+        (item) => "/material-sample/" + item?.materialSample?.id + "?include=organism"
       ),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
