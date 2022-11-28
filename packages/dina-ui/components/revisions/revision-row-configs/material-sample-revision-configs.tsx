@@ -18,7 +18,7 @@ import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protoc
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
-    name: ms => (
+    name: (ms) => (
       <Link href={`/collection/material-sample/view?id=${ms.id}`}>
         <a>{ms.materialSampleName}</a>
       </Link>
@@ -27,7 +27,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
       // Show the entire value of the metadata map in a key-value table:
       managedAttributes: ({ original: { value } }) => (
         <ManagedAttributesViewer
-          managedAttributeApiPath={key =>
+          managedAttributeApiPath={(key) =>
             `collection-api/managed-attribute/${key}`
           }
           values={value}
@@ -38,7 +38,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
       attachment: ({ original: { value } }) => (
         <div>
           {value?.map(
-            relation =>
+            (relation) =>
               relation && (
                 <div>
                   <ReferenceLink<Metadata>
@@ -58,7 +58,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           baseApiPath="collection-api"
           type="protocol"
           reference={value}
-          name={protocol => protocol.name}
+          name={(protocol) => protocol.name}
           href="/collection/protocol/view?id="
         />
       ),
@@ -74,14 +74,14 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
       projects: ({ original: { value } }) => (
         <div>
           {value?.map(
-            project =>
+            (project) =>
               project && (
                 <div>
                   <ReferenceLink<Project>
                     baseApiPath="collection-api"
                     type="project"
                     reference={project}
-                    name={it => it.name}
+                    name={(it) => it.name}
                     href="/collection/project/view?id="
                   />
                 </div>
@@ -90,15 +90,18 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
         </div>
       ),
       materialSampleType: ({ original: { value } }) => value,
-      preparedBy: ({ original: { value } }) => (
-        <ReferenceLink<Person>
-          baseApiPath="agent-api"
-          type="person"
-          reference={value}
-          name={person => person.displayName}
-          href="/person/view?id="
-        />
-      ),
+      preparedBy: ({ original: { value: relation } }) =>
+        relation.map((rel, index) => (
+          <div key={index}>
+            <ReferenceLink<Person>
+              baseApiPath="agent-api"
+              type="person"
+              reference={rel}
+              name={({ displayName }) => displayName}
+              href="/person/view?id="
+            />
+          </div>
+        )),
       collectingEvent: ({ original: { value } }) => (
         <ReferenceLink<CollectingEvent>
           baseApiPath="collection-api"
@@ -122,7 +125,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           baseApiPath="collection-api"
           type="storage-unit"
           reference={value}
-          name={it => it.name}
+          name={(it) => it.name}
           href="/collection/storage-unit/view?id="
         />
       ),
@@ -138,7 +141,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
                     baseApiPath="collection-api"
                     type="material-sample"
                     reference={{ id }}
-                    name={sample => sample.materialSampleName ?? sample.id}
+                    name={(sample) => sample.materialSampleName ?? sample.id}
                     href="/collection/material-sample/view?id="
                   />
                 )
@@ -160,7 +163,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
                       baseApiPath="user-api"
                       type="user"
                       reference={user}
-                      name={it => it.username}
+                      name={(it) => it.username}
                       href="/dina-user/view?id="
                     />
                   )
@@ -198,13 +201,13 @@ export function determinationRevision(value) {
           ),
           managedAttributes: ({ value: data }) => <KeyValueTable data={data} />,
           determiner: ({ value: ids }) =>
-            ids?.map(id => (
+            ids?.map((id) => (
               <div key={id}>
                 <ReferenceLink<Person>
                   baseApiPath="agent-api"
                   type="person"
                   reference={{ id }}
-                  name={person => person.displayName}
+                  name={(person) => person.displayName}
                   href="/person/view?id="
                 />
               </div>
