@@ -22,7 +22,7 @@ describe("OrganismUtils unit tests", () => {
           },
           {
             type: "organism",
-            isTarget: null,
+            isTarget: false,
             determination: [
               {
                 isPrimary: true,
@@ -39,7 +39,7 @@ describe("OrganismUtils unit tests", () => {
     ).toEqual("verbatimScientificName1");
   });
 
-  test("getScientificNames with multiple no target or no primary", async () => {
+  test("getScientificNames when isTarget is not being used", async () => {
     expect(
       getScientificNames({
         type: "material-sample",
