@@ -338,7 +338,6 @@ export function DeterminationField({
                     className: "non-strip",
                     sectionName: "organism-managed-attributes-section"
                   }}
-                  showFormTemplateDropdown={!isTemplate}
                   managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                   visibleAttributeKeys={visibleManagedAttributeKeys}
                 />

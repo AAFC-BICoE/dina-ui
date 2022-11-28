@@ -234,7 +234,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"
                       managedAttributeComponent="MATERIAL_SAMPLE"
-                      showFormTemplateDropdown={true}
                     />
                   </div>
                 </div>

@@ -13,13 +13,8 @@ import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import {
-  FormTemplate,
-  managedAttributesViewSchema
-} from "../../../types/collection-api";
 import { ManagedAttribute } from "../../../types/objectstore-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
-import { ManagedAttributesViewSelect } from "./managed-attributes-custom-views/ManagedAttributesViewSelect";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 
 export interface ManagedAttributesEditorProps {
@@ -36,11 +31,6 @@ export interface ManagedAttributesEditorProps {
   attributeSelectorWidth?: number;
 
   fieldSetProps?: Partial<FieldSetProps>;
-
-  /**
-   * Shows the dropdown to select a form-template for Managed Attributes.
-   */
-  showFormTemplateDropdown?: boolean;
 
   /**
    * The formik field name for editing a Form Template's managed attributes order.
@@ -63,7 +53,6 @@ export function ManagedAttributesEditor({
   managedAttributeComponent,
   attributeSelectorWidth = 6,
   fieldSetProps,
-  showFormTemplateDropdown,
   managedAttributeOrderFieldName,
   visibleAttributeKeys: visibleAttributeKeysProp,
   values
@@ -71,13 +60,11 @@ export function ManagedAttributesEditor({
   const bulkCtx = useBulkEditTabContext();
   const { readOnly, isTemplate } = useDinaFormContext();
 
-  const [formTemplate, setFormTemplate] =
-    useState<PersistedResource<FormTemplate>>();
   return (
     <FieldSpy<Record<string, string | null | undefined>> fieldName={valuesPath}>
-      {currentValue => {
+      {(currentValue) => {
         function getAttributeKeysInUse() {
-          const managedAttributeMaps = bulkCtx?.resourceHooks.map(sample =>
+          const managedAttributeMaps = bulkCtx?.resourceHooks.map((sample) =>
             get(sample.formRef.current?.values, valuesPath)
           ) || [currentValue];
 
@@ -100,27 +87,10 @@ export function ManagedAttributesEditor({
           );
         }, [visibleAttributeKeysProp]);
 
-        /** Put the Form Template into the dropdown and update the visible attribute keys.  */
-        function updateFormTemplate(newView?: PersistedResource<FormTemplate>) {
-          setFormTemplate(newView);
-
-          if (
-            newView?.id &&
-            managedAttributesViewSchema.isValidSync(newView.viewConfiguration)
-          ) {
-            const newKeys = newView.viewConfiguration.attributeKeys;
-            if (newKeys) {
-              setVisibleAttributeKeys(newKeys);
-            }
-          } else {
-            setVisibleAttributeKeys(getAttributeKeysInUse());
-          }
-        }
-
         // Fetch the attributes, but omit any that are missing e.g. were deleted.
         const { dataWithNullForMissing: fetchedAttributes, loading } =
           useBulkGet<ManagedAttribute>({
-            ids: visibleAttributeKeys.map(key =>
+            ids: visibleAttributeKeys.map((key) =>
               // Use the component prefix if needed by the back-end:
               compact([managedAttributeComponent, key]).join(".")
             ),
@@ -142,20 +112,6 @@ export function ManagedAttributesEditor({
           <FieldSet
             legend={<DinaMessage id="managedAttributes" />}
             {...fieldSetProps}
-            {...(showFormTemplateDropdown && {
-              wrapLegend: legend => (
-                <div className="row">
-                  <div className="col-sm-6">{legend}</div>
-                  <div className="col-sm-6">
-                    <ManagedAttributesViewSelect
-                      managedAttributeComponent={managedAttributeComponent}
-                      value={formTemplate}
-                      onChange={updateFormTemplate}
-                    />
-                  </div>
-                </div>
-              )
-            })}
           >
             <div className="mb-3 managed-attributes-editor">
               {isTemplate && managedAttributeOrderFieldName ? (
@@ -190,15 +146,15 @@ export function ManagedAttributesEditor({
                   )}
                   {!!visibleAttributes.length && <hr />}
                   <div className="row">
-                    {visibleAttributes.map(attribute => (
+                    {visibleAttributes.map((attribute) => (
                       <ManagedAttributeFieldWithLabel
                         key={attribute.key}
                         attribute={attribute}
                         values={values}
                         valuesPath={valuesPath}
-                        onRemoveClick={attributeKey =>
-                          setVisibleAttributeKeys(current =>
-                            current.filter(it => it !== attributeKey)
+                        onRemoveClick={(attributeKey) =>
+                          setVisibleAttributeKeys((current) =>
+                            current.filter((it) => it !== attributeKey)
                           )
                         }
                       />
@@ -238,18 +194,18 @@ export function ManagedAttributeMultiSelect({
       | PersistedResource<ManagedAttribute>[]
   ) {
     const newAttributes = castArray(newValues);
-    const newKeys = newAttributes.map(it => get(it, "key"));
+    const newKeys = newAttributes.map((it) => get(it, "key"));
     onChange(newKeys);
   }
 
   return (
     <ResourceSelect<ManagedAttribute>
-      filter={input => ({
+      filter={(input) => ({
         ...filterBy(["name"])(input),
         ...(managedAttributeComponent ? { managedAttributeComponent } : {})
       })}
       model={managedAttributeApiPath}
-      optionLabel={attribute => managedAttributeLabel(attribute)}
+      optionLabel={(attribute) => managedAttributeLabel(attribute)}
       isMulti={true}
       isLoading={loading}
       onChange={onChangeInternal}
