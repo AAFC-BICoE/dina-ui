@@ -9,22 +9,17 @@ import {
   useApiClient,
   DinaForm,
   LoadingSpinner,
-  SelectField,
-  SelectOption,
   Operation,
   AutoSuggestTextField
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
 import {
   MaterialSample,
-  Determination,
-  Organism
+  Determination
 } from "../../../types/collection-api";
 import { FormikProps } from "formik";
 import { sortBy } from "lodash";
-import { pick, compact, uniq } from "lodash";
 import { PersistedResource } from "kitsu";
-import { isGeneratorFunction } from "util/types";
 import { OrganismsField } from "../../collection/material-sample/OrganismsField";
 
 
@@ -56,35 +51,9 @@ export function SangerPcrReactionStep({
   const [loading, setLoading] = useState<boolean>(true);
 
   const [selectedResources, setSelectedResources] = useState<PcrBatchItem[]>(
-    [
-      // type: "pcr-batch-item",
-      // id: "2",
-      // materialSample: {
-      //   id: "1",
-      //   type: "material-sample",
-      // },
-      // wellColumn: 1,
-      // wellRow: "A",
-      // cellNumber: 1
-    ]
+    []
   );
-  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([
-    // {
-    //   type: "material-sample",
-    //   id: "1",
-    //   materialSampleName: "test",
-    //   organism: [
-    //     {
-    //       type: "organism",
-    //       determination: [
-    //         {
-    //           verbatimScientificName: "test123"
-    //         },
-    //       ]
-    //     }
-    //   ]
-    // }
-  ]);
+  const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
 
   useEffect(() => {
     setLoading(false);
@@ -123,16 +92,7 @@ export function SangerPcrReactionStep({
           response.data?.filter(
             (item) => item?.materialSample?.id !== undefined
           );
-
-        // setSelectedResources(response?.data);
         setSelectedResources(pcrBatchItems);
-        // setSelectedResources(
-        //   pcrBatchItems?.map<PcrBatchItemReactionStep>((item) => ({
-        //     pcrBatchItem: item as any,
-        //     determination: undefined,
-        //     materialSample: undefined
-        //   }))
-        // );
       });
   }
 
@@ -148,37 +108,12 @@ export function SangerPcrReactionStep({
       setMaterialSamples(response);
       setLoading(false);
     });
-    // await bulkGet<MaterialSample>(
-    //   selectedResources.map(
-    //     (item) => "/material-sample/" + item?.materialSample?.id
-    //   ),
-    //   { apiBaseUrl: "/collection-api" }
-    // ).then((response) => {
-    //   const materialSamplesTransformed = compact(response).map((resource) => ({
-    //     data: {
-    //       attributes: pick(resource, ["materialSampleName"])
-    //     },
-    //     id: resource.id,
-    //     type: resource.type
-    //   }));
-
-      // If there is nothing stored yet, automatically go to edit mode.
-      // if (materialSamplesTransformed.length === 0) {
-      //   setEditMode(true);
-      // }
-
-    //   setMaterialSamples(materialSamplesTransformed ?? []);
-    // });
   }
 
   async function performSaveInternal() {
     if (formRef && (formRef as any)?.current?.values?.results) {
-      // Currently the results look like this:
-      // { "ec067d28-8a66-43a3-8193-eefe13dec4bb": "No Band" }
       const results = (formRef as any)?.current.values.results;
 
-      // Transform to an array with the ids as well:
-      // [{ id: "ec067d28-8a66-43a3-8193-eefe13dec4bb" value: "No Band" }]
       const resultsWithId = Object.keys(results).map((id) => ({
         id,
         value: results[id]
@@ -224,7 +159,6 @@ export function SangerPcrReactionStep({
     }
   }
 
-  // const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
     const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
     {
       Cell: ({ original }) => {
@@ -273,11 +207,6 @@ export function SangerPcrReactionStep({
         console.log(targetOrganism);
 
         return <></>;
-        // <a
-        //   href={`/collection/material-sample/view?id=${original?.determination?.id}`}
-        // >
-        //   {original?.determination}
-        // </a>
       },
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
