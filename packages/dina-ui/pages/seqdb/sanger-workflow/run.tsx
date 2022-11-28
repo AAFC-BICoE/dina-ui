@@ -3,7 +3,6 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
-import { SangerPcrReactionStep } from "../../../components/seqdb/sanger-workflow/SangerPcrReactionStep";
 import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
@@ -134,9 +133,6 @@ export default function SangerWorkFlowRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("selectCoordinates")}
           </Tab>
-          <Tab disabled={isDisabled(3, true)}>
-            {formatMessage("pcrReaction")}
-          </Tab>
         </TabList>
         <TabPanel>
           <SangerPcrBatchStep
@@ -165,17 +161,6 @@ export default function SangerWorkFlowRunPage() {
             <PCRBatchItemGrid
               pcrBatchId={pcrBatchId}
               pcrBatch={pcrBatch.response.data}
-              editMode={editMode}
-              setEditMode={setEditMode}
-              performSave={performSave}
-              setPerformSave={setPerformSave}
-            />
-          )}
-        </TabPanel>
-        <TabPanel>
-          {pcrBatch.response?.data && pcrBatchId && (
-            <SangerPcrReactionStep
-              pcrBatchId={pcrBatchId}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
