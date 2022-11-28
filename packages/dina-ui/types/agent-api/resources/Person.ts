@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { PersonIdentifier } from "./PersonIdentifier";
+import { Identifier } from "./Identifier";
 import { Organization } from "./Organization";
 
 export interface PersonAttributes {
@@ -12,13 +12,13 @@ export interface PersonAttributes {
   uuid?: string | undefined;
   createdBy?: string;
   createdOn?: string;
-  identifiers?: PersonIdentifier[];
   webpage?: URL;
   remarks?: string;
 }
 
 export interface PersonRelationships {
   organizations?: Organization[];
+  identifiers?: Identifier[];
 }
 
 export type Person = KitsuResource & PersonAttributes & PersonRelationships;

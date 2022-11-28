@@ -28,7 +28,7 @@ export default function PersonEditPage() {
   );
 
   const query = useQuery<Person>({
-    path: `agent-api/person/${id}?include=organizations`
+    path: `agent-api/person/${id}?include=organizations,identifiers`
   });
 
   return (
