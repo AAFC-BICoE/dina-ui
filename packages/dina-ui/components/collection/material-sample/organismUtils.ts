@@ -3,19 +3,20 @@ import {
   Organism
 } from "packages/dina-ui/types/collection-api";
 
-/** Retrives all the scientific names for a material sample */
+/** Retrieves all the scientific names for a material sample */
 export function getScientificNames(materialSample: MaterialSample) {
   const organisms = materialSample.organism as Organism[];
   if (!organisms) return "";
 
-  const targetOrganisms = organisms.filter(
-    (organism) => organism?.isTarget === true
+  const targetOrganism = organisms.filter(
+    (organism) => organism.isTarget === true
   );
 
-  if (targetOrganisms.length === 0) {
-    return getDeterminations(organisms);
+  // Check if a target organism is found or if all the organisms will need to be checked.
+  if (targetOrganism.length === 1) {
+    return getDeterminations(targetOrganism);
   } else {
-    return getDeterminations(targetOrganisms);
+    return getDeterminations(organisms);
   }
 }
 
@@ -23,20 +24,18 @@ function getDeterminations(organisms: Organism[]) {
   // List of everything to be displayed.
   const determinationList: string[] = [];
 
-  const primaryDetermination = organisms
-    .filter((organism) =>
-      organism?.determination?.filter(
-        (singleDetermination) => singleDetermination.isPrimary === true
-      )
-    )
-    .map((organism) => organism.determination);
+  const primaryDeterminations = organisms.map(
+    (organism) => organism.determination
+  );
 
-  primaryDetermination.forEach((determinations) => {
+  primaryDeterminations.forEach((determinations) => {
     determinations?.forEach((determination) => {
-      if (determination?.scientificName) {
-        determinationList.push(determination.scientificName);
-      } else if (determination?.verbatimScientificName) {
-        determinationList.push(determination.verbatimScientificName);
+      if (determination.isPrimary) {
+        if (determination?.scientificName) {
+          determinationList.push(determination.scientificName);
+        } else if (determination?.verbatimScientificName) {
+          determinationList.push(determination.verbatimScientificName);
+        }
       }
     });
   });

@@ -13,16 +13,24 @@ describe("OrganismUtils unit tests", () => {
               {
                 isPrimary: true,
                 verbatimScientificName: "verbatimScientificName1"
+              },
+              {
+                isPrimary: false,
+                verbatimScientificName: "verbatimScientificName2"
               }
             ]
           },
           {
             type: "organism",
-            isTarget: false,
+            isTarget: null,
             determination: [
               {
                 isPrimary: true,
-                verbatimScientificName: "verbatimScientificName2"
+                verbatimScientificName: "verbatimScientificName3"
+              },
+              {
+                isPrimary: false,
+                verbatimScientificName: "verbatimScientificName4"
               }
             ]
           }
@@ -38,10 +46,10 @@ describe("OrganismUtils unit tests", () => {
         organism: [
           {
             type: "organism",
-            isTarget: false,
+            isTarget: null,
             determination: [
               {
-                isPrimary: false,
+                isPrimary: true,
                 verbatimScientificName: "verbatimScientificName1"
               },
               {
@@ -49,40 +57,24 @@ describe("OrganismUtils unit tests", () => {
                 verbatimScientificName: "verbatimScientificName2"
               }
             ]
-          }
-        ]
-      })
-    ).toEqual("verbatimScientificName1, verbatimScientificName2");
-  });
-
-  test("getScientificNames with multiple primary determinations between two organisms.", async () => {
-    expect(
-      getScientificNames({
-        type: "material-sample",
-        organism: [
-          {
-            type: "organism",
-            isTarget: false,
-            determination: [
-              {
-                isPrimary: true,
-                verbatimScientificName: "verbatimScientificName1"
-              }
-            ]
           },
           {
             type: "organism",
-            isTarget: false,
+            isTarget: null,
             determination: [
               {
                 isPrimary: true,
-                verbatimScientificName: "verbatimScientificName2"
+                verbatimScientificName: "verbatimScientificName3"
+              },
+              {
+                isPrimary: false,
+                verbatimScientificName: "verbatimScientificName4"
               }
             ]
           }
         ]
       })
-    ).toEqual("verbatimScientificName1, verbatimScientificName2");
+    ).toEqual("verbatimScientificName1, verbatimScientificName3");
   });
 
   test("getScientificNames scientific name should be preferred", async () => {
@@ -104,43 +96,6 @@ describe("OrganismUtils unit tests", () => {
         ]
       })
     ).toEqual("scientificName1");
-  });
-
-  test("getScientificNames with no target or no primary determinations", async () => {
-    expect(
-      getScientificNames({
-        type: "material-sample",
-        organism: [
-          {
-            type: "organism",
-            isTarget: false,
-            determination: [
-              {
-                isPrimary: false,
-                verbatimScientificName: "verbatimScientificName1"
-              }
-            ]
-          },
-          {
-            type: "organism",
-            isTarget: false,
-            determination: [
-              {
-                isPrimary: false,
-                verbatimScientificName: "verbatimScientificName2"
-              },
-              {
-                isPrimary: false,
-                verbatimScientificName: "verbatimScientificName3",
-                scientificName: "scientificName3"
-              }
-            ]
-          }
-        ]
-      })
-    ).toEqual(
-      "verbatimScientificName1, verbatimScientificName2, scientificName3"
-    );
   });
 
   test("getScientificNames with no organisms", async () => {
