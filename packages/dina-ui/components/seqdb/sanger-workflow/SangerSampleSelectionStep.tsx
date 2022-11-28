@@ -12,7 +12,7 @@ import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
 import { pick, compact, uniq } from "lodash";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { ELASTIC_SEARCH_COLUMN } from "../../material-sample/RelationshipColumns";
+import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;

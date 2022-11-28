@@ -27,7 +27,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/material-sample/RelationshipColumns";
+import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;

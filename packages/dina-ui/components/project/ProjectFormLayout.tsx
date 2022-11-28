@@ -9,7 +9,7 @@ import {
 import { AttachmentsField, GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
-import { ELASTIC_SEARCH_COLUMN } from "../material-sample/RelationshipColumns";
+import { ELASTIC_SEARCH_COLUMN } from "../collection/material-sample/MaterialSampleRelationshipColumns";
 
 export function ProjectFormLayout() {
   const { readOnly, initialValues } = useDinaFormContext();
