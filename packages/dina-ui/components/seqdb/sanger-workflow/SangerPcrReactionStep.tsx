@@ -26,6 +26,7 @@ import { pick, compact, uniq } from "lodash";
 import { PersistedResource } from "kitsu";
 import { isGeneratorFunction } from "util/types";
 import { OrganismsField } from "../../collection/material-sample/OrganismsField";
+import { getScientificNames } from "../../collection/material-sample/organismUtils";
 
 
 interface PcrBatchItemReactionStep {
@@ -262,22 +263,9 @@ export function SangerPcrReactionStep({
     {
       Cell: ({ original }) => {
         const fetchedMaterialSample = materialSamples.find((materialSample) => materialSample.id === original?.materialSample?.id);
-
+        
         if (!fetchedMaterialSample) return <></>;
-
-        const organisms = fetchedMaterialSample.organism;
-        console.log(fetchedMaterialSample);
-        if (!organisms) return <></>;
-
-        const targetOrganism = organisms.filter((organism) => organism?.isTarget === true);
-        console.log(targetOrganism);
-
-        return <></>;
-        // <a
-        //   href={`/collection/material-sample/view?id=${original?.determination?.id}`}
-        // >
-        //   {original?.determination}
-        // </a>
+        return getScientificNames(fetchedMaterialSample);
       },
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
