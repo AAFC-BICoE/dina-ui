@@ -176,7 +176,7 @@ export function CollectionFormFields({ title }) {
           readOnlyLink="/collection/collection/view?id="
           filter={filter}
           model="collection-api/collection"
-          optionLabel={collection => collection.name as any}
+          optionLabel={(collection) => collection.name as any}
           className="col-md-6"
           label={formatMessage("parentCollectionLabel")}
         />
