@@ -17,8 +17,12 @@ export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
   },
   {
     Cell: ({ original }) => {
-      const organisms: any[] | undefined = original.included?.organism;
-      // console.log(original);
+      let organisms: any[] | undefined = original.included?.organism;
+      if (organisms?.[0].attributes) {
+        organisms = organisms.map((organism) => {
+          return { ...organism, ...organism.attributes };
+        });
+      }
       const materialSample: MaterialSample = {
         type: "material-sample",
         organism: organisms
