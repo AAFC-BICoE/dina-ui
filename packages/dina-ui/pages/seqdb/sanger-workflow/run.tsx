@@ -1,4 +1,4 @@
-import { BackToListButton, ApiClientContext, LoadingSpinner } from "common-ui";
+import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -7,10 +7,11 @@ import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-work
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/sanger-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
+import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerPcrReactionStep";
 
 export default function SangerWorkFlowRunPage() {
   const router = useRouter();
@@ -133,6 +134,9 @@ export default function SangerWorkFlowRunPage() {
           <Tab disabled={isDisabled(2, true)}>
             {formatMessage("selectCoordinates")}
           </Tab>
+          <Tab disabled={isDisabled(3, true)}>
+            {formatMessage("pcrReaction")}
+          </Tab>
         </TabList>
         <TabPanel>
           <SangerPcrBatchStep
@@ -161,6 +165,17 @@ export default function SangerWorkFlowRunPage() {
             <PCRBatchItemGrid
               pcrBatchId={pcrBatchId}
               pcrBatch={pcrBatch.response.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {pcrBatch.response?.data && pcrBatchId && (
+            <SangerPcrReactionStep
+              pcrBatchId={pcrBatchId}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}
