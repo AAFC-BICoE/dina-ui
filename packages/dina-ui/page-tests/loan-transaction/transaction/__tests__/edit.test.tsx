@@ -252,6 +252,8 @@ describe("Transaction Form", () => {
           roles: ["my-role-1"]
         }
       ],
+      attachment: undefined,
+      materialSamples: undefined,
       closedDate: "2022-01-02",
       dueDate: "2022-01-03",
       materialDirection: "OUT",
@@ -259,7 +261,11 @@ describe("Transaction Form", () => {
       openedDate: "2022-01-01",
       otherIdentifiers: ["otherIdentifiers"],
       purpose: "purpose",
-      relationships: {},
+      relationships: {
+        materialSamples: {
+          data: []
+        }
+      },
       remarks: "transaction remarks",
       shipment: {
         address: {
@@ -341,6 +347,7 @@ describe("Transaction Form", () => {
             resource: {
               ...testExistingTransaction(),
               attachment: undefined,
+              materialSamples: undefined,
               // Moves the attachments into the relationships field:
               relationships: {
                 attachment: {
@@ -348,6 +355,9 @@ describe("Transaction Form", () => {
                     { id: "attach-1", type: "metadata" },
                     { id: "attach-2", type: "metadata" }
                   ]
+                },
+                materialSamples: {
+                  data: []
                 }
               }
             },

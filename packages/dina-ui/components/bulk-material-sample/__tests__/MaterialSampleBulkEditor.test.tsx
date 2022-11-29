@@ -15,6 +15,7 @@ import {
   ASSOCIATIONS_COMPONENT_NAME,
   blankMaterialSample,
   COLLECTING_EVENT_COMPONENT_NAME,
+  FormTemplate,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
@@ -24,6 +25,8 @@ import {
   StorageUnit
 } from "../../../types/collection-api";
 import { MaterialSampleBulkEditor } from "../MaterialSampleBulkEditor";
+import { deleteFromStorage } from "@rehooks/local-storage";
+import { SAMPLE_FORM_TEMPLATE_KEY } from "../..";
 
 const TEST_COLLECTING_EVENT = {
   id: "col-event-1",
@@ -71,6 +74,722 @@ const TEST_STORAGE_UNITS = ["A", "B", "C"].map<PersistedResource<StorageUnit>>(
     }
   })
 );
+
+const formTemplate: PersistedResource<FormTemplate> = {
+  id: "cd6d8297-43a0-45c6-b44e-983db917eb11",
+  type: "form-template",
+  name: "test view with managed attributes",
+  group: "cnc",
+  restrictToCreatedBy: false,
+  viewConfiguration: { type: "material-sample-form-template" },
+  components: [
+    {
+      name: "identifiers-component",
+      visible: true,
+      order: 0,
+      sections: [
+        {
+          name: "general-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "tags",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "projects",
+              visible: false
+            },
+            { defaultValue: undefined, name: "assemblages", visible: false },
+            {
+              defaultValue: undefined,
+              name: "publiclyReleasable",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "notPubliclyReleasableReason",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "identifiers-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "collection", visible: false },
+            {
+              defaultValue: "material sample 1",
+              name: "materialSampleName",
+              visible: true
+            },
+            {
+              defaultValue: undefined,
+              name: "useNextSequence",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcOtherCatalogNumbers",
+              visible: false
+            },
+            { defaultValue: "1111", name: "barcode", visible: true }
+          ]
+        }
+      ]
+    },
+    {
+      name: "material-sample-info-component",
+      visible: true,
+      order: 1,
+      sections: [
+        {
+          name: "material-sample-info-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "materialSampleType",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "materialSampleRemarks",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "materialSampleState",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "stateChangeRemarks",
+              visible: false
+            },
+            { defaultValue: undefined, name: "stateChangedOn", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: "collecting-event-component",
+      visible: true,
+      order: 2,
+      sections: [
+        {
+          name: "general-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "tags", visible: false },
+            {
+              defaultValue: undefined,
+              name: "publiclyReleasable",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "notPubliclyReleasableReason",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "identifiers-section",
+          visible: true,
+          items: [
+            { defaultValue: "123", name: "dwcFieldNumber", visible: true }
+          ]
+        },
+        {
+          name: "collecting-date-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "verbatimEventDateTime",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "startEventDateTime",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "endEventDateTime",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "collecting-agents-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "dwcRecordedBy", visible: false },
+            { defaultValue: undefined, name: "collectors", visible: false },
+            {
+              defaultValue: undefined,
+              name: "dwcRecordNumber",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "verbatim-label-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimLocality",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimCoordinateSystem",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimCoordinates",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimLatitude",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimLongitude",
+              visible: false
+            },
+            { defaultValue: undefined, name: "dwcVerbatimSRS", visible: false },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimElevation",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcVerbatimDepth",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "collecting-event-details",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "habitat", visible: false },
+            { defaultValue: undefined, name: "host", visible: false },
+            {
+              defaultValue: undefined,
+              name: "collectionMethod",
+              visible: false
+            },
+            { defaultValue: undefined, name: "substrate", visible: false },
+            {
+              defaultValue: undefined,
+              name: "dwcMinimumElevationInMeters",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcMaximumElevationInMeters",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcMinimumDepthInMeters",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcMaximumDepthInMeters",
+              visible: false
+            },
+            { defaultValue: undefined, name: "remarks", visible: false }
+          ]
+        },
+        {
+          name: "georeferencing-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcDecimalLatitude",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcDecimalLongitude",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeoreferencedDate",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeodeticDatum",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].literalGeoreferencedBy",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].georeferencedBy",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeoreferenceProtocol",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeoreferenceSources",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geoReferenceAssertions",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "current-geographic-place",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "srcAdminLevels", visible: false },
+            {
+              defaultValue: undefined,
+              name: "geographicPlaceNameSourceDetail.stateProvince",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "geographicPlaceNameSourceDetail.country",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "collecting-event-managed-attributes-section",
+          visible: true,
+          items: []
+        },
+        {
+          name: "collecting-event-attachments-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "managedAttributes.attachmentsConfig.allowNew",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "managedAttributes.attachmentsConfig.allowExisting",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "acquisition-event-component",
+      visible: false,
+      order: 3,
+      sections: [
+        {
+          name: "acquisition-event-reception-section",
+          visible: true,
+          items: [
+            {
+              name: "group",
+              visible: false,
+              defaultValue: "aafc"
+            },
+            { defaultValue: undefined, name: "receivedFrom", visible: false },
+            { defaultValue: undefined, name: "receivedDate", visible: false },
+            {
+              defaultValue: undefined,
+              name: "receptionRemarks",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "acquisition-event-isolation-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "isolatedBy", visible: false },
+            { defaultValue: undefined, name: "isolatedOn", visible: false },
+            {
+              defaultValue: undefined,
+              name: "isolationRemarks",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "preparations-component",
+      visible: false,
+      order: 4,
+      sections: [
+        {
+          name: "general-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "preparationType",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationMethod",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preservationType",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationFixative",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationMaterials",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationSubstrate",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationRemarks",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "dwcDegreeOfEstablishment",
+              visible: false
+            },
+            { defaultValue: undefined, name: "preparedBy", visible: false },
+            {
+              defaultValue: undefined,
+              name: "preparationDate",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "preparationProtocol",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "organisms-component",
+      visible: false,
+      order: 5,
+      sections: [
+        {
+          name: "organisms-general-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "organism[0].lifeStage",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].sex",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].remarks",
+              visible: false
+            },
+            { defaultValue: undefined, name: "organism", visible: false }
+          ]
+        },
+        {
+          name: "organism-verbatim-determination-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].verbatimScientificName",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].verbatimDeterminer",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].verbatimDate",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].verbatimRemarks",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].transcriberRemarks",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "organism-determination-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].scientificName",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].scientificNameInput",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].determiner",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].determinedOn",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].determinationRemarks",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "organism-type-specimen-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].typeStatus",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "organism[0].determination[0].typeStatusEvidence",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "organism-managed-attributes-section",
+          visible: true,
+          items: []
+        }
+      ]
+    },
+    {
+      name: "associations-component",
+      visible: false,
+      order: 6,
+      sections: [
+        {
+          name: "associations-host-organism-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "hostOrganism.name",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "hostOrganism.remarks",
+              visible: false
+            }
+          ]
+        },
+        {
+          name: "associations-material-sample-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "associations.associationType",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "associations.associatedSample",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "associations.remarks",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "storage-component",
+      visible: false,
+      order: 7,
+      sections: [
+        {
+          name: "storage-selection-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "storageUnit", visible: false }
+          ]
+        }
+      ]
+    },
+    {
+      name: "restriction-component",
+      visible: false,
+      order: 8,
+      sections: [
+        {
+          name: "restriction-general-section",
+          visible: true,
+          items: [
+            { defaultValue: undefined, name: "phac_animal_rg", visible: false },
+            { defaultValue: undefined, name: "cfia_ppc", visible: false },
+            { defaultValue: undefined, name: "phac_human_rg", visible: false },
+            { defaultValue: undefined, name: "phac_cl", visible: false },
+            { defaultValue: undefined, name: "isRestricted", visible: false },
+            {
+              defaultValue: undefined,
+              name: "restrictionRemarks",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "scheduled-actions-component",
+      visible: false,
+      order: 9,
+      sections: [
+        {
+          name: "scheduled-actions-add-section",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "scheduledAction.actionType",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "scheduledAction.actionStatus",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "scheduledAction.date",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "scheduledAction.assignedTo",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "scheduledAction.remarks",
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "managed-attributes-component",
+      visible: true,
+      order: 10,
+      sections: [
+        {
+          name: "managed-attributes-section",
+          visible: true,
+          items: []
+        }
+      ]
+    },
+    {
+      name: "material-sample-attachments-component",
+      visible: true,
+      order: 11,
+      sections: [
+        {
+          name: "material-sample-attachments-sections",
+          visible: true,
+          items: [
+            {
+              defaultValue: undefined,
+              name: "attachmentsConfig.allowNew",
+              visible: false
+            },
+            {
+              defaultValue: undefined,
+              name: "attachmentsConfig.allowExisting",
+              visible: false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
 
 /** FormTemplate with the managed attributes enabled for Material Sample, Collecting Event and Determination. */
 const TEST_CUSTOM_VIEW_WITH_MANAGED_ATTRIBUTES = {
@@ -134,6 +853,8 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
       return { data: TEST_STORAGE_UNIT };
     case "collection-api/storage-unit/C":
       return { data: TEST_STORAGE_UNITS[2] };
+    case "collection-api/form-template/cd6d8297-43a0-45c6-b44e-983db917eb11":
+      return { data: formTemplate };
     case "collection-api/storage-unit-type":
     case "collection-api/collection":
     case "collection-api/collection-method":
@@ -153,7 +874,6 @@ const mockGet = jest.fn<any, any>(async (path, params) => {
     case "collection-api/vocabulary/srs":
     case "collection-api/vocabulary/coordinateSystem":
     case "collection-api/acquisition-event":
-    case "collection-api/form-template":
     case "collection-api/vocabulary/materialSampleType":
       return { data: [] };
   }
@@ -433,6 +1153,7 @@ const TEST_SAMPLES_SAME_HOST_ORGANISM: InputResource<MaterialSample>[] = [
 ];
 
 describe("MaterialSampleBulkEditor", () => {
+  beforeEach(() => deleteFromStorage(SAMPLE_FORM_TEMPLATE_KEY));
   beforeEach(jest.clearAllMocks);
 
   it("Bulk creates material samples.", async () => {
@@ -2321,4 +3042,130 @@ describe("MaterialSampleBulkEditor", () => {
   //       .exists()
   //   ).toEqual(true);
   // });
+
+  it("Allows selecting a Form Template to show/hide fields in the bulk and single tabs for material sample section.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(true);
+
+    // Select a form template:
+    wrapper
+      .find(".form-template-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")(formTemplate);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".form-template-select")
+        .find(ResourceSelect)
+        .prop<any>("value").id
+    ).toEqual(formTemplate.id);
+
+    // The bulk edit tab shows the barcode field from the FormTemplate:
+    // For Material Sample:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field input")
+        .exists()
+    ).toEqual(false);
+
+    // Switch to the first individual sample tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".sample-tabpanel-0 .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".sample-tabpanel-0 .dwcOtherCatalogNumbers-field input")
+        .exists()
+    ).toEqual(false);
+  });
+
+  it("Allows selecting a Form Template to provide default values for bulk material sample edit all tab.", async () => {
+    const wrapper = mountWithAppContext(
+      <MaterialSampleBulkEditor
+        onSaved={mockOnSaved}
+        samples={TEST_NEW_SAMPLES}
+      />,
+      testCtx
+    );
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(true);
+
+    // Select a form template:
+    wrapper
+      .find(".form-template-select")
+      .find(ResourceSelect)
+      .prop<any>("onChange")(formTemplate);
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper
+        .find(".form-template-select")
+        .find(ResourceSelect)
+        .prop<any>("value").id
+    ).toEqual(formTemplate.id);
+
+    // The bulk edit tab shows the default values from the FormTemplate:
+    // For Material Sample:
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").exists()
+    ).toEqual(true);
+    expect(
+      wrapper
+        .find(".tabpanel-EDIT_ALL .dwcOtherCatalogNumbers-field textarea")
+        .exists()
+    ).toEqual(false);
+    expect(
+      wrapper.find(".tabpanel-EDIT_ALL .barcode-field input").prop("value")
+    ).toEqual("1111");
+
+    // Switch to the first individual sample tab:
+    wrapper.find("li.sample-tab-0").simulate("click");
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(
+      wrapper.find(".sample-tabpanel-0 .barcode-field input").prop("value")
+    ).toEqual("");
+  });
 });

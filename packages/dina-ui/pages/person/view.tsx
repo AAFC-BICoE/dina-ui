@@ -6,7 +6,7 @@ import { Person } from "../../types/agent-api/resources/Person";
 export default function PersonDetailsPage() {
   return (
     <ViewPageLayout<Person>
-      form={props => {
+      form={(props) => {
         const person = props.initialValues;
 
         if (person.createdOn) {
@@ -44,7 +44,9 @@ export default function PersonDetailsPage() {
           </DinaForm>
         );
       }}
-      query={id => ({ path: `agent-api/person/${id}` })}
+      query={(id) => ({
+        path: `agent-api/person/${id}?include=organizations,identifiers`
+      })}
       entityLink="/person"
       type="person"
       apiBaseUrl="/agent-api"

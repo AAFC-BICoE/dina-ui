@@ -100,7 +100,7 @@ export interface MaterialSampleRelationships {
   preparationProtocol?: ResourceIdentifierObject;
   preparationMethod?: ResourceIdentifierObject;
   preparationType?: PreparationType;
-  preparedBy?: Person;
+  preparedBy?: Person[];
   parentMaterialSample?: MaterialSample;
   storageUnit?: StorageUnit;
   projects?: Project[];

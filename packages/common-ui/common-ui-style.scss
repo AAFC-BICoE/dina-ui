@@ -198,10 +198,3 @@ input[type="number"]::-webkit-outer-spin-button {
 .hidden {
   display: none !important;
 }
-
-/*
- * React Table Styles
- */
-.react-table-overflow .rt-td, .react-table-overflow .rt-tbody, .react-table-overflow .rt-table {
-  overflow: visible !important;
-}

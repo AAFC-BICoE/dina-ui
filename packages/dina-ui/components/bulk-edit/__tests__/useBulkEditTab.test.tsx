@@ -25,7 +25,10 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
   const {
     sampleFormTemplate,
     setSampleFormTemplateUUID,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
 
   const [selectedTab, setSelectedTab] = useState<
@@ -48,7 +51,10 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     [baseSample],
     visibleManagedAttributeKeys,
     selectedTab,
-    sampleFormTemplate
+    sampleFormTemplate,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */

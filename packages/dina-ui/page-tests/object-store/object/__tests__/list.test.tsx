@@ -237,6 +237,7 @@ jest.mock("next/router", () => ({
 
 describe("Metadata List Page", () => {
   beforeEach(() => {
+    window.localStorage.clear();
     jest.clearAllMocks();
   });
 

@@ -11,7 +11,6 @@ import { clamp } from "lodash";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
-import { PersonIdentifierType } from "../../../dina-ui/types/agent-api/resources/PersonIdentifier";
 import { IdentifierRow } from "../identifier/IdentifierRow";
 
 export interface PersonFormFieldsProps {
@@ -27,16 +26,6 @@ export function PersonFormFields({
 }: PersonFormFieldsProps) {
   const [activeTabIdx, setActiveTabIdx] = useState(0);
   const { readOnly } = useDinaFormContext();
-  const typeOptions: SelectOption<string | undefined>[] = [
-    {
-      label: PersonIdentifierType.ORCID,
-      value: PersonIdentifierType.ORCID
-    },
-    {
-      label: PersonIdentifierType.WIKIDATA,
-      value: PersonIdentifierType.WIKIDATA
-    }
-  ];
 
   return (
     <div className={divClassName} style={{ width: `${width}` }}>
@@ -57,7 +46,7 @@ export function PersonFormFields({
               function removeIdentifier(index: number) {
                 remove(index);
                 // Stay on the current tab number, or reduce if removeing the last element:
-                setActiveTabIdx(current =>
+                setActiveTabIdx((current) =>
                   clamp(current, 0, identifiers.length - 2)
                 );
               }
@@ -82,7 +71,7 @@ export function PersonFormFields({
                       <TabPanel key={index}>
                         <IdentifierRow
                           index={index}
-                          typeOptions={typeOptions}
+                          vocabularyOptionsEndpoint="agent-api/vocabulary/identifiers"
                         />
                         {!readOnly && (
                           <div className="list-inline mb-3">
