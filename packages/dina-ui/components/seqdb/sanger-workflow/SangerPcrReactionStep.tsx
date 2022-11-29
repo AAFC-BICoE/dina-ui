@@ -48,7 +48,7 @@ export function SangerPcrReactionStep({
 
   // Initial fetch, should refetch between edit modes.
   useEffect(() => {
-    setLoading(false);
+    setLoading(true);
     fetchPcrBatchItems();
   }, [editMode]);
 
