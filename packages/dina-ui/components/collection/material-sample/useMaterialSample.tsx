@@ -696,6 +696,16 @@ export function useMaterialSampleSave({
               pick(it, "id", "type")
             )
           }
+        }),
+        ...(msDiffWithOrganisms.preparationType?.id && {
+          preparationType: {
+            data: pick(msDiffWithOrganisms.preparationType, "id", "type")
+          }
+        }),
+        ...(msDiffWithOrganisms.collection?.id && {
+          collection: {
+            data: pick(msDiffWithOrganisms.collection, "id", "type")
+          }
         })
       },
 
