@@ -368,9 +368,6 @@ export function MaterialSampleForm({
                   id,
                   legend: <DinaMessage id="materialSampleManagedAttributes" />
                 }}
-                // Custom view selection is supported for material samples,
-                // but not in template editor mode:
-                showFormTemplateDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
                   visibleManagedAttributeKeys?.materialSample

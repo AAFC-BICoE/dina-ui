@@ -406,7 +406,6 @@ export function CollectingEventFormLayout({
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
         sectionName: "collecting-event-managed-attributes-section"
       }}
-      showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
     />
