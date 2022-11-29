@@ -3,7 +3,15 @@ import {
   Organism
 } from "packages/dina-ui/types/collection-api";
 
-/** Retrieves all the scientific names for a material sample */
+/**
+ * Comma separated string with all of the scientific names of the organisms.
+ *
+ * isTarget and isPrimary are used to find the specific scientific name. If multiple
+ * primary determinations are found then a comma separated list is supplied.
+ *
+ * @param materialSample A material sample.
+ * @returns Empty string if no organism or no scientific names can be found.
+ */
 export function getScientificNames(materialSample: MaterialSample) {
   const organisms = materialSample.organism as Organism[];
   if (!organisms) return "";

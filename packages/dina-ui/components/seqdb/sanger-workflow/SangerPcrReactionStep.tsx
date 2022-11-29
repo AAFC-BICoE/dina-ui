@@ -1,6 +1,7 @@
 import {
   PcrBatchItem,
-  PcrBatchItemDropdownResults
+  PcrBatchItemDropdownResults,
+  pcrBatchItemResultColor
 } from "../../../types/seqdb-api";
 import { useState, useEffect, useRef, Ref } from "react";
 import {
@@ -13,17 +14,11 @@ import {
   AutoSuggestTextField
 } from "common-ui";
 import ReactTable, { Column } from "react-table";
-import { MaterialSample, Determination } from "../../../types/collection-api";
+import { MaterialSample } from "../../../types/collection-api";
 import { FormikProps } from "formik";
 import { sortBy } from "lodash";
 import { PersistedResource } from "kitsu";
-import { OrganismsField } from "../../collection/material-sample/OrganismsField";
-
-interface PcrBatchItemReactionStep {
-  pcrBatchItem: PcrBatchItem;
-  materialSample?: MaterialSample;
-  determination?: Determination;
-}
+import { getScientificNames } from "../../collection/material-sample/organismUtils";
 
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
@@ -51,11 +46,13 @@ export function SangerPcrReactionStep({
   );
   const [materialSamples, setMaterialSamples] = useState<MaterialSample[]>([]);
 
+  // Initial fetch, should refetch between edit modes.
   useEffect(() => {
     setLoading(false);
     fetchPcrBatchItems();
   }, [editMode]);
 
+  // Once the pcr batch items have been loaded, fetch the material samples as well.
   useEffect(() => {
     if (selectedResources.length !== 0) {
       fetchMaterialSamples();
@@ -137,25 +134,6 @@ export function SangerPcrReactionStep({
     setEditMode(false);
   }
 
-  function getColor(result: any) {
-    switch (result) {
-      case "No Band":
-        return "FFC0CB";
-      case "Good Band":
-        return "DEFCDE";
-      case "Weak Band":
-        return "FFFACD";
-      case "Multiple Bands":
-        return "EACEDE";
-      case "Contaminated":
-        return "FFC0CB";
-      case "Smear":
-        return "DCDCDC";
-      default:
-        return "92a8d1";
-    }
-  }
-
   const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
     {
       Cell: ({ original }) => {
@@ -198,14 +176,7 @@ export function SangerPcrReactionStep({
 
         if (!fetchedMaterialSample) return <></>;
 
-        const organisms = fetchedMaterialSample.organism;
-        if (!organisms) return <></>;
-
-        const targetOrganism = organisms.filter(
-          (organism) => organism?.isTarget === true
-        );
-
-        return <></>;
+        return <>{getScientificNames(fetchedMaterialSample)}</>;
       },
       Header: <FieldHeader name={"scientificName"} />,
       sortable: false
@@ -234,7 +205,7 @@ export function SangerPcrReactionStep({
         ) : (
           <div
             style={{
-              backgroundColor: "#" + getColor(original?.result),
+              backgroundColor: "#" + pcrBatchItemResultColor(original?.result),
               borderRadius: "5px",
               paddingLeft: "5px"
             }}
@@ -266,7 +237,6 @@ export function SangerPcrReactionStep({
       innerRef={formRef}
       readOnly={!editMode}
     >
-      {/* <ReactTable<PcrBatchItem> */}
       <ReactTable<PcrBatchItem>
         className="react-table-overflow"
         columns={PCR_REACTION_COLUMN}
