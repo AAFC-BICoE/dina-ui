@@ -8,29 +8,25 @@ import {
 import Link from "next/link";
 import { Footer, GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { PcrBatch } from "../../../types/seqdb-api";
+import { SeqBatch } from "../../../types/seqdb-api";
 
-const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
+const TABLE_COLUMNS: ColumnDefinition<SeqBatch>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/sanger-workflow/run?pcrBatchId=${id}`}>
+      <Link href={`/seqdb/sanger-workflow-sequencing/run?seqBatchId=${id}`}>
         {name || id}
       </Link>
     ),
     accessor: "name",
-    Header: () => <SeqdbMessage id="pcrBatchName" />
+    Header: () => <SeqdbMessage id="seqBatchName" />
   },
   "group",
-  "primerForward.name",
-  "primerReverse.name",
   "createdBy",
   dateCell("createdOn")
 ];
 
 const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "name",
-  "primerForward.name",
-  "primerReverse.name",
   {
     name: "createdOn",
     type: "DATE"
@@ -38,10 +34,10 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "createdBy"
 ];
 
-export default function SangerWorkflowListPage() {
+export default function SangerWorkflowSequencingListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("sangerWorkflowListTitle");
+  const title = formatMessage("sangerWorkflowSequencingListTitle");
 
   return (
     <div>
@@ -49,10 +45,10 @@ export default function SangerWorkflowListPage() {
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <SeqdbMessage id="sangerWorkflowListTitle" />
+          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
         </h1>
         <ButtonBar>
-          <Link href={`/seqdb/sanger-workflow/run`}>
+          <Link href={`/seqdb/sanger-workflow-sequencing/run`}>
             <a className="btn btn-primary">
               <SeqdbMessage id="startNewWorkflow" />
             </a>
@@ -64,11 +60,10 @@ export default function SangerWorkflowListPage() {
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
-          id="sanger-workflow-list"
+          id="sanger-workflow-sequencing-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
-            path: "seqdb-api/pcr-batch",
-            include: "primerForward,primerReverse"
+            path: "seqdb-api/seq-batch"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
