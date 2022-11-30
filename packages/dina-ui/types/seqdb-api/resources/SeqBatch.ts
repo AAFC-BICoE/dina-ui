@@ -1,4 +1,3 @@
-import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
 import { Region } from "./Region";
