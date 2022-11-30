@@ -100,5 +100,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   workflowDetailsTab: "Détails",
   workflowListTitle: "Flux de SNG",
   workflowStepTab: "Étape {number} : {name}",
-  workflowViewTitle: "Flux de SNG"
+  workflowViewTitle: "Flux de SNG",
+  sangerWorkflowSequencingListTitle: "Flux de travail Sanger - Séquences (fr)"
 };

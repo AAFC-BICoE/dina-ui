@@ -363,6 +363,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="sangerWorkflowListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/sanger-workflow-sequencing/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
         <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
           <SeqdbMessage id="thermocyclerProfileListTitle" />
