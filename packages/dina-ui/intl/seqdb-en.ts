@@ -101,5 +101,10 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowStepTab: "Step {number}: {name}",
   workflowViewTitle: "NGS Workflow",
   sangerWorkflowSequencingListTitle: "Sanger Workflows - Sequencing",
-  seqBatchName: "SEQ Batch Name"
+  seqBatchName: "SEQ Batch Name",
+  seqBatch: "SEQ Batch",
+  seqBatchListTitle: "SEQ Batches",
+  seqBatchViewTitle: "View SEQ Batch",
+  editSeqBatchTitle: "Edit SEQ Batch",
+  addSeqBatchTitle: "Add SEQ Batch"
 };
