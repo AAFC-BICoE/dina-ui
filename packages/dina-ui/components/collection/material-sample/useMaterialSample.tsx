@@ -24,7 +24,7 @@ import {
   find
 } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
+import { useLayoutEffect, useRef, useState, useEffect, RefObject } from "react";
 import {
   BLANK_PREPARATION,
   CollectingEventFormLayout,
@@ -168,6 +168,8 @@ export interface UseMaterialSampleSaveParams {
   showChangedIndicatorsInNestedForms?: boolean;
 
   visibleManagedAttributeKeys?: VisibleManagedAttributesConfig;
+
+  bulkEditCollectingEventFormRef?: any;
 }
 
 export interface PrepareSampleSaveOperationParams {
@@ -193,10 +195,14 @@ export function useMaterialSampleSave({
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
-  visibleManagedAttributeKeys
+  visibleManagedAttributeKeys,
+  bulkEditCollectingEventFormRef
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
+  const bulkEditCollectingEvent =
+    bulkEditCollectingEventFormRef &&
+    bulkEditCollectingEventFormRef.current?.values;
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -496,9 +502,14 @@ export function useMaterialSampleSave({
     // Save and link the Collecting Event if enabled:
     if (enableCollectingEvent && colEventFormRef.current) {
       // Save the linked CollectingEvent if included:
-      const submittedCollectingEvent = cloneDeep(
-        colEventFormRef.current.values
-      );
+      let submittedCollectingEvent = cloneDeep(colEventFormRef.current.values);
+
+      if (bulkEditCollectingEvent) {
+        submittedCollectingEvent = {
+          ...bulkEditCollectingEvent,
+          ...submittedCollectingEvent
+        };
+      }
 
       const collectingEventWasEdited =
         !submittedCollectingEvent.id ||
@@ -510,7 +521,6 @@ export function useMaterialSampleSave({
         if (!isEmpty(colEventErrors)) {
           throw new DoOperationsError("", colEventErrors);
         }
-
         // Only send the save request if the Collecting Event was edited:
         const savedCollectingEvent = collectingEventWasEdited
           ? // Use the same save method as the Collecting Event page:
@@ -939,7 +949,8 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
-    loading
+    loading,
+    colEventFormRef
   };
 }
 

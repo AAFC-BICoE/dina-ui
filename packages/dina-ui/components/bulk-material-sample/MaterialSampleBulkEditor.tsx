@@ -13,7 +13,7 @@ import {
 import { isEmpty } from "lodash";
 import { InputResource, PersistedResource, KitsuResource } from "kitsu";
 import { keys, omit, pick, pickBy } from "lodash";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, RefObject } from "react";
 import { Promisable } from "type-fest";
 import {
   MaterialSampleFormTemplateSelect,
@@ -214,10 +214,13 @@ export function initializeRefHookFormProps(
     showChangedIndicatorsInNestedForms: true
   });
 
+  const bulkEditCollectingEventFormRef = bulkEditSampleHook.colEventFormRef;
+
   const sampleHooks = getSampleHooks(
     samples,
     selectedTab,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    bulkEditCollectingEventFormRef
   );
 
   const materialSampleForm = getMaterialSampleForm(
@@ -242,7 +245,8 @@ function getSampleHooks(
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
     | undefined,
-  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined
+  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
+  bulkEditCollectingEventFormRef: any
 ) {
   return samples.map((resource, index) => {
     const key = `sample-${index}`;
@@ -255,7 +259,8 @@ function getSampleHooks(
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
         disableNestedFormEdits: true,
-        visibleManagedAttributeKeys
+        visibleManagedAttributeKeys,
+        bulkEditCollectingEventFormRef
       }),
       formRef: useRef(null)
     };
