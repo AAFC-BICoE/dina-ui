@@ -1,10 +1,6 @@
 import { KitsuResource } from "kitsu";
-import { Utils } from "react-awesome-query-builder";
 import { TableColumn } from "../../../types";
-import { QUERY_BUILDER_TEST_CONFIG } from "../../query-builder-test-support/QueryBuilderTestConfig";
-import { QUERY_BUILDER_AND_TREE } from "../../query-builder-test-support/QueryBuilderTestTree";
 import {
-  elasticSearchFormatExport,
   applyGroupFilters,
   applyPagination,
   applyRootQuery,
