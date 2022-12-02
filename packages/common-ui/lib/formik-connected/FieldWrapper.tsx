@@ -103,6 +103,15 @@ export function FieldWrapper(props: FieldWrapperProps) {
         name: sectionName
       });
       if (sectionFound) {
+        if (name.includes("managedAttributes")) {
+          const visibleManagedAttributes = find(sectionFound.items, {
+            name: "managedAttributesOrder"
+          })?.defaultValue;
+          return visibleManagedAttributes.includes(
+            templateCheckboxFieldName ?? name
+          );
+        }
+
         return (
           !find(sectionFound.items, {
             name: templateCheckboxFieldName ?? name
