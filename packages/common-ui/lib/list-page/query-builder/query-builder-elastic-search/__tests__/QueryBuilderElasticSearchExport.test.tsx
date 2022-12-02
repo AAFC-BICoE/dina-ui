@@ -1,10 +1,20 @@
 import { KitsuResource } from "kitsu";
+import { Utils } from "react-awesome-query-builder";
 import { TableColumn } from "../../../types";
+import { QUERY_BUILDER_TEST_CONFIG } from "../../query-builder-test-support/QueryBuilderTestConfig";
+import { QUERY_BUILDER_AND_TREE } from "../../query-builder-test-support/QueryBuilderTestTree";
 import {
+  elasticSearchFormatExport,
   applyGroupFilters,
   applyPagination,
+  applyRootQuery,
   applySortingRules,
-  applySourceFiltering
+  applySourceFiltering,
+  includedTypeQuery,
+  termQuery,
+  matchQuery,
+  existsQuery,
+  rangeQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -58,12 +68,6 @@ const columnDefinitions: (TableColumn<KitsuResource> | string)[] = [
 ];
 
 describe("QueryBuilderElasticSearchExport functionality", () => {
-  // describe("elasticSearchFormatExport", () => {
-  //   test("AND conjunction", async () => {
-
-  //   });
-  // });
-
   describe("applyPagination", () => {
     test("Pagination is correctly applied to query", async () => {
       // Pagination should be added to the existing query without altering anything.
@@ -196,7 +200,86 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
     });
   });
 
-  // describe("applyRootQuery", () => {
+  describe("applyRootQuery", () => {
+    test("Boolean logic exists, move it properly to it's own boolean section.", async () => {
+      expect(
+        applyRootQuery({
+          bool: {
+            must: [
+              {
+                term: {
+                  "data.attributes.materialSampleName.keyword": "Test"
+                }
+              },
+              {
+                term: {
+                  "data.attributes.preparationDate": "2022-11-30"
+                }
+              }
+            ]
+          }
+        })
+      ).toMatchSnapshot();
+    });
 
-  // });
+    test("Boolean logic exists, also contains should logic, include the must match minimum.", async () => {
+      expect(
+        applyRootQuery({
+          bool: {
+            should: [
+              {
+                term: {
+                  "data.attributes.materialSampleName.keyword": "Test"
+                }
+              },
+              {
+                term: {
+                  "data.attributes.preparationDate": "2022-11-30"
+                }
+              }
+            ],
+            must: [
+              {
+                term: {
+                  "data.attributes.materialSampleName.keyword": "Test"
+                }
+              },
+              {
+                term: {
+                  "data.attributes.preparationDate": "2022-11-30"
+                }
+              }
+            ]
+          }
+        })
+      ).toMatchSnapshot();
+    });
+
+    test("No boolean logic exists, just return the query as is.", async () => {
+      expect(applyRootQuery({ query: {} })).toMatchSnapshot();
+    });
+  });
+
+  describe("Query helper functions", () => {
+    test("includedTypeQuery", async () => {
+      expect(includedTypeQuery("parentTest")).toMatchSnapshot();
+    });
+
+    test("termQuery", async () => {
+      expect(termQuery("fieldTest", "valueToMatch", true)).toMatchSnapshot();
+      expect(termQuery("fieldTest", "valueToMatch", false)).toMatchSnapshot();
+    });
+
+    test("matchQuery", async () => {
+      expect(matchQuery("fieldTest", "valueToMatch")).toMatchSnapshot();
+    });
+
+    test("existsQuery", async () => {
+      expect(existsQuery("fieldTest")).toMatchSnapshot();
+    });
+
+    test("rangeQuery", async () => {
+      expect(rangeQuery("fieldTest", { lt: 500 })).toMatchSnapshot();
+    });
+  });
 });

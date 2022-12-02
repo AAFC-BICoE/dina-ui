@@ -1,5 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions existsQuery 1`] = `
+Object {
+  "exists": Object {
+    "field": "fieldTest",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
+Object {
+  "term": Object {
+    "included.type": "parentTest",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions matchQuery 1`] = `
+Object {
+  "match": Object {
+    "fieldTest": "valueToMatch",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions rangeQuery 1`] = `
+Object {
+  "range": Object {
+    "fieldTest": Object {
+      "lt": 500,
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 1`] = `
+Object {
+  "term": Object {
+    "fieldTest.keyword": "valueToMatch",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 2`] = `
+Object {
+  "term": Object {
+    "fieldTest": "valueToMatch",
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multiple groups 1`] = `
 Object {
   "query": Object {
@@ -120,6 +170,67 @@ Object {
     },
   },
   "size": 100,
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, also contains should logic, include the must match minimum. 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "minimum_should_match": 1,
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+      "should": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, move it properly to it's own boolean section. 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery No boolean logic exists, just return the query as is. 1`] = `
+Object {
+  "query": Object {},
 }
 `;
 
