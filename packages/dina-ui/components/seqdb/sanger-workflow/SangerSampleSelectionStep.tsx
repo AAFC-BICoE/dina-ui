@@ -155,6 +155,7 @@ export function SangerSampleSelectionStep({
   ];
 
   async function savePcrBatchItems() {
+    try{
     const { data: pcrBatch } = await apiClient.get<PcrBatch>(
       `seqdb-api/pcr-batch/${pcrBatchId}`,
       {}
@@ -229,6 +230,16 @@ export function SangerSampleSelectionStep({
     // Clear the previously selected resources.
     setPreviouslySelectedResources([]);
     setEditMode(false);
+  }
+  catch (e){
+    if(e.toString() == "Error: Access is denied"){
+      // console.log("test");
+      throw new Error("Error: Access is denied");
+    }
+  }
+  finally{
+    setEditMode(false);
+  }
   }
 
   // Wait until selected resources are loaded.
