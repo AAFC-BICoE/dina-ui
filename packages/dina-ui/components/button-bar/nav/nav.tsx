@@ -210,8 +210,13 @@ function NavCollectionDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/storage-unit/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item>
           <DinaMessage id="storageUnitListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/workbook/upload" passHref={true}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+          <DinaMessage id="workbookGroupUploadTitle" />
         </NavDropdown.Item>
       </Link>
     </NavDropdown>
