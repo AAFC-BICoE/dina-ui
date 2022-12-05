@@ -229,6 +229,12 @@ export function QueryPage<TData extends KitsuResource>({
     group: groupNames ?? []
   };
 
+  useEffect(() => {
+    if (viewMode && selectedResources?.length) {
+      setTotalRecords(selectedResources?.length);
+    }
+  }, [viewMode, selectedResources]);
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
     setLoading(true);
@@ -717,10 +723,13 @@ export function QueryPage<TData extends KitsuResource>({
               <ReactTable
                 // Column and data props
                 columns={mappedResultsColumns}
-                data={[
-                  ...searchResults,
-                  ...(selectedResources ? selectedResources : [])
-                ]}
+                data={
+                  viewMode
+                    ? customViewFields
+                      ? searchResults
+                      : selectedResources
+                    : searchResults
+                }
                 minRows={1}
                 // Loading Table props
                 loading={loading}
