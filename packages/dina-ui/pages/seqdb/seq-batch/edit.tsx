@@ -19,7 +19,12 @@ import { pick } from "lodash";
 import { useRouter } from "next/router";
 import { Protocol } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
-import { Head, Nav, PersonSelectField } from "../../../components";
+import {
+  GroupSelectField,
+  Head,
+  Nav,
+  PersonSelectField
+} from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
   Region,
@@ -106,20 +111,28 @@ export function SeqBatchForm({
     } = {
       ...submittedValues,
       relationships: {
-        experimenters: {
-          data: submittedValues?.experimenters?.map((collector) =>
-            pick(collector, "id", "type")
-          )
-        },
-        region: {
-          data: pick(submittedValues?.region, "id", "type")
-        },
-        thermocyclerProfile: {
-          data: pick(submittedValues?.thermocyclerProfile, "id", "type")
-        },
-        protocol: {
-          data: pick(submittedValues?.protocol, "id", "type")
-        }
+        ...(submittedValues.experimenters && {
+          experimenters: {
+            data: submittedValues?.experimenters?.map((collector) =>
+              pick(collector, "id", "type")
+            )
+          }
+        }),
+        ...(submittedValues.region && {
+          region: {
+            data: pick(submittedValues?.region, "id", "type")
+          }
+        }),
+        ...(submittedValues.thermocyclerProfile && {
+          thermocyclerProfile: {
+            data: pick(submittedValues?.thermocyclerProfile, "id", "type")
+          }
+        }),
+        ...(submittedValues.protocol && {
+          protocol: {
+            data: pick(submittedValues?.protocol, "id", "type")
+          }
+        })
       },
       experimenters: undefined,
       protocol: undefined,
@@ -157,6 +170,13 @@ export function SeqBatchFormFields() {
 
   return (
     <div>
+      <div className="row">
+        <GroupSelectField
+          name="group"
+          enableStoredDefaultGroup={true}
+          className="col-md-6"
+        />
+      </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
         <ResourceSelectField<ThermocyclerProfile>
