@@ -2,6 +2,7 @@ import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { SangerPcrBatchSelectionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerPcrBatchSelectionStep";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -31,7 +32,10 @@ export default function SangerWorkFlowRunPage() {
   );
 
   // Loaded SEQ Batch.
-  const seqBatch = useSeqBatchQuery(seqBatchId, [seqBatchId, currentStep]);
+  const seqBatchQueryState = useSeqBatchQuery(seqBatchId, [
+    seqBatchId,
+    currentStep
+  ]);
 
   // Update the URL to contain the current step.
   useEffect(() => {
@@ -52,7 +56,7 @@ export default function SangerWorkFlowRunPage() {
     });
   }
 
-  if (seqBatch.loading) {
+  if (seqBatchQueryState.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -125,17 +129,32 @@ export default function SangerWorkFlowRunPage() {
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
           <Tab disabled={isDisabled(0, false)}>{formatMessage("seqBatch")}</Tab>
+          <Tab disabled={isDisabled(0, false)}>
+            {formatMessage("selectPcrBatch")}
+          </Tab>
         </TabList>
         <TabPanel>
           <SangerSeqBatchStep
             seqBatchId={seqBatchId}
-            seqBatch={seqBatch.response?.data}
+            seqBatch={seqBatchQueryState.response?.data}
             onSaved={finishSeqBatchStep}
             editMode={editMode}
             setEditMode={setEditMode}
             performSave={performSave}
             setPerformSave={setPerformSave}
           />
+        </TabPanel>
+        <TabPanel>
+          {seqBatchId && (
+            <SangerPcrBatchSelectionStep
+              seqBatchId={seqBatchId}
+              seqBatch={seqBatchQueryState.response?.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
         </TabPanel>
       </Tabs>
     </PageLayout>
