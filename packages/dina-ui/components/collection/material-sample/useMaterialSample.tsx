@@ -200,9 +200,12 @@ export function useMaterialSampleSave({
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
-  const bulkEditCollectingEvent =
-    bulkEditCollectingEventFormRef &&
-    bulkEditCollectingEventFormRef.current?.values;
+  let bulkEditCollectingEvent;
+  if (bulkEditCollectingEventFormRef?.current?.values) {
+    bulkEditCollectingEvent = cloneDeep(
+      bulkEditCollectingEventFormRef.current.values
+    );
+  }
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -500,9 +503,14 @@ export function useMaterialSampleSave({
     };
 
     // Save and link the Collecting Event if enabled:
-    if (enableCollectingEvent && colEventFormRef.current) {
+    if (
+      (enableCollectingEvent && colEventFormRef.current) ||
+      bulkEditCollectingEvent
+    ) {
       // Save the linked CollectingEvent if included:
-      let submittedCollectingEvent = cloneDeep(colEventFormRef.current.values);
+      let submittedCollectingEvent = cloneDeep(
+        colEventFormRef?.current?.values
+      );
 
       if (bulkEditCollectingEvent) {
         submittedCollectingEvent = {
@@ -517,7 +525,7 @@ export function useMaterialSampleSave({
 
       try {
         // Throw if the Collecting Event sub-form has errors:
-        const colEventErrors = await colEventFormRef.current.validateForm();
+        const colEventErrors = await colEventFormRef?.current?.validateForm();
         if (!isEmpty(colEventErrors)) {
           throw new DoOperationsError("", colEventErrors);
         }
@@ -526,7 +534,7 @@ export function useMaterialSampleSave({
           ? // Use the same save method as the Collecting Event page:
             await saveCollectingEvent(
               submittedCollectingEvent,
-              colEventFormRef.current
+              colEventFormRef?.current ?? undefined
             )
           : submittedCollectingEvent;
 
@@ -541,8 +549,8 @@ export function useMaterialSampleSave({
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
           // Put the error messages into both form states:
-          colEventFormRef.current.setStatus(error.message);
-          colEventFormRef.current.setErrors(error.fieldErrors);
+          colEventFormRef?.current?.setStatus(error.message);
+          colEventFormRef?.current?.setErrors(error.fieldErrors);
           throw new DoOperationsError(
             error.message,
             mapKeys(error.fieldErrors, (_, field) => `collectingEvent.${field}`)

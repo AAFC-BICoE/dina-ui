@@ -311,7 +311,7 @@ export function getSampleBulkOverrider(bulkEditFormRef, bulkEditSampleHook) {
         hostOrganism: newHostOrganism
       })
     };
-
+    newSample.collectingEvent = baseSample.collectingEvent;
     return newSample;
   };
 }
