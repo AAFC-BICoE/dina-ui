@@ -5,7 +5,8 @@ import {
   useApiClient,
   LoadingSpinner,
   CommonMessage,
-  FieldHeader
+  FieldHeader,
+  DoOperationsError
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
@@ -119,9 +120,7 @@ export function SangerSampleSelectionStep({
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
    */
   useEffect(() => {
-    if (editMode || !selectedResources) {
       fetchSampledIds();
-    }
   }, [editMode]);
 
   // Displayed on edit mode only.
@@ -172,6 +171,10 @@ export function SangerSampleSelectionStep({
       }))
     );
 
+    const temp = previouslySelectedResources?.map((item) => ({
+      materialSampleUUID: item?.materialSample?.id,
+      pcrBatchItemUUID: item?.id
+    }));
     // UUIDs of PCR Batch Items that need to be created.
     const itemsToCreate = uniq(
       selectedResourceUUIDs.filter(
@@ -226,18 +229,15 @@ export function SangerSampleSelectionStep({
         { apiBaseUrl: "/seqdb-api" }
       );
     }
-
-    // Clear the previously selected resources.
-    setPreviouslySelectedResources([]);
-    setEditMode(false);
   }
   catch (e){
     if(e.toString() == "Error: Access is denied"){
-      // console.log("test");
-      throw new Error("Error: Access is denied");
+      throw new DoOperationsError("Access is denied");
     }
   }
   finally{
+    // Clear the previously selected resources.
+    setPreviouslySelectedResources([]);
     setEditMode(false);
   }
   }
