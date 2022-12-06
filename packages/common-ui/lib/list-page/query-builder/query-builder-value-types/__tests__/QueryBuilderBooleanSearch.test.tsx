@@ -20,7 +20,7 @@ describe("QueryBuilderBooleanSearch", () => {
       expect(
         boolSearchEquals.find(QueryBuilderBooleanSearch).debug()
       ).toMatchSnapshot(
-        "Expect text field to be displayed since match type is equals"
+        "Expect boolean field to be displayed since match type is equals"
       );
 
       const boolSearchEmpty = mountWithAppContext(
@@ -35,7 +35,7 @@ describe("QueryBuilderBooleanSearch", () => {
       expect(
         boolSearchEmpty.find(QueryBuilderBooleanSearch).debug()
       ).toMatchSnapshot(
-        "Expect text field not to be displayed since the match type is not equals"
+        "Expect boolean field not to be displayed since the match type is not equals"
       );
     });
   });

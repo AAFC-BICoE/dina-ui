@@ -8,7 +8,7 @@ describe("QueryBuilderTextSearch", () => {
     it("Display field if match type is equals", async () => {
       // This test will just ensure the layout does not change unexpectedly.
       // Any changes to the layout, the snapshots will need to be updated.
-      const boolSearchEquals = mountWithAppContext(
+      const textSearchEquals = mountWithAppContext(
         <QueryBuilderTextSearch
           matchType="equals"
           value="test"
@@ -18,12 +18,12 @@ describe("QueryBuilderTextSearch", () => {
 
       // Expect a snapshot with the text field being displayed.
       expect(
-        boolSearchEquals.find(QueryBuilderTextSearch).debug()
+        textSearchEquals.find(QueryBuilderTextSearch).debug()
       ).toMatchSnapshot(
         "Expect text field to be displayed since match type is equals"
       );
 
-      const boolSearchEmpty = mountWithAppContext(
+      const textSearchEmpty = mountWithAppContext(
         <QueryBuilderTextSearch
           matchType="empty"
           value="test"
@@ -33,7 +33,7 @@ describe("QueryBuilderTextSearch", () => {
 
       // Expect a snapshot without the text field being displayed.
       expect(
-        boolSearchEmpty.find(QueryBuilderTextSearch).debug()
+        textSearchEmpty.find(QueryBuilderTextSearch).debug()
       ).toMatchSnapshot(
         "Expect text field not to be displayed since the match type is not equals"
       );
@@ -63,7 +63,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "equals",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "equals"
           })
         ).toMatchSnapshot();
@@ -92,7 +92,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "partialMatch",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "partialMatch"
           })
         ).toMatchSnapshot();
@@ -121,7 +121,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "exactMatch",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "exactMatch"
           })
         ).toMatchSnapshot();
@@ -150,7 +150,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "notEquals",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "notEquals"
           })
         ).toMatchSnapshot();
@@ -179,7 +179,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "empty",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "empty"
           })
         ).toMatchSnapshot();
@@ -208,7 +208,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "notEmpty",
             value: "text search",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "notEmpty"
           })
         ).toMatchSnapshot();
@@ -237,7 +237,7 @@ describe("QueryBuilderTextSearch", () => {
             operation: "equals",
             value: "true",
             fieldInfo: {} as any,
-            fieldPath: "data.attributes.booleanField",
+            fieldPath: "data.attributes.textField",
             queryType: "equals"
           })
         ).toMatchSnapshot();

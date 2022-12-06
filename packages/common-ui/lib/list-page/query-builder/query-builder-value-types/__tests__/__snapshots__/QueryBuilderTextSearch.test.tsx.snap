@@ -18,7 +18,7 @@ Object {
         "bool": Object {
           "must_not": Object {
             "exists": Object {
-              "field": "data.attributes.booleanField",
+              "field": "data.attributes.textField",
             },
           },
         },
@@ -27,7 +27,7 @@ Object {
         "bool": Object {
           "must": Object {
             "term": Object {
-              "data.attributes.booleanField.keyword": "",
+              "data.attributes.textField.keyword": "",
             },
           },
         },
@@ -110,7 +110,7 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 1`] = `
 Object {
   "match": Object {
-    "data.attributes.booleanField": "text search",
+    "data.attributes.textField": "text search",
   },
 }
 `;
@@ -118,7 +118,7 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation Normal field 2`] = `
 Object {
   "match": Object {
-    "data.attributes.booleanField": "true",
+    "data.attributes.textField": "true",
   },
 }
 `;
@@ -174,7 +174,7 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Exact Match operation Normal field 1`] = `
 Object {
   "term": Object {
-    "data.attributes.booleanField.keyword": "text search",
+    "data.attributes.textField.keyword": "text search",
   },
 }
 `;
@@ -211,7 +211,7 @@ Object {
         "bool": Object {
           "must_not": Object {
             "match": Object {
-              "data.attributes.booleanField": "text search",
+              "data.attributes.textField": "text search",
             },
           },
         },
@@ -220,7 +220,7 @@ Object {
         "bool": Object {
           "must_not": Object {
             "exists": Object {
-              "field": "data.attributes.booleanField",
+              "field": "data.attributes.textField",
             },
           },
         },
@@ -291,12 +291,12 @@ Object {
   "bool": Object {
     "must": Object {
       "exists": Object {
-        "field": "data.attributes.booleanField",
+        "field": "data.attributes.textField",
       },
     },
     "must_not": Object {
       "term": Object {
-        "data.attributes.booleanField.keyword": "",
+        "data.attributes.textField.keyword": "",
       },
     },
   },
@@ -335,7 +335,7 @@ Object {
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Partial Match operation Normal field 1`] = `
 Object {
   "match": Object {
-    "data.attributes.booleanField": "text search",
+    "data.attributes.textField": "text search",
   },
 }
 `;
