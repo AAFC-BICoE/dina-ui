@@ -17,7 +17,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
-import { Assemblage } from "packages/dina-ui/types/collection-api/resources/Assemblage";
+import { Assemblage } from "../../../..//dina-ui/types/collection-api/resources/Assemblage";
 import { useContext } from "react";
 import {
   AttachmentsField,
@@ -27,9 +27,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { ManagedAttributesEditor } from "../../../components/object-store/managed-attributes/ManagedAttributesEditor";
-import { TableColumn } from "common-ui/lib/list-page/types";
-import Link from "next/link";
-import { JsonTree, Utils } from "react-awesome-query-builder";
+import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 interface AssemblageFormProps {
   fetchedAssemblage?: Assemblage;
@@ -182,28 +180,6 @@ export function AssemblageFormLayout() {
     "data.relationships.assemblages.data.id"
   );
 
-  // Columns for the elastic search list page.
-  const columns: TableColumn<Assemblage>[] = [
-    // Material Sample Name
-    {
-      Cell: ({ original: { id, data } }) => (
-        <Link
-          href={`/collection/material-sample/view?id=${id}`}
-          passHref={true}
-        >
-          <a>
-            {data?.attributes?.materialSampleName ||
-              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-              id}
-          </a>
-        </Link>
-      ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      isKeyword: true
-    }
-  ];
-
   return (
     <div>
       <div className="row">
@@ -266,7 +242,7 @@ export function AssemblageFormLayout() {
       {readOnly && (
         <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
           <QueryPage
-            columns={columns}
+            columns={ELASTIC_SEARCH_COLUMN}
             indexName={"dina_material_sample_index"}
             viewMode={readOnly}
             customViewQuery={readOnly ? customViewQuery : undefined}

@@ -2,12 +2,9 @@ import {
   AutoSuggestTextField,
   BackButton,
   ButtonBar,
-  CommonMessage,
   DateField,
   DinaForm,
   DinaFormOnSubmit,
-  DinaFormSection,
-  FieldHeader,
   FieldSet,
   FieldSpy,
   NumberField,
@@ -19,7 +16,6 @@ import {
   ToggleField,
   useApiClient,
   useDinaFormContext,
-  useFieldLabels,
   useQuery,
   withResponse
 } from "common-ui";
@@ -42,9 +38,9 @@ import ReactTable, { Column } from "react-table";
 import Link from "next/link";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { pick, compact } from "lodash";
+import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 export interface TransactionFormProps {
   fetchedTransaction?: Transaction;
@@ -225,37 +221,6 @@ export function TransactionFormLayout({
     MaterialSample[]
   >([]);
 
-  // Displayed on edit mode only.
-  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      additionalAccessors: ["data.attributes.dwcOtherCatalogNumbers"],
-      isKeyword: true
-    }
-  ];
-
-  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
-    }
-  ];
-
   /**
    * Taking all of the material sample UUIDs, retrieve the material samples using a bulk get
    * operation.
@@ -264,7 +229,7 @@ export function TransactionFormLayout({
    */
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
-      sampleIds.map((id) => "/material-sample/" + id),
+      sampleIds.map((id) => `/material-sample/${id}?include=organism`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       const materialSamplesTransformed = compact(response).map((resource) => ({
@@ -272,9 +237,11 @@ export function TransactionFormLayout({
           attributes: pick(resource, ["materialSampleName"])
         },
         id: resource.id,
-        type: resource.type
+        type: resource.type,
+        included: {
+          organism: resource.organism
+        }
       }));
-
       if (setSelectedResources !== undefined) {
         setSelectedResources(materialSamplesTransformed ?? []);
       }
@@ -417,35 +384,25 @@ export function TransactionFormLayout({
         />
       </FieldSet>
       <FieldSet legend={<DinaMessage id="materialSampleListTitle" />}>
-        {readOnly ? (
+        {readOnly && (
           <>
             <strong>
               <SeqdbMessage id="selectedSamplesTitle" />
             </strong>
-            <ReactTable<MaterialSample>
-              columns={API_SEARCH_COLUMN}
-              data={selectedResourcesView}
-              minRows={1}
-              defaultPageSize={100}
-              pageText={<CommonMessage id="page" />}
-              noDataText={<CommonMessage id="noRowsFound" />}
-              ofText={<CommonMessage id="of" />}
-              rowsText={formatMessage("rows")}
-              previousText={<CommonMessage id="previous" />}
-              nextText={<CommonMessage id="next" />}
-            />
           </>
-        ) : (
-          <div className="mb-3">
-            <QueryPage<MaterialSample>
-              indexName={"dina_material_sample_index"}
-              columns={ELASTIC_SEARCH_COLUMN}
-              selectionMode={true}
-              selectionResources={selectedResources}
-              setSelectionResources={setSelectedResources}
-            />
-          </div>
         )}
+        <div className="mb-3">
+          <QueryPage<MaterialSample>
+            indexName={"dina_material_sample_index"}
+            columns={ELASTIC_SEARCH_COLUMN}
+            selectionMode={!readOnly}
+            selectionResources={
+              readOnly ? selectedResourcesView : selectedResources
+            }
+            setSelectionResources={setSelectedResources}
+            viewMode={readOnly}
+          />
+        </div>
       </FieldSet>
       {readOnly ? (
         <FieldSpy<AgentRole[]> fieldName="agentRoles">
