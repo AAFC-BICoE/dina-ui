@@ -106,10 +106,10 @@ export function SeqBatchForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<SeqBatch>) {
-    const inputResourceWithRelationships: InputResource<SeqBatch> & {
-      relationships: any;
-    } = {
+    const inputResourceWithRelationships = {
       ...submittedValues,
+
+      // Relationships with an array will need to be handled separately and removed from attributes.
       relationships: {
         ...(submittedValues.experimenters && {
           experimenters: {
@@ -117,28 +117,11 @@ export function SeqBatchForm({
               pick(collector, "id", "type")
             )
           }
-        }),
-        ...(submittedValues.region && {
-          region: {
-            data: pick(submittedValues?.region, "id", "type")
-          }
-        }),
-        ...(submittedValues.thermocyclerProfile && {
-          thermocyclerProfile: {
-            data: pick(submittedValues?.thermocyclerProfile, "id", "type")
-          }
-        }),
-        ...(submittedValues.protocol && {
-          protocol: {
-            data: pick(submittedValues?.protocol, "id", "type")
-          }
         })
       },
-      experimenters: undefined,
-      protocol: undefined,
-      thermocyclerProfile: undefined,
-      region: undefined
+      experimenters: undefined
     };
+
     const [savedResource] = await save<SeqBatch>(
       [
         {
