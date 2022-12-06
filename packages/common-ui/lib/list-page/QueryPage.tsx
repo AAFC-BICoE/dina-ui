@@ -229,8 +229,20 @@ export function QueryPage<TData extends KitsuResource>({
     group: groupNames ?? []
   };
 
+  useEffect(() => {
+    if (viewMode && selectedResources?.length) {
+      setTotalRecords(selectedResources?.length);
+    }
+  }, [viewMode, selectedResources]);
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    // If in view mode with selected resources, no requests need to be made.
+    if (viewMode && selectedResources?.length) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     // Reset any error messages since we are trying again.
@@ -269,19 +281,43 @@ export function QueryPage<TData extends KitsuResource>({
     // The included section will be transformed from an array to an object with the type name for each relationship.
     elasticSearchRequest(queryDSL)
       .then((result) => {
-        const processedResult = result?.hits.map((rslt) => ({
-          id: rslt._source?.data?.id,
-          type: rslt._source?.data?.type,
-          data: {
-            attributes: rslt._source?.data?.attributes
-          },
-          included: rslt._source?.included?.reduce(
-            (array, currentIncluded) => (
-              (array[currentIncluded?.type] = currentIncluded), array
-            ),
-            {}
-          )
-        }));
+        const processedResult = result?.hits.map((rslt) => {
+          return {
+            id: rslt._source?.data?.id,
+            type: rslt._source?.data?.type,
+            data: {
+              attributes: rslt._source?.data?.attributes
+            },
+            included: rslt._source?.included?.reduce(
+              (includedAccumulator, currentIncluded) => {
+                if (currentIncluded?.type === "organism") {
+                  if (!includedAccumulator[currentIncluded?.type]) {
+                    return (
+                      (includedAccumulator[currentIncluded?.type] = [
+                        currentIncluded
+                      ]),
+                      includedAccumulator
+                    );
+                  } else {
+                    return (
+                      includedAccumulator[currentIncluded?.type].push(
+                        currentIncluded
+                      ),
+                      includedAccumulator
+                    );
+                  }
+                } else {
+                  return (
+                    (includedAccumulator[currentIncluded?.type] =
+                      currentIncluded),
+                    includedAccumulator
+                  );
+                }
+              },
+              {}
+            )
+          };
+        });
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
@@ -693,12 +729,18 @@ export function QueryPage<TData extends KitsuResource>({
               <ReactTable
                 // Column and data props
                 columns={mappedResultsColumns}
-                data={searchResults}
+                data={
+                  viewMode
+                    ? customViewFields
+                      ? searchResults
+                      : selectedResources
+                    : searchResults
+                }
                 minRows={1}
                 // Loading Table props
                 loading={loading}
                 // Pagination props
-                manual={true}
+                manual={viewMode && selectedResources?.length ? false : true}
                 pageSize={pageSize}
                 pages={totalRecords ? Math.ceil(totalRecords / pageSize) : 0}
                 page={pageOffset / pageSize}
