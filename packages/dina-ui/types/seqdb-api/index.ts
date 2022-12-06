@@ -2,6 +2,7 @@ export * from "./resources/ContainerType";
 export * from "./resources/PcrBatch";
 export * from "./resources/PcrBatchItem";
 export * from "./resources/PcrPrimer";
+export * from "./resources/SeqBatch";
 export * from "./resources/ThermocyclerProfile";
 export * from "./resources/Product";
 export * from "./resources/Region";
