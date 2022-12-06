@@ -178,7 +178,7 @@ export interface PrepareSampleSaveOperationParams {
     sample: InputResource<MaterialSample>
   ) => Promise<InputResource<MaterialSample>>;
 }
-
+let bulkEditCollectingEvent;
 export function useMaterialSampleSave({
   materialSample,
   collectingEventInitialValues: collectingEventInitialValuesProp,
@@ -200,7 +200,6 @@ export function useMaterialSampleSave({
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
-  let bulkEditCollectingEvent;
   if (bulkEditCollectingEventFormRef?.current?.values) {
     bulkEditCollectingEvent = cloneDeep(
       bulkEditCollectingEventFormRef.current.values
