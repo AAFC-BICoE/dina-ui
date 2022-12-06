@@ -101,6 +101,11 @@ export function Home() {
                     <DinaMessage id="storageUnitListTitle" />
                   </a>
                 </Link>
+                <Link href="/workbook/upload">
+                  <a>
+                    <DinaMessage id="workbookGroupUploadTitle" />
+                  </a>
+                </Link>
               </Stack>
             </Col>
 
