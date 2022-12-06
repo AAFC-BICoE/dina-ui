@@ -237,6 +237,12 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    // If in view mode with selected resources, no requests need to be made.
+    if (viewMode && selectedResources?.length) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     // Reset any error messages since we are trying again.
@@ -734,7 +740,7 @@ export function QueryPage<TData extends KitsuResource>({
                 // Loading Table props
                 loading={loading}
                 // Pagination props
-                manual={true}
+                manual={viewMode && selectedResources?.length ? false : true}
                 pageSize={pageSize}
                 pages={totalRecords ? Math.ceil(totalRecords / pageSize) : 0}
                 page={pageOffset / pageSize}
