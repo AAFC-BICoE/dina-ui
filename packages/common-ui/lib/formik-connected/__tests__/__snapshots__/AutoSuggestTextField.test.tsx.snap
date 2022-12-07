@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AutoSuggestTextField Blank search provider tests Blank search provider supplied, options should appear when empty search is focused. 1`] = `
+"<ul role=\\"listbox\\" className=\\"list-group\\">
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-0\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={0} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={0} item=\\"person1-json-api\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-0\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={0} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person1-json-api
+      </div>
+    </li>
+  </Item>
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-1\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={1} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={1} item=\\"person2-json-api\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-1\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={1} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person2-json-api
+      </div>
+    </li>
+  </Item>
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-2\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={2} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={2} item=\\"person3-json-api\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-2\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={2} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person3-json-api
+      </div>
+    </li>
+  </Item>
+</ul>"
+`;
+
+exports[`AutoSuggestTextField Elastic Search only provided, results are fetched from elastic search. 1`] = `
+"<ul role=\\"listbox\\" className=\\"list-group\\">
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-0\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={0} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={0} item=\\"person1-elastic-search\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-0\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={0} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person1-elastic-search
+      </div>
+    </li>
+  </Item>
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-1\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={1} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={1} item=\\"person2-elastic-search\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-1\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={1} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person2-elastic-search
+      </div>
+    </li>
+  </Item>
+  <Item id=\\"react-autowhatever-examplePersonNameField--item-2\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={2} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]} sectionIndex={{...}} isHighlighted={false} itemIndex={2} item=\\"person3-elastic-search\\" renderItem={[Function: renderSuggestion]} renderItemData={{...}}>
+    <li role=\\"option\\" id=\\"react-autowhatever-examplePersonNameField--item-2\\" aria-selected={false} className=\\"list-group-item\\" data-section-index={{...}} data-suggestion-index={2} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onMouseDown={[Function (anonymous)]} onTouchStart={[Function (anonymous)]} onTouchMove={[Function (anonymous)]} onClick={[Function (anonymous)]}>
+      <div>
+        person3-elastic-search
+      </div>
+    </li>
+  </Item>
+</ul>"
+`;
+
+exports[`AutoSuggestTextField Snapshot test 1`] = `
+"<AutoSuggestTextField name=\\"examplePersonNameField\\" jsonApiBackend={{...}} timeoutMs={0}>
+  <TextField name=\\"examplePersonNameField\\" customInput={[Function: customInput]}>
+    <FieldWrapper name=\\"examplePersonNameField\\">
+      <FieldSpy fieldName=\\"examplePersonNameField\\" validate={[undefined]}>
+        <FormikConnect(FastFieldInner) name=\\"examplePersonNameField\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
+          <FastFieldInner name=\\"examplePersonNameField\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
+            <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"examplePersonNameField\\">
+              <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
+                <div className=\\"\\">
+                  <label className=\\"examplePersonNameField-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
+                    <div className=\\"field-label mb-2\\">
+                      <strong>
+                        <FieldHeader name=\\"examplePersonNameField\\" customName={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]}>
+                          <div className=\\"examplePersonNameField-field-header\\">
+                            Example Person Name Field
+                          </div>
+                        </FieldHeader>
+                      </strong>
+                    </div>
+                    <div className={[undefined]} style={{...}}>
+                      <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
+                        <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
+                          <AutoSuggestTextFieldInternal elasticSearchBackend={[undefined]} jsonApiBackend={{...}} preferredBackend={[undefined]} blankSearchBackend={[undefined]} customOptions={[undefined]} placeholder=\\"Type here to search.\\" className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} onKeyDown={[Function: onKeyDown]} autoComplete=\\"none\\" onSuggestionSelected={[undefined]} id=\\"examplePersonNameField\\" timeoutMs={0}>
+                            <style>
+                              
+                                      .autosuggest-container {
+                                        position: relative;
+                                      }
+                                      .autosuggest .suggestions-container {
+                                        display: none;
+                                      }
+                                      .autosuggest .suggestions-container-open {
+                                        display: block;
+                                        position: absolute;
+                                        width: 100%;
+                                        z-index: 20;
+                                      }
+                                      .autosuggest .suggestion-highlighted { 
+                                        background-color: #ddd;
+                                        cursor: pointer;
+                                      }
+                                    
+                            </style>
+                            <div className=\\"autosuggest\\">
+                              <Autosuggest id=\\"examplePersonNameField\\" suggestions={{...}} getSuggestionValue={[Function: getSuggestionValue]} onSuggestionsFetchRequested={[Function: onSuggestionsFetchRequested]} onSuggestionSelected={[Function: onSuggestionSelected]} onSuggestionsClearRequested={[Function: onSuggestionsClearRequested]} renderSuggestion={[Function: renderSuggestion]} shouldRenderSuggestions={[Function: defaultShouldRenderSuggestions]} inputProps={{...}} theme={{...}} renderSuggestionsContainer={[Function: defaultRenderSuggestionsContainer]} alwaysRenderSuggestions={false} multiSection={false} shouldKeepSuggestionsOnSelect={[Function: shouldKeepSuggestionsOnSelect]} focusInputOnSuggestionClick={true} highlightFirstSuggestion={false} containerProps={{...}}>
+                                <Autowhatever multiSection={false} items={{...}} renderInputComponent={[Function: defaultRenderInputComponent]} renderItemsContainer={[Function (anonymous)]} renderItem={[Function: renderSuggestion]} renderItemData={{...}} renderSectionTitle={[Function: renderSectionTitle]} getSectionItems={[Function: getSectionItems]} highlightedSectionIndex={{...}} highlightedItemIndex={{...}} containerProps={{...}} inputProps={{...}} itemProps={[Function (anonymous)]} theme={{...}} id=\\"examplePersonNameField\\">
+                                  <div role=\\"combobox\\" aria-haspopup=\\"listbox\\" aria-owns=\\"react-autowhatever-examplePersonNameField\\" aria-expanded={false} className=\\"autosuggest-container\\">
+                                    <input type=\\"text\\" value=\\"\\" autoComplete=\\"none\\" aria-autocomplete=\\"list\\" aria-controls=\\"react-autowhatever-examplePersonNameField\\" aria-activedescendant={{...}} style={{...}} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]} placeholder=\\"Type here to search.\\" className=\\"form-control\\" onChange={[Function: onChange]} readOnly={[undefined]} onKeyDown={[Function (anonymous)]} />
+                                    <div id=\\"react-autowhatever-examplePersonNameField\\" role=\\"listbox\\" className=\\"suggestions-container\\" />
+                                  </div>
+                                </Autowhatever>
+                              </Autosuggest>
+                            </div>
+                          </AutoSuggestTextFieldInternal>
+                        </ErrorBoundary>
+                      </FormikConnectedField>
+                    </div>
+                  </label>
+                </div>
+              </LabelWrapper>
+            </FieldSpyInternal>
+          </FastFieldInner>
+        </FormikConnect(FastFieldInner)>
+      </FieldSpy>
+    </FieldWrapper>
+  </TextField>
+</AutoSuggestTextField>"
+`;

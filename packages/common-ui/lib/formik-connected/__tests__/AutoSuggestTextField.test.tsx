@@ -111,9 +111,43 @@ const apiContextJsonAPIFailure = {
   }
 } as any;
 
+// Json API works, but elastic search is not working.
+const apiContextElasticSearchFailure = {
+  apiClient: {
+    get: mockGet,
+    axios: {
+      get: mockGetFailure
+    }
+  }
+} as any;
+
 describe("AutoSuggestTextField", () => {
   // Clear the mocks between tests.
   beforeEach(jest.clearAllMocks);
+
+  it("Snapshot test", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm initialValues={{}}>
+        <AutoSuggestTextField<Person>
+          name="examplePersonNameField"
+          jsonApiBackend={{
+            query: (searchValue) => ({
+              path: "agent-api/person",
+              filter: {
+                rsql: `name==*${searchValue}*`
+              }
+            }),
+            option: (person) => person?.name
+          }}
+          timeoutMs={0}
+        />
+      </DinaForm>,
+      { apiContext: apiContextJsonAPIOnly }
+    );
+
+    // Snapshot test will check to ensure the layout does not change for unknown reasons.
+    expect(wrapper.find(AutoSuggestTextField).debug()).toMatchSnapshot();
+  });
 
   it("JSON API only provided, results are fetched from JSON API", async () => {
     const wrapper = mountWithAppContext(
@@ -193,6 +227,25 @@ describe("AutoSuggestTextField", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
+    // Expected suggestions to appear.
+    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+      "person1-elastic-search",
+      "person2-elastic-search",
+      "person3-elastic-search"
+    ]);
+
+    // Take a snapshot of the suggestion popup being displayed in the UI.
+    expect(
+      wrapper.find(AutoSuggestTextField).find(".list-group").debug()
+    ).toMatchSnapshot();
+
+    // Remove focus from input, the suggestions should no longer be displayed.
+    wrapper.find("input").simulate("blur");
+    wrapper.update();
+    expect(
+      wrapper.find(AutoSuggestTextField).find(".list-group").exists()
+    ).toBe(false);
+
     expect(mockGetAxios).lastCalledWith("search-api/search-ws/auto-complete", {
       params: {
         indexName: "dina_agent_index",
@@ -206,13 +259,8 @@ describe("AutoSuggestTextField", () => {
 
     expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1-elastic-search",
-      "person2-elastic-search",
-      "person3-elastic-search"
-    ]);
-
     // Test to ensure number of API calls does is not excessive.
+    wrapper.find("input").simulate("focus");
     wrapper.find("input").simulate("change", { target: { value: "pe" } });
 
     await new Promise(setImmediate);
@@ -315,82 +363,178 @@ describe("AutoSuggestTextField", () => {
     ]);
   });
 
-  it("Both backend providers are used, preferred backend fails, other backend is used.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{}}>
-        <AutoSuggestTextField<Person>
-          name="examplePersonNameField"
-          elasticSearchBackend={{
-            indexName: "dina_agent_index",
-            searchField: "data.attributes.name",
-            option: (person) => person?.name
-          }}
-          jsonApiBackend={{
-            query: (searchValue) => ({
-              path: "agent-api/person",
-              filter: {
-                rsql: `name==*${searchValue}*`
-              }
-            }),
-            option: (person) => person?.name
-          }}
-          preferredBackend={"json-api"}
-          timeoutMs={0}
-        />
-      </DinaForm>,
-      { apiContext: apiContextJsonAPIFailure }
-    );
+  describe("Both backend providers are supplied, test what happens when a backend fails", () => {
+    it("JSON-API is preferred, but fails, elastic search should be used instead.", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <AutoSuggestTextField<Person>
+            name="examplePersonNameField"
+            elasticSearchBackend={{
+              indexName: "dina_agent_index",
+              searchField: "data.attributes.name",
+              option: (person) => person?.name
+            }}
+            jsonApiBackend={{
+              query: (searchValue) => ({
+                path: "agent-api/person",
+                filter: {
+                  rsql: `name==*${searchValue}*`
+                }
+              }),
+              option: (person) => person?.name
+            }}
+            preferredBackend={"json-api"}
+            timeoutMs={0}
+          />
+        </DinaForm>,
+        { apiContext: apiContextJsonAPIFailure }
+      );
 
-    wrapper.find("input").simulate("focus");
-    wrapper.find("input").simulate("change", { target: { value: "p" } });
+      wrapper.find("input").simulate("focus");
+      wrapper.find("input").simulate("change", { target: { value: "p" } });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+      await new Promise(setImmediate);
+      wrapper.update();
 
-    // JSON API should be tried first but fails.
-    expect(mockGetFailure).toHaveBeenCalledTimes(1);
-    expect(mockGetAxios).toHaveBeenCalledTimes(1);
+      // JSON API should be tried first but fails.
+      expect(mockGetFailure).toHaveBeenCalledTimes(1);
+      expect(mockGetAxios).toHaveBeenCalledTimes(1);
 
-    expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
-      "person1-elastic-search",
-      "person2-elastic-search",
-      "person3-elastic-search"
-    ]);
+      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+        "person1-elastic-search",
+        "person2-elastic-search",
+        "person3-elastic-search"
+      ]);
 
-    wrapper.find("input").simulate("change", { target: { value: "pe" } });
+      wrapper.find("input").simulate("change", { target: { value: "pe" } });
 
-    await new Promise(setImmediate);
-    wrapper.update();
+      await new Promise(setImmediate);
+      wrapper.update();
 
-    // JSON API should not be called again at this point. Already failed and should have switched to
-    // elastic search.
-    expect(mockGetFailure).toHaveBeenCalledTimes(1);
-    expect(mockGetAxios).toHaveBeenCalledTimes(2);
+      // JSON API should not be called again at this point. Already failed and should have switched to
+      // elastic search.
+      expect(mockGetFailure).toHaveBeenCalledTimes(1);
+      expect(mockGetAxios).toHaveBeenCalledTimes(2);
+    });
+
+    it("Elastic-search is preferred, but fails, JSON-API should be used instead.", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <AutoSuggestTextField<Person>
+            name="examplePersonNameField"
+            elasticSearchBackend={{
+              indexName: "dina_agent_index",
+              searchField: "data.attributes.name",
+              option: (person) => person?.name
+            }}
+            jsonApiBackend={{
+              query: (searchValue) => ({
+                path: "agent-api/person",
+                filter: {
+                  rsql: `name==*${searchValue}*`
+                }
+              }),
+              option: (person) => person?.name
+            }}
+            preferredBackend={"elastic-search"}
+            timeoutMs={0}
+          />
+        </DinaForm>,
+        { apiContext: apiContextElasticSearchFailure }
+      );
+
+      wrapper.find("input").simulate("focus");
+      wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+      await new Promise(setImmediate);
+      wrapper.update();
+
+      // Elastic Search should be tried first, but fails.
+      expect(mockGetFailure).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledTimes(1);
+
+      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+        "person1-json-api",
+        "person2-json-api",
+        "person3-json-api"
+      ]);
+
+      wrapper.find("input").simulate("change", { target: { value: "pe" } });
+
+      await new Promise(setImmediate);
+      wrapper.update();
+
+      // JSON API should not be called again at this point. Already failed and should have switched to
+      // json api.
+      expect(mockGetFailure).toHaveBeenCalledTimes(1);
+      expect(mockGet).toHaveBeenCalledTimes(2);
+    });
   });
 
-  it("Blank search provider not supplied, options do not appear when empty search.", async () => {
-    const wrapper = mountWithAppContext(
-      <DinaForm initialValues={{}}>
-        <AutoSuggestTextField<Person>
-          name="examplePersonNameField"
-          jsonApiBackend={{
-            query: (searchValue) => ({
-              path: "agent-api/person",
-              filter: {
-                rsql: `name==*${searchValue}*`
-              }
-            }),
-            option: (person) => person?.name
-          }}
-          timeoutMs={0}
-        />
-      </DinaForm>,
-      { apiContext: apiContextJsonAPIOnly }
-    );
+  describe("Blank search provider tests", () => {
+    it("Blank search provider not supplied, options do not appear when empty search.", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <AutoSuggestTextField<Person>
+            name="examplePersonNameField"
+            jsonApiBackend={{
+              query: (searchValue) => ({
+                path: "agent-api/person",
+                filter: {
+                  rsql: `name==*${searchValue}*`
+                }
+              }),
+              option: (person) => person?.name
+            }}
+            timeoutMs={0}
+          />
+        </DinaForm>,
+        { apiContext: apiContextJsonAPIOnly }
+      );
 
-    wrapper.find("input").simulate("focus");
+      wrapper.find("input").simulate("focus");
 
-    // Api should not be requested when search is empty since no blank search provider is supplied.
-    expect(mockGet).toHaveBeenCalledTimes(0);
+      // Api should not be requested when search is empty since no blank search provider is supplied.
+      expect(mockGet).toHaveBeenCalledTimes(0);
+    });
+
+    it("Blank search provider supplied, options should appear when empty search is focused.", async () => {
+      const wrapper = mountWithAppContext(
+        <DinaForm initialValues={{}}>
+          <AutoSuggestTextField<Person>
+            name="examplePersonNameField"
+            jsonApiBackend={{
+              query: (searchValue) => ({
+                path: "agent-api/person",
+                filter: {
+                  rsql: `name==*${searchValue}*`
+                }
+              }),
+              option: (person) => person?.name
+            }}
+            blankSearchBackend={"json-api"}
+            timeoutMs={0}
+          />
+        </DinaForm>,
+        { apiContext: apiContextJsonAPIOnly }
+      );
+
+      wrapper.find("input").simulate("focus");
+
+      await new Promise(setImmediate);
+      wrapper.update();
+
+      // Expected suggestions to appear.
+      expect(wrapper.find(AutoSuggest).prop("suggestions")).toEqual([
+        "person1-json-api",
+        "person2-json-api",
+        "person3-json-api"
+      ]);
+
+      // Take a snapshot of the suggestion popup being displayed in the UI.
+      expect(
+        wrapper.find(AutoSuggestTextField).find(".list-group").debug()
+      ).toMatchSnapshot();
+    });
   });
 });
