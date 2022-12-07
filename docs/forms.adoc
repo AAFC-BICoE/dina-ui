@@ -156,7 +156,6 @@ To configure the Elastic Search auto-suggestions, you need to setup the `elastic
 `additionalField` is another field to search by in addition to the search field. This also needs to the full path. (optional)
 `restrictedField` is used to filter by a specific field in the index. This also needs to the full path. (optional)
 `restrictedFieldValue` is the value to search against the restricted field. (optional)
-`documentId` can be provided to specify the document id to use for the search. (optional)
 `option` is used to determine the text to display for each suggestion. This is also the value that is returned to the form. (required)
 
 === Typescript Support
