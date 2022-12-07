@@ -46,7 +46,6 @@ describe("doSearch function", () => {
             indexName: "dina_agent_index",
             prefix: "test-search",
             additionalFields: undefined,
-            documentId: undefined,
             group: undefined
           }
         }

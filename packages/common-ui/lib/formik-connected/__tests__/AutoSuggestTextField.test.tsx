@@ -121,6 +121,8 @@ const apiContextElasticSearchFailure = {
   }
 } as any;
 
+const suggestionSelectedMock = jest.fn();
+
 describe("AutoSuggestTextField", () => {
   // Clear the mocks between tests.
   beforeEach(jest.clearAllMocks);
@@ -139,6 +141,7 @@ describe("AutoSuggestTextField", () => {
             }),
             option: (person) => person?.name
           }}
+          onSuggestionSelected={suggestionSelectedMock}
           timeoutMs={0}
         />
       </DinaForm>,
@@ -147,6 +150,20 @@ describe("AutoSuggestTextField", () => {
 
     // Snapshot test will check to ensure the layout does not change for unknown reasons.
     expect(wrapper.find(AutoSuggestTextField).debug()).toMatchSnapshot();
+
+    // Simulate clicking an option, first need to provide a search.
+    wrapper.find("input").simulate("focus");
+    wrapper.find("input").simulate("change", { target: { value: "p" } });
+
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    // Select the first option in the list.
+    wrapper.find(AutoSuggestTextField).find("Item").at(0).simulate("click");
+    wrapper.update();
+
+    expect(suggestionSelectedMock).toBeCalledTimes(1);
+    expect(suggestionSelectedMock.mock.calls[0][0]).toEqual("person1-json-api");
   });
 
   it("JSON API only provided, results are fetched from JSON API", async () => {
@@ -251,7 +268,6 @@ describe("AutoSuggestTextField", () => {
         indexName: "dina_agent_index",
         autoCompleteField: "data.attributes.name",
         prefix: "p",
-        documentId: undefined,
         additionalField: undefined,
         group: undefined
       }
@@ -446,6 +462,8 @@ describe("AutoSuggestTextField", () => {
       wrapper.find("input").simulate("focus");
       wrapper.find("input").simulate("change", { target: { value: "p" } });
 
+      await new Promise(setImmediate);
+      wrapper.update();
       await new Promise(setImmediate);
       wrapper.update();
 

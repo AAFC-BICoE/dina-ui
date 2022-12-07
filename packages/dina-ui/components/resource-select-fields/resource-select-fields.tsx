@@ -31,7 +31,7 @@ export function CollectionMethodSelectField(
       readOnlyLink="/collection/collection-method/view?id="
       filter={filterBy(["name"])}
       model="collection-api/collection-method"
-      optionLabel={cm => cm.name}
+      optionLabel={(cm) => cm.name}
       {...props}
     />
   );
@@ -76,7 +76,7 @@ export function CollectionSelectField(
         readOnlyLink="/collection/collection/view?id="
         filter={filter}
         model="collection-api/collection"
-        optionLabel={coll =>
+        optionLabel={(coll) =>
           `${coll.name || coll.id}${coll.code ? ` (${coll.code})` : ""}`
         }
         isDisabled={collectionCannotBeChanged}
@@ -95,7 +95,7 @@ export function InstitutionSelectField(
       readOnlyLink="/collection/institution/view?id="
       filter={filterBy(["name"])}
       model="collection-api/institution"
-      optionLabel={inst => inst.name || inst.id}
+      optionLabel={(inst) => inst.name || inst.id}
       {...props}
     />
   );
@@ -108,7 +108,7 @@ export function UserSelectField(
     <ResourceSelectField<DinaUser>
       readOnlyLink="/dina-user/view?id="
       model="user-api/user"
-      optionLabel={user => user.username}
+      optionLabel={(user) => user.username}
       // TODO allow filtering by group
       filter={() => ({})}
       pageSize={1000}
@@ -132,7 +132,6 @@ export function PersonSelectField(
           querySpec,
           indexName: "dina_agent_index",
           searchField: "data.attributes.displayName",
-          documentId: "data.id",
           additionalField: "data.attributes.aliases"
         })
       }
@@ -140,7 +139,7 @@ export function PersonSelectField(
       filter={filterBy(["displayName"])}
       model="agent-api/person"
       // Show display name, and show aliases if any:
-      optionLabel={person => {
+      optionLabel={(person) => {
         return person.displayName
           ? `${person.displayName}${
               person.aliases?.length ? ` (${person.aliases.join(", ")})` : ""
@@ -182,7 +181,6 @@ export function StorageUnitSelectField({
           querySpec,
           indexName: "dina_storage_index",
           searchField: "data.attributes.name",
-          documentId: "data.id",
           restrictedField,
           restrictedFieldValue
         })
@@ -190,7 +188,7 @@ export function StorageUnitSelectField({
       readOnlyLink="/storageUnit/view?id="
       filter={filterBy(["name"])}
       model="collection-api/storage-unit"
-      optionLabel={storageUnit => {
+      optionLabel={(storageUnit) => {
         return storageUnit.name;
       }}
       {...resourceProps}

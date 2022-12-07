@@ -53,7 +53,7 @@ exports[`AutoSuggestTextField Elastic Search only provided, results are fetched 
 `;
 
 exports[`AutoSuggestTextField Snapshot test 1`] = `
-"<AutoSuggestTextField name=\\"examplePersonNameField\\" jsonApiBackend={{...}} timeoutMs={0}>
+"<AutoSuggestTextField name=\\"examplePersonNameField\\" jsonApiBackend={{...}} onSuggestionSelected={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} timeoutMs={0}>
   <TextField name=\\"examplePersonNameField\\" customInput={[Function: customInput]}>
     <FieldWrapper name=\\"examplePersonNameField\\">
       <FieldSpy fieldName=\\"examplePersonNameField\\" validate={[undefined]}>
@@ -75,7 +75,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
                     <div className={[undefined]} style={{...}}>
                       <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
                         <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
-                          <AutoSuggestTextFieldInternal elasticSearchBackend={[undefined]} jsonApiBackend={{...}} preferredBackend={[undefined]} blankSearchBackend={[undefined]} customOptions={[undefined]} placeholder=\\"Type here to search.\\" className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} onKeyDown={[Function: onKeyDown]} autoComplete=\\"none\\" onSuggestionSelected={[undefined]} id=\\"examplePersonNameField\\" timeoutMs={0}>
+                          <AutoSuggestTextFieldInternal elasticSearchBackend={[undefined]} jsonApiBackend={{...}} preferredBackend={[undefined]} blankSearchBackend={[undefined]} customOptions={[undefined]} placeholder=\\"Type here to search.\\" className=\\"form-control\\" onChange={[Function: onChange]} value=\\"\\" readOnly={[undefined]} onKeyDown={[Function: onKeyDown]} autoComplete=\\"none\\" onSuggestionSelected={[Function: mockConstructor] { _isMockFunction: true, getMockImplementation: [Function (anonymous)], mock: Object [Object: null prototype] { calls: [], instances: [], invocationCallOrder: [], results: [] }, mockClear: [Function (anonymous)], mockReset: [Function (anonymous)], mockRestore: [Function (anonymous)], mockReturnValueOnce: [Function (anonymous)], mockResolvedValueOnce: [Function (anonymous)], mockRejectedValueOnce: [Function (anonymous)], mockReturnValue: [Function (anonymous)], mockResolvedValue: [Function (anonymous)], mockRejectedValue: [Function (anonymous)], mockImplementationOnce: [Function (anonymous)], mockImplementation: [Function (anonymous)], mockReturnThis: [Function (anonymous)], mockName: [Function (anonymous)], getMockName: [Function (anonymous)] }} id=\\"examplePersonNameField\\" timeoutMs={0}>
                             <style>
                               
                                       .autosuggest-container {
