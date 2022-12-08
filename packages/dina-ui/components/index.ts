@@ -57,7 +57,7 @@ export * from "./object-store/managed-attributes/managed-attributes-custom-views
 export * from "./page-layouts/ViewPageLayout";
 export * from "./assemblage/AssemblageSelectSection";
 export * from "./project/ProjectSelectSection";
-export * from "./resource-select-fields/resource-select-fields";
+export * from "./resource-select-fields";
 export * from "./revision-by-user/CommonRevisionsByUserPage";
 export * from "./storage-unit-type/KeepContentsTogetherToggleForm";
 export * from "./storage/BrowseStorageTree";

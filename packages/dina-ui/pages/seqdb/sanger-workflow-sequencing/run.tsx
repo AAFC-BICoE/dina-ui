@@ -11,7 +11,7 @@ import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery } from "../seq-batch/edit";
 
-export default function SangerWorkFlowRunPage() {
+export default function SangerWorkFlowSequencingRunPage() {
   const router = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
@@ -129,7 +129,7 @@ export default function SangerWorkFlowRunPage() {
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
           <Tab disabled={isDisabled(0, false)}>{formatMessage("seqBatch")}</Tab>
-          <Tab disabled={isDisabled(0, false)}>
+          <Tab disabled={isDisabled(1, false)}>
             {formatMessage("selectPcrBatch")}
           </Tab>
         </TabList>
