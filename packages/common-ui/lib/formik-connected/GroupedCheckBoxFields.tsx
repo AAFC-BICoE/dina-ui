@@ -9,6 +9,7 @@ import { useIntl } from "react-intl";
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
   fileHyperlinkId?: string;
+  disabled?: boolean;
 }
 
 export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
@@ -30,7 +31,8 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   function CheckBoxField({
     resource,
-    fileHyperlinkId
+    fileHyperlinkId,
+    disabled
   }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
     const computedAvailableItems =
@@ -72,8 +74,9 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
             <div className="d-flex w-100 h-100">
               <div className="mx-auto my-auto">
                 <input
+                  disabled={disabled}
                   aria-labelledby={`select-column-header ${fileHyperlinkId}`}
-                  checked={value || false}
+                  checked={disabled ? false : value || false}
                   onClick={onCheckBoxClick}
                   onChange={noop}
                   style={{
@@ -120,7 +123,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
   const CheckBoxHeader = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(
-      pair => pair[1]
+      (pair) => pair[1]
     ).length;
     return (
       <div className="grouped-checkbox-header text-center">
@@ -142,7 +145,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   const DetachedTotalSelected = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(
-      pair => pair[1]
+      (pair) => pair[1]
     ).length;
     return (
       <div>

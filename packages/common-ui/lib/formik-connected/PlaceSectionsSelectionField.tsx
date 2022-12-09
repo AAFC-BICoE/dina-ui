@@ -46,9 +46,15 @@ export function PlaceSectionsSelectionField(
       ...(!hideSelectionCheckBox
         ? [
             {
-              Cell: ({ original: section }) => (
-                <CheckBoxField key={section.id} resource={section} />
-              ),
+              Cell: ({ original: section }) => {
+                return (
+                  <CheckBoxField
+                    key={section.id}
+                    resource={section}
+                    disabled={!(section.id && section.element)}
+                  />
+                );
+              },
               Header: CheckBoxHeader,
               sortable: false
             }
@@ -56,7 +62,7 @@ export function PlaceSectionsSelectionField(
         : [])
     ];
 
-  const mappedColumns = PLACE_SECTIONS_TABLE_COLUMNS.map<Column>(column => {
+  const mappedColumns = PLACE_SECTIONS_TABLE_COLUMNS.map<Column>((column) => {
     const { fieldName, customHeader } =
       typeof column === "string"
         ? {
@@ -79,7 +85,7 @@ export function PlaceSectionsSelectionField(
     value?: SourceAdministrativeLevel[] | null
   ) => (
     <div className="read-only-view">
-      {value?.map(val => (
+      {value?.map((val) => (
         <div key={val?.id ?? val.shortId ?? val?.name} className="mb-1">
           {" "}
           {val?.name ?? val?.id ?? val?.toString()}{" "}
@@ -94,7 +100,7 @@ export function PlaceSectionsSelectionField(
       removeLabel={true}
       readOnlyRender={defaultReadOnlyRender}
       disableLabelClick={true}
-      key={displayData.map(data => data.shortId).join()}
+      key={displayData.map((data) => data.shortId).join()}
     >
       {() => {
         return (

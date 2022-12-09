@@ -208,8 +208,7 @@ export function CollectingEventFormLayout({
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
     detailResults?.address?.map((addr) => {
-      // omitting country and state
-      if (
+      const isTargetType =
         addr.type !== "country" &&
         addr.type !== "state" &&
         addr.type !== "country_code" &&
@@ -217,8 +216,10 @@ export function CollectingEventFormLayout({
         addr.place_type !== "state" &&
         addr.place_type !== "country" &&
         addr.isaddress &&
-        (addr.osm_id || addr.place_id)
-      ) {
+        (addr.osm_id || addr.place_id);
+
+      // omitting country and state
+      if (isTargetType) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
         detail.placeType = addr.place_type ?? addr.class;
