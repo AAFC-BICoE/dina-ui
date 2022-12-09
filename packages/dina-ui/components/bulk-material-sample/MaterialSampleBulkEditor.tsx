@@ -258,7 +258,7 @@ function getSampleHooks(
         // Reduce the off-screen tabs rendering for better performance:
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
-        disableNestedFormEdits: true,
+        disableNestedFormEdits: false,
         visibleManagedAttributeKeys,
         bulkEditCollectingEventFormRef
       }),
