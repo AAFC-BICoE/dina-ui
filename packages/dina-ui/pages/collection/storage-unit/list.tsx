@@ -16,9 +16,15 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
     Cell: ({ original: storage }) => (
       <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
         {storageUnitDisplayName(storage)}
-      </Link>
+      </Link> 
     ),
     accessor: "name"
+  },
+  {
+    Cell: ({ original: {data}}) => (
+      <Link href={`/collection/storage-unit-type/view?id=${data?.attributes?.storageUnitType.id}`}></Link>
+    ),
+    accessor: "storage unit type"
   },
   {
     Cell: ({ original }) => (
