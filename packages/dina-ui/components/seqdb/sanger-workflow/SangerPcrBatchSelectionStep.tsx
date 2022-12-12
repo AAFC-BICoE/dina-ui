@@ -1,27 +1,35 @@
 import {
+  DinaForm,
+  FieldHeader,
   filterBy,
-  QueryPage2,
+  FormikButton,
+  ResourceSelectField,
+  TextField,
   useAccount,
   useApiClient,
-  LoadingSpinner,
-  CommonMessage,
-  FieldHeader,
-  TextField,
-  DinaForm,
-  useDinaFormContext
+  useGroupedCheckBoxes,
+  useQuery
 } from "common-ui";
-import { PersistedResource } from "kitsu";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { useState, useEffect } from "react";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { SeqBatch, PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { TableColumn } from "common-ui/lib/list-page/types";
-import { pick, compact, uniq } from "lodash";
-import ReactTable, { Column } from "react-table";
+import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { useEffect, useMemo, useState } from "react";
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import ReactTable from "react-table";
+import { v4 as uuidv4 } from "uuid";
+import { SeqdbMessage } from "../../../intl/seqdb-intl";
+import {
+  PcrBatch,
+  PcrBatchItem,
+  pcrBatchItemResultColor,
+  PcrPrimer,
+  Region,
+  SeqBatch,
+  SeqReaction
+} from "../../../types/seqdb-api";
+import { GroupSelectField } from "../../group-select/GroupSelectField";
 
 export interface SangerPcrBatchSelectionStepProps {
-  seqBatchId: string;
   seqBatch?: SeqBatch;
   editMode: boolean;
   setEditMode: (newValue: boolean) => void;
@@ -30,7 +38,6 @@ export interface SangerPcrBatchSelectionStepProps {
 }
 
 export function SangerPcrBatchSelectionStep({
-  seqBatchId,
   seqBatch,
   editMode,
   setEditMode,
@@ -39,21 +46,16 @@ export function SangerPcrBatchSelectionStep({
 }: SangerPcrBatchSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
-  const { username } = useAccount();
+  const { isAdmin, groupNames } = useAccount();
 
-  const API_SEARCH_COLUMN: Column<PcrBatch>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
-    }
-  ];
+  const [group, setGroup] = useState(
+    groupNames && groupNames.length > 0 ? groupNames[0] : ""
+  );
+
+  const defaultValues = {
+    group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined,
+    seqBatchName: seqBatch?.name
+  };
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
@@ -66,10 +68,6 @@ export function SangerPcrBatchSelectionStep({
       performSaveInternal();
     }
   }, [performSave]);
-
-  // Keep track of the previously selected resources to compare.
-  const [previouslySelectedResources, setPreviouslySelectedResources] =
-    useState<PcrBatchItem[]>([]);
 
   async function saveSeqBatchItems() {
     // const seqBatchQueryState = await apiClient.get<SeqBatch>(
@@ -143,23 +141,294 @@ export function SangerPcrBatchSelectionStep({
     //   );
     // }
 
-    // Clear the previously selected resources.
-    setPreviouslySelectedResources([]);
     setEditMode(false);
   }
 
   const onSubmit = () => {
     // TODO: implement it later.
   };
+  //#region of PCR Batch Item table
+  const [selectedPcrBatch, setSelectedPcrBatch] = useState<PcrBatch>();
+  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>();
+
+  // Checkbox for the first table that lists the search results
+  const {
+    CheckBoxField: SelectCheckBox,
+    CheckBoxHeader: SelectCheckBoxHeader,
+    setAvailableItems: setAvailableResources
+  } = useGroupedCheckBoxes({
+    fieldName: "itemIdsToSelect",
+    defaultAvailableItems: pcrBatchItems ?? []
+  });
+
+  const pcrBatchItemQuery = useQuery<PcrBatchItem[]>(
+    {
+      path: `seqdb-api/pcr-batch-item`,
+      include: ["pcrBatch", "materialSample"].join(","),
+      filter: {
+        "pcrBatch.uuid": selectedPcrBatch?.id as string
+      }
+    },
+    {
+      disabled: !selectedPcrBatch,
+      onSuccess: async ({ data }) => {
+        for (const item of data) {
+          if (item && item.materialSample && item.materialSample.id) {
+            const { data: materialSample } =
+              await apiClient.get<MaterialSample>(
+                `collection-api/material-sample/${item.materialSample.id}`,
+                {}
+              );
+            (item.materialSample as MaterialSample).materialSampleName =
+              materialSample?.materialSampleName;
+          }
+        }
+      }
+    }
+  );
+
+  const PCR_BATCH_ITEM_COLUMN: TableColumn<PcrBatchItem>[] = [
+    {
+      Cell: ({ original: resource }) => (
+        <SelectCheckBox key={resource.id} resource={resource} />
+      ),
+      Header: SelectCheckBoxHeader,
+      sortable: false,
+      width: 150
+    },
+    {
+      Cell: ({ original }) =>
+        original?.materialSample?.materialSampleName || "",
+      Header: <FieldHeader name={"sampleName"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => (
+        <div
+          style={{
+            backgroundColor: "#" + pcrBatchItemResultColor(original?.result),
+            borderRadius: "5px",
+            paddingLeft: "5px"
+          }}
+        >
+          {original?.result ?? ""}
+        </div>
+      ),
+      Header: <FieldHeader name={"result"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) =>
+        original?.wellRow === null || original?.wellColumn === null
+          ? ""
+          : original.wellRow + "" + original.wellColumn,
+      Header: <FieldHeader name={"wellCoordinates"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => original?.cellNumber || "",
+      Header: <FieldHeader name={"tubeNumber"} />,
+      sortable: false
+    }
+  ];
+
+  const pcrBatchTable = (
+    <ReactTable<PcrBatchItem>
+      className="col-md-5"
+      columns={PCR_BATCH_ITEM_COLUMN}
+      data={pcrBatchItemQuery?.response?.data}
+      minRows={1}
+      showPagination={false}
+      loading={pcrBatchItemQuery?.loading}
+      sortable={false}
+    />
+  );
+
+  // Generate the key for the DINA form. It should only be generated once.
+  const formKey = useMemo(() => uuidv4(), []);
+
+  //#endregion of PCR Batch item table
+
+  //#region of Gene Region and Primer
+  const [selectedRegion, setSelectedRegion] = useState<Region>();
+  const [selectedResources, setSelectedResources] = useState<any[]>();
+
+  // Checkbox for second table where selected/to be deleted items are displayed
+  const {
+    CheckBoxField: DeselectCheckBox,
+    CheckBoxHeader: DeselectCheckBoxHeader,
+    setAvailableItems: setRemovableItems
+  } = useGroupedCheckBoxes({
+    fieldName: "itemIdsToDelete",
+    defaultAvailableItems: selectedResources ?? []
+  });
+
+  const SELECTED_RESOURCE_HEADER = [
+    {
+      Cell: ({ original: resource }) => (
+        <DeselectCheckBox key={resource.id} resource={resource} />
+      ),
+      Header: DeselectCheckBoxHeader,
+      sortable: false,
+      width: 150
+    },
+    {
+      Cell: ({ original }) => original?.materialSample?.name || "",
+      Header: <FieldHeader name={"sampleName"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => (
+        <div
+          style={{
+            backgroundColor: "#" + pcrBatchItemResultColor(original?.result),
+            borderRadius: "5px",
+            paddingLeft: "5px"
+          }}
+        >
+          {original?.result ?? ""}
+        </div>
+      ),
+      Header: <FieldHeader name={"result"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) =>
+        original?.wellRow === null || original?.wellColumn === null
+          ? ""
+          : original.wellRow + "" + original.wellColumn,
+      Header: <FieldHeader name={"wellCoordinates"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => original?.cellNumber || "",
+      Header: <FieldHeader name={"tubeNumber"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => original?.cellNumber || "",
+      Header: <FieldHeader name={"primer"} />,
+      sortable: false
+    },
+    {
+      Cell: ({ original }) => original?.cellNumber || "",
+      Header: <FieldHeader name={"direction"} />,
+      sortable: false
+    }
+  ];
+
+  //#endregion of Gene Region and Primer
+
+  const addSelectedResources = () => {
+    // TODO: asdf
+  };
+  const removeSelectedResources = () => {
+    // TODO: sadfas
+  };
 
   return editMode ? (
-    <div className="row">
-      <QueryPage2<PcrBatch>
-        columns={API_SEARCH_COLUMN}
-        selectionMode={true}
-        indexName={""}
-      />
-    </div>
+    <DinaForm key={formKey} initialValues={defaultValues} onSubmit={onSubmit}>
+      <div className="row">
+        <TextField
+          className="col-md-5 pe-3 mt-3"
+          name="seqBatchName"
+          label={formatMessage("seqBatchName")}
+          readOnly={true}
+        />
+      </div>
+      <div className="row">
+        <GroupSelectField
+          className="col-md-5 pe-3"
+          name="group"
+          enableStoredDefaultGroup={true}
+          onChange={(value) => setGroup(value)}
+        />
+      </div>
+      <div className="row">
+        <ResourceSelectField<PcrBatch>
+          name="pcrBatch"
+          label={formatMessage("pcrBatch")}
+          className="col-md-5 pe-3"
+          filter={filterBy(
+            ["name"],
+            !isAdmin
+              ? {
+                  extraFilters: [
+                    {
+                      selector: "group",
+                      comparison: "==",
+                      arguments: group
+                    }
+                  ]
+                }
+              : undefined
+          )}
+          isDisabled={!group}
+          readOnlyLink="/seqdb/pcr-batch/view?id="
+          model="seqdb-api/pcr-batch"
+          optionLabel={(pcrBatch) => `${pcrBatch.name || pcrBatch.id}`}
+          onChange={(value) => setSelectedPcrBatch(value as PcrBatch)}
+        />
+      </div>
+      <div className="row">
+        {pcrBatchTable}
+        <div className="col-md-1">
+          <ResourceSelectField<Region>
+            name="region"
+            filter={filterBy(["name"])}
+            model="seqdb-api/region"
+            optionLabel={(region) => region.name}
+            readOnlyLink="/seqdb/region/view?id="
+            onChange={(value) => setSelectedRegion(value as Region)}
+          />
+          <ResourceSelectField<PcrPrimer>
+            name="primer"
+            filter={filterBy(
+              ["name"],
+              !!selectedRegion
+                ? {
+                    extraFilters: [
+                      {
+                        selector: "region.uuid",
+                        comparison: "==",
+                        arguments: selectedRegion?.id || ""
+                      }
+                    ]
+                  }
+                : undefined
+            )}
+            isDisabled={!selectedRegion}
+            model="seqdb-api/pcr-primer"
+            optionLabel={(primer) => `${primer.name} - ${primer.lotNumber}`}
+            readOnlyLink="/seqdb/pcr-primer/view?id="
+          />
+          <div className="mt-3">
+            <FormikButton
+              className="btn btn-primary w-100 mb-3"
+              onClick={addSelectedResources}
+            >
+              <FiChevronRight />
+            </FormikButton>
+          </div>
+          <div className="deselect-all-checked-button">
+            <FormikButton
+              className="btn btn-dark w-100 mb-3"
+              onClick={removeSelectedResources}
+            >
+              <FiChevronLeft />
+            </FormikButton>
+          </div>
+        </div>
+
+        <ReactTable<SeqReaction>
+          className="react-table-overflow col-md-6"
+          columns={SELECTED_RESOURCE_HEADER}
+          minRows={1}
+          showPagination={false}
+          sortable={false}
+        />
+      </div>
+    </DinaForm>
   ) : (
     <>
       <strong>

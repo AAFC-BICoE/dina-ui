@@ -147,7 +147,6 @@ export default function SangerWorkFlowSequencingRunPage() {
         <TabPanel>
           {seqBatchId && (
             <SangerPcrBatchSelectionStep
-              seqBatchId={seqBatchId}
               seqBatch={seqBatchQueryState.response?.data}
               editMode={editMode}
               setEditMode={setEditMode}
