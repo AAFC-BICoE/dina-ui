@@ -8,7 +8,8 @@ import {
   useAccount,
   useApiClient,
   useGroupedCheckBoxes,
-  useQuery
+  useQuery,
+  withResponse
 } from "common-ui";
 import { TableColumn } from "packages/common-ui/lib/list-page/types";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
@@ -149,16 +150,14 @@ export function SangerPcrBatchSelectionStep({
   };
   //#region of PCR Batch Item table
   const [selectedPcrBatch, setSelectedPcrBatch] = useState<PcrBatch>();
-  const [pcrBatchItems, setPcrBatchItems] = useState<PcrBatchItem[]>();
 
   // Checkbox for the first table that lists the search results
   const {
     CheckBoxField: SelectCheckBox,
     CheckBoxHeader: SelectCheckBoxHeader,
     setAvailableItems: setAvailableResources
-  } = useGroupedCheckBoxes({
-    fieldName: "itemIdsToSelect",
-    defaultAvailableItems: pcrBatchItems ?? []
+  } = useGroupedCheckBoxes<PcrBatchItem>({
+    fieldName: "itemIdsToSelect"
   });
 
   const pcrBatchItemQuery = useQuery<PcrBatchItem[]>(
@@ -183,6 +182,7 @@ export function SangerPcrBatchSelectionStep({
               materialSample?.materialSampleName;
           }
         }
+        setAvailableResources(data);
       }
     }
   );
@@ -259,8 +259,7 @@ export function SangerPcrBatchSelectionStep({
     CheckBoxHeader: DeselectCheckBoxHeader,
     setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
-    fieldName: "itemIdsToDelete",
-    defaultAvailableItems: selectedResources ?? []
+    fieldName: "itemIdsToDelete"
   });
 
   const SELECTED_RESOURCE_HEADER = [
