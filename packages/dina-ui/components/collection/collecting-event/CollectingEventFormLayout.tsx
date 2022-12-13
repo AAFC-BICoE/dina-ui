@@ -17,7 +17,7 @@ import {
   FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import useSWR from "swr";
 import {
   AttachmentsField,
@@ -104,6 +104,10 @@ export function CollectingEventFormLayout({
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
+  const [
+    customGeographicPlaceCheckboxState,
+    setCustomGeographicPlaceCheckboxState
+  ] = useState(false);
 
   const { isValidating: detailResultsIsLoading } = useSWR(
     [selectedSearchResult, "nominatimAddressDetailSearch"],
@@ -439,6 +443,7 @@ export function CollectingEventFormLayout({
                         </strong>
                       </label>
                       <input
+                        disabled={customGeographicPlaceCheckboxState}
                         aria-label="customPlace"
                         className="p-2 form-control"
                         style={{ width: "60%" }}
@@ -468,6 +473,9 @@ export function CollectingEventFormLayout({
                   <PlaceSectionsSelectionField
                     name="srcAdminLevels"
                     hideSelectionCheckBox={hideSelectionCheckBox}
+                    setCustomGeographicPlaceCheckboxState={
+                      setCustomGeographicPlaceCheckboxState
+                    }
                   />
                 ) : null}
                 <DinaFormSection horizontal={[3, 9]}>

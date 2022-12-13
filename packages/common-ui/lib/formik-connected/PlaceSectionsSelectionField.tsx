@@ -1,6 +1,6 @@
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { SourceAdministrativeLevel } from "../../../dina-ui/types/collection-api/resources/GeographicPlaceNameSourceDetail";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import ReactTable, { Column } from "react-table";
 import { ColumnDefinition } from "../table/QueryTable";
 import { useGroupedCheckBoxes } from "./GroupedCheckBoxFields";
@@ -10,14 +10,18 @@ import { useFormikContext } from "formik";
 export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
   hideSelectionCheckBox?: boolean;
+  setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
 }
 
 /** Formik-connected table for selecting sections from one search result. */
 export function PlaceSectionsSelectionField(
   placeSectionsSelectionFieldProps: PlaceSectionsSelectionFieldProps
 ) {
-  const { hideSelectionCheckBox, ...placeFieldProps } =
-    placeSectionsSelectionFieldProps;
+  const {
+    setCustomGeographicPlaceCheckboxState,
+    hideSelectionCheckBox,
+    ...placeFieldProps
+  } = placeSectionsSelectionFieldProps;
 
   const { values } = useFormikContext<any>();
 
@@ -29,7 +33,8 @@ export function PlaceSectionsSelectionField(
 
   const { CheckBoxField, CheckBoxHeader } = useGroupedCheckBoxes({
     fieldName: "selectedSections",
-    defaultAvailableItems: displayData
+    defaultAvailableItems: displayData,
+    setCustomGeographicPlaceCheckboxState
   });
 
   const PLACE_SECTIONS_TABLE_READONLY_COLUMNS: ColumnDefinition<SourceAdministrativeLevel>[] =
@@ -47,11 +52,17 @@ export function PlaceSectionsSelectionField(
         ? [
             {
               Cell: ({ original: section }) => {
+                const customGeographicPlace = !section.id;
                 return (
                   <CheckBoxField
                     key={section.id}
                     resource={section}
-                    disabled={!(section.id && section.element)}
+                    // disabled={!(section.id && section.element)}
+                    setCustomGeographicPlaceCheckboxState={
+                      customGeographicPlace
+                        ? setCustomGeographicPlaceCheckboxState
+                        : undefined
+                    }
                   />
                 );
               },

@@ -1,7 +1,7 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { useIntl } from "react-intl";
@@ -10,12 +10,14 @@ export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
   fileHyperlinkId?: string;
   disabled?: boolean;
+  setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
   fieldName: string;
   detachTotalSelected?: boolean;
   defaultAvailableItems?: TData[];
+  setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
 }
 
 export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
@@ -23,7 +25,8 @@ export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
 export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
   detachTotalSelected,
-  defaultAvailableItems
+  defaultAvailableItems,
+  setCustomGeographicPlaceCheckboxState
 }: GroupedCheckBoxesParams<TData>) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
@@ -44,6 +47,9 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
           function onCheckBoxClick(e) {
             setFieldValue(thisBoxFieldName, e.target.checked);
             setFieldTouched(thisBoxFieldName);
+            if (!resource.id) {
+              setCustomGeographicPlaceCheckboxState?.(e.target.checked);
+            }
 
             if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
@@ -100,12 +106,14 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
       const { checked } = e.target;
       const computedAvailableItems =
         (defaultAvailableItems as TData[]) ?? availableItems;
-
       for (const item of computedAvailableItems) {
         setFieldValue(
           `${fieldName}[${item?.shortId ?? item.id}]`,
           checked || undefined
         );
+        if (!item.id && setCustomGeographicPlaceCheckboxState) {
+          setCustomGeographicPlaceCheckboxState(checked);
+        }
       }
     }
 

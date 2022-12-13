@@ -72,7 +72,7 @@ export function useCollectingEventQuery(id?: string | null) {
           );
 
         srcAdminLevels?.map(
-          admn =>
+          (admn) =>
             (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         data.srcAdminLevels = srcAdminLevels;
@@ -141,7 +141,7 @@ export function useCollectingEventSave({
       submittedValues.collectors.length > 0
     ) {
       (submittedValues as any).relationships.collectors = {
-        data: submittedValues?.collectors.map(collector => ({
+        data: submittedValues?.collectors.map((collector) => ({
           id: collector.id,
           type: "person"
         }))
@@ -163,7 +163,7 @@ export function useCollectingEventSave({
     // Add attachments if they were selected:
     (submittedValues as any).relationships.attachment = {
       data:
-        submittedValues.attachment?.map(it => ({
+        submittedValues.attachment?.map((it) => ({
           id: it.id,
           type: it.type
         })) ?? []
@@ -179,7 +179,7 @@ export function useCollectingEventSave({
       for (const assertion of submittedValues.geoReferenceAssertions) {
         const referenceBy = assertion.georeferencedBy;
         if (referenceBy && typeof referenceBy !== "string") {
-          assertion.georeferencedBy = referenceBy.map(it =>
+          assertion.georeferencedBy = referenceBy.map((it) =>
             typeof it !== "string" ? it.id : (null as any)
           );
         }
@@ -199,12 +199,11 @@ export function useCollectingEventSave({
 
     if (srcAdminLevels && srcAdminLevels.length > 0 && srcDetail) {
       const sectionIds = toPairs(submittedValues.selectedSections)
-        .filter(pair => pair[1])
-        .map(pair => pair[0]);
-
+        .filter((pair) => pair[1])
+        .map((pair) => pair[0]);
       if (srcAdminLevels.length > 1) srcDetail.higherGeographicPlaces = [];
       srcAdminLevels
-        .filter(srcAdminLevel => srcAdminLevel)
+        .filter((srcAdminLevel) => srcAdminLevel)
         .map((srcAdminLevel, idx) => {
           const srcAdminLevelName = srcAdminLevel?.name;
           // remove the braceket from placeName
@@ -221,7 +220,7 @@ export function useCollectingEventSave({
             } else {
               if (
                 sectionIds.filter(
-                  id => id === srcAdminLevel.shortId?.toString()
+                  (id) => id === srcAdminLevel.shortId?.toString()
                 ).length
               )
                 srcDetail.selectedGeographicPlace = omit(srcAdminLevel, [
@@ -231,8 +230,9 @@ export function useCollectingEventSave({
             }
           } else {
             if (
-              sectionIds.filter(id => id === srcAdminLevel.shortId?.toString())
-                .length
+              sectionIds.filter(
+                (id) => id === srcAdminLevel.shortId?.toString()
+              ).length
             ) {
               srcDetail.higherGeographicPlaces?.push(
                 omit(srcAdminLevel, ["shortId", "type"])
@@ -300,14 +300,14 @@ function useCollectingEventFormSchema() {
         .string()
         .nullable()
         .test({
-          test: val => (val ? isValidDatePrecision(val) : true),
+          test: (val) => (val ? isValidDatePrecision(val) : true),
           message: formatMessage("field_collectingEvent_startDateTimeError")
         }),
       endEventDateTime: yup
         .string()
         .nullable()
         .test({
-          test: val => (val ? isValidDatePrecision(val) : true),
+          test: (val) => (val ? isValidDatePrecision(val) : true),
           message: formatMessage("field_collectingEvent_endDateTimeError")
         })
     });
