@@ -1,7 +1,7 @@
 import { connect, Field } from "formik";
 import { KitsuResource } from "kitsu";
 import { noop, toPairs } from "lodash";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { CommonMessage } from "../intl/common-ui-intl";
 import { Tooltip } from "../tooltip/Tooltip";
 import { useIntl } from "react-intl";
@@ -9,12 +9,15 @@ import { useIntl } from "react-intl";
 export interface CheckBoxFieldProps<TData extends KitsuResource> {
   resource: TData;
   fileHyperlinkId?: string;
+  disabled?: boolean;
+  setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface GroupedCheckBoxesParams<TData extends KitsuResource> {
   fieldName: string;
   detachTotalSelected?: boolean;
   defaultAvailableItems?: TData[];
+  setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
 }
 
 export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
@@ -22,7 +25,8 @@ export type ExtendedKitsuResource = KitsuResource & { shortId?: number };
 export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   fieldName,
   detachTotalSelected,
-  defaultAvailableItems
+  defaultAvailableItems,
+  setCustomGeographicPlaceCheckboxState
 }: GroupedCheckBoxesParams<TData>) {
   const [availableItems, setAvailableItems] = useState<TData[]>([]);
   const lastCheckedItemRef = useRef<TData>();
@@ -30,7 +34,8 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   function CheckBoxField({
     resource,
-    fileHyperlinkId
+    fileHyperlinkId,
+    disabled
   }: CheckBoxFieldProps<TData>) {
     const thisBoxFieldName = `${fieldName}[${resource.shortId ?? resource.id}]`;
     const computedAvailableItems =
@@ -42,6 +47,9 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
           function onCheckBoxClick(e) {
             setFieldValue(thisBoxFieldName, e.target.checked);
             setFieldTouched(thisBoxFieldName);
+            if (!resource.id) {
+              setCustomGeographicPlaceCheckboxState?.(e.target.checked);
+            }
 
             if (lastCheckedItemRef.current && e.shiftKey) {
               const checked: boolean = (e.target as any).checked;
@@ -72,8 +80,9 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
             <div className="d-flex w-100 h-100">
               <div className="mx-auto my-auto">
                 <input
+                  disabled={disabled}
                   aria-labelledby={`select-column-header ${fileHyperlinkId}`}
-                  checked={value || false}
+                  checked={disabled ? false : value || false}
                   onClick={onCheckBoxClick}
                   onChange={noop}
                   style={{
@@ -98,12 +107,19 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
       const computedAvailableItems =
         (defaultAvailableItems as TData[]) ?? availableItems;
 
-      for (const item of computedAvailableItems) {
-        setFieldValue(
-          `${fieldName}[${item?.shortId ?? item.id}]`,
-          checked || undefined
-        );
-      }
+      computedAvailableItems.forEach((item, index) => {
+        if (item.id || index === 0) {
+          setFieldValue(
+            `${fieldName}[${item?.shortId ?? item.id}]`,
+            checked || undefined
+          );
+        }
+
+        // If custom place name is checked, disable custom place name textbox
+        if (!item.id && setCustomGeographicPlaceCheckboxState) {
+          setCustomGeographicPlaceCheckboxState(checked);
+        }
+      });
     }
 
     return (
@@ -120,7 +136,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
   /** Table column header with a CheckAllCheckBox for the QueryTable. */
   const CheckBoxHeader = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(
-      pair => pair[1]
+      (pair) => pair[1]
     ).length;
     return (
       <div className="grouped-checkbox-header text-center">
@@ -142,7 +158,7 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
 
   const DetachedTotalSelected = connect(({ formik: { values } }) => {
     const totalChecked = toPairs(values[fieldName]).filter(
-      pair => pair[1]
+      (pair) => pair[1]
     ).length;
     return (
       <div>
