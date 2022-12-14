@@ -103,12 +103,12 @@ describe("BrowseStorageTree component", () => {
       wrapper
         .find(".collapser-for-A .collapser-for-B a.storage-unit-name")
         .text()
-    ).toEqual("B");
+    ).toEqual("B(undefined)");
     expect(
       wrapper
         .find(".collapser-for-A .collapser-for-C a.storage-unit-name")
         .text()
-    ).toEqual("C");
+    ).toEqual("C(undefined)");
 
     // Select a storage:
     wrapper

@@ -2638,7 +2638,7 @@ describe("MaterialSampleBulkEditor", () => {
     // New linked storage unit is indicated:
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .storageUnit-field .storage-path").text()
-    ).toEqual("Box storage unit C");
+    ).toEqual("storage unit C(Box)");
 
     // Save the samples with the new storage unit:
     wrapper.find("button.bulk-save-button").simulate("click");

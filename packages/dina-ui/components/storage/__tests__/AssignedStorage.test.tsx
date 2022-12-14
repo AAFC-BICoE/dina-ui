@@ -85,7 +85,7 @@ describe("AssignedStorage component", () => {
       wrapper
         .find(".storage-path li.breadcrumb-item")
         .map(node => node.text().trim())
-    ).toEqual(["E", "D", "C", "B", "A"]);
+    ).toEqual(["E", "D", "C", "B", "A(undefined)"]);
   });
 
   it("Lets you remove the storage unit", async () => {

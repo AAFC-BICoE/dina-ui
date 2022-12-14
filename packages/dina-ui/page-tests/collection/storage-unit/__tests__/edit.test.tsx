@@ -54,7 +54,7 @@ describe("Storage Unit edit page.", () => {
 
     expect(
       wrapper.find(".storage-path li.breadcrumb-item").map(node => node.text())
-    ).toEqual(["A"]);
+    ).toEqual(["A(undefined)"]);
 
     wrapper
       .find(".name-field input")
