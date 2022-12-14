@@ -1,0 +1,539 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions existsQuery 1`] = `
+Object {
+  "exists": Object {
+    "field": "fieldTest",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions includedTypeQuery 1`] = `
+Object {
+  "term": Object {
+    "included.type": "parentTest",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions matchQuery 1`] = `
+Object {
+  "match": Object {
+    "fieldTest": "valueToMatch",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions rangeQuery 1`] = `
+Object {
+  "range": Object {
+    "fieldTest": Object {
+      "lt": 500,
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 1`] = `
+Object {
+  "term": Object {
+    "fieldTest.keyword": "valueToMatch",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Query helper functions termQuery 2`] = `
+Object {
+  "term": Object {
+    "fieldTest": "valueToMatch",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Multiple groups 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+        Object {
+          "terms": Object {
+            "data.attributes.group": Array [
+              "aafc",
+              "cnc",
+              "seqdb",
+            ],
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters No groups 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyGroupFilters Single group 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.group": "aafc",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyPagination Pagination is correctly applied to query 1`] = `
+Object {
+  "from": 0,
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "size": 25,
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyPagination Pagination is correctly applied to query 2`] = `
+Object {
+  "from": 100,
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "size": 100,
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, also contains should logic, include the must match minimum. 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "minimum_should_match": 1,
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+      "should": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery Boolean logic exists, move it properly to it's own boolean section. 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applyRootQuery No boolean logic exists, just return the query as is. 1`] = `
+Object {
+  "query": Object {},
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Attempting to sort on a column that does not exist 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {},
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn1.keyword": Object {
+      "order": "desc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 2`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn1.keyword": Object {
+      "order": "asc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Basic sorting is correctly applied to the query 3`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn1.keyword": Object {
+      "order": "asc",
+    },
+    "data.attributes.testColumn2": Object {
+      "order": "desc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules No sorting to be performed, leave query the same without adding anything. 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn4": Object {
+      "nested_filter": Object {
+        "term": Object {
+          "included.type": "relationshipType1",
+        },
+      },
+      "nested_path": "included",
+      "order": "desc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 2`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn4": Object {
+      "nested_filter": Object {
+        "term": Object {
+          "included.type": "relationshipType1",
+        },
+      },
+      "nested_path": "included",
+      "order": "desc",
+    },
+    "data.attributes.testColumn5.keyword": Object {
+      "nested_filter": Object {
+        "term": Object {
+          "included.type": "relationshipType2",
+        },
+      },
+      "nested_path": "included",
+      "order": "asc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Relationship sorting query generation 3`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "data.attributes.testColumn1.keyword": Object {
+      "order": "asc",
+    },
+    "data.attributes.testColumn2": Object {
+      "order": "desc",
+    },
+    "data.attributes.testColumn4": Object {
+      "nested_filter": Object {
+        "term": Object {
+          "included.type": "relationshipType1",
+        },
+      },
+      "nested_path": "included",
+      "order": "desc",
+    },
+    "data.attributes.testColumn5.keyword": Object {
+      "nested_filter": Object {
+        "term": Object {
+          "included.type": "relationshipType2",
+        },
+      },
+      "nested_path": "included",
+      "order": "asc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySortingRules Strings as column definitions 1`] = `
+Object {
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+  "sort": Object {
+    "testColumn3": Object {
+      "order": "asc",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality applySourceFiltering Ensure all source filtering are being applied to the query 1`] = `
+Object {
+  "_source": Array [
+    "data.id",
+    "data.type",
+    "data.attributes.testColumn1",
+    "data.attributes.includeThis1",
+    "data.attributes.includeThis2",
+    "data.attributes.testColumn2",
+    "data.attributes.includeThis3",
+    "data.attributes.testColumn4",
+    "data.attributes.testColumn5",
+    "included.id",
+    "included.type",
+  ],
+  "query": Object {
+    "bool": Object {
+      "must": Array [
+        Object {
+          "term": Object {
+            "data.attributes.materialSampleName.keyword": "Test",
+          },
+        },
+        Object {
+          "term": Object {
+            "data.attributes.preparationDate": "2022-11-30",
+          },
+        },
+      ],
+    },
+  },
+}
+`;
