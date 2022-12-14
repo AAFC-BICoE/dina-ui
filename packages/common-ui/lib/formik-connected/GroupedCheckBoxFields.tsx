@@ -106,15 +106,20 @@ export function useGroupedCheckBoxes<TData extends ExtendedKitsuResource>({
       const { checked } = e.target;
       const computedAvailableItems =
         (defaultAvailableItems as TData[]) ?? availableItems;
-      for (const item of computedAvailableItems) {
-        setFieldValue(
-          `${fieldName}[${item?.shortId ?? item.id}]`,
-          checked || undefined
-        );
+
+      computedAvailableItems.forEach((item, index) => {
+        if (item.id || index === 0) {
+          setFieldValue(
+            `${fieldName}[${item?.shortId ?? item.id}]`,
+            checked || undefined
+          );
+        }
+
+        // If custom place name is checked, disable custom place name textbox
         if (!item.id && setCustomGeographicPlaceCheckboxState) {
           setCustomGeographicPlaceCheckboxState(checked);
         }
-      }
+      });
     }
 
     return (

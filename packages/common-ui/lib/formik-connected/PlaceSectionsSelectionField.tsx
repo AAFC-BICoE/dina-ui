@@ -11,6 +11,7 @@ export interface PlaceSectionsSelectionFieldProps extends FieldWrapperProps {
   isDisabled?: boolean;
   hideSelectionCheckBox?: boolean;
   setCustomGeographicPlaceCheckboxState?: Dispatch<SetStateAction<boolean>>;
+  customPlaceValue?: string;
 }
 
 /** Formik-connected table for selecting sections from one search result. */
@@ -19,6 +20,7 @@ export function PlaceSectionsSelectionField(
 ) {
   const {
     setCustomGeographicPlaceCheckboxState,
+    customPlaceValue,
     hideSelectionCheckBox,
     ...placeFieldProps
   } = placeSectionsSelectionFieldProps;
@@ -52,14 +54,15 @@ export function PlaceSectionsSelectionField(
         ? [
             {
               Cell: ({ original: section }) => {
-                const customGeographicPlace = !section.id;
+                const disableCustomGeographicPlace =
+                  !!customPlaceValue && !section.id && section.shortId !== 0;
                 return (
                   <CheckBoxField
                     key={section.id}
                     resource={section}
-                    // disabled={!(section.id && section.element)}
+                    disabled={disableCustomGeographicPlace}
                     setCustomGeographicPlaceCheckboxState={
-                      customGeographicPlace
+                      !section.id
                         ? setCustomGeographicPlaceCheckboxState
                         : undefined
                     }

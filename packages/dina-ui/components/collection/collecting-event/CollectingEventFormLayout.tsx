@@ -358,6 +358,8 @@ export function CollectingEventFormLayout({
     customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
     customPlaceAsInSrcAdmnLevel.type = "place-section";
     customPlaceAsInSrcAdmnLevel.shortId = 0;
+    customPlaceAsInSrcAdmnLevel.element = undefined;
+    customPlaceAsInSrcAdmnLevel.id = undefined;
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
@@ -369,7 +371,7 @@ export function CollectingEventFormLayout({
 
     // Make the custom place selected by default
     const selectedSections = form.values.selectedSections;
-    selectedSections.unshift(true);
+    selectedSections?.unshift(true);
 
     setHideCustomPlace(true);
   };
@@ -476,6 +478,7 @@ export function CollectingEventFormLayout({
                     setCustomGeographicPlaceCheckboxState={
                       setCustomGeographicPlaceCheckboxState
                     }
+                    customPlaceValue={customPlaceValue}
                   />
                 ) : null}
                 <DinaFormSection horizontal={[3, 9]}>
