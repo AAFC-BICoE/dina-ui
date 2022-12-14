@@ -5,8 +5,7 @@ import {
   GroupSelectField,
   Head,
   Nav,
-  StorageUnitBreadCrumb,
-  storageUnitDisplayName
+  StorageUnitBreadCrumb
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
@@ -15,16 +14,19 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
   {
     Cell: ({ original: storage }) => (
       <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
-        {storageUnitDisplayName(storage)}
+        {storage.name}
       </Link> 
     ),
     accessor: "name"
   },
   {
-    Cell: ({ original: {data}}) => (
-      <Link href={`/collection/storage-unit-type/view?id=${data?.attributes?.storageUnitType.id}`}></Link>
+    Cell: ({ original: storage}) => (
+      <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
+        {storage?.storageUnitType.name}
+      </Link>
     ),
-    accessor: "storage unit type"
+    accessor: "storage unit type",
+    sortable: false
   },
   {
     Cell: ({ original }) => (

@@ -105,7 +105,7 @@ export function ViewPageLayout<T extends KitsuResource>({
         { ...query(id), header: { "include-dina-permission": "true" } },
         { disabled: !id, ...queryOptions }
       ))) as QueryState<T & HasDinaMetaInfo, unknown>;
-
+console.log("test");
   return (
     <div>
       <Nav />
@@ -141,7 +141,7 @@ export function ViewPageLayout<T extends KitsuResource>({
           if (Array.isArray(title)) {
             title = title[0];
           }
-
+          console.log(title);
           return (
             <>
               <Head title={title} />
