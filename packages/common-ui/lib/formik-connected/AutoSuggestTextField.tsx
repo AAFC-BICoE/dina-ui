@@ -81,11 +81,6 @@ interface AutoSuggestConfig<T extends KitsuResource> {
     restrictedFieldValue?: string;
 
     /**
-     * Full path of the document id.
-     */
-    documentId?: string;
-
-    /**
      * Group name to filter the results by.
      */
     group?: string;
@@ -347,7 +342,6 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
     indexName: elasticSearchBackend?.indexName ?? "",
     searchField: elasticSearchBackend?.searchField ?? "",
     additionalField: elasticSearchBackend?.additionalSearchField,
-    documentId: elasticSearchBackend?.documentId,
     restrictedField: elasticSearchBackend?.restrictedField,
     restrictedFieldValue: elasticSearchBackend?.restrictedFieldValue,
     group: elasticSearchBackend?.group,
@@ -370,15 +364,17 @@ function AutoSuggestTextFieldInternal<T extends KitsuResource>({
   }, []);
 
   // If any errors occur, switch providers. Only if both providers are set.
-  if (
-    (jsonApiError || elasticSearchError) &&
-    elasticSearchBackend &&
-    jsonApiBackend
-  ) {
-    setBackend((current) =>
-      current === "elastic-search" ? "json-api" : "elastic-search"
-    );
-  }
+  useEffect(() => {
+    if (backend === "elastic-search" && elasticSearchError && jsonApiBackend) {
+      setBackend("json-api");
+      return;
+    }
+
+    if (backend === "json-api" && jsonApiError && elasticSearchBackend) {
+      setBackend("elastic-search");
+      return;
+    }
+  }, [elasticSearchError, jsonApiError]);
 
   const isLoading: boolean =
     elasticSearchLoading || (jsonApiLoading && !jsonApiIsDisabled);
