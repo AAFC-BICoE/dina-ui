@@ -2,7 +2,7 @@ import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { SangerPcrBatchSelectionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerPcrBatchSelectionStep";
+import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerSeqReactionStep";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -146,7 +146,7 @@ export default function SangerWorkFlowSequencingRunPage() {
         </TabPanel>
         <TabPanel>
           {seqBatchId && (
-            <SangerPcrBatchSelectionStep
+            <SangerSeqReactionStep
               seqBatch={seqBatchQueryState.response?.data}
               editMode={editMode}
               setEditMode={setEditMode}
