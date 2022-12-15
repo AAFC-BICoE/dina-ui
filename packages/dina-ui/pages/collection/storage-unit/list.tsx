@@ -22,7 +22,7 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
   {
     Cell: ({ original: storage}) => (
       <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
-        {storage?.storageUnitType.name}
+        {storage.storageUnitType.name}
       </Link>
     ),
     accessor: "storage unit type",
