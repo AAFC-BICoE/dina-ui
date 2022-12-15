@@ -25,6 +25,7 @@ export function QueryOperatorSelector({
   selectedOperator,
   setOperator
 }: QueryOperatorSelectorProps) {
+  /* istanbul ignore next */
   const customStyles = {
     placeholder: (provided, _) => ({
       ...provided,
