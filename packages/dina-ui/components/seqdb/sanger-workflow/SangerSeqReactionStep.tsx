@@ -8,6 +8,7 @@ import {
   useAccount,
   useApiClient,
   useGroupedCheckBoxes,
+  useIsMounted,
   useQuery,
   withResponse
 } from "common-ui";
@@ -58,8 +59,14 @@ export function SangerSeqReactionStep({
   const [selectedPcrBatch, setSelectedPcrBatch] = useState<PcrBatch>();
   const [selectedRegion, setSelectedRegion] = useState<Region>();
   const [selectedResources, setSelectedResources] = useState<SeqReaction[]>([]);
-  const [previouslySelectedResources, setPreviouslySelectedResources] =
-    useState<SeqReaction[]>([]);
+  const isMounted = useIsMounted();
+
+  // The map key is pcrBatchItem.id + "_" + seqPrimer.id
+  // the map value is the real UUID from the database.
+  const [
+    previouslySelectedResourcesIDMap,
+    setPreviouslySelectedResourcesIDMap
+  ] = useState<{ [key: string]: string }>({} as { [key: string]: string });
 
   const defaultValues = {
     group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined,
@@ -89,26 +96,14 @@ export function SangerSeqReactionStep({
       {} as { [key: string]: SeqReaction }
     );
 
-    // The map key is pcrBatchItem.id + "_" + seqPrimer.id
-    // the map value is the real UUID from the database.
-    const previouslySelectedResourcesUUIDMap = compact(
-      previouslySelectedResources
-    ).reduce(
-      (accu, obj) => ({
-        ...accu,
-        [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj.id
-      }),
-      {} as { [key: string]: string }
-    );
-
     const itemsToCreate: SeqReaction[] = Object.keys(selectedResourceMap)
-      .filter((key) => !previouslySelectedResourcesUUIDMap[key])
+      .filter((key) => !previouslySelectedResourcesIDMap[key])
       .map((key) => selectedResourceMap[key]);
 
     const itemIdsToDelete: string[] = compact(
-      Object.keys(previouslySelectedResourcesUUIDMap)
+      Object.keys(previouslySelectedResourcesIDMap)
         .filter((key) => !selectedResourceMap[key])
-        .map((key) => previouslySelectedResourcesUUIDMap[key])
+        .map((key) => previouslySelectedResourcesIDMap[key])
     );
 
     // Perform create
@@ -153,7 +148,7 @@ export function SangerSeqReactionStep({
       );
     }
     // Clear the previously selected resources.
-    setPreviouslySelectedResources([]);
+    setPreviouslySelectedResourcesIDMap({});
     setEditMode(false);
   }
 
@@ -177,17 +172,42 @@ export function SangerSeqReactionStep({
       }
     );
 
-    seqReactions.map(async (item) => {
+    for (const item of seqReactions) {
       if (!!item.pcrBatchItem?.id) {
-        const pcrBatchItem = await apiClient.get<PcrBatchItem>(
+        const { data: pcrBatchItem } = await apiClient.get<PcrBatchItem>(
           `/seqdb-api/pcr-batch-item/${item.pcrBatchItem.id}`,
           {
             include: "materialSample"
           }
         );
-        // console.log(pcrBatchItem);
+        if (!!pcrBatchItem?.materialSample?.id) {
+          const { data: materialSample } = await apiClient.get<MaterialSample>(
+            `collection-api/material-sample/${pcrBatchItem.materialSample.id}`,
+            {}
+          );
+          if (!!materialSample) {
+            (item.pcrBatchItem as PcrBatchItem).materialSample = materialSample;
+          }
+        }
       }
-    });
+    }
+
+    if (isMounted.current) {
+      // If there is nothing stored yet, automatically go to edit mode.
+      // if (seqReactions.length === 0) {
+      //   setEditMode(true);
+      // }
+      setPreviouslySelectedResourcesIDMap(
+        compact(seqReactions).reduce(
+          (accu, obj) => ({
+            ...accu,
+            [`${obj.pcrBatchItem?.id}_${obj.seqPrimer?.id}`]: obj.id
+          }),
+          {} as { [key: string]: string }
+        )
+      );
+      setSelectedResources(seqReactions);
+    }
   };
 
   //#region of PCR Batch Item table
@@ -300,19 +320,23 @@ export function SangerSeqReactionStep({
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete"
   });
-
+  const SELECTED_RESOURCE_SELECT_ALL_HEADER = editMode
+    ? [
+        {
+          Cell: ({ original: resource }) => (
+            <DeselectCheckBox
+              key={`${resource.pcrBatchItem.id}_${resource.seqPrimer.id}`}
+              resource={resource}
+            />
+          ),
+          Header: DeselectCheckBoxHeader,
+          sortable: false,
+          width: 150
+        }
+      ]
+    : [];
   const SELECTED_RESOURCE_HEADER = [
-    {
-      Cell: ({ original: resource }) => (
-        <DeselectCheckBox
-          key={`${resource.pcrBatchItem.id}_${resource.seqPrimer.id}`}
-          resource={resource}
-        />
-      ),
-      Header: DeselectCheckBoxHeader,
-      sortable: false,
-      width: 150
-    },
+    ...SELECTED_RESOURCE_SELECT_ALL_HEADER,
     {
       Cell: ({ original }) =>
         original?.pcrBatchItem?.materialSample.materialSampleName || "",
@@ -545,22 +569,20 @@ export function SangerSeqReactionStep({
       </div>
     </DinaForm>
   ) : (
-    <>
+    <DinaForm key={formKey} initialValues={defaultValues} readOnly={true}>
       <strong>
         <SeqdbMessage id="selectPcrBatchTitle" />
       </strong>
-      {/* <ReactTable<MaterialSample>
-        columns={API_SEARCH_COLUMN}
-        data={selectedResources}
-        minRows={1}
-        defaultPageSize={100}
-        pageText={<CommonMessage id="page" />}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage("rows")}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
-      /> */}
-    </>
+      <div className="row">
+        <ReactTable<SeqReaction>
+          className="react-table-overflow col-md-12"
+          columns={SELECTED_RESOURCE_HEADER}
+          data={selectedResources}
+          minRows={1}
+          showPagination={false}
+          sortable={false}
+        />
+      </div>
+    </DinaForm>
   );
 }
