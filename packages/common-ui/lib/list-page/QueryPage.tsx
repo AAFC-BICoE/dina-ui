@@ -531,10 +531,7 @@ export function QueryPage<TData extends KitsuResource>({
       ? [
           {
             Cell: ({ original: resource }) => (
-              <DeselectCheckBox
-                key={`${resource?.pcrBatchItem?.id}_${resource?.seqPrimer?.id}`}
-                resource={resource}
-              />
+              <DeselectCheckBox key={resource.id} resource={resource} />
             ),
             Header: DeselectCheckBoxHeader,
             sortable: false,
