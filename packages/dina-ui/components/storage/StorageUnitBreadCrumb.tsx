@@ -54,5 +54,5 @@ export function StorageUnitBreadCrumb({
 }
 
 export function storageUnitDisplayName({ name, storageUnitType }: StorageUnit) {
-  return [name + "(" + storageUnitType?.name + ")"].filter(it => it).join(" ");
+  return name + "(" + storageUnitType?.name + ")";
 }
