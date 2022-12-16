@@ -34,7 +34,26 @@ jest.mock("next/router", () => ({
   })
 }));
 
-const mockGet = jest.fn<any, any>(async path => {
+const MOCK_INDEX_MAPPING_RESP = {
+  data: {
+    indexName: "dina_material_sample_index",
+    attributes: [
+      {
+        name: "materialSampleName",
+        type: "text",
+        path: "data.attributes"
+      },
+      {
+        name: "dwcOtherCatalogNumbers",
+        type: "text",
+        path: "data.attributes"
+      }
+    ],
+    relationships: []
+  }
+};
+
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "loan-transaction-api/transaction/test-transaction-id":
       return { data: testExistingTransaction() };
@@ -45,18 +64,20 @@ const mockGet = jest.fn<any, any>(async path => {
     case "agent-api/person":
     case "objectstore-api/metadata":
       return { data: [] };
+    case "search-api/search-ws/mapping":
+      return MOCK_INDEX_MAPPING_RESP;
   }
 });
 
-const mockSave = jest.fn(async saves => {
-  return saves.map(save => ({
+const mockSave = jest.fn(async (saves) => {
+  return saves.map((save) => ({
     ...save.resource,
     id: save.resource.id ?? "123"
   }));
 });
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
-  paths.map(path => {
+  paths.map((path) => {
     switch (path) {
       case "metadata/attach-1":
         return { id: "metadata/attach-1", type: "metadata" };
@@ -76,7 +97,10 @@ const apiContext = {
   save: mockSave,
   bulkGet: mockBulkGet,
   apiClient: {
-    get: mockGet
+    get: mockGet,
+    axios: {
+      get: mockGet
+    }
   }
 };
 
@@ -90,7 +114,7 @@ describe("Transaction Form", () => {
   it("Submits a Transaction", async () => {
     const wrapper = mountWithAppContext(
       <TransactionForm onSaved={mockOnSaved} />,
-      testCtx
+      testCtx as any
     );
 
     // Fill out all fields:
@@ -228,6 +252,8 @@ describe("Transaction Form", () => {
           roles: ["my-role-1"]
         }
       ],
+      attachment: undefined,
+      materialSamples: undefined,
       closedDate: "2022-01-02",
       dueDate: "2022-01-03",
       materialDirection: "OUT",
@@ -235,7 +261,11 @@ describe("Transaction Form", () => {
       openedDate: "2022-01-01",
       otherIdentifiers: ["otherIdentifiers"],
       purpose: "purpose",
-      relationships: {},
+      relationships: {
+        materialSamples: {
+          data: []
+        }
+      },
       remarks: "transaction remarks",
       shipment: {
         address: {
@@ -286,7 +316,10 @@ describe("Transaction Form", () => {
 
   it("Edits an existing Transaction", async () => {
     // The Next.js router is mocked to provide the existing Transaction's ID
-    const wrapper = mountWithAppContext(<TransactionEditPage />, testCtx);
+    const wrapper = mountWithAppContext(
+      <TransactionEditPage />,
+      testCtx as any
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -314,6 +347,7 @@ describe("Transaction Form", () => {
             resource: {
               ...testExistingTransaction(),
               attachment: undefined,
+              materialSamples: undefined,
               // Moves the attachments into the relationships field:
               relationships: {
                 attachment: {
@@ -321,6 +355,9 @@ describe("Transaction Form", () => {
                     { id: "attach-1", type: "metadata" },
                     { id: "attach-2", type: "metadata" }
                   ]
+                },
+                materialSamples: {
+                  data: []
                 }
               }
             },

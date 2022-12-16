@@ -25,6 +25,7 @@ export interface TransactionAttributes {
 
 export interface TransactionRelationships {
   attachment?: ResourceIdentifierObject[];
+  materialSamples?: ResourceIdentifierObject[];
 }
 
 export interface Shipment {

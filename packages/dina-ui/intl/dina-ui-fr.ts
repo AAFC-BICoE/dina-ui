@@ -665,7 +665,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   viewDetailButtonLabel: "Afficher détails",
   viewOnMap: "Visualiser sur la carte",
   viewPreviewButtonText: "Prévisualiser",
-  virusNames: "Nom du virus",
   warningMessage: "Messages d’avertissement",
   whoAmITitle: "Qui suis-je?",
   withAKeyboard: "Avec un clavier",

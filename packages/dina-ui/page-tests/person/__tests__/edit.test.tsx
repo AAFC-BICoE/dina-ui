@@ -21,9 +21,9 @@ const mockPush = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async model => {
+const mockGet = jest.fn(async (model) => {
   // The get request will return the existing person.
-  if (model === "agent-api/person/1?include=organizations") {
+  if (model === "agent-api/person/1?include=organizations,identifiers") {
     // The request returns the test person.
     return { data: TEST_AGENT };
   } else if (model === "agent-api/organization") {

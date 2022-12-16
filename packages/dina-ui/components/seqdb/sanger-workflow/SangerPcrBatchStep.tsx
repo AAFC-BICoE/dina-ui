@@ -1,69 +1,56 @@
-import { ButtonBar, DinaForm, SubmitButton, withResponse } from "common-ui";
+import { SubmitButton } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { useState } from "react";
-import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import {
-  PcrBatchForm,
-  PcrBatchFormFields,
-  usePcrBatchQuery
-} from "../../../pages/seqdb/pcr-batch/edit";
+import { PcrBatchForm } from "../../../pages/seqdb/pcr-batch/edit";
 import { PcrBatch } from "../../../types/seqdb-api";
+import { useEffect } from "react";
 
 export interface SangerPcrBatchStepProps {
   pcrBatchId?: string;
+  pcrBatch?: PcrBatch;
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
+  editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function SangerPcrBatchStep({
   pcrBatchId,
-  onSaved
+  pcrBatch,
+  onSaved,
+  editMode,
+  setEditMode,
+  performSave,
+  setPerformSave
 }: SangerPcrBatchStepProps) {
-  const [editMode, setEditMode] = useState(!pcrBatchId);
-
-  const pcrBatchQuery = usePcrBatchQuery(pcrBatchId, [editMode]);
+  // If no PCR Batch has been created, automatically go to edit mode.
+  useEffect(() => {
+    if (!pcrBatchId) {
+      setEditMode(true);
+    }
+  }, [pcrBatchId]);
 
   async function onSavedInternal(resource: PersistedResource<PcrBatch>) {
     await onSaved(resource);
     setEditMode(false);
   }
 
-  return pcrBatchId ? (
-    withResponse(pcrBatchQuery, ({ data: pcrBatch }) =>
-      editMode ? (
-        <PcrBatchForm
-          pcrBatch={pcrBatch}
-          onSaved={onSavedInternal}
-          buttonBar={
-            <ButtonBar>
-              <button
-                className="btn btn-dark"
-                type="button"
-                onClick={() => setEditMode(false)}
-                style={{ width: "10rem" }}
-              >
-                <SeqdbMessage id="cancelButtonText" />
-              </button>
-              <SubmitButton className="ms-auto" />
-            </ButtonBar>
-          }
-        />
-      ) : (
-        <DinaForm<PcrBatch> initialValues={pcrBatch} readOnly={true}>
-          <ButtonBar>
-            <button
-              className="btn btn-primary edit-button"
-              type="button"
-              onClick={() => setEditMode(true)}
-              style={{ width: "10rem" }}
-            >
-              <SeqdbMessage id="editButtonText" />
-            </button>
-          </ButtonBar>
-          <PcrBatchFormFields />
-        </DinaForm>
-      )
-    )
-  ) : (
-    <PcrBatchForm onSaved={onSavedInternal} />
+  const buttonBar = (
+    <>
+      <SubmitButton
+        className="hidden"
+        performSave={performSave}
+        setPerformSave={setPerformSave}
+      />
+    </>
+  );
+
+  return (
+    <PcrBatchForm
+      pcrBatch={pcrBatch as any}
+      onSaved={onSavedInternal}
+      buttonBar={buttonBar}
+      readOnlyOverride={!editMode}
+    />
   );
 }

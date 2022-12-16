@@ -157,6 +157,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="verbatimDeterminationLegend" />}
                   className="non-strip"
+                  sectionName="organism-verbatim-determination-section"
                 >
                   <TextFieldWithMultiplicationButton
                     {...fieldProps("verbatimScientificName")}
@@ -186,6 +187,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="typeSpecimen" />}
                   className="non-strip"
+                  sectionName="organism-type-specimen-section"
                 >
                   <AutoSuggestTextField<Vocabulary>
                     {...fieldProps("typeStatus")}
@@ -215,6 +217,7 @@ export function DeterminationField({
                 <FieldSet
                   legend={<DinaMessage id="determination" />}
                   className="non-strip"
+                  sectionName="organism-determination-section"
                 >
                   {/* determination scientific name is used for display readonly and edit plain string entry  */}
 
@@ -332,10 +335,9 @@ export function DeterminationField({
                   attributeSelectorWidth={12}
                   fieldSetProps={{
                     legend: <DinaMessage id="determinationManagedAttributes" />,
-                    enabledFields: null,
-                    className: "non-strip"
+                    className: "non-strip",
+                    sectionName: "organism-managed-attributes-section"
                   }}
-                  showFormTemplateDropdown={!isTemplate}
                   managedAttributeOrderFieldName="determinationManagedAttributesOrder"
                   visibleAttributeKeys={visibleManagedAttributeKeys}
                 />

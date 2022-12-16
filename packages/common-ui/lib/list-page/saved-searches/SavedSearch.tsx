@@ -12,9 +12,10 @@ import { FaCog } from "react-icons/fa";
 import { LoadingSpinner } from "../..";
 import { Config, ImmutableTree, Utils } from "react-awesome-query-builder";
 import { SavedSearchStructure, SingleSavedSearch } from "./types";
-import { map, cloneDeep, isEqual } from "lodash";
+import { map, cloneDeep } from "lodash";
 import { SavedSearchListDropdown } from "./SavedSearchListDropdown";
 import { NotSavedBadge } from "./SavedSearchBadges";
+import { useLastSavedSearch } from "../reload-last-search/useLastSavedSearch";
 
 export interface SavedSearchProps {
   /**
@@ -39,11 +40,18 @@ export interface SavedSearchProps {
    *
    */
   queryBuilderConfig: Config;
+
+  /**
+   * For the last loaded search, we will actually perform the search by calling this callback
+   * function.
+   */
+  performSubmit: () => void;
 }
 
 /**
  * This component contains the following logic:
  *
+ * - Load the last used query when the `?reloadLastQuery` param is present in the URL.
  * - Ability to create new saved searches
  * - Delete existing saved searches
  * - Toggle the isDefault
@@ -57,7 +65,8 @@ export function SavedSearch({
   indexName,
   queryBuilderTree,
   setQueryBuilderTree,
-  queryBuilderConfig
+  queryBuilderConfig,
+  performSubmit
 }: SavedSearchProps) {
   const { save, apiClient } = useApiClient();
   const { openModal } = useModal();
@@ -76,9 +85,19 @@ export function SavedSearch({
 
   const [lastLoaded, setLastLoaded] = useState<number>(Date.now());
 
+  const [lastSelected, setLastSelected] = useState<number>(Date.now());
+
   const [defaultLoadedIn, setDefaultLoadedIn] = useState<boolean>(false);
 
   const [changesMade, setChangesMade] = useState<boolean>(false);
+
+  // Functionality for the last loaded search.
+  const { loadLastUsed } = useLastSavedSearch({
+    indexName,
+    queryBuilderTree,
+    setQueryBuilderTree,
+    performSubmit
+  });
 
   // Using the user preferences get the options and user preferences.
   const userPreferenceID = userPreferences?.id;
@@ -126,11 +145,12 @@ export function SavedSearch({
     if (!selectedSavedSearch || !userPreferences) return;
 
     loadSavedSearch(selectedSavedSearch);
-  }, [selectedSavedSearch]);
+  }, [selectedSavedSearch, lastSelected]);
 
-  // User Preferences has been loaded in:
+  // User Preferences has been loaded in and apply default loaded search:
   useEffect(() => {
-    if (!userPreferences || defaultLoadedIn) return;
+    // Do not load the saved search if the last search used was loaded in.
+    if (!userPreferences || defaultLoadedIn || loadLastUsed) return;
 
     // User preferences have been loaded in, we can now check for the default saved search if it
     // exists and pre-load it in.
@@ -421,13 +441,22 @@ export function SavedSearch({
                 </>
               )}
               {changesMade && (
-                <Dropdown.Item
-                  onClick={() =>
-                    saveSavedSearch(selectedSavedSearch, currentIsDefault, true)
-                  }
-                >
-                  <DinaMessage id="saveChanges" />
-                </Dropdown.Item>
+                <>
+                  <Dropdown.Item
+                    onClick={() =>
+                      saveSavedSearch(
+                        selectedSavedSearch,
+                        currentIsDefault,
+                        true
+                      )
+                    }
+                  >
+                    <DinaMessage id="saveChanges" />
+                  </Dropdown.Item>
+                  <Dropdown.Item onClick={() => setLastSelected(Date.now())}>
+                    <DinaMessage id="reloadSavedSearch" />
+                  </Dropdown.Item>
+                </>
               )}
               <Dropdown.Item
                 onClick={() => deleteSavedSearch(selectedSavedSearch)}
@@ -443,7 +472,10 @@ export function SavedSearch({
         selectedSavedSearch={selectedSavedSearch}
         currentIsDefault={currentIsDefault}
         error={error}
-        onSavedSearchSelected={setSelectedSavedSearch}
+        onSavedSearchSelected={(savedSearchName) => {
+          setLastSelected(Date.now());
+          setSelectedSavedSearch(savedSearchName);
+        }}
         onSavedSearchDelete={deleteSavedSearch}
       />
     </>

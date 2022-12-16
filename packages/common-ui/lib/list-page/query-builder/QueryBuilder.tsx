@@ -88,6 +88,7 @@ function QueryBuilder({
         queryBuilderTree={queryBuilderTree}
         setQueryBuilderTree={setQueryBuilderTree}
         queryBuilderConfig={queryBuilderConfig}
+        performSubmit={onSubmit}
       />
       <Query
         {...queryBuilderConfig}

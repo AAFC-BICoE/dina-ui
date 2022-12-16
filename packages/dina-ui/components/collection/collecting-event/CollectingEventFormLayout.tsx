@@ -17,7 +17,7 @@ import {
   FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import useSWR from "swr";
 import {
   AttachmentsField,
@@ -30,7 +30,10 @@ import {
   TagsAndRestrictionsSection
 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { Vocabulary } from "../../../types/collection-api";
+import {
+  COLLECTING_EVENT_COMPONENT_NAME,
+  Vocabulary
+} from "../../../types/collection-api";
 import {
   CollectingEvent,
   GeographicPlaceNameSource
@@ -101,6 +104,10 @@ export function CollectingEventFormLayout({
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
+  const [
+    customGeographicPlaceCheckboxState,
+    setCustomGeographicPlaceCheckboxState
+  ] = useState(false);
 
   const { isValidating: detailResultsIsLoading } = useSWR(
     [selectedSearchResult, "nominatimAddressDetailSearch"],
@@ -157,11 +164,15 @@ export function CollectingEventFormLayout({
     if (isTemplate) {
       // Include the hidden geographicPlaceNameSource and sourceUrl values in the enabled template fields:
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSource']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSource']",
         true
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
         true
       );
     }
@@ -201,8 +212,7 @@ export function CollectingEventFormLayout({
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
     detailResults?.address?.map((addr) => {
-      // omitting country and state
-      if (
+      const isTargetType =
         addr.type !== "country" &&
         addr.type !== "state" &&
         addr.type !== "country_code" &&
@@ -210,8 +220,10 @@ export function CollectingEventFormLayout({
         addr.place_type !== "state" &&
         addr.place_type !== "country" &&
         addr.isaddress &&
-        (addr.osm_id || addr.place_id)
-      ) {
+        (addr.osm_id || addr.place_id);
+
+      // omitting country and state
+      if (isTargetType) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
         detail.placeType = addr.place_type ?? addr.class;
@@ -261,24 +273,32 @@ export function CollectingEventFormLayout({
     if (isTemplate) {
       // Uncheck the templateCheckboxes in this form section:
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSource']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSource']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.sourceUrl']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.sourceUrl']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.country']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.country']",
         false
       );
       formik.setFieldValue(
-        "templateCheckboxes['geographicPlaceNameSourceDetail.stateProvince']",
+        "templateCheckboxes['" +
+          COLLECTING_EVENT_COMPONENT_NAME +
+          ".current-geographic-place.geographicPlaceNameSourceDetail.stateProvince']",
         false
       );
       for (let idx = 0; idx <= 10; idx++) {
         formik.setFieldValue(
-          `templateCheckboxes['srcAdminLevels[${idx}]']`,
+          `templateCheckboxes['${COLLECTING_EVENT_COMPONENT_NAME}.current-geographic-place.srcAdminLevels[${idx}]']`,
           false
         );
       }
@@ -338,6 +358,8 @@ export function CollectingEventFormLayout({
     customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
     customPlaceAsInSrcAdmnLevel.type = "place-section";
     customPlaceAsInSrcAdmnLevel.shortId = 0;
+    customPlaceAsInSrcAdmnLevel.element = undefined;
+    customPlaceAsInSrcAdmnLevel.id = undefined;
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
@@ -349,7 +371,7 @@ export function CollectingEventFormLayout({
 
     // Make the custom place selected by default
     const selectedSections = form.values.selectedSections;
-    selectedSections.unshift(true);
+    selectedSections?.unshift(true);
 
     setHideCustomPlace(true);
   };
@@ -367,14 +389,19 @@ export function CollectingEventFormLayout({
       });
   }
   const collectingEventAttachmentsComponent = (
-    <AttachmentsField
-      name="attachment"
-      title={<DinaMessage id="collectingEventAttachments" />}
-      allowNewFieldName="attachmentsConfig.allowNew"
-      allowExistingFieldName="attachmentsConfig.allowExisting"
-      allowAttachmentsConfig={attachmentsConfig}
-      attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
-    />
+    <DinaFormSection
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="collecting-event-attachments-section"
+    >
+      <AttachmentsField
+        name="attachment"
+        title={<DinaMessage id="collectingEventAttachments" />}
+        allowNewFieldName="attachmentsConfig.allowNew"
+        allowExistingFieldName="attachmentsConfig.allowExisting"
+        allowAttachmentsConfig={attachmentsConfig}
+        attachmentPath={`collection-api/collecting-event/${initialValues.id}/attachment`}
+      />
+    </DinaFormSection>
   );
   const collectingEventManagedAttributesComponent = (
     <ManagedAttributesEditor
@@ -382,9 +409,10 @@ export function CollectingEventFormLayout({
       managedAttributeApiPath="collection-api/managed-attribute"
       managedAttributeComponent="COLLECTING_EVENT"
       fieldSetProps={{
-        legend: <DinaMessage id="collectingEventManagedAttributes" />
+        legend: <DinaMessage id="collectingEventManagedAttributes" />,
+        componentName: COLLECTING_EVENT_COMPONENT_NAME,
+        sectionName: "collecting-event-managed-attributes-section"
       }}
-      showFormTemplateDropdown={!isTemplate}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
     />
@@ -394,6 +422,8 @@ export function CollectingEventFormLayout({
       fieldName="geographicPlaceNameSourceDetail"
       legend={<DinaMessage id="toponymyLegend" />}
       className="non-strip"
+      componentName={COLLECTING_EVENT_COMPONENT_NAME}
+      sectionName="current-geographic-place"
     >
       <div
         style={{
@@ -415,6 +445,7 @@ export function CollectingEventFormLayout({
                         </strong>
                       </label>
                       <input
+                        disabled={customGeographicPlaceCheckboxState}
                         aria-label="customPlace"
                         className="p-2 form-control"
                         style={{ width: "60%" }}
@@ -444,6 +475,10 @@ export function CollectingEventFormLayout({
                   <PlaceSectionsSelectionField
                     name="srcAdminLevels"
                     hideSelectionCheckBox={hideSelectionCheckBox}
+                    setCustomGeographicPlaceCheckboxState={
+                      setCustomGeographicPlaceCheckboxState
+                    }
+                    customPlaceValue={customPlaceValue}
                   />
                 ) : null}
                 <DinaFormSection horizontal={[3, 9]}>
@@ -549,14 +584,21 @@ export function CollectingEventFormLayout({
   );
   return (
     <div ref={layoutWrapperRef}>
-      <NotPubliclyReleasableWarning />
-      <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
+      <DinaFormSection
+        componentName={COLLECTING_EVENT_COMPONENT_NAME}
+        sectionName="general-section"
+      >
+        <NotPubliclyReleasableWarning />
+        <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
+      </DinaFormSection>
       <div className="row">
         <div>
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
             id="identifiers"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="identifiers-section"
           >
             <div className="row">
               <div className="col-md-6">
@@ -587,6 +629,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingDateLegend" />}
             id="collectingDateLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-date-section"
           >
             {isTemplate && (
               <Field name="includeAllCollectingDate">
@@ -622,6 +666,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="collectingAgentsLegend" />}
             id="collectingAgentsLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-agents-section"
           >
             {isTemplate && (
               <Field name="includeAllCollectingAgent">
@@ -676,6 +722,8 @@ export function CollectingEventFormLayout({
             legend={<DinaMessage id="verbatimLabelLegend" />}
             id="verbatimLabelLegend"
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="verbatim-label-section"
           >
             {isTemplate && (
               <Field name="includeAllVerbatimCoordinates">
@@ -831,6 +879,8 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
             className="non-strip"
+            componentName={COLLECTING_EVENT_COMPONENT_NAME}
+            sectionName="collecting-event-details"
           >
             <TextField name="habitat" />
             <TextField
@@ -915,16 +965,13 @@ export function CollectingEventFormLayout({
             : null}
         </div>
       </div>
-      <DinaFormSection
-        // Disabled the template's restrictions for this section:
-        enabledFields={null}
-      >
+      <>
         {!readOnly
           ? collectingEventManagedAttributesComponent
           : JSON.stringify(initialValues?.managedAttributes) !== "{}" // if read-only, check for managed attributes
           ? collectingEventManagedAttributesComponent
           : null}
-      </DinaFormSection>
+      </>
       <div className="mb-3">
         {!readOnly
           ? collectingEventAttachmentsComponent

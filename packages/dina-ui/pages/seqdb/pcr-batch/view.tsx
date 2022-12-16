@@ -1,19 +1,15 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
 import { PcrBatch } from "../../../types/seqdb-api";
-import {
-  PcrBatchFormFields,
-  usePcrBatchQuery,
-  LoadExternalDataForPcrBatchForm
-} from "./edit";
+import { usePcrBatchQuery, LoadExternalDataForPcrBatchForm } from "./edit";
 
 export default function PcrBatchDetailsPage() {
   return (
     <ViewPageLayout<PcrBatch>
-      form={props => (
+      form={(props) => (
         <LoadExternalDataForPcrBatchForm dinaFormProps={{ ...props }} />
       )}
-      customQueryHook={id => usePcrBatchQuery(id)}
+      customQueryHook={(id) => usePcrBatchQuery(id)}
       entityLink="/seqdb/pcr-batch"
       type="pcr-batch"
       apiBaseUrl="/seqdb-api"

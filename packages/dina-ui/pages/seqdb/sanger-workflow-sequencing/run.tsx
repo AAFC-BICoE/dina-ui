@@ -1,0 +1,143 @@
+import { BackToListButton, LoadingSpinner } from "common-ui";
+import { PersistedResource } from "kitsu";
+import { useRouter } from "next/router";
+import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { useEffect, useState } from "react";
+import { Button, Spinner } from "react-bootstrap";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
+import { SangerSeqBatchStep } from "../../../components/seqdb/sanger-workflow/SangerSeqBatchStep";
+import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
+import { SeqBatch } from "../../../types/seqdb-api";
+import { useSeqBatchQuery } from "../seq-batch/edit";
+
+export default function SangerWorkFlowRunPage() {
+  const router = useRouter();
+  const { formatMessage } = useSeqdbIntl();
+
+  // Current step being used.
+  const [currentStep, setCurrentStep] = useState<number>(
+    router.query.step ? Number(router.query.step) : 0
+  );
+
+  // Global edit mode state.
+  const [editMode, setEditMode] = useState<boolean>(false);
+
+  // Request saving to be performed.
+  const [performSave, setPerformSave] = useState<boolean>(false);
+
+  // Loaded SEQ Batch ID.
+  const [seqBatchId, setSeqBatchId] = useState<string | undefined>(
+    router.query.seqBatchId?.toString()
+  );
+
+  // Loaded SEQ Batch.
+  const seqBatch = useSeqBatchQuery(seqBatchId, [seqBatchId, currentStep]);
+
+  // Update the URL to contain the current step.
+  useEffect(() => {
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, step: currentStep }
+    });
+  }, [currentStep]);
+
+  async function finishSeqBatchStep(
+    seqBatchSaved: PersistedResource<SeqBatch>
+  ) {
+    setCurrentStep(1);
+    setSeqBatchId(seqBatchSaved.id);
+    await router.push({
+      pathname: router.pathname,
+      query: { ...router.query, seqBatchId: seqBatchSaved.id, step: "1" }
+    });
+  }
+
+  if (seqBatch.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
+  const buttonBarContent = (
+    <>
+      <BackToListButton entityLink="/seqdb/sanger-workflow-sequencing" />
+      {editMode ? (
+        <>
+          <Button
+            variant="secondary"
+            className="ms-auto"
+            onClick={() => setEditMode(false)}
+            style={{ width: "10rem" }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={"primary"}
+            className="ms-2"
+            onClick={() => setPerformSave(true)}
+            style={{ width: "10rem" }}
+          >
+            {performSave ? (
+              <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+            ) : (
+              <>Save</>
+            )}
+          </Button>
+        </>
+      ) : (
+        <Button
+          variant={"primary"}
+          className="ms-auto"
+          onClick={() => setEditMode(true)}
+          style={{ width: "10rem" }}
+        >
+          <SeqdbMessage id="editButtonText" />
+        </Button>
+      )}
+    </>
+  );
+
+  // Helper function to determine if a step should be disabled.
+  const isDisabled = (stepNumber: number, seqBatchRequired: boolean) => {
+    // While in edit mode, other steps should be disabled.
+    if (editMode && stepNumber !== currentStep) {
+      return true;
+    }
+
+    // If a SEQ Batch is required, and not provided then this step should be disabled.
+    if (seqBatchRequired && !seqBatchId) {
+      return true;
+    }
+
+    // Not disabled.
+    return false;
+  };
+
+  return (
+    <PageLayout titleId={"sangerWorkflow"} buttonBarContent={buttonBarContent}>
+      <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
+        <TabList>
+          <Tab disabled={isDisabled(0, false)}>{formatMessage("seqBatch")}</Tab>
+        </TabList>
+        <TabPanel>
+          <SangerSeqBatchStep
+            seqBatchId={seqBatchId}
+            seqBatch={seqBatch.response?.data}
+            onSaved={finishSeqBatchStep}
+            editMode={editMode}
+            setEditMode={setEditMode}
+            performSave={performSave}
+            setPerformSave={setPerformSave}
+          />
+        </TabPanel>
+      </Tabs>
+    </PageLayout>
+  );
+}

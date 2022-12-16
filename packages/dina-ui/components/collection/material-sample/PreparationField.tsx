@@ -49,7 +49,7 @@ export const BLANK_PREPARATION: Required<
 > = Object.seal({
   preparationType: Object.seal({ id: null, type: "preparation-type" }),
   preparationDate: null,
-  preparedBy: Object.seal({ id: null, type: "person" }),
+  preparedBy: [],
   preparationRemarks: null,
   dwcDegreeOfEstablishment: null,
   preparationMethod: Object.seal({ id: null, type: "preparation-method" }),
@@ -81,6 +81,8 @@ export function PreparationField({
       className={className}
       id={id}
       legend={<DinaMessage id="preparations" />}
+      componentName={PREPARATIONS_COMPONENT_NAME}
+      sectionName="general-section"
     >
       <div className="row">
         <div className="col-md-6">
@@ -101,7 +103,6 @@ export function PreparationField({
                         }
                       : { ...filterBy(["name"])(input) }
                   }
-                  key={group}
                   tooltipLink="https://aafc-bicoe.github.io/dina-documentation/#preparation-type"
                   tooltipLinkText="fromDinaUserGuide"
                 />
@@ -163,7 +164,7 @@ export function PreparationField({
             blankSearchBackend={"json-api"}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"
           />
-          <PersonSelectField {...fieldProps("preparedBy")} />
+          <PersonSelectField {...fieldProps("preparedBy")} isMulti={true} />
           <DateField {...fieldProps("preparationDate")} />
           <FieldSpy<string> fieldName="group">
             {(group) => (

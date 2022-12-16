@@ -1,0 +1,26 @@
+import { KitsuResource } from "kitsu";
+import { Protocol } from "../../collection-api";
+import { Person } from "../../objectstore-api";
+import { Region } from "./Region";
+import { ThermocyclerProfile } from "./ThermocyclerProfile";
+
+export interface SeqBatchAttributes {
+  type: "seq-batch";
+  name: string;
+  group?: string;
+  reactionDate?: string;
+  createdBy?: string;
+  createdOn?: string;
+}
+
+export interface SeqBatchRelationships {
+  /** UUID array (from the back-end JSON) or Person array (in the form state). */
+  experimenters?: Person[];
+  region?: Region;
+  thermocyclerProfile?: ThermocyclerProfile;
+  protocol?: Protocol;
+}
+
+export type SeqBatch = KitsuResource &
+  SeqBatchAttributes &
+  SeqBatchRelationships;

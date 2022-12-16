@@ -1,17 +1,13 @@
-import { FilterParam, KitsuResource, PersistedResource } from "kitsu";
+import { KitsuResource, PersistedResource } from "kitsu";
 import { useCallback, useState } from "react";
 import { useIntl } from "react-intl";
-import ReactTable, { TableProps, SortingRule, Column } from "react-table";
+import ReactTable, { TableProps, SortingRule } from "react-table";
 import { useApiClient } from "../api-client/ApiClientContext";
 import { FieldHeader } from "../field-header/FieldHeader";
 import { DinaForm, DinaFormSection } from "../formik-connected/DinaForm";
-import {
-  defaultQueryTree,
-  emptyQueryTree,
-  QueryBuilderMemo
-} from "./query-builder/QueryBuilder";
+import { emptyQueryTree, QueryBuilderMemo } from "./query-builder/QueryBuilder";
 import { DefaultTBody } from "../table/QueryTable";
-import { FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
@@ -23,14 +19,11 @@ import {
   useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
 import { v4 as uuidv4 } from "uuid";
-import { SavedSearch } from "./saved-searches/SavedSearch";
 import { MultiSortTooltip } from "./MultiSortTooltip";
-import { cloneDeep, toPairs, uniqBy } from "lodash";
+import { toPairs, uniqBy } from "lodash";
 import { FormikButton, useAccount } from "..";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
-import { UserPreference } from "../../../dina-ui/types/user-api/resources/UserPreference";
 import { TableColumn } from "./types";
 import { FormikContextType } from "formik";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
@@ -187,7 +180,7 @@ export function QueryPage<TData extends KitsuResource>({
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage } = useIntl();
-  const { groupNames, subject } = useAccount();
+  const { groupNames } = useAccount();
 
   // Search results returned by Elastic Search
   const [searchResults, setSearchResults] = useState<TData[]>([]);
@@ -236,8 +229,20 @@ export function QueryPage<TData extends KitsuResource>({
     group: groupNames ?? []
   };
 
+  useEffect(() => {
+    if (viewMode && selectedResources?.length) {
+      setTotalRecords(selectedResources?.length);
+    }
+  }, [viewMode, selectedResources]);
+
   // Fetch data if the pagination, sorting or search filters have changed.
   useEffect(() => {
+    // If in view mode with selected resources, no requests need to be made.
+    if (viewMode && selectedResources?.length) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     // Reset any error messages since we are trying again.
@@ -276,19 +281,43 @@ export function QueryPage<TData extends KitsuResource>({
     // The included section will be transformed from an array to an object with the type name for each relationship.
     elasticSearchRequest(queryDSL)
       .then((result) => {
-        const processedResult = result?.hits.map((rslt) => ({
-          id: rslt._source?.data?.id,
-          type: rslt._source?.data?.type,
-          data: {
-            attributes: rslt._source?.data?.attributes
-          },
-          included: rslt._source?.included?.reduce(
-            (array, currentIncluded) => (
-              (array[currentIncluded?.type] = currentIncluded), array
-            ),
-            {}
-          )
-        }));
+        const processedResult = result?.hits.map((rslt) => {
+          return {
+            id: rslt._source?.data?.id,
+            type: rslt._source?.data?.type,
+            data: {
+              attributes: rslt._source?.data?.attributes
+            },
+            included: rslt._source?.included?.reduce(
+              (includedAccumulator, currentIncluded) => {
+                if (currentIncluded?.type === "organism") {
+                  if (!includedAccumulator[currentIncluded?.type]) {
+                    return (
+                      (includedAccumulator[currentIncluded?.type] = [
+                        currentIncluded
+                      ]),
+                      includedAccumulator
+                    );
+                  } else {
+                    return (
+                      includedAccumulator[currentIncluded?.type].push(
+                        currentIncluded
+                      ),
+                      includedAccumulator
+                    );
+                  }
+                } else {
+                  return (
+                    (includedAccumulator[currentIncluded?.type] =
+                      currentIncluded),
+                    includedAccumulator
+                  );
+                }
+              },
+              {}
+            )
+          };
+        });
         // If we have reached the count limit, we will need to perform another request for the true
         // query size.
         if (result?.total.value === MAX_COUNT_SIZE) {
@@ -322,10 +351,6 @@ export function QueryPage<TData extends KitsuResource>({
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
-      } else {
-        const newTree = defaultQueryTree(queryBuilderConfig);
-        setQueryBuilderTree(newTree);
-        setSubmittedQueryBuilderTree(newTree);
       }
     }
   }, [queryBuilderConfig]);
@@ -561,10 +586,10 @@ export function QueryPage<TData extends KitsuResource>({
    * On search filter submit. This will also update the pagination to go back to the first page on
    * a new search.
    */
-  const onSubmit = useCallback(() => {
+  const onSubmit = () => {
     setSubmittedQueryBuilderTree(queryBuilderTree);
     setPageOffset(0);
-  }, [queryBuilderTree]);
+  };
 
   /**
    * When the group filter has changed, store the new value for the search.
@@ -704,12 +729,18 @@ export function QueryPage<TData extends KitsuResource>({
               <ReactTable
                 // Column and data props
                 columns={mappedResultsColumns}
-                data={searchResults}
+                data={
+                  viewMode
+                    ? customViewFields
+                      ? searchResults
+                      : selectedResources
+                    : searchResults
+                }
                 minRows={1}
                 // Loading Table props
                 loading={loading}
                 // Pagination props
-                manual={true}
+                manual={viewMode && selectedResources?.length ? false : true}
                 pageSize={pageSize}
                 pages={totalRecords ? Math.ceil(totalRecords / pageSize) : 0}
                 page={pageOffset / pageSize}
@@ -765,7 +796,7 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-primary w-100 mb-5"
                       onClick={moveSelectedResultsToSelectedResources}
                     >
-                      <FiChevronsRight />
+                      <FiChevronRight />
                     </FormikButton>
                   </div>
                   <div className="deselect-all-checked-button">
@@ -773,7 +804,7 @@ export function QueryPage<TData extends KitsuResource>({
                       className="btn btn-dark w-100 mb-5"
                       onClick={removeSelectedResources}
                     >
-                      <FiChevronsLeft />
+                      <FiChevronLeft />
                     </FormikButton>
                   </div>
                 </div>

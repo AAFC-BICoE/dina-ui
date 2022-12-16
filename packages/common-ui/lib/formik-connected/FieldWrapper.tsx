@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray } from "lodash";
+import { isArray, find } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -87,16 +87,40 @@ export interface FieldWrapperRenderProps {
 export function FieldWrapper(props: FieldWrapperProps) {
   const { name, templateCheckboxFieldName, validate } = props;
 
-  const { enabledFields } = useDinaFormContext();
+  const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
   /** Whether this field should be hidden because the template doesn't specify that it should be shown. */
-  const disabledByFormTemplate = useMemo(
-    () =>
-      enabledFields
-        ? !enabledFields.includes(templateCheckboxFieldName || name)
-        : false,
-    [enabledFields]
-  );
+  const disabledByFormTemplate: boolean = useMemo(() => {
+    if (!formTemplate || !componentName || !sectionName) return false;
+
+    // First find the component we are looking for.
+    const componentFound = find(formTemplate?.components, {
+      name: componentName
+    });
+    if (componentFound) {
+      // Next find the right section.
+      const sectionFound = find(componentFound?.sections, {
+        name: sectionName
+      });
+      if (sectionFound) {
+        if (name.includes("managedAttributes")) {
+          const visibleManagedAttributes = find(sectionFound.items, {
+            name: "managedAttributesOrder"
+          })?.defaultValue;
+          return visibleManagedAttributes.includes(
+            templateCheckboxFieldName ?? name
+          );
+        }
+
+        return (
+          !find(sectionFound.items, {
+            name: templateCheckboxFieldName ?? name
+          })?.visible ?? false
+        );
+      }
+    }
+    return false;
+  }, [formTemplate]);
 
   if (disabledByFormTemplate) {
     return null;
@@ -144,7 +168,8 @@ function LabelWrapper({
   },
   children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
-  const { horizontal, isTemplate } = useDinaFormContext();
+  const { horizontal, isTemplate, componentName, sectionName } =
+    useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
     currentValue: value
@@ -166,13 +191,13 @@ function LabelWrapper({
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : (horizontal || []).map(col => `col-sm-${col}`) ||
+      : (horizontal || []).map((col) => `col-sm-${col}`) ||
         (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
 
   // Replace dots and square brackets with underscores so the classes are selectable in tests and CSS:
   // e.g. organism.lifeStage-field -> organism_lifeStage-field
   const fieldNameClasses = [name, customName].map(
-    it => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
+    (it) => it && `${it.replaceAll(/[\.\[\]]/g, "_")}-field`
   );
 
   return (
@@ -186,7 +211,9 @@ function LabelWrapper({
     >
       {isTemplate && (
         <CheckBoxWithoutWrapper
-          name={`templateCheckboxes['${templateCheckboxFieldName ?? name}']`}
+          name={`templateCheckboxes['${componentName}.${sectionName}.${
+            templateCheckboxFieldName ?? name
+          }']`}
           className={`col-sm-1 templateCheckBox ${
             horizontal === "flex" && "mt-2"
           }`}

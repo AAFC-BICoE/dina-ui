@@ -31,7 +31,7 @@ import {
 import { useBulkEditTab } from "../bulk-edit/useBulkEditTab";
 import { FormikProps } from "formik";
 import { VisibleManagedAttributesConfig } from "..";
-import { MaterialSampleFormEnabledFields } from "../collection/material-sample/MaterialSampleForm";
+import { FormTemplate } from "packages/dina-ui/types/collection-api";
 
 export interface MaterialSampleBulkEditorProps {
   samples: InputResource<MaterialSample>[];
@@ -49,9 +49,11 @@ export function MaterialSampleBulkEditor({
   // Allow selecting a custom view for the form:
   const {
     sampleFormTemplate,
-    setSampleFormTemplate,
-    enabledFields,
-    visibleManagedAttributeKeys
+    setSampleFormTemplateUUID,
+    visibleManagedAttributeKeys,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
 
   const [selectedTab, setSelectedTab] = useState<
@@ -72,9 +74,12 @@ export function MaterialSampleBulkEditor({
     formTemplateProps: Partial<MaterialSampleFormProps>;
   } = initializeRefHookFormProps(
     samplesProp,
-    enabledFields,
     visibleManagedAttributeKeys,
-    selectedTab
+    selectedTab,
+    sampleFormTemplate,
+    materialSampleInitialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues
   );
   function sampleBulkOverrider() {
     /** Sample input including blank/empty fields. */
@@ -116,7 +121,7 @@ export function MaterialSampleBulkEditor({
             <div className="mx-auto">
               <MaterialSampleFormTemplateSelect
                 value={sampleFormTemplate}
-                onChange={setSampleFormTemplate}
+                onChange={setSampleFormTemplateUUID}
               />
             </div>
           </div>
@@ -174,19 +179,22 @@ interface BulkSampleSaveParams {
 
 export function initializeRefHookFormProps(
   samplesProp,
-  enabledFields: MaterialSampleFormEnabledFields,
   visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
   selectedTab:
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
-    | undefined
+    | undefined,
+  formTemplate: FormTemplate | undefined,
+  materialSampleInitialValues,
+  collectingEventInitialValues,
+  acquisitionEventInitialValues
 ) {
   // Make sure the samples list doesn't change during this component's lifecycle:
   const samples = useMemo(() => samplesProp, []);
 
   const formTemplateProps: Partial<MaterialSampleFormProps> = {
-    enabledFields,
-    visibleManagedAttributeKeys
+    visibleManagedAttributeKeys,
+    formTemplate
   };
 
   const initialValues: InputResource<MaterialSample> = {
@@ -196,17 +204,20 @@ export function initializeRefHookFormProps(
   const bulkEditFormRef =
     useRef<FormikProps<InputResource<MaterialSample>>>(null);
 
+  // don't use form template's materialSampleName default value for bulk edit
+  delete materialSampleInitialValues?.materialSampleName;
   const bulkEditSampleHook = useMaterialSampleSave({
     ...formTemplateProps,
-    materialSample: initialValues,
+    materialSample: materialSampleInitialValues ?? initialValues,
+    collectingEventInitialValues,
+    acquisitionEventInitialValues,
     showChangedIndicatorsInNestedForms: true
   });
 
   const sampleHooks = getSampleHooks(
     samples,
     selectedTab,
-    visibleManagedAttributeKeys,
-    enabledFields
+    visibleManagedAttributeKeys
   );
 
   const materialSampleForm = getMaterialSampleForm(
@@ -231,8 +242,7 @@ function getSampleHooks(
     | BulkNavigatorTab<KitsuResource>
     | ResourceWithHooks<KitsuResource>
     | undefined,
-  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined,
-  enabledFields: MaterialSampleFormEnabledFields
+  visibleManagedAttributeKeys: VisibleManagedAttributesConfig | undefined
 ) {
   return samples.map((resource, index) => {
     const key = `sample-${index}`;
@@ -245,8 +255,7 @@ function getSampleHooks(
         reduceRendering: key !== selectedTab?.key,
         // Don't allow editing existing Col/Acq events in the individual sample tabs to avoid conflicts.
         disableNestedFormEdits: true,
-        visibleManagedAttributeKeys,
-        enabledFields
+        visibleManagedAttributeKeys
       }),
       formRef: useRef(null)
     };
@@ -312,6 +321,7 @@ function getMaterialSampleForm(
   return (
     <MaterialSampleForm
       {...formTemplateProps}
+      enableReinitialize={formTemplateProps.formTemplate ? true : false}
       buttonBar={null}
       hideUseSequence={true}
       materialSampleFormRef={bulkEditFormRef}

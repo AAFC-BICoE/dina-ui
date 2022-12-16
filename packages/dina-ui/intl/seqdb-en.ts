@@ -58,6 +58,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   pcrBatchViewTitle: "View PCR Batch",
   pcrPrimerListTitle: "PCR Primers",
   pcrPrimerViewTitle: "PCR Primer",
+  pcrReaction: "PCR Reaction Step",
   thermocyclerProfileListTitle: "Thermocycler Profiles",
   plpDetailsFormTitle: "Add New Shearing/Size Selection Details",
   plpEditModeLabel: "Edit",
@@ -83,7 +84,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sangerWorkflowListTitle: "Sanger Workflows",
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
-  selectCoodinates: "Select Coordinates",
+  selectCoordinates: "Select Coordinates",
   selectMaterialSamples: "Select Material Samples",
   selectSamples: "Select Material Samples",
   selectedSamplesTitle: "Selected Material Samples",
@@ -98,5 +99,12 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowDetailsTab: "Details",
   workflowListTitle: "NGS Workflows",
   workflowStepTab: "Step {number}: {name}",
-  workflowViewTitle: "NGS Workflow"
+  workflowViewTitle: "NGS Workflow",
+  sangerWorkflowSequencingListTitle: "Sanger Workflows - Sequencing",
+  seqBatchName: "SEQ Batch Name",
+  seqBatch: "SEQ Batch",
+  seqBatchListTitle: "SEQ Batches",
+  seqBatchViewTitle: "View SEQ Batch",
+  editSeqBatchTitle: "Edit SEQ Batch",
+  addSeqBatchTitle: "Add SEQ Batch"
 };

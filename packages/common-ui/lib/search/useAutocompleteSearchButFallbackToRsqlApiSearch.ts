@@ -27,7 +27,6 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
   searchQuery,
   querySpec,
   additionalField,
-  documentId,
   searchField,
   restrictedField,
   restrictedFieldValue
@@ -45,7 +44,6 @@ export function useAutocompleteSearchButFallbackToRsqlApiSearch<
     indexName,
     searchField,
     additionalField,
-    documentId,
     restrictedField,
     restrictedFieldValue,
     disabled: searchQuery === "" ? true : apiMode !== "elasticsearch"

@@ -101,6 +101,11 @@ export function Home() {
                     <DinaMessage id="storageUnitListTitle" />
                   </a>
                 </Link>
+                <Link href="/workbook/upload">
+                  <a>
+                    <DinaMessage id="workbookGroupUploadTitle" />
+                  </a>
+                </Link>
               </Stack>
             </Col>
 
@@ -224,6 +229,11 @@ export function Home() {
                 <Link href="/seqdb/sanger-workflow/list">
                   <a>
                     <SeqdbMessage id="sangerWorkflowListTitle" />
+                  </a>
+                </Link>
+                <Link href="/seqdb/sanger-workflow-sequencing/list">
+                  <a>
+                    <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
                   </a>
                 </Link>
                 <Link href="/seqdb/thermocycler-profile/list">

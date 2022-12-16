@@ -47,16 +47,15 @@ export default function MaterialSampleEditPage() {
   const {
     navOrder,
     setNavOrder,
-    enabledFields,
     sampleFormTemplate,
-    setSampleFormTemplate,
+    setSampleFormTemplateUUID,
     visibleManagedAttributeKeys,
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
-    enabledFields,
+    formTemplate: sampleFormTemplate,
     visibleManagedAttributeKeys,
     materialSample: materialSampleInitialValues,
     collectingEventInitialValues,
@@ -64,12 +63,16 @@ export default function MaterialSampleEditPage() {
     enableStoredDefaultGroup: true,
     buttonBar: (
       <ButtonBar>
-        <BackButton entityId={id} entityLink="/collection/material-sample" />
+        <BackButton
+          entityId={id}
+          entityLink="/collection/material-sample"
+          reloadLastSearch={true}
+        />
         <div className="flex-grow-1 d-flex">
           <div className="mx-auto">
             <MaterialSampleFormTemplateSelect
               value={sampleFormTemplate}
-              onChange={setSampleFormTemplate}
+              onChange={setSampleFormTemplateUUID}
             />
           </div>
         </div>
@@ -126,6 +129,7 @@ export default function MaterialSampleEditPage() {
             return (
               <MaterialSampleForm
                 enableReinitialize={true}
+                navOrder={navOrder}
                 {...sampleFormProps}
                 materialSample={sample}
               />
@@ -143,7 +147,11 @@ export default function MaterialSampleEditPage() {
             );
           })
         ) : (
-          <MaterialSampleForm enableReinitialize={true} {...sampleFormProps} />
+          <MaterialSampleForm
+            enableReinitialize={true}
+            navOrder={navOrder}
+            {...sampleFormProps}
+          />
         )}
       </main>
       <Footer />

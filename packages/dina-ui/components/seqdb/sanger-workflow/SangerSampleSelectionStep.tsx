@@ -1,36 +1,49 @@
 import {
-  ButtonBar,
   filterBy,
   QueryPage,
   useAccount,
   useApiClient,
-  LoadingSpinner,
-  CommonMessage,
-  FieldHeader
+  LoadingSpinner
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { useState, useEffect } from "react";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import { PcrBatchItem, PcrBatch } from "../../../types/seqdb-api";
-import { TableColumn } from "common-ui/lib/list-page/types";
 import { pick, compact, uniq } from "lodash";
-import ReactTable, { Column } from "react-table";
 import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { ELASTIC_SEARCH_COLUMN } from "../../collection/material-sample/MaterialSampleRelationshipColumns";
 
 export interface SangerSampleSelectionStepProps {
   pcrBatchId: string;
+  editMode: boolean;
+  setEditMode: (newValue: boolean) => void;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function SangerSampleSelectionStep({
-  pcrBatchId
+  pcrBatchId,
+  editMode,
+  setEditMode,
+  performSave,
+  setPerformSave
 }: SangerSampleSelectionStepProps) {
   const { apiClient, bulkGet, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { username } = useAccount();
 
-  // State to keep track if in edit mode.
-  const [editMode, setEditMode] = useState(false);
+  // Check if a save was requested from the top level button bar.
+  useEffect(() => {
+    async function performSaveInternal() {
+      await savePcrBatchItems();
+      setPerformSave(false);
+    }
+
+    if (performSave) {
+      performSaveInternal();
+    }
+  }, [performSave]);
 
   // Keep track of the previously selected resources to compare.
   const [previouslySelectedResources, setPreviouslySelectedResources] =
@@ -79,7 +92,7 @@ export function SangerSampleSelectionStep({
    */
   async function fetchSamples(sampleIds: string[]) {
     await bulkGet<MaterialSample>(
-      sampleIds.map((id) => "/material-sample/" + id),
+      sampleIds.map((id) => `/material-sample/${id}?include=organism`),
       { apiBaseUrl: "/collection-api" }
     ).then((response) => {
       const materialSamplesTransformed = compact(response).map((resource) => ({
@@ -87,7 +100,10 @@ export function SangerSampleSelectionStep({
           attributes: pick(resource, ["materialSampleName"])
         },
         id: resource.id,
-        type: resource.type
+        type: resource.type,
+        included: {
+          organism: resource.organism
+        }
       }));
 
       // If there is nothing stored yet, automatically go to edit mode.
@@ -107,36 +123,6 @@ export function SangerSampleSelectionStep({
       fetchSampledIds();
     }
   }, [editMode]);
-
-  // Displayed on edit mode only.
-  const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      label: "materialSampleName",
-      accessor: "data.attributes.materialSampleName",
-      isKeyword: true
-    }
-  ];
-
-  const API_SEARCH_COLUMN: Column<MaterialSample>[] = [
-    {
-      Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
-      ),
-      Header: <FieldHeader name={"materialSampleName"} />,
-      sortable: false
-    }
-  ];
 
   async function savePcrBatchItems() {
     const { data: pcrBatch } = await apiClient.get<PcrBatch>(
@@ -220,65 +206,21 @@ export function SangerSampleSelectionStep({
     return <LoadingSpinner loading={true} />;
   }
 
-  const buttonBar = (
-    <ButtonBar>
-      <div className="ms-auto">
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={() => {
-            savePcrBatchItems();
-          }}
-          style={{ width: "10rem" }}
-          disabled={selectedResources.length === 0}
-        >
-          {formatMessage("save")}
-        </button>
-      </div>
-    </ButtonBar>
-  );
-
-  return editMode ? (
-    <>
-      {buttonBar}
-      <div className="mb-3">
-        <QueryPage<MaterialSample>
-          indexName={"dina_material_sample_index"}
-          columns={ELASTIC_SEARCH_COLUMN}
-          selectionMode={true}
-          selectionResources={selectedResources}
-          setSelectionResources={setSelectedResources}
-        />
-      </div>
-      {buttonBar}
-    </>
-  ) : (
-    <>
-      <ButtonBar>
-        <button
-          className="btn btn-primary edit-button"
-          type="button"
-          onClick={() => setEditMode(true)}
-          style={{ width: "10rem" }}
-        >
-          <SeqdbMessage id="editButtonText" />
-        </button>
-      </ButtonBar>
-      <strong>
-        <SeqdbMessage id="selectedSamplesTitle" />
-      </strong>
-      <ReactTable<MaterialSample>
-        columns={API_SEARCH_COLUMN}
-        data={selectedResources}
-        minRows={1}
-        defaultPageSize={100}
-        pageText={<CommonMessage id="page" />}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        ofText={<CommonMessage id="of" />}
-        rowsText={formatMessage("rows")}
-        previousText={<CommonMessage id="previous" />}
-        nextText={<CommonMessage id="next" />}
+  return (
+    <div>
+      {!editMode && (
+        <strong>
+          <SeqdbMessage id="selectedSamplesTitle" />
+        </strong>
+      )}
+      <QueryPage<MaterialSample>
+        indexName={"dina_material_sample_index"}
+        columns={ELASTIC_SEARCH_COLUMN}
+        selectionMode={editMode}
+        selectionResources={selectedResources}
+        setSelectionResources={setSelectedResources}
+        viewMode={!editMode}
       />
-    </>
+    </div>
   );
 }

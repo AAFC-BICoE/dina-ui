@@ -43,6 +43,7 @@ import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
+  FormTemplate,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
   MaterialSample,
@@ -68,16 +69,6 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
-
-/**
- * The enabled fields if creating from a template.
- * Nested DinaForms (Collecting Event and Acquisition Event) have separate string arrays.
- */
-export interface MaterialSampleFormEnabledFields {
-  materialSample: string[];
-  collectingEvent: string[];
-  acquisitionEvent: string[];
-}
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -111,8 +102,7 @@ export interface MaterialSampleFormProps {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
-  /** The enabled fields if creating from a template. */
-  enabledFields?: MaterialSampleFormEnabledFields;
+  formTemplate?: FormTemplate;
 
   attachmentsConfig?: {
     materialSample: AllowAttachmentsConfig;
@@ -173,7 +163,7 @@ export function MaterialSampleForm({
   onChangeNavOrder,
   onSaved,
   materialSampleSaveHook,
-  enabledFields,
+  formTemplate,
   attachmentsConfig,
   disableAutoNamePrefix,
   materialSampleFormRef,
@@ -190,6 +180,7 @@ export function MaterialSampleForm({
     <ButtonBar>
       <BackButton
         entityId={materialSample?.id}
+        reloadLastSearch={true}
         entityLink="/collection/material-sample"
       />
       <SubmitButton className="ms-auto" />
@@ -211,13 +202,13 @@ export function MaterialSampleForm({
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
+      formTemplate,
       collectingEventAttachmentsConfig: attachmentsConfig?.collectingEvent,
       materialSample,
       collectingEventInitialValues,
       acquisitionEventInitialValues,
       onSaved,
       isTemplate,
-      enabledFields,
       reduceRendering,
       visibleManagedAttributeKeys
     });
@@ -225,12 +216,15 @@ export function MaterialSampleForm({
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
   const templateAttachesCollectingEvent = Boolean(
-    enabledFields?.collectingEvent.includes("id")
+    // enabledFields?.collectingEvent.includes("id")
+    false
   );
   const templateAttachesAcquisitionEvent = Boolean(
-    enabledFields?.acquisitionEvent.includes("id")
+    // enabledFields?.acquisitionEvent.includes("id")
+    false
   );
   const attachmentsField = "attachment";
+  const hideLinkerTab = isTemplate ? true : false;
 
   /**
    * A map where:
@@ -252,6 +246,7 @@ export function MaterialSampleForm({
       dataComponentState.enableCollectingEvent && (
         <TabbedResourceLinker<CollectingEvent>
           fieldSetId={id}
+          hideLinkerTab={hideLinkerTab}
           legend={<DinaMessage id="collectingEvent" />}
           briefDetails={(colEvent) => (
             <CollectingEventBriefDetails collectingEvent={colEvent} />
@@ -302,6 +297,7 @@ export function MaterialSampleForm({
           resourceId={acqEventId}
           fieldName="acquisitionEvent"
           targetType="materialSample"
+          hideLinkerTab={hideLinkerTab}
         />
       ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
@@ -328,6 +324,8 @@ export function MaterialSampleForm({
           id={id}
           legend={<DinaMessage id="storage" />}
           fieldName="storageUnit"
+          componentName={STORAGE_COMPONENT_NAME}
+          sectionName="storage-selection-section"
         >
           <StorageLinkerField
             name="storageUnit"
@@ -357,8 +355,8 @@ export function MaterialSampleForm({
     [MANAGED_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <DinaFormSection
-          // Disabled the template's restrictions for this section:
-          enabledFields={null}
+          componentName={MANAGED_ATTRIBUTES_COMPONENT_NAME}
+          sectionName="managed-attributes-section"
         >
           <div className="row">
             <div className="col-md-6">
@@ -370,9 +368,6 @@ export function MaterialSampleForm({
                   id,
                   legend: <DinaMessage id="materialSampleManagedAttributes" />
                 }}
-                // Custom view selection is supported for material samples,
-                // but not in template editor mode:
-                showFormTemplateDropdown={!isTemplate}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
                   visibleManagedAttributeKeys?.materialSample
@@ -384,23 +379,28 @@ export function MaterialSampleForm({
       ),
     [MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
-        <AttachmentsField
-          name={attachmentsField}
-          title={<DinaMessage id="materialSampleAttachments" />}
-          id={id}
-          allowNewFieldName="attachmentsConfig.allowNew"
-          allowExistingFieldName="attachmentsConfig.allowExisting"
-          allowAttachmentsConfig={attachmentsConfig?.materialSample}
-          attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
-          wrapContent={(content) => (
-            <BulkEditTabWarning
-              targetType="material-sample"
-              fieldName={attachmentsField}
-            >
-              {content}
-            </BulkEditTabWarning>
-          )}
-        />
+        <DinaFormSection
+          componentName={MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME}
+          sectionName="material-sample-attachments-sections"
+        >
+          <AttachmentsField
+            name={attachmentsField}
+            title={<DinaMessage id="materialSampleAttachments" />}
+            id={id}
+            allowNewFieldName="attachmentsConfig.allowNew"
+            allowExistingFieldName="attachmentsConfig.allowExisting"
+            allowAttachmentsConfig={attachmentsConfig?.materialSample}
+            attachmentPath={`collection-api/material-sample/${materialSample?.id}/attachment`}
+            wrapContent={(content) => (
+              <BulkEditTabWarning
+                targetType="material-sample"
+                fieldName={attachmentsField}
+              >
+                {content}
+              </BulkEditTabWarning>
+            )}
+          />
+        </DinaFormSection>
       )
   };
 
@@ -429,43 +429,48 @@ export function MaterialSampleForm({
           />
         )}
       </div>
-      <div className="flex-grow-1 container-fluid">
-        {!reduceRendering && (
-          <>
-            {!isTemplate && materialSample && (
-              <MaterialSampleBreadCrumb
-                disableLastLink={true}
-                materialSample={materialSample as any}
-              />
-            )}
-            {!isTemplate && (
-              <div className="row">
-                <div className="col-md-6">
-                  <GroupSelectField
-                    name="group"
-                    enableStoredDefaultGroup={enableStoredDefaultGroup}
-                  />
+      <DinaFormSection
+        componentName={IDENTIFIER_COMPONENT_NAME}
+        sectionName="general-section"
+      >
+        <div className="flex-grow-1 container-fluid">
+          {!reduceRendering && (
+            <>
+              {!isTemplate && materialSample?.materialSampleName && (
+                <MaterialSampleBreadCrumb
+                  disableLastLink={true}
+                  materialSample={materialSample as any}
+                />
+              )}
+              {!isTemplate && (
+                <div className="row">
+                  <div className="col-md-6">
+                    <GroupSelectField
+                      name="group"
+                      enableStoredDefaultGroup={enableStoredDefaultGroup}
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-            <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
-            <ProjectSelectSection
-              classNames="mt-3"
-              resourcePath="collection-api/project"
-            />
-            <AssemblageSelectSection
-              classNames="mt-2"
-              resourcePath="collection-api/assemblage"
-            />
-          </>
-        )}
-        {/* The toggleable / re-arrangeable form sections: */}
-        <div className="data-components">
-          {sortedFormSectionPairs.map(([id, renderFn]) => (
-            <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
-          ))}
+              )}
+              <TagsAndRestrictionsSection resourcePath="collection-api/material-sample" />
+              <ProjectSelectSection
+                classNames="mt-3"
+                resourcePath="collection-api/project"
+              />
+              <AssemblageSelectSection
+                classNames="mt-2"
+                resourcePath="collection-api/assemblage"
+              />
+            </>
+          )}
+          {/* The toggleable / re-arrangeable form sections: */}
+          <div className="data-components">
+            {sortedFormSectionPairs.map(([id, renderFn]) => (
+              <Fragment key={id}>{renderFn(isOffScreen ? "" : id)}</Fragment>
+            ))}
+          </div>
         </div>
-      </div>
+      </DinaFormSection>
     </div>
   );
 
@@ -475,11 +480,11 @@ export function MaterialSampleForm({
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
+      formTemplate={formTemplate}
       enableReinitialize={enableReinitialize}
       innerRef={materialSampleFormRef}
       initialValues={initialValues}
       onSubmit={onSubmit}
-      enabledFields={enabledFields?.materialSample}
     >
       {!initialValues.id && !disableAutoNamePrefix && <SetDefaultSampleName />}
       {buttonBar}

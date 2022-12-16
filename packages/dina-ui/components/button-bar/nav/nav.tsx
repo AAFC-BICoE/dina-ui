@@ -210,8 +210,13 @@ function NavCollectionDropdown({ formatMessage }) {
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/storage-unit/list" passHref={true}>
-        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+        <NavDropdown.Item>
           <DinaMessage id="storageUnitListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/workbook/upload" passHref={true}>
+        <NavDropdown.Item onKeyDown={onKeyDownLastItem}>
+          <DinaMessage id="workbookGroupUploadTitle" />
         </NavDropdown.Item>
       </Link>
     </NavDropdown>
@@ -361,6 +366,11 @@ function NavSequenceDropdown({ formatMessage }) {
       <Link href="/seqdb/sanger-workflow/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sangerWorkflowListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/seqdb/sanger-workflow-sequencing/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>
