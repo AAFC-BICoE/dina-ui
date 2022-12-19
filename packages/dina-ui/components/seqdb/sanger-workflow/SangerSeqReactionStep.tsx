@@ -48,7 +48,7 @@ export function SangerSeqReactionStep({
   performSave,
   setPerformSave
 }: SangerSeqReactionStepProps) {
-  const { apiClient, bulkGet, save } = useApiClient();
+  const { apiClient, save } = useApiClient();
   const { formatMessage } = useDinaIntl();
   const { isAdmin, groupNames, username } = useAccount();
   const [searchResult, setSearchResults] = useState<PcrBatchItem[]>([]);
@@ -180,6 +180,7 @@ export function SangerSeqReactionStep({
             include: "materialSample"
           }
         );
+        item.pcrBatchItem = pcrBatchItem;
         if (!!pcrBatchItem?.materialSample?.id) {
           const { data: materialSample } = await apiClient.get<MaterialSample>(
             `collection-api/material-sample/${pcrBatchItem.materialSample.id}`,
@@ -193,10 +194,6 @@ export function SangerSeqReactionStep({
     }
 
     if (isMounted.current) {
-      // If there is nothing stored yet, automatically go to edit mode.
-      // if (seqReactions.length === 0) {
-      //   setEditMode(true);
-      // }
       setPreviouslySelectedResourcesIDMap(
         compact(seqReactions).reduce(
           (accu, obj) => ({
@@ -206,6 +203,14 @@ export function SangerSeqReactionStep({
           {} as { [key: string]: string }
         )
       );
+
+      for (const item of seqReactions) {
+        const tempId: (string | undefined)[] = [];
+        tempId.push(item.pcrBatchItem?.id);
+        tempId.push(item.seqPrimer?.id);
+        item.id = compact(tempId).join("_");
+      }
+      setRemovableItems(seqReactions);
       setSelectedResources(seqReactions);
     }
   };
@@ -294,15 +299,17 @@ export function SangerSeqReactionStep({
   ];
 
   const pcrBatchTable = (
-    <ReactTable<PcrBatchItem>
-      className="col-md-5"
-      columns={PCR_BATCH_ITEM_COLUMN}
-      data={pcrBatchItemQuery?.response?.data}
-      minRows={1}
-      showPagination={false}
-      loading={pcrBatchItemQuery?.loading}
-      sortable={false}
-    />
+    <div className="d-flex align-items-start col-md-5">
+      <ReactTable<PcrBatchItem>
+        className="w-100"
+        columns={PCR_BATCH_ITEM_COLUMN}
+        data={pcrBatchItemQuery?.response?.data}
+        minRows={1}
+        showPagination={false}
+        loading={pcrBatchItemQuery?.loading}
+        sortable={false}
+      />
+    </div>
   );
 
   // Generate the key for the DINA form. It should only be generated once.
@@ -453,8 +460,8 @@ export function SangerSeqReactionStep({
       .map((pair) => pair[0]);
 
     const unselectedObjects = selectedResources.filter((itemA) => {
-      return !ids.find((itemB) => {
-        return itemA.id === itemB;
+      return !ids.find((id) => {
+        return itemA.id === id;
       });
     });
 
@@ -514,6 +521,7 @@ export function SangerSeqReactionStep({
             name="region"
             filter={filterBy(["name"])}
             model="seqdb-api/region"
+            omitNullOption={true}
             optionLabel={(region) => region.name}
             readOnlyLink="/seqdb/region/view?id="
             onChange={(value) => setSelectedRegion(value as Region)}
@@ -534,6 +542,7 @@ export function SangerSeqReactionStep({
                   }
                 : undefined
             )}
+            omitNullOption={true}
             isDisabled={!selectedRegion}
             model="seqdb-api/pcr-primer"
             optionLabel={(primer) => `${primer.name} - ${primer.lotNumber}`}
@@ -557,15 +566,16 @@ export function SangerSeqReactionStep({
             </FormikButton>
           </div>
         </div>
-
-        <ReactTable<SeqReaction>
-          className="react-table-overflow col-md-6"
-          columns={SELECTED_RESOURCE_HEADER}
-          data={selectedResources}
-          minRows={1}
-          showPagination={false}
-          sortable={false}
-        />
+        <div className="d-flex align-items-start col-md-6">
+          <ReactTable<SeqReaction>
+            className="react-table-overflow w-100"
+            columns={SELECTED_RESOURCE_HEADER}
+            data={selectedResources}
+            minRows={1}
+            showPagination={false}
+            sortable={false}
+          />
+        </div>
       </div>
     </DinaForm>
   ) : (
