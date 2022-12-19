@@ -130,6 +130,7 @@ export function StorageUnitChildrenViewer({
             <StorageLinker
               actionMode="ADD_EXISTING_AS_CHILD"
               onChange={addExistingStorageUnitAsChild}
+              createStorageMode={false}
             />
           )}
         </FieldSet>
