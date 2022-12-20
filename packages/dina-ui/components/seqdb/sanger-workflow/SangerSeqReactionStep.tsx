@@ -259,12 +259,13 @@ export function SangerSeqReactionStep({
         <SelectCheckBox key={resource.id} resource={resource} />
       ),
       Header: SelectCheckBoxHeader,
-      sortable: false,
-      width: 150
+      sortable: false
     },
     {
       Cell: ({ original }) =>
-        original?.materialSample?.materialSampleName || "",
+        original?.materialSample?.materialSampleName ||
+        original?.materialSample.id ||
+        "",
       Header: <FieldHeader name={"sampleName"} />,
       sortable: false
     },
@@ -337,8 +338,7 @@ export function SangerSeqReactionStep({
             />
           ),
           Header: DeselectCheckBoxHeader,
-          sortable: false,
-          width: 150
+          sortable: false
         }
       ]
     : [];
@@ -346,7 +346,9 @@ export function SangerSeqReactionStep({
     ...SELECTED_RESOURCE_SELECT_ALL_HEADER,
     {
       Cell: ({ original }) =>
-        original?.pcrBatchItem?.materialSample.materialSampleName || "",
+        original?.pcrBatchItem?.materialSample?.materialSampleName ||
+        original?.pcrBatchItem?.materialSample?.id ||
+        "",
       Header: <FieldHeader name={"sampleName"} />,
       sortable: false
     },
