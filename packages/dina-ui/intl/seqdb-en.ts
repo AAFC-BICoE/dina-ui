@@ -106,5 +106,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   seqBatchListTitle: "SEQ Batches",
   seqBatchViewTitle: "View SEQ Batch",
   editSeqBatchTitle: "Edit SEQ Batch",
-  addSeqBatchTitle: "Add SEQ Batch"
+  addSeqBatchTitle: "Add SEQ Batch",
+  selectPcrBatch: "Select PCR Batch",
+  selectPcrBatchTitle: "Select PCR Batch"
 };
