@@ -662,7 +662,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   queryBuilder_operator_partialMatch: "Correspondance partielle",
   queryBuilder_value_number_placeholder: "Saisir le nombre à rechercher",
   queryBuilder_value_text_placeholder: "Saisir le texte à rechercher",
-  queryBuilder_value_true: true,
+  queryBuilder_value_true: "true",
   reception: "Réception",
   reloadSavedSearch: "Recharger la recherche enregistrée",
   removeAssertionLabel: "Supprimer ce géoréférencement",

@@ -106,5 +106,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowDetailsTab: "Details",
   workflowListTitle: "NGS Workflows",
   workflowStepTab: "Step {number}: {name}",
-  workflowViewTitle: "NGS Workflow"
+  workflowViewTitle: "NGS Workflow",
+  selectPcrBatch: "Select PCR Batch",
+  selectPcrBatchTitle: "Select PCR Batch"
 };
