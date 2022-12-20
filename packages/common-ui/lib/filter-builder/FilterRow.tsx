@@ -65,7 +65,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     // Get the selected Filter Attribute from the parent FilterBuilder's list:
     const selectedAttributeOption = (
       this.context as FilterBuilderContextI
-    ).attributeOptions.find(option => {
+    ).attributeOptions.find((option) => {
       const optionAttrString =
         typeof option.value === "string" ? option.value : option.value.name;
 
@@ -84,8 +84,8 @@ export class FilterRow extends React.Component<FilterRowProps> {
         : STRING_SEARCH_TYPES;
 
     const customStyle: any = {
-      multiValueLabel: base => ({ ...base, cursor: "move" }),
-      placeholder: base => ({ ...base, color: "rgb(87,120,94)" }),
+      multiValueLabel: (base) => ({ ...base, cursor: "move" }),
+      placeholder: (base) => ({ ...base, color: "rgb(87,120,94)" }),
       option: (_, state) => ({
         ...{
           backgroundColor:
@@ -97,7 +97,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     };
 
     return (
-      <div className="list-inline">
+      <div className="list-inline" style={{ display: "flex" }}>
         <div className="list-inline-item" style={{ width: 320 }}>
           <Select<FilterAttributeOption>
             aria-label="Filter Attribute"
@@ -117,7 +117,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
             options={predicateTypes}
             onChange={this.onPredicateChanged as any}
             value={predicateTypes.find(
-              option => option.value === model.predicate
+              (option) => option.value === model.predicate
             )}
             styles={customStyle}
           />
@@ -172,7 +172,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
               options={searchTypes}
               onChange={this.onSearchTypeChanged}
               value={searchTypes.find(
-                option => option.value === model.searchType
+                (option) => option.value === model.searchType
               )}
               styles={customStyle}
             />
@@ -252,7 +252,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     this.forceUpdate();
   };
 
-  private onSelectValueChanged = e => {
+  private onSelectValueChanged = (e) => {
     this.props.model.value = e;
     this.props.onChange();
     this.forceUpdate();
@@ -269,7 +269,7 @@ export class FilterRow extends React.Component<FilterRowProps> {
     const { model } = this.props;
 
     const selectedAttribute =
-      this.context.attributeOptions.find(option => {
+      this.context.attributeOptions.find((option) => {
         const propAttributeName =
           typeof model.attribute === "string"
             ? model.attribute
