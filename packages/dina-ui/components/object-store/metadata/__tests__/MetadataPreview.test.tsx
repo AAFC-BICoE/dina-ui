@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { Metadata } from "../../../../types/objectstore-api";
+import { ManagedAttribute, Metadata } from "../../../../types/objectstore-api";
 import { MetadataPreview } from "../MetadataPreview";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
@@ -12,6 +12,8 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   id: "232eda40-dc97-4255-91c4-f30485e2c707",
   type: "metadata"
 };
+
+const TEST_MANAGED_ATTRIBUTES: PersistedResource<ManagedAttribute>[] = [];
 
 const mockBulkGet = jest.fn(async (paths) =>
   paths.map((path) => {
@@ -28,7 +30,11 @@ const mockBulkGet = jest.fn(async (paths) =>
   })
 );
 
-const mockGet = jest.fn(async () => ({ data: TEST_METADATA }));
+const mockGet = jest.fn(async (path) => {
+  if (path === "objectstore-api/managed-attribute")
+    return { data: TEST_MANAGED_ATTRIBUTES };
+  else return { data: TEST_METADATA };
+});
 const apiContext: any = { apiClient: { get: mockGet }, bulkGet: mockBulkGet };
 
 describe("MetadataPreview component", () => {
