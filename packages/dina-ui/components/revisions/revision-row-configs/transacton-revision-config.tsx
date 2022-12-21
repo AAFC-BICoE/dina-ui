@@ -24,12 +24,7 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
       />
     ),
     managedAttributes: ({ original: { value } }) => (
-      <ManagedAttributesViewer
-        managedAttributeApiPath={key =>
-          `collection-api/managed-attribute/${key}`
-        }
-        values={value}
-      />
+      <ManagedAttributesViewer values={value} />
     ),
     // Computed value; don't show audits.
     involvedAgents: () => null,
@@ -45,7 +40,7 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
                   type="person"
                   baseApiPath="agent-api"
                   reference={{ id: personUuid, type: "person" }}
-                  name={person => person.displayName ?? person.id}
+                  name={(person) => person.displayName ?? person.id}
                   href="/person/view?id="
                 />
               )
