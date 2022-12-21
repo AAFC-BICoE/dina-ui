@@ -6,7 +6,8 @@ import {
   LoadingSpinner,
   generateUUIDTree,
   FieldSet,
-  QueryPage
+  QueryPage,
+  BackButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -74,7 +75,13 @@ export default function MetadataViewPage() {
 
     const buttonBar = (
       <ButtonBar>
-        <BackToListButton entityLink="/object-store/object" />
+        <BackButton
+          byPassView={true}
+          className="me-auto"
+          entityId={uuid}
+          entityLink="/object-store/object"
+          reloadLastSearch={true}
+        />
         <Link href={`/object-store/metadata/edit?id=${uuid}`}>
           <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
             <DinaMessage id="editButtonText" />
@@ -89,7 +96,7 @@ export default function MetadataViewPage() {
           className="ms-5"
           id={uuid}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list"
+          postDeleteRedirect="/object-store/object/list?reloadLastSearch"
           type="metadata"
         />
       </ButtonBar>
