@@ -20,9 +20,9 @@ export function ManagedAttributesViewer({
     [key: string]: string;
   }>({});
   const isMounted = useIsMounted();
-
+  // Call API to fetch all ManagedAttributes
   useEffect(() => {
-    async function getAllManagedAttributes() {
+    async function fetchAllManagedAttributes() {
       const { data } = await apiClient.get<ManagedAttribute[]>(
         "objectstore-api/managed-attribute?fields=key,name",
         {}
@@ -38,7 +38,7 @@ export function ManagedAttributesViewer({
         setAllAttrKeyNameMap(attrKeyNameMap);
       }
     }
-    getAllManagedAttributes();
+    fetchAllManagedAttributes();
   }, []);
 
   const managedAttributeValues = (
