@@ -24,7 +24,7 @@ export function ManagedAttributesViewer({
   useEffect(() => {
     async function getAllManagedAttributes() {
       const { data } = await apiClient.get<ManagedAttribute[]>(
-        "objectstore-api/managed-attribute",
+        "objectstore-api/managed-attribute?fields=key,name",
         {}
       );
       const attrKeyNameMap = data.reduce(

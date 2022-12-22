@@ -31,7 +31,7 @@ const mockBulkGet = jest.fn(async (paths) =>
 );
 
 const mockGet = jest.fn(async (path) => {
-  if (path === "objectstore-api/managed-attribute")
+  if (path.startWith("objectstore-api/managed-attribute"))
     return { data: TEST_MANAGED_ATTRIBUTES };
   else return { data: TEST_METADATA };
 });
