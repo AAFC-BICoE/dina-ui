@@ -8,7 +8,13 @@ import { InputResource } from "kitsu";
 import { MetadataForm } from "../../../components/object-store/metadata/MetadataForm";
 import { MetadataUpload } from "../../../components/object-store/metadata/MetadataUpload";
 
-export default function MetadataEditPage() {
+export interface MetadataEditPageProps {
+  reloadLastSearch?: boolean;
+}
+
+export default function MetadataEditPage({
+  reloadLastSearch
+}: MetadataEditPageProps) {
   const router = useRouter();
   const id = router.query.id?.toString();
   const { formatMessage } = useDinaIntl();
@@ -19,7 +25,7 @@ export default function MetadataEditPage() {
       <BackButton
         entityId={id}
         entityLink="/object-store/object"
-        reloadLastSearch={true}
+        reloadLastSearch={reloadLastSearch ?? true}
       />
       <SubmitButton className="ms-auto" />
     </ButtonBar>

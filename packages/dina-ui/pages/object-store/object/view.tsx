@@ -32,7 +32,13 @@ const OBJECT_DETAILS_PAGE_CSS = `
   }
 `;
 
-export default function MetadataViewPage() {
+export interface MetadataViewPageProps {
+  reloadLastSearch?: boolean;
+}
+
+export default function MetadataViewPage({
+  reloadLastSearch
+}: MetadataViewPageProps) {
   const router = useRouter();
 
   const uuid = String(router.query.id);
@@ -80,7 +86,7 @@ export default function MetadataViewPage() {
           className="me-auto"
           entityId={uuid}
           entityLink="/object-store/object"
-          reloadLastSearch={true}
+          reloadLastSearch={reloadLastSearch ?? true}
         />
         <Link href={`/object-store/metadata/edit?id=${uuid}`}>
           <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
