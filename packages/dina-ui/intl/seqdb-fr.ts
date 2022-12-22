@@ -87,7 +87,7 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sampleSelectionTitle: "Sélection d’échantillons",
   sangerWorkflow: "Flux de travail Sanger",
   sangerWorkflowListTitle: "Flux de travail Sanger",
-  sangerWorkflowSequencingListTitle: "Méthode de Sanger  Séquençage",
+  sangerWorkflowSequencingListTitle: "Méthode de Sanger - Séquençage",
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",
   selectButtonText: "Sélectionner",
