@@ -34,7 +34,7 @@ export function SubmissionFacilityEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -85,15 +85,19 @@ function SubmissionFacilityForm({
     await router.push(`/seqdb/sequencing-facility/view?id=${newId}`);
   };
 
+  const buttonBar = (
+    <ButtonBar>
+      <BackButton
+        entityId={id as string}
+        entityLink="/seqdb/sequencing-facility"
+      />
+      <SubmitButton className="ms-auto" />
+    </ButtonBar>
+  );
+
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      <ButtonBar>
-        <SubmitButton />
-        <BackButton
-          entityId={id as string}
-          entityLink="/seqdb/sequencing-facility"
-        />
-      </ButtonBar>
+      {buttonBar}
       <SubmissionFacilityFormFields />
     </DinaForm>
   );

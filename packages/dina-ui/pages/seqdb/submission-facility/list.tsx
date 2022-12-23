@@ -32,7 +32,7 @@ export default function RegionListPage() {
       <Head title={formatMessage("submissionFacilityListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/submissionFacility" />
+        <CreateButton entityLink="/seqdb/submission-facility" />
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
