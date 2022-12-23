@@ -108,5 +108,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowStepTab: "Step {number}: {name}",
   workflowViewTitle: "NGS Workflow",
   selectPcrBatch: "Select PCR Batch",
-  selectPcrBatchTitle: "Select PCR Batch"
+  selectPcrBatchTitle: "Select PCR Batch",
+  submissionFacilityListTitle: "Submission Facilities",
+  addSubmissionFacilityTitle: "Add Submission Facility",
+  editSubmissionFacilityTitle: "Edit Submission Facility"
 };
