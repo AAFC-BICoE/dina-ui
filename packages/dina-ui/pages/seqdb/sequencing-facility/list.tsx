@@ -7,13 +7,13 @@ import {
 import Link from "next/link";
 import { groupCell, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { SubmissionFacility } from "../../../types/seqdb-api/resources/SubmissionFacility";
+import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
 
-const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition<SubmissionFacility>[] =
+const SUBMISSION_FACILITY_TABLE_COLUMNS: ColumnDefinition<SequencingFacility>[] =
   [
     {
       Cell: ({ original: { id, name } }) => (
-        <Link href={`/seqdb/submission-facility/view?id=${id}`}>
+        <Link href={`/seqdb/sequencing-facility/view?id=${id}`}>
           <a>{name || id}</a>
         </Link>
       ),
@@ -29,18 +29,18 @@ export default function RegionListPage() {
 
   return (
     <>
-      <Head title={formatMessage("submissionFacilityListTitle")} />
+      <Head title={formatMessage("sequencingFacilityListTitle")} />
       <Nav />
       <ButtonBar>
-        <CreateButton entityLink="/seqdb/submission-facility" />
+        <CreateButton entityLink="/seqdb/sequencing-facility" />
       </ButtonBar>
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <SeqdbMessage id="submissionFacilityListTitle" />
+          <SeqdbMessage id="sequencingFacilityListTitle" />
         </h1>
         <ListPageLayout
           filterAttributes={SUBMISSION_FACILITY_FILTER_ATTRIBUTES}
-          id="submission-facility-list"
+          id="sequencing-facility-list"
           queryTableProps={{
             columns: SUBMISSION_FACILITY_TABLE_COLUMNS,
             path: "seqdb-api/sequencing-facility"

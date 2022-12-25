@@ -10,25 +10,34 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
+import { SequencingFacilityContacts } from "packages/dina-ui/components/seqdb";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
-import { SubmissionFacility } from "../../../types/seqdb-api/resources/SubmissionFacility";
+import {
+  SequencingFacility,
+  SequencingFacilityContact
+} from "../../../types/seqdb-api/";
 
-interface SubmissionFacilityFormProps {
-  submissionFacility?: SubmissionFacility;
+interface SequencingFacilityFormProps {
+  sequencingFacility?: SequencingFacility;
   router: NextRouter;
 }
 
-export function SubmissionFacilityEditPage({ router }: WithRouterProps) {
+export function SequencingFacilityEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
   const title = id
-    ? "editSubmissionFacilityTitle"
-    : "addSubmissionFacilityTitle";
+    ? "editSequencingFacilityTitle"
+    : "addSequencingFacilityTitle";
 
-  const query = useQuery<SubmissionFacility>({
-    path: `seqdb-api/sequencing-facility/${id}`
-  });
+  const query = useQuery<SequencingFacility>(
+    {
+      path: `seqdb-api/sequencing-facility/${id}`
+    },
+    {
+      disabled: !id
+    }
+  );
 
   return (
     <div>
@@ -38,11 +47,11 @@ export function SubmissionFacilityEditPage({ router }: WithRouterProps) {
         {id ? (
           <div>
             <h1 id="wb-cont">
-              <SeqdbMessage id="editSubmissionFacilityTitle" />
+              <SeqdbMessage id="editSequencingFacilityTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <SubmissionFacilityForm
-                submissionFacility={data}
+              <SequencingFacilityForm
+                sequencingFacility={data}
                 router={router}
               />
             ))}
@@ -50,9 +59,9 @@ export function SubmissionFacilityEditPage({ router }: WithRouterProps) {
         ) : (
           <div>
             <h1 id="wb-cont">
-              <SeqdbMessage id="addSubmissionFacilityTitle" />
+              <SeqdbMessage id="addSequencingFacilityTitle" />
             </h1>
-            <SubmissionFacilityForm router={router} />
+            <SequencingFacilityForm router={router} />
           </div>
         )}
       </main>
@@ -60,12 +69,12 @@ export function SubmissionFacilityEditPage({ router }: WithRouterProps) {
   );
 }
 
-function SubmissionFacilityForm({
-  submissionFacility,
+function SequencingFacilityForm({
+  sequencingFacility,
   router
-}: SubmissionFacilityFormProps) {
+}: SequencingFacilityFormProps) {
   const { id } = router.query;
-  const initialValues = submissionFacility || {};
+  const initialValues = sequencingFacility || {};
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
@@ -98,12 +107,17 @@ function SubmissionFacilityForm({
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       {buttonBar}
-      <SubmissionFacilityFormFields />
+      <SequencingFacilityFormFields />
     </DinaForm>
   );
 }
 
-export function SubmissionFacilityFormFields() {
+const mockData: SequencingFacilityContact[] = [
+  { name: "abc", roles: ["admin", "tester"], info: "abc info" },
+  { name: "def", roles: ["admin", "tester"], info: "def info" }
+];
+
+export function SequencingFacilityFormFields() {
   return (
     <div>
       <div className="row">
@@ -115,13 +129,10 @@ export function SubmissionFacilityFormFields() {
       </div>
       <div className="row">
         <TextField className="col-md-6" name="name" />
-        <TextField className="col-md-6" name="symbol" />
       </div>
-      <div className="row">
-        <TextField className="col-md-6" name="description" />
-      </div>
+      <SequencingFacilityContacts contacts={mockData} />
     </div>
   );
 }
 
-export default withRouter(SubmissionFacilityEditPage);
+export default withRouter(SequencingFacilityEditPage);

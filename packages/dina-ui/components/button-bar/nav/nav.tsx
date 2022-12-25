@@ -363,9 +363,9 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="regionListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/seqdb/submission-facility/list" passHref={true}>
+      <Link href="/seqdb/sequencing-facility/list" passHref={true}>
         <NavDropdown.Item>
-          <SeqdbMessage id="submissionFacilityListTitle" />
+          <SeqdbMessage id="sequencingFacilityListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/sanger-workflow/list" passHref={true}>

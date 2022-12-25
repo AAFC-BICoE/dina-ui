@@ -20,4 +20,4 @@ export * from "./resources/workflow/PreLibraryPrep";
 export * from "./resources/workflow/StepResource";
 export * from "./resources/workflow/StepTemplate";
 export * from "./resources/SeqReaction";
-export * from "./resources/SubmissionFacility";
+export * from "./resources/SequencingFacility";

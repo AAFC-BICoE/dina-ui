@@ -78,8 +78,8 @@ function RegionForm({ region, router }: RegionFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton className="ms-auto" />
         <BackButton entityId={id as string} entityLink="/seqdb/region" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <RegionFormFields />
     </DinaForm>

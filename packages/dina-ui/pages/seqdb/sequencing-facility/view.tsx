@@ -1,18 +1,18 @@
 import { DinaForm } from "common-ui";
 import { ViewPageLayout } from "../../../components";
-import { SubmissionFacility } from "../../../types/seqdb-api/resources/SubmissionFacility";
-import { SubmissionFacilityFormFields } from "./edit";
+import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
+import { SequencingFacilityFormFields } from "./edit";
 
-export default function SubmissionFacilityDetailsPage() {
+export default function SequencingFacilityDetailsPage() {
   return (
-    <ViewPageLayout<SubmissionFacility>
+    <ViewPageLayout<SequencingFacility>
       form={(props) => (
         <DinaForm {...props}>
-          <SubmissionFacilityFormFields />
+          <SequencingFacilityFormFields />
         </DinaForm>
       )}
       query={(id) => ({ path: `seqdb-api/sequencing-facility/${id}` })}
-      entityLink="/seqdb/submission-facility"
+      entityLink="/seqdb/sequencing-facility"
       type="sequencing-facility"
       apiBaseUrl="/seqdb-api"
     />
