@@ -1,124 +1,126 @@
-import { useState } from "react";
-import { Button } from "react-bootstrap";
-import ReactTable, { Column, SortingRule, TableProps } from "react-table";
-import { Promisable } from "type-fest";
+import { FieldArray, FieldArrayRenderProps } from "formik";
+import { useRef } from "react";
+import { Button, Table } from "react-bootstrap";
+import { Accessor, Column } from "react-table";
 import { FieldHeader } from "../field-header/FieldHeader";
-import { CommonMessage } from "../intl/common-ui-intl";
-import {
-  DefaultTBody,
-  DefaultTd,
-  InternationalizationProps
-} from "./QueryTable";
-import { useEditableCell } from "./useEditableCell";
+import { TextField } from "../formik-connected/TextField";
+import { InternationalizationProps } from "./QueryTable";
 
+export interface EditableTableColumn<D = any>
+  extends Column.Basics,
+    Column.CellProps,
+    Column.HeaderProps {
+  /**
+   * Property name as string or Accessor
+   * @example: 'myProperty'
+   * @example ["a.b", "c"]
+   * @example ["a", "b", "c"]
+   * @example {"a": {"b": {"c": $}}}
+   * @example (row) => row.propertyName
+   */
+  accessor?: Accessor<D> | undefined;
+}
 export interface FormatterParserProps {
   formatter?: (value: any) => string;
   parser?: (value: string) => any;
 }
 
-export type EditableTableColumnDefinition<TData> =
-  | (Column<TData> & InternationalizationProps & FormatterParserProps)
-  | string;
+export type EditableTableColumnDefinition<TData> = Partial<
+  EditableTableColumn<TData> & InternationalizationProps & FormatterParserProps
+>;
 
 export interface EditableTableProps<TData> {
+  fieldName: string;
   data: TData[];
-  setData: (data: TData[]) => Promisable<void>;
   /** The columns to show in the table. */
   columns: EditableTableColumnDefinition<TData>[];
-  /** Default sort attribute. */
-  defaultSort?: SortingRule[];
-  /** internal react-table props. */
-  reactTableProps?: Partial<TableProps>;
   /** readonly */
-  readonly?: boolean;
+  readOnly?: boolean;
 }
 
 export function EditableTable<TData>({
+  fieldName,
   data,
-  setData,
   columns,
-  defaultSort,
-  reactTableProps,
-  readonly = false
+  readOnly = false
 }: EditableTableProps<TData>) {
-  const [sortingRules, setSortingRules] = useState(defaultSort);
-  const rederEditableCell = useEditableCell({ data, setData, readonly });
+  const arrayHelpersRef = useRef<FieldArrayRenderProps>(
+    {} as FieldArrayRenderProps
+  );
 
-  const mappedColumns = columns.map<Column>((column) => {
-    // The "columns" prop can be a string or a react-table Column type.
-    const { fieldName, customHeader } =
-      typeof column === "string"
-        ? {
-            customHeader: undefined,
-            fieldName: column
-          }
-        : {
-            customHeader: column.Header,
-            fieldName: String(column.accessor)
-          };
+  const mappedColumnHeaders = columns.map((column, index) => (
+    <th key={index}>
+      {!!column.label ? (
+        <FieldHeader name={column.label} />
+      ) : (
+        <FieldHeader name={String(column.accessor)} />
+      )}
+    </th>
+  ));
 
-    const Header = customHeader ?? <FieldHeader name={fieldName} />;
+  const mappedRows = readOnly ? (
+    data ? (
+      data.map((rec, rowIndex) => (
+        <tr key={rowIndex}>
+          {columns.map((column, colIndex) => (
+            <td key={colIndex}>{rec[String(column.accessor)]}</td>
+          ))}
+        </tr>
+      ))
+    ) : undefined
+  ) : (
+    <FieldArray
+      name={fieldName}
+      render={(arrayHelpers) => {
+        arrayHelpersRef.current = arrayHelpers;
+        return data
+          ? data.map((_rec, rowIndex) => (
+              <tr key={rowIndex}>
+                {columns.map((column, columnIndex) => (
+                  <td key={columnIndex}>
+                    <TextField
+                      name={`${fieldName}[${rowIndex}][${String(
+                        column.accessor
+                      )}]`}
+                      hideLabel={true}
+                    />
+                  </td>
+                ))}
+                <td className="text-center">
+                  <Button
+                    style={{ padding: "0px 10px 3px", marginTop: "12px" }}
+                    variant="outline-secondary"
+                    onClick={() => arrayHelpers.remove(rowIndex)}
+                  >
+                    -
+                  </Button>
+                </td>
+              </tr>
+            ))
+          : undefined;
+      }}
+    />
+  );
 
-    return {
-      Header,
-      ...(typeof column === "string"
-        ? { accessor: column, Cell: rederEditableCell() }
-        : {
-            ...column,
-            Cell: rederEditableCell(column.formatter, column.parser)
-          })
-    };
-  });
-
-  if (readonly === false) {
-    mappedColumns.push({
-      Header: "",
-      Cell: ({ index }) => (
-        <div className="text-center">
-          <Button
-            style={{ padding: "0px 10px 3px" }}
-            variant="outline-secondary"
-            onClick={(e) => deleteItem(e, index)}
-          >
-            -
-          </Button>
-        </div>
-      ),
-      width: 100,
-      sortable: false
-    });
-  }
-
-  const addItem = (e) => {
-    e.preventDefault();
-    const tempData = [...data];
-    tempData.push({} as TData);
-    setData(tempData);
-  };
-
-  const deleteItem = (e, index: number) => {
-    e.preventDefault();
-    const tempData = [...data];
-    tempData.splice(index, 1);
-    setData(tempData);
+  const addItem = () => {
+    if (
+      arrayHelpersRef &&
+      arrayHelpersRef.current &&
+      arrayHelpersRef.current.push !== undefined
+    ) {
+      arrayHelpersRef.current.push({});
+    }
   };
 
   return (
     <>
-      <ReactTable
-        TdComponent={DefaultTd}
-        className="-striped"
-        columns={mappedColumns}
-        data={data}
-        defaultSorted={sortingRules}
-        showPagination={false}
-        minRows={1}
-        noDataText={<CommonMessage id="noRowsFound" />}
-        TbodyComponent={reactTableProps?.TbodyComponent ?? DefaultTBody}
-      />
-      {readonly ? (
-        ""
-      ) : (
+      <Table striped={true} bordered={true} hover={true}>
+        <thead>
+          <tr>{mappedColumnHeaders}</tr>
+        </thead>
+        <tbody>{mappedRows}</tbody>
+      </Table>
+      {readOnly ? undefined : (
         <div className="text-end">
           <Button
             variant="outline-secondary"
@@ -127,7 +129,7 @@ export function EditableTable<TData>({
               marginRight: "35px",
               marginTop: "10px"
             }}
-            onClick={(e) => addItem(e)}
+            onClick={() => addItem()}
           >
             +
           </Button>

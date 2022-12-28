@@ -1,11 +1,16 @@
-import { DinaForm } from "common-ui";
+import { DinaForm, useStringArrayConverter } from "common-ui";
 import { ViewPageLayout } from "../../../components";
-import { SequencingFacility } from "../../../types/seqdb-api/resources/SequencingFacility";
+import {
+  SequencingFacilityContactVO,
+  SequencingFacilityVO
+} from "../../../types/seqdb-api/resources/SequencingFacility";
 import { SequencingFacilityFormFields } from "./edit";
 
 export default function SequencingFacilityDetailsPage() {
+  const [convertArrayToString, convertStringToArray] =
+    useStringArrayConverter();
   return (
-    <ViewPageLayout<SequencingFacility>
+    <ViewPageLayout<SequencingFacilityVO>
       form={(props) => (
         <DinaForm {...props}>
           <SequencingFacilityFormFields />
@@ -15,6 +20,21 @@ export default function SequencingFacilityDetailsPage() {
       entityLink="/seqdb/sequencing-facility"
       type="sequencing-facility"
       apiBaseUrl="/seqdb-api"
+      alterInitialValues={(resources) => {
+        const contactArrayVO = (resources.contacts || []).map(
+          (contact) =>
+            ({
+              ...contact,
+              roles: convertArrayToString((contact.roles || []) as string[])
+            } as SequencingFacilityContactVO)
+        );
+
+        const facilityVO: SequencingFacilityVO = {
+          ...resources,
+          contacts: contactArrayVO
+        };
+        return facilityVO;
+      }}
     />
   );
 }

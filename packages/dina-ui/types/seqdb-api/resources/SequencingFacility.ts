@@ -24,4 +24,21 @@ export interface SequencingFacilityAttributes {
   shippingAddress?: SequencingFacilityAddress;
 }
 
+export interface SequencingFacilityContactVO {
+  name?: string;
+  roles?: string;
+  info?: string;
+}
+export interface SequencingFacilityAttributesVO {
+  type: "sequencing-facility";
+  group?: string;
+  createdBy?: string;
+  createdOn?: string;
+  contacts?: SequencingFacilityContactVO[];
+  shippingAddress?: SequencingFacilityAddress;
+}
+
 export type SequencingFacility = KitsuResource & SequencingFacilityAttributes;
+
+export type SequencingFacilityVO = KitsuResource &
+  SequencingFacilityAttributesVO;

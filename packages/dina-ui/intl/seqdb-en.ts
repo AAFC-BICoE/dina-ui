@@ -114,5 +114,12 @@ export const SEQDB_MESSAGES_ENGLISH = {
   editSequencingFacilityTitle: "Edit Sequencing Facility",
   sequencingFacilityContacts: "Contacts",
   field_role: "Role",
-  field_contactInfo: "Contact Info"
+  field_contactInfo: "Contact Info",
+  sequencingFacilityShippingAddress: "Shipping Address",
+  field_addressLine1: "Address Line 1",
+  field_addressLine2: "Address Line 2",
+  field_city: "City",
+  field_province: "Province/State",
+  field_zipCode: "Zip Code",
+  field_country: "Country"
 };

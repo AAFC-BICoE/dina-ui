@@ -5,27 +5,38 @@ import {
   DinaFormOnSubmit,
   SubmitButton,
   TextField,
+  useAccount,
   useQuery,
+  useStringArrayConverter,
   withResponse
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { SequencingFacilityContacts } from "packages/dina-ui/components/seqdb";
+import { SequencingFacilityContacts } from "../../../../dina-ui/components/seqdb";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
+  SequencingFacilityVO,
   SequencingFacility,
-  SequencingFacilityContact
+  SequencingFacilityContactVO
 } from "../../../types/seqdb-api/";
+import { Card } from "react-bootstrap";
+import { useState } from "react";
 
 interface SequencingFacilityFormProps {
-  sequencingFacility?: SequencingFacility;
+  sequencingFacility?: SequencingFacilityVO;
   router: NextRouter;
+  converter:
+    | ((arrayValue: string[]) => string)
+    | ((stringValue: any) => string[]);
 }
 
 export function SequencingFacilityEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const { formatMessage } = useSeqdbIntl();
+  const [convertArrayToString, convertStringToArray] =
+    useStringArrayConverter();
+
   const title = id
     ? "editSequencingFacilityTitle"
     : "addSequencingFacilityTitle";
@@ -49,19 +60,37 @@ export function SequencingFacilityEditPage({ router }: WithRouterProps) {
             <h1 id="wb-cont">
               <SeqdbMessage id="editSequencingFacilityTitle" />
             </h1>
-            {withResponse(query, ({ data }) => (
-              <SequencingFacilityForm
-                sequencingFacility={data}
-                router={router}
-              />
-            ))}
+            {withResponse(query, ({ data }) => {
+              const contactArrayVO = (data.contacts || []).map(
+                (contact) =>
+                  ({
+                    ...contact,
+                    roles: convertArrayToString(contact.roles || [])
+                  } as SequencingFacilityContactVO)
+              );
+
+              const facilityVO: SequencingFacilityVO = {
+                ...data,
+                contacts: contactArrayVO
+              };
+              return (
+                <SequencingFacilityForm
+                  sequencingFacility={facilityVO}
+                  router={router}
+                  converter={convertStringToArray}
+                />
+              );
+            })}
           </div>
         ) : (
           <div>
             <h1 id="wb-cont">
               <SeqdbMessage id="addSequencingFacilityTitle" />
             </h1>
-            <SequencingFacilityForm router={router} />
+            <SequencingFacilityForm
+              router={router}
+              converter={convertStringToArray}
+            />
           </div>
         )}
       </main>
@@ -71,19 +100,31 @@ export function SequencingFacilityEditPage({ router }: WithRouterProps) {
 
 function SequencingFacilityForm({
   sequencingFacility,
-  router
+  router,
+  converter
 }: SequencingFacilityFormProps) {
   const { id } = router.query;
-  const initialValues = sequencingFacility || {};
+  const { username } = useAccount();
+  const initialValues =
+    sequencingFacility ||
+    ({
+      contacts: [{}],
+      shippingAddress: {},
+      createdBy: username
+    } as SequencingFacilityVO);
 
   const onSubmit: DinaFormOnSubmit = async ({
     api: { save },
     submittedValues
   }) => {
+    const contacts = (submittedValues.contacts || []).map((contact) => ({
+      ...contact,
+      roles: converter(contact.roles)
+    }));
     const response = await save(
       [
         {
-          resource: submittedValues,
+          resource: { ...submittedValues, contacts },
           type: "sequencing-facility"
         }
       ],
@@ -112,11 +153,6 @@ function SequencingFacilityForm({
   );
 }
 
-const mockData: SequencingFacilityContact[] = [
-  { name: "abc", roles: ["admin", "tester"], info: "abc info" },
-  { name: "def", roles: ["admin", "tester"], info: "def info" }
-];
-
 export function SequencingFacilityFormFields() {
   return (
     <div>
@@ -130,7 +166,35 @@ export function SequencingFacilityFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      <SequencingFacilityContacts contacts={mockData} />
+      <SequencingFacilityContacts />
+      <Card>
+        <Card.Header>
+          <SeqdbMessage id="sequencingFacilityShippingAddress" />
+        </Card.Header>
+        <Card.Body>
+          <div className="row">
+            <TextField
+              className="col-md-6"
+              name="shippingAddress.addressLine1"
+            />
+            <TextField
+              className="col-md-6"
+              name="shippingAddress.addressLine2"
+            />
+          </div>
+          <div className="row">
+            <TextField className="col-md-6" name="shippingAddress.city" />
+            <TextField
+              className="col-md-6"
+              name="shippingAddress.provinceState"
+            />
+          </div>
+          <div className="row">
+            <TextField className="col-md-6" name="shippingAddress.zipCode" />
+            <TextField className="col-md-6" name="shippingAddress.country" />
+          </div>
+        </Card.Body>
+      </Card>
     </div>
   );
 }

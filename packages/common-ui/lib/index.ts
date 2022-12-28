@@ -93,4 +93,4 @@ export * from "./search/useSearch";
 export * from "./search/useAutocompleteSearchButFallbackToRsqlApiSearch";
 export * from "./util/useIsMounted";
 export * from "./table/EditableTable";
-export * from "./table/useEditableCell";
+export * from "./util/useStringArrayConverter";
