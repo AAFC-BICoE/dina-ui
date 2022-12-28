@@ -1,4 +1,12 @@
-import { TextField } from "common-ui";
+import {
+  filterBy,
+  ResourceSelect,
+  ResourceSelectField,
+  SelectField,
+  SelectOption,
+  TextField
+} from "common-ui";
+import { FilterParam, PersistedResource, KitsuResource } from "kitsu";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
 export function getFieldName(
@@ -16,6 +24,9 @@ export interface DataRowProps {
   showPlusIcon?: boolean;
   addRow?: () => void;
   removeRow?: (index) => void;
+  /** The model type to select resources from. */
+  model: string;
+  unitsOptions?: any[];
 }
 
 export function DataRow({
@@ -24,12 +35,21 @@ export function DataRow({
   removeRow,
   name,
   showPlusIcon,
-  readOnly
+  readOnly,
+  model,
+  unitsOptions
 }: DataRowProps) {
   const textFieldName = getFieldName(name, "step", index);
   return (
     <div className="d-flex">
+      <ResourceSelectField
+        filter={filterBy(["displayName"])}
+        model={model}
+        optionLabel={(person) => person.id}
+        name={""}
+      />
       <TextField name={textFieldName} customName={`Step${index + 1}`} />
+      {unitsOptions && <SelectField options={unitsOptions} name={""} />}
       {!readOnly &&
         (index === 0 && showPlusIcon ? (
           <>
