@@ -3,14 +3,16 @@ import {
   EditableTableColumnDefinition,
   useDinaFormContext
 } from "common-ui";
-import { useFormikContext } from "formik";
-import { compact, split } from "lodash";
 import { Card } from "react-bootstrap";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   SequencingFacilityContactVO,
   SequencingFacilityVO
 } from "../../../types/seqdb-api";
+
+export interface SequencingFacilityProps {
+  formValues: SequencingFacilityVO;
+}
 
 const CONTACT_COLUMNS: EditableTableColumnDefinition<SequencingFacilityContactVO>[] =
   [
@@ -20,10 +22,7 @@ const CONTACT_COLUMNS: EditableTableColumnDefinition<SequencingFacilityContactVO
     },
     {
       accessor: "roles",
-      Header: () => <SeqdbMessage id="field_role" />,
-      formatter: (roles) => (roles || []).join(", "),
-      parser: (value) =>
-        compact(split(value || "", ",").map((item) => item.trim()))
+      Header: () => <SeqdbMessage id="field_role" />
     },
     {
       accessor: "info",
@@ -31,8 +30,10 @@ const CONTACT_COLUMNS: EditableTableColumnDefinition<SequencingFacilityContactVO
     }
   ];
 
-export const SequencingFacilityContacts = () => {
-  const { readOnly, initialValues } = useDinaFormContext();
+export const SequencingFacilityContacts = ({
+  formValues
+}: SequencingFacilityProps) => {
+  const { readOnly } = useDinaFormContext();
   return (
     <Card>
       <Card.Header>
@@ -42,7 +43,7 @@ export const SequencingFacilityContacts = () => {
         <EditableTable<SequencingFacilityContactVO>
           fieldName="contacts"
           columns={CONTACT_COLUMNS}
-          data={initialValues.contacts || []}
+          data={formValues.contacts || []}
           readOnly={readOnly}
         />
       </Card.Body>

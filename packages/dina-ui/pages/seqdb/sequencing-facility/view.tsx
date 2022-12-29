@@ -13,7 +13,7 @@ export default function SequencingFacilityDetailsPage() {
     <ViewPageLayout<SequencingFacilityVO>
       form={(props) => (
         <DinaForm {...props}>
-          <SequencingFacilityFormFields />
+          {({ values }) => <SequencingFacilityFormFields formValues={values} />}
         </DinaForm>
       )}
       query={(id) => ({ path: `seqdb-api/sequencing-facility/${id}` })}

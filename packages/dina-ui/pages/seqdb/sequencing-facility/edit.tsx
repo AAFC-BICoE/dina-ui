@@ -12,7 +12,10 @@ import {
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
-import { SequencingFacilityContacts } from "../../../../dina-ui/components/seqdb";
+import {
+  SequencingFacilityContacts,
+  SequencingFacilityProps
+} from "../../../../dina-ui/components/seqdb";
 import { GroupSelectField, Head, Nav } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
@@ -147,13 +150,19 @@ function SequencingFacilityForm({
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
-      {buttonBar}
-      <SequencingFacilityFormFields />
+      {({ values }) => (
+        <>
+          {buttonBar}
+          <SequencingFacilityFormFields formValues={values} />
+        </>
+      )}
     </DinaForm>
   );
 }
 
-export function SequencingFacilityFormFields() {
+export function SequencingFacilityFormFields({
+  formValues
+}: SequencingFacilityProps) {
   return (
     <div>
       <div className="row">
@@ -166,7 +175,7 @@ export function SequencingFacilityFormFields() {
       <div className="row">
         <TextField className="col-md-6" name="name" />
       </div>
-      <SequencingFacilityContacts />
+      <SequencingFacilityContacts formValues={formValues} />
       <Card>
         <Card.Header>
           <SeqdbMessage id="sequencingFacilityShippingAddress" />
