@@ -20,13 +20,9 @@ export interface EditableTableColumn<D = any>
    */
   accessor?: Accessor<D> | undefined;
 }
-export interface FormatterParserProps {
-  formatter?: (value: any) => string;
-  parser?: (value: string) => any;
-}
 
 export type EditableTableColumnDefinition<TData> = Partial<
-  EditableTableColumn<TData> & InternationalizationProps & FormatterParserProps
+  EditableTableColumn<TData> & InternationalizationProps
 >;
 
 export interface EditableTableProps<TData> {
