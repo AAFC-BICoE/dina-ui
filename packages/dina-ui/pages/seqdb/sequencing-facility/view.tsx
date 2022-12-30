@@ -11,6 +11,7 @@ export default function SequencingFacilityDetailsPage() {
     useStringArrayConverter();
   return (
     <ViewPageLayout<SequencingFacilityVO>
+      mainClass="container-fluid"
       form={(props) => (
         <DinaForm {...props}>
           {({ values }) => <SequencingFacilityFormFields formValues={values} />}
