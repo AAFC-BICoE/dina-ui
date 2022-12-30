@@ -8,7 +8,8 @@ import {
   useAccount,
   useQuery,
   useStringArrayConverter,
-  withResponse
+  withResponse,
+  FieldSet
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -165,45 +166,36 @@ export function SequencingFacilityFormFields({
 }: SequencingFacilityProps) {
   return (
     <div>
-      <div className="row">
-        <GroupSelectField
-          className="col-md-6"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
-      <div className="row">
-        <TextField className="col-md-6" name="name" />
-      </div>
+      <FieldSet legend={<></>}>
+        <div className="row">
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+          <TextField className="col-md-6" name="name" />
+        </div>
+      </FieldSet>
       <SequencingFacilityContacts formValues={formValues} />
-      <Card>
-        <Card.Header>
-          <SeqdbMessage id="sequencingFacilityShippingAddress" />
-        </Card.Header>
-        <Card.Body>
-          <div className="row">
-            <TextField
-              className="col-md-6"
-              name="shippingAddress.addressLine1"
-            />
-            <TextField
-              className="col-md-6"
-              name="shippingAddress.addressLine2"
-            />
-          </div>
-          <div className="row">
-            <TextField className="col-md-6" name="shippingAddress.city" />
-            <TextField
-              className="col-md-6"
-              name="shippingAddress.provinceState"
-            />
-          </div>
-          <div className="row">
-            <TextField className="col-md-6" name="shippingAddress.zipCode" />
-            <TextField className="col-md-6" name="shippingAddress.country" />
-          </div>
-        </Card.Body>
-      </Card>
+      <FieldSet
+        legend={<SeqdbMessage id="sequencingFacilityShippingAddress" />}
+      >
+        <div className="row">
+          <TextField className="col-md-6" name="shippingAddress.addressLine1" />
+          <TextField className="col-md-6" name="shippingAddress.addressLine2" />
+        </div>
+        <div className="row">
+          <TextField className="col-md-6" name="shippingAddress.city" />
+          <TextField
+            className="col-md-6"
+            name="shippingAddress.provinceState"
+          />
+        </div>
+        <div className="row">
+          <TextField className="col-md-6" name="shippingAddress.zipCode" />
+          <TextField className="col-md-6" name="shippingAddress.country" />
+        </div>
+      </FieldSet>
     </div>
   );
 }

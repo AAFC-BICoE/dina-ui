@@ -1,9 +1,9 @@
 import {
   EditableTable,
   EditableTableColumnDefinition,
-  useDinaFormContext
+  useDinaFormContext,
+  FieldSet
 } from "common-ui";
-import { Card } from "react-bootstrap";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
 import {
   SequencingFacilityContactVO,
@@ -35,18 +35,13 @@ export const SequencingFacilityContacts = ({
 }: SequencingFacilityProps) => {
   const { readOnly } = useDinaFormContext();
   return (
-    <Card>
-      <Card.Header>
-        <SeqdbMessage id="sequencingFacilityContacts" />
-      </Card.Header>
-      <Card.Body>
-        <EditableTable<SequencingFacilityContactVO>
-          fieldName="contacts"
-          columns={CONTACT_COLUMNS}
-          data={formValues.contacts || []}
-          readOnly={readOnly}
-        />
-      </Card.Body>
-    </Card>
+    <FieldSet legend={<SeqdbMessage id="sequencingFacilityContacts" />}>
+      <EditableTable<SequencingFacilityContactVO>
+        fieldName="contacts"
+        columns={CONTACT_COLUMNS}
+        data={formValues.contacts || []}
+        readOnly={readOnly}
+      />
+    </FieldSet>
   );
 };

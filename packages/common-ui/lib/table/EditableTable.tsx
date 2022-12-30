@@ -54,6 +54,10 @@ export function EditableTable<TData>({
     </th>
   ));
 
+  if (readOnly === false) {
+    mappedColumnHeaders.push(<th />);
+  }
+
   const mappedRows = readOnly ? (
     data ? (
       data.map((rec, rowIndex) => (
