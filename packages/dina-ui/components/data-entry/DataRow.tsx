@@ -46,10 +46,17 @@ export function DataRow({
         filter={filterBy(["displayName"])}
         model={model}
         optionLabel={(person) => person.id}
-        name={""}
+        name={textFieldName}
+        customName={""}
       />
-      <TextField name={textFieldName} customName={`Step${index + 1}`} />
-      {unitsOptions && <SelectField options={unitsOptions} name={""} />}
+      <TextField name={textFieldName} customName={""} />
+      {unitsOptions && (
+        <SelectField
+          options={unitsOptions}
+          name={textFieldName}
+          customName={""}
+        />
+      )}
       {!readOnly &&
         (index === 0 && showPlusIcon ? (
           <>
@@ -58,7 +65,7 @@ export function DataRow({
                 className="ms-1"
                 onClick={addRow as any}
                 size="2em"
-                style={{ cursor: "pointer", marginTop: "2rem" }}
+                style={{ cursor: "pointer", marginTop: "0.55rem" }}
                 name={getFieldName(name, "addRow", index)}
               />
             }
@@ -68,7 +75,7 @@ export function DataRow({
             className="ms-1"
             onClick={() => removeRow?.(index)}
             size="2em"
-            style={{ cursor: "pointer", marginTop: "2rem" }}
+            style={{ cursor: "pointer", marginTop: "0.55rem" }}
             name={getFieldName(name, "removeRow", index)}
           />
         ))}

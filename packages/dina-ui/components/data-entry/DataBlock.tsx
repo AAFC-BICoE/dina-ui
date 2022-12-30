@@ -7,6 +7,7 @@ import {
   SelectOption
 } from "packages/common-ui/lib";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import Button from "react-bootstrap/Button";
 
 export interface DataBlockProps {
   index?: number;
@@ -27,15 +28,6 @@ export function DataBlock({
 
   return (
     <div>
-      <div className="d-flex align-items-center">
-        {options && <SelectField options={options} name={"select"} />}
-        {vocabularyOptionsPath && (
-          <VocabularySelectField path={vocabularyOptionsPath} name={"select"} />
-        )}
-        <DinaMessage id="dataType" />
-        <DinaMessage id="dataValue" />
-        {unitsOptions && <DinaMessage id="unit" />}
-      </div>
       <FieldArray name="steps">
         {(fieldArrayProps) => {
           const steps: [] = fieldArrayProps.form.values.steps;
@@ -58,30 +50,58 @@ export function DataBlock({
           }
 
           const showPlusIcon = steps.length < 5;
-          const column1 = (
-            <div className="card card-body col-md-4">
-              {steps.slice(0, 5).map((_, index) => {
-                return (
-                  <DataRow
-                    readOnly={false}
-                    showPlusIcon={showPlusIcon}
-                    name={fieldArrayProps.name}
-                    key={index}
-                    index={index}
-                    addRow={addRow}
-                    removeRow={removeRow}
-                    model={model}
-                  />
-                );
-              })}
+
+          return (
+            <div>
+              {steps?.length > 0 ? (
+                <div className="border" style={{ padding: 15 }}>
+                  <div className="d-inline-flex align-items-center">
+                    {options && (
+                      <SelectField
+                        options={options}
+                        name={"select"}
+                        customName={""}
+                      />
+                    )}
+                    {vocabularyOptionsPath && (
+                      <VocabularySelectField
+                        path={vocabularyOptionsPath}
+                        name={"select"}
+                        customName={""}
+                      />
+                    )}
+                    <div>
+                      <DinaMessage id="dataType" />
+                    </div>
+                    <div>
+                      <DinaMessage id="dataValue" />
+                    </div>
+
+                    {unitsOptions && (
+                      <div>
+                        <DinaMessage id="unit" />
+                      </div>
+                    )}
+                  </div>
+                  {steps.slice(0, 5).map((_, index) => {
+                    return (
+                      <DataRow
+                        readOnly={false}
+                        showPlusIcon={showPlusIcon}
+                        name={fieldArrayProps.name}
+                        key={index}
+                        index={index}
+                        addRow={addRow}
+                        removeRow={removeRow}
+                        model={model}
+                      />
+                    );
+                  })}
+                  <Button>Delete</Button>
+                </div>
+              ) : null}
             </div>
           );
-
-          return steps?.length > 0 ? (
-            <div className="card-group row" style={{ padding: 15 }}>
-              {column1}
-            </div>
-          ) : null;
         }}
       </FieldArray>
     </div>

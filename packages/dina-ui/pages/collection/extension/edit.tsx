@@ -44,9 +44,7 @@ export default function FieldEditPage() {
       return (
         <div className="d-flex align-items-center justify-content-between">
           {legend}
-          <Button onClick={() => setCategories(categories.push(DataBlock))}>
-            Add
-          </Button>
+          <Button>Add</Button>
         </div>
       );
     };
