@@ -132,7 +132,7 @@ describe("StorageUnitChildrenViewer component", () => {
 
     expect(
       wrapper.find(".storage-unit-name").map((node) => node.text())
-    ).toEqual(["Box B", "Box C", "Box D"]);
+    ).toEqual(["B (Box)", "C (Box)", "D (Box)"]);
   });
 
   it("Lets you move all stored samples and storages to another storage unit.", async () => {
