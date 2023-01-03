@@ -31,7 +31,7 @@ export function StorageUnitBreadCrumb({
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
             <a>
-              {node.typeName} {node.name}
+              {node.name} ({node.typeName})
             </a>
           </Link>
         </li>
