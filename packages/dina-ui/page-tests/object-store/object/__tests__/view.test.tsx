@@ -71,7 +71,10 @@ describe("Single Stored Object details page", () => {
   });
 
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <MetadataViewPage reloadLastSearch={false} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
