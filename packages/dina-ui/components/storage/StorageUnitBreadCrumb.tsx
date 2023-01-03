@@ -27,7 +27,7 @@ export function StorageUnitBreadCrumb({
       className="breadcrumb mb-0"
       style={{ "--bs-breadcrumb-divider": "'>'" } as any}
     >
-      {parentPath.map(node => (
+      {parentPath.map((node) => (
         <li className="breadcrumb-item" key={node.uuid}>
           <Link href={`/collection/storage-unit/view?id=${node.uuid}`}>
             <a>
@@ -54,5 +54,5 @@ export function StorageUnitBreadCrumb({
 }
 
 export function storageUnitDisplayName({ name, storageUnitType }: StorageUnit) {
-  return [storageUnitType?.name, name].filter(it => it).join(" ");
+  return name + " (" + storageUnitType?.name + ")";
 }
