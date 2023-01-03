@@ -19,3 +19,4 @@ export * from "./resources/workflow/NgsIndex";
 export * from "./resources/workflow/PreLibraryPrep";
 export * from "./resources/workflow/StepResource";
 export * from "./resources/workflow/StepTemplate";
+export * from "./resources/SeqReaction";

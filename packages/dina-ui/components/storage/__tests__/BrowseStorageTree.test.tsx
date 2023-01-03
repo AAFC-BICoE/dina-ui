@@ -4,20 +4,12 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { BrowseStorageTree } from "../BrowseStorageTree";
 
-const STORAGE_UNIT_TYPE_NAME = "Type";
-
 /** Top-level storage. */
 const STORAGE_A: PersistedResource<StorageUnit> = {
   id: "A",
   group: "aafc",
   name: "A",
-  type: "storage-unit",
-  storageUnitType: {
-    id: STORAGE_UNIT_TYPE_NAME,
-    type: "storage-unit-type",
-    name: STORAGE_UNIT_TYPE_NAME,
-    group: "group"
-  }
+  type: "storage-unit"
 };
 
 /** Units B and C are inside Unit A. */
@@ -26,12 +18,6 @@ const STORAGE_B: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "B",
   type: "storage-unit",
-  storageUnitType: {
-    id: STORAGE_UNIT_TYPE_NAME,
-    type: "storage-unit-type",
-    name: STORAGE_UNIT_TYPE_NAME,
-    group: "group"
-  },
   parentStorageUnit: {
     id: "A",
     type: "storage-unit"
@@ -42,12 +28,6 @@ const STORAGE_C: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "C",
   type: "storage-unit",
-  storageUnitType: {
-    id: STORAGE_UNIT_TYPE_NAME,
-    type: "storage-unit-type",
-    name: STORAGE_UNIT_TYPE_NAME,
-    group: "group"
-  },
   parentStorageUnit: {
     id: "A",
     type: "storage-unit"
@@ -60,12 +40,6 @@ const STORAGE_D: PersistedResource<StorageUnit> = {
   group: "aafc",
   name: "D",
   type: "storage-unit",
-  storageUnitType: {
-    id: STORAGE_UNIT_TYPE_NAME,
-    type: "storage-unit-type",
-    name: STORAGE_UNIT_TYPE_NAME,
-    group: "group"
-  },
   parentStorageUnit: {
     id: "C",
     type: "storage-unit"
@@ -129,12 +103,12 @@ describe("BrowseStorageTree component", () => {
       wrapper
         .find(".collapser-for-A .collapser-for-B a.storage-unit-name")
         .text()
-    ).toEqual("B (" + STORAGE_UNIT_TYPE_NAME + ")");
+    ).toEqual("B");
     expect(
       wrapper
         .find(".collapser-for-A .collapser-for-C a.storage-unit-name")
         .text()
-    ).toEqual("C (" + STORAGE_UNIT_TYPE_NAME + ")");
+    ).toEqual("C");
 
     // Select a storage:
     wrapper

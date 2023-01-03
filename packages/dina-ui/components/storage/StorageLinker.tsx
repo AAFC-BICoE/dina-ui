@@ -29,6 +29,7 @@ export interface StorageLinkerProps {
   placeholder?: string;
   actionMode?: StorageActionMode;
   parentIdInURL?: string;
+  createStorageMode?: boolean;
 }
 
 /** Multi-Tab Storage Assignment UI. */
@@ -37,7 +38,8 @@ export function StorageLinker({
   value,
   placeholder,
   actionMode,
-  parentIdInURL
+  parentIdInURL,
+  createStorageMode
 }: StorageLinkerProps) {
   const [activeTab, setActiveTab] = useState(0);
   const { readOnly } = useDinaFormContext();
@@ -90,7 +92,7 @@ export function StorageLinker({
                 <DinaMessage id="browseStorageTree" />
               </Tab>
             )}
-            {!value?.id && actionMode !== "ADD_EXISTING_AS_CHILD" && (
+            {!value?.id && actionMode !== "ADD_EXISTING_AS_CHILD" && createStorageMode === true &&(
               <Tab>
                 <DinaMessage id="createStorage" />
               </Tab>
@@ -146,6 +148,7 @@ export interface StorageLinkerFieldProps {
   customName?: string;
   hideLabel?: boolean;
   parentIdInURL?: string;
+  createStorageMode?: boolean;
 }
 
 /** DinaForm-connected Storage Assignment UI. */
@@ -154,7 +157,8 @@ export function StorageLinkerField({
   customName,
   hideLabel,
   targetType,
-  parentIdInURL
+  parentIdInURL,
+  createStorageMode
 }: StorageLinkerFieldProps) {
   const formId = useField<string | undefined>("id")[0].value;
 
@@ -195,6 +199,7 @@ export function StorageLinkerField({
             onChange={setValue}
             placeholder={placeholder}
             parentIdInURL={parentIdInURL}
+            createStorageMode={createStorageMode}
           />
         </div>
       )}
