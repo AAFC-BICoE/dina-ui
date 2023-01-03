@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MultiSortTooltip Snapshot test 1`] = `"<div><div class=\\"flex-grow-1\\"><span class=\\"m-2\\"><span><span aria-describedby=\\"queryTableMultiSortExplanation\\" tabindex=\\"0\\"><a href=\\"#\\" aria-describedby=\\"queryTableMultiSortExplanation\\">Multi-column sorting</a></span></span></span></div></div>"`;

@@ -7,10 +7,15 @@ const config: Config.InitialOptions = {
     "/.next/",
     "/coverage/",
     "/build/",
+    "/common-ui/types/",
     "/dina-ui/out/",
+    "/dina-ui/intl",
     "/jest.config.ts",
     "/jest.setup.js",
-    "/next.config.js"
+    "/next.config.js",
+    "index.ts",
+    "types.ts",
+    "next-env.d.ts"
   ],
   testEnvironment: "jsdom",
   moduleNameMapper: {
