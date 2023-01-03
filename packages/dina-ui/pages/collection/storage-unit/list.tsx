@@ -15,17 +15,19 @@ const STORAGE_UNIT_TABLE_COLUMNS = [
     Cell: ({ original: storage }) => (
       <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
         {storage.name}
-      </Link> 
+      </Link>
     ),
     accessor: "name"
   },
   {
-    Cell: ({ original: storage}) => (
-      <Link href={`/collection/storage-unit/view?id=${storage.id}`}>
+    Cell: ({ original: storage }) => (
+      <Link
+        href={`/collection/storage-unit-type/view?id=${storage.storageUnitType.id}`}
+      >
         {storage.storageUnitType.name}
       </Link>
     ),
-    accessor: "storage unit type",
+    accessor: "storageUnitType",
     sortable: false
   },
   {
@@ -55,7 +57,7 @@ export default function storageUnitListPage() {
           <CreateButton entityLink="/collection/storage-unit" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}

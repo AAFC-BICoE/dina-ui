@@ -4,6 +4,8 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../types/collection-api";
 import { AssignedStorage } from "../AssignedStorage";
 
+const STORAGE_UNIT_TYPE_NAME = "Type";
+
 const STORAGE_A_SHALLOW: PersistedResource<StorageUnit> = {
   id: "A",
   group: "group",
@@ -17,6 +19,12 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  storageUnitType: {
+    id: STORAGE_UNIT_TYPE_NAME,
+    type: "storage-unit-type",
+    name: STORAGE_UNIT_TYPE_NAME,
+    group: "group"
+  },
   parentStorageUnit: {
     id: "B",
     group: "group",
@@ -31,15 +39,15 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/storage-unit/A":
       return { data: STORAGE_A };
   }
 });
 
-const mockBulkGet = jest.fn(async paths =>
-  paths.map(path => {
+const mockBulkGet = jest.fn(async (paths) =>
+  paths.map((path) => {
     switch (path) {
       case "storage-unit/B?include=hierarchy":
         return {
@@ -84,8 +92,8 @@ describe("AssignedStorage component", () => {
     expect(
       wrapper
         .find(".storage-path li.breadcrumb-item")
-        .map(node => node.text().trim())
-    ).toEqual(["E", "D", "C", "B", "A(undefined)"]);
+        .map((node) => node.text().trim())
+    ).toEqual(["E", "D", "C", "B", "A (" + STORAGE_UNIT_TYPE_NAME + ")"]);
   });
 
   it("Lets you remove the storage unit", async () => {
