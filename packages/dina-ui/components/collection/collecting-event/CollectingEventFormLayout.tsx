@@ -17,7 +17,7 @@ import {
   FieldSpy
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useRef, useState, useEffect } from "react";
 import useSWR from "swr";
 import {
   AttachmentsField,
@@ -104,6 +104,10 @@ export function CollectingEventFormLayout({
   const [hideCustomPlace, setHideCustomPlace] = useState(true);
   const [hideSelectionCheckBox, setHideSelectionCheckBox] = useState(true);
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
+  const [
+    customGeographicPlaceCheckboxState,
+    setCustomGeographicPlaceCheckboxState
+  ] = useState(false);
 
   const { isValidating: detailResultsIsLoading } = useSWR(
     [selectedSearchResult, "nominatimAddressDetailSearch"],
@@ -208,8 +212,7 @@ export function CollectingEventFormLayout({
     const editableSrcAdmnLevels: SourceAdministrativeLevel[] = [];
     let detail: SourceAdministrativeLevel = {};
     detailResults?.address?.map((addr) => {
-      // omitting country and state
-      if (
+      const isTargetType =
         addr.type !== "country" &&
         addr.type !== "state" &&
         addr.type !== "country_code" &&
@@ -217,8 +220,10 @@ export function CollectingEventFormLayout({
         addr.place_type !== "state" &&
         addr.place_type !== "country" &&
         addr.isaddress &&
-        (addr.osm_id || addr.place_id)
-      ) {
+        (addr.osm_id || addr.place_id);
+
+      // omitting country and state
+      if (isTargetType) {
         detail.id = addr.osm_id;
         detail.element = addr.osm_type;
         detail.placeType = addr.place_type ?? addr.class;
@@ -353,6 +358,8 @@ export function CollectingEventFormLayout({
     customPlaceAsInSrcAdmnLevel.name = customPlaceValue;
     customPlaceAsInSrcAdmnLevel.type = "place-section";
     customPlaceAsInSrcAdmnLevel.shortId = 0;
+    customPlaceAsInSrcAdmnLevel.element = undefined;
+    customPlaceAsInSrcAdmnLevel.id = undefined;
 
     const srcAdminLevels = form.values.srcAdminLevels;
 
@@ -364,7 +371,7 @@ export function CollectingEventFormLayout({
 
     // Make the custom place selected by default
     const selectedSections = form.values.selectedSections;
-    selectedSections.unshift(true);
+    selectedSections?.unshift(true);
 
     setHideCustomPlace(true);
   };
@@ -438,6 +445,7 @@ export function CollectingEventFormLayout({
                         </strong>
                       </label>
                       <input
+                        disabled={customGeographicPlaceCheckboxState}
                         aria-label="customPlace"
                         className="p-2 form-control"
                         style={{ width: "60%" }}
@@ -467,6 +475,10 @@ export function CollectingEventFormLayout({
                   <PlaceSectionsSelectionField
                     name="srcAdminLevels"
                     hideSelectionCheckBox={hideSelectionCheckBox}
+                    setCustomGeographicPlaceCheckboxState={
+                      setCustomGeographicPlaceCheckboxState
+                    }
+                    customPlaceValue={customPlaceValue}
                   />
                 ) : null}
                 <DinaFormSection horizontal={[3, 9]}>
