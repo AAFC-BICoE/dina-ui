@@ -18,8 +18,8 @@ const TEST_METADATA: PersistedResource<Metadata> = {
   type: "metadata"
 };
 
-const mockBulkGet = jest.fn(async paths =>
-  paths.map(path => {
+const mockBulkGet = jest.fn(async (paths) =>
+  paths.map((path) => {
     switch (path) {
       case "object-upload/cf99c285-0353-4fed-a15d-ac963e0514f3":
         return {
@@ -48,7 +48,10 @@ describe("Single Stored Object details page", () => {
   });
 
   it("Renders the page.", async () => {
-    const wrapper = mountWithAppContext(<MetadataViewPage />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <MetadataViewPage reloadLastSearch={false} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();
