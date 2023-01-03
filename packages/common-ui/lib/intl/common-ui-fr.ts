@@ -32,6 +32,8 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     createNew: "Créer nouveau",
     created: "Créé",
     date: "Date",
+    dateMustBeFormattedPartial:
+      "Les dates doivent être écrites selon lun des formats suivants : AAAA-MM-JJ, AAAA-MM ou AAAA",
     dateMustBeFormattedYyyyMmDd:
       "La date doit être écrite sous la forme AAAA-MM-JJ",
     deleteAllButtonText: "Tout supprimer",
@@ -130,6 +132,7 @@ export const COMMON_UI_MESSAGES_FR: Partial<typeof COMMON_UI_MESSAGES_ENGLISH> =
     subjectTermsForPage:
       "information gouvernemental, information scientifique, recherche scientifique",
     submitBtnText: "Enregistrer",
+    tableSelectedCount: "Nombre de documents sélectionnés : {totalCount}",
     tableTotalCount: "Nombre d'enregistrements correspondants : {totalCount}",
     targetField: "Champ cible",
     text: "Texte",

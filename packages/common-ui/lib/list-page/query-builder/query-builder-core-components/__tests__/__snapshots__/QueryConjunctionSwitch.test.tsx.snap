@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryConjunctionSwitch component Snapshot Test 1`] = `
+"<QueryConjunctionSwitch currentConjunction=\\"AND\\">
+  <div className=\\"toggleGroup\\">
+    <Button className=\\"toggleButton activeToggle\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
+      <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton activeToggle btn btn-primary\\">
+        <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
+             
+          </FormattedMessage>
+        </FormattedMessage>
+      </button>
+    </Button>
+    <Button className=\\"toggleButton\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
+      <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton btn btn-primary\\">
+        <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
+             
+          </FormattedMessage>
+        </FormattedMessage>
+      </button>
+    </Button>
+  </div>
+</QueryConjunctionSwitch>"
+`;
+
+exports[`QueryConjunctionSwitch component Snapshot Test 2`] = `
+"<QueryConjunctionSwitch currentConjunction=\\"OR\\">
+  <div className=\\"toggleGroup\\">
+    <Button className=\\"toggleButton\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
+      <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton btn btn-primary\\">
+        <FormattedMessage id=\\"queryBuilder_conjunction_and\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_and\\">
+             
+          </FormattedMessage>
+        </FormattedMessage>
+      </button>
+    </Button>
+    <Button className=\\"toggleButton activeToggle\\" onClick={[Function: onClick]} variant=\\"primary\\" active={false} disabled={false}>
+      <button onClick={[Function: onClick]} disabled={false} type=\\"button\\" className=\\"toggleButton activeToggle btn btn-primary\\">
+        <FormattedMessage id=\\"queryBuilder_conjunction_or\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"queryBuilder_conjunction_or\\">
+             
+          </FormattedMessage>
+        </FormattedMessage>
+      </button>
+    </Button>
+  </div>
+</QueryConjunctionSwitch>"
+`;
