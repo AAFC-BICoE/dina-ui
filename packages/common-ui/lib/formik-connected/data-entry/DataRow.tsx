@@ -1,12 +1,9 @@
 import {
   filterBy,
-  ResourceSelect,
   ResourceSelectField,
   SelectField,
-  SelectOption,
   TextField
 } from "common-ui";
-import { FilterParam, PersistedResource, KitsuResource } from "kitsu";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
 export function getFieldName(
@@ -19,7 +16,7 @@ export function getFieldName(
 
 export interface DataRowProps {
   name: string;
-  index: number;
+  rowIndex: number;
   readOnly: boolean;
   showPlusIcon?: boolean;
   addRow?: () => void;
@@ -30,7 +27,7 @@ export interface DataRowProps {
 }
 
 export function DataRow({
-  index,
+  rowIndex,
   addRow,
   removeRow,
   name,
@@ -39,26 +36,35 @@ export function DataRow({
   model,
   unitsOptions
 }: DataRowProps) {
-  const textFieldName = getFieldName(name, "step", index);
+  const valueTextFieldName = getFieldName(name, "value", rowIndex);
+  const typeSelectFieldName = getFieldName(name, "type", rowIndex);
+  const unitSelectFieldName = getFieldName(name, "unit", rowIndex);
   return (
     <div className="d-flex">
-      <ResourceSelectField
-        filter={filterBy(["displayName"])}
-        model={model}
-        optionLabel={(person) => person.id}
-        name={textFieldName}
-        customName={""}
-      />
-      <TextField name={textFieldName} customName={""} />
-      {unitsOptions && (
-        <SelectField
-          options={unitsOptions}
-          name={textFieldName}
+      <div style={{ width: "15rem", marginLeft: "17rem" }}>
+        <ResourceSelectField
+          filter={filterBy(["displayName"])}
+          model={model}
+          optionLabel={(person) => person.id}
+          name={typeSelectFieldName}
           customName={""}
         />
+      </div>
+      <div style={{ width: "15rem", marginLeft: "3rem" }}>
+        <TextField name={valueTextFieldName} customName={""} />
+      </div>
+
+      {unitsOptions && (
+        <div style={{ width: "15rem", marginLeft: "3rem" }}>
+          <SelectField
+            options={unitsOptions}
+            name={unitSelectFieldName}
+            customName={""}
+          />
+        </div>
       )}
       {!readOnly &&
-        (index === 0 && showPlusIcon ? (
+        (rowIndex === 0 && showPlusIcon ? (
           <>
             {
               <FaPlus
@@ -66,17 +72,17 @@ export function DataRow({
                 onClick={addRow as any}
                 size="2em"
                 style={{ cursor: "pointer", marginTop: "0.55rem" }}
-                name={getFieldName(name, "addRow", index)}
+                name={getFieldName(name, "addRow", rowIndex)}
               />
             }
           </>
         ) : (
           <FaMinus
             className="ms-1"
-            onClick={() => removeRow?.(index)}
+            onClick={() => removeRow?.(rowIndex)}
             size="2em"
             style={{ cursor: "pointer", marginTop: "0.55rem" }}
-            name={getFieldName(name, "removeRow", index)}
+            name={getFieldName(name, "removeRow", rowIndex)}
           />
         ))}
     </div>

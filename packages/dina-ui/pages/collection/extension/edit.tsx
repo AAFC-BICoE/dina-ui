@@ -1,18 +1,7 @@
-import { Nav } from "packages/dina-ui/components";
-import {
-  DinaForm,
-  EditButton,
-  FieldSet,
-  FormikButton
-} from "packages/common-ui/lib";
-import { DataBlock } from "../../../components/data-entry/DataBlock";
-import Button from "react-bootstrap/Button";
-import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { useState } from "react";
+import { DinaForm } from "../../../../common-ui/lib";
+import { DataEntry } from "common-ui/lib/formik-connected/data-entry/DataEntry";
 
 export default function FieldEditPage() {
-  const { formatMessage } = useDinaIntl();
-  const [categories, setCategories] = useState<any>([]);
   const options = [
     { label: "Image", value: "IMAGE" },
     { label: "Moving Image", value: "MOVING_IMAGE" },
@@ -21,32 +10,20 @@ export default function FieldEditPage() {
     { label: "Dataset", value: "DATASET" },
     { label: "Undetermined", value: "UNDETERMINED" }
   ];
+  const unitsOptions = [{ label: "ul/rxn", value: "ul" }];
   return (
-    <div>
-      <FieldSet
-        legend={<DinaMessage id="dataEntryLabel" />}
-        wrapLegend={legendWrapper()}
-      >
-        <DinaForm initialValues={{ steps: [""], select: {} }}>
-          <DataBlock
-            index={categories.length}
-            options={options}
-            // mocked based on <ResourceSelectField<Person>
-            model={"agent-api/person"}
-          />
-        </DinaForm>
-      </FieldSet>
-    </div>
+    <DinaForm
+      initialValues={{ blocks: [{}] }}
+      // onSubmit={async (values) => {
+      //   console.log(values);
+      // }}
+    >
+      <DataEntry
+        options={options}
+        unitsOptions={unitsOptions}
+        model={"agent-api/person"}
+      />
+      <button type="submit">Submit</button>
+    </DinaForm>
   );
-
-  function legendWrapper(): ((legend: JSX.Element) => JSX.Element) | undefined {
-    return (legend) => {
-      return (
-        <div className="d-flex align-items-center justify-content-between">
-          {legend}
-          <Button>Add</Button>
-        </div>
-      );
-    };
-  }
 }
