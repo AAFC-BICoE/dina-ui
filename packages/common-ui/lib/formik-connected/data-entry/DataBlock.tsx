@@ -1,26 +1,32 @@
 import { DataRow, VocabularySelectField } from "../../../../dina-ui/components";
 import { FieldArray } from "formik";
-import { FieldWrapperProps, SelectField } from "../../../../common-ui/lib";
+import {
+  FieldWrapperProps,
+  SelectField,
+  TextField
+} from "../../../../common-ui/lib";
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export interface DataBlockProps extends FieldWrapperProps {
-  options?: any[];
+  blockOptions?: any[];
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
-  model: string;
+  model?: string;
   unitsOptions?: any[];
   blockIndex: number;
   removeBlock?: (index) => void;
+  typeOptions: any[];
 }
 
 export function DataBlock({
-  options,
+  blockOptions,
   vocabularyOptionsPath,
   model,
   unitsOptions,
   blockIndex,
   removeBlock,
+  typeOptions,
   ...props
 }: DataBlockProps) {
   return (
@@ -44,10 +50,10 @@ export function DataBlock({
                   style={{ padding: 15, marginBottom: "2rem" }}
                 >
                   <div className="d-inline-flex align-items-center">
-                    {options && (
+                    {blockOptions && (
                       <div style={{ width: "15rem" }}>
                         <SelectField
-                          options={options}
+                          options={blockOptions}
                           name={`${props.name}.select`}
                           removeBottomMargin={true}
                           removeLabel={true}
@@ -57,6 +63,12 @@ export function DataBlock({
                     {vocabularyOptionsPath && (
                       <VocabularySelectField
                         path={vocabularyOptionsPath}
+                        name={`${props.name}.select`}
+                        removeLabel={true}
+                      />
+                    )}
+                    {!blockOptions && !vocabularyOptionsPath && (
+                      <TextField
                         name={`${props.name}.select`}
                         removeLabel={true}
                       />
@@ -86,6 +98,7 @@ export function DataBlock({
                         removeRow={removeRow}
                         model={model}
                         unitsOptions={unitsOptions}
+                        typeOptions={typeOptions}
                       />
                     );
                   })}

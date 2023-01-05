@@ -22,8 +22,9 @@ export interface DataRowProps {
   addRow?: () => void;
   removeRow?: (index) => void;
   /** The model type to select resources from. */
-  model: string;
+  model?: string;
   unitsOptions?: any[];
+  typeOptions: any[];
 }
 
 export function DataRow({
@@ -33,8 +34,8 @@ export function DataRow({
   name,
   showPlusIcon,
   readOnly,
-  model,
-  unitsOptions
+  unitsOptions,
+  typeOptions
 }: DataRowProps) {
   const valueTextFieldName = getFieldName(name, "value", rowIndex);
   const typeSelectFieldName = getFieldName(name, "type", rowIndex);
@@ -42,16 +43,19 @@ export function DataRow({
   return (
     <div className="d-flex">
       <div style={{ width: "15rem", marginLeft: "17rem" }}>
-        <ResourceSelectField
-          filter={filterBy(["displayName"])}
-          model={model}
-          optionLabel={(person) => person.id}
+        <SelectField
+          options={typeOptions}
           name={typeSelectFieldName}
-          customName={""}
+          removeBottomMargin={true}
+          removeLabel={true}
         />
       </div>
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
-        <TextField name={valueTextFieldName} customName={""} />
+        <TextField
+          name={valueTextFieldName}
+          removeBottomMargin={true}
+          removeLabel={true}
+        />
       </div>
 
       {unitsOptions && (
@@ -59,7 +63,8 @@ export function DataRow({
           <SelectField
             options={unitsOptions}
             name={unitSelectFieldName}
-            customName={""}
+            removeBottomMargin={true}
+            removeLabel={true}
           />
         </div>
       )}
@@ -71,7 +76,7 @@ export function DataRow({
                 className="ms-1"
                 onClick={addRow as any}
                 size="2em"
-                style={{ cursor: "pointer", marginTop: "0.55rem" }}
+                style={{ cursor: "pointer", marginTop: "0.20rem" }}
                 name={getFieldName(name, "addRow", rowIndex)}
               />
             }
@@ -81,7 +86,7 @@ export function DataRow({
             className="ms-1"
             onClick={() => removeRow?.(rowIndex)}
             size="2em"
-            style={{ cursor: "pointer", marginTop: "0.55rem" }}
+            style={{ cursor: "pointer", marginTop: "0.20rem" }}
             name={getFieldName(name, "removeRow", rowIndex)}
           />
         ))}

@@ -6,18 +6,20 @@ import { Button } from "react-bootstrap";
 import { useRef } from "react";
 
 export interface DataEntryProps {
-  options?: any[];
+  blockOptions?: any[];
+  typeOptions: any[];
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
-  model: string;
+  model?: string;
   unitsOptions?: any[];
 }
 
 export function DataEntry({
-  options,
+  blockOptions,
   vocabularyOptionsPath,
   model,
-  unitsOptions
+  unitsOptions,
+  typeOptions
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -32,7 +34,9 @@ export function DataEntry({
       return (
         <div className="d-flex align-items-center justify-content-between">
           {legend}
-          <Button onClick={() => addBlock()}>Add</Button>
+          <Button onClick={() => addBlock()} className="add-datablock">
+            Add
+          </Button>
         </div>
       );
     };
@@ -56,7 +60,7 @@ export function DataEntry({
                     {blocks.map((_, index) => {
                       return (
                         <DataBlock
-                          options={options}
+                          blockOptions={blockOptions}
                           // mocked based on <ResourceSelectField<Person>
                           model={model}
                           unitsOptions={unitsOptions}
@@ -65,6 +69,7 @@ export function DataEntry({
                           name={`${fieldArrayProps.name}[${index}]`}
                           key={index}
                           vocabularyOptionsPath={vocabularyOptionsPath}
+                          typeOptions={typeOptions}
                         />
                       );
                     })}
