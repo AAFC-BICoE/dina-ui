@@ -16,15 +16,18 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
-  const query = useQuery<ManagedAttribute>({
-    path: `loan-transaction-api/managed-attribute/${id}`
-  });
+  const query = useQuery<ManagedAttribute>(
+    {
+      path: `loan-transaction-api/managed-attribute/${id}`
+    },
+    { disabled: id === undefined }
+  );
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/managed-attribute/list?tab=transaction",
+    postSaveRedirect: "/managed-attribute/list?step=2",
     apiBaseUrl: "/loan-transaction-api",
-    listHref: "/managed-attribute/list?tab=transaction"
+    listHref: "/managed-attribute/list?step=2"
   };
 
   return (

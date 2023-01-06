@@ -1,3 +1,4 @@
+import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import { Protocol } from "../../collection-api";
 import { Person } from "../../objectstore-api";
@@ -9,6 +10,7 @@ export interface SeqBatchAttributes {
   name: string;
   group?: string;
   reactionDate?: string;
+  storageRestriction?: any;
   createdBy?: string;
   createdOn?: string;
 }
@@ -19,6 +21,8 @@ export interface SeqBatchRelationships {
   region?: Region;
   thermocyclerProfile?: ThermocyclerProfile;
   protocol?: Protocol;
+  storageUnitType?: ResourceIdentifierObject;
+  storageUnit?: ResourceIdentifierObject;
 }
 
 export type SeqBatch = KitsuResource &

@@ -17,6 +17,12 @@ const STORAGE_A: PersistedResource<StorageUnit> = {
   group: "group",
   name: "A",
   type: "storage-unit",
+  storageUnitType: {
+    id: "Box",
+    type: "storage-unit-type",
+    name: "Box",
+    group: "group"
+  },
   parentStorageUnit: {
     id: "B",
     group: "group",
@@ -48,10 +54,10 @@ const mockBulkGet = jest.fn(async paths =>
           name: "B",
           type: "storage-unit",
           hierarchy: [
-            { uuid: "B", name: "B" },
-            { uuid: "C", name: "C" },
-            { uuid: "D", name: "D" },
-            { uuid: "E", name: "E" }
+            { uuid: "B", name: "B", typeName: "Shelf", typeUuid: "SHELF" },
+            { uuid: "C", name: "C", typeName: "Cabinet", typeUuid: "CABINET" },
+            { uuid: "D", name: "D", typeName: "Room", typeUuid: "ROOM" },
+            { uuid: "E", name: "E", typeName: "Building", typeUuid: "BUILDING" }
           ]
         };
     }
@@ -84,8 +90,14 @@ describe("AssignedStorage component", () => {
     expect(
       wrapper
         .find(".storage-path li.breadcrumb-item")
-        .map(node => node.text().trim())
-    ).toEqual(["E", "D", "C", "B", "A"]);
+        .map((node) => node.text().trim())
+    ).toEqual([
+      "E (Building)",
+      "D (Room)",
+      "C (Cabinet)",
+      "B (Shelf)",
+      "A (Box)"
+    ]);
   });
 
   it("Lets you remove the storage unit", async () => {
