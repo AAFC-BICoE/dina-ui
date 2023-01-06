@@ -3,27 +3,35 @@ import {
   ButtonBar,
   DateField,
   DinaForm,
+  DinaFormProps,
   DinaFormSubmitParams,
   filterBy,
+  LoadingSpinner,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
   useDinaFormContext,
   useQuery,
-  withResponse
+  withResponse,
+  withResponseOrDisabled
 } from "common-ui";
-import { useFormikContext } from "formik";
-import { InputResource, PersistedResource } from "kitsu";
-import { pick } from "lodash";
+import { connect, useFormikContext } from "formik";
+import { PersistedResource } from "kitsu";
+import { cloneDeep, pick } from "lodash";
 import { useRouter } from "next/router";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+import {
+  Protocol,
+  StorageUnit,
+  StorageUnitType
+} from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
   GroupSelectField,
   Head,
   Nav,
-  PersonSelectField
+  PersonSelectField,
+  StorageUnitSelectField
 } from "../../../components";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import {
@@ -36,7 +44,8 @@ export function useSeqBatchQuery(id?: string, deps?: any[]) {
   return useQuery<SeqBatch>(
     {
       path: `seqdb-api/seq-batch/${id}`,
-      include: "region,thermocyclerProfile,experimenters,protocol"
+      include:
+        "region,thermocyclerProfile,experimenters,protocol,,storageUnit,storageUnitType"
     },
     { disabled: !id, deps }
   );
@@ -122,6 +131,29 @@ export function SeqBatchForm({
       experimenters: undefined
     };
 
+    // Storage Unit or Storage Unit Type can be set but not both.
+    if (inputResourceWithRelationships.storageUnit?.id) {
+      (inputResourceWithRelationships as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
+    } else if (inputResourceWithRelationships.storageUnitType?.id) {
+      (inputResourceWithRelationships as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+    } else {
+      // Clear both in this case.
+      (inputResourceWithRelationships as any).storageUnit = {
+        id: null,
+        type: "storage-unit"
+      };
+      (inputResourceWithRelationships as any).storageUnitType = {
+        id: null,
+        type: "storage-unit-type"
+      };
+    }
+
     const [savedResource] = await save<SeqBatch>(
       [
         {
@@ -135,21 +167,101 @@ export function SeqBatchForm({
   }
 
   return (
+    <LoadExternalDataForSeqBatchForm
+      dinaFormProps={{
+        onSubmit,
+        initialValues: initialValues as any,
+        readOnly: readOnlyOverride
+      }}
+      buttonBar={buttonBar as any}
+    />
+  );
+}
+
+interface LoadExternalDataForSeqBatchFormProps {
+  dinaFormProps: DinaFormProps<SeqBatch>;
+  buttonBar?: ReactNode;
+}
+
+export function LoadExternalDataForSeqBatchForm({
+  dinaFormProps,
+  buttonBar
+}: LoadExternalDataForSeqBatchFormProps) {
+  // Create a copy of the initial value so we don't change the prop version.
+  const initialValues = cloneDeep(dinaFormProps.initialValues);
+
+  // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
+  const storageUnitQuery = useQuery<StorageUnit>(
+    {
+      path: `collection-api/storage-unit/${initialValues?.storageUnit?.id}`,
+      include: "storageUnitType"
+    },
+    {
+      disabled: !initialValues?.storageUnit?.id
+    }
+  );
+
+  // Add the storage unit type to the initial values.
+  if (storageUnitQuery?.response?.data) {
+    initialValues.storageUnitType = storageUnitQuery?.response?.data
+      ?.storageUnitType?.id
+      ? {
+          id: storageUnitQuery?.response.data.storageUnitType.id,
+          type: "storage-unit-type"
+        }
+      : undefined;
+  }
+
+  // Display loading indicator if not ready.
+  if (storageUnitQuery.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
+  // Wait for response or if disabled, just continue with rendering.
+  return withResponseOrDisabled(storageUnitQuery, () => (
     <DinaForm<Partial<SeqBatch>>
-      onSubmit={onSubmit}
-      readOnly={readOnlyOverride}
+      {...dinaFormProps}
       initialValues={initialValues}
     >
       {buttonBar}
       <SeqBatchFormFields />
     </DinaForm>
-  );
+  ));
 }
 
 /** Re-usable field layout between edit and view pages. */
 export function SeqBatchFormFields() {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
+
+  // When the storage unit type is changed, the storage unit needs to be cleared.
+  const StorageUnitTypeSelectorComponent = connect(
+    ({ formik: { setFieldValue } }) => {
+      return (
+        <ResourceSelectField<StorageUnitType>
+          name="storageUnitType"
+          filter={filterBy(["name"])}
+          model="collection-api/storage-unit-type"
+          optionLabel={(storageUnitType) => `${storageUnitType.name}`}
+          readOnlyLink="/collection/storage-unit-type/view?id="
+          onChange={(storageUnitType) => {
+            setFieldValue("storageUnit.id", null);
+            if (
+              !Array.isArray(storageUnitType) &&
+              storageUnitType?.gridLayoutDefinition != null
+            ) {
+              setFieldValue(
+                "storageRestriction.layout",
+                storageUnitType.gridLayoutDefinition
+              );
+            } else {
+              setFieldValue("storageRestriction", null);
+            }
+          }}
+        />
+      );
+    }
+  );
 
   return (
     <div>
@@ -195,6 +307,32 @@ export function SeqBatchFormFields() {
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
         />
+      </div>
+      <div className="row">
+        <div className="col-md-6">
+          <StorageUnitTypeSelectorComponent />
+        </div>
+        <div className="col-md-6">
+          <StorageUnitSelectField
+            resourceProps={{
+              name: "storageUnit",
+              filter: filterBy(["name"], {
+                extraFilters: values?.storageUnitType?.id
+                  ? [
+                      {
+                        selector: "storageUnitType.uuid",
+                        comparison: "==",
+                        arguments: values?.storageUnitType?.id ?? ""
+                      }
+                    ]
+                  : undefined
+              }),
+              isDisabled: !values?.storageUnitType?.id
+            }}
+            restrictedField={"data.relationships.storageUnitType.data.id"}
+            restrictedFieldValue={values?.storageUnitType?.id}
+          />
+        </div>
       </div>
       {readOnly && (
         <div className="row">
