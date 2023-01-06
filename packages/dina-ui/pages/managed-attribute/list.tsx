@@ -2,8 +2,7 @@ import { ColumnDefinition, descriptionCell, ListPageLayout } from "common-ui";
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Container from "react-bootstrap/Container";
-import Tabs from "react-bootstrap/Tabs";
-import Tab from "react-bootstrap/Tab";
+import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Link from "next/link";
@@ -21,13 +20,9 @@ export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
 
-  // Get default tab from URL query.
-  const defaultTab: string = router.query.tab
-    ? String(router.query.tab)
-    : "collection";
-
-  // Recorded tab key state.
-  const [selectedTabKey, setSelectedTabKey] = useState(defaultTab);
+  const [currentStep, setCurrentStep] = useState<number>(
+    router.query.step ? Number(router.query.step) : 0
+  );
 
   return (
     <div>
@@ -40,31 +35,25 @@ export default function ManagedAttributesListPage() {
           </h1>
 
           <Tabs
-            activeKey={selectedTabKey}
-            onSelect={(key) => (key ? setSelectedTabKey(key) : null)}
-            mountOnEnter={true}
-            unmountOnExit={true}
+            selectedIndex={currentStep}
+            onSelect={setCurrentStep}
             id="managedAttributeListTab"
             className="mb-3"
           >
-            <Tab
-              eventKey="collection"
-              title={formatMessage("collectionListTitle")}
-            >
+            <TabList>
+              <Tab>{formatMessage("collectionListTitle")}</Tab>
+              <Tab>{formatMessage("objectStoreTitle")}</Tab>
+              <Tab>{formatMessage("loanTransactionsSectionTitle")}</Tab>
+            </TabList>
+            <TabPanel>
               <CollectionAttributeListView />
-            </Tab>
-            <Tab
-              eventKey="objectStore"
-              title={formatMessage("objectStoreTitle")}
-            >
+            </TabPanel>
+            <TabPanel>
               <ObjectStoreAttributeListView />
-            </Tab>
-            <Tab
-              eventKey="transaction"
-              title={formatMessage("loanTransactionsSectionTitle")}
-            >
+            </TabPanel>
+            <TabPanel>
               <TransactionAttributeListView />
-            </Tab>
+            </TabPanel>
           </Tabs>
         </Container>
       </main>
@@ -108,7 +97,6 @@ function CollectionAttributeListView() {
       Header: "Name",
       accessor: "name"
     },
-    "createdBy",
     {
       Cell: ({ original }) => {
         const ma: ManagedAttribute<CollectionModuleType> = original;
@@ -144,7 +132,8 @@ function CollectionAttributeListView() {
       ),
       accessor: "acceptedValues"
     },
-    descriptionCell("multilingualDescription")
+    descriptionCell("multilingualDescription"),
+    "createdBy"
   ];
 
   return (
@@ -184,7 +173,6 @@ function ObjectStoreAttributeListView() {
         Header: "Name",
         accessor: "name"
       },
-      "createdBy",
       descriptionCell("multilingualDescription"),
       {
         Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
@@ -207,7 +195,8 @@ function ObjectStoreAttributeListView() {
           <div>{acceptedValues?.map((val) => `"${val}"`)?.join(", ")}</div>
         ),
         accessor: "acceptedValues"
-      }
+      },
+      "createdBy"
     ];
 
   return (
@@ -245,7 +234,6 @@ function TransactionAttributeListView() {
         Header: "Name",
         accessor: "name"
       },
-      "createdBy",
       {
         Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
           const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
@@ -268,7 +256,8 @@ function TransactionAttributeListView() {
         ),
         accessor: "acceptedValues"
       },
-      descriptionCell("multilingualDescription")
+      descriptionCell("multilingualDescription"),
+      "createdBy"
     ];
 
   return (

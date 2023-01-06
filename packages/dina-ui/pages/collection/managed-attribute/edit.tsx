@@ -21,23 +21,26 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
-  const query = useQuery<ManagedAttribute>({
-    path: `collection-api/managed-attribute/${id}`
-  });
+  const query = useQuery<ManagedAttribute>(
+    {
+      path: `collection-api/managed-attribute/${id}`
+    },
+    { disabled: id === undefined }
+  );
 
   const ATTRIBUTE_COMPONENT_OPTIONS: {
     label: string;
     value: CollectionModuleType;
-  }[] = COLLECTION_MODULE_TYPES.map(dataType => ({
+  }[] = COLLECTION_MODULE_TYPES.map((dataType) => ({
     label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
     value: dataType
   }));
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/managed-attribute/list?tab=collection",
+    postSaveRedirect: "/managed-attribute/list?step=0",
     apiBaseUrl: "/collection-api",
-    listHref: "/managed-attribute/list?tab=collection",
+    listHref: "/managed-attribute/list?step=0",
     componentField: (
       <SelectField
         className="col-md-6"
