@@ -35,9 +35,12 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
-  const query = useQuery<ManagedAttribute>({
-    path: `objectstore-api/managed-attribute/${id}`
-  });
+  const query = useQuery<ManagedAttribute>(
+    {
+      path: `objectstore-api/managed-attribute/${id}`
+    },
+    { disabled: id === undefined }
+  );
 
   return (
     <div>
@@ -134,7 +137,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     submittedValues.multilingualDescription = {
       descriptions: toPairs(submittedValues.multilingualDescription)
         .map(([lang, desc]) => ({ lang, desc }))
-        .filter(it => it.desc)
+        .filter((it) => it.desc)
     };
 
     await save(
@@ -147,14 +150,14 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/managed-attribute/list?tab=objectStore`);
+    await router.push(`/managed-attribute/list?step=1`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <Link href="/managed-attribute/list?tab=objectStore">
+        <Link href="/managed-attribute/list?step=1">
           <a className="btn btn-dark">
             <DinaMessage id="cancelButtonText" />
           </a>
@@ -163,7 +166,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           className="ms-5"
           id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/managed-attribute/list?tab=objectStore"
+          postDeleteRedirect="/managed-attribute/list?step=1"
           type="managed-attribute"
         />
       </ButtonBar>
