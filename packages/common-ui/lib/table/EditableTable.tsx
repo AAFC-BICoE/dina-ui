@@ -89,7 +89,7 @@ export function EditableTable<TData>({
                 <td className="text-center">
                   <Button
                     style={{ padding: "0px 10px 3px", marginTop: "12px" }}
-                    variant="outline-secondary"
+                    variant="primary"
                     onClick={() => arrayHelpers.remove(rowIndex)}
                   >
                     -
@@ -123,7 +123,7 @@ export function EditableTable<TData>({
       {readOnly ? undefined : (
         <div className="text-end">
           <Button
-            variant="outline-secondary"
+            variant="primary"
             style={{
               padding: "0px 10px",
               marginRight: "35px",
