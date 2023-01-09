@@ -10,3 +10,4 @@ export * from "./workflow/pre-library-prep/PreLibPrepEditModeSelector";
 export * from "./workflow/pre-library-prep/PreLibraryPrepBulkEdit";
 export * from "./workflow/sample-selection/SampleSelection";
 export * from "./workflow/sample-selection/useSelectionControls";
+export * from "./sequencing-facility/SequencingFacilityContacts";
