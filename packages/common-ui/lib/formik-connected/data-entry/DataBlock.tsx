@@ -104,7 +104,7 @@ export function DataBlock({
                   })}
                   <div className="d-flex align-items-center justify-content-between">
                     <Button onClick={() => removeBlock?.(blockIndex)}>
-                      Delete
+                      <DinaMessage id="deleteButtonText" />
                     </Button>
                   </div>
                 </div>

@@ -12,6 +12,8 @@ export interface DataEntryProps {
   /** The model type to select resources from. */
   model?: string;
   unitsOptions?: any[];
+  /** Name that will be passed down to DataBlock and FieldArray component. */
+  name: string;
 }
 
 export function DataEntry({
@@ -19,7 +21,8 @@ export function DataEntry({
   vocabularyOptionsPath,
   model,
   unitsOptions,
-  typeOptions
+  typeOptions,
+  name
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -35,7 +38,7 @@ export function DataEntry({
         <div className="d-flex align-items-center justify-content-between">
           {legend}
           <Button onClick={() => addBlock()} className="add-datablock">
-            Add
+            <DinaMessage id="addCustomPlaceName" />
           </Button>
         </div>
       );
@@ -48,9 +51,9 @@ export function DataEntry({
         legend={<DinaMessage id="dataEntryLabel" />}
         wrapLegend={legendWrapper()}
       >
-        <FieldArray name="blocks">
+        <FieldArray name={name}>
           {(fieldArrayProps) => {
-            const blocks: [] = fieldArrayProps.form.values.blocks;
+            const blocks: [] = fieldArrayProps.form.values[name];
             arrayHelpersRef.current = fieldArrayProps;
 
             return (
