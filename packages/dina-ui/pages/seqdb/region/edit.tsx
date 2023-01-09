@@ -30,7 +30,7 @@ export function RegionEditPage({ router }: WithRouterProps) {
     <div>
       <Head title={formatMessage(title)} />
       <Nav />
-      <main className="container">
+      <main className="container-fluid">
         {id ? (
           <div>
             <h1 id="wb-cont">
@@ -78,8 +78,8 @@ function RegionForm({ region, router }: RegionFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/region" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <RegionFormFields />
     </DinaForm>
