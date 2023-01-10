@@ -57,9 +57,10 @@ describe("DataEntry", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
+    const name = "blocks";
     const wrapper = mountWithAppContext(
       <DinaForm
-        initialValues={{ blocks: [] }}
+        initialValues={{}}
         onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <DataEntry
@@ -67,6 +68,7 @@ describe("DataEntry", () => {
           unitsOptions={unitsOptions}
           model={"agent-api/person"}
           typeOptions={typeOptions}
+          name={name}
         />
       </DinaForm>,
       { apiContext }
@@ -84,36 +86,36 @@ describe("DataEntry", () => {
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
     let selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === "blocks[0]")
+      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
       .find(SelectField);
 
     // block select option
     selectFields
-      .filterWhere((n: any) => n.props().name === "blocks[0].select")
+      .filterWhere((n: any) => n.props().name === `${name}[0].select`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 1", value: "BLOCK_OPTION_1" });
 
     // type select option
     selectFields
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[0].type")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].type`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 1", value: "TYPE_OPTION_1" });
 
     // unit select option
     selectFields
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[0].unit")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].unit`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 1", value: "UNIT_OPTION_1" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[0].value")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].value`)
       .find("input")
       .simulate("change", {
-        target: { name: "blocks[0].rows[0].value", value: "VALUE_1" }
+        target: { name: `${name}[0].rows[0].value`, value: "VALUE_1" }
       });
 
     // form submission
@@ -139,7 +141,7 @@ describe("DataEntry", () => {
 
     // Add new row to data block
     wrapper
-      .findWhere((datablock) => datablock.props().name === "blocks[0]")
+      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
       .find(FaPlus)
       .simulate("click");
 
@@ -148,29 +150,29 @@ describe("DataEntry", () => {
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
     selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === "blocks[0]")
+      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
       .find(SelectField);
 
     // type select option
     selectFields
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[1].type")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].type`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 2", value: "TYPE_OPTION_2" });
 
     // unit select option
     selectFields
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[1].unit")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].unit`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 2", value: "UNIT_OPTION_2" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === "blocks[0].rows[1].value")
+      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].value`)
       .find("input")
       .simulate("change", {
-        target: { name: "blocks[0].rows[1].value", value: "VALUE_2" }
+        target: { name: `${name}[0].rows[1].value`, value: "VALUE_2" }
       });
 
     // form submission
@@ -205,36 +207,36 @@ describe("DataEntry", () => {
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
     const selectFieldsSecondBlock = wrapper
-      .findWhere((datablock) => datablock.props().name === "blocks[1]")
+      .findWhere((datablock) => datablock.props().name === `${name}[1]`)
       .find(SelectField);
 
     // block select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === "blocks[1].select")
+      .filterWhere((n: any) => n.props().name === `${name}[1].select`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 2", value: "BLOCK_OPTION_2" });
 
     // type select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === "blocks[1].rows[0].type")
+      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].type`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 3", value: "TYPE_OPTION_3" });
 
     // unit select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === "blocks[1].rows[0].unit")
+      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].unit`)
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 3", value: "UNIT_OPTION_3" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === "blocks[1].rows[0].value")
+      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].value`)
       .find("input")
       .simulate("change", {
-        target: { name: "blocks[1].rows[0].value", value: "VALUE_3" }
+        target: { name: `${name}[1].rows[0].value`, value: "VALUE_3" }
       });
 
     // form submission
