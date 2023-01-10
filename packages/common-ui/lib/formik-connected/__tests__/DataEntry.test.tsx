@@ -125,7 +125,7 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      blocks: [
+      [name]: [
         {
           rows: [
             {
@@ -182,7 +182,7 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      blocks: [
+      [name]: [
         {
           rows: [
             {
@@ -246,7 +246,7 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      blocks: [
+      [name]: [
         {
           rows: [
             {

@@ -31,9 +31,10 @@ export function DataBlock({
 }: DataBlockProps) {
   return (
     <div>
-      <FieldArray name={`${props.name}.rows`}>
+      <FieldArray name={`${props.name}[${blockIndex}].rows`}>
         {(fieldArrayProps) => {
-          const rows: [] = fieldArrayProps.form.values.blocks[blockIndex].rows;
+          const rows: [] =
+            fieldArrayProps.form.values[props.name][blockIndex].rows;
           function addRow() {
             fieldArrayProps.push({});
           }
@@ -54,7 +55,7 @@ export function DataBlock({
                       <div style={{ width: "15rem" }}>
                         <SelectField
                           options={blockOptions}
-                          name={`${props.name}.select`}
+                          name={`${props.name}[${blockIndex}].select`}
                           removeBottomMargin={true}
                           removeLabel={true}
                         />
@@ -63,13 +64,13 @@ export function DataBlock({
                     {vocabularyOptionsPath && (
                       <VocabularySelectField
                         path={vocabularyOptionsPath}
-                        name={`${props.name}.select`}
+                        name={`${props.name}[${blockIndex}].select`}
                         removeLabel={true}
                       />
                     )}
                     {!blockOptions && !vocabularyOptionsPath && (
                       <TextField
-                        name={`${props.name}.select`}
+                        name={`${props.name}[${blockIndex}].select`}
                         removeLabel={true}
                       />
                     )}
