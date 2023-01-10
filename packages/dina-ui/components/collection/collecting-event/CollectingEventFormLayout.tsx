@@ -56,6 +56,7 @@ import {
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import Link from "next/link";
+import { find, compact } from "lodash";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -747,9 +748,15 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/coordinateSystem"
                 }),
                 option: (vocabElement) =>
-                  vocabElement?.vocabularyElements?.map(
-                    (it) => it?.labels?.[locale] ?? ""
-                  ) ?? ""
+                  compact(
+                    vocabElement?.vocabularyElements?.map(
+                      (it) =>
+                        find(
+                          it?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title
+                    ) ?? []
+                  )
               }}
               blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}
@@ -843,9 +850,17 @@ export function CollectingEventFormLayout({
                   path: "collection-api/vocabulary/srs"
                 }),
                 option: (vocabElement) =>
-                  vocabElement?.vocabularyElements?.map(
-                    (it) => it?.labels?.[locale] ?? ""
-                  ) ?? ""
+                  compact(
+                    vocabElement?.vocabularyElements?.map(
+                      (it) =>
+                        find(
+                          it?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title ||
+                        it.name ||
+                        ""
+                    ) ?? []
+                  )
               }}
               blankSearchBackend={"json-api"}
               onChangeExternal={onChangeExternal}
