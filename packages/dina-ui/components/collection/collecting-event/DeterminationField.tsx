@@ -25,6 +25,7 @@ import {
   SelectedScientificNameView
 } from "../global-names/GlobalNamesField";
 import { TabbedArrayField } from "../TabbedArrayField";
+import { find, compact } from "lodash";
 
 export interface DeterminationFieldProps {
   className?: string;
@@ -196,14 +197,24 @@ export function DeterminationField({
                         path: "collection-api/vocabulary/typeStatus"
                       }),
                       option: (vocabElement, searchValue) =>
-                        vocabElement?.vocabularyElements
-                          ?.filter((it) => it?.name !== TypeStatusEnum.NONE)
-                          .filter((it) =>
-                            it?.name
-                              ?.toLowerCase?.()
-                              ?.includes(searchValue?.toLowerCase?.())
-                          )
-                          .map((it) => it?.labels?.[locale] ?? "")
+                        compact(
+                          vocabElement?.vocabularyElements
+                            ?.filter((it) => it?.name !== TypeStatusEnum.NONE)
+                            .filter((it) =>
+                              it?.name
+                                ?.toLowerCase?.()
+                                ?.includes(searchValue?.toLowerCase?.())
+                            )
+                            .map(
+                              (it) =>
+                                find(
+                                  it?.multilingualTitle?.titles || [],
+                                  (item) => item.lang === locale
+                                )?.title ||
+                                it.name ||
+                                ""
+                            ) ?? []
+                        )
                     }}
                     blankSearchBackend={"json-api"}
                   />

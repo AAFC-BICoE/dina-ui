@@ -18,6 +18,7 @@ import {
   PreparationType,
   Vocabulary
 } from "../../../types/collection-api";
+import { find, compact } from "lodash";
 
 export interface PreparationFieldProps {
   className?: string;
@@ -157,9 +158,17 @@ export function PreparationField({
                 path: "collection-api/vocabulary/degreeOfEstablishment"
               }),
               option: (vocabElement) =>
-                vocabElement?.vocabularyElements?.map(
-                  (it) => it?.labels?.[locale] ?? ""
-                ) ?? ""
+                compact(
+                  vocabElement?.vocabularyElements?.map(
+                    (it) =>
+                      find(
+                        it?.multilingualTitle?.titles || [],
+                        (item) => item.lang === locale
+                      )?.title ||
+                      it.name ||
+                      ""
+                  ) ?? []
+                )
             }}
             blankSearchBackend={"json-api"}
             tooltipLink="https://dwc.tdwg.org/terms/#dwc:establishmentMeans"

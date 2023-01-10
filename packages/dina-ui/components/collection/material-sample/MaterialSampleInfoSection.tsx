@@ -2,7 +2,6 @@ import {
   AutoSuggestTextField,
   ControlledVocabularySelectField,
   DateField,
-  DinaFormSection,
   FieldSet,
   FieldSpy,
   TextField,
@@ -15,6 +14,7 @@ import {
 } from "../../..//types/collection-api";
 import { Vocabulary } from "../../../types/collection-api";
 import { MaterialSampleStateReadOnlyRender } from "../MaterialSampleStateWarning";
+import { find, compact } from "lodash";
 
 export const MATERIALSAMPLE_FIELDSET_FIELDS: (keyof MaterialSample)[] = [
   "materialSampleRemarks",
@@ -57,9 +57,17 @@ export function MaterialSampleInfoSection({ id }: { id?: string }) {
                   path: "collection-api/vocabulary/materialSampleState"
                 }),
                 option: (vocabElement) =>
-                  vocabElement?.vocabularyElements?.map(
-                    (it) => it?.labels?.[locale] ?? ""
-                  ) ?? ""
+                  compact(
+                    vocabElement?.vocabularyElements?.map(
+                      (it) =>
+                        find(
+                          it?.multilingualTitle?.titles || [],
+                          (item) => item.lang === locale
+                        )?.title ||
+                        it.name ||
+                        ""
+                    ) ?? []
+                  )
               }}
               blankSearchBackend={"json-api"}
               onChangeExternal={onMaterialSampleStateChanged}
