@@ -57,7 +57,7 @@ describe("DataEntry", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
-    const name = "blocks";
+    const name = "protocolData";
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}

@@ -69,7 +69,7 @@ export function DataEntry({
                           unitsOptions={unitsOptions}
                           blockIndex={index}
                           removeBlock={removeBlock}
-                          name={`${fieldArrayProps.name}`}
+                          name={`${fieldArrayProps.name}[${index}]`}
                           key={index}
                           vocabularyOptionsPath={vocabularyOptionsPath}
                           typeOptions={typeOptions}

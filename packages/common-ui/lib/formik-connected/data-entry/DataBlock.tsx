@@ -7,6 +7,7 @@ import {
 } from "../../../../common-ui/lib";
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { get } from "lodash";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
@@ -31,10 +32,12 @@ export function DataBlock({
 }: DataBlockProps) {
   return (
     <div>
-      <FieldArray name={`${props.name}[${blockIndex}].rows`}>
+      <FieldArray name={`${props.name}.rows`}>
         {(fieldArrayProps) => {
-          const rows: [] =
-            fieldArrayProps.form.values[props.name][blockIndex].rows;
+          const rows: [] = get(
+            fieldArrayProps,
+            `form.values.${fieldArrayProps.name}`
+          );
           function addRow() {
             fieldArrayProps.push({});
           }
@@ -55,7 +58,7 @@ export function DataBlock({
                       <div style={{ width: "15rem" }}>
                         <SelectField
                           options={blockOptions}
-                          name={`${props.name}[${blockIndex}].select`}
+                          name={`${props.name}.select`}
                           removeBottomMargin={true}
                           removeLabel={true}
                         />
@@ -64,13 +67,13 @@ export function DataBlock({
                     {vocabularyOptionsPath && (
                       <VocabularySelectField
                         path={vocabularyOptionsPath}
-                        name={`${props.name}[${blockIndex}].select`}
+                        name={`${props.name}.select`}
                         removeLabel={true}
                       />
                     )}
                     {!blockOptions && !vocabularyOptionsPath && (
                       <TextField
-                        name={`${props.name}[${blockIndex}].select`}
+                        name={`${props.name}.select`}
                         removeLabel={true}
                       />
                     )}
