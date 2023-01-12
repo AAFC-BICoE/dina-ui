@@ -811,5 +811,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   yearMonthDayTime: "Year-Month-Day-Time",
   dataType: "Type: ",
   dataValue: "Value: ",
-  unit: "Unit: "
+  unit: "Unit: ",
+  fieldExtension: "Field Extension"
 };

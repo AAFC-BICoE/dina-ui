@@ -24,7 +24,7 @@ export interface DataRowProps {
   /** The model type to select resources from. */
   model?: string;
   unitsOptions?: any[];
-  typeOptions: any[];
+  typeOptions?: any[];
 }
 
 export function DataRow({
@@ -42,14 +42,16 @@ export function DataRow({
   const unitSelectFieldName = getFieldName(name, "unit", rowIndex);
   return (
     <div className="d-flex">
-      <div style={{ width: "15rem", marginLeft: "17rem" }}>
-        <SelectField
-          options={typeOptions}
-          name={typeSelectFieldName}
-          removeBottomMargin={true}
-          removeLabel={true}
-        />
-      </div>
+      {typeOptions && (
+        <div style={{ width: "15rem", marginLeft: "17rem" }}>
+          <SelectField
+            options={typeOptions}
+            name={typeSelectFieldName}
+            removeBottomMargin={true}
+            removeLabel={true}
+          />
+        </div>
+      )}
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
         <TextField
           name={valueTextFieldName}

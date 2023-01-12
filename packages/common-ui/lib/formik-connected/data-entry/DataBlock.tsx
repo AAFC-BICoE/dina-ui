@@ -11,17 +11,19 @@ import { get } from "lodash";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
+  onBlockSelectChange?: (value, formik) => void;
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
   model?: string;
   unitsOptions?: any[];
   blockIndex: number;
   removeBlock?: (index) => void;
-  typeOptions: any[];
+  typeOptions?: any[];
 }
 
 export function DataBlock({
   blockOptions,
+  onBlockSelectChange,
   vocabularyOptionsPath,
   model,
   unitsOptions,
@@ -61,6 +63,7 @@ export function DataBlock({
                           name={`${props.name}.select`}
                           removeBottomMargin={true}
                           removeLabel={true}
+                          onChange={onBlockSelectChange}
                         />
                       </div>
                     )}

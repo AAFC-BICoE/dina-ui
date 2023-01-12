@@ -7,7 +7,8 @@ import { useRef } from "react";
 
 export interface DataEntryProps {
   blockOptions?: any[];
-  typeOptions: any[];
+  onBlockSelectChange?: (value, formik) => void;
+  typeOptions?: any[];
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
   model?: string;
@@ -18,6 +19,7 @@ export interface DataEntryProps {
 
 export function DataEntry({
   blockOptions,
+  onBlockSelectChange,
   vocabularyOptionsPath,
   model,
   unitsOptions,
@@ -64,7 +66,7 @@ export function DataEntry({
                       return (
                         <DataBlock
                           blockOptions={blockOptions}
-                          // mocked based on <ResourceSelectField<Person>
+                          onBlockSelectChange={onBlockSelectChange}
                           model={model}
                           unitsOptions={unitsOptions}
                           blockIndex={index}

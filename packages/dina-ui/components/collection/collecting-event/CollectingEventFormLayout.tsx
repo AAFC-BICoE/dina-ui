@@ -1,3 +1,4 @@
+import useSWR from "swr";
 import {
   AutoSuggestTextField,
   CheckBoxWithoutWrapper,
@@ -14,11 +15,13 @@ import {
   TextField,
   TextFieldWithCoordButtons,
   useDinaFormContext,
-  FieldSpy
+  FieldSpy,
+  DataEntry,
+  useQuery
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { ChangeEvent, useRef, useState, useEffect } from "react";
-import useSWR from "swr";
+
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -57,6 +60,10 @@ import {
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import Link from "next/link";
 import { find, compact } from "lodash";
+import {
+  ExtensionField,
+  FieldExtension
+} from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -76,6 +83,31 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
+  const { response, loading } = useQuery<FieldExtension[]>({
+    path: `collection-api/extension`
+  });
+
+  const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
+  const extensionOptions = response?.data
+    .filter(
+      (data) => data.extension.fields?.[0].dinaComponent === "COLLECTING_EVENT"
+    )
+    .map((data) => ({
+      label: data.extension.name,
+      value: data.id
+    }));
+
+  function onBlockSelectChange(selected, _formik) {
+    const selectedFieldExtension = response?.data.find(
+      (data) => data.id === selected
+    );
+    setExtensionFieldsOptions(
+      selectedFieldExtension?.extension.fields.map((data) => ({
+        label: data.name,
+        value: data.term
+      }))
+    );
+  }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
@@ -959,7 +991,6 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
       </div>
-
       <div className="row">
         <div className="col-md-6">
           {!readOnly ? (
@@ -979,6 +1010,22 @@ export function CollectingEventFormLayout({
             ? geographicPlaceNameSourceComponent
             : null}
         </div>
+      </div>
+      <div>
+        <FieldSet
+          legend={<DinaMessage id="fieldExtension" />}
+          id="fieldExtension"
+          className="non-strip"
+          componentName={COLLECTING_EVENT_COMPONENT_NAME}
+          sectionName="field-extension-section"
+        >
+          <DataEntry
+            name="fieldExtension"
+            blockOptions={extensionOptions}
+            typeOptions={extensionFieldsOptions}
+            onBlockSelectChange={onBlockSelectChange}
+          />
+        </FieldSet>
       </div>
       <>
         {!readOnly
