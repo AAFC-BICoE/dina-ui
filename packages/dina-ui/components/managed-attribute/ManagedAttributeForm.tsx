@@ -17,7 +17,7 @@ import { GroupSelectField } from "..";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
-  ManagedAttributeType,
+  VocabularyElementType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../types/collection-api/resources/ManagedAttribute";
 
@@ -60,12 +60,12 @@ export function ManagedAttributeForm({
     fetchedManagedAttribute
       ? fetchedManagedAttribute?.acceptedValues?.length
         ? "PICKLIST"
-        : fetchedManagedAttribute.managedAttributeType
+        : fetchedManagedAttribute.vocabularyElementType
       : undefined
   );
 
   if (type === "PICKLIST") {
-    initialValues.managedAttributeType = "PICKLIST";
+    initialValues.vocabularyElementType = "PICKLIST";
   }
 
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
@@ -81,11 +81,11 @@ export function ManagedAttributeForm({
       submittedValues.acceptedValues = null;
     }
 
-    if (submittedValues.managedAttributeType === "PICKLIST") {
-      submittedValues.managedAttributeType = "STRING";
+    if (submittedValues.vocabularyElementType === "PICKLIST") {
+      submittedValues.vocabularyElementType = "STRING";
     } else if (
-      submittedValues.managedAttributeType === "INTEGER" ||
-      submittedValues.managedAttributeType === "STRING"
+      submittedValues.vocabularyElementType === "INTEGER" ||
+      submittedValues.vocabularyElementType === "STRING"
     ) {
       submittedValues.acceptedValues = null;
     }
@@ -139,9 +139,11 @@ export function ManagedAttributeForm({
       <div className="row">
         <SelectField
           className="col-md-6"
-          name="managedAttributeType"
+          name="vocabularyElementType"
           options={ATTRIBUTE_TYPE_OPTIONS}
-          onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
+          onChange={(selectValue: VocabularyElementType) =>
+            setType(selectValue)
+          }
         />
       </div>
       {type === "PICKLIST" && (

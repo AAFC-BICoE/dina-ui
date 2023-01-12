@@ -71,19 +71,19 @@ export function ManagedAttributeField({
   const props = {
     removeBottomMargin: true,
     removeLabel: true,
-    name: attributePath,
+    name: attributePath
   };
 
   const isSelectAttr = !!(
-    attribute.managedAttributeType === "STRING" &&
+    attribute.vocabularyElementType === "STRING" &&
     attribute.acceptedValues?.length
   );
 
-  const isIntegerAttr = attribute.managedAttributeType === "INTEGER";
+  const isIntegerAttr = attribute.vocabularyElementType === "INTEGER";
 
-  const isDateAttr = attribute.managedAttributeType === "DATE";
+  const isDateAttr = attribute.vocabularyElementType === "DATE";
 
-  const isBoolAttr = attribute.managedAttributeType === "BOOL";
+  const isBoolAttr = attribute.vocabularyElementType === "BOOL";
 
   return isSelectAttr ? (
     <SelectField
@@ -93,7 +93,7 @@ export function ManagedAttributeField({
           label: `<${formatMessage("none")}>`,
           value: ""
         },
-        ...(attribute.acceptedValues?.map(value => ({
+        ...(attribute.acceptedValues?.map((value) => ({
           label: value,
           value
         })) ?? [])
@@ -104,7 +104,7 @@ export function ManagedAttributeField({
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
-    <StringToggleField {...props}/>
+    <StringToggleField {...props} />
   ) : (
     <TextField {...props} />
   );
