@@ -5,7 +5,7 @@ import { MultilingualDescription } from "../../common";
 export interface ManagedAttributeAttributes<TComponent = string> {
   type: "managed-attribute";
   name: string;
-  managedAttributeType: string;
+  vocabularyElementType: string;
   managedAttributeComponent: TComponent;
   acceptedValues?: string[] | null;
   group?: string;
@@ -14,7 +14,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   multilingualDescription?: MultilingualDescription;
 }
 
-export type ManagedAttributeType =
+export type VocabularyElementType =
   | "INTEGER"
   | "STRING"
   | "PICKLIST"
@@ -40,26 +40,26 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
-  value: ManagedAttributeType;
+  value: VocabularyElementType;
 }[] = [
   {
-    labelKey: "field_managedAttributeType_integer_label",
+    labelKey: "field_vocabularyElementType_integer_label",
     value: "INTEGER"
   },
   {
-    labelKey: "field_managedAttributeType_text_label",
+    labelKey: "field_vocabularyElementType_text_label",
     value: "STRING"
   },
   {
-    labelKey: "field_managedAttributeType_picklist_label",
+    labelKey: "field_vocabularyElementType_picklist_label",
     value: "PICKLIST"
   },
   {
-    labelKey: "field_managedAttributeType_date_label",
+    labelKey: "field_vocabularyElementType_date_label",
     value: "DATE"
   },
   {
-    labelKey: "field_managedAttributeType_boolean_label",
+    labelKey: "field_vocabularyElementType_boolean_label",
     value: "BOOL"
   }
 ];

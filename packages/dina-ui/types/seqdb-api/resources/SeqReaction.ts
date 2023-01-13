@@ -6,6 +6,8 @@ import { SeqBatch } from "./SeqBatch";
 export interface SeqReactionAttributes {
   type: "seq-reaction";
   group?: string;
+  wellColumn?: number;
+  wellRow?: string;
   createdBy?: string;
   createdOn?: string;
 }

@@ -899,7 +899,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "1",
           key: "m1",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 1"
         };
@@ -908,7 +908,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "2",
           key: "m2",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 2"
         };
@@ -917,7 +917,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "3",
           key: "m3",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 3"
         };
