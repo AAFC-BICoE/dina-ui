@@ -8,34 +8,48 @@ import {
 } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
 import Select from "react-select";
 import { useState } from "react";
+import { find } from "lodash";
 
-const TABLE_COLUMNS: ColumnDefinition<ExtensionField>[] = [
-  "term",
-  "name",
-  "definition",
-  "dinaComponent"
-];
+function getTableColumn(locale: string) {
+  const TABLE_COLUMNS: ColumnDefinition<ExtensionField>[] = [
+    "key",
+    "name",
+    {
+      Cell: ({ original: { multilingualDescription } }) => {
+        const desc =
+          find(
+            multilingualDescription?.descriptions || [],
+            (item) => item.lang === locale
+          )?.desc || "";
+        return desc;
+      },
+      accessor: "multilingualDescription"
+    },
+    "dinaComponent"
+  ];
 
-const mappedColumns = TABLE_COLUMNS.map<Column>(column => {
-  const { fieldName, customHeader } =
-    typeof column === "string"
-      ? {
-          customHeader: undefined,
-          fieldName: column
-        }
-      : {
-          customHeader: column.Header,
-          fieldName: String(column.accessor)
-        };
+  return TABLE_COLUMNS.map<Column>((column) => {
+    const { fieldName, customHeader } =
+      typeof column === "string"
+        ? {
+            customHeader: undefined,
+            fieldName: column
+          }
+        : {
+            customHeader: column.Header,
+            fieldName: String(column.accessor)
+          };
 
-  const Header = customHeader ?? <FieldHeader name={fieldName} />;
-  return {
-    Header,
-    ...(typeof column === "string" ? { accessor: column } : { ...column })
-  };
-});
+    const Header = customHeader ?? <FieldHeader name={fieldName} />;
+    return {
+      Header,
+      ...(typeof column === "string" ? { accessor: column } : { ...column })
+    };
+  });
+}
 
 export default function FieldListPage() {
+  const { locale } = useDinaIntl();
   const { formatMessage } = useDinaIntl();
   const [fields, setFields] = useState<ExtensionField[]>();
 
@@ -45,14 +59,14 @@ export default function FieldListPage() {
 
   if (loading) return null;
 
-  const extensionOptions = response?.data.map(data => ({
+  const extensionOptions = response?.data.map((data) => ({
     label: data.extension.name,
     value: data.id
   }));
 
-  const onExtensionSelectionChanged = option => {
+  const onExtensionSelectionChanged = (option) => {
     const selectedExtension = response?.data.filter(
-      data => data.id === option.value
+      (data) => data.id === option.value
     );
     setFields(selectedExtension?.[0].extension.fields);
   };
@@ -84,7 +98,7 @@ export default function FieldListPage() {
           <ReactTable
             key={fields?.length}
             className="-striped"
-            columns={mappedColumns}
+            columns={getTableColumn(locale)}
             data={fields ?? response?.data?.[0].extension.fields}
             minRows={1}
             showPagination={true}
