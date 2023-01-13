@@ -66,13 +66,13 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
               data={assertion}
               customValueCells={{
                 georeferencedBy: ({ value: ids }) =>
-                  ids?.map(id => (
+                  ids?.map((id) => (
                     <div key={id}>
                       <ReferenceLink<Person>
                         baseApiPath="agent-api"
                         type="person"
                         reference={{ id }}
-                        name={person => person.displayName}
+                        name={(person) => person.displayName}
                         href="/person/view?id="
                       />
                     </div>
@@ -85,19 +85,14 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           </div>
         )) ?? null,
       managedAttributes: ({ original: { value } }) => (
-        <ManagedAttributesViewer
-          managedAttributeApiPath={key =>
-            `collection-api/managed-attribute/${key}`
-          }
-          values={value}
-        />
+        <ManagedAttributesViewer values={value} />
       ),
       geographicPlaceNameSourceDetail: ({ original: { value } }) => (
         <KeyValueTable
           data={value}
           customValueCells={{
-            stateProvince: sp => <KeyValueTable data={sp.value} />,
-            country: c => <KeyValueTable data={c.value} />
+            stateProvince: (sp) => <KeyValueTable data={sp.value} />,
+            country: (c) => <KeyValueTable data={c.value} />
           }}
         />
       )

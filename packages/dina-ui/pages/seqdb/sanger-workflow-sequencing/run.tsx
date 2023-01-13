@@ -3,6 +3,7 @@ import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerSeqReactionStep";
+import { SeqBatchSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/sanger-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -132,6 +133,9 @@ export default function SangerWorkFlowSequencingRunPage() {
           <Tab disabled={isDisabled(1, false)}>
             {formatMessage("selectPcrBatch")}
           </Tab>
+          <Tab disabled={isDisabled(2, true)}>
+            {formatMessage("selectCoordinates")}
+          </Tab>
         </TabList>
         <TabPanel>
           <SangerSeqBatchStep
@@ -148,6 +152,18 @@ export default function SangerWorkFlowSequencingRunPage() {
           {seqBatchId && (
             <SangerSeqReactionStep
               seqBatch={seqBatchQueryState.response?.data}
+              editMode={editMode}
+              setEditMode={setEditMode}
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
+          )}
+        </TabPanel>
+        <TabPanel>
+          {seqBatchQueryState.response?.data && seqBatchId && (
+            <SeqBatchSelectCoordinatesStep
+              seqBatchId={seqBatchId}
+              seqBatch={seqBatchQueryState.response.data}
               editMode={editMode}
               setEditMode={setEditMode}
               performSave={performSave}

@@ -4,7 +4,7 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { VocabularySelectField } from "../VocabularySelectField";
 
 const mockOnSubmit = jest.fn();
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/vocabulary/substrate":
       return {
@@ -14,7 +14,14 @@ const mockGet = jest.fn<any, any>(async path => {
           vocabularyElements: [
             {
               name: "substrate_1",
-              labels: { en: "substrate 1" }
+              multilingualTitle: {
+                titles: [
+                  {
+                    lang: "en",
+                    title: "substrate 1"
+                  }
+                ]
+              }
             }
           ]
         }

@@ -808,5 +808,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
-  yearMonthDayTime: "Year-Month-Day-Time"
+  yearMonthDayTime: "Year-Month-Day-Time",
+  dataType: "Type: ",
+  dataValue: "Value: ",
+  unit: "Unit: "
 };

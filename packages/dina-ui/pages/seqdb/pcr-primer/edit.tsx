@@ -92,8 +92,8 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/pcr-primer" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <PcrPrimerFormFields />
     </DinaForm>
@@ -125,7 +125,7 @@ export function PcrPrimerFormFields() {
           filter={filterBy(["name"])}
           label="Target Gene Region"
           model="seqdb-api/region"
-          optionLabel={region => region.name}
+          optionLabel={(region) => region.name}
         />
         <TextField className="col-md-2" name="name" />
         <NumberField className="col-md-2" name="lotNumber" />

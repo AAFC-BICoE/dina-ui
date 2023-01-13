@@ -108,5 +108,18 @@ export const SEQDB_MESSAGES_ENGLISH = {
   workflowStepTab: "Step {number}: {name}",
   workflowViewTitle: "NGS Workflow",
   selectPcrBatch: "Select PCR Batch",
-  selectPcrBatchTitle: "Select PCR Batch"
+  selectPcrBatchTitle: "Select PCR Batch",
+  sequencingFacilityListTitle: "Sequencing Facilities",
+  addSequencingFacilityTitle: "Add Sequencing Facility",
+  editSequencingFacilityTitle: "Edit Sequencing Facility",
+  sequencingFacilityContacts: "Contacts",
+  field_role: "Role",
+  field_contactInfo: "Contact Info",
+  sequencingFacilityShippingAddress: "Shipping Address",
+  "field_shippingAddress.addressLine1": "Address Line 1",
+  "field_shippingAddress.addressLine2": "Address Line 2",
+  "field_shippingAddress.city": "City",
+  "field_shippingAddress.provinceState": "Province/State",
+  "field_shippingAddress.zipCode": "Zip Code",
+  "field_shippingAddress.country": "Country"
 };
