@@ -83,7 +83,7 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
-  const { response, loading } = useQuery<FieldExtension[]>({
+  const { response } = useQuery<FieldExtension[]>({
     path: `collection-api/extension`
   });
 
@@ -101,10 +101,11 @@ export function CollectingEventFormLayout({
     const selectedFieldExtension = response?.data.find(
       (data) => data.id === selected
     );
+
     setExtensionFieldsOptions(
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.term
+        value: data.key
       }))
     );
   }
@@ -1020,7 +1021,7 @@ export function CollectingEventFormLayout({
           sectionName="field-extension-section"
         >
           <DataEntry
-            name="fieldExtension"
+            name="extensionValues"
             blockOptions={extensionOptions}
             typeOptions={extensionFieldsOptions}
             onBlockSelectChange={onBlockSelectChange}
