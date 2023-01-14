@@ -24,7 +24,7 @@ import { MetadataFileView } from "../../../components/object-store/metadata/Meta
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api";
-import { ELASTIC_SEARCH_COLUMN } from "packages/dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
