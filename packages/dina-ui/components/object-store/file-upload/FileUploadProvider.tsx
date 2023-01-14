@@ -1,5 +1,5 @@
 import { ApiClientContext } from "common-ui";
-import { useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { createContext, useContext } from "react";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { IFileWithMeta } from "./FileUploader";
