@@ -6,11 +6,16 @@ import { WorkbookJSON } from "../types/Workbook";
  * content.
  *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
+ * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
  * @return An array of the columns from the spreadsheet. Null if no headers could be found.
  */
-export function getColumnHeaders(spreadsheetData: WorkbookJSON) {
+export function getColumnHeaders(
+  spreadsheetData: WorkbookJSON,
+  sheetNumber: number
+) {
   return (
-    spreadsheetData.find((rowData) => rowData.content.length !== 0)?.content ??
-    null
+    spreadsheetData?.[sheetNumber]?.find(
+      (rowData) => rowData.content.length !== 0
+    )?.content ?? null
   );
 }
