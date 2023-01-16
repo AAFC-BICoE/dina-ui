@@ -807,7 +807,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Drag and drop a spreadsheet here or click to open browse dialog.",
   spreadsheetHeader: "Spreadsheet Header",
   materialSampleFieldsMapping: "Material Sample Field",
-  formTemplates: "Form Templates",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
