@@ -1,13 +1,14 @@
 /**
- * Data returned from the Excel to JSON API from the object store module API.
+ * A specific row on a spreadsheet.
  */
 export interface WorkbookRow {
-  id: number;
   rowNumber: number;
   content: string[];
 }
 
 /**
- * JSON workbook contains an array of rows, defined as a Workbook Row.
+ * A spreadsheet can contain multiple sheets, each sheet has an array of rows.
  */
-export interface WorkbookJSON extends Array<WorkbookRow> {}
+export interface WorkbookJSON {
+  [sheetNumber: number]: WorkbookRow[];
+}

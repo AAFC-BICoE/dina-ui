@@ -805,6 +805,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
+  spreadsheetHeader: "Spreadsheet Header",
+  materialSampleFieldsMapping: "Material Sample Field",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
