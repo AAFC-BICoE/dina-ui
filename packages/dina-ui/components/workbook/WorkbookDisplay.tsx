@@ -1,5 +1,8 @@
 import { WorkbookRow, WorkbookJSON } from "./types/Workbook";
 
+/**
+ * This component is currently not used anywhere yet. It will be implemented in a future ticket.
+ */
 export function WorkbookDisplay({
   jsonData,
   sheetIndex

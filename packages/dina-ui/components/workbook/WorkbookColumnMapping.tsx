@@ -3,8 +3,9 @@ import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { WorkbookJSON } from "./types/Workbook";
 import { getColumnHeaders } from "./utils/workbookMappingUtils";
 import Table from "react-bootstrap/Table";
-import { FieldWrapper, SelectField } from "packages/common-ui/lib";
+import { FieldWrapper, SelectField } from "common-ui/lib";
 import Select from "react-select";
+import { DinaMessage } from "../../intl/dina-ui-intl";
 
 export interface WorkbookColumnMappingProps {
   spreadsheetData: WorkbookJSON;
@@ -24,6 +25,8 @@ export function WorkbookColumnMapping({
   const sheetOptions = useMemo(() => {
     return Object.entries(spreadsheetData).map(([sheetNumberString, _]) => {
       const sheetNumber = +sheetNumberString;
+      // This label is hardcoded for now, it will eventually be replaced with the sheet name in a
+      // future ticket.
       return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
     });
   }, [spreadsheetData]);
@@ -55,8 +58,12 @@ export function WorkbookColumnMapping({
       <Table>
         <thead>
           <tr>
-            <th>Spreadsheet Header</th>
-            <th>Material Sample Field</th>
+            <th>
+              <DinaMessage id="spreadsheetHeader" />
+            </th>
+            <th>
+              <DinaMessage id="materialSampleFieldsMapping" />
+            </th>
           </tr>
         </thead>
         <tbody>
