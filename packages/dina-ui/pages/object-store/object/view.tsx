@@ -24,6 +24,7 @@ import { MetadataFileView } from "../../../components/object-store/metadata/Meta
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api";
+import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -56,28 +57,6 @@ export default function MetadataViewPage({
     const customViewQuery = metadata?.id
       ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
       : undefined;
-
-    // Columns for the elastic search list page.
-    const columns: TableColumn<Metadata>[] = [
-      // Material Sample Name
-      {
-        Cell: ({ original: { id, data } }) => (
-          <Link
-            href={`/collection/material-sample/view?id=${id}`}
-            passHref={true}
-          >
-            <a>
-              {data?.attributes?.materialSampleName ||
-                data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-                id}
-            </a>
-          </Link>
-        ),
-        label: "materialSampleName",
-        accessor: "data.attributes.materialSampleName",
-        isKeyword: true
-      }
-    ];
 
     const buttonBar = (
       <ButtonBar>
@@ -134,7 +113,7 @@ export default function MetadataViewPage({
                       legend={<DinaMessage id="attachedMaterialSamples" />}
                     >
                       <QueryPage
-                        columns={columns}
+                        columns={ELASTIC_SEARCH_COLUMN}
                         indexName={"dina_material_sample_index"}
                         viewMode={customViewQuery ? true : false}
                         customViewQuery={customViewQuery ?? undefined}
