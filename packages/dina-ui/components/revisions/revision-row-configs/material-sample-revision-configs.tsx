@@ -26,12 +26,7 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
     customValueCells: {
       // Show the entire value of the metadata map in a key-value table:
       managedAttributes: ({ original: { value } }) => (
-        <ManagedAttributesViewer
-          managedAttributeApiPath={(key) =>
-            `collection-api/managed-attribute/${key}`
-          }
-          values={value}
-        />
+        <ManagedAttributesViewer values={value} />
       ),
 
       // Try to render object / array fields visually instead of the default JSON:

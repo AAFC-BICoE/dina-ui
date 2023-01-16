@@ -40,7 +40,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
           id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
           name: "test-managed-attribute",
           key: "test_managed_attribute",
-          managedAttributeType: "STRING"
+          vocabularyElementType: "STRING"
         };
     }
   })
@@ -86,7 +86,7 @@ const TEST_MANAGED_ATTRIBUTE: PersistedResource<ManagedAttribute> = {
   id: "a360a695-bbff-4d58-9a07-b6d6c134b208",
   name: "test-managed-attribute",
   key: "test-managed-attribute",
-  managedAttributeType: "STRING"
+  vocabularyElementType: "STRING"
 };
 
 const mockSave = jest.fn();
@@ -117,7 +117,10 @@ describe("Metadata single record edit page.", () => {
   });
 
   it("Lets you edit the Metadata.", async () => {
-    const wrapper = mountWithAppContext(<MetadataEditPage />, { apiContext });
+    const wrapper = mountWithAppContext(
+      <MetadataEditPage reloadLastSearch={false} />,
+      { apiContext }
+    );
 
     await new Promise(setImmediate);
     wrapper.update();

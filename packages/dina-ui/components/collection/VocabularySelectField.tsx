@@ -4,6 +4,7 @@ import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import { Vocabulary, VocabularyElement } from "../../types/collection-api";
+import { find } from "lodash";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -34,8 +35,8 @@ export function VocabularySelectField({
   return (
     <FieldWrapper
       // Re-initialize the component if the labels change:
-      key={vocabOptions.map(option => option.label).join()}
-      readOnlyRender={value => (
+      key={vocabOptions.map((option) => option.label).join()}
+      readOnlyRender={(value) => (
         <VocabularyReadOnlyView path={path} value={value} />
       )}
       {...labelWrapperProps}
@@ -49,7 +50,7 @@ export function VocabularySelectField({
           selected: VocabularyOption | VocabularyOption[] | null
         ) {
           const newValue = Array.isArray(selected)
-            ? selected.map(option => option.value)
+            ? selected.map((option) => option.value)
             : selected?.value;
 
           setValue(newValue);
@@ -64,10 +65,10 @@ export function VocabularySelectField({
               isMulti={isMulti}
               onChange={setFormValue}
               value={selectValue}
-              formatCreateLabel={inputValue => `Add "${inputValue}"`}
+              formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
               placeholder={placeholder ?? formatMessage("selectOrType")}
               styles={{
-                control: base => ({
+                control: (base) => ({
                   ...base,
                   ...(invalid && {
                     borderColor: "rgb(148, 26, 37)",
@@ -95,11 +96,17 @@ function useVocabularyOptions({ path }) {
   function toOption(value: string | VocabularyElement): VocabularyOption {
     if (typeof value === "string") {
       return {
-        label: vocabOptions.find(it => it.value === value)?.label || value,
+        label: vocabOptions.find((it) => it.value === value)?.label || value,
         value
       };
     }
-    const label = value.labels?.[locale] || value.name || String(value);
+    const label =
+      find(
+        value?.multilingualTitle?.titles || [],
+        (item) => item.lang === locale
+      )?.title ||
+      value.name ||
+      "";
     return { label, value: value.name || label };
   }
 
@@ -113,7 +120,7 @@ export function VocabularyReadOnlyView({ path, value }) {
   return value ? (
     <div>
       {castArray(value)
-        .map(text => toOption(text).label)
+        .map((text) => toOption(text).label)
         .join(", ")}
     </div>
   ) : null;

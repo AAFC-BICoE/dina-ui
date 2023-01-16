@@ -3,14 +3,22 @@ import { StorageUnitForm } from "../../../../components";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { StorageUnit } from "../../../../types/collection-api";
 
+const STORAGE_UNIT_TYPE_NAME = "Type";
+
 const PARENT_STORAGE_UNIT: PersistedResource<StorageUnit> = {
   id: "A",
   group: "test-group",
   type: "storage-unit",
-  name: "A"
+  name: "A",
+  storageUnitType: {
+    id: STORAGE_UNIT_TYPE_NAME,
+    type: "storage-unit-type",
+    name: STORAGE_UNIT_TYPE_NAME,
+    group: "group"
+  }
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/storage-unit/A":
       return { data: PARENT_STORAGE_UNIT };
@@ -21,8 +29,8 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
-const mockSave = jest.fn(async saves => {
-  return saves.map(save => ({
+const mockSave = jest.fn(async (saves) => {
+  return saves.map((save) => ({
     ...save.resource,
     id: save.resource.id ?? "123"
   }));
@@ -53,8 +61,10 @@ describe("Storage Unit edit page.", () => {
     wrapper.update();
 
     expect(
-      wrapper.find(".storage-path li.breadcrumb-item").map(node => node.text())
-    ).toEqual(["A"]);
+      wrapper
+        .find(".storage-path li.breadcrumb-item")
+        .map((node) => node.text())
+    ).toEqual(["A (" + STORAGE_UNIT_TYPE_NAME + ")"]);
 
     wrapper
       .find(".name-field input")

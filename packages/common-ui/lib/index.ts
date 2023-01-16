@@ -91,3 +91,6 @@ export * from "./formik-connected/ControlledVocabularySelectField";
 export * from "./formik-connected/FieldExtensionSelectField";
 export * from "./search/useSearch";
 export * from "./search/useAutocompleteSearchButFallbackToRsqlApiSearch";
+export * from "./util/useIsMounted";
+export * from "./table/EditableTable";
+export * from "./util/useStringArrayConverter";

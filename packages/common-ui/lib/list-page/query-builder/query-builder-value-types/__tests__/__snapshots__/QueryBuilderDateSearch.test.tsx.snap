@@ -1,0 +1,517 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field not to be displayed since the match type is not equals 1`] = `"<QueryBuilderDateSearch matchType=\\"empty\\" value=\\"test\\" setValue={[Function: bound fn]} />"`;
+
+exports[`QueryBuilderDateSearch QueryBuilderDateSearch Component Display field if match type is equals: Expect date field to be displayed since match type is equals 1`] = `
+"<QueryBuilderDateSearch matchType=\\"equals\\" value=\\"test\\" setValue={[Function: bound fn]}>
+  <r className=\\"form-control\\" value=\\"test\\" onChange={[Function: onChange]} onChangeRaw={[Function: onChangeRaw]} dateFormat=\\"yyyy-MM-dd\\" placeholderText=\\"YYYY-MM-DD\\" isClearable={true} showYearDropdown={true} todayButton=\\"Today\\" allowSameDay={false} dateFormatCalendar=\\"LLLL yyyy\\" disabled={false} disabledKeyboardNavigation={false} dropdownMode=\\"scroll\\" onFocus={[Function: onFocus]} onBlur={[Function: onBlur]} onKeyDown={[Function: onKeyDown]} onInputClick={[Function: onInputClick]} onSelect={[Function: onSelect]} onClickOutside={[Function: onClickOutside]} onMonthChange={[Function: onMonthChange]} onCalendarOpen={[Function: onCalendarOpen]} onCalendarClose={[Function: onCalendarClose]} preventOpenOnFocus={false} onYearChange={[Function: onYearChange]} onInputError={[Function: onInputError]} monthsShown={1} readOnly={false} withPortal={false} shouldCloseOnSelect={true} showTimeSelect={false} showTimeInput={false} showPreviousMonths={false} showMonthYearPicker={false} showFullMonthYearPicker={false} showTwoColumnMonthYearPicker={false} showFourColumnMonthYearPicker={false} showYearPicker={false} showQuarterYearPicker={false} strictParsing={false} timeIntervals={30} timeCaption=\\"Time\\" previousMonthAriaLabel=\\"Previous Month\\" previousMonthButtonLabel=\\"Previous Month\\" nextMonthAriaLabel=\\"Next Month\\" nextMonthButtonLabel=\\"Next Month\\" previousYearAriaLabel=\\"Previous Year\\" previousYearButtonLabel=\\"Previous Year\\" nextYearAriaLabel=\\"Next Year\\" nextYearButtonLabel=\\"Next Year\\" timeInputLabel=\\"Time\\" enableTabLoop={true} yearItemNumber={12} renderDayContents={[Function: renderDayContents]} focusSelectedMonth={false} showPopperArrow={true} excludeScrollbar={true} customTimeInput={{...}} calendarStartDay={[undefined]}>
+    <r className={[undefined]} wrapperClassName={[undefined]} hidePopper={true} portalId={[undefined]} popperModifiers={{...}} targetComponent={{...}} popperContainer={[undefined]} popperComponent={{...}} popperPlacement=\\"bottom-start\\" popperProps={{...}} popperOnKeyDown={[Function (anonymous)]} enableTabLoop={true}>
+      <Manager className=\\"react-datepicker-manager\\">
+        <Reference>
+          <div className=\\"react-datepicker-wrapper\\">
+            <div className=\\"react-datepicker__input-container\\">
+              <input type=\\"text\\" value=\\"test\\" onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onClick={[Function (anonymous)]} onFocus={[Function (anonymous)]} onKeyDown={[Function (anonymous)]} id={[undefined]} name={[undefined]} autoFocus={[undefined]} placeholder=\\"YYYY-MM-DD\\" disabled={false} autoComplete={[undefined]} className=\\"form-control\\" title={[undefined]} readOnly={false} required={[undefined]} tabIndex={[undefined]} aria-describedby={[undefined]} aria-invalid={[undefined]} aria-labelledby={[undefined]} aria-required={[undefined]} />
+            </div>
+          </div>
+        </Reference>
+      </Manager>
+    </r>
+  </r>
+</QueryBuilderDateSearch>"
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Contains operation Normal field 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy",
+      "gte": "1998||/y",
+      "lte": "1998||/y",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Contains operation Normal field 2`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM",
+      "gte": "1998-05||/M",
+      "lte": "1998-05||/M",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Contains operation Normal field 3`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "format": "yyyy-MM-dd",
+      "gte": "1998-05-19||/d",
+      "lte": "1998-05-19||/d",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Contains operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "includes.name": "1998",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Empty operation Normal field 1`] = `
+Object {
+  "bool": Object {
+    "must_not": Object {
+      "exists": Object {
+        "field": "data.attributes.dateField",
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Empty operation With relationship as field 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "nested": Object {
+              "path": "included",
+              "query": Object {
+                "bool": Object {
+                  "must": Array [
+                    Object {
+                      "exists": Object {
+                        "field": "includes.name",
+                      },
+                    },
+                    Object {
+                      "term": Object {
+                        "included.type": "collection",
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collection.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation Normal field 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.dateField": "1998-05-19",
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation Normal field 2`] = `
+Object {
+  "term": Object {
+    "data.attributes.dateField": "true",
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Equals operation With relationship as field 2`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "includes.name": "false",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Exact Match operation Normal field 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.dateField": "1998-05-19",
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Exact Match operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Greater Than Or Equal To operation Normal field 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "gte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Greater Than Or Equal To operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Greater Than operation Normal field 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "gt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Greater Than operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Less Than operation Normal field 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "lt": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Less Than operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Not Equals operation Normal field 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "term": Object {
+              "data.attributes.dateField": "1998-05-19",
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.attributes.dateField",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Not Equals operation With relationship as field 1`] = `
+Object {
+  "bool": Object {
+    "should": Array [
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
+              "must_not": Object {
+                "term": Object {
+                  "includes.name": "1998-05-19",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "nested": Object {
+          "path": "included",
+          "query": Object {
+            "bool": Object {
+              "must": Object {
+                "term": Object {
+                  "included.type": "collection",
+                },
+              },
+              "must_not": Object {
+                "exists": Object {
+                  "field": "includes.name",
+                },
+              },
+            },
+          },
+        },
+      },
+      Object {
+        "bool": Object {
+          "must_not": Object {
+            "exists": Object {
+              "field": "data.relationships.collection.data.id",
+            },
+          },
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Not empty operation Normal field 1`] = `
+Object {
+  "exists": Object {
+    "field": "data.attributes.dateField",
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Not empty operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "exists": Object {
+              "field": "includes.name",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Partial Match operation Normal field 1`] = `
+Object {
+  "term": Object {
+    "data.attributes.dateField": "1998-05-19",
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function Partial Match operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function lessThanOrEqualTo operation Normal field 1`] = `
+Object {
+  "range": Object {
+    "data.attributes.dateField": Object {
+      "lte": "1998-05-19",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderDateSearch transformDateSearchToDSL function lessThanOrEqualTo operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "range": Object {
+              "includes.name": "1998-05-19",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;

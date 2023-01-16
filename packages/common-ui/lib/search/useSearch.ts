@@ -33,7 +33,6 @@ export interface DoSearchParams {
   indexName: string;
   searchValue?: string;
   additionalField?: string;
-  documentId?: string;
   restrictedField?: string;
   restrictedFieldValue?: string;
   group?: string;
@@ -48,7 +47,6 @@ export async function doSearch<T extends KitsuResource>(
     indexName,
     searchField,
     searchValue,
-    documentId,
     additionalField,
     restrictedField,
     restrictedFieldValue,
@@ -74,7 +72,6 @@ export async function doSearch<T extends KitsuResource>(
         prefix: searchValue,
         autoCompleteField: searchField,
         additionalField,
-        documentId,
         indexName,
         group,
         ...restrictedFieldParams
