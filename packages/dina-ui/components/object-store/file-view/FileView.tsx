@@ -1,4 +1,4 @@
-import { useAccount } from "common-ui";
+import { LoadingSpinner, useAccount } from "../../../../common-ui";
 import dynamic from "next/dynamic";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { ComponentType, ReactNode, useEffect, useState } from "react";
@@ -98,6 +98,10 @@ export function FileView({
       const currentToken = await getCurrentToken();
       router.push(`${path}?access_token=${currentToken}`);
     }
+  }
+
+  if (token === undefined) {
+    return <LoadingSpinner loading={true} />;
   }
 
   return (
