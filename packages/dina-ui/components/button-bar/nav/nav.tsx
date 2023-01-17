@@ -32,6 +32,8 @@ export function Nav({ marginBottom = true }: NavProps) {
   useEffect(() => {
     async function getInstanceMode() {
       const response = await axios.get(`/instance.json`);
+      const data = JSON.stringify(response.data);
+      console.log(response.data)
       // console.log(response);
     }
     getInstanceMode();

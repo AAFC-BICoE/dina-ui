@@ -35,7 +35,7 @@ respond /keycloak.json "{
 }"
 
 respond /instance.json "{ 
-	\"instance-mode\": \"{$INSTANCE_MODE}\", 
+	\"instance-mode\": \"{$INSTANCE_MODE}\"
 }"
 
 # Proxy to the main back-end API:

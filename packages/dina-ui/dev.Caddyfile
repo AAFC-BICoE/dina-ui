@@ -32,7 +32,7 @@ respond /keycloak.json "{
 }"
 
 respond /instance.json "{ 
-	\"instance-mode\": \"{$INSTANCE_MODE}\", 
+	\"instance-mode\": \"{$INSTANCE_MODE}\"
 }"
 
 # Proxy to the back-end Object Store API:
