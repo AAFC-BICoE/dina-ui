@@ -7,7 +7,7 @@ import {
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
@@ -17,6 +17,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
+import axios from 'axios';
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -26,6 +27,15 @@ export interface NavProps {
 export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
+  const [instanceMode, setInstanceMode] = useState();
+
+  useEffect(() => {
+    async function getInstanceMode() {
+      const response = await axios.get(`/instance.json`);
+      // console.log(response);
+    }
+    getInstanceMode();
+  }, [])
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
