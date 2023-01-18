@@ -1,4 +1,5 @@
 import { ApiClientContext } from "common-ui";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { createContext, useContext } from "react";
 import { ObjectUpload } from "../../../types/objectstore-api/resources/ObjectUpload";
 import { IFileWithMeta } from "./FileUploader";
@@ -27,6 +28,7 @@ export const FileUploadProvider = FileUploadContext.Provider;
 
 export function FileUploadProviderImpl({ children }) {
   const { apiClient } = useContext(ApiClientContext);
+  const { formatMessage } = useDinaIntl();
 
   async function uploadFiles({ files, group }: UploadFileParams) {
     const uploadRespsT: ObjectUpload[] = [];
@@ -40,7 +42,8 @@ export function FileUploadProviderImpl({ children }) {
         `/objectstore-api/file/${group}`,
         formData,
         {
-          transformResponse: (data) => fileUploadErrorHandler(data, file),
+          transformResponse: (data) =>
+            fileUploadErrorHandler(data, file, formatMessage),
           timeout: 0
         }
       );
@@ -56,7 +59,11 @@ export function FileUploadProviderImpl({ children }) {
 }
 
 /** Errors are handled differently here because they come from Spring Boot instead of Crnk. */
-export function fileUploadErrorHandler(data: string, file: File) {
+export function fileUploadErrorHandler(
+  data: string,
+  file: File,
+  formatMessage
+) {
   // Custom spring boot error handling to get the correct error message:
   let parsedData;
 
@@ -66,10 +73,10 @@ export function fileUploadErrorHandler(data: string, file: File) {
     // Check if the error is a Unsupported Media Type error.
     if (data.includes("Unsupported Media Type")) {
       throw new Error(
-        "The '" +
-          file.name +
-          "' file cannot be uploaded since it's an unsupported file type."
+        formatMessage("unsupportedFileTypeError", { fileName: file.name })
       );
+    } else if (data.includes("HTTP Status 403")) {
+      throw new Error(formatMessage("http403ForbiddenError"));
     }
 
     // Otherwise, just display the error message.

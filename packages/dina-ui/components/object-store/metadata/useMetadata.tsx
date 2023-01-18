@@ -22,6 +22,7 @@ export function useMetadataEditQuery(id?: string | null) {
       include: "dcCreator,derivatives"
     },
     {
+      disabled: !id,
       joinSpecs: [
         // Join to persons api:
         {

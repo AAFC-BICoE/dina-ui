@@ -814,5 +814,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   yearMonthDayTime: "Year-Month-Day-Time",
   dataType: "Type: ",
   dataValue: "Value: ",
-  unit: "Unit: "
+  unit: "Unit: ",
+  http403ForbiddenError: "Access is denied",
+  unsupportedFileTypeError:
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
 };
