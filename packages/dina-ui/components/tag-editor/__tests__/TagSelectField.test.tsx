@@ -35,10 +35,6 @@ const testCtx = {
 };
 
 describe("TagSelectField", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it("Lets you select tags from previous values.", async () => {
     const wrapper = mountWithAppContext(
       <DinaForm initialValues={{}}>
