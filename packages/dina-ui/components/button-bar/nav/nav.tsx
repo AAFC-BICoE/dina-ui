@@ -37,7 +37,6 @@ export function Nav({ marginBottom = true }: NavProps) {
       } catch (error) {
         setInstanceMode(undefined);
       }
-      
     };
     getInstanceMode();
   }, []);
