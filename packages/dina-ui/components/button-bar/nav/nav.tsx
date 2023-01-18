@@ -29,17 +29,17 @@ export function Nav({ marginBottom = true }: NavProps) {
   const { formatMessage } = useDinaIntl();
   const [instanceMode, setInstanceMode] = useState();
 
-  useEffect(() => {
-    async function getInstanceMode() {
-      try {
-        const response = await axios.get(`/instance.json`);
-        setInstanceMode(response.data["instance-mode"]);
-      } catch (error) {
-        setInstanceMode(undefined);
-      }
-    }
-    getInstanceMode();
-  }, []);
+  // useEffect(() => {
+  //   async function getInstanceMode() {
+  //     try {
+  //       const response = await axios.get(`/instance.json`);
+  //       setInstanceMode(response.data["instance-mode"]);
+  //     } catch (error) {
+  //       setInstanceMode(undefined);
+  //     }
+  //   }
+  //   getInstanceMode();
+  // }, []);
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
