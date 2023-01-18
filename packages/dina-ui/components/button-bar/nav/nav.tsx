@@ -2,7 +2,7 @@ import {
   LanguageSelector,
   NavbarUserControl,
   useAccount,
-  intlContext
+  intlContext,
 } from "common-ui";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -17,7 +17,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
-import axios from 'axios';
+import axios from "axios";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -32,12 +32,10 @@ export function Nav({ marginBottom = true }: NavProps) {
   useEffect(() => {
     async function getInstanceMode() {
       const response = await axios.get(`/instance.json`);
-      const data = JSON.stringify(response.data);
-      console.log(response.data)
-      // console.log(response);
+      setInstanceMode(response.data["instance-mode"]);
     }
     getInstanceMode();
-  }, [])
+  }, []);
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
@@ -80,7 +78,14 @@ export function Nav({ marginBottom = true }: NavProps) {
           <Container fluid={true} className="px-5">
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
-                <DinaMessage id="appTitle" />
+                {instanceMode === "PROD" || !instanceMode ? (
+                  <DinaMessage id="appTitle" />
+                ) : (
+                  <DinaMessage
+                    id="appTitleInstanceMode"
+                    values={{ instanceMode }}
+                  />
+                )}
               </Navbar.Brand>
             </Link>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />

@@ -62,6 +62,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   allowExisting: "Allow Existing",
   allowNew: "Allow New",
   appTitle: "DINA",
+  appTitleInstanceMode: "DINA ({instanceMode})",
   assemblage: "Assemblage",
   assemblageAttachments: "Assemblage Attachments",
   assemblageListTitle: "Assemblages",
