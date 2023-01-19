@@ -15,6 +15,7 @@ export interface DataEntryProps {
   unitsOptions?: any[];
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
+  readOnly?: boolean;
 }
 
 export function DataEntry({
@@ -24,7 +25,8 @@ export function DataEntry({
   model,
   unitsOptions,
   typeOptions,
-  name
+  name,
+  readOnly,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -39,9 +41,11 @@ export function DataEntry({
       return (
         <div className="d-flex align-items-center justify-content-between">
           {legend}
-          <Button onClick={() => addBlock()} className="add-datablock">
-            <DinaMessage id="addCustomPlaceName" />
-          </Button>
+          {!readOnly && (
+            <Button onClick={() => addBlock()} className="add-datablock">
+              <DinaMessage id="addCustomPlaceName" />
+            </Button>
+          )}
         </div>
       );
     };

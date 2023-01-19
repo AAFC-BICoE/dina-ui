@@ -22,7 +22,7 @@ export function useCollectingEventQuery(id?: string | null) {
   // TODO disable the fetch query when the ID is undefined.
   const collectingEventQuery = useQuery<CollectingEvent>(
     {
-      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod`
+      path: `collection-api/collecting-event/${id}?include=collectors,attachment,collectionMethod`,
     },
     {
       // Return undefined when ID is undefined:
@@ -40,7 +40,7 @@ export function useCollectingEventQuery(id?: string | null) {
                   ),
                   {
                     apiBaseUrl: "/agent-api",
-                    returnNullForMissingResource: true
+                    returnNullForMissingResource: true,
                   }
                 )
               );
@@ -76,7 +76,7 @@ export function useCollectingEventQuery(id?: string | null) {
             (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         data.srcAdminLevels = srcAdminLevels;
-      }
+      },
     }
   );
 
@@ -91,7 +91,7 @@ interface UseCollectingEventSaveParams {
 /** CollectingEvent save method to be re-used by CollectingEvent and MaterialSample forms. */
 export function useCollectingEventSave({
   fetchedCollectingEvent,
-  attachmentsConfig
+  attachmentsConfig,
 }: UseCollectingEventSaveParams) {
   const { save } = useApiClient();
   const collectingEventFormSchema = useCollectingEventFormSchema();
@@ -110,7 +110,7 @@ export function useCollectingEventSave({
           ...fetchedCollectingEvent,
           geoReferenceAssertions:
             fetchedCollectingEvent.geoReferenceAssertions ?? [],
-          srcAdminLevels: fetchedCollectingEvent.srcAdminLevels
+          srcAdminLevels: fetchedCollectingEvent.srcAdminLevels,
         }
       : {
           type: "collecting-event",
@@ -118,13 +118,13 @@ export function useCollectingEventSave({
           collectorGroups: [],
           geoReferenceAssertions: [
             {
-              isPrimary: true
-            }
+              isPrimary: true,
+            },
           ],
           dwcVerbatimCoordinateSystem:
             defaultVerbatimCoordSys ?? CoordinateSystemEnum.DECIMAL_DEGREE,
           dwcVerbatimSRS: defaultVerbatimSRS ?? SRSEnum.WGS84,
-          publiclyReleasable: true
+          publiclyReleasable: true,
         };
 
   async function saveCollectingEvent(
@@ -143,8 +143,8 @@ export function useCollectingEventSave({
       (submittedValues as any).relationships.collectors = {
         data: submittedValues?.collectors.map((collector) => ({
           id: collector.id,
-          type: "person"
-        }))
+          type: "person",
+        })),
       };
     }
     delete submittedValues.collectors;
@@ -165,8 +165,8 @@ export function useCollectingEventSave({
       data:
         submittedValues.attachment?.map((it) => ({
           id: it.id,
-          type: it.type
-        })) ?? []
+          type: it.type,
+        })) ?? [],
     };
     // Delete the 'attachment' attribute because it should stay in the relationships field:
     delete submittedValues.attachment;
@@ -225,7 +225,7 @@ export function useCollectingEventSave({
               )
                 srcDetail.selectedGeographicPlace = omit(srcAdminLevel, [
                   "shortId",
-                  "type"
+                  "type",
                 ]);
             }
           } else {
@@ -254,15 +254,34 @@ export function useCollectingEventSave({
       submittedValues.dwcVerbatimCoordinateSystem = null;
     }
 
+    const submittedExtensionValues: any[] | undefined =
+      submittedValues["extensionValues"];
+
+    const processedExtensionValues = submittedExtensionValues?.reduce(
+      (result, item) => {
+        const extensionKey = item.select;
+        let processedExtensionFields = {};
+        item.rows?.forEach((extensionField) => {
+          processedExtensionFields[extensionField.type] = extensionField.value;
+        });
+        result[extensionKey] = processedExtensionFields;
+        return result;
+      },
+      {}
+    );
+
+    submittedValues.extensionValues = processedExtensionValues;
+    console.log(submittedValues);
+
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
         {
           resource: submittedValues,
-          type: "collecting-event"
-        }
+          type: "collecting-event",
+        },
       ],
       {
-        apiBaseUrl: "/collection-api"
+        apiBaseUrl: "/collection-api",
       }
     );
 
@@ -277,7 +296,7 @@ export function useCollectingEventSave({
     collectingEventInitialValues,
     saveCollectingEvent,
     attachmentsConfig,
-    collectingEventFormSchema
+    collectingEventFormSchema,
   };
 }
 
@@ -301,15 +320,15 @@ function useCollectingEventFormSchema() {
         .nullable()
         .test({
           test: (val) => (val ? isValidDatePrecision(val) : true),
-          message: formatMessage("field_collectingEvent_startDateTimeError")
+          message: formatMessage("field_collectingEvent_startDateTimeError"),
         }),
       endEventDateTime: yup
         .string()
         .nullable()
         .test({
           test: (val) => (val ? isValidDatePrecision(val) : true),
-          message: formatMessage("field_collectingEvent_endDateTimeError")
-        })
+          message: formatMessage("field_collectingEvent_endDateTimeError"),
+        }),
     });
 
     return collectingEventFormSchema;
