@@ -79,6 +79,7 @@ export function DataEntry({
                           key={index}
                           vocabularyOptionsPath={vocabularyOptionsPath}
                           typeOptions={typeOptions}
+                          readOnly={readOnly}
                         />
                       );
                     })}

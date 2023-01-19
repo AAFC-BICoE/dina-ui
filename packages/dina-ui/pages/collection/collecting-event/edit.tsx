@@ -5,7 +5,7 @@ import {
   DinaForm,
   DinaFormOnSubmit,
   SubmitButton,
-  withResponse
+  withResponse,
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
@@ -17,7 +17,7 @@ import {
   Head,
   Nav,
   useCollectingEventQuery,
-  useCollectingEventSave
+  useCollectingEventSave,
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
@@ -29,7 +29,7 @@ interface CollectingEventFormProps {
 export default function CollectingEventEditPage() {
   const router = useRouter();
   const {
-    query: { id }
+    query: { id },
   } = router;
   const { formatMessage } = useDinaIntl();
 
@@ -71,7 +71,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
   const {
     collectingEventInitialValues,
     saveCollectingEvent,
-    collectingEventFormSchema
+    collectingEventFormSchema,
   } = useCollectingEventSave({ fetchedCollectingEvent: collectingEvent });
 
   const [, setDefaultVerbatimCoordSys] = useLocalStorage<
@@ -84,7 +84,7 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
 
   const onSubmit: DinaFormOnSubmit<CollectingEvent> = async ({
     submittedValues,
-    formik
+    formik,
   }) => {
     const savedCollectingEvent = await saveCollectingEvent(
       submittedValues,
@@ -108,8 +108,11 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
 
   const initValues = {
     ...collectingEventInitialValues,
-    type: "collecting-event" as const
+    type: "collecting-event" as const,
   };
+  const processedExtensionValues = processExtensionValues(initValues);
+
+  initValues.extensionValues = processedExtensionValues;
 
   return (
     <DinaForm<CollectingEvent>
@@ -126,4 +129,27 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
       {buttonBar}
     </DinaForm>
   );
+}
+
+export function processExtensionValues(initValues) {
+  const initExtensionValues = initValues.extensionValues;
+  const processedExtensionValues = Object.keys(initExtensionValues).map(
+    (extensionKey) => {
+      const initExtensionValue = initExtensionValues[extensionKey];
+      const extensionFields = Object.keys(initExtensionValue).map(
+        (extensionFieldKey) => {
+          return {
+            type: extensionFieldKey,
+            value: initExtensionValue[extensionFieldKey],
+          };
+        }
+      );
+      const processedExtensionValue = {
+        select: extensionKey,
+        rows: extensionFields,
+      };
+      return processedExtensionValue;
+    }
+  );
+  return processedExtensionValues;
 }

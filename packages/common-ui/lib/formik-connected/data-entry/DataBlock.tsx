@@ -19,6 +19,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   blockIndex: number;
   removeBlock?: (index) => void;
   typeOptions?: any[];
+  readOnly?: boolean;
 }
 
 export function DataBlock({
@@ -30,6 +31,7 @@ export function DataBlock({
   blockIndex,
   removeBlock,
   typeOptions,
+  readOnly,
   ...props
 }: DataBlockProps) {
   return (
@@ -96,7 +98,6 @@ export function DataBlock({
                   {rows.map((_, rowIndex) => {
                     return (
                       <DataRow
-                        readOnly={false}
                         showPlusIcon={true}
                         name={`${fieldArrayProps.name}`}
                         key={rowIndex}
@@ -106,14 +107,15 @@ export function DataBlock({
                         model={model}
                         unitsOptions={unitsOptions}
                         typeOptions={typeOptions}
+                        readOnly={readOnly}
                       />
                     );
                   })}
-                  <div className="d-flex align-items-center justify-content-between">
+                  {!readOnly && <div className="d-flex align-items-center justify-content-between">
                     <Button onClick={() => removeBlock?.(blockIndex)}>
                       <DinaMessage id="deleteButtonText" />
                     </Button>
-                  </div>
+                  </div>}
                 </div>
               ) : null}
             </div>

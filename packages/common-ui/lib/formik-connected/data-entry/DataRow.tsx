@@ -2,7 +2,7 @@ import {
   filterBy,
   ResourceSelectField,
   SelectField,
-  TextField
+  TextField,
 } from "common-ui";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
@@ -17,7 +17,6 @@ export function getFieldName(
 export interface DataRowProps {
   name: string;
   rowIndex: number;
-  readOnly: boolean;
   showPlusIcon?: boolean;
   addRow?: () => void;
   removeRow?: (index) => void;
@@ -25,6 +24,7 @@ export interface DataRowProps {
   model?: string;
   unitsOptions?: any[];
   typeOptions?: any[];
+  readOnly?: boolean;
 }
 
 export function DataRow({
@@ -33,9 +33,9 @@ export function DataRow({
   removeRow,
   name,
   showPlusIcon,
-  readOnly,
   unitsOptions,
-  typeOptions
+  typeOptions,
+  readOnly,
 }: DataRowProps) {
   const valueTextFieldName = getFieldName(name, "value", rowIndex);
   const typeSelectFieldName = getFieldName(name, "type", rowIndex);
