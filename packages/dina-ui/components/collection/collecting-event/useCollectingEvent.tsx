@@ -271,7 +271,6 @@ export function useCollectingEventSave({
     );
 
     submittedValues.extensionValues = processedExtensionValues;
-    console.log(submittedValues);
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [
