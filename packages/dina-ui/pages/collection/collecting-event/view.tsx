@@ -32,7 +32,6 @@ export default function CollectingEventDetailsPage() {
       mainClass="container-fluid"
       showRevisionsLink={true}
       alterInitialValues={(resource) => {
-        console.log(resource);
         resource.extensionValues = processExtensionValues(resource);
         return resource;
       }}
