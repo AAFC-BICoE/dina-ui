@@ -362,11 +362,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_managedAttributeMandatoryFieldsError:
     "Both name and type are mandatory fields",
   field_managedAttributeName: "Attribute Name",
-  field_managedAttributeType_boolean_label: "Boolean",
-  field_managedAttributeType_date_label: "Date",
-  field_managedAttributeType_integer_label: "Numerical",
-  field_managedAttributeType_picklist_label: "Pick List",
-  field_managedAttributeType_text_label: "Text",
+  field_vocabularyElementType_boolean_label: "Boolean",
+  field_vocabularyElementType_date_label: "Date",
+  field_vocabularyElementType_integer_label: "Numerical",
+  field_vocabularyElementType_picklist_label: "Pick List",
+  field_vocabularyElementType_text_label: "Text",
   field_materialSampleName: "Primary ID",
   field_materialSampleRemarks: "Material Sample Remarks",
   field_materialSampleState: "Material Sample State",
@@ -805,11 +805,16 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "A problem occurred while trying to read the uploaded spreadsheet.",
   workbookUploadInstructions:
     "Drag and drop a spreadsheet here or click to open browse dialog.",
+  spreadsheetHeader: "Spreadsheet Header",
+  materialSampleFieldsMapping: "Material Sample Field",
   year: "Year",
   yearMonth: "Year-Month",
   yearMonthDay: "Year-Month-Day",
   yearMonthDayTime: "Year-Month-Day-Time",
   dataType: "Type: ",
   dataValue: "Value: ",
-  unit: "Unit: "
+  unit: "Unit: ",
+  http403ForbiddenError: "Access is denied",
+  unsupportedFileTypeError:
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
 };

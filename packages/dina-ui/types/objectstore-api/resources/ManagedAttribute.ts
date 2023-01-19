@@ -6,7 +6,7 @@ export interface ManagedAttributeAttributes {
   type: string;
   name: string;
   key: string;
-  managedAttributeType: string;
+  vocabularyElementType: string;
   acceptedValues?: string[] | null;
   createdBy?: string;
   createdOn?: string;
@@ -25,23 +25,23 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   value: ManagedAttributeType;
 }[] = [
   {
-    labelKey: "field_managedAttributeType_integer_label",
+    labelKey: "field_vocabularyElementType_integer_label",
     value: "INTEGER"
   },
   {
-    labelKey: "field_managedAttributeType_text_label",
+    labelKey: "field_vocabularyElementType_text_label",
     value: "STRING"
   },
   {
-    labelKey: "field_managedAttributeType_picklist_label",
+    labelKey: "field_vocabularyElementType_picklist_label",
     value: "PICKLIST"
   },
   {
-    labelKey: "field_managedAttributeType_date_label",
+    labelKey: "field_vocabularyElementType_date_label",
     value: "DATE"
   },
   {
-    labelKey: "field_managedAttributeType_boolean_label",
+    labelKey: "field_vocabularyElementType_boolean_label",
     value: "BOOL"
   }
 ];

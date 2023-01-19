@@ -118,7 +118,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
         return {
           id: "1",
           type: "managed-attribute",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           key: "a",
           name: "Managed Attribute 1"
@@ -127,7 +127,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
         return {
           id: "2",
           type: "managed-attribute",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           key: "b",
           name: "Managed Attribute 2"
@@ -136,7 +136,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
         return {
           id: "3",
           type: "managed-attribute",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           key: "c",
           name: "Managed Attribute 3"
@@ -283,8 +283,8 @@ describe("Material sample bulk edit tab", () => {
       .find(".managed-attributes-editor")
       .find(ResourceSelect)
       .prop<any>("onChange")([
-      { key: "b", managedAttributeType: "STRING" },
-      { key: "c", managedAttributeType: "STRING" }
+      { key: "b", vocabularyElementType: "STRING" },
+      { key: "c", vocabularyElementType: "STRING" }
     ]);
 
     await new Promise(setImmediate);

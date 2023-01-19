@@ -29,6 +29,7 @@ interface MockAppContextProviderProps {
 export function MockAppContextProvider({
   accountContext,
   apiContext = { apiClient: { get: () => undefined as any } },
+
   children
 }: MockAppContextProviderProps) {
   const DEFAULT_MOCK_ACCOUNT_CONTEXT: AccountContextI = useMemo(
@@ -88,8 +89,8 @@ export function MockAppContextProvider({
         <ApiClientProvider
           value={merge({}, DEFAULT_API_CONTEXT_VALUE, apiContextWithWarnings)}
         >
-          <FileUploadProviderImpl>
-            <DinaIntlProvider>
+          <DinaIntlProvider>
+            <FileUploadProviderImpl>
               <DndProvider backend={HTML5Backend}>
                 <div ref={modalWrapperRef}>
                   <ModalProvider appElement={modalWrapperRef.current}>
@@ -97,8 +98,8 @@ export function MockAppContextProvider({
                   </ModalProvider>
                 </div>
               </DndProvider>
-            </DinaIntlProvider>
-          </FileUploadProviderImpl>
+            </FileUploadProviderImpl>
+          </DinaIntlProvider>
         </ApiClientProvider>
       </AccountProvider>
     </SWRConfig>

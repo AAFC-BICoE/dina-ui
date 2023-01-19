@@ -111,17 +111,17 @@ function CollectionAttributeListView() {
       accessor: "managedAttributeComponent"
     },
     {
-      Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
+      Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
         const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
           acceptedValues?.length
-            ? "field_managedAttributeType_picklist_label"
+            ? "field_vocabularyElementType_picklist_label"
             : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                (option) => option.value === managedAttributeType
+                (option) => option.value === vocabularyElementType
               )?.labelKey;
 
         return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
       },
-      accessor: "managedAttributeType",
+      accessor: "vocabularyElementType",
       // The API sorts alphabetically by key, not displayed intl-ized value,
       // so the displayed order wouldn't make sense.
       sortable: false
@@ -175,17 +175,17 @@ function ObjectStoreAttributeListView() {
       },
       descriptionCell("multilingualDescription"),
       {
-        Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
+        Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
           const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
             acceptedValues?.length
-              ? "field_managedAttributeType_picklist_label"
+              ? "field_vocabularyElementType_picklist_label"
               : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                  (option) => option.value === managedAttributeType
+                  (option) => option.value === vocabularyElementType
                 )?.labelKey;
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
         },
-        accessor: "managedAttributeType",
+        accessor: "vocabularyElementType",
         // The API sorts alphabetically by key, not displayed intl-ized value,
         // so the displayed order wouldn't make sense.
         sortable: false
@@ -235,17 +235,17 @@ function TransactionAttributeListView() {
         accessor: "name"
       },
       {
-        Cell: ({ original: { acceptedValues, managedAttributeType } }) => {
+        Cell: ({ original: { acceptedValues, vocabularyElementType } }) => {
           const labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH | undefined =
             acceptedValues?.length
-              ? "field_managedAttributeType_picklist_label"
+              ? "field_vocabularyElementType_picklist_label"
               : MANAGED_ATTRIBUTE_TYPE_OPTIONS.find(
-                  (option) => option.value === managedAttributeType
+                  (option) => option.value === vocabularyElementType
                 )?.labelKey;
 
           return <div>{labelKey && <DinaMessage id={labelKey} />}</div>;
         },
-        accessor: "managedAttributeType",
+        accessor: "vocabularyElementType",
         // The API sorts alphabetically by key, not displayed intl-ized value,
         // so the displayed order wouldn't make sense.
         sortable: false
