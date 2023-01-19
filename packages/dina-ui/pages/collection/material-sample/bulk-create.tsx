@@ -32,12 +32,12 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   ) {
     writeStorage(
       BULK_EDIT_RESULT_IDS_KEY,
-      samples.map(it => it.id)
+      samples.map((it) => it.id)
     );
 
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { parentSampleId: splitFromId, actionType: "created" }
+      query: { actionType: "created" }
     });
   }
 

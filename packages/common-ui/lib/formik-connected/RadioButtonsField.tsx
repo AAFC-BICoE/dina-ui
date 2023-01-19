@@ -4,6 +4,10 @@ import { FieldWrapper, FieldWrapperProps } from "..";
 
 export interface RadioFieldProps<T> extends FieldWrapperProps {
   options: { label: ReactNode; value: T }[];
+
+  /** Render horizontally, by default it will be rendered vertically. */
+  horizontalOptions?: boolean;
+
   /** Render as regular html radio inputs (default) or as Bootstrap button group . */
   radioStyle?: "RADIO" | "BUTTONS";
 }
@@ -11,6 +15,7 @@ export interface RadioFieldProps<T> extends FieldWrapperProps {
 export function RadioButtonsField<T = any>({
   options,
   radioStyle = "RADIO",
+  horizontalOptions = false,
   ...props
 }: RadioFieldProps<T>) {
   const radioIdPrefix = useMemo(() => uuidv4() as string, []);
@@ -49,10 +54,18 @@ export function RadioButtonsField<T = any>({
             </div>
           ) : (
             options.map((option, index) => (
-              <div className="form-check" key={index}>
+              <div
+                className={
+                  horizontalOptions ? "form-check-horizontal" : "form-check"
+                }
+                key={index}
+              >
                 <label className="form-check-label">
                   <input
-                    className="form-check-input"
+                    className={
+                      "form-check-input " + horizontalOptions &&
+                      "form-check-input-horizontal"
+                    }
                     type="radio"
                     checked={(value ?? null) === option.value}
                     onChange={() => setValue(option.value)}

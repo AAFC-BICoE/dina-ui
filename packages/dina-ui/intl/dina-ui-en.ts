@@ -614,6 +614,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparations: "Preparations",
   preparedBy: "Prepared By",
+  previewLabel: "Preview",
   previewAndCustomizeLabel: "Preview and Customize",
   previewNotAvailable: "Preview Not Available",
   primary: "Primary",
