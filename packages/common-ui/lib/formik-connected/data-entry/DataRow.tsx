@@ -4,6 +4,7 @@ import {
   SelectField,
   TextField,
 } from "common-ui";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
 export function getFieldName(
@@ -47,8 +48,8 @@ export function DataRow({
           <SelectField
             options={typeOptions}
             name={typeSelectFieldName}
+            label={<DinaMessage id="dataType" />}
             removeBottomMargin={true}
-            removeLabel={true}
           />
         </div>
       )}
@@ -56,42 +57,42 @@ export function DataRow({
         <TextField
           name={valueTextFieldName}
           removeBottomMargin={true}
-          removeLabel={true}
+          label={<DinaMessage id="dataValue" />}
         />
       </div>
-
       {unitsOptions && (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>
           <SelectField
             options={unitsOptions}
             name={unitSelectFieldName}
             removeBottomMargin={true}
-            removeLabel={true}
+            label={<DinaMessage id="unit" />}
           />
         </div>
       )}
-      {!readOnly &&
-        (rowIndex === 0 && showPlusIcon ? (
-          <>
-            {
-              <FaPlus
-                className="ms-1"
-                onClick={addRow as any}
-                size="2em"
-                style={{ cursor: "pointer", marginTop: "0.20rem" }}
-                name={getFieldName(name, "addRow", rowIndex)}
-              />
-            }
-          </>
-        ) : (
-          <FaMinus
-            className="ms-1"
-            onClick={() => removeRow?.(rowIndex)}
-            size="2em"
-            style={{ cursor: "pointer", marginTop: "0.20rem" }}
-            name={getFieldName(name, "removeRow", rowIndex)}
-          />
-        ))}
+      {!readOnly && (
+        <div style={{ cursor: "pointer", marginTop: "2rem" }}>
+          {rowIndex === 0 && showPlusIcon ? (
+            <>
+              {
+                <FaPlus
+                  className="ms-1"
+                  onClick={addRow as any}
+                  size="2em"
+                  name={getFieldName(name, "addRow", rowIndex)}
+                />
+              }
+            </>
+          ) : (
+            <FaMinus
+              className="ms-1"
+              onClick={() => removeRow?.(rowIndex)}
+              size="2em"
+              name={getFieldName(name, "removeRow", rowIndex)}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

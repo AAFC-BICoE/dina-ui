@@ -1019,14 +1019,12 @@ export function CollectingEventFormLayout({
         </div>
       </div>
       <div>
-        <FieldSet
-          legend={<DinaMessage id="fieldExtension" />}
-          id="fieldExtension"
-          className="non-strip"
+        <DinaFormSection
           componentName={COLLECTING_EVENT_COMPONENT_NAME}
           sectionName="field-extension-section"
         >
           <DataEntry
+            legend={<DinaMessage id="fieldExtension" />}
             name="extensionValues"
             blockOptions={extensionOptions}
             typeOptions={extensionFieldsOptions}
@@ -1034,7 +1032,7 @@ export function CollectingEventFormLayout({
             readOnly={readOnly}
             initialValues={initialValues.extensionValues}
           />
-        </FieldSet>
+        </DinaFormSection>
       </div>
       <>
         {!readOnly

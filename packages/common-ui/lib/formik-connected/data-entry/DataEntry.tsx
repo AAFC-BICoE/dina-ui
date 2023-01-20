@@ -17,6 +17,7 @@ export interface DataEntryProps {
   name: string;
   readOnly?: boolean;
   initialValues?: any;
+  legend: JSX.Element;
 }
 
 export function DataEntry({
@@ -29,6 +30,7 @@ export function DataEntry({
   name,
   readOnly,
   initialValues,
+  legend,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -55,10 +57,7 @@ export function DataEntry({
 
   return (
     <div style={{ width: "70%" }}>
-      <FieldSet
-        legend={<DinaMessage id="dataEntryLabel" />}
-        wrapLegend={legendWrapper()}
-      >
+      <FieldSet legend={legend} wrapLegend={legendWrapper()}>
         <FieldArray name={name}>
           {(fieldArrayProps) => {
             const blocks: [] = fieldArrayProps.form.values[name];

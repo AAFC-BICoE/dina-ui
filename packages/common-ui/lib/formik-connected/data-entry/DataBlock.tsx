@@ -91,18 +91,6 @@ export function DataBlock({
                         removeLabel={true}
                       />
                     )}
-                    <div style={{ marginLeft: "2rem" }}>
-                      <DinaMessage id="dataType" />
-                    </div>
-                    <div style={{ marginLeft: "15.5rem" }}>
-                      <DinaMessage id="dataValue" />
-                    </div>
-
-                    {unitsOptions && (
-                      <div style={{ marginLeft: "15.2rem" }}>
-                        <DinaMessage id="unit" />
-                      </div>
-                    )}
                   </div>
                   {rows.map((_, rowIndex) => {
                     return (
