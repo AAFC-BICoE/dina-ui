@@ -3,11 +3,12 @@ import { FieldArray } from "formik";
 import {
   FieldWrapperProps,
   SelectField,
-  TextField
+  TextField,
 } from "../../../../common-ui/lib";
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { get } from "lodash";
+import { useEffect } from "react";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
@@ -20,6 +21,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (index) => void;
   typeOptions?: any[];
   readOnly?: boolean;
+  initialValues?: any;
 }
 
 export function DataBlock({
@@ -32,8 +34,15 @@ export function DataBlock({
   removeBlock,
   typeOptions,
   readOnly,
+  initialValues,
   ...props
 }: DataBlockProps) {
+  useEffect(() => {
+    if (onBlockSelectChange && initialValues?.select) {
+      onBlockSelectChange(initialValues.select, undefined);
+    }
+  }, []);
+
   return (
     <div>
       <FieldArray name={`${props.name}.rows`}>
@@ -111,11 +120,13 @@ export function DataBlock({
                       />
                     );
                   })}
-                  {!readOnly && <div className="d-flex align-items-center justify-content-between">
-                    <Button onClick={() => removeBlock?.(blockIndex)}>
-                      <DinaMessage id="deleteButtonText" />
-                    </Button>
-                  </div>}
+                  {!readOnly && (
+                    <div className="d-flex align-items-center justify-content-between">
+                      <Button onClick={() => removeBlock?.(blockIndex)}>
+                        <DinaMessage id="deleteButtonText" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>

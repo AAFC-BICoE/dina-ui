@@ -16,6 +16,7 @@ export interface DataEntryProps {
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
   readOnly?: boolean;
+  initialValues: any;
 }
 
 export function DataEntry({
@@ -27,6 +28,7 @@ export function DataEntry({
   typeOptions,
   name,
   readOnly,
+  initialValues,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -80,6 +82,7 @@ export function DataEntry({
                           vocabularyOptionsPath={vocabularyOptionsPath}
                           typeOptions={typeOptions}
                           readOnly={readOnly}
+                          initialValues={initialValues.at(index)}
                         />
                       );
                     })}

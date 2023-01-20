@@ -83,7 +83,7 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
-  const { response } = useQuery<FieldExtension[]>({
+  const { response, loading } = useQuery<FieldExtension[]>({
     path: `collection-api/extension`,
   });
 
@@ -618,6 +618,10 @@ export function CollectingEventFormLayout({
       </div>
     </FieldSet>
   );
+
+  if (loading) {
+    return <LoadingSpinner loading={true} />;
+  }
   return (
     <div ref={layoutWrapperRef}>
       <DinaFormSection
@@ -1028,6 +1032,7 @@ export function CollectingEventFormLayout({
             typeOptions={extensionFieldsOptions}
             onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
+            initialValues={initialValues.extensionValues}
           />
         </FieldSet>
       </div>
