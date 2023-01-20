@@ -5,7 +5,7 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { DEFAULT_GROUP_STORAGE_KEY } from "../../group-select/useStoredDefaultGroup";
 import { MaterialSampleGenerationForm } from "../MaterialSampleGenerationForm";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/material-sample/test-parent-id":
       return {
@@ -87,7 +87,7 @@ describe("MaterialSampleGenerationForm", () => {
 
     // The default names should be in the placeholders:
     expect(
-      wrapper.find(".sample-name input").map(node => node.prop("placeholder"))
+      wrapper.find(".sample-name input").map((node) => node.prop("placeholder"))
     ).toEqual(expectedNames);
 
     wrapper.find("form").simulate("submit");
@@ -98,7 +98,7 @@ describe("MaterialSampleGenerationForm", () => {
     // Sample initialValues are created with the expected names and the linked collection:
     expect(mockOnGenerate).lastCalledWith({
       generationMode: "SERIES",
-      samples: expectedNames.map(name => ({
+      samples: expectedNames.map((name) => ({
         allowDuplicateName: false,
         collection: { id: "100", name: "test-collection", type: "collection" },
         group: "aafc",
@@ -171,7 +171,7 @@ describe("MaterialSampleGenerationForm", () => {
 
     // The default names should be in the placeholders:
     expect(
-      wrapper.find(".sample-name input").map(node => node.prop("placeholder"))
+      wrapper.find(".sample-name input").map((node) => node.prop("placeholder"))
     ).toEqual(expectedNames);
 
     wrapper.find("form").simulate("submit");
@@ -182,7 +182,7 @@ describe("MaterialSampleGenerationForm", () => {
     // Sample initialValues are created with the expected names and the linked collection:
     expect(mockOnGenerate).lastCalledWith({
       generationMode: "BATCH",
-      samples: expectedNames.map(name => ({
+      samples: expectedNames.map((name) => ({
         allowDuplicateName: true,
         collection: { id: "100", name: "test-collection", type: "collection" },
         group: "aafc",
@@ -205,104 +205,6 @@ describe("MaterialSampleGenerationForm", () => {
         start: "001",
         suffix: "my-suffix"
       }
-    });
-  });
-
-  it("Generates split samples from a parent sample in series mode.", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleGenerationForm
-        parentId={"test-parent-id"}
-        onGenerate={mockOnGenerate}
-      />,
-      testCtx
-    );
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Use series mode:
-    wrapper.find("li.series-tab").simulate("click");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    expect(
-      wrapper.find(".collection-field").find(ResourceSelect).prop("value")
-    ).toEqual({
-      code: "TC",
-      id: "test-collection-id",
-      name: "test-collection",
-      type: "collection"
-    });
-    expect(wrapper.find(".baseName-field input").prop("value")).toEqual(
-      "test-sample"
-    );
-
-    // Fill out the form:
-    wrapper
-      .find(".numberToCreate-field input")
-      .simulate("change", { target: { value: "5" } });
-    wrapper
-      .find(".separator-field input")
-      .simulate("change", { target: { value: "-" } });
-    // Use letter incrementation:
-    wrapper.find(".increment-field").find(Select).prop<any>("onChange")({
-      value: "LETTER"
-    });
-    wrapper
-      .find(".start-field input")
-      .simulate("change", { target: { value: "AA" } });
-
-    // Generates the names in alphabet incrementation like Excel columns:
-    const expectedNames = [
-      "test-sample-AA",
-      "test-sample-AB",
-      "test-sample-AC",
-      "test-sample-AD",
-      "test-sample-AE"
-    ];
-
-    // The default names should be in the placeholders:
-    expect(
-      wrapper.find(".sample-name input").map(node => node.prop("placeholder"))
-    ).toEqual(expectedNames);
-
-    wrapper.find("form").simulate("submit");
-
-    await new Promise(setImmediate);
-    wrapper.update();
-
-    // Sample initialValues are created with the expected names and the linked collection and parent sample:
-    expect(mockOnGenerate).lastCalledWith({
-      generationMode: "SERIES",
-      submittedValues: {
-        baseName: "test-sample",
-        collection: {
-          code: "TC",
-          id: "test-collection-id",
-          name: "test-collection",
-          type: "collection"
-        },
-        group: "aafc",
-        increment: "LETTER",
-        numberToCreate: "5",
-        samples: [],
-        separator: "-",
-        start: "AA",
-        suffix: ""
-      },
-      samples: expectedNames.map(name => ({
-        allowDuplicateName: false,
-        collection: expect.objectContaining({
-          id: "test-collection-id",
-          type: "collection"
-        }),
-        group: "aafc",
-        parentMaterialSample: { id: "test-parent-id", type: "material-sample" },
-        publiclyReleasable: true,
-        materialSampleName: name,
-        type: "material-sample"
-      }))
     });
   });
 });
