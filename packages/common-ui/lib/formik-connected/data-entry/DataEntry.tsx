@@ -16,7 +16,7 @@ export interface DataEntryProps {
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
   readOnly?: boolean;
-  initialValues: any;
+  initialValues?: any;
 }
 
 export function DataEntry({
