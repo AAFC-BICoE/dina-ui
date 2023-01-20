@@ -11,8 +11,9 @@ import {
   SelectField,
   FieldSpy,
   useApiClient,
-  LoadingSpinner
-} from "common-ui/lib";
+  LoadingSpinner,
+  DinaFormOnSubmit
+} from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
@@ -63,6 +64,10 @@ export function MaterialSampleSplitGenerationForm({
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
   const isMultiple = useMemo(() => ids.length > 1, [ids]);
 
+  const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
+    []
+  );
+
   // Clear local storage once the ids have been retrieved.
   useEffect(() => {
     if (ids.length === 0) {
@@ -75,7 +80,7 @@ export function MaterialSampleSplitGenerationForm({
 
   const splitFromMaterialSamples = useBulkGet<MaterialSample>({
     ids,
-    listPath: "collection-api/material-sample",
+    listPath: "collection-api/material-sample?include=materialSampleChildren",
     disabled: ids.length === 0
   });
 
@@ -113,9 +118,42 @@ export function MaterialSampleSplitGenerationForm({
     seriesGenerationOptions: "lowercase"
   };
 
-  function onSubmit({ submittedValues }) {
-    onGenerate([]);
-  }
+  const onSubmit: DinaFormOnSubmit<MaterialSampleBulkSplitFields> = ({
+    submittedValues
+  }) => {
+    if (
+      Number(generatedIdentifiers.length) !==
+      Number(submittedValues?.numberToCreate)
+    ) {
+      return;
+    }
+
+    if (!splitFromMaterialSamples?.data?.[0]) {
+      return;
+    }
+
+    const samples = [...Array(Number(submittedValues.numberToCreate))].map<
+      InputResource<MaterialSample>
+    >((_, index) => {
+      return {
+        type: "material-sample",
+        parentMaterialSample: {
+          id: splitFromMaterialSamples?.data?.[0]?.id ?? "",
+          type: "material-sample"
+        },
+        group: splitFromMaterialSamples?.data?.[0]?.group ?? "",
+        collection: {
+          id: splitFromMaterialSamples?.data?.[0]?.collection?.id ?? "",
+          type: "collection"
+        },
+        publiclyReleasable: true,
+        allowDuplicateName: false,
+        materialSampleName: generatedIdentifiers[index]
+      };
+    });
+
+    onGenerate(samples);
+  };
 
   return (
     <DinaForm<MaterialSampleBulkSplitFields>
@@ -181,6 +219,8 @@ export function MaterialSampleSplitGenerationForm({
             splitFromMaterialSamples={
               splitFromMaterialSamples.data as MaterialSample[]
             }
+            generatedIdentifiers={generatedIdentifiers}
+            setGeneratedIdentifiers={setGeneratedIdentifiers}
           />
         </>
       </PageLayout>
@@ -190,17 +230,17 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
+  generatedIdentifiers: string[];
+  setGeneratedIdentifiers: (identifiers: string[]) => void;
 }
 
 function PreviewGeneratedNames({
-  splitFromMaterialSamples
+  splitFromMaterialSamples,
+  generatedIdentifiers,
+  setGeneratedIdentifiers
 }: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
-
-  const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
-    []
-  );
 
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
@@ -230,7 +270,7 @@ function PreviewGeneratedNames({
             )?.materialSampleName;
 
       const input: MaterialSampleIdentifierGenerator = {
-        amount: formik.values.numberToCreate,
+        amount: formik.values.numberToCreate - (seriesMode === "new" ? 1 : 0),
         identifier,
         type: "material-sample-identifier-generator"
       };

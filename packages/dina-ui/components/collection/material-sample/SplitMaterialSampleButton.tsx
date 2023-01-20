@@ -1,7 +1,7 @@
-import { BULK_SPLIT_IDS } from "../../../pages/collection/material-sample/bulk-split";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
+import { BULK_SPLIT_IDS } from "../../bulk-material-sample/MaterialSampleSplitGenerationForm";
 
 interface SplitMaterialSampleButtonProps {
   ids: string[];
@@ -20,7 +20,7 @@ export function SplitMaterialSampleButton({
   }
 
   return (
-    <button className="btn btn-primary" onClick={onClick}>
+    <button className="btn btn-primary me-2" onClick={onClick}>
       <DinaMessage id="splitButton" />
     </button>
   );

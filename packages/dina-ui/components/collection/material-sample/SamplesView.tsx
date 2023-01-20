@@ -9,11 +9,9 @@ import {
 import Link from "next/link";
 import { useState } from "react";
 import ReactTable from "react-table";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { SplitMaterialSampleButton } from "./SplitMaterialSampleButton";
 
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
@@ -58,13 +56,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
-          <Link
-            href={`/collection/material-sample/bulk-create?splitFromId=${id}`}
-          >
-            <a className="btn btn-info mx-2">
-              <DinaMessage id="splitButton" />
-            </a>
-          </Link>
+          <SplitMaterialSampleButton ids={[id]} />
           <DeleteButton
             id={id as string}
             options={{ apiBaseUrl: "/collection-api" }}
