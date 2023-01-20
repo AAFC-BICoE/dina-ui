@@ -128,7 +128,14 @@ export function MaterialSampleSplitGenerationForm({
       return;
     }
 
-    if (!splitFromMaterialSamples?.data?.[0]) {
+    const splitMaterialSample = splitFromMaterialSamples
+      ?.data?.[0] as MaterialSample;
+
+    if (
+      !splitMaterialSample ||
+      !splitMaterialSample.group ||
+      !splitMaterialSample.collection
+    ) {
       return;
     }
 
@@ -138,12 +145,12 @@ export function MaterialSampleSplitGenerationForm({
       return {
         type: "material-sample",
         parentMaterialSample: {
-          id: splitFromMaterialSamples?.data?.[0]?.id ?? "",
+          id: splitMaterialSample.id ?? "",
           type: "material-sample"
         },
-        group: splitFromMaterialSamples?.data?.[0]?.group ?? "",
+        group: splitMaterialSample.group,
         collection: {
-          id: splitFromMaterialSamples?.data?.[0]?.collection?.id ?? "",
+          id: splitMaterialSample.collection?.id ?? "",
           type: "collection"
         },
         publiclyReleasable: true,
