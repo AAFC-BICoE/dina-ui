@@ -46,7 +46,7 @@ const APPEND_GENERATION_MODE: AppendGenerationMode = {
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
   seriesOptions: SeriesOptions;
-  seriesGenerationOptions: GenerationOptions;
+  generationOptions: GenerationOptions;
 }
 
 interface MaterialSampleSplitGenerationFormProps {
@@ -115,7 +115,7 @@ export function MaterialSampleSplitGenerationForm({
   const initialValues: MaterialSampleBulkSplitFields = {
     numberToCreate: 1,
     seriesOptions: ableToContinueSeries ? "continue" : "new",
-    seriesGenerationOptions: "lowercase"
+    generationOptions: "lowercase"
   };
 
   const onSubmit: DinaFormOnSubmit<MaterialSampleBulkSplitFields> = ({
@@ -187,14 +187,18 @@ export function MaterialSampleSplitGenerationForm({
             <div className="col-md-4">
               <RadioButtonsField<string>
                 name="seriesOptions"
+                label={formatMessage("splitSeriesOptionLabel")}
                 horizontalOptions={true}
                 options={[
                   {
                     value: "continue",
-                    label: "Continue series",
+                    label: formatMessage("splitSeriesOptionContinue"),
                     disabled: !ableToContinueSeries
                   },
-                  { value: "new", label: "New Series" }
+                  {
+                    value: "new",
+                    label: formatMessage("splitSeriesOptionNew")
+                  }
                 ]}
               />
             </div>
@@ -202,12 +206,22 @@ export function MaterialSampleSplitGenerationForm({
               <FieldSpy fieldName="seriesOptions">
                 {(selected) => (
                   <SelectField
-                    name="seriesGenerationOptions"
+                    name="generationOptions"
+                    label={formatMessage("splitGenerationOptionLabel")}
                     disabled={selected === "continue"}
                     options={[
-                      { value: "lowercase", label: "a (Lowercase letters)" },
-                      { value: "uppercase", label: "A (Uppercase letters)" },
-                      { value: "numeric", label: "1 (Numerical)" }
+                      {
+                        value: "lowercase",
+                        label: formatMessage("splitGenerationOptionLowercase")
+                      },
+                      {
+                        value: "uppercase",
+                        label: formatMessage("splitGenerationOptionUppercase")
+                      },
+                      {
+                        value: "numeric",
+                        label: formatMessage("splitGenerationOptionNumerical")
+                      }
                     ]}
                   />
                 )}
@@ -246,7 +260,7 @@ function PreviewGeneratedNames({
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
       const seriesMode = formik.values.seriesOptions;
-      const generationMode = formik.values.seriesGenerationOptions;
+      const generationMode = formik.values.generationOptions;
 
       const getOldestMaterialSample = (materialSampleChildren) => {
         return materialSampleChildren
@@ -318,8 +332,12 @@ function PreviewGeneratedNames({
       <table className="table">
         <thead>
           <tr>
-            <th>Number</th>
-            <th>Generated name</th>
+            <th>
+              <DinaMessage id="splitPreviewNumberColumn" />
+            </th>
+            <th>
+              <DinaMessage id="splitPreviewGeneratedIdentifierColumn" />
+            </th>
           </tr>
         </thead>
         <tbody>

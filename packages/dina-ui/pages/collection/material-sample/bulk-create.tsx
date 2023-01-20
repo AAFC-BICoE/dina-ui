@@ -21,8 +21,6 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   const [lastSubmission, setLastSubmission] =
     useState<MaterialSampleGenerationFormSubmission>();
 
-  const splitFromId = router.query.splitFromId?.toString();
-
   const title = "createNewMaterialSamples";
 
   const generatedSamples = lastSubmission?.samples;
@@ -63,7 +61,6 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
         {mode === "GENERATE" && (
           <MaterialSampleGenerationForm
             onGenerate={onGenerate}
-            parentId={splitFromId}
             initialValues={lastSubmission?.submittedValues}
             initialMode={lastSubmission?.generationMode}
           />
