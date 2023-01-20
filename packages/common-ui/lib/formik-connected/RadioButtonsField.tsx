@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { FieldWrapper, FieldWrapperProps } from "..";
 
 export interface RadioFieldProps<T> extends FieldWrapperProps {
-  options: { label: ReactNode; value: T }[];
+  options: { label: ReactNode; value: T; disabled?: boolean }[];
 
   /** Render horizontally, by default it will be rendered vertically. */
   horizontalOptions?: boolean;
@@ -39,6 +39,7 @@ export function RadioButtonsField<T = any>({
                       className="btn-check"
                       checked={(value ?? null) === option.value}
                       onChange={() => setValue(option.value)}
+                      disabled={option.disabled ?? false}
                       id={id}
                     />
                     <label
@@ -68,6 +69,7 @@ export function RadioButtonsField<T = any>({
                     }
                     type="radio"
                     checked={(value ?? null) === option.value}
+                    disabled={option.disabled ?? false}
                     onChange={() => setValue(option.value)}
                   />
                   {option.label}

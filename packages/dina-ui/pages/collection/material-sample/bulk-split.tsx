@@ -17,30 +17,59 @@ import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
+import { useRouter } from "next/router";
+import { useBulkGet, useStringArrayConverter } from "common-ui";
+import { MaterialSample } from "../../../types/collection-api";
 
 /**
  * String key for the local storage of the bulk split ids.
  */
-const BULK_SPLIT_IDS = "bulk_split_ids";
+export const BULK_SPLIT_IDS = "bulk_split_ids";
 
 const ENTITY_LINK = "/collection/material-sample";
 
+type SeriesOptions = "continue" | "new";
+type GenerationOptions = "lowercase" | "uppercase" | "numeric";
+type AppendGenerationMode = {
+  [key in GenerationOptions]: string;
+};
+
+const APPEND_GENERATION_MODE: AppendGenerationMode = {
+  lowercase: "-a",
+  uppercase: "-A",
+  numeric: "-1"
+};
+
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
-  seriesOptions: "continue" | "new";
-  seriesGenerationOptions: "lowercase" | "uppercase" | "numeric";
+  seriesOptions: SeriesOptions;
+  seriesGenerationOptions: GenerationOptions;
 }
 
 export function MaterialSampleBulkSplitPage() {
   const { formatMessage } = useDinaIntl();
+  const router = useRouter();
+  const { bulkGet } = useApiClient();
+  const [convertArrayToString] = useStringArrayConverter();
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
   const isMultiple = useMemo(() => ids.length > 1, [ids]);
 
   // Clear local storage once the ids have been retrieved.
   useEffect(() => {
-    localStorage.removeItem(BULK_SPLIT_IDS);
-  }, ids);
+    if (ids.length === 0) {
+      // router.push("/collection/material-sample/list");
+    }
+
+    // Clear the local storage.
+    // localStorage.removeItem(BULK_SPLIT_IDS);
+  }, [ids]);
+
+  const splitFromMaterialSamples = useBulkGet<MaterialSample>({
+    ids,
+    listPath: "collection-api/material-sample",
+    disabled: ids.length === 0
+  });
 
   const buttonBar = (
     <>
@@ -58,9 +87,21 @@ export function MaterialSampleBulkSplitPage() {
     </>
   );
 
+  const ableToContinueSeries = useMemo<boolean>(
+    () =>
+      (splitFromMaterialSamples.data as any)?.every(
+        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
+      ),
+    [splitFromMaterialSamples.data]
+  );
+
+  if (splitFromMaterialSamples.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   const initialValues: MaterialSampleBulkSplitFields = {
     numberToCreate: 1,
-    seriesOptions: "continue",
+    seriesOptions: ableToContinueSeries ? "continue" : "new",
     seriesGenerationOptions: "lowercase"
   };
 
@@ -71,6 +112,13 @@ export function MaterialSampleBulkSplitPage() {
           <Card>
             <Card.Body>
               <DinaMessage id="splitFrom" />:
+              <span className="ms-2">
+                {convertArrayToString(
+                  (splitFromMaterialSamples?.data as any)?.map(
+                    (materialSample) => materialSample?.materialSampleName
+                  )
+                )}
+              </span>
             </Card.Body>
           </Card>
 
@@ -88,7 +136,11 @@ export function MaterialSampleBulkSplitPage() {
                 name="seriesOptions"
                 horizontalOptions={true}
                 options={[
-                  { value: "continue", label: "Continue series" },
+                  {
+                    value: "continue",
+                    label: "Continue series",
+                    disabled: !ableToContinueSeries
+                  },
                   { value: "new", label: "New Series" }
                 ]}
               />
@@ -110,14 +162,24 @@ export function MaterialSampleBulkSplitPage() {
             </div>
           </div>
 
-          <PreviewGeneratedNames />
+          <PreviewGeneratedNames
+            splitFromMaterialSamples={
+              splitFromMaterialSamples.data as MaterialSample[]
+            }
+          />
         </>
       </PageLayout>
     </DinaForm>
   );
 }
 
-function PreviewGeneratedNames() {
+interface PreviewGeneratedNamesProps {
+  splitFromMaterialSamples: MaterialSample[];
+}
+
+function PreviewGeneratedNames({
+  splitFromMaterialSamples
+}: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
 
@@ -128,9 +190,17 @@ function PreviewGeneratedNames() {
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
+      const seriesMode = formik.values.seriesOptions;
+      const generationMode = formik.values.seriesGenerationOptions;
+      const identifier =
+        seriesMode === "new"
+          ? splitFromMaterialSamples[0]?.materialSampleName +
+            APPEND_GENERATION_MODE[generationMode]
+          : "CNC-1";
+
       const input: MaterialSampleIdentifierGenerator = {
         amount: formik.values.numberToCreate,
-        identifier: "CNC-1",
+        identifier,
         type: "material-sample-identifier-generator"
       };
 
@@ -163,7 +233,7 @@ function PreviewGeneratedNames() {
   }, [formik.values]);
 
   return (
-    <div className="row mt-4">
+    <div className="mt-4">
       <h4>
         <DinaMessage id="previewLabel" />
       </h4>
