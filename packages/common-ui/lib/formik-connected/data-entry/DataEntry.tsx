@@ -81,7 +81,7 @@ export function DataEntry({
                           vocabularyOptionsPath={vocabularyOptionsPath}
                           typeOptions={typeOptions}
                           readOnly={readOnly}
-                          initialValues={initialValues.at(index)}
+                          initialValues={initialValues?.at(index)}
                         />
                       );
                     })}
