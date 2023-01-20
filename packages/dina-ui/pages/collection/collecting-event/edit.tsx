@@ -110,9 +110,10 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
     ...collectingEventInitialValues,
     type: "collecting-event" as const,
   };
-  const processedExtensionValues = processExtensionValues(initValues);
 
-  initValues.extensionValues = processedExtensionValues;
+  if (initValues.extensionValues) {
+    initValues.extensionValues = processExtensionValues(initValues);
+  }
 
   return (
     <DinaForm<CollectingEvent>
@@ -132,6 +133,9 @@ function CollectingEventForm({ collectingEvent }: CollectingEventFormProps) {
 }
 
 export function processExtensionValues(initValues) {
+  if (!initValues.extensionValues) {
+    return undefined;
+  }
   const initExtensionValues = initValues.extensionValues;
   const processedExtensionValues = Object.keys(initExtensionValues).map(
     (extensionKey) => {
