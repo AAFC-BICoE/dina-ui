@@ -12,6 +12,7 @@ import UploadPage, {
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
 
 const mockPush = jest.fn();
+const mockFormatMessage = jest.fn();
 
 jest.mock("next/router", () => ({
   useRouter: () => ({
@@ -121,9 +122,13 @@ describe("Upload page", () => {
   it("Throws file upload errors with a readable message.", (done) => {
     const exampleErrorResponse = `{"errors": [{ "detail": "Error from Spring" }]}`;
     try {
-      fileUploadErrorHandler(exampleErrorResponse, {
-        name: "fileName"
-      } as File);
+      fileUploadErrorHandler(
+        exampleErrorResponse,
+        {
+          name: "fileName"
+        } as File,
+        mockFormatMessage
+      );
     } catch (error) {
       expect(error.message).toEqual("Error from Spring");
       done();
@@ -133,13 +138,34 @@ describe("Upload page", () => {
   it("Throws file upload error when unsupported file type is provided.", (done) => {
     const exampleErrorResponse = "<h1>Unsupported Media Type</h1>";
     try {
-      fileUploadErrorHandler(exampleErrorResponse, {
-        name: "fileName_test.png"
-      } as File);
-    } catch (error) {
-      expect(error.message).toEqual(
-        "The 'fileName_test.png' file cannot be uploaded since it's an unsupported file type."
+      fileUploadErrorHandler(
+        exampleErrorResponse,
+        {
+          name: "fileName_test.png"
+        } as File,
+        mockFormatMessage
       );
+    } catch (error) {
+      expect(mockFormatMessage).toHaveBeenCalledWith(
+        "unsupportedFileTypeError",
+        { fileName: "fileName_test.png" }
+      );
+      done();
+    }
+  });
+
+  it("Handle http status 403 error", (done) => {
+    const exampleErrorResponse = "HTTP Status 403 forbidden";
+    try {
+      fileUploadErrorHandler(
+        exampleErrorResponse,
+        {
+          name: "fileName_test.png"
+        } as File,
+        mockFormatMessage
+      );
+    } catch (error) {
+      expect(mockFormatMessage).toHaveBeenCalledWith("http403ForbiddenError");
       done();
     }
   });

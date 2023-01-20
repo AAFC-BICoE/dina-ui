@@ -34,6 +34,10 @@ respond /keycloak.json "{
 	\"confidential-port\": 0
 }"
 
+respond /instance.json "{ 
+	\"instance-mode\": \"{$INSTANCE_MODE}\"
+}"
+
 # Proxy to the main back-end API:
 route /api/objectstore-api/* {
 	uri replace /api/objectstore-api /api/v1

@@ -5,7 +5,7 @@ import { WorkbookJSON } from "../../components/workbook/types/Workbook";
 import { IFileWithMeta } from "../../components/object-store";
 import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { WorkbookDisplay } from "../../components/workbook/WorkbookDisplay";
+import { WorkbookColumnMapping } from "packages/dina-ui/components/workbook/WorkbookColumnMapping";
 
 export default function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -67,7 +67,7 @@ export default function UploadWorkbookPage() {
       ) : (
         <>
           {jsonData ? (
-            <WorkbookDisplay jsonData={jsonData} />
+            <WorkbookColumnMapping spreadsheetData={jsonData} />
           ) : (
             <>
               {failedMessage}
