@@ -1,0 +1,36 @@
+{
+  "materialSample": [
+    { "field": "materialSampleName", "dataType": "string" },
+    { "field": "preservationType", "dataType": "string" },
+    { "field": "preparationFixative", "dataType": "string" },
+    { "field": "preparationMaterials", "dataType": "string" },
+    { "field": "preparationSubstrate", "dataType": "string" },
+    { "field": "preparationDate", "dataType": "string" },
+    { "field": "preparationRemarks", "dataType": "string" },
+    { "field": "description", "dataType": "string" },
+    { "field": "dwcDegreeOfEstablishment", "dataType": "string" },
+    { "field": "barcode", "dataType": "string" },
+    { "field": "materialSampleState", "dataType": "string" },
+    { "field": "materialSampleRemarks", "dataType": "string" },
+    { "field": "notPubliclyReleasableReason", "dataType": "string" },
+    { "field": "dwcOtherCatalogNumbers", "dataType": "string[]" },
+    { "field": "tags", "dataType": "string[]" },
+    { "field": "materialSampleType", "dataType": "string" },
+    { "field": "managedAttributes", "dataType": "Map" },
+    { "field": "organismsIndividualEntry", "dataType": "boolean" },
+    { "field": "useTargetOrganism", "dataType": "boolean" },
+    { "field": "publiclyReleasable", "dataType": "boolean" },
+    { "field": "useNextSequence", "dataType": "boolean" },
+    { "field": "isRestricted", "dataType": "boolean" }
+  ],
+  "collection": [
+    { "field": "group", "dataType": "string" },
+    { "field": "name", "dataType": "string" },
+    { "field": "code", "dataType": "string" },
+    { "field": "webpage", "dataType": "string" },
+    { "field": "contact", "dataType": "string" },
+    { "field": "address", "dataType": "string" },
+    { "field": "remarks", "dataType": "string" },
+    { "field": "multilingualDescription", "dataType": "Map" }
+  ]
+}
