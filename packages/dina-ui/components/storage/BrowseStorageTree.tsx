@@ -2,15 +2,18 @@ import classNames from "classnames";
 import {
   FilterGroupModel,
   FormikButton,
+  LoadingSpinner,
   MetaWithTotal,
+  Operation,
   rsql,
+  useApiClient,
   useQuery,
   withResponse
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import Pagination from "rc-pagination";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import { Promisable } from "type-fest";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -74,7 +77,25 @@ export function StorageTreeList({
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
   const offset = (pageNumber - 1) * limit;
+  const [tempStorageUnitChildren, setTempStorageUnitChildren] = useState<StorageUnit[]>([]);
+  const { bulkGet } = useApiClient();
+  const [loading, setLoading] = useState<boolean>(true);
 
+  async function fetchStorageUnitChildren(){
+    if( storageUnitChildren ){
+      await bulkGet<StorageUnit>(
+        storageUnitChildren.map(
+          (storageUnit) =>
+            "/storage-unit/" + storageUnit.id + "?include=storageUnitType"
+        ),
+        { apiBaseUrl: "/collection-api" }
+      ).then((response) => {
+        setTempStorageUnitChildren(response);
+        setLoading(false);
+      });
+    }
+  }
+  
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>(
     {
       path: `collection-api/storage-unit`,
@@ -112,6 +133,11 @@ export function StorageTreeList({
     { disabled: storageUnitChildren !== undefined }
   );
 
+  useEffect(() => {
+    if (storageUnitChildren) {
+      fetchStorageUnitChildren();
+    }
+  }, [storageUnitChildren]);
   // If the children are provided we can skip the query and just display them.
   if (storageUnitChildren !== undefined) {
     return (
@@ -255,3 +281,4 @@ function StorageUnitCollapser({
     </div>
   );
 }
+
