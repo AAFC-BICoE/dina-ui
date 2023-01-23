@@ -3,7 +3,7 @@ import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { TagSelectField } from "../TagSelectField";
 import CreatableSelect from "react-select/creatable";
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/material-sample":
       return {
@@ -14,14 +14,14 @@ const mockGet = jest.fn<any, any>(async path => {
               "example-tag-2",
               "example-tag-3",
               // include duplicate tag which should be removed:
-              "example-tag-3"
-            ]
+              "example-tag-3",
+            ],
           },
           {
             // include null tags which should be removed:
-            tags: null
-          }
-        ]
+            tags: null,
+          },
+        ],
       };
   }
 });
@@ -29,9 +29,9 @@ const mockGet = jest.fn<any, any>(async path => {
 const testCtx = {
   apiContext: {
     apiClient: {
-      get: mockGet
-    }
-  }
+      get: mockGet,
+    },
+  },
 };
 
 describe("TagSelectField", () => {
@@ -53,7 +53,7 @@ describe("TagSelectField", () => {
       fields: { "material-sample": "tags" }, // Only request tags field.
       filter: { rsql: "group=in=(aafc,cnc)", tags: { NEQ: "null" } }, // Restrict to user's groups
       page: { limit: 100 },
-      sort: "-createdOn" // Newest first
+      sort: "-createdOn", // Newest first
     });
 
     expect(wrapper.find(CreatableSelect).prop("options")).toEqual([
@@ -62,18 +62,18 @@ describe("TagSelectField", () => {
         options: [
           {
             label: "example-tag-1",
-            value: "example-tag-1"
+            value: "example-tag-1",
           },
           {
             label: "example-tag-2",
-            value: "example-tag-2"
+            value: "example-tag-2",
           },
           {
             label: "example-tag-3",
-            value: "example-tag-3"
-          }
-        ]
-      }
+            value: "example-tag-3",
+          },
+        ],
+      },
     ]);
   });
 
@@ -92,14 +92,14 @@ describe("TagSelectField", () => {
     wrapper.update();
 
     wrapper.find(CreatableSelect).prop<any>("onChange")([
-      { value: "my-tag-1" }
+      { value: "my-tag-1" },
     ]);
 
     await new Promise(setImmediate);
     wrapper.update();
 
     expect(wrapper.find(CreatableSelect).prop("value")).toEqual([
-      { label: "my-tag-1", value: "my-tag-1" }
+      { label: "my-tag-1", value: "my-tag-1" },
     ]);
   });
 });
