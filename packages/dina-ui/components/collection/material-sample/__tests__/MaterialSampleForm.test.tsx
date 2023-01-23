@@ -12,7 +12,7 @@ import {
   COLLECTING_EVENT_COMPONENT_NAME,
   MaterialSample,
   ORGANISMS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
 } from "../../../../types/collection-api";
 
 // Mock out the dynamic component, which should only be rendered in the browser
@@ -28,7 +28,7 @@ function testCollectionEvent(): Partial<CollectingEvent> {
     verbatimEventDateTime: "2021-04-13",
     id: "1",
     type: "collecting-event",
-    group: "test group"
+    group: "test group",
   };
 }
 
@@ -39,7 +39,7 @@ function testAcquisitionEvent(): Partial<AcquisitionEvent> {
     group: "test group",
     createdBy: "poffm",
     createdOn: "2021-11-15",
-    receptionRemarks: "test reception remarks"
+    receptionRemarks: "test reception remarks",
   };
 }
 
@@ -51,14 +51,14 @@ function testMaterialSample(): InputResource<MaterialSample> {
     materialSampleName: "my-sample-name",
     collectingEvent: {
       id: "1",
-      type: "collecting-event"
+      type: "collecting-event",
     },
     acquisitionEvent: {
       id: "1",
-      type: "acquisition-event"
+      type: "acquisition-event",
     },
     attachment: [{ id: "attach-1", type: "metadata" }],
-    ...blankMaterialSample()
+    ...blankMaterialSample(),
   };
 }
 
@@ -80,8 +80,8 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "collection-api/material-sample":
       return {
         data: [
-          { id: "1", materialSampleName: "test name", type: "material-sample" }
-        ]
+          { id: "1", materialSampleName: "test name", type: "material-sample" },
+        ],
       };
     case "collection-api/preparation-type":
     case "collection-api/managed-attribute":
@@ -122,7 +122,7 @@ const mockSave = jest.fn<any, any>(async (saves) => {
     }
     return {
       ...save.resource,
-      id: save.resource.id ?? "11111111-1111-1111-1111-111111111111"
+      id: save.resource.id ?? "11111111-1111-1111-1111-111111111111",
     };
   });
 });
@@ -153,9 +153,9 @@ const testCtx = {
     bulkGet: mockBulkGet,
     save: mockSave,
     apiClient: {
-      get: mockGet
-    }
-  }
+      get: mockGet,
+    },
+  },
 };
 
 const mockOnSaved = jest.fn();
@@ -179,6 +179,11 @@ describe("Material Sample Edit Page", () => {
     wrapper.find(".enable-catalogue-info").find(Switch).prop<any>("onChange")(
       true
     );
+    // Wait for the page to load.
+    await new Promise(setImmediate);
+    wrapper.update();
+
+    expect(wrapper.find(".spinner-border").exists()).toEqual(false);
 
     wrapper
       .find(".materialSampleName-field input")
@@ -203,22 +208,22 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
-                  isPrimary: true
-                }
+                  isPrimary: true,
+                },
               ],
               relationships: {
                 attachment: {
-                  data: []
-                }
+                  data: [],
+                },
               },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default value
-              type: "collecting-event"
+              type: "collecting-event",
             },
-            type: "collecting-event"
-          }
+            type: "collecting-event",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         // New material-sample:
@@ -227,12 +232,12 @@ describe("Material Sample Edit Page", () => {
             resource: {
               acquisitionEvent: {
                 id: null,
-                type: "acquisition-event"
+                type: "acquisition-event",
               },
               associations: [],
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+                type: "collecting-event",
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
@@ -251,13 +256,13 @@ describe("Material Sample Edit Page", () => {
               restrictionRemarks: null,
               scheduledAction: undefined,
               preparationMethod: undefined,
-              collection: undefined
+              collection: undefined,
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -305,12 +310,12 @@ describe("Material Sample Edit Page", () => {
             resource: {
               acquisitionEvent: {
                 id: null,
-                type: "acquisition-event"
+                type: "acquisition-event",
               },
               associations: [],
               collectingEvent: {
                 id: "1",
-                type: "collecting-event"
+                type: "collecting-event",
               },
               storageUnit: { id: null, type: "storage-unit" },
               materialSampleName: "test-material-sample-id",
@@ -330,14 +335,14 @@ describe("Material Sample Edit Page", () => {
               restrictionRemarks: null,
               scheduledAction: undefined,
               relationships: {
-                organism: { data: [] }
-              }
+                organism: { data: [] },
+              },
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -377,13 +382,13 @@ describe("Material Sample Edit Page", () => {
               id: "1",
               type: "material-sample",
               materialSampleName: "test-material-sample-id",
-              relationships: {}
+              relationships: {},
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -439,22 +444,22 @@ describe("Material Sample Edit Page", () => {
               dwcVerbatimSRS: "WGS84 (EPSG:4326)",
               geoReferenceAssertions: [
                 {
-                  isPrimary: true
-                }
+                  isPrimary: true,
+                },
               ],
               relationships: {
                 attachment: {
-                  data: []
-                }
+                  data: [],
+                },
               },
               verbatimEventDateTime: "2019-12-21T16:00",
               publiclyReleasable: true, // Default Value
-              type: "collecting-event"
+              type: "collecting-event",
             },
-            type: "collecting-event"
-          }
+            type: "collecting-event",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         // Existing material-sample updated:
@@ -463,17 +468,17 @@ describe("Material Sample Edit Page", () => {
             resource: {
               collectingEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
-                type: "collecting-event"
+                type: "collecting-event",
               },
               id: "1",
               type: "material-sample",
-              relationships: {}
+              relationships: {},
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -487,8 +492,8 @@ describe("Material Sample Edit Page", () => {
           preparationType: {
             id: "65765",
             type: "preparation-type",
-            name: "test-prep-type"
-          } as KitsuResourceLink
+            name: "test-prep-type",
+          } as KitsuResourceLink,
         }}
         onSaved={mockOnSaved}
       />,
@@ -514,8 +519,8 @@ describe("Material Sample Edit Page", () => {
           storageUnit: {
             id: "76575",
             type: "storage-unit",
-            name: "test-storage-unit"
-          } as KitsuResourceLink
+            name: "test-storage-unit",
+          } as KitsuResourceLink,
         }}
         onSaved={mockOnSaved}
       />,
@@ -543,10 +548,10 @@ describe("Material Sample Edit Page", () => {
             {
               type: "organism",
               determination: [
-                { verbatimScientificName: "test verbatim scientific name" }
-              ]
-            }
-          ]
+                { verbatimScientificName: "test verbatim scientific name" },
+              ],
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -571,8 +576,8 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           associations: [
-            { associatedSample: "test name", associationType: "host" }
-          ]
+            { associatedSample: "test name", associationType: "host" },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -598,7 +603,7 @@ describe("Material Sample Edit Page", () => {
           ...testMaterialSample(),
           id: "333",
           materialSampleName: "test-ms",
-          associations: [{ associatedSample: "1", associationType: "host" }]
+          associations: [{ associatedSample: "1", associationType: "host" }],
         }}
         onSaved={mockOnSaved}
       />,
@@ -631,15 +636,15 @@ describe("Material Sample Edit Page", () => {
               relationships: {},
               attachment: undefined,
               projects: undefined,
-              type: "material-sample"
+              type: "material-sample",
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
         {
-          apiBaseUrl: "/collection-api"
-        }
-      ]
+          apiBaseUrl: "/collection-api",
+        },
+      ],
     ]);
   });
 
@@ -651,7 +656,7 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           attachment: [],
-          organism: []
+          organism: [],
         }}
         onSaved={mockOnSaved}
       />,
@@ -696,8 +701,8 @@ describe("Material Sample Edit Page", () => {
           id: "333",
           materialSampleName: "test-ms",
           managedAttributes: {
-            test_attr: "do the test"
-          }
+            test_attr: "do the test",
+          },
         }}
         onSaved={mockOnSaved}
       />,
@@ -719,15 +724,15 @@ describe("Material Sample Edit Page", () => {
             resource: {
               id: "333",
               relationships: {},
-              type: "material-sample"
+              type: "material-sample",
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
         {
-          apiBaseUrl: "/collection-api"
-        }
-      ]
+          apiBaseUrl: "/collection-api",
+        },
+      ],
     ]);
   });
 
@@ -743,7 +748,7 @@ describe("Material Sample Edit Page", () => {
     // Set the group:
     wrapper.find(".group-field Select").prop<any>("onChange")({
       label: "group",
-      value: "test group"
+      value: "test group",
     });
 
     wrapper
@@ -799,25 +804,25 @@ describe("Material Sample Edit Page", () => {
               determination: [
                 {
                   verbatimDeterminer: "test-agent-1",
-                  verbatimScientificName: "test-name-1"
+                  verbatimScientificName: "test-name-1",
                 },
                 {
                   verbatimDeterminer: "test-agent-2",
-                  verbatimScientificName: "test-name-2"
+                  verbatimScientificName: "test-name-2",
                 },
                 {
                   verbatimDeterminer: "test-agent-3",
-                  verbatimScientificName: "test-name-3"
-                }
+                  verbatimScientificName: "test-name-3",
+                },
               ],
               // The organism should get the same group as the Material Sample:
               group: "test group",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       // Submits the sample with the linked organism:
       [
@@ -830,18 +835,18 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
-                    }
-                  ]
-                }
+                      type: "organism",
+                    },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -852,36 +857,36 @@ describe("Material Sample Edit Page", () => {
         type: "material-sample",
         createdBy: "Mat",
         createdOn: "2020-05-04",
-        materialSampleName: "MY-SAMPLE-001"
+        materialSampleName: "MY-SAMPLE-001",
       })
     ).toEqual({
       // Omits id/createdBy/createdOn, increments the name:
       type: "material-sample",
-      materialSampleName: "MY-SAMPLE-002"
+      materialSampleName: "MY-SAMPLE-002",
     });
 
     expect(
       nextSampleInitialValues({
         id: "123",
         type: "material-sample",
-        materialSampleName: "MY-SAMPLE-9"
+        materialSampleName: "MY-SAMPLE-9",
       })
     ).toEqual({
       // Increments the name:
       type: "material-sample",
-      materialSampleName: "MY-SAMPLE-10"
+      materialSampleName: "MY-SAMPLE-10",
     });
 
     expect(
       nextSampleInitialValues({
         id: "123",
         type: "material-sample",
-        materialSampleName: "1-MY-SAMPLE"
+        materialSampleName: "1-MY-SAMPLE",
       })
     ).toEqual({
       // No way to increment the name, so it becomes blank:
       type: "material-sample",
-      materialSampleName: ""
+      materialSampleName: "",
     });
 
     // Organisms should not be linked to multiple Samples.
@@ -893,8 +898,8 @@ describe("Material Sample Edit Page", () => {
         materialSampleName: "MY-SAMPLE-100",
         organism: [
           { id: "organism-1", type: "organism", lifeStage: "test lifestage 1" },
-          { id: "organism-2", type: "organism", lifeStage: "test lifestage 2" }
-        ]
+          { id: "organism-2", type: "organism", lifeStage: "test lifestage 2" },
+        ],
       })
     ).toEqual({
       type: "material-sample",
@@ -902,8 +907,8 @@ describe("Material Sample Edit Page", () => {
       // The original organism IDs should be omitted:
       organism: [
         { type: "organism", lifeStage: "test lifestage 1" },
-        { type: "organism", lifeStage: "test lifestage 2" }
-      ]
+        { type: "organism", lifeStage: "test lifestage 2" },
+      ],
     });
   });
 
@@ -941,14 +946,14 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               receptionRemarks: "new acq event remarks",
-              type: "acquisition-event"
+              type: "acquisition-event",
             },
-            type: "acquisition-event"
-          }
+            type: "acquisition-event",
+          },
         ],
         {
-          apiBaseUrl: "/collection-api"
-        }
+          apiBaseUrl: "/collection-api",
+        },
       ],
       [
         [
@@ -956,14 +961,14 @@ describe("Material Sample Edit Page", () => {
             resource: expect.objectContaining({
               acquisitionEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
-                type: "acquisition-event"
-              }
+                type: "acquisition-event",
+              },
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1003,16 +1008,16 @@ describe("Material Sample Edit Page", () => {
             resource: expect.objectContaining({
               acquisitionEvent: {
                 id: "1",
-                type: "acquisition-event"
-              }
+                type: "acquisition-event",
+              },
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
         {
-          apiBaseUrl: "/collection-api"
-        }
-      ]
+          apiBaseUrl: "/collection-api",
+        },
+      ],
     ]);
   });
 
@@ -1065,12 +1070,12 @@ describe("Material Sample Edit Page", () => {
           {
             resource: {
               receptionRemarks: "new remarks value",
-              type: "acquisition-event"
+              type: "acquisition-event",
             },
-            type: "acquisition-event"
-          }
+            type: "acquisition-event",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -1080,15 +1085,15 @@ describe("Material Sample Edit Page", () => {
               type: "material-sample",
               acquisitionEvent: {
                 id: "11111111-1111-1111-1111-111111111111",
-                type: "acquisition-event"
+                type: "acquisition-event",
               },
-              relationships: {}
+              relationships: {},
             },
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1192,7 +1197,7 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           group: "test-group",
-          materialSampleName: "test-ms"
+          materialSampleName: "test-ms",
         }}
         onSaved={mockOnSaved}
       />,
@@ -1231,12 +1236,12 @@ describe("Material Sample Edit Page", () => {
               // The group is copied from the sample:
               group: "test-group",
               lifeStage: "test lifestage",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       // Submits the sample:
       [
@@ -1249,18 +1254,18 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
-                    }
-                  ]
-                }
+                      type: "organism",
+                    },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1278,21 +1283,21 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
+              group: "test-group",
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              group: "test-group"
+              group: "test-group",
             },
             {
               type: "organism",
               id: "organism-3",
               lifeStage: "lifestage 3",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1334,12 +1339,12 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               group: "test-group",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -1351,18 +1356,18 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "organism-1",
-                      type: "organism"
-                    }
-                  ]
-                }
+                      type: "organism",
+                    },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1380,15 +1385,15 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
+              group: "test-group",
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1427,12 +1432,12 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -1445,18 +1450,18 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "organism-2",
-                      type: "organism"
-                    }
-                  ]
-                }
+                      type: "organism",
+                    },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1474,9 +1479,9 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1510,15 +1515,15 @@ describe("Material Sample Edit Page", () => {
           {
             resource: expect.objectContaining({
               relationships: expect.objectContaining({
-                organism: { data: [] }
+                organism: { data: [] },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1536,9 +1541,9 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1573,15 +1578,15 @@ describe("Material Sample Edit Page", () => {
           {
             resource: expect.objectContaining({
               relationships: expect.objectContaining({
-                organism: { data: [] }
+                organism: { data: [] },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1599,9 +1604,9 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1636,30 +1641,30 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-1",
               lifeStage: "common-life-stage",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
+            type: "organism",
           },
           // New organism which is a copy of Organism #1:
           {
             resource: {
               group: "test-group",
               lifeStage: "common-life-stage",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
+            type: "organism",
           },
           // New organism which is a copy of Organism #1:
           {
             resource: {
               group: "test-group",
               lifeStage: "common-life-stage",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -1672,26 +1677,26 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     {
                       id: "organism-1",
-                      type: "organism"
+                      type: "organism",
                     },
                     {
                       id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
+                      type: "organism",
                     },
                     {
                       id: "11111111-1111-1111-1111-111111111111",
-                      type: "organism"
-                    }
-                  ]
-                }
+                      type: "organism",
+                    },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1709,21 +1714,21 @@ describe("Material Sample Edit Page", () => {
               type: "organism",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              group: "test-group"
+              group: "test-group",
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              group: "test-group"
+              group: "test-group",
             },
             {
               type: "organism",
               id: "organism-3",
               lifeStage: "lifestage 3",
-              group: "test-group"
-            }
-          ]
+              group: "test-group",
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1772,18 +1777,18 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
+            type: "organism",
           },
           {
             resource: {
               group: "test-group",
               id: "organism-2",
               lifeStage: "lifestage 2",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
+            type: "organism",
           },
           // Adds the new value to the 3rd organism:
           {
@@ -1791,12 +1796,12 @@ describe("Material Sample Edit Page", () => {
               group: "test-group",
               id: "organism-3",
               lifeStage: "lifestage 3 edited",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -1808,17 +1813,17 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     { id: "organism-1", type: "organism" },
                     { id: "organism-2", type: "organism" },
-                    { id: "organism-3", type: "organism" }
-                  ]
-                }
+                    { id: "organism-3", type: "organism" },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1837,23 +1842,23 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               group: "test-group",
-              isTarget: true
+              isTarget: true,
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
               group: "test-group",
-              isTarget: false
+              isTarget: false,
             },
             {
               type: "organism",
               id: "organism-3",
               lifeStage: "lifestage 3",
               group: "test-group",
-              isTarget: false
-            }
-          ]
+              isTarget: false,
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -1900,9 +1905,9 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: null
+              isTarget: null,
             },
-            type: "organism"
+            type: "organism",
           },
           {
             resource: {
@@ -1910,9 +1915,9 @@ describe("Material Sample Edit Page", () => {
               id: "organism-2",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: null
+              isTarget: null,
             },
-            type: "organism"
+            type: "organism",
           },
           {
             resource: {
@@ -1920,12 +1925,12 @@ describe("Material Sample Edit Page", () => {
               id: "organism-3",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: null
+              isTarget: null,
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       // The material sample is saved with the same 3 organisms linked:
       [
@@ -1938,17 +1943,17 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     { id: "organism-1", type: "organism" },
                     { id: "organism-2", type: "organism" },
-                    { id: "organism-3", type: "organism" }
-                  ]
-                }
+                    { id: "organism-3", type: "organism" },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -1967,23 +1972,23 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               group: "test-group",
-              isTarget: false
+              isTarget: false,
             },
             {
               type: "organism",
               id: "organism-2",
               lifeStage: "lifestage 2",
               group: "test-group",
-              isTarget: true
+              isTarget: true,
             },
             {
               type: "organism",
               id: "organism-3",
               lifeStage: "lifestage 3",
               group: "test-group",
-              isTarget: false
-            }
-          ]
+              isTarget: false,
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -2031,9 +2036,9 @@ describe("Material Sample Edit Page", () => {
               id: "organism-1",
               lifeStage: "lifestage 1",
               type: "organism",
-              isTarget: true
+              isTarget: true,
             },
-            type: "organism"
+            type: "organism",
           },
           {
             resource: {
@@ -2041,9 +2046,9 @@ describe("Material Sample Edit Page", () => {
               id: "organism-2",
               lifeStage: "lifestage 2",
               type: "organism",
-              isTarget: false
+              isTarget: false,
             },
-            type: "organism"
+            type: "organism",
           },
           {
             resource: {
@@ -2051,12 +2056,12 @@ describe("Material Sample Edit Page", () => {
               id: "organism-3",
               lifeStage: "lifestage 3",
               type: "organism",
-              isTarget: false
+              isTarget: false,
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       // The material sample is saved with the same 3 organisms linked:
       [
@@ -2069,17 +2074,17 @@ describe("Material Sample Edit Page", () => {
                   data: [
                     { id: "organism-1", type: "organism" },
                     { id: "organism-2", type: "organism" },
-                    { id: "organism-3", type: "organism" }
-                  ]
-                }
+                    { id: "organism-3", type: "organism" },
+                  ],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -2105,9 +2110,9 @@ describe("Material Sample Edit Page", () => {
                     {
                       id: "person-1-uuid",
                       type: "person",
-                      displayName: "Person 1"
-                    }
-                  ]
+                      displayName: "Person 1",
+                    },
+                  ],
                 },
                 {
                   isPrimary: true,
@@ -2115,13 +2120,13 @@ describe("Material Sample Edit Page", () => {
                     {
                       id: "person-2-uuid",
                       type: "person",
-                      displayName: "Person 2"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
+                      displayName: "Person 2",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         }}
         onSaved={mockOnSaved}
       />,
@@ -2143,10 +2148,10 @@ describe("Material Sample Edit Page", () => {
         resource: {
           displayName: "Person 1",
           id: "person-1-uuid",
-          type: "person"
+          type: "person",
         },
-        value: "person-1-uuid"
-      }
+        value: "person-1-uuid",
+      },
     ]);
 
     // Add a second Person to the primary Determination's determiners:
@@ -2158,16 +2163,16 @@ describe("Material Sample Edit Page", () => {
         resource: {
           displayName: "Person 1",
           id: "person-1-uuid",
-          type: "person"
-        }
+          type: "person",
+        },
       },
       {
         resource: {
           displayName: "Person 2",
           id: "person-2-uuid",
-          type: "person"
-        }
-      }
+          type: "person",
+        },
+      },
     ]);
 
     await new Promise(setImmediate);
@@ -2189,22 +2194,22 @@ describe("Material Sample Edit Page", () => {
                 {
                   // The new value as IDs only:
                   determiner: ["person-1-uuid", "person-2-uuid"],
-                  isPrimary: true
+                  isPrimary: true,
                 },
                 {
                   determiner: ["person-2-uuid"],
-                  isPrimary: true
-                }
+                  isPrimary: true,
+                },
               ],
               group: "test-group",
               id: "organism-1",
               lifeStage: "lifestage 1",
-              type: "organism"
+              type: "organism",
             },
-            type: "organism"
-          }
+            type: "organism",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
+        { apiBaseUrl: "/collection-api" },
       ],
       [
         [
@@ -2213,16 +2218,16 @@ describe("Material Sample Edit Page", () => {
               id: "333",
               relationships: expect.objectContaining({
                 organism: {
-                  data: [{ id: "organism-1", type: "organism" }]
-                }
+                  data: [{ id: "organism-1", type: "organism" }],
+                },
               }),
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -2237,11 +2242,11 @@ describe("Material Sample Edit Page", () => {
           managedAttributes: {
             // Has existing attribute_1 and attribute_2 values:
             attribute_1: "attribute 1 value",
-            attribute_2: "attribute 2 value"
-          }
+            attribute_2: "attribute 2 value",
+          },
         }}
         visibleManagedAttributeKeys={{
-          materialSample: ["attribute_2", "attribute_3"]
+          materialSample: ["attribute_2", "attribute_3"],
         }}
         onSaved={mockOnSaved}
       />,
@@ -2280,15 +2285,15 @@ describe("Material Sample Edit Page", () => {
                 // The existing Attribute 1 value is kept event though it was hidden by the custom view:
                 attribute_1: "attribute 1 value",
                 // The new Attribute 2 value is saved:
-                attribute_2: "new attribute 2 value"
+                attribute_2: "new attribute 2 value",
               },
-              type: "material-sample"
+              type: "material-sample",
             }),
-            type: "material-sample"
-          }
+            type: "material-sample",
+          },
         ],
-        { apiBaseUrl: "/collection-api" }
-      ]
+        { apiBaseUrl: "/collection-api" },
+      ],
     ]);
   });
 
@@ -2299,10 +2304,10 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           group: "test-group",
-          materialSampleName: "test-ms"
+          materialSampleName: "test-ms",
         }}
         visibleManagedAttributeKeys={{
-          collectingEvent: ["attribute_2", "attribute_3"]
+          collectingEvent: ["attribute_2", "attribute_3"],
         }}
         onSaved={mockOnSaved}
       />,
@@ -2343,10 +2348,10 @@ describe("Material Sample Edit Page", () => {
           type: "material-sample",
           id: "333",
           group: "test-group",
-          materialSampleName: "test-ms"
+          materialSampleName: "test-ms",
         }}
         visibleManagedAttributeKeys={{
-          determination: ["attribute_2", "attribute_3"]
+          determination: ["attribute_2", "attribute_3"],
         }}
         onSaved={mockOnSaved}
       />,
