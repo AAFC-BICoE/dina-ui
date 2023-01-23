@@ -21,7 +21,6 @@ import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/re
 import { useRouter } from "next/router";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
-import moment from "moment";
 import { InputResource } from "kitsu";
 
 /**
@@ -58,7 +57,6 @@ export function MaterialSampleSplitGenerationForm({
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
   const router = useRouter();
-  const { bulkGet } = useApiClient();
   const [convertArrayToString] = useStringArrayConverter();
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
@@ -71,16 +69,17 @@ export function MaterialSampleSplitGenerationForm({
   // Clear local storage once the ids have been retrieved.
   useEffect(() => {
     if (ids.length === 0) {
-      // router.push("/collection/material-sample/list");
+      router.push("/collection/material-sample/list");
     }
 
     // Clear the local storage.
-    // localStorage.removeItem(BULK_SPLIT_IDS);
+    localStorage.removeItem(BULK_SPLIT_IDS);
   }, [ids]);
 
   const splitFromMaterialSamples = useBulkGet<MaterialSample>({
     ids,
-    listPath: "collection-api/material-sample?include=materialSampleChildren",
+    listPath:
+      "collection-api/material-sample?include=materialSampleChildren,collection",
     disabled: ids.length === 0
   });
 
@@ -269,11 +268,11 @@ function PreviewGeneratedNames({
       const seriesMode = formik.values.seriesOptions;
       const generationMode = formik.values.generationOptions;
 
-      const getOldestMaterialSample = (materialSampleChildren) => {
+      const getYoungestMaterialSample = (materialSampleChildren) => {
         return materialSampleChildren
-          ? materialSampleChildren.sort((a, b) =>
-              moment(a.createdOn).diff(moment(b.createdOn))
-            )[0]
+          ? materialSampleChildren.reduce((max, current) => {
+              return current.ordinal > max.ordinal ? current : max;
+            }, materialSampleChildren[0])
           : undefined;
       };
 
@@ -286,7 +285,7 @@ function PreviewGeneratedNames({
       const identifier =
         seriesMode === "new"
           ? getNewIdentifier
-          : getOldestMaterialSample(
+          : getYoungestMaterialSample(
               splitFromMaterialSamples[0]?.materialSampleChildren
             )?.materialSampleName;
 

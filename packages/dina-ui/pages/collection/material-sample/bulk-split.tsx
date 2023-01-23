@@ -4,22 +4,15 @@ import { withRouter } from "next/router";
 import { useState } from "react";
 import { writeStorage } from "@rehooks/local-storage";
 import { MaterialSampleBulkEditor } from "../../../components";
-import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { MaterialSample } from "../../../types/collection-api/resources/MaterialSample";
 import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
 import { MaterialSampleSplitGenerationForm } from "../../../components/bulk-material-sample/MaterialSampleSplitGenerationForm";
 import PageLayout from "../../../components/page/PageLayout";
 
 export function MaterialSampleBulkSplitPage({ router }: WithRouterProps) {
-  const { formatMessage } = useDinaIntl();
-
   const [mode, setMode] = useState<"GENERATE" | "EDIT">("GENERATE");
   const [lastSubmission, setLastSubmission] =
     useState<InputResource<MaterialSample>[]>();
-
-  const splitFromId = router.query.splitFromId?.toString();
-
-  const title = "splitSubsampleTitle";
 
   async function moveToResultPage(
     samples: PersistedResource<MaterialSample>[]
