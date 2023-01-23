@@ -113,6 +113,7 @@ export function CollectingEventFormLayout({
   }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
+  console.log(initialValues);
 
   // Check if Georeferences are empty
   const georeferencesEmpty: [] = initialValues.geoReferenceAssertions.map(

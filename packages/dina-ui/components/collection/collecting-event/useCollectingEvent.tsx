@@ -76,11 +76,41 @@ export function useCollectingEventQuery(id?: string | null) {
             (admn.name += admn.placeType ? " [ " + admn.placeType + " ] " : "")
         );
         data.srcAdminLevels = srcAdminLevels;
+
+        if (data?.extensionValues) {
+          data.extensionValues = processExtensionValues(data);
+        }
       },
     }
   );
 
   return collectingEventQuery;
+}
+
+export function processExtensionValues(initValues) {
+  if (!initValues.extensionValues) {
+    return undefined;
+  }
+  const initExtensionValues = initValues.extensionValues;
+  const processedExtensionValues = Object.keys(initExtensionValues).map(
+    (extensionKey) => {
+      const initExtensionValue = initExtensionValues[extensionKey];
+      const extensionFields = Object.keys(initExtensionValue).map(
+        (extensionFieldKey) => {
+          return {
+            type: extensionFieldKey,
+            value: initExtensionValue[extensionFieldKey],
+          };
+        }
+      );
+      const processedExtensionValue = {
+        select: extensionKey,
+        rows: extensionFields,
+      };
+      return processedExtensionValue;
+    }
+  );
+  return processedExtensionValues;
 }
 
 interface UseCollectingEventSaveParams {

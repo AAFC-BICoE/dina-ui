@@ -51,7 +51,6 @@ import {
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
-import { processExtensionValues } from "../collecting-event/edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -155,9 +154,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 )}
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
-                  if (colEvent.extensionValues) {
-                    colEvent.extensionValues = processExtensionValues(colEvent);
-                  }
                   return (
                     <FieldSet legend={<DinaMessage id="collectingEvent" />}>
                       {materialSample.parentMaterialSample && (

@@ -4,7 +4,6 @@ import { CollectingEventFormLayout } from "../../../components/collection/collec
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { CollectingEvent } from "../../../types/collection-api/resources/CollectingEvent";
 import { getColumnDefinition } from "../material-sample/list";
-import { processExtensionValues } from "./edit";
 
 export default function CollectingEventDetailsPage() {
   return (
@@ -31,13 +30,6 @@ export default function CollectingEventDetailsPage() {
       apiBaseUrl="/collection-api"
       mainClass="container-fluid"
       showRevisionsLink={true}
-      alterInitialValues={(resource) => {
-        if (resource.extensionValues) {
-          resource.extensionValues = processExtensionValues(resource);
-        }
-
-        return resource;
-      }}
     />
   );
 }
