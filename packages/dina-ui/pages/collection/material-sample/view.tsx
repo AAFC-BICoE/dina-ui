@@ -5,7 +5,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  withResponse
+  withResponse,
 } from "common-ui";
 import { Field } from "formik";
 import { isEmpty } from "lodash";
@@ -37,20 +37,21 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent
+  useAcquisitionEvent,
 } from "../../../pages/collection/acquisition-event/edit";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
-  MaterialSample
+  MaterialSample,
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
+import { processExtensionValues } from "../collecting-event/edit";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -114,7 +115,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <>
             <Head
               title={formatMessage("materialSampleViewTitle", {
-                primaryID: materialSample?.materialSampleName
+                primaryID: materialSample?.materialSampleName,
               })}
             />
             <Nav />
@@ -153,34 +154,39 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   />
                 )}
                 <MaterialSampleInfoSection />
-                {withResponse(colEventQuery, ({ data: colEvent }) => (
-                  <FieldSet legend={<DinaMessage id="collectingEvent" />}>
-                    {materialSample.parentMaterialSample && (
-                      <div
-                        style={{
-                          marginLeft: "16px"
-                        }}
-                      >
-                        <DinaMessage
-                          id="fromParent"
-                          values={{ parentLink: collectingEventParentLink }}
-                        />
-                      </div>
-                    )}
-                    <DinaForm initialValues={colEvent} readOnly={true}>
-                      <div className="mb-3 d-flex justify-content-end align-items-center">
-                        <Link
-                          href={`/collection/collecting-event/view?id=${colEvent.id}`}
+                {withResponse(colEventQuery, ({ data: colEvent }) => {
+                  if (colEvent.extensionValues) {
+                    colEvent.extensionValues = processExtensionValues(colEvent);
+                  }
+                  return (
+                    <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+                      {materialSample.parentMaterialSample && (
+                        <div
+                          style={{
+                            marginLeft: "16px",
+                          }}
                         >
-                          <a>
-                            <DinaMessage id="detailsPageLink" />
-                          </a>
-                        </Link>
-                      </div>
-                      <CollectingEventFormLayout />
-                    </DinaForm>
-                  </FieldSet>
-                ))}
+                          <DinaMessage
+                            id="fromParent"
+                            values={{ parentLink: collectingEventParentLink }}
+                          />
+                        </div>
+                      )}
+                      <DinaForm initialValues={colEvent} readOnly={true}>
+                        <div className="mb-3 d-flex justify-content-end align-items-center">
+                          <Link
+                            href={`/collection/collecting-event/view?id=${colEvent.id}`}
+                          >
+                            <a>
+                              <DinaMessage id="detailsPageLink" />
+                            </a>
+                          </Link>
+                        </div>
+                        <CollectingEventFormLayout />
+                      </DinaForm>
+                    </FieldSet>
+                  );
+                })}
                 {withResponse(acqEventQuery, ({ data: acqEvent }) => (
                   <FieldSet
                     id={ACQUISITION_EVENT_COMPONENT_NAME}
@@ -229,7 +235,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       fieldSetProps={{
                         legend: (
                           <DinaMessage id="materialSampleManagedAttributes" />
-                        )
+                        ),
                       }}
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"
