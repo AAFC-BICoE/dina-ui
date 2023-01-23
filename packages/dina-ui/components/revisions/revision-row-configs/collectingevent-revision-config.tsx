@@ -1,10 +1,11 @@
-import { DateView, KeyValueTable } from "common-ui";
+import { DataEntry, DateView, DinaForm, KeyValueTable } from "common-ui";
 import Link from "next/link";
 import {
   CollectionMethod,
-  CollectingEvent
+  CollectingEvent,
 } from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
+import { processExtensionValues } from "../../collection/collecting-event/useCollectingEvent";
 import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
@@ -79,7 +80,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
                   )) ?? null,
                 createdOn: ({ original: { value } }) => (
                   <DateView date={value} />
-                )
+                ),
               }}
             />
           </div>
@@ -92,9 +93,26 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           data={value}
           customValueCells={{
             stateProvince: (sp) => <KeyValueTable data={sp.value} />,
-            country: (c) => <KeyValueTable data={c.value} />
+            country: (c) => <KeyValueTable data={c.value} />,
           }}
         />
-      )
-    }
+      ),
+      extensionValues: ({ original: { value } }) => {
+        const processedExtensionValues = processExtensionValues(value);
+        return (
+          <DinaForm
+            initialValues={{ extensionValues: processedExtensionValues }}
+            readOnly={true}
+          >
+            <DataEntry
+              legend={<></>}
+              name="extensionValues"
+              initialValues={processedExtensionValues}
+              typeOptions={[]}
+              readOnly={true}
+            />
+          </DinaForm>
+        );
+      },
+    },
   };

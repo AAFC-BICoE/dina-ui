@@ -78,7 +78,7 @@ export function useCollectingEventQuery(id?: string | null) {
         data.srcAdminLevels = srcAdminLevels;
 
         if (data?.extensionValues) {
-          data.extensionValues = processExtensionValues(data);
+          data.extensionValues = processExtensionValues(data.extensionValues);
         }
       },
     }
@@ -87,11 +87,11 @@ export function useCollectingEventQuery(id?: string | null) {
   return collectingEventQuery;
 }
 
-export function processExtensionValues(initValues) {
-  if (!initValues.extensionValues) {
+export function processExtensionValues(initExtensionValues) {
+  if (!initExtensionValues) {
     return undefined;
   }
-  const initExtensionValues = initValues.extensionValues;
+
   const processedExtensionValues = Object.keys(initExtensionValues).map(
     (extensionKey) => {
       const initExtensionValue = initExtensionValues[extensionKey];
