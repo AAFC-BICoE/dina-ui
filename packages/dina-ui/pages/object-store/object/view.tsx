@@ -58,6 +58,16 @@ export default function MetadataViewPage({
       ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
       : undefined;
 
+    // Check the request to see if a permission provider is present.
+    const permissionsProvided = metadata.meta?.permissionsProvider;
+
+    const canEdit = permissionsProvided
+      ? metadata.meta?.permissions?.includes("update") ?? false
+      : true;
+    const canDelete = permissionsProvided
+      ? metadata.meta?.permissions?.includes("delete") ?? false
+      : true;
+
     const buttonBar = (
       <ButtonBar>
         <BackButton
@@ -67,23 +77,27 @@ export default function MetadataViewPage({
           entityLink="/object-store/object"
           reloadLastSearch={reloadLastSearch ?? true}
         />
-        <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-          <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-            <DinaMessage id="editButtonText" />
-          </a>
-        </Link>
+        {canEdit && (
+          <Link href={`/object-store/metadata/edit?id=${uuid}`}>
+            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+              <DinaMessage id="editButtonText" />
+            </a>
+          </Link>
+        )}
         <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
           <a className="btn btn-info">
             <DinaMessage id="revisionsButtonText" />
           </a>
         </Link>
-        <DeleteButton
-          className="ms-5"
-          id={uuid}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list?reloadLastSearch"
-          type="metadata"
-        />
+        {canDelete && (
+          <DeleteButton
+            className="ms-5"
+            id={uuid}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object/list?reloadLastSearch"
+            type="metadata"
+          />
+        )}
       </ButtonBar>
     );
 
