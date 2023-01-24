@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { WorkbookJSON } from "./types/Workbook";
 import { getColumnHeaders } from "./utils/workbookMappingUtils";
@@ -6,15 +6,47 @@ import Table from "react-bootstrap/Table";
 import { FieldWrapper, SelectField } from "common-ui/lib";
 import Select from "react-select";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import FieldMappingConfig from "./utils/FieldMappingConfig.json";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
+import { useMateriaSampleConverter } from "./utils/useMaterialSampleConverter";
 
 export interface WorkbookColumnMappingProps {
   spreadsheetData: WorkbookJSON;
 }
 
+const ENTITY_TYPES = ["materialSample"] as const;
+
 export function WorkbookColumnMapping({
   spreadsheetData
 }: WorkbookColumnMappingProps) {
+  const { formatMessage } = useDinaIntl();
+  const entityTypes = ENTITY_TYPES.map((entityType) => ({
+    label: formatMessage(entityType),
+    value: entityType
+  }));
   const [sheet, setSheet] = useState<number>(0);
+  const [selectedType, setSelectedType] = useState<{
+    label: string;
+    value: string;
+  } | null>(entityTypes[0]);
+  const [fieldOptions, setFieldOptions] = useState(
+    [] as { label: string; value: string }[]
+  );
+  const { convertEntity } = useMateriaSampleConverter(FieldMappingConfig);
+
+  useEffect(() => {
+    if (!!selectedType?.value) {
+      const filedsConfigs = FieldMappingConfig[selectedType?.value];
+      setFieldOptions(
+        filedsConfigs.map((item) => ({
+          label: formatMessage(`field_${item.field}` as any),
+          value: item.field
+        }))
+      );
+    } else {
+      setFieldOptions([]);
+    }
+  }, [selectedType]);
 
   // Retrieve a string array of the headers from the uploaded spreadsheet.
   const headers = useMemo(() => {
@@ -35,7 +67,7 @@ export function WorkbookColumnMapping({
   const sheetValue = sheetOptions[sheet];
 
   return (
-    <DinaForm initialValues={{ sheet: 1, type: "material-sample" }}>
+    <DinaForm initialValues={{ sheet: 1, type: "materialSample" }}>
       <div className="mb-3 border card px-4 py-2">
         <div className="list-inline d-flex flex-row gap-4 pt-2">
           <FieldWrapper name="sheet" className="flex-grow-1">
@@ -47,8 +79,10 @@ export function WorkbookColumnMapping({
           </FieldWrapper>
           <FieldWrapper name="type" className="flex-grow-1">
             <Select
-              value={{ label: "Material Sample", value: "material-sample" }}
-              isDisabled={true}
+              isDisabled={entityTypes.length === 1}
+              value={selectedType}
+              onChange={(entityType) => setSelectedType(entityType)}
+              options={entityTypes}
             />
           </FieldWrapper>
         </div>
@@ -73,7 +107,7 @@ export function WorkbookColumnMapping({
               <td>
                 <SelectField
                   name={"fieldMap[" + columnHeader + "]"}
-                  options={[]}
+                  options={fieldOptions}
                   hideLabel={true}
                 />
               </td>
