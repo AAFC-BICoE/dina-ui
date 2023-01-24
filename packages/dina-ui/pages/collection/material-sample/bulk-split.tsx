@@ -1,6 +1,4 @@
 import { InputResource, PersistedResource } from "kitsu";
-import { WithRouterProps } from "next/dist/client/with-router";
-import { withRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { writeStorage } from "@rehooks/local-storage";
 import { MaterialSampleBulkEditor } from "../../../components";
@@ -9,13 +7,16 @@ import { BULK_EDIT_RESULT_IDS_KEY } from "./bulk-edit";
 import { MaterialSampleSplitGenerationForm } from "../../../components/bulk-material-sample/MaterialSampleSplitGenerationForm";
 import PageLayout from "../../../components/page/PageLayout";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { useRouter } from "next/router";
 
 /**
  * String key for the local storage of the bulk split ids.
  */
 export const BULK_SPLIT_IDS = "bulk_split_ids";
 
-export function MaterialSampleBulkSplitPage({ router }: WithRouterProps) {
+export default function MaterialSampleBulkSplitPage() {
+  const router = useRouter();
+
   const [mode, setMode] = useState<"GENERATE" | "EDIT">("GENERATE");
   const [lastSubmission, setLastSubmission] =
     useState<InputResource<MaterialSample>[]>();
@@ -69,5 +70,3 @@ export function MaterialSampleBulkSplitPage({ router }: WithRouterProps) {
     </>
   );
 }
-
-export default withRouter(MaterialSampleBulkSplitPage);
