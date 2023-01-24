@@ -1,14 +1,17 @@
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { BULK_SPLIT_IDS } from "../../bulk-material-sample/MaterialSampleSplitGenerationForm";
+import { BULK_SPLIT_IDS } from "../../../pages/collection/material-sample/bulk-split";
+import { Tooltip } from "common-ui/lib";
 
 interface SplitMaterialSampleButtonProps {
   ids: string[];
+  disabled: boolean;
 }
 
 export function SplitMaterialSampleButton({
-  ids
+  ids,
+  disabled
 }: SplitMaterialSampleButtonProps) {
   const router = useRouter();
 
@@ -19,7 +22,17 @@ export function SplitMaterialSampleButton({
     await router.push("/collection/material-sample/bulk-split");
   }
 
-  return (
+  return disabled ? (
+    <Tooltip
+      id="splitMaterialSampleNameRequiredTooltip"
+      disableSpanMargin={true}
+      visibleElement={
+        <button className="btn btn-primary me-2" disabled={true}>
+          <DinaMessage id="splitButton" />
+        </button>
+      }
+    />
+  ) : (
     <button className="btn btn-primary me-2" onClick={onClick}>
       <DinaMessage id="splitButton" />
     </button>

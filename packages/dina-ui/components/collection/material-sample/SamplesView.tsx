@@ -48,7 +48,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       Header: formatMessage("tags")
     },
     {
-      Cell: ({ original: { id } }) => (
+      Cell: ({ original: { id, materialSampleName } }) => (
         <div className="d-flex">
           <EditButton
             className="mx-2"
@@ -56,7 +56,10 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
-          <SplitMaterialSampleButton ids={[id]} />
+          <SplitMaterialSampleButton
+            ids={[id]}
+            disabled={!materialSampleName}
+          />
           <DeleteButton
             id={id as string}
             options={{ apiBaseUrl: "/collection-api" }}

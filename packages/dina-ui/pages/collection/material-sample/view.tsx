@@ -273,7 +273,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
-          <SplitMaterialSampleButton ids={[id]} />
+          <SplitMaterialSampleButton
+            ids={[id]}
+            disabled={!materialSample.materialSampleName}
+          />
           <GenerateLabelDropdownButton materialSample={materialSample} />
           <Link href={`/collection/material-sample/revisions?id=${id}`}>
             <a className="btn btn-info ms-5">

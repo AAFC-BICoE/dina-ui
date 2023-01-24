@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { BackToListButton } from "common-ui/lib/button-bar/BackToListButton";
 import PageLayout from "../page/PageLayout";
-import { useLocalStorage } from "@rehooks/local-storage";
 import {
   BackButton,
   DinaForm,
@@ -18,15 +17,9 @@ import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
-import { useRouter } from "next/router";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { InputResource } from "kitsu";
-
-/**
- * String key for the local storage of the bulk split ids.
- */
-export const BULK_SPLIT_IDS = "bulk_split_ids";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -49,32 +42,22 @@ interface MaterialSampleBulkSplitFields {
 }
 
 interface MaterialSampleSplitGenerationFormProps {
+  ids: string[];
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
 }
 
 export function MaterialSampleSplitGenerationForm({
+  ids,
   onGenerate
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
-  const router = useRouter();
   const [convertArrayToString] = useStringArrayConverter();
 
-  const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
   const isMultiple = useMemo(() => ids.length > 1, [ids]);
 
   const [generatedIdentifiers, setGeneratedIdentifiers] = useState<string[]>(
     []
   );
-
-  // Clear local storage once the ids have been retrieved.
-  useEffect(() => {
-    if (ids.length === 0) {
-      router.push("/collection/material-sample/list");
-    }
-
-    // Clear the local storage.
-    localStorage.removeItem(BULK_SPLIT_IDS);
-  }, [ids]);
 
   const splitFromMaterialSamples = useBulkGet<MaterialSample>({
     ids,
@@ -130,11 +113,7 @@ export function MaterialSampleSplitGenerationForm({
     const splitMaterialSample = splitFromMaterialSamples
       ?.data?.[0] as MaterialSample;
 
-    if (
-      !splitMaterialSample ||
-      !splitMaterialSample.group ||
-      !splitMaterialSample.collection
-    ) {
+    if (!splitMaterialSample) {
       return;
     }
 
@@ -147,11 +126,13 @@ export function MaterialSampleSplitGenerationForm({
           id: splitMaterialSample.id ?? "",
           type: "material-sample"
         },
-        group: splitMaterialSample.group,
-        collection: {
-          id: splitMaterialSample.collection?.id ?? "",
-          type: "collection"
-        },
+        group: splitMaterialSample.group ?? "",
+        collection: splitMaterialSample?.collection?.id
+          ? {
+              id: splitMaterialSample.collection?.id ?? "",
+              type: "collection"
+            }
+          : undefined,
         publiclyReleasable: true,
         allowDuplicateName: false,
         materialSampleName: generatedIdentifiers[index]
@@ -199,7 +180,10 @@ export function MaterialSampleSplitGenerationForm({
                   {
                     value: "continue",
                     label: formatMessage("splitSeriesOptionContinue"),
-                    disabled: !ableToContinueSeries
+                    disabled: !ableToContinueSeries,
+                    tooltipLabel: !ableToContinueSeries
+                      ? "splitSeriesOptionContinueTooltip"
+                      : undefined
                   },
                   {
                     value: "new",

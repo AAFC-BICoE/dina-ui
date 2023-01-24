@@ -1,8 +1,5 @@
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import {
-  BULK_SPLIT_IDS,
-  MaterialSampleSplitGenerationForm
-} from "../MaterialSampleSplitGenerationForm";
+import { MaterialSampleSplitGenerationForm } from "../MaterialSampleSplitGenerationForm";
 
 const NO_CHILDREN_MATERIAL_SAMPLE_UUID = "a503d31d-8203-4766-af85-db271e087853";
 
@@ -37,12 +34,6 @@ const CHILDREN_MATERIAL_SAMPLE = {
   ]
 };
 
-const mockRouter = jest.fn();
-
-jest.mock("next/router", () => ({
-  useRouter: () => ({ push: mockRouter })
-}));
-
 const mockOnGenerate = jest.fn();
 
 const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
@@ -63,31 +54,14 @@ const mockSave = jest.fn();
 const apiContext: any = { bulkGet: mockBulkGet, save: mockSave };
 
 describe("MaterialSampleSplitGenerationForm", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    localStorage.clear();
-  });
-
-  it("If no ids are provided in local storage, redirect the user to the entity list page", async () => {
-    const wrapper = mountWithAppContext(
-      <MaterialSampleSplitGenerationForm onGenerate={mockOnGenerate} />,
-      { apiContext }
-    );
-
-    wrapper.update();
-
-    expect(mockRouter).lastCalledWith("/collection/material-sample/list");
-  });
+  beforeEach(() => jest.clearAllMocks);
 
   it("Layout snapshot", async () => {
-    // Update the local storage.
-    localStorage.setItem(
-      BULK_SPLIT_IDS,
-      `["${NO_CHILDREN_MATERIAL_SAMPLE_UUID}"]`
-    );
-
     const wrapper = mountWithAppContext(
-      <MaterialSampleSplitGenerationForm onGenerate={mockOnGenerate} />,
+      <MaterialSampleSplitGenerationForm
+        onGenerate={mockOnGenerate}
+        ids={[NO_CHILDREN_MATERIAL_SAMPLE_UUID]}
+      />,
       { apiContext }
     );
 
@@ -102,14 +76,11 @@ describe("MaterialSampleSplitGenerationForm", () => {
 
   describe("New Series Generation", () => {
     it("Split from material sample does not contain children, disable the continue series option.", async () => {
-      // Update the local storage.
-      localStorage.setItem(
-        BULK_SPLIT_IDS,
-        `["${NO_CHILDREN_MATERIAL_SAMPLE_UUID}"]`
-      );
-
       const wrapper = mountWithAppContext(
-        <MaterialSampleSplitGenerationForm onGenerate={mockOnGenerate} />,
+        <MaterialSampleSplitGenerationForm
+          onGenerate={mockOnGenerate}
+          ids={[NO_CHILDREN_MATERIAL_SAMPLE_UUID]}
+        />,
         { apiContext }
       );
 
@@ -130,14 +101,11 @@ describe("MaterialSampleSplitGenerationForm", () => {
 
   describe("Continue Series Generation", () => {
     it("Split from material sample contains children, enable the continue series option", async () => {
-      // Update the local storage.
-      localStorage.setItem(
-        BULK_SPLIT_IDS,
-        `["${CHILDREN_MATERIAL_SAMPLE_UUID}"]`
-      );
-
       const wrapper = mountWithAppContext(
-        <MaterialSampleSplitGenerationForm onGenerate={mockOnGenerate} />,
+        <MaterialSampleSplitGenerationForm
+          onGenerate={mockOnGenerate}
+          ids={[CHILDREN_MATERIAL_SAMPLE_UUID]}
+        />,
         { apiContext }
       );
 

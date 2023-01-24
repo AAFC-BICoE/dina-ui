@@ -1,9 +1,15 @@
 import { ReactNode, useMemo, Fragment } from "react";
+import { useIntl } from "react-intl";
 import { v4 as uuidv4 } from "uuid";
-import { FieldWrapper, FieldWrapperProps } from "..";
+import { FieldWrapper, FieldWrapperProps, Tooltip } from "..";
 
 export interface RadioFieldProps<T> extends FieldWrapperProps {
-  options: { label: ReactNode; value: T; disabled?: boolean }[];
+  options: {
+    label: ReactNode;
+    value: T;
+    disabled?: boolean;
+    tooltipLabel?: string;
+  }[];
 
   /** Render horizontally, by default it will be rendered vertically. */
   horizontalOptions?: boolean;
@@ -18,6 +24,8 @@ export function RadioButtonsField<T = any>({
   horizontalOptions = false,
   ...props
 }: RadioFieldProps<T>) {
+  const { messages } = useIntl();
+
   const radioIdPrefix = useMemo(() => uuidv4() as string, []);
 
   return (
@@ -42,13 +50,33 @@ export function RadioButtonsField<T = any>({
                       disabled={option.disabled ?? false}
                       id={id}
                     />
-                    <label
-                      className="btn btn-outline-primary"
-                      key={index}
-                      htmlFor={id}
-                    >
-                      {option.label}
-                    </label>
+                    {option?.tooltipLabel && messages[option.tooltipLabel] ? (
+                      <Tooltip
+                        id={
+                          messages[option.tooltipLabel]
+                            ? option.tooltipLabel
+                            : undefined
+                        }
+                        disableSpanMargin={true}
+                        visibleElement={
+                          <label
+                            className="btn btn-outline-primary"
+                            key={index}
+                            htmlFor={id}
+                          >
+                            {option.label}
+                          </label>
+                        }
+                      />
+                    ) : (
+                      <label
+                        className="btn btn-outline-primary"
+                        key={index}
+                        htmlFor={id}
+                      >
+                        {option.label}
+                      </label>
+                    )}
                   </Fragment>
                 );
               })}
@@ -72,7 +100,19 @@ export function RadioButtonsField<T = any>({
                     disabled={option.disabled ?? false}
                     onChange={() => setValue(option.value)}
                   />
-                  {option.label}
+                  {option?.tooltipLabel && messages[option.tooltipLabel] ? (
+                    <Tooltip
+                      id={
+                        messages[option.tooltipLabel]
+                          ? option.tooltipLabel
+                          : undefined
+                      }
+                      disableSpanMargin={true}
+                      visibleElement={<>{option.label}</>}
+                    />
+                  ) : (
+                    <>{option.label}</>
+                  )}
                 </label>
               </div>
             ))
