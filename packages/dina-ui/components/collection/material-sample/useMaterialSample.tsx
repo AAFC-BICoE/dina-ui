@@ -110,18 +110,39 @@ export function useMaterialSampleQuery(id?: string | null) {
 
         // Convert to seperated list
         if (data.restrictionFieldsExtension && data.isRestricted) {
-          data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_animal_rg"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[1]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_human_rg"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[2]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "cfia_ppc"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[3]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_cl"
-          )?.[0];
+          // Process risk groups
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
+            data[RESTRICTIONS_FIELDS[0]] = {
+              extKey: RESTRICTIONS_FIELDS[0],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
+                  .risk_group,
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
+            data[RESTRICTIONS_FIELDS[1]] = {
+              extKey: RESTRICTIONS_FIELDS[1],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
+                  .risk_group,
+            };
+          }
+
+          // Process levels
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]]) {
+            data[RESTRICTIONS_FIELDS[2]] = {
+              extKey: RESTRICTIONS_FIELDS[2],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level,
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
+            data[RESTRICTIONS_FIELDS[3]] = {
+              extKey: RESTRICTIONS_FIELDS[3],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level,
+            };
+          }
         }
       },
     }
@@ -455,7 +476,7 @@ export function useMaterialSampleSave({
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
-    // Set the restrictedExtensions
+    // Set the restrictionFieldsExtension
     submittedValues.restrictionFieldsExtension = {};
     if (submittedValues.phac_cl && submittedValues.phac_cl.extKey) {
       submittedValues.restrictionFieldsExtension[
