@@ -91,7 +91,6 @@ export function StorageTreeList({
         ),
         { apiBaseUrl: "/collection-api" }
       ).then((response) => {
-        console.log(response);
         setTempStorageUnitChildren(response);
         setLoading(false);
       });
@@ -154,7 +153,7 @@ export function StorageTreeList({
           >
             <StorageUnitCollapser
               showPathInName={showPathInName}
-              storageUnit={unit}
+              storageUnit={unit as PersistedResource<StorageUnit>}
               onSelect={onSelect}
               disabled={disabled}
               checkForChildren={false}
