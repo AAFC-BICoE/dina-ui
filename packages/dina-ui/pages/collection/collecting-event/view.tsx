@@ -8,7 +8,7 @@ import { getColumnDefinition } from "../material-sample/list";
 export default function CollectingEventDetailsPage() {
   return (
     <ViewPageLayout<CollectingEvent>
-      form={props => (
+      form={(props) => (
         <DinaForm<CollectingEvent> {...props}>
           <CollectingEventFormLayout />
           <FieldSet legend={<DinaMessage id="materialSamples" />}>
@@ -17,13 +17,13 @@ export default function CollectingEventDetailsPage() {
               include="collection"
               columns={getColumnDefinition()}
               filter={{
-                rsql: `collectingEvent.uuid==${props.initialValues.id}`
+                rsql: `collectingEvent.uuid==${props.initialValues.id}`,
               }}
             />
           </FieldSet>
         </DinaForm>
       )}
-      customQueryHook={id => useCollectingEventQuery(id)}
+      customQueryHook={(id) => useCollectingEventQuery(id)}
       nameField={["dwcFieldNumber", "dwcRecordNumber", "otherRecordNumbers"]}
       entityLink="/collection/collecting-event"
       type="collecting-event"

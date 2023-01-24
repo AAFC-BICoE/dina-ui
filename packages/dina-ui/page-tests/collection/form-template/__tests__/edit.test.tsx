@@ -1379,6 +1379,7 @@ describe("Workflow template edit page", () => {
                 }
               ]
             },
+            { name: "field-extension-section", visible: true, items: [] },
             {
               name: "collecting-event-managed-attributes-section",
               visible: true,

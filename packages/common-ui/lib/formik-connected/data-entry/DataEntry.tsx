@@ -7,22 +7,30 @@ import { useRef } from "react";
 
 export interface DataEntryProps {
   blockOptions?: any[];
-  typeOptions: any[];
+  onBlockSelectChange?: (value, formik) => void;
+  typeOptions?: any[];
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
   model?: string;
   unitsOptions?: any[];
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
+  readOnly?: boolean;
+  initialValues?: any;
+  legend: JSX.Element;
 }
 
 export function DataEntry({
   blockOptions,
+  onBlockSelectChange,
   vocabularyOptionsPath,
   model,
   unitsOptions,
   typeOptions,
-  name
+  name,
+  readOnly,
+  initialValues,
+  legend,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -37,9 +45,11 @@ export function DataEntry({
       return (
         <div className="d-flex align-items-center justify-content-between">
           {legend}
-          <Button onClick={() => addBlock()} className="add-datablock">
-            <DinaMessage id="addCustomPlaceName" />
-          </Button>
+          {!readOnly && (
+            <Button onClick={() => addBlock()} className="add-datablock">
+              <DinaMessage id="addCustomPlaceName" />
+            </Button>
+          )}
         </div>
       );
     };
@@ -47,10 +57,7 @@ export function DataEntry({
 
   return (
     <div style={{ width: "70%" }}>
-      <FieldSet
-        legend={<DinaMessage id="dataEntryLabel" />}
-        wrapLegend={legendWrapper()}
-      >
+      <FieldSet legend={legend} wrapLegend={legendWrapper()}>
         <FieldArray name={name}>
           {(fieldArrayProps) => {
             const blocks: [] = fieldArrayProps.form.values[name];
@@ -64,7 +71,7 @@ export function DataEntry({
                       return (
                         <DataBlock
                           blockOptions={blockOptions}
-                          // mocked based on <ResourceSelectField<Person>
+                          onBlockSelectChange={onBlockSelectChange}
                           model={model}
                           unitsOptions={unitsOptions}
                           blockIndex={index}
@@ -73,6 +80,8 @@ export function DataEntry({
                           key={index}
                           vocabularyOptionsPath={vocabularyOptionsPath}
                           typeOptions={typeOptions}
+                          readOnly={readOnly}
+                          initialValues={initialValues?.at(index)}
                         />
                       );
                     })}

@@ -285,6 +285,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           }
         ]
       },
+      { id: "field-extension-section", maxGridSizeX: 1, items: [] },
       {
         id: "collecting-event-managed-attributes-section",
         maxGridSizeX: 2,

@@ -451,6 +451,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Date and time of when the record was last updated.",
   field_xmpRightsWebStatement: "License",
   field_sampleName: "Sample Name",
+  field_managedAttributes: "Managed Attributes",
   fileTooBig: "File too big",
   filterAttribute: "Filter Attribute",
   filterByGroup: "Filter By Group",
@@ -615,6 +616,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparationTypeNameLabel: "Preparation Type Name",
   preparations: "Preparations",
   preparedBy: "Prepared By",
+  previewLabel: "Preview",
   previewAndCustomizeLabel: "Preview and Customize",
   previewNotAvailable: "Preview Not Available",
   primary: "Primary",
@@ -734,6 +736,19 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitSampleTagOriginalAsDestroyed: 'Tag Original as "Destroyed"',
   splitSubsampleTitle: "Split Material Sample",
   splitWorkflowRunTitle: "Split Workflow Run",
+  splitPreviewNumberColumn: "Number",
+  splitPreviewGeneratedIdentifierColumn: "Generated Identifier",
+  splitSeriesOptionContinue: "Continue Series",
+  splitSeriesOptionNew: "New Series",
+  splitGenerationOptionLowercase: "a (Lowercase letters)",
+  splitGenerationOptionUppercase: "A (Uppercase letters)",
+  splitGenerationOptionNumerical: "1 (Numerical)",
+  splitSeriesOptionLabel: "Series Options",
+  splitGenerationOptionLabel: "Generation Options",
+  splitSeriesOptionContinueTooltip:
+    "Continue Series is only available if the Material Sample that is being split from already has children to continue the series from.",
+  splitMaterialSampleNameRequiredTooltip:
+    "A primary ID is required in order to perform a split.",
   startEventDateTime: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Start a New Run ",
   stateChangeMetaLegend: " State Change Metadata(Optional)",
@@ -815,7 +830,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataType: "Type: ",
   dataValue: "Value: ",
   unit: "Unit: ",
+  fieldExtension: "Field Extension",
   http403ForbiddenError: "Access is denied",
   unsupportedFileTypeError:
-    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
 };

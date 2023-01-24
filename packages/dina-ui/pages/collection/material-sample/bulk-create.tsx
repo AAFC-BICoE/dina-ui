@@ -21,8 +21,6 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   const [lastSubmission, setLastSubmission] =
     useState<MaterialSampleGenerationFormSubmission>();
 
-  const splitFromId = router.query.splitFromId?.toString();
-
   const title = "createNewMaterialSamples";
 
   const generatedSamples = lastSubmission?.samples;
@@ -32,12 +30,12 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
   ) {
     writeStorage(
       BULK_EDIT_RESULT_IDS_KEY,
-      samples.map(it => it.id)
+      samples.map((it) => it.id)
     );
 
     await router.push({
       pathname: "/collection/material-sample/bulk-result",
-      query: { parentSampleId: splitFromId, actionType: "created" }
+      query: { actionType: "created" }
     });
   }
 
@@ -63,7 +61,6 @@ export function MaterialSampleBulkCreatePage({ router }: WithRouterProps) {
         {mode === "GENERATE" && (
           <MaterialSampleGenerationForm
             onGenerate={onGenerate}
-            parentId={splitFromId}
             initialValues={lastSubmission?.submittedValues}
             initialMode={lastSubmission?.generationMode}
           />
