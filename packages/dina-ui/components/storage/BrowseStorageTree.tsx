@@ -12,6 +12,7 @@ import {
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
+import { CoordinateSystemEnumPlaceHolder } from "packages/dina-ui/types/collection-api/resources/CoordinateSystem";
 import Pagination from "rc-pagination";
 import { useState, useEffect } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
@@ -90,6 +91,7 @@ export function StorageTreeList({
         ),
         { apiBaseUrl: "/collection-api" }
       ).then((response) => {
+        console.log(response);
         setTempStorageUnitChildren(response);
         setLoading(false);
       });
@@ -138,13 +140,16 @@ export function StorageTreeList({
       fetchStorageUnitChildren();
     }
   }, [storageUnitChildren]);
+
   // If the children are provided we can skip the query and just display them.
-  if (storageUnitChildren !== undefined) {
-    return (
+  if (tempStorageUnitChildren !== undefined) {
+    return loading ? (
+      <LoadingSpinner loading={true} />
+    ) : (
       <>
-        {storageUnitChildren.map((unit, index) => (
+        {tempStorageUnitChildren.map((unit, index) => (
           <div
-            className={index === storageUnitChildren.length - 1 ? "" : "my-2"}
+            className={index === tempStorageUnitChildren.length - 1 ? "" : "my-2"}
             key={unit.id}
           >
             <StorageUnitCollapser
