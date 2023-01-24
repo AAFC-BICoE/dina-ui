@@ -22,15 +22,5 @@
     { "field": "publiclyReleasable", "dataType": "boolean" },
     { "field": "useNextSequence", "dataType": "boolean" },
     { "field": "isRestricted", "dataType": "boolean" }
-  ],
-  "collection": [
-    { "field": "group", "dataType": "string" },
-    { "field": "name", "dataType": "string" },
-    { "field": "code", "dataType": "string" },
-    { "field": "webpage", "dataType": "string" },
-    { "field": "contact", "dataType": "string" },
-    { "field": "address", "dataType": "string" },
-    { "field": "remarks", "dataType": "string" },
-    { "field": "multilingualDescription", "dataType": "Map" }
   ]
 }
