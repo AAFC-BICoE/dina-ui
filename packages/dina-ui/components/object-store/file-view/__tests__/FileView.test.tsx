@@ -13,6 +13,8 @@ describe("FileView component", () => {
     const wrapper = mountWithAppContext(
       <FileView filePath="image.png" fileType="png" />
     );
+    await new Promise(setImmediate);
+    wrapper.update();
 
     // Renders the img.
     expect(wrapper.find("img").exists()).toEqual(true);
@@ -22,7 +24,8 @@ describe("FileView component", () => {
     const wrapper = mountWithAppContext(
       <FileView filePath="doc.pdf" fileType="pdf" />
     );
-
+    await new Promise(setImmediate);
+    wrapper.update();
     // It should just pass the file path and type to the FileViewer component.
     expect(wrapper.find("MockDynamicComponent").prop("filePath")).toContain(
       "doc.pdf"

@@ -45,6 +45,7 @@ export default function ExternalResourceMetadataPage() {
       path: `objectstore-api/metadata/${id}?include=dcCreator,derivatives`
     },
     {
+      disabled: !id,
       onSuccess: async ({ data: metadata }) => {
         // Get the License resource based on the Metadata's xmpRightsWebStatement field:
         if (metadata.xmpRightsWebStatement) {
