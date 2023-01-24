@@ -49,7 +49,7 @@ export interface MaterialSampleAttributes {
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
-  materialSampleChildren?: Partial<MaterialSample>[];
+  materialSampleChildren?: Partial<MaterialSampleChildren>[];
   tags?: string[];
 
   scheduledActions?: ScheduledAction[];
@@ -106,6 +106,10 @@ export interface MaterialSampleRelationships {
   projects?: Project[];
   assemblages?: Assemblage[];
   acquisitionEvent?: AcquisitionEvent;
+}
+
+interface MaterialSampleChildren extends MaterialSample {
+  ordinal: number;
 }
 
 export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {

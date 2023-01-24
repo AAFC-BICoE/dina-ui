@@ -51,6 +51,7 @@ import {
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
+import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -274,18 +275,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
-          <Link
-            href={`/collection/material-sample/bulk-create?splitFromId=${id}`}
-          >
-            <a className="btn btn-primary">
-              <DinaMessage id="splitButton" />
-            </a>
-          </Link>
-          <Link href={`/collection/material-sample/edit/?copyFromId=${id}`}>
-            <a className="btn btn-primary">
-              <DinaMessage id="duplicate" />
-            </a>
-          </Link>
+          <SplitMaterialSampleButton
+            ids={[id]}
+            disabled={!materialSample.materialSampleName}
+          />
           <GenerateLabelDropdownButton materialSample={materialSample} />
           <Link href={`/collection/material-sample/revisions?id=${id}`}>
             <a className="btn btn-info ms-5">

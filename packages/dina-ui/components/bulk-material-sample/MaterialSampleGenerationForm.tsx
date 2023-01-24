@@ -9,14 +9,11 @@ import {
   SelectField,
   SubmitButton,
   TextField,
-  useApiClient,
-  useQuery,
-  withResponse
+  useApiClient
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
 import { InputResource } from "kitsu";
 import { padStart, range } from "lodash";
-import Link from "next/link";
 import { useState } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import SpreadSheetColumn from "spreadsheet-column";
@@ -32,7 +29,6 @@ import { useGenerateSequence } from "../collection/material-sample/useGenerateSe
 
 export interface MaterialSampleGenerationFormProps {
   onGenerate: (samples: MaterialSampleGenerationFormSubmission) => void;
-  parentId?: string;
   initialValues?: GeneratorFormValues;
   initialMode?: GenerationMode;
 }
@@ -45,7 +41,6 @@ export interface MaterialSampleGenerationFormSubmission {
 
 export function MaterialSampleGenerationForm({
   onGenerate,
-  parentId,
   initialValues,
   initialMode
 }: MaterialSampleGenerationFormProps) {
@@ -69,7 +64,7 @@ export function MaterialSampleGenerationForm({
         collectionId: submittedValues.collection.id,
         amount: submittedValues.numberToCreate as any,
         save
-      }).then(async data => {
+      }).then(async (data) => {
         if (data.result?.lowReservedID && data.result.highReservedID) {
           generatedLowId = data.result?.lowReservedID;
           onGenerateSamples();
@@ -86,9 +81,7 @@ export function MaterialSampleGenerationForm({
         const sample = submittedValues.samples[index];
         return {
           type: "material-sample",
-          parentMaterialSample: parentId
-            ? { id: parentId, type: "material-sample" }
-            : undefined,
+          parentMaterialSample: undefined,
           group: submittedValues.group,
           collection: submittedValues.collection,
           publiclyReleasable: true,
@@ -111,26 +104,17 @@ export function MaterialSampleGenerationForm({
     }
   };
 
-  const parentQuery = useQuery<MaterialSample>(
-    {
-      path: `collection-api/material-sample/${parentId}`,
-      include: "collection"
-    },
-    { disabled: !parentId }
-  );
-
   // Default to use the last used collection:
   const collectionQuery = useLastUsedCollection();
 
-  if (parentQuery.loading || collectionQuery.loading) {
+  if (collectionQuery.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
   const baseNameFromCollection =
     collectionQuery?.lastUsedCollection?.code ??
     collectionQuery?.lastUsedCollection?.name;
-  const baseNameFromParent =
-    parentQuery.response?.data?.materialSampleName || "";
+
   return (
     <DinaForm<Partial<GeneratorFormValues>>
       initialValues={
@@ -140,26 +124,15 @@ export function MaterialSampleGenerationForm({
           increment: "NUMERICAL",
           suffix: "",
           start: "001",
-          baseName: baseNameFromParent,
+          baseName: "",
           separator: "",
-          collection:
-            parentQuery.response?.data?.collection ||
-            collectionQuery.lastUsedCollection
+          collection: collectionQuery.lastUsedCollection
         }
       }
       horizontal="flex"
       validationSchema={generatorFormSchema}
       onSubmit={onSubmit}
     >
-      {parentId &&
-        withResponse(parentQuery, ({ data: ms }) => (
-          <h2>
-            <DinaMessage id="splitFrom" />:{" "}
-            <Link href={`/collection/material-sample/view?id=${ms.id}`}>
-              <a>{ms.materialSampleName}</a>
-            </Link>
-          </h2>
-        ))}
       <div className="row">
         <GroupSelectField
           name="group"
@@ -180,7 +153,7 @@ export function MaterialSampleGenerationForm({
             if (event.target.checked) {
               formik.setFieldValue("baseName", baseNameFromCollection);
             } else {
-              formik.setFieldValue("baseName", baseNameFromParent);
+              formik.setFieldValue("baseName", "");
             }
             setUseNextSequence(event.target.checked);
             setGenerationMode(GENERATION_MODES[0]);
@@ -197,7 +170,7 @@ export function MaterialSampleGenerationForm({
       </div>
       <Tabs
         selectedIndex={GENERATION_MODES.indexOf(generationMode)}
-        onSelect={index => setGenerationMode(GENERATION_MODES[index])}
+        onSelect={(index) => setGenerationMode(GENERATION_MODES[index])}
       >
         <TabList>
           <Tab className="react-tabs__tab batch-tab">
@@ -261,7 +234,7 @@ function GeneratorFields({
 }: GeneratorFieldsProps) {
   const { formatMessage } = useDinaIntl();
 
-  const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map(mode => ({
+  const SUFFIX_TYPE_OPTIONS = INCREMENT_MODES.map((mode) => ({
     label: formatMessage(mode),
     value: mode
   }));
@@ -310,7 +283,7 @@ function GeneratorFields({
                   className="col-md-3"
                   // Select all text on click:
                   inputProps={{
-                    onClick: e => (e.target as any).select()
+                    onClick: (e) => (e.target as any).select()
                   }}
                   name="start"
                   numberOnly={increment === "NUMERICAL"}
@@ -368,7 +341,7 @@ function PreviewAndCustomizeFields({ generationMode }: GeneratorFieldsProps) {
               return null;
             }
 
-            return range(0, formState.numberToCreate).map(index => {
+            return range(0, formState.numberToCreate).map((index) => {
               const placeholder = generateName({
                 index,
                 generationMode,
