@@ -74,7 +74,8 @@ export function useMetadataViewQuery(id?: string) {
           joinField: "objectUpload",
           path: (metadata) => `object-upload/${metadata.fileIdentifier}`
         }
-      ]
+      ],
+      disabled: !id
     }
   );
 
