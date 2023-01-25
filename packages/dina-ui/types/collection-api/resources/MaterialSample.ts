@@ -63,7 +63,7 @@ export interface MaterialSampleAttributes {
 
   useNextSequence?: boolean;
 
-  restrictionFieldsExtension?: ExtensionValue[] | null;
+  restrictionFieldsExtension?: any | null;
 
   phac_human_rg?: ExtensionValue | null;
   phac_cl?: ExtensionValue | null;
@@ -118,7 +118,7 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
     ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
-    organism: []
+    organism: [],
   };
 }
 
