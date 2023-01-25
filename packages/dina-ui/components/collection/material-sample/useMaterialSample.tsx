@@ -8,7 +8,7 @@ import {
   SaveArgs,
   useApiClient,
   useQuery,
-  withResponse,
+  withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -21,7 +21,7 @@ import {
   pick,
   pickBy,
   range,
-  find,
+  find
 } from "lodash";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
 import { useLayoutEffect, useRef, useState, useEffect } from "react";
@@ -32,7 +32,7 @@ import {
   useCollectingEventQuery,
   useCollectingEventSave,
   useDuplicateSampleNameDetection,
-  useLastUsedCollection,
+  useLastUsedCollection
 } from "../..";
 import {
   AcquisitionEvent,
@@ -48,12 +48,12 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../../dina-ui/types/collection-api";
 import { Person } from "../../../../dina-ui/types/objectstore-api";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent,
+  useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
@@ -81,8 +81,8 @@ export function useMaterialSampleQuery(id?: string | null) {
         "materialSampleChildren",
         "parentMaterialSample",
         "projects",
-        "assemblages",
-      ].join(","),
+        "assemblages"
+      ].join(",")
     },
     {
       disabled: !id,
@@ -99,7 +99,7 @@ export function useMaterialSampleQuery(id?: string | null) {
                     ),
                     {
                       apiBaseUrl: "/agent-api",
-                      returnNullForMissingResource: true,
+                      returnNullForMissingResource: true
                     }
                   )
                 );
@@ -108,15 +108,15 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
-        // Convert to seperated list
-        if (data.restrictionFieldsExtension && data.isRestricted) {
+        // Convert to separated list
+        if (data.restrictionFieldsExtension) {
           // Process risk groups
           if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
             data[RESTRICTIONS_FIELDS[0]] = {
               extKey: RESTRICTIONS_FIELDS[0],
               value:
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
-                  .risk_group,
+                  .risk_group
             };
           }
           if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
@@ -124,7 +124,7 @@ export function useMaterialSampleQuery(id?: string | null) {
               extKey: RESTRICTIONS_FIELDS[1],
               value:
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
-                  .risk_group,
+                  .risk_group
             };
           }
 
@@ -133,18 +133,18 @@ export function useMaterialSampleQuery(id?: string | null) {
             data[RESTRICTIONS_FIELDS[2]] = {
               extKey: RESTRICTIONS_FIELDS[2],
               value:
-                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level,
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level
             };
           }
           if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
             data[RESTRICTIONS_FIELDS[3]] = {
               extKey: RESTRICTIONS_FIELDS[3],
               value:
-                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level,
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
             };
           }
         }
-      },
+      }
     }
   );
 
@@ -214,7 +214,7 @@ export function useMaterialSampleSave({
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
-  visibleManagedAttributeKeys,
+  visibleManagedAttributeKeys
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
@@ -304,7 +304,7 @@ export function useMaterialSampleSave({
         hasColEventTemplate ||
           materialSample?.collectingEvent ||
           (find(formTemplate?.components, {
-            name: COLLECTING_EVENT_COMPONENT_NAME,
+            name: COLLECTING_EVENT_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -314,7 +314,7 @@ export function useMaterialSampleSave({
         hasAcquisitionEventTemplate ||
           materialSample?.acquisitionEvent ||
           (find(formTemplate?.components, {
-            name: ACQUISITION_EVENT_COMPONENT_NAME,
+            name: ACQUISITION_EVENT_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -327,7 +327,7 @@ export function useMaterialSampleSave({
             (prepFieldName) =>
               !isEmpty(materialSample?.[prepFieldName]) ||
               (find(formTemplate?.components, {
-                name: PREPARATIONS_COMPONENT_NAME,
+                name: PREPARATIONS_COMPONENT_NAME
               })?.visible ??
                 false)
           )
@@ -339,7 +339,7 @@ export function useMaterialSampleSave({
         hasOrganismsTemplate ||
           materialSample?.organism?.length ||
           (find(formTemplate?.components, {
-            name: ORGANISMS_COMPONENT_NAME,
+            name: ORGANISMS_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -351,7 +351,7 @@ export function useMaterialSampleSave({
         hasStorageTemplate ||
           materialSample?.storageUnit?.id ||
           (find(formTemplate?.components, {
-            name: STORAGE_COMPONENT_NAME,
+            name: STORAGE_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -363,7 +363,7 @@ export function useMaterialSampleSave({
         hasScheduledActionsTemplate ||
           materialSample?.scheduledActions?.length ||
           (find(formTemplate?.components, {
-            name: SCHEDULED_ACTIONS_COMPONENT_NAME,
+            name: SCHEDULED_ACTIONS_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -377,7 +377,7 @@ export function useMaterialSampleSave({
           !isEmpty(materialSample?.hostOrganism) ||
           !isEmpty(materialSample?.associations) ||
           (find(formTemplate?.components, {
-            name: ASSOCIATIONS_COMPONENT_NAME,
+            name: ASSOCIATIONS_COMPONENT_NAME
           })?.visible ??
             false)
       )
@@ -391,7 +391,7 @@ export function useMaterialSampleSave({
             (restrictFieldName) =>
               !isEmpty(materialSample?.[restrictFieldName]) ||
               (find(formTemplate?.components, {
-                name: RESTRICTION_COMPONENT_NAME,
+                name: RESTRICTION_COMPONENT_NAME
               })?.visible ??
                 false)
           )
@@ -416,7 +416,7 @@ export function useMaterialSampleSave({
     enableAssociations,
     setEnableAssociations,
     enableRestrictions,
-    setEnableRestrictions,
+    setEnableRestrictions
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
@@ -426,7 +426,7 @@ export function useMaterialSampleSave({
     managedAttributes: {},
     // Defaults to the last Collection used to create a Material Sample:
     collection: lastUsedCollection,
-    publiclyReleasable: true,
+    publiclyReleasable: true
   };
 
   const msInitialValues: InputResource<MaterialSample> =
@@ -443,10 +443,10 @@ export function useMaterialSampleSave({
   const {
     collectingEventInitialValues: collectingEventHookInitialValues,
     saveCollectingEvent,
-    collectingEventFormSchema,
+    collectingEventFormSchema
   } = useCollectingEventSave({
     attachmentsConfig: collectingEventAttachmentsConfig,
-    fetchedCollectingEvent: colEventQuery.response?.data,
+    fetchedCollectingEvent: colEventQuery.response?.data
   });
   const collectingEventInitialValues =
     collectingEventInitialValuesProp ?? collectingEventHookInitialValues;
@@ -482,14 +482,14 @@ export function useMaterialSampleSave({
       submittedValues.restrictionFieldsExtension[
         submittedValues.phac_cl.extKey
       ] = {
-        level: submittedValues?.phac_cl?.value,
+        level: submittedValues?.phac_cl?.value
       };
     }
     if (submittedValues.cfia_ppc && submittedValues.cfia_ppc.extKey) {
       submittedValues.restrictionFieldsExtension[
         submittedValues.cfia_ppc.extKey
       ] = {
-        level: submittedValues?.cfia_ppc?.value,
+        level: submittedValues?.cfia_ppc?.value
       };
     }
     if (
@@ -499,14 +499,14 @@ export function useMaterialSampleSave({
       submittedValues.restrictionFieldsExtension[
         submittedValues.phac_animal_rg.extKey
       ] = {
-        risk_group: submittedValues?.phac_animal_rg?.value,
+        risk_group: submittedValues?.phac_animal_rg?.value
       };
     }
     if (submittedValues.phac_human_rg && submittedValues.phac_human_rg.extKey) {
       submittedValues.restrictionFieldsExtension[
         submittedValues.phac_human_rg.extKey
       ] = {
-        risk_group: submittedValues?.phac_human_rg?.value,
+        risk_group: submittedValues?.phac_human_rg?.value
       };
     }
 
@@ -520,22 +520,22 @@ export function useMaterialSampleSave({
       ...(!enableOrganisms && {
         organismsIndividualEntry: undefined,
         organismsQuantity: undefined,
-        organism: [],
+        organism: []
       }),
 
       ...(!enableStorage && {
-        storageUnit: { id: null, type: "storage-unit" },
+        storageUnit: { id: null, type: "storage-unit" }
       }),
       ...(!enableCollectingEvent && {
-        collectingEvent: { id: null, type: "collecting-event" },
+        collectingEvent: { id: null, type: "collecting-event" }
       }),
       ...(!enableAcquisitionEvent && {
-        acquisitionEvent: { id: null, type: "acquisition-event" },
+        acquisitionEvent: { id: null, type: "acquisition-event" }
       }),
       ...(!enableAssociations && { associations: [], hostOrganism: null }),
 
       // Remove the scheduledAction field from the Form Template:
-      ...{ scheduledAction: undefined },
+      ...{ scheduledAction: undefined }
     };
 
     // Save and link the Collecting Event if enabled:
@@ -571,7 +571,7 @@ export function useMaterialSampleSave({
         // Link the MaterialSample to the CollectingEvent:
         materialSampleInput.collectingEvent = {
           id: savedCollectingEvent.id,
-          type: savedCollectingEvent.type,
+          type: savedCollectingEvent.type
         };
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
@@ -612,8 +612,8 @@ export function useMaterialSampleSave({
               [
                 {
                   resource: submittedAcqEvent,
-                  type: "acquisition-event",
-                },
+                  type: "acquisition-event"
+                }
               ],
               { apiBaseUrl: "/collection-api" }
             )
@@ -625,7 +625,7 @@ export function useMaterialSampleSave({
         // Link the MaterialSample to the AcquisitionEvent:
         materialSampleInput.acquisitionEvent = {
           id: savedAcqEvent.id,
-          type: savedAcqEvent.type,
+          type: savedAcqEvent.type
         };
       } catch (error: unknown) {
         if (error instanceof DoOperationsError) {
@@ -669,7 +669,7 @@ export function useMaterialSampleSave({
    */
   async function prepareSampleSaveOperation({
     submittedValues,
-    preProcessSample,
+    preProcessSample
   }: PrepareSampleSaveOperationParams): Promise<SaveArgs<MaterialSample>> {
     const materialSampleInput = await prepareSampleInput(submittedValues);
 
@@ -680,7 +680,7 @@ export function useMaterialSampleSave({
     const msDiff = msInitialValues.id
       ? resourceDifference({
           original: msInitialValues,
-          updated: msPreprocessed,
+          updated: msPreprocessed
         })
       : msPreprocessed;
 
@@ -711,47 +711,47 @@ export function useMaterialSampleSave({
           attachment: {
             data: msDiffWithOrganisms.attachment.map((it) =>
               pick(it, "id", "type")
-            ),
-          },
+            )
+          }
         }),
         ...(msDiffWithOrganisms.projects && {
           projects: {
             data: msDiffWithOrganisms.projects.map((it) =>
               pick(it, "id", "type")
-            ),
-          },
+            )
+          }
         }),
         ...(msDiffWithOrganisms.assemblages && {
           assemblages: {
             data: msDiffWithOrganisms.assemblages.map((it) =>
               pick(it, "id", "type")
-            ),
-          },
+            )
+          }
         }),
         ...(msDiffWithOrganisms.organism && {
           organism: {
             data: msDiffWithOrganisms.organism.map((it) =>
               pick(it, "id", "type")
-            ),
-          },
+            )
+          }
         }),
         ...(msDiffWithOrganisms.preparedBy && {
           preparedBy: {
             data: msDiffWithOrganisms.preparedBy.map((it) =>
               pick(it, "id", "type")
-            ),
-          },
+            )
+          }
         }),
         ...(msDiffWithOrganisms.preparationType?.id && {
           preparationType: {
-            data: pick(msDiffWithOrganisms.preparationType, "id", "type"),
-          },
+            data: pick(msDiffWithOrganisms.preparationType, "id", "type")
+          }
         }),
         ...(msDiffWithOrganisms.collection?.id && {
           collection: {
-            data: pick(msDiffWithOrganisms.collection, "id", "type"),
-          },
-        }),
+            data: pick(msDiffWithOrganisms.collection, "id", "type")
+          }
+        })
       },
 
       // Set the attributes to undefined after they've been moved to "relationships":
@@ -759,7 +759,7 @@ export function useMaterialSampleSave({
       projects: undefined,
       organism: undefined,
       assemblages: undefined,
-      preparedBy: undefined,
+      preparedBy: undefined
     };
 
     // delete the association if associated sample is left unfilled
@@ -771,7 +771,7 @@ export function useMaterialSampleSave({
     }
     const saveOperation = {
       resource: msInputWithRelationships,
-      type: "material-sample",
+      type: "material-sample"
     };
 
     return saveOperation;
@@ -792,7 +792,7 @@ export function useMaterialSampleSave({
         const defaults = {
           // Default to the sample's group:
           group: sample.group,
-          type: "organism" as const,
+          type: "organism" as const
         };
 
         const { id: firstOrganismId, ...firstOrganismValues } =
@@ -803,7 +803,7 @@ export function useMaterialSampleSave({
           // When Individual Entry is disabled,
           // copy the first organism's values onto the rest of the organisms:
           ...(!sample.organismsIndividualEntry && firstOrganismValues),
-          ...defaults,
+          ...defaults
         };
       })
       // Convert determiners from Objects to UUID strings:
@@ -813,14 +813,14 @@ export function useMaterialSampleSave({
           ...det,
           determiner: det.determiner?.map((determiner) =>
             typeof determiner === "string" ? determiner : String(determiner.id)
-          ),
-        })),
+          )
+        }))
       }));
 
     const organismSaveArgs: SaveArgs<Organism>[] = preparedOrganisms.map(
       (resource) => ({
         resource,
-        type: "organism",
+        type: "organism"
       })
     );
 
@@ -830,7 +830,7 @@ export function useMaterialSampleSave({
         return [];
       }
       const savedOrganisms = await save<Organism>(organismSaveArgs, {
-        apiBaseUrl: "/collection-api",
+        apiBaseUrl: "/collection-api"
       });
 
       return savedOrganisms;
@@ -842,7 +842,7 @@ export function useMaterialSampleSave({
             (_, field) => `organism[${err.index}].${field}`
           ),
           errorMessage: err.errorMessage,
-          index: err.index,
+          index: err.index
         }));
 
         const overallFieldErrors = newErrors.reduce(
@@ -859,11 +859,11 @@ export function useMaterialSampleSave({
 
   async function onSubmit({
     submittedValues,
-    formik,
+    formik
   }: DinaFormSubmitParams<InputResource<MaterialSample>>) {
     // In case of error, return early instead of saving to the back-end:
     const materialSampleSaveOp = await prepareSampleSaveOperation({
-      submittedValues,
+      submittedValues
     });
 
     async function saveToBackend() {
@@ -871,7 +871,7 @@ export function useMaterialSampleSave({
       const [savedMaterialSample] = await withDuplicateSampleNameCheck(
         async () =>
           await save<MaterialSample>([materialSampleSaveOp], {
-            apiBaseUrl: "/collection-api",
+            apiBaseUrl: "/collection-api"
           }),
         formik
       );
@@ -882,7 +882,7 @@ export function useMaterialSampleSave({
       useGenerateSequence({
         collectionId: submittedValues.collection?.id as any,
         amount: 1,
-        save,
+        save
       }).then(async (data) => {
         if (data.result?.lowReservedID && data.result.highReservedID) {
           const prefix = materialSampleSaveOp.resource.collection
@@ -934,7 +934,7 @@ export function useMaterialSampleSave({
             attachmentsConfig={collectingEventAttachmentsConfig}
           />
         </div>
-      ),
+      )
     };
 
     return <DinaForm {...colEventFormProps} />;
@@ -960,7 +960,7 @@ export function useMaterialSampleSave({
         <div className={nestedFormClassName}>
           <AcquisitionEventFormLayout />
         </div>
-      ),
+      )
     };
 
     return acqEventId ? (
@@ -984,7 +984,7 @@ export function useMaterialSampleSave({
     onSubmit,
     prepareSampleInput,
     prepareSampleSaveOperation,
-    loading,
+    loading
   };
 }
 
@@ -1014,6 +1014,6 @@ export function withOrganismEditorValues<
     ...materialSample,
     // Client-side-only organisms UI fields:
     organismsQuantity: materialSample?.organism?.length,
-    organismsIndividualEntry: hasDifferentOrganisms,
+    organismsIndividualEntry: hasDifferentOrganisms
   };
 }
