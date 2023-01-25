@@ -18,6 +18,7 @@ export interface DataEntryProps {
   readOnly?: boolean;
   initialValues?: any;
   legend: JSX.Element;
+  width?: string;
 }
 
 export function DataEntry({
@@ -31,6 +32,7 @@ export function DataEntry({
   readOnly,
   initialValues,
   legend,
+  width,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -54,9 +56,9 @@ export function DataEntry({
       );
     };
   }
-
+  const defaultWidth = "70%";
   return (
-    <div style={{ width: "70%" }}>
+    <div style={{ width: width ?? defaultWidth }}>
       <FieldSet legend={legend} wrapLegend={legendWrapper()}>
         <FieldArray name={name}>
           {(fieldArrayProps) => {
