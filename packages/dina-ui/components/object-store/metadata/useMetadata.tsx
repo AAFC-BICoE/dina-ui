@@ -52,7 +52,8 @@ export function useMetadataViewQuery(id?: string) {
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
       include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
-      path: `objectstore-api/metadata/${id}`
+      path: `objectstore-api/metadata/${id}`,
+      header: { "include-dina-permission": "true" }
     },
     {
       joinSpecs: [
