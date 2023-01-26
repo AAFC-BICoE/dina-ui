@@ -1031,6 +1031,7 @@ export function CollectingEventFormLayout({
             onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
             initialValues={initialValues.extensionValues}
+            isTemplate={isTemplate}
           />
         </DinaFormSection>
       </div>

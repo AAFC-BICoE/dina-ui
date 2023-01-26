@@ -1,4 +1,4 @@
-import { FieldSet } from "../../../../common-ui/lib";
+import { FieldSet, FieldWrapper } from "../../../../common-ui/lib";
 import { DataBlock } from "./DataBlock";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { FieldArray } from "formik";
@@ -18,6 +18,8 @@ export interface DataEntryProps {
   readOnly?: boolean;
   initialValues?: any;
   legend: JSX.Element;
+  width?: string;
+  isTemplate?: boolean;
 }
 
 export function DataEntry({
@@ -31,6 +33,8 @@ export function DataEntry({
   readOnly,
   initialValues,
   legend,
+  width,
+  isTemplate,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -54,44 +58,46 @@ export function DataEntry({
       );
     };
   }
-
+  const defaultWidth = isTemplate ? "100%" : "70%";
   return (
-    <div style={{ width: "70%" }}>
-      <FieldSet legend={legend} wrapLegend={legendWrapper()}>
-        <FieldArray name={name}>
-          {(fieldArrayProps) => {
-            const blocks: [] = fieldArrayProps.form.values[name];
-            arrayHelpersRef.current = fieldArrayProps;
+    <div style={{ width: width ?? defaultWidth }}>
+      <FieldWrapper name={name} hideLabel={true}>
+        <FieldSet legend={legend} wrapLegend={legendWrapper()}>
+          <FieldArray name={name}>
+            {(fieldArrayProps) => {
+              const blocks: [] = fieldArrayProps.form.values[name];
+              arrayHelpersRef.current = fieldArrayProps;
 
-            return (
-              <div>
-                {blocks?.length > 0 ? (
-                  <div style={{ padding: 15 }}>
-                    {blocks.map((_, index) => {
-                      return (
-                        <DataBlock
-                          blockOptions={blockOptions}
-                          onBlockSelectChange={onBlockSelectChange}
-                          model={model}
-                          unitsOptions={unitsOptions}
-                          blockIndex={index}
-                          removeBlock={removeBlock}
-                          name={`${fieldArrayProps.name}[${index}]`}
-                          key={index}
-                          vocabularyOptionsPath={vocabularyOptionsPath}
-                          typeOptions={typeOptions}
-                          readOnly={readOnly}
-                          initialValues={initialValues?.at(index)}
-                        />
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-            );
-          }}
-        </FieldArray>
-      </FieldSet>
+              return (
+                <div>
+                  {blocks?.length > 0 ? (
+                    <div style={{ padding: 15 }}>
+                      {blocks.map((_, index) => {
+                        return (
+                          <DataBlock
+                            blockOptions={blockOptions}
+                            onBlockSelectChange={onBlockSelectChange}
+                            model={model}
+                            unitsOptions={unitsOptions}
+                            blockIndex={index}
+                            removeBlock={removeBlock}
+                            name={`${fieldArrayProps.name}[${index}]`}
+                            key={index}
+                            vocabularyOptionsPath={vocabularyOptionsPath}
+                            typeOptions={typeOptions}
+                            readOnly={readOnly}
+                            initialValues={initialValues?.at(index)}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }}
+          </FieldArray>
+        </FieldSet>
+      </FieldWrapper>
     </div>
   );
 }
