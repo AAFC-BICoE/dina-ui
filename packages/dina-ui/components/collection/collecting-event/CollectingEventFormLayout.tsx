@@ -16,7 +16,7 @@ import {
   TextFieldWithCoordButtons,
   useDinaFormContext,
   FieldSpy,
-  DataEntry,
+  DataEntryField,
   useQuery,
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
@@ -1023,7 +1023,7 @@ export function CollectingEventFormLayout({
           componentName={COLLECTING_EVENT_COMPONENT_NAME}
           sectionName="field-extension-section"
         >
-          <DataEntry
+          <DataEntryField
             legend={<DinaMessage id="fieldExtension" />}
             name="extensionValues"
             blockOptions={extensionOptions}

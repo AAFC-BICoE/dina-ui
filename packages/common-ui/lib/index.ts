@@ -82,7 +82,7 @@ export * from "./formik-connected/AssociatedMaterialSampleSearchBox";
 export * from "./formik-connected/CheckBoxWithoutWrapper";
 export * from "./formik-connected/NumberSpinnerField";
 export * from "./formik-connected/SelectFieldWithNav";
-export * from "./formik-connected/data-entry/DataEntry";
+export * from "./formik-connected/data-entry/DataEntryField";
 export * from "./text-field-with-multiplication-button/TextFieldWithMultiplicationButton";
 export * from "./formik-connected/PlaceSectionsSelectionField";
 export * from "./list-page/query-builder/QueryBuilder";

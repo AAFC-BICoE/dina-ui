@@ -62,7 +62,7 @@ export interface FieldWrapperProps {
   templateCheckboxFieldName?: string;
 
   /**
-   * Disables displaying checkbox for wrapped component in template mode.
+   * Disables displaying or using checkbox for wrapped component in template mode.
    */
   disableTemplateCheckbox?: boolean;
 
@@ -90,7 +90,8 @@ export interface FieldWrapperRenderProps {
  * e.g. select the "description" text input using wrapper.find(".description-field input").
  */
 export function FieldWrapper(props: FieldWrapperProps) {
-  const { name, templateCheckboxFieldName, validate } = props;
+  const { name, templateCheckboxFieldName, validate, disableTemplateCheckbox } =
+    props;
 
   const { formTemplate, componentName, sectionName } = useDinaFormContext();
 
@@ -127,7 +128,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
     return false;
   }, [formTemplate]);
 
-  if (disabledByFormTemplate) {
+  if (disabledByFormTemplate && !disableTemplateCheckbox) {
     return null;
   }
 
@@ -322,7 +323,6 @@ function FormikConnectedField({
     // Only used within the bulk editor's "Edit All" tab:
     placeholder: bulkTab?.placeholder,
   };
-
   return (
     <ErrorBoundary
       // The error boundary is just for render errors
