@@ -748,6 +748,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitGenerationOptionLabel: "Generation Options",
   splitSeriesOptionContinueTooltip:
     "Continue Series is only available if the Material Sample that is being split from already has children to continue the series from.",
+  splitSeriesOptionContinueFromParentTooltip:
+    "Continue Series from Parent is only available if the Material Sample that is being split from has a parent to continue the series from.",
   splitMaterialSampleNameRequiredTooltip:
     "A primary ID is required in order to perform a split.",
   startEventDateTime: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",

@@ -209,7 +209,10 @@ export function MaterialSampleSplitGenerationForm({
                   {
                     value: "continueFromParent",
                     label: formatMessage("splitSeriesOptionContinueFromParent"),
-                    disabled: !ableToContinueSeriesFromParent
+                    disabled: !ableToContinueSeriesFromParent,
+                    tooltipLabel: !ableToContinueSeriesFromParent
+                      ? "splitSeriesOptionContinueFromParentTooltip"
+                      : undefined
                   },
                   {
                     value: "new",
@@ -292,7 +295,7 @@ function PreviewGeneratedNames({
       };
 
       const getNewIdentifier =
-        splitFromMaterialSamples[0]?.materialSampleName +
+        splitFromMaterialSamples?.[0]?.materialSampleName +
         APPEND_GENERATION_MODE[generationMode];
 
       // Depending on the series mode, the identifier that will need to be sent to the backend to
