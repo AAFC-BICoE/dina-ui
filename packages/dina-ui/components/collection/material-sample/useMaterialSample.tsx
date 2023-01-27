@@ -108,20 +108,41 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
-        // Convert to seperated list
-        if (data.restrictionFieldsExtension && data.isRestricted) {
-          data[RESTRICTIONS_FIELDS[0]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_animal_rg"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[1]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_human_rg"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[2]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "cfia_ppc"
-          )?.[0];
-          data[RESTRICTIONS_FIELDS[3]] = data.restrictionFieldsExtension.filter(
-            (ext) => ext.extKey === "phac_cl"
-          )?.[0];
+        // Convert to separated list
+        if (data.restrictionFieldsExtension) {
+          // Process risk groups
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]) {
+            data[RESTRICTIONS_FIELDS[0]] = {
+              extKey: RESTRICTIONS_FIELDS[0],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[0]]
+                  .risk_group
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]) {
+            data[RESTRICTIONS_FIELDS[1]] = {
+              extKey: RESTRICTIONS_FIELDS[1],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[1]]
+                  .risk_group
+            };
+          }
+
+          // Process levels
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]]) {
+            data[RESTRICTIONS_FIELDS[2]] = {
+              extKey: RESTRICTIONS_FIELDS[2],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[2]].level
+            };
+          }
+          if (data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]]) {
+            data[RESTRICTIONS_FIELDS[3]] = {
+              extKey: RESTRICTIONS_FIELDS[3],
+              value:
+                data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
+            };
+          }
         }
       }
     }
@@ -455,15 +476,39 @@ export function useMaterialSampleSave({
   async function prepareSampleInput(
     submittedValues: InputResource<MaterialSample>
   ): Promise<InputResource<MaterialSample>> {
-    // Set the restrictedExtensions
-    submittedValues.restrictionFieldsExtension = [
-      ...(submittedValues.cfia_ppc ? [submittedValues.cfia_ppc] : []),
-      ...(submittedValues.phac_animal_rg
-        ? [submittedValues.phac_animal_rg]
-        : []),
-      ...(submittedValues.phac_cl ? [submittedValues.phac_cl] : []),
-      ...(submittedValues.phac_human_rg ? [submittedValues.phac_human_rg] : [])
-    ];
+    // Set the restrictionFieldsExtension
+    submittedValues.restrictionFieldsExtension = {};
+    if (submittedValues.phac_cl && submittedValues.phac_cl.extKey) {
+      submittedValues.restrictionFieldsExtension[
+        submittedValues.phac_cl.extKey
+      ] = {
+        level: submittedValues?.phac_cl?.value
+      };
+    }
+    if (submittedValues.cfia_ppc && submittedValues.cfia_ppc.extKey) {
+      submittedValues.restrictionFieldsExtension[
+        submittedValues.cfia_ppc.extKey
+      ] = {
+        level: submittedValues?.cfia_ppc?.value
+      };
+    }
+    if (
+      submittedValues.phac_animal_rg &&
+      submittedValues.phac_animal_rg.extKey
+    ) {
+      submittedValues.restrictionFieldsExtension[
+        submittedValues.phac_animal_rg.extKey
+      ] = {
+        risk_group: submittedValues?.phac_animal_rg?.value
+      };
+    }
+    if (submittedValues.phac_human_rg && submittedValues.phac_human_rg.extKey) {
+      submittedValues.restrictionFieldsExtension[
+        submittedValues.phac_human_rg.extKey
+      ] = {
+        risk_group: submittedValues?.phac_human_rg?.value
+      };
+    }
 
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {

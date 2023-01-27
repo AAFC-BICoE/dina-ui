@@ -1,8 +1,8 @@
 import { KitsuResource, PersistedResource } from "kitsu";
 import { Person } from "../../agent-api/resources/Person";
+import { DinaJsonMetaInfo } from "../../DinaJsonMetaInfo";
 import { Derivative } from "./Derivative";
 import { License } from "./License";
-import { ManagedAttributeMap } from "./ManagedAttributeMap";
 import { DcType } from "./ObjectUpload";
 
 export interface MetadataAttributes {
@@ -39,6 +39,9 @@ export interface MetadataAttributes {
   acHashValue?: string;
 
   resourceExternalURL?: string;
+
+  // Used for permission information included on the request.
+  meta?: DinaJsonMetaInfo;
 }
 
 export interface MetadataRelationships {
