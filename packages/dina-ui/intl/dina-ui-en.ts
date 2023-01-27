@@ -739,6 +739,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitPreviewNumberColumn: "Number",
   splitPreviewGeneratedIdentifierColumn: "Generated Identifier",
   splitSeriesOptionContinue: "Continue Series",
+  splitSeriesOptionContinueFromParent: "Continue Series from Parent",
   splitSeriesOptionNew: "New Series",
   splitGenerationOptionLowercase: "a (Lowercase letters)",
   splitGenerationOptionUppercase: "A (Uppercase letters)",
@@ -833,5 +834,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fieldExtension: "Field Extension",
   http403ForbiddenError: "Access is denied",
   unsupportedFileTypeError:
-    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
 };
