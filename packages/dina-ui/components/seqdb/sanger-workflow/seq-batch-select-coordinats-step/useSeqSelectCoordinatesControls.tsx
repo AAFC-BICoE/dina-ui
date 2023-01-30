@@ -89,17 +89,17 @@ export function useSeqSelectCoordinatesControls({
 
     fetchSamples((materialSamples) => {
       const seqBatchItemsWithSampleNames =
-        materialSamples.map<SeqReactionSample>((sample) => {
-          const batchItem = seqReactionSamples.find(
-            (item) => item.sampleId === sample.id
+        seqReactionSamples.map<SeqReactionSample>((reaction) => {
+          const foundSample = materialSamples.find(
+            (sample) => sample.id === reaction.sampleId
           );
           return {
-            seqReactionId: batchItem?.seqReactionId,
-            pcrBatchItemId: batchItem?.pcrBatchItemId,
-            sampleId: sample.id,
-            sampleName: sample?.materialSampleName ?? sample.id,
-            wellColumn: batchItem?.wellColumn,
-            wellRow: batchItem?.wellRow
+            seqReactionId: reaction.seqReactionId,
+            pcrBatchItemId: reaction.pcrBatchItemId,
+            sampleId: foundSample?.id,
+            sampleName: foundSample?.materialSampleName ?? foundSample?.id,
+            wellColumn: reaction.wellColumn,
+            wellRow: reaction.wellRow
           };
         });
 
@@ -192,16 +192,16 @@ export function useSeqSelectCoordinatesControls({
         );
 
         setSeqReactionSamples(
-          pcrBatchItems.map((item) => {
-            const foundRec = seqReactionAndPcrBatchItem.find(
-              (rec) => rec.pcrBatchItemId === item.id
+          seqReactionAndPcrBatchItem.map((rec) => {
+            const pcrBatchItem = pcrBatchItems.find(
+              (item) => item.id === rec.pcrBatchItemId
             );
             return {
-              seqReactionId: foundRec?.seqReactionId,
-              pcrBatchItemId: item.id,
-              sampleId: item.materialSample?.id,
-              wellColumn: foundRec?.wellColumn,
-              wellRow: foundRec?.wellRow
+              seqReactionId: rec.seqReactionId,
+              pcrBatchItemId: pcrBatchItem?.id,
+              sampleId: pcrBatchItem?.materialSample?.id,
+              wellColumn: rec.wellColumn,
+              wellRow: rec.wellRow
             };
           })
         );
