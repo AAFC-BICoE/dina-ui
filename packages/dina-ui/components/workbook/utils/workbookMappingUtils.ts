@@ -1,4 +1,5 @@
 import { WorkbookJSON } from "../types/Workbook";
+import { find } from "lodash";
 
 /**
  * This is currently a pretty simple function but in the future you will be able to select the
@@ -18,4 +19,26 @@ export function getColumnHeaders(
       (rowData) => rowData.content.length !== 0
     )?.content ?? null
   );
+}
+
+export function _toPlainString(value: string) {
+  if (!!value) {
+    return value.replace(/\s|-|_/g, "").toLowerCase();
+  } else {
+    return value;
+  }
+}
+
+export function getSelectedValue(
+  columnHeader: string,
+  fieldOptions: {
+    label: string;
+    value: string;
+  }[]
+) {
+  const option = find(
+    fieldOptions,
+    (item) => _toPlainString(item.label) === _toPlainString(columnHeader)
+  );
+  return option?.value;
 }

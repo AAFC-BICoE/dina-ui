@@ -1,7 +1,10 @@
 import { useMemo, useState, useEffect } from "react";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { WorkbookJSON } from "./types/Workbook";
-import { getColumnHeaders } from "./utils/workbookMappingUtils";
+import {
+  getColumnHeaders,
+  getSelectedValue
+} from "./utils/workbookMappingUtils";
 import Table from "react-bootstrap/Table";
 import { FieldWrapper, SelectField } from "common-ui/lib";
 import Select from "react-select";
@@ -109,6 +112,9 @@ export function WorkbookColumnMapping({
                   name={"fieldMap[" + columnHeader + "]"}
                   options={fieldOptions}
                   hideLabel={true}
+                  selectProps={{
+                    value: getSelectedValue(columnHeader, fieldOptions)
+                  }}
                 />
               </td>
             </tr>
