@@ -99,7 +99,11 @@ export function CollectingEventFormLayout({
       };
     });
 
-  function onBlockSelectChange(selected, _formik) {
+  function onBlockSelectChange(
+    selected,
+    formik: FormikContextType<any>,
+    oldValue
+  ) {
     const selectedFieldExtension = response?.data.find(
       (data) => data.extension.key === selected
     );
@@ -110,6 +114,13 @@ export function CollectingEventFormLayout({
         value: data.key,
       }))
     );
+    if (selected !== oldValue) {
+      formik?.values?.extensionValues?.forEach((extensionValue) => {
+        if (extensionValue.select === oldValue) {
+          extensionValue.rows = [{}];
+        }
+      });
+    }
   }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();

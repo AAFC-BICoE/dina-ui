@@ -3,7 +3,7 @@ import { DataEntry } from "./DataEntry";
 
 export interface DataEntryFieldProps {
   blockOptions?: any[];
-  onBlockSelectChange?: (value, formik) => void;
+  onBlockSelectChange?: (value, formik, oldValue?) => void;
   typeOptions?: any[];
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */

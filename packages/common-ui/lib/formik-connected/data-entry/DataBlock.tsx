@@ -9,10 +9,11 @@ import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { get } from "lodash";
 import { useEffect } from "react";
+import { DataEntryProps } from "./DataEntry";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
-  onBlockSelectChange?: (value, formik) => void;
+  onBlockSelectChange?: (value, formik, oldValue?) => void;
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
   model?: string;
@@ -37,6 +38,7 @@ export function DataBlock({
   initialValues,
   ...props
 }: DataBlockProps) {
+  // Make SelectField component load initial values if they exist
   useEffect(() => {
     if (onBlockSelectChange && initialValues?.select) {
       onBlockSelectChange(initialValues.select, undefined);

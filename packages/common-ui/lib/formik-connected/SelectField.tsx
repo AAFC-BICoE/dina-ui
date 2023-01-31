@@ -18,7 +18,8 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
 
   onChange?: (
     value: T | T[] | null | undefined,
-    formik: FormikContextType<any>
+    formik: FormikContextType<any>,
+    oldValue?: T | T[] | null | undefined
   ) => void;
   options: SelectOption<T>[];
   styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
@@ -58,7 +59,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             ? change.map((option) => option.value)
             : change?.value;
           setValue(newValue);
-          onChange?.(newValue as any, formik);
+          onChange?.(newValue as any, formik, value);
         }
 
         let selectedOption;
@@ -94,17 +95,17 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
         const customStyle = {
           placeholder: (provided, _) => ({
             ...provided,
-            color: "rgb(87,120,94)"
+            color: "rgb(87,120,94)",
           }),
           menu: (base) => ({ ...base, zIndex: 1050 }),
           control: (base) => ({
             ...base,
             ...(invalid && {
               borderColor: "rgb(148, 26, 37)",
-              "&:hover": { borderColor: "rgb(148, 26, 37)" }
-            })
+              "&:hover": { borderColor: "rgb(148, 26, 37)" },
+            }),
           }),
-          ...styles
+          ...styles,
         };
 
         return (
