@@ -89,7 +89,13 @@ export function RadioButtonsField<T = any>({
                 }
                 key={index}
               >
-                <label className="form-check-label">
+                <label
+                  className={
+                    option.disabled
+                      ? "disabled-radio-text form-check-label"
+                      : "form-check-label"
+                  }
+                >
                   <input
                     className={
                       "form-check-input " + horizontalOptions &&
