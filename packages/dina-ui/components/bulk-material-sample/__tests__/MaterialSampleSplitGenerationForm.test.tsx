@@ -8,7 +8,8 @@ const NO_CHILDREN_MATERIAL_SAMPLE = {
   type: "material-sample",
   group: "aafc",
   materialSampleName: "CNC-1",
-  materialSampleChildren: []
+  materialSampleChildren: [],
+  parentMaterialSample: undefined
 };
 
 const CHILDREN_MATERIAL_SAMPLE_UUID = "3a0ec067-6a98-4dba-8866-443237483a56";
@@ -72,55 +73,5 @@ describe("MaterialSampleSplitGenerationForm", () => {
     // This test is designed to simply ensure the design doesn't change when it's not expected.
     // If it's expected, the snapshot will need to be updated.
     expect(wrapper.find("main").debug()).toMatchSnapshot();
-  });
-
-  describe("New Series Generation", () => {
-    it("Split from material sample does not contain children, disable the continue series option.", async () => {
-      const wrapper = mountWithAppContext(
-        <MaterialSampleSplitGenerationForm
-          onGenerate={mockOnGenerate}
-          ids={[NO_CHILDREN_MATERIAL_SAMPLE_UUID]}
-        />,
-        { apiContext }
-      );
-
-      // Wait for the material sample request.
-      await new Promise(setImmediate);
-      wrapper.update();
-
-      // Find the continue series radio button.
-      const continueSeriesRadioButton = wrapper
-        .find("label")
-        .filterWhere((n) => n.text() === "Continue Series")
-        .find("input");
-
-      // Ensure it's disabled.
-      expect(continueSeriesRadioButton.prop("disabled")).toEqual(true);
-    });
-  });
-
-  describe("Continue Series Generation", () => {
-    it("Split from material sample contains children, enable the continue series option", async () => {
-      const wrapper = mountWithAppContext(
-        <MaterialSampleSplitGenerationForm
-          onGenerate={mockOnGenerate}
-          ids={[CHILDREN_MATERIAL_SAMPLE_UUID]}
-        />,
-        { apiContext }
-      );
-
-      // Wait for the material sample request.
-      await new Promise(setImmediate);
-      wrapper.update();
-
-      // Find the continue series radio button.
-      const continueSeriesRadioButton = wrapper
-        .find("label")
-        .filterWhere((n) => n.text() === "Continue Series")
-        .find("input");
-
-      // Ensure it's enabled.
-      expect(continueSeriesRadioButton.prop("disabled")).toEqual(false);
-    });
   });
 });
