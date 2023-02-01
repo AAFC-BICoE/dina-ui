@@ -1,3 +1,4 @@
+import { Dispatch } from "react";
 import { FieldWrapper } from "../..";
 import { DataEntry } from "./DataEntry";
 
@@ -16,6 +17,8 @@ export interface DataEntryFieldProps {
   legend: JSX.Element;
   width?: string;
   isTemplate?: boolean;
+  selectedBlockOptions?: any;
+  setSelectedBlockOptions?: Dispatch<any>;
 }
 
 export function DataEntryField({
@@ -31,6 +34,8 @@ export function DataEntryField({
   legend,
   width,
   isTemplate,
+  selectedBlockOptions,
+  setSelectedBlockOptions
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
   return (
@@ -50,6 +55,8 @@ export function DataEntryField({
             typeOptions={typeOptions}
             readOnly={readOnly}
             initialValues={initialValues}
+            selectedBlockOptions={selectedBlockOptions}
+            setSelectedBlockOptions={setSelectedBlockOptions}
           />
         )}
       >
@@ -65,6 +72,8 @@ export function DataEntryField({
             typeOptions={typeOptions}
             readOnly={readOnly}
             initialValues={initialValues}
+            selectedBlockOptions={selectedBlockOptions}
+            setSelectedBlockOptions={setSelectedBlockOptions}
           />
         }
       </FieldWrapper>

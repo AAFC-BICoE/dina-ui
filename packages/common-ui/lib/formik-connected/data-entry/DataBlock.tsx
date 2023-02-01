@@ -23,6 +23,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   typeOptions?: any[];
   readOnly?: boolean;
   initialValues?: any;
+  selectedBlockOptions?: any;
 }
 
 export function DataBlock({
@@ -36,6 +37,7 @@ export function DataBlock({
   typeOptions,
   readOnly,
   initialValues,
+  selectedBlockOptions,
   ...props
 }: DataBlockProps) {
   // Make SelectField component load initial values if they exist
@@ -78,6 +80,7 @@ export function DataBlock({
                           removeLabel={true}
                           onChange={onBlockSelectChange}
                           disableTemplateCheckbox={true}
+                          filterValues={selectedBlockOptions}
                         />
                       </div>
                     )}
@@ -115,7 +118,9 @@ export function DataBlock({
                   })}
                   {!readOnly && (
                     <div className="d-flex align-items-center justify-content-between">
-                      <Button onClick={() => removeBlock?.(blockIndex)}>
+                      <Button
+                        onClick={() => removeBlock?.(blockIndex)}
+                      >
                         <DinaMessage id="deleteButtonText" />
                       </Button>
                     </div>

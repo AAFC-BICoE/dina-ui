@@ -28,6 +28,7 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   isLoading?: boolean;
 
   selectProps?: Partial<ComponentProps<typeof Select>>;
+  filterValues?: any;
 }
 
 /** Formik-connected select input. */
@@ -41,6 +42,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     forwardedRef,
     isLoading,
     selectProps,
+    filterValues,
     ...labelWrapperProps
   } = props;
 
@@ -122,6 +124,11 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               ref={forwardedRef as any}
               {...selectProps}
               placeholder={placeholder ?? selectProps?.placeholder}
+              filterOption={
+                filterValues
+                  ? (option) => !filterValues.includes(option.value)
+                  : undefined
+              }
             />
           </div>
         );

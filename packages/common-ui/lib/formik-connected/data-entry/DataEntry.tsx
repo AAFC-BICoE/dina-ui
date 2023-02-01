@@ -19,12 +19,22 @@ export function DataEntry({
   typeOptions,
   readOnly,
   initialValues,
+  selectedBlockOptions,
+  setSelectedBlockOptions,
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
   function removeBlock(index) {
+    const oldValue =
+      arrayHelpersRef.current.form.values.extensionValues[index].select;
+    if (setSelectedBlockOptions) {
+      setSelectedBlockOptions(
+        selectedBlockOptions.filter((item) => item !== oldValue)
+      );
+    }
     arrayHelpersRef.current.remove(index);
   }
+
   function addBlock() {
     arrayHelpersRef.current.push({ rows: [{}] });
   }
@@ -68,6 +78,7 @@ export function DataEntry({
                         typeOptions={typeOptions}
                         readOnly={readOnly}
                         initialValues={initialValues?.at(index)}
+                        selectedBlockOptions={selectedBlockOptions}
                       />
                     );
                   })}
