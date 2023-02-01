@@ -6,40 +6,40 @@ import { SelectField } from "../SelectField";
 const PRIMER_TYPE_OPTIONS = [
   {
     label: "PCR Primer",
-    value: "PRIMER"
+    value: "PRIMER",
   },
   {
     label: "454 Multiplex Identifier",
-    value: "MID"
+    value: "MID",
   },
   {
     label: "Fusion Primer",
-    value: "FUSION_PRIMER"
+    value: "FUSION_PRIMER",
   },
   {
     label: "Illumina Index",
-    value: "ILLUMINA_INDEX"
+    value: "ILLUMINA_INDEX",
   },
   {
     label: "iTru Primer",
-    value: "ITRU_PRIMER"
+    value: "ITRU_PRIMER",
   },
   {
     label: "nested group",
     options: [
       {
         label: "nested label",
-        value: "nested value"
-      }
-    ]
-  }
+        value: "nested value",
+      },
+    ],
+  },
 ];
 
 function getWrapper(propsOverride = {}) {
   return mountWithAppContext(
     <DinaForm
       initialValues={{
-        testField: "ITRU_PRIMER"
+        testField: "ITRU_PRIMER",
       }}
     >
       {({ values: { testField } }) => (
@@ -65,7 +65,7 @@ describe("SelectField component", () => {
     // The selected option object should be passed into the Select component.
     expect(value).toEqual({
       label: "iTru Primer",
-      value: "ITRU_PRIMER"
+      value: "ITRU_PRIMER",
     });
   });
 
@@ -77,7 +77,7 @@ describe("SelectField component", () => {
     // Simulate changing the selected option.
     onChange({
       label: "Fusion Primer",
-      value: "FUSION_PRIMER"
+      value: "FUSION_PRIMER",
     });
 
     // The new value should be re-rendered into the value-display div.
@@ -92,7 +92,11 @@ describe("SelectField component", () => {
     wrapper.find(Select).prop<any>("onChange")({ value: "newTestValue" });
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith("newTestValue", expect.anything());
+    expect(mockOnChange).lastCalledWith(
+      "newTestValue",
+      expect.anything(),
+      "ITRU_PRIMER"
+    );
   });
 
   it("Allows multi-select.", async () => {
@@ -102,10 +106,14 @@ describe("SelectField component", () => {
     // Change the value to the first two options:
     wrapper.find(Select).prop<any>("onChange")([
       PRIMER_TYPE_OPTIONS[0],
-      PRIMER_TYPE_OPTIONS[1]
+      PRIMER_TYPE_OPTIONS[1],
     ]);
 
     // The mock function should have been called with the new value.
-    expect(mockOnChange).lastCalledWith(["PRIMER", "MID"], expect.anything());
+    expect(mockOnChange).lastCalledWith(
+      ["PRIMER", "MID"],
+      expect.anything(),
+      "ITRU_PRIMER"
+    );
   });
 });
