@@ -23,7 +23,7 @@ import { InputResource } from "kitsu";
 
 const ENTITY_LINK = "/collection/material-sample";
 
-type SeriesOptions = "continue" | "new";
+type SeriesOptions = "continue" | "continueFromParent" | "new";
 type GenerationOptions = "lowercase" | "uppercase" | "numeric";
 type AppendGenerationMode = {
   [key in GenerationOptions]: string;
@@ -62,8 +62,21 @@ export function MaterialSampleSplitGenerationForm({
   const splitFromMaterialSamples = useBulkGet<MaterialSample>({
     ids,
     listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection",
+      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
     disabled: ids.length === 0
+  });
+
+  const splitFromParentMaterialSamples = useBulkGet<MaterialSample>({
+    ids: (splitFromMaterialSamples.data as any)?.map(
+      (sample) => sample?.parentMaterialSample?.id ?? ""
+    ),
+    listPath:
+      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
+    disabled:
+      splitFromMaterialSamples.loading ||
+      (splitFromMaterialSamples.data as any)?.some(
+        (sample) => !sample.parentMaterialSample
+      )
   });
 
   const buttonBar = (
@@ -88,6 +101,14 @@ export function MaterialSampleSplitGenerationForm({
         (materialSample) => materialSample?.materialSampleChildren?.length !== 0
       ),
     [splitFromMaterialSamples.data]
+  );
+
+  const ableToContinueSeriesFromParent = useMemo<boolean>(
+    () =>
+      (splitFromParentMaterialSamples.data as any)?.every(
+        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
+      ),
+    [splitFromParentMaterialSamples.data]
   );
 
   if (splitFromMaterialSamples.loading) {
@@ -186,6 +207,14 @@ export function MaterialSampleSplitGenerationForm({
                       : undefined
                   },
                   {
+                    value: "continueFromParent",
+                    label: formatMessage("splitSeriesOptionContinueFromParent"),
+                    disabled: !ableToContinueSeriesFromParent,
+                    tooltipLabel: !ableToContinueSeriesFromParent
+                      ? "splitSeriesOptionContinueFromParentTooltip"
+                      : undefined
+                  },
+                  {
                     value: "new",
                     label: formatMessage("splitSeriesOptionNew")
                   }
@@ -223,6 +252,9 @@ export function MaterialSampleSplitGenerationForm({
             splitFromMaterialSamples={
               splitFromMaterialSamples.data as MaterialSample[]
             }
+            splitFromParentMaterialSamples={
+              splitFromParentMaterialSamples.data as MaterialSample[]
+            }
             generatedIdentifiers={generatedIdentifiers}
             setGeneratedIdentifiers={setGeneratedIdentifiers}
           />
@@ -234,12 +266,14 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
+  splitFromParentMaterialSamples: MaterialSample[];
   generatedIdentifiers: string[];
   setGeneratedIdentifiers: (identifiers: string[]) => void;
 }
 
 function PreviewGeneratedNames({
   splitFromMaterialSamples,
+  splitFromParentMaterialSamples,
   generatedIdentifiers,
   setGeneratedIdentifiers
 }: PreviewGeneratedNamesProps) {
@@ -261,17 +295,27 @@ function PreviewGeneratedNames({
       };
 
       const getNewIdentifier =
-        splitFromMaterialSamples[0]?.materialSampleName +
+        splitFromMaterialSamples?.[0]?.materialSampleName +
         APPEND_GENERATION_MODE[generationMode];
 
       // Depending on the series mode, the identifier that will need to be sent to the backend to
       // generate more identifier changes.
-      const identifier =
-        seriesMode === "new"
-          ? getNewIdentifier
-          : getYoungestMaterialSample(
-              splitFromMaterialSamples[0]?.materialSampleChildren
-            )?.materialSampleName;
+      let identifier;
+      switch (seriesMode) {
+        case "new":
+          identifier = getNewIdentifier;
+          break;
+        case "continue":
+          identifier = getYoungestMaterialSample(
+            splitFromMaterialSamples[0]?.materialSampleChildren
+          )?.materialSampleName;
+          break;
+        case "continueFromParent":
+          identifier = getYoungestMaterialSample(
+            splitFromParentMaterialSamples[0]?.materialSampleChildren
+          )?.materialSampleName;
+          break;
+      }
 
       const input: MaterialSampleIdentifierGenerator = {
         amount: formik.values.numberToCreate - (seriesMode === "new" ? 1 : 0),
