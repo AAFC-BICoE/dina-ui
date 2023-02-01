@@ -85,6 +85,8 @@ export function ManagedAttributeField({
 
   const isBoolAttr = attribute.vocabularyElementType === "BOOL";
 
+  const isDecimalAttr = attribute.vocabularyElementType === "DECIMAL";
+
   return isSelectAttr ? (
     <SelectField
       {...props}
@@ -100,11 +102,13 @@ export function ManagedAttributeField({
       ]}
     />
   ) : isIntegerAttr ? (
-    <NumberField {...props} />
+    <NumberField isInteger={true} {...props} />
   ) : isDateAttr ? (
     <DateField {...props} />
   ) : isBoolAttr ? (
     <StringToggleField {...props} />
+  ) : isDecimalAttr ? (
+    <NumberField isInteger={false} {...props} />
   ) : (
     <TextField {...props} />
   );
