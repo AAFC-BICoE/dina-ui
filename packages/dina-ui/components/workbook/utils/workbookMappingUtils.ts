@@ -40,5 +40,5 @@ export function getSelectedValue(
     fieldOptions,
     (item) => _toPlainString(item.label) === _toPlainString(columnHeader)
   );
-  return option?.value;
+  return option;
 }
