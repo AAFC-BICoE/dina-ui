@@ -74,7 +74,7 @@ export function WorkbookColumnMapping({
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
-  const onSubmitInternal = (submittedValues) => {
+  const onSubmitInternal = (_submittedValues) => {
     // console.log(submittedValues);
   };
 
