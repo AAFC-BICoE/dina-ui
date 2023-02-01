@@ -739,6 +739,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitPreviewNumberColumn: "Number",
   splitPreviewGeneratedIdentifierColumn: "Generated Identifier",
   splitSeriesOptionContinue: "Continue Series",
+  splitSeriesOptionContinueFromParent: "Continue Series from Parent",
   splitSeriesOptionNew: "New Series",
   splitGenerationOptionLowercase: "a (Lowercase letters)",
   splitGenerationOptionUppercase: "A (Uppercase letters)",
@@ -747,6 +748,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   splitGenerationOptionLabel: "Generation Options",
   splitSeriesOptionContinueTooltip:
     "Continue Series is only available if the Material Sample that is being split from already has children to continue the series from.",
+  splitSeriesOptionContinueFromParentTooltip:
+    "Continue Series from Parent is only available if the Material Sample that is being split from has a parent to continue the series from.",
   splitMaterialSampleNameRequiredTooltip:
     "A primary ID is required in order to perform a split.",
   startEventDateTime: "Start Event DateTime (YYYY-MM-DDTHH:MM:SS.MMM)",
@@ -833,5 +836,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   fieldExtension: "Field Extension",
   http403ForbiddenError: "Access is denied",
   unsupportedFileTypeError:
-    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
 };
