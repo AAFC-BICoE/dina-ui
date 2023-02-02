@@ -11,7 +11,8 @@ import {
   SubmitButton,
   TextField,
   useQuery,
-  withResponse
+  withResponse,
+  RadioButtonsField
 } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
 import { NextRouter, withRouter } from "next/router";
@@ -68,7 +69,8 @@ function PcrPrimerForm({ primer, router }: PcrPrimerFormProps) {
   const initialValues = primer || {
     lotNumber: 1,
     seq: "",
-    type: "PRIMER"
+    type: "PRIMER",
+    direction: "F"
   };
 
   const onSubmit: DinaFormOnSubmit = async ({
@@ -133,7 +135,15 @@ export function PcrPrimerFormFields() {
         <TextField className="col-md-2" name="purification" />
       </div>
       <div className="row">
-        <TextField className="col-md-2" name="direction" />
+        <RadioButtonsField<string>
+          horizontalOptions={true}
+          className="col-md-2"
+          name="direction"
+          options={[
+            { value: "F", label: "F" },
+            { value: "R", label: "R" }
+          ]}
+        />
         <TextField className="col-md-2" name="tmCalculated" />
         <DateField className="col-md-2" name="dateOrdered" />
       </div>

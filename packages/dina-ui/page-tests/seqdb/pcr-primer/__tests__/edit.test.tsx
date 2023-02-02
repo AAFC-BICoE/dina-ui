@@ -9,7 +9,7 @@ import { PcrPrimer } from "../../../../types/seqdb-api/resources/PcrPrimer";
 jest.mock("next/link", () => ({ children }) => <div>{children}</div>);
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   if (path === "seqdb-api/pcr-primer/100") {
     // The request for the primer returns the test primer.
     return { data: TEST_PRIMER };
@@ -74,6 +74,7 @@ describe("PcrPrimer edit page", () => {
           path: "pcr-primer",
           value: {
             attributes: {
+              direction: "F",
               group: "aafc",
               lotNumber: 1,
               name: "New PcrPrimer",
