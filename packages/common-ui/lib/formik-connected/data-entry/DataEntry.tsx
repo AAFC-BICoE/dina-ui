@@ -45,11 +45,13 @@ export function DataEntry({
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
-    initialValues.forEach((initialValue) => {
-      if (onBlockSelectChange && initialValue?.select) {
-        onBlockSelectChange(initialValue.select, undefined);
-      }
-    });
+    if (onBlockSelectChange && initialValues) {
+      initialValues.forEach((initialValue) => {
+        if (onBlockSelectChange && initialValue?.select) {
+          onBlockSelectChange(initialValue.select, undefined);
+        }
+      });
+    }
   }, []);
   function legendWrapper(): ((legend: JSX.Element) => JSX.Element) | undefined {
     return (legend) => {
