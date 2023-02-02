@@ -16,6 +16,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
 
 export type VocabularyElementType =
   | "INTEGER"
+  | "DECIMAL"
   | "STRING"
   | "PICKLIST"
   | "DATE"
@@ -45,6 +46,10 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
   {
     labelKey: "field_vocabularyElementType_integer_label",
     value: "INTEGER"
+  },
+  {
+    labelKey: "field_vocabularyElementType_decimal_label",
+    value: "DECIMAL"
   },
   {
     labelKey: "field_vocabularyElementType_text_label",

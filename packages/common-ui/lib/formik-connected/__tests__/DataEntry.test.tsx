@@ -1,7 +1,7 @@
 import { DinaForm } from "../DinaForm";
 import { KitsuResource } from "kitsu";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
-import { DataEntry } from "../data-entry/DataEntry";
+import { DataEntryField } from "../data-entry/DataEntryField";
 import { DataBlock } from "../data-entry/DataBlock";
 import { SelectField, TextField } from "../../../../common-ui/lib";
 import { FaPlus, FaMinus } from "react-icons/fa";
@@ -64,7 +64,7 @@ describe("DataEntry", () => {
         initialValues={{}}
         onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
       >
-        <DataEntry
+        <DataEntryField
           legend={<DinaMessage id="fieldExtension" />}
           blockOptions={blockOptions}
           unitsOptions={unitsOptions}

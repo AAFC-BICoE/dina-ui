@@ -75,6 +75,7 @@ export function DataBlock({
                           removeBottomMargin={true}
                           removeLabel={true}
                           onChange={onBlockSelectChange}
+                          disableTemplateCheckbox={true}
                         />
                       </div>
                     )}
@@ -83,12 +84,14 @@ export function DataBlock({
                         path={vocabularyOptionsPath}
                         name={`${props.name}.select`}
                         removeLabel={true}
+                        disableTemplateCheckbox={true}
                       />
                     )}
                     {!blockOptions && !vocabularyOptionsPath && (
                       <TextField
                         name={`${props.name}.select`}
                         removeLabel={true}
+                        disableTemplateCheckbox={true}
                       />
                     )}
                   </div>
