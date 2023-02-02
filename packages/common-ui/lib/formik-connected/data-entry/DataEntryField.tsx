@@ -35,47 +35,34 @@ export function DataEntryField({
   width,
   isTemplate,
   selectedBlockOptions,
-  setSelectedBlockOptions
+  setSelectedBlockOptions,
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
+  const dataEntry = (
+    <DataEntry
+      legend={legend}
+      name={name}
+      blockOptions={blockOptions}
+      onBlockSelectChange={onBlockSelectChange}
+      model={model}
+      unitsOptions={unitsOptions}
+      vocabularyOptionsPath={vocabularyOptionsPath}
+      typeOptions={typeOptions}
+      readOnly={readOnly}
+      initialValues={initialValues}
+      selectedBlockOptions={selectedBlockOptions}
+      setSelectedBlockOptions={setSelectedBlockOptions}
+    />
+  );
   return (
     <div style={{ width: width ?? defaultWidth }}>
       <FieldWrapper
+        disableLabelClick={true}
         name={name}
         hideLabel={true}
-        readOnlyRender={(_value, _form) => (
-          <DataEntry
-            legend={legend}
-            name={name}
-            blockOptions={blockOptions}
-            onBlockSelectChange={onBlockSelectChange}
-            model={model}
-            unitsOptions={unitsOptions}
-            vocabularyOptionsPath={vocabularyOptionsPath}
-            typeOptions={typeOptions}
-            readOnly={readOnly}
-            initialValues={initialValues}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
-          />
-        )}
+        readOnlyRender={(_value, _form) => dataEntry}
       >
-        {
-          <DataEntry
-            legend={legend}
-            name={name}
-            blockOptions={blockOptions}
-            onBlockSelectChange={onBlockSelectChange}
-            model={model}
-            unitsOptions={unitsOptions}
-            vocabularyOptionsPath={vocabularyOptionsPath}
-            typeOptions={typeOptions}
-            readOnly={readOnly}
-            initialValues={initialValues}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
-          />
-        }
+        {dataEntry}
       </FieldWrapper>
     </div>
   );
