@@ -226,9 +226,19 @@ export function Home() {
                     <SeqdbMessage id="regionListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/sequencing-facility/list">
+                  <a>
+                    <SeqdbMessage id="sequencingFacilityListTitle" />
+                  </a>
+                </Link>
                 <Link href="/seqdb/sanger-workflow/list">
                   <a>
                     <SeqdbMessage id="sangerWorkflowListTitle" />
+                  </a>
+                </Link>
+                <Link href="/seqdb/sanger-workflow-sequencing/list">
+                  <a>
+                    <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
                   </a>
                 </Link>
                 <Link href="/seqdb/thermocycler-profile/list">

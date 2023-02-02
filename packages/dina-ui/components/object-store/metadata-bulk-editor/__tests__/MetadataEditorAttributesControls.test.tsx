@@ -24,13 +24,13 @@ const TEST_BUILT_IN_COLUMNS = [
 
 const TEST_MANAGED_ATTRIBUTES: ManagedAttribute[] = [
   {
-    managedAttributeType: "STRING",
+    vocabularyElementType: "STRING",
     name: "managed-attribute-1",
     key: "managed-attribute-1",
     type: "managed-attribute"
   },
   {
-    managedAttributeType: "STRING",
+    vocabularyElementType: "STRING",
     name: "managed-attribute-2",
     key: "managed-attribute-2",
     type: "managed-attribute"
@@ -39,7 +39,7 @@ const TEST_MANAGED_ATTRIBUTES: ManagedAttribute[] = [
 
 const initialFormControls: MetadataEditorControls = {
   attributesTemplate: null,
-  editableBuiltInAttributes: TEST_BUILT_IN_COLUMNS.map(col => col.data),
+  editableBuiltInAttributes: TEST_BUILT_IN_COLUMNS.map((col) => col.data),
   editableManagedAttributes: TEST_MANAGED_ATTRIBUTES
 };
 
@@ -130,7 +130,7 @@ describe("MetadataEditorAttributesControls component", () => {
           editableManagedAttributes: [
             {
               key: "managed-attribute-1",
-              managedAttributeType: "STRING",
+              vocabularyElementType: "STRING",
               name: "managed-attribute-1",
               type: "managed-attribute"
             }
@@ -165,7 +165,7 @@ describe("MetadataEditorAttributesControls component", () => {
     ).toEqual([
       {
         key: "managed-attribute-1",
-        managedAttributeType: "STRING",
+        vocabularyElementType: "STRING",
         name: "managed-attribute-1",
         type: "managed-attribute"
       }

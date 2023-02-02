@@ -83,8 +83,8 @@ function ProductForm({ product, router }: ProductFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
         <BackButton entityId={id as string} entityLink="/seqdb/product" />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <ProductFormFields />
     </DinaForm>

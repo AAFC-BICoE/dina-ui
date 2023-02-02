@@ -8,7 +8,7 @@ const EXAMPLE_MA_1 = {
   id: "1",
   key: "example_attribute_1",
   name: "Example Attribute 1",
-  managedAttributeType: "STRING",
+  vocabularyElementType: "STRING",
   managedAttributeComponent: "COLLECTING_EVENT"
 };
 
@@ -16,7 +16,7 @@ const EXAMPLE_MA_2 = {
   id: "2",
   key: "example_attribute_2",
   name: "Example Attribute 2",
-  managedAttributeType: "STRING",
+  vocabularyElementType: "STRING",
   managedAttributeComponent: "COLLECTING_EVENT"
 };
 
@@ -24,7 +24,7 @@ const EXAMPLE_MA_3 = {
   id: "3",
   key: "example_attribute_3",
   name: "Example Attribute 3",
-  managedAttributeType: "STRING",
+  vocabularyElementType: "STRING",
   managedAttributeComponent: "COLLECTING_EVENT"
 };
 

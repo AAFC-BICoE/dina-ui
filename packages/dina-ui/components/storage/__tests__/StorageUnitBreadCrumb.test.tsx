@@ -50,9 +50,9 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     expect(
-      wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["Room C", "Cabinet B", "Box A"]);
-    expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
+      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
+    ).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
+    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",
       "/collection/storage-unit/view?id=A"
@@ -64,9 +64,9 @@ describe("StorageUnitBreadCrumb component", () => {
     );
 
     expect(
-      wrapper.find("li.breadcrumb-item").map(node => node.text().trim())
-    ).toEqual(["Room C", "Cabinet B", "Box A"]);
-    expect(wrapper.find("a").map(node => node.prop("href"))).toEqual([
+      wrapper.find("li.breadcrumb-item").map((node) => node.text().trim())
+    ).toEqual(["C (Room)", "B (Cabinet)", "A (Box)"]);
+    expect(wrapper.find("a").map((node) => node.prop("href"))).toEqual([
       "/collection/storage-unit/view?id=C",
       "/collection/storage-unit/view?id=B",
       "/collection/storage-unit/view?id=A"

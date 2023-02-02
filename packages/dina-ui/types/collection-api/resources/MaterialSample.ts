@@ -49,7 +49,7 @@ export interface MaterialSampleAttributes {
 
   publiclyReleasable?: boolean | null;
   notPubliclyReleasableReason?: string;
-  materialSampleChildren?: Partial<MaterialSample>[];
+  materialSampleChildren?: Partial<MaterialSampleChildren>[];
   tags?: string[];
 
   scheduledActions?: ScheduledAction[];
@@ -63,7 +63,7 @@ export interface MaterialSampleAttributes {
 
   useNextSequence?: boolean;
 
-  restrictionFieldsExtension?: ExtensionValue[] | null;
+  restrictionFieldsExtension?: any | null;
 
   phac_human_rg?: ExtensionValue | null;
   phac_cl?: ExtensionValue | null;
@@ -108,13 +108,17 @@ export interface MaterialSampleRelationships {
   acquisitionEvent?: AcquisitionEvent;
 }
 
+interface MaterialSampleChildren extends MaterialSample {
+  ordinal: number;
+}
+
 export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
   return {
     ...BLANK_PREPARATION,
     ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
-    organism: []
+    organism: [],
   };
 }
 

@@ -241,7 +241,5 @@ function buildNumberRangeObject(matchType, value) {
       return { lt: value };
     case "lessThanOrEqualTo":
       return { lte: value };
-    default:
-      return value;
   }
 }

@@ -2,12 +2,12 @@ import {
   LanguageSelector,
   NavbarUserControl,
   useAccount,
-  intlContext
+  intlContext,
 } from "common-ui";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage } from "../../../intl/seqdb-intl";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Navbar from "react-bootstrap/Navbar";
 import ReactNav from "react-bootstrap/Nav";
@@ -17,6 +17,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { SUPER_USER } from "common-ui/types/DinaRoles";
 import Link from "next/link";
+import axios from "axios";
 
 export interface NavProps {
   // Temporary prop for transitioning all pages to use the new layout.
@@ -26,6 +27,19 @@ export interface NavProps {
 export function Nav({ marginBottom = true }: NavProps) {
   const { isAdmin, rolesPerGroup } = useAccount();
   const { formatMessage } = useDinaIntl();
+  const [instanceMode, setInstanceMode] = useState();
+
+  useEffect(() => {
+    const getInstanceMode = async () => {
+      try {
+        const response = await axios.get(`/instance.json`);
+        setInstanceMode(response.data["instance-mode"]);
+      } catch (error) {
+        setInstanceMode(undefined);
+      }
+    };
+    getInstanceMode();
+  }, []);
 
   // Editable if current user is dina-admin, or a collection manager of any group:
   const showManagementNavigation =
@@ -68,7 +82,14 @@ export function Nav({ marginBottom = true }: NavProps) {
           <Container fluid={true} className="px-5">
             <Link href="/" passHref={true}>
               <Navbar.Brand href="/" className="app-name">
-                <DinaMessage id="appTitle" />
+                {instanceMode === "PROD" || !instanceMode ? (
+                  <DinaMessage id="appTitle" />
+                ) : (
+                  <DinaMessage
+                    id="appTitleInstanceMode"
+                    values={{ instanceMode }}
+                  />
+                )}
               </Navbar.Brand>
             </Link>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -363,9 +384,19 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="regionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/sequencing-facility/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="sequencingFacilityListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/sanger-workflow/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sangerWorkflowListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/seqdb/sanger-workflow-sequencing/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="sangerWorkflowSequencingListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/thermocycler-profile/list" passHref={true}>

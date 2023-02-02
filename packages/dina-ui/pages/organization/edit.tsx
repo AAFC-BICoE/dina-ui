@@ -68,12 +68,12 @@ export const trimAliases = (aliases, isArray) => {
   let trimmedAliases;
   isArray
     ? (trimmedAliases = aliases
-        .filter(a => a.trim().length > 0)
-        .map(a => a.trim()))
+        .filter((a) => a.trim().length > 0)
+        .map((a) => a.trim()))
     : (trimmedAliases = aliases
         .split(",")
-        .filter(a => a.trim().length > 0)
-        .map(a => a.trim()));
+        .filter((a) => a.trim().length > 0)
+        .map((a) => a.trim()));
   return trimmedAliases;
 };
 
@@ -154,12 +154,12 @@ function OrganizationForm({ organization, router }: OrganizationFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
         <BackButton
           entityId={id as string}
           entityLink="/organization"
           byPassView={true}
         />
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
       <OrganizationFields />
     </DinaForm>

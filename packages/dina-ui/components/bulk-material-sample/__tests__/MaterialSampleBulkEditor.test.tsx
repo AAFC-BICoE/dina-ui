@@ -899,7 +899,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "1",
           key: "m1",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 1"
         };
@@ -908,7 +908,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "2",
           key: "m2",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 2"
         };
@@ -917,7 +917,7 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) => {
           type: "managed-attribute",
           id: "3",
           key: "m3",
-          managedAttributeType: "STRING",
+          vocabularyElementType: "STRING",
           managedAttributeComponent: "MATERIAL_SAMPLE",
           name: "Managed Attribute 3"
         };
@@ -2638,7 +2638,7 @@ describe("MaterialSampleBulkEditor", () => {
     // New linked storage unit is indicated:
     expect(
       wrapper.find(".tabpanel-EDIT_ALL .storageUnit-field .storage-path").text()
-    ).toEqual("Box storage unit C");
+    ).toEqual("storage unit C (Box)");
 
     // Save the samples with the new storage unit:
     wrapper.find("button.bulk-save-button").simulate("click");

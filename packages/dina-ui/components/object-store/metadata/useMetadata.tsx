@@ -22,6 +22,7 @@ export function useMetadataEditQuery(id?: string | null) {
       include: "dcCreator,derivatives"
     },
     {
+      disabled: !id,
       joinSpecs: [
         // Join to persons api:
         {
@@ -51,7 +52,8 @@ export function useMetadataViewQuery(id?: string) {
   const query = useQuery<Metadata & { objectUpload: ObjectUpload }>(
     {
       include: "managedAttributeMap,acMetadataCreator,dcCreator,derivatives",
-      path: `objectstore-api/metadata/${id}`
+      path: `objectstore-api/metadata/${id}`,
+      header: { "include-dina-permission": "true" }
     },
     {
       joinSpecs: [
@@ -73,7 +75,8 @@ export function useMetadataViewQuery(id?: string) {
           joinField: "objectUpload",
           path: (metadata) => `object-upload/${metadata.fileIdentifier}`
         }
-      ]
+      ],
+      disabled: !id
     }
   );
 

@@ -6,7 +6,8 @@ import {
   LoadingSpinner,
   generateUUIDTree,
   FieldSet,
-  QueryPage
+  QueryPage,
+  BackButton
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -23,6 +24,7 @@ import { MetadataFileView } from "../../../components/object-store/metadata/Meta
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { TableColumn } from "../../../../common-ui/lib/list-page/types";
 import { Metadata } from "../../../../dina-ui/types/objectstore-api";
+import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
   .file-viewer-wrapper img {
@@ -31,7 +33,13 @@ const OBJECT_DETAILS_PAGE_CSS = `
   }
 `;
 
-export default function MetadataViewPage() {
+export interface MetadataViewPageProps {
+  reloadLastSearch?: boolean;
+}
+
+export default function MetadataViewPage({
+  reloadLastSearch
+}: MetadataViewPageProps) {
   const router = useRouter();
 
   const uuid = String(router.query.id);
@@ -50,48 +58,46 @@ export default function MetadataViewPage() {
       ? generateUUIDTree(metadata?.id, "data.relationships.attachment.data.id")
       : undefined;
 
-    // Columns for the elastic search list page.
-    const columns: TableColumn<Metadata>[] = [
-      // Material Sample Name
-      {
-        Cell: ({ original: { id, data } }) => (
-          <Link
-            href={`/collection/material-sample/view?id=${id}`}
-            passHref={true}
-          >
-            <a>
-              {data?.attributes?.materialSampleName ||
-                data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-                id}
-            </a>
-          </Link>
-        ),
-        label: "materialSampleName",
-        accessor: "data.attributes.materialSampleName",
-        isKeyword: true
-      }
-    ];
+    // Check the request to see if a permission provider is present.
+    const permissionsProvided = metadata.meta?.permissionsProvider;
+
+    const canEdit = permissionsProvided
+      ? metadata.meta?.permissions?.includes("update") ?? false
+      : true;
+    const canDelete = permissionsProvided
+      ? metadata.meta?.permissions?.includes("delete") ?? false
+      : true;
 
     const buttonBar = (
       <ButtonBar>
-        <BackToListButton entityLink="/object-store/object" />
-        <Link href={`/object-store/metadata/edit?id=${uuid}`}>
-          <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
-            <DinaMessage id="editButtonText" />
-          </a>
-        </Link>
+        <BackButton
+          byPassView={true}
+          className="me-auto"
+          entityId={uuid}
+          entityLink="/object-store/object"
+          reloadLastSearch={reloadLastSearch ?? true}
+        />
+        {canEdit && (
+          <Link href={`/object-store/metadata/edit?id=${uuid}`}>
+            <a className="btn btn-primary ms-auto" style={{ width: "10rem" }}>
+              <DinaMessage id="editButtonText" />
+            </a>
+          </Link>
+        )}
         <Link href={`/object-store/metadata/revisions?id=${uuid}`}>
           <a className="btn btn-info">
             <DinaMessage id="revisionsButtonText" />
           </a>
         </Link>
-        <DeleteButton
-          className="ms-5"
-          id={uuid}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/object-store/object/list"
-          type="metadata"
-        />
+        {canDelete && (
+          <DeleteButton
+            className="ms-5"
+            id={uuid}
+            options={{ apiBaseUrl: "/objectstore-api" }}
+            postDeleteRedirect="/object-store/object/list?reloadLastSearch"
+            type="metadata"
+          />
+        )}
       </ButtonBar>
     );
 
@@ -121,7 +127,7 @@ export default function MetadataViewPage() {
                       legend={<DinaMessage id="attachedMaterialSamples" />}
                     >
                       <QueryPage
-                        columns={columns}
+                        columns={ELASTIC_SEARCH_COLUMN}
                         indexName={"dina_material_sample_index"}
                         viewMode={customViewQuery ? true : false}
                         customViewQuery={customViewQuery ?? undefined}

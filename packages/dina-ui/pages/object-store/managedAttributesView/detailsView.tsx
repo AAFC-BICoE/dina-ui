@@ -35,9 +35,12 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   const { id } = router.query;
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
 
-  const query = useQuery<ManagedAttribute>({
-    path: `objectstore-api/managed-attribute/${id}`
-  });
+  const query = useQuery<ManagedAttribute>(
+    {
+      path: `objectstore-api/managed-attribute/${id}`
+    },
+    { disabled: id === undefined }
+  );
 
   return (
     <div>
@@ -94,12 +97,12 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     profile
       ? acceptedValueLen
         ? "PICKLIST"
-        : profile.managedAttributeType
+        : profile.vocabularyElementType
       : undefined
   );
 
   if (type === "PICKLIST") {
-    initialValues.managedAttributeType = "PICKLIST";
+    initialValues.vocabularyElementType = "PICKLIST";
   }
 
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
@@ -115,17 +118,17 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       submittedValues.acceptedValues = null;
     }
 
-    if (!submittedValues.name || !submittedValues.managedAttributeType) {
+    if (!submittedValues.name || !submittedValues.vocabularyElementType) {
       throw new Error(
         formatMessage("field_managedAttributeMandatoryFieldsError")
       );
     }
 
-    if (submittedValues.managedAttributeType === "PICKLIST") {
-      submittedValues.managedAttributeType = "STRING";
+    if (submittedValues.vocabularyElementType === "PICKLIST") {
+      submittedValues.vocabularyElementType = "STRING";
     } else if (
-      submittedValues.managedAttributeType === "INTEGER" ||
-      submittedValues.managedAttributeType === "STRING"
+      submittedValues.vocabularyElementType === "INTEGER" ||
+      submittedValues.vocabularyElementType === "STRING"
     ) {
       submittedValues.acceptedValues = null;
     }
@@ -134,7 +137,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
     submittedValues.multilingualDescription = {
       descriptions: toPairs(submittedValues.multilingualDescription)
         .map(([lang, desc]) => ({ lang, desc }))
-        .filter(it => it.desc)
+        .filter((it) => it.desc)
     };
 
     await save(
@@ -147,14 +150,14 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/managed-attribute/list?tab=objectStore`);
+    await router.push(`/managed-attribute/list?step=1`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
         <SubmitButton />
-        <Link href="/managed-attribute/list?tab=objectStore">
+        <Link href="/managed-attribute/list?step=1">
           <a className="btn btn-dark">
             <DinaMessage id="cancelButtonText" />
           </a>
@@ -163,7 +166,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
           className="ms-5"
           id={id}
           options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/managed-attribute/list?tab=objectStore"
+          postDeleteRedirect="/managed-attribute/list?step=1"
           type="managed-attribute"
         />
       </ButtonBar>
@@ -178,7 +181,7 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
       <div className="row">
         <SelectField
           className="col-md-6"
-          name="managedAttributeType"
+          name="vocabularyElementType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: ManagedAttributeType) => setType(selectValue)}
         />
