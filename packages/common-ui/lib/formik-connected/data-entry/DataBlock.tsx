@@ -8,8 +8,6 @@ import {
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { get } from "lodash";
-import { useEffect } from "react";
-import { DataEntryProps } from "./DataEntry";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
@@ -22,7 +20,6 @@ export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (index) => void;
   typeOptions?: any[];
   readOnly?: boolean;
-  initialValues?: any;
   selectedBlockOptions?: any;
 }
 
@@ -36,16 +33,9 @@ export function DataBlock({
   removeBlock,
   typeOptions,
   readOnly,
-  initialValues,
   selectedBlockOptions,
   ...props
 }: DataBlockProps) {
-  // Make SelectField component load initial values if they exist
-  useEffect(() => {
-    if (onBlockSelectChange && initialValues?.select) {
-      onBlockSelectChange(initialValues.select, undefined);
-    }
-  }, []);
 
   return (
     <div>
@@ -118,9 +108,7 @@ export function DataBlock({
                   })}
                   {!readOnly && (
                     <div className="d-flex align-items-center justify-content-between">
-                      <Button
-                        onClick={() => removeBlock?.(blockIndex)}
-                      >
+                      <Button onClick={() => removeBlock?.(blockIndex)}>
                         <DinaMessage id="deleteButtonText" />
                       </Button>
                     </div>

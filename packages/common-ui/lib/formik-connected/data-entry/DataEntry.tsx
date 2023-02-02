@@ -5,6 +5,7 @@ import { FieldArray } from "formik";
 import { Button } from "react-bootstrap";
 import { useRef } from "react";
 import { DataEntryFieldProps } from "./DataEntryField";
+import { useEffect } from "react";
 
 export interface DataEntryProps extends DataEntryFieldProps {}
 
@@ -26,7 +27,11 @@ export function DataEntry({
 
   function removeBlock(index) {
     const oldValue =
-      arrayHelpersRef.current.form.values.extensionValues[index].select;
+      arrayHelpersRef?.current?.form?.values?.extensionValues?.[index]
+        ?.select ??
+      arrayHelpersRef?.current?.form?.initialValues?.extensionValues?.[index]
+        ?.select;
+
     if (setSelectedBlockOptions) {
       setSelectedBlockOptions(
         selectedBlockOptions.filter((item) => item !== oldValue)
@@ -38,6 +43,14 @@ export function DataEntry({
   function addBlock() {
     arrayHelpersRef.current.push({ rows: [{}] });
   }
+  // Make SelectField component load initial values if they exist
+  useEffect(() => {
+    initialValues.forEach((initialValue) => {
+      if (onBlockSelectChange && initialValue?.select) {
+        onBlockSelectChange(initialValue.select, undefined);
+      }
+    });
+  }, []);
   function legendWrapper(): ((legend: JSX.Element) => JSX.Element) | undefined {
     return (legend) => {
       return (
@@ -77,7 +90,6 @@ export function DataEntry({
                         vocabularyOptionsPath={vocabularyOptionsPath}
                         typeOptions={typeOptions}
                         readOnly={readOnly}
-                        initialValues={initialValues?.at(index)}
                         selectedBlockOptions={selectedBlockOptions}
                       />
                     );
