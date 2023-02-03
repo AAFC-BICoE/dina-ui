@@ -1,8 +1,9 @@
 // tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
-import { isArray } from "lodash";
+import { find, isArray, castArray, compact } from "lodash";
 import { ComponentProps, RefObject } from "react";
 import Select, { StylesConfig } from "react-select";
+import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 
 export interface SelectOption<T> {
@@ -29,6 +30,9 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   selectProps?: Partial<ComponentProps<typeof Select>>;
 }
 
+/** The value could be one element or an array. */
+type SingleOrArray<T> = T | T[];
+
 /** Formik-connected select input. */
 export function SelectField<T>(props: SelectFieldProps<T>) {
   const {
@@ -40,11 +44,32 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     forwardedRef,
     isLoading,
     selectProps,
+    readOnlyRender,
     ...labelWrapperProps
   } = props;
 
+  const defaultReadOnlyRender = (value?: SingleOrArray<T | null>) => {
+    const values = compact(castArray(value));
+    const labels = compact(
+      values.map(
+        (item) => find(options, (option) => option.value === item)?.label
+      )
+    );
+    return (
+      <div className="read-only-view">
+        <ReadOnlyValue
+          link={labelWrapperProps.link}
+          value={labels ?? [].join(", ")}
+        />
+      </div>
+    );
+  };
+
   return (
-    <FieldWrapper {...labelWrapperProps}>
+    <FieldWrapper
+      {...labelWrapperProps}
+      readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
+    >
       {({ setValue, value, formik, invalid, placeholder }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
