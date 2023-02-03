@@ -50,6 +50,7 @@ export function DataRow({
             name={typeSelectFieldName}
             label={<DinaMessage id="dataType" />}
             removeBottomMargin={true}
+            disableTemplateCheckbox={true}
           />
         </div>
       )}
@@ -58,6 +59,7 @@ export function DataRow({
           name={valueTextFieldName}
           removeBottomMargin={true}
           label={<DinaMessage id="dataValue" />}
+          disableTemplateCheckbox={true}
         />
       </div>
       {unitsOptions && (
@@ -67,6 +69,7 @@ export function DataRow({
             name={unitSelectFieldName}
             removeBottomMargin={true}
             label={<DinaMessage id="unit" />}
+            disableTemplateCheckbox={true}
           />
         </div>
       )}

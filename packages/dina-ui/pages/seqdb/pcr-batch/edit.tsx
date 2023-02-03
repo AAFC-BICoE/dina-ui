@@ -331,7 +331,10 @@ export function PcrBatchFormFields() {
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerForward"
-          filter={filterBy(["name"])}
+          filter={(input) => ({
+            ...filterBy(["name"])(input),
+            direction: { EQ: "F" }
+          })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
@@ -339,7 +342,10 @@ export function PcrBatchFormFields() {
         <ResourceSelectField<PcrPrimer>
           className="col-md-6"
           name="primerReverse"
-          filter={filterBy(["name"])}
+          filter={(input) => ({
+            ...filterBy(["name"])(input),
+            direction: { EQ: "R" }
+          })}
           model="seqdb-api/pcr-primer"
           optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
           readOnlyLink="/seqdb/pcr-primer/view?id="
