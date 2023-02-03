@@ -8,11 +8,10 @@ import {
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { get } from "lodash";
-import { useEffect } from "react";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
-  onBlockSelectChange?: (value, formik) => void;
+  onBlockSelectChange?: (value, formik, oldValue?) => void;
   vocabularyOptionsPath?: string;
   /** The model type to select resources from. */
   model?: string;
@@ -21,7 +20,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (index) => void;
   typeOptions?: any[];
   readOnly?: boolean;
-  initialValues?: any;
+  selectedBlockOptions?: any;
 }
 
 export function DataBlock({
@@ -34,14 +33,9 @@ export function DataBlock({
   removeBlock,
   typeOptions,
   readOnly,
-  initialValues,
+  selectedBlockOptions,
   ...props
 }: DataBlockProps) {
-  useEffect(() => {
-    if (onBlockSelectChange && initialValues?.select) {
-      onBlockSelectChange(initialValues.select, undefined);
-    }
-  }, []);
 
   return (
     <div>
@@ -76,6 +70,7 @@ export function DataBlock({
                           removeLabel={true}
                           onChange={onBlockSelectChange}
                           disableTemplateCheckbox={true}
+                          filterValues={selectedBlockOptions}
                         />
                       </div>
                     )}

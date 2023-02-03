@@ -98,8 +98,13 @@ export function CollectingEventFormLayout({
         value: data.extension.key,
       };
     });
+  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
 
-  function onBlockSelectChange(selected, _formik) {
+  function onBlockSelectChange(
+    selected,
+    formik: FormikContextType<any>,
+    oldValue
+  ) {
     const selectedFieldExtension = response?.data.find(
       (data) => data.extension.key === selected
     );
@@ -110,6 +115,17 @@ export function CollectingEventFormLayout({
         value: data.key,
       }))
     );
+    if (selected !== oldValue) {
+      formik?.values?.extensionValues?.forEach((extensionValue) => {
+        if (extensionValue.select === oldValue) {
+          extensionValue.rows = [{}];
+        }
+      });
+    }
+    setSelectedBlockOptions(
+      selectedBlockOptions.filter((item) => item !== oldValue)
+    );
+    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
   }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -1032,6 +1048,8 @@ export function CollectingEventFormLayout({
             readOnly={readOnly}
             initialValues={initialValues.extensionValues}
             isTemplate={isTemplate}
+            selectedBlockOptions={selectedBlockOptions}
+            setSelectedBlockOptions={setSelectedBlockOptions}
           />
         </DinaFormSection>
       </div>
