@@ -8,11 +8,10 @@ import {
   rsql,
   useApiClient,
   useQuery,
-  withResponse
+  withResponse,
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
-import { CoordinateSystemEnumPlaceHolder } from "packages/dina-ui/types/collection-api/resources/CoordinateSystem";
 import Pagination from "rc-pagination";
 import { useState, useEffect } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
@@ -22,7 +21,7 @@ import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
 import {
   StorageUnitBreadCrumb,
-  storageUnitDisplayName
+  storageUnitDisplayName,
 } from "./StorageUnitBreadCrumb";
 
 export interface BrowseStorageTreeProps {
@@ -73,17 +72,21 @@ export function StorageTreeList({
   parentId,
   disabled,
   filter,
-  showPathInName
+  showPathInName,
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
   const offset = (pageNumber - 1) * limit;
-  const [tempStorageUnitChildren, setTempStorageUnitChildren] = useState<StorageUnit[]>([]);
+  const [tempStorageUnitChildren, setTempStorageUnitChildren] = useState<
+    StorageUnit[] | undefined
+  >(storageUnitChildren ? [] : undefined);
   const { bulkGet } = useApiClient();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(
+    storageUnitChildren ? true : false
+  );
 
-  async function fetchStorageUnitChildren(){
-    if( storageUnitChildren ){
+  async function fetchStorageUnitChildren() {
+    if (storageUnitChildren) {
       await bulkGet<StorageUnit>(
         storageUnitChildren.map(
           (storageUnit) =>
@@ -96,7 +99,7 @@ export function StorageTreeList({
       });
     }
   }
-  
+
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>(
     {
       path: `collection-api/storage-unit`,
@@ -118,18 +121,18 @@ export function StorageTreeList({
                     attribute: "parentStorageUnit.uuid",
                     predicate: "IS" as const,
                     searchType: "EXACT_MATCH" as const,
-                    value: parentId
-                  }
+                    value: parentId,
+                  },
                 ]
               : []),
-            ...(filter ? [filter] : [])
-          ]
+            ...(filter ? [filter] : []),
+          ],
         }),
         // For top-level storage units:
         ...(!filter?.children?.length && !parentId
           ? { parentStorageUnit: null }
-          : {})
-      }
+          : {}),
+      },
     },
     { disabled: storageUnitChildren !== undefined }
   );
@@ -141,14 +144,16 @@ export function StorageTreeList({
   }, [storageUnitChildren]);
 
   // If the children are provided we can skip the query and just display them.
-  if (tempStorageUnitChildren !== undefined) {
+  if (tempStorageUnitChildren) {
     return loading ? (
       <LoadingSpinner loading={true} />
     ) : (
       <>
         {tempStorageUnitChildren.map((unit, index) => (
           <div
-            className={index === tempStorageUnitChildren.length - 1 ? "" : "my-2"}
+            className={
+              index === tempStorageUnitChildren.length - 1 ? "" : "my-2"
+            }
             key={unit.id}
           >
             <StorageUnitCollapser
@@ -219,7 +224,7 @@ function StorageUnitCollapser({
   onSelect,
   disabled,
   showPathInName,
-  checkForChildren
+  checkForChildren,
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -231,7 +236,7 @@ function StorageUnitCollapser({
       e.code === " " ||
       e.type === "click"
     )
-      setOpen(current => !current);
+      setOpen((current) => !current);
   }
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
@@ -249,7 +254,7 @@ function StorageUnitCollapser({
         size="2em"
         className={classNames("storage-collapser-icon aligh-top", {
           // Hide the expander button when there are no children:
-          invisible: !hasChildren
+          invisible: !hasChildren,
         })}
         style={{ cursor: "pointer" }}
         title={isOpen ? formatMessage("collapse") : formatMessage("expand")}
@@ -285,4 +290,3 @@ function StorageUnitCollapser({
     </div>
   );
 }
-
