@@ -19,7 +19,8 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
 
   onChange?: (
     value: T | T[] | null | undefined,
-    formik: FormikContextType<any>
+    formik: FormikContextType<any>,
+    oldValue?: T | T[] | null | undefined
   ) => void;
   options: SelectOption<T>[];
   styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
@@ -28,6 +29,7 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   isLoading?: boolean;
 
   selectProps?: Partial<ComponentProps<typeof Select>>;
+  filterValues?: any;
 }
 
 /** The value could be one element or an array. */
@@ -45,6 +47,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     isLoading,
     selectProps,
     readOnlyRender,
+    filterValues,
     ...labelWrapperProps
   } = props;
 
@@ -83,7 +86,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             ? change.map((option) => option.value)
             : change?.value;
           setValue(newValue);
-          onChange?.(newValue as any, formik);
+          onChange?.(newValue as any, formik, value);
         }
 
         let selectedOption;
@@ -146,6 +149,11 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               ref={forwardedRef as any}
               {...selectProps}
               placeholder={placeholder ?? selectProps?.placeholder}
+              filterOption={
+                filterValues
+                  ? (option) => !filterValues.includes(option.value)
+                  : undefined
+              }
             />
           </div>
         );
