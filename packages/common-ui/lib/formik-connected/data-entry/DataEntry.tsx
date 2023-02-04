@@ -7,6 +7,9 @@ import { useRef } from "react";
 import { DataEntryFieldProps } from "./DataEntryField";
 import { useEffect } from "react";
 
+/* tslint:disable-next-line */
+export interface DataEntryProps extends DataEntryFieldProps {};
+
 export function DataEntry({
   legend,
   name,
@@ -20,7 +23,7 @@ export function DataEntry({
   initialValues,
   selectedBlockOptions,
   setSelectedBlockOptions
-}: DataEntryFieldProps) {
+}: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
   function removeBlock(index) {

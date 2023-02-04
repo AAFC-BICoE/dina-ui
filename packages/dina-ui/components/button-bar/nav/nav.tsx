@@ -2,7 +2,7 @@ import {
   LanguageSelector,
   NavbarUserControl,
   useAccount,
-  intlContext,
+  intlContext
 } from "common-ui";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
