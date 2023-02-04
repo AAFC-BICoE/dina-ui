@@ -122,7 +122,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
           <FastFieldInner name=\\"seriesOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
             <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"seriesOptions\\">
               <SelectField name=\\"generationOptions\\" label=\\"Generation Options\\" disabled={true} options={{...}}>
-                <FieldWrapper name=\\"generationOptions\\" label=\\"Generation Options\\">
+                <FieldWrapper name=\\"generationOptions\\" label=\\"Generation Options\\" readOnlyRender={[Function: defaultReadOnlyRender]}>
                   <FieldSpy fieldName=\\"generationOptions\\" validate={[undefined]}>
                     <FormikConnect(FastFieldInner) name=\\"generationOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
                       <FastFieldInner name=\\"generationOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
