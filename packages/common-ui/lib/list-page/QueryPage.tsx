@@ -179,7 +179,7 @@ export function QueryPage<TData extends KitsuResource>({
   customViewFields
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
 
   // Search results returned by Elastic Search
@@ -701,7 +701,7 @@ export function QueryPage<TData extends KitsuResource>({
                   ) : (
                     <CommonMessage
                       id="tableTotalCount"
-                      values={{ totalCount: totalRecords }}
+                      values={{ totalCount: formatNumber(totalRecords) }}
                     />
                   )}
                 </span>
