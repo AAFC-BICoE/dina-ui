@@ -125,39 +125,36 @@ export function MaterialSampleSplitGenerationForm({
     submittedValues
   }) => {
     if (
+      !isMultiple &&
       Number(generatedIdentifiers.length) !==
-      Number(submittedValues?.numberToCreate)
+        Number(submittedValues?.numberToCreate)
     ) {
       return;
     }
 
-    const splitMaterialSample = splitFromMaterialSamples
-      ?.data?.[0] as MaterialSample;
+    const samples: InputResource<MaterialSample>[] = [];
+    splitFromMaterialSamples?.data?.forEach((splitMaterialSample, index) => {
+      if (!splitMaterialSample) {
+        return;
+      }
 
-    if (!splitMaterialSample) {
-      return;
-    }
-
-    const samples = [...Array(Number(submittedValues.numberToCreate))].map<
-      InputResource<MaterialSample>
-    >((_, index) => {
-      return {
+      samples.push({
         type: "material-sample",
         parentMaterialSample: {
           id: splitMaterialSample.id ?? "",
           type: "material-sample"
         },
-        group: splitMaterialSample.group ?? "",
-        collection: splitMaterialSample?.collection?.id
+        group: (splitMaterialSample as any).group ?? "",
+        collection: (splitMaterialSample as any)?.collection?.id
           ? {
-              id: splitMaterialSample.collection?.id ?? "",
+              id: (splitMaterialSample as any).collection?.id ?? "",
               type: "collection"
             }
           : undefined,
         publiclyReleasable: true,
         allowDuplicateName: false,
         materialSampleName: generatedIdentifiers[index]
-      };
+      });
     });
 
     onGenerate(samples);
@@ -336,20 +333,33 @@ function PreviewGeneratedNames({
         (i) => getIdentifierRequest(i)
       );
 
-      const responses = await save<MaterialSampleIdentifierGenerator>(
-        requests.map((request) => ({
-          resource: request,
-          type: "material-sample-identifier-generator"
-        })),
-        { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-      );
+      // If in multiple mode and series mode is new, no request is required.
+      const responses =
+        isMultiple && seriesMode === "new"
+          ? []
+          : await save<MaterialSampleIdentifierGenerator>(
+              requests.map((request) => ({
+                resource: request,
+                type: "material-sample-identifier-generator"
+              })),
+              { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+            );
 
       const generatedIdentifiersResults = responses
         .flatMap((response) => response?.nextIdentifiers || [])
         .filter((identifier) => identifier);
 
       if (seriesMode === "new") {
-        setGeneratedIdentifiers(requests.map((request) => request.identifier));
+        if (isMultiple) {
+          setGeneratedIdentifiers(
+            requests.map((request) => request.identifier)
+          );
+        } else {
+          setGeneratedIdentifiers([
+            requests[0].identifier,
+            ...generatedIdentifiersResults
+          ]);
+        }
       } else {
         setGeneratedIdentifiers(generatedIdentifiersResults);
       }
@@ -385,20 +395,23 @@ function PreviewGeneratedNames({
           </tr>
         </thead>
         <tbody>
-          {Array.from({ length: generatedIdentifiers.length }, (_, i) => i).map(
-            (_, index) => (
-              <tr key={index + 1}>
-                <td>#{index + 1}</td>
-                <td>
-                  {generatedIdentifiers[index] ? (
-                    generatedIdentifiers[index]
-                  ) : (
-                    <LoadingSpinner loading={true} />
-                  )}
-                </td>
-              </tr>
-            )
-          )}
+          {Array.from(
+            {
+              length: isMultiple ? generatedIdentifiers.length : numberToCreate
+            },
+            (_, i) => i
+          ).map((_, index) => (
+            <tr key={index + 1}>
+              <td>#{index + 1}</td>
+              <td>
+                {generatedIdentifiers[index] ? (
+                  generatedIdentifiers[index]
+                ) : (
+                  <LoadingSpinner loading={true} />
+                )}
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
