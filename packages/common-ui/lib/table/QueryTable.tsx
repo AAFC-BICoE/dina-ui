@@ -262,7 +262,7 @@ export function QueryTable<TData extends KitsuResource>({
               />
             </span>
             {resolvedReactTableProps?.sortable !== false && (
-              <span className="mx-3">
+              <span className="mx-0">
                 <Tooltip id="queryTableMultiSortExplanation" />
               </span>
             )}
