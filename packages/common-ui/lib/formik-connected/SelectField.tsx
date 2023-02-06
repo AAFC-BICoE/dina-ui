@@ -1,8 +1,9 @@
 // tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
-import { isArray } from "lodash";
+import { find, isArray, castArray, compact } from "lodash";
 import { ComponentProps, RefObject } from "react";
 import Select, { StylesConfig } from "react-select";
+import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 
 export interface SelectOption<T> {
@@ -18,7 +19,8 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
 
   onChange?: (
     value: T | T[] | null | undefined,
-    formik: FormikContextType<any>
+    formik: FormikContextType<any>,
+    oldValue?: T | T[] | null | undefined
   ) => void;
   options: SelectOption<T>[];
   styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
@@ -27,7 +29,11 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
   isLoading?: boolean;
 
   selectProps?: Partial<ComponentProps<typeof Select>>;
+  filterValues?: any;
 }
+
+/** The value could be one element or an array. */
+type SingleOrArray<T> = T | T[];
 
 /** Formik-connected select input. */
 export function SelectField<T>(props: SelectFieldProps<T>) {
@@ -40,11 +46,33 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     forwardedRef,
     isLoading,
     selectProps,
+    readOnlyRender,
+    filterValues,
     ...labelWrapperProps
   } = props;
 
+  const defaultReadOnlyRender = (value?: SingleOrArray<T | null>) => {
+    const values = compact(castArray(value));
+    const labels = compact(
+      values.map(
+        (item) => find(options, (option) => option.value === item)?.label
+      )
+    );
+    return (
+      <div className="read-only-view">
+        <ReadOnlyValue
+          link={labelWrapperProps.link}
+          value={labels ?? [].join(", ")}
+        />
+      </div>
+    );
+  };
+
   return (
-    <FieldWrapper {...labelWrapperProps}>
+    <FieldWrapper
+      {...labelWrapperProps}
+      readOnlyRender={readOnlyRender ?? defaultReadOnlyRender}
+    >
       {({ setValue, value, formik, invalid, placeholder }) => {
         function onChangeInternal(
           change: SelectOption<T>[] | SelectOption<T> | null
@@ -58,7 +86,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
             ? change.map((option) => option.value)
             : change?.value;
           setValue(newValue);
-          onChange?.(newValue as any, formik);
+          onChange?.(newValue as any, formik, value);
         }
 
         let selectedOption;
@@ -121,6 +149,11 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
               ref={forwardedRef as any}
               {...selectProps}
               placeholder={placeholder ?? selectProps?.placeholder}
+              filterOption={
+                filterValues
+                  ? (option) => !filterValues.includes(option.value)
+                  : undefined
+              }
             />
           </div>
         );

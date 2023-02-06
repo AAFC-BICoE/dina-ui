@@ -179,7 +179,7 @@ export function QueryPage<TData extends KitsuResource>({
   customViewFields
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
   const { groupNames } = useAccount();
 
   // Search results returned by Elastic Search
@@ -673,16 +673,32 @@ export function QueryPage<TData extends KitsuResource>({
         {/* Group Selection */}
         {!viewMode && (
           <DinaFormSection horizontal={"flex"}>
-            <GroupSelectField
-              isMulti={true}
-              name="group"
-              className="col-md-4 mt-3"
-              onChange={(newGroups) =>
-                setImmediate(() => {
-                  onGroupChange(newGroups);
-                })
-              }
-            />
+            <div className="row">
+              <GroupSelectField
+                isMulti={true}
+                name="group"
+                className="col-md-4 mt-3"
+                onChange={(newGroups) =>
+                  setImmediate(() => {
+                    onGroupChange(newGroups);
+                  })
+                }
+              />
+              {/* Bulk edit buttons - Only shown when not in selection mode. */}
+              {!selectionMode && (
+                <div className="col-md-8 mt-3 d-flex align-items-end gap-2 justify-content-end align-items-start">
+                  {bulkEditPath && (
+                    <BulkEditButton
+                      pathname={bulkEditPath}
+                      singleEditPathName={singleEditPath}
+                    />
+                  )}
+                  {bulkDeleteButtonProps && (
+                    <BulkDeleteButton {...bulkDeleteButtonProps} />
+                  )}
+                </div>
+              )}
+            </div>
           </DinaFormSection>
         )}
 
@@ -701,7 +717,7 @@ export function QueryPage<TData extends KitsuResource>({
                   ) : (
                     <CommonMessage
                       id="tableTotalCount"
-                      values={{ totalCount: totalRecords }}
+                      values={{ totalCount: formatNumber(totalRecords) }}
                     />
                   )}
                 </span>
@@ -709,21 +725,6 @@ export function QueryPage<TData extends KitsuResource>({
                 {/* Multi sort tooltip - Only shown if it's possible to sort */}
                 {resolvedReactTableProps?.sortable !== false && (
                   <MultiSortTooltip />
-                )}
-
-                {/* Bulk edit buttons - Only shown when not in selection mode. */}
-                {!selectionMode && (
-                  <div className="d-flex gap-3 mb-2">
-                    {bulkEditPath && (
-                      <BulkEditButton
-                        pathname={bulkEditPath}
-                        singleEditPathName={singleEditPath}
-                      />
-                    )}
-                    {bulkDeleteButtonProps && (
-                      <BulkDeleteButton {...bulkDeleteButtonProps} />
-                    )}
-                  </div>
                 )}
               </div>
               <ReactTable

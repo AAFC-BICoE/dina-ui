@@ -108,7 +108,7 @@ export function BulkDataEditor<TRow>({
 
     const editedDiffs = submitUnchangedRows
       ? diffs
-      : diffs.filter(diff => !isEmpty(diff.changes));
+      : diffs.filter((diff) => !isEmpty(diff.changes));
 
     await onSubmit(editedDiffs, formikValues, formikActions, workingTableData);
 
@@ -212,8 +212,8 @@ const DynamicHotTable = dynamic(
 
       public render() {
         (this.props.columns as GridSettings[])
-          .filter(col => col.type === "dropdown")
-          .forEach(col => (col.renderer = readableAutocompleteRenderer));
+          .filter((col) => col.type === "dropdown")
+          .forEach((col) => (col.renderer = readableAutocompleteRenderer));
 
         return <HotTable {...this.props} />;
       }

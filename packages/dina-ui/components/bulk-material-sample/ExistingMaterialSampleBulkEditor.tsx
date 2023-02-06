@@ -16,7 +16,7 @@ export function ExistingMaterialSampleBulkEditor({
   onSaved,
   onPreviousClick
 }: ExistingMaterialSampleBulkEditorProps) {
-  const sampleQueries = ids.map(id => useMaterialSampleQuery(id));
+  const sampleQueries = ids.map((id) => useMaterialSampleQuery(id));
 
   /** Whether any query is loading. */
   const isLoading = sampleQueries.reduce(
@@ -24,7 +24,7 @@ export function ExistingMaterialSampleBulkEditor({
     false
   );
 
-  const errors = compact(sampleQueries.map(query => query.error));
+  const errors = compact(sampleQueries.map((query) => query.error));
 
   if (isLoading) {
     return <LoadingSpinner loading={true} />;
@@ -35,14 +35,14 @@ export function ExistingMaterialSampleBulkEditor({
       <div className="alert alert-danger">
         {errors.map((error, index) => (
           <div key={index}>
-            {error?.errors?.map(e => e.detail).join("\n") ?? String(error)}
+            {error?.errors?.map((e) => e.detail).join("\n") ?? String(error)}
           </div>
         ))}
       </div>
     );
   }
 
-  const samples = compact(sampleQueries.map(query => query.response?.data));
+  const samples = compact(sampleQueries.map((query) => query.response?.data));
 
   if (samples.length) {
     return (

@@ -2,7 +2,7 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
 import {
   GeographicPlaceNameSourceDetail,
-  SourceAdministrativeLevel,
+  SourceAdministrativeLevel
 } from "./GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
@@ -64,7 +64,7 @@ export interface CollectingEventAttributes {
 }
 
 export enum GeographicPlaceNameSource {
-  OSM = "OSM",
+  OSM = "OSM"
 }
 
 export interface CollectingEventRelationships {

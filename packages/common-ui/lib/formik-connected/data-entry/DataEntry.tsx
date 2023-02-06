@@ -5,8 +5,10 @@ import { FieldArray } from "formik";
 import { Button } from "react-bootstrap";
 import { useRef } from "react";
 import { DataEntryFieldProps } from "./DataEntryField";
+import { useEffect } from "react";
 
-export interface DataEntryProps extends DataEntryFieldProps {}
+/* tslint:disable-next-line */
+export interface DataEntryProps extends DataEntryFieldProps {};
 
 export function DataEntry({
   legend,
@@ -19,20 +21,46 @@ export function DataEntry({
   typeOptions,
   readOnly,
   initialValues,
+  selectedBlockOptions,
+  setSelectedBlockOptions
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
   function removeBlock(index) {
+    const oldValue =
+      arrayHelpersRef?.current?.form?.values?.extensionValues?.[index]
+        ?.select ??
+      arrayHelpersRef?.current?.form?.initialValues?.extensionValues?.[index]
+        ?.select;
+
+    if (setSelectedBlockOptions) {
+      setSelectedBlockOptions(
+        selectedBlockOptions.filter((item) => item !== oldValue)
+      );
+    }
     arrayHelpersRef.current.remove(index);
   }
+
   function addBlock() {
     arrayHelpersRef.current.push({ rows: [{}] });
   }
-  function legendWrapper(): ((legend: JSX.Element) => JSX.Element) | undefined {
-    return (legend) => {
+  // Make SelectField component load initial values if they exist
+  useEffect(() => {
+    if (onBlockSelectChange && initialValues) {
+      initialValues.forEach((initialValue) => {
+        if (onBlockSelectChange && initialValue?.select) {
+          onBlockSelectChange(initialValue.select, undefined);
+        }
+      });
+    }
+  }, []);
+  function legendWrapper():
+    | ((legendElement: JSX.Element) => JSX.Element)
+    | undefined {
+    return (legendElement) => {
       return (
         <div className="d-flex align-items-center justify-content-between">
-          {legend}
+          {legendElement}
           {!readOnly && (
             <Button onClick={() => addBlock()} className="add-datablock">
               <DinaMessage id="addCustomPlaceName" />
@@ -67,7 +95,7 @@ export function DataEntry({
                         vocabularyOptionsPath={vocabularyOptionsPath}
                         typeOptions={typeOptions}
                         readOnly={readOnly}
-                        initialValues={initialValues?.at(index)}
+                        selectedBlockOptions={selectedBlockOptions}
                       />
                     );
                   })}
