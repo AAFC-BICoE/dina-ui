@@ -1,5 +1,4 @@
 import { Tooltip } from "../tooltip/Tooltip";
-import { CommonMessage } from "../intl/common-ui-intl";
 
 export function MultiSortTooltip() {
   return (

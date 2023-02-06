@@ -1,3 +1,3 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`MultiSortTooltip Snapshot test 1`] = `"<div><div class=\\"flex-grow-1\\"><span class=\\"m-2\\"><span><img src=\\"/static/images/iconInformation.gif\\" alt=\\"To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.\\" aria-describedby=\\"queryTableMultiSortExplanation\\" tabindex=\\"0\\"></span></span></div></div>"`;
+exports[`MultiSortTooltip Snapshot test 1`] = `"<div><div class=\\"ms-auto\\"><span class=\\"m-2\\"><span><img src=\\"/static/images/iconInformation.gif\\" alt=\\"To sort by multiple columns: Click one column header to sort by that column, then press shift while you click an additional header.\\" aria-describedby=\\"queryTableMultiSortExplanation\\" tabindex=\\"0\\"></span></span></div></div>"`;
