@@ -2,15 +2,18 @@ import classNames from "classnames";
 import {
   FilterGroupModel,
   FormikButton,
+  LoadingSpinner,
   MetaWithTotal,
+  Operation,
   rsql,
+  useApiClient,
   useQuery,
-  withResponse
+  withResponse,
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import Link from "next/link";
 import Pagination from "rc-pagination";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaMinusSquare, FaPlusSquare } from "react-icons/fa";
 import { Promisable } from "type-fest";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -18,7 +21,7 @@ import { StorageUnit } from "../../types/collection-api";
 import { StorageFilter } from "./StorageFilter";
 import {
   StorageUnitBreadCrumb,
-  storageUnitDisplayName
+  storageUnitDisplayName,
 } from "./StorageUnitBreadCrumb";
 
 export interface BrowseStorageTreeProps {
@@ -69,11 +72,33 @@ export function StorageTreeList({
   parentId,
   disabled,
   filter,
-  showPathInName
+  showPathInName,
 }: StorageTreeListProps) {
   const limit = 100;
   const [pageNumber, setPageNumber] = useState(1);
   const offset = (pageNumber - 1) * limit;
+  const [tempStorageUnitChildren, setTempStorageUnitChildren] = useState<
+    StorageUnit[] | undefined
+  >(storageUnitChildren ? [] : undefined);
+  const { bulkGet } = useApiClient();
+  const [loading, setLoading] = useState<boolean>(
+    storageUnitChildren ? true : false
+  );
+
+  async function fetchStorageUnitChildren() {
+    if (storageUnitChildren) {
+      await bulkGet<StorageUnit>(
+        storageUnitChildren.map(
+          (storageUnit) =>
+            "/storage-unit/" + storageUnit.id + "?include=storageUnitType"
+        ),
+        { apiBaseUrl: "/collection-api" }
+      ).then((response) => {
+        setTempStorageUnitChildren(response);
+        setLoading(false);
+      });
+    }
+  }
 
   const storageUnitsQuery = useQuery<StorageUnit[], MetaWithTotal>(
     {
@@ -96,34 +121,44 @@ export function StorageTreeList({
                     attribute: "parentStorageUnit.uuid",
                     predicate: "IS" as const,
                     searchType: "EXACT_MATCH" as const,
-                    value: parentId
-                  }
+                    value: parentId,
+                  },
                 ]
               : []),
-            ...(filter ? [filter] : [])
-          ]
+            ...(filter ? [filter] : []),
+          ],
         }),
         // For top-level storage units:
         ...(!filter?.children?.length && !parentId
           ? { parentStorageUnit: null }
-          : {})
-      }
+          : {}),
+      },
     },
     { disabled: storageUnitChildren !== undefined }
   );
 
+  useEffect(() => {
+    if (storageUnitChildren) {
+      fetchStorageUnitChildren();
+    }
+  }, [storageUnitChildren]);
+
   // If the children are provided we can skip the query and just display them.
-  if (storageUnitChildren !== undefined) {
-    return (
+  if (tempStorageUnitChildren) {
+    return loading ? (
+      <LoadingSpinner loading={true} />
+    ) : (
       <>
-        {storageUnitChildren.map((unit, index) => (
+        {tempStorageUnitChildren.map((unit, index) => (
           <div
-            className={index === storageUnitChildren.length - 1 ? "" : "my-2"}
+            className={
+              index === tempStorageUnitChildren.length - 1 ? "" : "my-2"
+            }
             key={unit.id}
           >
             <StorageUnitCollapser
               showPathInName={showPathInName}
-              storageUnit={unit}
+              storageUnit={unit as PersistedResource<StorageUnit>}
               onSelect={onSelect}
               disabled={disabled}
               checkForChildren={false}
@@ -189,7 +224,7 @@ function StorageUnitCollapser({
   onSelect,
   disabled,
   showPathInName,
-  checkForChildren
+  checkForChildren,
 }: StorageUnitCollapserProps) {
   const [isOpen, setOpen] = useState(false);
   const { formatMessage } = useDinaIntl();
@@ -201,7 +236,7 @@ function StorageUnitCollapser({
       e.code === " " ||
       e.type === "click"
     )
-      setOpen(current => !current);
+      setOpen((current) => !current);
   }
 
   const CollapserIcon = isOpen ? FaMinusSquare : FaPlusSquare;
@@ -219,7 +254,7 @@ function StorageUnitCollapser({
         size="2em"
         className={classNames("storage-collapser-icon aligh-top", {
           // Hide the expander button when there are no children:
-          invisible: !hasChildren
+          invisible: !hasChildren,
         })}
         style={{ cursor: "pointer" }}
         title={isOpen ? formatMessage("collapse") : formatMessage("expand")}
