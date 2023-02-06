@@ -3,8 +3,8 @@ import { CommonMessage } from "../intl/common-ui-intl";
 
 export function MultiSortTooltip() {
   return (
-    <div className="flex-grow-1">
-      <Tooltip id="queryTableMultiSortExplanation" />
+    <div className="ms-auto">
+      <Tooltip id="queryTableMultiSortExplanation" placement="left" />
     </div>
   );
 }

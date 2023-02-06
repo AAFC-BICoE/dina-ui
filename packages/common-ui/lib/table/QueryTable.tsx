@@ -261,14 +261,14 @@ export function QueryTable<TData extends KitsuResource>({
                 values={{ totalCount: formatNumber(totalCount) }}
               />
             </span>
-            {resolvedReactTableProps?.sortable !== false && (
-              <span className="mx-3">
-                <Tooltip id="queryTableMultiSortExplanation" />
-              </span>
-            )}
           </>
         )}
-        {topRightCorner && <div className="ms-auto">{topRightCorner}</div>}
+        <div className="ms-auto">
+          {topRightCorner}
+          {resolvedReactTableProps?.sortable !== false && (
+            <Tooltip id="queryTableMultiSortExplanation" placement="left" />
+          )}
+        </div>
       </div>
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
