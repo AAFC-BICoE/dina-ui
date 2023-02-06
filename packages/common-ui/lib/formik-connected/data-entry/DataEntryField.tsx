@@ -35,7 +35,7 @@ export function DataEntryField({
   width,
   isTemplate,
   selectedBlockOptions,
-  setSelectedBlockOptions,
+  setSelectedBlockOptions
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
   const dataEntry = (

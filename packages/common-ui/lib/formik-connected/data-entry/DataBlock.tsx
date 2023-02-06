@@ -3,7 +3,7 @@ import { FieldArray } from "formik";
 import {
   FieldWrapperProps,
   SelectField,
-  TextField,
+  TextField
 } from "../../../../common-ui/lib";
 import Button from "react-bootstrap/Button";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -36,7 +36,6 @@ export function DataBlock({
   selectedBlockOptions,
   ...props
 }: DataBlockProps) {
-
   return (
     <div>
       <FieldArray name={`${props.name}.rows`}>

@@ -39,9 +39,8 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
         const header = wrapper.querySelector<HTMLDivElement>(
           ".ht_clone_top .wtHider"
         );
-        const htCore = wrapper.querySelector<HTMLDivElement>(
-          ".ht_master .htCore"
-        );
+        const htCore =
+          wrapper.querySelector<HTMLDivElement>(".ht_master .htCore");
 
         if (header && htCore) {
           const requiredHeaderWidth = `${htCore.clientWidth}px`;
@@ -54,7 +53,7 @@ export function useHeaderWidthFix({ columns }: HeaderWidthFixParams) {
   }, []);
 
   // Whenever the columns change, run some code to manually set the width of the header row:
-  useEffect(fixWidth, [columns.map(col => col.data).join()]);
+  useEffect(fixWidth, [columns.map((col) => col.data).join()]);
 
   // Sometimes the Handsontable resizes itself wrong when clicking on a cell. Run the code again on every mouse click:
   useEffect(() => {

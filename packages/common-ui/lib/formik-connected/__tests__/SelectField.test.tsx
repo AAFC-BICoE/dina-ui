@@ -6,40 +6,40 @@ import { SelectField } from "../SelectField";
 const PRIMER_TYPE_OPTIONS = [
   {
     label: "PCR Primer",
-    value: "PRIMER",
+    value: "PRIMER"
   },
   {
     label: "454 Multiplex Identifier",
-    value: "MID",
+    value: "MID"
   },
   {
     label: "Fusion Primer",
-    value: "FUSION_PRIMER",
+    value: "FUSION_PRIMER"
   },
   {
     label: "Illumina Index",
-    value: "ILLUMINA_INDEX",
+    value: "ILLUMINA_INDEX"
   },
   {
     label: "iTru Primer",
-    value: "ITRU_PRIMER",
+    value: "ITRU_PRIMER"
   },
   {
     label: "nested group",
     options: [
       {
         label: "nested label",
-        value: "nested value",
-      },
-    ],
-  },
+        value: "nested value"
+      }
+    ]
+  }
 ];
 
 function getWrapper(propsOverride = {}) {
   return mountWithAppContext(
     <DinaForm
       initialValues={{
-        testField: "ITRU_PRIMER",
+        testField: "ITRU_PRIMER"
       }}
     >
       {({ values: { testField } }) => (
@@ -65,7 +65,7 @@ describe("SelectField component", () => {
     // The selected option object should be passed into the Select component.
     expect(value).toEqual({
       label: "iTru Primer",
-      value: "ITRU_PRIMER",
+      value: "ITRU_PRIMER"
     });
   });
 
@@ -77,7 +77,7 @@ describe("SelectField component", () => {
     // Simulate changing the selected option.
     onChange({
       label: "Fusion Primer",
-      value: "FUSION_PRIMER",
+      value: "FUSION_PRIMER"
     });
 
     // The new value should be re-rendered into the value-display div.
@@ -106,7 +106,7 @@ describe("SelectField component", () => {
     // Change the value to the first two options:
     wrapper.find(Select).prop<any>("onChange")([
       PRIMER_TYPE_OPTIONS[0],
-      PRIMER_TYPE_OPTIONS[1],
+      PRIMER_TYPE_OPTIONS[1]
     ]);
 
     // The mock function should have been called with the new value.
@@ -115,5 +115,29 @@ describe("SelectField component", () => {
       expect.anything(),
       "ITRU_PRIMER"
     );
+  });
+
+  it("Renders the read-only view.", async () => {
+    const wrapper = mountWithAppContext(
+      <DinaForm
+        initialValues={{
+          singleValue: "ITRU_PRIMER",
+          multipleValues: ["PRIMER", "MID"]
+        }}
+        readOnly={true}
+      >
+        <SelectField name="singleValue" options={PRIMER_TYPE_OPTIONS} />
+        <SelectField name="multipleValues" options={PRIMER_TYPE_OPTIONS} />
+      </DinaForm>
+    );
+
+    expect(wrapper.find(".singleValue-field .read-only-view").text()).toEqual(
+      "iTru Primer"
+    );
+
+    // Joins the names with commas:
+    expect(
+      wrapper.find(".multipleValues-field .read-only-view").text()
+    ).toEqual("PCR Primer, 454 Multiplex Identifier");
   });
 });

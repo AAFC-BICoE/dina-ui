@@ -7,7 +7,8 @@ import { useRef } from "react";
 import { DataEntryFieldProps } from "./DataEntryField";
 import { useEffect } from "react";
 
-export interface DataEntryProps extends DataEntryFieldProps {}
+/* tslint:disable-next-line */
+export interface DataEntryProps extends DataEntryFieldProps {};
 
 export function DataEntry({
   legend,
@@ -21,7 +22,7 @@ export function DataEntry({
   readOnly,
   initialValues,
   selectedBlockOptions,
-  setSelectedBlockOptions,
+  setSelectedBlockOptions
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -53,11 +54,13 @@ export function DataEntry({
       });
     }
   }, []);
-  function legendWrapper(): ((legend: JSX.Element) => JSX.Element) | undefined {
-    return (legend) => {
+  function legendWrapper():
+    | ((legendElement: JSX.Element) => JSX.Element)
+    | undefined {
+    return (legendElement) => {
       return (
         <div className="d-flex align-items-center justify-content-between">
-          {legend}
+          {legendElement}
           {!readOnly && (
             <Button onClick={() => addBlock()} className="add-datablock">
               <DinaMessage id="addCustomPlaceName" />
