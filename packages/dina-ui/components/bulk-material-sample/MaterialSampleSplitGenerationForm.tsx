@@ -190,6 +190,7 @@ export function MaterialSampleSplitGenerationForm({
                 min={1}
                 max={500}
                 label={formatMessage("materialSamplesToCreate")}
+                disabled={isMultiple}
               />
             </div>
             <div className="col-md-4">
@@ -280,68 +281,77 @@ function PreviewGeneratedNames({
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
 
+  const isMultiple = useMemo(
+    () => splitFromMaterialSamples?.length > 1,
+    [splitFromMaterialSamples]
+  );
+
+  const seriesMode = formik.values.seriesOptions;
+  const generationMode = formik.values.generationOptions;
+  const numberToCreate = formik.values.numberToCreate;
+
+  function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
+    const getYoungestMaterialSample = (materialSampleChildren) => {
+      return materialSampleChildren
+        ? materialSampleChildren.reduce((max, current) => {
+            return current.ordinal > max.ordinal ? current : max;
+          }, materialSampleChildren[0])
+        : undefined;
+    };
+
+    // Depending on the series mode, the identifier that will need to be sent to the backend to
+    // generate more identifier changes.
+    switch (seriesMode) {
+      case "new":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate - 1,
+          identifier:
+            splitFromMaterialSamples?.[index]?.materialSampleName +
+            APPEND_GENERATION_MODE[generationMode]
+        };
+      case "continue":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate,
+          identifier: getYoungestMaterialSample(
+            splitFromMaterialSamples?.[index]?.materialSampleChildren
+          )?.materialSampleName
+        };
+      case "continueFromParent":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate,
+          identifier: getYoungestMaterialSample(
+            splitFromParentMaterialSamples?.[index]?.materialSampleChildren
+          )?.materialSampleName
+        };
+    }
+  }
+
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
-      const seriesMode = formik.values.seriesOptions;
-      const generationMode = formik.values.generationOptions;
+      const requests = [...Array(splitFromMaterialSamples.length).keys()].map(
+        (i) => getIdentifierRequest(i)
+      );
 
-      const getYoungestMaterialSample = (materialSampleChildren) => {
-        return materialSampleChildren
-          ? materialSampleChildren.reduce((max, current) => {
-              return current.ordinal > max.ordinal ? current : max;
-            }, materialSampleChildren[0])
-          : undefined;
-      };
-
-      const getNewIdentifier =
-        splitFromMaterialSamples?.[0]?.materialSampleName +
-        APPEND_GENERATION_MODE[generationMode];
-
-      // Depending on the series mode, the identifier that will need to be sent to the backend to
-      // generate more identifier changes.
-      let identifier;
-      switch (seriesMode) {
-        case "new":
-          identifier = getNewIdentifier;
-          break;
-        case "continue":
-          identifier = getYoungestMaterialSample(
-            splitFromMaterialSamples[0]?.materialSampleChildren
-          )?.materialSampleName;
-          break;
-        case "continueFromParent":
-          identifier = getYoungestMaterialSample(
-            splitFromParentMaterialSamples[0]?.materialSampleChildren
-          )?.materialSampleName;
-          break;
-      }
-
-      const input: MaterialSampleIdentifierGenerator = {
-        amount: formik.values.numberToCreate - (seriesMode === "new" ? 1 : 0),
-        identifier,
-        type: "material-sample-identifier-generator"
-      };
-
-      const response = await save<MaterialSampleIdentifierGenerator>(
-        [
-          {
-            resource: input,
-            type: "material-sample-identifier-generator"
-          }
-        ],
+      const responses = await save<MaterialSampleIdentifierGenerator>(
+        requests.map((request) => ({
+          resource: request,
+          type: "material-sample-identifier-generator"
+        })),
         { apiBaseUrl: "/collection-api", overridePatchOperation: true }
       );
 
-      if (response?.[0]?.nextIdentifiers) {
-        if (seriesMode === "new") {
-          setGeneratedIdentifiers([
-            identifier,
-            ...response?.[0]?.nextIdentifiers
-          ]);
-        } else {
-          setGeneratedIdentifiers(response?.[0]?.nextIdentifiers);
-        }
+      const generatedIdentifiersResults = responses
+        .flatMap((response) => response?.nextIdentifiers || [])
+        .filter((identifier) => identifier);
+
+      if (seriesMode === "new") {
+        setGeneratedIdentifiers(requests.map((request) => request.identifier));
+      } else {
+        setGeneratedIdentifiers(generatedIdentifiersResults);
       }
     }
 
@@ -375,21 +385,20 @@ function PreviewGeneratedNames({
           </tr>
         </thead>
         <tbody>
-          {Array.from(
-            { length: formik.values.numberToCreate },
-            (_, i) => i
-          ).map((_, index) => (
-            <tr key={index + 1}>
-              <td>{index + 1}</td>
-              <td>
-                {generatedIdentifiers[index] ? (
-                  generatedIdentifiers[index]
-                ) : (
-                  <LoadingSpinner loading={true} />
-                )}
-              </td>
-            </tr>
-          ))}
+          {Array.from({ length: generatedIdentifiers.length }, (_, i) => i).map(
+            (_, index) => (
+              <tr key={index + 1}>
+                <td>#{index + 1}</td>
+                <td>
+                  {generatedIdentifiers[index] ? (
+                    generatedIdentifiers[index]
+                  ) : (
+                    <LoadingSpinner loading={true} />
+                  )}
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>

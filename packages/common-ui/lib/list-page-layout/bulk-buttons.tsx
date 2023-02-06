@@ -111,3 +111,36 @@ export function BulkEditButton({
     </FormikButton>
   );
 }
+
+export interface BulkSplitButtonProps {
+  /**
+   * Page where the bulk split is being performed.
+   */
+  pathname: string;
+}
+
+/**
+ * String key for the local storage of the bulk split ids.
+ */
+export const BULK_SPLIT_IDS = "";
+
+export function BulkSplitButton({ pathname }: BulkSplitButtonProps) {
+  const router = useRouter();
+
+  return (
+    <FormikButton
+      buttonProps={bulkButtonProps}
+      className="btn btn-primary bulk-split-button"
+      onClick={async (values: BulkSelectableFormValues) => {
+        const ids = toPairs(values.itemIdsToSelect)
+          .filter((pair) => pair[1])
+          .map((pair) => pair[0]);
+
+        writeStorage<string[]>(BULK_SPLIT_IDS, ids);
+        await router.push({ pathname });
+      }}
+    >
+      <CommonMessage id="splitSelectedButtonText" />
+    </FormikButton>
+  );
+}

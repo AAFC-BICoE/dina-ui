@@ -11,7 +11,8 @@ import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
 import {
   BulkDeleteButton,
   BulkDeleteButtonProps,
-  BulkEditButton
+  BulkEditButton,
+  BulkSplitButton
 } from "../list-page-layout/bulk-buttons";
 import { CommonMessage } from "../intl/common-ui-intl";
 import {
@@ -93,6 +94,11 @@ export interface QueryPageProps<TData extends KitsuResource> {
   /** Adds the bulk delete button and the row checkboxes. */
   bulkDeleteButtonProps?: BulkDeleteButtonProps;
 
+  /**
+   * Router path to perform the split from, all of the ids are moved over using local storage.
+   */
+  bulkSplitPath?: string;
+
   reactTableProps?:
     | Partial<TableProps>
     | ((
@@ -167,6 +173,7 @@ export function QueryPage<TData extends KitsuResource>({
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
+  bulkSplitPath,
   singleEditPath,
   reactTableProps,
   defaultSort,
@@ -686,12 +693,15 @@ export function QueryPage<TData extends KitsuResource>({
               />
               {/* Bulk edit buttons - Only shown when not in selection mode. */}
               {!selectionMode && (
-                <div className="col-md-8 mt-3 d-flex align-items-end gap-2 justify-content-end align-items-start">
+                <div className="col-md-8 mt-3 d-flex gap-2 justify-content-end align-items-start">
                   {bulkEditPath && (
                     <BulkEditButton
                       pathname={bulkEditPath}
                       singleEditPathName={singleEditPath}
                     />
+                  )}
+                  {bulkSplitPath && (
+                    <BulkSplitButton pathname={bulkSplitPath} />
                   )}
                   {bulkDeleteButtonProps && (
                     <BulkDeleteButton {...bulkDeleteButtonProps} />
