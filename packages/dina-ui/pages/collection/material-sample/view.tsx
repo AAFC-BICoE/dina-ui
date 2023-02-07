@@ -52,7 +52,7 @@ import {
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
-import { DataEntryViewer } from "packages/common-ui/lib/formik-connected/data-entry/DataEntryViewer";
+import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();

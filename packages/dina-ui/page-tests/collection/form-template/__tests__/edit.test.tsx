@@ -908,9 +908,27 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ],
     },
     {
+      name: "field-extensions-component",
+      visible: undefined,
+      order: 10,
+      sections: [
+        {
+          items: [
+            {
+              defaultValue: undefined,
+              name: "extensionValues",
+              visible: false,
+            },
+          ],
+          name: "field-extension-section",
+          visible: true,
+        },
+      ],
+    },
+    {
       name: "managed-attributes-component",
       visible: true,
-      order: 10,
+      order: 11,
       sections: [
         {
           name: "managed-attributes-section",
@@ -922,7 +940,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: "material-sample-attachments-component",
       visible: true,
-      order: 11,
+      order: 12,
       sections: [
         {
           name: "material-sample-attachments-sections",
@@ -981,6 +999,7 @@ describe("Workflow template edit page", () => {
       "storage-component",
       "restriction-component",
       "scheduled-actions-component",
+      "field-extensions-component",
       "managed-attributes-component",
       "material-sample-attachments-component",
     ]);
@@ -1380,7 +1399,7 @@ describe("Workflow template edit page", () => {
               ],
             },
             {
-              name: "field-extension-section",
+              name: "collecting-event-field-extension-section",
               visible: true,
               items: [
                 {
@@ -1771,9 +1790,27 @@ describe("Workflow template edit page", () => {
           ],
         },
         {
+          name: "field-extensions-component",
+          visible: undefined,
+          order: 10,
+          sections: [
+            {
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "extensionValues",
+                  visible: false,
+                },
+              ],
+              name: "field-extension-section",
+              visible: true,
+            },
+          ],
+        },
+        {
           name: "managed-attributes-component",
           visible: true,
-          order: 10,
+          order: 11,
           sections: [
             {
               name: "managed-attributes-section",
@@ -1796,7 +1833,7 @@ describe("Workflow template edit page", () => {
         {
           name: "material-sample-attachments-component",
           visible: true,
-          order: 11,
+          order: 12,
           sections: [
             {
               name: "material-sample-attachments-sections",
