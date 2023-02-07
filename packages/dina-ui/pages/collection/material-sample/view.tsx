@@ -52,6 +52,7 @@ import {
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
+import { DataEntryViewer } from "packages/common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -226,6 +227,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />
                 )}
+                <DataEntryViewer
+                  name={"extensionValues"}
+                  legend={<DinaMessage id="fieldExtensions" />}
+                  extensionValues={materialSample.extensionValues}
+                  disableDinaForm={true}
+                  dinaComponent={"MATERIAL_SAMPLE"}
+                />
                 <div className="row">
                   <div className="col-md-6">
                     <ManagedAttributesEditor

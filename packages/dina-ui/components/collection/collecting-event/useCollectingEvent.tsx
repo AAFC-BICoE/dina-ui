@@ -1,5 +1,10 @@
 import { useLocalStorage } from "@rehooks/local-storage";
-import { useApiClient, useQuery } from "common-ui";
+import {
+  processExtensionValuesLoading,
+  processExtensionValuesSaving,
+  useApiClient,
+  useQuery,
+} from "common-ui";
 import { FormikContextType } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import { compact, omit, orderBy, toPairs } from "lodash";
@@ -12,7 +17,6 @@ import { SourceAdministrativeLevel } from "../../../types/collection-api/resourc
 import { SRSEnum } from "../../../types/collection-api/resources/SRS";
 import { Person } from "../../../types/objectstore-api";
 import { AllowAttachmentsConfig } from "../../object-store";
-
 export const DEFAULT_VERBATIM_COORDSYS_KEY = "collecting-event-coord_system";
 export const DEFAULT_VERBATIM_SRS_KEY = "collecting-event-srs";
 
@@ -78,39 +82,15 @@ export function useCollectingEventQuery(id?: string | null) {
         data.srcAdminLevels = srcAdminLevels;
 
         if (data?.extensionValues) {
-          data.extensionValues = processExtensionValues(data.extensionValues);
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
         }
       },
     }
   );
 
   return collectingEventQuery;
-}
-
-export function processExtensionValues(initExtensionValues) {
-  if (!initExtensionValues) {
-    return undefined;
-  }
-
-  const processedExtensionValues = Object.keys(initExtensionValues).map(
-    (extensionKey) => {
-      const initExtensionValue = initExtensionValues[extensionKey];
-      const extensionFields = Object.keys(initExtensionValue).map(
-        (extensionFieldKey) => {
-          return {
-            type: extensionFieldKey,
-            value: initExtensionValue[extensionFieldKey],
-          };
-        }
-      );
-      const processedExtensionValue = {
-        select: extensionKey,
-        rows: extensionFields,
-      };
-      return processedExtensionValue;
-    }
-  );
-  return processedExtensionValues;
 }
 
 interface UseCollectingEventSaveParams {
@@ -284,21 +264,8 @@ export function useCollectingEventSave({
       submittedValues.dwcVerbatimCoordinateSystem = null;
     }
 
-    const submittedExtensionValues: any[] | undefined =
-      submittedValues["extensionValues"];
-
-    const processedExtensionValues = submittedExtensionValues?.reduce(
-      (result, item) => {
-        const extensionKey = item.select;
-        let processedExtensionFields = {};
-        item.rows?.forEach((extensionField) => {
-          processedExtensionFields[extensionField.type] = extensionField.value;
-        });
-        result[extensionKey] = processedExtensionFields;
-        return result;
-      },
-      {}
-    );
+    const processedExtensionValues =
+      processExtensionValuesSaving(submittedValues);
 
     submittedValues.extensionValues = processedExtensionValues;
 

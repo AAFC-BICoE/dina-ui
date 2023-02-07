@@ -1,15 +1,17 @@
-import { FormikProps } from "formik";
+import { FormikProps, FormikContextType } from "formik";
 import { InputResource } from "kitsu";
 import { compact, toPairs, uniq } from "lodash";
 import {
   BackButton,
   ButtonBar,
+  DataEntryField,
   DinaForm,
   DinaFormContext,
   DinaFormSection,
   FieldSet,
   LoadingSpinner,
-  SubmitButton
+  SubmitButton,
+  useQuery,
 } from "common-ui";
 import {
   Fragment,
@@ -17,7 +19,7 @@ import {
   Ref,
   useContext,
   useState,
-  useEffect
+  useEffect,
 } from "react";
 import {
   AttachmentsField,
@@ -30,12 +32,12 @@ import {
   StorageLinkerField,
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
-  AssemblageSelectSection
+  AssemblageSelectSection,
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent
+  useAcquisitionEvent,
 } from "../../../pages/collection/acquisition-event/edit";
 import {
   AcquisitionEvent,
@@ -43,6 +45,7 @@ import {
   ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
   COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
   FormTemplate,
   IDENTIFIER_COMPONENT_NAME,
   MANAGED_ATTRIBUTES_COMPONENT_NAME,
@@ -53,7 +56,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME
+  STORAGE_COMPONENT_NAME,
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AcquisitionEventLinker } from "../AcquisitionEventLinker";
@@ -69,6 +72,7 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
+import { FieldExtension } from "../../../types/collection-api/resources/FieldExtension";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -185,9 +189,9 @@ export function MaterialSampleForm({
       />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  )
+  ),
 }: MaterialSampleFormProps) {
-  const { isTemplate } = useContext(DinaFormContext) ?? {};
+  const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
   const {
     initialValues,
     nestedCollectingEventForm,
@@ -198,7 +202,7 @@ export function MaterialSampleForm({
     acqEventId,
     setAcqEventId,
     onSubmit,
-    loading
+    loading,
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -210,8 +214,54 @@ export function MaterialSampleForm({
       onSaved,
       isTemplate,
       reduceRendering,
-      visibleManagedAttributeKeys
+      visibleManagedAttributeKeys,
     });
+
+  // Set up Field Extensions values and functions
+  const { response } = useQuery<FieldExtension[]>({
+    path: `collection-api/extension`,
+  });
+
+  const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
+  const extensionOptions = response?.data
+    .filter(
+      (data) => data.extension.fields?.[0].dinaComponent === "MATERIAL_SAMPLE"
+    )
+    .map((data) => {
+      return {
+        label: data.extension.name,
+        value: data.extension.key,
+      };
+    });
+  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
+
+  function onBlockSelectChange(
+    selected,
+    formik: FormikContextType<any>,
+    oldValue
+  ) {
+    const selectedFieldExtension = response?.data.find(
+      (data) => data.extension.key === selected
+    );
+
+    setExtensionFieldsOptions(
+      selectedFieldExtension?.extension.fields.map((data) => ({
+        label: data.name,
+        value: data.key,
+      }))
+    );
+    if (selected !== oldValue) {
+      formik?.values?.extensionValues?.forEach((extensionValue) => {
+        if (extensionValue.select === oldValue) {
+          extensionValue.rows = [{}];
+        }
+      });
+    }
+    setSelectedBlockOptions(
+      selectedBlockOptions.filter((item) => item !== oldValue)
+    );
+    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
+  }
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -353,6 +403,27 @@ export function MaterialSampleForm({
           )}
         />
       ),
+    [FIELD_EXTENSIONS_COMPONENT_NAME]: (id) =>
+      !reduceRendering && (
+        <DinaFormSection
+          componentName={FIELD_EXTENSIONS_COMPONENT_NAME}
+          sectionName="field-extension-section"
+        >
+          <DataEntryField
+            legend={<DinaMessage id="fieldExtensions" />}
+            name="extensionValues"
+            blockOptions={extensionOptions}
+            typeOptions={extensionFieldsOptions}
+            onBlockSelectChange={onBlockSelectChange}
+            readOnly={readOnly}
+            initialValues={initialValues.extensionValues}
+            isTemplate={isTemplate}
+            selectedBlockOptions={selectedBlockOptions}
+            setSelectedBlockOptions={setSelectedBlockOptions}
+            id={id}
+          />
+        </DinaFormSection>
+      ),
     [MANAGED_ATTRIBUTES_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <DinaFormSection
@@ -367,7 +438,7 @@ export function MaterialSampleForm({
                 managedAttributeComponent="MATERIAL_SAMPLE"
                 fieldSetProps={{
                   id,
-                  legend: <DinaMessage id="materialSampleManagedAttributes" />
+                  legend: <DinaMessage id="materialSampleManagedAttributes" />,
                 }}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
@@ -402,7 +473,7 @@ export function MaterialSampleForm({
             )}
           />
         </DinaFormSection>
-      )
+      ),
   };
 
   const formSectionPairs = toPairs(formSections);
@@ -411,7 +482,7 @@ export function MaterialSampleForm({
     ...compact(
       (navOrder ?? []).map((id) => formSectionPairs.find(([it]) => it === id))
     ),
-    ...formSectionPairs
+    ...formSectionPairs,
   ]);
 
   const formLayout = (

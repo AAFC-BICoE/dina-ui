@@ -72,6 +72,7 @@ export interface MaterialSampleAttributes {
 
   isRestricted?: boolean;
   restrictionRemarks?: string | null;
+  extensionValues?: any;
 }
 
 export interface HostOrganism {
@@ -118,7 +119,7 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
     ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
-    organism: []
+    organism: [],
   };
 }
 
