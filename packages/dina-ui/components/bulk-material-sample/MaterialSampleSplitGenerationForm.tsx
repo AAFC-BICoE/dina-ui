@@ -19,7 +19,7 @@ import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -334,16 +334,22 @@ function PreviewGeneratedNames({
       );
 
       // If in multiple mode and series mode is new, no request is required.
-      const responses =
-        isMultiple && seriesMode === "new"
-          ? []
-          : await save<MaterialSampleIdentifierGenerator>(
-              requests.map((request) => ({
+      const responses: PersistedResource<MaterialSampleIdentifierGenerator>[] =
+        [];
+      if (!isMultiple || seriesMode !== "new") {
+        for (const request of requests) {
+          const response = await save<MaterialSampleIdentifierGenerator>(
+            [
+              {
                 resource: request,
                 type: "material-sample-identifier-generator"
-              })),
-              { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-            );
+              }
+            ],
+            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+          );
+          responses.push(response[0]);
+        }
+      }
 
       const generatedIdentifiersResults = responses
         .flatMap((response) => response?.nextIdentifiers || [])
