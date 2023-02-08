@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerSeqReactionStep";
 import { SeqBatchSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/sanger-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -92,7 +93,7 @@ export default function SangerWorkFlowSequencingRunPage() {
                 <span className="visually-hidden">Loading...</span>
               </>
             ) : (
-              <>Save</>
+              <DinaMessage id="save"/>
             )}
           </Button>
         </>
