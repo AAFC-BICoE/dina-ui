@@ -19,7 +19,7 @@ import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
-import { InputResource } from "kitsu";
+import { InputResource, PersistedResource } from "kitsu";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -125,39 +125,36 @@ export function MaterialSampleSplitGenerationForm({
     submittedValues
   }) => {
     if (
+      !isMultiple &&
       Number(generatedIdentifiers.length) !==
-      Number(submittedValues?.numberToCreate)
+        Number(submittedValues?.numberToCreate)
     ) {
       return;
     }
 
-    const splitMaterialSample = splitFromMaterialSamples
-      ?.data?.[0] as MaterialSample;
+    const samples: InputResource<MaterialSample>[] = [];
+    splitFromMaterialSamples?.data?.forEach((splitMaterialSample, index) => {
+      if (!splitMaterialSample) {
+        return;
+      }
 
-    if (!splitMaterialSample) {
-      return;
-    }
-
-    const samples = [...Array(Number(submittedValues.numberToCreate))].map<
-      InputResource<MaterialSample>
-    >((_, index) => {
-      return {
+      samples.push({
         type: "material-sample",
         parentMaterialSample: {
           id: splitMaterialSample.id ?? "",
           type: "material-sample"
         },
-        group: splitMaterialSample.group ?? "",
-        collection: splitMaterialSample?.collection?.id
+        group: (splitMaterialSample as any).group ?? "",
+        collection: (splitMaterialSample as any)?.collection?.id
           ? {
-              id: splitMaterialSample.collection?.id ?? "",
+              id: (splitMaterialSample as any).collection?.id ?? "",
               type: "collection"
             }
           : undefined,
         publiclyReleasable: true,
         allowDuplicateName: false,
         materialSampleName: generatedIdentifiers[index]
-      };
+      });
     });
 
     onGenerate(samples);
@@ -190,6 +187,7 @@ export function MaterialSampleSplitGenerationForm({
                 min={1}
                 max={500}
                 label={formatMessage("materialSamplesToCreate")}
+                disabled={isMultiple}
               />
             </div>
             <div className="col-md-4">
@@ -280,68 +278,96 @@ function PreviewGeneratedNames({
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
 
+  const isMultiple = useMemo(
+    () => splitFromMaterialSamples?.length > 1,
+    [splitFromMaterialSamples]
+  );
+
+  const seriesMode = formik.values.seriesOptions;
+  const generationMode = formik.values.generationOptions;
+  const numberToCreate = formik.values.numberToCreate;
+
+  function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
+    const getYoungestMaterialSample = (materialSampleChildren) => {
+      return materialSampleChildren
+        ? materialSampleChildren.reduce((max, current) => {
+            return current.ordinal > max.ordinal ? current : max;
+          }, materialSampleChildren[0])
+        : undefined;
+    };
+
+    // Depending on the series mode, the identifier that will need to be sent to the backend to
+    // generate more identifier changes.
+    switch (seriesMode) {
+      case "new":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate - 1,
+          identifier:
+            splitFromMaterialSamples?.[index]?.materialSampleName +
+            APPEND_GENERATION_MODE[generationMode]
+        };
+      case "continue":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate,
+          identifier: getYoungestMaterialSample(
+            splitFromMaterialSamples?.[index]?.materialSampleChildren
+          )?.materialSampleName
+        };
+      case "continueFromParent":
+        return {
+          type: "material-sample-identifier-generator",
+          amount: numberToCreate,
+          identifier: getYoungestMaterialSample(
+            splitFromParentMaterialSamples?.[index]?.materialSampleChildren
+          )?.materialSampleName
+        };
+    }
+  }
+
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
-      const seriesMode = formik.values.seriesOptions;
-      const generationMode = formik.values.generationOptions;
-
-      const getYoungestMaterialSample = (materialSampleChildren) => {
-        return materialSampleChildren
-          ? materialSampleChildren.reduce((max, current) => {
-              return current.ordinal > max.ordinal ? current : max;
-            }, materialSampleChildren[0])
-          : undefined;
-      };
-
-      const getNewIdentifier =
-        splitFromMaterialSamples?.[0]?.materialSampleName +
-        APPEND_GENERATION_MODE[generationMode];
-
-      // Depending on the series mode, the identifier that will need to be sent to the backend to
-      // generate more identifier changes.
-      let identifier;
-      switch (seriesMode) {
-        case "new":
-          identifier = getNewIdentifier;
-          break;
-        case "continue":
-          identifier = getYoungestMaterialSample(
-            splitFromMaterialSamples[0]?.materialSampleChildren
-          )?.materialSampleName;
-          break;
-        case "continueFromParent":
-          identifier = getYoungestMaterialSample(
-            splitFromParentMaterialSamples[0]?.materialSampleChildren
-          )?.materialSampleName;
-          break;
-      }
-
-      const input: MaterialSampleIdentifierGenerator = {
-        amount: formik.values.numberToCreate - (seriesMode === "new" ? 1 : 0),
-        identifier,
-        type: "material-sample-identifier-generator"
-      };
-
-      const response = await save<MaterialSampleIdentifierGenerator>(
-        [
-          {
-            resource: input,
-            type: "material-sample-identifier-generator"
-          }
-        ],
-        { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+      const requests = [...Array(splitFromMaterialSamples.length).keys()].map(
+        (i) => getIdentifierRequest(i)
       );
 
-      if (response?.[0]?.nextIdentifiers) {
-        if (seriesMode === "new") {
-          setGeneratedIdentifiers([
-            identifier,
-            ...response?.[0]?.nextIdentifiers
-          ]);
-        } else {
-          setGeneratedIdentifiers(response?.[0]?.nextIdentifiers);
+      // If in multiple mode and series mode is new, no request is required.
+      const responses: PersistedResource<MaterialSampleIdentifierGenerator>[] =
+        [];
+      if (!isMultiple || seriesMode !== "new") {
+        for (const request of requests) {
+          const response = await save<MaterialSampleIdentifierGenerator>(
+            [
+              {
+                resource: request,
+                type: "material-sample-identifier-generator"
+              }
+            ],
+            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
+          );
+          responses.push(response[0]);
         }
+      }
+
+      const generatedIdentifiersResults = responses
+        .flatMap((response) => response?.nextIdentifiers || [])
+        .filter((identifier) => identifier);
+
+      if (seriesMode === "new") {
+        if (isMultiple) {
+          setGeneratedIdentifiers(
+            requests.map((request) => request.identifier)
+          );
+        } else {
+          setGeneratedIdentifiers([
+            requests[0].identifier,
+            ...generatedIdentifiersResults
+          ]);
+        }
+      } else {
+        setGeneratedIdentifiers(generatedIdentifiersResults);
       }
     }
 
@@ -376,11 +402,13 @@ function PreviewGeneratedNames({
         </thead>
         <tbody>
           {Array.from(
-            { length: formik.values.numberToCreate },
+            {
+              length: isMultiple ? generatedIdentifiers.length : numberToCreate
+            },
             (_, i) => i
           ).map((_, index) => (
             <tr key={index + 1}>
-              <td>{index + 1}</td>
+              <td>#{index + 1}</td>
               <td>
                 {generatedIdentifiers[index] ? (
                   generatedIdentifiers[index]

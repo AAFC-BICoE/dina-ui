@@ -707,12 +707,10 @@ export function CollectingEventFormLayout({
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
-              label={formatMessage("startEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             <FormattedTextField
               name="endEventDateTime"
-              label={formatMessage("endEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>

@@ -8,11 +8,7 @@ import { MaterialSampleSplitGenerationForm } from "../../../components/bulk-mate
 import PageLayout from "../../../components/page/PageLayout";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
-
-/**
- * String key for the local storage of the bulk split ids.
- */
-export const BULK_SPLIT_IDS = "bulk_split_ids";
+import { BULK_SPLIT_IDS } from "common-ui/lib";
 
 export default function MaterialSampleBulkSplitPage() {
   const router = useRouter();
