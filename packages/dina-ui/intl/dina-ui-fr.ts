@@ -222,7 +222,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   editTransactionTitle: "Modifier une transaction",
   elevationInMeters: "Élévation en mètres",
   enableDateRangeLabel: "Activer la plage de dates",
-  endEventDateTime: "Date/heure de fin d’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   exact: "Exact",
   exifProperties: "Propriétés existantes",
   existingAttachments: "Pièces jointes existantes",
@@ -755,8 +754,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   splitSampleTagOriginalAsDestroyed: "Identifier l’original comme « Détruit »",
   splitSubsampleTitle: "Division (sous-échantillon)",
   splitWorkflowRunTitle: "Exécuter la division du flux de travail ",
-  startEventDateTime:
-    "Date/heure de début de l’événement (AAAA-MM-JJTHH:MM:SS.MMM)",
   startNewRunConfigLabel: "Lancer une nouvelle éxécution",
   stateChangeMetaLegend: "Métadonnées sur le changement d'état (optionnel)",
   stateProvinceLabel: "État/province",

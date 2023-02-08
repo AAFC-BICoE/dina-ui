@@ -17,7 +17,7 @@ import {
 import { CommonMessage } from "../intl/common-ui-intl";
 import {
   CheckBoxFieldProps,
-  useGroupedCheckBoxes
+  useGroupedCheckBoxes,
 } from "../formik-connected/GroupedCheckBoxFields";
 import { v4 as uuidv4 } from "uuid";
 import { MultiSortTooltip } from "./MultiSortTooltip";
@@ -34,19 +34,20 @@ import {
   applyRootQuery,
   applySortingRules,
   applySourceFiltering,
-  elasticSearchFormatExport
+  elasticSearchFormatExport,
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
 import React from "react";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
   {
     id: "createdOn",
-    desc: true
-  }
+    desc: true,
+  },
 ];
 
 /**
@@ -158,6 +159,8 @@ export interface QueryPageProps<TData extends KitsuResource> {
   customViewFields?: string[];
 }
 
+const GROUP_STORAGE_KEY = "groupStorage";
+
 /**
  * Top level component for displaying an elastic-search listing page.
  *
@@ -183,7 +186,7 @@ export function QueryPage<TData extends KitsuResource>({
   onSortedChange,
   viewMode,
   customViewQuery,
-  customViewFields
+  customViewFields,
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -221,7 +224,10 @@ export function QueryPage<TData extends KitsuResource>({
   );
 
   // Groups selected for the search.
-  const [groups, setGroups] = useState<string[]>(groupNames ?? []);
+  const [groups, setGroups] = useLocalStorage<string[]>(
+    GROUP_STORAGE_KEY,
+    groupNames ?? []
+  );
 
   // Row Checkbox Toggle
   const showRowCheckboxes = Boolean(bulkDeleteButtonProps || bulkEditPath);
@@ -233,7 +239,7 @@ export function QueryPage<TData extends KitsuResource>({
   const [error, setError] = useState<any>();
 
   const defaultGroups = {
-    group: groupNames ?? []
+    group: groups,
   };
 
   useEffect(() => {
@@ -293,7 +299,7 @@ export function QueryPage<TData extends KitsuResource>({
             id: rslt._source?.data?.id,
             type: rslt._source?.data?.type,
             data: {
-              attributes: rslt._source?.data?.attributes
+              attributes: rslt._source?.data?.attributes,
             },
             included: rslt._source?.included?.reduce(
               (includedAccumulator, currentIncluded) => {
@@ -301,7 +307,7 @@ export function QueryPage<TData extends KitsuResource>({
                   if (!includedAccumulator[currentIncluded?.type]) {
                     return (
                       (includedAccumulator[currentIncluded?.type] = [
-                        currentIncluded
+                        currentIncluded,
                       ]),
                       includedAccumulator
                     );
@@ -322,7 +328,7 @@ export function QueryPage<TData extends KitsuResource>({
                 }
               },
               {}
-            )
+            ),
           };
         });
         // If we have reached the count limit, we will need to perform another request for the true
@@ -456,8 +462,8 @@ export function QueryPage<TData extends KitsuResource>({
       query,
       {
         params: {
-          indexName
-        }
+          indexName,
+        },
       }
     );
     return resp?.data?.hits;
@@ -478,8 +484,8 @@ export function QueryPage<TData extends KitsuResource>({
       query,
       {
         params: {
-          indexName
-        }
+          indexName,
+        },
       }
     );
     return resp?.data?.count;
@@ -489,20 +495,20 @@ export function QueryPage<TData extends KitsuResource>({
   const {
     CheckBoxField: SelectCheckBox,
     CheckBoxHeader: SelectCheckBoxHeader,
-    setAvailableItems: setAvailableResources
+    setAvailableItems: setAvailableResources,
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToSelect",
-    defaultAvailableItems: searchResults ?? []
+    defaultAvailableItems: searchResults ?? [],
   });
 
   // Checkbox for second table where selected/to be deleted items are displayed
   const {
     CheckBoxField: DeselectCheckBox,
     CheckBoxHeader: DeselectCheckBoxHeader,
-    setAvailableItems: setRemovableItems
+    setAvailableItems: setRemovableItems,
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete",
-    defaultAvailableItems: selectedResources ?? []
+    defaultAvailableItems: selectedResources ?? [],
   });
 
   const computedReactTableProps =
@@ -525,11 +531,11 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             Header: SelectCheckBoxHeader,
             sortable: false,
-            width: 200
-          }
+            width: 200,
+          },
         ]
       : []),
-    ...columns
+    ...columns,
   ];
 
   // Columns generated for the selected resources, only in selection mode.
@@ -542,24 +548,24 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             Header: DeselectCheckBoxHeader,
             sortable: false,
-            width: 200
-          }
+            width: 200,
+          },
         ]
       : []),
-    ...columns
+    ...columns,
   ];
 
   const mappedResultsColumns = columnsResults.map((column) => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
-      fieldName: String(column.label)
+      fieldName: String(column.label),
     };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...column
+      ...column,
     };
   });
 
@@ -567,14 +573,14 @@ export function QueryPage<TData extends KitsuResource>({
     // The "columns" prop can be a string or a react-table Column type.
     const { fieldName, customHeader } = {
       customHeader: column.Header,
-      fieldName: String(column.label)
+      fieldName: String(column.label),
     };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...column
+      ...column,
     };
   });
 
@@ -775,7 +781,7 @@ export function QueryPage<TData extends KitsuResource>({
                         <div
                           className="alert alert-danger"
                           style={{
-                            whiteSpace: "pre-line"
+                            whiteSpace: "pre-line",
                           }}
                         >
                           <p>
