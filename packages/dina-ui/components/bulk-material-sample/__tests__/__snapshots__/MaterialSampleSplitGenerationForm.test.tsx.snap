@@ -22,8 +22,8 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
   </Card>
   <div className=\\"row mt-3\\">
     <div className=\\"col-md-4\\">
-      <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\">
-        <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\">
+      <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false}>
+        <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false}>
           <FieldSpy fieldName=\\"numberToCreate\\" validate={[undefined]}>
             <FormikConnect(FastFieldInner) name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
               <FastFieldInner name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
@@ -39,7 +39,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                         <div className={[undefined]} style={{...}}>
                           <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
                             <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
-                              <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} value={1} />
+                              <input className=\\"form-control\\" type=\\"number\\" min={1} max={500} size={4} step={1} onKeyDown={[Function: onKeyDown]} onChange={[Function: onChange]} onClick={[Function: onClick]} disabled={false} value={1} />
                             </ErrorBoundary>
                           </FormikConnectedField>
                         </div>
@@ -263,6 +263,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
         <tbody>
           <tr>
             <td>
+              #
               1
             </td>
             <td>

@@ -1,8 +1,7 @@
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { BULK_SPLIT_IDS } from "../../../pages/collection/material-sample/bulk-split";
-import { Tooltip } from "common-ui/lib";
+import { BULK_SPLIT_IDS, Tooltip } from "common-ui/lib";
 
 interface SplitMaterialSampleButtonProps {
   ids: string[];
