@@ -617,7 +617,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
     sections: [
       {
         id: "field-extension-section",
-        labelKey: "fieldExtensions",
         maxGridSizeX: 1,
         items: [{ id: "extensionValues" }],
       },

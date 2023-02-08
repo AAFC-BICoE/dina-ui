@@ -33,6 +33,7 @@ import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
   FormTemplate,
   FormTemplateComponents,
   IDENTIFIER_COMPONENT_NAME,
@@ -314,6 +315,7 @@ function getDataComponentsStateMap(dataComponentState) {
     dataComponentState.enableScheduledActions;
   dataComponentEnabledMap[STORAGE_COMPONENT_NAME] =
     dataComponentState.enableStorage;
+  dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
   return dataComponentEnabledMap;

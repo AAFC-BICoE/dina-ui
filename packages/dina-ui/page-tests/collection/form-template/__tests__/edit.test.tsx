@@ -1791,7 +1791,7 @@ describe("Workflow template edit page", () => {
         },
         {
           name: "field-extensions-component",
-          visible: undefined,
+          visible: true,
           order: 10,
           sections: [
             {
