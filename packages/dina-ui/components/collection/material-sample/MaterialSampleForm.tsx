@@ -218,7 +218,9 @@ export function MaterialSampleForm({
     });
 
   // Set up Field Extensions values and functions
-  const { response } = useQuery<FieldExtension[]>({
+  const { response, loading: loadingExtensionValues } = useQuery<
+    FieldExtension[]
+  >({
     path: `collection-api/extension`
   });
 
@@ -548,7 +550,7 @@ export function MaterialSampleForm({
 
   return isTemplate ? (
     formLayout
-  ) : loading ? (
+  ) : loading || loadingExtensionValues ? (
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>
