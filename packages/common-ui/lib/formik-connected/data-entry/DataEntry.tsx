@@ -23,7 +23,7 @@ export function DataEntry({
   initialValues,
   selectedBlockOptions,
   setSelectedBlockOptions,
-  id,
+  id
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 

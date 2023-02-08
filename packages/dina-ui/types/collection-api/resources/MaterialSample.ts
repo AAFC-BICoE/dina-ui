@@ -119,7 +119,7 @@ export function blankMaterialSample(): Partial<InputResource<MaterialSample>> {
     ...BLANK_RESTRICTION,
     associations: [],
     hostOrganism: null,
-    organism: [],
+    organism: []
   };
 }
 

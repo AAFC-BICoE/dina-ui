@@ -2,7 +2,7 @@ import {
   DinaForm,
   LoadingSpinner,
   processExtensionValuesLoading,
-  useQuery,
+  useQuery
 } from "common-ui";
 import { useState } from "react";
 import { FieldExtension } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
@@ -19,10 +19,10 @@ export function DataEntryViewer({
   legend,
   name,
   disableDinaForm,
-  dinaComponent,
+  dinaComponent
 }: DataEntryViewerProps) {
   const { response, loading } = useQuery<FieldExtension[]>({
-    path: `collection-api/extension`,
+    path: `collection-api/extension`
   });
   const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
   const extensionOptions = response?.data
@@ -32,7 +32,7 @@ export function DataEntryViewer({
     .map((data) => {
       return {
         label: data.extension.name,
-        value: data.extension.key,
+        value: data.extension.key
       };
     });
 
@@ -44,7 +44,7 @@ export function DataEntryViewer({
     setExtensionFieldsOptions(
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.key,
+        value: data.key
       }))
     );
   }

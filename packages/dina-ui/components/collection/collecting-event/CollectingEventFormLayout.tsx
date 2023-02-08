@@ -17,11 +17,10 @@ import {
   useDinaFormContext,
   FieldSpy,
   DataEntryField,
-  useQuery,
+  useQuery
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { ChangeEvent, useRef, useState, useEffect } from "react";
-
+import { ChangeEvent, useRef, useState } from "react";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -30,24 +29,24 @@ import {
   NotPubliclyReleasableWarning,
   ParseVerbatimToRangeButton,
   PersonSelectField,
-  TagsAndRestrictionsSection,
+  TagsAndRestrictionsSection
 } from "../..";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   COLLECTING_EVENT_COMPONENT_NAME,
-  Vocabulary,
+  Vocabulary
 } from "../../../types/collection-api";
 import {
   CollectingEvent,
-  GeographicPlaceNameSource,
+  GeographicPlaceNameSource
 } from "../../../types/collection-api/resources/CollectingEvent";
 import {
   CoordinateSystemEnum,
-  CoordinateSystemEnumPlaceHolder,
+  CoordinateSystemEnumPlaceHolder
 } from "../../../types/collection-api/resources/CoordinateSystem";
 import {
   geographicPlaceSourceUrl,
-  SourceAdministrativeLevel,
+  SourceAdministrativeLevel
 } from "../../../types/collection-api/resources/GeographicPlaceNameSourceDetail";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
@@ -55,15 +54,12 @@ import { GeoReferenceAssertionField } from "../GeoReferenceAssertionField";
 import {
   nominatimAddressDetailSearch,
   NominatimAddressDetailSearchProps,
-  NominatumApiAddressDetailSearchResult,
+  NominatumApiAddressDetailSearchResult
 } from "./GeographySearchBox";
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import Link from "next/link";
 import { find, compact } from "lodash";
-import {
-  ExtensionField,
-  FieldExtension,
-} from "packages/dina-ui/types/collection-api/resources/FieldExtension";
+import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -79,12 +75,12 @@ export function CollectingEventFormLayout({
   setDefaultVerbatimCoordSys,
   setDefaultVerbatimSRS,
   attachmentsConfig,
-  visibleManagedAttributeKeys,
+  visibleManagedAttributeKeys
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
   const { response, loading } = useQuery<FieldExtension[]>({
-    path: `collection-api/extension`,
+    path: `collection-api/extension`
   });
 
   const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
@@ -95,7 +91,7 @@ export function CollectingEventFormLayout({
     .map((data) => {
       return {
         label: data.extension.name,
-        value: data.extension.key,
+        value: data.extension.key
       };
     });
   const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
@@ -112,7 +108,7 @@ export function CollectingEventFormLayout({
     setExtensionFieldsOptions(
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.key,
+        value: data.key
       }))
     );
     if (selected !== oldValue) {
@@ -158,7 +154,7 @@ export function CollectingEventFormLayout({
   const [selectedSearchResult, setSelectedSearchResult] = useState<{}>();
   const [
     customGeographicPlaceCheckboxState,
-    setCustomGeographicPlaceCheckboxState,
+    setCustomGeographicPlaceCheckboxState
   ] = useState(false);
 
   const { isValidating: detailResultsIsLoading } = useSWR(
@@ -167,7 +163,7 @@ export function CollectingEventFormLayout({
     {
       shouldRetryOnError: false,
       revalidateOnFocus: false,
-      revalidateOnReconnect: false,
+      revalidateOnReconnect: false
     }
   );
 
@@ -235,11 +231,11 @@ export function CollectingEventFormLayout({
       urlValue: {
         osmid: result.osm_id,
         osmtype: osmTypeForSearch,
-        class: result.category,
+        class: result.category
       },
       updateAdminLevels,
       formik,
-      stateProvinceName,
+      stateProvinceName
     };
 
     setSelectedSearchResult(detailSearchProps);
@@ -463,7 +459,7 @@ export function CollectingEventFormLayout({
       fieldSetProps={{
         legend: <DinaMessage id="collectingEventManagedAttributes" />,
         componentName: COLLECTING_EVENT_COMPONENT_NAME,
-        sectionName: "collecting-event-managed-attributes-section",
+        sectionName: "collecting-event-managed-attributes-section"
       }}
       managedAttributeOrderFieldName="managedAttributesOrder"
       visibleAttributeKeys={visibleManagedAttributeKeys}
@@ -481,7 +477,7 @@ export function CollectingEventFormLayout({
         style={{
           overflowY: "auto",
           overflowX: "hidden",
-          maxHeight: 520,
+          maxHeight: 520
         }}
       >
         <Field name="geographicPlaceNameSourceDetail">
@@ -744,18 +740,18 @@ export function CollectingEventFormLayout({
                       path: "collection-api/collecting-event",
                       filter: {
                         ...(ctx.values.group && {
-                          group: { EQ: ctx.values.group },
+                          group: { EQ: ctx.values.group }
                         }),
-                        rsql: `dwcRecordedBy==*${searchValue}*`,
-                      },
+                        rsql: `dwcRecordedBy==*${searchValue}*`
+                      }
                     }),
-                    option: (collEvent) => collEvent?.dwcRecordedBy ?? "",
+                    option: (collEvent) => collEvent?.dwcRecordedBy ?? ""
                   }}
                   elasticSearchBackend={{
                     indexName: "dina_material_sample_index",
                     searchField: "included.attributes.dwcRecordedBy",
                     group: group ?? undefined,
-                    option: (collEvent) => collEvent?.dwcRecordedBy,
+                    option: (collEvent) => collEvent?.dwcRecordedBy
                   }}
                   preferredBackend={"elastic-search"}
                 />
@@ -798,7 +794,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimCoordinateSystem"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/coordinateSystem",
+                  path: "collection-api/vocabulary/coordinateSystem"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -809,7 +805,7 @@ export function CollectingEventFormLayout({
                           (item) => item.lang === locale
                         )?.title
                     ) ?? []
-                  ),
+                  )
               }}
               blankSearchBackend={"json-api"}
               onSuggestionSelected={onSuggestionSelected}
@@ -900,7 +896,7 @@ export function CollectingEventFormLayout({
               name="dwcVerbatimSRS"
               jsonApiBackend={{
                 query: () => ({
-                  path: "collection-api/vocabulary/srs",
+                  path: "collection-api/vocabulary/srs"
                 }),
                 option: (vocabElement) =>
                   compact(
@@ -913,7 +909,7 @@ export function CollectingEventFormLayout({
                         it.name ||
                         ""
                     ) ?? []
-                  ),
+                  )
               }}
               blankSearchBackend={"json-api"}
               onChangeExternal={onChangeExternal}
@@ -924,7 +920,7 @@ export function CollectingEventFormLayout({
                 verbatimField="dwcVerbatimElevation"
                 rangeFields={[
                   "dwcMinimumElevationInMeters",
-                  "dwcMaximumElevationInMeters",
+                  "dwcMaximumElevationInMeters"
                 ]}
                 buttonText={formatMessage("convertToElevationMinMax")}
               />
@@ -936,7 +932,7 @@ export function CollectingEventFormLayout({
                 verbatimField="dwcVerbatimDepth"
                 rangeFields={[
                   "dwcMinimumDepthInMeters",
-                  "dwcMaximumDepthInMeters",
+                  "dwcMaximumDepthInMeters"
                 ]}
                 buttonText={formatMessage("convertToDepthMinMax")}
               />
@@ -971,10 +967,10 @@ export function CollectingEventFormLayout({
                           {
                             selector: "group",
                             comparison: "==",
-                            arguments: group,
-                          },
+                            arguments: group
+                          }
                         ]
-                      : undefined,
+                      : undefined
                   })}
                 />
               )}
@@ -989,18 +985,18 @@ export function CollectingEventFormLayout({
                   path: "collection-api/collecting-event",
                   filter: {
                     ...(ctx.values.group && {
-                      group: { EQ: ctx.values.group },
+                      group: { EQ: ctx.values.group }
                     }),
-                    rsql: `substrate==${searchValue}*`,
-                  },
+                    rsql: `substrate==${searchValue}*`
+                  }
                 }),
-                option: (collEvent) => collEvent?.substrate ?? "",
+                option: (collEvent) => collEvent?.substrate ?? ""
               }}
             />
             <NumberRangeFields
               names={[
                 "dwcMinimumElevationInMeters",
-                "dwcMaximumElevationInMeters",
+                "dwcMaximumElevationInMeters"
               ]}
               labelMsg={<DinaMessage id="elevationInMeters" />}
             />

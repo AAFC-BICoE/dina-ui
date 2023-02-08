@@ -11,7 +11,7 @@ import {
   FieldSet,
   LoadingSpinner,
   SubmitButton,
-  useQuery,
+  useQuery
 } from "common-ui";
 import {
   Fragment,
@@ -19,7 +19,7 @@ import {
   Ref,
   useContext,
   useState,
-  useEffect,
+  useEffect
 } from "react";
 import {
   AttachmentsField,
@@ -32,12 +32,12 @@ import {
   StorageLinkerField,
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
-  AssemblageSelectSection,
+  AssemblageSelectSection
 } from "../..";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent,
+  useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import {
   AcquisitionEvent,
@@ -56,7 +56,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
 import { AcquisitionEventLinker } from "../AcquisitionEventLinker";
@@ -189,7 +189,7 @@ export function MaterialSampleForm({
       />
       <SubmitButton className="ms-auto" />
     </ButtonBar>
-  ),
+  )
 }: MaterialSampleFormProps) {
   const { isTemplate, readOnly } = useContext(DinaFormContext) ?? {};
   const {
@@ -202,7 +202,7 @@ export function MaterialSampleForm({
     acqEventId,
     setAcqEventId,
     onSubmit,
-    loading,
+    loading
   } =
     materialSampleSaveHook ??
     useMaterialSampleSave({
@@ -214,12 +214,12 @@ export function MaterialSampleForm({
       onSaved,
       isTemplate,
       reduceRendering,
-      visibleManagedAttributeKeys,
+      visibleManagedAttributeKeys
     });
 
   // Set up Field Extensions values and functions
   const { response } = useQuery<FieldExtension[]>({
-    path: `collection-api/extension`,
+    path: `collection-api/extension`
   });
 
   const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
@@ -230,7 +230,7 @@ export function MaterialSampleForm({
     .map((data) => {
       return {
         label: data.extension.name,
-        value: data.extension.key,
+        value: data.extension.key
       };
     });
   const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
@@ -247,7 +247,7 @@ export function MaterialSampleForm({
     setExtensionFieldsOptions(
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.key,
+        value: data.key
       }))
     );
     if (selected !== oldValue) {
@@ -438,7 +438,7 @@ export function MaterialSampleForm({
                 managedAttributeComponent="MATERIAL_SAMPLE"
                 fieldSetProps={{
                   id,
-                  legend: <DinaMessage id="materialSampleManagedAttributes" />,
+                  legend: <DinaMessage id="materialSampleManagedAttributes" />
                 }}
                 managedAttributeOrderFieldName="managedAttributesOrder"
                 visibleAttributeKeys={
@@ -473,7 +473,7 @@ export function MaterialSampleForm({
             )}
           />
         </DinaFormSection>
-      ),
+      )
   };
 
   const formSectionPairs = toPairs(formSections);
@@ -482,7 +482,7 @@ export function MaterialSampleForm({
     ...compact(
       (navOrder ?? []).map((id) => formSectionPairs.find(([it]) => it === id))
     ),
-    ...formSectionPairs,
+    ...formSectionPairs
   ]);
 
   const formLayout = (

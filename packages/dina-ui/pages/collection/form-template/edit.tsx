@@ -8,7 +8,7 @@ import {
   SubmitButton,
   TextField,
   useQuery,
-  withResponse,
+  withResponse
 } from "common-ui";
 import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
@@ -18,13 +18,13 @@ import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
   MaterialSampleForm,
-  useMaterialSampleSave,
+  useMaterialSampleSave
 } from "../../../../dina-ui/components";
 import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
-  getFormTemplateCheckboxes,
+  getFormTemplateCheckboxes
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
@@ -45,7 +45,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
-  STORAGE_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 
 export default function FormTemplateEditPage() {
@@ -92,7 +92,7 @@ interface FormTemplateEditPageLoadedProps {
 export function FormTemplateEditPageLoaded({
   id,
   fetchedFormTemplate,
-  onSaved,
+  onSaved
 }: FormTemplateEditPageLoadedProps) {
   const [navOrder, setNavOrder] = useState<string[] | null>(
     getComponentOrderFromTemplate(fetchedFormTemplate)
@@ -130,7 +130,7 @@ export function FormTemplateEditPageLoaded({
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
     id,
-    type: "form-template",
+    type: "form-template"
   };
 
   // Generate the material sample save hook to use for the form.
@@ -140,13 +140,13 @@ export function FormTemplateEditPageLoaded({
     colEventTemplateInitialValues: collectingEventInitialValues,
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
-    acquisitionEventFormRef: acqEventFormRef,
+    acquisitionEventFormRef: acqEventFormRef
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
   async function onSaveTemplateSubmit({
     api: { save },
-    submittedValues,
+    submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
     // Get collecting event checkboxes and values
     const {
@@ -155,7 +155,7 @@ export function FormTemplateEditPageLoaded({
     } = collectingEvtFormRef?.current?.values || {};
     submittedValues.templateCheckboxes = {
       ...submittedValues.templateCheckboxes,
-      ...collectingEventCheckboxes,
+      ...collectingEventCheckboxes
     };
 
     // Get acquisition event checkboxes and values
@@ -165,14 +165,14 @@ export function FormTemplateEditPageLoaded({
     } = acqEventFormRef?.current?.values || {};
     submittedValues.templateCheckboxes = {
       ...submittedValues.templateCheckboxes,
-      ...acquisitionEventCheckboxes,
+      ...acquisitionEventCheckboxes
     };
 
     // Include the collecting event and acquisition event values.
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
       ...(collectinEventFormRefValues ?? {}),
       ...(acquisitionEventFormRefValues ?? {}),
-      ...submittedValues,
+      ...submittedValues
     };
 
     const dataComponentsStateMap =
@@ -220,12 +220,12 @@ export function FormTemplateEditPageLoaded({
                   : allSubmittedValues?.templateCheckboxes?.[
                       dataComponent.id + "." + section.id + "." + field.id
                     ] ?? false,
-                defaultValue: _.get(allSubmittedValues, field.id),
+                defaultValue: _.get(allSubmittedValues, field.id)
               };
-            }),
-          })),
+            })
+          }))
         })
-      ),
+      )
     };
 
     const [savedDefinition] = await save<FormTemplate>(

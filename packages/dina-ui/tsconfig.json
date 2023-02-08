@@ -1,12 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "exclude": ["node_modules", "scripts"],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "../common-ui/lib/formik-connected/data-entry/DataEntryUtils.tsx"
-  ],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     // This property was auto-written by next.js on startup:
     "incremental": true

@@ -1,9 +1,6 @@
-import { CollectingEvent, MaterialSample } from "../../../../dina-ui/types/collection-api";
-
 /**
  * Process Extension Values from back-end into nested arrays for front-end
- * */
-
+ */
 export function processExtensionValuesLoading(initExtensionValues) {
   if (!initExtensionValues) {
     return undefined;
@@ -16,31 +13,31 @@ export function processExtensionValuesLoading(initExtensionValues) {
         (extensionFieldKey) => {
           return {
             type: extensionFieldKey,
-            value: initExtensionValue[extensionFieldKey],
+            value: initExtensionValue[extensionFieldKey]
           };
         }
       );
       const processedExtensionValue = {
         select: extensionKey,
-        rows: extensionFields,
+        rows: extensionFields
       };
       return processedExtensionValue;
     }
   );
   return processedExtensionValues;
 }
+
 /**
  * Process Extension Values from front-end into nested maps for back-end
- * */
-
+ */
 export function processExtensionValuesSaving(submittedValues: any) {
   const submittedExtensionValues: any[] | undefined =
-    submittedValues["extensionValues"];
+    submittedValues.extensionValues;
 
   const processedExtensionValues = submittedExtensionValues?.reduce(
     (result, item) => {
       const extensionKey = item.select;
-      let processedExtensionFields = {};
+      const processedExtensionFields = {};
       item.rows?.forEach((extensionField) => {
         processedExtensionFields[extensionField.type] = extensionField.value;
       });
