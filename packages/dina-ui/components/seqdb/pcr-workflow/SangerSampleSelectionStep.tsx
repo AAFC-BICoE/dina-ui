@@ -120,96 +120,94 @@ export function SangerSampleSelectionStep({
    * When the page is first loaded, check if saved samples has already been chosen and reload them.
    */
   useEffect(() => {
-      fetchSampledIds();
+    fetchSampledIds();
   }, [editMode]);
 
   async function savePcrBatchItems() {
-    try{
-    const { data: pcrBatch } = await apiClient.get<PcrBatch>(
-      `seqdb-api/pcr-batch/${pcrBatchId}`,
-      {}
-    );
+    try {
+      const { data: pcrBatch } = await apiClient.get<PcrBatch>(
+        `seqdb-api/pcr-batch/${pcrBatchId}`,
+        {}
+      );
 
-    // Convert to UUID arrays to compare the two arrays.
-    const selectedResourceUUIDs = compact(
-      selectedResources?.map((material) => material.id)
-    );
-    const previouslySelectedResourcesUUIDs = compact(
-      previouslySelectedResources?.map((item) => ({
+      // Convert to UUID arrays to compare the two arrays.
+      const selectedResourceUUIDs = compact(
+        selectedResources?.map((material) => material.id)
+      );
+      const previouslySelectedResourcesUUIDs = compact(
+        previouslySelectedResources?.map((item) => ({
+          materialSampleUUID: item?.materialSample?.id,
+          pcrBatchItemUUID: item?.id
+        }))
+      );
+
+      const temp = previouslySelectedResources?.map((item) => ({
         materialSampleUUID: item?.materialSample?.id,
         pcrBatchItemUUID: item?.id
-      }))
-    );
+      }));
+      // UUIDs of PCR Batch Items that need to be created.
+      const itemsToCreate = uniq(
+        selectedResourceUUIDs.filter(
+          (uuid) =>
+            !previouslySelectedResourcesUUIDs.some(
+              (item) => item.materialSampleUUID === uuid
+            )
+        )
+      );
 
-    const temp = previouslySelectedResources?.map((item) => ({
-      materialSampleUUID: item?.materialSample?.id,
-      pcrBatchItemUUID: item?.id
-    }));
-    // UUIDs of PCR Batch Items that need to be created.
-    const itemsToCreate = uniq(
-      selectedResourceUUIDs.filter(
-        (uuid) =>
-          !previouslySelectedResourcesUUIDs.some(
-            (item) => item.materialSampleUUID === uuid
-          )
-      )
-    );
+      // UUIDs of PCR Batch Items that need to be deleted.
+      const itemsToDelete = uniq(
+        previouslySelectedResourcesUUIDs.filter(
+          (uuid) =>
+            !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
+        )
+      );
 
-    // UUIDs of PCR Batch Items that need to be deleted.
-    const itemsToDelete = uniq(
-      previouslySelectedResourcesUUIDs.filter(
-        (uuid) =>
-          !selectedResourceUUIDs.includes(uuid.materialSampleUUID as string)
-      )
-    );
-
-    // Perform create
-    if (itemsToCreate.length !== 0) {
-      await save(
-        itemsToCreate.map((materialUUID) => ({
-          resource: {
-            type: "pcr-batch-item",
-            group: pcrBatch.group ?? "",
-            createdBy: username ?? "",
-            pcrBatch: pick(pcrBatch, "id", "type"),
-            relationships: {
-              materialSample: {
-                data: {
-                  id: materialUUID,
-                  type: "material-sample"
+      // Perform create
+      if (itemsToCreate.length !== 0) {
+        await save(
+          itemsToCreate.map((materialUUID) => ({
+            resource: {
+              type: "pcr-batch-item",
+              group: pcrBatch.group ?? "",
+              createdBy: username ?? "",
+              pcrBatch: pick(pcrBatch, "id", "type"),
+              relationships: {
+                materialSample: {
+                  data: {
+                    id: materialUUID,
+                    type: "material-sample"
+                  }
                 }
               }
-            }
-          },
-          type: "pcr-batch-item"
-        })),
-        { apiBaseUrl: "/seqdb-api" }
-      );
-    }
-
-    // Perform deletes
-    if (itemsToDelete.length !== 0) {
-      await save(
-        itemsToDelete.map((item) => ({
-          delete: {
-            id: item.pcrBatchItemUUID ?? "",
+            },
             type: "pcr-batch-item"
-          }
-        })),
-        { apiBaseUrl: "/seqdb-api" }
-      );
+          })),
+          { apiBaseUrl: "/seqdb-api" }
+        );
+      }
+
+      // Perform deletes
+      if (itemsToDelete.length !== 0) {
+        await save(
+          itemsToDelete.map((item) => ({
+            delete: {
+              id: item.pcrBatchItemUUID ?? "",
+              type: "pcr-batch-item"
+            }
+          })),
+          { apiBaseUrl: "/seqdb-api" }
+        );
+      }
+    } catch (e) {
+      if (e.toString() === "Error: Access is denied") {
+        throw new DoOperationsError("Access is denied");
+      }
+    } finally {
+      // Clear the previously selected resources.
+      setPreviouslySelectedResources([]);
+      setEditMode(false);
     }
-  }
-  catch (e){
-    if(e.toString() == "Error: Access is denied"){
-      throw new DoOperationsError("Access is denied");
-    }
-  }
-  finally{
-    // Clear the previously selected resources.
-    setPreviouslySelectedResources([]);
-    setEditMode(false);
-  }
   }
 
   // Wait until selected resources are loaded.

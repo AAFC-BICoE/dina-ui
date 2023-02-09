@@ -216,6 +216,11 @@ export function Home() {
                     <SeqdbMessage id="pcrPrimerListTitle" />
                   </a>
                 </Link>
+                <Link href="/seqdb/pcr-workflow/list">
+                  <a>
+                    <SeqdbMessage id="pcrWorkflowListTitle" />
+                  </a>
+                </Link>
                 <Link href="/seqdb/product/list">
                   <a>
                     <SeqdbMessage id="productListTitle" />
@@ -229,11 +234,6 @@ export function Home() {
                 <Link href="/seqdb/sequencing-facility/list">
                   <a>
                     <SeqdbMessage id="sequencingFacilityListTitle" />
-                  </a>
-                </Link>
-                <Link href="/seqdb/sanger-workflow/list">
-                  <a>
-                    <SeqdbMessage id="sangerWorkflowListTitle" />
                   </a>
                 </Link>
                 <Link href="/seqdb/sanger-workflow-sequencing/list">
