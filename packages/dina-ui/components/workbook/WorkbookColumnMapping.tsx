@@ -191,7 +191,7 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
               }
               break;
             case DataTypeEnum.BOOLEAN_ARRAY:
-              if(!isBoolean(row[field])) {
+              if(!isBooleanArray(row[field])) {
                 param["dataType"] = DataTypeEnum.BOOLEAN_ARRAY;
                 errors.push(
                   new ValidationError(
