@@ -15,6 +15,7 @@ import { ManagedAttributesViewer } from "../../object-store/managed-attributes/M
 import { ReferenceLink } from "../ReferenceLink";
 import { RevisionRowConfig } from "../revision-row-config";
 import { Protocol } from "packages/dina-ui/types/collection-api/resources/Protocol";
+import { DataEntryViewer } from "common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
 export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSample> =
   {
@@ -178,6 +179,14 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
             }}
           />
         )),
+      extensionValues: ({ original: { value } }) => (
+        <DataEntryViewer
+          extensionValues={value}
+          legend={<></>}
+          name={"extensionValues"}
+          dinaComponent={"MATERIAL_SAMPLE"}
+        />
+      ),
       // Don't render this one because it isn't an editable field:
       materialSampleChildren: () => <></>
     }

@@ -65,7 +65,7 @@ describe("DataEntry", () => {
         onSubmit={async ({ submittedValues }) => mockSubmit(submittedValues)}
       >
         <DataEntryField
-          legend={<DinaMessage id="fieldExtension" />}
+          legend={<DinaMessage id="fieldExtensions" />}
           blockOptions={blockOptions}
           unitsOptions={unitsOptions}
           model={"agent-api/person"}

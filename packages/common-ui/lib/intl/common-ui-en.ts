@@ -46,6 +46,7 @@ export const COMMON_UI_MESSAGES_ENGLISH = {
   editAll: "Edit All",
   editButtonText: "Edit",
   editSelectedButtonText: "Edit Selected",
+  splitSelectedButtonText: "Split Selected",
   editableTable: "Editable Table",
   edited: "edited",
   errorPageTitle: "Error",

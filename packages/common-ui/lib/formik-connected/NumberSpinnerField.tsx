@@ -9,13 +9,14 @@ interface NumberSpinnerFieldProps extends FieldWrapperProps {
   defaultValue?: number;
   size?: number;
   step?: number;
+  disabled?: boolean;
 }
 
 export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
-  const { min, max, size, step, onChangeExternal, name } = props;
+  const { min, max, size, step, onChangeExternal, name, disabled } = props;
 
   /* Avoid entries like 'e' for valid number */
-  const onKeyDown = e => {
+  const onKeyDown = (e) => {
     const NUMBER_ALLOWED_CHARS_REGEXP = /[0-9]+/;
     const CTRL_ALLOWED_CHARS_REGEXP =
       /^(Backspace|Delete|ArrowLeft|ArrowRight|ArrowUp|ArrowDown|Tab)$/;
@@ -50,8 +51,9 @@ export function NumberSpinnerField(props: NumberSpinnerFieldProps) {
             size={size ?? 4}
             step={step ?? 1}
             onKeyDown={onKeyDown}
-            onChange={e => onChangeInternal(e.target.value)}
-            onClick={e => (e.target as any).select()}
+            onChange={(e) => onChangeInternal(e.target.value)}
+            onClick={(e) => (e.target as any).select()}
+            disabled={disabled}
             value={value}
           />
         );

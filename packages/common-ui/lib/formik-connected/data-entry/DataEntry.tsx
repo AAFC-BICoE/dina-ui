@@ -8,7 +8,7 @@ import { DataEntryFieldProps } from "./DataEntryField";
 import { useEffect } from "react";
 
 /* tslint:disable-next-line */
-export interface DataEntryProps extends DataEntryFieldProps {};
+export interface DataEntryProps extends DataEntryFieldProps {}
 
 export function DataEntry({
   legend,
@@ -22,7 +22,8 @@ export function DataEntry({
   readOnly,
   initialValues,
   selectedBlockOptions,
-  setSelectedBlockOptions
+  setSelectedBlockOptions,
+  id
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -71,7 +72,7 @@ export function DataEntry({
     };
   }
   return (
-    <FieldSet legend={legend} wrapLegend={legendWrapper()}>
+    <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
       <FieldArray name={name}>
         {(fieldArrayProps) => {
           const blocks: [] = fieldArrayProps.form.values[name];

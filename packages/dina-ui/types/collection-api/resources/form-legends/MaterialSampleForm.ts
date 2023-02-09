@@ -19,6 +19,8 @@ export const MANAGED_ATTRIBUTES_COMPONENT_NAME: string =
   "managed-attributes-component";
 export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
   "material-sample-attachments-component";
+export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
+  "field-extensions-component";
 
 /**
  * All Material Sample form data component in order.
@@ -286,7 +288,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         ]
       },
       {
-        id: "field-extension-section",
+        id: "collecting-event-field-extension-section",
         maxGridSizeX: 1,
         items: [{ id: "extensionValues" }]
       },
@@ -605,6 +607,18 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "scheduledAction.remarks"
           }
         ]
+      }
+    ]
+  },
+  {
+    id: FIELD_EXTENSIONS_COMPONENT_NAME,
+    labelKey: "fieldExtensions",
+    maxGridSizeX: 1,
+    sections: [
+      {
+        id: "field-extension-section",
+        maxGridSizeX: 1,
+        items: [{ id: "extensionValues" }]
       }
     ]
   },

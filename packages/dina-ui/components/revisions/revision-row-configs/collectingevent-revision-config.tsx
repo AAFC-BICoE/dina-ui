@@ -102,6 +102,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           extensionValues={value}
           legend={<></>}
           name={"extensionValues"}
+          dinaComponent={"COLLECTING_EVENT"}
         />
       ),
     },

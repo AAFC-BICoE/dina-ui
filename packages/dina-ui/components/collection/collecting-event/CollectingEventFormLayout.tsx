@@ -20,8 +20,7 @@ import {
   useQuery
 } from "common-ui";
 import { Field, FormikContextType } from "formik";
-import { ChangeEvent, useRef, useState, useEffect } from "react";
-
+import { ChangeEvent, useRef, useState } from "react";
 import {
   AttachmentsField,
   CollectionMethodSelectField,
@@ -60,10 +59,7 @@ import {
 import { SetCoordinatesFromVerbatimButton } from "./SetCoordinatesFromVerbatimButton";
 import Link from "next/link";
 import { find, compact } from "lodash";
-import {
-  ExtensionField,
-  FieldExtension
-} from "packages/dina-ui/types/collection-api/resources/FieldExtension";
+import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 
 interface CollectingEventFormLayoutProps {
   setDefaultVerbatimCoordSys?: (newValue: string | undefined | null) => void;
@@ -707,12 +703,10 @@ export function CollectingEventFormLayout({
             <FormattedTextField
               name="startEventDateTime"
               className="startEventDateTime"
-              label={formatMessage("startEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
             <FormattedTextField
               name="endEventDateTime"
-              label={formatMessage("endEventDateTime")}
               placeholder={"YYYY-MM-DDTHH:MM:SS.MMM"}
             />
           </FieldSet>
@@ -1037,10 +1031,10 @@ export function CollectingEventFormLayout({
       <div>
         <DinaFormSection
           componentName={COLLECTING_EVENT_COMPONENT_NAME}
-          sectionName="field-extension-section"
+          sectionName="collecting-event-field-extension-section"
         >
           <DataEntryField
-            legend={<DinaMessage id="fieldExtension" />}
+            legend={<DinaMessage id="fieldExtensions" />}
             name="extensionValues"
             blockOptions={extensionOptions}
             typeOptions={extensionFieldsOptions}
