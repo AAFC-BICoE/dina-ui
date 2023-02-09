@@ -19,6 +19,7 @@ export interface DataEntryFieldProps {
   isTemplate?: boolean;
   selectedBlockOptions?: any;
   setSelectedBlockOptions?: Dispatch<any>;
+  id?: string;
 }
 
 export function DataEntryField({
@@ -35,7 +36,8 @@ export function DataEntryField({
   width,
   isTemplate,
   selectedBlockOptions,
-  setSelectedBlockOptions
+  setSelectedBlockOptions,
+  id
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
   const dataEntry = (
@@ -52,6 +54,7 @@ export function DataEntryField({
       initialValues={initialValues}
       selectedBlockOptions={selectedBlockOptions}
       setSelectedBlockOptions={setSelectedBlockOptions}
+      id={id}
     />
   );
   return (
