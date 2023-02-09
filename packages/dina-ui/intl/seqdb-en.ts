@@ -81,8 +81,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   sampleSelectionInstructions:
     "Your Sample selection is Saved when you press a Select or Deselect button. There is no separate Save button.",
   sampleSelectionTitle: "Sample Selection",
-  sangerWorkflow: "Sanger Workflow",
-  sangerWorkflowListTitle: "Sanger Workflows",
+  pcrWorkflow: "PCR Workflow",
+  pcrWorkflowListTitle: "PCR Workflows",
   sangerWorkflowSequencingListTitle: "Sanger Workflows - Sequencing",
   selectAllCheckedSamplesButtonText: "Select all checked molecular samples -->",
   selectButtonText: "Select",
