@@ -37,10 +37,15 @@ export interface WorkbookColumnMappingProps {
   setPerformSave: (newValue: boolean) => void;
 }
 
-const ENTITY_TYPES = ["materialSample"] as const;
+const ENTITY_TYPES = ["material-sample"] as const;
 
-export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerformSave }: WorkbookColumnMappingProps) {
-  const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> = useRef(null);
+export function WorkbookColumnMapping({
+  spreadsheetData,
+  performSave,
+  setPerformSave
+}: WorkbookColumnMappingProps) {
+  const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
+    useRef(null);
   const { formatMessage } = useDinaIntl();
   const entityTypes = ENTITY_TYPES.map((entityType) => ({
     label: formatMessage(entityType),
@@ -52,17 +57,24 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
     value: string;
   } | null>(entityTypes[0]);
   const [fieldMap, setFieldMap] = useState([] as FieldMapType);
-  const [fieldHeaderPair, setFieldHeaderPair] = useState({} as { [field: string]: string });
-  const { convertWorkbook: convertWorkbookToMaterialSample } = useWorkbookConverter<MaterialSample>(
-    "materialSample",
-    FieldMappingConfig as {
-      [key: string]: { [field: string]: { dataType: DataTypeEnum } };
-    }
+  const [fieldHeaderPair, setFieldHeaderPair] = useState(
+    {} as { [field: string]: string }
   );
+  const { convertWorkbook: convertWorkbookToMaterialSample } =
+    useWorkbookConverter<MaterialSample>(
+      "material-sample",
+      FieldMappingConfig as {
+        [key: string]: { [field: string]: { dataType: DataTypeEnum } };
+      }
+    );
 
   const buttonBar = (
     <>
-      <SubmitButton className="hidden" performSave={performSave} setPerformSave={setPerformSave} />
+      <SubmitButton
+        className="hidden"
+        performSave={performSave}
+        setPerformSave={setPerformSave}
+      />
     </>
   );
 
@@ -84,7 +96,8 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType?.value) {
-      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } = FieldMappingConfig[selectedType?.value];
+      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
+        FieldMappingConfig[selectedType?.value];
       const newFieldOptions: { label: string; value: string }[] = [];
       Object.keys(filedsConfigs).forEach((field) => {
         const option = {
@@ -97,7 +110,7 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
       const _fieldHeaderPair = {};
       for (const columnHeader of headers || []) {
         const field = findMatchField(columnHeader, newFieldOptions)?.value;
-        if (field != undefined) {
+        if (field !== undefined) {
           _fieldHeaderPair[field] = columnHeader;
         }
         map.push(field);
@@ -113,15 +126,21 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
   // Generate the currently selected value
   const sheetValue = sheetOptions[sheet];
 
-  function onSubmit(fieldNames) {
-    const workbookData = getDataFromWorkbook(spreadsheetData, sheet, fieldNames);
-    switch(selectedType?.value) {
-      case "materialSample":
+  function onSubmit({ submittedValues }) {
+    const workbookData = getDataFromWorkbook(
+      spreadsheetData,
+      sheet,
+      submittedValues.fieldMap
+    );
+    switch (selectedType?.value) {
+      case "material-sample":
         const materialSample = convertWorkbookToMaterialSample(workbookData);
-        console.log(JSON.stringify(materialSample, null, ' '));
+        // console.log(JSON.stringify(materialSample, null, " "));
         break;
       default:
-        throw new Error(`Unsupported type for workbook conversion: ${selectedType?.value}`)
+        throw new Error(
+          `Unsupported type for workbook conversion: ${selectedType?.value}`
+        );
     }
   }
 
@@ -131,10 +150,19 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
       exclusive: false,
       test: (fieldNames: string[]) => {
         const errors: ValidationError[] = [];
-        for (const i in fieldNames) {
+        for (let i = 0; i < fieldNames.length; i++) {
           const field = fieldNames[i];
-          if (!!field && fieldNames.filter((item) => item === field).length > 1) {
-            errors.push(new ValidationError(formatMessage("workBookDuplicateFieldMap"), field, `fieldMap[${i}]`));
+          if (
+            !!field &&
+            fieldNames.filter((item) => item === field).length > 1
+          ) {
+            errors.push(
+              new ValidationError(
+                formatMessage("workBookDuplicateFieldMap"),
+                field,
+                `fieldMap[${i}]`
+              )
+            );
           }
         }
         if (errors.length > 0) {
@@ -150,10 +178,14 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
     })
   });
 
-  function validateData(workbookData: { [field: string]: string }[], errors: ValidationError[]) {
+  function validateData(
+    workbookData: { [field: string]: string }[],
+    errors: ValidationError[]
+  ) {
     if (!!selectedType?.value) {
-      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } = FieldMappingConfig[selectedType?.value];
-      for (const i in workbookData) {
+      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
+        FieldMappingConfig[selectedType?.value];
+      for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         for (const field of Object.keys(row)) {
           const param = {
@@ -164,37 +196,73 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
           switch (filedsConfigs[field].dataType) {
             case DataTypeEnum.BOOLEAN:
               if (!isBoolean(row[field])) {
-                param["dataType"] = DataTypeEnum.BOOLEAN;
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                param.dataType = DataTypeEnum.BOOLEAN;
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
             case DataTypeEnum.NUMBER:
               if (!isNumber(row[field])) {
-                param["dataType"] = DataTypeEnum.NUMBER;
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                param.dataType = DataTypeEnum.NUMBER;
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
             case DataTypeEnum.NUMBER_ARRAY:
               if (!isNumberArray(row[field])) {
-                param["dataType"] = DataTypeEnum.NUMBER_ARRAY;
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                param.dataType = DataTypeEnum.NUMBER_ARRAY;
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
             case DataTypeEnum.BOOLEAN_ARRAY:
               if (!isBooleanArray(row[field])) {
-                param["dataType"] = DataTypeEnum.BOOLEAN_ARRAY;
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
             case DataTypeEnum.MAP:
               if (!isMap(row[field])) {
-                param["dataType"] = DataTypeEnum.MAP;
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                param.dataType = DataTypeEnum.MAP;
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
             case DataTypeEnum.NUMBER:
               if (!isNumber(row[field])) {
-                errors.push(new ValidationError(formatMessage("workBookInvalidDataFormat", param), field, "sheet"));
+                errors.push(
+                  new ValidationError(
+                    formatMessage("workBookInvalidDataFormat", param),
+                    field,
+                    "sheet"
+                  )
+                );
               }
               break;
           }
@@ -208,7 +276,7 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
         sheet: 1,
-        type: "materialSample",
+        type: "material-sample",
         fieldMap
       }}
       innerRef={formRef}
@@ -258,7 +326,11 @@ export function WorkbookColumnMapping({ spreadsheetData, performSave, setPerform
                         <tr key={columnHeader}>
                           <td>{columnHeader}</td>
                           <td>
-                            <SelectField name={`fieldMap[${index}]`} options={fieldOptions} hideLabel={true} />
+                            <SelectField
+                              name={`fieldMap[${index}]`}
+                              options={fieldOptions}
+                              hideLabel={true}
+                            />
                           </td>
                         </tr>
                       ))

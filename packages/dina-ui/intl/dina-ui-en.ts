@@ -337,7 +337,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
     "Create a grid to store contents. Cannot have child storage units.",
   field_endDate: "End Date",
   field_endEventDateTime: "End Event Date Time",
-  field_endEventDateTime_tooltip: "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_endEventDateTime_tooltip:
+    "End Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_familyNames: "Family Names",
   field_familyNames_tooltip: "Family name(s) including compound family names",
   field_givenNames: "Given Names",
@@ -426,7 +427,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_scientificNameInput: "Scientific Name",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
-  field_startEventDateTime_tooltip: "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
+  field_startEventDateTime_tooltip:
+    "Start Event Date Time format must be a subset of : YYYY-MM-DDTHH:MM:SS.MMM, if datetime is present, 'T' is mandatory",
   field_tags: "Tags",
   field_title: "Title",
   "field_title.en": "English Title",
@@ -527,6 +529,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialIn: "Material In",
   materialOut: "Material Out",
   materialSample: "Material Sample",
+  "material-sample": "Material Sample",
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFormTemplate: "Material Sample Form Template",
@@ -839,5 +842,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   unsupportedFileTypeError:
     'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
   workBookDuplicateFieldMap: "This column should not map to the same field",
-  workBookInvalidDataFormat: "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}"
+  workBookInvalidDataFormat:
+    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}"
 };
