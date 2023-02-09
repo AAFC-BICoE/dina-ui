@@ -210,6 +210,7 @@ export function ManagedAttributeMultiSelect({
       isLoading={loading}
       onChange={onChangeInternal}
       value={visibleAttributes}
+      selectProps={{ controlShouldRenderValue: false, isClearable: false }}
     />
   );
 }
