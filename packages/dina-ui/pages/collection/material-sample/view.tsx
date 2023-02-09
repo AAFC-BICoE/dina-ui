@@ -5,7 +5,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  withResponse,
+  withResponse
 } from "common-ui";
 import { Field } from "formik";
 import { isEmpty } from "lodash";
@@ -37,21 +37,22 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues,
+  withOrganismEditorValues
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
   AcquisitionEventFormLayout,
-  useAcquisitionEvent,
+  useAcquisitionEvent
 } from "../../../pages/collection/acquisition-event/edit";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
-  MaterialSample,
+  MaterialSample
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
+import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -115,7 +116,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <>
             <Head
               title={formatMessage("materialSampleViewTitle", {
-                primaryID: materialSample?.materialSampleName,
+                primaryID: materialSample?.materialSampleName
               })}
             />
             <Nav />
@@ -160,7 +161,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       {materialSample.parentMaterialSample && (
                         <div
                           style={{
-                            marginLeft: "16px",
+                            marginLeft: "16px"
                           }}
                         >
                           <DinaMessage
@@ -226,13 +227,20 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {!!materialSample?.scheduledActions?.length && (
                   <ScheduledActionsField />
                 )}
+                <DataEntryViewer
+                  name={"extensionValues"}
+                  legend={<DinaMessage id="fieldExtensions" />}
+                  extensionValues={materialSample.extensionValues}
+                  disableDinaForm={true}
+                  dinaComponent={"MATERIAL_SAMPLE"}
+                />
                 <div className="row">
                   <div className="col-md-6">
                     <ManagedAttributesEditor
                       fieldSetProps={{
                         legend: (
                           <DinaMessage id="materialSampleManagedAttributes" />
-                        ),
+                        )
                       }}
                       valuesPath="managedAttributes"
                       managedAttributeApiPath="collection-api/managed-attribute"

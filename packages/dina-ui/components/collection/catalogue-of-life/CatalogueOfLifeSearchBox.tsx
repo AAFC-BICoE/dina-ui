@@ -65,7 +65,7 @@ export function CatalogueOfLifeSearchBox({
     searchIsDisabled,
     doThrottledSearch
   } = useThrottledFetch({
-    fetcher: searchValue =>
+    fetcher: (searchValue) =>
       catalogueOfLifeQuery<NameUsageSearchResult>({
         url: `https://api.catalogueoflife.org/dataset/${dataSet.key}/nameusage`,
         params: {
@@ -80,7 +80,7 @@ export function CatalogueOfLifeSearchBox({
 
   const nameResults = searchResult?.result;
 
-  const onInputChange = value => {
+  const onInputChange = (value) => {
     setInputValue(value);
     // Will save the user entry if it is not the determination scientific name
     // use case is for association host organism
@@ -123,9 +123,9 @@ export function CatalogueOfLifeSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control col-search-input search-input"
-                onChange={e => onInputChange(e.target.value)}
-                onFocus={e => e.target.select()}
-                onKeyDown={e => {
+                onChange={(e) => onInputChange(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
                     doThrottledSearch(inputValue);
@@ -148,9 +148,9 @@ export function CatalogueOfLifeSearchBox({
               <input
                 aria-label={formatMessage("colSearchLabel")}
                 className="form-control col-search-input"
-                onChange={e => onInputChange(e.target.value)}
-                onFocus={e => e.target.select()}
-                onKeyDown={e => {
+                onChange={(e) => onInputChange(e.target.value)}
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
                   if (e.keyCode === 13) {
                     e.preventDefault();
                     doThrottledSearch(inputValue);
@@ -260,7 +260,7 @@ export async function catalogueOfLifeQuery<T>({
   url,
   params,
   searchValue,
-  fetchJson = urlArg => window.fetch(urlArg).then(res => res.json())
+  fetchJson = (urlArg) => window.fetch(urlArg).then((res) => res.json())
 }: CatalogueOfLifeSearchParams): Promise<T | null> {
   if (!searchValue?.trim()) {
     return null;

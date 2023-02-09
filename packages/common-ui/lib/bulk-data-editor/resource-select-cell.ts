@@ -43,7 +43,7 @@ export function useResourceSelectCells() {
       // Send the API request.
       const { data } = await apiClient.get<T[]>(model, requestParams);
 
-      const encodedResources = data.map<string>(resource =>
+      const encodedResources = data.map<string>((resource) =>
         encodeResourceCell(resource, { label: label(resource), type })
       );
 
@@ -82,7 +82,7 @@ export function getUserFriendlyAutoCompleteRenderer(originalRenderer) {
 export function makeDropdownOptionsUserFriendly(element: ParentNode) {
   const listboxes = element.querySelectorAll("table.htCore .listbox");
 
-  listboxes.forEach(listbox => {
+  listboxes.forEach((listbox) => {
     listbox.innerHTML = withoutIdentifier(listbox.innerHTML);
   });
 }

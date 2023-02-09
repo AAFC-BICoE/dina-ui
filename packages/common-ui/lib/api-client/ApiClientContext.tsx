@@ -131,7 +131,7 @@ export class ApiClientImpl implements ApiClientI {
     });
 
     this.apiClient.axios?.interceptors?.response.use(
-      successResponse => successResponse,
+      (successResponse) => successResponse,
       makeAxiosErrorMoreReadable
     );
 
@@ -218,15 +218,17 @@ export class ApiClientImpl implements ApiClientI {
     args: (SaveArgs | DeleteArgs)[],
     options?: DoOperationsOptions
   ): Promise<PersistedResource<TData>[]> {
-    const deleteArgs = args.filter(arg => (arg as any).delete) as DeleteArgs[];
-    const saveArgs = args.filter(arg => !(arg as any).delete) as SaveArgs[];
+    const deleteArgs = args.filter(
+      (arg) => (arg as any).delete
+    ) as DeleteArgs[];
+    const saveArgs = args.filter((arg) => !(arg as any).delete) as SaveArgs[];
 
     // Serialize the resources to JSONAPI format.
-    const serializePromises = saveArgs.map(saveArg => serialize(saveArg));
+    const serializePromises = saveArgs.map((saveArg) => serialize(saveArg));
     const serialized = await Promise.all(serializePromises);
 
     // Create the jsonpatch operations objects.
-    const saveOperations = serialized.map<Operation>(jsonapiResource => ({
+    const saveOperations = serialized.map<Operation>((jsonapiResource) => ({
       op: options?.overridePatchOperation
         ? "POST"
         : jsonapiResource.id
@@ -243,7 +245,7 @@ export class ApiClientImpl implements ApiClientI {
       }
     }));
 
-    const deleteOperations = deleteArgs.map<Operation>(deleteArg => ({
+    const deleteOperations = deleteArgs.map<Operation>((deleteArg) => ({
       op: "DELETE",
       path: `${deleteArg.delete.type}/${deleteArg.delete.id}`
     }));
@@ -254,7 +256,7 @@ export class ApiClientImpl implements ApiClientI {
     const responses = await this.doOperations(operations, options);
 
     // Deserialize the responses to Kitsu format.
-    const deserializePromises = responses.map(response =>
+    const deserializePromises = responses.map((response) =>
       deserialise(response)
     );
     const deserialized = await Promise.all(deserializePromises);
@@ -283,8 +285,8 @@ export class ApiClientImpl implements ApiClientI {
     // Use DataLoader to avoid requesting the same ID multiple times,
     // which crnk-operations throws an error for:
     const batchLoader = new DataLoader<string, SuccessfulOperation>(
-      async uniquePaths => {
-        const getOperations = uniquePaths.map<Operation>(path => ({
+      async (uniquePaths) => {
+        const getOperations = uniquePaths.map<Operation>((path) => ({
           op: "GET",
           path
         }));
@@ -302,7 +304,7 @@ export class ApiClientImpl implements ApiClientI {
       ? PersistedResource<T> | null
       : PersistedResource<T>)[] = (
       await Promise.all(responses.map(deserialise))
-    ).map(res => res.data);
+    ).map((res) => res.data);
 
     for (const joinSpec of joinSpecs) {
       await new ClientSideJoiner(this.bulkGet, resources, joinSpec).join();
@@ -341,19 +343,19 @@ export function getErrorMessages(
     const errorMessage =
       jsonApiErrors
         // Don't include field-level errors in the form-level error message:
-        .filter(error => !error.source?.pointer)
+        .filter((error) => !error.source?.pointer)
         .map(
           // The error message is the title + detail, but remove one if the other is missing
           ({ title, detail }) =>
-            [title, detail].filter(s => s?.trim()).join(": ")
+            [title, detail].filter((s) => s?.trim()).join(": ")
         )
         .join("\n") || null;
 
     const fieldErrors = fromPairs(
       jsonApiErrors
         // Only include field-level errors in the fieldErrors:
-        .filter(error => error.source?.pointer && error.detail)
-        .map(error => [
+        .filter((error) => error.source?.pointer && error.detail)
+        .map((error) => [
           error.source?.pointer?.toString?.() ?? "",
           error.detail ?? ""
         ])
@@ -363,7 +365,7 @@ export function getErrorMessages(
   });
 
   const overallErrorMessage =
-    compact(individualErrors.map(it => it.errorMessage)).join("\n") || null;
+    compact(individualErrors.map((it) => it.errorMessage)).join("\n") || null;
   const overallFieldErrors = individualErrors.reduce(
     (total, curr) => ({ ...total, ...curr.fieldErrors }),
     {}
@@ -427,7 +429,7 @@ export class CustomDinaKitsu extends Kitsu {
       const { data } = await this.axios.get(path, {
         headers: { ...this.headers, ...params.header },
         params: paramsNet,
-        paramsSerializer: p => query(p)
+        paramsSerializer: (p) => query(p)
       });
 
       const deserialized = await deserialise(data);

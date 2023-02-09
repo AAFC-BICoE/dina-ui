@@ -142,7 +142,7 @@ export function withResponse<
     const message =
       error instanceof Error
         ? `${error.name}: ${error.message}`
-        : error?.errors?.map(e => e.detail).join("\n") ?? String(error);
+        : error?.errors?.map((e) => e.detail).join("\n") ?? String(error);
 
     return <div className="alert alert-danger">{message}</div>;
   }
@@ -174,7 +174,7 @@ export function withResponseOrDisabled<
     const message =
       error instanceof Error
         ? `${error.name}: ${error.message}`
-        : error?.errors?.map(e => e.detail).join("\n") ?? String(error);
+        : error?.errors?.map((e) => e.detail).join("\n") ?? String(error);
 
     return <div className="alert alert-danger">{message}</div>;
   }

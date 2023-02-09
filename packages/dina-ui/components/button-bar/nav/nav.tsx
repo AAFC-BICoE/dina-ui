@@ -2,7 +2,7 @@ import {
   LanguageSelector,
   NavbarUserControl,
   useAccount,
-  intlContext,
+  intlContext
 } from "common-ui";
 import React from "react";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -374,6 +374,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="pcrPrimerListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/pcr-workflow/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="pcrWorkflowListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/product/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="productListTitle" />
@@ -387,11 +392,6 @@ function NavSequenceDropdown({ formatMessage }) {
       <Link href="/seqdb/sequencing-facility/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sequencingFacilityListTitle" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/seqdb/sanger-workflow/list" passHref={true}>
-        <NavDropdown.Item>
-          <SeqdbMessage id="sangerWorkflowListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/seqdb/sanger-workflow-sequencing/list" passHref={true}>
