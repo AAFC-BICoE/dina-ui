@@ -1,10 +1,10 @@
 {
   "materialSample": {
-    "materialSampleName": { "dataType": "number" },
+    "materialSampleName": { "dataType": "string" },
     "preservationType": { "dataType": "string" },
-    "preparationFixative": { "dataType": "boolean" },
-    "preparationMaterials": { "dataType": "Map" },
-    "preparationSubstrate": { "dataType": "string[]" },
+    "preparationFixative": { "dataType": "string" },
+    "preparationMaterials": { "dataType": "string" },
+    "preparationSubstrate": { "dataType": "string" },
     "preparationDate": { "dataType": "string" },
     "preparationRemarks": { "dataType": "string" },
     "description": { "dataType": "string" },
