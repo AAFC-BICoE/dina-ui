@@ -144,7 +144,7 @@ export function isMap(value: string): boolean {
  */
 export function convertNumber(value: any): number | null {
   if (value !== null && value !== undefined) {
-    return +trim(value);
+    return +value;
   } else {
     return null;
   }

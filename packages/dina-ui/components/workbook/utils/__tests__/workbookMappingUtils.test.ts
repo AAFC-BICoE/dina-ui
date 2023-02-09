@@ -159,7 +159,7 @@ describe('workbookMappingUtils functions', () => {
     expect(convertNumber(false)).toEqual(0);
     expect(convertNumber(true)).toEqual(1);
     expect(convertNumber(null)).toBeNull();
-    expect(convertNumber(undefined)).toBeUndefined();
+    expect(convertNumber(undefined)).toBeNull();
   });
 
   it('convertStringArray', () => {
