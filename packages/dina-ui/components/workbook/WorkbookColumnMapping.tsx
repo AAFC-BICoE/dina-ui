@@ -188,7 +188,12 @@ export function WorkbookColumnMapping({
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         for (const field of Object.keys(row)) {
-          const param = {
+          const param: {
+            sheet: number;
+            index: number;
+            field: string;
+            dataType?: DataTypeEnum;
+          } = {
             sheet: sheet + 1,
             index: +i + 1,
             field: fieldHeaderPair[field]
