@@ -85,8 +85,6 @@ export const SEQDB_MESSAGES_FRENCH: Partial<typeof SEQDB_MESSAGES_ENGLISH> = {
   sampleSelectionInstructions:
     "Votre sélection d’échantillons est sauvegardée lorsque vous appuyez sur un bouton de sélection ou de désélection. Il n’y a pas de bouton Enregistrer distinct.",
   sampleSelectionTitle: "Sélection d’échantillons",
-  sangerWorkflow: "Flux de travail Sanger",
-  sangerWorkflowListTitle: "Flux de travail Sanger",
   sangerWorkflowSequencingListTitle: "Méthode de Sanger - Séquençage",
   selectAllCheckedSamplesButtonText:
     "Sélectionner tous les échantillons cochés -->",

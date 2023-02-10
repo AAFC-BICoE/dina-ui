@@ -2,13 +2,13 @@ import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerSeqReactionStep";
-import { SeqBatchSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/sanger-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerSeqReactionStep";
+import { SeqBatchSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/pcr-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
 import { useEffect, useState } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { SangerSeqBatchStep } from "../../../components/seqdb/sanger-workflow/SangerSeqBatchStep";
+import { SangerSeqBatchStep } from "../../../components/seqdb/pcr-workflow/SangerSeqBatchStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { SeqBatch } from "../../../types/seqdb-api";
 import { useSeqBatchQuery } from "../seq-batch/edit";
@@ -93,7 +93,7 @@ export default function SangerWorkFlowSequencingRunPage() {
                 <span className="visually-hidden">Loading...</span>
               </>
             ) : (
-              <DinaMessage id="save"/>
+              <DinaMessage id="save" />
             )}
           </Button>
         </>

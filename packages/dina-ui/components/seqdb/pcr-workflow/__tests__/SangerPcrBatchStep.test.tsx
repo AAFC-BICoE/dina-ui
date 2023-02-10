@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import { SangerPcrBatchStep } from "../SangerPcrBatchStep";
 import { noop } from "lodash";
-import { PcrBatch } from "../../../../../dina-ui/types/seqdb-api";
+import { PcrBatch } from "../../../../types/seqdb-api";
 
 const PCR_BATCH_ID = "test-batch-id";
 const PCR_BATCH_NAME = "test-batch";

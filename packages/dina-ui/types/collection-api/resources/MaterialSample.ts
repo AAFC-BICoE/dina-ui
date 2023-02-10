@@ -72,6 +72,7 @@ export interface MaterialSampleAttributes {
 
   isRestricted?: boolean;
   restrictionRemarks?: string | null;
+  extensionValues?: any;
 }
 
 export interface HostOrganism {
