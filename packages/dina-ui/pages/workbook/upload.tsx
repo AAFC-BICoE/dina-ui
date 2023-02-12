@@ -1,19 +1,31 @@
-import { ApiClientContext, LoadingSpinner, SubmitButton } from "common-ui";
-import { useContext, useState } from "react";
+import { writeStorage } from "@rehooks/local-storage";
+import { ApiClientContext, LoadingSpinner } from "common-ui";
+import { InputResource, KitsuResource, PersistedResource } from "kitsu";
+import { WithRouterProps } from "next/dist/client/with-router";
+import { withRouter } from "next/router";
+import { MaterialSampleBulkEditor } from "packages/dina-ui/components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
-import { WorkbookJSON } from "../../components/workbook/types/Workbook";
+import { WorkbookColumnMapping } from "packages/dina-ui/components/workbook/WorkbookColumnMapping";
+import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { useContext, useState } from "react";
+import { Button, Spinner } from "react-bootstrap";
 import { IFileWithMeta } from "../../components/object-store";
+import { WorkbookJSON } from "../../components/workbook/types/Workbook";
 import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
 import { DinaMessage } from "../../intl/dina-ui-intl";
-import { WorkbookColumnMapping } from "packages/dina-ui/components/workbook/WorkbookColumnMapping";
-import { Button, Spinner } from "react-bootstrap";
+import { BULK_EDIT_RESULT_IDS_KEY } from "../collection/material-sample/bulk-edit";
 
-export default function UploadWorkbookPage() {
+export function UploadWorkbookPage({ router }: WithRouterProps) {
   const { apiClient } = useContext(ApiClientContext);
 
   const [jsonData, setJsonData] = useState<WorkbookJSON | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
+  const [mode, setMode] = useState<string>("GENERATE");
+  const [lastSubmission, setLastSubmission] = useState<{
+    data: InputResource<KitsuResource & { group?: string }>[];
+    type?: string;
+  }>();
   // Request saving to be performed.
   const [performSave, setPerformSave] = useState<boolean>(false);
 
@@ -51,54 +63,76 @@ export default function UploadWorkbookPage() {
     setLoading(false);
   }
 
+  async function moveToResultPage(
+    samples: PersistedResource<MaterialSample>[]
+  ) {
+    writeStorage(
+      BULK_EDIT_RESULT_IDS_KEY,
+      samples.map((it) => it.id)
+    );
+
+    await router.push({
+      pathname: "/collection/material-sample/bulk-result",
+      query: { actionType: "created" }
+    });
+  }
+
+  function onGenerate(submission: {
+    data: InputResource<KitsuResource & { group?: string }>[];
+    type?: string;
+  }) {
+    setLastSubmission(submission);
+    setMode("EDIT");
+  }
+
   const failedMessage = failed ? (
     <div className="alert alert-danger">
       <DinaMessage id="workbookUploadFailure" />
     </div>
   ) : undefined;
 
-  const buttonBar = jsonData ? (
-    <>
-      <button onClick={backToUpload} className="btn btn-secondary">
-      {performSave ? (
-          <>
-            <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            <span className="visually-hidden">Loading...</span>
-          </>
-        ) : (
-        <DinaMessage id="cancelButtonText" />
-        )}
-      </button>
-      <Button
-        variant={"primary"}
-        className="ms-auto"
-        onClick={() => setPerformSave(true)}
-        style={{ width: "10rem" }}
-      >
-        {performSave ? (
-          <>
-            <Spinner
-              as="span"
-              animation="border"
-              size="sm"
-              role="status"
-              aria-hidden="true"
-            />
-            <span className="visually-hidden">Loading...</span>
-          </>
-        ) : (
-          <DinaMessage id="save"/>
-        )}
-      </Button>
-    </>
-
-  ) : undefined;
+  const buttonBar =
+    mode === "GENERATE" && !!jsonData ? (
+      <>
+        <button onClick={backToUpload} className="btn btn-secondary">
+          {performSave ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+              <span className="visually-hidden">Loading...</span>
+            </>
+          ) : (
+            <DinaMessage id="cancelButtonText" />
+          )}
+        </button>
+        <Button
+          variant={"primary"}
+          className="ms-auto"
+          onClick={() => setPerformSave(true)}
+          style={{ width: "10rem" }}
+        >
+          {performSave ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+              <span className="visually-hidden">Loading...</span>
+            </>
+          ) : (
+            <DinaMessage id="save" />
+          )}
+        </Button>
+      </>
+    ) : undefined;
 
   return (
     <PageLayout titleId="workbookGroupUploadTitle" buttonBarContent={buttonBar}>
@@ -106,20 +140,34 @@ export default function UploadWorkbookPage() {
         <LoadingSpinner loading={true} />
       ) : (
         <>
-          {jsonData ? (
-            <WorkbookColumnMapping 
-              spreadsheetData={jsonData} 
-              performSave={performSave}
-              setPerformSave={setPerformSave}
-            />
-          ) : (
-            <>
-              {failedMessage}
-              <WorkbookUpload submitData={submitFile} />
-            </>
-          )}
+          {mode === "GENERATE" &&
+            (jsonData ? (
+              <WorkbookColumnMapping
+                spreadsheetData={jsonData}
+                performSave={performSave}
+                setPerformSave={setPerformSave}
+                onGenerate={onGenerate}
+              />
+            ) : (
+              <>
+                {failedMessage}
+                <WorkbookUpload submitData={submitFile} />
+              </>
+            ))}
+          {mode === "EDIT" &&
+            lastSubmission &&
+            lastSubmission.type === "material-sample" && (
+              <MaterialSampleBulkEditor
+                disableSampleNameField={true}
+                samples={lastSubmission.data as InputResource<MaterialSample>[]}
+                onSaved={moveToResultPage}
+                onPreviousClick={() => setMode("GENERATE")}
+              />
+            )}
         </>
       )}
     </PageLayout>
   );
 }
+
+export default withRouter(UploadWorkbookPage);

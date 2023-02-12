@@ -1,7 +1,12 @@
-import { FieldWrapper, SelectField, SubmitButton } from "common-ui/lib";
+import {
+  FieldWrapper,
+  SelectField,
+  SubmitButton,
+  useAccount
+} from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
+import { InputResource, KitsuResource } from "kitsu";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
@@ -9,7 +14,7 @@ import * as yup from "yup";
 import { ValidationError } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkbookJSON } from "./types/Workbook";
-import FieldMappingConfig from "./utils/FieldMappingConfig.json";
+import FieldMappingConfigJSON from "./utils/FieldMappingConfig.json";
 import { DataTypeEnum } from "./utils/useFieldConverters";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import {
@@ -29,24 +34,34 @@ export interface WorkbookColumnMappingFields {
   sheet: number;
   type: string;
   fieldMap: FieldMapType;
+  group: string;
 }
 
 export interface WorkbookColumnMappingProps {
   spreadsheetData: WorkbookJSON;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
+  onGenerate: (submission: {
+    data: InputResource<KitsuResource & { group?: string }>[];
+    type?: string;
+  }) => void;
 }
 
 const ENTITY_TYPES = ["material-sample"] as const;
+const FieldMappingConfig = FieldMappingConfigJSON as {
+  [key: string]: { [field: string]: { dataType: DataTypeEnum } };
+};
 
 export function WorkbookColumnMapping({
   spreadsheetData,
   performSave,
-  setPerformSave
+  setPerformSave,
+  onGenerate
 }: WorkbookColumnMappingProps) {
   const formRef: Ref<FormikProps<Partial<WorkbookColumnMappingFields>>> =
     useRef(null);
   const { formatMessage } = useDinaIntl();
+  const { groupNames } = useAccount();
   const entityTypes = ENTITY_TYPES.map((entityType) => ({
     label: formatMessage(entityType),
     value: entityType
@@ -60,13 +75,10 @@ export function WorkbookColumnMapping({
   const [fieldHeaderPair, setFieldHeaderPair] = useState(
     {} as { [field: string]: string }
   );
-  const { convertWorkbook: convertWorkbookToMaterialSample } =
-    useWorkbookConverter<MaterialSample>(
-      "material-sample",
-      FieldMappingConfig as {
-        [key: string]: { [field: string]: { dataType: DataTypeEnum } };
-      }
-    );
+  const { convertWorkbook } = useWorkbookConverter(
+    selectedType?.value || "material-sample",
+    FieldMappingConfig
+  );
 
   const buttonBar = (
     <>
@@ -132,15 +144,9 @@ export function WorkbookColumnMapping({
       sheet,
       submittedValues.fieldMap
     );
-    switch (selectedType?.value) {
-      case "material-sample":
-        const materialSample = convertWorkbookToMaterialSample(workbookData);
-        // console.log(JSON.stringify(materialSample, null, " "));
-        break;
-      default:
-        throw new Error(
-          `Unsupported type for workbook conversion: ${selectedType?.value}`
-        );
+    const samples = convertWorkbook(workbookData, submittedValues.group);
+    if (onGenerate) {
+      onGenerate({ data: samples, type: selectedType?.value });
     }
   }
 
@@ -198,7 +204,7 @@ export function WorkbookColumnMapping({
             index: +i + 1,
             field: fieldHeaderPair[field]
           };
-          switch (filedsConfigs[field].dataType) {
+          switch (filedsConfigs[field]?.dataType) {
             case DataTypeEnum.BOOLEAN:
               if (!isBoolean(row[field])) {
                 param.dataType = DataTypeEnum.BOOLEAN;
@@ -282,7 +288,8 @@ export function WorkbookColumnMapping({
       initialValues={{
         sheet: 1,
         type: "material-sample",
-        fieldMap
+        fieldMap,
+        group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined
       }}
       innerRef={formRef}
       onSubmit={onSubmit}

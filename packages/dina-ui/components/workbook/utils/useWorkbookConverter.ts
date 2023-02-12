@@ -1,9 +1,7 @@
-import { KitsuResource } from "kitsu";
+import { InputResource, KitsuResource } from "kitsu";
 import { DataTypeEnum, useFieldConverters } from "./useFieldConverters";
 
-export function useWorkbookConverter<
-  TData extends KitsuResource = KitsuResource
->(
+export function useWorkbookConverter(
   entityType: string,
   mappingConfig: {
     [key: string]: { [field: string]: { dataType: DataTypeEnum } };
@@ -11,10 +9,16 @@ export function useWorkbookConverter<
 ) {
   const { getConverter } = useFieldConverters(mappingConfig);
 
-  function convertWorkbook(workbookData: { [key: string]: any }[]): TData[] {
-    const data: TData[] = [];
+  function convertWorkbook(
+    workbookData: { [key: string]: any }[],
+    group: string
+  ): InputResource<KitsuResource & { group?: string }>[] {
+    const data: InputResource<KitsuResource & { group?: string }>[] = [];
     for (const workbookRow of workbookData) {
-      const dataItem: TData = { type: entityType } as TData;
+      const dataItem: InputResource<KitsuResource & { group?: string }> = {
+        type: entityType,
+        group
+      } as InputResource<KitsuResource & { group?: string }>;
       for (const field of Object.keys(workbookRow)) {
         const convertField = getConverter(entityType, field);
         if (!!convertField) {

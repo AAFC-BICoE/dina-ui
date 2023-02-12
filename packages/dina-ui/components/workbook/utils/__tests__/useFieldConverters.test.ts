@@ -2,12 +2,12 @@ import { DataTypeEnum, useFieldConverters } from "../useFieldConverters";
 
 const mockConfig = {
   mockEntity: {
-    "stringField": { dataType: DataTypeEnum.STRING },
-    "numberField": { dataType: DataTypeEnum.NUMBER },
-    "booleanField": { dataType: DataTypeEnum.BOOLEAN },
-    "stringArrayField": { dataType: DataTypeEnum.STRING_ARRAY },
-    "numberArrayField": { dataType: DataTypeEnum.NUMBER_ARRAY },
-    "mapField": { dataType: DataTypeEnum.MAP }
+    stringField: { dataType: DataTypeEnum.STRING },
+    numberField: { dataType: DataTypeEnum.NUMBER },
+    booleanField: { dataType: DataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: DataTypeEnum.MAP }
   }
 };
 
@@ -17,7 +17,7 @@ describe("useFieldConverter", () => {
   it("getConverter", () => {
     expect(() => {
       getConverter("wrongEntity", "stringField");
-    }).toThrowError("Unknown entity name: wrongEntity");
+    }).toThrowError("Unknown entity type: wrongEntity");
     expect(() => {
       getConverter("mockEntity", "wrongField");
     }).toThrowError("Unknown field name: mockEntity.wrongField");
