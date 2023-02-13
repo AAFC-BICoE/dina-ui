@@ -10,9 +10,8 @@ import {
   useQuery,
   withResponse,
   Tooltip,
-  FieldSet,
-  QueryPage,
-  generateUUIDTree
+  generateUUIDTree,
+  CustomQueryPageView
 } from "common-ui";
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
@@ -240,17 +239,16 @@ export function AssemblageFormLayout() {
         hideAddAttchmentBtn={true}
       />
       {readOnly && (
-        <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
-          <QueryPage
-            columns={ELASTIC_SEARCH_COLUMN}
-            indexName={"dina_material_sample_index"}
-            viewMode={readOnly}
-            customViewQuery={readOnly ? customViewQuery : undefined}
-            customViewFields={
-              readOnly ? ["data.relationships.assemblages.data.id"] : undefined
-            }
-          />
-        </FieldSet>
+        <CustomQueryPageView
+          titleKey="attachedMaterialSamples"
+          columns={ELASTIC_SEARCH_COLUMN}
+          indexName={"dina_material_sample_index"}
+          viewMode={readOnly}
+          customViewQuery={readOnly ? customViewQuery : undefined}
+          customViewFields={
+            readOnly ? ["data.relationships.assemblages.data.id"] : undefined
+          }
+        />
       )}
     </div>
   );

@@ -89,6 +89,7 @@ export * from "./formik-connected/PlaceSectionsSelectionField";
 export * from "./list-page/query-builder/QueryBuilder";
 export * from "./formik-connected/QueryLogicSwitchField";
 export * from "./list-page/QueryPage";
+export * from "./custom-query-view/CustomQueryPageView";
 export * from "./formik-connected/ControlledVocabularySelectField";
 export * from "./formik-connected/FieldExtensionSelectField";
 export * from "./search/useSearch";

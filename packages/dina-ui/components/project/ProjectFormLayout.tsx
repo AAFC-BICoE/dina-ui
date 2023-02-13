@@ -1,8 +1,7 @@
 import {
+  CustomQueryPageView,
   DateField,
-  FieldSet,
   generateUUIDTree,
-  QueryPage,
   TextField,
   useDinaFormContext
 } from "common-ui";
@@ -80,17 +79,16 @@ export function ProjectFormLayout() {
       />
 
       {readOnly && (
-        <FieldSet legend={<DinaMessage id="attachedMaterialSamples" />}>
-          <QueryPage
-            columns={ELASTIC_SEARCH_COLUMN}
-            indexName={"dina_material_sample_index"}
-            viewMode={readOnly}
-            customViewQuery={readOnly ? customViewQuery : undefined}
-            customViewFields={
-              readOnly ? ["data.relationships.projects.data.id"] : undefined
-            }
-          />
-        </FieldSet>
+        <CustomQueryPageView
+          titleKey="attachedMaterialSamples"
+          columns={ELASTIC_SEARCH_COLUMN}
+          indexName={"dina_material_sample_index"}
+          viewMode={readOnly}
+          customViewQuery={readOnly ? customViewQuery : undefined}
+          customViewFields={
+            readOnly ? ["data.relationships.projects.data.id"] : undefined
+          }
+        />
       )}
     </div>
   );
