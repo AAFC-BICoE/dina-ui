@@ -79,7 +79,7 @@ export function StorageUnitForm({
         ? submittedValues.name
         : [submittedValues.name];
       delete submittedValues.isMultiple;
-      names.map(unitName =>
+      names.map((unitName) =>
         savedArgs.push({
           resource: { ...submittedValues, name: unitName },
           type: "storage-unit"
@@ -124,7 +124,7 @@ export function StorageUnitFormFields({
   const { readOnly, initialValues } = useDinaFormContext();
   const { formatMessage } = useDinaIntl();
   const [showTextAreaInput, setShowTextAreaInput] = useState(false);
-  const onStorageUnitMultipleToggled = checked => {
+  const onStorageUnitMultipleToggled = (checked) => {
     setShowTextAreaInput(checked);
   };
 
@@ -142,7 +142,7 @@ export function StorageUnitFormFields({
           className="col-md-6"
           model="collection-api/storage-unit-type"
           name="storageUnitType"
-          optionLabel={it => it.name}
+          optionLabel={(it) => it.name}
           filter={filterBy(["name"])}
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
@@ -171,6 +171,13 @@ export function StorageUnitFormFields({
             />
           )}
         </div>
+      </div>
+      <div className="row">
+        <TextField
+          className="col-md-6"
+          name="barcode"
+          label={formatMessage("field_barcode")}
+        />
       </div>
       {readOnly ? (
         <FieldWrapper
