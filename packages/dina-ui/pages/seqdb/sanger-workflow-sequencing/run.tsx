@@ -2,6 +2,7 @@ import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SangerSeqReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerSeqReactionStep";
 import { SeqBatchSelectCoordinatesStep } from "packages/dina-ui/components/seqdb/pcr-workflow/seq-batch-select-coordinats-step/SeqBatchSelectCoordinatesStep";
 import { useEffect, useState } from "react";
@@ -92,7 +93,7 @@ export default function SangerWorkFlowSequencingRunPage() {
                 <span className="visually-hidden">Loading...</span>
               </>
             ) : (
-              <>Save</>
+              <DinaMessage id="save" />
             )}
           </Button>
         </>

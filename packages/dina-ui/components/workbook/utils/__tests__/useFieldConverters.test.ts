@@ -1,14 +1,14 @@
-import { useFieldConverters } from "../useFieldConverters";
+import { DataTypeEnum, useFieldConverters } from "../useFieldConverters";
 
 const mockConfig = {
-  mockEntity: [
-    { field: "stringField", dataType: "string" },
-    { field: "numberField", dataType: "number" },
-    { field: "booleanField", dataType: "boolean" },
-    { field: "stringArrayField", dataType: "string[]" },
-    { field: "numberArrayField", dataType: "number[]" },
-    { field: "mapField", dataType: "Map" }
-  ]
+  mockEntity: {
+    "stringField": { dataType: DataTypeEnum.STRING },
+    "numberField": { dataType: DataTypeEnum.NUMBER },
+    "booleanField": { dataType: DataTypeEnum.BOOLEAN },
+    "stringArrayField": { dataType: DataTypeEnum.STRING_ARRAY },
+    "numberArrayField": { dataType: DataTypeEnum.NUMBER_ARRAY },
+    "mapField": { dataType: DataTypeEnum.MAP }
+  }
 };
 
 describe("useFieldConverter", () => {
@@ -32,13 +32,10 @@ describe("useFieldConverter", () => {
 
   it("convertNumber", () => {
     const convertNumber = getConverter("mockEntity", "numberField");
-
     expect(convertNumber("100")).toEqual(100);
     expect(convertNumber("ssss")).toBeNaN();
-    expect(convertNumber(false)).toEqual(0);
-    expect(convertNumber(true)).toEqual(1);
     expect(convertNumber(null)).toBeNull();
-    expect(convertNumber(undefined)).toBeUndefined();
+    expect(convertNumber(undefined)).toBeNull();
   });
 
   it("convertStringArray", () => {

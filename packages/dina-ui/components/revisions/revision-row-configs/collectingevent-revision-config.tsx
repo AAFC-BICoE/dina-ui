@@ -2,7 +2,7 @@ import { DateView, KeyValueTable } from "common-ui";
 import Link from "next/link";
 import {
   CollectionMethod,
-  CollectingEvent,
+  CollectingEvent
 } from "../../../types/collection-api/";
 import { Metadata, Person } from "../../../types/objectstore-api";
 import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
@@ -80,7 +80,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
                   )) ?? null,
                 createdOn: ({ original: { value } }) => (
                   <DateView date={value} />
-                ),
+                )
               }}
             />
           </div>
@@ -93,7 +93,7 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           data={value}
           customValueCells={{
             stateProvince: (sp) => <KeyValueTable data={sp.value} />,
-            country: (c) => <KeyValueTable data={c.value} />,
+            country: (c) => <KeyValueTable data={c.value} />
           }}
         />
       ),
@@ -104,6 +104,6 @@ export const COLLECTING_EVENT_REVISION_ROW_CONFIG: RevisionRowConfig<CollectingE
           name={"extensionValues"}
           dinaComponent={"COLLECTING_EVENT"}
         />
-      ),
-    },
+      )
+    }
   };
