@@ -287,7 +287,7 @@ export function WorkbookColumnMapping({
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
         sheet: 1,
-        type: "material-sample",
+        type: selectedType?.value || "material-sample",
         fieldMap,
         group: groupNames && groupNames.length > 0 ? groupNames[0] : undefined
       }}

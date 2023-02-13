@@ -18,7 +18,9 @@ import { BULK_EDIT_RESULT_IDS_KEY } from "../collection/material-sample/bulk-edi
 export function UploadWorkbookPage({ router }: WithRouterProps) {
   const { apiClient } = useContext(ApiClientContext);
 
-  const [jsonData, setJsonData] = useState<WorkbookJSON | null>(null);
+  const [spreadsheetData, setSpreadsheetData] = useState<WorkbookJSON | null>(
+    null
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
   const [mode, setMode] = useState<string>("GENERATE");
@@ -46,19 +48,19 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
     await apiClient.axios
       .post("/objectstore-api/conversion/workbook", formData)
       .then((response) => {
-        setJsonData(response.data);
+        setSpreadsheetData(response.data);
         setLoading(false);
         setFailed(false);
       })
       .catch(() => {
-        setJsonData(null);
+        setSpreadsheetData(null);
         setLoading(false);
         setFailed(true);
       });
   }
 
   function backToUpload() {
-    setJsonData(null);
+    setSpreadsheetData(null);
     setFailed(false);
     setLoading(false);
   }
@@ -92,7 +94,7 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
   ) : undefined;
 
   const buttonBar =
-    mode === "GENERATE" && !!jsonData ? (
+    mode === "GENERATE" && !!spreadsheetData ? (
       <>
         <button onClick={backToUpload} className="btn btn-secondary">
           {performSave ? (
@@ -141,9 +143,9 @@ export function UploadWorkbookPage({ router }: WithRouterProps) {
       ) : (
         <>
           {mode === "GENERATE" &&
-            (jsonData ? (
+            (spreadsheetData ? (
               <WorkbookColumnMapping
-                spreadsheetData={jsonData}
+                spreadsheetData={spreadsheetData}
                 performSave={performSave}
                 setPerformSave={setPerformSave}
                 onGenerate={onGenerate}
