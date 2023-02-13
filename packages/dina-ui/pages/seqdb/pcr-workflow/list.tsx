@@ -13,7 +13,7 @@ import { PcrBatch } from "../../../types/seqdb-api";
 const TABLE_COLUMNS: ColumnDefinition<PcrBatch>[] = [
   {
     Cell: ({ original: { id, name } }) => (
-      <Link href={`/seqdb/sanger-workflow/run?pcrBatchId=${id}`}>
+      <Link href={`/seqdb/pcr-workflow/run?pcrBatchId=${id}`}>
         {name || id}
       </Link>
     ),
@@ -38,10 +38,10 @@ const FILTER_ATTRIBUTES: FilterAttribute[] = [
   "createdBy"
 ];
 
-export default function SangerWorkflowListPage() {
+export default function PCRWorkflowListPage() {
   const { formatMessage } = useSeqdbIntl();
 
-  const title = formatMessage("sangerWorkflowListTitle");
+  const title = formatMessage("pcrWorkflowListTitle");
 
   return (
     <div>
@@ -49,22 +49,22 @@ export default function SangerWorkflowListPage() {
       <Nav />
       <main className="container-fluid">
         <h1 id="wb-cont">
-          <SeqdbMessage id="sangerWorkflowListTitle" />
+          <SeqdbMessage id="pcrWorkflowListTitle" />
         </h1>
         <ButtonBar>
-          <Link href={`/seqdb/sanger-workflow/run`}>
+          <Link href={`/seqdb/pcr-workflow/run`}>
             <a className="btn btn-primary">
               <SeqdbMessage id="startNewWorkflow" />
             </a>
           </Link>
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
           filterAttributes={FILTER_ATTRIBUTES}
-          id="sanger-workflow-list"
+          id="pcr-workflow-list"
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/pcr-batch",

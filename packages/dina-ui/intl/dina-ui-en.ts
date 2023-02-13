@@ -837,7 +837,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   dataType: "Type: ",
   dataValue: "Value: ",
   unit: "Unit: ",
-  fieldExtension: "Field Extension",
   http403ForbiddenError: "Access is denied",
   unsupportedFileTypeError:
     'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',

@@ -1,5 +1,5 @@
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { PcrBatch } from "../../../../../dina-ui/types/seqdb-api";
+import { PcrBatch } from "../../../../types/seqdb-api";
 import { PCRBatchItemGrid } from "../pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { noop } from "lodash";
 

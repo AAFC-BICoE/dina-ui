@@ -8,7 +8,7 @@ import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
   CollectingEvent,
-  FormTemplate,
+  FormTemplate
 } from "../../../../types/collection-api";
 
 const mockOnSaved = jest.fn();
@@ -16,13 +16,13 @@ const mockOnSaved = jest.fn();
 const TEST_GROUP_1 = {
   type: "group",
   name: "aafc",
-  labels: { en: "Test Group 1" },
+  labels: { en: "Test Group 1" }
 };
 
 const TEST_PREP_TYPE = {
   id: "100",
   type: "preparation-type",
-  name: "test-prep-type",
+  name: "test-prep-type"
 };
 
 function testCollectionEvent(): Partial<CollectingEvent> {
@@ -30,7 +30,7 @@ function testCollectionEvent(): Partial<CollectingEvent> {
     startEventDateTime: "2021-04-13",
     id: "321",
     type: "collecting-event",
-    group: "test group",
+    group: "test group"
   };
 }
 
@@ -39,7 +39,7 @@ function testAcquisitionEvent(): Partial<AcquisitionEvent> {
     id: "987",
     type: "acquisition-event",
     group: "test group",
-    receptionRemarks: "test reception remarks",
+    receptionRemarks: "test reception remarks"
   };
 }
 
@@ -102,16 +102,16 @@ const mockBulkGet = jest.fn<any, any>(async (paths: string[]) =>
 const mockSave = jest.fn<any, any>(async (saves: SaveArgs[]) =>
   saves.map((save) => ({
     ...save.resource,
-    id: save.resource.id ?? "123",
+    id: save.resource.id ?? "123"
   }))
 );
 
 const apiContext = {
   bulkGet: mockBulkGet,
   apiClient: {
-    get: mockGet,
+    get: mockGet
   },
-  save: mockSave,
+  save: mockSave
 };
 
 /** Mount the form and provide test util functions. */
@@ -221,7 +221,7 @@ async function mountForm(
     acquisitionEventSwitch,
     associationsSwitch,
     fillOutRequiredFields,
-    submitForm,
+    submitForm
   };
 }
 
@@ -249,25 +249,25 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "tags",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "projects",
-              visible: false,
+              visible: false
             },
             { defaultValue: undefined, name: "assemblages", visible: false },
             {
               defaultValue: undefined,
               name: "publiclyReleasable",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "notPubliclyReleasableReason",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "identifiers-section",
@@ -277,22 +277,22 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "materialSampleName",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "useNextSequence",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcOtherCatalogNumbers",
-              visible: false,
+              visible: false
             },
-            { defaultValue: undefined, name: "barcode", visible: false },
-          ],
-        },
-      ],
+            { defaultValue: undefined, name: "barcode", visible: false }
+          ]
+        }
+      ]
     },
     {
       name: "material-sample-info-component",
@@ -306,27 +306,27 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "materialSampleType",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "materialSampleRemarks",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "materialSampleState",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "stateChangeRemarks",
-              visible: false,
+              visible: false
             },
-            { defaultValue: undefined, name: "stateChangedOn", visible: false },
-          ],
-        },
-      ],
+            { defaultValue: undefined, name: "stateChangedOn", visible: false }
+          ]
+        }
+      ]
     },
     {
       name: "collecting-event-component",
@@ -341,21 +341,21 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "publiclyReleasable",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "notPubliclyReleasableReason",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "identifiers-section",
           visible: true,
           items: [
-            { defaultValue: undefined, name: "dwcFieldNumber", visible: false },
-          ],
+            { defaultValue: undefined, name: "dwcFieldNumber", visible: false }
+          ]
         },
         {
           name: "collecting-date-section",
@@ -364,19 +364,19 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "verbatimEventDateTime",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "startEventDateTime",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "endEventDateTime",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "collecting-agents-section",
@@ -387,9 +387,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "dwcRecordNumber",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "verbatim-label-section",
@@ -398,40 +398,40 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "dwcVerbatimLocality",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcVerbatimCoordinateSystem",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcVerbatimCoordinates",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcVerbatimLatitude",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcVerbatimLongitude",
-              visible: false,
+              visible: false
             },
             { defaultValue: undefined, name: "dwcVerbatimSRS", visible: false },
             {
               defaultValue: undefined,
               name: "dwcVerbatimElevation",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcVerbatimDepth",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "collecting-event-details",
@@ -442,31 +442,31 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "collectionMethod",
-              visible: false,
+              visible: false
             },
             { defaultValue: undefined, name: "substrate", visible: false },
             {
               defaultValue: undefined,
               name: "dwcMinimumElevationInMeters",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcMaximumElevationInMeters",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcMinimumDepthInMeters",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcMaximumDepthInMeters",
-              visible: false,
+              visible: false
             },
-            { defaultValue: undefined, name: "remarks", visible: false },
-          ],
+            { defaultValue: undefined, name: "remarks", visible: false }
+          ]
         },
         {
           name: "georeferencing-section",
@@ -475,64 +475,64 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcDecimalLatitude",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcDecimalLongitude",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferencedDate",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeodeticDatum",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].literalGeoreferencedBy",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].georeferencedBy",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceProtocol",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceSources",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geoReferenceAssertions",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "current-geographic-place",
@@ -542,19 +542,19 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "geographicPlaceNameSourceDetail.stateProvince",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "geographicPlaceNameSourceDetail.country",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "collecting-event-managed-attributes-section",
           visible: true,
-          items: [],
+          items: []
         },
         {
           name: "collecting-event-attachments-section",
@@ -563,16 +563,16 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "managedAttributes.attachmentsConfig.allowNew",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "managedAttributes.attachmentsConfig.allowExisting",
-              visible: false,
-            },
-          ],
-        },
-      ],
+              visible: false
+            }
+          ]
+        }
+      ]
     },
     {
       name: "acquisition-event-component",
@@ -586,16 +586,16 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               name: "group",
               visible: false,
-              defaultValue: "aafc",
+              defaultValue: "aafc"
             },
             { defaultValue: undefined, name: "receivedFrom", visible: false },
             { defaultValue: undefined, name: "receivedDate", visible: false },
             {
               defaultValue: undefined,
               name: "receptionRemarks",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "acquisition-event-isolation-section",
@@ -606,11 +606,11 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "isolationRemarks",
-              visible: false,
-            },
-          ],
-        },
-      ],
+              visible: false
+            }
+          ]
+        }
+      ]
     },
     {
       name: "preparations-component",
@@ -624,57 +624,57 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "preparationType",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationMethod",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preservationType",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationFixative",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationMaterials",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationSubstrate",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationRemarks",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "dwcDegreeOfEstablishment",
-              visible: false,
+              visible: false
             },
             { defaultValue: undefined, name: "preparedBy", visible: false },
             {
               defaultValue: undefined,
               name: "preparationDate",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "preparationProtocol",
-              visible: false,
-            },
-          ],
-        },
-      ],
+              visible: false
+            }
+          ]
+        }
+      ]
     },
     {
       name: "organisms-component",
@@ -688,20 +688,20 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "organism[0].lifeStage",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].sex",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].remarks",
-              visible: false,
+              visible: false
             },
-            { defaultValue: undefined, name: "organism", visible: false },
-          ],
+            { defaultValue: undefined, name: "organism", visible: false }
+          ]
         },
         {
           name: "organism-verbatim-determination-section",
@@ -710,29 +710,29 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].verbatimScientificName",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].verbatimDeterminer",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].verbatimDate",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].verbatimRemarks",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].transcriberRemarks",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "organism-determination-section",
@@ -741,29 +741,29 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].scientificName",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].scientificNameInput",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].determiner",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].determinedOn",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].determinationRemarks",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "organism-type-specimen-section",
@@ -772,21 +772,21 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].typeStatus",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "organism[0].determination[0].typeStatusEvidence",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "organism-managed-attributes-section",
           visible: true,
-          items: [],
-        },
-      ],
+          items: []
+        }
+      ]
     },
     {
       name: "associations-component",
@@ -800,14 +800,14 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "hostOrganism.name",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "hostOrganism.remarks",
-              visible: false,
-            },
-          ],
+              visible: false
+            }
+          ]
         },
         {
           name: "associations-material-sample-section",
@@ -816,21 +816,21 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "associations.associationType",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "associations.associatedSample",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "associations.remarks",
-              visible: false,
-            },
-          ],
-        },
-      ],
+              visible: false
+            }
+          ]
+        }
+      ]
     },
     {
       name: "storage-component",
@@ -841,10 +841,10 @@ const formTemplate: PersistedResource<FormTemplate> = {
           name: "storage-selection-section",
           visible: true,
           items: [
-            { defaultValue: undefined, name: "storageUnit", visible: false },
-          ],
-        },
-      ],
+            { defaultValue: undefined, name: "storageUnit", visible: false }
+          ]
+        }
+      ]
     },
     {
       name: "restriction-component",
@@ -863,11 +863,11 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "restrictionRemarks",
-              visible: false,
-            },
-          ],
-        },
-      ],
+              visible: false
+            }
+          ]
+        }
+      ]
     },
     {
       name: "scheduled-actions-component",
@@ -881,48 +881,66 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "scheduledAction.actionType",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "scheduledAction.actionStatus",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "scheduledAction.date",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "scheduledAction.assignedTo",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "scheduledAction.remarks",
-              visible: false,
-            },
+              visible: false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      name: "field-extensions-component",
+      visible: undefined,
+      order: 10,
+      sections: [
+        {
+          items: [
+            {
+              defaultValue: undefined,
+              name: "extensionValues",
+              visible: false
+            }
           ],
-        },
-      ],
+          name: "field-extension-section",
+          visible: true
+        }
+      ]
     },
     {
       name: "managed-attributes-component",
       visible: true,
-      order: 10,
+      order: 11,
       sections: [
         {
           name: "managed-attributes-section",
           visible: true,
-          items: [],
-        },
-      ],
+          items: []
+        }
+      ]
     },
     {
       name: "material-sample-attachments-component",
       visible: true,
-      order: 11,
+      order: 12,
       sections: [
         {
           name: "material-sample-attachments-sections",
@@ -931,18 +949,18 @@ const formTemplate: PersistedResource<FormTemplate> = {
             {
               defaultValue: undefined,
               name: "attachmentsConfig.allowNew",
-              visible: false,
+              visible: false
             },
             {
               defaultValue: undefined,
               name: "attachmentsConfig.allowExisting",
-              visible: false,
-            },
-          ],
-        },
-      ],
-    },
-  ],
+              visible: false
+            }
+          ]
+        }
+      ]
+    }
+  ]
 };
 
 describe("Workflow template edit page", () => {
@@ -981,8 +999,9 @@ describe("Workflow template edit page", () => {
       "storage-component",
       "restriction-component",
       "scheduled-actions-component",
+      "field-extensions-component",
       "managed-attributes-component",
-      "material-sample-attachments-component",
+      "material-sample-attachments-component"
     ]);
   });
 
@@ -1000,7 +1019,7 @@ describe("Workflow template edit page", () => {
       .find("input[name='includeAllCollectingDate']")
       .simulate("change", { target: { checked: true } });
     wrapper.find(".verbatimEventDateTime-field input").simulate("change", {
-      target: { value: "test-verbatim-default-datetime" },
+      target: { value: "test-verbatim-default-datetime" }
     });
 
     // Set default geo assertion lat/lng:
@@ -1043,34 +1062,34 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: "aafc",
                   name: "group",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "tags",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "projects",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "assemblages",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "publiclyReleasable",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "notPubliclyReleasableReason",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "identifiers-section",
@@ -1080,22 +1099,22 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "materialSampleName",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "useNextSequence",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcOtherCatalogNumbers",
-                  visible: false,
+                  visible: false
                 },
-                { defaultValue: undefined, name: "barcode", visible: false },
-              ],
-            },
-          ],
+                { defaultValue: undefined, name: "barcode", visible: false }
+              ]
+            }
+          ]
         },
         {
           name: "material-sample-info-component",
@@ -1109,31 +1128,31 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "materialSampleType",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "materialSampleRemarks",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "materialSampleState",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "stateChangeRemarks",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "stateChangedOn",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "collecting-event-component",
@@ -1148,14 +1167,14 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "publiclyReleasable",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "notPubliclyReleasableReason",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "identifiers-section",
@@ -1164,9 +1183,9 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "dwcFieldNumber",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "collecting-date-section",
@@ -1175,19 +1194,19 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: "test-verbatim-default-datetime",
                   name: "verbatimEventDateTime",
-                  visible: true,
+                  visible: true
                 },
                 {
                   defaultValue: undefined,
                   name: "startEventDateTime",
-                  visible: true,
+                  visible: true
                 },
                 {
                   defaultValue: undefined,
                   name: "endEventDateTime",
-                  visible: true,
-                },
-              ],
+                  visible: true
+                }
+              ]
             },
             {
               name: "collecting-agents-section",
@@ -1196,15 +1215,15 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "dwcRecordedBy",
-                  visible: false,
+                  visible: false
                 },
                 { defaultValue: undefined, name: "collectors", visible: false },
                 {
                   defaultValue: undefined,
                   name: "dwcRecordNumber",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "verbatim-label-section",
@@ -1213,44 +1232,44 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimLocality",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimCoordinateSystem",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimCoordinates",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimLatitude",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimLongitude",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimSRS",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimElevation",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcVerbatimDepth",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "collecting-event-details",
@@ -1261,31 +1280,31 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "collectionMethod",
-                  visible: false,
+                  visible: false
                 },
                 { defaultValue: undefined, name: "substrate", visible: false },
                 {
                   defaultValue: undefined,
                   name: "dwcMinimumElevationInMeters",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcMaximumElevationInMeters",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcMinimumDepthInMeters",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcMaximumDepthInMeters",
-                  visible: false,
+                  visible: false
                 },
-                { defaultValue: undefined, name: "remarks", visible: false },
-              ],
+                { defaultValue: undefined, name: "remarks", visible: false }
+              ]
             },
             {
               name: "georeferencing-section",
@@ -1294,69 +1313,69 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: "1",
                   name: "geoReferenceAssertions[0].dwcDecimalLatitude",
-                  visible: true,
+                  visible: true
                 },
                 {
                   defaultValue: "2",
                   name: "geoReferenceAssertions[0].dwcDecimalLongitude",
-                  visible: true,
+                  visible: true
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeoreferencedDate",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeodeticDatum",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].literalGeoreferencedBy",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].georeferencedBy",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeoreferenceProtocol",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeoreferenceSources",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: [
                     {
                       dwcDecimalLatitude: "1",
-                      dwcDecimalLongitude: "2",
-                    },
+                      dwcDecimalLongitude: "2"
+                    }
                   ],
                   name: "geoReferenceAssertions",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "current-geographic-place",
@@ -1365,35 +1384,35 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "srcAdminLevels",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geographicPlaceNameSourceDetail.stateProvince",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "geographicPlaceNameSourceDetail.country",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
-              name: "field-extension-section",
+              name: "collecting-event-field-extension-section",
               visible: true,
               items: [
                 {
                   defaultValue: undefined,
                   name: "extensionValues",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "collecting-event-managed-attributes-section",
               visible: true,
-              items: [],
+              items: []
             },
             {
               name: "collecting-event-attachments-section",
@@ -1402,16 +1421,16 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "managedAttributes.attachmentsConfig.allowNew",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "managedAttributes.attachmentsConfig.allowExisting",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "acquisition-event-component",
@@ -1425,24 +1444,24 @@ describe("Workflow template edit page", () => {
                 {
                   name: "group",
                   visible: false,
-                  defaultValue: "aafc",
+                  defaultValue: "aafc"
                 },
                 {
                   defaultValue: undefined,
                   name: "receivedFrom",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "receivedDate",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "receptionRemarks",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "acquisition-event-isolation-section",
@@ -1453,11 +1472,11 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "isolationRemarks",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "preparations-component",
@@ -1471,57 +1490,57 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "preparationType",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationMethod",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preservationType",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationFixative",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationMaterials",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationSubstrate",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationRemarks",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "dwcDegreeOfEstablishment",
-                  visible: false,
+                  visible: false
                 },
                 { defaultValue: undefined, name: "preparedBy", visible: false },
                 {
                   defaultValue: undefined,
                   name: "preparationDate",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "preparationProtocol",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "organisms-component",
@@ -1535,20 +1554,20 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "organism[0].lifeStage",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].sex",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].remarks",
-                  visible: false,
+                  visible: false
                 },
-                { defaultValue: undefined, name: "organism", visible: false },
-              ],
+                { defaultValue: undefined, name: "organism", visible: false }
+              ]
             },
             {
               name: "organism-verbatim-determination-section",
@@ -1557,29 +1576,29 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].verbatimScientificName",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].verbatimDeterminer",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].verbatimDate",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].verbatimRemarks",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].transcriberRemarks",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "organism-determination-section",
@@ -1588,29 +1607,29 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].scientificName",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].scientificNameInput",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].determiner",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].determinedOn",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].determinationRemarks",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "organism-type-specimen-section",
@@ -1619,21 +1638,21 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].typeStatus",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "organism[0].determination[0].typeStatusEvidence",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "organism-managed-attributes-section",
               visible: true,
-              items: [],
-            },
-          ],
+              items: []
+            }
+          ]
         },
         {
           name: "associations-component",
@@ -1647,14 +1666,14 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "hostOrganism.name",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "hostOrganism.remarks",
-                  visible: false,
-                },
-              ],
+                  visible: false
+                }
+              ]
             },
             {
               name: "associations-material-sample-section",
@@ -1663,21 +1682,21 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "associations.associationType",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "associations.associatedSample",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "associations.remarks",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "storage-component",
@@ -1691,11 +1710,11 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "storageUnit",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "restriction-component",
@@ -1709,28 +1728,28 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "phac_animal_rg",
-                  visible: false,
+                  visible: false
                 },
                 { defaultValue: undefined, name: "cfia_ppc", visible: false },
                 {
                   defaultValue: undefined,
                   name: "phac_human_rg",
-                  visible: false,
+                  visible: false
                 },
                 { defaultValue: undefined, name: "phac_cl", visible: false },
                 {
                   defaultValue: undefined,
                   name: "isRestricted",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "restrictionRemarks",
-                  visible: false,
-                },
-              ],
-            },
-          ],
+                  visible: false
+                }
+              ]
+            }
+          ]
         },
         {
           name: "scheduled-actions-component",
@@ -1744,36 +1763,54 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "scheduledAction.actionType",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "scheduledAction.actionStatus",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "scheduledAction.date",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "scheduledAction.assignedTo",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "scheduledAction.remarks",
-                  visible: false,
-                },
+                  visible: false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          name: "field-extensions-component",
+          visible: true,
+          order: 10,
+          sections: [
+            {
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "extensionValues",
+                  visible: false
+                }
               ],
-            },
-          ],
+              name: "field-extension-section",
+              visible: true
+            }
+          ]
         },
         {
           name: "managed-attributes-component",
           visible: true,
-          order: 10,
+          order: 11,
           sections: [
             {
               name: "managed-attributes-section",
@@ -1782,21 +1819,21 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "managedAttributes",
-                  visible: true,
+                  visible: true
                 },
                 {
                   defaultValue: undefined,
                   name: "managedAttributesOrder",
-                  visible: true,
-                },
-              ],
-            },
-          ],
+                  visible: true
+                }
+              ]
+            }
+          ]
         },
         {
           name: "material-sample-attachments-component",
           visible: true,
-          order: 11,
+          order: 12,
           sections: [
             {
               name: "material-sample-attachments-sections",
@@ -1805,18 +1842,18 @@ describe("Workflow template edit page", () => {
                 {
                   defaultValue: undefined,
                   name: "attachmentsConfig.allowNew",
-                  visible: false,
+                  visible: false
                 },
                 {
                   defaultValue: undefined,
                   name: "attachmentsConfig.allowExisting",
-                  visible: false,
-                },
-              ],
-            },
-          ],
-        },
-      ],
+                  visible: false
+                }
+              ]
+            }
+          ]
+        }
+      ]
     };
 
     expect(mockOnSaved).lastCalledWith(expected);
