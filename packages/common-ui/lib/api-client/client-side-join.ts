@@ -17,7 +17,7 @@ export interface ClientSideJoinSpec {
 export class ClientSideJoiner {
   /** DataLoader to batch find-by-id requests into a single HTTP request. */
   private joinLoader: DataLoader<string, PersistedResource<any> | null> =
-    new DataLoader<string, PersistedResource<any> | null>(async paths => {
+    new DataLoader<string, PersistedResource<any> | null>(async (paths) => {
       const joinedResources = await this.bulkGet(paths, {
         apiBaseUrl: this.joinSpec.apiBaseUrl,
         returnNullForMissingResource: true
@@ -34,11 +34,11 @@ export class ClientSideJoiner {
   /** Fetches the joined data and joins it to the  */
   public async join() {
     // Only join on the resources that have the idField set:
-    const baseResources = this.resources.filter(resource =>
+    const baseResources = this.resources.filter((resource) =>
       get(resource, this.joinSpec.idField)
     );
 
-    const paths = baseResources.map(resource => this.joinSpec.path(resource));
+    const paths = baseResources.map((resource) => this.joinSpec.path(resource));
 
     // Load the joined resources from the back-end:
     const joinedResources = await this.joinLoader.loadMany(paths);

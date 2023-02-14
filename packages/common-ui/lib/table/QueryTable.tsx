@@ -125,7 +125,7 @@ export function QueryTable<TData extends KitsuResource>({
   topRightCorner,
   ariaLabel
 }: QueryTableProps<TData>) {
-  const { formatMessage } = useIntl();
+  const { formatMessage, formatNumber } = useIntl();
 
   // JSONAPI sort attribute.
   const [sortingRules, setSortingRules] = useState(defaultSort);
@@ -176,7 +176,7 @@ export function QueryTable<TData extends KitsuResource>({
     sort
   };
 
-  const mappedColumns = columns.map<Column>(column => {
+  const mappedColumns = columns.map<Column>((column) => {
     // The "columns" prop can be a string or a react-table Column type.
     const { fieldName, customHeader } =
       typeof column === "string"
@@ -211,7 +211,8 @@ export function QueryTable<TData extends KitsuResource>({
     lastSuccessfulResponse.current = response;
   }
 
-  const totalCount = lastSuccessfulResponse.current?.meta?.totalResourceCount;
+  const totalCount =
+    lastSuccessfulResponse.current?.meta?.totalResourceCount ?? 0;
 
   const numberOfPages = totalCount
     ? Math.ceil(totalCount / page.limit)
@@ -239,7 +240,7 @@ export function QueryTable<TData extends KitsuResource>({
     const reactTableDivs = document?.querySelectorAll<any>(
       "div.rt-table[role='grid']"
     );
-    reactTableDivs?.forEach(element => {
+    reactTableDivs?.forEach((element) => {
       element.setAttribute("aria-label", ariaLabel ?? autoAriaLabel);
     });
   });
@@ -255,26 +256,19 @@ export function QueryTable<TData extends KitsuResource>({
         {!omitPaging && (
           <>
             <span>
-              <CommonMessage id="tableTotalCount" values={{ totalCount }} />
+              <CommonMessage
+                id="tableTotalCount"
+                values={{ totalCount: formatNumber(totalCount) }}
+              />
             </span>
-            {resolvedReactTableProps?.sortable !== false && (
-              <span className="mx-3">
-                <Tooltip
-                  id="queryTableMultiSortExplanation"
-                  visibleElement={
-                    <a
-                      href="#"
-                      aria-describedby={"queryTableMultiSortExplanation"}
-                    >
-                      <CommonMessage id="queryTableMultiSortTooltipTitle" />
-                    </a>
-                  }
-                />
-              </span>
-            )}
           </>
         )}
-        {topRightCorner && <div className="ms-auto">{topRightCorner}</div>}
+        <div className="ms-auto">
+          {topRightCorner}
+          {resolvedReactTableProps?.sortable !== false && (
+            <Tooltip id="queryTableMultiSortExplanation" placement="left" />
+          )}
+        </div>
       </div>
       <ReactTable
         FilterComponent={({ filter: headerFilter, onChange }) => (
@@ -282,7 +276,7 @@ export function QueryTable<TData extends KitsuResource>({
             className="w-100"
             placeholder="Search..."
             value={headerFilter ? headerFilter.value : ""}
-            onChange={event => onChange(event.target.value)}
+            onChange={(event) => onChange(event.target.value)}
           />
         )}
         TdComponent={DefaultTd}
@@ -319,7 +313,7 @@ export function QueryTable<TData extends KitsuResource>({
                   }}
                 >
                   <p>
-                    {error.errors?.map(e => e.detail).join("\n") ??
+                    {error.errors?.map((e) => e.detail).join("\n") ??
                       String(error)}
                   </p>
                   <button

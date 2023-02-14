@@ -4,6 +4,8 @@ import {
   DinaFormSubmitParams,
   DoOperationsError,
   OperationError,
+  processExtensionValuesLoading,
+  processExtensionValuesSaving,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -143,6 +145,13 @@ export function useMaterialSampleQuery(id?: string | null) {
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
             };
           }
+        }
+
+        // Process loaded Extension Fields values
+        if (data?.extensionValues) {
+          data.extensionValues = processExtensionValuesLoading(
+            data.extensionValues
+          );
         }
       }
     }
@@ -517,6 +526,10 @@ export function useMaterialSampleSave({
         risk_group: submittedValues?.phac_human_rg?.value
       };
     }
+    const processedExtensionValues =
+      processExtensionValuesSaving(submittedValues);
+
+    submittedValues.extensionValues = processedExtensionValues;
 
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {

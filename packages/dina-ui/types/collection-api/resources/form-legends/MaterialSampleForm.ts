@@ -19,6 +19,8 @@ export const MANAGED_ATTRIBUTES_COMPONENT_NAME: string =
   "managed-attributes-component";
 export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
   "material-sample-attachments-component";
+export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
+  "field-extensions-component";
 
 /**
  * All Material Sample form data component in order.
@@ -36,21 +38,21 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         items: [
           { id: "group" },
           {
-            id: "tags",
+            id: "tags"
           },
           {
-            id: "projects",
+            id: "projects"
           },
           {
-            id: "assemblages",
+            id: "assemblages"
           },
           {
-            id: "publiclyReleasable",
+            id: "publiclyReleasable"
           },
           {
-            id: "notPubliclyReleasableReason",
-          },
-        ],
+            id: "notPubliclyReleasableReason"
+          }
+        ]
       },
       {
         id: "identifiers-section",
@@ -58,23 +60,23 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "collection",
+            id: "collection"
           },
           {
-            id: "materialSampleName",
+            id: "materialSampleName"
           },
           {
-            id: "useNextSequence",
+            id: "useNextSequence"
           },
           {
-            id: "dwcOtherCatalogNumbers",
+            id: "dwcOtherCatalogNumbers"
           },
           {
-            id: "barcode",
-          },
-        ],
-      },
-    ],
+            id: "barcode"
+          }
+        ]
+      }
+    ]
   },
   {
     id: MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
@@ -87,23 +89,23 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "materialSampleType",
+            id: "materialSampleType"
           },
           {
-            id: "materialSampleRemarks",
+            id: "materialSampleRemarks"
           },
           {
-            id: "materialSampleState",
+            id: "materialSampleState"
           },
           {
-            id: "stateChangeRemarks",
+            id: "stateChangeRemarks"
           },
           {
-            id: "stateChangedOn",
-          },
-        ],
-      },
-    ],
+            id: "stateChangedOn"
+          }
+        ]
+      }
+    ]
   },
   {
     id: COLLECTING_EVENT_COMPONENT_NAME,
@@ -116,198 +118,198 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "tags",
+            id: "tags"
           },
           {
-            id: "publiclyReleasable",
+            id: "publiclyReleasable"
           },
           {
-            id: "notPubliclyReleasableReason",
-          },
-        ],
+            id: "notPubliclyReleasableReason"
+          }
+        ]
       },
       {
         id: "identifiers-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "dwcFieldNumber",
-          },
-        ],
+            id: "dwcFieldNumber"
+          }
+        ]
       },
       {
         id: "collecting-date-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "verbatimEventDateTime",
+            id: "verbatimEventDateTime"
           },
           {
-            id: "startEventDateTime",
+            id: "startEventDateTime"
           },
           {
-            id: "endEventDateTime",
-          },
-        ],
+            id: "endEventDateTime"
+          }
+        ]
       },
       {
         id: "collecting-agents-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "dwcRecordedBy",
+            id: "dwcRecordedBy"
           },
           {
-            id: "collectors",
+            id: "collectors"
           },
           {
-            id: "dwcRecordNumber",
-          },
-        ],
+            id: "dwcRecordNumber"
+          }
+        ]
       },
       {
         id: "verbatim-label-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "dwcVerbatimLocality",
+            id: "dwcVerbatimLocality"
           },
           {
-            id: "dwcVerbatimCoordinateSystem",
+            id: "dwcVerbatimCoordinateSystem"
           },
           {
-            id: "dwcVerbatimCoordinates",
+            id: "dwcVerbatimCoordinates"
           },
           {
-            id: "dwcVerbatimLatitude",
+            id: "dwcVerbatimLatitude"
           },
           {
-            id: "dwcVerbatimLongitude",
+            id: "dwcVerbatimLongitude"
           },
           {
-            id: "dwcVerbatimSRS",
+            id: "dwcVerbatimSRS"
           },
           {
-            id: "dwcVerbatimElevation",
+            id: "dwcVerbatimElevation"
           },
           {
-            id: "dwcVerbatimDepth",
-          },
-        ],
+            id: "dwcVerbatimDepth"
+          }
+        ]
       },
       {
         id: "collecting-event-details",
         maxGridSizeX: 1,
         items: [
           {
-            id: "habitat",
+            id: "habitat"
           },
           {
-            id: "host",
+            id: "host"
           },
           {
-            id: "collectionMethod",
+            id: "collectionMethod"
           },
           {
-            id: "substrate",
+            id: "substrate"
           },
           {
-            id: "dwcMinimumElevationInMeters",
+            id: "dwcMinimumElevationInMeters"
           },
           {
-            id: "dwcMaximumElevationInMeters",
+            id: "dwcMaximumElevationInMeters"
           },
           {
-            id: "dwcMinimumDepthInMeters",
+            id: "dwcMinimumDepthInMeters"
           },
           {
-            id: "dwcMaximumDepthInMeters",
+            id: "dwcMaximumDepthInMeters"
           },
           {
-            id: "remarks",
-          },
-        ],
+            id: "remarks"
+          }
+        ]
       },
       {
         id: "georeferencing-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus",
+            id: "geoReferenceAssertions[0].dwcGeoreferenceVerificationStatus"
           },
           {
-            id: "geoReferenceAssertions[0].dwcDecimalLatitude",
+            id: "geoReferenceAssertions[0].dwcDecimalLatitude"
           },
           {
-            id: "geoReferenceAssertions[0].dwcDecimalLongitude",
+            id: "geoReferenceAssertions[0].dwcDecimalLongitude"
           },
           {
-            id: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters",
+            id: "geoReferenceAssertions[0].dwcCoordinateUncertaintyInMeters"
           },
           {
-            id: "geoReferenceAssertions[0].dwcGeoreferencedDate",
+            id: "geoReferenceAssertions[0].dwcGeoreferencedDate"
           },
           {
-            id: "geoReferenceAssertions[0].dwcGeodeticDatum",
+            id: "geoReferenceAssertions[0].dwcGeodeticDatum"
           },
           {
-            id: "geoReferenceAssertions[0].literalGeoreferencedBy",
+            id: "geoReferenceAssertions[0].literalGeoreferencedBy"
           },
           {
-            id: "geoReferenceAssertions[0].georeferencedBy",
+            id: "geoReferenceAssertions[0].georeferencedBy"
           },
           {
-            id: "geoReferenceAssertions[0].dwcGeoreferenceProtocol",
+            id: "geoReferenceAssertions[0].dwcGeoreferenceProtocol"
           },
           {
-            id: "geoReferenceAssertions[0].dwcGeoreferenceSources",
+            id: "geoReferenceAssertions[0].dwcGeoreferenceSources"
           },
           {
-            id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks",
+            id: "geoReferenceAssertions[0].dwcGeoreferenceRemarks"
           },
           {
-            id: "geoReferenceAssertions",
-          },
-        ],
+            id: "geoReferenceAssertions"
+          }
+        ]
       },
       {
         id: "current-geographic-place",
         maxGridSizeX: 1,
         items: [
           {
-            id: "srcAdminLevels",
+            id: "srcAdminLevels"
           },
           {
-            id: "geographicPlaceNameSourceDetail.stateProvince",
+            id: "geographicPlaceNameSourceDetail.stateProvince"
           },
           {
-            id: "geographicPlaceNameSourceDetail.country",
-          },
-        ],
+            id: "geographicPlaceNameSourceDetail.country"
+          }
+        ]
       },
       {
-        id: "field-extension-section",
+        id: "collecting-event-field-extension-section",
         maxGridSizeX: 1,
-        items: [{ id: "extensionValues" }],
+        items: [{ id: "extensionValues" }]
       },
       {
         id: "collecting-event-managed-attributes-section",
         maxGridSizeX: 2,
-        items: [],
+        items: []
       },
       {
         id: "collecting-event-attachments-section",
         maxGridSizeX: 1,
         items: [
           {
-            id: "managedAttributes.attachmentsConfig.allowNew",
+            id: "managedAttributes.attachmentsConfig.allowNew"
           },
           {
-            id: "managedAttributes.attachmentsConfig.allowExisting",
-          },
-        ],
-      },
-    ],
+            id: "managedAttributes.attachmentsConfig.allowExisting"
+          }
+        ]
+      }
+    ]
   },
   {
     id: ACQUISITION_EVENT_COMPONENT_NAME,
@@ -321,18 +323,18 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "group",
+            id: "group"
           },
           {
-            id: "receivedFrom",
+            id: "receivedFrom"
           },
           {
-            id: "receivedDate",
+            id: "receivedDate"
           },
           {
-            id: "receptionRemarks",
-          },
-        ],
+            id: "receptionRemarks"
+          }
+        ]
       },
       {
         id: "acquisition-event-isolation-section",
@@ -340,17 +342,17 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "isolatedBy",
+            id: "isolatedBy"
           },
           {
-            id: "isolatedOn",
+            id: "isolatedOn"
           },
           {
-            id: "isolationRemarks",
-          },
-        ],
-      },
-    ],
+            id: "isolationRemarks"
+          }
+        ]
+      }
+    ]
   },
   {
     id: PREPARATIONS_COMPONENT_NAME,
@@ -364,41 +366,41 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         labelKey: "preparations",
         items: [
           {
-            id: "preparationType",
+            id: "preparationType"
           },
           {
-            id: "preparationMethod",
+            id: "preparationMethod"
           },
           {
-            id: "preservationType",
+            id: "preservationType"
           },
           {
-            id: "preparationFixative",
+            id: "preparationFixative"
           },
           {
-            id: "preparationMaterials",
+            id: "preparationMaterials"
           },
           {
-            id: "preparationSubstrate",
+            id: "preparationSubstrate"
           },
           {
-            id: "preparationRemarks",
+            id: "preparationRemarks"
           },
           {
-            id: "dwcDegreeOfEstablishment",
+            id: "dwcDegreeOfEstablishment"
           },
           {
-            id: "preparedBy",
+            id: "preparedBy"
           },
           {
-            id: "preparationDate",
+            id: "preparationDate"
           },
           {
-            id: "preparationProtocol",
-          },
-        ],
-      },
-    ],
+            id: "preparationProtocol"
+          }
+        ]
+      }
+    ]
   },
   {
     id: ORGANISMS_COMPONENT_NAME,
@@ -412,18 +414,18 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "organism[0].lifeStage",
+            id: "organism[0].lifeStage"
           },
           {
-            id: "organism[0].sex",
+            id: "organism[0].sex"
           },
           {
-            id: "organism[0].remarks",
+            id: "organism[0].remarks"
           },
           {
-            id: "organism",
-          },
-        ],
+            id: "organism"
+          }
+        ]
       },
       {
         id: "organism-verbatim-determination-section",
@@ -431,21 +433,21 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organism[0].determination[0].verbatimScientificName",
+            id: "organism[0].determination[0].verbatimScientificName"
           },
           {
-            id: "organism[0].determination[0].verbatimDeterminer",
+            id: "organism[0].determination[0].verbatimDeterminer"
           },
           {
-            id: "organism[0].determination[0].verbatimDate",
+            id: "organism[0].determination[0].verbatimDate"
           },
           {
-            id: "organism[0].determination[0].verbatimRemarks",
+            id: "organism[0].determination[0].verbatimRemarks"
           },
           {
-            id: "organism[0].determination[0].transcriberRemarks",
-          },
-        ],
+            id: "organism[0].determination[0].transcriberRemarks"
+          }
+        ]
       },
       {
         id: "organism-determination-section",
@@ -453,21 +455,21 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organism[0].determination[0].scientificName",
+            id: "organism[0].determination[0].scientificName"
           },
           {
-            id: "organism[0].determination[0].scientificNameInput",
+            id: "organism[0].determination[0].scientificNameInput"
           },
           {
-            id: "organism[0].determination[0].determiner",
+            id: "organism[0].determination[0].determiner"
           },
           {
-            id: "organism[0].determination[0].determinedOn",
+            id: "organism[0].determination[0].determinedOn"
           },
           {
-            id: "organism[0].determination[0].determinationRemarks",
-          },
-        ],
+            id: "organism[0].determination[0].determinationRemarks"
+          }
+        ]
       },
       {
         id: "organism-type-specimen-section",
@@ -475,20 +477,20 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "organism[0].determination[0].typeStatus",
+            id: "organism[0].determination[0].typeStatus"
           },
           {
-            id: "organism[0].determination[0].typeStatusEvidence",
-          },
-        ],
+            id: "organism[0].determination[0].typeStatusEvidence"
+          }
+        ]
       },
       {
         id: "organism-managed-attributes-section",
         labelKey: "typeSpecimen",
         maxGridSizeX: 2,
-        items: [],
-      },
-    ],
+        items: []
+      }
+    ]
   },
   {
     id: ASSOCIATIONS_COMPONENT_NAME,
@@ -502,12 +504,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "hostOrganism.name",
+            id: "hostOrganism.name"
           },
           {
-            id: "hostOrganism.remarks",
-          },
-        ],
+            id: "hostOrganism.remarks"
+          }
+        ]
       },
       {
         id: "associations-material-sample-section",
@@ -515,17 +517,17 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "associations.associationType",
+            id: "associations.associationType"
           },
           {
-            id: "associations.associatedSample",
+            id: "associations.associatedSample"
           },
           {
-            id: "associations.remarks",
-          },
-        ],
-      },
-    ],
+            id: "associations.remarks"
+          }
+        ]
+      }
+    ]
   },
   {
     id: STORAGE_COMPONENT_NAME,
@@ -539,11 +541,11 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "storageUnit",
-          },
-        ],
-      },
-    ],
+            id: "storageUnit"
+          }
+        ]
+      }
+    ]
   },
   {
     id: RESTRICTION_COMPONENT_NAME,
@@ -557,26 +559,26 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "phac_animal_rg",
+            id: "phac_animal_rg"
           },
           {
-            id: "cfia_ppc",
+            id: "cfia_ppc"
           },
           {
-            id: "phac_human_rg",
+            id: "phac_human_rg"
           },
           {
-            id: "phac_cl",
+            id: "phac_cl"
           },
           {
-            id: "isRestricted",
+            id: "isRestricted"
           },
           {
-            id: "restrictionRemarks",
-          },
-        ],
-      },
-    ],
+            id: "restrictionRemarks"
+          }
+        ]
+      }
+    ]
   },
   {
     id: SCHEDULED_ACTIONS_COMPONENT_NAME,
@@ -590,23 +592,35 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "scheduledAction.actionType",
+            id: "scheduledAction.actionType"
           },
           {
-            id: "scheduledAction.actionStatus",
+            id: "scheduledAction.actionStatus"
           },
           {
-            id: "scheduledAction.date",
+            id: "scheduledAction.date"
           },
           {
-            id: "scheduledAction.assignedTo",
+            id: "scheduledAction.assignedTo"
           },
           {
-            id: "scheduledAction.remarks",
-          },
-        ],
-      },
-    ],
+            id: "scheduledAction.remarks"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: FIELD_EXTENSIONS_COMPONENT_NAME,
+    labelKey: "fieldExtensions",
+    maxGridSizeX: 1,
+    sections: [
+      {
+        id: "field-extension-section",
+        maxGridSizeX: 1,
+        items: [{ id: "extensionValues" }]
+      }
+    ]
   },
   {
     id: MANAGED_ATTRIBUTES_COMPONENT_NAME,
@@ -620,12 +634,12 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         items: [
           {
             id: "managedAttributes",
-            visible: true,
+            visible: true
           },
-          { id: "managedAttributesOrder", visible: true },
-        ],
-      },
-    ],
+          { id: "managedAttributesOrder", visible: true }
+        ]
+      }
+    ]
   },
   {
     id: MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
@@ -638,13 +652,13 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 1,
         items: [
           {
-            id: "attachmentsConfig.allowNew",
+            id: "attachmentsConfig.allowNew"
           },
           {
-            id: "attachmentsConfig.allowExisting",
-          },
-        ],
-      },
-    ],
-  },
+            id: "attachmentsConfig.allowExisting"
+          }
+        ]
+      }
+    ]
+  }
 ];

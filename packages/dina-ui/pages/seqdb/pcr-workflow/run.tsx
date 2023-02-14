@@ -2,18 +2,19 @@ import { BackToListButton, LoadingSpinner } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
-import { SangerPcrBatchStep } from "../../../components/seqdb/sanger-workflow/SangerPcrBatchStep";
-import { SangerSampleSelectionStep } from "../../../components/seqdb/sanger-workflow/SangerSampleSelectionStep";
+import { SangerPcrBatchStep } from "../../../components/seqdb/pcr-workflow/SangerPcrBatchStep";
+import { SangerSampleSelectionStep } from "../../../components/seqdb/pcr-workflow/SangerSampleSelectionStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
-import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/sanger-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
+import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
-import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/sanger-workflow/SangerPcrReactionStep";
+import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
-export default function SangerWorkFlowRunPage() {
+export default function PCRWorkFlowRunPage() {
   const router = useRouter();
   const { formatMessage } = useSeqdbIntl();
 
@@ -61,7 +62,7 @@ export default function SangerWorkFlowRunPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/sanger-workflow" />
+      <BackToListButton entityLink="/seqdb/pcr-workflow" />
       {editMode ? (
         <>
           <Button
@@ -90,7 +91,7 @@ export default function SangerWorkFlowRunPage() {
                 <span className="visually-hidden">Loading...</span>
               </>
             ) : (
-              <>Save</>
+              <DinaMessage id="save" />
             )}
           </Button>
         </>
@@ -124,7 +125,7 @@ export default function SangerWorkFlowRunPage() {
   };
 
   return (
-    <PageLayout titleId={"sangerWorkflow"} buttonBarContent={buttonBarContent}>
+    <PageLayout titleId={"pcrWorkflow"} buttonBarContent={buttonBarContent}>
       <Tabs selectedIndex={currentStep} onSelect={setCurrentStep}>
         <TabList>
           <Tab disabled={isDisabled(0, false)}>{formatMessage("pcrBatch")}</Tab>

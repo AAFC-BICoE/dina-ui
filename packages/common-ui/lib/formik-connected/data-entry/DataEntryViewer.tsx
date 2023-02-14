@@ -1,30 +1,38 @@
-import { DinaForm, LoadingSpinner, useQuery } from "common-ui";
-import { processExtensionValues } from "../../../../dina-ui/components/collection/collecting-event/useCollectingEvent";
+import {
+  DinaForm,
+  LoadingSpinner,
+  processExtensionValuesLoading,
+  useQuery
+} from "common-ui";
 import { useState } from "react";
 import { FieldExtension } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
 import { DataEntry, DataEntryProps } from "./DataEntry";
 
 export interface DataEntryViewerProps extends DataEntryProps {
   extensionValues?: any;
+  disableDinaForm?: boolean;
+  dinaComponent: string;
 }
 
 export function DataEntryViewer({
   extensionValues,
   legend,
   name,
+  disableDinaForm,
+  dinaComponent
 }: DataEntryViewerProps) {
   const { response, loading } = useQuery<FieldExtension[]>({
-    path: `collection-api/extension`,
+    path: `collection-api/extension`
   });
   const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
   const extensionOptions = response?.data
     .filter(
-      (data) => data.extension.fields?.[0].dinaComponent === "COLLECTING_EVENT"
+      (data) => data.extension.fields?.[0].dinaComponent === dinaComponent
     )
     .map((data) => {
       return {
         label: data.extension.name,
-        value: data.extension.key,
+        value: data.extension.key
       };
     });
 
@@ -36,15 +44,29 @@ export function DataEntryViewer({
     setExtensionFieldsOptions(
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.key,
+        value: data.key
       }))
     );
   }
-  const processedExtensionValues = processExtensionValues(extensionValues);
+
+  const processedExtensionValues = disableDinaForm
+    ? extensionValues
+    : processExtensionValuesLoading(extensionValues);
   if (loading) {
     return <LoadingSpinner loading={true} />;
   }
-  return (
+  return disableDinaForm ? (
+    <DataEntry
+      legend={legend}
+      name={name}
+      initialValues={processedExtensionValues}
+      blockOptions={extensionOptions}
+      typeOptions={extensionFieldsOptions}
+      readOnly={true}
+      onBlockSelectChange={onBlockSelectChange}
+      width={"100%"}
+    />
+  ) : (
     <DinaForm
       initialValues={{ extensionValues: processedExtensionValues }}
       readOnly={true}

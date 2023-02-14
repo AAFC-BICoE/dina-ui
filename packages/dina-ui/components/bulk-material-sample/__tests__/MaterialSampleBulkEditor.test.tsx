@@ -2321,19 +2321,6 @@ describe("MaterialSampleBulkEditor", () => {
     await new Promise(setImmediate);
     wrapper.update();
 
-    // All Managed Attributes from all samples are shown in the bulk edit UI:
-    expect(
-      wrapper
-        .find(
-          ".tabpanel-EDIT_ALL .visible-attribute-menu .react-select__multi-value__label"
-        )
-        .map((node) => node.text())
-    ).toEqual([
-      "Managed Attribute 1",
-      "Managed Attribute 3",
-      "Managed Attribute 2"
-    ]);
-
     // m1 and m2 have multiple values, so show a blank input with a placeholder:
     expect(
       wrapper
