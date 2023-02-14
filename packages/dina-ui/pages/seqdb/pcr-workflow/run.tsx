@@ -13,6 +13,7 @@ import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/pcr-workflow
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
