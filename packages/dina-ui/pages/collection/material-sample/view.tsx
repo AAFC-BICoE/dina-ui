@@ -1,6 +1,7 @@
 import {
   BackButton,
   ButtonBar,
+  CustomQueryPageView,
   DeleteButton,
   DinaForm,
   EditButton,
@@ -53,6 +54,7 @@ import { GenerateLabelDropdownButton } from "../../../components/collection/mate
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
+import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -154,6 +156,21 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     fieldSetId={<DinaMessage id="childMaterialSamples" />}
                   />
                 )}
+
+                {/* Custom Query View */}
+                <CustomQueryPageView
+                  indexName="dina_material_sample_index"
+                  columns={ELASTIC_SEARCH_COLUMN}
+                  customQueryOptions={[
+                    {
+                      value: "materialSampleChildren",
+                      label: "childMaterialSamples",
+                      customQuery: {},
+                      customViewFields: []
+                    }
+                  ]}
+                />
+
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   return (
