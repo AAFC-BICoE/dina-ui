@@ -60,20 +60,8 @@ export function CustomQueryPageView<TData extends KitsuResource>({
 }: CustomQueryPageViewProps<TData>) {
   const { formatMessage, locale } = useDinaIntl();
 
-  const [customQuerySelected, setCustomQuerySelected] =
-    useState<CustomQueryOption | null>(null);
-
-  // The legend is based if customQueryOptions are provided as a prop or just a title key.
-  const legend = customQuerySelected?.labelKey ? (
-    <DinaMessage id={customQuerySelected.labelKey} />
-  ) : titleKey ? (
-    <DinaMessage id={titleKey} />
-  ) : (
-    <></>
-  );
-
   // Generate the labels based on the locale and options provided.
-  const translatedOptions = useMemo(() => {
+  const translatedOptions: CustomQueryOption[] | undefined = useMemo(() => {
     if (customQueryOptions) {
       return customQueryOptions.map((option) => ({
         ...option,
@@ -83,6 +71,24 @@ export function CustomQueryPageView<TData extends KitsuResource>({
       return undefined;
     }
   }, [customQueryOptions, locale]);
+
+  // Initialize the `customQuerySelected` state to the first option in the `customQueryOptions`
+  // array, if it exists and has at least one element. Otherwise, set it to `null`.
+  const [customQuerySelected, setCustomQuerySelected] =
+    useState<CustomQueryOption | null>(
+      translatedOptions && translatedOptions.length > 0
+        ? translatedOptions[0]
+        : null
+    );
+
+  // The legend is based if customQueryOptions are provided as a prop or just a title key.
+  const legend = customQuerySelected?.labelKey ? (
+    <DinaMessage id={customQuerySelected.labelKey} />
+  ) : titleKey ? (
+    <DinaMessage id={titleKey} />
+  ) : (
+    <></>
+  );
 
   return (
     <FieldSet

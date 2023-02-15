@@ -149,6 +149,11 @@ export function applyPagination(
   pageSize: number,
   pageOffset: number
 ) {
+  // Special case if the page size is set to 0, turn off pagination on the query.
+  if (pageSize === 0) {
+    return elasticSearchQuery;
+  }
+
   return {
     ...elasticSearchQuery,
     size: pageSize,

@@ -152,14 +152,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   />
                 )}
 
-                {/* TODO: Remove this - currently using for testing purposes. */}
-                {!!materialSample.materialSampleChildren?.length && (
-                  <SamplesView
-                    samples={materialSample.materialSampleChildren}
-                    fieldSetId={<DinaMessage id="childMaterialSamples" />}
-                  />
-                )}
-
                 {/* Custom Query View */}
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
@@ -177,6 +169,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       ]
                     }
                   ]}
+                  reactTableProps={{
+                    showPagination: false
+                  }}
+                  defaultPageSize={0}
                 />
 
                 <MaterialSampleInfoSection />

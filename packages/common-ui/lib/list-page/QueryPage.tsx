@@ -83,6 +83,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
   defaultSort?: SortingRule[];
 
   /**
+   * By default, the page size is 25 (25 items can be displayed per page). If you set this to zero
+   * the page size will not be applied to the elastic search query.
+   */
+  defaultPageSize?: number;
+
+  /**
    * Adds the bulk edit button and the row checkboxes.
    *
    * The query path to perform for bulk editing.
@@ -180,6 +186,7 @@ export function QueryPage<TData extends KitsuResource>({
   singleEditPath,
   reactTableProps,
   defaultSort,
+  defaultPageSize,
   selectionMode = false,
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
@@ -202,7 +209,9 @@ export function QueryPage<TData extends KitsuResource>({
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // The pagination size.
-  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    defaultPageSize ?? DEFAULT_PAGE_SIZE
+  );
 
   // The pagination offset.
   const [pageOffset, setPageOffset] = useState<number>(0);
