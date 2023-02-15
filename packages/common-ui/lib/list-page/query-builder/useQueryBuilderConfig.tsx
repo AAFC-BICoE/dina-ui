@@ -144,7 +144,7 @@ export function useQueryBuilderConfig(
         customViewFields
       )
     );
-  }, [indexMap]);
+  }, [indexMap, customViewFields]);
 
   return { queryBuilderConfig };
 }

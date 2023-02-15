@@ -6,6 +6,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
+  generateUUIDTree,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -54,7 +55,7 @@ import { GenerateLabelDropdownButton } from "../../../components/collection/mate
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
-import { ELASTIC_SEARCH_COLUMN } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
+import { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -150,6 +151,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     fieldSetId={<DinaMessage id="parentMaterialSample" />}
                   />
                 )}
+
+                {/* TODO: Remove this - currently using for testing purposes. */}
                 {!!materialSample.materialSampleChildren?.length && (
                   <SamplesView
                     samples={materialSample.materialSampleChildren}
@@ -160,13 +163,18 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 {/* Custom Query View */}
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
-                  columns={ELASTIC_SEARCH_COLUMN}
+                  columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
                   customQueryOptions={[
                     {
                       value: "materialSampleChildren",
-                      label: "childMaterialSamples",
-                      customQuery: {},
-                      customViewFields: []
+                      labelKey: "childMaterialSamples",
+                      customQuery: generateUUIDTree(
+                        id ?? "",
+                        "data.relationships.parentMaterialSample.data.id"
+                      ),
+                      customViewFields: [
+                        "data.relationships.parentMaterialSample.data.id"
+                      ]
                     }
                   ]}
                 />

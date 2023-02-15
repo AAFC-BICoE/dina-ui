@@ -79,7 +79,7 @@ function buildEsRule(
   operator: string,
   config: Config
 ) {
-  const widgetName = config.fields[fieldName].type;
+  const widgetName = config.fields?.[fieldName]?.type;
   const widgetConfig = config.widgets[widgetName];
   if (!widgetConfig) return undefined; // Unable to find the widget.
 

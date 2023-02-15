@@ -1,10 +1,10 @@
 import { KitsuResource } from "kitsu";
-import { DinaMessage } from "../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage, useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { FieldSet, QueryPage, QueryPageProps } from "..";
 import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
 import Select from "react-select";
 import { JsonTree } from "react-awesome-query-builder";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export interface CustomQueryOption {
   /**
@@ -15,7 +15,13 @@ export interface CustomQueryOption {
   /**
    * DINA Label Key to display. Uses the <DinaMessage> component.
    */
-  readonly label: keyof typeof DINAUI_MESSAGES_ENGLISH;
+  readonly labelKey: keyof typeof DINAUI_MESSAGES_ENGLISH;
+
+  /**
+   * Direct label to display in the dropdown. The `labelKey` prop should be used instead to support
+   * localization.
+   */
+  readonly label?: string;
 
   /**
    * Custom query to be applied to the QueryPage if this option is selected.
@@ -52,17 +58,31 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   customQueryOptions,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
+  const { formatMessage, locale } = useDinaIntl();
+
   const [customQuerySelected, setCustomQuerySelected] =
     useState<CustomQueryOption | null>(null);
 
   // The legend is based if customQueryOptions are provided as a prop or just a title key.
-  const legend = customQuerySelected?.label ? (
-    <DinaMessage id={customQuerySelected.label} />
+  const legend = customQuerySelected?.labelKey ? (
+    <DinaMessage id={customQuerySelected.labelKey} />
   ) : titleKey ? (
     <DinaMessage id={titleKey} />
   ) : (
     <></>
   );
+
+  // Generate the labels based on the locale and options provided.
+  const translatedOptions = useMemo(() => {
+    if (customQueryOptions) {
+      return customQueryOptions.map((option) => ({
+        ...option,
+        label: formatMessage(option.labelKey)
+      }));
+    } else {
+      return undefined;
+    }
+  }, [customQueryOptions, locale]);
 
   return (
     <FieldSet
@@ -76,7 +96,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
                 <Select<CustomQueryOption>
                   className="mt-2"
                   name="customQueryOptions"
-                  options={customQueryOptions}
+                  options={translatedOptions}
                   value={customQuerySelected}
                   onChange={(selectedOption) =>
                     setCustomQuerySelected(selectedOption)

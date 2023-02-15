@@ -1,4 +1,5 @@
 import { TableColumn } from "common-ui/lib/list-page/types";
+import { dateCell, stringArrayCell } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import { getScientificNames } from "./organismUtils";
 
@@ -36,3 +37,29 @@ export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
     sortable: false
   }
 ];
+
+export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] =
+  [
+    {
+      Cell: ({ original: { id, data } }) => (
+        <a href={`/collection/material-sample/view?id=${id}`}>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      ),
+      label: "materialSampleName",
+      accessor: "data.attributes.materialSampleName",
+      isKeyword: true
+    },
+    {
+      accessor: "data.attributes.materialSampleType",
+      label: "materialSampleType",
+      isKeyword: true
+    },
+    dateCell("createdOn", "data.attributes.createdOn"),
+    stringArrayCell("tags", "data.attributes.tags"),
+    {
+      label: "actions"
+    }
+  ];
