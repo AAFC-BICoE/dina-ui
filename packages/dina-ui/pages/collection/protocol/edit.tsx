@@ -13,6 +13,7 @@ import {
 import { InputResource, PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { useRouter } from "next/router";
+import { ProtocolsField } from "packages/dina-ui/components/collection/ProtocolDataField";
 import { useContext } from "react";
 import {
   GroupSelectField,
@@ -41,9 +42,14 @@ export default function ProtocolEditPage() {
 
   const title = id ? "editProtocolTitle" : "addProtocolTitle";
 
-  const query = useQuery<Protocol>({
-    path: `collection-api/protocol/${id}?include=attachments`
-  });
+  const query = useQuery<Protocol>(
+    {
+      path: `collection-api/protocol/${id}?include=attachments`
+    },
+    {
+      disabled: !id
+    }
+  );
 
   return (
     <div>
@@ -84,7 +90,7 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
           )
         )
       }
-    : { name: "", type: "protocol" };
+    : { name: "", type: "protocol", protocolData: [] };
 
   const onSubmit: DinaFormOnSubmit<ProtocolFormValues> = async ({
     submittedValues
@@ -103,7 +109,7 @@ export function ProtocolForm({ fetchedProtocol, onSaved }: ProtocolFormProps) {
     (input as any).relationships = {
       attachments: {
         data:
-          input.attachments?.map(it => ({
+          input.attachments?.map((it) => ({
             id: it.id,
             type: it.type
           })) ?? []
@@ -189,6 +195,9 @@ export function ProtocolFormLayout() {
         attachmentPath={`collection-api/protocol/${initialValues?.id}/attachments`}
         hideAddAttchmentBtn={true}
       />
+      <div className="row">
+        <ProtocolsField />
+      </div>
     </>
   );
 }
