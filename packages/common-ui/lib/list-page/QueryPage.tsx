@@ -36,7 +36,10 @@ import {
   applySourceFiltering,
   elasticSearchFormatExport
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
+import {
+  CustomViewField,
+  useQueryBuilderConfig
+} from "./query-builder/useQueryBuilderConfig";
 import React from "react";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
@@ -162,7 +165,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Required if view mode is enabled. This is used to provide the fields into the Query Builder
    * configuration which is required for generating the elastic search query.
    */
-  customViewFields?: string[];
+  customViewFields?: CustomViewField[];
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";

@@ -246,7 +246,14 @@ export function AssemblageFormLayout() {
           viewMode={readOnly}
           customViewQuery={readOnly ? customViewQuery : undefined}
           customViewFields={
-            readOnly ? ["data.relationships.assemblages.data.id"] : undefined
+            readOnly
+              ? [
+                  {
+                    fieldName: "data.relationships.assemblages.data.id",
+                    type: "uuid"
+                  }
+                ]
+              : undefined
           }
         />
       )}

@@ -27,6 +27,7 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
+import { transformHierarchySearchToDSL } from "./query-builder-value-types/QueryBuilderHierarchySearch";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
@@ -119,12 +120,24 @@ function validateField(value: string, type: string, formatMessage: any) {
   }
 }
 
+export interface CustomViewField {
+  /**
+   * The field name used in the Custom View.
+   */
+  fieldName: string;
+
+  /**
+   * The type of the Custom View item. Usually this is a UUID but any type can be used.
+   */
+  type: string;
+}
+
 /**
  * Custom hook for generating the query builder hook. It should only be generated once.
  */
 export function useQueryBuilderConfig(
   indexName: string,
-  customViewFields?: string[]
+  customViewFields?: CustomViewField[]
 ) {
   // Load index map using the index name.
   const { indexMap } = useIndexMapping(indexName);
@@ -160,7 +173,7 @@ function generateBuilderConfig(
   indexMap: ESIndexMapping[],
   indexName: string,
   formatMessage: any,
-  customViewFields?: string[]
+  customViewFields?: CustomViewField[]
 ): Config {
   // If the index map doesn't exist, then there is no point of loading the config yet.
   if (!indexMap) {
@@ -218,6 +231,10 @@ function generateBuilderConfig(
     },
     uuid: {
       label: "UUID",
+      cardinality: 1
+    },
+    hierarchy: {
+      label: "Hierarchy",
       cardinality: 1
     }
   };
@@ -281,6 +298,17 @@ function generateBuilderConfig(
         transformUUIDSearchToDSL({
           fieldPath: field,
           value: val
+        })
+    },
+    // Hierarchy is a special type used for custom views.
+    hierarchy: {
+      ...BasicConfig.widgets.text,
+      type: "hierarchy",
+      valueSrc: "value",
+      factory: () => <></>,
+      elasticSearchFormatValue: (_queryType, val, _op, _field, _config) =>
+        transformHierarchySearchToDSL({
+          uuid: val
         })
     },
     date: {
@@ -382,6 +410,15 @@ function generateBuilderConfig(
       widgets: {
         uuid: {
           operators: ["uuid"]
+        }
+      }
+    },
+    hierarchy: {
+      valueSources: ["value", "value"],
+      defaultOperator: "hierarchy",
+      widgets: {
+        hierarchy: {
+          operators: ["hierarchy"]
         }
       }
     },
@@ -536,11 +573,11 @@ function generateBuilderConfig(
     }),
     // Support all first level fields from the custom view.
     ...(customViewFields
-      ? customViewFields.map((fieldName: string) => {
+      ? customViewFields.map((customViewField: CustomViewField) => {
           const field = {};
-          field[fieldName] = {
-            label: fieldName,
-            type: "uuid",
+          field[customViewField.fieldName] = {
+            label: customViewField.fieldName,
+            type: customViewField.type,
             valueSources: ["value"]
           };
           return field;

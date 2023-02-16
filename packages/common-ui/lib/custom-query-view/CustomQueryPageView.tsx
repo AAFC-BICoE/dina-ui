@@ -5,6 +5,7 @@ import { DINAUI_MESSAGES_ENGLISH } from "../../../dina-ui/intl/dina-ui-en";
 import Select from "react-select";
 import { JsonTree } from "react-awesome-query-builder";
 import { useMemo, useState } from "react";
+import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
 
 export interface CustomQueryOption {
   /**
@@ -24,7 +25,7 @@ export interface CustomQueryOption {
   readonly label?: string;
 
   /**
-   * Custom query to be applied to the QueryPage if this option is selected.
+   * Custom query builder tree to be applied to the QueryPage if this option is selected.
    */
   readonly customQuery: JsonTree;
 
@@ -32,7 +33,7 @@ export interface CustomQueryOption {
    * Fields to include in the _source section of the query. Since we will only require certain
    * fields to display not the whole elastic search document.
    */
-  readonly customViewFields: string[];
+  readonly customViewFields: CustomViewField[];
 }
 
 export interface CustomQueryPageViewProps<TData extends KitsuResource>

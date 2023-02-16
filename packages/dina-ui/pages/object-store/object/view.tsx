@@ -127,7 +127,13 @@ export default function MetadataViewPage({
                       customViewQuery={customViewQuery ?? undefined}
                       customViewFields={
                         customViewQuery
-                          ? ["data.relationships.attachment.data.id"]
+                          ? [
+                              {
+                                fieldName:
+                                  "data.relationships.attachment.data.id",
+                                type: "uuid"
+                              }
+                            ]
                           : undefined
                       }
                     />

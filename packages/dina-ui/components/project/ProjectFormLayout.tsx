@@ -86,7 +86,14 @@ export function ProjectFormLayout() {
           viewMode={readOnly}
           customViewQuery={readOnly ? customViewQuery : undefined}
           customViewFields={
-            readOnly ? ["data.relationships.projects.data.id"] : undefined
+            readOnly
+              ? [
+                  {
+                    fieldName: "data.relationships.projects.data.id",
+                    type: "uuid"
+                  }
+                ]
+              : undefined
           }
         />
       )}

@@ -6,7 +6,7 @@ import {
   DinaForm,
   EditButton,
   FieldSet,
-  generateUUIDTree,
+  generateDirectMaterialSampleChildrenTree,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -160,12 +160,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     {
                       value: "materialSampleChildren",
                       labelKey: "childMaterialSamples",
-                      customQuery: generateUUIDTree(
-                        id ?? "",
-                        "data.relationships.parentMaterialSample.data.id"
+                      customQuery: generateDirectMaterialSampleChildrenTree(
+                        id ?? ""
                       ),
                       customViewFields: [
-                        "data.relationships.parentMaterialSample.data.id"
+                        {
+                          fieldName: "data.attributes.hierarchy",
+                          type: "hierarchy"
+                        }
                       ]
                     }
                   ]}
