@@ -204,78 +204,80 @@ export function WorkbookColumnMapping({
             index: +i + 1,
             field: fieldHeaderPair[field]
           };
-          switch (filedsConfigs[field]?.dataType) {
-            case DataTypeEnum.BOOLEAN:
-              if (!isBoolean(row[field])) {
-                param.dataType = DataTypeEnum.BOOLEAN;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case DataTypeEnum.NUMBER:
-              if (!isNumber(row[field])) {
-                param.dataType = DataTypeEnum.NUMBER;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case DataTypeEnum.NUMBER_ARRAY:
-              if (!isNumberArray(row[field])) {
-                param.dataType = DataTypeEnum.NUMBER_ARRAY;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case DataTypeEnum.BOOLEAN_ARRAY:
-              if (!isBooleanArray(row[field])) {
-                param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case DataTypeEnum.MAP:
-              if (!isMap(row[field])) {
-                param.dataType = DataTypeEnum.MAP;
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
-            case DataTypeEnum.NUMBER:
-              if (!isNumber(row[field])) {
-                errors.push(
-                  new ValidationError(
-                    formatMessage("workBookInvalidDataFormat", param),
-                    field,
-                    "sheet"
-                  )
-                );
-              }
-              break;
+          if (!!row[field]) {
+            switch (filedsConfigs[field]?.dataType) {
+              case DataTypeEnum.BOOLEAN:
+                if (!isBoolean(row[field])) {
+                  param.dataType = DataTypeEnum.BOOLEAN;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+              case DataTypeEnum.NUMBER:
+                if (!isNumber(row[field])) {
+                  param.dataType = DataTypeEnum.NUMBER;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+              case DataTypeEnum.NUMBER_ARRAY:
+                if (!isNumberArray(row[field])) {
+                  param.dataType = DataTypeEnum.NUMBER_ARRAY;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+              case DataTypeEnum.BOOLEAN_ARRAY:
+                if (!isBooleanArray(row[field])) {
+                  param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+              case DataTypeEnum.MAP:
+                if (!isMap(row[field])) {
+                  param.dataType = DataTypeEnum.MAP;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+              case DataTypeEnum.NUMBER:
+                if (!isNumber(row[field])) {
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
+                break;
+            }
           }
         }
       }
