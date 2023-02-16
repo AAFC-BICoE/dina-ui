@@ -16,8 +16,8 @@ const PERSON_TEST_DATA_JSON_API = {
   data: [
     { name: "person1-json-api" },
     { name: "person2-json-api" },
-    { name: "person3-json-api" },
-  ],
+    { name: "person3-json-api" }
+  ]
 };
 
 // JSON API mock response.
@@ -32,24 +32,24 @@ const mockGetAll = jest.fn(async (path) => {
 
 const apiContext = {
   apiClient: {
-    get: mockGet,
-  },
+    get: mockGet
+  }
 } as any;
 
 const blockOptions = [
   { label: "Block Option 1", value: "BLOCK_OPTION_1" },
   { label: "Block Option 2", value: "BLOCK_OPTION_2" },
-  { label: "Block Option 3", value: "BLOCK_OPTION_3" },
+  { label: "Block Option 3", value: "BLOCK_OPTION_3" }
 ];
 const unitsOptions = [
   { label: "Unit Option 1", value: "UNIT_OPTION_1" },
   { label: "Unit Option 2", value: "UNIT_OPTION_2" },
-  { label: "Unit Option 3", value: "UNIT_OPTION_3" },
+  { label: "Unit Option 3", value: "UNIT_OPTION_3" }
 ];
 const typeOptions = [
   { label: "Type Option 1", value: "TYPE_OPTION_1" },
   { label: "Type Option 2", value: "TYPE_OPTION_2" },
-  { label: "Type Option 3", value: "TYPE_OPTION_3" },
+  { label: "Type Option 3", value: "TYPE_OPTION_3" }
 ];
 const mockSubmit = jest.fn();
 
@@ -117,7 +117,7 @@ describe("DataEntry", () => {
       .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].value`)
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[0].value`, value: "VALUE_1" },
+        target: { name: `${name}[0].rows[0].value`, value: "VALUE_1" }
       });
 
     // form submission
@@ -133,12 +133,12 @@ describe("DataEntry", () => {
             {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
-              value: "VALUE_1",
-            },
+              value: "VALUE_1"
+            }
           ],
-          select: "BLOCK_OPTION_1",
-        },
-      ],
+          select: "BLOCK_OPTION_1"
+        }
+      ]
     });
 
     // Add new row to data block
@@ -174,7 +174,7 @@ describe("DataEntry", () => {
       .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].value`)
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[1].value`, value: "VALUE_2" },
+        target: { name: `${name}[0].rows[1].value`, value: "VALUE_2" }
       });
 
     // form submission
@@ -190,17 +190,17 @@ describe("DataEntry", () => {
             {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
-              value: "VALUE_1",
+              value: "VALUE_1"
             },
             {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
-              value: "VALUE_2",
-            },
+              value: "VALUE_2"
+            }
           ],
-          select: "BLOCK_OPTION_1",
-        },
-      ],
+          select: "BLOCK_OPTION_1"
+        }
+      ]
     });
 
     wrapper.find("button.add-datablock").simulate("click");
@@ -238,7 +238,7 @@ describe("DataEntry", () => {
       .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].value`)
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[1].rows[0].value`, value: "VALUE_3" },
+        target: { name: `${name}[1].rows[0].value`, value: "VALUE_3" }
       });
 
     // form submission
@@ -254,27 +254,27 @@ describe("DataEntry", () => {
             {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
-              value: "VALUE_1",
+              value: "VALUE_1"
             },
             {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
-              value: "VALUE_2",
-            },
+              value: "VALUE_2"
+            }
           ],
-          select: "BLOCK_OPTION_1",
+          select: "BLOCK_OPTION_1"
         },
         {
           rows: [
             {
               type: "TYPE_OPTION_3",
               unit: "UNIT_OPTION_3",
-              value: "VALUE_3",
-            },
+              value: "VALUE_3"
+            }
           ],
-          select: "BLOCK_OPTION_2",
-        },
-      ],
+          select: "BLOCK_OPTION_2"
+        }
+      ]
     });
   });
 });

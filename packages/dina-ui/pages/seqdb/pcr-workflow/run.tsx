@@ -6,12 +6,13 @@ import { SangerPcrBatchStep } from "../../../components/seqdb/pcr-workflow/Sange
 import { SangerSampleSelectionStep } from "../../../components/seqdb/pcr-workflow/SangerSampleSelectionStep";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { PcrBatch } from "../../../types/seqdb-api";
-import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import PageLayout from "../../../../dina-ui/components/page/PageLayout";
 import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
 import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
@@ -90,7 +91,7 @@ export default function PCRWorkFlowRunPage() {
                 <span className="visually-hidden">Loading...</span>
               </>
             ) : (
-              <>Save</>
+              <DinaMessage id="save" />
             )}
           </Button>
         </>

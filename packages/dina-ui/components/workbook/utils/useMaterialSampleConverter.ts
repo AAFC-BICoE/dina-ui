@@ -1,8 +1,8 @@
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { useFieldConverters } from "./useFieldConverters";
+import { DataTypeEnum, useFieldConverters } from "./useFieldConverters";
 
 export function useMateriaSampleConverter(mappingConfig: {
-  [key: string]: { field: string; dataType: string }[];
+  [key: string]: { [field: string]: {dataType: DataTypeEnum} };
 }) {
   const { getConverter } = useFieldConverters(mappingConfig);
 

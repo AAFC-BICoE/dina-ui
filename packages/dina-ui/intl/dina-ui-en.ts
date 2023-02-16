@@ -838,5 +838,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   unit: "Unit: ",
   http403ForbiddenError: "Access is denied",
   unsupportedFileTypeError:
-    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.'
+    'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
+  workBookDuplicateFieldMap: "This column should not map to the same field",
+  workBookInvalidDataFormat:
+    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}"
 };

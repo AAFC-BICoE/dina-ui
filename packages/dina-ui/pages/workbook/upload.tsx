@@ -1,4 +1,4 @@
-import { ApiClientContext, LoadingSpinner } from "common-ui";
+import { ApiClientContext, LoadingSpinner, SubmitButton } from "common-ui";
 import { useContext, useState } from "react";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
 import { WorkbookJSON } from "../../components/workbook/types/Workbook";
@@ -6,6 +6,7 @@ import { IFileWithMeta } from "../../components/object-store";
 import { WorkbookUpload } from "../../components/workbook/WorkbookUpload";
 import { DinaMessage } from "../../intl/dina-ui-intl";
 import { WorkbookColumnMapping } from "packages/dina-ui/components/workbook/WorkbookColumnMapping";
+import { Button, Spinner } from "react-bootstrap";
 
 export default function UploadWorkbookPage() {
   const { apiClient } = useContext(ApiClientContext);
@@ -13,6 +14,8 @@ export default function UploadWorkbookPage() {
   const [jsonData, setJsonData] = useState<WorkbookJSON | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [failed, setFailed] = useState<boolean>(false);
+  // Request saving to be performed.
+  const [performSave, setPerformSave] = useState<boolean>(false);
 
   /**
    * Using the object store backend that takes in a spreadsheet and returns a JSON format
@@ -55,9 +58,46 @@ export default function UploadWorkbookPage() {
   ) : undefined;
 
   const buttonBar = jsonData ? (
-    <button onClick={backToUpload} className="btn btn-secondary">
-      <DinaMessage id="cancelButtonText" />
-    </button>
+    <>
+      <button onClick={backToUpload} className="btn btn-secondary">
+      {performSave ? (
+          <>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+            <span className="visually-hidden">Loading...</span>
+          </>
+        ) : (
+        <DinaMessage id="cancelButtonText" />
+        )}
+      </button>
+      <Button
+        variant={"primary"}
+        className="ms-auto"
+        onClick={() => setPerformSave(true)}
+        style={{ width: "10rem" }}
+      >
+        {performSave ? (
+          <>
+            <Spinner
+              as="span"
+              animation="border"
+              size="sm"
+              role="status"
+              aria-hidden="true"
+            />
+            <span className="visually-hidden">Loading...</span>
+          </>
+        ) : (
+          <DinaMessage id="save"/>
+        )}
+      </Button>
+    </>
+
   ) : undefined;
 
   return (
@@ -67,7 +107,11 @@ export default function UploadWorkbookPage() {
       ) : (
         <>
           {jsonData ? (
-            <WorkbookColumnMapping spreadsheetData={jsonData} />
+            <WorkbookColumnMapping 
+              spreadsheetData={jsonData} 
+              performSave={performSave}
+              setPerformSave={setPerformSave}
+            />
           ) : (
             <>
               {failedMessage}
