@@ -101,7 +101,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cataloguedObjectListTitle: "Catalogued Objects",
   cfiaPPCLevel: " CFIA PPC Level",
   changedProperties: "Changes",
-  childMaterialSamples: "Child Material Samples",
+  childMaterialSamples: "Direct Material Sample Children",
   childrenStorageUnits: "Children Storage Units",
   closePreviewButtonText: "Close Preview",
   colSearchBoxTooltip: "Search the Catalog of Life",

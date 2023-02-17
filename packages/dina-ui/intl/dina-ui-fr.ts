@@ -100,7 +100,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   cataloguedObjectListTitle: "Objets catalogués",
   cfiaPPCLevel: "Niveau ACIA PPC",
   changedProperties: "Modifications",
-  childMaterialSamples: "Sous-échantillons de matière",
   childrenStorageUnits: "Tables enfants des unités de stockage",
   closePreviewButtonText: "Fermer la prévisualisation",
   colSearchBoxTooltip: "Rechercher dans le Catalogue de la vie",

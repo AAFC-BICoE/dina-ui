@@ -1,13 +1,11 @@
 import {
-  BackToListButton,
   ButtonBar,
   DeleteButton,
   DinaForm,
   LoadingSpinner,
   generateUUIDTree,
-  FieldSet,
-  QueryPage,
-  BackButton
+  BackButton,
+  CustomQueryPageView
 } from "common-ui";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -22,8 +20,6 @@ import {
 import { ExifView, MetadataDetails } from "../../../components/object-store";
 import { MetadataFileView } from "../../../components/object-store/metadata/MetadataFileView";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { TableColumn } from "../../../../common-ui/lib/list-page/types";
-import { Metadata } from "../../../../dina-ui/types/objectstore-api";
 import { ELASTIC_SEARCH_COLUMN } from "../../../../dina-ui/components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 const OBJECT_DETAILS_PAGE_CSS = `
@@ -123,21 +119,24 @@ export default function MetadataViewPage({
                   <MetadataDetails metadata={metadata} />
                   <ExifView objectUpload={metadata.objectUpload} />
                   {customViewQuery && (
-                    <FieldSet
-                      legend={<DinaMessage id="attachedMaterialSamples" />}
-                    >
-                      <QueryPage
-                        columns={ELASTIC_SEARCH_COLUMN}
-                        indexName={"dina_material_sample_index"}
-                        viewMode={customViewQuery ? true : false}
-                        customViewQuery={customViewQuery ?? undefined}
-                        customViewFields={
-                          customViewQuery
-                            ? ["data.relationships.attachment.data.id"]
-                            : undefined
-                        }
-                      />
-                    </FieldSet>
+                    <CustomQueryPageView
+                      titleKey="attachedMaterialSamples"
+                      columns={ELASTIC_SEARCH_COLUMN}
+                      indexName={"dina_material_sample_index"}
+                      viewMode={customViewQuery ? true : false}
+                      customViewQuery={customViewQuery ?? undefined}
+                      customViewFields={
+                        customViewQuery
+                          ? [
+                              {
+                                fieldName:
+                                  "data.relationships.attachment.data.id",
+                                type: "uuid"
+                              }
+                            ]
+                          : undefined
+                      }
+                    />
                   )}
                 </DinaForm>
               </div>
