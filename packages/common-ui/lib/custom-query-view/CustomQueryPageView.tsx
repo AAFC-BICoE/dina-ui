@@ -27,7 +27,14 @@ export interface CustomQueryOption {
   /**
    * Custom query builder tree to be applied to the QueryPage if this option is selected.
    */
-  readonly customQuery: JsonTree;
+  readonly customQuery?: JsonTree;
+
+  /**
+   * Instead of a query builder tree, you can also just do custom elastic search queries.
+   *
+   * Pagination, sorting and source fields are applied as normal.
+   */
+  readonly customElasticSearch?: any;
 
   /**
    * Fields to include in the _source section of the query. Since we will only require certain
@@ -123,6 +130,9 @@ export function CustomQueryPageView<TData extends KitsuResource>({
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
             customViewFields={customQuerySelected.customViewFields}
+            customViewElasticSearchQuery={
+              customQuerySelected.customElasticSearch
+            }
             viewMode={true}
           />
         </>

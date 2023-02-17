@@ -27,7 +27,6 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
-import { transformHierarchySearchToDSL } from "./query-builder-value-types/QueryBuilderHierarchySearch";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
@@ -232,10 +231,6 @@ function generateBuilderConfig(
     uuid: {
       label: "UUID",
       cardinality: 1
-    },
-    hierarchy: {
-      label: "Hierarchy",
-      cardinality: 1
     }
   };
 
@@ -298,17 +293,6 @@ function generateBuilderConfig(
         transformUUIDSearchToDSL({
           fieldPath: field,
           value: val
-        })
-    },
-    // Hierarchy is a special type used for custom views.
-    hierarchy: {
-      ...BasicConfig.widgets.text,
-      type: "hierarchy",
-      valueSrc: "value",
-      factory: () => <></>,
-      elasticSearchFormatValue: (_queryType, val, _op, _field, _config) =>
-        transformHierarchySearchToDSL({
-          uuid: val
         })
     },
     date: {
@@ -410,15 +394,6 @@ function generateBuilderConfig(
       widgets: {
         uuid: {
           operators: ["uuid"]
-        }
-      }
-    },
-    hierarchy: {
-      valueSources: ["value", "value"],
-      defaultOperator: "hierarchy",
-      widgets: {
-        hierarchy: {
-          operators: ["hierarchy"]
         }
       }
     },

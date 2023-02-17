@@ -160,13 +160,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     {
                       value: "materialSampleChildren",
                       labelKey: "childMaterialSamples",
-                      customQuery: generateDirectMaterialSampleChildrenTree(
-                        id ?? ""
-                      ),
+                      customElasticSearch:
+                        generateDirectMaterialSampleChildrenTree(id ?? ""),
                       customViewFields: [
                         {
                           fieldName: "data.attributes.hierarchy",
-                          type: "hierarchy"
+                          type: "uuid"
                         }
                       ]
                     }
