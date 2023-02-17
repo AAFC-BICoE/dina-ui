@@ -17,7 +17,7 @@ import {
 import { CommonMessage } from "../intl/common-ui-intl";
 import {
   CheckBoxFieldProps,
-  useGroupedCheckBoxes,
+  useGroupedCheckBoxes
 } from "../formik-connected/GroupedCheckBoxFields";
 import { v4 as uuidv4 } from "uuid";
 import { MultiSortTooltip } from "./MultiSortTooltip";
@@ -34,9 +34,12 @@ import {
   applyRootQuery,
   applySortingRules,
   applySourceFiltering,
-  elasticSearchFormatExport,
+  elasticSearchFormatExport
 } from "./query-builder/query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { useQueryBuilderConfig } from "./query-builder/useQueryBuilderConfig";
+import {
+  CustomViewField,
+  useQueryBuilderConfig
+} from "./query-builder/useQueryBuilderConfig";
 import React from "react";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
@@ -46,8 +49,8 @@ const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
   {
     id: "createdOn",
-    desc: true,
-  },
+    desc: true
+  }
 ];
 
 /**
@@ -81,6 +84,12 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * setting by providing your own default sort.
    */
   defaultSort?: SortingRule[];
+
+  /**
+   * By default, the page size is 25 (25 items can be displayed per page). If you set this to zero
+   * the page size will not be applied to the elastic search query.
+   */
+  defaultPageSize?: number;
 
   /**
    * Adds the bulk edit button and the row checkboxes.
@@ -156,7 +165,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Required if view mode is enabled. This is used to provide the fields into the Query Builder
    * configuration which is required for generating the elastic search query.
    */
-  customViewFields?: string[];
+  customViewFields?: CustomViewField[];
 }
 
 const GROUP_STORAGE_KEY = "groupStorage";
@@ -180,13 +189,14 @@ export function QueryPage<TData extends KitsuResource>({
   singleEditPath,
   reactTableProps,
   defaultSort,
+  defaultPageSize,
   selectionMode = false,
   selectionResources: selectedResources,
   setSelectionResources: setSelectedResources,
   onSortedChange,
   viewMode,
   customViewQuery,
-  customViewFields,
+  customViewFields
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
   const { formatMessage, formatNumber } = useIntl();
@@ -202,7 +212,9 @@ export function QueryPage<TData extends KitsuResource>({
   const [sortingRules, setSortingRules] = useState(defaultSort ?? DEFAULT_SORT);
 
   // The pagination size.
-  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState<number>(
+    defaultPageSize ?? DEFAULT_PAGE_SIZE
+  );
 
   // The pagination offset.
   const [pageOffset, setPageOffset] = useState<number>(0);
@@ -239,7 +251,7 @@ export function QueryPage<TData extends KitsuResource>({
   const [error, setError] = useState<any>();
 
   const defaultGroups = {
-    group: groups,
+    group: groups
   };
 
   useEffect(() => {
@@ -299,7 +311,7 @@ export function QueryPage<TData extends KitsuResource>({
             id: rslt._source?.data?.id,
             type: rslt._source?.data?.type,
             data: {
-              attributes: rslt._source?.data?.attributes,
+              attributes: rslt._source?.data?.attributes
             },
             included: rslt._source?.included?.reduce(
               (includedAccumulator, currentIncluded) => {
@@ -307,7 +319,7 @@ export function QueryPage<TData extends KitsuResource>({
                   if (!includedAccumulator[currentIncluded?.type]) {
                     return (
                       (includedAccumulator[currentIncluded?.type] = [
-                        currentIncluded,
+                        currentIncluded
                       ]),
                       includedAccumulator
                     );
@@ -328,7 +340,7 @@ export function QueryPage<TData extends KitsuResource>({
                 }
               },
               {}
-            ),
+            )
           };
         });
         // If we have reached the count limit, we will need to perform another request for the true
@@ -366,7 +378,7 @@ export function QueryPage<TData extends KitsuResource>({
         setQueryBuilderTree(newTree);
       }
     }
-  }, [queryBuilderConfig]);
+  }, [queryBuilderConfig, customViewQuery, customViewFields]);
 
   /**
    * Used for selection mode only.
@@ -462,8 +474,8 @@ export function QueryPage<TData extends KitsuResource>({
       query,
       {
         params: {
-          indexName,
-        },
+          indexName
+        }
       }
     );
     return resp?.data?.hits;
@@ -484,8 +496,8 @@ export function QueryPage<TData extends KitsuResource>({
       query,
       {
         params: {
-          indexName,
-        },
+          indexName
+        }
       }
     );
     return resp?.data?.count;
@@ -495,20 +507,20 @@ export function QueryPage<TData extends KitsuResource>({
   const {
     CheckBoxField: SelectCheckBox,
     CheckBoxHeader: SelectCheckBoxHeader,
-    setAvailableItems: setAvailableResources,
+    setAvailableItems: setAvailableResources
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToSelect",
-    defaultAvailableItems: searchResults ?? [],
+    defaultAvailableItems: searchResults ?? []
   });
 
   // Checkbox for second table where selected/to be deleted items are displayed
   const {
     CheckBoxField: DeselectCheckBox,
     CheckBoxHeader: DeselectCheckBoxHeader,
-    setAvailableItems: setRemovableItems,
+    setAvailableItems: setRemovableItems
   } = useGroupedCheckBoxes({
     fieldName: "itemIdsToDelete",
-    defaultAvailableItems: selectedResources ?? [],
+    defaultAvailableItems: selectedResources ?? []
   });
 
   const computedReactTableProps =
@@ -531,11 +543,11 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             Header: SelectCheckBoxHeader,
             sortable: false,
-            width: 200,
-          },
+            width: 200
+          }
         ]
       : []),
-    ...columns,
+    ...columns
   ];
 
   // Columns generated for the selected resources, only in selection mode.
@@ -548,24 +560,24 @@ export function QueryPage<TData extends KitsuResource>({
             ),
             Header: DeselectCheckBoxHeader,
             sortable: false,
-            width: 200,
-          },
+            width: 200
+          }
         ]
       : []),
-    ...columns,
+    ...columns
   ];
 
   const mappedResultsColumns = columnsResults.map((column) => {
     const { fieldName, customHeader } = {
       customHeader: column.Header,
-      fieldName: String(column.label),
+      fieldName: String(column.label)
     };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...column,
+      ...column
     };
   });
 
@@ -573,14 +585,14 @@ export function QueryPage<TData extends KitsuResource>({
     // The "columns" prop can be a string or a react-table Column type.
     const { fieldName, customHeader } = {
       customHeader: column.Header,
-      fieldName: String(column.label),
+      fieldName: String(column.label)
     };
 
     const Header = customHeader ?? <FieldHeader name={fieldName} />;
 
     return {
       Header,
-      ...column,
+      ...column
     };
   });
 
@@ -781,7 +793,7 @@ export function QueryPage<TData extends KitsuResource>({
                         <div
                           className="alert alert-danger"
                           style={{
-                            whiteSpace: "pre-line",
+                            whiteSpace: "pre-line"
                           }}
                         >
                           <p>
