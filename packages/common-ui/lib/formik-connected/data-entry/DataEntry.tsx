@@ -1,4 +1,8 @@
-import { FieldSet } from "../..";
+import {
+  FieldSet,
+  useBulkEditTabContext,
+  useBulkEditTabFieldIndicators
+} from "../..";
 import { DataBlock } from "./DataBlock";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { FieldArray } from "formik";
@@ -25,6 +29,29 @@ export function DataEntry({
   setSelectedBlockOptions,
   id
 }: DataEntryProps) {
+  const bulkCtx = useBulkEditTabContext();
+
+  const bulkEditResourceHooks = bulkCtx?.resourceHooks;
+
+  let bulkEditBlocksRowsMap = {};
+  bulkEditResourceHooks?.forEach((resourceHook: any) => {
+    resourceHook?.resource?.extensionValues?.forEach((extensionValue) => {
+      if (bulkEditBlocksRowsMap[extensionValue?.select]) {
+        bulkEditBlocksRowsMap[extensionValue?.select] = Math.max(
+          bulkEditBlocksRowsMap[extensionValue?.select],
+          extensionValue?.rows?.length
+        );
+        bulkEditBlocksRowsMap[extensionValue?.select] =
+          bulkEditBlocksRowsMap[extensionValue?.select].length >
+          extensionValue?.rows?.length
+            ? bulkEditBlocksRowsMap[extensionValue?.select]
+            : extensionValue?.rows;
+      } else {
+        bulkEditBlocksRowsMap[extensionValue?.select] = extensionValue?.rows;
+      }
+    });
+  });
+
   const arrayHelpersRef = useRef<any>(null);
 
   function removeBlock(index) {
@@ -77,7 +104,6 @@ export function DataEntry({
         {(fieldArrayProps) => {
           const blocks: [] = fieldArrayProps.form.values[name];
           arrayHelpersRef.current = fieldArrayProps;
-
           return (
             <div>
               {blocks?.length > 0 ? (
@@ -97,6 +123,28 @@ export function DataEntry({
                         typeOptions={typeOptions}
                         readOnly={readOnly}
                         selectedBlockOptions={selectedBlockOptions}
+                      />
+                    );
+                  })}
+                </div>
+              ) : Object.keys(bulkEditBlocksRowsMap).length > 0 ? (
+                <div style={{ padding: 15 }}>
+                  {Object.keys(bulkEditBlocksRowsMap).map((select, index) => {
+                    return (
+                      <DataBlock
+                        blockOptions={blockOptions}
+                        onBlockSelectChange={onBlockSelectChange}
+                        model={model}
+                        unitsOptions={unitsOptions}
+                        blockIndex={index}
+                        removeBlock={removeBlock}
+                        name={`${fieldArrayProps.name}[${index}]`}
+                        key={index}
+                        vocabularyOptionsPath={vocabularyOptionsPath}
+                        typeOptions={typeOptions}
+                        readOnly={readOnly}
+                        selectedBlockOptions={selectedBlockOptions}
+                        bulkEditRows={bulkEditBlocksRowsMap[select]}
                       />
                     );
                   })}

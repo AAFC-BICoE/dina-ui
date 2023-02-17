@@ -21,6 +21,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   typeOptions?: any[];
   readOnly?: boolean;
   selectedBlockOptions?: any;
+  bulkEditRows?: any;
 }
 
 export function DataBlock({
@@ -34,6 +35,7 @@ export function DataBlock({
   typeOptions,
   readOnly,
   selectedBlockOptions,
+  bulkEditRows,
   ...props
 }: DataBlockProps) {
   return (
@@ -43,7 +45,7 @@ export function DataBlock({
           const rows: [] = get(
             fieldArrayProps,
             `form.values.${fieldArrayProps.name}`
-          );
+          ) || bulkEditRows;
           function addRow() {
             fieldArrayProps.push({});
           }
