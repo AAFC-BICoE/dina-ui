@@ -138,7 +138,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
         return (
           <div className={invalid ? "is-invalid" : ""}>
             <Creatable<SelectOption<T>, boolean>
-              isClearable={false}
+              isClearable={true}
               isDisabled={disabled}
               isMulti={isMulti}
               options={options}

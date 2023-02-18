@@ -14,6 +14,9 @@ export function ProtocolsField() {
   const { initialValues, readOnly } = useContext(DinaFormContext) ?? {};
   const { apiClient } = useApiClient();
 
+  const { vocabOptions: blockOptions } = useVocabularyOptions({
+    path: "collection-api/vocabulary/protocolData"
+  });
   const [typeOptions, setTypeOptions] = useState<SelectOption<string>[]>([]);
   const { vocabOptions: unitOptions } = useVocabularyOptions({
     path: "collection-api/vocabulary/unitsOfMeasurement"
@@ -42,12 +45,17 @@ export function ProtocolsField() {
     <DataEntryField
       legend={<DinaMessage id="protocolData" />}
       name="protocolData"
-      vocabularyOptionsPath="collection-api/vocabulary/protocolData"
+      blockOptions={blockOptions}
       typeOptions={typeOptions}
       unitsOptions={unitOptions}
       readOnly={readOnly}
       initialValues={initialValues.extensionValues}
       isTemplate={true}
+      blockAddable={true}
+      unitsAddable={true}
+      typesAddable={true}
+      isVocabularyBasedEnabledForBlock={true}
+      isVocabularyBasedEnabledForType={true}
     />
   );
 }
