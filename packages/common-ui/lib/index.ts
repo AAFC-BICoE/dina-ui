@@ -18,6 +18,7 @@ export * from "./filter-builder/FilterBuilderField";
 export * from "./filter-builder/FilterGroup";
 export * from "./filter-builder/rsql";
 export * from "./formik-connected/AutoSuggestTextField";
+export * from "./formik-connected/CreatableSelectField";
 export * from "./formik-connected/DateField";
 export * from "./formik-connected/FormattedTextField";
 export * from "./formik-connected/DinaForm";

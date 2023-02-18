@@ -1,35 +1,39 @@
-import CreatableSelect from "react-select/creatable";
 import { DinaForm } from "common-ui";
+import { VocabularyElement } from "packages/dina-ui/types/collection-api";
+import CreatableSelect from "react-select/creatable";
 import { mountWithAppContext } from "../../../test-util/mock-app-context";
-import { VocabularySelectField } from "../VocabularySelectField";
+import {
+  VocabularyOption,
+  VocabularySelectField
+} from "../VocabularySelectField";
+import { find } from "lodash";
 
 const mockOnSubmit = jest.fn();
-const mockGet = jest.fn<any, any>(async (path) => {
-  switch (path) {
-    case "collection-api/vocabulary/substrate":
-      return {
-        data: {
-          id: "substrate",
-          type: "vocabulary",
-          vocabularyElements: [
-            {
-              name: "substrate_1",
-              multilingualTitle: {
-                titles: [
-                  {
-                    lang: "en",
-                    title: "substrate 1"
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      };
+const vocabOptions = [{ value: "substrate_1", label: "substrate 1" }];
+const mockToOption = (value: string | VocabularyElement): VocabularyOption => {
+  if (typeof value === "string") {
+    return {
+      label: vocabOptions.find((it) => it.value === value)?.label || value,
+      value
+    };
   }
+  const label =
+    find(value?.multilingualTitle?.titles || [], (item) => item.lang === "en")
+      ?.title ||
+    value.name ||
+    "";
+  return { label, value: value.name || label };
+};
+
+jest.mock("../useVocabularyOptions", () => {
+  return jest.fn(() => ({
+    toOption: mockToOption,
+    loading: false,
+    vocabOptions
+  }));
 });
 
-const testCtx = { apiContext: { apiClient: { get: mockGet } } };
+const testCtx = { apiContext: { apiClient: {} } };
 
 describe("VocabularySelectField component", () => {
   it("Renders and sets values correctly (multi-select)", async () => {
