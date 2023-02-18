@@ -2,7 +2,7 @@ import {
   filterBy,
   ResourceSelectField,
   SelectField,
-  TextField,
+  TextField
 } from "common-ui";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { FaPlus, FaMinus } from "react-icons/fa";
@@ -26,6 +26,8 @@ export interface DataRowProps {
   unitsOptions?: any[];
   typeOptions?: any[];
   readOnly?: boolean;
+  unitsAddable?: boolean;
+  typesAddable?: boolean;
 }
 
 export function DataRow({
@@ -37,6 +39,8 @@ export function DataRow({
   unitsOptions,
   typeOptions,
   readOnly,
+  unitsAddable = false,
+  typesAddable = false
 }: DataRowProps) {
   const valueTextFieldName = getFieldName(name, "value", rowIndex);
   const typeSelectFieldName = getFieldName(name, "type", rowIndex);

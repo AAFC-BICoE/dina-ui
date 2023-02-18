@@ -1,7 +1,7 @@
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 import { DinaForm } from "../DinaForm";
 import { CreatableSelectField } from "../CreatableSelectField";
-import CreatableSelect from "react-select/creatable";
+import Creatable from "react-select/creatable";
 
 const PRIMER_TYPE_OPTIONS = [
   {
@@ -60,7 +60,7 @@ describe("CreatableSelectField component", () => {
   it("Displays the Formik field's value.", async () => {
     const wrapper = getWrapper();
 
-    const { value } = wrapper.find<any>(CreatableSelect).props();
+    const { value } = wrapper.find<any>(Creatable).props();
 
     // The selected option object should be passed into the Select component.
     expect(value).toEqual({
@@ -72,7 +72,7 @@ describe("CreatableSelectField component", () => {
   it("Changes the Formik field's value.", () => {
     const wrapper = getWrapper();
 
-    const { onChange } = wrapper.find<any>(CreatableSelect).props();
+    const { onChange } = wrapper.find<any>(Creatable).props();
 
     // Simulate changing the selected option.
     onChange({
@@ -89,9 +89,7 @@ describe("CreatableSelectField component", () => {
     const wrapper = getWrapper({ onChange: mockOnChange });
 
     // Change the value.
-    wrapper.find(CreatableSelect).prop<any>("onChange")({
-      value: "newTestValue"
-    });
+    wrapper.find(Creatable).prop<any>("onChange")({ value: "newTestValue" });
 
     // The mock function should have been called with the new value.
     expect(mockOnChange).lastCalledWith(
@@ -106,7 +104,7 @@ describe("CreatableSelectField component", () => {
     const wrapper = getWrapper({ onChange: mockOnChange });
 
     // Change the value to the first two options:
-    wrapper.find(CreatableSelect).prop<any>("onChange")([
+    wrapper.find(Creatable).prop<any>("onChange")([
       PRIMER_TYPE_OPTIONS[0],
       PRIMER_TYPE_OPTIONS[1]
     ]);

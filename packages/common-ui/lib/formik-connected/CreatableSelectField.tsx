@@ -6,7 +6,7 @@ import { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { GroupBase } from "react-select";
-import CreatableSelect, { CreatableProps } from "react-select/creatable";
+import Creatable, { CreatableProps } from "react-select/creatable";
 import { SelectOption } from "./SelectField";
 
 export interface CreatableSelectFieldProps<T> extends FieldWrapperProps {
@@ -137,8 +137,8 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
 
         return (
           <div className={invalid ? "is-invalid" : ""}>
-            <CreatableSelect<SelectOption<T>, boolean>
-              isClearable={true}
+            <Creatable<SelectOption<T>, boolean>
+              isClearable={false}
               isDisabled={disabled}
               isMulti={isMulti}
               options={options}

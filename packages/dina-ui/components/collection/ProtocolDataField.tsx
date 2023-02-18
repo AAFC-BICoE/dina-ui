@@ -1,20 +1,23 @@
 import {
   DataEntryField,
   DinaFormContext,
+  SelectOption,
   useApiClient
 } from "packages/common-ui/lib";
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { ProtocolElement } from "packages/dina-ui/types/collection-api/resources/ProtocolElement";
 import { useContext, useEffect, useState } from "react";
+import useVocabularyOptions from "./useVocabularyOptions";
 
 export function ProtocolsField() {
   const { locale } = useDinaIntl();
   const { initialValues, readOnly } = useContext(DinaFormContext) ?? {};
   const { apiClient } = useApiClient();
 
-  const [protocolElementOptions, setProtocolElementOptions] = useState<
-    { value: string; label: string }[]
-  >([]);
+  const [typeOptions, setTypeOptions] = useState<SelectOption<string>[]>([]);
+  const { vocabOptions: unitOptions } = useVocabularyOptions({
+    path: "collection-api/vocabulary/unitsOfMeasurement"
+  });
 
   useEffect(() => {
     async function fetchAllProtocolElements() {
@@ -30,7 +33,7 @@ export function ProtocolsField() {
           value: rec.id
         };
       });
-      setProtocolElementOptions(options);
+      setTypeOptions(options);
     }
     fetchAllProtocolElements();
   }, []);
@@ -40,7 +43,8 @@ export function ProtocolsField() {
       legend={<DinaMessage id="protocolData" />}
       name="protocolData"
       vocabularyOptionsPath="collection-api/vocabulary/protocolData"
-      typeOptions={protocolElementOptions}
+      typeOptions={typeOptions}
+      unitsOptions={unitOptions}
       readOnly={readOnly}
       initialValues={initialValues.extensionValues}
       isTemplate={true}
