@@ -8,9 +8,12 @@ import {
   SubmitButton,
   TextField,
   useDinaFormContext
-} from "packages/common-ui/lib";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+} from "../../../../common-ui/lib";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
+import { Protocol } from "../../../../dina-ui/types/collection-api";
 import { useContext } from "react";
 import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";

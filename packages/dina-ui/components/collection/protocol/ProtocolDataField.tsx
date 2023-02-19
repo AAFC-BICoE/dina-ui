@@ -3,9 +3,12 @@ import {
   DinaFormContext,
   SelectOption,
   useApiClient
-} from "packages/common-ui/lib";
-import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
-import { ProtocolElement } from "packages/dina-ui/types/collection-api/resources/ProtocolElement";
+} from "../../../../common-ui/lib";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
+import { ProtocolElement } from "../../../../dina-ui/types/collection-api/resources/ProtocolElement";
 import { useContext, useEffect, useState } from "react";
 import useVocabularyOptions from "../useVocabularyOptions";
 
