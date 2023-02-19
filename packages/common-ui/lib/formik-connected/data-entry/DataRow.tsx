@@ -1,6 +1,10 @@
-import { CreatableSelectField, SelectField, TextField } from "common-ui";
+import {
+  CheckBoxField,
+  CreatableSelectField,
+  SelectField,
+  TextField
+} from "common-ui";
 import { find } from "lodash";
-import { useState } from "react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
@@ -49,11 +53,13 @@ export function DataRow({
     "vocabularyBased",
     rowIndex
   );
-  const [vocabularyBased, setVocabularyBased] = useState<boolean>(false);
 
-  function onCreatableSelectFieldChange(value) {
+  function onCreatableSelectFieldChange(value, formik) {
     if (isVocabularyBasedEnabledForType) {
-      setVocabularyBased(!!find(typeOptions, (item) => item.value === value));
+      formik.setFieldValue(
+        vocabularyBasedFieldName,
+        !!find(typeOptions, (item) => item.value === value)
+      );
     }
   }
 
@@ -111,10 +117,10 @@ export function DataRow({
         </div>
       )}
       {isVocabularyBasedEnabledForType && (
-        <input
+        <CheckBoxField
+          className="hidden"
           name={vocabularyBasedFieldName}
-          value={vocabularyBased ? "true" : "false"}
-          type="hidden"
+          removeLabel={true}
         />
       )}
       {!readOnly && (

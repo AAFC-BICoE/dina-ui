@@ -55,7 +55,8 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
     const values = compact(castArray(value));
     const labels = compact(
       values.map(
-        (item) => find(options, (option) => option.value === item)?.label
+        (item) =>
+          find(options, (option) => option.value === item)?.label || item
       )
     );
     return (

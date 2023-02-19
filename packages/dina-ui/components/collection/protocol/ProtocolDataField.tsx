@@ -7,7 +7,7 @@ import {
 import { DinaMessage, useDinaIntl } from "packages/dina-ui/intl/dina-ui-intl";
 import { ProtocolElement } from "packages/dina-ui/types/collection-api/resources/ProtocolElement";
 import { useContext, useEffect, useState } from "react";
-import useVocabularyOptions from "./useVocabularyOptions";
+import useVocabularyOptions from "../useVocabularyOptions";
 
 export function ProtocolsField() {
   const { locale } = useDinaIntl();
@@ -44,7 +44,7 @@ export function ProtocolsField() {
   return (
     <DataEntryField
       legend={<DinaMessage id="protocolData" />}
-      name="protocolData"
+      name="protocolFormData"
       blockOptions={blockOptions}
       typeOptions={typeOptions}
       unitsOptions={unitOptions}

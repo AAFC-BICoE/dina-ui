@@ -1,8 +1,8 @@
 import { FieldArray } from "formik";
 import { find, get } from "lodash";
-import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import {
+  CheckBoxField,
   CreatableSelectField,
   FieldWrapperProps,
   SelectField,
@@ -48,7 +48,6 @@ export function DataBlock({
   isVocabularyBasedEnabledForType = false,
   ...props
 }: DataBlockProps) {
-  const [vocabularyBased, setVocabularyBased] = useState<boolean>(false);
   return (
     <div>
       <FieldArray name={`${props.name}.rows`}>
@@ -67,7 +66,8 @@ export function DataBlock({
 
           function onCreatableSelectFieldChange(value, formik, oldValue) {
             if (isVocabularyBasedEnabledForBlock) {
-              setVocabularyBased(
+              formik.setFieldValue(
+                `${props.name}.vocabularyBased`,
                 !!find(blockOptions, (item) => item.value === value)
               );
             }
@@ -125,11 +125,10 @@ export function DataBlock({
                       />
                     )}
                     {isVocabularyBasedEnabledForBlock && (
-                      <input
-                        className="vocabularyBased"
+                      <CheckBoxField
+                        className="hidden"
                         name={`${props.name}.vocabularyBased`}
-                        value={vocabularyBased ? "true" : "false"}
-                        type="hidden"
+                        removeLabel={true}
                       />
                     )}
                   </div>

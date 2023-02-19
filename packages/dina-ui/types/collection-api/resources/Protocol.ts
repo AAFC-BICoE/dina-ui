@@ -3,14 +3,16 @@ import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MultilingualDescription } from "../../common";
 
 export interface ProtocolData {
-  key: string;
-  vocabularyBased: boolean;
-  protocolDataElement: {
-    elementType: string;
-    value: string;
-    vocabularyBased: boolean;
-    unit: string | null;
-  }[];
+  key?: string;
+  vocabularyBased?: boolean;
+  protocolDataElement?:
+    | {
+        elementType?: string;
+        value?: string;
+        vocabularyBased?: boolean;
+        unit?: string | null;
+      }[]
+    | null;
 }
 
 export interface ProtocolAttributes {
