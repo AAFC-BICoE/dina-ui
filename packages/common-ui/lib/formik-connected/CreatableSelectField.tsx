@@ -1,4 +1,3 @@
-// tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
 import { find, isArray, castArray, compact } from "lodash";
 import { RefObject } from "react";
@@ -102,9 +101,9 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
             .find((option) => option.value === value) as any;
           // also search in possible nested options
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
-            const optionWithNested = options.filter((opt) => !!opt["options"]);
+            const optionWithNested = options.filter((opt) => !!opt.options);
             optionWithNested.map((option) =>
-              option["options"].map((opt) => {
+              option.options.map((opt) => {
                 if (opt.value === value) {
                   selectedOption = opt;
                   return;
