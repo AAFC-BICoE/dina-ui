@@ -44,7 +44,6 @@ export function elasticSearchFormatExport(
     const operator = properties.get("operator");
     const field = properties.get("field");
     const value = properties.get("value").toJS();
-    const errors = properties.get("valueError");
 
     return buildEsRule(field, value, operator, config);
   }
@@ -88,7 +87,7 @@ function buildEsRule(
   // Use the custom logic by default.
   const parameters = elasticSearchFormatValue(
     undefined,
-    value[0],
+    value[0].trim(),
     operator,
     fieldName,
     config
