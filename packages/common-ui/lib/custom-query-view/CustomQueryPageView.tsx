@@ -6,6 +6,7 @@ import Select from "react-select";
 import { JsonTree } from "react-awesome-query-builder";
 import { useMemo, useState } from "react";
 import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 export interface CustomQueryOption {
   /**
@@ -27,13 +28,20 @@ export interface CustomQueryOption {
   /**
    * Custom query builder tree to be applied to the QueryPage if this option is selected.
    */
-  readonly customQuery: JsonTree;
+  readonly customQuery?: JsonTree;
+
+  /**
+   * Instead of a query builder tree, you can also just do custom elastic search queries.
+   *
+   * Pagination, sorting and source fields are applied as normal.
+   */
+  readonly customElasticSearch?: any;
 
   /**
    * Fields to include in the _source section of the query. Since we will only require certain
    * fields to display not the whole elastic search document.
    */
-  readonly customViewFields: CustomViewField[];
+  readonly customViewFields?: CustomViewField[];
 }
 
 export interface CustomQueryPageViewProps<TData extends KitsuResource>
@@ -46,6 +54,14 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
   titleKey?: keyof typeof DINAUI_MESSAGES_ENGLISH;
 
   /**
+   * This key is used for generating the local storage key so the option can be saved in the users
+   * local storage.
+   *
+   * If no key is provided, local storage for saving the option will be disabled.
+   */
+  localStorageKey?: string;
+
+  /**
    * If options are provided, a dropdown menu to the right of the legend title will be displayed
    * to allow the user to choose the query thats being displayed.
    *
@@ -56,9 +72,14 @@ export interface CustomQueryPageViewProps<TData extends KitsuResource>
 
 export function CustomQueryPageView<TData extends KitsuResource>({
   titleKey,
+  localStorageKey,
   customQueryOptions,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
+  const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = localStorageKey
+    ? localStorageKey + "-custom-query-page-option"
+    : null;
+
   const { formatMessage, locale } = useDinaIntl();
 
   // Generate the labels based on the locale and options provided.
@@ -75,12 +96,31 @@ export function CustomQueryPageView<TData extends KitsuResource>({
 
   // Initialize the `customQuerySelected` state to the first option in the `customQueryOptions`
   // array, if it exists and has at least one element. Otherwise, set it to `null`.
-  const [customQuerySelected, setCustomQuerySelected] =
-    useState<CustomQueryOption | null>(
-      translatedOptions && translatedOptions.length > 0
-        ? translatedOptions[0]
-        : null
-    );
+  let customQuerySelectedValue;
+  let setCustomQuerySelectedValue;
+  if (
+    translatedOptions &&
+    translatedOptions.length !== 0 &&
+    CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY
+  ) {
+    [customQuerySelectedValue, setCustomQuerySelectedValue] =
+      useLocalStorage<string>(
+        CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY,
+        translatedOptions[0].value
+      );
+  } else {
+    [customQuerySelectedValue, setCustomQuerySelectedValue] = useState<
+      string | null
+    >(null);
+  }
+
+  const customQuerySelected = useMemo(
+    () =>
+      translatedOptions?.find(
+        (option) => option.value === customQuerySelectedValue
+      ),
+    [customQuerySelectedValue]
+  );
 
   // The legend is based if customQueryOptions are provided as a prop or just a title key.
   const legend = customQuerySelected?.labelKey ? (
@@ -106,7 +146,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
                   options={translatedOptions}
                   value={customQuerySelected}
                   onChange={(selectedOption) =>
-                    setCustomQuerySelected(selectedOption)
+                    setCustomQuerySelectedValue(selectedOption?.value ?? null)
                   }
                 />
               </div>
@@ -122,7 +162,10 @@ export function CustomQueryPageView<TData extends KitsuResource>({
           <QueryPage<TData>
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
-            customViewFields={customQuerySelected.customViewFields}
+            customViewFields={customQuerySelected.customViewFields ?? []}
+            customViewElasticSearchQuery={
+              customQuerySelected.customElasticSearch
+            }
             viewMode={true}
           />
         </>
