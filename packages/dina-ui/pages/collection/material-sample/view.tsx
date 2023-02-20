@@ -171,7 +171,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       customElasticSearch:
                         materialSampleCultureStrainChildrenQuery(
                           materialSample?.hierarchy?.reduce((prev, current) =>
-                            prev.rank > current.rank ? prev : current
+                            (prev?.rank ?? 0) > (current?.rank ?? 0)
+                              ? prev
+                              : current
                           )?.uuid ?? ""
                         )
                     }
