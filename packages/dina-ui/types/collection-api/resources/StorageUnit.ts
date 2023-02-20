@@ -11,6 +11,7 @@ export interface StorageUnitAttributes {
   storageUnitChildren?: StorageUnit[];
   uuid?: string;
   isMultiple?: boolean | null;
+  barcode?: string;
 }
 
 export interface HierarchyItem {

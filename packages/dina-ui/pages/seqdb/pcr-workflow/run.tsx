@@ -11,8 +11,8 @@ import { useState, useEffect } from "react";
 import { Button, Spinner } from "react-bootstrap";
 import { PCRBatchItemGrid } from "packages/dina-ui/components/seqdb/pcr-workflow/pcr-batch-plating-step/SangerPcrBatchItemGridStep";
 import { usePcrBatchQuery } from "../pcr-batch/edit";
-import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { SangerPcrReactionStep } from "packages/dina-ui/components/seqdb/pcr-workflow/SangerPcrReactionStep";
 
 export default function PCRWorkFlowRunPage() {
   const router = useRouter();
