@@ -1,10 +1,12 @@
 import {
   BackButton,
   ButtonBar,
+  CustomQueryPageView,
   DeleteButton,
   DinaForm,
   EditButton,
   FieldSet,
+  generateDirectMaterialSampleChildrenTree,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -53,6 +55,7 @@ import { GenerateLabelDropdownButton } from "../../../components/collection/mate
 import { PersistedResource } from "kitsu";
 import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
+import { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
 export function MaterialSampleViewPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
@@ -148,12 +151,32 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     fieldSetId={<DinaMessage id="parentMaterialSample" />}
                   />
                 )}
-                {!!materialSample.materialSampleChildren?.length && (
-                  <SamplesView
-                    samples={materialSample.materialSampleChildren}
-                    fieldSetId={<DinaMessage id="childMaterialSamples" />}
-                  />
-                )}
+
+                {/* Custom Query View */}
+                <CustomQueryPageView
+                  indexName="dina_material_sample_index"
+                  columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                  customQueryOptions={[
+                    {
+                      value: "materialSampleChildren",
+                      labelKey: "childMaterialSamples",
+                      customQuery: generateDirectMaterialSampleChildrenTree(
+                        id ?? ""
+                      ),
+                      customViewFields: [
+                        {
+                          fieldName: "data.attributes.hierarchy",
+                          type: "hierarchy"
+                        }
+                      ]
+                    }
+                  ]}
+                  reactTableProps={{
+                    showPagination: false
+                  }}
+                  defaultPageSize={0}
+                />
+
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
                   return (

@@ -170,30 +170,13 @@ export function FormTemplateEditPageLoaded({
 
     // Include the collecting event and acquisition event values.
     const allSubmittedValues: FormTemplate & FormTemplateComponents = {
-      ...(collectinEventFormRefValues ?? {}),
-      ...(acquisitionEventFormRefValues ?? {}),
       ...submittedValues
     };
+    allSubmittedValues.collectingEvent = collectinEventFormRefValues ?? {};
+    allSubmittedValues.acquisitionEvent = acquisitionEventFormRefValues ?? {};
 
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
-
-    // All arrays should be removed from the submitted values.
-    const iterateThrough = (object: any) => {
-      Object.keys(object).forEach((key) => {
-        if (object[key]) {
-          if (Array.isArray(object[key])) {
-            const objects = Object.assign({}, ...object[key]);
-            allSubmittedValues[key] = objects;
-            iterateThrough(objects);
-          }
-
-          if (typeof object[key] === "object") {
-            return iterateThrough(object[key]);
-          }
-        }
-      });
-    };
 
     // The finished form template to save with all of the visibility, default values for each
     // field. Eventually position will also be stored here.
@@ -213,7 +196,7 @@ export function FormTemplateEditPageLoaded({
             name: section.id,
             visible: true,
             items: section.items.map((field) => {
-              return {
+              const item = {
                 name: field.id,
                 visible: field.visible
                   ? true
@@ -222,6 +205,21 @@ export function FormTemplateEditPageLoaded({
                     ] ?? false,
                 defaultValue: _.get(allSubmittedValues, field.id)
               };
+              if (dataComponent.id === COLLECTING_EVENT_COMPONENT_NAME) {
+                item.defaultValue = _.get(
+                  allSubmittedValues,
+                  `collectingEvent.${field.id}`
+                );
+              } else if (
+                dataComponent.id === ACQUISITION_EVENT_COMPONENT_NAME
+              ) {
+                item.defaultValue = _.get(
+                  allSubmittedValues,
+                  `acquisitionEvent.${field.id}`
+                );
+              }
+
+              return item;
             })
           }))
         })
