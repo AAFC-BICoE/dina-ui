@@ -157,6 +157,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
                   columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                  localStorageKey="material-sample-children"
                   customQueryOptions={[
                     {
                       value: "materialSampleChildren",
