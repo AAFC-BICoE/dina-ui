@@ -40,7 +40,7 @@ export interface CustomQueryOption {
    * Fields to include in the _source section of the query. Since we will only require certain
    * fields to display not the whole elastic search document.
    */
-  readonly customViewFields: CustomViewField[];
+  readonly customViewFields?: CustomViewField[];
 }
 
 export interface CustomQueryPageViewProps<TData extends KitsuResource>
@@ -129,7 +129,7 @@ export function CustomQueryPageView<TData extends KitsuResource>({
           <QueryPage<TData>
             {...queryPageProps}
             customViewQuery={customQuerySelected.customQuery}
-            customViewFields={customQuerySelected.customViewFields}
+            customViewFields={customQuerySelected.customViewFields ?? []}
             customViewElasticSearchQuery={
               customQuerySelected.customElasticSearch
             }

@@ -7,6 +7,7 @@ import {
   EditButton,
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
+  materialSampleCultureStrainChildrenQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -161,13 +162,17 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       value: "materialSampleChildren",
                       labelKey: "childMaterialSamples",
                       customElasticSearch:
-                        generateDirectMaterialSampleChildrenTree(id ?? ""),
-                      customViewFields: [
-                        {
-                          fieldName: "data.attributes.hierarchy",
-                          type: "uuid"
-                        }
-                      ]
+                        generateDirectMaterialSampleChildrenTree(id ?? "")
+                    },
+                    {
+                      value: "cultureStrains",
+                      labelKey: "childCultureStrains",
+                      customElasticSearch:
+                        materialSampleCultureStrainChildrenQuery(
+                          materialSample?.hierarchy?.reduce((prev, current) =>
+                            prev.rank > current.rank ? prev : current
+                          )?.uuid ?? ""
+                        )
                     }
                   ]}
                   reactTableProps={{

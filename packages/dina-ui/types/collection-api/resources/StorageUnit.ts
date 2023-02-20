@@ -17,6 +17,7 @@ export interface HierarchyItem {
   organismPrimaryDetermination?: any;
   uuid: string;
   name: string;
+  rank: number;
 }
 
 export interface StorageHierarchyItem extends HierarchyItem {
