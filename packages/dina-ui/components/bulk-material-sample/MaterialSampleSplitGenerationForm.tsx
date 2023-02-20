@@ -1,3 +1,4 @@
+import { useLocalStorage } from "@rehooks/local-storage";
 import { useEffect, useMemo, useState } from "react";
 import { BackToListButton } from "common-ui/lib/button-bar/BackToListButton";
 import PageLayout from "../page/PageLayout";
@@ -11,7 +12,9 @@ import {
   FieldSpy,
   useApiClient,
   LoadingSpinner,
-  DinaFormOnSubmit
+  DinaFormOnSubmit,
+  getCustomQueryPageLocalStorageKey,
+  materialSampleChildrenViewOptions
 } from "common-ui";
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
@@ -78,6 +81,17 @@ export function MaterialSampleSplitGenerationForm({
         (sample) => !sample.parentMaterialSample
       )
   });
+
+  // Load the custom view option value.
+  const [_customQuerySelectedValue, _setCustomQuerySelectedValue] =
+    useLocalStorage<string>(
+      getCustomQueryPageLocalStorageKey("material-sample-children")
+    );
+
+  // const customQuerySelected : CustomViewOption[] = useMemo(
+  //   () => materialSampleChildrenViewOptions.find((option) => option.),
+  //   [customQuerySelectedValue]
+  // );
 
   const buttonBar = (
     <>

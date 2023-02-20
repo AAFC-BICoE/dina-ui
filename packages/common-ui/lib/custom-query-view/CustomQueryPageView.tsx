@@ -8,6 +8,12 @@ import { useMemo, useState } from "react";
 import { CustomViewField } from "../list-page/query-builder/useQueryBuilderConfig";
 import { useLocalStorage } from "@rehooks/local-storage";
 
+export const getCustomQueryPageLocalStorageKey = (
+  localStorageKey: string
+): string => {
+  return `${localStorageKey}-custom-query-page-option`;
+};
+
 export interface CustomQueryOption {
   /**
    * Value to be saved when selecting the option.
@@ -76,10 +82,6 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   customQueryOptions,
   ...queryPageProps
 }: CustomQueryPageViewProps<TData>) {
-  const CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY = localStorageKey
-    ? localStorageKey + "-custom-query-page-option"
-    : null;
-
   const { formatMessage, locale } = useDinaIntl();
 
   // Generate the labels based on the locale and options provided.
@@ -98,14 +100,10 @@ export function CustomQueryPageView<TData extends KitsuResource>({
   // array, if it exists and has at least one element. Otherwise, set it to `null`.
   let customQuerySelectedValue;
   let setCustomQuerySelectedValue;
-  if (
-    translatedOptions &&
-    translatedOptions.length !== 0 &&
-    CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY
-  ) {
+  if (translatedOptions && translatedOptions.length !== 0 && localStorageKey) {
     [customQuerySelectedValue, setCustomQuerySelectedValue] =
       useLocalStorage<string>(
-        CUSTOM_QUERY_PAGE_LOCAL_STORAGE_KEY,
+        getCustomQueryPageLocalStorageKey(localStorageKey),
         translatedOptions[0].value
       );
   } else {
