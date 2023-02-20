@@ -529,6 +529,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialIn: "Material In",
   materialOut: "Material Out",
   materialSample: "Material Sample",
+  "material-sample": "Material Sample",
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
   materialSampleFormTemplate: "Material Sample Form Template",
