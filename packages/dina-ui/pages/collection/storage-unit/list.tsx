@@ -9,7 +9,7 @@ import {
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
-const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy"];
+const STORAGE_UNIT_FILTER_ATTRIBUTES = ["name", "createdBy", "barcode"];
 const STORAGE_UNIT_TABLE_COLUMNS = [
   {
     Cell: ({ original: storage }) => (

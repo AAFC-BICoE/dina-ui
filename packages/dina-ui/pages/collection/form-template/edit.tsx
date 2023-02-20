@@ -174,7 +174,6 @@ export function FormTemplateEditPageLoaded({
     };
     allSubmittedValues.collectingEvent = collectinEventFormRefValues ?? {};
     allSubmittedValues.acquisitionEvent = acquisitionEventFormRefValues ?? {};
-    console.log(allSubmittedValues);
 
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
@@ -197,7 +196,7 @@ export function FormTemplateEditPageLoaded({
             name: section.id,
             visible: true,
             items: section.items.map((field) => {
-              let item = {
+              const item = {
                 name: field.id,
                 visible: field.visible
                   ? true
@@ -226,8 +225,6 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
-
-    console.log(formTemplate);
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
