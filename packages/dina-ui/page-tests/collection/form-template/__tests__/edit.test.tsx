@@ -1444,7 +1444,7 @@ describe("Workflow template edit page", () => {
                 {
                   name: "group",
                   visible: false,
-                  defaultValue: undefined
+                  defaultValue: "aafc"
                 },
                 {
                   defaultValue: undefined,

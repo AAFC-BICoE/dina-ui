@@ -173,7 +173,9 @@ export function FormTemplateEditPageLoaded({
       ...submittedValues
     };
     allSubmittedValues.collectingEvent = collectinEventFormRefValues ?? {};
+    allSubmittedValues.collectingEvent.group = allSubmittedValues.group;
     allSubmittedValues.acquisitionEvent = acquisitionEventFormRefValues ?? {};
+    allSubmittedValues.acquisitionEvent.group = allSubmittedValues.group;
 
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
