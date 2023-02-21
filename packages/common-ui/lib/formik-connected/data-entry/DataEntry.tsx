@@ -29,6 +29,7 @@ export function DataEntry({
   setSelectedBlockOptions,
   id
 }: DataEntryProps) {
+  // Display loaded values when in bulk edit
   const bulkCtx = useBulkEditTabContext();
 
   const bulkEditResourceHooks = bulkCtx?.resourceHooks;
@@ -36,11 +37,8 @@ export function DataEntry({
   let bulkEditBlocksRowsMap = {};
   bulkEditResourceHooks?.forEach((resourceHook: any) => {
     resourceHook?.resource?.extensionValues?.forEach((extensionValue) => {
+      // If extension value already in map, get the largest number of rows
       if (bulkEditBlocksRowsMap[extensionValue?.select]) {
-        bulkEditBlocksRowsMap[extensionValue?.select] = Math.max(
-          bulkEditBlocksRowsMap[extensionValue?.select],
-          extensionValue?.rows?.length
-        );
         bulkEditBlocksRowsMap[extensionValue?.select] =
           bulkEditBlocksRowsMap[extensionValue?.select].length >
           extensionValue?.rows?.length
@@ -74,12 +72,15 @@ export function DataEntry({
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
-    if (onBlockSelectChange && initialValues) {
-      initialValues.forEach((initialValue) => {
-        if (onBlockSelectChange && initialValue?.select) {
+    if (onBlockSelectChange) {
+      initialValues?.forEach((initialValue) => {
+        if (initialValue?.select) {
           onBlockSelectChange(initialValue.select, undefined);
         }
       });
+      Object.keys(bulkEditBlocksRowsMap).forEach((select) => {
+        onBlockSelectChange(select, undefined);
+      })
     }
   }, []);
   function legendWrapper():
