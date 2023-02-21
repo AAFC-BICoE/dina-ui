@@ -6,7 +6,7 @@ export function processExtensionValuesLoading(initExtensionValues) {
     return undefined;
   }
 
-  const processedExtensionValues = Object.keys(initExtensionValues).map(
+  let processedExtensionValues = Object.keys(initExtensionValues).map(
     (extensionKey) => {
       const initExtensionValue = initExtensionValues[extensionKey];
       const extensionFields = Object.keys(initExtensionValue).map(
@@ -24,6 +24,12 @@ export function processExtensionValuesLoading(initExtensionValues) {
       return processedExtensionValue;
     }
   );
+  processedExtensionValues.forEach((extensionValue) => {
+    extensionValue.rows.sort((a, b) => {
+      return a.type.localeCompare(b.type);
+    })
+  })
+  
   return processedExtensionValues;
 }
 

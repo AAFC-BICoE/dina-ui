@@ -41,6 +41,12 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     const bulkValue = get(form, fieldName);
     const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);
 
+    // If fieldName is extension values type, don't count as multiple values if only 1 tab has type
+    if (fieldName.includes("extensionValues") && fieldName.includes("type")) {
+      if (bulkValue === undefined && !isBlankResourceAttribute(sampleValue)) {
+        return true;
+      }
+    }
     // Treat different types of blank values the same e.g. null, "", empty array:
     return isEqual(
       isBlankResourceAttribute(bulkValue) ? null : bulkValue,
