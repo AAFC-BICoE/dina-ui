@@ -23,10 +23,11 @@ import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/re
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { InputResource, PersistedResource } from "kitsu";
+import { CustomOptionsDropdown } from "common-ui/lib/custom-query-view/CustomOptionsDropdown";
 
 const ENTITY_LINK = "/collection/material-sample";
 
-type SeriesOptions = "continue" | "continueFromParent" | "new";
+type SeriesOptions = "continue" | "new";
 type GenerationOptions = "lowercase" | "uppercase" | "numeric";
 type AppendGenerationMode = {
   [key in GenerationOptions]: string;
@@ -69,29 +70,11 @@ export function MaterialSampleSplitGenerationForm({
     disabled: ids.length === 0
   });
 
-  const splitFromParentMaterialSamples = useBulkGet<MaterialSample>({
-    ids: (splitFromMaterialSamples.data as any)?.map(
-      (sample) => sample?.parentMaterialSample?.id ?? ""
-    ),
-    listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
-    disabled:
-      splitFromMaterialSamples.loading ||
-      (splitFromMaterialSamples.data as any)?.some(
-        (sample) => !sample.parentMaterialSample
-      )
-  });
-
   // Load the custom view option value.
-  const [_customQuerySelectedValue, _setCustomQuerySelectedValue] =
+  const [customQuerySelectedValue, setCustomQuerySelectedValue] =
     useLocalStorage<string>(
       getCustomQueryPageLocalStorageKey("material-sample-children")
     );
-
-  // const customQuerySelected : CustomViewOption[] = useMemo(
-  //   () => materialSampleChildrenViewOptions.find((option) => option.),
-  //   [customQuerySelectedValue]
-  // );
 
   const buttonBar = (
     <>
@@ -115,14 +98,6 @@ export function MaterialSampleSplitGenerationForm({
         (materialSample) => materialSample?.materialSampleChildren?.length !== 0
       ),
     [splitFromMaterialSamples.data]
-  );
-
-  const ableToContinueSeriesFromParent = useMemo<boolean>(
-    () =>
-      (splitFromParentMaterialSamples.data as any)?.every(
-        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
-      ),
-    [splitFromParentMaterialSamples.data]
   );
 
   if (splitFromMaterialSamples.loading) {
@@ -219,14 +194,6 @@ export function MaterialSampleSplitGenerationForm({
                       : undefined
                   },
                   {
-                    value: "continueFromParent",
-                    label: formatMessage("splitSeriesOptionContinueFromParent"),
-                    disabled: !ableToContinueSeriesFromParent,
-                    tooltipLabel: !ableToContinueSeriesFromParent
-                      ? "splitSeriesOptionContinueFromParentTooltip"
-                      : undefined
-                  },
-                  {
                     value: "new",
                     label: formatMessage("splitSeriesOptionNew")
                   }
@@ -235,27 +202,44 @@ export function MaterialSampleSplitGenerationForm({
             </div>
             <div className="col-md-4">
               <FieldSpy fieldName="seriesOptions">
-                {(selected) => (
-                  <SelectField
-                    name="generationOptions"
-                    label={formatMessage("splitGenerationOptionLabel")}
-                    disabled={selected === "continue"}
-                    options={[
-                      {
-                        value: "lowercase",
-                        label: formatMessage("splitGenerationOptionLowercase")
-                      },
-                      {
-                        value: "uppercase",
-                        label: formatMessage("splitGenerationOptionUppercase")
-                      },
-                      {
-                        value: "numeric",
-                        label: formatMessage("splitGenerationOptionNumerical")
-                      }
-                    ]}
-                  />
-                )}
+                {(selected) =>
+                  selected === "new" ? (
+                    <SelectField
+                      name="generationOptions"
+                      label={formatMessage("splitGenerationOptionLabel")}
+                      options={[
+                        {
+                          value: "lowercase",
+                          label: formatMessage("splitGenerationOptionLowercase")
+                        },
+                        {
+                          value: "uppercase",
+                          label: formatMessage("splitGenerationOptionUppercase")
+                        },
+                        {
+                          value: "numeric",
+                          label: formatMessage("splitGenerationOptionNumerical")
+                        }
+                      ]}
+                    />
+                  ) : (
+                    <>
+                      {splitFromMaterialSamples?.data?.[0] ? (
+                        <CustomOptionsDropdown
+                          customQueryOptions={materialSampleChildrenViewOptions(
+                            splitFromMaterialSamples.data[0] as MaterialSample
+                          )}
+                          customQuerySelected={customQuerySelectedValue}
+                          setCustomQuerySelectedValue={
+                            setCustomQuerySelectedValue
+                          }
+                        />
+                      ) : (
+                        <></>
+                      )}
+                    </>
+                  )
+                }
               </FieldSpy>
             </div>
           </div>
@@ -263,9 +247,6 @@ export function MaterialSampleSplitGenerationForm({
           <PreviewGeneratedNames
             splitFromMaterialSamples={
               splitFromMaterialSamples.data as MaterialSample[]
-            }
-            splitFromParentMaterialSamples={
-              splitFromParentMaterialSamples.data as MaterialSample[]
             }
             generatedIdentifiers={generatedIdentifiers}
             setGeneratedIdentifiers={setGeneratedIdentifiers}
@@ -278,14 +259,12 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
-  splitFromParentMaterialSamples: MaterialSample[];
   generatedIdentifiers: string[];
   setGeneratedIdentifiers: (identifiers: string[]) => void;
 }
 
 function PreviewGeneratedNames({
   splitFromMaterialSamples,
-  splitFromParentMaterialSamples,
   generatedIdentifiers,
   setGeneratedIdentifiers
 }: PreviewGeneratedNamesProps) {
@@ -327,14 +306,6 @@ function PreviewGeneratedNames({
           amount: numberToCreate,
           identifier: getYoungestMaterialSample(
             splitFromMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
-        };
-      case "continueFromParent":
-        return {
-          type: "material-sample-identifier-generator",
-          amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromParentMaterialSamples?.[index]?.materialSampleChildren
           )?.materialSampleName
         };
     }
