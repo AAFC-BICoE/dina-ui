@@ -1,7 +1,8 @@
 import { FieldArray, useFormikContext } from "formik";
+import { KitsuResource } from "kitsu";
 import { useEffect, useRef } from "react";
 import { Button } from "react-bootstrap";
-import { FieldSet } from "../..";
+import { BulkEditTabContextI, FieldSet, useBulkEditTabContext } from "../..";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
@@ -30,7 +31,11 @@ export function DataEntry({
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
   const formik = useFormikContext<any>();
+  const bulkContext = useBulkEditTabContext();
 
+  const extensionValues =
+    formik?.values?.extensionValues ??
+    getBulkContextExtensionValues(bulkContext);
   function removeBlock(index) {
     const oldValue =
       arrayHelpersRef?.current?.form?.values?.extensionValues?.[index]
@@ -52,11 +57,13 @@ export function DataEntry({
   // Make SelectField component load initial values if they exist
   useEffect(() => {
     if (onBlockSelectChange) {
-      Object.keys(formik?.values?.extensionValues)?.forEach((fieldKey) => {
-        if (fieldKey) {
-          onBlockSelectChange(fieldKey, undefined);
-        }
-      });
+      if (extensionValues) {
+        Object.keys(extensionValues)?.forEach((fieldKey) => {
+          if (fieldKey) {
+            onBlockSelectChange(fieldKey, undefined);
+          }
+        });
+      }
     }
   }, []);
   function legendWrapper():
@@ -80,35 +87,60 @@ export function DataEntry({
     <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
       {
         <div style={{ padding: 15 }}>
-          {Object.keys(formik?.values?.extensionValues).map((fieldKey) => {
-            // render all keys except for fieldKey
-            return (
-              <DataBlock
-                blockOptions={blockOptions}
-                onBlockSelectChange={onBlockSelectChange}
-                model={model}
-                unitsOptions={unitsOptions}
-                removeBlock={removeBlock}
-                name={`${name}.${fieldKey}`}
-                fieldKey={fieldKey}
-                vocabularyOptionsPath={vocabularyOptionsPath}
-                typeOptions={typeOptions}
-                readOnly={readOnly}
-                selectedBlockOptions={selectedBlockOptions}
-                blockAddable={blockAddable}
-                unitsAddable={unitsAddable}
-                typesAddable={typesAddable}
-                isVocabularyBasedEnabledForBlock={
-                  isVocabularyBasedEnabledForBlock
-                }
-                isVocabularyBasedEnabledForType={
-                  isVocabularyBasedEnabledForType
-                }
-              />
-            );
-          })}
+          {extensionValues
+            ? Object.keys(extensionValues).map((fieldKey) => {
+                // render all keys except for fieldKey
+                return (
+                  <DataBlock
+                    blockOptions={blockOptions}
+                    onBlockSelectChange={onBlockSelectChange}
+                    model={model}
+                    unitsOptions={unitsOptions}
+                    removeBlock={removeBlock}
+                    name={`${name}.${fieldKey}`}
+                    fieldKey={fieldKey}
+                    vocabularyOptionsPath={vocabularyOptionsPath}
+                    typeOptions={typeOptions}
+                    readOnly={readOnly}
+                    selectedBlockOptions={selectedBlockOptions}
+                    blockAddable={blockAddable}
+                    unitsAddable={unitsAddable}
+                    typesAddable={typesAddable}
+                    isVocabularyBasedEnabledForBlock={
+                      isVocabularyBasedEnabledForBlock
+                    }
+                    isVocabularyBasedEnabledForType={
+                      isVocabularyBasedEnabledForType
+                    }
+                    extensionValues={extensionValues}
+                  />
+                );
+              })
+            : null}
         </div>
       }
     </FieldSet>
   );
 }
+
+/**
+ * Gets extensionValues from individual Material Samples to be displayed in bulk edit tab 
+ * @param bulkContext 
+ * @returns extensionValues taken from individual Material Samples used for displaying in bulk edit tab
+ */
+function getBulkContextExtensionValues(bulkContext: BulkEditTabContextI<KitsuResource> | null): any {
+  let extensionValues = {}
+  bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
+    Object.keys(resourceHook?.resource?.extensionValues).forEach((fieldKey) => {
+      if (extensionValues[fieldKey]) {
+        Object.keys(resourceHook?.resource?.extensionValues[fieldKey]).forEach((extensionKey) => {
+          extensionValues[fieldKey][extensionKey] = resourceHook?.resource?.extensionValues[fieldKey][extensionKey];
+        })
+      } else {
+        extensionValues[fieldKey] = resourceHook?.resource?.extensionValues[fieldKey];
+      }
+    })
+  })
+  return extensionValues;
+}
+

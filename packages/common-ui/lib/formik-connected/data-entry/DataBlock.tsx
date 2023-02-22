@@ -6,7 +6,8 @@ import {
   CreatableSelectField,
   FieldWrapperProps,
   SelectField,
-  TextField
+  TextField,
+  useBulkEditTabContext
 } from "../../../../common-ui/lib";
 import { DataRow, VocabularySelectField } from "../../../../dina-ui/components";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -28,6 +29,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   isVocabularyBasedEnabledForBlock?: boolean;
   isVocabularyBasedEnabledForType?: boolean;
   fieldKey: string;
+  extensionValues: any;
 }
 
 export function DataBlock({
@@ -46,6 +48,7 @@ export function DataBlock({
   isVocabularyBasedEnabledForBlock = false,
   isVocabularyBasedEnabledForType = false,
   fieldKey: blockKey,
+  extensionValues,
   ...props
 }: DataBlockProps) {
   // function addRow() {
@@ -55,7 +58,6 @@ export function DataBlock({
   // function removeRow(rowIndex) {
   //   fieldArrayProps.remove(rowIndex);
   // }
-  const formik = useFormikContext<any>();
   function onCreatableSelectFieldChange(value, formik, oldValue) {
     if (isVocabularyBasedEnabledForBlock) {
       formik.setFieldValue(
@@ -67,6 +69,7 @@ export function DataBlock({
       onBlockSelectChange(value, formik, oldValue);
     }
   }
+  const extensionKeys = extensionValues[blockKey];
   return (
     <div>
       {
@@ -120,7 +123,7 @@ export function DataBlock({
               />
             )}
           </div>
-          {Object.keys(formik?.values?.extensionValues[blockKey]).map(
+          {Object.keys(extensionKeys).map(
             (extensionKey, rowIndex) => {
               return extensionKey !== "fieldKey" && extensionKey !== "vocabularyBased" && (
                 <DataRow
