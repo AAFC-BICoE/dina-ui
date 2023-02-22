@@ -1,13 +1,15 @@
-import { DataRow, VocabularySelectField } from "../../../../dina-ui/components";
 import { FieldArray } from "formik";
+import { find, get } from "lodash";
+import Button from "react-bootstrap/Button";
 import {
+  CheckBoxField,
+  CreatableSelectField,
   FieldWrapperProps,
   SelectField,
   TextField
 } from "../../../../common-ui/lib";
-import Button from "react-bootstrap/Button";
+import { DataRow, VocabularySelectField } from "../../../../dina-ui/components";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { get } from "lodash";
 
 export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
@@ -21,6 +23,11 @@ export interface DataBlockProps extends FieldWrapperProps {
   typeOptions?: any[];
   readOnly?: boolean;
   selectedBlockOptions?: any;
+  blockAddable?: boolean;
+  unitsAddable?: boolean;
+  typesAddable?: boolean;
+  isVocabularyBasedEnabledForBlock?: boolean;
+  isVocabularyBasedEnabledForType?: boolean;
 }
 
 export function DataBlock({
@@ -34,6 +41,11 @@ export function DataBlock({
   typeOptions,
   readOnly,
   selectedBlockOptions,
+  blockAddable = false,
+  unitsAddable = false,
+  typesAddable = false,
+  isVocabularyBasedEnabledForBlock = false,
+  isVocabularyBasedEnabledForType = false,
   ...props
 }: DataBlockProps) {
   return (
@@ -52,6 +64,18 @@ export function DataBlock({
             fieldArrayProps.remove(rowIndex);
           }
 
+          function onCreatableSelectFieldChange(value, formik, oldValue) {
+            if (isVocabularyBasedEnabledForBlock) {
+              formik.setFieldValue(
+                `${props.name}.vocabularyBased`,
+                !!find(blockOptions, (item) => item.value === value)
+              );
+            }
+            if (onBlockSelectChange) {
+              onBlockSelectChange(value, formik, oldValue);
+            }
+          }
+
           return (
             <div>
               {rows?.length > 0 ? (
@@ -62,15 +86,27 @@ export function DataBlock({
                   <div className="d-inline-flex align-items-center">
                     {blockOptions && (
                       <div style={{ width: "15rem" }}>
-                        <SelectField
-                          options={blockOptions}
-                          name={`${props.name}.select`}
-                          removeBottomMargin={true}
-                          removeLabel={true}
-                          onChange={onBlockSelectChange}
-                          disableTemplateCheckbox={true}
-                          filterValues={selectedBlockOptions}
-                        />
+                        {blockAddable ? (
+                          <CreatableSelectField
+                            options={blockOptions}
+                            name={`${props.name}.select`}
+                            removeBottomMargin={true}
+                            removeLabel={true}
+                            onChange={onCreatableSelectFieldChange}
+                            disableTemplateCheckbox={true}
+                            filterValues={selectedBlockOptions}
+                          />
+                        ) : (
+                          <SelectField
+                            options={blockOptions}
+                            name={`${props.name}.select`}
+                            removeBottomMargin={true}
+                            removeLabel={true}
+                            onChange={onBlockSelectChange}
+                            disableTemplateCheckbox={true}
+                            filterValues={selectedBlockOptions}
+                          />
+                        )}
                       </div>
                     )}
                     {vocabularyOptionsPath && (
@@ -88,6 +124,13 @@ export function DataBlock({
                         disableTemplateCheckbox={true}
                       />
                     )}
+                    {isVocabularyBasedEnabledForBlock && (
+                      <CheckBoxField
+                        className="hidden"
+                        name={`${props.name}.vocabularyBased`}
+                        removeLabel={true}
+                      />
+                    )}
                   </div>
                   {rows.map((_, rowIndex) => {
                     return (
@@ -102,6 +145,11 @@ export function DataBlock({
                         unitsOptions={unitsOptions}
                         typeOptions={typeOptions}
                         readOnly={readOnly}
+                        typesAddable={typesAddable}
+                        unitsAddable={unitsAddable}
+                        isVocabularyBasedEnabledForType={
+                          isVocabularyBasedEnabledForType
+                        }
                       />
                     );
                   })}

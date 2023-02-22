@@ -1,10 +1,9 @@
-import { FieldWrapper, FieldWrapperProps, useQuery } from "common-ui";
+import { FieldWrapper, FieldWrapperProps } from "common-ui";
 import { castArray } from "lodash";
 import { GroupBase } from "react-select";
 import CreatableSelect, { CreatableProps } from "react-select/creatable";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
-import { Vocabulary, VocabularyElement } from "../../types/collection-api";
-import { find } from "lodash";
+import useVocabularyOptions from "./useVocabularyOptions";
 
 export interface VocabularySelectFieldProps extends FieldWrapperProps {
   path: string;
@@ -84,33 +83,6 @@ export function VocabularySelectField({
       }}
     </FieldWrapper>
   );
-}
-
-/** Gets the vocab options from the back-end. */
-function useVocabularyOptions({ path }) {
-  const { response, loading } = useQuery<Vocabulary>({ path });
-  const { locale } = useDinaIntl();
-
-  const vocabOptions = response?.data?.vocabularyElements?.map(toOption) ?? [];
-
-  function toOption(value: string | VocabularyElement): VocabularyOption {
-    if (typeof value === "string") {
-      return {
-        label: vocabOptions.find((it) => it.value === value)?.label || value,
-        value
-      };
-    }
-    const label =
-      find(
-        value?.multilingualTitle?.titles || [],
-        (item) => item.lang === locale
-      )?.title ||
-      value.name ||
-      "";
-    return { label, value: value.name || label };
-  }
-
-  return { toOption, loading, vocabOptions };
 }
 
 /** Shows the values or labels if available. */
