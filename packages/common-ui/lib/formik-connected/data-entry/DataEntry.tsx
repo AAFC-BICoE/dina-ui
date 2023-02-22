@@ -1,11 +1,10 @@
-import { FieldSet } from "../..";
-import { DataBlock } from "./DataBlock";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { FieldArray } from "formik";
+import { useEffect, useRef } from "react";
 import { Button } from "react-bootstrap";
-import { useRef } from "react";
+import { FieldSet } from "../..";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
-import { useEffect } from "react";
 
 /* tslint:disable-next-line */
 export interface DataEntryProps extends DataEntryFieldProps {}
@@ -23,7 +22,12 @@ export function DataEntry({
   initialValues,
   selectedBlockOptions,
   setSelectedBlockOptions,
-  id
+  id,
+  blockAddable = false,
+  unitsAddable = false,
+  typesAddable = false,
+  isVocabularyBasedEnabledForBlock = false,
+  isVocabularyBasedEnabledForType = false
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
 
@@ -97,6 +101,15 @@ export function DataEntry({
                         typeOptions={typeOptions}
                         readOnly={readOnly}
                         selectedBlockOptions={selectedBlockOptions}
+                        blockAddable={blockAddable}
+                        unitsAddable={unitsAddable}
+                        typesAddable={typesAddable}
+                        isVocabularyBasedEnabledForBlock={
+                          isVocabularyBasedEnabledForBlock
+                        }
+                        isVocabularyBasedEnabledForType={
+                          isVocabularyBasedEnabledForType
+                        }
                       />
                     );
                   })}

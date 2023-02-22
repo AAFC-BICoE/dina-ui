@@ -1,7 +1,6 @@
 import { OperationsResponse } from "common-ui";
-import ProtocolEditPage, {
-  ProtocolForm
-} from "../../../../pages/collection/protocol/edit";
+import { ProtocolForm } from "../../../../../dina-ui/components/collection/protocol/ProtocolForm";
+import ProtocolEditPage from "../../../../pages/collection/protocol/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 
 // Mock out the Link component, which normally fails when used outside of a Next app.
@@ -21,7 +20,7 @@ const mockPush = jest.fn();
 let mockQuery: any = {};
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn(async path => {
+const mockGet = jest.fn(async (path) => {
   switch (path) {
     // The get request will return the existing protocol.
     case "collection-api/protocol/1":
@@ -32,6 +31,127 @@ const mockGet = jest.fn(async path => {
           type: "protocol",
           group: "protocol-test-group"
         }
+      };
+    case "collection-api/vocabulary/protocolData":
+      return {
+        data: {
+          id: "protocolData",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                name: "Forward Primer",
+                term: "forward_primer",
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "Forward Primer" },
+                    { lang: "fr", title: "Amorce sens" }
+                  ]
+                },
+                inverseOf: null
+              },
+              {
+                name: "Reverse Primer",
+                term: "reverse_primer",
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "Reverse Primer" },
+                    { lang: "fr", title: "Amorce antisens" }
+                  ]
+                },
+                inverseOf: null
+              }
+            ]
+          }
+        }
+      };
+    case "collection-api/vocabulary/unitsOfMeasurement":
+      return {
+        data: {
+          id: "unitsOfMeasurement",
+          type: "vocabulary",
+          attributes: {
+            vocabularyElements: [
+              {
+                name: "ug.mL-1",
+                term: "https://w3id.org/uom/ug.mL-1",
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "μg/mL" },
+                    { lang: "fr", title: "μg/mL" }
+                  ]
+                },
+                inverseOf: null
+              },
+              {
+                name: "uL",
+                term: "https://w3id.org/uom/uL",
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "μL" },
+                    { lang: "fr", title: "μL" }
+                  ]
+                },
+                inverseOf: null
+              },
+              {
+                name: "uL.rxn",
+                term: null,
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "µl/rxn" },
+                    { lang: "fr", title: "µl/rxn" }
+                  ]
+                },
+                inverseOf: null
+              },
+              {
+                name: "mM",
+                term: "http://www.wikidata.org/entity/Q105687351",
+                multilingualTitle: {
+                  titles: [
+                    { lang: "en", title: "mM" },
+                    { lang: "fr", title: "mM" }
+                  ]
+                },
+                inverseOf: null
+              }
+            ]
+          }
+        }
+      };
+    case "collection-api/protocol-element":
+      return {
+        data: [
+          {
+            id: "concentration",
+            type: "protocol-element",
+            attributes: {
+              term: "http://www.wikidata.org/entity/Q3686031",
+              vocabularyElementType: "DECIMAL",
+              multilingualTitle: {
+                titles: [
+                  { lang: "en", title: "Concentration" },
+                  { lang: "fr", title: "Concentration" }
+                ]
+              }
+            }
+          },
+          {
+            id: "quantity",
+            type: "protocol-element",
+            attributes: {
+              term: "http://www.wikidata.org/entity/Q309314",
+              vocabularyElementType: "DECIMAL",
+              multilingualTitle: {
+                titles: [
+                  { lang: "en", title: "Quantity" },
+                  { lang: "fr", title: "Quantité" }
+                ]
+              }
+            }
+          }
+        ]
       };
   }
 });

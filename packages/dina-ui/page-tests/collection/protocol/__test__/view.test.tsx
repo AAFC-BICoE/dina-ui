@@ -10,10 +10,43 @@ const TEST_PROTOCOL: Protocol = {
 };
 
 /** Mock Kitsu "get" method. */
-const mockGet = jest.fn<any, any>(async model => {
+const mockGet = jest.fn<any, any>(async (model) => {
   // The get request will return the existing protocol.
   if (model === "collection-api/protocol/100") {
     return { data: TEST_PROTOCOL };
+  } else if (model === "collection-api/protocol-element") {
+    return {
+      data: [
+        {
+          id: "concentration",
+          type: "protocol-element",
+          attributes: {
+            term: "http://www.wikidata.org/entity/Q3686031",
+            vocabularyElementType: "DECIMAL",
+            multilingualTitle: {
+              titles: [
+                { lang: "en", title: "Concentration" },
+                { lang: "fr", title: "Concentration" }
+              ]
+            }
+          }
+        },
+        {
+          id: "quantity",
+          type: "protocol-element",
+          attributes: {
+            term: "http://www.wikidata.org/entity/Q309314",
+            vocabularyElementType: "DECIMAL",
+            multilingualTitle: {
+              titles: [
+                { lang: "en", title: "Quantity" },
+                { lang: "fr", title: "Quantité" }
+              ]
+            }
+          }
+        }
+      ]
+    };
   }
 });
 

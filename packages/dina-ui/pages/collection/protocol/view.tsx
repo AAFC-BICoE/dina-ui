@@ -1,29 +1,27 @@
 import { DinaForm } from "common-ui";
-import { fromPairs } from "lodash";
-import { Protocol } from "../../../types/collection-api/resources/Protocol";
+import {
+  ProtocolFormLayout,
+  ProtocolFormValue
+} from "../../../../dina-ui/components/collection/protocol/ProtocolForm";
+import { useProtocolFormConverter } from "../../../../dina-ui/components/collection/protocol/useProtocolFormConverter";
 import { ViewPageLayout } from "../../../components";
-import { ProtocolFormLayout } from "./edit";
+import { Protocol } from "../../../types/collection-api/resources/Protocol";
 
 export default function PreparationTypeDetailsPage() {
+  const { convertProtocolToFormData } = useProtocolFormConverter();
   return (
     <ViewPageLayout<Protocol>
-      form={props => (
-        <DinaForm<Protocol>
-          {...props}
-          initialValues={{
-            ...props.initialValues,
-            // Convert multilingualDescription to editable Dictionary format:
-            multilingualDescription: fromPairs<string | undefined>(
-              props.initialValues.multilingualDescription?.descriptions?.map(
-                ({ desc, lang }) => [lang ?? "", desc ?? ""]
-              )
-            )
-          }}
-        >
-          <ProtocolFormLayout />
-        </DinaForm>
-      )}
-      query={id => ({ path: `collection-api/protocol/${id}` })}
+      form={(props) => {
+        const fetchedProtocol = props.initialValues;
+        const initialValues: ProtocolFormValue =
+          convertProtocolToFormData(fetchedProtocol);
+        return (
+          <DinaForm<ProtocolFormValue> {...props} initialValues={initialValues}>
+            <ProtocolFormLayout />
+          </DinaForm>
+        );
+      }}
+      query={(id) => ({ path: `collection-api/protocol/${id}` })}
       entityLink="/collection/protocol"
       type="protocol"
       apiBaseUrl="/collection-api"

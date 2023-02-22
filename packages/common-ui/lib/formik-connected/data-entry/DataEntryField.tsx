@@ -20,6 +20,11 @@ export interface DataEntryFieldProps {
   selectedBlockOptions?: any;
   setSelectedBlockOptions?: Dispatch<any>;
   id?: string;
+  blockAddable?: boolean;
+  unitsAddable?: boolean;
+  typesAddable?: boolean;
+  isVocabularyBasedEnabledForBlock?: boolean;
+  isVocabularyBasedEnabledForType?: boolean;
 }
 
 export function DataEntryField({
@@ -37,7 +42,12 @@ export function DataEntryField({
   isTemplate,
   selectedBlockOptions,
   setSelectedBlockOptions,
-  id
+  id,
+  blockAddable = false,
+  unitsAddable = false,
+  typesAddable = false,
+  isVocabularyBasedEnabledForBlock = false,
+  isVocabularyBasedEnabledForType = false
 }: DataEntryFieldProps) {
   const defaultWidth = isTemplate ? "100%" : "70%";
   const dataEntry = (
@@ -55,6 +65,11 @@ export function DataEntryField({
       selectedBlockOptions={selectedBlockOptions}
       setSelectedBlockOptions={setSelectedBlockOptions}
       id={id}
+      blockAddable={blockAddable}
+      unitsAddable={unitsAddable}
+      typesAddable={typesAddable}
+      isVocabularyBasedEnabledForBlock={isVocabularyBasedEnabledForBlock}
+      isVocabularyBasedEnabledForType={isVocabularyBasedEnabledForType}
     />
   );
   return (
