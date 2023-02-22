@@ -21,6 +21,8 @@ export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
   "material-sample-attachments-component";
 export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
   "field-extensions-component";
+export const SPLIT_CONFIGURATION_COMPONENT_NAME: string =
+  "split-configuration-component";
 
 /**
  * All Material Sample form data component in order.
@@ -656,6 +658,56 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "attachmentsConfig.allowExisting"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: SPLIT_CONFIGURATION_COMPONENT_NAME,
+    labelKey: "materialSampleSplitConfiguration",
+    maxGridSizeX: 2,
+    formTemplateOnly: true,
+    sections: [
+      {
+        id: "split-configuration-condition-section",
+        labelKey: "materialSampleSplitConfigurationCondition",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.condition.by"
+          },
+          {
+            id: "splitConfiguration.condition.type"
+          }
+        ]
+      },
+      {
+        id: "split-configuration-basename-section",
+        labelKey: "materialSampleSplitConfigurationBasename",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.basename.by"
+          },
+          {
+            id: "splitConfiguration.basename.type"
+          }
+        ]
+      },
+      {
+        id: "split-configuration-sequence-generation-section",
+        labelKey: "materialSampleSplitConfigurationSequenceGeneration",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.sequenceGeneration.by"
+          },
+          {
+            id: "splitConfiguration.sequenceGeneration.type"
+          },
+          {
+            id: "splitConfiguration.sequenceGeneration.seriesMode"
           }
         ]
       }

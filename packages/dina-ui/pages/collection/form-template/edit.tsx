@@ -45,6 +45,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 
@@ -118,12 +119,18 @@ export function FormTemplateEditPageLoaded({
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
+  const splitConfigurationInitialValues = getComponentValues(
+    SPLIT_CONFIGURATION_COMPONENT_NAME,
+    fetchedFormTemplate
+  );
+
   const acquisitionEventInitialValues = getComponentValues(
     ACQUISITION_EVENT_COMPONENT_NAME,
     fetchedFormTemplate
   );
 
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
+
   // Provide initial values for the material sample form.
   const initialValues: any = {
     ...fetchedFormTemplate,
@@ -316,5 +323,6 @@ function getDataComponentsStateMap(dataComponentState) {
   dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] = true;
   return dataComponentEnabledMap;
 }
