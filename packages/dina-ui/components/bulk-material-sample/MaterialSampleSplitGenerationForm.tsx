@@ -23,7 +23,10 @@ import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/re
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { InputResource, PersistedResource } from "kitsu";
-import { CustomOptionsDropdown } from "common-ui/lib/custom-query-view/CustomOptionsDropdown";
+import {
+  CustomOptionsDropdown,
+  CustomQueryOption
+} from "common-ui/lib/custom-query-view/CustomOptionsDropdown";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -66,7 +69,7 @@ export function MaterialSampleSplitGenerationForm({
   const splitFromMaterialSamples = useBulkGet<MaterialSample>({
     ids,
     listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
+      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample,hierarchy",
     disabled: ids.length === 0
   });
 
@@ -75,6 +78,21 @@ export function MaterialSampleSplitGenerationForm({
     useLocalStorage<string>(
       getCustomQueryPageLocalStorageKey("material-sample-children")
     );
+
+  // List of all the possible options, we use the first index to generate the list options.
+  const customQueryOptions = useMemo(() => {
+    if (splitFromMaterialSamples?.data?.[0]) {
+      return materialSampleChildrenViewOptions(
+        splitFromMaterialSamples.data[0] as MaterialSample
+      );
+    }
+  }, [splitFromMaterialSamples.data]);
+
+  const customQuerySelected: CustomQueryOption | undefined = useMemo(() => {
+    return customQueryOptions?.find(
+      (option) => option.value === customQuerySelectedValue
+    );
+  }, [customQuerySelectedValue, customQueryOptions]);
 
   const buttonBar = (
     <>
@@ -224,11 +242,9 @@ export function MaterialSampleSplitGenerationForm({
                     />
                   ) : (
                     <>
-                      {splitFromMaterialSamples?.data?.[0] ? (
+                      {customQueryOptions ? (
                         <CustomOptionsDropdown
-                          customQueryOptions={materialSampleChildrenViewOptions(
-                            splitFromMaterialSamples.data[0] as MaterialSample
-                          )}
+                          customQueryOptions={customQueryOptions}
                           customQuerySelected={customQuerySelectedValue}
                           setCustomQuerySelectedValue={
                             setCustomQuerySelectedValue
@@ -250,6 +266,7 @@ export function MaterialSampleSplitGenerationForm({
             }
             generatedIdentifiers={generatedIdentifiers}
             setGeneratedIdentifiers={setGeneratedIdentifiers}
+            customQueryOptionSelected={customQuerySelected}
           />
         </>
       </PageLayout>
@@ -261,15 +278,21 @@ interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
   generatedIdentifiers: string[];
   setGeneratedIdentifiers: (identifiers: string[]) => void;
+  customQueryOptionSelected: CustomQueryOption | undefined;
 }
 
 function PreviewGeneratedNames({
   splitFromMaterialSamples,
   generatedIdentifiers,
-  setGeneratedIdentifiers
+  setGeneratedIdentifiers,
+  customQueryOptionSelected
 }: PreviewGeneratedNamesProps) {
-  const { save } = useApiClient();
+  const { save, apiClient } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
+
+  const [seedIdentifiers, setSeedIdentifiers] = useState<string[] | undefined>(
+    undefined
+  );
 
   const isMultiple = useMemo(
     () => splitFromMaterialSamples?.length > 1,
@@ -281,14 +304,6 @@ function PreviewGeneratedNames({
   const numberToCreate = formik.values.numberToCreate;
 
   function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
-    const getYoungestMaterialSample = (materialSampleChildren) => {
-      return materialSampleChildren
-        ? materialSampleChildren.reduce((max, current) => {
-            return current.ordinal > max.ordinal ? current : max;
-          }, materialSampleChildren[0])
-        : undefined;
-    };
-
     // Depending on the series mode, the identifier that will need to be sent to the backend to
     // generate more identifier changes.
     switch (seriesMode) {
@@ -304,9 +319,7 @@ function PreviewGeneratedNames({
         return {
           type: "material-sample-identifier-generator",
           amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
+          identifier: seedIdentifiers?.[index] ?? ""
         };
     }
   }
@@ -360,6 +373,11 @@ function PreviewGeneratedNames({
     const debouncedHandleChange = () => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
+        // Don't run the identifier API call until seeds are created (only in continue mode.)
+        if (seriesMode === "continue" && seedIdentifiers === undefined) {
+          return;
+        }
+
         callGenerateIdentifierAPI();
       }, 500);
     };
@@ -367,7 +385,58 @@ function PreviewGeneratedNames({
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [formik.values]);
+  }, [formik.values, seedIdentifiers]);
+
+  useEffect(() => {
+    if (!customQueryOptionSelected) {
+      return;
+    }
+
+    // Go through each "split from" material sample to get the generated custom elastic search query
+    // for each. We will need to do a query for each one to determine the "seed" identifier.
+    const customOptionsForEachMaterialSample: any[] = [
+      ...Array(splitFromMaterialSamples.length).keys()
+    ].map(
+      (index) =>
+        materialSampleChildrenViewOptions(
+          splitFromMaterialSamples?.[index] as MaterialSample
+        ).find((option) => option.value === customQueryOptionSelected?.value)
+          ?.customElasticSearch
+    );
+
+    Promise.all(
+      customOptionsForEachMaterialSample.map((elasticSearchQuery) =>
+        elasticSearchRequest(elasticSearchQuery)
+      )
+    ).then((values) => {
+      setSeedIdentifiers(
+        values.map(
+          (value) =>
+            value?.hits?.[0]?._source?.data?.attributes?.materialSampleName
+        )
+      );
+    });
+  }, [customQueryOptionSelected]);
+
+  /**
+   * Asynchronous POST request for elastic search.
+   *
+   * @param queryDSL query containing filters and pagination.
+   * @returns Elastic search response.
+   */
+  async function elasticSearchRequest(queryDSL) {
+    const query = { ...queryDSL };
+    const resp = await apiClient.axios.post(
+      `search-api/search-ws/search`,
+      query,
+      {
+        params: {
+          indexName: "dina_material_sample_index"
+        }
+      }
+    );
+    return resp?.data?.hits;
+  }
 
   return (
     <div className="mt-4">
