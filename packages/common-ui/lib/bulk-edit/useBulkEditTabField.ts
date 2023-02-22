@@ -45,10 +45,12 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);
     if (fieldName.includes("extensionValues") && fieldName.includes("type")) {
       if (
-        isBlankResourceAttribute(sampleValue) &&
-        !isBlankResourceAttribute(bulkValue)
+        (isBlankResourceAttribute(bulkValue) &&
+          !isBlankResourceAttribute(sampleValue)) ||
+        (!isBlankResourceAttribute(bulkValue) &&
+          isBlankResourceAttribute(sampleValue))
       ) {
-        commonValue = bulkValue;
+        commonValue = bulkValue ?? sampleValue;
         return true;
       }
     }
@@ -60,10 +62,10 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   });
 
   const hasSameValues = !hasMultipleValues;
-
   commonValue =
     commonValue ??
     (hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined);
+
   const bulkEditValue =
     "currentValue" in params
       ? params.currentValue
