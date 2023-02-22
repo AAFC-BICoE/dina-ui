@@ -505,6 +505,7 @@ export function MaterialSampleForm({
             }
             navOrder={navOrder}
             onChangeNavOrder={onChangeNavOrder}
+            isTemplate={isTemplate ?? false}
           />
         )}
       </div>

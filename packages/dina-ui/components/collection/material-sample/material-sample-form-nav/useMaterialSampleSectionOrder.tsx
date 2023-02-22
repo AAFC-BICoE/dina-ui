@@ -21,19 +21,21 @@ export interface MaterialSampleSectionOrderParams {
     typeof useMaterialSampleSave
   >["dataComponentState"];
   navOrder?: string[] | null;
+  isTemplate: boolean;
 }
 
 export function useMaterialSampleSectionOrder({
   dataComponentState,
-  navOrder
+  navOrder,
+  isTemplate
 }: MaterialSampleSectionOrderParams) {
   const { formatMessage, messages } = useDinaIntl();
 
   /** An array with all section IDs, beginning with the user-defined order. */
   const navOrderWithAllSections: string[] = uniq([
     ...(navOrder ?? []),
-    ...MATERIAL_SAMPLE_FORM_LEGEND.filter(
-      (component) => !component.formTemplateOnly
+    ...MATERIAL_SAMPLE_FORM_LEGEND.filter((component) =>
+      isTemplate ? true : !component.formTemplateOnly
     ).map((component) => component.id)
   ]);
 
@@ -76,7 +78,9 @@ export function useMaterialSampleSectionOrder({
   };
 
   const scrollTargets: ScrollTarget[] = [
-    ...MATERIAL_SAMPLE_FORM_LEGEND.map((component) => ({
+    ...MATERIAL_SAMPLE_FORM_LEGEND.filter((component) =>
+      isTemplate ? true : !component.formTemplateOnly
+    ).map((component) => ({
       id: component.id,
       msg: messages[component.labelKey]
         ? formatMessage(component.labelKey as any)

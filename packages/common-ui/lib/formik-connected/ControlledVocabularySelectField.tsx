@@ -13,13 +13,14 @@ import { find } from "lodash";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
+  isMulti?: boolean;
 }
 
 export function ControlledVocabularySelectField(
   controlledVocabularySelectFieldProps: ControlledVocabularySelectFieldProp
 ) {
   const { locale, formatMessage } = useDinaIntl();
-  const { query } = controlledVocabularySelectFieldProps;
+  const { query, isMulti = false } = controlledVocabularySelectFieldProps;
 
   const vocQuery = useQuery<Vocabulary>(query?.() as any);
 
@@ -39,9 +40,21 @@ export function ControlledVocabularySelectField(
       <FieldWrapper {...controlledVocabularySelectFieldProps}>
         {({ setValue, value }) => {
           function onChange(newValue) {
-            setValue(newValue.value);
+            if (Array.isArray(newValue)) {
+              setValue(newValue.map((v) => v.value));
+            } else {
+              setValue(newValue.value);
+            }
           }
-          const selectedValue = options?.filter((opt) => opt.value === value);
+
+          const selectedValue = options?.filter((opt) => {
+            if (Array.isArray(value)) {
+              return value.includes(opt.value);
+            } else {
+              return opt.value === value;
+            }
+          });
+
           return (
             <SortableSelect
               onChange={onChange}
@@ -50,6 +63,7 @@ export function ControlledVocabularySelectField(
               value={selectedValue}
               axis="xy"
               distance={4}
+              isMulti={isMulti}
             />
           );
         }}

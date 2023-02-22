@@ -1,5 +1,5 @@
-export type SplitSupportedTypes = "DIRECT_PARENT" | "MATERIAL_SAMPLE_TYPE";
-export type SplitSupportedModes = "LOWERCASE" | "UPPERCASE" | "NUMERICAL";
+export type SplitSupportedTypes = "direct_parent" | "type";
+export type SplitSupportedModes = "lowercase" | "uppercase" | "numerical";
 
 export interface SplitConfiguration {
   condition: SplitConfigurationCondition;
@@ -8,7 +8,7 @@ export interface SplitConfiguration {
 }
 
 export interface SplitConfigurationCondition {
-  conditionOn: SplitSupportedTypes;
+  conditionOn: Omit<"DIRECT_PARENT", SplitSupportedTypes>;
   materialSampleType?: string[];
 }
 
