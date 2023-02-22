@@ -21,6 +21,8 @@ export interface FormLegendComponentInformation {
   maxGridSizeX: number;
 
   sections: FormLegendSectionInformation[];
+
+  formTemplateOnly?: boolean;
 }
 
 /**

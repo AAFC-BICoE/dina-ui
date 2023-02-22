@@ -32,7 +32,9 @@ export function useMaterialSampleSectionOrder({
   /** An array with all section IDs, beginning with the user-defined order. */
   const navOrderWithAllSections: string[] = uniq([
     ...(navOrder ?? []),
-    ...MATERIAL_SAMPLE_FORM_LEGEND.map((component) => component.id)
+    ...MATERIAL_SAMPLE_FORM_LEGEND.filter(
+      (component) => !component.formTemplateOnly
+    ).map((component) => component.id)
   ]);
 
   /** Switch information to apply to the legend. */
