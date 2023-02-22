@@ -45,14 +45,10 @@ export function DataRow({
   unitsAddable = false,
   isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
-  const valueTextFieldName = getFieldName(name, "value", rowIndex);
-  const typeSelectFieldName = getFieldName(name, "type", rowIndex);
-  const unitSelectFieldName = getFieldName(name, "unit", rowIndex);
-  const vocabularyBasedFieldName = getFieldName(
-    name,
-    "vocabularyBased",
-    rowIndex
-  );
+  const valueTextFieldName = `${name}.value`;
+  const typeSelectFieldName = `${name}.type`;
+  const unitSelectFieldName = `${name}.unit`;
+  const vocabularyBasedFieldName = `${name}.vocabularyBased`;
 
   function onCreatableSelectFieldChange(value, formik) {
     if (isVocabularyBasedEnabledForType) {

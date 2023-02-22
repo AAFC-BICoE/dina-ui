@@ -1040,7 +1040,6 @@ export function CollectingEventFormLayout({
             typeOptions={extensionFieldsOptions}
             onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
-            initialValues={initialValues.extensionValues}
             isTemplate={isTemplate}
             selectedBlockOptions={selectedBlockOptions}
             setSelectedBlockOptions={setSelectedBlockOptions}

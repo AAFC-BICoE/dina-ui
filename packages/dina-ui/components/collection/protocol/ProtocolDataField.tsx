@@ -14,7 +14,7 @@ import useVocabularyOptions from "../useVocabularyOptions";
 
 export function ProtocolsField() {
   const { locale } = useDinaIntl();
-  const { initialValues, readOnly } = useContext(DinaFormContext) ?? {};
+  const { readOnly } = useContext(DinaFormContext) ?? {};
   const { apiClient } = useApiClient();
 
   const { vocabOptions: blockOptions } = useVocabularyOptions({
@@ -52,7 +52,6 @@ export function ProtocolsField() {
       typeOptions={typeOptions}
       unitsOptions={unitOptions}
       readOnly={readOnly}
-      initialValues={initialValues.extensionValues}
       isTemplate={true}
       blockAddable={true}
       unitsAddable={true}

@@ -1,4 +1,4 @@
-import { FieldArray } from "formik";
+import { FieldArray, useFormikContext } from "formik";
 import { useEffect, useRef } from "react";
 import { Button } from "react-bootstrap";
 import { FieldSet } from "../..";
@@ -19,7 +19,6 @@ export function DataEntry({
   vocabularyOptionsPath,
   typeOptions,
   readOnly,
-  initialValues,
   selectedBlockOptions,
   setSelectedBlockOptions,
   id,
@@ -30,6 +29,7 @@ export function DataEntry({
   isVocabularyBasedEnabledForType = false
 }: DataEntryProps) {
   const arrayHelpersRef = useRef<any>(null);
+  const formik = useFormikContext<any>();
 
   function removeBlock(index) {
     const oldValue =
@@ -51,10 +51,10 @@ export function DataEntry({
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
-    if (onBlockSelectChange && initialValues) {
-      initialValues.forEach((initialValue) => {
-        if (onBlockSelectChange && initialValue?.select) {
-          onBlockSelectChange(initialValue.select, undefined);
+    if (onBlockSelectChange) {
+      Object.keys(formik?.values?.extensionValues)?.forEach((fieldKey) => {
+        if (fieldKey) {
+          onBlockSelectChange(fieldKey, undefined);
         }
       });
     }
@@ -75,50 +75,40 @@ export function DataEntry({
       );
     };
   }
+  // arrayHelpersRef.current = fieldArrayProps;
   return (
     <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
-      <FieldArray name={name}>
-        {(fieldArrayProps) => {
-          const blocks: [] = fieldArrayProps.form.values[name];
-          arrayHelpersRef.current = fieldArrayProps;
-
-          return (
-            <div>
-              {blocks?.length > 0 ? (
-                <div style={{ padding: 15 }}>
-                  {blocks.map((_, index) => {
-                    return (
-                      <DataBlock
-                        blockOptions={blockOptions}
-                        onBlockSelectChange={onBlockSelectChange}
-                        model={model}
-                        unitsOptions={unitsOptions}
-                        blockIndex={index}
-                        removeBlock={removeBlock}
-                        name={`${fieldArrayProps.name}[${index}]`}
-                        key={index}
-                        vocabularyOptionsPath={vocabularyOptionsPath}
-                        typeOptions={typeOptions}
-                        readOnly={readOnly}
-                        selectedBlockOptions={selectedBlockOptions}
-                        blockAddable={blockAddable}
-                        unitsAddable={unitsAddable}
-                        typesAddable={typesAddable}
-                        isVocabularyBasedEnabledForBlock={
-                          isVocabularyBasedEnabledForBlock
-                        }
-                        isVocabularyBasedEnabledForType={
-                          isVocabularyBasedEnabledForType
-                        }
-                      />
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-          );
-        }}
-      </FieldArray>
+      {
+        <div style={{ padding: 15 }}>
+          {Object.keys(formik?.values?.extensionValues).map((fieldKey) => {
+            // render all keys except for fieldKey
+            return (
+              <DataBlock
+                blockOptions={blockOptions}
+                onBlockSelectChange={onBlockSelectChange}
+                model={model}
+                unitsOptions={unitsOptions}
+                removeBlock={removeBlock}
+                name={`${name}.${fieldKey}`}
+                fieldKey={fieldKey}
+                vocabularyOptionsPath={vocabularyOptionsPath}
+                typeOptions={typeOptions}
+                readOnly={readOnly}
+                selectedBlockOptions={selectedBlockOptions}
+                blockAddable={blockAddable}
+                unitsAddable={unitsAddable}
+                typesAddable={typesAddable}
+                isVocabularyBasedEnabledForBlock={
+                  isVocabularyBasedEnabledForBlock
+                }
+                isVocabularyBasedEnabledForType={
+                  isVocabularyBasedEnabledForType
+                }
+              />
+            );
+          })}
+        </div>
+      }
     </FieldSet>
   );
 }

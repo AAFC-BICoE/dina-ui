@@ -4,8 +4,6 @@ import {
   DinaFormSubmitParams,
   DoOperationsError,
   OperationError,
-  processExtensionValuesLoading,
-  processExtensionValuesSaving,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -110,6 +108,21 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
+        // Process loaded back-end data into data structure that Forkmiks can use
+        if (data.extensionValues) {
+          Object.keys(data.extensionValues).forEach((fieldKey) => {
+            Object.keys(data.extensionValues[fieldKey]).forEach(
+              (extensionKey) => {
+                data.extensionValues[fieldKey][extensionKey] = {
+                  type: extensionKey,
+                  value: data.extensionValues[fieldKey][extensionKey]
+                };
+              }
+            );
+            data.extensionValues[fieldKey]["fieldKey"] = fieldKey;
+          });
+        }
+
         // Convert to separated list
         if (data.restrictionFieldsExtension) {
           // Process risk groups
@@ -145,13 +158,6 @@ export function useMaterialSampleQuery(id?: string | null) {
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
             };
           }
-        }
-
-        // Process loaded Extension Fields values
-        if (data?.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(
-            data.extensionValues
-          );
         }
       }
     }
@@ -518,10 +524,6 @@ export function useMaterialSampleSave({
         risk_group: submittedValues?.phac_human_rg?.value
       };
     }
-    const processedExtensionValues =
-      processExtensionValuesSaving(submittedValues);
-
-    submittedValues.extensionValues = processedExtensionValues;
 
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {
