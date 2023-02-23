@@ -4,6 +4,7 @@ import {
   DinaFormSubmitParams,
   DoOperationsError,
   OperationError,
+  processExtensionValuesLoading,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -110,17 +111,7 @@ export function useMaterialSampleQuery(id?: string | null) {
 
         // Process loaded back-end data into data structure that Forkmiks can use
         if (data.extensionValues) {
-          Object.keys(data.extensionValues).forEach((fieldKey) => {
-            Object.keys(data.extensionValues[fieldKey]).forEach(
-              (extensionKey) => {
-                data.extensionValues[fieldKey][extensionKey] = {
-                  type: extensionKey,
-                  value: data.extensionValues[fieldKey][extensionKey]
-                };
-              }
-            );
-            data.extensionValues[fieldKey]["fieldKey"] = fieldKey;
-          });
+          processExtensionValuesLoading(data.extensionValues);
         }
 
         // Convert to separated list

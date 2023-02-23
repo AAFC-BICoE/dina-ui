@@ -6,25 +6,20 @@ export function processExtensionValuesLoading(initExtensionValues) {
     return undefined;
   }
 
-  const processedExtensionValues = Object.keys(initExtensionValues).map(
-    (extensionKey) => {
-      const initExtensionValue = initExtensionValues[extensionKey];
-      const extensionFields = Object.keys(initExtensionValue).map(
-        (extensionFieldKey) => {
-          return {
-            type: extensionFieldKey,
-            value: initExtensionValue[extensionFieldKey]
-          };
-        }
-      );
-      const processedExtensionValue = {
-        select: extensionKey,
-        rows: extensionFields
-      };
-      return processedExtensionValue;
-    }
-  );
-  return processedExtensionValues;
+  Object.keys(initExtensionValues).forEach((blockKey) => {
+    initExtensionValues[blockKey]["rows"] = {};
+    Object.keys(initExtensionValues[blockKey]).forEach((extensionKey) => {
+      if (extensionKey !== "rows") {
+        const extensionField = {
+          type: extensionKey,
+          value: initExtensionValues[blockKey][extensionKey]
+        };
+        initExtensionValues[blockKey]["rows"][extensionKey] = extensionField;
+        delete initExtensionValues[blockKey][extensionKey];
+      }
+    });
+    initExtensionValues[blockKey]["select"] = blockKey;
+  });
 }
 
 /**

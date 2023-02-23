@@ -19,7 +19,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   /** The model type to select resources from. */
   model?: string;
   unitsOptions?: any[];
-  removeBlock?: (index) => void;
+  removeBlock?: (blockPath) => void;
   typeOptions?: any[];
   readOnly?: boolean;
   selectedBlockOptions?: any;
@@ -28,7 +28,7 @@ export interface DataBlockProps extends FieldWrapperProps {
   typesAddable?: boolean;
   isVocabularyBasedEnabledForBlock?: boolean;
   isVocabularyBasedEnabledForType?: boolean;
-  fieldKey: string;
+  blockKey: string;
   extensionValues: any;
 }
 
@@ -47,7 +47,7 @@ export function DataBlock({
   typesAddable = false,
   isVocabularyBasedEnabledForBlock = false,
   isVocabularyBasedEnabledForType = false,
-  fieldKey: blockKey,
+  blockKey,
   extensionValues,
   ...props
 }: DataBlockProps) {
@@ -69,7 +69,8 @@ export function DataBlock({
       onBlockSelectChange(value, formik, oldValue);
     }
   }
-  const extensionKeys = extensionValues[blockKey];
+  const extensionKeys = extensionValues[blockKey].rows;
+  
   return (
     <div>
       {
@@ -80,7 +81,7 @@ export function DataBlock({
                 {blockAddable ? (
                   <CreatableSelectField
                     options={blockOptions}
-                    name={`${props.name}.fieldKey`}
+                    name={`${props.name}.select`}
                     removeBottomMargin={true}
                     removeLabel={true}
                     onChange={onCreatableSelectFieldChange}
@@ -90,7 +91,7 @@ export function DataBlock({
                 ) : (
                   <SelectField
                     options={blockOptions}
-                    name={`${props.name}.fieldKey`}
+                    name={`${props.name}.select`}
                     removeBottomMargin={true}
                     removeLabel={true}
                     onChange={onBlockSelectChange}
@@ -103,14 +104,14 @@ export function DataBlock({
             {vocabularyOptionsPath && (
               <VocabularySelectField
                 path={vocabularyOptionsPath}
-                name={`${props.name}.fieldKey`}
+                name={`${props.name}.select`}
                 removeLabel={true}
                 disableTemplateCheckbox={true}
               />
             )}
             {!blockOptions && !vocabularyOptionsPath && (
               <TextField
-                name={`${props.name}.fieldKey`}
+                name={`${props.name}.select`}
                 removeLabel={true}
                 disableTemplateCheckbox={true}
               />
@@ -125,10 +126,10 @@ export function DataBlock({
           </div>
           {Object.keys(extensionKeys).map(
             (extensionKey, rowIndex) => {
-              return extensionKey !== "fieldKey" && extensionKey !== "vocabularyBased" && (
+              return (
                 <DataRow
                   showPlusIcon={true}
-                  name={`${props.name}.${extensionKey}`}
+                  name={`${props.name}.rows.${extensionKey}`}
                   rowIndex={rowIndex}
                   // addRow={addRow}
                   // removeRow={removeRow}
@@ -147,7 +148,7 @@ export function DataBlock({
           )}
           {!readOnly && (
             <div className="d-flex align-items-center justify-content-between">
-              <Button onClick={() => {}}>
+              <Button onClick={() => removeBlock?.(props.name)}>
                 <DinaMessage id="deleteButtonText" />
               </Button>
             </div>

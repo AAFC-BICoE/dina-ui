@@ -1,6 +1,6 @@
 import { FieldArray, useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import { BulkEditTabContextI, FieldSet, useBulkEditTabContext } from "../..";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -29,38 +29,60 @@ export function DataEntry({
   isVocabularyBasedEnabledForBlock = false,
   isVocabularyBasedEnabledForType = false
 }: DataEntryProps) {
-  const arrayHelpersRef = useRef<any>(null);
   const formik = useFormikContext<any>();
   const bulkContext = useBulkEditTabContext();
-
-  const extensionValues =
+  let extensionValues =
     formik?.values?.extensionValues ??
     getBulkContextExtensionValues(bulkContext);
-  function removeBlock(index) {
-    const oldValue =
-      arrayHelpersRef?.current?.form?.values?.extensionValues?.[index]
-        ?.select ??
-      arrayHelpersRef?.current?.form?.initialValues?.extensionValues?.[index]
-        ?.select;
 
+  // If user changes field extensions in Bulk Edit, write Bulk Edit values to Formik form once
+  const [bulkExtensionValuesOverride, setBulkExtensionValuesOverride] =
+    useState<boolean>(false);
+  if (
+    formik?.values?.extensionValues &&
+    bulkContext &&
+    !bulkExtensionValuesOverride
+  ) {
+    setBulkExtensionValuesOverride(true);
+    formik.values.extensionValues = getBulkContextExtensionValues(bulkContext);
+    extensionValues = formik.values.extensionValues;
+  }
+
+  function removeBlock(blockPath) {
+    const blockName = blockPath.split(".").at(-1);
+    const { [blockName]: _, ...newExtensionValues } =
+      formik?.values?.extensionValues;
     if (setSelectedBlockOptions) {
       setSelectedBlockOptions(
-        selectedBlockOptions.filter((item) => item !== oldValue)
+        selectedBlockOptions.filter((item) => item !== blockName)
       );
     }
-    arrayHelpersRef.current.remove(index);
+    formik.setFieldValue("extensionValues", newExtensionValues);
   }
 
   function addBlock() {
-    arrayHelpersRef.current.push({ rows: [{}] });
+    const newBlockOption = blockOptions?.find(
+      (blockOption) => !selectedBlockOptions.includes(blockOption.value)
+    );
+    if (newBlockOption) {
+      let newExtensionValues = {
+        ...formik?.values?.extensionValues,
+        [newBlockOption.value]: {
+          select: newBlockOption.value,
+          rows: { "extensionField-0": "" }
+        }
+      };
+      formik.setFieldValue("extensionValues", newExtensionValues);
+      onBlockSelectChange?.(newBlockOption.value, formik);
+    }
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
     if (onBlockSelectChange) {
       if (extensionValues) {
-        Object.keys(extensionValues)?.forEach((fieldKey) => {
-          if (fieldKey) {
-            onBlockSelectChange(fieldKey, undefined);
+        Object.keys(extensionValues)?.forEach((blockKey) => {
+          if (blockKey) {
+            onBlockSelectChange(blockKey, undefined);
           }
         });
       }
@@ -82,14 +104,12 @@ export function DataEntry({
       );
     };
   }
-  // arrayHelpersRef.current = fieldArrayProps;
   return (
     <FieldSet legend={legend} wrapLegend={legendWrapper()} id={id}>
       {
         <div style={{ padding: 15 }}>
           {extensionValues
-            ? Object.keys(extensionValues).map((fieldKey) => {
-                // render all keys except for fieldKey
+            ? Object.keys(extensionValues).map((blockKey) => {
                 return (
                   <DataBlock
                     blockOptions={blockOptions}
@@ -97,8 +117,8 @@ export function DataEntry({
                     model={model}
                     unitsOptions={unitsOptions}
                     removeBlock={removeBlock}
-                    name={`${name}.${fieldKey}`}
-                    fieldKey={fieldKey}
+                    name={`${name}.${blockKey}`}
+                    blockKey={blockKey}
                     vocabularyOptionsPath={vocabularyOptionsPath}
                     typeOptions={typeOptions}
                     readOnly={readOnly}
@@ -124,23 +144,32 @@ export function DataEntry({
 }
 
 /**
- * Gets extensionValues from individual Material Samples to be displayed in bulk edit tab 
- * @param bulkContext 
+ * Gets extensionValues from individual Material Samples to be displayed in bulk edit tab
+ * @param bulkContext
  * @returns extensionValues taken from individual Material Samples used for displaying in bulk edit tab
  */
-function getBulkContextExtensionValues(bulkContext: BulkEditTabContextI<KitsuResource> | null): any {
-  let extensionValues = {}
+function getBulkContextExtensionValues(
+  bulkContext: BulkEditTabContextI<KitsuResource> | null
+): any {
+  let extensionValues = {};
   bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
-    Object.keys(resourceHook?.resource?.extensionValues).forEach((fieldKey) => {
+    Object.keys(resourceHook.resource.extensionValues).forEach((fieldKey) => {
       if (extensionValues[fieldKey]) {
-        Object.keys(resourceHook?.resource?.extensionValues[fieldKey]).forEach((extensionKey) => {
-          extensionValues[fieldKey][extensionKey] = resourceHook?.resource?.extensionValues[fieldKey][extensionKey];
-        })
+        Object.keys(
+          resourceHook?.resource?.extensionValues[fieldKey].rows
+        ).forEach((extensionKey) => {
+          extensionValues[fieldKey].rows[extensionKey] = undefined;
+        });
       } else {
-        extensionValues[fieldKey] = resourceHook?.resource?.extensionValues[fieldKey];
+        extensionValues[fieldKey] =
+          resourceHook.resource.extensionValues[fieldKey];
+        Object.keys(
+          resourceHook?.resource?.extensionValues[fieldKey].rows
+        ).forEach((extensionKey) => {
+          extensionValues[fieldKey].rows[extensionKey] = undefined;
+        });
       }
-    })
-  })
+    });
+  });
   return extensionValues;
 }
-

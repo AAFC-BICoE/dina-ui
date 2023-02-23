@@ -104,19 +104,23 @@ export function CollectingEventFormLayout({
     const selectedFieldExtension = response?.data.find(
       (data) => data.extension.key === selected
     );
-
-    setExtensionFieldsOptions(
-      selectedFieldExtension?.extension.fields.map((data) => ({
+    const selectedExtensionFieldsOptions = selectedFieldExtension?.extension.fields.map(
+      (data) => ({
         label: data.name,
         value: data.key
-      }))
+      })
     );
+    setExtensionFieldsOptions(selectedExtensionFieldsOptions);
+
+    // Clear block rows if new block option selected
     if (selected !== oldValue) {
-      formik?.values?.extensionValues?.forEach((extensionValue) => {
-        if (extensionValue.select === oldValue) {
-          extensionValue.rows = [{}];
-        }
-      });
+      if (formik?.values?.extensionValues) {
+        Object.keys(formik?.values?.extensionValues).forEach((extensionKey) => {
+          if (formik?.values?.extensionValues[extensionKey].select === oldValue) {
+            formik.values.extensionValues[extensionKey].rows = { "extensionField-0": "" };
+          }
+        })
+      }
     }
     setSelectedBlockOptions(
       selectedBlockOptions.filter((item) => item !== oldValue)
