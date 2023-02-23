@@ -1,11 +1,12 @@
 import {
-  filterBy,
-  ResourceSelectField,
+  CheckBoxField,
+  CreatableSelectField,
   SelectField,
-  TextField,
+  TextField
 } from "common-ui";
+import { find } from "lodash";
+import { FaMinus, FaPlus } from "react-icons/fa";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { FaPlus, FaMinus } from "react-icons/fa";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -26,6 +27,9 @@ export interface DataRowProps {
   unitsOptions?: any[];
   typeOptions?: any[];
   readOnly?: boolean;
+  unitsAddable?: boolean;
+  typesAddable?: boolean;
+  isVocabularyBasedEnabledForType?: boolean;
 }
 
 export function DataRow({
@@ -37,21 +41,50 @@ export function DataRow({
   unitsOptions,
   typeOptions,
   readOnly,
+  typesAddable = false,
+  unitsAddable = false,
+  isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
   const valueTextFieldName = getFieldName(name, "value", rowIndex);
   const typeSelectFieldName = getFieldName(name, "type", rowIndex);
   const unitSelectFieldName = getFieldName(name, "unit", rowIndex);
+  const vocabularyBasedFieldName = getFieldName(
+    name,
+    "vocabularyBased",
+    rowIndex
+  );
+
+  function onCreatableSelectFieldChange(value, formik) {
+    if (isVocabularyBasedEnabledForType) {
+      formik.setFieldValue(
+        vocabularyBasedFieldName,
+        !!find(typeOptions, (item) => item.value === value)
+      );
+    }
+  }
+
   return (
     <div className="d-flex">
       {typeOptions && (
         <div style={{ width: "15rem", marginLeft: "17rem" }}>
-          <SelectField
-            options={typeOptions}
-            name={typeSelectFieldName}
-            label={<DinaMessage id="dataType" />}
-            removeBottomMargin={true}
-            disableTemplateCheckbox={true}
-          />
+          {typesAddable ? (
+            <CreatableSelectField
+              options={typeOptions}
+              name={typeSelectFieldName}
+              label={<DinaMessage id="dataType" />}
+              removeBottomMargin={true}
+              disableTemplateCheckbox={true}
+              onChange={onCreatableSelectFieldChange}
+            />
+          ) : (
+            <SelectField
+              options={typeOptions}
+              name={typeSelectFieldName}
+              label={<DinaMessage id="dataType" />}
+              removeBottomMargin={true}
+              disableTemplateCheckbox={true}
+            />
+          )}
         </div>
       )}
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
@@ -64,14 +97,31 @@ export function DataRow({
       </div>
       {unitsOptions && (
         <div style={{ width: "15rem", marginLeft: "3rem" }}>
-          <SelectField
-            options={unitsOptions}
-            name={unitSelectFieldName}
-            removeBottomMargin={true}
-            label={<DinaMessage id="unit" />}
-            disableTemplateCheckbox={true}
-          />
+          {unitsAddable ? (
+            <CreatableSelectField
+              options={unitsOptions}
+              name={unitSelectFieldName}
+              removeBottomMargin={true}
+              label={<DinaMessage id="unit" />}
+              disableTemplateCheckbox={true}
+            />
+          ) : (
+            <SelectField
+              options={unitsOptions}
+              name={unitSelectFieldName}
+              removeBottomMargin={true}
+              label={<DinaMessage id="unit" />}
+              disableTemplateCheckbox={true}
+            />
+          )}
         </div>
+      )}
+      {isVocabularyBasedEnabledForType && (
+        <CheckBoxField
+          className="hidden"
+          name={vocabularyBasedFieldName}
+          removeLabel={true}
+        />
       )}
       {!readOnly && (
         <div style={{ cursor: "pointer", marginTop: "2rem" }}>
