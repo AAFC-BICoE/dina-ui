@@ -1,11 +1,11 @@
 import {
   ControlledVocabularySelectField,
   FieldSet,
+  FieldSpy,
   SelectField
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SPLIT_CONFIGURATION_COMPONENT_NAME } from "../../../types/collection-api";
-import { FaEquals } from "react-icons/fa";
 
 export interface SplitConfigurationSectionProps {
   id?: string;
@@ -46,15 +46,20 @@ export function SplitConfigurationSection({
             />
           </div>
           <div className="col-md-6">
-            <ControlledVocabularySelectField
-              name="splitConfiguration.condition.materialSampleType"
-              label={formatMessage("field_materialSampleType")}
-              disableTemplateCheckbox={true}
-              query={() => ({
-                path: "collection-api/vocabulary/materialSampleType"
-              })}
-              isMulti={true}
-            />
+            <FieldSpy fieldName="splitConfiguration.condition.conditionType">
+              {(selected) => (
+                <ControlledVocabularySelectField
+                  name="splitConfiguration.condition.materialSampleType"
+                  label={formatMessage("field_materialSampleType")}
+                  disableTemplateCheckbox={true}
+                  disabled={selected !== "type"}
+                  query={() => ({
+                    path: "collection-api/vocabulary/materialSampleType"
+                  })}
+                  isMulti={true}
+                />
+              )}
+            </FieldSpy>
           </div>
         </div>
       </FieldSet>
@@ -67,7 +72,43 @@ export function SplitConfigurationSection({
         className="non-strip"
       >
         <div className="row">
-          <div className="col-md-6" />
+          <div className="col-md-6">
+            <SelectField
+              name="splitConfiguration.basename.generateFrom"
+              label={formatMessage(
+                "materialSampleSplitConfigurationGenerateFrom"
+              )}
+              disableTemplateCheckbox={true}
+              options={[
+                {
+                  value: "direct_parent",
+                  label: formatMessage(
+                    "materialSampleSplitConfigurationDirectParent"
+                  )
+                },
+                {
+                  value: "type",
+                  label: formatMessage("field_materialSampleType")
+                }
+              ]}
+            />
+          </div>
+          <div className="col-md-6">
+            <FieldSpy fieldName="splitConfiguration.basename.generateFrom">
+              {(selected) => (
+                <ControlledVocabularySelectField
+                  name="splitConfiguration.basename.materialSampleType"
+                  label={formatMessage("field_materialSampleType")}
+                  disableTemplateCheckbox={true}
+                  disabled={selected !== "type"}
+                  query={() => ({
+                    path: "collection-api/vocabulary/materialSampleType"
+                  })}
+                  isMulti={true}
+                />
+              )}
+            </FieldSpy>
+          </div>
         </div>
       </FieldSet>
 
@@ -81,7 +122,66 @@ export function SplitConfigurationSection({
         className="non-strip"
       >
         <div className="row">
-          <div className="col-md-6" />
+          <div className="col-md-6">
+            <SelectField
+              name="splitConfiguration.sequenceGeneration.generateFrom"
+              label={formatMessage(
+                "materialSampleSplitConfigurationGenerateFrom"
+              )}
+              disableTemplateCheckbox={true}
+              options={[
+                {
+                  value: "direct_parent",
+                  label: formatMessage(
+                    "materialSampleSplitConfigurationDirectParent"
+                  )
+                },
+                {
+                  value: "type",
+                  label: formatMessage("field_materialSampleType")
+                }
+              ]}
+            />
+          </div>
+          <div className="col-md-6">
+            <FieldSpy fieldName="splitConfiguration.sequenceGeneration.generateFrom">
+              {(selected) => (
+                <ControlledVocabularySelectField
+                  name="splitConfiguration.sequenceGeneration.materialSampleType"
+                  label={formatMessage("field_materialSampleType")}
+                  disableTemplateCheckbox={true}
+                  disabled={selected !== "type"}
+                  query={() => ({
+                    path: "collection-api/vocabulary/materialSampleType"
+                  })}
+                  isMulti={true}
+                />
+              )}
+            </FieldSpy>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col-md-6">
+            <SelectField
+              name="splitConfiguration.sequenceGeneration.generationOptions"
+              label={formatMessage("splitGenerationOptionLabel")}
+              disableTemplateCheckbox={true}
+              options={[
+                {
+                  value: "lowercase",
+                  label: formatMessage("splitGenerationOptionLowercase")
+                },
+                {
+                  value: "uppercase",
+                  label: formatMessage("splitGenerationOptionUppercase")
+                },
+                {
+                  value: "numeric",
+                  label: formatMessage("splitGenerationOptionNumerical")
+                }
+              ]}
+            />
+          </div>
         </div>
       </FieldSet>
     </FieldSet>

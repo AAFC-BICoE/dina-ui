@@ -14,13 +14,18 @@ import { find } from "lodash";
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
   isMulti?: boolean;
+  disabled?: boolean;
 }
 
 export function ControlledVocabularySelectField(
   controlledVocabularySelectFieldProps: ControlledVocabularySelectFieldProp
 ) {
   const { locale, formatMessage } = useDinaIntl();
-  const { query, isMulti = false } = controlledVocabularySelectFieldProps;
+  const {
+    query,
+    isMulti = false,
+    disabled = false
+  } = controlledVocabularySelectFieldProps;
 
   const vocQuery = useQuery<Vocabulary>(query?.() as any);
 
@@ -64,6 +69,7 @@ export function ControlledVocabularySelectField(
               axis="xy"
               distance={4}
               isMulti={isMulti}
+              isDisabled={disabled}
             />
           );
         }}

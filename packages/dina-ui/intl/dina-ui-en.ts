@@ -537,6 +537,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleSplitConfigurationBasename: "Basename Generation",
   materialSampleSplitConfigurationSequenceGeneration: "Sequence Generation",
   materialSampleSplitConfigurationConditionType: "Condition Type",
+  materialSampleSplitConfigurationDirectParent: "Direct Parent",
+  materialSampleSplitConfigurationGenerateFrom: "Generate From",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleInfo: "Material Sample Info",
