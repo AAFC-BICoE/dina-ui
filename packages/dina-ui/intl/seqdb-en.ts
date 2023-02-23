@@ -121,5 +121,7 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_shippingAddress.city": "City",
   "field_shippingAddress.provinceState": "Province/State",
   "field_shippingAddress.zipCode": "Zip Code",
-  "field_shippingAddress.country": "Country"
+  "field_shippingAddress.country": "Country",
+  pcrWorksheet: "PCR Worksheet",
+  print: "Print"
 };
