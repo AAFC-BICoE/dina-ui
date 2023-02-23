@@ -48,16 +48,18 @@ export function DataEntry({
     extensionValues = formik.values.extensionValues;
   }
 
-  function removeBlock(blockPath) {
+  function removeBlock(blockPath: string) {
     const blockName = blockPath.split(".").at(-1);
-    const { [blockName]: _, ...newExtensionValues } =
-      formik?.values?.extensionValues;
-    if (setSelectedBlockOptions) {
-      setSelectedBlockOptions(
-        selectedBlockOptions.filter((item) => item !== blockName)
-      );
+    if (blockName) {
+      const { [blockName]: _, ...newExtensionValues } =
+        formik?.values?.extensionValues;
+      if (setSelectedBlockOptions) {
+        setSelectedBlockOptions(
+          selectedBlockOptions.filter((item) => item !== blockName)
+        );
+      }
+      formik.setFieldValue("extensionValues", newExtensionValues);
     }
-    formik.setFieldValue("extensionValues", newExtensionValues);
   }
 
   function addBlock() {

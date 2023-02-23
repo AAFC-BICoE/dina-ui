@@ -51,13 +51,6 @@ export function DataBlock({
   extensionValues,
   ...props
 }: DataBlockProps) {
-  // function addRow() {
-  //   fieldArrayProps.push({});
-  // }
-
-  // function removeRow(rowIndex) {
-  //   fieldArrayProps.remove(rowIndex);
-  // }
   function onCreatableSelectFieldChange(value, formik, oldValue) {
     if (isVocabularyBasedEnabledForBlock) {
       formik.setFieldValue(
@@ -131,8 +124,6 @@ export function DataBlock({
                   showPlusIcon={true}
                   name={`${props.name}.rows.${extensionKey}`}
                   rowIndex={rowIndex}
-                  // addRow={addRow}
-                  // removeRow={removeRow}
                   model={model}
                   unitsOptions={unitsOptions}
                   typeOptions={typeOptions}
