@@ -1,5 +1,6 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { KitsuResource } from "kitsu";
+import { Protocol } from "../../collection-api";
 import { Person } from "../../objectstore-api";
 import { PcrPrimer } from "./PcrPrimer";
 import { Region } from "./Region";
@@ -25,6 +26,7 @@ export interface PcrBatchRelationships {
   attachment?: ResourceIdentifierObject[];
   storageUnitType?: ResourceIdentifierObject;
   storageUnit?: ResourceIdentifierObject;
+  protocol?: Protocol;
 }
 
 export type PcrBatch = KitsuResource &
