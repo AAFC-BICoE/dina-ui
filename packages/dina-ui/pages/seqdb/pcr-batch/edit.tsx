@@ -21,7 +21,8 @@ import { useFormikContext, connect } from "formik";
 import { useRouter } from "next/router";
 import {
   StorageUnitType,
-  StorageUnit
+  StorageUnit,
+  Protocol
 } from "packages/dina-ui/types/collection-api";
 import { ReactNode } from "react";
 import {
@@ -48,7 +49,7 @@ export function usePcrBatchQuery(id?: string, deps?: any[]) {
     {
       path: `seqdb-api/pcr-batch/${id}`,
       include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType"
+        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType,protocol"
     },
     { disabled: !id, deps }
   );
@@ -355,6 +356,13 @@ export function PcrBatchFormFields() {
         <TextField className="col-md-6" name="positiveControl" />
         <TextField className="col-md-6" name="reactionVolume" />
         <DateField className="col-md-6" name="reactionDate" />
+        <ResourceSelectField<Protocol>
+          className="col-md-6"
+          name="protocol"
+          filter={filterBy(["name"])}
+          model="collection-api/protocol"
+          optionLabel={(protocol) => protocol.name}
+        />
         <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
           resourceProps={{
@@ -370,7 +378,8 @@ export function PcrBatchFormFields() {
                   ]
                 : undefined
             }),
-            isDisabled: !values?.storageUnitType?.id
+            isDisabled: !values?.storageUnitType?.id,
+            className: "col-md-6"
           }}
           restrictedField={"data.relationships.storageUnitType.data.id"}
           restrictedFieldValue={values?.storageUnitType?.id}
