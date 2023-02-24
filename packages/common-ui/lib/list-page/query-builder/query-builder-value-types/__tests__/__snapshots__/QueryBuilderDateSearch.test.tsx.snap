@@ -65,7 +65,11 @@ Object {
         "must": Array [
           Object {
             "range": Object {
-              "includes.name": "1998",
+              "includes.name": Object {
+                "format": "yyyy",
+                "gte": "1998||/y",
+                "lte": "1998||/y",
+              },
             },
           },
           Object {
@@ -252,7 +256,9 @@ Object {
         "must": Array [
           Object {
             "range": Object {
-              "includes.name": "1998-05-19",
+              "includes.name": Object {
+                "gte": "1998-05-19",
+              },
             },
           },
           Object {
@@ -286,7 +292,9 @@ Object {
         "must": Array [
           Object {
             "range": Object {
-              "includes.name": "1998-05-19",
+              "includes.name": Object {
+                "gt": "1998-05-19",
+              },
             },
           },
           Object {
@@ -320,7 +328,9 @@ Object {
         "must": Array [
           Object {
             "range": Object {
-              "includes.name": "1998-05-19",
+              "includes.name": Object {
+                "lt": "1998-05-19",
+              },
             },
           },
           Object {
@@ -501,7 +511,9 @@ Object {
         "must": Array [
           Object {
             "range": Object {
-              "includes.name": "1998-05-19",
+              "includes.name": Object {
+                "lte": "1998-05-19",
+              },
             },
           },
           Object {
