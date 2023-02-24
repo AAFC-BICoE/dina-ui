@@ -305,6 +305,8 @@ export function useMaterialSampleSave({
     useState<boolean>(false);
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
+  const [enableSplitConfiguration, setEnableSplitConfiguration] =
+    useState<boolean>(false);
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
@@ -425,7 +427,9 @@ export function useMaterialSampleSave({
     enableAssociations,
     setEnableAssociations,
     enableRestrictions,
-    setEnableRestrictions
+    setEnableRestrictions,
+    enableSplitConfiguration,
+    setEnableSplitConfiguration
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();

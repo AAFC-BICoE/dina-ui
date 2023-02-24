@@ -675,10 +675,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "splitConfiguration.condition.by"
+            id: "splitConfiguration.condition.conditionType"
           },
           {
-            id: "splitConfiguration.condition.type"
+            id: "splitConfiguration.condition.materialSampleType"
           }
         ]
       },
@@ -688,10 +688,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "splitConfiguration.basename.by"
+            id: "splitConfiguration.basename.generateFrom"
           },
           {
-            id: "splitConfiguration.basename.type"
+            id: "splitConfiguration.basename.materialSampleType"
           }
         ]
       },
@@ -701,10 +701,10 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         maxGridSizeX: 2,
         items: [
           {
-            id: "splitConfiguration.sequenceGeneration.by"
+            id: "splitConfiguration.sequenceGeneration.generateFrom"
           },
           {
-            id: "splitConfiguration.sequenceGeneration.type"
+            id: "splitConfiguration.sequenceGeneration.materialSampleType"
           },
           {
             id: "splitConfiguration.sequenceGeneration.seriesMode"

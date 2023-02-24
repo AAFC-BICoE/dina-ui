@@ -163,7 +163,7 @@ export function SplitConfigurationSection({
         <div className="row">
           <div className="col-md-6">
             <SelectField
-              name="splitConfiguration.sequenceGeneration.generationOptions"
+              name="splitConfiguration.sequenceGeneration.seriesMode"
               label={formatMessage("splitGenerationOptionLabel")}
               disableTemplateCheckbox={true}
               options={[

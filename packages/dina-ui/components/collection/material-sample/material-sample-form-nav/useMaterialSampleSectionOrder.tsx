@@ -9,6 +9,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 import { ScrollTarget } from "./MaterialSampleFormNav";
@@ -74,6 +75,10 @@ export function useMaterialSampleSectionOrder({
     [SCHEDULED_ACTIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableScheduledActions,
       setEnabled: dataComponentState.setEnableScheduledActions
+    },
+    [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
+      disabled: !dataComponentState.enableSplitConfiguration,
+      setEnabled: dataComponentState.setEnableSplitConfiguration
     }
   };
 

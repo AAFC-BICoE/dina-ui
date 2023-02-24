@@ -124,6 +124,8 @@ export function FormTemplateEditPageLoaded({
     fetchedFormTemplate
   );
 
+  // console.log(splitConfigurationInitialValues);
+
   const acquisitionEventInitialValues = getComponentValues(
     ACQUISITION_EVENT_COMPONENT_NAME,
     fetchedFormTemplate
@@ -155,6 +157,8 @@ export function FormTemplateEditPageLoaded({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
+    // console.log(JSON.stringify(submittedValues));
+
     // Get collecting event checkboxes and values
     const {
       templateCheckboxes: collectingEventCheckboxes,
@@ -212,18 +216,25 @@ export function FormTemplateEditPageLoaded({
                     ] ?? false,
                 defaultValue: _.get(allSubmittedValues, field.id)
               };
-              if (dataComponent.id === COLLECTING_EVENT_COMPONENT_NAME) {
-                item.defaultValue = _.get(
-                  allSubmittedValues,
-                  `collectingEvent.${field.id}`
-                );
-              } else if (
-                dataComponent.id === ACQUISITION_EVENT_COMPONENT_NAME
-              ) {
-                item.defaultValue = _.get(
-                  allSubmittedValues,
-                  `acquisitionEvent.${field.id}`
-                );
+
+              // Separate the different parts of the form that are not being saved to the Material
+              // Sample directly.
+              switch (dataComponent.id) {
+                case COLLECTING_EVENT_COMPONENT_NAME:
+                  item.defaultValue = _.get(
+                    allSubmittedValues,
+                    `collectingEvent.${field.id}`
+                  );
+                  break;
+                case ACQUISITION_EVENT_COMPONENT_NAME:
+                  item.defaultValue = _.get(
+                    allSubmittedValues,
+                    `acquisitionEvent.${field.id}`
+                  );
+                  break;
+                case SPLIT_CONFIGURATION_COMPONENT_NAME:
+                  // Displayed by default. Visibility cannot be configured.
+                  item.visible = true;
               }
 
               return item;
@@ -232,6 +243,8 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
+
+    // console.log("SAVING THIS: " + JSON.stringify(formTemplate));
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
@@ -323,6 +336,7 @@ function getDataComponentsStateMap(dataComponentState) {
   dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
-  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] = true;
+  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
+    dataComponentState.enableSplitConfiguration;
   return dataComponentEnabledMap;
 }

@@ -480,7 +480,11 @@ export function MaterialSampleForm({
         </DinaFormSection>
       ),
     [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
-      !reduceRendering && isTemplate && <SplitConfigurationSection id={id} />
+      !reduceRendering &&
+      isTemplate &&
+      dataComponentState.enableSplitConfiguration && (
+        <SplitConfigurationSection id={id} />
+      )
   };
 
   const formSectionPairs = toPairs(formSections);
