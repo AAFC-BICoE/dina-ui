@@ -40,23 +40,8 @@ export function processExtensionValuesSaving(submittedValues: any) {
     Object.keys(extensionFieldsRows).forEach((rowKey) => {
       const type = extensionFieldsRows[rowKey]?.type
       const value = extensionFieldsRows[rowKey]?.value
-      const extensionField = {[type]: value}
-      console.log(extensionField)
       processedExtensionValues[fieldKey] = {...processedExtensionValues[fieldKey], [type]: value}
     })
   })
   submittedValues.extensionValues = processedExtensionValues;
-  // const processedExtensionValues = submittedExtensionValues?.reduce(
-  //   (result, item) => {
-  //     const extensionKey = item.select;
-  //     const processedExtensionFields = {};
-  //     item.rows?.forEach((extensionField) => {
-  //       processedExtensionFields[extensionField.type] = extensionField.value;
-  //     });
-  //     result[extensionKey] = processedExtensionFields;
-  //     return result;
-  //   },
-  //   {}
-  // );
-  // return processedExtensionValues;
 }

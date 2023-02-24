@@ -30,17 +30,12 @@ export function DataEntry({
   const formik = useFormikContext<any>();
   const bulkContext = useBulkEditTabContext();
   let extensionValues =
-    formik?.values?.[name] ??
-    getBulkContextExtensionValues(bulkContext, name);
+    formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
 
   // If user changes field extensions in Bulk Edit, write Bulk Edit values to Formik form once
   const [bulkExtensionValuesOverride, setBulkExtensionValuesOverride] =
     useState<boolean>(false);
-  if (
-    formik?.values?.[name] &&
-    bulkContext &&
-    !bulkExtensionValuesOverride
-  ) {
+  if (formik?.values?.[name] && bulkContext && !bulkExtensionValuesOverride) {
     setBulkExtensionValuesOverride(true);
     formik.values[name] = getBulkContextExtensionValues(bulkContext, name);
     extensionValues = formik.values[name];
@@ -49,29 +44,51 @@ export function DataEntry({
   function removeBlock(blockPath: string) {
     const blockName = blockPath.split(".").at(-1);
     if (blockName) {
-      const { [blockName]: _, ...newExtensionValues } =
-        formik?.values?.[name];
+      const { [blockName]: _, ...newExtensionValues } = formik?.values?.[name];
       formik.setFieldValue(name, newExtensionValues);
     }
   }
 
   function addBlock() {
-    const selectedBlockOptions = formik?.values?.[name] ? Object.keys(formik?.values?.[name]) : [];
-    
+    const selectedBlockOptions = formik?.values?.[name]
+      ? Object.keys(formik?.values?.[name])
+      : [];
+
     const newBlockOption = blockOptions?.find(
       (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
     );
+    let newExtensionValues = {};
     if (newBlockOption) {
-      let newExtensionValues = {
+      newExtensionValues = {
         ...formik?.values?.[name],
-        [newBlockOption.value]: {
-          select: newBlockOption.value,
-          rows: { "extensionField-0": "" }
-        }
+        [newBlockOption.value]: !blockAddable
+          ? {
+              select: newBlockOption.value,
+              rows: { "extensionField-0": "" }
+            }
+          : {
+              select: newBlockOption.value,
+              rows: { "extensionField-0": "" },
+              vocabularyBased: true
+            }
       };
-      formik.setFieldValue(name, newExtensionValues);
-      onBlockSelectChange?.(newBlockOption.value, formik);
+    } else {
+      newExtensionValues = {
+        ...formik?.values?.[name],
+        [`extension-${Object.keys(extensionValues)}`]: !blockAddable
+          ? {
+              select: "",
+              rows: { "extensionField-0": "" }
+            }
+          : {
+              select: "",
+              rows: { "extensionField-0": "" },
+              vocabularyBased: true
+            }
+      };
     }
+    formik.setFieldValue(name, newExtensionValues);
+    onBlockSelectChange?.(newBlockOption.value, formik);
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
@@ -152,19 +169,18 @@ function getBulkContextExtensionValues(
   bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
     Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
       if (extensionValues[fieldKey]) {
-        Object.keys(
-          resourceHook?.resource?.[name][fieldKey].rows
-        ).forEach((extensionKey) => {
-          extensionValues[fieldKey].rows[extensionKey] = undefined;
-        });
+        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+          (extensionKey) => {
+            extensionValues[fieldKey].rows[extensionKey] = undefined;
+          }
+        );
       } else {
-        extensionValues[fieldKey] =
-          resourceHook.resource?.[name][fieldKey];
-        Object.keys(
-          resourceHook?.resource?.[name][fieldKey].rows
-        ).forEach((extensionKey) => {
-          extensionValues[fieldKey].rows[extensionKey] = undefined;
-        });
+        extensionValues[fieldKey] = resourceHook.resource?.[name][fieldKey];
+        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+          (extensionKey) => {
+            extensionValues[fieldKey].rows[extensionKey] = undefined;
+          }
+        );
       }
     });
   });
