@@ -5,6 +5,7 @@ import {
   DoOperationsError,
   OperationError,
   processExtensionValuesLoading,
+  processExtensionValuesSaving,
   resourceDifference,
   SaveArgs,
   useApiClient,
@@ -514,6 +515,10 @@ export function useMaterialSampleSave({
       ] = {
         risk_group: submittedValues?.phac_human_rg?.value
       };
+    }
+
+    if (submittedValues.extensionValues) {
+      processExtensionValuesSaving(submittedValues);
     }
 
     /** Input to submit to the back-end API. */

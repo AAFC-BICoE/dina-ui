@@ -94,7 +94,6 @@ export function CollectingEventFormLayout({
         value: data.extension.key
       };
     });
-  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
 
   function onBlockSelectChange(
     selected,
@@ -122,10 +121,6 @@ export function CollectingEventFormLayout({
         })
       }
     }
-    setSelectedBlockOptions(
-      selectedBlockOptions.filter((item) => item !== oldValue)
-    );
-    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
   }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
@@ -1045,8 +1040,6 @@ export function CollectingEventFormLayout({
             onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
             isTemplate={isTemplate}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
           />
         </DinaFormSection>
       </div>

@@ -39,8 +39,6 @@ export function DataEntryField({
   legend,
   width,
   isTemplate,
-  selectedBlockOptions,
-  setSelectedBlockOptions,
   id,
   blockAddable = false,
   unitsAddable = false,
@@ -60,8 +58,6 @@ export function DataEntryField({
       vocabularyOptionsPath={vocabularyOptionsPath}
       typeOptions={typeOptions}
       readOnly={readOnly}
-      selectedBlockOptions={selectedBlockOptions}
-      setSelectedBlockOptions={setSelectedBlockOptions}
       id={id}
       blockAddable={blockAddable}
       unitsAddable={unitsAddable}

@@ -20,8 +20,6 @@ export function DataEntry({
   vocabularyOptionsPath,
   typeOptions,
   readOnly,
-  selectedBlockOptions,
-  setSelectedBlockOptions,
   id,
   blockAddable = false,
   unitsAddable = false,
@@ -53,18 +51,18 @@ export function DataEntry({
     if (blockName) {
       const { [blockName]: _, ...newExtensionValues } =
         formik?.values?.extensionValues;
-      if (setSelectedBlockOptions) {
-        setSelectedBlockOptions(
-          selectedBlockOptions.filter((item) => item !== blockName)
-        );
-      }
       formik.setFieldValue("extensionValues", newExtensionValues);
     }
   }
 
   function addBlock() {
+    let selectedBlockOptions: any[] = []
+    if (formik?.values?.extensionValues) {
+      selectedBlockOptions = Object.keys(formik?.values?.extensionValues);
+    }
+    
     const newBlockOption = blockOptions?.find(
-      (blockOption) => !selectedBlockOptions.includes(blockOption.value)
+      (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
     );
     if (newBlockOption) {
       let newExtensionValues = {
@@ -124,7 +122,6 @@ export function DataEntry({
                     vocabularyOptionsPath={vocabularyOptionsPath}
                     typeOptions={typeOptions}
                     readOnly={readOnly}
-                    selectedBlockOptions={selectedBlockOptions}
                     blockAddable={blockAddable}
                     unitsAddable={unitsAddable}
                     typesAddable={typesAddable}

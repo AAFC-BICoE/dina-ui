@@ -58,7 +58,7 @@ describe("DataEntry", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
-    const name = "protocolData";
+    const name = "extensionValues";
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
@@ -87,37 +87,57 @@ describe("DataEntry", () => {
     expect(wrapper.find(DataBlock).exists()).toEqual(true);
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    let selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+    let dataBlock = wrapper
+      .findWhere(
+        (datablock) =>
+          datablock.props().name === `${name}.${blockOptions[0].value}`
+      )
       .find(SelectField);
 
     // block select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].select`)
+    dataBlock
+      .filterWhere(
+        (n: any) => n.props().name === `${name}.${blockOptions[0].value}.select`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 1", value: "BLOCK_OPTION_1" });
 
     // type select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].type`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-0.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 1", value: "TYPE_OPTION_1" });
 
     // unit select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].unit`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-0.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 1", value: "UNIT_OPTION_1" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-0.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[0].value`, value: "VALUE_1" }
+        target: {
+          name: `${name}.${blockOptions[0].value}.rows.extensionField-0.value`,
+          value: "VALUE_1"
+        }
       });
 
     // form submission
@@ -127,23 +147,26 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         }
-      ]
+      }
     });
 
     // Add new row to data block
     wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+      .findWhere(
+        (datablock) =>
+          datablock.props().name === `${name}.${blockOptions[0].value}`
+      )
       .find(FaPlus)
       .simulate("click");
 
@@ -151,30 +174,48 @@ describe("DataEntry", () => {
     wrapper.update();
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+    dataBlock = wrapper
+      .findWhere(
+        (datablock) =>
+          datablock.props().name === `${name}.${blockOptions[0].value}`
+      )
       .find(SelectField);
 
     // type select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].type`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-1.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 2", value: "TYPE_OPTION_2" });
 
     // unit select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].unit`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-1.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 2", value: "UNIT_OPTION_2" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[0].value}.rows.extensionField-1.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[1].value`, value: "VALUE_2" }
+        target: {
+          name: `${name}.${blockOptions[0].value}.rows.extensionField-1.value`,
+          value: "VALUE_2"
+        }
       });
 
     // form submission
@@ -184,23 +225,24 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             },
-            {
+
+            "extensionField-1": {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
               value: "VALUE_2"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         }
-      ]
+      }
     });
 
     wrapper.find("button.add-datablock").simulate("click");
@@ -209,36 +251,56 @@ describe("DataEntry", () => {
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
     const selectFieldsSecondBlock = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[1]`)
+      .findWhere(
+        (datablock) =>
+          datablock.props().name === `${name}.${blockOptions[1].value}`
+      )
       .find(SelectField);
-
+    // console.log(wrapper.debug())
     // block select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].select`)
+      .filterWhere(
+        (n: any) => n.props().name === `${name}.${blockOptions[1].value}.select`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 2", value: "BLOCK_OPTION_2" });
 
     // type select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].type`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[1].value}.rows.extensionField-0.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 3", value: "TYPE_OPTION_3" });
 
     // unit select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].unit`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[1].value}.rows.extensionField-0.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 3", value: "UNIT_OPTION_3" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions[1].value}.rows.extensionField-0.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[1].rows[0].value`, value: "VALUE_3" }
+        target: {
+          name: `${name}.${blockOptions[1].value}.rows.extensionField-0.value`,
+          value: "VALUE_3"
+        }
       });
 
     // form submission
@@ -248,33 +310,34 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             },
-            {
+
+            "extensionField-1": {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
               value: "VALUE_2"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         },
-        {
-          rows: [
-            {
+        BLOCK_OPTION_2: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_3",
               unit: "UNIT_OPTION_3",
               value: "VALUE_3"
-            }
-          ],
+            },
+          },
           select: "BLOCK_OPTION_2"
         }
-      ]
+      }
     });
   });
 });

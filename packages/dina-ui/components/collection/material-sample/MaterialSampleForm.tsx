@@ -235,7 +235,6 @@ export function MaterialSampleForm({
         value: data.extension.key
       };
     });
-  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
 
   function onBlockSelectChange(
     selected,
@@ -263,10 +262,6 @@ export function MaterialSampleForm({
         })
       }
     }
-    setSelectedBlockOptions(
-      selectedBlockOptions.filter((item) => item !== oldValue)
-    );
-    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
   }
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -423,8 +418,6 @@ export function MaterialSampleForm({
             onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
             isTemplate={isTemplate}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
             id={id}
           />
         </DinaFormSection>

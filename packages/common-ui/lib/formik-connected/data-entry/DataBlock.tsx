@@ -22,7 +22,6 @@ export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (blockPath) => void;
   typeOptions?: any[];
   readOnly?: boolean;
-  selectedBlockOptions?: any;
   blockAddable?: boolean;
   unitsAddable?: boolean;
   typesAddable?: boolean;
@@ -41,7 +40,6 @@ export function DataBlock({
   removeBlock,
   typeOptions,
   readOnly,
-  selectedBlockOptions,
   blockAddable = false,
   unitsAddable = false,
   typesAddable = false,
@@ -63,6 +61,8 @@ export function DataBlock({
     }
   }
   const extensionKeys = extensionValues[blockKey].rows;
+  const formik = useFormikContext<any>();
+  const selectedBlockOptions = Object.keys(formik?.values?.extensionValues);
   
   return (
     <div>
