@@ -62,7 +62,8 @@ export function DataBlock({
   }
   const extensionKeys = extensionValues[blockKey].rows;
   const formik = useFormikContext<any>();
-  const selectedBlockOptions = Object.keys(formik?.values?.extensionValues);
+  const rootName = props.name.split(".")[0];
+  const selectedBlockOptions = formik?.values?.[rootName] ? Object.keys(formik?.values?.[rootName]) : [];
   
   return (
     <div>

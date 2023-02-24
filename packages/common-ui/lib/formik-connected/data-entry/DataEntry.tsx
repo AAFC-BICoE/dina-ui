@@ -30,49 +30,46 @@ export function DataEntry({
   const formik = useFormikContext<any>();
   const bulkContext = useBulkEditTabContext();
   let extensionValues =
-    formik?.values?.extensionValues ??
-    getBulkContextExtensionValues(bulkContext);
+    formik?.values?.[name] ??
+    getBulkContextExtensionValues(bulkContext, name);
 
   // If user changes field extensions in Bulk Edit, write Bulk Edit values to Formik form once
   const [bulkExtensionValuesOverride, setBulkExtensionValuesOverride] =
     useState<boolean>(false);
   if (
-    formik?.values?.extensionValues &&
+    formik?.values?.[name] &&
     bulkContext &&
     !bulkExtensionValuesOverride
   ) {
     setBulkExtensionValuesOverride(true);
-    formik.values.extensionValues = getBulkContextExtensionValues(bulkContext);
-    extensionValues = formik.values.extensionValues;
+    formik.values[name] = getBulkContextExtensionValues(bulkContext, name);
+    extensionValues = formik.values[name];
   }
 
   function removeBlock(blockPath: string) {
     const blockName = blockPath.split(".").at(-1);
     if (blockName) {
       const { [blockName]: _, ...newExtensionValues } =
-        formik?.values?.extensionValues;
-      formik.setFieldValue("extensionValues", newExtensionValues);
+        formik?.values?.[name];
+      formik.setFieldValue(name, newExtensionValues);
     }
   }
 
   function addBlock() {
-    let selectedBlockOptions: any[] = []
-    if (formik?.values?.extensionValues) {
-      selectedBlockOptions = Object.keys(formik?.values?.extensionValues);
-    }
+    const selectedBlockOptions = formik?.values?.[name] ? Object.keys(formik?.values?.[name]) : [];
     
     const newBlockOption = blockOptions?.find(
       (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
     );
     if (newBlockOption) {
       let newExtensionValues = {
-        ...formik?.values?.extensionValues,
+        ...formik?.values?.[name],
         [newBlockOption.value]: {
           select: newBlockOption.value,
           rows: { "extensionField-0": "" }
         }
       };
-      formik.setFieldValue("extensionValues", newExtensionValues);
+      formik.setFieldValue(name, newExtensionValues);
       onBlockSelectChange?.(newBlockOption.value, formik);
     }
   }
@@ -148,22 +145,23 @@ export function DataEntry({
  * @returns extensionValues taken from individual Material Samples used for displaying in bulk edit tab
  */
 function getBulkContextExtensionValues(
-  bulkContext: BulkEditTabContextI<KitsuResource> | null
+  bulkContext: BulkEditTabContextI<KitsuResource> | null,
+  name
 ): any {
   let extensionValues = {};
   bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
-    Object.keys(resourceHook.resource.extensionValues).forEach((fieldKey) => {
+    Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
       if (extensionValues[fieldKey]) {
         Object.keys(
-          resourceHook?.resource?.extensionValues[fieldKey].rows
+          resourceHook?.resource?.[name][fieldKey].rows
         ).forEach((extensionKey) => {
           extensionValues[fieldKey].rows[extensionKey] = undefined;
         });
       } else {
         extensionValues[fieldKey] =
-          resourceHook.resource.extensionValues[fieldKey];
+          resourceHook.resource?.[name][fieldKey];
         Object.keys(
-          resourceHook?.resource?.extensionValues[fieldKey].rows
+          resourceHook?.resource?.[name][fieldKey].rows
         ).forEach((extensionKey) => {
           extensionValues[fieldKey].rows[extensionKey] = undefined;
         });
