@@ -85,9 +85,14 @@ function buildEsRule(
   const { elasticSearchFormatValue } = widgetConfig as any;
 
   // Use the custom logic by default.
+  let formattedValue = value[0];
+  if (typeof formattedValue === "string") {
+    formattedValue = formattedValue.trim();
+  }
+
   const parameters = elasticSearchFormatValue(
     undefined,
-    value[0].trim(),
+    formattedValue,
     operator,
     fieldName,
     config

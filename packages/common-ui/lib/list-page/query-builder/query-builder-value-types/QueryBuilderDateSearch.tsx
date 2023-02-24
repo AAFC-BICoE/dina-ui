@@ -103,7 +103,7 @@ export function transformDateSearchToDSL({
                   must: [
                     rangeQuery(
                       fieldPath,
-                      buildDateRangeObject(fieldPath, value)
+                      buildDateRangeObject(operation, value)
                     ),
                     includedTypeQuery(parentType)
                   ]
