@@ -15,7 +15,7 @@
     "notPubliclyReleasableReason": { "dataType": "string" },
     "dwcOtherCatalogNumbers": { "dataType": "string[]" },
     "tags": { "dataType": "string[]" },
-    "materialSampleType": { "dataType": "string" },
+    "materialSampleType": { "dataType": "vocabulary", "vocabularyEndpoint": "/collection-api/vocabulary/materialSampleType" },
     "managedAttributes": { "dataType": "Map" },
     "organismsIndividualEntry": { "dataType": "boolean" },
     "useTargetOrganism": { "dataType": "boolean" },
