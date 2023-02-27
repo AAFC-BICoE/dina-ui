@@ -5,7 +5,6 @@ import {
   DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
-  LoadingSpinner,
   SubmitButton,
   TextField,
   useQuery,
@@ -15,6 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
+import { TYPE_BASED_OPTION } from "../../../components/collection/material-sample/SplitConfigurationSection";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -49,7 +49,6 @@ import {
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
-import { get } from "lodash";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
@@ -75,7 +74,7 @@ export default function FormTemplateEditPage() {
           />
         ))
       ) : (
-        <LoadingSpinner loading={true} />
+        <FormTemplateEditPageLoaded id={id} onSaved={moveToNextPage} />
       )}
     </>
   );
@@ -83,7 +82,7 @@ export default function FormTemplateEditPage() {
 
 interface FormTemplateEditPageLoadedProps {
   id?: string;
-  fetchedFormTemplate: FormTemplate;
+  fetchedFormTemplate?: FormTemplate;
   onSaved: (
     savedDefinition: PersistedResource<FormTemplate>
   ) => Promisable<void>;
@@ -136,7 +135,7 @@ export function FormTemplateEditPageLoaded({
 
   // Initial values do not need to contain the components object.
   const { components, ...fetchedFormTemplateWithoutComponents } =
-    fetchedFormTemplate;
+    fetchedFormTemplate || {};
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
@@ -145,35 +144,35 @@ export function FormTemplateEditPageLoaded({
     ...formTemplateCheckboxes,
     splitConfiguration: {
       condition: {
-        conditionType: get(
+        conditionType: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.condition.conditionType"
         ),
-        materialSampleType: get(
+        materialSampleType: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.condition.materialSampleType"
         )
       },
       basename: {
-        generateFrom: get(
+        generateFrom: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.basename.generateFrom"
         ),
-        materialSampleType: get(
+        materialSampleType: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.basename.materialSampleType"
         )
       },
       sequenceGeneration: {
-        generateFrom: get(
+        generateFrom: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.sequenceGeneration.generateFrom"
         ),
-        materialSampleType: get(
+        materialSampleType: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.sequenceGeneration.materialSampleType"
         ),
-        seriesMode: get(
+        seriesMode: _.get(
           splitConfigurationInitialValues,
           "splitConfiguration.sequenceGeneration.seriesMode"
         )
@@ -291,6 +290,86 @@ export function FormTemplateEditPageLoaded({
     await onSaved(savedDefinition);
   }
 
+  function onValidate(values: FormTemplate & FormTemplateComponents) {
+    const requiredFields = [
+      "splitConfiguration.condition.conditionType",
+      "splitConfiguration.basename.generateFrom",
+      "splitConfiguration.sequenceGeneration.generateFrom",
+      "splitConfiguration.sequenceGeneration.seriesMode"
+    ];
+
+    const errors: any = {};
+
+    // Check if a split configuration is provided.
+    if (!_.every(values.splitConfiguration, _.isUndefined)) {
+      // Go through all the required fields and ensure they are provided.
+      requiredFields.forEach((field) => {
+        if (!_.get(values, field)) {
+          errors[field] = "Required field";
+        }
+      });
+    }
+
+    // If condition type is a Material Sample Type, then the material sample type is required.
+    if (
+      _.get(values, "splitConfiguration.condition.conditionType") ===
+      TYPE_BASED_OPTION
+    ) {
+      const materialSampleTypePath =
+        "splitConfiguration.condition.materialSampleType";
+      const materialSampleTypeFieldValue = _.get(
+        values,
+        materialSampleTypePath
+      );
+      if (
+        _.isUndefined(materialSampleTypeFieldValue) ||
+        _.isEmpty(materialSampleTypeFieldValue)
+      ) {
+        errors[materialSampleTypePath] = "Required field";
+      }
+    }
+
+    // If basename generateFrom is a Material Sample Type, then the material sample type is required.
+    if (
+      _.get(values, "splitConfiguration.basename.generateFrom") ===
+      TYPE_BASED_OPTION
+    ) {
+      const materialSampleTypePath =
+        "splitConfiguration.basename.materialSampleType";
+      const materialSampleTypeFieldValue = _.get(
+        values,
+        materialSampleTypePath
+      );
+      if (
+        _.isUndefined(materialSampleTypeFieldValue) ||
+        _.isEmpty(materialSampleTypeFieldValue)
+      ) {
+        errors[materialSampleTypePath] = "Required field";
+      }
+    }
+
+    // If sequenceGeneration generateFrom is a Material Sample Type, then the material sample type is required.
+    if (
+      _.get(values, "splitConfiguration.sequenceGeneration.generateFrom") ===
+      TYPE_BASED_OPTION
+    ) {
+      const materialSampleTypePath =
+        "splitConfiguration.sequenceGeneration.materialSampleType";
+      const materialSampleTypeFieldValue = _.get(
+        values,
+        materialSampleTypePath
+      );
+      if (
+        _.isUndefined(materialSampleTypeFieldValue) ||
+        _.isEmpty(materialSampleTypeFieldValue)
+      ) {
+        errors[materialSampleTypePath] = "Required field";
+      }
+    }
+
+    return errors;
+  }
+
   const buttonBarContent = (
     <>
       <BackButton
@@ -318,6 +397,7 @@ export function FormTemplateEditPageLoaded({
     <DinaForm<FormTemplate & FormTemplateComponents>
       initialValues={initialValues}
       onSubmit={onSaveTemplateSubmit}
+      validate={onValidate}
     >
       <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
         {/* Form Template Specific Configuration */}

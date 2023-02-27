@@ -7,6 +7,13 @@ import {
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import { SPLIT_CONFIGURATION_COMPONENT_NAME } from "../../../types/collection-api";
 
+export const DIRECT_PARENT_OPTION = "DIRECT_PARENT";
+export const TYPE_BASED_OPTION = "TYPE_BASED";
+
+export const SEQUENCE_UPPERCASE_OPTION = "UPPER_LETTER";
+export const SEQUENCE_LOWERCASE_OPTION = "LOWER_LETTER";
+export const SEQUENCE_NUMBER_OPTION = "NUMBER";
+
 export interface SplitConfigurationSectionProps {
   id?: string;
 }
@@ -39,7 +46,7 @@ export function SplitConfigurationSection({
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: "type",
+                  value: TYPE_BASED_OPTION,
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
@@ -52,7 +59,7 @@ export function SplitConfigurationSection({
                   name="splitConfiguration.condition.materialSampleType"
                   label={formatMessage("field_materialSampleType")}
                   disableTemplateCheckbox={true}
-                  disabled={selected !== "type"}
+                  disabled={selected !== TYPE_BASED_OPTION}
                   query={() => ({
                     path: "collection-api/vocabulary/materialSampleType"
                   })}
@@ -81,13 +88,13 @@ export function SplitConfigurationSection({
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: "direct_parent",
+                  value: DIRECT_PARENT_OPTION,
                   label: formatMessage(
                     "materialSampleSplitConfigurationDirectParent"
                   )
                 },
                 {
-                  value: "type",
+                  value: TYPE_BASED_OPTION,
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
@@ -100,7 +107,7 @@ export function SplitConfigurationSection({
                   name="splitConfiguration.basename.materialSampleType"
                   label={formatMessage("field_materialSampleType")}
                   disableTemplateCheckbox={true}
-                  disabled={selected !== "type"}
+                  disabled={selected !== TYPE_BASED_OPTION}
                   query={() => ({
                     path: "collection-api/vocabulary/materialSampleType"
                   })}
@@ -131,13 +138,13 @@ export function SplitConfigurationSection({
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: "direct_parent",
+                  value: DIRECT_PARENT_OPTION,
                   label: formatMessage(
                     "materialSampleSplitConfigurationDirectParent"
                   )
                 },
                 {
-                  value: "type",
+                  value: TYPE_BASED_OPTION,
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
@@ -150,7 +157,7 @@ export function SplitConfigurationSection({
                   name="splitConfiguration.sequenceGeneration.materialSampleType"
                   label={formatMessage("field_materialSampleType")}
                   disableTemplateCheckbox={true}
-                  disabled={selected !== "type"}
+                  disabled={selected !== TYPE_BASED_OPTION}
                   query={() => ({
                     path: "collection-api/vocabulary/materialSampleType"
                   })}
@@ -168,15 +175,15 @@ export function SplitConfigurationSection({
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: "lowercase",
+                  value: SEQUENCE_LOWERCASE_OPTION,
                   label: formatMessage("splitGenerationOptionLowercase")
                 },
                 {
-                  value: "uppercase",
+                  value: SEQUENCE_UPPERCASE_OPTION,
                   label: formatMessage("splitGenerationOptionUppercase")
                 },
                 {
-                  value: "numeric",
+                  value: SEQUENCE_NUMBER_OPTION,
                   label: formatMessage("splitGenerationOptionNumerical")
                 }
               ]}
