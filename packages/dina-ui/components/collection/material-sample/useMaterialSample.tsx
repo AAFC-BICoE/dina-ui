@@ -61,6 +61,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
+import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -184,6 +185,9 @@ export interface UseMaterialSampleSaveParams {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
+  /** Split Configuration (Form Template Only) */
+  splitConfigurationTemplateInitialValues?: Partial<SplitConfiguration>;
+
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
 
@@ -220,6 +224,7 @@ export function useMaterialSampleSave({
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
+  splitConfigurationTemplateInitialValues,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -293,6 +298,9 @@ export function useMaterialSampleSave({
       )
     );
 
+  const hasSplitConfigurationTemplate =
+    isTemplate && splitConfigurationTemplateInitialValues;
+
   // Enable Switch States:
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
@@ -320,6 +328,7 @@ export function useMaterialSampleSave({
             false)
       )
     );
+
     setEnableAcquisitionEvent(
       Boolean(
         hasAcquisitionEventTemplate ||
@@ -330,6 +339,7 @@ export function useMaterialSampleSave({
             false)
       )
     );
+
     setEnablePreparations(
       Boolean(
         hasPreparationsTemplate ||
@@ -408,6 +418,8 @@ export function useMaterialSampleSave({
           )
       )
     );
+
+    setEnableSplitConfiguration(Boolean(hasSplitConfigurationTemplate));
   }, [formTemplate]);
 
   // The state describing which Data components (Form sections) are enabled:

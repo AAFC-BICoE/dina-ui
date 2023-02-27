@@ -8,7 +8,7 @@ export interface SplitConfiguration {
 }
 
 export interface SplitConfigurationCondition {
-  conditionOn: Omit<"DIRECT_PARENT", SplitSupportedTypes>;
+  conditionType: Omit<"DIRECT_PARENT", SplitSupportedTypes>;
   materialSampleType?: string[];
 }
 

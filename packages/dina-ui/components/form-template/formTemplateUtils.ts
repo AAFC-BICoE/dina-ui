@@ -1,9 +1,10 @@
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate
 } from "../../types/collection-api";
-import { sortBy } from "lodash";
+import { sortBy, isEmpty } from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -16,6 +17,11 @@ export function getFormTemplateCheckboxes(
   const templateCheckboxesValues: Record<string, true | undefined> = {};
 
   formTemplate.components?.forEach((component) => {
+    // Split configuration does not have visibility.
+    if (component.name === SPLIT_CONFIGURATION_COMPONENT_NAME) {
+      return;
+    }
+
     component.sections?.forEach((section) => {
       section.items?.forEach((item) => {
         if (item.name && item.visible) {
@@ -59,6 +65,10 @@ export function getComponentValues(
     });
   }
 
+  if (isEmpty(templateCheckboxes) && isEmpty(componentValues)) {
+    return undefined;
+  }
+
   ret = { ...componentValues, templateCheckboxes };
 
   return ret;
@@ -74,7 +84,8 @@ export function getMaterialSampleComponentValues(
     formTemplate.components?.forEach((component) => {
       if (
         component.name !== COLLECTING_EVENT_COMPONENT_NAME &&
-        component.name !== ACQUISITION_EVENT_COMPONENT_NAME
+        component.name !== ACQUISITION_EVENT_COMPONENT_NAME &&
+        component.name !== SPLIT_CONFIGURATION_COMPONENT_NAME
       ) {
         if (component.visible) {
           component.sections?.forEach((section) => {

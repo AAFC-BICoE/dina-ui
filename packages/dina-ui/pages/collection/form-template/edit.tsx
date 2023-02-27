@@ -5,6 +5,7 @@ import {
   DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  LoadingSpinner,
   SubmitButton,
   TextField,
   useQuery,
@@ -48,6 +49,7 @@ import {
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
+import { get } from "lodash";
 
 export default function FormTemplateEditPage() {
   const router = useRouter();
@@ -73,7 +75,7 @@ export default function FormTemplateEditPage() {
           />
         ))
       ) : (
-        <FormTemplateEditPageLoaded id={id} onSaved={moveToNextPage} />
+        <LoadingSpinner loading={true} />
       )}
     </>
   );
@@ -81,7 +83,7 @@ export default function FormTemplateEditPage() {
 
 interface FormTemplateEditPageLoadedProps {
   id?: string;
-  fetchedFormTemplate?: FormTemplate;
+  fetchedFormTemplate: FormTemplate;
   onSaved: (
     savedDefinition: PersistedResource<FormTemplate>
   ) => Promisable<void>;
@@ -106,38 +108,77 @@ export function FormTemplateEditPageLoaded({
   // Get initial values of data components
   const allMaterialSampleComponentValues =
     getMaterialSampleComponentValues(fetchedFormTemplate);
+
   if (!allMaterialSampleComponentValues.associations?.length) {
     allMaterialSampleComponentValues.associations = [{}];
   }
+
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
-  const collectingEventInitialValues = getComponentValues(
-    COLLECTING_EVENT_COMPONENT_NAME,
-    fetchedFormTemplate
-  );
+  const collectingEventInitialValues =
+    getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate) ??
+    {};
 
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
+  const acquisitionEventInitialValues =
+    getComponentValues(ACQUISITION_EVENT_COMPONENT_NAME, fetchedFormTemplate) ??
+    {};
+
+  // Get Split Configuration Settings
   const splitConfigurationInitialValues = getComponentValues(
     SPLIT_CONFIGURATION_COMPONENT_NAME,
     fetchedFormTemplate
   );
 
-  // console.log(splitConfigurationInitialValues);
-
-  const acquisitionEventInitialValues = getComponentValues(
-    ACQUISITION_EVENT_COMPONENT_NAME,
-    fetchedFormTemplate
-  );
-
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
+
+  // Initial values do not need to contain the components object.
+  const { components, ...fetchedFormTemplateWithoutComponents } =
+    fetchedFormTemplate;
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
-    ...fetchedFormTemplate,
+    ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
+    splitConfiguration: {
+      condition: {
+        conditionType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.conditionType"
+        ),
+        materialSampleType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.materialSampleType"
+        )
+      },
+      basename: {
+        generateFrom: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.basename.generateFrom"
+        ),
+        materialSampleType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.basename.materialSampleType"
+        )
+      },
+      sequenceGeneration: {
+        generateFrom: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.sequenceGeneration.generateFrom"
+        ),
+        materialSampleType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.sequenceGeneration.materialSampleType"
+        ),
+        seriesMode: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.sequenceGeneration.seriesMode"
+        )
+      }
+    },
     id,
     type: "form-template"
   };
@@ -149,7 +190,8 @@ export function FormTemplateEditPageLoaded({
     colEventTemplateInitialValues: collectingEventInitialValues,
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
-    acquisitionEventFormRef: acqEventFormRef
+    acquisitionEventFormRef: acqEventFormRef,
+    splitConfigurationTemplateInitialValues: splitConfigurationInitialValues
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
@@ -157,8 +199,6 @@ export function FormTemplateEditPageLoaded({
     api: { save },
     submittedValues
   }: DinaFormSubmitParams<FormTemplate & FormTemplateComponents>) {
-    // console.log(JSON.stringify(submittedValues));
-
     // Get collecting event checkboxes and values
     const {
       templateCheckboxes: collectingEventCheckboxes,
@@ -243,8 +283,6 @@ export function FormTemplateEditPageLoaded({
         })
       )
     };
-
-    // console.log("SAVING THIS: " + JSON.stringify(formTemplate));
 
     const [savedDefinition] = await save<FormTemplate>(
       [{ resource: formTemplate, type: "form-template" }],
