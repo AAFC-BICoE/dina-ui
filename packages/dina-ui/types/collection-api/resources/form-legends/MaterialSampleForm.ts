@@ -1,6 +1,8 @@
 import { FormLegendComponentInformation } from "packages/dina-ui/types/common/resources/FormLegendInformation";
 
 // Data Components for Material Samples.
+export const SPLIT_CONFIGURATION_COMPONENT_NAME: string =
+  "split-configuration-component";
 export const IDENTIFIER_COMPONENT_NAME: string = "identifiers-component";
 export const MATERIAL_SAMPLE_INFO_COMPONENT_NAME: string =
   "material-sample-info-component";
@@ -21,14 +23,62 @@ export const MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME: string =
   "material-sample-attachments-component";
 export const FIELD_EXTENSIONS_COMPONENT_NAME: string =
   "field-extensions-component";
-export const SPLIT_CONFIGURATION_COMPONENT_NAME: string =
-  "split-configuration-component";
 
 /**
  * All Material Sample form data component in order.
  * This array is the source of truth for the section ID names and their order.
  */
 export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
+  {
+    id: SPLIT_CONFIGURATION_COMPONENT_NAME,
+    labelKey: "materialSampleSplitConfiguration",
+    maxGridSizeX: 2,
+    formTemplateOnly: true,
+    sections: [
+      {
+        id: "split-configuration-condition-section",
+        labelKey: "materialSampleSplitConfigurationCondition",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.condition.conditionType"
+          },
+          {
+            id: "splitConfiguration.condition.materialSampleType"
+          }
+        ]
+      },
+      {
+        id: "split-configuration-basename-section",
+        labelKey: "materialSampleSplitConfigurationBasename",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.basename.generateFrom"
+          },
+          {
+            id: "splitConfiguration.basename.materialSampleType"
+          }
+        ]
+      },
+      {
+        id: "split-configuration-sequence-generation-section",
+        labelKey: "materialSampleSplitConfigurationSequenceGeneration",
+        maxGridSizeX: 2,
+        items: [
+          {
+            id: "splitConfiguration.sequenceGeneration.generateFrom"
+          },
+          {
+            id: "splitConfiguration.sequenceGeneration.materialSampleType"
+          },
+          {
+            id: "splitConfiguration.sequenceGeneration.seriesMode"
+          }
+        ]
+      }
+    ]
+  },
   {
     id: IDENTIFIER_COMPONENT_NAME,
     labelKey: "identifiers",
@@ -658,56 +708,6 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
           },
           {
             id: "attachmentsConfig.allowExisting"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    id: SPLIT_CONFIGURATION_COMPONENT_NAME,
-    labelKey: "materialSampleSplitConfiguration",
-    maxGridSizeX: 2,
-    formTemplateOnly: true,
-    sections: [
-      {
-        id: "split-configuration-condition-section",
-        labelKey: "materialSampleSplitConfigurationCondition",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "splitConfiguration.condition.conditionType"
-          },
-          {
-            id: "splitConfiguration.condition.materialSampleType"
-          }
-        ]
-      },
-      {
-        id: "split-configuration-basename-section",
-        labelKey: "materialSampleSplitConfigurationBasename",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "splitConfiguration.basename.generateFrom"
-          },
-          {
-            id: "splitConfiguration.basename.materialSampleType"
-          }
-        ]
-      },
-      {
-        id: "split-configuration-sequence-generation-section",
-        labelKey: "materialSampleSplitConfigurationSequenceGeneration",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "splitConfiguration.sequenceGeneration.generateFrom"
-          },
-          {
-            id: "splitConfiguration.sequenceGeneration.materialSampleType"
-          },
-          {
-            id: "splitConfiguration.sequenceGeneration.seriesMode"
           }
         ]
       }
