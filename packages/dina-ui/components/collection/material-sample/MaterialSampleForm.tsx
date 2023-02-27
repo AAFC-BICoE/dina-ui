@@ -287,6 +287,12 @@ export function MaterialSampleForm({
    * - The value is the section's render function given the ID as a param.
    */
   const formSections: Record<string, (id: string) => ReactNode> = {
+    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      isTemplate &&
+      dataComponentState.enableSplitConfiguration && (
+        <SplitConfigurationSection id={id} />
+      ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <MaterialSampleIdentifiersSection
@@ -478,12 +484,6 @@ export function MaterialSampleForm({
             )}
           />
         </DinaFormSection>
-      ),
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
-      !reduceRendering &&
-      isTemplate &&
-      dataComponentState.enableSplitConfiguration && (
-        <SplitConfigurationSection id={id} />
       )
   };
 

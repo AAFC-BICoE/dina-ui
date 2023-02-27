@@ -1,4 +1,4 @@
-import { uniq } from "lodash";
+import { uniq, compact } from "lodash";
 import { useDinaIntl } from "../../../../intl/dina-ui-intl";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
@@ -42,6 +42,10 @@ export function useMaterialSampleSectionOrder({
 
   /** Switch information to apply to the legend. */
   const scrollTargetSwitches: { [key: string]: Partial<ScrollTarget> } = {
+    [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
+      disabled: !dataComponentState.enableSplitConfiguration,
+      setEnabled: dataComponentState.setEnableSplitConfiguration
+    },
     [COLLECTING_EVENT_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableCollectingEvent,
       setEnabled: dataComponentState.setEnableCollectingEvent
@@ -75,10 +79,6 @@ export function useMaterialSampleSectionOrder({
     [SCHEDULED_ACTIONS_COMPONENT_NAME]: {
       disabled: !dataComponentState.enableScheduledActions,
       setEnabled: dataComponentState.setEnableScheduledActions
-    },
-    [SPLIT_CONFIGURATION_COMPONENT_NAME]: {
-      disabled: !dataComponentState.enableSplitConfiguration,
-      setEnabled: dataComponentState.setEnableSplitConfiguration
     }
   };
 
@@ -97,9 +97,11 @@ export function useMaterialSampleSectionOrder({
     }))
   ];
 
-  const sortedScrollTargets: ScrollTarget[] = uniq(
-    navOrderWithAllSections.map(
-      (id) => scrollTargets.filter((target) => target.id === id)[0]
+  const sortedScrollTargets: ScrollTarget[] = compact(
+    uniq(
+      navOrderWithAllSections.map(
+        (id) => scrollTargets.filter((target) => target.id === id)[0]
+      )
     )
   );
 

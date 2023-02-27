@@ -233,6 +233,9 @@ export function useMaterialSampleSave({
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
 
+  const hasSplitConfigurationTemplate =
+    isTemplate && splitConfigurationTemplateInitialValues;
+
   // For editing existing templates:
   const hasColEventTemplate =
     isTemplate &&
@@ -298,10 +301,9 @@ export function useMaterialSampleSave({
       )
     );
 
-  const hasSplitConfigurationTemplate =
-    isTemplate && splitConfigurationTemplateInitialValues;
-
   // Enable Switch States:
+  const [enableSplitConfiguration, setEnableSplitConfiguration] =
+    useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
   const [enableAcquisitionEvent, setEnableAcquisitionEvent] =
@@ -313,11 +315,11 @@ export function useMaterialSampleSave({
     useState<boolean>(false);
   const [enableAssociations, setEnableAssociations] = useState<boolean>(false);
   const [enableRestrictions, setEnableRestrictions] = useState<boolean>(false);
-  const [enableSplitConfiguration, setEnableSplitConfiguration] =
-    useState<boolean>(false);
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
+    setEnableSplitConfiguration(Boolean(hasSplitConfigurationTemplate));
+
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate ||
@@ -418,8 +420,6 @@ export function useMaterialSampleSave({
           )
       )
     );
-
-    setEnableSplitConfiguration(Boolean(hasSplitConfigurationTemplate));
   }, [formTemplate]);
 
   // The state describing which Data components (Form sections) are enabled:

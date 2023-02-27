@@ -291,80 +291,59 @@ export function FormTemplateEditPageLoaded({
   }
 
   function onValidate(values: FormTemplate & FormTemplateComponents) {
+    // Get switches for validation purposes.
+    const dataComponentsStateMap =
+      getDataComponentsStateMap(dataComponentState);
+
     const requiredFields = [
-      "splitConfiguration.condition.conditionType",
-      "splitConfiguration.basename.generateFrom",
-      "splitConfiguration.sequenceGeneration.generateFrom",
-      "splitConfiguration.sequenceGeneration.seriesMode"
+      {
+        field: "condition.conditionType",
+        materialSampleTypeField: "condition.materialSampleType"
+      },
+      {
+        field: "basename.generateFrom",
+        materialSampleTypeField: "basename.materialSampleType"
+      },
+      {
+        field: "sequenceGeneration.generateFrom",
+        materialSampleTypeField: "sequenceGeneration.materialSampleType"
+      },
+      { field: "sequenceGeneration.seriesMode" }
     ];
 
     const errors: any = {};
 
     // Check if a split configuration is provided.
-    if (!_.every(values.splitConfiguration, _.isUndefined)) {
+    if (dataComponentsStateMap[SPLIT_CONFIGURATION_COMPONENT_NAME]) {
       // Go through all the required fields and ensure they are provided.
-      requiredFields.forEach((field) => {
-        if (!_.get(values, field)) {
-          errors[field] = "Required field";
+      requiredFields.forEach(({ field, materialSampleTypeField }) => {
+        const requiredField = _.get(values, `splitConfiguration.${field}`);
+        if (materialSampleTypeField) {
+          const materialSampleType = _.get(
+            values,
+            `splitConfiguration.${materialSampleTypeField}`
+          );
+
+          // Generate From Dropdown is required.
+          if (_.isUndefined(requiredField)) {
+            errors[`splitConfiguration.${field}`] = "Required field";
+          }
+
+          // If the Generate From is TYPE_BASED_OPTION, then the Material Sample Type is required.
+          if (
+            requiredField === TYPE_BASED_OPTION &&
+            (_.isUndefined(materialSampleType) || _.isEmpty(materialSampleType))
+          ) {
+            errors[`splitConfiguration.${materialSampleTypeField}`] =
+              "Required field";
+          }
+        }
+
+        // Check if the required field is provided.
+        if (_.isUndefined(requiredField)) {
+          errors[`splitConfiguration.${field}`] = "Required field";
         }
       });
-    }
-
-    // If condition type is a Material Sample Type, then the material sample type is required.
-    if (
-      _.get(values, "splitConfiguration.condition.conditionType") ===
-      TYPE_BASED_OPTION
-    ) {
-      const materialSampleTypePath =
-        "splitConfiguration.condition.materialSampleType";
-      const materialSampleTypeFieldValue = _.get(
-        values,
-        materialSampleTypePath
-      );
-      if (
-        _.isUndefined(materialSampleTypeFieldValue) ||
-        _.isEmpty(materialSampleTypeFieldValue)
-      ) {
-        errors[materialSampleTypePath] = "Required field";
-      }
-    }
-
-    // If basename generateFrom is a Material Sample Type, then the material sample type is required.
-    if (
-      _.get(values, "splitConfiguration.basename.generateFrom") ===
-      TYPE_BASED_OPTION
-    ) {
-      const materialSampleTypePath =
-        "splitConfiguration.basename.materialSampleType";
-      const materialSampleTypeFieldValue = _.get(
-        values,
-        materialSampleTypePath
-      );
-      if (
-        _.isUndefined(materialSampleTypeFieldValue) ||
-        _.isEmpty(materialSampleTypeFieldValue)
-      ) {
-        errors[materialSampleTypePath] = "Required field";
-      }
-    }
-
-    // If sequenceGeneration generateFrom is a Material Sample Type, then the material sample type is required.
-    if (
-      _.get(values, "splitConfiguration.sequenceGeneration.generateFrom") ===
-      TYPE_BASED_OPTION
-    ) {
-      const materialSampleTypePath =
-        "splitConfiguration.sequenceGeneration.materialSampleType";
-      const materialSampleTypeFieldValue = _.get(
-        values,
-        materialSampleTypePath
-      );
-      if (
-        _.isUndefined(materialSampleTypeFieldValue) ||
-        _.isEmpty(materialSampleTypeFieldValue)
-      ) {
-        errors[materialSampleTypePath] = "Required field";
-      }
     }
 
     return errors;

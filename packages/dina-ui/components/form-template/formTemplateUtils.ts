@@ -65,10 +65,6 @@ export function getComponentValues(
     });
   }
 
-  if (isEmpty(templateCheckboxes) && isEmpty(componentValues)) {
-    return undefined;
-  }
-
   ret = { ...componentValues, templateCheckboxes };
 
   return ret;
