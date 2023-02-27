@@ -239,16 +239,3 @@ export function convertMap(value: string): { [key: string]: any } {
   }
   return map;
 }
-
-/**
- * convert a string to number
- * @param value string
- * @returns number
- */
-export function convertVocabulary(value: any): number | null {
-  if (value !== null && value !== undefined) {
-    return +value;
-  } else {
-    return null;
-  }
-}
