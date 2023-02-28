@@ -37,7 +37,7 @@ export function onValidateSplitConfiguration(
   errors: any
 ) {
   // Create a new object to hold any new errors we find
-  const newErrors = {};
+  const newErrors: any = {};
 
   // Condition Type is required.
   if (isUndefined(values?.splitConfiguration?.condition?.conditionType)) {

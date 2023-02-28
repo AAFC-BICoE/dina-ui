@@ -266,7 +266,7 @@ export function FormTemplateEditPageLoaded({
       errors = Object.assign(
         {},
         errors,
-        onValidateSplitConfiguration({ values, errors })
+        onValidateSplitConfiguration(values, errors)
       );
     }
 
