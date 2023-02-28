@@ -34,7 +34,8 @@ export interface SplitConfigurationSectionProps {
  */
 export function onValidateSplitConfiguration(
   values: FormTemplate & FormTemplateComponents,
-  errors: any
+  errors: any,
+  formatMessage: any
 ) {
   // Create a new object to hold any new errors we find
   const newErrors: any = {};
@@ -42,17 +43,19 @@ export function onValidateSplitConfiguration(
   // Condition Type is required.
   if (isUndefined(values?.splitConfiguration?.condition?.conditionType)) {
     newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
-      condition: { conditionType: "Required Field" }
+      condition: { conditionType: formatMessage("requiredField") }
     });
   } else {
     // If condition type is `Material Sample Type` then the Material Sample Type field is required.
     if (
       values.splitConfiguration?.condition.conditionType ===
         TYPE_BASED_STRATEGY &&
-      isUndefined(values?.splitConfiguration?.condition?.materialSampleType)
+      isEmpty(values?.splitConfiguration?.condition?.materialSampleType)
     ) {
       newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
-        condition: { materialSampleType: "Required Field" }
+        condition: {
+          materialSampleType: formatMessage("requiredField")
+        }
       });
     }
   }
@@ -64,7 +67,9 @@ export function onValidateSplitConfiguration(
     )
   ) {
     newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
-      materialSampleNameGeneration: { strategy: "Required Field" }
+      materialSampleNameGeneration: {
+        strategy: formatMessage("requiredField")
+      }
     });
   } else {
     // If strategy is `Material Sample Type` then the Material Sample Type field is required.
@@ -73,12 +78,10 @@ export function onValidateSplitConfiguration(
       TYPE_BASED_STRATEGY
     ) {
       // Material Sample Type is required when doing a split configuration.
-      if (
-        isUndefined(values?.materialSampleType) ||
-        isEmpty(values?.materialSampleType)
-      ) {
-        newErrors.materialSampleType =
-          "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.";
+      if (isEmpty(values?.materialSampleType)) {
+        newErrors.materialSampleType = formatMessage(
+          "materialSampleSplitConfigurationRequiredMaterialSampleType"
+        );
       }
 
       // Also must be visible on the form.
@@ -92,8 +95,9 @@ export function onValidateSplitConfiguration(
           "material-sample-info-component.material-sample-info-section.materialSampleType"
         ] === false
       ) {
-        newErrors.materialSampleType =
-          "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.";
+        newErrors.materialSampleType = formatMessage(
+          "materialSampleSplitConfigurationVisibleMaterialSampleType"
+        );
       }
     }
   }
@@ -105,7 +109,9 @@ export function onValidateSplitConfiguration(
     )
   ) {
     newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
-      materialSampleNameGeneration: { characterType: "Required Field" }
+      materialSampleNameGeneration: {
+        characterType: formatMessage("requiredField")
+      }
     });
   }
 

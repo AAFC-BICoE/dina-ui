@@ -4,7 +4,7 @@ import {
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate
 } from "../../types/collection-api";
-import { sortBy, get } from "lodash";
+import { sortBy, get, isEmpty } from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -72,11 +72,17 @@ export function getComponentValues(
               }
             });
           });
-        } else if (invisibleUndefined) {
-          return undefined;
         }
       }
     });
+  }
+
+  if (
+    invisibleUndefined &&
+    isEmpty(componentValues) &&
+    isEmpty(templateCheckboxes)
+  ) {
+    return undefined;
   }
 
   ret = { ...componentValues, templateCheckboxes };
@@ -128,7 +134,7 @@ export function getSplitConfigurationComponentValues(
 
   // Return an empty object to be put into the form template default values.
   if (!splitConfigurationInitialValues) {
-    return {};
+    return undefined;
   }
 
   // Transform form template info into a Split Configuration object.

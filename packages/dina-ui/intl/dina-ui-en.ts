@@ -539,6 +539,10 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialSampleSplitConfigurationConditionType: "Condition Type",
   materialSampleSplitConfigurationDirectParent: "Direct Parent",
   materialSampleSplitConfigurationStrategy: "Strategy",
+  materialSampleSplitConfigurationRequiredMaterialSampleType:
+    "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationVisibleMaterialSampleType:
+    "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleInfo: "Material Sample Info",
@@ -684,6 +688,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  requiredField: "Required field",
   role: "Role",
   roleAction: "Role/Action",
   roles: "Roles",

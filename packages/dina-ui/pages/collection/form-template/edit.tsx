@@ -30,7 +30,10 @@ import {
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
@@ -97,6 +100,8 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
+  const { formatMessage } = useDinaIntl();
+
   const [navOrder, setNavOrder] = useState<string[] | null>(
     getComponentOrderFromTemplate(fetchedFormTemplate)
   );
@@ -147,7 +152,7 @@ export function FormTemplateEditPageLoaded({
     ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
-    ...splitConfigurationInitialValues,
+    ...(splitConfigurationInitialValues ?? {}),
     id,
     type: "form-template"
   };
@@ -277,7 +282,7 @@ export function FormTemplateEditPageLoaded({
       errors = Object.assign(
         {},
         errors,
-        onValidateSplitConfiguration(values, errors)
+        onValidateSplitConfiguration(values, errors, formatMessage)
       );
     }
 
