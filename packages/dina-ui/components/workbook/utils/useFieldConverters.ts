@@ -17,7 +17,7 @@ export enum DataTypeEnum {
   STRING_ARRAY = "string[]",
   NUMBER_ARRAY = "number[]",
   BOOLEAN_ARRAY = "boolean[]",
-  MAP = "Map",
+  ManagedAttributes = "ManagedAttributes",
   VOCABULARY = "vocabulary"
 }
 
@@ -26,7 +26,7 @@ export const DATATYPE_CONVERTER_MAPPING = {
   [DataTypeEnum.BOOLEAN]: convertBoolean,
   [DataTypeEnum.STRING_ARRAY]: convertStringArray,
   [DataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
-  [DataTypeEnum.MAP]: convertMap,
+  [DataTypeEnum.ManagedAttributes]: convertMap,
   [DataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray, 
   [DataTypeEnum.STRING]: (value) => (value),
   [DataTypeEnum.VOCABULARY]: (value) => (value)

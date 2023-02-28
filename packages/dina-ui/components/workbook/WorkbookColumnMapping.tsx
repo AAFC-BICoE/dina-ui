@@ -53,7 +53,11 @@ export interface WorkbookColumnMappingProps {
 const ENTITY_TYPES = ["material-sample"] as const;
 const FieldMappingConfig = FieldMappingConfigJSON as {
   [key: string]: {
-    [field: string]: { dataType: DataTypeEnum, vocabularyEndpoint?: string };
+    [field: string]: {
+      dataType: DataTypeEnum;
+      endpoint?: string;
+      managedAttributeComponent?: string;
+    };
   };
 };
 
@@ -84,7 +88,6 @@ export function WorkbookColumnMapping({
     selectedType?.value || "material-sample",
     FieldMappingConfig
   );
-  
 
   const buttonBar = (
     <>
@@ -116,16 +119,45 @@ export function WorkbookColumnMapping({
   Object.keys(FieldMappingConfig).forEach((recordType) => {
     const recordFieldsMap = FieldMappingConfig[recordType];
     Object.keys(recordFieldsMap).forEach((recordField) => {
-      const {dataType, vocabularyEndpoint} = recordFieldsMap[recordField];
-      if (dataType === DataTypeEnum.VOCABULARY && vocabularyEndpoint) {
-        const query: any = useQuery({
-          path: vocabularyEndpoint
-        });
-        const vocabElements = query?.response?.data?.vocabularyElements?.map((vocabElement) => (vocabElement.name));
-        FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
+      const { dataType, endpoint, managedAttributeComponent } =
+        recordFieldsMap[recordField];
+      switch (dataType) {
+        case DataTypeEnum.VOCABULARY:
+          if (endpoint) {
+            const query: any = useQuery({
+              path: endpoint
+            });
+            const vocabElements =
+              query?.response?.data?.vocabularyElements?.map(
+                (vocabElement) => vocabElement.name
+              );
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
+          }
+          break;
+        case DataTypeEnum.ManagedAttributes:
+          if (endpoint) {
+            // load available Managed Attributes
+            const query: any = useQuery({
+              path: "collection-api/managed-attribute"
+            });
+            const managedAttributeKeys = query?.response?.data?.map(
+              (managedAttribute) => {
+                if (
+                  managedAttribute.managedAttributeComponent ===
+                  managedAttributeComponent
+                ) {
+                  return managedAttribute.key;
+                }
+              }
+            );
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, managedAttributeKeys)
+          }
+          break;
+        default:
+          break;
       }
-    })
-  })
+    });
+  });
 
   // Generate field options
   const fieldOptions = useMemo(() => {
@@ -277,10 +309,9 @@ export function WorkbookColumnMapping({
                   );
                 }
                 break;
-              case DataTypeEnum.MAP:
+              case DataTypeEnum.ManagedAttributes:
                 if (!isMap(row[field])) {
-                  param.dataType = DataTypeEnum.MAP;
-                  console.log(row);
+                  param.dataType = DataTypeEnum.ManagedAttributes;
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
@@ -304,11 +335,7 @@ export function WorkbookColumnMapping({
                 break;
               case DataTypeEnum.VOCABULARY:
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                if (
-                  !vocabElements.includes(
-                    row[field]
-                  )
-                ) {
+                if (!vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;
                   errors.push(
                     new ValidationError(
@@ -318,6 +345,7 @@ export function WorkbookColumnMapping({
                     )
                   );
                 }
+                break;
             }
           }
         }
