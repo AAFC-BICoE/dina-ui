@@ -14,7 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { onValidateSplitConfiguration } from "packages/dina-ui/components/collection/material-sample/SplitConfigurationSection";
+import { onValidateSplitConfiguration } from "../../../components/collection/material-sample/SplitConfigurationSection";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
