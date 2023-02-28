@@ -224,7 +224,7 @@ export function WorkbookColumnMapping({
             dataType?: DataTypeEnum;
           } = {
             sheet: sheet + 1,
-            index: i + 2,
+            index: +i + 1,
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {
@@ -280,6 +280,7 @@ export function WorkbookColumnMapping({
               case DataTypeEnum.MAP:
                 if (!isMap(row[field])) {
                   param.dataType = DataTypeEnum.MAP;
+                  console.log(row);
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
