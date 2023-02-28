@@ -4,7 +4,7 @@ import {
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate
 } from "../../types/collection-api";
-import { sortBy, isEmpty } from "lodash";
+import { sortBy, get } from "lodash";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -100,6 +100,42 @@ export function getMaterialSampleComponentValues(
   }
   ret = { ...componentValues, templateCheckboxes };
   return ret;
+}
+
+export function getSplitConfigurationComponentValues(
+  formTemplate: FormTemplate | undefined
+): any {
+  // Retrieve form template split configuration info.
+  const splitConfigurationInitialValues = getComponentValues(
+    SPLIT_CONFIGURATION_COMPONENT_NAME,
+    formTemplate
+  );
+
+  // Transform form template info into a Split Configuration object.
+  return {
+    splitConfiguration: {
+      condition: {
+        conditionType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.conditionType"
+        ),
+        materialSampleType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.materialSampleType"
+        )
+      },
+      materialSampleNameGeneration: {
+        strategy: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.materialSampleNameGeneration.strategy"
+        ),
+        characterSet: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.materialSampleNameGeneration.characterSet"
+        )
+      }
+    }
+  };
 }
 
 /**

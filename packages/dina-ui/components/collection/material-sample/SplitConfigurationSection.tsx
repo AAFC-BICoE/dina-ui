@@ -5,17 +5,104 @@ import {
   SelectField
 } from "common-ui";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { SPLIT_CONFIGURATION_COMPONENT_NAME } from "../../../types/collection-api";
-
-export const DIRECT_PARENT_OPTION = "DIRECT_PARENT";
-export const TYPE_BASED_OPTION = "TYPE_BASED";
-
-export const SEQUENCE_UPPERCASE_OPTION = "UPPER_LETTER";
-export const SEQUENCE_LOWERCASE_OPTION = "LOWER_LETTER";
-export const SEQUENCE_NUMBER_OPTION = "NUMBER";
+import {
+  FormTemplate,
+  FormTemplateComponents,
+  SPLIT_CONFIGURATION_COMPONENT_NAME
+} from "../../../types/collection-api";
+import {
+  TYPE_BASED_STRATEGY,
+  DIRECT_PARENT_STRATEGY,
+  LOWER_CHARACTER_TYPE,
+  UPPER_CHARACTER_TYPE,
+  NUMBER_CHARACTER_TYPE
+} from "../../../types/collection-api/resources/SplitConfiguration";
+import { isUndefined, isEmpty, merge } from "lodash";
 
 export interface SplitConfigurationSectionProps {
   id?: string;
+}
+
+/**
+ * Perform split configuration validation. The following rules are applied:
+ *
+ * - Check for required fields.
+ * - Check for Material Sample Type if that is the condition Type.
+ * - Material Sample Type is required.
+ *
+ * This function will only be called if the data component "Split Configuration" is enabled.
+ */
+export function onValidateSplitConfiguration(
+  values: FormTemplate & FormTemplateComponents,
+  errors: any
+) {
+  // Create a new object to hold any new errors we find
+  const newErrors = {};
+
+  // Condition Type is required.
+  if (isUndefined(values?.splitConfiguration?.condition?.conditionType)) {
+    newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
+      condition: { conditionType: "Required Field" }
+    });
+  } else {
+    // If condition type is `Material Sample Type` then the Material Sample Type field is required.
+    if (
+      values.splitConfiguration?.condition.conditionType ===
+        TYPE_BASED_STRATEGY &&
+      isUndefined(values?.splitConfiguration?.condition?.materialSampleType)
+    ) {
+      newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
+        condition: { materialSampleType: "Required Field" }
+      });
+    }
+  }
+
+  // Strategy is required.
+  if (
+    isUndefined(
+      values?.splitConfiguration?.materialSampleNameGeneration?.strategy
+    )
+  ) {
+    newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
+      materialSampleNameGeneration: { strategy: "Required Field" }
+    });
+  }
+
+  // Character Type is required.
+  if (
+    isUndefined(
+      values?.splitConfiguration?.materialSampleNameGeneration?.characterType
+    )
+  ) {
+    newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
+      materialSampleNameGeneration: { characterType: "Required Field" }
+    });
+  }
+
+  // Material Sample Type is required when doing a split configuration.
+  if (
+    isUndefined(values?.materialSampleType) ||
+    isEmpty(values?.materialSampleType)
+  ) {
+    newErrors.materialSampleType =
+      "Material Sample Type is required when Split Configuration is enabled.";
+  }
+  if (
+    isUndefined(
+      values?.templateCheckboxes[
+        "material-sample-info-component.material-sample-info-section.materialSampleType"
+      ]
+    ) ||
+    values?.templateCheckboxes[
+      "material-sample-info-component.material-sample-info-section.materialSampleType"
+    ] === false
+  ) {
+    newErrors.materialSampleType =
+      "Material Sample Type must be visible when Split Configuration is enabled.";
+  }
+
+  // Merge the new errors into the existing errors object
+  return merge(errors, newErrors);
 }
 
 export function SplitConfigurationSection({
@@ -46,7 +133,7 @@ export function SplitConfigurationSection({
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: TYPE_BASED_OPTION,
+                  value: TYPE_BASED_STRATEGY,
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
@@ -59,55 +146,7 @@ export function SplitConfigurationSection({
                   name="splitConfiguration.condition.materialSampleType"
                   label={formatMessage("field_materialSampleType")}
                   disableTemplateCheckbox={true}
-                  disabled={selected !== TYPE_BASED_OPTION}
-                  query={() => ({
-                    path: "collection-api/vocabulary/materialSampleType"
-                  })}
-                  isMulti={true}
-                />
-              )}
-            </FieldSpy>
-          </div>
-        </div>
-      </FieldSet>
-
-      {/* Basename Generation Fields */}
-      <FieldSet
-        id="split-configuration-basename-section"
-        legend={<DinaMessage id="materialSampleSplitConfigurationBasename" />}
-        sectionName="split-configuration-basename-section"
-        className="non-strip"
-      >
-        <div className="row">
-          <div className="col-md-6">
-            <SelectField
-              name="splitConfiguration.basename.generateFrom"
-              label={formatMessage(
-                "materialSampleSplitConfigurationGenerateFrom"
-              )}
-              disableTemplateCheckbox={true}
-              options={[
-                {
-                  value: DIRECT_PARENT_OPTION,
-                  label: formatMessage(
-                    "materialSampleSplitConfigurationDirectParent"
-                  )
-                },
-                {
-                  value: TYPE_BASED_OPTION,
-                  label: formatMessage("field_materialSampleType")
-                }
-              ]}
-            />
-          </div>
-          <div className="col-md-6">
-            <FieldSpy fieldName="splitConfiguration.basename.generateFrom">
-              {(selected) => (
-                <ControlledVocabularySelectField
-                  name="splitConfiguration.basename.materialSampleType"
-                  label={formatMessage("field_materialSampleType")}
-                  disableTemplateCheckbox={true}
-                  disabled={selected !== TYPE_BASED_OPTION}
+                  disabled={selected !== TYPE_BASED_STRATEGY}
                   query={() => ({
                     path: "collection-api/vocabulary/materialSampleType"
                   })}
@@ -121,69 +160,49 @@ export function SplitConfigurationSection({
 
       {/* Sequence Generation Fields */}
       <FieldSet
-        id="split-configuration-sequence-generation-section"
+        id="split-configuration-material-sample-name-generation-section"
         legend={
-          <DinaMessage id="materialSampleSplitConfigurationSequenceGeneration" />
+          <DinaMessage id="materialSampleSplitConfigurationMaterialSampleNameGeneration" />
         }
-        sectionName="split-configuration-sequence-generation-section"
+        sectionName="split-configuration-material-sample-name-generation-section"
         className="non-strip"
       >
         <div className="row">
           <div className="col-md-6">
             <SelectField
-              name="splitConfiguration.sequenceGeneration.generateFrom"
-              label={formatMessage(
-                "materialSampleSplitConfigurationGenerateFrom"
-              )}
+              name="splitConfiguration.materialSampleNameGeneration.strategy"
+              label={formatMessage("materialSampleSplitConfigurationStrategy")}
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: DIRECT_PARENT_OPTION,
+                  value: DIRECT_PARENT_STRATEGY,
                   label: formatMessage(
                     "materialSampleSplitConfigurationDirectParent"
                   )
                 },
                 {
-                  value: TYPE_BASED_OPTION,
+                  value: TYPE_BASED_STRATEGY,
                   label: formatMessage("field_materialSampleType")
                 }
               ]}
             />
           </div>
           <div className="col-md-6">
-            <FieldSpy fieldName="splitConfiguration.sequenceGeneration.generateFrom">
-              {(selected) => (
-                <ControlledVocabularySelectField
-                  name="splitConfiguration.sequenceGeneration.materialSampleType"
-                  label={formatMessage("field_materialSampleType")}
-                  disableTemplateCheckbox={true}
-                  disabled={selected !== TYPE_BASED_OPTION}
-                  query={() => ({
-                    path: "collection-api/vocabulary/materialSampleType"
-                  })}
-                  isMulti={true}
-                />
-              )}
-            </FieldSpy>
-          </div>
-        </div>
-        <div className="row">
-          <div className="col-md-6">
             <SelectField
-              name="splitConfiguration.sequenceGeneration.seriesMode"
+              name="splitConfiguration.materialSampleNameGeneration.characterType"
               label={formatMessage("splitGenerationOptionLabel")}
               disableTemplateCheckbox={true}
               options={[
                 {
-                  value: SEQUENCE_LOWERCASE_OPTION,
+                  value: LOWER_CHARACTER_TYPE,
                   label: formatMessage("splitGenerationOptionLowercase")
                 },
                 {
-                  value: SEQUENCE_UPPERCASE_OPTION,
+                  value: UPPER_CHARACTER_TYPE,
                   label: formatMessage("splitGenerationOptionUppercase")
                 },
                 {
-                  value: SEQUENCE_NUMBER_OPTION,
+                  value: NUMBER_CHARACTER_TYPE,
                   label: formatMessage("splitGenerationOptionNumerical")
                 }
               ]}

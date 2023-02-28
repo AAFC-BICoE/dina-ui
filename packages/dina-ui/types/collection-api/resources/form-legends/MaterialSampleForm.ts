@@ -49,31 +49,16 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
         ]
       },
       {
-        id: "split-configuration-basename-section",
-        labelKey: "materialSampleSplitConfigurationBasename",
+        id: "split-configuration-material-sample-name-generation-section",
+        labelKey:
+          "materialSampleSplitConfigurationMaterialSampleNameGeneration",
         maxGridSizeX: 2,
         items: [
           {
-            id: "splitConfiguration.basename.generateFrom"
+            id: "splitConfiguration.materialSampleNameGeneration.strategy"
           },
           {
-            id: "splitConfiguration.basename.materialSampleType"
-          }
-        ]
-      },
-      {
-        id: "split-configuration-sequence-generation-section",
-        labelKey: "materialSampleSplitConfigurationSequenceGeneration",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "splitConfiguration.sequenceGeneration.generateFrom"
-          },
-          {
-            id: "splitConfiguration.sequenceGeneration.materialSampleType"
-          },
-          {
-            id: "splitConfiguration.sequenceGeneration.seriesMode"
+            id: "splitConfiguration.materialSampleNameGeneration.characterSet"
           }
         ]
       }

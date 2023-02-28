@@ -14,7 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
-import { TYPE_BASED_OPTION } from "../../../components/collection/material-sample/SplitConfigurationSection";
+import { onValidateSplitConfiguration } from "packages/dina-ui/components/collection/material-sample/SplitConfigurationSection";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -25,7 +25,8 @@ import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
-  getFormTemplateCheckboxes
+  getFormTemplateCheckboxes,
+  getSplitConfigurationComponentValues
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
@@ -126,10 +127,8 @@ export function FormTemplateEditPageLoaded({
     {};
 
   // Get Split Configuration Settings
-  const splitConfigurationInitialValues = getComponentValues(
-    SPLIT_CONFIGURATION_COMPONENT_NAME,
-    fetchedFormTemplate
-  );
+  const splitConfigurationInitialValues =
+    getSplitConfigurationComponentValues(fetchedFormTemplate);
 
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
 
@@ -142,42 +141,7 @@ export function FormTemplateEditPageLoaded({
     ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
-    splitConfiguration: {
-      condition: {
-        conditionType: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.condition.conditionType"
-        ),
-        materialSampleType: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.condition.materialSampleType"
-        )
-      },
-      basename: {
-        generateFrom: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.basename.generateFrom"
-        ),
-        materialSampleType: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.basename.materialSampleType"
-        )
-      },
-      sequenceGeneration: {
-        generateFrom: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.sequenceGeneration.generateFrom"
-        ),
-        materialSampleType: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.sequenceGeneration.materialSampleType"
-        ),
-        seriesMode: _.get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.sequenceGeneration.seriesMode"
-        )
-      }
-    },
+    ...splitConfigurationInitialValues,
     id,
     type: "form-template"
   };
@@ -295,55 +259,15 @@ export function FormTemplateEditPageLoaded({
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
 
-    const requiredFields = [
-      {
-        field: "condition.conditionType",
-        materialSampleTypeField: "condition.materialSampleType"
-      },
-      {
-        field: "basename.generateFrom",
-        materialSampleTypeField: "basename.materialSampleType"
-      },
-      {
-        field: "sequenceGeneration.generateFrom",
-        materialSampleTypeField: "sequenceGeneration.materialSampleType"
-      },
-      { field: "sequenceGeneration.seriesMode" }
-    ];
+    let errors: any = {};
 
-    const errors: any = {};
-
-    // Check if a split configuration is provided.
+    // Split Configuration Validation Checking
     if (dataComponentsStateMap[SPLIT_CONFIGURATION_COMPONENT_NAME]) {
-      // Go through all the required fields and ensure they are provided.
-      requiredFields.forEach(({ field, materialSampleTypeField }) => {
-        const requiredField = _.get(values, `splitConfiguration.${field}`);
-        if (materialSampleTypeField) {
-          const materialSampleType = _.get(
-            values,
-            `splitConfiguration.${materialSampleTypeField}`
-          );
-
-          // Generate From Dropdown is required.
-          if (_.isUndefined(requiredField)) {
-            errors[`splitConfiguration.${field}`] = "Required field";
-          }
-
-          // If the Generate From is TYPE_BASED_OPTION, then the Material Sample Type is required.
-          if (
-            requiredField === TYPE_BASED_OPTION &&
-            (_.isUndefined(materialSampleType) || _.isEmpty(materialSampleType))
-          ) {
-            errors[`splitConfiguration.${materialSampleTypeField}`] =
-              "Required field";
-          }
-        }
-
-        // Check if the required field is provided.
-        if (_.isUndefined(requiredField)) {
-          errors[`splitConfiguration.${field}`] = "Required field";
-        }
-      });
+      errors = Object.assign(
+        {},
+        errors,
+        onValidateSplitConfiguration({ values, errors })
+      );
     }
 
     return errors;
@@ -412,6 +336,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
+    dataComponentState.enableSplitConfiguration;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
   dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =
@@ -433,7 +359,5 @@ function getDataComponentsStateMap(dataComponentState) {
   dataComponentEnabledMap[FIELD_EXTENSIONS_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MANAGED_ATTRIBUTES_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME] = true;
-  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
-    dataComponentState.enableSplitConfiguration;
   return dataComponentEnabledMap;
 }

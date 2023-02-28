@@ -10,6 +10,7 @@ import {
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
 import { useDinaIntl } from "../../../dina-ui/intl/dina-ui-intl";
 import { find } from "lodash";
+import classNames from "classnames";
 
 export interface ControlledVocabularySelectFieldProp extends FieldWrapperProps {
   query?: () => JsonApiQuerySpec;
@@ -43,7 +44,7 @@ export function ControlledVocabularySelectField(
 
     return (
       <FieldWrapper {...controlledVocabularySelectFieldProps}>
-        {({ setValue, value }) => {
+        {({ setValue, value, invalid }) => {
           function onChange(newValue) {
             if (Array.isArray(newValue)) {
               setValue(newValue.map((v) => v.value));
@@ -61,16 +62,18 @@ export function ControlledVocabularySelectField(
           });
 
           return (
-            <SortableSelect
-              onChange={onChange}
-              options={options}
-              placeholder={formatMessage("typeHereToSearch")}
-              value={selectedValue}
-              axis="xy"
-              distance={4}
-              isMulti={isMulti}
-              isDisabled={disabled}
-            />
+            <div className={classNames(invalid && "is-invalid")}>
+              <SortableSelect
+                onChange={onChange}
+                options={options}
+                placeholder={formatMessage("typeHereToSearch")}
+                value={selectedValue}
+                axis="xy"
+                distance={4}
+                isMulti={isMulti}
+                isDisabled={disabled}
+              />
+            </div>
           );
         }}
       </FieldWrapper>
