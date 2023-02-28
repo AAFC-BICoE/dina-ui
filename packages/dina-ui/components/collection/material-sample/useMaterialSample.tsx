@@ -186,7 +186,7 @@ export interface UseMaterialSampleSaveParams {
   };
 
   /** Split Configuration (Form Template Only) */
-  splitConfigurationTemplateInitialValues?: Partial<SplitConfiguration>;
+  splitConfigurationInitialState?: boolean;
 
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
@@ -224,7 +224,7 @@ export function useMaterialSampleSave({
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
-  splitConfigurationTemplateInitialValues,
+  splitConfigurationInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -232,9 +232,6 @@ export function useMaterialSampleSave({
 }: UseMaterialSampleSaveParams) {
   const { save } = useApiClient();
   const { formatMessage } = useDinaIntl();
-
-  const hasSplitConfigurationTemplate =
-    isTemplate && splitConfigurationTemplateInitialValues;
 
   // For editing existing templates:
   const hasColEventTemplate =
@@ -318,7 +315,7 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
-    setEnableSplitConfiguration(Boolean(hasSplitConfigurationTemplate));
+    setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
 
     setEnableCollectingEvent(
       Boolean(

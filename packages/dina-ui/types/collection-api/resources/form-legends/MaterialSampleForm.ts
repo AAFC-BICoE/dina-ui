@@ -58,7 +58,7 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
             id: "splitConfiguration.materialSampleNameGeneration.strategy"
           },
           {
-            id: "splitConfiguration.materialSampleNameGeneration.characterSet"
+            id: "splitConfiguration.materialSampleNameGeneration.characterType"
           }
         ]
       }

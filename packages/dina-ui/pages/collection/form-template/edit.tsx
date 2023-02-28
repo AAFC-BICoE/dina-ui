@@ -115,16 +115,22 @@ export function FormTemplateEditPageLoaded({
 
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
   const collectingEventInitialValues =
-    getComponentValues(COLLECTING_EVENT_COMPONENT_NAME, fetchedFormTemplate) ??
-    {};
+    getComponentValues(
+      COLLECTING_EVENT_COMPONENT_NAME,
+      fetchedFormTemplate,
+      false
+    ) ?? {};
 
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
   const acquisitionEventInitialValues =
-    getComponentValues(ACQUISITION_EVENT_COMPONENT_NAME, fetchedFormTemplate) ??
-    {};
+    getComponentValues(
+      ACQUISITION_EVENT_COMPONENT_NAME,
+      fetchedFormTemplate,
+      false
+    ) ?? {};
 
   // Get Split Configuration Settings
   const splitConfigurationInitialValues =
@@ -154,7 +160,9 @@ export function FormTemplateEditPageLoaded({
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
     acquisitionEventFormRef: acqEventFormRef,
-    splitConfigurationTemplateInitialValues: splitConfigurationInitialValues
+    splitConfigurationInitialState: !_.isUndefined(
+      splitConfigurationInitialValues
+    )
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
@@ -254,6 +262,9 @@ export function FormTemplateEditPageLoaded({
     await onSaved(savedDefinition);
   }
 
+  /**
+   * Validation rules to apply for the form template.
+   */
   function onValidate(values: FormTemplate & FormTemplateComponents) {
     // Get switches for validation purposes.
     const dataComponentsStateMap =

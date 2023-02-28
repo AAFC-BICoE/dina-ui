@@ -66,6 +66,36 @@ export function onValidateSplitConfiguration(
     newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
       materialSampleNameGeneration: { strategy: "Required Field" }
     });
+  } else {
+    // If strategy is `Material Sample Type` then the Material Sample Type field is required.
+    if (
+      values.splitConfiguration?.materialSampleNameGeneration.strategy ===
+      TYPE_BASED_STRATEGY
+    ) {
+      // Material Sample Type is required when doing a split configuration.
+      if (
+        isUndefined(values?.materialSampleType) ||
+        isEmpty(values?.materialSampleType)
+      ) {
+        newErrors.materialSampleType =
+          "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.";
+      }
+
+      // Also must be visible on the form.
+      if (
+        isUndefined(
+          values?.templateCheckboxes[
+            "material-sample-info-component.material-sample-info-section.materialSampleType"
+          ]
+        ) ||
+        values?.templateCheckboxes[
+          "material-sample-info-component.material-sample-info-section.materialSampleType"
+        ] === false
+      ) {
+        newErrors.materialSampleType =
+          "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.";
+      }
+    }
   }
 
   // Character Type is required.
@@ -77,28 +107,6 @@ export function onValidateSplitConfiguration(
     newErrors.splitConfiguration = merge(newErrors.splitConfiguration, {
       materialSampleNameGeneration: { characterType: "Required Field" }
     });
-  }
-
-  // Material Sample Type is required when doing a split configuration.
-  if (
-    isUndefined(values?.materialSampleType) ||
-    isEmpty(values?.materialSampleType)
-  ) {
-    newErrors.materialSampleType =
-      "Material Sample Type is required when Split Configuration is enabled.";
-  }
-  if (
-    isUndefined(
-      values?.templateCheckboxes[
-        "material-sample-info-component.material-sample-info-section.materialSampleType"
-      ]
-    ) ||
-    values?.templateCheckboxes[
-      "material-sample-info-component.material-sample-info-section.materialSampleType"
-    ] === false
-  ) {
-    newErrors.materialSampleType =
-      "Material Sample Type must be visible when Split Configuration is enabled.";
   }
 
   // Merge the new errors into the existing errors object

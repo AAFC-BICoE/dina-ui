@@ -38,29 +38,43 @@ export function getFormTemplateCheckboxes(
   };
 }
 
+/**
+ * Using the form template provided, retrieve all of the sections/fields for a specific component.
+ *
+ * @param comp The component name to search against.
+ * @param formTemplate The form template settings to search against.
+ * @param invisibleUndefined If the component is not visible (user switched it off) then it will
+ *  return undefined if this option is true.
+ */
 export function getComponentValues(
   comp: string,
-  formTemplate: FormTemplate | undefined
+  formTemplate: FormTemplate | undefined,
+  invisibleUndefined: boolean
 ): any {
   const componentValues = {};
   const templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
+
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
-      if (component.name === comp && component.visible) {
-        component.sections?.forEach((section) => {
-          section.items?.forEach((item) => {
-            if (
-              (item.name && item.visible) ||
-              item.name === "geoReferenceAssertions"
-            ) {
-              componentValues[item.name] = item.defaultValue;
-              templateCheckboxes[
-                component.name + "." + section.name + "." + item.name
-              ] = true;
-            }
+      if (component.name === comp) {
+        if (component.visible) {
+          component.sections?.forEach((section) => {
+            section.items?.forEach((item) => {
+              if (
+                (item.name && item.visible) ||
+                item.name === "geoReferenceAssertions"
+              ) {
+                componentValues[item.name] = item.defaultValue;
+                templateCheckboxes[
+                  component.name + "." + section.name + "." + item.name
+                ] = true;
+              }
+            });
           });
-        });
+        } else if (invisibleUndefined) {
+          return undefined;
+        }
       }
     });
   }
@@ -108,8 +122,14 @@ export function getSplitConfigurationComponentValues(
   // Retrieve form template split configuration info.
   const splitConfigurationInitialValues = getComponentValues(
     SPLIT_CONFIGURATION_COMPONENT_NAME,
-    formTemplate
+    formTemplate,
+    true
   );
+
+  // Return an empty object to be put into the form template default values.
+  if (!splitConfigurationInitialValues) {
+    return {};
+  }
 
   // Transform form template info into a Split Configuration object.
   return {
@@ -129,9 +149,9 @@ export function getSplitConfigurationComponentValues(
           splitConfigurationInitialValues,
           "splitConfiguration.materialSampleNameGeneration.strategy"
         ),
-        characterSet: get(
+        characterType: get(
           splitConfigurationInitialValues,
-          "splitConfiguration.materialSampleNameGeneration.characterSet"
+          "splitConfiguration.materialSampleNameGeneration.characterType"
         )
       }
     }
