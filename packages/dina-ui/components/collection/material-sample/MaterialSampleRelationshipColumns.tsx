@@ -2,7 +2,7 @@ import { TableColumn } from "common-ui/lib/list-page/types";
 import { dateCell, DeleteButton, EditButton, stringArrayCell } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import { getScientificNames } from "./organismUtils";
-import { SplitMaterialSampleButton } from "./SplitMaterialSampleButton";
+import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 
 export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
   {
@@ -69,7 +69,7 @@ export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] 
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
-          <SplitMaterialSampleButton
+          <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!data?.attributes?.materialSampleName}
           />

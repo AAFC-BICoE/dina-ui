@@ -53,7 +53,7 @@ import {
 } from "../../../types/collection-api";
 import { GenerateLabelDropdownButton } from "../../../components/collection/material-sample/GenerateLabelDropdownButton";
 import { PersistedResource } from "kitsu";
-import { SplitMaterialSampleButton } from "../../../components/collection/material-sample/SplitMaterialSampleButton";
+import { SplitMaterialSampleDropdownButton } from "../../../components/collection/material-sample/SplitMaterialSampleDropdownButton";
 import { DataEntryViewer } from "../../../../common-ui/lib/formik-connected/data-entry/DataEntryViewer";
 import { ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW } from "../../../components/collection/material-sample/MaterialSampleRelationshipColumns";
 
@@ -306,7 +306,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
             reloadLastSearch={true}
           />
           <EditButton entityId={id} entityLink="collection/material-sample" />
-          <SplitMaterialSampleButton
+          <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSample.materialSampleName}
           />
