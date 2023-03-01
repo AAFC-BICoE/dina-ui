@@ -123,5 +123,8 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_shippingAddress.zipCode": "Zip Code",
   "field_shippingAddress.country": "Country",
   pcrWorksheet: "PCR Worksheet",
-  print: "Print"
+  print: "Print",
+  field_positiveControl: "Pos Control",
+  field_negtiveControl: "Neg Control",
+  rxnsFormular: "# Rxns = x samples + control + error"
 };

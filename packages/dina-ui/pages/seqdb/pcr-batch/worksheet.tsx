@@ -1,44 +1,90 @@
-import { PersistedResource } from "kitsu";
 import { useRouter } from "next/router";
 import {
   BackToListButton,
   DateField,
   DinaForm,
   filterBy,
+  LoadingSpinner,
   ResourceSelectField,
   TextField,
-  useQuery,
-  withResponse
+  useApiClient
 } from "packages/common-ui/lib";
-import {
-  GroupSelectField,
-  PersonSelectField
-} from "packages/dina-ui/components";
+import { GroupSelectField, PersonSelectField } from "../../../components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { ReactionRxns } from "packages/dina-ui/components/seqdb/pcr-worksheet/ReactionRxns";
+import { ThermocyclerProfileWorksheetElement } from "packages/dina-ui/components/seqdb/pcr-worksheet/ThermocyclerProfileWorksheetElement";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { useSeqdbIntl } from "packages/dina-ui/intl/seqdb-intl";
-import {
-  PcrBatch,
-  PcrPrimer,
-  Region,
-  ThermocyclerProfile
-} from "packages/dina-ui/types/seqdb-api";
+import { Protocol } from "packages/dina-ui/types/collection-api";
+import { PcrBatch, PcrPrimer, Region } from "packages/dina-ui/types/seqdb-api";
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { usePcrBatchQuery } from "./edit";
+import { PcrBatchItemTable } from "packages/dina-ui/components/seqdb/pcr-worksheet/PcrBatchItemTable";
 
 export default function PcrWorksheetPage() {
   const router = useRouter();
-  const { formatMessage } = useSeqdbIntl();
+  const { apiClient } = useApiClient();
   const id = router.query.id?.toString();
 
-  const pcrBatchQuery = useQuery<PcrBatch>(
-    {
-      path: `seqdb-api/pcr-batch/${id}`,
-      include:
-        "primerForward,primerReverse,region,thermocyclerProfile,experimenters,attachment,storageUnit,storageUnitType, protocol"
-    },
-    { disabled: !id }
-  );
+  const [resource, setResource] = useState<any>();
+
+  useEffect(() => {
+    fetchResources();
+  }, [id]);
+
+  async function fetchResources() {
+    const response = await apiClient.get<PcrBatch>(
+      `seqdb-api/pcr-batch/${id}`,
+      {
+        include:
+          "primerForward,primerReverse,region,thermocyclerProfile,experimenters,storageUnit,storageUnitType,protocol"
+      }
+    );
+    const pcrBatch = response.data;
+    setResource(await fetchExternalResources(pcrBatch));
+  }
+
+  async function fetchExternalResources(pcrBatch: PcrBatch) {
+    const promises = new Map<string, any>();
+    if (pcrBatch?.protocol?.id) {
+      promises.set(
+        "protocol",
+        apiClient.get<Protocol>(
+          `collection-api/protocol/${pcrBatch?.protocol?.id}`,
+          {}
+        )
+      );
+    }
+
+    if (promises.size > 0) {
+      const results = await Promise.all(promises.values());
+      const resultMap = new Map<string, any>();
+      const keys = Array.from(promises.keys());
+      for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        if (key === "protocol") {
+          const value = (results[i].data as Protocol).name;
+          resultMap.set(key, value);
+        } else if (key === "primerForward" || key === "primerReverse") {
+          const primer = results[i].data as PcrPrimer;
+          resultMap.set(key, `${primer.name} (#${primer.lotNumber})`);
+        }
+      }
+      const initData = {
+        ...pcrBatch
+      };
+      for (const key of resultMap.keys()) {
+        initData[key] = resultMap.get(key);
+      }
+      // add extra fields that are needed on the worksshet.
+      initData.notes = "";
+      initData.positiveControl = "";
+      initData.negtiveControl = "";
+      initData.resultsAndNextSteps = "";
+
+      return initData;
+    }
+    return pcrBatch;
+  }
 
   const buttonBarContent = (
     <>
@@ -54,123 +100,122 @@ export default function PcrWorksheetPage() {
     </>
   );
 
+  if (resource === undefined) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
     <PageLayout titleId="pcrWorksheet" buttonBarContent={buttonBarContent}>
-      <style>
-        {`
-         @media print {
-            body {
-              padding: 0;
-            }
-            a[href]:after {
-              content: none !important;
-            }
-            header, footer, .btn-bar {
-              display: none !important;
-            }
+      <link rel="stylesheet" href="/static/bootstrap-print.css" media="print" />
 
-          }
-        `}
-      </style>
-      {withResponse(pcrBatchQuery, ({ data: pcrBatchData }) => (
-        <PcrWorksheetForm pcrBatch={pcrBatchData} />
-      ))}
+      <PcrWorksheetForm pcrBatch={resource} />
     </PageLayout>
   );
 }
 
 export interface PcrWorksheetFormProps {
-  pcrBatch?: PersistedResource<PcrBatch>;
+  pcrBatch?: any;
 }
 
 export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
   const initialValues = pcrBatch;
   return (
-    <DinaForm<PcrBatch> initialValues={initialValues as any}>
+    <DinaForm<any> initialValues={initialValues as any}>
       <div>
         <div className="row">
           <GroupSelectField
             name="group"
             enableStoredDefaultGroup={true}
-            className="col-md-6"
+            className="col-sm-6"
             disabled={true}
           />
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="name" disabled={true} />
+          <TextField className="col-sm-6" name="name" disabled={true} />
           <PersonSelectField
-            className="col-md-6"
+            className="col-sm-6"
             name="experimenters"
             isMulti={true}
             isDisabled={true}
           />
         </div>
         <div className="row">
-          <TextField className="col-md-6" name="objective" disabled={true} />
-          <DateField className="col-md-6" name="reactionDate" disabled={true} />
-        </div>
-        <div className="row">
-          <ResourceSelectField<Region>
-            className="col-md-6"
-            name="region"
-            filter={filterBy(["name"])}
-            model="seqdb-api/region"
-            optionLabel={(region) => region.name}
-            readOnlyLink="/seqdb/region/view?id="
-            isDisabled={true}
-          />
-          <TextField className="col-md-6" name="thermocycler" disabled={true} />
-        </div>
-
-        <div className="row">
-          <ResourceSelectField<ThermocyclerProfile>
-            className="col-md-6"
-            name="thermocyclerProfile"
-            filter={filterBy(["name"])}
-            model="seqdb-api/thermocycler-profile"
-            optionLabel={(profile) => profile.name}
-            readOnlyLink="/seqdb/thermocycler-profile/view?id="
-            isDisabled={true}
-          />
-        </div>
-        <div className="row">
-          <ResourceSelectField<PcrPrimer>
-            className="col-md-6"
-            name="primerForward"
-            filter={(input) => ({
-              ...filterBy(["name"])(input),
-              direction: { EQ: "F" }
-            })}
-            model="seqdb-api/pcr-primer"
-            optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
-            readOnlyLink="/seqdb/pcr-primer/view?id="
-            isDisabled={true}
-          />
-          <ResourceSelectField<PcrPrimer>
-            className="col-md-6"
-            name="primerReverse"
-            filter={(input) => ({
-              ...filterBy(["name"])(input),
-              direction: { EQ: "R" }
-            })}
-            model="seqdb-api/pcr-primer"
-            optionLabel={(primer) => `${primer.name} (#${primer.lotNumber})`}
-            readOnlyLink="/seqdb/pcr-primer/view?id="
-            isDisabled={true}
-          />
-
           <TextField
-            className="col-md-6"
-            name="positiveControl"
+            className="col-sm-6"
+            name="objective"
             disabled={true}
+            multiLines={true}
+            inputProps={{ rows: 2 }}
           />
+          <DateField className="col-sm-6" name="reactionDate" disabled={true} />
+        </div>
+        <div className="row">
           <TextField
-            className="col-md-6"
-            name="reactionVolume"
+            className="col-sm-6"
+            name="protocol"
             disabled={true}
+            multiLines={true}
+            inputProps={{ rows: 2 }}
           />
         </div>
-        <pre>{JSON.stringify(initialValues, null, " ")}</pre>
+        <div className="row">
+          <div className="col-sm-6">
+            <div className="row">
+              <TextField
+                className="col-sm-12"
+                name="notes"
+                disabled={true}
+                multiLines={true}
+                inputProps={{ rows: 2 }}
+              />
+            </div>
+            <div className="row">
+              <ResourceSelectField<Region>
+                className="col-sm-12"
+                name="region"
+                filter={filterBy(["name"])}
+                model="seqdb-api/region"
+                optionLabel={(region) => region.name}
+                readOnlyLink="/seqdb/region/view?id="
+                isDisabled={true}
+              />
+            </div>
+            <div className="row">
+              <TextField
+                className="col-sm-12"
+                name="thermocycler"
+                disabled={true}
+              />
+            </div>
+            <ReactionRxns />
+          </div>
+          <div className="col-sm-6">
+            <TextField
+              className="col-sm-12"
+              name="positiveControl"
+              disabled={true}
+            />
+            <TextField className="col-sm-12" name="negtiveControl" />
+            <ThermocyclerProfileWorksheetElement
+              thermocyclerProfile={pcrBatch.thermocyclerProfile}
+            />
+          </div>
+        </div>
+        <div className="row">
+          <TextField
+            className="col-sm-12"
+            name="resultsAndNextSteps"
+            disabled={true}
+            multiLines={true}
+            inputProps={{ rows: 2 }}
+          />
+        </div>
+        <div className="row">
+          <div className="col-sm-12">
+            <PcrBatchItemTable pcrBatchId={pcrBatch.id} />
+          </div>
+        </div>
+        {/* <pre>{JSON.stringify(initialValues, null, " ")}</pre> */}
       </div>
     </DinaForm>
   );

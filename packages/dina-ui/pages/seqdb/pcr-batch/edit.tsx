@@ -362,6 +362,7 @@ export function PcrBatchFormFields() {
           filter={filterBy(["name"])}
           model="collection-api/protocol"
           optionLabel={(protocol) => protocol.name}
+          readOnlyLink="/collection/protocol/view?id="
         />
         <StorageUnitTypeSelectorComponent />
         <StorageUnitSelectField
