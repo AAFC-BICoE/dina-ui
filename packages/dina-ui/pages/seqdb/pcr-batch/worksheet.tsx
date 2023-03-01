@@ -69,7 +69,7 @@ export default function PcrWorksheetPage() {
           resultMap.set(key, `${primer.name} (#${primer.lotNumber})`);
         }
       }
-      const initData = {
+      const initData: { [key: string]: any } = {
         ...pcrBatch
       };
       for (const key of resultMap.keys()) {
