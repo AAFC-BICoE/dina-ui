@@ -280,7 +280,6 @@ export function WorkbookColumnMapping({
               case DataTypeEnum.MAP:
                 if (!isMap(row[field])) {
                   param.dataType = DataTypeEnum.MAP;
-                  console.log(row);
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
