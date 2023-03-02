@@ -79,6 +79,8 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
+
+  // Set up Field Extensions values and functions
   const { response, loading } = useQuery<FieldExtension[]>({
     path: `collection-api/extension`
   });

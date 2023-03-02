@@ -51,8 +51,10 @@ export function DataEntry({
 
   function addBlock() {
     const selectedBlockOptions = formik?.values?.[name]
-      ? Object.keys(formik?.values?.[name])
-      : [];
+    ? Object.keys(formik?.values?.[name]).map(
+        (blockKey) => formik?.values?.[name][blockKey].select
+      )
+    : [];
 
     const newBlockOption = blockOptions?.find(
       (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
@@ -72,6 +74,7 @@ export function DataEntry({
               vocabularyBased: true
             }
       };
+      onBlockSelectChange?.(newBlockOption.value, formik);
     } else {
       newExtensionValues = {
         ...formik?.values?.[name],
@@ -88,7 +91,6 @@ export function DataEntry({
       };
     }
     formik.setFieldValue(name, newExtensionValues);
-    onBlockSelectChange?.(newBlockOption.value, formik);
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {

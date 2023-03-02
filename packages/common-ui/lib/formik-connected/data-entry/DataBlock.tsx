@@ -63,8 +63,12 @@ export function DataBlock({
   const extensionKeys = extensionValues[blockKey].rows;
   const formik = useFormikContext<any>();
   const rootName = props.name.split(".")[0];
-  const selectedBlockOptions = formik?.values?.[rootName] ? Object.keys(formik?.values?.[rootName]) : [];
-  
+  const selectedBlockOptions = formik?.values?.[rootName]
+    ? Object.keys(formik?.values?.[rootName]).map(
+        (blockKey) => formik?.values?.[rootName][blockKey].select
+      )
+    : [];
+
   return (
     <div>
       {
@@ -118,26 +122,24 @@ export function DataBlock({
               />
             )}
           </div>
-          {Object.keys(extensionKeys).map(
-            (extensionKey, rowIndex) => {
-              return (
-                <DataRow
-                  showPlusIcon={true}
-                  name={`${props.name}.rows.${extensionKey}`}
-                  rowIndex={rowIndex}
-                  model={model}
-                  unitsOptions={unitsOptions}
-                  typeOptions={typeOptions}
-                  readOnly={readOnly}
-                  typesAddable={typesAddable}
-                  unitsAddable={unitsAddable}
-                  isVocabularyBasedEnabledForType={
-                    isVocabularyBasedEnabledForType
-                  }
-                />
-              );
-            }
-          )}
+          {Object.keys(extensionKeys).map((extensionKey, rowIndex) => {
+            return (
+              <DataRow
+                showPlusIcon={true}
+                name={`${props.name}.rows.${extensionKey}`}
+                rowIndex={rowIndex}
+                model={model}
+                unitsOptions={unitsOptions}
+                typeOptions={typeOptions}
+                readOnly={readOnly}
+                typesAddable={typesAddable}
+                unitsAddable={unitsAddable}
+                isVocabularyBasedEnabledForType={
+                  isVocabularyBasedEnabledForType
+                }
+              />
+            );
+          })}
           {!readOnly && (
             <div className="d-flex align-items-center justify-content-between">
               <Button onClick={() => removeBlock?.(props.name)}>
