@@ -102,6 +102,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cfiaPPCLevel: " CFIA PPC Level",
   changedProperties: "Changes",
   childMaterialSamples: "Direct Material Sample Children",
+  childCultureStrains: "Culture Strains",
   childrenStorageUnits: "Children Storage Units",
   closePreviewButtonText: "Close Preview",
   colSearchBoxTooltip: "Search the Catalog of Life",
