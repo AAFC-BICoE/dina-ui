@@ -16,8 +16,6 @@ export interface DataBlockProps extends FieldWrapperProps {
   blockOptions?: any[];
   onBlockSelectChange?: (value, formik, oldValue?) => void;
   vocabularyOptionsPath?: string;
-  /** The model type to select resources from. */
-  model?: string;
   unitsOptions?: any[];
   removeBlock?: (blockPath) => void;
   typeOptions?: any[];
@@ -35,7 +33,6 @@ export function DataBlock({
   blockOptions,
   onBlockSelectChange,
   vocabularyOptionsPath,
-  model,
   unitsOptions,
   removeBlock,
   typeOptions,
@@ -128,7 +125,6 @@ export function DataBlock({
                 showPlusIcon={true}
                 name={`${props.name}.rows.${extensionKey}`}
                 rowIndex={rowIndex}
-                model={model}
                 unitsOptions={unitsOptions}
                 typeOptions={typeOptions}
                 readOnly={readOnly}

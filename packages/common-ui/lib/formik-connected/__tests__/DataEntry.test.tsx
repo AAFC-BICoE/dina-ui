@@ -68,7 +68,6 @@ describe("DataEntry", () => {
           legend={<DinaMessage id="fieldExtensions" />}
           blockOptions={blockOptions}
           unitsOptions={unitsOptions}
-          model={"agent-api/person"}
           typeOptions={typeOptions}
           name={name}
         />

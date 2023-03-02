@@ -21,8 +21,6 @@ export interface DataRowProps {
   name: string;
   rowIndex: number;
   showPlusIcon?: boolean;
-  /** The model type to select resources from. */
-  model?: string;
   unitsOptions?: any[];
   typeOptions?: any[];
   readOnly?: boolean;

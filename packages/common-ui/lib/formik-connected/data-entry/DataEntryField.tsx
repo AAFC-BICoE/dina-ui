@@ -7,8 +7,6 @@ export interface DataEntryFieldProps {
   onBlockSelectChange?: (value, formik, oldValue?) => void;
   typeOptions?: any[];
   vocabularyOptionsPath?: string;
-  /** The model type to select resources from. */
-  model?: string;
   unitsOptions?: any[];
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
@@ -31,7 +29,6 @@ export function DataEntryField({
   blockOptions,
   onBlockSelectChange,
   vocabularyOptionsPath,
-  model,
   unitsOptions,
   typeOptions,
   name,
@@ -53,7 +50,6 @@ export function DataEntryField({
       name={name}
       blockOptions={blockOptions}
       onBlockSelectChange={onBlockSelectChange}
-      model={model}
       unitsOptions={unitsOptions}
       vocabularyOptionsPath={vocabularyOptionsPath}
       typeOptions={typeOptions}

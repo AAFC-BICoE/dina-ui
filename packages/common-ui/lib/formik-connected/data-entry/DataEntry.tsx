@@ -15,7 +15,6 @@ export function DataEntry({
   name,
   blockOptions,
   onBlockSelectChange,
-  model,
   unitsOptions,
   vocabularyOptionsPath,
   typeOptions,
@@ -130,7 +129,6 @@ export function DataEntry({
                   <DataBlock
                     blockOptions={blockOptions}
                     onBlockSelectChange={onBlockSelectChange}
-                    model={model}
                     unitsOptions={unitsOptions}
                     removeBlock={removeBlock}
                     name={`${name}.${blockKey}`}
