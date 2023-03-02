@@ -5,29 +5,28 @@ export function processExtensionValuesLoading(initExtensionValues) {
   if (!initExtensionValues) {
     return undefined;
   }
-
+  let processedExtensionValues = {}
   Object.keys(initExtensionValues).forEach((blockKey) => {
-    initExtensionValues[blockKey]["rows"] = {};
+    processedExtensionValues[blockKey] = {};
+    processedExtensionValues[blockKey]["rows"] = {};
     Object.keys(initExtensionValues[blockKey]).forEach((extensionKey) => {
       if (extensionKey !== "rows") {
         const extensionField = {
           type: extensionKey,
           value: initExtensionValues[blockKey][extensionKey]
         };
-        initExtensionValues[blockKey]["rows"][extensionKey] = extensionField;
-        delete initExtensionValues[blockKey][extensionKey];
+        processedExtensionValues[blockKey]["rows"][extensionKey] = extensionField;
       }
     });
-    initExtensionValues[blockKey]["select"] = blockKey;
+    processedExtensionValues[blockKey]["select"] = blockKey;
   });
+  return processedExtensionValues;
 }
 
 /**
  * Process Extension Values from front-end into nested maps for back-end
  */
-export function processExtensionValuesSaving(submittedValues: any) {
-  const submittedExtensionValues =
-    submittedValues.extensionValues;
+export function processExtensionValuesSaving(submittedExtensionValues: any) {
 
   let processedExtensionValues = {};
   Object.keys(submittedExtensionValues).forEach((dataBlockKey) => {
@@ -43,5 +42,5 @@ export function processExtensionValuesSaving(submittedValues: any) {
       processedExtensionValues[fieldKey] = {...processedExtensionValues[fieldKey], [type]: value}
     })
   })
-  submittedValues.extensionValues = processedExtensionValues;
+  return processedExtensionValues;
 }

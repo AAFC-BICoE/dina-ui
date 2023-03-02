@@ -1036,7 +1036,7 @@ export function CollectingEventFormLayout({
         >
           <DataEntryField
             legend={<DinaMessage id="fieldExtensions" />}
-            name="extensionValues"
+            name="extensionValuesForm"
             blockOptions={extensionOptions}
             typeOptions={extensionFieldsOptions}
             onBlockSelectChange={onBlockSelectChange}

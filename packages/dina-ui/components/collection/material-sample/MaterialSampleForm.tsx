@@ -412,7 +412,7 @@ export function MaterialSampleForm({
         >
           <DataEntryField
             legend={<DinaMessage id="fieldExtensions" />}
-            name="extensionValues"
+            name="extensionValuesForm"
             blockOptions={extensionOptions}
             typeOptions={extensionFieldsOptions}
             onBlockSelectChange={onBlockSelectChange}
