@@ -3,6 +3,7 @@ import {
   BackToListButton,
   DateField,
   DinaForm,
+  DinaFormSection,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -19,6 +20,7 @@ import { PcrBatch, PcrPrimer, Region } from "packages/dina-ui/types/seqdb-api";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { PcrBatchItemTable } from "packages/dina-ui/components/seqdb/pcr-worksheet/PcrBatchItemTable";
+import { ReactionInputs } from "packages/dina-ui/components/seqdb/pcr-worksheet/ReactionInputs";
 
 export default function PcrWorksheetPage() {
   const router = useRouter();
@@ -106,7 +108,7 @@ export default function PcrWorksheetPage() {
 
   return (
     <PageLayout titleId="pcrWorksheet" buttonBarContent={buttonBarContent}>
-      <link rel="stylesheet" href="/static/bootstrap-print.css" media="print" />
+      {/* <link rel="stylesheet" href="/static/bootstrap-print.css" media="print" /> */}
 
       <PcrWorksheetForm pcrBatch={resource} />
     </PageLayout>
@@ -121,54 +123,54 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
   const initialValues = pcrBatch;
   return (
     <DinaForm<any> initialValues={initialValues as any}>
-      <div>
-        <div className="row">
-          <GroupSelectField
-            name="group"
-            enableStoredDefaultGroup={true}
-            className="col-sm-6"
-            disabled={true}
-          />
-        </div>
-        <div className="row">
-          <TextField className="col-sm-6" name="name" disabled={true} />
-          <PersonSelectField
-            className="col-sm-6"
-            name="experimenters"
-            isMulti={true}
-            isDisabled={true}
-          />
-        </div>
-        <div className="row">
-          <TextField
-            className="col-sm-6"
-            name="objective"
-            disabled={true}
-            multiLines={true}
-            inputProps={{ rows: 2 }}
-          />
-          <DateField className="col-sm-6" name="reactionDate" disabled={true} />
-        </div>
-        <div className="row">
-          <TextField
-            className="col-sm-6"
-            name="protocol"
-            disabled={true}
-            multiLines={true}
-            inputProps={{ rows: 2 }}
-          />
-        </div>
+      <DinaFormSection horizontal={[3, 9]}>
         <div className="row">
           <div className="col-sm-6">
             <div className="row">
+              <TextField className="col-sm-12" name="name" disabled={true} />
               <TextField
                 className="col-sm-12"
-                name="notes"
+                name="objective"
                 disabled={true}
                 multiLines={true}
-                inputProps={{ rows: 2 }}
+              />
+              <TextField
+                className="col-sm-12"
+                name="protocol"
+                disabled={true}
+                multiLines={true}
               />
             </div>
+          </div>
+          <div className="col-sm-6">
+            <div className="row">
+              <PersonSelectField
+                className="col-sm-12"
+                name="experimenters"
+                isMulti={true}
+                isDisabled={true}
+              />
+              <DateField
+                className="col-sm-12"
+                name="reactionDate"
+                disabled={true}
+              />
+            </div>
+          </div>
+        </div>
+      </DinaFormSection>
+
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="row">
+            <TextField
+              className="col-sm-12"
+              name="notes"
+              disabled={true}
+              multiLines={true}
+            />
+          </div>
+          <DinaFormSection horizontal={[3, 9]}>
             <div className="row">
               <ResourceSelectField<Region>
                 className="col-sm-12"
@@ -187,36 +189,51 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
                 disabled={true}
               />
             </div>
-            <ReactionRxns />
+          </DinaFormSection>
+          <div className="row">
+            <div className="col-sm-12">
+              <ReactionRxns />
+            </div>
           </div>
-          <div className="col-sm-6">
+        </div>
+        <div className="col-sm-6">
+          <DinaFormSection horizontal={[3, 9]}>
             <TextField
               className="col-sm-12"
               name="positiveControl"
               disabled={true}
             />
             <TextField className="col-sm-12" name="negtiveControl" />
+          </DinaFormSection>
+          <div className="mb-2 col-sm-12">
+            <ReactionInputs />
             <ThermocyclerProfileWorksheetElement
               thermocyclerProfile={pcrBatch.thermocyclerProfile}
             />
+            <DinaFormSection horizontal={[2, 10]}>
+              <TextField
+                className="col-sm-12"
+                name="reference"
+                disabled={true}
+              />
+            </DinaFormSection>
           </div>
         </div>
-        <div className="row">
-          <TextField
-            className="col-sm-12"
-            name="resultsAndNextSteps"
-            disabled={true}
-            multiLines={true}
-            inputProps={{ rows: 2 }}
-          />
-        </div>
-        <div className="row">
-          <div className="col-sm-12">
-            <PcrBatchItemTable pcrBatchId={pcrBatch.id} />
-          </div>
-        </div>
-        {/* <pre>{JSON.stringify(initialValues, null, " ")}</pre> */}
       </div>
+      <div className="row">
+        <TextField
+          className="col-sm-12"
+          name="resultsAndNextSteps"
+          disabled={true}
+          multiLines={true}
+        />
+      </div>
+      <div className="row">
+        <div className="col-sm-12">
+          <PcrBatchItemTable pcrBatchId={pcrBatch.id} />
+        </div>
+      </div>
+      {/* <pre>{JSON.stringify(initialValues, null, " ")}</pre> */}
     </DinaForm>
   );
 }

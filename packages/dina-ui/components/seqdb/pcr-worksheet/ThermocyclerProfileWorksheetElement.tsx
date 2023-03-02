@@ -1,4 +1,8 @@
-import { filterBy, ResourceSelectField } from "packages/common-ui/lib";
+import {
+  DinaFormSection,
+  filterBy,
+  ResourceSelectField
+} from "packages/common-ui/lib";
 import { ThermocyclerProfile } from "packages/dina-ui/types/seqdb-api";
 import styles from "./ThermocylerProfileWorksheetElement.module.css";
 
@@ -9,19 +13,23 @@ export function ThermocyclerProfileWorksheetElement({
 }) {
   return !!thermocyclerProfile ? (
     <>
-      <ResourceSelectField<ThermocyclerProfile>
-        className="col-sm-12"
-        name="thermocyclerProfile"
-        filter={filterBy(["name"])}
-        model="seqdb-api/thermocycler-profile"
-        optionLabel={(profile) => profile.name}
-        readOnlyLink="/seqdb/thermocycler-profile/view?id="
-        isDisabled={true}
-      />
+      <DinaFormSection horizontal={[4, 8]}>
+        <ResourceSelectField<ThermocyclerProfile>
+          className="col-sm-12"
+          name="thermocyclerProfile"
+          filter={filterBy(["name"])}
+          model="seqdb-api/thermocycler-profile"
+          optionLabel={(profile) => profile.name}
+          readOnlyLink="/seqdb/thermocycler-profile/view?id="
+          isDisabled={true}
+        />
+      </DinaFormSection>
       <div className={styles["step-container"] + " mb-2"}>
         {thermocyclerProfile.steps?.map((step, index) => (
           <div key={index} className={styles[`step${index + 1}`] + " mb-2"}>
-            <label>Step {index + 1}</label>
+            <label>
+              <strong>Step {index + 1}</strong>
+            </label>
             <input
               type="text"
               className="form-control"
@@ -33,7 +41,9 @@ export function ThermocyclerProfileWorksheetElement({
       </div>
       <div className={styles["step-container"] + " mb-2"}>
         <div className={styles["cycles-container"]}>
-          <label>Cycles</label>
+          <label>
+            <strong>Cycles</strong>
+          </label>
           <input
             type="text"
             className="form-control"

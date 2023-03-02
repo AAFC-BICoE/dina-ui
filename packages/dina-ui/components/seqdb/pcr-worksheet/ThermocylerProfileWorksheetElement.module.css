@@ -1,10 +1,6 @@
-.cycles-container > input {
-  display: inline-block !important;
-  width: 81%;
-}
-.cycles-container > input {
-  display: inline-block;
-  width: 81%;
+.cycles-container {
+  display: flex;
+  padding-right: 10px;
 }
 
 .step-container {

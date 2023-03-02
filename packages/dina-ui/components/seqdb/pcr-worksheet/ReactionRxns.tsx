@@ -7,7 +7,9 @@ export function ReactionRxns() {
       <div className="row">
         <div className={styles.fieldGroup + " col-sm-12 mb-3"}>
           <div>
-            <label>Reaction mix (ul)</label>
+            <label>
+              <strong>Reaction mix (ul)</strong>
+            </label>
             <input
               type="text"
               className="form-control"
@@ -16,7 +18,9 @@ export function ReactionRxns() {
             />
           </div>
           <div>
-            <label># Rxns = </label>
+            <label>
+              <strong># Rxns = </strong>
+            </label>
             <input
               type="text"
               className="form-control"
@@ -29,7 +33,9 @@ export function ReactionRxns() {
       <div className="row">
         <div className="col-sm-12 text-end mb-3">
           <span className={styles.rxnsFormular}>
-            <DinaMessage id="rxnsFormular" />
+            <strong>
+              <DinaMessage id="rxnsFormular" />
+            </strong>
           </span>
         </div>
       </div>
