@@ -102,6 +102,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   cfiaPPCLevel: " CFIA PPC Level",
   changedProperties: "Changes",
   childMaterialSamples: "Direct Material Sample Children",
+  childCultureStrains: "Culture Strains",
   childrenStorageUnits: "Children Storage Units",
   closePreviewButtonText: "Close Preview",
   colSearchBoxTooltip: "Search the Catalog of Life",
@@ -532,6 +533,17 @@ export const DINAUI_MESSAGES_ENGLISH = {
   "material-sample": "Material Sample",
   materialSampleAssociationLegend: "Material Sample Association",
   materialSampleAttachments: "Material Sample Attachments",
+  materialSampleSplitConfiguration: "Split Configuration",
+  materialSampleSplitConfigurationCondition: "Condition",
+  materialSampleSplitConfigurationMaterialSampleNameGeneration:
+    "Material Sample Name Generation",
+  materialSampleSplitConfigurationConditionType: "Condition Type",
+  materialSampleSplitConfigurationDirectParent: "Direct Parent",
+  materialSampleSplitConfigurationStrategy: "Strategy",
+  materialSampleSplitConfigurationRequiredMaterialSampleType:
+    "Material Sample Type is required when the Split Configuration is using the Material Sample Type strategy.",
+  materialSampleSplitConfigurationVisibleMaterialSampleType:
+    "Material Sample Type must be visible when Split Configuration is using the Material Sample Type strategy.",
   materialSampleFormTemplate: "Material Sample Form Template",
   materialSampleFormTemplates: "Material Sample Form Templates",
   materialSampleInfo: "Material Sample Info",
@@ -677,6 +689,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   revisionsButtonText: "Revisions",
   revisionsByUserPageTitle: "Revisions by user",
   revisionsListTitle: "Revisions for {name}",
+  requiredField: "Required field",
   role: "Role",
   roleAction: "Role/Action",
   roles: "Roles",

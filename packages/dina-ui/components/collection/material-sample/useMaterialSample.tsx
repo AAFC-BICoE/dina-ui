@@ -61,6 +61,7 @@ import { AllowAttachmentsConfig } from "../../object-store";
 import { VisibleManagedAttributesConfig } from "./MaterialSampleForm";
 import { BLANK_RESTRICTION, RESTRICTIONS_FIELDS } from "./RestrictionField";
 import { useGenerateSequence } from "./useGenerateSequence";
+import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
 
 export function useMaterialSampleQuery(id?: string | null) {
   const { bulkGet } = useApiClient();
@@ -184,6 +185,9 @@ export interface UseMaterialSampleSaveParams {
     templateCheckboxes?: Record<string, boolean | undefined>;
   };
 
+  /** Split Configuration (Form Template Only) */
+  splitConfigurationInitialState?: boolean;
+
   /** Optionally restrict the form to these enabled fields. */
   formTemplate?: FormTemplate;
 
@@ -220,6 +224,7 @@ export function useMaterialSampleSave({
   acqEventTemplateInitialValues,
   colEventTemplateInitialValues,
   materialSampleTemplateInitialValues,
+  splitConfigurationInitialState,
   reduceRendering,
   disableNestedFormEdits,
   showChangedIndicatorsInNestedForms,
@@ -294,6 +299,8 @@ export function useMaterialSampleSave({
     );
 
   // Enable Switch States:
+  const [enableSplitConfiguration, setEnableSplitConfiguration] =
+    useState<boolean>(false);
   const [enableCollectingEvent, setEnableCollectingEvent] =
     useState<boolean>(false);
   const [enableAcquisitionEvent, setEnableAcquisitionEvent] =
@@ -308,6 +315,8 @@ export function useMaterialSampleSave({
 
   // Setup the enabled fields state based on the form template being used.
   useEffect(() => {
+    setEnableSplitConfiguration(splitConfigurationInitialState ?? false);
+
     setEnableCollectingEvent(
       Boolean(
         hasColEventTemplate ||
@@ -318,6 +327,7 @@ export function useMaterialSampleSave({
             false)
       )
     );
+
     setEnableAcquisitionEvent(
       Boolean(
         hasAcquisitionEventTemplate ||
@@ -328,6 +338,7 @@ export function useMaterialSampleSave({
             false)
       )
     );
+
     setEnablePreparations(
       Boolean(
         hasPreparationsTemplate ||
@@ -425,7 +436,9 @@ export function useMaterialSampleSave({
     enableAssociations,
     setEnableAssociations,
     enableRestrictions,
-    setEnableRestrictions
+    setEnableRestrictions,
+    enableSplitConfiguration,
+    setEnableSplitConfiguration
   };
 
   const { loading, lastUsedCollection } = useLastUsedCollection();
