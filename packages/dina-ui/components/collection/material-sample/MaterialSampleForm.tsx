@@ -56,6 +56,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
@@ -73,6 +74,8 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { FieldExtension } from "../../../types/collection-api/resources/FieldExtension";
+import { SplitConfigurationSection } from "./SplitConfigurationSection";
+import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -284,6 +287,12 @@ export function MaterialSampleForm({
    * - The value is the section's render function given the ID as a param.
    */
   const formSections: Record<string, (id: string) => ReactNode> = {
+    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      isTemplate &&
+      dataComponentState.enableSplitConfiguration && (
+        <SplitConfigurationSection id={id} />
+      ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <MaterialSampleIdentifiersSection
@@ -500,6 +509,7 @@ export function MaterialSampleForm({
             }
             navOrder={navOrder}
             onChangeNavOrder={onChangeNavOrder}
+            isTemplate={isTemplate ?? false}
           />
         )}
       </div>

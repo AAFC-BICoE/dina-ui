@@ -1,6 +1,5 @@
 import { WorkbookJSON } from "../types/Workbook";
 import { find, compact, trim } from "lodash";
-import { FieldMapType } from "../WorkbookColumnMapping";
 
 /**
  * This is currently a pretty simple function but in the future you will be able to select the
@@ -127,7 +126,7 @@ export function isBooleanArray(value: string): boolean {
 }
 
 /**
- * Check is a string a map paris
+ * Check if a string a map pair
  * @param value string, it can be 'key:value, key2:"value with special char", key3 : value3'
  * @returns boolean
  */

@@ -41,6 +41,11 @@ export interface MaterialSampleFormNavProps {
    * navigation.
    */
   onChangeNavOrder?: (newOrder: string[] | null) => void;
+
+  /**
+   * Are we currently editing a form template?
+   */
+  isTemplate: boolean;
 }
 
 // Don't render the react-scrollspy-nav component during tests because it only works in the browser.
@@ -82,11 +87,13 @@ export function MaterialSampleFormNav({
   disableRemovePrompt,
   disableCollectingEventSwitch,
   navOrder,
-  onChangeNavOrder
+  onChangeNavOrder,
+  isTemplate
 }: MaterialSampleFormNavProps) {
   const { sortedScrollTargets } = useMaterialSampleSectionOrder({
     dataComponentState,
-    navOrder
+    navOrder,
+    isTemplate
   });
 
   function onSortStart(_, event: unknown) {

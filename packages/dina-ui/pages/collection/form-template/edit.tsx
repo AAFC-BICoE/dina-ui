@@ -14,6 +14,7 @@ import { FormikProps } from "formik";
 import { InputResource, PersistedResource } from "kitsu";
 import _ from "lodash";
 import { useRouter } from "next/router";
+import { onValidateSplitConfiguration } from "../../../components/collection/material-sample/SplitConfigurationSection";
 import { useRef, useState } from "react";
 import { Promisable } from "type-fest";
 import {
@@ -24,11 +25,15 @@ import {
   getMaterialSampleComponentValues,
   getComponentOrderFromTemplate,
   getComponentValues,
-  getFormTemplateCheckboxes
+  getFormTemplateCheckboxes,
+  getSplitConfigurationComponentValues
 } from "../../../../dina-ui/components/form-template/formTemplateUtils";
 import { GroupSelectField } from "../../../../dina-ui/components/group-select/GroupSelectField";
 import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   ASSOCIATIONS_COMPONENT_NAME,
@@ -45,6 +50,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 
@@ -94,6 +100,8 @@ export function FormTemplateEditPageLoaded({
   fetchedFormTemplate,
   onSaved
 }: FormTemplateEditPageLoadedProps) {
+  const { formatMessage } = useDinaIntl();
+
   const [navOrder, setNavOrder] = useState<string[] | null>(
     getComponentOrderFromTemplate(fetchedFormTemplate)
   );
@@ -105,30 +113,46 @@ export function FormTemplateEditPageLoaded({
   // Get initial values of data components
   const allMaterialSampleComponentValues =
     getMaterialSampleComponentValues(fetchedFormTemplate);
+
   if (!allMaterialSampleComponentValues.associations?.length) {
     allMaterialSampleComponentValues.associations = [{}];
   }
+
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
-  const collectingEventInitialValues = getComponentValues(
-    COLLECTING_EVENT_COMPONENT_NAME,
-    fetchedFormTemplate
-  );
+  const collectingEventInitialValues =
+    getComponentValues(
+      COLLECTING_EVENT_COMPONENT_NAME,
+      fetchedFormTemplate,
+      false
+    ) ?? {};
 
   if (!collectingEventInitialValues.geoReferenceAssertions?.length) {
     collectingEventInitialValues.geoReferenceAssertions = [{}];
   }
 
-  const acquisitionEventInitialValues = getComponentValues(
-    ACQUISITION_EVENT_COMPONENT_NAME,
-    fetchedFormTemplate
-  );
+  const acquisitionEventInitialValues =
+    getComponentValues(
+      ACQUISITION_EVENT_COMPONENT_NAME,
+      fetchedFormTemplate,
+      false
+    ) ?? {};
+
+  // Get Split Configuration Settings
+  const splitConfigurationInitialValues =
+    getSplitConfigurationComponentValues(fetchedFormTemplate);
 
   const formTemplateCheckboxes = getFormTemplateCheckboxes(fetchedFormTemplate);
+
+  // Initial values do not need to contain the components object.
+  const { components, ...fetchedFormTemplateWithoutComponents } =
+    fetchedFormTemplate || {};
+
   // Provide initial values for the material sample form.
   const initialValues: any = {
-    ...fetchedFormTemplate,
+    ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
+    ...(splitConfigurationInitialValues ?? {}),
     id,
     type: "form-template"
   };
@@ -140,7 +164,10 @@ export function FormTemplateEditPageLoaded({
     colEventTemplateInitialValues: collectingEventInitialValues,
     materialSampleTemplateInitialValues: allMaterialSampleComponentValues,
     colEventFormRef: collectingEvtFormRef,
-    acquisitionEventFormRef: acqEventFormRef
+    acquisitionEventFormRef: acqEventFormRef,
+    splitConfigurationInitialState: !_.isUndefined(
+      splitConfigurationInitialValues
+    )
   });
   const dataComponentState = materialSampleSaveHook.dataComponentState;
 
@@ -173,7 +200,9 @@ export function FormTemplateEditPageLoaded({
       ...submittedValues
     };
     allSubmittedValues.collectingEvent = collectinEventFormRefValues ?? {};
+    allSubmittedValues.collectingEvent.group = allSubmittedValues.group;
     allSubmittedValues.acquisitionEvent = acquisitionEventFormRefValues ?? {};
+    allSubmittedValues.acquisitionEvent.group = allSubmittedValues.group;
 
     const dataComponentsStateMap =
       getDataComponentsStateMap(dataComponentState);
@@ -205,18 +234,25 @@ export function FormTemplateEditPageLoaded({
                     ] ?? false,
                 defaultValue: _.get(allSubmittedValues, field.id)
               };
-              if (dataComponent.id === COLLECTING_EVENT_COMPONENT_NAME) {
-                item.defaultValue = _.get(
-                  allSubmittedValues,
-                  `collectingEvent.${field.id}`
-                );
-              } else if (
-                dataComponent.id === ACQUISITION_EVENT_COMPONENT_NAME
-              ) {
-                item.defaultValue = _.get(
-                  allSubmittedValues,
-                  `acquisitionEvent.${field.id}`
-                );
+
+              // Separate the different parts of the form that are not being saved to the Material
+              // Sample directly.
+              switch (dataComponent.id) {
+                case COLLECTING_EVENT_COMPONENT_NAME:
+                  item.defaultValue = _.get(
+                    allSubmittedValues,
+                    `collectingEvent.${field.id}`
+                  );
+                  break;
+                case ACQUISITION_EVENT_COMPONENT_NAME:
+                  item.defaultValue = _.get(
+                    allSubmittedValues,
+                    `acquisitionEvent.${field.id}`
+                  );
+                  break;
+                case SPLIT_CONFIGURATION_COMPONENT_NAME:
+                  // Displayed by default. Visibility cannot be configured.
+                  item.visible = true;
               }
 
               return item;
@@ -231,6 +267,28 @@ export function FormTemplateEditPageLoaded({
       { apiBaseUrl: "/collection-api" }
     );
     await onSaved(savedDefinition);
+  }
+
+  /**
+   * Validation rules to apply for the form template.
+   */
+  function onValidate(values: FormTemplate & FormTemplateComponents) {
+    // Get switches for validation purposes.
+    const dataComponentsStateMap =
+      getDataComponentsStateMap(dataComponentState);
+
+    let errors: any = {};
+
+    // Split Configuration Validation Checking
+    if (dataComponentsStateMap[SPLIT_CONFIGURATION_COMPONENT_NAME]) {
+      errors = Object.assign(
+        {},
+        errors,
+        onValidateSplitConfiguration(values, errors, formatMessage)
+      );
+    }
+
+    return errors;
   }
 
   const buttonBarContent = (
@@ -260,6 +318,7 @@ export function FormTemplateEditPageLoaded({
     <DinaForm<FormTemplate & FormTemplateComponents>
       initialValues={initialValues}
       onSubmit={onSaveTemplateSubmit}
+      validate={onValidate}
     >
       <PageLayout titleId={pageTitle} buttonBarContent={buttonBarContent}>
         {/* Form Template Specific Configuration */}
@@ -295,6 +354,8 @@ export function FormTemplateEditPageLoaded({
 }
 function getDataComponentsStateMap(dataComponentState) {
   const dataComponentEnabledMap = {};
+  dataComponentEnabledMap[SPLIT_CONFIGURATION_COMPONENT_NAME] =
+    dataComponentState.enableSplitConfiguration;
   dataComponentEnabledMap[IDENTIFIER_COMPONENT_NAME] = true;
   dataComponentEnabledMap[MATERIAL_SAMPLE_INFO_COMPONENT_NAME] = true;
   dataComponentEnabledMap[ACQUISITION_EVENT_COMPONENT_NAME] =

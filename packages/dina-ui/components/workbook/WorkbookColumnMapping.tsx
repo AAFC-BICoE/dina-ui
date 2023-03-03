@@ -2,11 +2,14 @@ import {
   FieldWrapper,
   SelectField,
   SubmitButton,
-  useAccount
+  useAccount,
+  useApiClient,
+  useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
+import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
@@ -49,7 +52,9 @@ export interface WorkbookColumnMappingProps {
 
 const ENTITY_TYPES = ["material-sample"] as const;
 const FieldMappingConfig = FieldMappingConfigJSON as {
-  [key: string]: { [field: string]: { dataType: DataTypeEnum } };
+  [key: string]: {
+    [field: string]: { dataType: DataTypeEnum; vocabularyEndpoint?: string };
+  };
 };
 
 export function WorkbookColumnMapping({
@@ -105,13 +110,31 @@ export function WorkbookColumnMapping({
     });
   }, [spreadsheetData]);
 
+  // Have to load end-points up front, save all responses in a map
+  const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
+  Object.keys(FieldMappingConfig).forEach((recordType) => {
+    const recordFieldsMap = FieldMappingConfig[recordType];
+    Object.keys(recordFieldsMap).forEach((recordField) => {
+      const { dataType, vocabularyEndpoint } = recordFieldsMap[recordField];
+      if (dataType === DataTypeEnum.VOCABULARY && vocabularyEndpoint) {
+        const query: any = useQuery({
+          path: vocabularyEndpoint
+        });
+        const vocabElements = query?.response?.data?.vocabularyElements?.map(
+          (vocabElement) => vocabElement.name
+        );
+        FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
+      }
+    });
+  });
+
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType?.value) {
-      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
+      const fieldsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
         FieldMappingConfig[selectedType?.value];
       const newFieldOptions: { label: string; value: string }[] = [];
-      Object.keys(filedsConfigs).forEach((field) => {
+      Object.keys(fieldsConfigs).forEach((field) => {
         const option = {
           label: formatMessage(`field_${field}` as any),
           value: field
@@ -189,8 +212,9 @@ export function WorkbookColumnMapping({
     errors: ValidationError[]
   ) {
     if (!!selectedType?.value) {
-      const filedsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
-        FieldMappingConfig[selectedType?.value];
+      const fieldsConfigs: {
+        [field: string]: { dataType: DataTypeEnum };
+      } = FieldMappingConfig[selectedType?.value];
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         for (const field of Object.keys(row)) {
@@ -205,7 +229,7 @@ export function WorkbookColumnMapping({
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {
-            switch (filedsConfigs[field]?.dataType) {
+            switch (fieldsConfigs[field]?.dataType) {
               case DataTypeEnum.BOOLEAN:
                 if (!isBoolean(row[field])) {
                   param.dataType = DataTypeEnum.BOOLEAN;
@@ -268,6 +292,7 @@ export function WorkbookColumnMapping({
                 break;
               case DataTypeEnum.NUMBER:
                 if (!isNumber(row[field])) {
+                  param.dataType = DataTypeEnum.NUMBER;
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
@@ -277,6 +302,18 @@ export function WorkbookColumnMapping({
                   );
                 }
                 break;
+              case DataTypeEnum.VOCABULARY:
+                const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
+                if (!vocabElements.includes(row[field])) {
+                  param.dataType = DataTypeEnum.VOCABULARY;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
             }
           }
         }
