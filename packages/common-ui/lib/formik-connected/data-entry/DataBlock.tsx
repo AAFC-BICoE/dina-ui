@@ -1,4 +1,4 @@
-import {  useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 import { find } from "lodash";
 import { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
@@ -8,7 +8,7 @@ import {
   FieldWrapperProps,
   LoadingSpinner,
   QueryState,
-  SelectField,
+  SelectField
 } from "../../../../common-ui/lib";
 import { DataRow } from "../../../../dina-ui/components";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
@@ -53,11 +53,12 @@ export function DataBlock({
         (blockKey) => formik?.values?.[rootName][blockKey].select
       )
     : [];
-    
-  // Dynamic DataBlock type options that changes based on what DataBlock selection is
-  const [dynamicSelectedTypeOptions, setDynamicSelectedTypeOptions] = useState<any>([]);
 
-  function onBlockSelectChange(selected, oldValue?) {
+  // Dynamic DataBlock type options that changes based on what DataBlock selection is
+  const [dynamicSelectedTypeOptions, setDynamicSelectedTypeOptions] =
+    useState<any>([]);
+
+  function onBlockSelectChange(selected, formik, oldValue?) {
     const selectedFieldExtension = blockOptionsQuery?.response?.data.find(
       (data) => data.extension.key === selected
     );
@@ -70,6 +71,8 @@ export function DataBlock({
 
     // Clear block rows if new block option selected
     if (selected !== oldValue) {
+      console.log(selected);
+      console.log(oldValue);
       if (formik?.values?.[rootName]) {
         Object.keys(formik?.values?.[rootName]).forEach((extensionKey) => {
           if (formik?.values?.[rootName][extensionKey].select === oldValue) {
@@ -90,20 +93,16 @@ export function DataBlock({
       );
     }
     if (onBlockSelectChange) {
-      onBlockSelectChange(value, oldValue);
+      onBlockSelectChange(value, formik, oldValue);
     }
   }
   // Make SelectField component load initial values if they exist
   useEffect(() => {
     if (extensionValues && blockOptionsQuery?.response) {
-      Object.keys(extensionValues)?.forEach((blockKey) => {
-        if (blockKey) {
-          onBlockSelectChange(extensionValues[blockKey].select);
-        }
-      });
+      onBlockSelectChange(extensionValues[blockKey].select, formik);
     }
   }, [blockOptionsQuery?.response]);
-  
+
   if (blockOptionsQuery?.loading) {
     return <LoadingSpinner loading={true} />;
   }
