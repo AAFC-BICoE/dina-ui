@@ -71,8 +71,6 @@ export function DataBlock({
 
     // Clear block rows if new block option selected
     if (selected !== oldValue) {
-      console.log(selected);
-      console.log(oldValue);
       if (formik?.values?.[rootName]) {
         Object.keys(formik?.values?.[rootName]).forEach((extensionKey) => {
           if (formik?.values?.[rootName][extensionKey].select === oldValue) {
