@@ -4,22 +4,21 @@
 }
 .fieldGroup > div:first-child {
   grid-area: 1 / 1 / 2 / 2;
-  padding-right: 10px;
+  padding-right: 1rem;
 }
 .fieldGroup > div:nth-child(2) {
   grid-area: 1 / 2 / 2 / 3;
-  padding-left: 10px;
+  padding-left: 1rem;
 }
 .fieldGroup > div {
   display: flex;
 }
 
 .fieldGroup > div > label {
-  margin-right: 15px;
+  margin-right: 1rem;
   white-space: nowrap;
 }
 
 .rxnsFormular {
-  margin: 10px;
-  background-color: yellow;
+  padding: 0.4rem 0.5rem;
 }

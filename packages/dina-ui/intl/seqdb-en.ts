@@ -122,9 +122,16 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_shippingAddress.provinceState": "Province/State",
   "field_shippingAddress.zipCode": "Zip Code",
   "field_shippingAddress.country": "Country",
-  pcrWorksheet: "PCR Worksheet",
+  pcrWorksheetTitle: "Detailed PCR Reaction Information",
   print: "Print",
   field_positiveControl: "Pos Control",
   field_negtiveControl: "Neg Control",
-  rxnsFormular: "# Rxns = x samples + control + error"
+  rxnsFormular: "# Rxns = x samples + control + error",
+  wellLocation: "Well Location",
+  pcrTubeNumber: "PCR Tube Number",
+  sampleVersion: "Sample Version",
+  specimenIdentifier: "Specimen Identifier",
+  genus: "Genus",
+  species: "Species",
+  result: "Result"
 };

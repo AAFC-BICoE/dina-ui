@@ -33,9 +33,6 @@
   h3 {
     page-break-after: avoid;
   }
-  @page {
-    size: a3;
-  }
   body {
     min-width: 992px !important;
   }
@@ -64,5 +61,17 @@
   .table-dark thead th,
   .table-dark tbody + tbody {
     border-color: #dee2e6;
+  }
+  .table > :not(caption) > * > * {
+    padding: 0rem;
+  }
+  .mb-3 {
+    margin-bottom: 0.5rem !important;
+  }
+  .form-control {
+    padding: 0.25rem 0.5rem;
+  }
+  .react-select__indicators {
+    display: none !important;
   }
 }

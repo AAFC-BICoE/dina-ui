@@ -1,8 +1,57 @@
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
+import { Protocol } from "packages/dina-ui/types/collection-api";
+import { useState } from "react";
+import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";
 
-export function ReactionRxns() {
-  return (
+/**
+ * JavaScript has an issue that 0.1 + 0.2 = 0.30000000000000004
+ * This function is to make the number more accurate.
+ * @param value
+ * @returns
+ */
+function accurateNumber(value: number): number {
+  return +value.toPrecision(12);
+}
+
+export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
+  const [numOfRxns, setNumOfRxns] = useState<number>();
+  const ulRnxQuantities = [] as {
+    key?: string;
+    ulPerRxn: number | null;
+    ul: number | null;
+  }[];
+  let totalUlRxn = 0;
+  let totalUl = 0;
+  if (protocol?.protocolData) {
+    for (const pd of protocol.protocolData) {
+      const ulRnxQuantityeElements = pd.protocolDataElement?.filter(
+        (pde) => pde.elementType === "quantity" && pde.unit === "uL.rxn"
+      );
+      if (ulRnxQuantityeElements) {
+        for (const el of ulRnxQuantityeElements) {
+          const key =
+            pd.key === "Reverse Primer"
+              ? "ITS4"
+              : pd.key === "Forward Primer"
+              ? "ITS_1F"
+              : pd.key;
+          const ulPerRxn = convertNumber(el.value);
+          const ul =
+            numOfRxns == null || ulPerRxn == null
+              ? null
+              : accurateNumber(numOfRxns * ulPerRxn);
+          ulRnxQuantities.push({ key, ulPerRxn, ul });
+          totalUlRxn = accurateNumber(
+            totalUlRxn + (ulPerRxn === null ? 0 : ulPerRxn)
+          );
+          totalUl = accurateNumber(totalUl + (ul === null ? 0 : ul));
+        }
+      }
+    }
+  }
+
+  return !!protocol ? (
     <>
       <div className="row">
         <div className={styles.fieldGroup + " col-sm-12 mb-3"}>
@@ -22,17 +71,17 @@ export function ReactionRxns() {
               <strong># Rxns = </strong>
             </label>
             <input
-              type="text"
-              className="form-control"
-              value={2}
-              style={{ backgroundColor: "yellow" }}
+              type="number"
+              className="form-control bg-warning"
+              value={numOfRxns}
+              onChange={(e) => setNumOfRxns(convertNumber(e.target.value) || 0)}
             />
           </div>
         </div>
       </div>
       <div className="row">
         <div className="col-sm-12 text-end mb-3">
-          <span className={styles.rxnsFormular}>
+          <span className={styles.rxnsFormular + " bg-warning"}>
             <strong>
               <DinaMessage id="rxnsFormular" />
             </strong>
@@ -51,60 +100,28 @@ export function ReactionRxns() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>ITS4</td>
-                <td />
-                <td>0.04</td>
-                <td />
-              </tr>
-              <tr>
-                <td>ITS_1F</td>
-                <td />
-                <td>0.04</td>
-                <td />
-              </tr>
-              <tr>
-                <td>(10X)Tit Buffer</td>
-                <td />
-                <td>1</td>
-                <td />
-              </tr>
-              <tr>
-                <td>2mM dNTPs</td>
-                <td />
-                <td>0.5</td>
-                <td />
-              </tr>
-              <tr>
-                <td>(50X) Titanium Taq</td>
-                <td />
-                <td>0.1</td>
-                <td />
-              </tr>
-              <tr>
-                <td>BSA 20mg/ml</td>
-                <td />
-                <td>0.5</td>
-                <td />
-              </tr>
-              <tr>
-                <td>Sterile HPLC Water H20</td>
-                <td />
-                <td>6.82</td>
-                <td />
-              </tr>
+              {ulRnxQuantities.map((item, index) => (
+                <tr key={`${item.key}-${index}`}>
+                  <td>{item.key}</td>
+                  <td />
+                  <td>{item.ulPerRxn}</td>
+                  <td>{item.ul}</td>
+                </tr>
+              ))}
             </tbody>
             <tfoot>
               <tr>
                 <th>Total</th>
                 <th />
-                <th>9</th>
-                <th />
+                <th>{totalUlRxn}</th>
+                <th>{totalUl}</th>
               </tr>
             </tfoot>
           </table>
         </div>
       </div>
     </>
+  ) : (
+    <></>
   );
 }

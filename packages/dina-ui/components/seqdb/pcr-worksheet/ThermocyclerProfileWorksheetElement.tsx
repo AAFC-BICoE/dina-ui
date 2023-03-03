@@ -11,6 +11,11 @@ export function ThermocyclerProfileWorksheetElement({
 }: {
   thermocyclerProfile?: ThermocyclerProfile;
 }) {
+  const numToAppend = 12 - (thermocyclerProfile?.steps?.length || 0);
+  const steps = thermocyclerProfile?.steps || [];
+  for (let i = 0; i < numToAppend; i++) {
+    steps.push("");
+  }
   return !!thermocyclerProfile ? (
     <>
       <DinaFormSection horizontal={[4, 8]}>
@@ -24,9 +29,9 @@ export function ThermocyclerProfileWorksheetElement({
           isDisabled={true}
         />
       </DinaFormSection>
-      <div className={styles["step-container"] + " mb-2"}>
-        {thermocyclerProfile.steps?.map((step, index) => (
-          <div key={index} className={styles[`step${index + 1}`] + " mb-2"}>
+      <div className={styles["step-container"]}>
+        {steps?.map((step, index) => (
+          <div key={index} className={styles[`step${index + 1}`] + " mb-3"}>
             <label>
               <strong>Step {index + 1}</strong>
             </label>
@@ -39,7 +44,7 @@ export function ThermocyclerProfileWorksheetElement({
           </div>
         ))}
       </div>
-      <div className={styles["step-container"] + " mb-2"}>
+      <div className={styles["step-container"] + " mb-3"}>
         <div className={styles["cycles-container"]}>
           <label>
             <strong>Cycles</strong>

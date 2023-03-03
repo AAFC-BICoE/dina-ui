@@ -18,11 +18,8 @@ export function getColumnHeaders(
   const data = spreadsheetData?.[sheetNumber]?.find(
     (rowData) => rowData.content.length !== 0
   );
-  return (
-    data?.content ?? null
-  );
+  return data?.content ?? null;
 }
-
 
 export function _toPlainString(value: string) {
   if (!!value) {
@@ -36,7 +33,7 @@ export function _toPlainString(value: string) {
  * find the possible field that match the column header
  * @param columnHeader The column header from excel file
  * @param fieldOptions FieldOptions that predefined in FieldMappingConfig.json
- * @returns 
+ * @returns
  */
 export function findMatchField(
   columnHeader: string,
@@ -54,28 +51,30 @@ export function findMatchField(
 
 /**
  * Get the data of
- * 
+ *
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
- * @param fieldNames 
- * @returns 
+ * @param fieldNames
+ * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON,
   sheetNumber: number,
-  fieldNames: (string|undefined)[]
+  fieldNames: (string | undefined)[]
 ) {
-  const data:{[key: string]: any}[] = [];
-  const workbookData = spreadsheetData?.[sheetNumber].filter(rowData => rowData.content.length != 0);
-  for(let i = 1; i < workbookData.length; i++) {
+  const data: { [key: string]: any }[] = [];
+  const workbookData = spreadsheetData?.[sheetNumber].filter(
+    (rowData) => rowData.content.length !== 0
+  );
+  for (let i = 1; i < workbookData.length; i++) {
     const row = workbookData[i];
-    const rowData: {[key: string]: any} = {};
-    for(const index in fieldNames) {
+    const rowData: { [key: string]: any } = {};
+    for (const index = 0; index < fieldNames.length; i++) {
       const field = fieldNames[index];
       if (field !== undefined) {
         rowData[field] = row.content[index];
       }
-    };
+    }
     data.push(rowData);
   }
   return data;
@@ -83,21 +82,21 @@ export function getDataFromWorkbook(
 
 /**
  * Check is a string a number value
- * @param value string 
+ * @param value string
  * @returns number
  */
-export function isNumber(value: string|null|undefined): boolean {
+export function isNumber(value: string | null | undefined): boolean {
   const num = convertNumber(value);
   return typeof num === "number" && !isNaN(num);
 }
 
 /**
  * Check if a comma separated string a number array
- * @param value 
- * @returns 
+ * @param value
+ * @returns
  */
-export function isNumberArray(value: string|null|undefined): boolean {
-  if(!!value) {
+export function isNumberArray(value: string | null | undefined): boolean {
+  if (!!value) {
     for (const val of value.split(",")) {
       if (isNumber(val)) {
         return true;
@@ -108,32 +107,33 @@ export function isNumberArray(value: string|null|undefined): boolean {
 }
 
 /**
- * Check if a comma separated string a boolean value.  
+ * Check if a comma separated string a boolean value.
  * @param value String, it can be 'true', 'false', 'yes', or 'no'
  * @returns boolean
  */
 export function isBoolean(value: string): boolean {
-  const regx = /^\s*yes|no|true|false\s*$/ig
+  const regx = /^\s*yes|no|true|false\s*$/gi;
   return !!value && regx.test(value);
 }
 
 /**
  * Check is a comma separated string a boolean array
  * @param value string.  It can be 'true, false, No, yes'
- * @returns 
+ * @returns
  */
 export function isBooleanArray(value: string): boolean {
-  const regx = /^\s*(yes|no|true|false)\s*(,\s*(yes|no|true|false)\s*)*$/ig;
+  const regx = /^\s*(yes|no|true|false)\s*(,\s*(yes|no|true|false)\s*)*$/gi;
   return !!value && regx.test(value);
 }
 
 /**
  * Check is a string a map paris
- * @param value string, it can be 'key:value, key2:"value with special char", key3 : value3' 
+ * @param value string, it can be 'key:value, key2:"value with special char", key3 : value3'
  * @returns boolean
  */
 export function isMap(value: string): boolean {
-  const regx = /^\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+))\s*(,\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+)))*\s*$/g;
+  const regx =
+    /^\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+))\s*(,\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+)))*\s*$/g;
   return !!value && regx.test(value);
 }
 
@@ -143,7 +143,7 @@ export function isMap(value: string): boolean {
  * @returns number
  */
 export function convertNumber(value: any): number | null {
-  if (value !== null && value !== undefined) {
+  if (value !== null && value !== undefined && value !== "" && !isNaN(+value)) {
     return +value;
   } else {
     return null;
@@ -176,8 +176,6 @@ export function convertStringArray(value: string): string[] {
   return arr.map((str) => trim(trim(str, '"')));
 }
 
-
-
 /**
  * Convert comma separated number string into array of numbers.
  *
@@ -195,7 +193,7 @@ export function convertNumberArray(value: string): number[] {
 
 /**
  * convert comma separated boolean string into array of boolean
- * @param value 
+ * @param value
  */
 export function convertBooleanArray(value: string): boolean[] {
   const arr = value.split(",");
@@ -204,7 +202,7 @@ export function convertBooleanArray(value: string): boolean[] {
     .filter((item) => item !== "")
     .map((item) => convertBoolean(item.trim())) as boolean[];
 }
- 
+
 /**
  * convert string into a map
  * @param value Map type of string.

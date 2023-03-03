@@ -10,17 +10,17 @@ import {
   TextField,
   useApiClient
 } from "packages/common-ui/lib";
-import { GroupSelectField, PersonSelectField } from "../../../components";
 import PageLayout from "packages/dina-ui/components/page/PageLayout";
+import { PcrBatchItemTable } from "packages/dina-ui/components/seqdb/pcr-worksheet/PcrBatchItemTable";
+import { ReactionInputs } from "packages/dina-ui/components/seqdb/pcr-worksheet/ReactionInputs";
 import { ReactionRxns } from "packages/dina-ui/components/seqdb/pcr-worksheet/ReactionRxns";
 import { ThermocyclerProfileWorksheetElement } from "packages/dina-ui/components/seqdb/pcr-worksheet/ThermocyclerProfileWorksheetElement";
 import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { Protocol } from "packages/dina-ui/types/collection-api";
-import { PcrBatch, PcrPrimer, Region } from "packages/dina-ui/types/seqdb-api";
+import { PcrBatch, Region } from "packages/dina-ui/types/seqdb-api";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { PcrBatchItemTable } from "packages/dina-ui/components/seqdb/pcr-worksheet/PcrBatchItemTable";
-import { ReactionInputs } from "packages/dina-ui/components/seqdb/pcr-worksheet/ReactionInputs";
+import { PersonSelectField } from "../../../components";
 
 export default function PcrWorksheetPage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function PcrWorksheetPage() {
       `seqdb-api/pcr-batch/${id}`,
       {
         include:
-          "primerForward,primerReverse,region,thermocyclerProfile,experimenters,storageUnit,storageUnitType,protocol"
+          "primerForward,primerReverse,region,thermocyclerProfile,protocol"
       }
     );
     const pcrBatch = response.data;
@@ -46,46 +46,21 @@ export default function PcrWorksheetPage() {
   }
 
   async function fetchExternalResources(pcrBatch: PcrBatch) {
-    const promises = new Map<string, any>();
+    const initData: { [key: string]: any } = {
+      ...pcrBatch
+    };
     if (pcrBatch?.protocol?.id) {
-      promises.set(
-        "protocol",
-        apiClient.get<Protocol>(
-          `collection-api/protocol/${pcrBatch?.protocol?.id}`,
-          {}
-        )
+      const protocol = await apiClient.get<Protocol>(
+        `collection-api/protocol/${pcrBatch?.protocol?.id}`,
+        {}
       );
+      initData.protocol = protocol.data;
     }
-
-    if (promises.size > 0) {
-      const results = await Promise.all(promises.values());
-      const resultMap = new Map<string, any>();
-      const keys = Array.from(promises.keys());
-      for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        if (key === "protocol") {
-          const value = (results[i].data as Protocol).name;
-          resultMap.set(key, value);
-        } else if (key === "primerForward" || key === "primerReverse") {
-          const primer = results[i].data as PcrPrimer;
-          resultMap.set(key, `${primer.name} (#${primer.lotNumber})`);
-        }
-      }
-      const initData: { [key: string]: any } = {
-        ...pcrBatch
-      };
-      for (const key of resultMap.keys()) {
-        initData[key] = resultMap.get(key);
-      }
-      // add extra fields that are needed on the worksshet.
-      initData.notes = "";
-      initData.positiveControl = "";
-      initData.negtiveControl = "";
-      initData.resultsAndNextSteps = "";
-
-      return initData;
-    }
-    return pcrBatch;
+    initData.notes = "";
+    initData.positiveControl = "";
+    initData.negtiveControl = "";
+    initData.resultsAndNextSteps = "";
+    return initData;
   }
 
   const buttonBarContent = (
@@ -107,9 +82,7 @@ export default function PcrWorksheetPage() {
   }
 
   return (
-    <PageLayout titleId="pcrWorksheet" buttonBarContent={buttonBarContent}>
-      {/* <link rel="stylesheet" href="/static/bootstrap-print.css" media="print" /> */}
-
+    <PageLayout titleId="pcrWorksheetTitle" buttonBarContent={buttonBarContent}>
       <PcrWorksheetForm pcrBatch={resource} />
     </PageLayout>
   );
@@ -136,7 +109,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
               />
               <TextField
                 className="col-sm-12"
-                name="protocol"
+                name="protocol.name"
                 disabled={true}
                 multiLines={true}
               />
@@ -168,6 +141,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
               name="notes"
               disabled={true}
               multiLines={true}
+              inputProps={{ rows: 3 }}
             />
           </div>
           <DinaFormSection horizontal={[3, 9]}>
@@ -192,7 +166,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
           </DinaFormSection>
           <div className="row">
             <div className="col-sm-12">
-              <ReactionRxns />
+              <ReactionRxns protocol={initialValues?.protocol} />
             </div>
           </div>
         </div>
@@ -210,7 +184,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
             <ThermocyclerProfileWorksheetElement
               thermocyclerProfile={pcrBatch.thermocyclerProfile}
             />
-            <DinaFormSection horizontal={[2, 10]}>
+            <DinaFormSection horizontal={[3, 9]}>
               <TextField
                 className="col-sm-12"
                 name="reference"
@@ -233,7 +207,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
           <PcrBatchItemTable pcrBatchId={pcrBatch.id} />
         </div>
       </div>
-      {/* <pre>{JSON.stringify(initialValues, null, " ")}</pre> */}
+      <pre>{JSON.stringify(initialValues, null, " ")}</pre>
     </DinaForm>
   );
 }

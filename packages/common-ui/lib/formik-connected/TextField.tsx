@@ -92,7 +92,9 @@ export function TextField(props: TextFieldProps) {
           customInput?.(inputPropsInternal, formik) ??
           (multiLines ? (
             <TextareaAutosize
-              minRows={3}
+              minRows={
+                (inputPropsExternal as TextareaHTMLAttributes<any>)?.rows || 2
+              }
               {...(inputPropsInternal as TextareaAutosizeProps)}
             />
           ) : (

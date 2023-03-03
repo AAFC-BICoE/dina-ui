@@ -5,6 +5,7 @@ import {
   useQuery,
   withResponse
 } from "packages/common-ui/lib";
+import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "packages/dina-ui/types/collection-api";
 import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
 
@@ -50,14 +51,30 @@ export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
     <table className="table table-striped table-bordered">
       <thead>
         <tr>
-          <th>Well Location</th>
-          <th>PCR Tube Number</th>
-          <th>Sample Name</th>
-          <th>Sample Version</th>
-          <th>Specimen Identifier</th>
-          <th>Genus</th>
-          <th>Species</th>
-          <th>Result</th>
+          <th>
+            <DinaMessage id="wellLocation" />
+          </th>
+          <th>
+            <DinaMessage id="pcrTubeNumber" />
+          </th>
+          <th>
+            <DinaMessage id="field_sampleName" />
+          </th>
+          <th>
+            <DinaMessage id="sampleVersion" />
+          </th>
+          <th>
+            <DinaMessage id="specimenIdentifier" />
+          </th>
+          <th>
+            <DinaMessage id="genus" />
+          </th>
+          <th>
+            <DinaMessage id="species" />
+          </th>
+          <th>
+            <DinaMessage id="result" />
+          </th>
         </tr>
       </thead>
       <tbody>
