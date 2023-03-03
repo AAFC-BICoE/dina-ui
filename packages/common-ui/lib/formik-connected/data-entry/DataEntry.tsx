@@ -1,9 +1,22 @@
-import { FieldArray, useFormikContext } from "formik";
+import { useFormikContext } from "formik";
 import { KitsuResource } from "kitsu";
-import { useEffect, useRef, useState } from "react";
+import useVocabularyOptions from "../../../../dina-ui/components/collection/useVocabularyOptions";
+import { ProtocolElement } from "../../../../dina-ui/types/collection-api";
+import { FieldExtension } from "../../../../dina-ui/types/collection-api/resources/FieldExtension";
+import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
-import { BulkEditTabContextI, FieldSet, useBulkEditTabContext } from "../..";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  BulkEditTabContextI,
+  FieldSet,
+  SelectOption,
+  useApiClient,
+  useBulkEditTabContext,
+  useQuery
+} from "../..";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 import { DataBlock } from "./DataBlock";
 import { DataEntryFieldProps } from "./DataEntryField";
 
@@ -13,23 +26,74 @@ export interface DataEntryProps extends DataEntryFieldProps {}
 export function DataEntry({
   legend,
   name,
-  blockOptions,
-  onBlockSelectChange,
-  unitsOptions,
-  vocabularyOptionsPath,
-  typeOptions,
   readOnly,
   id,
   blockAddable = false,
   unitsAddable = false,
   typesAddable = false,
   isVocabularyBasedEnabledForBlock = false,
-  isVocabularyBasedEnabledForType = false
+  isVocabularyBasedEnabledForType = false,
+  blockOptionsEndpoint,
+  blockOptionsFilter,
+  unitOptionsEndpoint,
+  typeOptionsEndpoint
 }: DataEntryProps) {
+  const { apiClient } = useApiClient();
+  const { locale } = useDinaIntl();
   const formik = useFormikContext<any>();
   const bulkContext = useBulkEditTabContext();
   let extensionValues =
     formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
+
+  const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock ? useVocabularyOptions({
+    path: "collection-api/vocabulary/protocolData"
+  }) : useQuery<FieldExtension[]>({
+    path: blockOptionsEndpoint
+  });
+
+  const blockOptions = isVocabularyBasedEnabledForBlock ? blockOptionsQuery?.vocabOptions : blockOptionsQuery?.response?.data
+    .filter(
+      (data) => data.extension.fields?.[0].dinaComponent === blockOptionsFilter
+    )
+    .map((data) => {
+      return {
+        label: data.extension.name,
+        value: data.extension.key
+      };
+    });
+
+  const [queriedTypeOptions, setQueriedTypeOptions] = useState<
+    SelectOption<string>[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchAllProtocolElements() {
+      if (typeOptionsEndpoint) {
+        const { data } = await apiClient.get<ProtocolElement[]>(
+          typeOptionsEndpoint,
+          {}
+        );
+        const options = data.map((rec) => {
+          return {
+            label:
+              rec.multilingualTitle?.titles?.find(
+                (item) => item.lang === locale
+              )?.title || "",
+            value: rec.id
+          };
+        });
+        setQueriedTypeOptions(options);
+      }
+    }
+
+    fetchAllProtocolElements();
+  }, []);
+
+  const vocabQuery = unitOptionsEndpoint
+    ? useVocabularyOptions({
+        path: unitOptionsEndpoint
+      })
+    : undefined;
 
   // If user changes field extensions in Bulk Edit, write Bulk Edit values to Formik form once
   const [bulkExtensionValuesOverride, setBulkExtensionValuesOverride] =
@@ -49,16 +113,18 @@ export function DataEntry({
   }
 
   function addBlock() {
+    let newExtensionValues = {};
+
     const selectedBlockOptions = formik?.values?.[name]
-    ? Object.keys(formik?.values?.[name]).map(
-        (blockKey) => formik?.values?.[name][blockKey].select
-      )
-    : [];
+      ? Object.keys(formik?.values?.[name]).map(
+          (blockKey) => formik?.values?.[name][blockKey].select
+        )
+      : [];
 
     const newBlockOption = blockOptions?.find(
       (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
     );
-    let newExtensionValues = {};
+
     if (newBlockOption) {
       newExtensionValues = {
         ...formik?.values?.[name],
@@ -73,7 +139,6 @@ export function DataEntry({
               vocabularyBased: true
             }
       };
-      onBlockSelectChange?.(newBlockOption.value, formik);
     } else {
       newExtensionValues = {
         ...formik?.values?.[name],
@@ -89,20 +154,10 @@ export function DataEntry({
             }
       };
     }
+
     formik.setFieldValue(name, newExtensionValues);
   }
-  // Make SelectField component load initial values if they exist
-  useEffect(() => {
-    if (onBlockSelectChange) {
-      if (extensionValues) {
-        Object.keys(extensionValues)?.forEach((blockKey) => {
-          if (blockKey) {
-            onBlockSelectChange(blockKey, undefined);
-          }
-        });
-      }
-    }
-  }, []);
+
   function legendWrapper():
     | ((legendElement: JSX.Element) => JSX.Element)
     | undefined {
@@ -127,14 +182,9 @@ export function DataEntry({
             ? Object.keys(extensionValues).map((blockKey) => {
                 return (
                   <DataBlock
-                    blockOptions={blockOptions}
-                    onBlockSelectChange={onBlockSelectChange}
-                    unitsOptions={unitsOptions}
                     removeBlock={removeBlock}
                     name={`${name}.${blockKey}`}
                     blockKey={blockKey}
-                    vocabularyOptionsPath={vocabularyOptionsPath}
-                    typeOptions={typeOptions}
                     readOnly={readOnly}
                     blockAddable={blockAddable}
                     unitsAddable={unitsAddable}
@@ -146,6 +196,10 @@ export function DataEntry({
                       isVocabularyBasedEnabledForType
                     }
                     extensionValues={extensionValues}
+                    blockOptionsQuery={blockOptionsQuery}
+                    blockOptions={blockOptions}
+                    unitsOptions={vocabQuery?.vocabOptions}
+                    typeOptions={typeOptionsEndpoint ? queriedTypeOptions : undefined}
                   />
                 );
               })

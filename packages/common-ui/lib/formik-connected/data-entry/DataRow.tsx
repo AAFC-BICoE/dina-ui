@@ -73,7 +73,7 @@ export function DataRow({
   }
   return (
     <div className="d-flex">
-      {typeOptions && (
+      {(
         <div style={{ width: "15rem", marginLeft: "17rem" }}>
           {typesAddable ? (
             <CreatableSelectField

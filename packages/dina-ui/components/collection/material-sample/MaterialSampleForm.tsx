@@ -413,12 +413,11 @@ export function MaterialSampleForm({
           <DataEntryField
             legend={<DinaMessage id="fieldExtensions" />}
             name="extensionValuesForm"
-            blockOptions={extensionOptions}
-            typeOptions={extensionFieldsOptions}
-            onBlockSelectChange={onBlockSelectChange}
             readOnly={readOnly}
             isTemplate={isTemplate}
             id={id}
+            blockOptionsEndpoint={`collection-api/extension`}
+            blockOptionsFilter={"MATERIAL_SAMPLE"}
           />
         </DinaFormSection>
       ),
