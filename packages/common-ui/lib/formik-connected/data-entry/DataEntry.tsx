@@ -124,7 +124,6 @@ export function DataEntry({
     const newBlockOption = blockOptions?.find(
       (blockOption) => !selectedBlockOptions?.includes(blockOption.value)
     );
-
     if (newBlockOption) {
       newExtensionValues = {
         ...formik?.values?.[name],

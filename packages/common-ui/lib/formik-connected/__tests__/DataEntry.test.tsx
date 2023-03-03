@@ -8,25 +8,57 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import Select from "react-select";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
-interface Person extends KitsuResource {
-  name: string;
-}
-
-const PERSON_TEST_DATA_JSON_API = {
-  data: [
-    { name: "person1-json-api" },
-    { name: "person2-json-api" },
-    { name: "person3-json-api" }
+const blockOptions = {
+  id: "blockOptions",
+  type: "vocabulary",
+  vocabularyElements: [
+    { name: "BLOCK_OPTION_1", term: "BLOCK_OPTION_1" },
+    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_2" },
+    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_3" }
   ]
 };
 
-// JSON API mock response.
-const mockGet = jest.fn(async () => PERSON_TEST_DATA_JSON_API);
+const unitsOptions = {
+  id: "unitsOptions",
+  type: "vocabulary",
+  vocabularyElements: [
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_1" },
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_2" },
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_3" }
+  ]
+};
+const typeOptions = [
+  {
+    id: "TYPE_OPTION_1",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_1" }]
+    }
+  },
+  {
+    id: "TYPE_OPTION_2",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_2" }]
+    }
+  },
+  {
+    id: "TYPE_OPTION_3",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_3" }]
+    }
+  }
+];
 
-// JSON API
-const mockGetAll = jest.fn(async (path) => {
-  if (path === "agent-api/person") {
-    return PERSON_TEST_DATA_JSON_API;
+const mockGet = jest.fn(async (path) => {
+  switch (path) {
+    case "collection-api/vocabulary/protocolData":
+      return { data: blockOptions };
+    case "collection-api/protocol-element":
+      return { data: typeOptions };
+    case "collection-api/vocabulary/unitsOfMeasurement":
+      return { data: unitsOptions };
   }
 });
 
@@ -36,21 +68,11 @@ const apiContext = {
   }
 } as any;
 
-const blockOptions = [
-  { label: "Block Option 1", value: "BLOCK_OPTION_1" },
-  { label: "Block Option 2", value: "BLOCK_OPTION_2" },
-  { label: "Block Option 3", value: "BLOCK_OPTION_3" }
-];
-const unitsOptions = [
-  { label: "Unit Option 1", value: "UNIT_OPTION_1" },
-  { label: "Unit Option 2", value: "UNIT_OPTION_2" },
-  { label: "Unit Option 3", value: "UNIT_OPTION_3" }
-];
-const typeOptions = [
-  { label: "Type Option 1", value: "TYPE_OPTION_1" },
-  { label: "Type Option 2", value: "TYPE_OPTION_2" },
-  { label: "Type Option 3", value: "TYPE_OPTION_3" }
-];
+// Mock out the debounce function to avoid waiting during tests.
+jest.mock("use-debounce", () => ({
+  useDebounce: (fn) => [fn, { isPending: () => false }]
+}));
+
 const mockSubmit = jest.fn();
 
 describe("DataEntry", () => {
@@ -66,9 +88,11 @@ describe("DataEntry", () => {
       >
         <DataEntryField
           legend={<DinaMessage id="fieldExtensions" />}
-          blockOptions={blockOptions}
-          unitsOptions={unitsOptions}
-          typeOptions={typeOptions}
+          isVocabularyBasedEnabledForBlock={true}
+          isVocabularyBasedEnabledForType={true}
+          blockOptionsEndpoint={"collection-api/vocabulary/protocolData"}
+          typeOptionsEndpoint={"collection-api/protocol-element"}
+          unitOptionsEndpoint={"collection-api/vocabulary/unitsOfMeasurement"}
           name={name}
         />
       </DinaForm>,
@@ -89,14 +113,17 @@ describe("DataEntry", () => {
     let dataBlock = wrapper
       .findWhere(
         (datablock) =>
-          datablock.props().name === `${name}.${blockOptions[0].value}`
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
       )
       .find(SelectField);
 
     // block select option
     dataBlock
       .filterWhere(
-        (n: any) => n.props().name === `${name}.${blockOptions[0].value}.select`
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.select`
       )
       .find<any>(Select)
       .props()
@@ -107,7 +134,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-0.type`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.type`
       )
       .find<any>(Select)
       .props()
@@ -118,7 +145,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-0.unit`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.unit`
       )
       .find<any>(Select)
       .props()
@@ -129,12 +156,12 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-0.value`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`
       )
       .find("input")
       .simulate("change", {
         target: {
-          name: `${name}.${blockOptions[0].value}.rows.extensionField-0.value`,
+          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`,
           value: "VALUE_1"
         }
       });
@@ -164,7 +191,8 @@ describe("DataEntry", () => {
     wrapper
       .findWhere(
         (datablock) =>
-          datablock.props().name === `${name}.${blockOptions[0].value}`
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
       )
       .find(FaPlus)
       .simulate("click");
@@ -176,7 +204,8 @@ describe("DataEntry", () => {
     dataBlock = wrapper
       .findWhere(
         (datablock) =>
-          datablock.props().name === `${name}.${blockOptions[0].value}`
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
       )
       .find(SelectField);
 
@@ -185,7 +214,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-1.type`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.type`
       )
       .find<any>(Select)
       .props()
@@ -196,7 +225,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-1.unit`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.unit`
       )
       .find<any>(Select)
       .props()
@@ -207,12 +236,12 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[0].value}.rows.extensionField-1.value`
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`
       )
       .find("input")
       .simulate("change", {
         target: {
-          name: `${name}.${blockOptions[0].value}.rows.extensionField-1.value`,
+          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`,
           value: "VALUE_2"
         }
       });
@@ -252,14 +281,16 @@ describe("DataEntry", () => {
     const selectFieldsSecondBlock = wrapper
       .findWhere(
         (datablock) =>
-          datablock.props().name === `${name}.${blockOptions[1].value}`
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}`
       )
       .find(SelectField);
-    // console.log(wrapper.debug())
     // block select option
     selectFieldsSecondBlock
       .filterWhere(
-        (n: any) => n.props().name === `${name}.${blockOptions[1].value}.select`
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}.select`
       )
       .find<any>(Select)
       .props()
@@ -270,7 +301,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[1].value}.rows.extensionField-0.type`
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.type`
       )
       .find<any>(Select)
       .props()
@@ -281,7 +312,7 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[1].value}.rows.extensionField-0.unit`
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.unit`
       )
       .find<any>(Select)
       .props()
@@ -292,12 +323,12 @@ describe("DataEntry", () => {
       .filterWhere(
         (n: any) =>
           n.props().name ===
-          `${name}.${blockOptions[1].value}.rows.extensionField-0.value`
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`
       )
       .find("input")
       .simulate("change", {
         target: {
-          name: `${name}.${blockOptions[1].value}.rows.extensionField-0.value`,
+          name: `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`,
           value: "VALUE_3"
         }
       });
@@ -332,7 +363,7 @@ describe("DataEntry", () => {
               type: "TYPE_OPTION_3",
               unit: "UNIT_OPTION_3",
               value: "VALUE_3"
-            },
+            }
           },
           select: "BLOCK_OPTION_2"
         }
