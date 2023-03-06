@@ -1,5 +1,5 @@
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { Protocol } from "packages/dina-ui/types/collection-api";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { Protocol } from "../../../../dina-ui/types/collection-api";
 import { useState } from "react";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";

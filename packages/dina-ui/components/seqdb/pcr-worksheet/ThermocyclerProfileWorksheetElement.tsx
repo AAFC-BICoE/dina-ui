@@ -2,8 +2,8 @@ import {
   DinaFormSection,
   filterBy,
   ResourceSelectField
-} from "packages/common-ui/lib";
-import { ThermocyclerProfile } from "packages/dina-ui/types/seqdb-api";
+} from "../../../../common-ui/lib";
+import { ThermocyclerProfile } from "../../../../dina-ui/types/seqdb-api";
 import styles from "./ThermocylerProfileWorksheetElement.module.css";
 
 export function ThermocyclerProfileWorksheetElement({

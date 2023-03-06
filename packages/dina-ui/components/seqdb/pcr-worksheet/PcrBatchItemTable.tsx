@@ -4,10 +4,10 @@ import {
   useApiClient,
   useQuery,
   withResponse
-} from "packages/common-ui/lib";
-import { DinaMessage } from "packages/dina-ui/intl/dina-ui-intl";
-import { MaterialSample } from "packages/dina-ui/types/collection-api";
-import { PcrBatchItem } from "packages/dina-ui/types/seqdb-api";
+} from "../../../../common-ui/lib";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import { MaterialSample } from "../../../../dina-ui/types/collection-api";
+import { PcrBatchItem } from "../../../../dina-ui/types/seqdb-api";
 
 export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
   const { apiClient } = useApiClient();
