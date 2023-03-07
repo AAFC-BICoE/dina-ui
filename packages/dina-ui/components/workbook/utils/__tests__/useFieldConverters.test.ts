@@ -33,7 +33,7 @@ describe("useFieldConverter", () => {
   it("convertNumber", () => {
     const convertNumber = getConverter("mockEntity", "numberField");
     expect(convertNumber("100")).toEqual(100);
-    expect(convertNumber("ssss")).toBeNaN();
+    expect(convertNumber("ssss")).toBeNull();
     expect(convertNumber(null)).toBeNull();
     expect(convertNumber(undefined)).toBeNull();
   });
