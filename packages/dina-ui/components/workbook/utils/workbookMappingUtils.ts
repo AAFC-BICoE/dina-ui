@@ -68,7 +68,7 @@ export function getDataFromWorkbook(
   for (let i = 1; i < workbookData.length; i++) {
     const row = workbookData[i];
     const rowData: { [key: string]: any } = {};
-    for (const index = 0; index < fieldNames.length; i++) {
+    for (let index = 0; index < fieldNames.length; index++) {
       const field = fieldNames[index];
       if (field !== undefined) {
         rowData[field] = row.content[index];
