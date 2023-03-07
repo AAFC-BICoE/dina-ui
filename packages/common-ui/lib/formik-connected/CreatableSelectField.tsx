@@ -20,7 +20,7 @@ export interface CreatableSelectFieldProps<T> extends FieldWrapperProps {
     formik: FormikContextType<any>,
     oldValue?: T | T[] | null | undefined
   ) => void;
-  options: SelectOption<T>[];
+  options: SelectOption<T>[] | undefined;
   styles?: Partial<StylesConfig<SelectOption<T | null | undefined>, boolean>>;
 
   forwardedRef?: RefObject<HTMLSelectElement>;
@@ -98,12 +98,12 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           );
         } else if (value) {
           selectedOption = options
-            .filter((opt) => !!opt.value)
-            .find((option) => option.value === value) as any;
+            ?.filter((opt) => !!opt.value)
+            ?.find((option) => option.value === value) as any;
           // also search in possible nested options
           if (!selectedOption || Object.keys(selectedOption).length === 0) {
-            const optionWithNested = options.filter((opt) => !!opt["options"]);
-            optionWithNested.map((option) =>
+            const optionWithNested = options?.filter((opt) => !!opt["options"]);
+            optionWithNested?.map((option) =>
               option["options"].map((opt) => {
                 if (opt.value === value) {
                   selectedOption = opt;

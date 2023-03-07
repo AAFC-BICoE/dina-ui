@@ -5,46 +5,42 @@ export function processExtensionValuesLoading(initExtensionValues) {
   if (!initExtensionValues) {
     return undefined;
   }
-
-  const processedExtensionValues = Object.keys(initExtensionValues).map(
-    (extensionKey) => {
-      const initExtensionValue = initExtensionValues[extensionKey];
-      const extensionFields = Object.keys(initExtensionValue).map(
-        (extensionFieldKey) => {
-          return {
-            type: extensionFieldKey,
-            value: initExtensionValue[extensionFieldKey]
-          };
-        }
-      );
-      const processedExtensionValue = {
-        select: extensionKey,
-        rows: extensionFields
-      };
-      return processedExtensionValue;
-    }
-  );
+  let processedExtensionValues = {}
+  Object.keys(initExtensionValues).forEach((blockKey) => {
+    processedExtensionValues[blockKey] = {};
+    processedExtensionValues[blockKey]["rows"] = {};
+    Object.keys(initExtensionValues[blockKey]).forEach((extensionKey) => {
+      if (extensionKey !== "rows") {
+        const extensionField = {
+          type: extensionKey,
+          value: initExtensionValues[blockKey][extensionKey]
+        };
+        processedExtensionValues[blockKey]["rows"][extensionKey] = extensionField;
+      }
+    });
+    processedExtensionValues[blockKey]["select"] = blockKey;
+  });
   return processedExtensionValues;
 }
 
 /**
  * Process Extension Values from front-end into nested maps for back-end
  */
-export function processExtensionValuesSaving(submittedValues: any) {
-  const submittedExtensionValues: any[] | undefined =
-    submittedValues.extensionValues;
+export function processExtensionValuesSaving(submittedExtensionValues: any) {
 
-  const processedExtensionValues = submittedExtensionValues?.reduce(
-    (result, item) => {
-      const extensionKey = item.select;
-      const processedExtensionFields = {};
-      item.rows?.forEach((extensionField) => {
-        processedExtensionFields[extensionField.type] = extensionField.value;
-      });
-      result[extensionKey] = processedExtensionFields;
-      return result;
-    },
-    {}
-  );
+  let processedExtensionValues = {};
+  Object.keys(submittedExtensionValues).forEach((dataBlockKey) => {
+    const fieldKey = submittedExtensionValues[dataBlockKey]?.select
+    const extensionFieldsRows = submittedExtensionValues[dataBlockKey]?.rows
+    if (!processedExtensionValues[fieldKey]) {
+      processedExtensionValues[fieldKey] = {}
+    }
+
+    Object.keys(extensionFieldsRows).forEach((rowKey) => {
+      const type = extensionFieldsRows[rowKey]?.type
+      const value = extensionFieldsRows[rowKey]?.value
+      processedExtensionValues[fieldKey] = {...processedExtensionValues[fieldKey], [type]: value}
+    })
+  })
   return processedExtensionValues;
 }

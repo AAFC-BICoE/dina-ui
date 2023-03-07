@@ -81,10 +81,10 @@ export function useCollectingEventQuery(id?: string | null) {
         );
         data.srcAdminLevels = srcAdminLevels;
 
-        if (data?.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(
-            data.extensionValues
-          );
+        // Process loaded back-end data into data structure that Forkmiks can use
+        if (data.extensionValues) {
+          data.extensionValuesForm = processExtensionValuesLoading(data.extensionValues);
+          delete data.extensionValues;
         }
       }
     }
@@ -263,11 +263,10 @@ export function useCollectingEventSave({
     ) {
       submittedValues.dwcVerbatimCoordinateSystem = null;
     }
-
-    const processedExtensionValues =
-      processExtensionValuesSaving(submittedValues);
-
-    submittedValues.extensionValues = processedExtensionValues;
+    if (submittedValues.extensionValuesForm) {
+      submittedValues.extensionValues = processExtensionValuesSaving(submittedValues.extensionValuesForm);
+    }
+    delete submittedValues.extensionValuesForm;
 
     const [savedCollectingEvent] = await save<CollectingEvent>(
       [

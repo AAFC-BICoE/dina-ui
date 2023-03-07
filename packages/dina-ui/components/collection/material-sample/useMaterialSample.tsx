@@ -111,6 +111,12 @@ export function useMaterialSampleQuery(id?: string | null) {
           }
         }
 
+        // Process loaded back-end data into data structure that Forkmiks can use
+        if (data.extensionValues) {
+          data.extensionValuesForm = processExtensionValuesLoading(data.extensionValues);
+          delete data.extensionValues;
+        }
+
         // Convert to separated list
         if (data.restrictionFieldsExtension) {
           // Process risk groups
@@ -146,13 +152,6 @@ export function useMaterialSampleQuery(id?: string | null) {
                 data.restrictionFieldsExtension[RESTRICTIONS_FIELDS[3]].level
             };
           }
-        }
-
-        // Process loaded Extension Fields values
-        if (data?.extensionValues) {
-          data.extensionValues = processExtensionValuesLoading(
-            data.extensionValues
-          );
         }
       }
     }
@@ -531,10 +530,11 @@ export function useMaterialSampleSave({
         risk_group: submittedValues?.phac_human_rg?.value
       };
     }
-    const processedExtensionValues =
-      processExtensionValuesSaving(submittedValues);
 
-    submittedValues.extensionValues = processedExtensionValues;
+    if (submittedValues.extensionValuesForm) {
+      submittedValues.extensionValues = processExtensionValuesSaving(submittedValues.extensionValuesForm);
+    }
+    delete submittedValues.extensionValuesForm;
 
     /** Input to submit to the back-end API. */
     const materialSampleInput: InputResource<MaterialSample> = {

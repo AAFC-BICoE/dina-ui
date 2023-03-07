@@ -79,50 +79,6 @@ export function CollectingEventFormLayout({
 }: CollectingEventFormLayoutProps) {
   const { formatMessage, locale } = useDinaIntl();
   const layoutWrapperRef = useRef<HTMLDivElement>(null);
-  const { response, loading } = useQuery<FieldExtension[]>({
-    path: `collection-api/extension`
-  });
-
-  const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
-  const extensionOptions = response?.data
-    .filter(
-      (data) => data.extension.fields?.[0].dinaComponent === "COLLECTING_EVENT"
-    )
-    .map((data) => {
-      return {
-        label: data.extension.name,
-        value: data.extension.key
-      };
-    });
-  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
-
-  function onBlockSelectChange(
-    selected,
-    formik: FormikContextType<any>,
-    oldValue
-  ) {
-    const selectedFieldExtension = response?.data.find(
-      (data) => data.extension.key === selected
-    );
-
-    setExtensionFieldsOptions(
-      selectedFieldExtension?.extension.fields.map((data) => ({
-        label: data.name,
-        value: data.key
-      }))
-    );
-    if (selected !== oldValue) {
-      formik?.values?.extensionValues?.forEach((extensionValue) => {
-        if (extensionValue.select === oldValue) {
-          extensionValue.rows = [{}];
-        }
-      });
-    }
-    setSelectedBlockOptions(
-      selectedBlockOptions.filter((item) => item !== oldValue)
-    );
-    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
-  }
 
   const { initialValues, readOnly, isTemplate } = useDinaFormContext();
 
@@ -631,9 +587,6 @@ export function CollectingEventFormLayout({
     </FieldSet>
   );
 
-  if (loading) {
-    return <LoadingSpinner loading={true} />;
-  }
   return (
     <div ref={layoutWrapperRef}>
       <DinaFormSection
@@ -1035,15 +988,11 @@ export function CollectingEventFormLayout({
         >
           <DataEntryField
             legend={<DinaMessage id="fieldExtensions" />}
-            name="extensionValues"
-            blockOptions={extensionOptions}
-            typeOptions={extensionFieldsOptions}
-            onBlockSelectChange={onBlockSelectChange}
+            name="extensionValuesForm"
             readOnly={readOnly}
-            initialValues={initialValues.extensionValues}
             isTemplate={isTemplate}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
+            blockOptionsEndpoint={`collection-api/extension`}
+            blockOptionsFilter={"COLLECTING_EVENT"}
           />
         </DinaFormSection>
       </div>
