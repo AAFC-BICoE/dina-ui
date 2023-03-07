@@ -8,25 +8,57 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 import Select from "react-select";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
-interface Person extends KitsuResource {
-  name: string;
-}
-
-const PERSON_TEST_DATA_JSON_API = {
-  data: [
-    { name: "person1-json-api" },
-    { name: "person2-json-api" },
-    { name: "person3-json-api" }
+const blockOptions = {
+  id: "blockOptions",
+  type: "vocabulary",
+  vocabularyElements: [
+    { name: "BLOCK_OPTION_1", term: "BLOCK_OPTION_1" },
+    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_2" },
+    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_3" }
   ]
 };
 
-// JSON API mock response.
-const mockGet = jest.fn(async () => PERSON_TEST_DATA_JSON_API);
+const unitsOptions = {
+  id: "unitsOptions",
+  type: "vocabulary",
+  vocabularyElements: [
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_1" },
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_2" },
+    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_3" }
+  ]
+};
+const typeOptions = [
+  {
+    id: "TYPE_OPTION_1",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_1" }]
+    }
+  },
+  {
+    id: "TYPE_OPTION_2",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_2" }]
+    }
+  },
+  {
+    id: "TYPE_OPTION_3",
+    type: "protocol-element",
+    multilingualTitle: {
+      titles: [{ lang: "en", title: "TYPE_OPTION_3" }]
+    }
+  }
+];
 
-// JSON API
-const mockGetAll = jest.fn(async (path) => {
-  if (path === "agent-api/person") {
-    return PERSON_TEST_DATA_JSON_API;
+const mockGet = jest.fn(async (path) => {
+  switch (path) {
+    case "collection-api/vocabulary/protocolData":
+      return { data: blockOptions };
+    case "collection-api/protocol-element":
+      return { data: typeOptions };
+    case "collection-api/vocabulary/unitsOfMeasurement":
+      return { data: unitsOptions };
   }
 });
 
@@ -36,21 +68,11 @@ const apiContext = {
   }
 } as any;
 
-const blockOptions = [
-  { label: "Block Option 1", value: "BLOCK_OPTION_1" },
-  { label: "Block Option 2", value: "BLOCK_OPTION_2" },
-  { label: "Block Option 3", value: "BLOCK_OPTION_3" }
-];
-const unitsOptions = [
-  { label: "Unit Option 1", value: "UNIT_OPTION_1" },
-  { label: "Unit Option 2", value: "UNIT_OPTION_2" },
-  { label: "Unit Option 3", value: "UNIT_OPTION_3" }
-];
-const typeOptions = [
-  { label: "Type Option 1", value: "TYPE_OPTION_1" },
-  { label: "Type Option 2", value: "TYPE_OPTION_2" },
-  { label: "Type Option 3", value: "TYPE_OPTION_3" }
-];
+// Mock out the debounce function to avoid waiting during tests.
+jest.mock("use-debounce", () => ({
+  useDebounce: (fn) => [fn, { isPending: () => false }]
+}));
+
 const mockSubmit = jest.fn();
 
 describe("DataEntry", () => {
@@ -58,7 +80,7 @@ describe("DataEntry", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Tests correct number of data blocks and data block fields entered", async () => {
-    const name = "protocolData";
+    const name = "extensionValues";
     const wrapper = mountWithAppContext(
       <DinaForm
         initialValues={{}}
@@ -66,10 +88,11 @@ describe("DataEntry", () => {
       >
         <DataEntryField
           legend={<DinaMessage id="fieldExtensions" />}
-          blockOptions={blockOptions}
-          unitsOptions={unitsOptions}
-          model={"agent-api/person"}
-          typeOptions={typeOptions}
+          isVocabularyBasedEnabledForBlock={true}
+          isVocabularyBasedEnabledForType={true}
+          blockOptionsEndpoint={"collection-api/vocabulary/protocolData"}
+          typeOptionsEndpoint={"collection-api/protocol-element"}
+          unitOptionsEndpoint={"collection-api/vocabulary/unitsOfMeasurement"}
           name={name}
         />
       </DinaForm>,
@@ -87,37 +110,60 @@ describe("DataEntry", () => {
     expect(wrapper.find(DataBlock).exists()).toEqual(true);
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    let selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+    let dataBlock = wrapper
+      .findWhere(
+        (datablock) =>
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
+      )
       .find(SelectField);
 
     // block select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].select`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.select`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 1", value: "BLOCK_OPTION_1" });
 
     // type select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].type`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 1", value: "TYPE_OPTION_1" });
 
     // unit select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].unit`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 1", value: "UNIT_OPTION_1" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[0].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[0].value`, value: "VALUE_1" }
+        target: {
+          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-0.value`,
+          value: "VALUE_1"
+        }
       });
 
     // form submission
@@ -127,23 +173,27 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         }
-      ]
+      }
     });
 
     // Add new row to data block
     wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+      .findWhere(
+        (datablock) =>
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
+      )
       .find(FaPlus)
       .simulate("click");
 
@@ -151,30 +201,49 @@ describe("DataEntry", () => {
     wrapper.update();
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
-    selectFields = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[0]`)
+    dataBlock = wrapper
+      .findWhere(
+        (datablock) =>
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}`
+      )
       .find(SelectField);
 
     // type select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].type`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 2", value: "TYPE_OPTION_2" });
 
     // unit select option
-    selectFields
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].unit`)
+    dataBlock
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 2", value: "UNIT_OPTION_2" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[0].rows[1].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[0].rows[1].value`, value: "VALUE_2" }
+        target: {
+          name: `${name}.${blockOptions.vocabularyElements[0].name}.rows.extensionField-1.value`,
+          value: "VALUE_2"
+        }
       });
 
     // form submission
@@ -184,23 +253,24 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             },
-            {
+
+            "extensionField-1": {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
               value: "VALUE_2"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         }
-      ]
+      }
     });
 
     wrapper.find("button.add-datablock").simulate("click");
@@ -209,36 +279,58 @@ describe("DataEntry", () => {
 
     // find DataBlock with specified name, then find SelectField inside DataBlock with specified name
     const selectFieldsSecondBlock = wrapper
-      .findWhere((datablock) => datablock.props().name === `${name}[1]`)
+      .findWhere(
+        (datablock) =>
+          datablock.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}`
+      )
       .find(SelectField);
-
     // block select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].select`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}.select`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Block Option 2", value: "BLOCK_OPTION_2" });
 
     // type select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].type`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.type`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Type Option 3", value: "TYPE_OPTION_3" });
 
     // unit select option
     selectFieldsSecondBlock
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].unit`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.unit`
+      )
       .find<any>(Select)
       .props()
       .onChange({ label: "Unit Option 3", value: "UNIT_OPTION_3" });
 
     wrapper
       .find<any>(TextField)
-      .filterWhere((n: any) => n.props().name === `${name}[1].rows[0].value`)
+      .filterWhere(
+        (n: any) =>
+          n.props().name ===
+          `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`
+      )
       .find("input")
       .simulate("change", {
-        target: { name: `${name}[1].rows[0].value`, value: "VALUE_3" }
+        target: {
+          name: `${name}.${blockOptions.vocabularyElements[1].name}.rows.extensionField-0.value`,
+          value: "VALUE_3"
+        }
       });
 
     // form submission
@@ -248,33 +340,34 @@ describe("DataEntry", () => {
 
     // Formik should have the updated value.
     expect(mockSubmit).lastCalledWith({
-      [name]: [
-        {
-          rows: [
-            {
+      [name]: {
+        BLOCK_OPTION_1: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_1",
               unit: "UNIT_OPTION_1",
               value: "VALUE_1"
             },
-            {
+
+            "extensionField-1": {
               type: "TYPE_OPTION_2",
               unit: "UNIT_OPTION_2",
               value: "VALUE_2"
             }
-          ],
+          },
           select: "BLOCK_OPTION_1"
         },
-        {
-          rows: [
-            {
+        BLOCK_OPTION_2: {
+          rows: {
+            "extensionField-0": {
               type: "TYPE_OPTION_3",
               unit: "UNIT_OPTION_3",
               value: "VALUE_3"
             }
-          ],
+          },
           select: "BLOCK_OPTION_2"
         }
-      ]
+      }
     });
   });
 });

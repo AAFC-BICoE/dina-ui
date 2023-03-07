@@ -61,6 +61,7 @@ export interface CollectingEventAttributes {
 
   selectedSections?: string[];
   extensionValues?: any;
+  extensionValuesForm?: any;
 }
 
 export enum GeographicPlaceNameSource {
