@@ -183,7 +183,8 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
         <DataEntryViewer
           extensionValues={value}
           legend={<></>}
-          name={"extensionValues"}
+          name={"extensionValuesForm"}
+          blockOptionsEndpoint={`collection-api/extension`}
           dinaComponent={"MATERIAL_SAMPLE"}
         />
       ),
