@@ -9,15 +9,15 @@ import {
   ResourceSelectField,
   TextField,
   useApiClient
-} from "../../../../common-ui/lib";
-import PageLayout from "../../../../dina-ui/components/page/PageLayout";
-import { PcrBatchItemTable } from "../../../../dina-ui/components/seqdb/pcr-worksheet/PcrBatchItemTable";
-import { ReactionInputs } from "../../../../dina-ui/components/seqdb/pcr-worksheet/ReactionInputs";
-import { ReactionRxns } from "../../../../dina-ui/components/seqdb/pcr-worksheet/ReactionRxns";
-import { ThermocyclerProfileWorksheetElement } from "../../../../dina-ui/components/seqdb/pcr-worksheet/ThermocyclerProfileWorksheetElement";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { Protocol } from "../../../../dina-ui/types/collection-api";
-import { PcrBatch, Region } from "../../../../dina-ui/types/seqdb-api";
+} from "common-ui";
+import PageLayout from "../../../components/page/PageLayout";
+import { PcrBatchItemTable } from "../../../components/seqdb/pcr-worksheet/PcrBatchItemTable";
+import { ReactionInputs } from "../../../components/seqdb/pcr-worksheet/ReactionInputs";
+import { ReactionRxns } from "../../../components/seqdb/pcr-worksheet/ReactionRxns";
+import { ThermocyclerProfileWorksheetElement } from "../../../components/seqdb/pcr-worksheet/ThermocyclerProfileWorksheetElement";
+import { DinaMessage } from "../../../intl/dina-ui-intl";
+import { Protocol } from "../../../types/collection-api";
+import { PcrBatch, Region } from "../../../types/seqdb-api";
 import { useEffect, useState } from "react";
 import { Button } from "react-bootstrap";
 import { PersonSelectField } from "../../../components";
@@ -207,7 +207,6 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
           <PcrBatchItemTable pcrBatchId={pcrBatch.id} />
         </div>
       </div>
-      <pre>{JSON.stringify(initialValues, null, " ")}</pre>
     </DinaForm>
   );
 }
