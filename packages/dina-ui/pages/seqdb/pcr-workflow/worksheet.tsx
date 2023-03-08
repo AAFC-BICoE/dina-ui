@@ -65,10 +65,9 @@ export default function PcrWorksheetPage() {
 
   const buttonBarContent = (
     <>
-      <BackToListButton entityLink="/seqdb/pcr-batch" />
       <Button
         variant="secondary"
-        className="ms-auto"
+        className="btn btn-primary"
         onClick={() => window.print()}
         style={{ width: "10rem" }}
       >
