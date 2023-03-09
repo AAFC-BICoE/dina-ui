@@ -41,25 +41,30 @@ export function useProtocolFormConverter() {
   function convertFormDataToProtocol(
     protocolFormValue: ProtocolFormValue
   ): InputResource<Protocol> {
-    if (
-      protocolFormValue.protocolFormData &&
-      protocolFormValue.protocolFormData.length > 0
-    ) {
-      protocolFormValue.protocolData = protocolFormValue.protocolFormData.map(
-        (formData) => ({
-          key: formData.select,
-          vocabularyBased: formData.vocabularyBased,
+    if (protocolFormValue.protocolFormData) {
+      protocolFormValue.protocolData = Object.keys(
+        protocolFormValue.protocolFormData
+      ).map((formDataKey) => {
+        const formData = protocolFormValue?.protocolFormData?.[formDataKey];
+        const protocolData = {
+          key: formData?.select,
+          vocabularyBased: formData?.vocabularyBased,
           protocolDataElement:
-            !formData.rows || formData.rows.length === 0
+            !formData?.rows || Object.keys(formData?.rows).length === 0
               ? null
-              : formData.rows.map((rowData) => ({
-                  elementType: rowData.type,
-                  vocabularyBased: rowData.vocabularyBased,
-                  unit: rowData.unit,
-                  value: rowData.value
-                }))
-        })
-      );
+              : Object.keys(formData.rows).map((rowDataKey) => {
+                  const rowData = formData?.rows[rowDataKey];
+                  const protocolRowData = {
+                    elementType: rowData.type,
+                    vocabularyBased: rowData.vocabularyBased,
+                    unit: rowData.unit,
+                    value: rowData.value
+                  };
+                  return protocolRowData;
+                })
+        };
+        return protocolData;
+      });
     }
     delete protocolFormValue.protocolFormData;
     const protocolResource: InputResource<Protocol> = {

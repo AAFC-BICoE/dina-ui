@@ -89,6 +89,7 @@ export * from "./text-field-with-multiplication-button/TextFieldWithMultiplicati
 export * from "./formik-connected/PlaceSectionsSelectionField";
 export * from "./list-page/query-builder/QueryBuilder";
 export * from "./list-page/hardcoded-queries/directMaterialSampleChildrenQuery";
+export * from "./list-page/hardcoded-queries/materialSampleCultureStrainChildrenQuery";
 export * from "./formik-connected/QueryLogicSwitchField";
 export * from "./list-page/QueryPage";
 export * from "./custom-query-view/CustomQueryPageView";

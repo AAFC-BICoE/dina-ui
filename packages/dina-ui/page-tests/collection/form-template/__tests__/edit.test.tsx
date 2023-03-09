@@ -7,8 +7,22 @@ import { FormTemplateEditPageLoaded } from "../../../../pages/collection/form-te
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
 import {
   AcquisitionEvent,
+  ACQUISITION_EVENT_COMPONENT_NAME,
+  ASSOCIATIONS_COMPONENT_NAME,
   CollectingEvent,
-  FormTemplate
+  COLLECTING_EVENT_COMPONENT_NAME,
+  FIELD_EXTENSIONS_COMPONENT_NAME,
+  FormTemplate,
+  IDENTIFIER_COMPONENT_NAME,
+  MANAGED_ATTRIBUTES_COMPONENT_NAME,
+  MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+  ORGANISMS_COMPONENT_NAME,
+  PREPARATIONS_COMPONENT_NAME,
+  RESTRICTION_COMPONENT_NAME,
+  SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
+  STORAGE_COMPONENT_NAME
 } from "../../../../types/collection-api";
 
 const mockOnSaved = jest.fn();
@@ -238,9 +252,14 @@ const formTemplate: PersistedResource<FormTemplate> = {
   viewConfiguration: {},
   components: [
     {
-      name: "identifiers-component",
+      name: SPLIT_CONFIGURATION_COMPONENT_NAME,
       visible: true,
-      order: 0,
+      order: 0
+    },
+    {
+      name: IDENTIFIER_COMPONENT_NAME,
+      visible: true,
+      order: 1,
       sections: [
         {
           name: "general-section",
@@ -295,9 +314,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "material-sample-info-component",
+      name: MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
       visible: true,
-      order: 1,
+      order: 2,
       sections: [
         {
           name: "material-sample-info-section",
@@ -329,9 +348,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "collecting-event-component",
+      name: COLLECTING_EVENT_COMPONENT_NAME,
       visible: false,
-      order: 2,
+      order: 3,
       sections: [
         {
           name: "general-section",
@@ -575,9 +594,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "acquisition-event-component",
+      name: ACQUISITION_EVENT_COMPONENT_NAME,
       visible: false,
-      order: 3,
+      order: 4,
       sections: [
         {
           name: "acquisition-event-reception-section",
@@ -613,9 +632,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "preparations-component",
+      name: PREPARATIONS_COMPONENT_NAME,
       visible: false,
-      order: 4,
+      order: 5,
       sections: [
         {
           name: "general-section",
@@ -677,9 +696,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "organisms-component",
+      name: ORGANISMS_COMPONENT_NAME,
       visible: false,
-      order: 5,
+      order: 6,
       sections: [
         {
           name: "organisms-general-section",
@@ -789,9 +808,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "associations-component",
+      name: ASSOCIATIONS_COMPONENT_NAME,
       visible: false,
-      order: 6,
+      order: 7,
       sections: [
         {
           name: "associations-host-organism-section",
@@ -833,9 +852,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "storage-component",
+      name: STORAGE_COMPONENT_NAME,
       visible: false,
-      order: 7,
+      order: 8,
       sections: [
         {
           name: "storage-selection-section",
@@ -847,9 +866,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "restriction-component",
+      name: RESTRICTION_COMPONENT_NAME,
       visible: false,
-      order: 8,
+      order: 9,
       sections: [
         {
           name: "restriction-general-section",
@@ -870,9 +889,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "scheduled-actions-component",
+      name: SCHEDULED_ACTIONS_COMPONENT_NAME,
       visible: false,
-      order: 9,
+      order: 10,
       sections: [
         {
           name: "scheduled-actions-add-section",
@@ -908,9 +927,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "field-extensions-component",
+      name: FIELD_EXTENSIONS_COMPONENT_NAME,
       visible: undefined,
-      order: 10,
+      order: 11,
       sections: [
         {
           items: [
@@ -926,9 +945,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "managed-attributes-component",
+      name: MANAGED_ATTRIBUTES_COMPONENT_NAME,
       visible: true,
-      order: 11,
+      order: 12,
       sections: [
         {
           name: "managed-attributes-section",
@@ -938,9 +957,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: "material-sample-attachments-component",
+      name: MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
       visible: true,
-      order: 12,
+      order: 13,
       sections: [
         {
           name: "material-sample-attachments-sections",
@@ -963,7 +982,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
   ]
 };
 
-describe("Workflow template edit page", () => {
+describe("Form template edit page", () => {
   beforeEach(jest.clearAllMocks);
 
   it("Renders the blank template edit page", async () => {
@@ -989,6 +1008,7 @@ describe("Workflow template edit page", () => {
       mockOnSaved.mock.calls[0][0]
     );
     expect(navOrder).toEqual([
+      "split-configuration-component",
       "identifiers-component",
       "material-sample-info-component",
       "collecting-event-component",
@@ -1051,9 +1071,48 @@ describe("Workflow template edit page", () => {
       viewConfiguration: { type: "material-sample-form-template" },
       components: [
         {
+          name: "split-configuration-component",
+          visible: false,
+          order: 0,
+          sections: [
+            {
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "splitConfiguration.condition.conditionType",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "splitConfiguration.condition.materialSampleType",
+                  visible: true
+                }
+              ],
+              name: "split-configuration-condition-section",
+              visible: true
+            },
+            {
+              items: [
+                {
+                  defaultValue: undefined,
+                  name: "splitConfiguration.materialSampleNameGeneration.strategy",
+                  visible: true
+                },
+                {
+                  defaultValue: undefined,
+                  name: "splitConfiguration.materialSampleNameGeneration.characterType",
+                  visible: true
+                }
+              ],
+              name: "split-configuration-material-sample-name-generation-section",
+              visible: true
+            }
+          ]
+        },
+        {
           name: "identifiers-component",
           visible: true,
-          order: 0,
+          order: 1,
           sections: [
             {
               name: "general-section",
@@ -1119,7 +1178,7 @@ describe("Workflow template edit page", () => {
         {
           name: "material-sample-info-component",
           visible: true,
-          order: 1,
+          order: 2,
           sections: [
             {
               name: "material-sample-info-section",
@@ -1157,7 +1216,7 @@ describe("Workflow template edit page", () => {
         {
           name: "collecting-event-component",
           visible: true,
-          order: 2,
+          order: 3,
           sections: [
             {
               name: "general-section",
@@ -1435,7 +1494,7 @@ describe("Workflow template edit page", () => {
         {
           name: "acquisition-event-component",
           visible: false,
-          order: 3,
+          order: 4,
           sections: [
             {
               name: "acquisition-event-reception-section",
@@ -1481,7 +1540,7 @@ describe("Workflow template edit page", () => {
         {
           name: "preparations-component",
           visible: false,
-          order: 4,
+          order: 5,
           sections: [
             {
               name: "general-section",
@@ -1545,7 +1604,7 @@ describe("Workflow template edit page", () => {
         {
           name: "organisms-component",
           visible: false,
-          order: 5,
+          order: 6,
           sections: [
             {
               name: "organisms-general-section",
@@ -1657,7 +1716,7 @@ describe("Workflow template edit page", () => {
         {
           name: "associations-component",
           visible: false,
-          order: 6,
+          order: 7,
           sections: [
             {
               name: "associations-host-organism-section",
@@ -1701,7 +1760,7 @@ describe("Workflow template edit page", () => {
         {
           name: "storage-component",
           visible: false,
-          order: 7,
+          order: 8,
           sections: [
             {
               name: "storage-selection-section",
@@ -1719,7 +1778,7 @@ describe("Workflow template edit page", () => {
         {
           name: "restriction-component",
           visible: false,
-          order: 8,
+          order: 9,
           sections: [
             {
               name: "restriction-general-section",
@@ -1754,7 +1813,7 @@ describe("Workflow template edit page", () => {
         {
           name: "scheduled-actions-component",
           visible: false,
-          order: 9,
+          order: 10,
           sections: [
             {
               name: "scheduled-actions-add-section",
@@ -1792,7 +1851,7 @@ describe("Workflow template edit page", () => {
         {
           name: "field-extensions-component",
           visible: true,
-          order: 10,
+          order: 11,
           sections: [
             {
               items: [
@@ -1810,7 +1869,7 @@ describe("Workflow template edit page", () => {
         {
           name: "managed-attributes-component",
           visible: true,
-          order: 11,
+          order: 12,
           sections: [
             {
               name: "managed-attributes-section",
@@ -1833,7 +1892,7 @@ describe("Workflow template edit page", () => {
         {
           name: "material-sample-attachments-component",
           visible: true,
-          order: 12,
+          order: 13,
           sections: [
             {
               name: "material-sample-attachments-sections",

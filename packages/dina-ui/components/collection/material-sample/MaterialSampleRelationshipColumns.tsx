@@ -3,15 +3,18 @@ import { dateCell, DeleteButton, EditButton, stringArrayCell } from "common-ui";
 import { MaterialSample } from "../../../types/collection-api";
 import { getScientificNames } from "./organismUtils";
 import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
+import Link from "next/link";
 
 export const ELASTIC_SEARCH_COLUMN: TableColumn<MaterialSample>[] = [
   {
     Cell: ({ original: { id, data } }) => (
-      <a href={`/collection/material-sample/view?id=${id}`}>
-        {data?.attributes?.materialSampleName ||
-          data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-          id}
-      </a>
+      <Link href={`/collection/material-sample/view?id=${id}`}>
+        <a>
+          {data?.attributes?.materialSampleName ||
+            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+            id}
+        </a>
+      </Link>
     ),
     label: "materialSampleName",
     accessor: "data.attributes.materialSampleName",
@@ -43,11 +46,13 @@ export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] 
   [
     {
       Cell: ({ original: { id, data } }) => (
-        <a href={`/collection/material-sample/view?id=${id}`}>
-          {data?.attributes?.materialSampleName ||
-            data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
-            id}
-        </a>
+        <Link href={`/collection/material-sample/view?id=${id}`}>
+          <a>
+            {data?.attributes?.materialSampleName ||
+              data?.attributes?.dwcOtherCatalogNumbers?.join?.(", ") ||
+              id}
+          </a>
+        </Link>
       ),
       label: "materialSampleName",
       accessor: "data.attributes.materialSampleName",

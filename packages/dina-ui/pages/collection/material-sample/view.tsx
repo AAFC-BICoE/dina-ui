@@ -7,6 +7,7 @@ import {
   EditButton,
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
+  materialSampleCultureStrainChildrenQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -156,19 +157,25 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                 <CustomQueryPageView
                   indexName="dina_material_sample_index"
                   columns={ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW}
+                  localStorageKey="material-sample-children"
                   customQueryOptions={[
                     {
                       value: "materialSampleChildren",
                       labelKey: "childMaterialSamples",
-                      customQuery: generateDirectMaterialSampleChildrenTree(
-                        id ?? ""
-                      ),
-                      customViewFields: [
-                        {
-                          fieldName: "data.attributes.hierarchy",
-                          type: "hierarchy"
-                        }
-                      ]
+                      customElasticSearch:
+                        generateDirectMaterialSampleChildrenTree(id ?? "")
+                    },
+                    {
+                      value: "cultureStrains",
+                      labelKey: "childCultureStrains",
+                      customElasticSearch:
+                        materialSampleCultureStrainChildrenQuery(
+                          materialSample?.hierarchy?.reduce((prev, current) =>
+                            (prev?.rank ?? 0) > (current?.rank ?? 0)
+                              ? prev
+                              : current
+                          )?.uuid ?? ""
+                        )
                     }
                   ]}
                   reactTableProps={{
@@ -251,10 +258,11 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <ScheduledActionsField />
                 )}
                 <DataEntryViewer
-                  name={"extensionValues"}
+                  name={"extensionValuesForm"}
                   legend={<DinaMessage id="fieldExtensions" />}
                   extensionValues={materialSample.extensionValues}
                   disableDinaForm={true}
+                  blockOptionsEndpoint={`collection-api/extension`}
                   dinaComponent={"MATERIAL_SAMPLE"}
                 />
                 <div className="row">

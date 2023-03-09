@@ -80,11 +80,13 @@ export function useMaterialSampleFormTemplateSelectState() {
   // collecting event and acquisition components need to be isolated for useMaterialSample hook
   const collectingEventComponent = getComponentValues(
     COLLECTING_EVENT_COMPONENT_NAME,
-    sampleFormTemplate
+    sampleFormTemplate,
+    false
   );
   const acquisitionEventComponent = getComponentValues(
     ACQUISITION_EVENT_COMPONENT_NAME,
-    sampleFormTemplate
+    sampleFormTemplate,
+    false
   );
   const hasAcquisitionEvent =
     Object.keys(acquisitionEventComponent.templateCheckboxes).length > 0

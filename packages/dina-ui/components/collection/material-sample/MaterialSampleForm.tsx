@@ -56,6 +56,7 @@ import {
   PREPARATIONS_COMPONENT_NAME,
   RESTRICTION_COMPONENT_NAME,
   SCHEDULED_ACTIONS_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   STORAGE_COMPONENT_NAME
 } from "../../../types/collection-api";
 import { AllowAttachmentsConfig } from "../../object-store";
@@ -73,6 +74,8 @@ import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
 import { FieldExtension } from "../../../types/collection-api/resources/FieldExtension";
+import { SplitConfigurationSection } from "./SplitConfigurationSection";
+import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -235,7 +238,6 @@ export function MaterialSampleForm({
         value: data.extension.key
       };
     });
-  const [selectedBlockOptions, setSelectedBlockOptions] = useState<any>([]);
 
   function onBlockSelectChange(
     selected,
@@ -245,24 +247,27 @@ export function MaterialSampleForm({
     const selectedFieldExtension = response?.data.find(
       (data) => data.extension.key === selected
     );
-
-    setExtensionFieldsOptions(
+    const selectedExtensionFieldsOptions =
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
         value: data.key
-      }))
-    );
+      }));
+    setExtensionFieldsOptions(selectedExtensionFieldsOptions);
+
+    // Clear block rows if new block option selected
     if (selected !== oldValue) {
-      formik?.values?.extensionValues?.forEach((extensionValue) => {
-        if (extensionValue.select === oldValue) {
-          extensionValue.rows = [{}];
-        }
-      });
+      if (formik?.values?.extensionValues) {
+        Object.keys(formik?.values?.extensionValues).forEach((extensionKey) => {
+          if (
+            formik?.values?.extensionValues[extensionKey].select === oldValue
+          ) {
+            formik.values.extensionValues[extensionKey].rows = {
+              "extensionField-0": ""
+            };
+          }
+        });
+      }
     }
-    setSelectedBlockOptions(
-      selectedBlockOptions.filter((item) => item !== oldValue)
-    );
-    setSelectedBlockOptions((oldArray) => [...oldArray, selected]);
   }
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
@@ -284,6 +289,12 @@ export function MaterialSampleForm({
    * - The value is the section's render function given the ID as a param.
    */
   const formSections: Record<string, (id: string) => ReactNode> = {
+    [SPLIT_CONFIGURATION_COMPONENT_NAME]: (id) =>
+      !reduceRendering &&
+      isTemplate &&
+      dataComponentState.enableSplitConfiguration && (
+        <SplitConfigurationSection id={id} />
+      ),
     [IDENTIFIER_COMPONENT_NAME]: (id) =>
       !reduceRendering && (
         <MaterialSampleIdentifiersSection
@@ -413,16 +424,12 @@ export function MaterialSampleForm({
         >
           <DataEntryField
             legend={<DinaMessage id="fieldExtensions" />}
-            name="extensionValues"
-            blockOptions={extensionOptions}
-            typeOptions={extensionFieldsOptions}
-            onBlockSelectChange={onBlockSelectChange}
+            name="extensionValuesForm"
             readOnly={readOnly}
-            initialValues={initialValues.extensionValues}
             isTemplate={isTemplate}
-            selectedBlockOptions={selectedBlockOptions}
-            setSelectedBlockOptions={setSelectedBlockOptions}
             id={id}
+            blockOptionsEndpoint={`collection-api/extension`}
+            blockOptionsFilter={"MATERIAL_SAMPLE"}
           />
         </DinaFormSection>
       ),
@@ -500,6 +507,7 @@ export function MaterialSampleForm({
             }
             navOrder={navOrder}
             onChangeNavOrder={onChangeNavOrder}
+            isTemplate={isTemplate ?? false}
           />
         )}
       </div>

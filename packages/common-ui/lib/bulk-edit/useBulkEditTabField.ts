@@ -31,16 +31,29 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     fieldName
   } = params;
 
-  const formStates = sampleHooks.map(sample => sample.formRef.current?.values);
+  const formStates = sampleHooks.map(
+    (sample) => sample.formRef.current?.values
+  );
 
-  const hasNoValues = formStates.every(form =>
+  const hasNoValues = formStates.every((form) =>
     isBlankResourceAttribute(get(form, fieldName))
   );
 
-  const hasMultipleValues = !formStates.every(form => {
+  let commonValue: any;
+  const hasMultipleValues = !formStates.every((form) => {
     const bulkValue = get(form, fieldName);
     const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);
-
+    if (fieldName.includes("extensionValues") && fieldName.includes("type")) {
+      if (
+        (isBlankResourceAttribute(bulkValue) &&
+          !isBlankResourceAttribute(sampleValue)) ||
+        (!isBlankResourceAttribute(bulkValue) &&
+          isBlankResourceAttribute(sampleValue))
+      ) {
+        commonValue = bulkValue ?? sampleValue;
+        return true;
+      }
+    }
     // Treat different types of blank values the same e.g. null, "", empty array:
     return isEqual(
       isBlankResourceAttribute(bulkValue) ? null : bulkValue,
@@ -49,9 +62,9 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
   });
 
   const hasSameValues = !hasMultipleValues;
-
-  const commonValue =
-    hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined;
+  commonValue =
+    commonValue ??
+    (hasSameValues && !hasNoValues ? get(formStates[0], fieldName) : undefined);
 
   const bulkEditValue =
     "currentValue" in params

@@ -1,4 +1,10 @@
-import { JsonTree, Utils } from "react-awesome-query-builder";
+/**
+ * The rank number which represents the parent.
+ *
+ * The hierarchy displays `1` as the current Material Sample you are viewing and `2` as the
+ * parent of what you are viewing.
+ */
+const PARENT_HIERARCHY_RANK = 2;
 
 /**
  * Using the UUID provided it will find the Material Sample that are direct children.
@@ -17,20 +23,33 @@ import { JsonTree, Utils } from "react-awesome-query-builder";
  *
  * @param uuid The parent UUID to use to return the children against.
  */
-export function generateDirectMaterialSampleChildrenTree(
-  uuid: string
-): JsonTree {
+export function generateDirectMaterialSampleChildrenTree(uuid: string): any {
   return {
-    id: Utils.uuid(),
-    type: "group",
-    children1: {
-      [Utils.uuid()]: {
-        type: "rule",
-        properties: {
-          field: "data.attributes.hierarchy",
-          operator: "hierarchy",
-          value: [uuid]
-        }
+    query: {
+      bool: {
+        must: [
+          {
+            nested: {
+              path: "data.attributes.hierarchy",
+              query: {
+                bool: {
+                  must: [
+                    {
+                      match: {
+                        "data.attributes.hierarchy.uuid": uuid
+                      }
+                    },
+                    {
+                      match: {
+                        "data.attributes.hierarchy.rank": PARENT_HIERARCHY_RANK
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
       }
     }
   };

@@ -1,4 +1,5 @@
 import { KitsuResource } from "kitsu";
+import { SplitConfiguration } from "./SplitConfiguration";
 
 export interface FormTemplateComponents {
   // Visibility for each of the items.
@@ -20,6 +21,9 @@ export interface FormTemplate extends KitsuResource {
   viewConfiguration?: unknown;
 
   components?: FormTemplateComponent[];
+
+  // Not saved to the API, only used in the UI.
+  splitConfiguration?: SplitConfiguration;
 }
 
 /**
