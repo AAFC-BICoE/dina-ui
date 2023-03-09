@@ -42,6 +42,7 @@ export function SplitMaterialSampleDropdownButton({
     SplitConfigurationOption | undefined
   >();
 
+  // Retrieve all of the form templates, then filter for the correct one.
   useQuery<FormTemplate[]>(
     {
       path: "collection-api/form-template"
@@ -68,11 +69,21 @@ export function SplitMaterialSampleDropdownButton({
     }
   );
 
+  /**
+   * Split submit button clicked.
+   */
   async function onClick() {
+    // Ensure a split configuration option has been selected.
+    if (!splitConfiguration || splitConfiguration.value === "") {
+      return;
+    }
+
     // Save the ids to local storage for the split page to read.
     writeStorage<string[]>(BULK_SPLIT_IDS, ids);
 
-    await router.push("/collection/material-sample/bulk-split");
+    await router.push(
+      `/collection/material-sample/bulk-split?splitConfiguration=${splitConfiguration.value}`
+    );
   }
 
   const CustomMenu = React.forwardRef(
