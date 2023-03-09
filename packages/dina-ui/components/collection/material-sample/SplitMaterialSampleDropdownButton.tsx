@@ -1,27 +1,18 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { BULK_SPLIT_IDS, Tooltip } from "common-ui/lib";
+import { BULK_SPLIT_IDS, Tooltip, useQuery } from "common-ui";
 import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
 import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
+import { FormTemplate } from "../../../types/collection-api";
+import { getSplitConfigurationFormTemplates } from "../../form-template/formTemplateUtils";
 
-interface SplitConfiguration {
+interface SplitConfigurationOption {
   label: string;
   value: string;
 }
-
-const SPLIT_CONFIGURATION_OPTIONS: SplitConfiguration[] = [
-  {
-    label: "Culture Strain",
-    value: "cultureStrain"
-  },
-  {
-    label: "Sample",
-    value: "sample"
-  }
-];
 
 type CustomMenuProps = {
   children?: React.ReactNode;
@@ -41,9 +32,41 @@ export function SplitMaterialSampleDropdownButton({
 }: SplitMaterialSampleDropdownButtonProps) {
   const router = useRouter();
 
+  // List of all the split configurations available.
+  const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
+    SplitConfigurationOption[]
+  >([]);
+
+  // Selected split configuration to use.
   const [splitConfiguration, setSplitConfiguration] = useState<
-    SplitConfiguration | undefined
+    SplitConfigurationOption | undefined
   >();
+
+  useQuery<FormTemplate[]>(
+    {
+      path: "collection-api/form-template"
+    },
+    {
+      disabled,
+      onSuccess: async ({ data }) => {
+        const formTemplatesWithSplitConfig = getSplitConfigurationFormTemplates(
+          data as FormTemplate[]
+        );
+        const generatedOptions = formTemplatesWithSplitConfig.map(
+          (formTemplate) => ({
+            label: formTemplate?.name ?? "",
+            value: formTemplate?.id ?? ""
+          })
+        );
+        setSplitConfigurationOptions(generatedOptions);
+
+        // If options are available, just set the first one automatically.
+        if (generatedOptions.length > 0) {
+          setSplitConfiguration(generatedOptions[0]);
+        }
+      }
+    }
+  );
 
   async function onClick() {
     // Save the ids to local storage for the split page to read.
@@ -68,10 +91,10 @@ export function SplitMaterialSampleDropdownButton({
           <strong>
             <DinaMessage id="selectSplitConfiguration" />
           </strong>
-          <Select<SplitConfiguration>
+          <Select<SplitConfigurationOption>
             className="mt-2"
             name="splitConfiguration"
-            options={SPLIT_CONFIGURATION_OPTIONS}
+            options={splitConfigurationOptions}
             onChange={(selection) =>
               selection && setSplitConfiguration(selection)
             }
