@@ -310,16 +310,16 @@ export function WorkbookColumnMapping({
                 }
                 break;
               case DataTypeEnum.ManagedAttributes:
-                if (!isMap(row[field])) {
-                  param.dataType = DataTypeEnum.ManagedAttributes;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
+                // if (!isMap(row[field])) {
+                //   param.dataType = DataTypeEnum.ManagedAttributes;
+                //   errors.push(
+                //     new ValidationError(
+                //       formatMessage("workBookInvalidDataFormat", param),
+                //       field,
+                //       "sheet"
+                //     )
+                //   );
+                // }
                 break;
               case DataTypeEnum.NUMBER:
                 if (!isNumber(row[field])) {
@@ -334,6 +334,8 @@ export function WorkbookColumnMapping({
                 }
                 break;
               case DataTypeEnum.VOCABULARY:
+                console.log(field);
+                console.log(FIELD_TO_VOCAB_ELEMS_MAP);
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
                 if (!vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;

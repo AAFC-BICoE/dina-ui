@@ -215,27 +215,37 @@ export function convertBooleanArray(value: string): boolean[] {
  * Any item in the value string has no key or value will be filtered out.
  *
  */
-export function convertMap(value: string): { [key: string]: any } {
-  const regx = /:(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/;
-  const items = value
-    .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
-    .map((str) => trim(str));
-  const map = {} as { [key: string]: any };
-  for (const keyValue of items) {
-    if (keyValue) {
-      const arr = keyValue.split(regx).map((str) => trim(trim(str, '"')));
-      if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
-        const key = arr[0];
-        const strVal = arr[1];
-        if (isBoolean(strVal)) {
-          map[key] = convertBoolean(strVal);
-        } else if (isNumber(strVal)) {
-          map[key] = convertNumber(strVal);
-        } else {
-          map[key] = strVal;
-        }
-      }
+export function convertMap(test: string): { [key: string]: any } {
+  const inputString = "data_attribute: 2023-02-28, boolean_attribute: true, pick_list_attribute: 1, 2, text_attribute: school 1, class 2, asdf,!@#$$,,,$%^*(), 234324, decimal_attribute: 12.1, integer_attribute: 123";
+
+  const outputObject = {};
+
+  // Split the input string by commas
+  const items = inputString.split(", ");
+
+  // Loop through each item and add it to the output object
+  for (const item of items) {
+    const [key, ...values] = item.split(": ");
+
+    // Join the values into a string
+    const value = values.join(": ");
+
+    // Parse the value as a number if it's a decimal or integer
+    const parsedValue = parseFloat(value);
+    const isNumber = !isNaN(parsedValue);
+
+    if (isNumber) {
+      outputObject[key] = parsedValue;
+    } else if (value === "true" || value === "false") {
+      outputObject[key] = value === "true";
+    } else if (value.includes(",")) {
+      // Split the value by commas and trim any leading/trailing whitespace
+      const values = value.split(",").map((v) => v.trim());
+      outputObject[key] = values;
+    } else {
+      outputObject[key] = value;
     }
   }
-  return map;
+  console.log(outputObject);
+  return outputObject;
 }
