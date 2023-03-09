@@ -1,6 +1,8 @@
 import { WorkbookJSON } from "../types/Workbook";
 import { find, compact, trim } from "lodash";
 
+const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
+
 /**
  * This is currently a pretty simple function but in the future you will be able to select the
  * sheet to get the headers from. For now this will simply just retrieve the first row with
@@ -107,21 +109,21 @@ export function isNumberArray(value: string | null | undefined): boolean {
 
 /**
  * Check if a comma separated string a boolean value.
- * @param value String, it can be 'true', 'false', 'yes', or 'no'
+ * @param value String, it can be 'true', 'false', 'yes', 'no', '1', or '0'
  * @returns boolean
  */
 export function isBoolean(value: string): boolean {
-  const regx = /^\s*yes|no|true|false\s*$/gi;
-  return !!value && regx.test(value);
+  return !!value && BOOLEAN_CONSTS.indexOf(value.toLowerCase()) > -1;
 }
 
 /**
  * Check is a comma separated string a boolean array
- * @param value string.  It can be 'true, false, No, yes'
+ * @param value string.  It can be 'true, false, No, yes', '1', or '0'
  * @returns
  */
 export function isBooleanArray(value: string): boolean {
-  const regx = /^\s*(yes|no|true|false)\s*(,\s*(yes|no|true|false)\s*)*$/gi;
+  const regx =
+    /^\s*(yes|no|true|false|[0-1])\s*(,\s*(yes|no|true|false|1|0)\s*)*$/gi;
   return !!value && regx.test(value);
 }
 
@@ -156,7 +158,7 @@ export function convertNumber(value: any): number | null {
  */
 export function convertBoolean(value: any): boolean {
   const strBoolean = String(value).toLowerCase().trim();
-  if (strBoolean === "false" || strBoolean === "no") {
+  if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
   }
   return !!value;
