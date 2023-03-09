@@ -18,7 +18,7 @@ import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
-import { MaterialSample } from "../../types/collection-api";
+import { FormTemplate, MaterialSample } from "../../types/collection-api";
 import { InputResource, PersistedResource } from "kitsu";
 
 const ENTITY_LINK = "/collection/material-sample";
@@ -43,11 +43,13 @@ interface MaterialSampleBulkSplitFields {
 
 interface MaterialSampleSplitGenerationFormProps {
   ids: string[];
+  splitConfiguration?: FormTemplate;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
 }
 
 export function MaterialSampleSplitGenerationForm({
   ids,
+  splitConfiguration,
   onGenerate
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
@@ -97,18 +99,25 @@ export function MaterialSampleSplitGenerationForm({
 
   const ableToContinueSeries = useMemo<boolean>(
     () =>
+      !splitConfiguration &&
       (splitFromMaterialSamples.data as any)?.every(
         (materialSample) => materialSample?.materialSampleChildren?.length !== 0
       ),
-    [splitFromMaterialSamples.data]
+    [splitFromMaterialSamples.data, splitConfiguration]
   );
 
   const ableToContinueSeriesFromParent = useMemo<boolean>(
     () =>
+      !splitConfiguration &&
       (splitFromParentMaterialSamples.data as any)?.every(
         (materialSample) => materialSample?.materialSampleChildren?.length !== 0
       ),
-    [splitFromParentMaterialSamples.data]
+    [splitFromParentMaterialSamples.data, splitConfiguration]
+  );
+
+  const ableToStartNewSeries = useMemo<boolean>(
+    () => !splitConfiguration,
+    [splitConfiguration]
   );
 
   if (splitFromMaterialSamples.loading) {
@@ -214,7 +223,8 @@ export function MaterialSampleSplitGenerationForm({
                   },
                   {
                     value: "new",
-                    label: formatMessage("splitSeriesOptionNew")
+                    label: formatMessage("splitSeriesOptionNew"),
+                    disabled: !ableToStartNewSeries
                   }
                 ]}
               />
@@ -225,7 +235,7 @@ export function MaterialSampleSplitGenerationForm({
                   <SelectField
                     name="generationOptions"
                     label={formatMessage("splitGenerationOptionLabel")}
-                    disabled={selected === "continue"}
+                    disabled={selected === "continue" || !ableToStartNewSeries}
                     options={[
                       {
                         value: "lowercase",

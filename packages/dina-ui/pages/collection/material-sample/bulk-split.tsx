@@ -8,7 +8,8 @@ import { MaterialSampleSplitGenerationForm } from "../../../components/bulk-mate
 import PageLayout from "../../../components/page/PageLayout";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
-import { BULK_SPLIT_IDS } from "common-ui/lib";
+import { BULK_SPLIT_IDS, LoadingSpinner, useQuery } from "common-ui/lib";
+import { FormTemplate } from "../../../types/collection-api";
 
 export default function MaterialSampleBulkSplitPage() {
   const router = useRouter();
@@ -18,6 +19,17 @@ export default function MaterialSampleBulkSplitPage() {
     useState<InputResource<MaterialSample>[]>();
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
+
+  const formTemplateId = router.query.splitConfiguration;
+
+  const formTemplateQuery = useQuery<FormTemplate>(
+    {
+      path: `collection-api/form-template/${formTemplateId}`
+    },
+    {
+      disabled: !formTemplateId
+    }
+  );
 
   // Clear local storage once the ids have been retrieved.
   useEffect(() => {
@@ -48,6 +60,10 @@ export default function MaterialSampleBulkSplitPage() {
     setMode("EDIT");
   }
 
+  if (!formTemplateQuery.isDisabled && formTemplateQuery.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
     <>
       {mode === "EDIT" && lastSubmission && (
@@ -61,7 +77,11 @@ export default function MaterialSampleBulkSplitPage() {
         </PageLayout>
       )}
       {mode === "GENERATE" && (
-        <MaterialSampleSplitGenerationForm onGenerate={onGenerate} ids={ids} />
+        <MaterialSampleSplitGenerationForm
+          onGenerate={onGenerate}
+          ids={ids}
+          splitConfiguration={formTemplateQuery.response?.data}
+        />
       )}
     </>
   );
