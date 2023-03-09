@@ -24,6 +24,16 @@
     "useTargetOrganism": { "dataType": "boolean" },
     "publiclyReleasable": { "dataType": "boolean" },
     "useNextSequence": { "dataType": "boolean" },
-    "isRestricted": { "dataType": "boolean" }
+    "isRestricted": { "dataType": "boolean" },
+    "organism": {
+      "lifeStage": { "dataType": "string" },
+      "sex": { "dataType": "string" },
+      "remarks": { "dataType": "string" },
+      "isTarget": { "dataType": "boolean" },
+      "address": {
+        "addressLine": { "dataType": "string" },
+        "city": { "dataType": "string" }
+      }
+    }
   }
 }
