@@ -63,12 +63,12 @@ export function getDataFromWorkbook(
 ) {
   const data: { [key: string]: any }[] = [];
   const workbookData = spreadsheetData?.[sheetNumber].filter(
-    (rowData) => rowData.content.length != 0
+    (rowData) => rowData.content.length !== 0
   );
   for (let i = 1; i < workbookData.length; i++) {
     const row = workbookData[i];
     const rowData: { [key: string]: any } = {};
-    for (const index in fieldNames) {
+    for (let index = 0; index < fieldNames.length; index++) {
       const field = fieldNames[index];
       if (field !== undefined) {
         rowData[field] = row.content[index];
@@ -238,4 +238,16 @@ export function convertMap(value: string): { [key: string]: any } {
     }
   }
   return map;
+}
+
+export function convertDate(value: string) {
+  if (isNumber(value)) {
+    const dateNum = convertNumber(value);
+    const excelEpoc = new Date(1900, 0, -1).getTime();
+    const msDay = 86400000;
+    const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
+    return date.toISOString().split("T")[0];
+  } else {
+    return null;
+  }
 }
