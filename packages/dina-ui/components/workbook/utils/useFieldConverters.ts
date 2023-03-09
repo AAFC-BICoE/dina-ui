@@ -1,6 +1,7 @@
 import {
   convertBoolean,
   convertBooleanArray,
+  convertDate,
   convertMap,
   convertNumber,
   convertNumberArray,
@@ -14,6 +15,7 @@ export enum DataTypeEnum {
   NUMBER = "number",
   BOOLEAN = "boolean",
   STRING = "string",
+  DATE = "date",
   STRING_ARRAY = "string[]",
   NUMBER_ARRAY = "number[]",
   BOOLEAN_ARRAY = "boolean[]",
@@ -27,10 +29,11 @@ export const DATATYPE_CONVERTER_MAPPING = {
   [DataTypeEnum.STRING_ARRAY]: convertStringArray,
   [DataTypeEnum.NUMBER_ARRAY]: convertNumberArray,
   [DataTypeEnum.ManagedAttributes]: convertMap,
-  [DataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray, 
-  [DataTypeEnum.STRING]: (value) => (value),
-  [DataTypeEnum.VOCABULARY]: (value) => (value)
-}
+  [DataTypeEnum.BOOLEAN_ARRAY]: convertBooleanArray,
+  [DataTypeEnum.DATE]: convertDate,
+  [DataTypeEnum.STRING]: (value) => value,
+  [DataTypeEnum.VOCABULARY]: (value) => value
+};
 
 export function useFieldConverters(mappingConfig: {
   [key: string]: { [field: string]: { dataType: DataTypeEnum } };

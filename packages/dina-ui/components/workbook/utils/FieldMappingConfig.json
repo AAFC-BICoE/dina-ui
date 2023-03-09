@@ -5,7 +5,7 @@
     "preparationFixative": { "dataType": "string" },
     "preparationMaterials": { "dataType": "string" },
     "preparationSubstrate": { "dataType": "string" },
-    "preparationDate": { "dataType": "string" },
+    "preparationDate": { "dataType": "date" },
     "preparationRemarks": { "dataType": "string" },
     "description": { "dataType": "string" },
     "dwcDegreeOfEstablishment": { "dataType": "string" },
