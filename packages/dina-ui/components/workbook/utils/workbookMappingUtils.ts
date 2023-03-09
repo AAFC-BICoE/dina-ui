@@ -122,9 +122,11 @@ export function isBoolean(value: string): boolean {
  * @returns
  */
 export function isBooleanArray(value: string): boolean {
-  const regx =
-    /^\s*(yes|no|true|false|[0-1])\s*(,\s*(yes|no|true|false|1|0)\s*)*$/gi;
-  return !!value && regx.test(value);
+  const arr = value.split(",");
+  return (
+    arr.map((item) => trim(item)).filter((item) => !isBoolean(item)).length ===
+    0
+  );
 }
 
 /**

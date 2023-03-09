@@ -7,6 +7,7 @@ import {
   getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
+  isBooleanArray,
   isMap,
   isNumber
 } from "../workbookMappingUtils";
@@ -146,6 +147,11 @@ describe("workbookMappingUtils functions", () => {
     expect(isBoolean("adf0")).toBeFalsy();
     expect(isBoolean("0")).toBeTruthy();
     expect(isBoolean("1")).toBeTruthy();
+  });
+
+  it("isBooleanArray", () => {
+    expect(isBooleanArray("yes, false, no, 1")).toBeTruthy();
+    expect(isBooleanArray("yesno, yes, no, 1")).toBeFalsy();
   });
 
   it("isMap", () => {
