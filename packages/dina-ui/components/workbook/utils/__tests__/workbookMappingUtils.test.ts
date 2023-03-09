@@ -1,4 +1,5 @@
 import {
+  convertDate,
   convertMap,
   convertNumber,
   convertNumberArray,
@@ -193,5 +194,9 @@ describe("workbookMappingUtils functions", () => {
     });
     expect(convertMap("223:value3")).toEqual({ "223": "value3" });
     expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
+  });
+
+  it("convertDate", () => {
+    expect(convertDate("43831")).toEqual("2020-01-01");
   });
 });
