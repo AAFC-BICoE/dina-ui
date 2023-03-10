@@ -42,7 +42,7 @@ export function StringToggleField({
     <FieldWrapper {...props}>
       {({ value, setValue, formik }) => (
         <Switch
-          checked={value === "true" ?? false}
+          checked={(value === "true" || value === true) ?? false}
           onChange={checked => {
             setValue(String(checked));
             onChangeExternal?.(checked, formik);

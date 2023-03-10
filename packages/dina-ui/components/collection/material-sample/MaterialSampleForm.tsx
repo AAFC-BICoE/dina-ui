@@ -555,7 +555,7 @@ export function MaterialSampleForm({
 
   return isTemplate ? (
     formLayout
-  ) : loading || loadingExtensionValues ? (
+  ) : loading ? (
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>

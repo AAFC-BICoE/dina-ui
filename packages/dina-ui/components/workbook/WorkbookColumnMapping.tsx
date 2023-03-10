@@ -138,7 +138,7 @@ export function WorkbookColumnMapping({
           if (endpoint) {
             // load available Managed Attributes
             const query: any = useQuery({
-              path: "collection-api/managed-attribute"
+              path: endpoint
             });
             const managedAttributeKeys = query?.response?.data?.map(
               (managedAttribute) => {
@@ -310,16 +310,16 @@ export function WorkbookColumnMapping({
                 }
                 break;
               case DataTypeEnum.ManagedAttributes:
-                // if (!isMap(row[field])) {
-                //   param.dataType = DataTypeEnum.ManagedAttributes;
-                //   errors.push(
-                //     new ValidationError(
-                //       formatMessage("workBookInvalidDataFormat", param),
-                //       field,
-                //       "sheet"
-                //     )
-                //   );
-                // }
+                if (!isMap(row[field])) {
+                  param.dataType = DataTypeEnum.ManagedAttributes;
+                  errors.push(
+                    new ValidationError(
+                      formatMessage("workBookInvalidDataFormat", param),
+                      field,
+                      "sheet"
+                    )
+                  );
+                }
                 break;
               case DataTypeEnum.NUMBER:
                 if (!isNumber(row[field])) {
