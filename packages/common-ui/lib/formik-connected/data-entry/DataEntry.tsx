@@ -45,22 +45,27 @@ export function DataEntry({
   let extensionValues =
     formik?.values?.[name] ?? getBulkContextExtensionValues(bulkContext, name);
 
-  const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock ? useVocabularyOptions({
-    path: "collection-api/vocabulary/protocolData"
-  }) : useQuery<FieldExtension[]>({
-    path: blockOptionsEndpoint
-  });
+  const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock
+    ? useVocabularyOptions({
+        path: "collection-api/vocabulary/protocolData"
+      })
+    : useQuery<FieldExtension[]>({
+        path: blockOptionsEndpoint
+      });
 
-  const blockOptions = isVocabularyBasedEnabledForBlock ? blockOptionsQuery?.vocabOptions : blockOptionsQuery?.response?.data
-    .filter(
-      (data) => data.extension.fields?.[0].dinaComponent === blockOptionsFilter
-    )
-    .map((data) => {
-      return {
-        label: data.extension.name,
-        value: data.extension.key
-      };
-    });
+  const blockOptions = isVocabularyBasedEnabledForBlock
+    ? blockOptionsQuery?.vocabOptions
+    : blockOptionsQuery?.response?.data
+        .filter(
+          (data) =>
+            data.extension.fields?.[0].dinaComponent === blockOptionsFilter
+        )
+        .map((data) => {
+          return {
+            label: data.extension.name,
+            value: data.extension.key
+          };
+        });
 
   const [queriedTypeOptions, setQueriedTypeOptions] = useState<
     SelectOption<string>[]
@@ -181,6 +186,7 @@ export function DataEntry({
             ? Object.keys(extensionValues).map((blockKey) => {
                 return (
                   <DataBlock
+                    key={blockKey}
                     removeBlock={removeBlock}
                     name={`${name}.${blockKey}`}
                     blockKey={blockKey}
@@ -198,7 +204,9 @@ export function DataEntry({
                     blockOptionsQuery={blockOptionsQuery}
                     blockOptions={blockOptions}
                     unitsOptions={vocabQuery?.vocabOptions}
-                    typeOptions={typeOptionsEndpoint ? queriedTypeOptions : undefined}
+                    typeOptions={
+                      typeOptionsEndpoint ? queriedTypeOptions : undefined
+                    }
                   />
                 );
               })
@@ -218,24 +226,26 @@ function getBulkContextExtensionValues(
   bulkContext: BulkEditTabContextI<KitsuResource> | null,
   name
 ): any {
-  let extensionValues = {};
+  const extensionValues = {};
   bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
-    Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
-      if (extensionValues[fieldKey]) {
-        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
-          (extensionKey) => {
-            extensionValues[fieldKey].rows[extensionKey] = undefined;
-          }
-        );
-      } else {
-        extensionValues[fieldKey] = resourceHook.resource?.[name][fieldKey];
-        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
-          (extensionKey) => {
-            extensionValues[fieldKey].rows[extensionKey] = undefined;
-          }
-        );
-      }
-    });
+    if (!!resourceHook.resource[name]) {
+      Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
+        if (extensionValues[fieldKey]) {
+          Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+            (extensionKey) => {
+              extensionValues[fieldKey].rows[extensionKey] = undefined;
+            }
+          );
+        } else {
+          extensionValues[fieldKey] = resourceHook.resource?.[name][fieldKey];
+          Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+            (extensionKey) => {
+              extensionValues[fieldKey].rows[extensionKey] = undefined;
+            }
+          );
+        }
+      });
+    }
   });
   return extensionValues;
 }
