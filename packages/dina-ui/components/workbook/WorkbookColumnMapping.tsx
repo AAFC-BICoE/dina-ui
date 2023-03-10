@@ -22,6 +22,7 @@ import FieldMappingConfigJSON from "./utils/FieldMappingConfig.json";
 import { DataTypeEnum } from "./utils/useFieldConverters";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import {
+  convertMap,
   findMatchField,
   getColumnHeaders,
   getDataFromWorkbook,
@@ -29,7 +30,8 @@ import {
   isBooleanArray,
   isMap,
   isNumber,
-  isNumberArray
+  isNumberArray,
+  isValidManagedAttribute
 } from "./utils/workbookMappingUtils";
 
 export type FieldMapType = (string | undefined)[];
@@ -143,18 +145,8 @@ export function WorkbookColumnMapping({
             const query: any = useQuery({
               path: endpoint
             });
-            const managedAttributeKeys = query?.response?.data?.map(
-              (managedAttribute) => {
-                if (
-                  managedAttribute.managedAttributeComponent ===
-                  managedAttributeComponent
-                ) {
-                  return managedAttribute.key;
-                }
-              }
-            );
             loading = query?.loading;
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, managedAttributeKeys)
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data)
           }
           break;
         default:
@@ -323,6 +315,12 @@ export function WorkbookColumnMapping({
                       "sheet"
                     )
                   );
+                }
+                const workbookManagedAttributes = convertMap(row[field]);
+                try {
+                  isValidManagedAttribute(workbookManagedAttributes, FIELD_TO_VOCAB_ELEMS_MAP.get(field), formatMessage);
+                } catch (error) {
+                  errors.push(error);
                 }
                 break;
               case DataTypeEnum.NUMBER:
