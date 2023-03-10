@@ -135,7 +135,8 @@ export function isBooleanArray(value: string): boolean {
  * @returns boolean
  */
 export function isMap(value: string): boolean {
-  const regex = /^[a-zA-Z_]+:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_]+:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
+  const regex =
+    /^[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
   return !!value && regex.test(value);
 }
 
@@ -226,7 +227,7 @@ export function convertMap(value: string): { [key: string]: any } {
   const map = {} as { [key: string]: any };
   for (const keyValue of items) {
     if (keyValue) {
-      const arr = keyValue.split(regx).map((str) => trim(trim(str, '"')));
+      const arr = keyValue.split(regx).map((str) => trim(trim(str, '"').replace('"', "")));
       if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
         const key = arr[0];
         const strVal = arr[1];

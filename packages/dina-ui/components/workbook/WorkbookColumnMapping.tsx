@@ -1,5 +1,6 @@
 import {
   FieldWrapper,
+  LoadingSpinner,
   SelectField,
   SubmitButton,
   useAccount,
@@ -113,6 +114,7 @@ export function WorkbookColumnMapping({
       return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
     });
   }, [spreadsheetData]);
+  let loading = false;
 
   // Have to load end-points up front, save all responses in a map
   const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
@@ -131,6 +133,7 @@ export function WorkbookColumnMapping({
               query?.response?.data?.vocabularyElements?.map(
                 (vocabElement) => vocabElement.name
               );
+            loading = query?.loading;
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
           }
           break;
@@ -150,6 +153,7 @@ export function WorkbookColumnMapping({
                 }
               }
             );
+            loading = query?.loading;
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, managedAttributeKeys)
           }
           break;
@@ -334,8 +338,6 @@ export function WorkbookColumnMapping({
                 }
                 break;
               case DataTypeEnum.VOCABULARY:
-                console.log(field);
-                console.log(FIELD_TO_VOCAB_ELEMS_MAP);
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
                 if (!vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;
