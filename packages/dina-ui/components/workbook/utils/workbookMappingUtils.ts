@@ -255,3 +255,37 @@ export function convertDate(value: string) {
     return null;
   }
 }
+
+function isObject(input: any) {
+  return typeof input === "object" && input !== null;
+}
+
+/**
+ * Flattern an object into a one level property:value object. For example, it will convert
+ *   mockEntity: {
+ *      objectField: {
+ *        name: { dataType: DataTypeEnum.STRING },
+ *      }
+ *    }
+ *   into
+ *   {
+ *    "mockEntity.objectField.name.dataType": DataTypeEnum.STRING
+ *   }
+ * @param source
+ * @returns
+ */
+export function flattenObject(source: any) {
+  return isObject(source)
+    ? Object.fromEntries(
+        Object.entries(source).flatMap(([key, value]) =>
+          ((flattenValue) =>
+            isObject(flattenValue)
+              ? Object.entries(flattenValue).map(([valueKey, valueValue]) => [
+                  `${key}.${valueKey}`,
+                  valueValue
+                ])
+              : [[key, value]])(flattenObject(value))
+        )
+      )
+    : source;
+}
