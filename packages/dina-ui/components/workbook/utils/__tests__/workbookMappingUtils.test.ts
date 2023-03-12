@@ -1,4 +1,5 @@
 import {
+  convertDate,
   convertMap,
   convertNumber,
   convertNumberArray,
@@ -6,6 +7,7 @@ import {
   getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
+  isBooleanArray,
   isMap,
   isNumber
 } from "../workbookMappingUtils";
@@ -140,6 +142,16 @@ describe("workbookMappingUtils functions", () => {
     expect(isBoolean("yes")).toBeTruthy();
     expect(isBoolean("no")).toBeTruthy();
     expect(isBoolean("adf")).toBeFalsy();
+    expect(isBoolean("adfyes")).toBeFalsy();
+    expect(isBoolean("adf1")).toBeFalsy();
+    expect(isBoolean("adf0")).toBeFalsy();
+    expect(isBoolean("0")).toBeTruthy();
+    expect(isBoolean("1")).toBeTruthy();
+  });
+
+  it("isBooleanArray", () => {
+    expect(isBooleanArray("yes, false, no, 1")).toBeTruthy();
+    expect(isBooleanArray("yesno, yes, no, 1")).toBeFalsy();
   });
 
   it("isMap", () => {
@@ -188,5 +200,9 @@ describe("workbookMappingUtils functions", () => {
     });
     expect(convertMap("223:value3")).toEqual({ "223": "value3" });
     expect(convertMap("223ddd:value3")).toEqual({ "223ddd": "value3" });
+  });
+
+  it("convertDate", () => {
+    expect(convertDate("43831")).toEqual("2020-01-01");
   });
 });
