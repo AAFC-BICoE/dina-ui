@@ -3,13 +3,11 @@ import {
   SelectField,
   SubmitButton,
   useAccount,
-  useApiClient,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
-import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
@@ -17,8 +15,13 @@ import * as yup from "yup";
 import { ValidationError } from "yup";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { WorkbookJSON } from "./types/Workbook";
-import { DataTypeEnum } from "./utils/useWorkbookConverter";
-import { useWorkbookConverter } from "./utils/useWorkbookConverter";
+import FieldMappingConfig from "./utils/FieldMappingConfig";
+import {
+  DataTypeEnum,
+  FieldMappingConfigType,
+  useWorkbookConverter
+} from "./utils/useWorkbookConverter";
+import { startCase } from "lodash";
 import {
   findMatchField,
   getColumnHeaders,
@@ -29,7 +32,6 @@ import {
   isNumber,
   isNumberArray
 } from "./utils/workbookMappingUtils";
-import FieldMappingConfig from "./utils/FieldMappingConfig.json";
 
 export type FieldMapType = (string | undefined)[];
 
@@ -72,13 +74,15 @@ export function WorkbookColumnMapping({
     value: string;
   } | null>(entityTypes[0]);
   const [fieldMap, setFieldMap] = useState([] as FieldMapType);
+  // fieldHeaderPair stores the pairs of field name in the configuration and the column header in the excel file.
   const [fieldHeaderPair, setFieldHeaderPair] = useState(
     {} as { [field: string]: string }
   );
-  const { convertWorkbook } = useWorkbookConverter(
-    FieldMappingConfig,
-    selectedType?.value || "material-sample"
-  );
+  const { convertWorkbook, flattenedConfig, getPathOfField } =
+    useWorkbookConverter(
+      FieldMappingConfig,
+      selectedType?.value || "material-sample"
+    );
 
   const buttonBar = (
     <>
@@ -126,15 +130,24 @@ export function WorkbookColumnMapping({
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType?.value) {
-      const fieldsConfigs: { [field: string]: { dataType: DataTypeEnum } } =
-        FieldMappingConfig[selectedType?.value];
       const newFieldOptions: { label: string; value: string }[] = [];
-      Object.keys(fieldsConfigs).forEach((field) => {
-        const option = {
-          label: formatMessage(`field_${field}` as any),
-          value: field
-        };
-        newFieldOptions.push(option);
+      Object.keys(flattenedConfig).forEach((fieldPath) => {
+        const config = flattenedConfig[fieldPath];
+        if (
+          config.dataType !== DataTypeEnum.OBJECT &&
+          config.dataType !== DataTypeEnum.OBJECT_ARRAY
+        ) {
+          let label = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
+          label =
+            formatMessage(`field_${label}` as any)?.trim() ||
+            formatMessage(label as any)?.trim() ||
+            startCase(label);
+          const option = {
+            label,
+            value: fieldPath
+          };
+          newFieldOptions.push(option);
+        }
       });
       const map = [] as FieldMapType;
       const _fieldHeaderPair = {};
@@ -207,9 +220,6 @@ export function WorkbookColumnMapping({
     errors: ValidationError[]
   ) {
     if (!!selectedType?.value) {
-      const fieldsConfigs: {
-        [field: string]: { dataType: DataTypeEnum };
-      } = FieldMappingConfig[selectedType?.value];
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         for (const field of Object.keys(row)) {
@@ -224,91 +234,94 @@ export function WorkbookColumnMapping({
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {
-            switch (fieldsConfigs[field]?.dataType) {
-              case DataTypeEnum.BOOLEAN:
-                if (!isBoolean(row[field])) {
-                  param.dataType = DataTypeEnum.BOOLEAN;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.NUMBER:
-                if (!isNumber(row[field])) {
-                  param.dataType = DataTypeEnum.NUMBER;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.NUMBER_ARRAY:
-                if (!isNumberArray(row[field])) {
-                  param.dataType = DataTypeEnum.NUMBER_ARRAY;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.BOOLEAN_ARRAY:
-                if (!isBooleanArray(row[field])) {
-                  param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.MAP:
-                if (!isMap(row[field])) {
-                  param.dataType = DataTypeEnum.MAP;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.NUMBER:
-                if (!isNumber(row[field])) {
-                  param.dataType = DataTypeEnum.NUMBER;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
-                break;
-              case DataTypeEnum.VOCABULARY:
-                const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                if (!vocabElements.includes(row[field])) {
-                  param.dataType = DataTypeEnum.VOCABULARY;
-                  errors.push(
-                    new ValidationError(
-                      formatMessage("workBookInvalidDataFormat", param),
-                      field,
-                      "sheet"
-                    )
-                  );
-                }
+            const fieldPath = getPathOfField(field);
+            if (fieldPath) {
+              switch (flattenedConfig[fieldPath]?.dataType) {
+                case DataTypeEnum.BOOLEAN:
+                  if (!isBoolean(row[field])) {
+                    param.dataType = DataTypeEnum.BOOLEAN;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.NUMBER:
+                  if (!isNumber(row[field])) {
+                    param.dataType = DataTypeEnum.NUMBER;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.NUMBER_ARRAY:
+                  if (!isNumberArray(row[field])) {
+                    param.dataType = DataTypeEnum.NUMBER_ARRAY;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.BOOLEAN_ARRAY:
+                  if (!isBooleanArray(row[field])) {
+                    param.dataType = DataTypeEnum.BOOLEAN_ARRAY;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.MAP:
+                  if (!isMap(row[field])) {
+                    param.dataType = DataTypeEnum.MAP;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.NUMBER:
+                  if (!isNumber(row[field])) {
+                    param.dataType = DataTypeEnum.NUMBER;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+                  break;
+                case DataTypeEnum.VOCABULARY:
+                  const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
+                  if (!vocabElements.includes(row[field])) {
+                    param.dataType = DataTypeEnum.VOCABULARY;
+                    errors.push(
+                      new ValidationError(
+                        formatMessage("workBookInvalidDataFormat", param),
+                        field,
+                        "sheet"
+                      )
+                    );
+                  }
+              }
             }
           }
         }

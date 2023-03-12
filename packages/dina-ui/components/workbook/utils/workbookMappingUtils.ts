@@ -43,10 +43,23 @@ export function findMatchField(
     value: string;
   }[]
 ) {
-  const option = find(
-    fieldOptions,
-    (item) => _toPlainString(item.label) === _toPlainString(columnHeader)
-  );
+  const option = find(fieldOptions, (item) => {
+    const pos = columnHeader.lastIndexOf(".");
+    if (pos !== -1) {
+      const prefix = columnHeader.substring(0, pos + 1);
+      if (
+        item.value.startsWith(prefix) &&
+        _toPlainString(item.label) ===
+          _toPlainString(columnHeader.substring(pos + 1))
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return _toPlainString(item.label) === _toPlainString(columnHeader);
+    }
+  });
   return option;
 }
 

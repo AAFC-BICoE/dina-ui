@@ -1,5 +1,5 @@
 import { InputResource, KitsuResource } from "kitsu";
-import { get, has, replace, filter } from "lodash";
+import { filter, get, has } from "lodash";
 import {
   convertBoolean,
   convertBooleanArray,
@@ -169,5 +169,10 @@ export function useWorkbookConverter(
     return resoureces;
   }
 
-  return { getFieldConverter, getPathOfField, convertWorkbook };
+  return {
+    convertWorkbook,
+    flattenedConfig,
+    getFieldConverter,
+    getPathOfField
+  };
 }
