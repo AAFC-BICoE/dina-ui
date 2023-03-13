@@ -56,12 +56,14 @@ export function findMatchField(
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
  * @param fieldNames
+ * @param getRowNumber (optional) - if yes, gets the corresponding row number in the workbook for the row data
  * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON,
   sheetNumber: number,
-  fieldNames: (string | undefined)[]
+  fieldNames: (string | undefined)[],
+  getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
   const workbookData = spreadsheetData?.[sheetNumber].filter(
@@ -76,6 +78,11 @@ export function getDataFromWorkbook(
         rowData[field] = row.content[index];
       }
     }
+
+    if (!!getRowNumber) {
+      rowData.rowNumber = row.rowNumber
+    }
+    
     data.push(rowData);
   }
   return data;
