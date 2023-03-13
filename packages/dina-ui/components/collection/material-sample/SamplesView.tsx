@@ -48,7 +48,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       Header: formatMessage("tags")
     },
     {
-      Cell: ({ original: { id, materialSampleName } }) => (
+      Cell: ({ original: { id, materialSampleName, materialSampleType } }) => (
         <div className="d-flex">
           <EditButton
             className="mx-2"
@@ -59,6 +59,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
           <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSampleName}
+            materialSampleType={materialSampleType}
           />
           <DeleteButton
             id={id as string}

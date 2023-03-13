@@ -206,16 +206,41 @@ export function getComponentOrderFromTemplate(
  * After fetching all of the form templates a user has access to, this function will filter out all
  * of the form templates that do not have split configuration setup.
  *
+ * An additional filter is added for the condition on the split configuration.
+ *
  * @param templates All form templates the user can have access to.
+ * @param materialSampleType The split from Material Sample Type used for the condition.
  */
 export function getSplitConfigurationFormTemplates(
-  templates?: FormTemplate[]
+  templates?: FormTemplate[],
+  materialSampleType?: string
 ): FormTemplate[] {
-  if (!templates) return [];
+  if (!templates || !materialSampleType) return [];
 
-  return templates.filter(
-    (template) =>
-      getComponentValues(SPLIT_CONFIGURATION_COMPONENT_NAME, template, true) !==
-      undefined
-  );
+  return templates.filter((template) => {
+    const splitConfigComponent = getComponentValues(
+      SPLIT_CONFIGURATION_COMPONENT_NAME,
+      template,
+      true
+    );
+
+    // Split configuration does not exist on this form template.
+    if (!splitConfigComponent) {
+      return false;
+    }
+
+    // Check the split configuration condition.
+    if (
+      splitConfigComponent["splitConfiguration.condition.conditionType"] ===
+        "TYPE_BASED" &&
+      splitConfigComponent[
+        "splitConfiguration.condition.materialSampleType"
+      ].includes(materialSampleType)
+    ) {
+      return true;
+    }
+
+    // Condition not met, do not include it.
+    return false;
+  });
 }

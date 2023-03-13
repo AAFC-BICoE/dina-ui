@@ -317,6 +317,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSample.materialSampleName}
+            materialSampleType={materialSample.materialSampleType}
           />
           <GenerateLabelDropdownButton materialSample={materialSample} />
           <Link href={`/collection/material-sample/revisions?id=${id}`}>

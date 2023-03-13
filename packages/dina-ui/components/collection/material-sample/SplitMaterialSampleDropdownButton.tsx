@@ -24,11 +24,13 @@ type CustomMenuProps = {
 interface SplitMaterialSampleDropdownButtonProps {
   ids: string[];
   disabled: boolean;
+  materialSampleType?: string;
 }
 
 export function SplitMaterialSampleDropdownButton({
   ids,
-  disabled
+  disabled,
+  materialSampleType
 }: SplitMaterialSampleDropdownButtonProps) {
   const router = useRouter();
 
@@ -51,7 +53,8 @@ export function SplitMaterialSampleDropdownButton({
       disabled,
       onSuccess: async ({ data }) => {
         const formTemplatesWithSplitConfig = getSplitConfigurationFormTemplates(
-          data as FormTemplate[]
+          data as FormTemplate[],
+          materialSampleType
         );
         const generatedOptions = formTemplatesWithSplitConfig.map(
           (formTemplate) => ({
