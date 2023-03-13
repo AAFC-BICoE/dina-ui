@@ -41,10 +41,10 @@ export function useProtocolFormConverter() {
   function convertFormDataToProtocol(
     protocolFormValue: ProtocolFormValue
   ): InputResource<Protocol> {
-    if (
-      protocolFormValue.protocolFormData
-    ) {
-      protocolFormValue.protocolData = Object.keys(protocolFormValue.protocolFormData).map((formDataKey) => {
+    if (protocolFormValue.protocolFormData) {
+      protocolFormValue.protocolData = Object.keys(
+        protocolFormValue.protocolFormData
+      ).map((formDataKey) => {
         const formData = protocolFormValue?.protocolFormData?.[formDataKey];
         const protocolData = {
           key: formData?.select,

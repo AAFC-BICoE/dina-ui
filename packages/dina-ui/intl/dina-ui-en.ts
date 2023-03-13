@@ -726,6 +726,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",
   selectTemplate: "Select Template",
+  selectSplitConfiguration: "Select Split Configuration",
   seriesModeInfo: "Series Mode: Material Samples have incrementing IDs.",
   set: "Set",
   setAll: "Set All",
