@@ -227,7 +227,7 @@ export function WorkbookColumnMapping({
             dataType?: DataTypeEnum;
           } = {
             sheet: sheet + 1,
-            index: row.rowNumber,
+            index: row.rowNumber + 1,
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {
