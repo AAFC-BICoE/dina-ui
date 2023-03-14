@@ -8,6 +8,7 @@ import {
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
   materialSampleCultureStrainChildrenQuery,
+  useElasticSearchQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -89,6 +90,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <a>{highestParentMaterialSample}</a>
     </Link>
   );
+
+  const transactionQuery = useElasticSearchQuery({indexName: "dina_loan_transaction_index", queryDSL: {}});
 
   return (
     <div>
