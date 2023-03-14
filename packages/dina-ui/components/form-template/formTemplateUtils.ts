@@ -2,7 +2,8 @@ import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
-  FormTemplate
+  FormTemplate,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME
 } from "../../types/collection-api";
 import { sortBy, get, isEmpty, compact } from "lodash";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
@@ -133,6 +134,23 @@ export function getSplitConfigurationComponentValues(
     true
   );
 
+  // Retrieve form template identifiers to get the material sample type.
+  const materialSampleInfoInitialValues = getComponentValues(
+    MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+    formTemplate,
+    true
+  );
+
+  const splitConfigurationStrategy = get(
+    splitConfigurationInitialValues,
+    "splitConfiguration.materialSampleNameGeneration.strategy"
+  );
+
+  const materialSampleType =
+    splitConfigurationStrategy === "TYPE_BASED"
+      ? get(materialSampleInfoInitialValues, "materialSampleType")
+      : undefined;
+
   // Return an empty object to be put into the form template default values.
   if (!splitConfigurationInitialValues) {
     return undefined;
@@ -152,14 +170,12 @@ export function getSplitConfigurationComponentValues(
         )
       },
       materialSampleNameGeneration: {
-        strategy: get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.materialSampleNameGeneration.strategy"
-        ),
+        strategy: splitConfigurationStrategy,
         characterType: get(
           splitConfigurationInitialValues,
           "splitConfiguration.materialSampleNameGeneration.characterType"
-        )
+        ),
+        materialSampleType
       }
     }
   };

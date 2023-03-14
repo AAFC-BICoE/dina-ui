@@ -16,34 +16,28 @@ import {
 import { Card } from "react-bootstrap";
 import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
 import { useFormikContext } from "formik";
-import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
+import {
+  CharacterTypes,
+  MaterialSampleIdentifierGenerator
+} from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
-import { FormTemplate, MaterialSample } from "../../types/collection-api";
+import { MaterialSample } from "../../types/collection-api";
 import { InputResource, PersistedResource } from "kitsu";
+import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 const ENTITY_LINK = "/collection/material-sample";
 
-type SeriesOptions = "continue" | "continueFromParent" | "new";
-type GenerationOptions = "lowercase" | "uppercase" | "numeric";
-type AppendGenerationMode = {
-  [key in GenerationOptions]: string;
-};
-
-const APPEND_GENERATION_MODE: AppendGenerationMode = {
-  lowercase: "-a",
-  uppercase: "-A",
-  numeric: "-1"
-};
+type SeriesOptions = "splitConfig" | "continue" | "new";
 
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
   seriesOptions: SeriesOptions;
-  generationOptions: GenerationOptions;
+  generationOptions: CharacterTypes;
 }
 
 interface MaterialSampleSplitGenerationFormProps {
   ids: string[];
-  splitConfiguration?: FormTemplate;
+  splitConfiguration?: SplitConfiguration;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
 }
 
@@ -68,18 +62,10 @@ export function MaterialSampleSplitGenerationForm({
     disabled: ids.length === 0
   });
 
-  const splitFromParentMaterialSamples = useBulkGet<MaterialSample>({
-    ids: (splitFromMaterialSamples.data as any)?.map(
-      (sample) => sample?.parentMaterialSample?.id ?? ""
-    ),
-    listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
-    disabled:
-      splitFromMaterialSamples.loading ||
-      (splitFromMaterialSamples.data as any)?.some(
-        (sample) => !sample.parentMaterialSample
-      )
-  });
+  // Verify that all the ids meet the condition before preceding.
+  // useEffect(() => {
+
+  // }, [splitFromMaterialSamples.data])
 
   const buttonBar = (
     <>
@@ -106,15 +92,6 @@ export function MaterialSampleSplitGenerationForm({
     [splitFromMaterialSamples.data, splitConfiguration]
   );
 
-  const ableToContinueSeriesFromParent = useMemo<boolean>(
-    () =>
-      !splitConfiguration &&
-      (splitFromParentMaterialSamples.data as any)?.every(
-        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
-      ),
-    [splitFromParentMaterialSamples.data, splitConfiguration]
-  );
-
   const ableToStartNewSeries = useMemo<boolean>(
     () => !splitConfiguration,
     [splitConfiguration]
@@ -126,43 +103,45 @@ export function MaterialSampleSplitGenerationForm({
 
   const initialValues: MaterialSampleBulkSplitFields = {
     numberToCreate: 1,
-    seriesOptions: ableToContinueSeries ? "continue" : "new",
-    generationOptions: "lowercase"
+    seriesOptions: splitConfiguration
+      ? "splitConfig"
+      : ableToContinueSeries
+      ? "continue"
+      : "new",
+    generationOptions: "LOWER_LETTER"
   };
 
   const onSubmit: DinaFormOnSubmit<MaterialSampleBulkSplitFields> = ({
     submittedValues
   }) => {
     if (
-      !isMultiple &&
       Number(generatedIdentifiers.length) !==
-        Number(submittedValues?.numberToCreate)
+      Number(submittedValues?.numberToCreate)
     ) {
       return;
     }
 
-    const samples: InputResource<MaterialSample>[] = [];
-    splitFromMaterialSamples?.data?.forEach((splitMaterialSample, index) => {
-      if (!splitMaterialSample) {
-        return;
-      }
+    const splitFromMaterialSample: any = splitFromMaterialSamples?.data?.[0];
 
+    // TODO support multiple.
+    const samples: InputResource<MaterialSample>[] = [];
+    generatedIdentifiers.forEach((identifier) => {
       samples.push({
         type: "material-sample",
         parentMaterialSample: {
-          id: splitMaterialSample.id ?? "",
+          id: splitFromMaterialSample?.id ?? "",
           type: "material-sample"
         },
-        group: (splitMaterialSample as any).group ?? "",
-        collection: (splitMaterialSample as any)?.collection?.id
+        group: splitFromMaterialSample?.group ?? "",
+        collection: splitFromMaterialSample?.collection?.id
           ? {
-              id: (splitMaterialSample as any).collection?.id ?? "",
+              id: splitFromMaterialSample?.collection?.id ?? "",
               type: "collection"
             }
           : undefined,
         publiclyReleasable: true,
         allowDuplicateName: false,
-        materialSampleName: generatedIdentifiers[index]
+        materialSampleName: identifier
       });
     });
 
@@ -206,19 +185,16 @@ export function MaterialSampleSplitGenerationForm({
                 horizontalOptions={true}
                 options={[
                   {
+                    value: "splitConfig",
+                    label: formatMessage("materialSampleSplitConfiguration"),
+                    disabled: !splitConfiguration
+                  },
+                  {
                     value: "continue",
                     label: formatMessage("splitSeriesOptionContinue"),
                     disabled: !ableToContinueSeries,
                     tooltipLabel: !ableToContinueSeries
                       ? "splitSeriesOptionContinueTooltip"
-                      : undefined
-                  },
-                  {
-                    value: "continueFromParent",
-                    label: formatMessage("splitSeriesOptionContinueFromParent"),
-                    disabled: !ableToContinueSeriesFromParent,
-                    tooltipLabel: !ableToContinueSeriesFromParent
-                      ? "splitSeriesOptionContinueFromParentTooltip"
                       : undefined
                   },
                   {
@@ -238,15 +214,15 @@ export function MaterialSampleSplitGenerationForm({
                     disabled={selected === "continue" || !ableToStartNewSeries}
                     options={[
                       {
-                        value: "lowercase",
+                        value: "LOWER_LETTER",
                         label: formatMessage("splitGenerationOptionLowercase")
                       },
                       {
-                        value: "uppercase",
+                        value: "UPPER_LETTER",
                         label: formatMessage("splitGenerationOptionUppercase")
                       },
                       {
-                        value: "numeric",
+                        value: "NUMBER",
                         label: formatMessage("splitGenerationOptionNumerical")
                       }
                     ]}
@@ -260,11 +236,9 @@ export function MaterialSampleSplitGenerationForm({
             splitFromMaterialSamples={
               splitFromMaterialSamples.data as MaterialSample[]
             }
-            splitFromParentMaterialSamples={
-              splitFromParentMaterialSamples.data as MaterialSample[]
-            }
             generatedIdentifiers={generatedIdentifiers}
             setGeneratedIdentifiers={setGeneratedIdentifiers}
+            splitConfiguration={splitConfiguration}
           />
         </>
       </PageLayout>
@@ -274,16 +248,16 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
-  splitFromParentMaterialSamples: MaterialSample[];
   generatedIdentifiers: string[];
   setGeneratedIdentifiers: (identifiers: string[]) => void;
+  splitConfiguration?: SplitConfiguration;
 }
 
 function PreviewGeneratedNames({
   splitFromMaterialSamples,
-  splitFromParentMaterialSamples,
   generatedIdentifiers,
-  setGeneratedIdentifiers
+  setGeneratedIdentifiers,
+  splitConfiguration
 }: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
@@ -298,40 +272,38 @@ function PreviewGeneratedNames({
   const numberToCreate = formik.values.numberToCreate;
 
   function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
-    const getYoungestMaterialSample = (materialSampleChildren) => {
-      return materialSampleChildren
-        ? materialSampleChildren.reduce((max, current) => {
-            return current.ordinal > max.ordinal ? current : max;
-          }, materialSampleChildren[0])
-        : undefined;
-    };
-
     // Depending on the series mode, the identifier that will need to be sent to the backend to
     // generate more identifier changes.
     switch (seriesMode) {
       case "new":
         return {
           type: "material-sample-identifier-generator",
-          amount: numberToCreate - 1,
-          identifier:
-            splitFromMaterialSamples?.[index]?.materialSampleName +
-            APPEND_GENERATION_MODE[generationMode]
+          amount: numberToCreate,
+          currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
+          strategy: "DIRECT_PARENT",
+          characterType: generationMode
         };
       case "continue":
         return {
           type: "material-sample-identifier-generator",
           amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
+          currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
+          strategy: "DIRECT_PARENT",
+          characterType: generationMode
         };
-      case "continueFromParent":
+      case "splitConfig":
         return {
           type: "material-sample-identifier-generator",
           amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromParentMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
+          currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
+          strategy:
+            splitConfiguration?.materialSampleNameGeneration?.strategy ??
+            "DIRECT_PARENT",
+          characterType:
+            splitConfiguration?.materialSampleNameGeneration?.characterType ??
+            "LOWER_LETTER",
+          materialSampleType:
+            splitConfiguration?.materialSampleNameGeneration?.materialSampleType
         };
     }
   }
@@ -365,20 +337,7 @@ function PreviewGeneratedNames({
         .flatMap((response) => response?.nextIdentifiers || [])
         .filter((identifier) => identifier);
 
-      if (seriesMode === "new") {
-        if (isMultiple) {
-          setGeneratedIdentifiers(
-            requests.map((request) => request.identifier)
-          );
-        } else {
-          setGeneratedIdentifiers([
-            requests[0].identifier,
-            ...generatedIdentifiersResults
-          ]);
-        }
-      } else {
-        setGeneratedIdentifiers(generatedIdentifiersResults);
-      }
+      setGeneratedIdentifiers(generatedIdentifiersResults);
     }
 
     let timeoutId;
