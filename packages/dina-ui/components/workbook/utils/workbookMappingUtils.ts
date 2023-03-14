@@ -1,6 +1,8 @@
 import { WorkbookJSON } from "../types/Workbook";
 import { find, compact, trim } from "lodash";
 
+const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
+
 /**
  * This is currently a pretty simple function but in the future you will be able to select the
  * sheet to get the headers from. For now this will simply just retrieve the first row with
@@ -54,26 +56,33 @@ export function findMatchField(
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
  * @param fieldNames
+ * @param getRowNumber (optional) - if yes, gets the corresponding row number in the workbook for the row data
  * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON,
   sheetNumber: number,
-  fieldNames: (string | undefined)[]
+  fieldNames: (string | undefined)[],
+  getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
   const workbookData = spreadsheetData?.[sheetNumber].filter(
-    (rowData) => rowData.content.length != 0
+    (rowData) => rowData.content.length !== 0
   );
   for (let i = 1; i < workbookData.length; i++) {
     const row = workbookData[i];
     const rowData: { [key: string]: any } = {};
-    for (const index in fieldNames) {
+    for (let index = 0; index < fieldNames.length; index++) {
       const field = fieldNames[index];
       if (field !== undefined) {
         rowData[field] = row.content[index];
       }
     }
+
+    if (!!getRowNumber) {
+      rowData.rowNumber = row.rowNumber;
+    }
+
     data.push(rowData);
   }
   return data;
@@ -107,22 +116,24 @@ export function isNumberArray(value: string | null | undefined): boolean {
 
 /**
  * Check if a comma separated string a boolean value.
- * @param value String, it can be 'true', 'false', 'yes', or 'no'
+ * @param value String, it can be 'true', 'false', 'yes', 'no', '1', or '0'
  * @returns boolean
  */
 export function isBoolean(value: string): boolean {
-  const regx = /^\s*yes|no|true|false\s*$/gi;
-  return !!value && regx.test(value);
+  return !!value && BOOLEAN_CONSTS.indexOf(value.toLowerCase()) > -1;
 }
 
 /**
  * Check is a comma separated string a boolean array
- * @param value string.  It can be 'true, false, No, yes'
+ * @param value string.  It can be 'true, false, No, yes', '1', or '0'
  * @returns
  */
 export function isBooleanArray(value: string): boolean {
-  const regx = /^\s*(yes|no|true|false)\s*(,\s*(yes|no|true|false)\s*)*$/gi;
-  return !!value && regx.test(value);
+  const arr = value.split(",");
+  return (
+    arr.map((item) => trim(item)).filter((item) => !isBoolean(item)).length ===
+    0
+  );
 }
 
 /**
@@ -156,7 +167,7 @@ export function convertNumber(value: any): number | null {
  */
 export function convertBoolean(value: any): boolean {
   const strBoolean = String(value).toLowerCase().trim();
-  if (strBoolean === "false" || strBoolean === "no") {
+  if (strBoolean === "false" || strBoolean === "no" || strBoolean === "0") {
     return false;
   }
   return !!value;
@@ -238,4 +249,16 @@ export function convertMap(value: string): { [key: string]: any } {
     }
   }
   return map;
+}
+
+export function convertDate(value: string) {
+  if (isNumber(value)) {
+    const dateNum = convertNumber(value);
+    const excelEpoc = new Date(1900, 0, -1).getTime();
+    const msDay = 86400000;
+    const date = new Date(excelEpoc + (dateNum ?? 0) * msDay);
+    return date.toISOString().split("T")[0];
+  } else {
+    return null;
+  }
 }

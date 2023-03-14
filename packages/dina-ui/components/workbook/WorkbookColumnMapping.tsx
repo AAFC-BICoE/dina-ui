@@ -53,7 +53,7 @@ export interface WorkbookColumnMappingProps {
 const ENTITY_TYPES = ["material-sample"] as const;
 const FieldMappingConfig = FieldMappingConfigJSON as {
   [key: string]: {
-    [field: string]: { dataType: DataTypeEnum, vocabularyEndpoint?: string };
+    [field: string]: { dataType: DataTypeEnum; vocabularyEndpoint?: string };
   };
 };
 
@@ -84,7 +84,6 @@ export function WorkbookColumnMapping({
     selectedType?.value || "material-sample",
     FieldMappingConfig
   );
-  
 
   const buttonBar = (
     <>
@@ -116,16 +115,18 @@ export function WorkbookColumnMapping({
   Object.keys(FieldMappingConfig).forEach((recordType) => {
     const recordFieldsMap = FieldMappingConfig[recordType];
     Object.keys(recordFieldsMap).forEach((recordField) => {
-      const {dataType, vocabularyEndpoint} = recordFieldsMap[recordField];
+      const { dataType, vocabularyEndpoint } = recordFieldsMap[recordField];
       if (dataType === DataTypeEnum.VOCABULARY && vocabularyEndpoint) {
         const query: any = useQuery({
           path: vocabularyEndpoint
         });
-        const vocabElements = query?.response?.data?.vocabularyElements?.map((vocabElement) => (vocabElement.name));
+        const vocabElements = query?.response?.data?.vocabularyElements?.map(
+          (vocabElement) => vocabElement.name
+        );
         FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
       }
-    })
-  })
+    });
+  });
 
   // Generate field options
   const fieldOptions = useMemo(() => {
@@ -196,7 +197,12 @@ export function WorkbookColumnMapping({
         if (errors.length > 0) {
           return new ValidationError(errors);
         }
-        const data = getDataFromWorkbook(spreadsheetData, sheet, fieldNames);
+        const data = getDataFromWorkbook(
+          spreadsheetData,
+          sheet,
+          fieldNames,
+          true
+        );
         validateData(data, errors);
         if (errors.length > 0) {
           return new ValidationError(errors);
@@ -207,16 +213,18 @@ export function WorkbookColumnMapping({
   });
 
   function validateData(
-    workbookData: { [field: string]: string }[],
+    workbookData: { [field: string]: any }[],
     errors: ValidationError[]
   ) {
     if (!!selectedType?.value) {
       const fieldsConfigs: {
         [field: string]: { dataType: DataTypeEnum };
       } = FieldMappingConfig[selectedType?.value];
-      for (let i = 0; i < workbookData.length; i++) {
-        const row = workbookData[i];
+      for (const row of workbookData) {
         for (const field of Object.keys(row)) {
+          if (field === "rowNumber") {
+            continue;
+          }
           const param: {
             sheet: number;
             index: number;
@@ -224,7 +232,7 @@ export function WorkbookColumnMapping({
             dataType?: DataTypeEnum;
           } = {
             sheet: sheet + 1,
-            index: +i + 1,
+            index: row.rowNumber + 1,
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {
@@ -303,11 +311,7 @@ export function WorkbookColumnMapping({
                 break;
               case DataTypeEnum.VOCABULARY:
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                if (
-                  !vocabElements.includes(
-                    row[field]
-                  )
-                ) {
+                if (!vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;
                   errors.push(
                     new ValidationError(

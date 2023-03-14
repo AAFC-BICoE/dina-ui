@@ -228,22 +228,24 @@ function getBulkContextExtensionValues(
 ): any {
   const extensionValues = {};
   bulkContext?.resourceHooks?.forEach((resourceHook: any) => {
-    Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
-      if (extensionValues[fieldKey]) {
-        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
-          (extensionKey) => {
-            extensionValues[fieldKey].rows[extensionKey] = undefined;
-          }
-        );
-      } else {
-        extensionValues[fieldKey] = resourceHook.resource?.[name][fieldKey];
-        Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
-          (extensionKey) => {
-            extensionValues[fieldKey].rows[extensionKey] = undefined;
-          }
-        );
-      }
-    });
+    if (!!resourceHook.resource[name]) {
+      Object.keys(resourceHook.resource[name]).forEach((fieldKey) => {
+        if (extensionValues[fieldKey]) {
+          Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+            (extensionKey) => {
+              extensionValues[fieldKey].rows[extensionKey] = undefined;
+            }
+          );
+        } else {
+          extensionValues[fieldKey] = resourceHook.resource?.[name][fieldKey];
+          Object.keys(resourceHook?.resource?.[name][fieldKey].rows).forEach(
+            (extensionKey) => {
+              extensionValues[fieldKey].rows[extensionKey] = undefined;
+            }
+          );
+        }
+      });
+    }
   });
   return extensionValues;
 }
