@@ -24,7 +24,7 @@ export default function MaterialSampleBulkSplitPage() {
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
 
-  const formTemplateId = router.query.splitConfiguration;
+  const formTemplateId: string = router.query.splitConfiguration as string;
 
   const formTemplateQuery = useQuery<FormTemplate>(
     {
@@ -85,6 +85,7 @@ export default function MaterialSampleBulkSplitPage() {
             samples={lastSubmission}
             onSaved={moveToResultPage}
             onPreviousClick={() => setMode("GENERATE")}
+            initialFormTemplateUUID={formTemplateId}
           />
         </PageLayout>
       )}

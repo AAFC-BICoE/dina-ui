@@ -38,13 +38,15 @@ export interface MaterialSampleBulkEditorProps {
   onSaved: (samples: PersistedResource<MaterialSample>[]) => Promisable<void>;
   disableSampleNameField?: boolean;
   onPreviousClick?: () => void;
+  initialFormTemplateUUID?: string;
 }
 
 export function MaterialSampleBulkEditor({
   samples: samplesProp,
   disableSampleNameField,
   onSaved,
-  onPreviousClick
+  onPreviousClick,
+  initialFormTemplateUUID
 }: MaterialSampleBulkEditorProps) {
   // Allow selecting a custom view for the form:
   const {
@@ -55,6 +57,15 @@ export function MaterialSampleBulkEditor({
     collectingEventInitialValues,
     acquisitionEventInitialValues
   } = useMaterialSampleFormTemplateSelectState();
+
+  // Set the initial form template.
+  useEffect(() => {
+    if (!initialFormTemplateUUID) {
+      return;
+    }
+
+    setSampleFormTemplateUUID(initialFormTemplateUUID);
+  }, [initialFormTemplateUUID]);
 
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks
