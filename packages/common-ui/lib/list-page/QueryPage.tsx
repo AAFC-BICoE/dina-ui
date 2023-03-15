@@ -807,7 +807,7 @@ export function QueryPage<TData extends KitsuResource>({
                 sorted={sortingRules}
                 // Table customization props
                 {...resolvedReactTableProps}
-                className="-striped"
+                className="-striped react-table-overflow"
                 TbodyComponent={
                   error
                     ? () => (
