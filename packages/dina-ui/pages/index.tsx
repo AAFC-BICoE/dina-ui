@@ -81,9 +81,24 @@ export function Home() {
               </h2>
 
               <Stack style={{ display: "inline-flex" }}>
+                <Link href="/collection/assemblage/list">
+                  <a>
+                    <DinaMessage id="title_assemblage" />
+                  </a>
+                </Link>
                 <Link href="/collection/collecting-event/list">
                   <a>
                     <DinaMessage id="collectingEventListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/collection-method/list">
+                  <a>
+                    <DinaMessage id="collectionMethodListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/collection/list">
+                  <a>
+                    <DinaMessage id="collectionListTitle" />
                   </a>
                 </Link>
                 <Link href="/collection/material-sample/list">
@@ -99,6 +114,11 @@ export function Home() {
                 <Link href="/collection/storage-unit/list">
                   <a>
                     <DinaMessage id="storageUnitListTitle" />
+                  </a>
+                </Link>
+                <Link href="/collection/project/list">
+                  <a>
+                    <DinaMessage id="projectListTitle" />
                   </a>
                 </Link>
                 <Link href="/workbook/upload">
@@ -257,21 +277,6 @@ export function Home() {
                 </h2>
 
                 <Stack style={{ display: "inline-flex" }}>
-                  <Link href="/collection/assemblage/list">
-                    <a>
-                      <DinaMessage id="title_assemblage" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/collection-method/list">
-                    <a>
-                      <DinaMessage id="collectionMethodListTitle" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/collection/list">
-                    <a>
-                      <DinaMessage id="collectionListTitle" />
-                    </a>
-                  </Link>
                   <Link href="/collection/extension/list">
                     <a>
                       <DinaMessage id="fieldExtensions" />
@@ -292,11 +297,6 @@ export function Home() {
                       <DinaMessage id="managedAttributes" />
                     </a>
                   </Link>
-                  <Link href="/object-store/object-subtype/list">
-                    <a>
-                      <DinaMessage id="objectSubtypeListTitle" />
-                    </a>
-                  </Link>
                   {/* Permissions link here */}
                   <Link href="/collection/preparation-method/list">
                     <a>
@@ -306,11 +306,6 @@ export function Home() {
                   <Link href="/collection/preparation-type/list">
                     <a>
                       <DinaMessage id="preparationTypeListTitle" />
-                    </a>
-                  </Link>
-                  <Link href="/collection/project/list">
-                    <a>
-                      <DinaMessage id="projectListTitle" />
                     </a>
                   </Link>
                   <Link href="/collection/protocol/list">

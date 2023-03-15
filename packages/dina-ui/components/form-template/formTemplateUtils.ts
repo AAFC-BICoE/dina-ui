@@ -4,7 +4,8 @@ import {
   SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate
 } from "../../types/collection-api";
-import { sortBy, get, isEmpty } from "lodash";
+import { sortBy, get, isEmpty, compact } from "lodash";
+import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -198,5 +199,23 @@ export function getComponentOrderFromTemplate(
 
   return sortBy(template.components, "order").map<string>(
     (component) => component.name ?? ""
+  );
+}
+
+/**
+ * After fetching all of the form templates a user has access to, this function will filter out all
+ * of the form templates that do not have split configuration setup.
+ *
+ * @param templates All form templates the user can have access to.
+ */
+export function getSplitConfigurationFormTemplates(
+  templates?: FormTemplate[]
+): FormTemplate[] {
+  if (!templates) return [];
+
+  return templates.filter(
+    (template) =>
+      getComponentValues(SPLIT_CONFIGURATION_COMPONENT_NAME, template, true) !==
+      undefined
   );
 }

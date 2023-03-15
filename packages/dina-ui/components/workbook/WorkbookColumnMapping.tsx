@@ -224,7 +224,7 @@ export function WorkbookColumnMapping({
         if (errors.length > 0) {
           return new ValidationError(errors);
         }
-        const data = getDataFromWorkbook(spreadsheetData, sheet, fieldNames);
+        const data = getDataFromWorkbook(spreadsheetData, sheet, fieldNames, true);
         validateData(data, errors);
         if (errors.length > 0) {
           return new ValidationError(errors);
@@ -235,7 +235,7 @@ export function WorkbookColumnMapping({
   });
 
   function validateData(
-    workbookData: { [field: string]: string }[],
+    workbookData: { [field: string]: any }[],
     errors: ValidationError[]
   ) {
     if (!!selectedType?.value) {
@@ -245,6 +245,9 @@ export function WorkbookColumnMapping({
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         for (const field of Object.keys(row)) {
+          if (field === "rowNumber") {
+            continue;
+          }
           const param: {
             sheet: number;
             index: number;
@@ -252,7 +255,7 @@ export function WorkbookColumnMapping({
             dataType?: DataTypeEnum;
           } = {
             sheet: sheet + 1,
-            index: +i + 1,
+            index: row.rowNumber + 1,
             field: fieldHeaderPair[field]
           };
           if (!!row[field]) {

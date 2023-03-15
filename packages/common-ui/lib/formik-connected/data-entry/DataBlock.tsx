@@ -50,7 +50,7 @@ export function DataBlock({
   const rootName = props.name.split(".")[0];
   const selectedBlockOptions = formik?.values?.[rootName]
     ? Object.keys(formik?.values?.[rootName]).map(
-        (blockKey) => formik?.values?.[rootName][blockKey].select
+        (blockKeySelect) => formik?.values?.[rootName][blockKeySelect].select
       )
     : [];
 
@@ -58,7 +58,7 @@ export function DataBlock({
   const [dynamicSelectedTypeOptions, setDynamicSelectedTypeOptions] =
     useState<any>([]);
 
-  function onBlockSelectChange(selected, formik, oldValue?) {
+  function onBlockSelectChange(selected, formikCtx, oldValue?) {
     const selectedFieldExtension = blockOptionsQuery?.response?.data.find(
       (data) => data.extension.key === selected
     );
@@ -71,10 +71,10 @@ export function DataBlock({
 
     // Clear block rows if new block option selected
     if (selected !== oldValue) {
-      if (formik?.values?.[rootName]) {
-        Object.keys(formik?.values?.[rootName]).forEach((extensionKey) => {
-          if (formik?.values?.[rootName][extensionKey].select === oldValue) {
-            formik.values[rootName][extensionKey].rows = {
+      if (formikCtx?.values?.[rootName]) {
+        Object.keys(formikCtx?.values?.[rootName]).forEach((extensionKey) => {
+          if (formikCtx?.values?.[rootName][extensionKey].select === oldValue) {
+            formikCtx.values[rootName][extensionKey].rows = {
               "extensionField-0": ""
             };
           }
@@ -146,6 +146,7 @@ export function DataBlock({
           {Object.keys(extensionKeys).map((extensionKey, rowIndex) => {
             return (
               <DataRow
+                key={rowIndex}
                 showPlusIcon={true}
                 name={`${props.name}.rows.${extensionKey}`}
                 rowIndex={rowIndex}
