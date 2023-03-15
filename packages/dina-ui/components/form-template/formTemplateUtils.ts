@@ -1,9 +1,11 @@
 import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
+  SPLIT_CONFIGURATION_COMPONENT_NAME,
   FormTemplate
 } from "../../types/collection-api";
-import { sortBy } from "lodash";
+import { sortBy, get, isEmpty, compact } from "lodash";
+import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 export function getFormTemplateCheckboxes(
   formTemplate: Partial<FormTemplate> | undefined
@@ -16,6 +18,11 @@ export function getFormTemplateCheckboxes(
   const templateCheckboxesValues: Record<string, true | undefined> = {};
 
   formTemplate.components?.forEach((component) => {
+    // Split configuration does not have visibility.
+    if (component.name === SPLIT_CONFIGURATION_COMPONENT_NAME) {
+      return;
+    }
+
     component.sections?.forEach((section) => {
       section.items?.forEach((item) => {
         if (item.name && item.visible) {
@@ -32,31 +39,51 @@ export function getFormTemplateCheckboxes(
   };
 }
 
+/**
+ * Using the form template provided, retrieve all of the sections/fields for a specific component.
+ *
+ * @param comp The component name to search against.
+ * @param formTemplate The form template settings to search against.
+ * @param invisibleUndefined If the component is not visible (user switched it off) then it will
+ *  return undefined if this option is true.
+ */
 export function getComponentValues(
   comp: string,
-  formTemplate: FormTemplate | undefined
+  formTemplate: FormTemplate | undefined,
+  invisibleUndefined: boolean
 ): any {
   const componentValues = {};
   const templateCheckboxes: Record<string, true | undefined> = {};
   let ret = {};
+
   if (formTemplate) {
     formTemplate.components?.forEach((component) => {
-      if (component.name === comp && component.visible) {
-        component.sections?.forEach((section) => {
-          section.items?.forEach((item) => {
-            if (
-              (item.name && item.visible) ||
-              item.name === "geoReferenceAssertions"
-            ) {
-              componentValues[item.name] = item.defaultValue;
-              templateCheckboxes[
-                component.name + "." + section.name + "." + item.name
-              ] = true;
-            }
+      if (component.name === comp) {
+        if (component.visible) {
+          component.sections?.forEach((section) => {
+            section.items?.forEach((item) => {
+              if (
+                (item.name && item.visible) ||
+                item.name === "geoReferenceAssertions"
+              ) {
+                componentValues[item.name] = item.defaultValue;
+                templateCheckboxes[
+                  component.name + "." + section.name + "." + item.name
+                ] = true;
+              }
+            });
           });
-        });
+        }
       }
     });
+  }
+
+  if (
+    invisibleUndefined &&
+    isEmpty(componentValues) &&
+    isEmpty(templateCheckboxes)
+  ) {
+    return undefined;
   }
 
   ret = { ...componentValues, templateCheckboxes };
@@ -74,7 +101,8 @@ export function getMaterialSampleComponentValues(
     formTemplate.components?.forEach((component) => {
       if (
         component.name !== COLLECTING_EVENT_COMPONENT_NAME &&
-        component.name !== ACQUISITION_EVENT_COMPONENT_NAME
+        component.name !== ACQUISITION_EVENT_COMPONENT_NAME &&
+        component.name !== SPLIT_CONFIGURATION_COMPONENT_NAME
       ) {
         if (component.visible) {
           component.sections?.forEach((section) => {
@@ -93,6 +121,48 @@ export function getMaterialSampleComponentValues(
   }
   ret = { ...componentValues, templateCheckboxes };
   return ret;
+}
+
+export function getSplitConfigurationComponentValues(
+  formTemplate: FormTemplate | undefined
+): any {
+  // Retrieve form template split configuration info.
+  const splitConfigurationInitialValues = getComponentValues(
+    SPLIT_CONFIGURATION_COMPONENT_NAME,
+    formTemplate,
+    true
+  );
+
+  // Return an empty object to be put into the form template default values.
+  if (!splitConfigurationInitialValues) {
+    return undefined;
+  }
+
+  // Transform form template info into a Split Configuration object.
+  return {
+    splitConfiguration: {
+      condition: {
+        conditionType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.conditionType"
+        ),
+        materialSampleType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.condition.materialSampleType"
+        )
+      },
+      materialSampleNameGeneration: {
+        strategy: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.materialSampleNameGeneration.strategy"
+        ),
+        characterType: get(
+          splitConfigurationInitialValues,
+          "splitConfiguration.materialSampleNameGeneration.characterType"
+        )
+      }
+    }
+  };
 }
 
 /**
@@ -129,5 +199,23 @@ export function getComponentOrderFromTemplate(
 
   return sortBy(template.components, "order").map<string>(
     (component) => component.name ?? ""
+  );
+}
+
+/**
+ * After fetching all of the form templates a user has access to, this function will filter out all
+ * of the form templates that do not have split configuration setup.
+ *
+ * @param templates All form templates the user can have access to.
+ */
+export function getSplitConfigurationFormTemplates(
+  templates?: FormTemplate[]
+): FormTemplate[] {
+  if (!templates) return [];
+
+  return templates.filter(
+    (template) =>
+      getComponentValues(SPLIT_CONFIGURATION_COMPONENT_NAME, template, true) !==
+      undefined
   );
 }

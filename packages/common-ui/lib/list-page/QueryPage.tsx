@@ -157,9 +157,14 @@ export interface QueryPageProps<TData extends KitsuResource> {
   viewMode?: boolean;
 
   /**
-   * Custom elastic search query given by calling component
+   * Custom query builder tree used to generate into elastic search.
    */
   customViewQuery?: JsonTree;
+
+  /**
+   * Custom elastic search query to use.
+   */
+  customViewElasticSearchQuery?: any;
 
   /**
    * Required if view mode is enabled. This is used to provide the fields into the Query Builder
@@ -196,6 +201,7 @@ export function QueryPage<TData extends KitsuResource>({
   onSortedChange,
   viewMode,
   customViewQuery,
+  customViewElasticSearchQuery,
   customViewFields
 }: QueryPageProps<TData>) {
   const { apiClient } = useApiClient();
@@ -286,10 +292,17 @@ export function QueryPage<TData extends KitsuResource>({
     }
 
     // Elastic search query with pagination settings.
-    let queryDSL = elasticSearchFormatExport(
-      submittedQueryBuilderTree,
-      queryBuilderConfig
-    );
+    let queryDSL;
+
+    if (customViewElasticSearchQuery) {
+      queryDSL = customViewElasticSearchQuery;
+    } else {
+      queryDSL = elasticSearchFormatExport(
+        submittedQueryBuilderTree,
+        queryBuilderConfig
+      );
+    }
+
     queryDSL = applyRootQuery(queryDSL);
     queryDSL = applyGroupFilters(queryDSL, groups);
     queryDSL = applyPagination(queryDSL, pageSize, pageOffset);
@@ -371,14 +384,22 @@ export function QueryPage<TData extends KitsuResource>({
 
   // Once the configuration is setup, we can display change the tree.
   useEffect(() => {
-    if (queryBuilderConfig) {
-      if (viewMode && customViewQuery) {
+    if (queryBuilderConfig && viewMode) {
+      if (customViewQuery) {
         const newTree = Utils.loadTree(customViewQuery);
         setSubmittedQueryBuilderTree(newTree);
         setQueryBuilderTree(newTree);
+      } else if (customViewElasticSearchQuery) {
+        setSubmittedQueryBuilderTree(emptyQueryTree());
+        setQueryBuilderTree(emptyQueryTree());
       }
     }
-  }, [queryBuilderConfig, customViewQuery, customViewFields]);
+  }, [
+    queryBuilderConfig,
+    customViewQuery,
+    customViewFields,
+    customViewElasticSearchQuery
+  ]);
 
   /**
    * Used for selection mode only.

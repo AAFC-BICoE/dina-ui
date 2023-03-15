@@ -145,7 +145,7 @@ export function defaultQueryTree(config: Config): ImmutableTree {
  */
 export function emptyQueryTree(): ImmutableTree {
   return Utils.loadTree({
-    id: "baabbba8-0123-4456-b89a-b183d17aa81f",
+    id: Utils.uuid(),
     type: "group",
     children1: {}
   } as JsonTree);

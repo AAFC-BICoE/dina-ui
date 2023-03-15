@@ -1,6 +1,4 @@
 import { z } from "zod";
-import { MATERIAL_SAMPLE_FORM_LEGEND } from "../../../types/collection-api";
-
 // Define as Zod schemas instead of Typescript interfaces to enforce structure at runtime:
 
 const templateFieldSchema = z.object({
