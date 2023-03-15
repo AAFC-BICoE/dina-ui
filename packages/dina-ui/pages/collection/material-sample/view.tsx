@@ -41,7 +41,8 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
+  TransactionMaterialDirectionSection
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -91,7 +92,43 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
     </Link>
   );
 
-  const transactionQuery = useElasticSearchQuery({indexName: "dina_loan_transaction_index", queryDSL: {}});
+  const transactionElasticQuery = useElasticSearchQuery({
+    indexName: "dina_loan_transaction_index",
+    queryDSL: {
+      _source: [
+        "data.id",
+        "data.attributes.materialDirection",
+        "data.attributes.transactionNumber"
+      ],
+      query: {
+        bool: {
+          must: [
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          "included.id": id
+                        }
+                      },
+                      {
+                        term: {
+                          "included.type": "material-sample"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  });
 
   return (
     <div>
@@ -147,6 +184,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <TagSelectReadOnly />
                   <ProjectSelectSection />
                   <AssemblageSelectSection />
+                  {withResponse(
+                    transactionElasticQuery as any,
+                    ({ data: transactionElasticQuery }) => {
+                      return (
+                        <TransactionMaterialDirectionSection
+                          transactionElasticQuery={transactionElasticQuery}
+                        />
+                      );
+                    }
+                  )}
                 </div>
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (

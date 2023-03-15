@@ -56,6 +56,14 @@ const mockGet = jest.fn<any, any>(async path => {
   }
 });
 
+const mockPost = jest.fn<any, any>(async (path) => {
+  switch (path) {
+    // Elastic search response with object store mock metadata data.
+    case "search-api/search-ws/search":
+      return {};
+  }
+});
+
 const mockBulkGet = jest.fn<any, any>(async paths => {
   if (!paths.length) {
     return [];
@@ -65,7 +73,8 @@ const mockBulkGet = jest.fn<any, any>(async paths => {
 const testCtx = {
   apiContext: {
     apiClient: {
-      get: mockGet
+      get: mockGet,
+      post: mockPost
     },
     bulkGet: mockBulkGet
   }
