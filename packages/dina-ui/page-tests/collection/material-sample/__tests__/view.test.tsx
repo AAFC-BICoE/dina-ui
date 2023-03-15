@@ -74,11 +74,13 @@ const testCtx = {
   apiContext: {
     apiClient: {
       get: mockGet,
-      post: mockPost
+      axios: {
+        post: mockPost
+      }
     },
-    bulkGet: mockBulkGet
+    bulkGet: mockBulkGet,
   }
-};
+} as any;
 
 describe("Material Sample View Page", () => {
   it("Renders the Material Sample with the linked Collecting Event", async () => {

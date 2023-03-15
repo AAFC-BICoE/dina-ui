@@ -44,6 +44,14 @@ export function useElasticSearchQuery({
       }
     );
 
+    if (!response) {
+      // This warning may appear in tests where apiClient.get hasn't been mocked:
+      console.warn(
+        "No response returned from apiClient.get for query: ",
+        query
+      );
+    }
+
     await onSuccess?.(response);
 
     return response;
