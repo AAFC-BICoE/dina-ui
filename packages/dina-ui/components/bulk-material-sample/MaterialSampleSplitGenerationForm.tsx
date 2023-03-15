@@ -198,17 +198,19 @@ function PreviewGeneratedNames({
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
-      const requests = [...Array(splitFromMaterialSamples.length).keys()].map(
-        (i) => getIdentifierRequest(i)
+      const response = await save<MaterialSampleIdentifierGenerator>(
+        [
+          {
+            resource: getIdentifierRequest(0),
+            type: "material-sample-identifier-generator"
+          }
+        ],
+        { apiBaseUrl: "/collection-api", overridePatchOperation: true }
       );
 
-      // If in multiple mode and series mode is new, no request is required.
-      const responses: PersistedResource<MaterialSampleIdentifierGenerator>[] =
-        [];
-
-      const generatedIdentifiersResults = responses
-        .flatMap((response) => response?.nextIdentifiers || [])
-        .filter((identifier) => identifier);
+      const generatedIdentifiersResults = response.flatMap(
+        (resp) => resp?.nextIdentifiers ?? []
+      );
 
       setGeneratedIdentifiers(generatedIdentifiersResults);
     }

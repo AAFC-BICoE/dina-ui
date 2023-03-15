@@ -56,16 +56,9 @@ export function MaterialSampleBulkEditor({
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
-  } = useMaterialSampleFormTemplateSelectState();
-
-  // Set the initial form template.
-  useEffect(() => {
-    if (!initialFormTemplateUUID) {
-      return;
-    }
-
-    setSampleFormTemplateUUID(initialFormTemplateUUID);
-  }, [initialFormTemplateUUID]);
+  } = useMaterialSampleFormTemplateSelectState({
+    temporaryFormTemplateUUID: initialFormTemplateUUID
+  });
 
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks

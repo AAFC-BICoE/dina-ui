@@ -181,7 +181,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   reactTableProps={{
                     showPagination: false
                   }}
-                  defaultPageSize={0}
+                  defaultPageSize={500}
+                  defaultSort={[
+                    { id: "data.attributes.materialSampleName", desc: false }
+                  ]}
                 />
 
                 <MaterialSampleInfoSection />

@@ -87,6 +87,7 @@ export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] 
           />
         </div>
       ),
-      label: "actions"
+      label: "actions",
+      sortable: false
     }
   ];
