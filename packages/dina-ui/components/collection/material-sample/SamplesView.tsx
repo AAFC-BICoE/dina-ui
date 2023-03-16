@@ -11,7 +11,7 @@ import { useState } from "react";
 import ReactTable from "react-table";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { SplitMaterialSampleButton } from "./SplitMaterialSampleButton";
+import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
@@ -56,7 +56,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
-          <SplitMaterialSampleButton
+          <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSampleName}
           />

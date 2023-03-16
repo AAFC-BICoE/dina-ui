@@ -113,7 +113,9 @@ export function useMaterialSampleQuery(id?: string | null) {
 
         // Process loaded back-end data into data structure that Forkmiks can use
         if (data.extensionValues) {
-          data.extensionValuesForm = processExtensionValuesLoading(data.extensionValues);
+          data.extensionValuesForm = processExtensionValuesLoading(
+            data.extensionValues
+          );
           delete data.extensionValues;
         }
 
@@ -532,7 +534,9 @@ export function useMaterialSampleSave({
     }
 
     if (submittedValues.extensionValuesForm) {
-      submittedValues.extensionValues = processExtensionValuesSaving(submittedValues.extensionValuesForm);
+      submittedValues.extensionValues = processExtensionValuesSaving(
+        submittedValues.extensionValuesForm
+      );
     }
     delete submittedValues.extensionValuesForm;
 
