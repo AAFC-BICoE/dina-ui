@@ -48,11 +48,37 @@ describe("QueryBuilderTextSearch", () => {
             operation: "equals",
             value: "text search",
             fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
               parentType: "collection",
-              parentName: "collection"
+              parentPath: "included",
+              distinctTerm: true
             } as any,
-            fieldPath: "includes.name",
+            fieldPath: "included.attributes.name",
             queryType: "equals"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "exactMatch",
+            value: "text search",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName"
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "exactMatch"
           })
         ).toMatchSnapshot();
       });
