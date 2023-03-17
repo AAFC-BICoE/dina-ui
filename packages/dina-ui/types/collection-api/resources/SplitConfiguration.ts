@@ -15,7 +15,7 @@ export type SplitCharacterTypes =
 
 export interface SplitConfiguration {
   condition: SplitConfigurationCondition;
-  materialSampleNameGeneration: SplitConfigurationmaterialSampleNameGeneration;
+  materialSampleNameGeneration: SplitConfigurationMaterialSampleNameGeneration;
 }
 
 export interface SplitConfigurationCondition {
@@ -23,7 +23,10 @@ export interface SplitConfigurationCondition {
   materialSampleType?: string[];
 }
 
-export interface SplitConfigurationmaterialSampleNameGeneration {
+export interface SplitConfigurationMaterialSampleNameGeneration {
   strategy: SplitStrategies;
   characterType: SplitCharacterTypes;
+
+  // If the strategy is material sample type then this will be provided here.
+  materialSampleType?: string;
 }

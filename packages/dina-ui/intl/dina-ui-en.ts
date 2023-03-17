@@ -634,6 +634,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparations: "Preparations",
   preparedBy: "Prepared By",
   previewLabel: "Preview",
+  settingLabel: "Settings",
   previewAndCustomizeLabel: "Preview and Customize",
   previewNotAvailable: "Preview Not Available",
   primary: "Primary",
@@ -861,5 +862,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookInvalidManagedAttributeDataType:
     "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
   workBookInvalidManagedAttributeKey:
-    "Invalid Managed Attribute key: managed attribute key {key} not found."
+    "Invalid Managed Attribute key: managed attribute key {key} not found.",
+  materialDirection_tooltip: "Transaction Material Direction: {materialDirection}"
 };

@@ -29,7 +29,7 @@ function BulkEditTab({ baseSample }: BulkEditTabProps) {
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
-  } = useMaterialSampleFormTemplateSelectState();
+  } = useMaterialSampleFormTemplateSelectState({});
 
   const [selectedTab, setSelectedTab] = useState<
     BulkNavigatorTab | ResourceWithHooks

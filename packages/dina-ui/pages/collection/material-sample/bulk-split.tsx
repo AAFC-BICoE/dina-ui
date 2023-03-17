@@ -8,7 +8,10 @@ import { MaterialSampleSplitGenerationForm } from "../../../components/bulk-mate
 import PageLayout from "../../../components/page/PageLayout";
 import { useLocalStorage } from "@rehooks/local-storage";
 import { useRouter } from "next/router";
-import { BULK_SPLIT_IDS } from "common-ui/lib";
+import { BULK_SPLIT_IDS, LoadingSpinner, useQuery } from "common-ui/lib";
+import { FormTemplate } from "../../../types/collection-api";
+import { SplitConfiguration } from "../../../types/collection-api/resources/SplitConfiguration";
+import { getSplitConfigurationComponentValues } from "../../../components/form-template/formTemplateUtils";
 
 export default function MaterialSampleBulkSplitPage() {
   const router = useRouter();
@@ -16,17 +19,33 @@ export default function MaterialSampleBulkSplitPage() {
   const [mode, setMode] = useState<"GENERATE" | "EDIT">("GENERATE");
   const [lastSubmission, setLastSubmission] =
     useState<InputResource<MaterialSample>[]>();
+  const [splitConfiguration, setSplitConfiguration] =
+    useState<SplitConfiguration>();
 
   const [ids] = useLocalStorage<string[]>(BULK_SPLIT_IDS, []);
+
+  const formTemplateId: string = router.query.splitConfiguration as string;
+
+  const formTemplateQuery = useQuery<FormTemplate>(
+    {
+      path: `collection-api/form-template/${formTemplateId}`
+    },
+    {
+      disabled: !formTemplateId,
+      onSuccess: (response) => {
+        setSplitConfiguration(
+          getSplitConfigurationComponentValues(response.data)
+            ?.splitConfiguration
+        );
+      }
+    }
+  );
 
   // Clear local storage once the ids have been retrieved.
   useEffect(() => {
     if (ids.length === 0) {
       router.push("/collection/material-sample/list");
     }
-
-    // Clear the local storage.
-    localStorage.removeItem(BULK_SPLIT_IDS);
   }, [ids]);
 
   async function moveToResultPage(
@@ -48,8 +67,17 @@ export default function MaterialSampleBulkSplitPage() {
     setMode("EDIT");
   }
 
+  if (
+    !formTemplateQuery.isDisabled &&
+    formTemplateQuery.loading &&
+    !splitConfiguration
+  ) {
+    return <LoadingSpinner loading={true} />;
+  }
+
   return (
     <>
+      {/* Bulk Edit Mode */}
       {mode === "EDIT" && lastSubmission && (
         <PageLayout titleId="splitSubsampleTitle">
           <MaterialSampleBulkEditor
@@ -57,11 +85,18 @@ export default function MaterialSampleBulkSplitPage() {
             samples={lastSubmission}
             onSaved={moveToResultPage}
             onPreviousClick={() => setMode("GENERATE")}
+            initialFormTemplateUUID={formTemplateId}
           />
         </PageLayout>
       )}
+
+      {/* Generate identifiers */}
       {mode === "GENERATE" && (
-        <MaterialSampleSplitGenerationForm onGenerate={onGenerate} ids={ids} />
+        <MaterialSampleSplitGenerationForm
+          onGenerate={onGenerate}
+          ids={ids}
+          splitConfiguration={splitConfiguration}
+        />
       )}
     </>
   );
