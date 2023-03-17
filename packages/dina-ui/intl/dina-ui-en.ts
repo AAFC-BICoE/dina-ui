@@ -859,5 +859,9 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookDuplicateFieldMap: "This column should not map to the same field",
   workBookInvalidDataFormat:
     "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
+  workBookInvalidManagedAttributeDataType:
+    "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
+  workBookInvalidManagedAttributeKey:
+    "Invalid Managed Attribute key: managed attribute key {key} not found.",
   materialDirection_tooltip: "Transaction Material Direction: {materialDirection}"
 };
