@@ -3,13 +3,11 @@ import {
   SelectField,
   SubmitButton,
   useAccount,
-  useApiClient,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
-import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
@@ -21,6 +19,7 @@ import FieldMappingConfigJSON from "./utils/FieldMappingConfig.json";
 import { DataTypeEnum } from "./utils/useFieldConverters";
 import { useWorkbookConverter } from "./utils/useWorkbookConverter";
 import {
+  convertMap,
   findMatchField,
   getColumnHeaders,
   getDataFromWorkbook,
@@ -28,7 +27,8 @@ import {
   isBooleanArray,
   isMap,
   isNumber,
-  isNumberArray
+  isNumberArray,
+  isValidManagedAttribute
 } from "./utils/workbookMappingUtils";
 
 export type FieldMapType = (string | undefined)[];
@@ -53,7 +53,11 @@ export interface WorkbookColumnMappingProps {
 const ENTITY_TYPES = ["material-sample"] as const;
 const FieldMappingConfig = FieldMappingConfigJSON as {
   [key: string]: {
-    [field: string]: { dataType: DataTypeEnum; vocabularyEndpoint?: string };
+    [field: string]: {
+      dataType: DataTypeEnum;
+      endpoint?: string;
+      managedAttributeComponent?: string;
+    };
   };
 };
 
@@ -115,15 +119,32 @@ export function WorkbookColumnMapping({
   Object.keys(FieldMappingConfig).forEach((recordType) => {
     const recordFieldsMap = FieldMappingConfig[recordType];
     Object.keys(recordFieldsMap).forEach((recordField) => {
-      const { dataType, vocabularyEndpoint } = recordFieldsMap[recordField];
-      if (dataType === DataTypeEnum.VOCABULARY && vocabularyEndpoint) {
-        const query: any = useQuery({
-          path: vocabularyEndpoint
-        });
-        const vocabElements = query?.response?.data?.vocabularyElements?.map(
-          (vocabElement) => vocabElement.name
-        );
-        FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
+      const { dataType, endpoint } =
+        recordFieldsMap[recordField];
+      switch (dataType) {
+        case DataTypeEnum.VOCABULARY:
+          if (endpoint) {
+            const query: any = useQuery({
+              path: endpoint
+            });
+            const vocabElements =
+              query?.response?.data?.vocabularyElements?.map(
+                (vocabElement) => vocabElement.name
+              );
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
+          }
+          break;
+        case DataTypeEnum.MANAGED_ATTRIBUTES:
+          if (endpoint) {
+            // load available Managed Attributes
+            const query: any = useQuery({
+              path: endpoint
+            });
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data);
+          }
+          break;
+        default:
+          break;
       }
     });
   });
@@ -285,9 +306,9 @@ export function WorkbookColumnMapping({
                   );
                 }
                 break;
-              case DataTypeEnum.MAP:
+              case DataTypeEnum.MANAGED_ATTRIBUTES:
                 if (!isMap(row[field])) {
-                  param.dataType = DataTypeEnum.MAP;
+                  param.dataType = DataTypeEnum.MANAGED_ATTRIBUTES;
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
@@ -295,6 +316,16 @@ export function WorkbookColumnMapping({
                       "sheet"
                     )
                   );
+                }
+                const workbookManagedAttributes = convertMap(row[field]);
+                try {
+                  isValidManagedAttribute(
+                    workbookManagedAttributes,
+                    FIELD_TO_VOCAB_ELEMS_MAP.get(field),
+                    formatMessage
+                  );
+                } catch (error) {
+                  errors.push(error);
                 }
                 break;
               case DataTypeEnum.NUMBER:
@@ -311,7 +342,7 @@ export function WorkbookColumnMapping({
                 break;
               case DataTypeEnum.VOCABULARY:
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                if (!vocabElements.includes(row[field])) {
+                if (vocabElements && !vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;
                   errors.push(
                     new ValidationError(
@@ -321,6 +352,7 @@ export function WorkbookColumnMapping({
                     )
                   );
                 }
+                break;
             }
           }
         }

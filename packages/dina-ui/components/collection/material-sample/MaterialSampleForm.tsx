@@ -1,4 +1,4 @@
-import { FormikProps, FormikContextType } from "formik";
+import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { compact, toPairs, uniq } from "lodash";
 import {
@@ -10,17 +10,9 @@ import {
   DinaFormSection,
   FieldSet,
   LoadingSpinner,
-  SubmitButton,
-  useQuery
+  SubmitButton
 } from "common-ui";
-import {
-  Fragment,
-  ReactNode,
-  Ref,
-  useContext,
-  useState,
-  useEffect
-} from "react";
+import { Fragment, ReactNode, Ref, useContext } from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -73,9 +65,7 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
-import { FieldExtension } from "../../../types/collection-api/resources/FieldExtension";
 import { SplitConfigurationSection } from "./SplitConfigurationSection";
-import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
@@ -219,56 +209,6 @@ export function MaterialSampleForm({
       reduceRendering,
       visibleManagedAttributeKeys
     });
-
-  // Set up Field Extensions values and functions
-  const { response, loading: loadingExtensionValues } = useQuery<
-    FieldExtension[]
-  >({
-    path: `collection-api/extension`
-  });
-
-  const [extensionFieldsOptions, setExtensionFieldsOptions] = useState<any>([]);
-  const extensionOptions = response?.data
-    .filter(
-      (data) => data.extension.fields?.[0].dinaComponent === "MATERIAL_SAMPLE"
-    )
-    .map((data) => {
-      return {
-        label: data.extension.name,
-        value: data.extension.key
-      };
-    });
-
-  function onBlockSelectChange(
-    selected,
-    formik: FormikContextType<any>,
-    oldValue
-  ) {
-    const selectedFieldExtension = response?.data.find(
-      (data) => data.extension.key === selected
-    );
-    const selectedExtensionFieldsOptions =
-      selectedFieldExtension?.extension.fields.map((data) => ({
-        label: data.name,
-        value: data.key
-      }));
-    setExtensionFieldsOptions(selectedExtensionFieldsOptions);
-
-    // Clear block rows if new block option selected
-    if (selected !== oldValue) {
-      if (formik?.values?.extensionValues) {
-        Object.keys(formik?.values?.extensionValues).forEach((extensionKey) => {
-          if (
-            formik?.values?.extensionValues[extensionKey].select === oldValue
-          ) {
-            formik.values.extensionValues[extensionKey].rows = {
-              "extensionField-0": ""
-            };
-          }
-        });
-      }
-    }
-  }
 
   // CollectingEvent "id" being enabled in the template enabledFields means that the
   // Template links an existing Collecting Event:
@@ -558,7 +498,7 @@ export function MaterialSampleForm({
 
   return isTemplate ? (
     formLayout
-  ) : loading || loadingExtensionValues ? (
+  ) : loading ? (
     <LoadingSpinner loading={true} />
   ) : (
     <DinaForm<InputResource<MaterialSample>>

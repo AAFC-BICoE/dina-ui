@@ -7,7 +7,7 @@ const mockConfig = {
     booleanField: { dataType: DataTypeEnum.BOOLEAN },
     stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
     numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: DataTypeEnum.MAP }
+    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES }
   }
 };
 
