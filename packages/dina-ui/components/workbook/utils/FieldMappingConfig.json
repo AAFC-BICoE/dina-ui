@@ -15,8 +15,15 @@
     "notPubliclyReleasableReason": { "dataType": "string" },
     "dwcOtherCatalogNumbers": { "dataType": "string[]" },
     "tags": { "dataType": "string[]" },
-    "materialSampleType": { "dataType": "vocabulary", "endpoint": "/collection-api/vocabulary/materialSampleType" },
-    "managedAttributes": { "dataType": "ManagedAttributes", "endpoint": "collection-api/managed-attribute", "managedAttributeComponent": "MATERIAL_SAMPLE" },
+    "materialSampleType": {
+      "dataType": "vocabulary",
+      "endpoint": "/collection-api/vocabulary/materialSampleType"
+    },
+    "managedAttributes": {
+      "dataType": "managedAttributes",
+      "endpoint": "collection-api/managed-attribute",
+      "managedAttributeComponent": "MATERIAL_SAMPLE"
+    },
     "organismsIndividualEntry": { "dataType": "boolean" },
     "useTargetOrganism": { "dataType": "boolean" },
     "publiclyReleasable": { "dataType": "boolean" },

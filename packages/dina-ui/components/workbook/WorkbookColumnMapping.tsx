@@ -1,16 +1,13 @@
 import {
   FieldWrapper,
-  LoadingSpinner,
   SelectField,
   SubmitButton,
   useAccount,
-  useApiClient,
   useQuery
 } from "common-ui/lib";
 import { DinaForm } from "common-ui/lib/formik-connected/DinaForm";
 import { FieldArray, FormikProps } from "formik";
 import { InputResource, KitsuResource } from "kitsu";
-import { FieldExtension } from "packages/dina-ui/types/collection-api/resources/FieldExtension";
 import { Ref, useMemo, useRef, useState } from "react";
 import Table from "react-bootstrap/Table";
 import Select from "react-select";
@@ -139,14 +136,14 @@ export function WorkbookColumnMapping({
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
           }
           break;
-        case DataTypeEnum.ManagedAttributes:
+        case DataTypeEnum.MANAGED_ATTRIBUTES:
           if (endpoint) {
             // load available Managed Attributes
             const query: any = useQuery({
               path: endpoint
             });
             loading = query?.loading;
-            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data)
+            FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data);
           }
           break;
         default:
@@ -224,7 +221,12 @@ export function WorkbookColumnMapping({
         if (errors.length > 0) {
           return new ValidationError(errors);
         }
-        const data = getDataFromWorkbook(spreadsheetData, sheet, fieldNames, true);
+        const data = getDataFromWorkbook(
+          spreadsheetData,
+          sheet,
+          fieldNames,
+          true
+        );
         validateData(data, errors);
         if (errors.length > 0) {
           return new ValidationError(errors);
@@ -242,8 +244,7 @@ export function WorkbookColumnMapping({
       const fieldsConfigs: {
         [field: string]: { dataType: DataTypeEnum };
       } = FieldMappingConfig[selectedType?.value];
-      for (let i = 0; i < workbookData.length; i++) {
-        const row = workbookData[i];
+      for (const row of workbookData) {
         for (const field of Object.keys(row)) {
           if (field === "rowNumber") {
             continue;
@@ -308,9 +309,9 @@ export function WorkbookColumnMapping({
                   );
                 }
                 break;
-              case DataTypeEnum.ManagedAttributes:
+              case DataTypeEnum.MANAGED_ATTRIBUTES:
                 if (!isMap(row[field])) {
-                  param.dataType = DataTypeEnum.ManagedAttributes;
+                  param.dataType = DataTypeEnum.MANAGED_ATTRIBUTES;
                   errors.push(
                     new ValidationError(
                       formatMessage("workBookInvalidDataFormat", param),
@@ -321,7 +322,11 @@ export function WorkbookColumnMapping({
                 }
                 const workbookManagedAttributes = convertMap(row[field]);
                 try {
-                  isValidManagedAttribute(workbookManagedAttributes, FIELD_TO_VOCAB_ELEMS_MAP.get(field), formatMessage);
+                  isValidManagedAttribute(
+                    workbookManagedAttributes,
+                    FIELD_TO_VOCAB_ELEMS_MAP.get(field),
+                    formatMessage
+                  );
                 } catch (error) {
                   errors.push(error);
                 }

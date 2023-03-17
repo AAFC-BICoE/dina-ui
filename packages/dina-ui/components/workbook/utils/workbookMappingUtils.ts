@@ -1,5 +1,5 @@
 import { WorkbookJSON } from "../types/Workbook";
-import { find, compact, trim } from "lodash";
+import { find, trim } from "lodash";
 import { ValidationError } from "yup";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
@@ -81,9 +81,9 @@ export function getDataFromWorkbook(
     }
 
     if (!!getRowNumber) {
-      rowData.rowNumber = row.rowNumber
+      rowData.rowNumber = row.rowNumber;
     }
-    
+
     data.push(rowData);
   }
   return data;
@@ -168,9 +168,11 @@ export function isValidManagedAttribute(
       );
       if (!matchedManagedAttribute) {
         const key = workbookManagedAttributeKey;
-        const param = {key};
+        const param = { key };
         throw new ValidationError(
-          formatMessage("workBookInvalidManagedAttributeKey", param), "managedAttributes", "sheet"
+          formatMessage("workBookInvalidManagedAttributeKey", param),
+          "managedAttributes",
+          "sheet"
         );
       }
       if (
@@ -179,9 +181,11 @@ export function isValidManagedAttribute(
       ) {
         const key = workbookManagedAttributeKey;
         const type = matchedManagedAttribute.vocabularyElementType;
-        const param = {key, type};
+        const param = { key, type };
         throw new ValidationError(
-          formatMessage("workBookInvalidManagedAttributeDataType", param), "managedAttributes", "sheet"
+          formatMessage("workBookInvalidManagedAttributeDataType", param),
+          "managedAttributes",
+          "sheet"
         );
       }
     }

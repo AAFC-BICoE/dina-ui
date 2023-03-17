@@ -1,4 +1,4 @@
-import { FormikProps, FormikContextType } from "formik";
+import { FormikProps } from "formik";
 import { InputResource } from "kitsu";
 import { compact, toPairs, uniq } from "lodash";
 import {
@@ -10,17 +10,9 @@ import {
   DinaFormSection,
   FieldSet,
   LoadingSpinner,
-  SubmitButton,
-  useQuery
+  SubmitButton
 } from "common-ui";
-import {
-  Fragment,
-  ReactNode,
-  Ref,
-  useContext,
-  useState,
-  useEffect
-} from "react";
+import { Fragment, ReactNode, Ref, useContext } from "react";
 import {
   AttachmentsField,
   BulkEditTabWarning,
@@ -73,9 +65,7 @@ import { ScheduledActionsField } from "./ScheduledActionsField";
 import { SetDefaultSampleName } from "./SetDefaultSampleName";
 import { useMaterialSampleSave } from "./useMaterialSample";
 import { RestrictionField } from "./RestrictionField";
-import { FieldExtension } from "../../../types/collection-api/resources/FieldExtension";
 import { SplitConfigurationSection } from "./SplitConfigurationSection";
-import { SplitConfiguration } from "packages/dina-ui/types/collection-api/resources/SplitConfiguration";
 
 export interface VisibleManagedAttributesConfig {
   materialSample?: string[];
