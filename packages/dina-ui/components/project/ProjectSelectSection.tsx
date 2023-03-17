@@ -1,12 +1,16 @@
 import {
   DinaFormSection,
   filterBy,
+  ReadOnlyResourceLink,
   ResourceSelectField,
+  ResourceSelectFieldProps,
   useDinaFormContext
 } from "common-ui";
 import { IoIosListBox } from "react-icons/io";
+import { partialUtil } from "zod/lib/helpers/partialUtil";
 import { Project } from "../../../dina-ui/types/collection-api/resources/Project";
 import { DinaMessage } from "../../intl/dina-ui-intl";
+import Link from "next/link";
 
 export interface ProjectSelectSectionProps {
   resourcePath?: string;
@@ -72,7 +76,9 @@ export function ProjectSelectField({
                   key={idx}
                 >
                   <IoIosListBox />
-                  <span>{val.name}</span>
+                  <Link href={"/collection/project/view?id=" + val.id}>
+                    <a>{val.name}</a>
+                  </Link>
                 </div>
               ))}
             </div>
