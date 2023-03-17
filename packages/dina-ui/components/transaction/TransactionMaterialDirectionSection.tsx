@@ -1,5 +1,4 @@
 import { DinaFormSection, Tooltip } from "common-ui";
-import { DinaMessage } from "../../intl/dina-ui-intl";
 import { FaLongArrowAltUp, FaLongArrowAltDown } from "react-icons/fa";
 import Link from "next/link";
 
@@ -23,38 +22,36 @@ export function TransactionMaterialDirectionSection({
     onMouseOut: (event) => (event.currentTarget.style.color = "")
   };
 
-  return (
-    transactionData ? (
-      <DinaFormSection horizontal={"flex"}>
-        <div className="card d-flex flex-row align-items-center mb-3 py-1 px-2 gap-1">
+  return transactionData ? (
+    <DinaFormSection horizontal={"flex"}>
+      <div className="card d-flex flex-row align-items-center mb-3 py-1 px-2 gap-1 ms-auto">
+        <Link
+          href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
+        >
+          {transactionData.attributes.materialDirection ===
+          MaterialDirection.OUT ? (
+            <FaLongArrowAltUp {...materialDirectionIconProps} />
+          ) : (
+            <FaLongArrowAltDown {...materialDirectionIconProps} />
+          )}
+        </Link>
+        {transactionData.attributes.transactionNumber && (
           <Link
             href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
           >
-            {transactionData.attributes.materialDirection ===
-            MaterialDirection.OUT ? (
-              <FaLongArrowAltUp {...materialDirectionIconProps} />
-            ) : (
-              <FaLongArrowAltDown {...materialDirectionIconProps} />
-            )}
+            <a>{transactionData.attributes.transactionNumber}</a>
           </Link>
-          {transactionData.attributes.transactionNumber && (
-            <Link
-              href={`/loan-transaction/transaction/view?id=${transactionData.id}`}
-            >
-              <a>{transactionData.attributes.transactionNumber}</a>
-            </Link>
-          )}
-          <Tooltip
-            id="materialDirection_tooltip"
-            intlValues={{
-              materialDirection: transactionData.attributes.materialDirection
-            }}
-            disableSpanMargin={true}
-          />
-        </div>
-      </DinaFormSection>
-    ) : (
-      <></>
-    )
+        )}
+        <Tooltip
+          id="materialDirection_tooltip"
+          intlValues={{
+            materialDirection: transactionData.attributes.materialDirection
+          }}
+          disableSpanMargin={true}
+        />
+      </div>
+    </DinaFormSection>
+  ) : (
+    <></>
   );
 }
