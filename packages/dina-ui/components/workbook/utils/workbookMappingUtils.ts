@@ -80,9 +80,9 @@ export function getDataFromWorkbook(
     }
 
     if (!!getRowNumber) {
-      rowData.rowNumber = row.rowNumber
+      rowData.rowNumber = row.rowNumber;
     }
-    
+
     data.push(rowData);
   }
   return data;

@@ -231,7 +231,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   reactTableProps={{
                     showPagination: false
                   }}
-                  defaultPageSize={0}
+                  defaultPageSize={500}
+                  defaultSort={[
+                    { id: "data.attributes.materialSampleName", desc: false }
+                  ]}
                 />
 
                 <MaterialSampleInfoSection />
@@ -367,6 +370,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSample.materialSampleName}
+            materialSampleType={materialSample.materialSampleType}
           />
           <GenerateLabelDropdownButton materialSample={materialSample} />
           <Link href={`/collection/material-sample/revisions?id=${id}`}>

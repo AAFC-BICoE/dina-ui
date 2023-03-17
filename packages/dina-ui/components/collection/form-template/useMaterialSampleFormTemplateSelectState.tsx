@@ -18,12 +18,25 @@ import { useApiClient } from "../../../../common-ui/lib";
 import { useRouter } from "next/router";
 
 export const SAMPLE_FORM_TEMPLATE_KEY = "sampleFormTemplateKey";
+
+export interface UseMaterialSampleFormTemplateSelectStateProps {
+  /**
+   * If this is provided, the local storage version won't be used. It will automatically load
+   * this form template first.
+   *
+   * This value will not be saved into local storage so it doesn't override their usual choice.
+   */
+  temporaryFormTemplateUUID?: string;
+}
+
 /**
  * Manages the state of a MaterialSampleForm Form Template selection
  * and returns the props needed to enable the custom view in a MaterialSampleForm.
  * Only handles Form Templates (e.g. show/hide fields), not default values.
  */
-export function useMaterialSampleFormTemplateSelectState() {
+export function useMaterialSampleFormTemplateSelectState({
+  temporaryFormTemplateUUID
+}: UseMaterialSampleFormTemplateSelectStateProps) {
   const { apiClient } = useApiClient();
   const router = useRouter();
   const formTemplateId = router?.query?.formTemplateId?.toString();
@@ -40,13 +53,13 @@ export function useMaterialSampleFormTemplateSelectState() {
     useState<PersistedResource<FormTemplate>>();
 
   useEffect(() => {
-    if (sampleFormTemplateUUID) {
+    if (temporaryFormTemplateUUID || sampleFormTemplateUUID) {
       getFormTemplate();
     } else {
       setSampleFormTemplate(undefined);
       setNavOrder(null);
     }
-  }, [sampleFormTemplateUUID]);
+  }, [sampleFormTemplateUUID, temporaryFormTemplateUUID]);
 
   useEffect(() => {
     if (formTemplateId) {
@@ -57,7 +70,9 @@ export function useMaterialSampleFormTemplateSelectState() {
   async function getFormTemplate() {
     await apiClient
       .get<FormTemplate>(
-        `collection-api/form-template/${sampleFormTemplateUUID}`,
+        `collection-api/form-template/${
+          temporaryFormTemplateUUID ?? sampleFormTemplateUUID
+        }`,
         {}
       )
       .then((response) => {
