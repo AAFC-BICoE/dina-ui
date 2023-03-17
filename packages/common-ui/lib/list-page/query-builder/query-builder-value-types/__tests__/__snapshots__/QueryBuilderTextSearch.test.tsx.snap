@@ -131,8 +131,8 @@ Object {
       "bool": Object {
         "must": Array [
           Object {
-            "match": Object {
-              "includes.name": "text search",
+            "term": Object {
+              "included.attributes.name.keyword": "text search",
             },
           },
           Object {
@@ -162,6 +162,30 @@ Object {
           Object {
             "term": Object {
               "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Equals operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "term": Object {
+              "included.attributes.determination.scientificName.keyword": "text search",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
             },
           },
         ],
