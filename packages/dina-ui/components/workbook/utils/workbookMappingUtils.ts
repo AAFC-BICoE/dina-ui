@@ -177,7 +177,7 @@ export function isValidManagedAttribute(
       }
       if (
         matchedManagedAttribute.vocabularyElementType === "BOOL" &&
-        !isBoolean(workbookManagedAttributeValue)
+        !isBoolean(workbookManagedAttributeValue.toString())
       ) {
         const key = workbookManagedAttributeKey;
         const type = matchedManagedAttribute.vocabularyElementType;

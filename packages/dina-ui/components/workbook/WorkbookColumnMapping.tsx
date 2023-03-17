@@ -113,14 +113,13 @@ export function WorkbookColumnMapping({
       return { label: "Sheet " + (sheetNumber + 1), value: sheetNumber };
     });
   }, [spreadsheetData]);
-  let loading = false;
 
   // Have to load end-points up front, save all responses in a map
   const FIELD_TO_VOCAB_ELEMS_MAP = new Map();
   Object.keys(FieldMappingConfig).forEach((recordType) => {
     const recordFieldsMap = FieldMappingConfig[recordType];
     Object.keys(recordFieldsMap).forEach((recordField) => {
-      const { dataType, endpoint, managedAttributeComponent } =
+      const { dataType, endpoint } =
         recordFieldsMap[recordField];
       switch (dataType) {
         case DataTypeEnum.VOCABULARY:
@@ -132,7 +131,6 @@ export function WorkbookColumnMapping({
               query?.response?.data?.vocabularyElements?.map(
                 (vocabElement) => vocabElement.name
               );
-            loading = query?.loading;
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, vocabElements);
           }
           break;
@@ -142,7 +140,6 @@ export function WorkbookColumnMapping({
             const query: any = useQuery({
               path: endpoint
             });
-            loading = query?.loading;
             FIELD_TO_VOCAB_ELEMS_MAP.set(recordField, query?.response?.data);
           }
           break;
@@ -345,7 +342,7 @@ export function WorkbookColumnMapping({
                 break;
               case DataTypeEnum.VOCABULARY:
                 const vocabElements = FIELD_TO_VOCAB_ELEMS_MAP.get(field);
-                if (!vocabElements.includes(row[field])) {
+                if (vocabElements && !vocabElements.includes(row[field])) {
                   param.dataType = DataTypeEnum.VOCABULARY;
                   errors.push(
                     new ValidationError(
