@@ -4,11 +4,8 @@ import PageLayout from "../page/PageLayout";
 import {
   BackButton,
   DinaForm,
-  RadioButtonsField,
   NumberSpinnerField,
   SubmitButton,
-  SelectField,
-  FieldSpy,
   useApiClient,
   LoadingSpinner,
   DinaFormOnSubmit
@@ -20,34 +17,23 @@ import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/re
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
 import { InputResource, PersistedResource } from "kitsu";
+import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
 
 const ENTITY_LINK = "/collection/material-sample";
 
-type SeriesOptions = "continue" | "continueFromParent" | "new";
-type GenerationOptions = "lowercase" | "uppercase" | "numeric";
-type AppendGenerationMode = {
-  [key in GenerationOptions]: string;
-};
-
-const APPEND_GENERATION_MODE: AppendGenerationMode = {
-  lowercase: "-a",
-  uppercase: "-A",
-  numeric: "-1"
-};
-
 interface MaterialSampleBulkSplitFields {
   numberToCreate: number;
-  seriesOptions: SeriesOptions;
-  generationOptions: GenerationOptions;
 }
 
 interface MaterialSampleSplitGenerationFormProps {
   ids: string[];
+  splitConfiguration?: SplitConfiguration;
   onGenerate: (samples: InputResource<MaterialSample>[]) => void;
 }
 
 export function MaterialSampleSplitGenerationForm({
   ids,
+  splitConfiguration,
   onGenerate
 }: MaterialSampleSplitGenerationFormProps) {
   const { formatMessage } = useDinaIntl();
@@ -66,19 +52,6 @@ export function MaterialSampleSplitGenerationForm({
     disabled: ids.length === 0
   });
 
-  const splitFromParentMaterialSamples = useBulkGet<MaterialSample>({
-    ids: (splitFromMaterialSamples.data as any)?.map(
-      (sample) => sample?.parentMaterialSample?.id ?? ""
-    ),
-    listPath:
-      "collection-api/material-sample?include=materialSampleChildren,collection,parentMaterialSample",
-    disabled:
-      splitFromMaterialSamples.loading ||
-      (splitFromMaterialSamples.data as any)?.some(
-        (sample) => !sample.parentMaterialSample
-      )
-  });
-
   const buttonBar = (
     <>
       {/* Back Button (Changes depending on the number of records) */}
@@ -95,65 +68,44 @@ export function MaterialSampleSplitGenerationForm({
     </>
   );
 
-  const ableToContinueSeries = useMemo<boolean>(
-    () =>
-      (splitFromMaterialSamples.data as any)?.every(
-        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
-      ),
-    [splitFromMaterialSamples.data]
-  );
-
-  const ableToContinueSeriesFromParent = useMemo<boolean>(
-    () =>
-      (splitFromParentMaterialSamples.data as any)?.every(
-        (materialSample) => materialSample?.materialSampleChildren?.length !== 0
-      ),
-    [splitFromParentMaterialSamples.data]
-  );
-
   if (splitFromMaterialSamples.loading) {
     return <LoadingSpinner loading={true} />;
   }
 
   const initialValues: MaterialSampleBulkSplitFields = {
-    numberToCreate: 1,
-    seriesOptions: ableToContinueSeries ? "continue" : "new",
-    generationOptions: "lowercase"
+    numberToCreate: 1
   };
 
   const onSubmit: DinaFormOnSubmit<MaterialSampleBulkSplitFields> = ({
     submittedValues
   }) => {
     if (
-      !isMultiple &&
       Number(generatedIdentifiers.length) !==
-        Number(submittedValues?.numberToCreate)
+      Number(submittedValues?.numberToCreate)
     ) {
       return;
     }
 
-    const samples: InputResource<MaterialSample>[] = [];
-    splitFromMaterialSamples?.data?.forEach((splitMaterialSample, index) => {
-      if (!splitMaterialSample) {
-        return;
-      }
+    const splitFromMaterialSample: any = splitFromMaterialSamples?.data?.[0];
 
+    const samples: InputResource<MaterialSample>[] = [];
+    generatedIdentifiers.forEach((identifier) => {
       samples.push({
         type: "material-sample",
         parentMaterialSample: {
-          id: splitMaterialSample.id ?? "",
+          id: splitFromMaterialSample?.id ?? "",
           type: "material-sample"
         },
-        group: (splitMaterialSample as any).group ?? "",
-        collection: (splitMaterialSample as any)?.collection?.id
+        group: splitFromMaterialSample?.group ?? "",
+        collection: splitFromMaterialSample?.collection?.id
           ? {
-              id: (splitMaterialSample as any).collection?.id ?? "",
+              id: splitFromMaterialSample?.collection?.id ?? "",
               type: "collection"
             }
           : undefined,
         publiclyReleasable: true,
         allowDuplicateName: false,
-        materialSampleName: generatedIdentifiers[index]
+        materialSampleName: identifier
       });
     });
 
@@ -166,97 +118,44 @@ export function MaterialSampleSplitGenerationForm({
       onSubmit={onSubmit}
     >
       <PageLayout titleId="splitSubsampleTitle" buttonBarContent={buttonBar}>
-        <>
-          <Card>
-            <Card.Body>
-              <DinaMessage id="splitFrom" />:
-              <span className="ms-2">
-                {convertArrayToString(
-                  (splitFromMaterialSamples?.data as any)?.map(
-                    (materialSample) => materialSample?.materialSampleName
-                  )
-                )}
-              </span>
-            </Card.Body>
-          </Card>
+        <div className="row">
+          <div className="col-md-6">
+            <h4 className="mt-2">
+              <DinaMessage id="settingLabel" />
+            </h4>
+            <Card>
+              <Card.Body>
+                <DinaMessage id="splitFrom" />:
+                <span className="ms-2">
+                  {convertArrayToString(
+                    (splitFromMaterialSamples?.data as any)?.map(
+                      (materialSample) => materialSample?.materialSampleName
+                    )
+                  )}
+                </span>
+              </Card.Body>
+            </Card>
 
-          <div className="row mt-3">
-            <div className="col-md-4">
-              <NumberSpinnerField
-                name="numberToCreate"
-                min={1}
-                max={500}
-                label={formatMessage("materialSamplesToCreate")}
-                disabled={isMultiple}
-              />
-            </div>
-            <div className="col-md-4">
-              <RadioButtonsField<string>
-                name="seriesOptions"
-                label={formatMessage("splitSeriesOptionLabel")}
-                horizontalOptions={true}
-                options={[
-                  {
-                    value: "continue",
-                    label: formatMessage("splitSeriesOptionContinue"),
-                    disabled: !ableToContinueSeries,
-                    tooltipLabel: !ableToContinueSeries
-                      ? "splitSeriesOptionContinueTooltip"
-                      : undefined
-                  },
-                  {
-                    value: "continueFromParent",
-                    label: formatMessage("splitSeriesOptionContinueFromParent"),
-                    disabled: !ableToContinueSeriesFromParent,
-                    tooltipLabel: !ableToContinueSeriesFromParent
-                      ? "splitSeriesOptionContinueFromParentTooltip"
-                      : undefined
-                  },
-                  {
-                    value: "new",
-                    label: formatMessage("splitSeriesOptionNew")
-                  }
-                ]}
-              />
-            </div>
-            <div className="col-md-4">
-              <FieldSpy fieldName="seriesOptions">
-                {(selected) => (
-                  <SelectField
-                    name="generationOptions"
-                    label={formatMessage("splitGenerationOptionLabel")}
-                    disabled={selected === "continue"}
-                    options={[
-                      {
-                        value: "lowercase",
-                        label: formatMessage("splitGenerationOptionLowercase")
-                      },
-                      {
-                        value: "uppercase",
-                        label: formatMessage("splitGenerationOptionUppercase")
-                      },
-                      {
-                        value: "numeric",
-                        label: formatMessage("splitGenerationOptionNumerical")
-                      }
-                    ]}
-                  />
-                )}
-              </FieldSpy>
-            </div>
+            <NumberSpinnerField
+              name="numberToCreate"
+              min={1}
+              max={500}
+              label={formatMessage("materialSamplesToCreate")}
+              disabled={isMultiple}
+              className="mt-3"
+            />
           </div>
-
-          <PreviewGeneratedNames
-            splitFromMaterialSamples={
-              splitFromMaterialSamples.data as MaterialSample[]
-            }
-            splitFromParentMaterialSamples={
-              splitFromParentMaterialSamples.data as MaterialSample[]
-            }
-            generatedIdentifiers={generatedIdentifiers}
-            setGeneratedIdentifiers={setGeneratedIdentifiers}
-          />
-        </>
+          <div className="col-md-6">
+            <PreviewGeneratedNames
+              splitFromMaterialSamples={
+                splitFromMaterialSamples.data as MaterialSample[]
+              }
+              generatedIdentifiers={generatedIdentifiers}
+              setGeneratedIdentifiers={setGeneratedIdentifiers}
+              splitConfiguration={splitConfiguration}
+            />
+          </div>
+        </div>
       </PageLayout>
     </DinaForm>
   );
@@ -264,111 +163,56 @@ export function MaterialSampleSplitGenerationForm({
 
 interface PreviewGeneratedNamesProps {
   splitFromMaterialSamples: MaterialSample[];
-  splitFromParentMaterialSamples: MaterialSample[];
   generatedIdentifiers: string[];
   setGeneratedIdentifiers: (identifiers: string[]) => void;
+  splitConfiguration?: SplitConfiguration;
 }
 
 function PreviewGeneratedNames({
   splitFromMaterialSamples,
-  splitFromParentMaterialSamples,
   generatedIdentifiers,
-  setGeneratedIdentifiers
+  setGeneratedIdentifiers,
+  splitConfiguration
 }: PreviewGeneratedNamesProps) {
   const { save } = useApiClient();
   const formik = useFormikContext<MaterialSampleBulkSplitFields>();
 
-  const isMultiple = useMemo(
-    () => splitFromMaterialSamples?.length > 1,
-    [splitFromMaterialSamples]
-  );
-
-  const seriesMode = formik.values.seriesOptions;
-  const generationMode = formik.values.generationOptions;
   const numberToCreate = formik.values.numberToCreate;
 
   function getIdentifierRequest(index): MaterialSampleIdentifierGenerator {
-    const getYoungestMaterialSample = (materialSampleChildren) => {
-      return materialSampleChildren
-        ? materialSampleChildren.reduce((max, current) => {
-            return current.ordinal > max.ordinal ? current : max;
-          }, materialSampleChildren[0])
-        : undefined;
+    return {
+      type: "material-sample-identifier-generator",
+      amount: numberToCreate,
+      currentParentUUID: splitFromMaterialSamples?.[index]?.id ?? "",
+      strategy:
+        splitConfiguration?.materialSampleNameGeneration?.strategy ??
+        "DIRECT_PARENT",
+      characterType:
+        splitConfiguration?.materialSampleNameGeneration?.characterType ??
+        "LOWER_LETTER",
+      materialSampleType:
+        splitConfiguration?.materialSampleNameGeneration?.materialSampleType
     };
-
-    // Depending on the series mode, the identifier that will need to be sent to the backend to
-    // generate more identifier changes.
-    switch (seriesMode) {
-      case "new":
-        return {
-          type: "material-sample-identifier-generator",
-          amount: numberToCreate - 1,
-          identifier:
-            splitFromMaterialSamples?.[index]?.materialSampleName +
-            APPEND_GENERATION_MODE[generationMode]
-        };
-      case "continue":
-        return {
-          type: "material-sample-identifier-generator",
-          amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
-        };
-      case "continueFromParent":
-        return {
-          type: "material-sample-identifier-generator",
-          amount: numberToCreate,
-          identifier: getYoungestMaterialSample(
-            splitFromParentMaterialSamples?.[index]?.materialSampleChildren
-          )?.materialSampleName
-        };
-    }
   }
 
   // To prevent spamming the network calls, this useEffect has a debounce.
   useEffect(() => {
     async function callGenerateIdentifierAPI() {
-      const requests = [...Array(splitFromMaterialSamples.length).keys()].map(
-        (i) => getIdentifierRequest(i)
+      const response = await save<MaterialSampleIdentifierGenerator>(
+        [
+          {
+            resource: getIdentifierRequest(0),
+            type: "material-sample-identifier-generator"
+          }
+        ],
+        { apiBaseUrl: "/collection-api", overridePatchOperation: true }
       );
 
-      // If in multiple mode and series mode is new, no request is required.
-      const responses: PersistedResource<MaterialSampleIdentifierGenerator>[] =
-        [];
-      if (!isMultiple || seriesMode !== "new") {
-        for (const request of requests) {
-          const response = await save<MaterialSampleIdentifierGenerator>(
-            [
-              {
-                resource: request,
-                type: "material-sample-identifier-generator"
-              }
-            ],
-            { apiBaseUrl: "/collection-api", overridePatchOperation: true }
-          );
-          responses.push(response[0]);
-        }
-      }
+      const generatedIdentifiersResults = response.flatMap(
+        (resp) => resp?.nextIdentifiers ?? []
+      );
 
-      const generatedIdentifiersResults = responses
-        .flatMap((response) => response?.nextIdentifiers || [])
-        .filter((identifier) => identifier);
-
-      if (seriesMode === "new") {
-        if (isMultiple) {
-          setGeneratedIdentifiers(
-            requests.map((request) => request.identifier)
-          );
-        } else {
-          setGeneratedIdentifiers([
-            requests[0].identifier,
-            ...generatedIdentifiersResults
-          ]);
-        }
-      } else {
-        setGeneratedIdentifiers(generatedIdentifiersResults);
-      }
+      setGeneratedIdentifiers(generatedIdentifiersResults);
     }
 
     let timeoutId;
@@ -385,7 +229,7 @@ function PreviewGeneratedNames({
   }, [formik.values]);
 
   return (
-    <div className="mt-4">
+    <div className="mt-2">
       <h4>
         <DinaMessage id="previewLabel" />
       </h4>
@@ -403,7 +247,7 @@ function PreviewGeneratedNames({
         <tbody>
           {Array.from(
             {
-              length: isMultiple ? generatedIdentifiers.length : numberToCreate
+              length: numberToCreate
             },
             (_, i) => i
           ).map((_, index) => (

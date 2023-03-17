@@ -2,7 +2,8 @@ import {
   ACQUISITION_EVENT_COMPONENT_NAME,
   COLLECTING_EVENT_COMPONENT_NAME,
   SPLIT_CONFIGURATION_COMPONENT_NAME,
-  FormTemplate
+  FormTemplate,
+  MATERIAL_SAMPLE_INFO_COMPONENT_NAME
 } from "../../types/collection-api";
 import { sortBy, get, isEmpty, compact } from "lodash";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
@@ -133,6 +134,23 @@ export function getSplitConfigurationComponentValues(
     true
   );
 
+  // Retrieve form template identifiers to get the material sample type.
+  const materialSampleInfoInitialValues = getComponentValues(
+    MATERIAL_SAMPLE_INFO_COMPONENT_NAME,
+    formTemplate,
+    true
+  );
+
+  const splitConfigurationStrategy = get(
+    splitConfigurationInitialValues,
+    "splitConfiguration.materialSampleNameGeneration.strategy"
+  );
+
+  const materialSampleType =
+    splitConfigurationStrategy === "TYPE_BASED"
+      ? get(materialSampleInfoInitialValues, "materialSampleType")
+      : undefined;
+
   // Return an empty object to be put into the form template default values.
   if (!splitConfigurationInitialValues) {
     return undefined;
@@ -152,14 +170,12 @@ export function getSplitConfigurationComponentValues(
         )
       },
       materialSampleNameGeneration: {
-        strategy: get(
-          splitConfigurationInitialValues,
-          "splitConfiguration.materialSampleNameGeneration.strategy"
-        ),
+        strategy: splitConfigurationStrategy,
         characterType: get(
           splitConfigurationInitialValues,
           "splitConfiguration.materialSampleNameGeneration.characterType"
-        )
+        ),
+        materialSampleType
       }
     }
   };
@@ -206,16 +222,41 @@ export function getComponentOrderFromTemplate(
  * After fetching all of the form templates a user has access to, this function will filter out all
  * of the form templates that do not have split configuration setup.
  *
+ * An additional filter is added for the condition on the split configuration.
+ *
  * @param templates All form templates the user can have access to.
+ * @param materialSampleType The split from Material Sample Type used for the condition.
  */
 export function getSplitConfigurationFormTemplates(
-  templates?: FormTemplate[]
+  templates?: FormTemplate[],
+  materialSampleType?: string
 ): FormTemplate[] {
-  if (!templates) return [];
+  if (!templates || !materialSampleType) return [];
 
-  return templates.filter(
-    (template) =>
-      getComponentValues(SPLIT_CONFIGURATION_COMPONENT_NAME, template, true) !==
-      undefined
-  );
+  return templates.filter((template) => {
+    const splitConfigComponent = getComponentValues(
+      SPLIT_CONFIGURATION_COMPONENT_NAME,
+      template,
+      true
+    );
+
+    // Split configuration does not exist on this form template.
+    if (!splitConfigComponent) {
+      return false;
+    }
+
+    // Check the split configuration condition.
+    if (
+      splitConfigComponent["splitConfiguration.condition.conditionType"] ===
+        "TYPE_BASED" &&
+      splitConfigComponent[
+        "splitConfiguration.condition.materialSampleType"
+      ].includes(materialSampleType)
+    ) {
+      return true;
+    }
+
+    // Condition not met, do not include it.
+    return false;
+  });
 }
