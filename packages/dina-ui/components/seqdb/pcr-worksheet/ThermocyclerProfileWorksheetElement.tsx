@@ -16,7 +16,7 @@ export function ThermocyclerProfileWorksheetElement({
   for (let i = 0; i < numToAppend; i++) {
     steps.push("");
   }
-  return !!thermocyclerProfile ? (
+  return (
     <>
       <DinaFormSection horizontal={[4, 8]}>
         <ResourceSelectField<ThermocyclerProfile>
@@ -58,5 +58,5 @@ export function ThermocyclerProfileWorksheetElement({
         </div>
       </div>
     </>
-  ) : null;
+  );
 }

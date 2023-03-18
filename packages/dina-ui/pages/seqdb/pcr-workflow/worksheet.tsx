@@ -1,6 +1,4 @@
-import { useRouter } from "next/router";
 import {
-  BackToListButton,
   DateField,
   DinaForm,
   DinaFormSection,
@@ -10,6 +8,10 @@ import {
   TextField,
   useApiClient
 } from "common-ui";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { Button } from "react-bootstrap";
+import { PersonSelectField } from "../../../components";
 import PageLayout from "../../../components/page/PageLayout";
 import { PcrBatchItemTable } from "../../../components/seqdb/pcr-worksheet/PcrBatchItemTable";
 import { ReactionInputs } from "../../../components/seqdb/pcr-worksheet/ReactionInputs";
@@ -18,9 +20,6 @@ import { ThermocyclerProfileWorksheetElement } from "../../../components/seqdb/p
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { Protocol } from "../../../types/collection-api";
 import { PcrBatch, Region } from "../../../types/seqdb-api";
-import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
-import { PersonSelectField } from "../../../components";
 
 export default function PcrWorksheetPage() {
   const router = useRouter();
@@ -134,6 +133,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
 
       <div className="row">
         <div className="col-sm-6">
+          {/* Left column */}
           <div className="row">
             <TextField
               className="col-sm-12"
@@ -170,6 +170,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
           </div>
         </div>
         <div className="col-sm-6">
+          {/* Right column */}
           <DinaFormSection horizontal={[3, 9]}>
             <TextField
               className="col-sm-12"

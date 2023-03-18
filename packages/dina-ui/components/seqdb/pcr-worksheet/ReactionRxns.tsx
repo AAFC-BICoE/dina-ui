@@ -51,7 +51,7 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
     }
   }
 
-  return !!protocol ? (
+  return (
     <>
       <div className="row">
         <div className={styles.fieldGroup + " col-sm-12 mb-3"}>
@@ -100,14 +100,22 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
               </tr>
             </thead>
             <tbody>
-              {ulRnxQuantities.map((item, index) => (
-                <tr key={`${item.key}-${index}`}>
-                  <td>{item.key}</td>
-                  <td />
-                  <td>{item.ulPerRxn}</td>
-                  <td>{item.ul}</td>
+              {ulRnxQuantities && ulRnxQuantities.length > 0 ? (
+                ulRnxQuantities.map((item, index) => (
+                  <tr key={`${item.key}-${index}`}>
+                    <td>{item.key}</td>
+                    <td />
+                    <td>{item.ulPerRxn}</td>
+                    <td>{item.ul}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={4}>
+                    <DinaMessage id="noUlRnxProtocolData" />
+                  </td>
                 </tr>
-              ))}
+              )}
             </tbody>
             <tfoot>
               <tr>
@@ -121,7 +129,5 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
         </div>
       </div>
     </>
-  ) : (
-    <></>
   );
 }

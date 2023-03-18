@@ -133,5 +133,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   specimenIdentifier: "Specimen Identifier",
   genus: "Genus",
   species: "Species",
-  result: "Result"
+  result: "Result",
+  noUlRnxProtocolData: "No valid protocol data of ulRnx."
 };
