@@ -77,6 +77,7 @@ export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] 
           <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!data?.attributes?.materialSampleName}
+            materialSampleType={data?.attributes?.materialSampleType}
           />
           <DeleteButton
             id={id as string}
@@ -86,6 +87,7 @@ export const ELASTIC_SEARCH_COLUMN_CHILDREN_VIEW: TableColumn<MaterialSample>[] 
           />
         </div>
       ),
-      label: "actions"
+      label: "actions",
+      sortable: false
     }
   ];

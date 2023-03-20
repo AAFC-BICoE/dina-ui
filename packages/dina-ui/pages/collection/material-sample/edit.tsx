@@ -53,7 +53,7 @@ export default function MaterialSampleEditPage() {
     materialSampleInitialValues,
     collectingEventInitialValues,
     acquisitionEventInitialValues
-  } = useMaterialSampleFormTemplateSelectState();
+  } = useMaterialSampleFormTemplateSelectState({});
   const sampleFormProps: Partial<MaterialSampleFormProps> = {
     formTemplate: sampleFormTemplate,
     visibleManagedAttributeKeys,

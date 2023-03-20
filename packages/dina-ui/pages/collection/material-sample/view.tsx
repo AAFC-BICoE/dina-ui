@@ -8,6 +8,7 @@ import {
   FieldSet,
   generateDirectMaterialSampleChildrenTree,
   materialSampleCultureStrainChildrenQuery,
+  useElasticSearchQuery,
   withResponse
 } from "common-ui";
 import { Field } from "formik";
@@ -40,7 +41,8 @@ import {
   TagsAndRestrictionsSection,
   useCollectingEventQuery,
   useMaterialSampleQuery,
-  withOrganismEditorValues
+  withOrganismEditorValues,
+  TransactionMaterialDirectionSection
 } from "../../../components";
 import { AttachmentReadOnlySection } from "../../../components/object-store/attachment-list/AttachmentReadOnlySection";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -89,6 +91,44 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       <a>{highestParentMaterialSample}</a>
     </Link>
   );
+
+  const transactionElasticQuery = useElasticSearchQuery({
+    indexName: "dina_loan_transaction_index",
+    queryDSL: {
+      _source: [
+        "data.id",
+        "data.attributes.materialDirection",
+        "data.attributes.transactionNumber"
+      ],
+      query: {
+        bool: {
+          must: [
+            {
+              nested: {
+                path: "included",
+                query: {
+                  bool: {
+                    must: [
+                      {
+                        term: {
+                          "included.id": id
+                        }
+                      },
+                      {
+                        term: {
+                          "included.type": "material-sample"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  });
 
   return (
     <div>
@@ -144,6 +184,13 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <TagSelectReadOnly />
                   <ProjectSelectSection />
                   <AssemblageSelectSection />
+                  {withResponse(transactionElasticQuery as any, (response) => {
+                    return (
+                      <TransactionMaterialDirectionSection
+                        transactionElasticQuery={response.data}
+                      />
+                    );
+                  })}
                 </div>
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
@@ -181,7 +228,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   reactTableProps={{
                     showPagination: false
                   }}
-                  defaultPageSize={0}
+                  defaultPageSize={500}
+                  defaultSort={[
+                    { id: "data.attributes.materialSampleName", desc: false }
+                  ]}
                 />
 
                 <MaterialSampleInfoSection />
@@ -317,6 +367,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
           <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSample.materialSampleName}
+            materialSampleType={materialSample.materialSampleType}
           />
           <GenerateLabelDropdownButton materialSample={materialSample} />
           <Link href={`/collection/material-sample/revisions?id=${id}`}>

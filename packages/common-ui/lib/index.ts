@@ -5,6 +5,7 @@ export * from "./api-client/ApiClientContext";
 export * from "./api-client/client-side-join";
 export * from "./api-client/operations-types";
 export * from "./api-client/useQuery";
+export * from "./api-client/useElasticSearchQuery";
 export * from "./bulk-data-editor/BulkDataEditor";
 export * from "./bulk-data-editor/encode-resource-cell";
 export * from "./bulk-data-editor/resource-select-cell";

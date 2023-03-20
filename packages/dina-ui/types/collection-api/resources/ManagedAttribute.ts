@@ -26,7 +26,8 @@ export const COLLECTION_MODULE_TYPES = [
   "COLLECTING_EVENT",
   "MATERIAL_SAMPLE",
   "DETERMINATION",
-  "ASSEMBLAGE"
+  "ASSEMBLAGE",
+  "PREPARATION"
 ] as const;
 export type CollectionModuleType = typeof COLLECTION_MODULE_TYPES[number];
 export const COLLECTION_MODULE_TYPE_LABELS: Record<
@@ -36,7 +37,8 @@ export const COLLECTION_MODULE_TYPE_LABELS: Record<
   COLLECTING_EVENT: "collectingEvent",
   MATERIAL_SAMPLE: "materialSample",
   DETERMINATION: "determination",
-  ASSEMBLAGE: "assemblage"
+  ASSEMBLAGE: "assemblage",
+  PREPARATION: "preparation"
 };
 
 export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
