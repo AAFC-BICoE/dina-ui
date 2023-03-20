@@ -611,7 +611,6 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   originalMaterialSampleLabel: "Échantillon de matière original",
   overwriteValues: "Écraser les valeurs",
   parentCollectionLabel: "Collection mère",
-  parentMaterialSample: "Échantillon d'origine",
   parentSampleNotFoundLabel: "Échantillon parent non trouvé",
   partial: "Partiel",
   personListTitle: "Personnes",
