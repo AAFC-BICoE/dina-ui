@@ -334,7 +334,6 @@ export function FormTemplateEditPageLoaded({
                 <TextField name="name" className="row" />
                 <CheckBoxField
                   name="restrictToCreatedBy"
-                  label="Private"
                   overridecheckboxProps={{
                     style: {
                       height: "30px",
