@@ -1,10 +1,12 @@
 import {
   BackButton,
+  CheckBoxField,
   DeleteButton,
   DinaForm,
   DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  FieldSpy,
   SubmitButton,
   TextField,
   useQuery,
@@ -214,7 +216,7 @@ export function FormTemplateEditPageLoaded({
       type: "form-template",
       name: submittedValues.name,
       group: submittedValues.group,
-      restrictToCreatedBy: false,
+      restrictToCreatedBy: submittedValues.restrictToCreatedBy,
       viewConfiguration: { type: "material-sample-form-template" },
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
@@ -330,6 +332,31 @@ export function FormTemplateEditPageLoaded({
             <div className="row">
               <div className="col-md-6">
                 <TextField name="name" className="row" />
+                <CheckBoxField
+                  name="restrictToCreatedBy"
+                  label="Private"
+                  overridecheckboxProps={{
+                    style: {
+                      height: "30px",
+                      width: "30px"
+                    }
+                  }}
+                />
+                <FieldSpy<string> fieldName={"group"}>
+                  {(group) => (
+                    <FieldSpy<boolean> fieldName={"restrictToCreatedBy"}>
+                      {(privateFormTemplate) => (
+                        <p>
+                          {privateFormTemplate === true
+                            ? "Form template is visible only to you."
+                            : `Form template is visible to everyone that is part of the "${group?.toUpperCase()}" group.`}
+                        </p>
+                      )}
+                    </FieldSpy>
+                  )}
+                </FieldSpy>
+              </div>
+              <div className="col-md-6">
                 <GroupSelectField
                   name="group"
                   enableStoredDefaultGroup={true}
