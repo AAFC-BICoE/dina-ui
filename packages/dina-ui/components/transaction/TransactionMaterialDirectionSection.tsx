@@ -15,7 +15,7 @@ export function TransactionMaterialDirectionSection({
 }: TransactionMaterialDirectionSectionProps) {
   // Assuming that transactions only attach to 1 material sample
   const transactionDatas: any[] = transactionElasticQuery?.hits?.hits;
-  transactionDatas.sort((a, b) => {
+  transactionDatas?.sort((a, b) => {
     if (
       (!a?._source?.data?.attributes?.openedDate &&
         !b?._source?.data?.attributes?.openedDate) ||
@@ -34,7 +34,7 @@ export function TransactionMaterialDirectionSection({
       return 1;
     }
   });
-  const transactionData = transactionDatas[0]._source.data;
+  const transactionData = transactionDatas?.[0]?._source.data;
   const materialDirectionIconProps = {
     style: { cursor: "pointer" },
     onMouseOver: (event) => (event.currentTarget.style.color = "blue"),
