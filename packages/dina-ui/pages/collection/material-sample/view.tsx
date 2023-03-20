@@ -98,7 +98,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       _source: [
         "data.id",
         "data.attributes.materialDirection",
-        "data.attributes.transactionNumber"
+        "data.attributes.transactionNumber",
+        "data.attributes.openedDate"
       ],
       query: {
         bool: {
@@ -186,10 +187,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <AssemblageSelectSection />
                   {withResponse(
                     transactionElasticQuery as any,
-                    ({ data: transactionElasticQuery }) => {
+                    ({ data: query }) => {
                       return (
                         <TransactionMaterialDirectionSection
-                          transactionElasticQuery={transactionElasticQuery}
+                          transactionElasticQuery={query}
                         />
                       );
                     }
