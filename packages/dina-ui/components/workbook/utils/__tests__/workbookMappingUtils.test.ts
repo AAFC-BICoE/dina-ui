@@ -24,7 +24,7 @@ const mockConfig = {
     booleanField: { dataType: DataTypeEnum.BOOLEAN },
     stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
     numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
-    mapField: { dataType: DataTypeEnum.MAP },
+    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
     objectField: {
       name: { dataType: DataTypeEnum.STRING },
       age: { dataType: DataTypeEnum.NUMBER },
@@ -238,7 +238,7 @@ describe("workbookMappingUtils functions", () => {
   it("flattenObject", () => {
     expect(flattenObject(mockConfig)).toEqual({
       "mockEntity.booleanField.dataType": "boolean",
-      "mockEntity.mapField.dataType": "Map",
+      "mockEntity.mapField.dataType": "managedAttributes",
       "mockEntity.numberArrayField.dataType": "number[]",
       "mockEntity.numberField.dataType": "number",
       "mockEntity.objectField.age.dataType": "number",
