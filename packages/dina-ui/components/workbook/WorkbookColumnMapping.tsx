@@ -243,9 +243,6 @@ export function WorkbookColumnMapping({
     errors: ValidationError[]
   ) {
     if (!!selectedType?.value) {
-      const fieldsConfigs: {
-        [field: string]: { dataType: DataTypeEnum };
-      } = FieldMappingConfig[selectedType?.value];
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
         // eslint-disable-next-line
