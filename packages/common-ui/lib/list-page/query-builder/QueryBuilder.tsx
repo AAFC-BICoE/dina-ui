@@ -109,39 +109,39 @@ function QueryBuilder({
 }
 
 /**
- * Empty query tree, used as the default when loading the page.
+ * Default query tree contains an empty rule so it's one less the step the user needs to perform.
+ *
+ * This is the default when first loading the page and resetting the query builder.
  */
-export function defaultQueryTree(config: Config): ImmutableTree {
-  return Utils.checkTree(
-    Utils.loadTree({
-      id: "baabbba8-0123-4456-b89a-b183d17aa81f",
-      type: "group",
-      children1: {
-        "9b8889bb-4567-489a-bcde-f183d18abfc3": {
-          type: "rule",
-          id: "9b8889bb-4567-489a-bcde-f183d18abfc3",
-          properties: {
-            field: null,
-            operator: null,
-            value: [],
-            valueSrc: [],
-            valueError: []
-          },
-          path: [
-            "baabbba8-0123-4456-b89a-b183d17aa81f",
-            "9b8889bb-4567-489a-bcde-f183d18abfc3"
-          ]
-        }
-      },
-      properties: { conjunction: "AND" },
-      path: ["baabbba8-0123-4456-b89a-b183d17aa81f"]
-    } as JsonTree),
-    config
-  );
+export function defaultQueryTree(): ImmutableTree {
+  const groupId = "8c6dc2c8-4070-48ce-b700-13a931f9ebaf";
+  const ruleId = "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6";
+
+  return Utils.loadTree({
+    id: groupId,
+    type: "group",
+    children1: {
+      "f76a54f6-0112-4ac9-b2a1-f6dced58b3d6": {
+        type: "rule",
+        id: ruleId,
+        properties: {
+          field: null,
+          operator: null,
+          value: [],
+          valueSrc: [],
+          valueError: []
+        },
+        path: [groupId, ruleId]
+      }
+    },
+    properties: { conjunction: "AND" },
+    path: [groupId]
+  } as JsonTree);
 }
 
 /**
- * Generate an empty tree, used for resetting.
+ * Generate an empty tree with no rules. Used for special cases like custom elastic search
+ * view queries where the query builder is not needed.
  */
 export function emptyQueryTree(): ImmutableTree {
   return Utils.loadTree({

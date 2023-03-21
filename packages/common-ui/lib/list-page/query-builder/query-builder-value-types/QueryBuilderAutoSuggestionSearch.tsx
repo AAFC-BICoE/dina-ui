@@ -87,7 +87,7 @@ function QueryBuilderAutoSuggestionTextSearch({
             fieldSettings?.path +
             "." +
             fieldSettings?.label
-        : fieldSettings?.path + "." + fieldSettings?.label
+        : fieldSettings?.value
     );
   }, [fieldSettings]);
 
