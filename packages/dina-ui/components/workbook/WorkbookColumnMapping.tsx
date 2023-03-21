@@ -245,7 +245,6 @@ export function WorkbookColumnMapping({
     if (!!selectedType?.value) {
       for (let i = 0; i < workbookData.length; i++) {
         const row = workbookData[i];
-        // eslint-disable-next-line
         for (const field of Object.keys(row)) {
           if (field === "rowNumber") {
             continue;
