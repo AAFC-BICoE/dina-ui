@@ -98,9 +98,14 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       _source: [
         "data.id",
         "data.attributes.materialDirection",
-        "data.attributes.transactionNumber",
-        "data.attributes.openedDate"
+        "data.attributes.transactionNumber"
       ],
+      size: 1,
+      sort: {
+        "data.attributes.openedDate.keyword": {
+          order: "desc"
+        }
+      },
       query: {
         bool: {
           must: [
