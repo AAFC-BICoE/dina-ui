@@ -291,11 +291,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       onChange={onChange}
       isLoading={isLoading}
       options={options}
-      placeholder={
-        placeholder ?? isDisabled
-          ? ""
-          : formatMessage({ id: "typeHereToSearch" })
-      }
+      placeholder={placeholder ?? formatMessage({ id: "typeHereToSearch" })}
       loadingMessage={() => formatMessage({ id: "loadingText" })}
       styles={customStyle}
       classNamePrefix="react-select"
