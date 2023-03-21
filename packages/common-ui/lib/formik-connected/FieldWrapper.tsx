@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { FormikProps } from "formik";
-import { isArray, find } from "lodash";
+import { isArray, find, isNumber } from "lodash";
 import { PropsWithChildren, ReactNode, useMemo } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { FieldSpyRenderProps } from "..";
@@ -101,17 +101,17 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
     // First find the component we are looking for.
     const componentFound = find(formTemplate?.components, {
-      name: componentName,
+      name: componentName
     });
     if (componentFound) {
       // Next find the right section.
       const sectionFound = find(componentFound?.sections, {
-        name: sectionName,
+        name: sectionName
       });
       if (sectionFound) {
         if (name.includes("managedAttributes")) {
           const visibleManagedAttributes = find(sectionFound.items, {
-            name: "managedAttributesOrder",
+            name: "managedAttributesOrder"
           })?.defaultValue;
           return visibleManagedAttributes.includes(
             templateCheckboxFieldName ?? name
@@ -120,7 +120,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
         return (
           !find(sectionFound.items, {
-            name: templateCheckboxFieldName ?? name,
+            name: templateCheckboxFieldName ?? name
           })?.visible ?? false
         );
       }
@@ -167,19 +167,19 @@ function LabelWrapper({
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    disableTemplateCheckbox,
+    disableTemplateCheckbox
   },
   fieldSpyProps: {
     field: { value },
-    isChanged,
+    isChanged
   },
-  children,
+  children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
   const { horizontal, isTemplate, componentName, sectionName } =
     useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
-    currentValue: value,
+    currentValue: value
   });
 
   const fieldLabel = label ?? (
@@ -198,8 +198,17 @@ function LabelWrapper({
       ? ["col-sm-6", "col-sm-6"]
       : horizontal === "flex"
       ? ["", "flex-grow-1"]
-      : (horizontal || []).map((col) => `col-sm-${col}`) ||
-        (isTemplate ? ["col-sm-12", "col-sm-12"] : []);
+      : isArray(horizontal)
+      ? (horizontal || []).map((col) => `col-sm-${col}`) ||
+        (isTemplate ? ["col-sm-12", "col-sm-12"] : [])
+      : ["label-col", "field-col"];
+
+  const [labelStyle, valueStyle] = isNumber(horizontal)
+    ? [
+        { display: "inline-block", width: `${horizontal}em` },
+        { display: "inline-block", width: `calc(100% - ${horizontal}em` }
+      ]
+    : [];
 
   // Replace dots and square brackets with underscores so the classes are selectable in tests and CSS:
   // e.g. organism.lifeStage-field -> organism_lifeStage-field
@@ -259,7 +268,8 @@ function LabelWrapper({
             horizontal ? "align-items-center" : "mb-2",
             (horizontal === true || isArray(horizontal)) && "row",
             isTemplate && `col-sm-${horizontal ? "11" : "10"}`,
-            !isTemplate && !horizontal && "w-100",
+            !isTemplate && (!horizontal || isNumber(horizontal)) && "w-100",
+            !isTemplate && isNumber(horizontal) && "d-flex",
             !removeBottomMargin && "mb-3"
           )}
           htmlFor={disableLabelClick ? "none" : undefined}
@@ -271,11 +281,12 @@ function LabelWrapper({
                 labelClass,
                 !horizontal && "mb-2"
               )}
+              style={labelStyle}
             >
               {!hideLabel && <strong>{fieldLabel}</strong>}
             </div>
           )}
-          <div className={valueClass} style={{ cursor: "auto" }}>
+          <div className={valueClass} style={{ ...valueStyle, cursor: "auto" }}>
             {children}
           </div>
         </label>
@@ -289,14 +300,14 @@ function FormikConnectedField({
   fieldSpyProps: {
     form,
     field: { name, value: formikValue },
-    meta: { error },
+    meta: { error }
   },
-  fieldWrapperProps: { readOnlyRender, link, children },
+  fieldWrapperProps: { readOnlyRender, link, children }
 }: FieldWrapperInternalProps) {
   const { readOnly } = useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
-    currentValue: formikValue,
+    currentValue: formikValue
   });
 
   function setValue(input: any) {
@@ -321,7 +332,7 @@ function FormikConnectedField({
     formik: form,
 
     // Only used within the bulk editor's "Edit All" tab:
-    placeholder: bulkTab?.placeholder,
+    placeholder: bulkTab?.placeholder
   };
   return (
     <ErrorBoundary

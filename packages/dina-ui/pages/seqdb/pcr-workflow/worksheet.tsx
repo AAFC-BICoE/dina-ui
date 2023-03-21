@@ -94,7 +94,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
   const initialValues = pcrBatch;
   return (
     <DinaForm<any> initialValues={initialValues as any}>
-      <DinaFormSection horizontal={[3, 9]}>
+      <DinaFormSection horizontal={11}>
         <div className="row">
           <div className="col-sm-6">
             <div className="row">
@@ -143,7 +143,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
               inputProps={{ rows: 3 }}
             />
           </div>
-          <DinaFormSection horizontal={[3, 9]}>
+          <DinaFormSection horizontal={11}>
             <div className="row">
               <ResourceSelectField<Region>
                 className="col-sm-12"
@@ -171,7 +171,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
         </div>
         <div className="col-sm-6">
           {/* Right column */}
-          <DinaFormSection horizontal={[3, 9]}>
+          <DinaFormSection horizontal={11}>
             <TextField
               className="col-sm-12"
               name="positiveControl"
@@ -184,7 +184,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
             <ThermocyclerProfileWorksheetElement
               thermocyclerProfile={pcrBatch.thermocyclerProfile}
             />
-            <DinaFormSection horizontal={[3, 9]}>
+            <DinaFormSection horizontal={11}>
               <TextField
                 className="col-sm-12"
                 name="reference"
