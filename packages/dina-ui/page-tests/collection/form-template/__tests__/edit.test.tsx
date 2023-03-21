@@ -594,47 +594,9 @@ const formTemplate: PersistedResource<FormTemplate> = {
       ]
     },
     {
-      name: ACQUISITION_EVENT_COMPONENT_NAME,
-      visible: false,
-      order: 4,
-      sections: [
-        {
-          name: "acquisition-event-reception-section",
-          visible: true,
-          items: [
-            {
-              name: "group",
-              visible: false,
-              defaultValue: "aafc"
-            },
-            { defaultValue: undefined, name: "receivedFrom", visible: false },
-            { defaultValue: undefined, name: "receivedDate", visible: false },
-            {
-              defaultValue: undefined,
-              name: "receptionRemarks",
-              visible: false
-            }
-          ]
-        },
-        {
-          name: "acquisition-event-isolation-section",
-          visible: true,
-          items: [
-            { defaultValue: undefined, name: "isolatedBy", visible: false },
-            { defaultValue: undefined, name: "isolatedOn", visible: false },
-            {
-              defaultValue: undefined,
-              name: "isolationRemarks",
-              visible: false
-            }
-          ]
-        }
-      ]
-    },
-    {
       name: PREPARATIONS_COMPONENT_NAME,
       visible: false,
-      order: 5,
+      order: 4,
       sections: [
         {
           name: "general-section",
@@ -698,7 +660,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: ORGANISMS_COMPONENT_NAME,
       visible: false,
-      order: 6,
+      order: 5,
       sections: [
         {
           name: "organisms-general-section",
@@ -810,7 +772,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: ASSOCIATIONS_COMPONENT_NAME,
       visible: false,
-      order: 7,
+      order: 6,
       sections: [
         {
           name: "associations-host-organism-section",
@@ -854,7 +816,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: STORAGE_COMPONENT_NAME,
       visible: false,
-      order: 8,
+      order: 7,
       sections: [
         {
           name: "storage-selection-section",
@@ -868,7 +830,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: RESTRICTION_COMPONENT_NAME,
       visible: false,
-      order: 9,
+      order: 8,
       sections: [
         {
           name: "restriction-general-section",
@@ -891,7 +853,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: SCHEDULED_ACTIONS_COMPONENT_NAME,
       visible: false,
-      order: 10,
+      order: 9,
       sections: [
         {
           name: "scheduled-actions-add-section",
@@ -929,7 +891,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: FIELD_EXTENSIONS_COMPONENT_NAME,
       visible: undefined,
-      order: 11,
+      order: 10,
       sections: [
         {
           items: [
@@ -947,7 +909,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: MANAGED_ATTRIBUTES_COMPONENT_NAME,
       visible: true,
-      order: 12,
+      order: 11,
       sections: [
         {
           name: "managed-attributes-section",
@@ -959,7 +921,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
     {
       name: MATERIAL_SAMPLE_ATTACHMENTS_COMPONENT_NAME,
       visible: true,
-      order: 13,
+      order: 12,
       sections: [
         {
           name: "material-sample-attachments-sections",
@@ -1012,7 +974,6 @@ describe("Form template edit page", () => {
       "identifiers-component",
       "material-sample-info-component",
       "collecting-event-component",
-      "acquisition-event-component",
       "preparations-component",
       "organisms-component",
       "associations-component",
@@ -1492,55 +1453,9 @@ describe("Form template edit page", () => {
           ]
         },
         {
-          name: "acquisition-event-component",
-          visible: false,
-          order: 4,
-          sections: [
-            {
-              name: "acquisition-event-reception-section",
-              visible: true,
-              items: [
-                {
-                  name: "group",
-                  visible: false,
-                  defaultValue: "aafc"
-                },
-                {
-                  defaultValue: undefined,
-                  name: "receivedFrom",
-                  visible: false
-                },
-                {
-                  defaultValue: undefined,
-                  name: "receivedDate",
-                  visible: false
-                },
-                {
-                  defaultValue: undefined,
-                  name: "receptionRemarks",
-                  visible: false
-                }
-              ]
-            },
-            {
-              name: "acquisition-event-isolation-section",
-              visible: true,
-              items: [
-                { defaultValue: undefined, name: "isolatedBy", visible: false },
-                { defaultValue: undefined, name: "isolatedOn", visible: false },
-                {
-                  defaultValue: undefined,
-                  name: "isolationRemarks",
-                  visible: false
-                }
-              ]
-            }
-          ]
-        },
-        {
           name: "preparations-component",
           visible: false,
-          order: 5,
+          order: 4,
           sections: [
             {
               name: "general-section",
@@ -1604,7 +1519,7 @@ describe("Form template edit page", () => {
         {
           name: "organisms-component",
           visible: false,
-          order: 6,
+          order: 5,
           sections: [
             {
               name: "organisms-general-section",
@@ -1716,7 +1631,7 @@ describe("Form template edit page", () => {
         {
           name: "associations-component",
           visible: false,
-          order: 7,
+          order: 6,
           sections: [
             {
               name: "associations-host-organism-section",
@@ -1760,7 +1675,7 @@ describe("Form template edit page", () => {
         {
           name: "storage-component",
           visible: false,
-          order: 8,
+          order: 7,
           sections: [
             {
               name: "storage-selection-section",
@@ -1778,7 +1693,7 @@ describe("Form template edit page", () => {
         {
           name: "restriction-component",
           visible: false,
-          order: 9,
+          order: 8,
           sections: [
             {
               name: "restriction-general-section",
@@ -1813,7 +1728,7 @@ describe("Form template edit page", () => {
         {
           name: "scheduled-actions-component",
           visible: false,
-          order: 10,
+          order: 9,
           sections: [
             {
               name: "scheduled-actions-add-section",
@@ -1851,7 +1766,7 @@ describe("Form template edit page", () => {
         {
           name: "field-extensions-component",
           visible: true,
-          order: 11,
+          order: 10,
           sections: [
             {
               items: [
@@ -1869,7 +1784,7 @@ describe("Form template edit page", () => {
         {
           name: "managed-attributes-component",
           visible: true,
-          order: 12,
+          order: 11,
           sections: [
             {
               name: "managed-attributes-section",
@@ -1892,7 +1807,7 @@ describe("Form template edit page", () => {
         {
           name: "material-sample-attachments-component",
           visible: true,
-          order: 13,
+          order: 12,
           sections: [
             {
               name: "material-sample-attachments-sections",
