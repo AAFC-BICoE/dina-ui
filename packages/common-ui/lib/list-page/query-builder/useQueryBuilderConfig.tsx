@@ -57,9 +57,7 @@ function indexSettingsToFieldPath(indexSettings?: ESIndexMapping): string {
   if (!indexSettings) return "";
 
   return indexSettings.parentName
-    ? indexSettings.parentPath +
-        ".attributes." +
-        indexSettings.label.substring(indexSettings.label.indexOf(".") + 1)
+    ? indexSettings.parentPath + ".attributes." + indexSettings.label
     : "data.attributes." + indexSettings.label;
 }
 
@@ -520,7 +518,9 @@ function generateBuilderConfig(
     canReorder: true,
     clearValueOnChangeField: false,
     clearValueOnChangeOp: false,
-    showErrorMessage: true
+    showErrorMessage: true,
+    removeIncompleteRulesOnLoad: false,
+    removeEmptyGroupsOnLoad: false
   };
 
   const fields: Fields = Object.assign(

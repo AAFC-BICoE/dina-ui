@@ -5,31 +5,38 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
   <h1 id=\\"wb-cont\\">
     Split Material Sample
   </h1>
-  <Card body={false}>
-    <div className=\\"card\\">
-      <CardBody>
-        <div className=\\"card-body\\">
-          <FormattedMessage id=\\"splitFrom\\">
-            <FormattedMessage defaultMessage=\\" \\" id=\\"splitFrom\\">
-              Split from
-            </FormattedMessage>
+  <div className=\\"row\\">
+    <div className=\\"col-md-5\\">
+      <h4 className=\\"mt-2\\">
+        <FormattedMessage id=\\"settingLabel\\">
+          <FormattedMessage defaultMessage=\\" \\" id=\\"settingLabel\\">
+            Settings
           </FormattedMessage>
-          :
-          <span className=\\"ms-2\\" />
+        </FormattedMessage>
+      </h4>
+      <Card body={false}>
+        <div className=\\"card\\">
+          <CardBody>
+            <div className=\\"card-body\\">
+              <FormattedMessage id=\\"splitFrom\\">
+                <FormattedMessage defaultMessage=\\" \\" id=\\"splitFrom\\">
+                  Split from
+                </FormattedMessage>
+              </FormattedMessage>
+              :
+              <span className=\\"ms-2\\" />
+            </div>
+          </CardBody>
         </div>
-      </CardBody>
-    </div>
-  </Card>
-  <div className=\\"row mt-3\\">
-    <div className=\\"col-md-4\\">
-      <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false}>
-        <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false}>
+      </Card>
+      <NumberSpinnerField name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
+        <FieldWrapper name=\\"numberToCreate\\" min={1} max={500} label=\\"Material Samples to Create\\" disabled={false} className=\\"mt-3\\">
           <FieldSpy fieldName=\\"numberToCreate\\" validate={[undefined]}>
             <FormikConnect(FastFieldInner) name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
               <FastFieldInner name=\\"numberToCreate\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
                 <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"numberToCreate\\">
                   <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
-                    <div className=\\"\\">
+                    <div className=\\"mt-3\\">
                       <label className=\\"numberToCreate-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
                         <div className=\\"field-label mb-2\\">
                           <strong>
@@ -53,232 +60,72 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
         </FieldWrapper>
       </NumberSpinnerField>
     </div>
-    <div className=\\"col-md-4\\">
-      <RadioButtonsField name=\\"seriesOptions\\" label=\\"Series Options\\" horizontalOptions={true} options={{...}}>
-        <FieldWrapper disableLabelClick={true} name=\\"seriesOptions\\" label=\\"Series Options\\">
-          <FieldSpy fieldName=\\"seriesOptions\\" validate={[undefined]}>
-            <FormikConnect(FastFieldInner) name=\\"seriesOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
-              <FastFieldInner name=\\"seriesOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
-                <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"seriesOptions\\">
-                  <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
-                    <div className=\\"\\">
-                      <label className=\\"seriesOptions-field mb-2 w-100 mb-3\\" htmlFor=\\"none\\">
-                        <div className=\\"field-label mb-2\\">
-                          <strong>
-                            Series Options
-                          </strong>
-                        </div>
-                        <div className={[undefined]} style={{...}}>
-                          <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
-                            <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
-                              <div>
-                                <div className=\\"form-check-horizontal\\">
-                                  <label className=\\"form-check-label\\">
-                                    <input className=\\"form-check-input-horizontal\\" type=\\"radio\\" checked={true} disabled={false} onChange={[Function: onChange]} />
-                                    Continue Series
-                                  </label>
-                                </div>
-                                <div className=\\"form-check-horizontal\\">
-                                  <label className=\\"disabled-radio-text form-check-label\\">
-                                    <input className=\\"form-check-input-horizontal\\" type=\\"radio\\" checked={false} disabled={true} onChange={[Function: onChange]} />
-                                    <Tooltip id=\\"splitSeriesOptionContinueFromParentTooltip\\" disableSpanMargin={true} visibleElement={{...}}>
-                                      <span className={[undefined]}>
-                                        <ForwardRef(Tooltip) id=\\"splitSeriesOptionContinueFromParentTooltip\\" overlay={{...}} placement=\\"top\\" trigger={{...}}>
-                                          <Trigger popupClassName=\\"\\" prefixCls=\\"rc-tooltip\\" popup={[Function: getPopupElement]} action={{...}} builtinPlacements={{...}} popupPlacement=\\"top\\" popupAlign={{...}} getPopupContainer={[undefined]} onPopupVisibleChange={[Function: noop]} afterPopupVisibleChange={[Function: noop]} popupTransitionName={[undefined]} popupAnimation={[undefined]} popupMotion={[undefined]} defaultPopupVisible={false} destroyPopupOnHide={false} autoDestroy={false} mouseLeaveDelay={0.1} popupStyle={{...}} mouseEnterDelay={0} id=\\"splitSeriesOptionContinueFromParentTooltip\\" overlay={{...}} getPopupClassNameFromAlign={[Function: returnEmptyString]} getDocument={[Function: returnDocument]} onPopupAlign={[Function: noop]} focusDelay={0} blurDelay={0.15} mask={false} maskClosable={true} showAction={{...}} hideAction={{...}}>
-                                            <span onContextMenu={[undefined]} onClick={[undefined]} onMouseDown={[undefined]} onTouchStart={[undefined]} onMouseEnter={[Function (anonymous)]} onMouseLeave={[Function (anonymous)]} onFocus={[Function (anonymous)]} onBlur={[Function (anonymous)]}>
-                                              <span aria-describedby=\\"splitSeriesOptionContinueFromParentTooltip\\" tabIndex={0}>
-                                                Continue Series from Parent
-                                              </span>
-                                            </span>
-                                          </Trigger>
-                                        </ForwardRef(Tooltip)>
-                                      </span>
-                                    </Tooltip>
-                                  </label>
-                                </div>
-                                <div className=\\"form-check-horizontal\\">
-                                  <label className=\\"form-check-label\\">
-                                    <input className=\\"form-check-input-horizontal\\" type=\\"radio\\" checked={false} disabled={false} onChange={[Function: onChange]} />
-                                    New Series
-                                  </label>
-                                </div>
-                              </div>
-                            </ErrorBoundary>
-                          </FormikConnectedField>
-                        </div>
-                      </label>
+    <div className=\\"col-md-7\\">
+      <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={[undefined]}>
+        <div className=\\"mt-2\\">
+          <h4>
+            <FormattedMessage id=\\"previewLabel\\">
+              <FormattedMessage defaultMessage=\\" \\" id=\\"previewLabel\\">
+                Preview
+              </FormattedMessage>
+            </FormattedMessage>
+          </h4>
+          <table className=\\"table\\">
+            <thead>
+              <tr>
+                <th>
+                  <FormattedMessage id=\\"splitPreviewNumberColumn\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewNumberColumn\\">
+                      Number
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewGeneratedIdentifierColumn\\">
+                      Generated Identifier
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"parentMaterialSample\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
+                       Parent Material Sample
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"field_materialSampleType\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"field_materialSampleType\\">
+                      Material Sample Type
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  #
+                  1
+                </td>
+                <td>
+                  <LoadingSpinner loading={true}>
+                    <div className=\\"spinner-border\\" role=\\"status\\">
+                      <span className=\\"visually-hidden mb-3\\">
+                        Loading...
+                      </span>
                     </div>
-                  </LabelWrapper>
-                </FieldSpyInternal>
-              </FastFieldInner>
-            </FormikConnect(FastFieldInner)>
-          </FieldSpy>
-        </FieldWrapper>
-      </RadioButtonsField>
-    </div>
-    <div className=\\"col-md-4\\">
-      <FieldSpy fieldName=\\"seriesOptions\\">
-        <FormikConnect(FastFieldInner) name=\\"seriesOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
-          <FastFieldInner name=\\"seriesOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
-            <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"seriesOptions\\">
-              <SelectField name=\\"generationOptions\\" label=\\"Generation Options\\" disabled={true} options={{...}}>
-                <FieldWrapper name=\\"generationOptions\\" label=\\"Generation Options\\" readOnlyRender={[Function: defaultReadOnlyRender]}>
-                  <FieldSpy fieldName=\\"generationOptions\\" validate={[undefined]}>
-                    <FormikConnect(FastFieldInner) name=\\"generationOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]}>
-                      <FastFieldInner name=\\"generationOptions\\" shouldUpdate={[Function: shouldRender]} validate={[undefined]} formik={{...}}>
-                        <FieldSpyInternal fastFieldProps={{...}} fieldName=\\"generationOptions\\">
-                          <LabelWrapper fieldWrapperProps={{...}} fieldSpyProps={{...}}>
-                            <div className=\\"\\">
-                              <label className=\\"generationOptions-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
-                                <div className=\\"field-label mb-2\\">
-                                  <strong>
-                                    Generation Options
-                                  </strong>
-                                </div>
-                                <div className={[undefined]} style={{...}}>
-                                  <FormikConnectedField fieldSpyProps={{...}} fieldWrapperProps={{...}}>
-                                    <ErrorBoundary FallbackComponent={[Function: FallbackComponent]}>
-                                      <div className=\\"\\">
-                                        <ForwardRef isDisabled={true} isMulti={[undefined]} options={{...}} onChange={[Function: onChangeInternal]} value={{...}} styles={{...}} isLoading={[undefined]} classNamePrefix=\\"react-select\\" placeholder={[undefined]} filterOption={[undefined]}>
-                                          <Select isDisabled={true} isMulti={false} options={{...}} styles={{...}} isLoading={false} classNamePrefix=\\"react-select\\" placeholder=\\"Select...\\" filterOption={[Function (anonymous)]} inputValue=\\"\\" menuIsOpen={false} onChange={[Function (anonymous)]} onInputChange={[Function (anonymous)]} onMenuClose={[Function (anonymous)]} onMenuOpen={[Function (anonymous)]} value={{...}} aria-live=\\"polite\\" backspaceRemovesValue={true} blurInputOnSelect={true} captureMenuScroll={false} closeMenuOnSelect={true} closeMenuOnScroll={false} components={{...}} controlShouldRenderValue={true} escapeClearsValue={false} formatGroupLabel={[Function: formatGroupLabel]} getOptionLabel={[Function: getOptionLabel]} getOptionValue={[Function: getOptionValue]} isRtl={false} isSearchable={true} isOptionDisabled={[Function: isOptionDisabled]} loadingMessage={[Function: loadingMessage]} maxMenuHeight={300} minMenuHeight={140} menuPlacement=\\"bottom\\" menuPosition=\\"absolute\\" menuShouldBlockScroll={false} menuShouldScrollIntoView={true} noOptionsMessage={[Function: noOptionsMessage]} openMenuOnFocus={false} openMenuOnClick={true} pageSize={5} screenReaderStatus={[Function: screenReaderStatus]} tabIndex={0} tabSelectsValue={true}>
-                                            <SelectContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} className={[undefined]} innerProps={{...}} isDisabled={true} isFocused={false}>
-                                              <EmotionCssPropInternal css={{...}} className=\\"react-select--is-disabled\\" id={[undefined]} onKeyDown={[Function (anonymous)]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"SelectContainer\\">
-                                                <div className=\\"react-select--is-disabled css-3iigni-container\\" id={[undefined]} onKeyDown={[Function (anonymous)]}>
-                                                  <LiveRegion clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} id=\\"react-select-2-live-region\\" ariaSelection={{...}} focusedOption={[undefined]} focusedValue={{...}} isFocused={false} selectValue={{...}} focusableOptions={{...}}>
-                                                    <A11yText id=\\"react-select-2-live-region\\">
-                                                      <EmotionCssPropInternal css={{...}} id=\\"react-select-2-live-region\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"A11yText\\">
-                                                        <span id=\\"react-select-2-live-region\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
-                                                      </EmotionCssPropInternal>
-                                                    </A11yText>
-                                                    <A11yText aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\">
-                                                      <EmotionCssPropInternal css={{...}} aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"A11yText\\">
-                                                        <span aria-live=\\"polite\\" aria-atomic=\\"false\\" aria-relevant=\\"additions text\\" className=\\"css-1f43avz-a11yText-A11yText\\" />
-                                                      </EmotionCssPropInternal>
-                                                    </A11yText>
-                                                  </LiveRegion>
-                                                  <Control clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerRef={[Function (anonymous)]} innerProps={{...}} isDisabled={true} isFocused={false} menuIsOpen={false}>
-                                                    <EmotionCssPropInternal css={{...}} className=\\"react-select__control react-select__control--is-disabled\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Control\\">
-                                                      <div className=\\"react-select__control react-select__control--is-disabled css-1insrsq-control\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]}>
-                                                        <ValueContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={true}>
-                                                          <EmotionCssPropInternal css={{...}} className=\\"react-select__value-container react-select__value-container--has-value\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"ValueContainer\\">
-                                                            <div className=\\"react-select__value-container react-select__value-container--has-value css-319lph-ValueContainer\\">
-                                                              <SingleValue clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} data={{...}} isDisabled={true}>
-                                                                <EmotionCssPropInternal css={{...}} className=\\"react-select__single-value react-select__single-value--is-disabled\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"SingleValue\\">
-                                                                  <div className=\\"react-select__single-value react-select__single-value--is-disabled css-lr9fot-singleValue\\">
-                                                                    a (Lowercase letters)
-                                                                  </div>
-                                                                </EmotionCssPropInternal>
-                                                              </SingleValue>
-                                                              <Input clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" innerRef={[Function (anonymous)]} isDisabled={true} isHidden={false} onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-controls=\\"react-select-2-listbox\\" aria-owns=\\"react-select-2-listbox\\" aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} role=\\"combobox\\">
-                                                                <EmotionCssPropInternal className=\\"react-select__input-container\\" css={{...}} data-value=\\"\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Input\\">
-                                                                  <div className=\\"react-select__input-container css-jzldcf-Input\\" data-value=\\"\\">
-                                                                    <input className=\\"react-select__input\\" style={{...}} disabled={true} autoCapitalize=\\"none\\" autoComplete=\\"off\\" autoCorrect=\\"off\\" id=\\"react-select-2-input\\" onBlur={[Function (anonymous)]} onChange={[Function (anonymous)]} onFocus={[Function (anonymous)]} spellCheck=\\"false\\" tabIndex={0} form={[undefined]} type=\\"text\\" value=\\"\\" aria-autocomplete=\\"list\\" aria-expanded={false} aria-haspopup={true} aria-controls=\\"react-select-2-listbox\\" aria-owns=\\"react-select-2-listbox\\" aria-errormessage={[undefined]} aria-invalid={[undefined]} aria-label={[undefined]} aria-labelledby={[undefined]} role=\\"combobox\\" />
-                                                                  </div>
-                                                                </EmotionCssPropInternal>
-                                                              </Input>
-                                                            </div>
-                                                          </EmotionCssPropInternal>
-                                                        </ValueContainer>
-                                                        <IndicatorsContainer clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={true}>
-                                                          <EmotionCssPropInternal css={{...}} className=\\"react-select__indicators\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorsContainer\\">
-                                                            <div className=\\"react-select__indicators css-1hb7zxy-IndicatorsContainer\\">
-                                                              <IndicatorSeparator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} isDisabled={true} isFocused={false}>
-                                                                <EmotionCssPropInternal css={{...}} className=\\"react-select__indicator-separator\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"span\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"IndicatorSeparator\\">
-                                                                  <span className=\\"react-select__indicator-separator css-109onse-indicatorSeparator\\" />
-                                                                </EmotionCssPropInternal>
-                                                              </IndicatorSeparator>
-                                                              <DropdownIndicator clearValue={[Function (anonymous)]} cx={[Function (anonymous)]} getStyles={[Function (anonymous)]} getValue={[Function (anonymous)]} hasValue={true} isMulti={false} isRtl={false} options={{...}} selectOption={[Function (anonymous)]} selectProps={{...}} setValue={[Function (anonymous)]} theme={{...}} innerProps={{...}} isDisabled={true} isFocused={false}>
-                                                                <EmotionCssPropInternal css={{...}} className=\\"react-select__indicator react-select__dropdown-indicator\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\" __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"div\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"DropdownIndicator\\">
-                                                                  <div className=\\"react-select__indicator react-select__dropdown-indicator css-tlfecz-indicatorContainer\\" onMouseDown={[Function (anonymous)]} onTouchEnd={[Function (anonymous)]} aria-hidden=\\"true\\">
-                                                                    <DownChevron>
-                                                                      <Svg size={20}>
-                                                                        <EmotionCssPropInternal height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" css={{...}} __EMOTION_TYPE_PLEASE_DO_NOT_USE__=\\"svg\\" __EMOTION_LABEL_PLEASE_DO_NOT_USE__=\\"Svg\\">
-                                                                          <svg height={20} width={20} viewBox=\\"0 0 20 20\\" aria-hidden=\\"true\\" focusable=\\"false\\" className=\\"css-tj5bde-Svg\\">
-                                                                            <path d=\\"M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z\\" />
-                                                                          </svg>
-                                                                        </EmotionCssPropInternal>
-                                                                      </Svg>
-                                                                    </DownChevron>
-                                                                  </div>
-                                                                </EmotionCssPropInternal>
-                                                              </DropdownIndicator>
-                                                            </div>
-                                                          </EmotionCssPropInternal>
-                                                        </IndicatorsContainer>
-                                                      </div>
-                                                    </EmotionCssPropInternal>
-                                                  </Control>
-                                                </div>
-                                              </EmotionCssPropInternal>
-                                            </SelectContainer>
-                                          </Select>
-                                        </ForwardRef>
-                                      </div>
-                                    </ErrorBoundary>
-                                  </FormikConnectedField>
-                                </div>
-                              </label>
-                            </div>
-                          </LabelWrapper>
-                        </FieldSpyInternal>
-                      </FastFieldInner>
-                    </FormikConnect(FastFieldInner)>
-                  </FieldSpy>
-                </FieldWrapper>
-              </SelectField>
-            </FieldSpyInternal>
-          </FastFieldInner>
-        </FormikConnect(FastFieldInner)>
-      </FieldSpy>
+                  </LoadingSpinner>
+                </td>
+                <td />
+                <td />
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </PreviewGeneratedNames>
     </div>
   </div>
-  <PreviewGeneratedNames splitFromMaterialSamples={{...}} splitFromParentMaterialSamples={[undefined]} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]}>
-    <div className=\\"mt-4\\">
-      <h4>
-        <FormattedMessage id=\\"previewLabel\\">
-          <FormattedMessage defaultMessage=\\" \\" id=\\"previewLabel\\">
-            Preview
-          </FormattedMessage>
-        </FormattedMessage>
-      </h4>
-      <table className=\\"table\\">
-        <thead>
-          <tr>
-            <th>
-              <FormattedMessage id=\\"splitPreviewNumberColumn\\">
-                <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewNumberColumn\\">
-                  Number
-                </FormattedMessage>
-              </FormattedMessage>
-            </th>
-            <th>
-              <FormattedMessage id=\\"splitPreviewGeneratedIdentifierColumn\\">
-                <FormattedMessage defaultMessage=\\" \\" id=\\"splitPreviewGeneratedIdentifierColumn\\">
-                  Generated Identifier
-                </FormattedMessage>
-              </FormattedMessage>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-              #
-              1
-            </td>
-            <td>
-              <LoadingSpinner loading={true}>
-                <div className=\\"spinner-border\\" role=\\"status\\">
-                  <span className=\\"visually-hidden mb-3\\">
-                    Loading...
-                  </span>
-                </div>
-              </LoadingSpinner>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </PreviewGeneratedNames>
 </main>"
 `;

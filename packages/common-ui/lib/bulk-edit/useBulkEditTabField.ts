@@ -39,7 +39,7 @@ export function getBulkEditTabFieldInfo(params: BulkEditTabFieldInfoParams) {
     isBlankResourceAttribute(get(form, fieldName))
   );
 
-  let commonValue: any = undefined;
+  let commonValue: any;
   const hasMultipleValues = !formStates.every((form) => {
     const bulkValue = get(form, fieldName);
     const sampleValue = get(sampleHooks[0].formRef.current?.values, fieldName);

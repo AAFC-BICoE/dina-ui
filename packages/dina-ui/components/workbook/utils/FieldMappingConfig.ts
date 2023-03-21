@@ -21,7 +21,7 @@ const FieldMappingConfig: FieldMappingConfigType = {
       dataType: DataTypeEnum.VOCABULARY,
       vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
     },
-    managedAttributes: { dataType: DataTypeEnum.MAP },
+    managedAttributes: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
     organismsIndividualEntry: { dataType: DataTypeEnum.BOOLEAN },
     useTargetOrganism: { dataType: DataTypeEnum.BOOLEAN },
     publiclyReleasable: { dataType: DataTypeEnum.BOOLEAN },

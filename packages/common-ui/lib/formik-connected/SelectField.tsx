@@ -55,7 +55,8 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     const values = compact(castArray(value));
     const labels = compact(
       values.map(
-        (item) => find(options, (option) => option.value === item)?.label ?? item
+        (item) =>
+          find(options, (option) => option.value === item)?.label ?? item
       )
     );
     return (

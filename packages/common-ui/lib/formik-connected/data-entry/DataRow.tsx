@@ -46,9 +46,9 @@ export function DataRow({
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
 
-  function onCreatableSelectFieldChange(value, formik) {
+  function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
-      formik.setFieldValue(
+      formikCtx.setFieldValue(
         vocabularyBasedFieldName,
         !!find(typeOptions, (item) => item.value === value)
       );
@@ -58,7 +58,7 @@ export function DataRow({
   const rowsPath = name.substring(0, name.lastIndexOf("."));
   const currentRows = get(formik.values, rowsPath);
   function addRow() {
-    let newRows = {
+    const newRows = {
       ...currentRows,
       [`extensionField-${Object.keys(currentRows).length}`]: ""
     };
@@ -73,7 +73,7 @@ export function DataRow({
   }
   return (
     <div className="d-flex">
-      {(
+      {
         <div style={{ width: "15rem", marginLeft: "17rem" }}>
           {typesAddable ? (
             <CreatableSelectField
@@ -94,7 +94,7 @@ export function DataRow({
             />
           )}
         </div>
-      )}
+      }
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
         <TextField
           name={valueTextFieldName}

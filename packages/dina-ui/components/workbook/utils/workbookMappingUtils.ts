@@ -1,5 +1,6 @@
 import { WorkbookJSON } from "../types/Workbook";
-import { find, compact, trim } from "lodash";
+import { find, trim } from "lodash";
+import { ValidationError } from "yup";
 
 const BOOLEAN_CONSTS = ["yes", "no", "true", "false", "0", "1"];
 
@@ -69,12 +70,14 @@ export function findMatchField(
  * @param spreadsheetData Whole spreadsheet data to retrieve the headers from.
  * @param sheetNumber the sheet index (starting from 0) to pull the header columns from.
  * @param fieldNames
+ * @param getRowNumber (optional) - if yes, gets the corresponding row number in the workbook for the row data
  * @returns
  */
 export function getDataFromWorkbook(
   spreadsheetData: WorkbookJSON,
   sheetNumber: number,
-  fieldNames: (string | undefined)[]
+  fieldNames: (string | undefined)[],
+  getRowNumber?: boolean
 ) {
   const data: { [key: string]: any }[] = [];
   const workbookData = spreadsheetData?.[sheetNumber].filter(
@@ -89,6 +92,11 @@ export function getDataFromWorkbook(
         rowData[field] = row.content[index];
       }
     }
+
+    if (!!getRowNumber) {
+      rowData.rowNumber = row.rowNumber;
+    }
+
     data.push(rowData);
   }
   return data;
@@ -144,13 +152,57 @@ export function isBooleanArray(value: string): boolean {
 
 /**
  * Check if a string a map pair
- * @param value string, it can be 'key:value, key2:"value with special char", key3 : value3'
+ * @param value string, it can be 'key:value, key2:"value with comma or colon chars", key3 : value3'
  * @returns boolean
  */
 export function isMap(value: string): boolean {
-  const regx =
-    /^\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+))\s*(,\s*([0-9A-Za-z_]+\s*:\s*(".*"|[0-9A-Za-z_]+)))*\s*$/g;
-  return !!value && regx.test(value);
+  const regex =
+    /^[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+))(?:,\s*[a-zA-Z_]+\s*:\s*(?:(?:"(?:\\"|[^"])*"|“(?:\\"|[^“”])*”|[^,"\n]+)))*$/;
+  return !!value && regex.test(value);
+}
+
+/**
+ * Check if the input managed attribute is valid
+ * @param value string, it can be 'key:value, key2:"value with comma or colon chars", key3 : value3'
+ * @returns boolean
+ */
+export function isValidManagedAttribute(
+  workbookManagedAttributes: { [key: string]: string },
+  endpointManagedAttributes: any[],
+  formatMessage: (id, values?) => string
+) {
+  Object.keys(workbookManagedAttributes).forEach(
+    (workbookManagedAttributeKey) => {
+      const workbookManagedAttributeValue =
+        workbookManagedAttributes[workbookManagedAttributeKey];
+      const matchedManagedAttribute = endpointManagedAttributes.find(
+        (endpointManagedAttribute) =>
+          endpointManagedAttribute.key === workbookManagedAttributeKey
+      );
+      if (!matchedManagedAttribute) {
+        const key = workbookManagedAttributeKey;
+        const param = { key };
+        throw new ValidationError(
+          formatMessage("workBookInvalidManagedAttributeKey", param),
+          "managedAttributes",
+          "sheet"
+        );
+      }
+      if (
+        matchedManagedAttribute.vocabularyElementType === "BOOL" &&
+        !isBoolean(workbookManagedAttributeValue.toString())
+      ) {
+        const key = workbookManagedAttributeKey;
+        const type = matchedManagedAttribute.vocabularyElementType;
+        const param = { key, type };
+        throw new ValidationError(
+          formatMessage("workBookInvalidManagedAttributeDataType", param),
+          "managedAttributes",
+          "sheet"
+        );
+      }
+    }
+  );
 }
 
 /**
@@ -240,7 +292,9 @@ export function convertMap(value: string): { [key: string]: any } {
   const map = {} as { [key: string]: any };
   for (const keyValue of items) {
     if (keyValue) {
-      const arr = keyValue.split(regx).map((str) => trim(trim(str, '"')));
+      const arr = keyValue
+        .split(regx)
+        .map((str) => trim(trim(str, '"').replace('"', "")));
       if (arr && arr.length === 2 && arr[0] !== "" && arr[1] !== "") {
         const key = arr[0];
         const strVal = arr[1];

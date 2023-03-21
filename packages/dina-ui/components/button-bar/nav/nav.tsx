@@ -215,9 +215,24 @@ function NavCollectionDropdown({ formatMessage }) {
       onMouseLeave={hideDropdown}
       show={show}
     >
+      <Link href="/collection/assemblage/list" passHref={true}>
+        <NavDropdown.Item>
+          <DinaMessage id="title_assemblage" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/collection/collecting-event/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="collectingEventListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/collection-method/list" passHref={true}>
+        <NavDropdown.Item>
+          <DinaMessage id="collectionMethodListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/collection/list" passHref={true}>
+        <NavDropdown.Item>
+          <DinaMessage id="collectionListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/collection/material-sample/list" passHref={true}>
@@ -233,6 +248,11 @@ function NavCollectionDropdown({ formatMessage }) {
       <Link href="/collection/storage-unit/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="storageUnitListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/collection/project/list" passHref={true}>
+        <NavDropdown.Item>
+          <DinaMessage id="projectListTitle" />
         </NavDropdown.Item>
       </Link>
       <Link href="/workbook/upload" passHref={true}>
@@ -421,21 +441,6 @@ function NavDinaManagementDropdown({ formatMessage }) {
       show={show}
       className="float-right"
     >
-      <Link href="/collection/assemblage/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="title_assemblage" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/collection/collection-method/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="collectionMethodListTitle" />
-        </NavDropdown.Item>
-      </Link>
-      <Link href="/collection/collection/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="collectionListTitle" />
-        </NavDropdown.Item>
-      </Link>
       <Link href="/collection/extension/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="fieldExtensions" />
@@ -456,11 +461,6 @@ function NavDinaManagementDropdown({ formatMessage }) {
           <DinaMessage id="managedAttributes" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/object-store/object-subtype/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="objectSubtypeListTitle" />
-        </NavDropdown.Item>
-      </Link>
       {/* Permission page here. */}
       <Link href="/collection/preparation-method/list" passHref={true}>
         <NavDropdown.Item>
@@ -472,11 +472,7 @@ function NavDinaManagementDropdown({ formatMessage }) {
           <DinaMessage id="preparationTypeListTitle" />
         </NavDropdown.Item>
       </Link>
-      <Link href="/collection/project/list" passHref={true}>
-        <NavDropdown.Item>
-          <DinaMessage id="projectListTitle" />
-        </NavDropdown.Item>
-      </Link>
+
       <Link href="/collection/protocol/list" passHref={true}>
         <NavDropdown.Item>
           <DinaMessage id="protocolListTitle" />

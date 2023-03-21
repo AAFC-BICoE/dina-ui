@@ -616,7 +616,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
-  parentMaterialSample: " Parent Sample",
+  parentMaterialSample: " Parent Material Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
   partial: "Partial",
   personListTitle: "Persons",
@@ -634,6 +634,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   preparations: "Preparations",
   preparedBy: "Prepared By",
   previewLabel: "Preview",
+  settingLabel: "Settings",
   previewAndCustomizeLabel: "Preview and Customize",
   previewNotAvailable: "Preview Not Available",
   primary: "Primary",
@@ -726,6 +727,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   selectOrType: "Select or Type",
   selectRuleSet: "Select Rule Set",
   selectTemplate: "Select Template",
+  selectSplitConfiguration: "Select Split Configuration",
   seriesModeInfo: "Series Mode: Material Samples have incrementing IDs.",
   set: "Set",
   setAll: "Set All",
@@ -856,5 +858,11 @@ export const DINAUI_MESSAGES_ENGLISH = {
     'The "{fileName}" file cannot be uploaded since it\'s an unsupported file type.',
   workBookDuplicateFieldMap: "This column should not map to the same field",
   workBookInvalidDataFormat:
-    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}"
+    "Invalid data format, sheet: {sheet}, row: {index}, field: {field}, data type should be {dataType}",
+  workBookInvalidManagedAttributeDataType:
+    "Invalid Managed Attribute data type: managed attribute key {key} expects {type} data type.",
+  workBookInvalidManagedAttributeKey:
+    "Invalid Managed Attribute key: managed attribute key {key} not found.",
+  materialDirection_tooltip:
+    "Transaction Material Direction: {materialDirection}"
 };

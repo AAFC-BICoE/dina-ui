@@ -11,7 +11,7 @@ import { useState } from "react";
 import ReactTable from "react-table";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
-import { SplitMaterialSampleButton } from "./SplitMaterialSampleButton";
+import { SplitMaterialSampleDropdownButton } from "./SplitMaterialSampleDropdownButton";
 
 export interface SamplesViewProps {
   samples?: Partial<MaterialSample>[];
@@ -48,7 +48,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
       Header: formatMessage("tags")
     },
     {
-      Cell: ({ original: { id, materialSampleName } }) => (
+      Cell: ({ original: { id, materialSampleName, materialSampleType } }) => (
         <div className="d-flex">
           <EditButton
             className="mx-2"
@@ -56,9 +56,10 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
             entityLink="collection/material-sample"
             style={{ width: "5rem" }}
           />
-          <SplitMaterialSampleButton
+          <SplitMaterialSampleDropdownButton
             ids={[id]}
             disabled={!materialSampleName}
+            materialSampleType={materialSampleType}
           />
           <DeleteButton
             id={id as string}
@@ -92,7 +93,7 @@ export function SamplesView({ samples, fieldSetId }: SamplesViewProps) {
     <FieldSet legend={fieldSetId}>
       <ReactTable
         columns={CHILD_SAMPLES_COLUMNS}
-        className="-striped"
+        className="-striped react-table-overflow"
         data={samples}
         defaultSorted={sortingRules}
         minRows={1}
