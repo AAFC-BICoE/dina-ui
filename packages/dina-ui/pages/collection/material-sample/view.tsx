@@ -82,9 +82,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       : materialSampleQuery.response?.data?.collectingEvent?.id
   );
 
-  const acqEventQuery = useAcquisitionEvent(
-    materialSampleQuery.response?.data?.acquisitionEvent?.id
-  );
+  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
+  // const acqEventQuery = useAcquisitionEvent(
+  //   materialSampleQuery.response?.data?.acquisitionEvent?.id
+  // );
 
   const collectingEventParentLink = (
     <Link href={`/collection/material-sample/view?id=${highestParentId}`}>
@@ -186,10 +187,10 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <AssemblageSelectSection />
                   {withResponse(
                     transactionElasticQuery as any,
-                    ({ data: transactionElasticQuery }) => {
+                    ({ data: query }) => {
                       return (
                         <TransactionMaterialDirectionSection
-                          transactionElasticQuery={transactionElasticQuery}
+                          transactionElasticQuery={query}
                         />
                       );
                     }
@@ -268,7 +269,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                     </FieldSet>
                   );
                 })}
-                {withResponse(acqEventQuery, ({ data: acqEvent }) => (
+                {
+                  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
+                  /* {withResponse(acqEventQuery, ({ data: acqEvent }) => (
                   <FieldSet
                     id={ACQUISITION_EVENT_COMPONENT_NAME}
                     legend={<DinaMessage id="acquisitionEvent" />}
@@ -286,7 +289,8 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                       <AcquisitionEventFormLayout />
                     </DinaForm>
                   </FieldSet>
-                ))}
+                ))} */
+                }
                 {hasPreparations && <PreparationField />}
                 {hasOrganism && <OrganismsField name="organism" />}
                 {hasInheritedDetermination && (

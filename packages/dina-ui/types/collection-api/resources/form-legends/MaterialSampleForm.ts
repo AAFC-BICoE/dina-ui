@@ -348,49 +348,50 @@ export const MATERIAL_SAMPLE_FORM_LEGEND: FormLegendComponentInformation[] = [
       }
     ]
   },
-  {
-    id: ACQUISITION_EVENT_COMPONENT_NAME,
-    labelKey: "acquisitionEvent",
-    maxGridSizeX: 2,
-    switchClassName: "enable-acquisition-event",
-    sections: [
-      {
-        id: "acquisition-event-reception-section",
-        labelKey: "reception",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "group"
-          },
-          {
-            id: "receivedFrom"
-          },
-          {
-            id: "receivedDate"
-          },
-          {
-            id: "receptionRemarks"
-          }
-        ]
-      },
-      {
-        id: "acquisition-event-isolation-section",
-        labelKey: "isolation",
-        maxGridSizeX: 2,
-        items: [
-          {
-            id: "isolatedBy"
-          },
-          {
-            id: "isolatedOn"
-          },
-          {
-            id: "isolationRemarks"
-          }
-        ]
-      }
-    ]
-  },
+  // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
+  // {
+  //   id: ACQUISITION_EVENT_COMPONENT_NAME,
+  //   labelKey: "acquisitionEvent",
+  //   maxGridSizeX: 2,
+  //   switchClassName: "enable-acquisition-event",
+  //   sections: [
+  //     {
+  //       id: "acquisition-event-reception-section",
+  //       labelKey: "reception",
+  //       maxGridSizeX: 2,
+  //       items: [
+  //         {
+  //           id: "group"
+  //         },
+  //         {
+  //           id: "receivedFrom"
+  //         },
+  //         {
+  //           id: "receivedDate"
+  //         },
+  //         {
+  //           id: "receptionRemarks"
+  //         }
+  //       ]
+  //     },
+  //     {
+  //       id: "acquisition-event-isolation-section",
+  //       labelKey: "isolation",
+  //       maxGridSizeX: 2,
+  //       items: [
+  //         {
+  //           id: "isolatedBy"
+  //         },
+  //         {
+  //           id: "isolatedOn"
+  //         },
+  //         {
+  //           id: "isolationRemarks"
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // },
   {
     id: PREPARATIONS_COMPONENT_NAME,
     labelKey: "preparations",
