@@ -100,6 +100,12 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
         "data.attributes.materialDirection",
         "data.attributes.transactionNumber"
       ],
+      size: 1,
+      sort: {
+        "data.attributes.openedDate.keyword": {
+          order: "desc"
+        }
+      },
       query: {
         bool: {
           must: [
@@ -184,13 +190,16 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   <TagSelectReadOnly />
                   <ProjectSelectSection />
                   <AssemblageSelectSection />
-                  {withResponse(transactionElasticQuery as any, (response) => {
-                    return (
-                      <TransactionMaterialDirectionSection
-                        transactionElasticQuery={response.data}
-                      />
-                    );
-                  })}
+                  {withResponse(
+                    transactionElasticQuery as any,
+                    ({ data: query }) => {
+                      return (
+                        <TransactionMaterialDirectionSection
+                          transactionElasticQuery={query}
+                        />
+                      );
+                    }
+                  )}
                 </div>
                 <MaterialSampleIdentifiersSection />
                 {materialSample.parentMaterialSample && (
