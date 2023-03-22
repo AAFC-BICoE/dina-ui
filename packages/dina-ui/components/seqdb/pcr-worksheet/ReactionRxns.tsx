@@ -1,6 +1,9 @@
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { Protocol } from "../../../../dina-ui/types/collection-api";
 import { useState } from "react";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
+import { Protocol } from "../../../../dina-ui/types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";
 
@@ -15,6 +18,7 @@ function accurateNumber(value: number): number {
 }
 
 export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
+  const { messages, formatMessage } = useDinaIntl();
   const [numOfRxns, setNumOfRxns] = useState<number>();
   const ulRnxQuantities = [] as {
     key?: string;
@@ -26,16 +30,17 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
   if (protocol?.protocolData) {
     for (const pd of protocol.protocolData) {
       const ulRnxQuantityeElements = pd.protocolDataElement?.filter(
-        (pde) => pde.elementType === "quantity" && pde.unit === "uL.rxn"
+        (pde) => pde.elementType === "quantity" && pde.unit === "µl/rxn"
       );
       if (ulRnxQuantityeElements) {
         for (const el of ulRnxQuantityeElements) {
           const key =
-            pd.key === "Reverse Primer"
+            pd.key === "reverse_primer"
               ? "ITS4"
-              : pd.key === "Forward Primer"
+              : pd.key === "forward_primer"
               ? "ITS_1F"
               : pd.key;
+
           const ulPerRxn = convertNumber(el.value);
           const ul =
             numOfRxns == null || ulPerRxn == null
