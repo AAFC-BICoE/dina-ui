@@ -13,7 +13,6 @@ export enum MaterialDirection {
 export function TransactionMaterialDirectionSection({
   transactionElasticQuery
 }: TransactionMaterialDirectionSectionProps) {
-  // Assuming that transactions only attach to 1 material sample
   const transactionData =
     transactionElasticQuery?.hits?.hits?.[0]?._source?.data;
   const materialDirectionIconProps = {
