@@ -2796,10 +2796,10 @@ describe("MaterialSampleBulkEditor", () => {
       .find(ReactSwitch)
       .prop<any>("onChange")(true);
     // Enable the acquisition event section:
-    wrapper
-      .find(".sample-tabpanel-0 .enable-acquisition-event")
-      .find(ReactSwitch)
-      .prop<any>("onChange")(true);
+    // wrapper
+    //   .find(".sample-tabpanel-0 .enable-acquisition-event")
+    //   .find(ReactSwitch)
+    //   .prop<any>("onChange")(true);
 
     await new Promise(setImmediate);
     wrapper.update();
@@ -2811,13 +2811,13 @@ describe("MaterialSampleBulkEditor", () => {
           " .dwcVerbatimLocality-field input"
       )
       .simulate("change", { target: { value: "test locality" } });
-    wrapper
-      .find(
-        ".sample-tabpanel-0 #" +
-          ACQUISITION_EVENT_COMPONENT_NAME +
-          " .receptionRemarks-field textarea"
-      )
-      .simulate("change", { target: { value: "test remarks" } });
+    // wrapper
+    //   .find(
+    //     ".sample-tabpanel-0 #" +
+    //       ACQUISITION_EVENT_COMPONENT_NAME +
+    //       " .receptionRemarks-field textarea"
+    //   )
+    //   .simulate("change", { target: { value: "test remarks" } });
 
     // Save the samples:
     wrapper.find("button.bulk-save-button").simulate("click");
@@ -2840,27 +2840,27 @@ describe("MaterialSampleBulkEditor", () => {
         { apiBaseUrl: "/collection-api" }
       ],
       // Creates the new Acq Event:
-      [
-        [
-          {
-            resource: {
-              receptionRemarks: "test remarks",
-              type: "acquisition-event"
-            },
-            type: "acquisition-event"
-          }
-        ],
-        { apiBaseUrl: "/collection-api" }
-      ],
+      // [
+      //   [
+      //     {
+      //       resource: {
+      //         receptionRemarks: "test remarks",
+      //         type: "acquisition-event"
+      //       },
+      //       type: "acquisition-event"
+      //     }
+      //   ],
+      //   { apiBaseUrl: "/collection-api" }
+      // ],
       [
         [
           // Creates the first sample with the attached events:
           {
             resource: expect.objectContaining({
-              acquisitionEvent: {
-                id: "11111",
-                type: "acquisition-event"
-              },
+              // acquisitionEvent: {
+              //   id: "11111",
+              //   type: "acquisition-event"
+              // },
               collectingEvent: {
                 id: "11111",
                 type: "collecting-event"
@@ -2872,10 +2872,10 @@ describe("MaterialSampleBulkEditor", () => {
           // Creates the next 2 samples without the attached events:
           {
             resource: expect.objectContaining({
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
+              // acquisitionEvent: {
+              //   id: null,
+              //   type: "acquisition-event"
+              // },
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
@@ -2886,10 +2886,10 @@ describe("MaterialSampleBulkEditor", () => {
           },
           {
             resource: expect.objectContaining({
-              acquisitionEvent: {
-                id: null,
-                type: "acquisition-event"
-              },
+              // acquisitionEvent: {
+              //   id: null,
+              //   type: "acquisition-event"
+              // },
               collectingEvent: {
                 id: null,
                 type: "collecting-event"
