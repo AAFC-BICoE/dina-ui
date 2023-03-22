@@ -102,7 +102,7 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
       ],
       size: 1,
       sort: {
-        "data.attributes.openedDate.keyword": {
+        "data.attributes.openedDate": {
           order: "desc"
         }
       },

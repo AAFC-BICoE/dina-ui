@@ -74,7 +74,7 @@ export function DataRow({
   return (
     <div className="d-flex">
       {
-        <div style={{ width: "15rem", marginLeft: "17rem" }}>
+        <div style={{ width: "15rem", marginLeft: "12rem" }}>
           {typesAddable ? (
             <CreatableSelectField
               options={typeOptions}
@@ -83,6 +83,8 @@ export function DataRow({
               removeBottomMargin={true}
               disableTemplateCheckbox={true}
               onChange={onCreatableSelectFieldChange}
+              hideLabel={rowIndex !== 0}
+              readOnlyBold={true}
             />
           ) : (
             <SelectField
@@ -91,6 +93,8 @@ export function DataRow({
               label={<DinaMessage id="dataType" />}
               removeBottomMargin={true}
               disableTemplateCheckbox={true}
+              hideLabel={rowIndex !== 0}
+              readOnlyBold={true}
             />
           )}
         </div>
@@ -101,6 +105,7 @@ export function DataRow({
           removeBottomMargin={true}
           label={<DinaMessage id="dataValue" />}
           disableTemplateCheckbox={true}
+          hideLabel={rowIndex !== 0}
         />
       </div>
       {unitsOptions && (
@@ -112,6 +117,7 @@ export function DataRow({
               removeBottomMargin={true}
               label={<DinaMessage id="unit" />}
               disableTemplateCheckbox={true}
+              hideLabel={rowIndex !== 0}
             />
           ) : (
             <SelectField
@@ -120,6 +126,7 @@ export function DataRow({
               removeBottomMargin={true}
               label={<DinaMessage id="unit" />}
               disableTemplateCheckbox={true}
+              hideLabel={rowIndex !== 0}
             />
           )}
         </div>
