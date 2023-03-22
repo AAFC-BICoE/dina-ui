@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { Protocol } from "../../../../dina-ui/types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";
@@ -18,7 +15,6 @@ function accurateNumber(value: number): number {
 }
 
 export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
-  const { messages, formatMessage } = useDinaIntl();
   const [numOfRxns, setNumOfRxns] = useState<number>();
   const ulRnxQuantities = [] as {
     key?: string;

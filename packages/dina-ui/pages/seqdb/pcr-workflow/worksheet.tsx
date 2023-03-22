@@ -56,7 +56,6 @@ export default function PcrWorksheetPage() {
       initData.protocol = protocol.data;
     }
     initData.notes = "";
-    initData.positiveControl = "";
     initData.negtiveControl = "";
     initData.resultsAndNextSteps = "";
     return initData;
@@ -125,6 +124,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
                 className="col-sm-12"
                 name="reactionDate"
                 disabled={true}
+                showPlaceholder={false}
               />
             </div>
           </div>
