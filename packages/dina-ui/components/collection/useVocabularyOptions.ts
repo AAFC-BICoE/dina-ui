@@ -28,7 +28,7 @@ export default function useVocabularyOptions({ path }) {
       )?.title ||
       value.name ||
       "";
-    return { label, value: value.name || label };
+    return { label, value: value.term || label };
   }
 
   return { toOption, loading, vocabOptions };

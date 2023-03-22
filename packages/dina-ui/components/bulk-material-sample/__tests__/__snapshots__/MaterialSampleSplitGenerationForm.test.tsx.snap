@@ -6,7 +6,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
     Split Material Sample
   </h1>
   <div className=\\"row\\">
-    <div className=\\"col-md-6\\">
+    <div className=\\"col-md-5\\">
       <h4 className=\\"mt-2\\">
         <FormattedMessage id=\\"settingLabel\\">
           <FormattedMessage defaultMessage=\\" \\" id=\\"settingLabel\\">
@@ -60,7 +60,7 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
         </FieldWrapper>
       </NumberSpinnerField>
     </div>
-    <div className=\\"col-md-6\\">
+    <div className=\\"col-md-7\\">
       <PreviewGeneratedNames splitFromMaterialSamples={{...}} generatedIdentifiers={{...}} setGeneratedIdentifiers={[Function: bound dispatchAction]} splitConfiguration={[undefined]}>
         <div className=\\"mt-2\\">
           <h4>
@@ -87,6 +87,20 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                     </FormattedMessage>
                   </FormattedMessage>
                 </th>
+                <th>
+                  <FormattedMessage id=\\"parentMaterialSample\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"parentMaterialSample\\">
+                       Parent Material Sample
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
+                <th>
+                  <FormattedMessage id=\\"field_materialSampleType\\">
+                    <FormattedMessage defaultMessage=\\" \\" id=\\"field_materialSampleType\\">
+                      Material Sample Type
+                    </FormattedMessage>
+                  </FormattedMessage>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -104,6 +118,8 @@ exports[`MaterialSampleSplitGenerationForm Layout snapshot 1`] = `
                     </div>
                   </LoadingSpinner>
                 </td>
+                <td />
+                <td />
               </tr>
             </tbody>
           </table>

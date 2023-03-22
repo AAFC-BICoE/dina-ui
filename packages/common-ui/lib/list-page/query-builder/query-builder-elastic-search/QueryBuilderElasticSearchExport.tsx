@@ -85,15 +85,21 @@ function buildEsRule(
   const { elasticSearchFormatValue } = widgetConfig as any;
 
   // Use the custom logic by default.
-  let formattedValue = value[0];
+  let formattedValue = value?.[0] ?? "";
   if (typeof formattedValue === "string") {
     formattedValue = formattedValue.trim();
+  }
+
+  // Edge case if nothing is provided for a date.
+  let operatorValue = operator;
+  if (widgetName === "date" && formattedValue === "") {
+    operatorValue = "empty";
   }
 
   const parameters = elasticSearchFormatValue(
     undefined,
     formattedValue,
-    operator,
+    operatorValue,
     fieldName,
     config
   );
