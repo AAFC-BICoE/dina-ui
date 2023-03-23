@@ -139,7 +139,12 @@ export function DataRow({
         />
       )}
       {!readOnly && (
-        <div style={{ cursor: "pointer", marginTop: "2rem" }}>
+        <div
+          style={{
+            cursor: "pointer",
+            marginTop: rowIndex === 0 ? "2rem" : "0.6rem"
+          }}
+        >
           {rowIndex === 0 && showPlusIcon ? (
             <>
               {
@@ -148,6 +153,10 @@ export function DataRow({
                   onClick={addRow}
                   size="2em"
                   name={getFieldName(name, "addRow", rowIndex)}
+                  onMouseOver={(event) =>
+                    (event.currentTarget.style.color = "blue")
+                  }
+                  onMouseOut={(event) => (event.currentTarget.style.color = "")}
                 />
               }
             </>
@@ -157,6 +166,10 @@ export function DataRow({
               onClick={removeRow}
               size="2em"
               name={getFieldName(name, "removeRow", rowIndex)}
+              onMouseOver={(event) =>
+                (event.currentTarget.style.color = "blue")
+              }
+              onMouseOut={(event) => (event.currentTarget.style.color = "")}
             />
           )}
         </div>
