@@ -5,6 +5,7 @@ import {
   SelectField,
   StringToggleField,
   TextField,
+  Tooltip,
   useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
@@ -29,9 +30,16 @@ export function ManagedAttributeFieldWithLabel(
 ) {
   const { attribute, valuesPath, onRemoveClick } = props;
   const { readOnly } = useDinaFormContext();
+  const { locale } = useDinaIntl();
   const attributeKey = attribute.key;
-
   const attributePath = `${valuesPath}.${attributeKey}`;
+  const tooltipText = attribute?.multilingualDescription?.descriptions?.find(
+    (description) => description.lang === locale
+  )?.desc;
+  const fallbackTooltipText =
+    attribute?.multilingualDescription?.descriptions?.find(
+      (description) => description.lang !== locale
+    )?.desc;
 
   return (
     <label
@@ -40,7 +48,13 @@ export function ManagedAttributeFieldWithLabel(
       htmlFor="none"
     >
       <div className="mb-2 d-flex align-items-center">
-        <strong className="me-auto">{attribute.name ?? attributeKey}</strong>
+        <strong className="me-auto">
+          {attribute.name ?? attributeKey}
+          <Tooltip
+            id="freeText"
+            intlValues={{ freeText: tooltipText ?? fallbackTooltipText }}
+          />
+        </strong>
         {!readOnly && (
           <FormikButton
             className="btn remove-attribute"

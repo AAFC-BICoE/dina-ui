@@ -864,5 +864,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   materialDirection_tooltip:
-    "Transaction Material Direction: {materialDirection}"
+    "Transaction Material Direction: {materialDirection}",
+  freeText: "{freeText}"
 };
