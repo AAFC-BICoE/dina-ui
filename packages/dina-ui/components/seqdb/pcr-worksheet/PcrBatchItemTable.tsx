@@ -8,6 +8,7 @@ import {
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import { MaterialSample } from "../../../../dina-ui/types/collection-api";
 import { PcrBatchItem } from "../../../../dina-ui/types/seqdb-api";
+import { getScientificNames } from "../../collection/material-sample/organismUtils";
 
 export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
   const { apiClient } = useApiClient();
@@ -35,8 +36,9 @@ export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
                 `collection-api/material-sample/${item.materialSample.id}`,
                 {}
               );
-            (item.materialSample as MaterialSample).materialSampleName =
-              materialSample?.materialSampleName;
+            item.materialSample = materialSample;
+            // (item.materialSample as MaterialSample).materialSampleName =
+            //   materialSample?.materialSampleName;
           }
         }
       }
@@ -61,16 +63,10 @@ export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
             <DinaMessage id="field_sampleName" />
           </th>
           <th>
-            <DinaMessage id="sampleVersion" />
-          </th>
-          <th>
             <DinaMessage id="specimenIdentifier" />
           </th>
           <th>
-            <DinaMessage id="genus" />
-          </th>
-          <th>
-            <DinaMessage id="species" />
+            <DinaMessage id="field_scientificNameInput" />
           </th>
           <th>
             <DinaMessage id="result" />
@@ -78,23 +74,26 @@ export function PcrBatchItemTable({ pcrBatchId }: { pcrBatchId: string }) {
         </tr>
       </thead>
       <tbody>
-        {response.data.map((item) => (
-          <tr key={item.id}>
-            <td>
-              {item.wellColumn}
-              {item.wellRow}
-            </td>
-            <td>{item.cellNumber}</td>
-            <td>
-              {(item.materialSample as MaterialSample)?.materialSampleName}
-            </td>
-            <td>Where is version?</td>
-            <td>where is Specimen ID?</td>
-            <td>Where is Genus</td>
-            <td>Where is Species</td>
-            <td>{item.result}</td>
-          </tr>
-        ))}
+        {response.data.map((item) => {
+          const scientificNames = getScientificNames(
+            item.materialSample as MaterialSample
+          );
+          return (
+            <tr key={item.id}>
+              <td>
+                {item.wellColumn}
+                {item.wellRow}
+              </td>
+              <td>{item.cellNumber}</td>
+              <td>
+                {(item.materialSample as MaterialSample)?.materialSampleName}
+              </td>
+              <td>where is Specimen ID?</td>
+              <td>{scientificNames}</td>
+              <td>{item.result}</td>
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   ));

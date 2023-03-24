@@ -180,7 +180,7 @@ export function PcrWorksheetForm({ pcrBatch }: PcrWorksheetFormProps) {
             <TextField className="col-sm-12" name="negtiveControl" />
           </DinaFormSection>
           <div className="mb-2 col-sm-12">
-            <ReactionInputs />
+            <ReactionInputs protocol={initialValues?.protocol} />
             <ThermocyclerProfileWorksheetElement
               thermocyclerProfile={pcrBatch.thermocyclerProfile}
             />

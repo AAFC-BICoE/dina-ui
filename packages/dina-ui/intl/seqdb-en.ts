@@ -131,8 +131,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   pcrTubeNumber: "PCR Tube Number",
   sampleVersion: "Sample Version",
   specimenIdentifier: "Specimen Identifier",
-  genus: "Genus",
-  species: "Species",
   result: "Result",
   noUlRnxProtocolData: "No valid protocol data of ulRnx."
 };

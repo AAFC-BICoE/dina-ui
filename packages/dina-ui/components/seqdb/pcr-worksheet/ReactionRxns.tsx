@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { Protocol } from "../../../../dina-ui/types/collection-api";
+import {
+  Protocol,
+  ProtocolData
+} from "../../../../dina-ui/types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";
 
@@ -23,31 +26,49 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
   }[];
   let totalUlRxn = 0;
   let totalUl = 0;
+  let reactionMix: number | undefined;
   if (protocol?.protocolData) {
     for (const pd of protocol.protocolData) {
-      const ulRnxQuantityeElements = pd.protocolDataElement?.filter(
-        (pde) => pde.elementType === "quantity" && pde.unit === "µl/rxn"
+      populateReactionRxnsData(pd);
+      populateTotalReactionMixVolume(pd);
+    }
+  }
+  function populateTotalReactionMixVolume(pd: ProtocolData) {
+    if (reactionMix === undefined && pd.key === "total_reaction_mix_volume") {
+      const totalReactionMixVolumes = pd.protocolDataElement?.filter(
+        (pde) =>
+          pde.elementType === "quantity" &&
+          (pde.unit === "µl" || pde.unit === "https://w3id.org/uom/uL")
       );
-      if (ulRnxQuantityeElements) {
-        for (const el of ulRnxQuantityeElements) {
-          const key =
-            pd.key === "reverse_primer"
-              ? "ITS4"
-              : pd.key === "forward_primer"
-              ? "ITS_1F"
-              : pd.key;
+      if (totalReactionMixVolumes) {
+        reactionMix = convertNumber(totalReactionMixVolumes[0]?.value) || 0;
+      }
+    }
+  }
 
-          const ulPerRxn = convertNumber(el.value);
-          const ul =
-            numOfRxns == null || ulPerRxn == null
-              ? null
-              : accurateNumber(numOfRxns * ulPerRxn);
-          ulRnxQuantities.push({ key, ulPerRxn, ul });
-          totalUlRxn = accurateNumber(
-            totalUlRxn + (ulPerRxn === null ? 0 : ulPerRxn)
-          );
-          totalUl = accurateNumber(totalUl + (ul === null ? 0 : ul));
-        }
+  function populateReactionRxnsData(pd: ProtocolData) {
+    const ulRnxQuantityeElements = pd.protocolDataElement?.filter(
+      (pde) => pde.elementType === "quantity" && pde.unit === "µl/rxn"
+    );
+    if (ulRnxQuantityeElements) {
+      for (const el of ulRnxQuantityeElements) {
+        const key =
+          pd.key === "reverse_primer"
+            ? "ITS4"
+            : pd.key === "forward_primer"
+            ? "ITS_1F"
+            : pd.key;
+
+        const ulPerRxn = convertNumber(el.value);
+        const ul =
+          numOfRxns == null || ulPerRxn == null
+            ? null
+            : accurateNumber(numOfRxns * ulPerRxn);
+        ulRnxQuantities.push({ key, ulPerRxn, ul });
+        totalUlRxn = accurateNumber(
+          totalUlRxn + (ulPerRxn === null ? 0 : ulPerRxn)
+        );
+        totalUl = accurateNumber(totalUl + (ul === null ? 0 : ul));
       }
     }
   }
@@ -64,7 +85,7 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
               type="text"
               className="form-control"
               disabled={true}
-              value={10}
+              value={reactionMix}
             />
           </div>
           <div>

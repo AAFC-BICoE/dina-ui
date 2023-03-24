@@ -1,4 +1,34 @@
-export function ReactionInputs() {
+import {
+  Protocol,
+  ProtocolData
+} from "../../../../dina-ui/types/collection-api";
+import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
+
+export function ReactionInputs({ protocol }: { protocol?: Protocol }) {
+  let reactionMixVolumePerTube: number | undefined;
+  if (protocol?.protocolData) {
+    for (const pd of protocol.protocolData) {
+      populateReactionMixVolumePerTube(pd);
+    }
+  }
+
+  function populateReactionMixVolumePerTube(pd: ProtocolData) {
+    if (
+      reactionMixVolumePerTube === undefined &&
+      pd.key === "reaction_mix_volume_per_tube"
+    ) {
+      const totalReactionMixVolumes = pd.protocolDataElement?.filter(
+        (pde) =>
+          pde.elementType === "quantity" &&
+          (pde.unit === "µl" || pde.unit === "https://w3id.org/uom/uL")
+      );
+      if (totalReactionMixVolumes) {
+        reactionMixVolumePerTube =
+          convertNumber(totalReactionMixVolumes[0]?.value) || 0;
+      }
+    }
+  }
+
   return (
     <>
       <div className="row">
@@ -7,7 +37,7 @@ export function ReactionInputs() {
             type="text"
             className="form-control"
             disabled={true}
-            value={9}
+            value={reactionMixVolumePerTube}
           />
         </div>
         <label className="col-sm-10 mb-3">
