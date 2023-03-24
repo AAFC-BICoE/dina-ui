@@ -30,6 +30,7 @@ export interface CreatableSelectFieldProps<T> extends FieldWrapperProps {
     CreatableProps<SelectOption<T>, true, GroupBase<SelectOption<T>>>
   >;
   filterValues?: any;
+  readOnlyBold?: boolean;
 }
 
 /** The value could be one element or an array. */
@@ -48,6 +49,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
     selectProps,
     readOnlyRender,
     filterValues,
+    readOnlyBold,
     ...labelWrapperProps
   } = props;
 
@@ -64,6 +66,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
         <ReadOnlyValue
           link={labelWrapperProps.link}
           value={labels ?? [].join(", ")}
+          bold={readOnlyBold}
         />
       </div>
     );
