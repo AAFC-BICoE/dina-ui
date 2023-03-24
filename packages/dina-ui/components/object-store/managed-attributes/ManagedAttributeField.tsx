@@ -50,10 +50,7 @@ export function ManagedAttributeFieldWithLabel(
       <div className="mb-2 d-flex align-items-center">
         <strong className="me-auto">
           {attribute.name ?? attributeKey}
-          <Tooltip
-            id="freeText"
-            intlValues={{ freeText: tooltipText ?? fallbackTooltipText }}
-          />
+          <Tooltip directText={tooltipText ?? fallbackTooltipText ?? ""} />
         </strong>
         {!readOnly && (
           <FormikButton
