@@ -248,7 +248,7 @@ const formTemplate: PersistedResource<FormTemplate> = {
   type: "form-template",
   name: "form1",
   group: "aafc",
-  restrictToCreatedBy: false,
+  restrictToCreatedBy: true,
   viewConfiguration: {},
   components: [
     {
@@ -1067,7 +1067,7 @@ describe("Form template edit page", () => {
       type: "form-template",
       name: "form1",
       group: "aafc",
-      restrictToCreatedBy: false,
+      restrictToCreatedBy: true,
       viewConfiguration: { type: "material-sample-form-template" },
       components: [
         {

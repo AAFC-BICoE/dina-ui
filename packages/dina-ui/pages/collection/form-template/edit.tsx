@@ -151,6 +151,7 @@ export function FormTemplateEditPageLoaded({
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
+    restrictToCreatedBy: true,
     ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
