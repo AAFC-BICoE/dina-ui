@@ -19,6 +19,7 @@ import { GroupSelectField } from "../../group-select/GroupSelectField";
 import { AttachmentsField } from "../../object-store/attachment-list/AttachmentsField";
 import { ProtocolsField } from "./ProtocolDataField";
 import { useProtocolFormConverter } from "./useProtocolFormConverter";
+import { VocabularySelectField } from "../VocabularySelectField";
 
 export interface ProtocolFormValue extends InputResource<Protocol> {
   multilingualDescription?: Record<string, string | undefined>;
@@ -105,6 +106,13 @@ export function ProtocolFormLayout() {
           className="col-md-6 protocolName"
           name="name"
           label={formatMessage("protocolNameLabel")}
+        />
+      </div>
+      <div className="row">
+        <VocabularySelectField
+          className="col-md-6"
+          name="protocolType"
+          path="collection-api/vocabulary/protocolType"
         />
       </div>
       <div className="row">
