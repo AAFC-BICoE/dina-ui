@@ -617,7 +617,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
-  parentMaterialSample: " Parent Sample",
+  parentMaterialSample: " Parent Material Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
   partial: "Partial",
   personListTitle: "Persons",
@@ -867,5 +867,6 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialDirection_tooltip:
     "Transaction Material Direction: {materialDirection}",
   formTemplateEditPermission_tooltip:
-    "Only the creator of this form template can edit this form template."
+    "Only the creator of this form template can edit this form template.",
+    "Transaction Material Direction: {materialDirection}"
 };

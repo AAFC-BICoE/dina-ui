@@ -16,8 +16,9 @@ import { useFormikContext } from "formik";
 import { MaterialSampleIdentifierGenerator } from "../../types/collection-api/resources/MaterialSampleIdentifierGenerator";
 import { useBulkGet, useStringArrayConverter } from "common-ui";
 import { MaterialSample } from "../../types/collection-api";
-import { InputResource, PersistedResource } from "kitsu";
+import { InputResource } from "kitsu";
 import { SplitConfiguration } from "../../types/collection-api/resources/SplitConfiguration";
+import { startCase } from "lodash";
 
 const ENTITY_LINK = "/collection/material-sample";
 
@@ -119,7 +120,7 @@ export function MaterialSampleSplitGenerationForm({
     >
       <PageLayout titleId="splitSubsampleTitle" buttonBarContent={buttonBar}>
         <div className="row">
-          <div className="col-md-6">
+          <div className="col-md-5">
             <h4 className="mt-2">
               <DinaMessage id="settingLabel" />
             </h4>
@@ -145,7 +146,7 @@ export function MaterialSampleSplitGenerationForm({
               className="mt-3"
             />
           </div>
-          <div className="col-md-6">
+          <div className="col-md-7">
             <PreviewGeneratedNames
               splitFromMaterialSamples={
                 splitFromMaterialSamples.data as MaterialSample[]
@@ -228,6 +229,13 @@ function PreviewGeneratedNames({
     };
   }, [formik.values]);
 
+  // Columns to be displayed
+  const materialSampleType =
+    splitConfiguration?.materialSampleNameGeneration?.materialSampleType ?? "";
+  const formattedMaterialSampleType = startCase(
+    materialSampleType.toLowerCase().replace(/_/g, " ")
+  );
+
   return (
     <div className="mt-2">
       <h4>
@@ -241,6 +249,12 @@ function PreviewGeneratedNames({
             </th>
             <th>
               <DinaMessage id="splitPreviewGeneratedIdentifierColumn" />
+            </th>
+            <th>
+              <DinaMessage id="parentMaterialSample" />
+            </th>
+            <th>
+              <DinaMessage id="field_materialSampleType" />
             </th>
           </tr>
         </thead>
@@ -260,6 +274,8 @@ function PreviewGeneratedNames({
                   <LoadingSpinner loading={true} />
                 )}
               </td>
+              <td>{splitFromMaterialSamples?.[0]?.materialSampleName ?? ""}</td>
+              <td>{formattedMaterialSampleType}</td>
             </tr>
           ))}
         </tbody>

@@ -12,11 +12,15 @@ export function FieldView(props: FieldWrapperProps) {
 export interface ReadOnlyValueProps {
   value: any;
   link?: string;
+  bold?: boolean;
 }
 
-export function ReadOnlyValue({ value, link }: ReadOnlyValueProps) {
+export function ReadOnlyValue({ value, link, bold }: ReadOnlyValueProps) {
   return (
-    <div className="field-view" style={{ whiteSpace: "pre-wrap" }}>
+    <div
+      className="field-view"
+      style={{ whiteSpace: "pre-wrap", fontWeight: bold ? "bold" : undefined }}
+    >
       {link ? (
         <Link href={link}>
           <a>{value}</a>
