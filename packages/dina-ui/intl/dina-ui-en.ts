@@ -867,6 +867,5 @@ export const DINAUI_MESSAGES_ENGLISH = {
   materialDirection_tooltip:
     "Transaction Material Direction: {materialDirection}",
   formTemplateEditPermission_tooltip:
-    "Only the creator of this form template can edit this form template.",
-    "Transaction Material Direction: {materialDirection}"
+    "Only the creator of this form template can edit this form template."
 };
