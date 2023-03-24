@@ -1,7 +1,7 @@
 // tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
 import { find, isArray, castArray, compact } from "lodash";
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
@@ -94,6 +94,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
         }
 
         let selectedOption;
+        let input;
 
         if (isMulti) {
           selectedOption = options?.filter((option) =>
@@ -138,6 +139,13 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           }),
           ...styles
         };
+        function handleCreate() {
+          if (input) {
+            const newOption = { label: input, value: input };
+            onChangeInternal(newOption);
+            selectedOption = newOption;
+          }
+        }
 
         return (
           <div className={invalid ? "is-invalid" : ""}>
@@ -159,7 +167,9 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
                   ? (option) => !filterValues.includes(option.value)
                   : undefined
               }
-              formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
+              onInputChange={(newValue) => (input = newValue)}
+              onBlur={() => handleCreate()}
+              formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
             />
           </div>
         );
