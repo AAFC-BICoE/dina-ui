@@ -1,6 +1,12 @@
-import { ButtonBar, CreateButton, ListPageLayout, dateCell } from "common-ui";
+import { ButtonBar, CreateButton, dateCell, ListPageLayout } from "common-ui";
 import Link from "next/link";
-import { Footer, GroupSelectField, Head, Nav } from "../../../components";
+import {
+  Footer,
+  GroupSelectField,
+  Head,
+  Nav,
+  VocabularyReadOnlyView
+} from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 
 const PROTOCOL_FILTER_ATTRIBUTES = ["name"];
@@ -10,6 +16,15 @@ const PROTOCOL_TABLE_COLUMNS = [
       <Link href={`/collection/protocol/view?id=${id}`}>{name}</Link>
     ),
     accessor: "name"
+  },
+  {
+    Cell: ({ original: { protocolType } }) => (
+      <VocabularyReadOnlyView
+        path={"collection-api/vocabulary/protocolType"}
+        value={protocolType}
+      />
+    ),
+    accessor: "protocolType"
   },
   "group",
   "createdBy",
@@ -31,7 +46,7 @@ export default function protocolListPage() {
           <CreateButton entityLink="/collection/protocol" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
