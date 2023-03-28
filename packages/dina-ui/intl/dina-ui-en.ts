@@ -617,7 +617,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   originalMaterialSampleLabel: "Original Material Sample",
   overwriteValues: "Overwrite Values",
   parentCollectionLabel: "Parent Collection",
-  parentMaterialSample: " Parent Sample",
+  parentMaterialSample: " Parent Material Sample",
   parentSampleNotFoundLabel: " Parent sample not found",
   partial: "Partial",
   personListTitle: "Persons",

@@ -518,7 +518,9 @@ function generateBuilderConfig(
     canReorder: true,
     clearValueOnChangeField: false,
     clearValueOnChangeOp: false,
-    showErrorMessage: true
+    showErrorMessage: true,
+    removeIncompleteRulesOnLoad: false,
+    removeEmptyGroupsOnLoad: false
   };
 
   const fields: Fields = Object.assign(
