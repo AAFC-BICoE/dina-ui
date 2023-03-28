@@ -169,6 +169,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
               }
               onInputChange={(newValue) => (input = newValue)}
               onBlur={() => handleCreate()}
+              createOptionPosition={"first"}
               formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
             />
           </div>
