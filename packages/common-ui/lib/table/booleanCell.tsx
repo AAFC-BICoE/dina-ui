@@ -1,9 +1,9 @@
 import { get } from "lodash";
-import { CommonMessage } from "../intl/common-ui-intl";
+import { FaCheckSquare, FaRegSquare } from "react-icons/fa";
 
 /**
- * Helper cell function to display boolean values in tables. The true/false value will be displayed
- * with a true/false string (which is also translated)
+ * Helper cell function to display boolean values in tables. It will display a checkbox icon that
+ * changes depending on if it's true/false.
  *
  * Null/undefined values will be displayed as an empty string.
  *
@@ -11,14 +11,14 @@ import { CommonMessage } from "../intl/common-ui-intl";
  * @param accessor Accessor for elastic search.
  * @returns The cell to be displayed.
  */
-export function BooleanCell(label: string, accessor?: string) {
+export function booleanCell(label: string, accessor?: string) {
   return {
     Cell: ({ original }) => {
       const booleanValue = get(original, accessor ?? label)?.toString();
       if (booleanValue === "true") {
-        return <CommonMessage id="true" />;
+        return <FaCheckSquare />;
       } else if (booleanValue === "false") {
-        return <CommonMessage id="false" />;
+        return <FaRegSquare />;
       } else {
         return <></>;
       }
