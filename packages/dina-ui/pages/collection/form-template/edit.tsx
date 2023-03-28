@@ -333,24 +333,30 @@ export function FormTemplateEditPageLoaded({
             <div className="row">
               <div className="col-md-6">
                 <TextField name="name" className="row" />
-                <CheckBoxField
-                  name="restrictToCreatedBy"
-                  overridecheckboxProps={{
-                    style: {
-                      height: "30px",
-                      width: "30px"
-                    }
-                  }}
-                />
                 <FieldSpy<string> fieldName={"group"}>
                   {(group) => (
                     <FieldSpy<boolean> fieldName={"restrictToCreatedBy"}>
                       {(privateFormTemplate) => (
-                        <p>
-                          {privateFormTemplate === true
-                            ? "Form template is visible only to you."
-                            : `Form template is visible to everyone that is part of the "${group?.toUpperCase()}" group.`}
-                        </p>
+                        <CheckBoxField
+                          name="restrictToCreatedBy"
+                          tooltipOverride={
+                            privateFormTemplate
+                              ? formatMessage("formTemplatePrivate_tooltip")
+                              : group
+                              ? formatMessage("formTemplatePublic_tooltip", {
+                                  group: group?.toUpperCase()
+                                })
+                              : formatMessage(
+                                  "formTemplateGroupVisibility_tooltip"
+                                )
+                          }
+                          overridecheckboxProps={{
+                            style: {
+                              height: "30px",
+                              width: "30px"
+                            }
+                          }}
+                        />
                       )}
                     </FieldSpy>
                   )}
