@@ -1,7 +1,7 @@
 // tslint:disable: no-string-literal
 import { FormikContextType } from "formik";
 import { find, isArray, castArray, compact } from "lodash";
-import { RefObject } from "react";
+import { RefObject, useState } from "react";
 import { StylesConfig } from "react-select";
 import { ReadOnlyValue } from "./FieldView";
 import { FieldWrapper, FieldWrapperProps } from "./FieldWrapper";
@@ -30,6 +30,7 @@ export interface CreatableSelectFieldProps<T> extends FieldWrapperProps {
     CreatableProps<SelectOption<T>, true, GroupBase<SelectOption<T>>>
   >;
   filterValues?: any;
+  readOnlyBold?: boolean;
 }
 
 /** The value could be one element or an array. */
@@ -48,6 +49,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
     selectProps,
     readOnlyRender,
     filterValues,
+    readOnlyBold,
     ...labelWrapperProps
   } = props;
 
@@ -64,6 +66,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
         <ReadOnlyValue
           link={labelWrapperProps.link}
           value={labels ?? [].join(", ")}
+          bold={readOnlyBold}
         />
       </div>
     );
@@ -91,6 +94,7 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
         }
 
         let selectedOption;
+        let input;
 
         if (isMulti) {
           selectedOption = options?.filter((option) =>
@@ -135,6 +139,13 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
           }),
           ...styles
         };
+        function handleCreate() {
+          if (input) {
+            const newOption = { label: input, value: input };
+            onChangeInternal(newOption);
+            selectedOption = newOption;
+          }
+        }
 
         return (
           <div className={invalid ? "is-invalid" : ""}>
@@ -156,7 +167,10 @@ export function CreatableSelectField<T>(props: CreatableSelectFieldProps<T>) {
                   ? (option) => !filterValues.includes(option.value)
                   : undefined
               }
-              formatCreateLabel={(inputValue) => `Add "${inputValue}"`}
+              onInputChange={(newValue) => (input = newValue)}
+              onBlur={() => handleCreate()}
+              createOptionPosition={"first"}
+              formatCreateLabel={(inputValue) => `Use "${inputValue}"`}
             />
           </div>
         );

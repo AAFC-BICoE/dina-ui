@@ -1,52 +1,52 @@
-import { BooleanCell } from "../BooleanCell";
+import { booleanCell } from "../booleanCell";
 import { mountWithAppContext } from "../../test-util/mock-app-context";
 
-describe("BooleanCell", () => {
+describe("booleanCell", () => {
   it("Renders the true boolean value", () => {
     const booleanString = "true";
-    const cell = BooleanCell("myBooleanField");
+    const cell = booleanCell("myBooleanField");
 
     const wrapper = mountWithAppContext(
       <cell.Cell original={{ myBooleanField: booleanString }} />
     );
 
     expect(cell.accessor).toEqual("myBooleanField");
-    expect(wrapper.text()).toEqual("True");
+    expect(wrapper.debug()).toMatchSnapshot();
   });
 
   it("Renders the false boolean value", () => {
     const booleanString = "false";
-    const cell = BooleanCell("myBooleanField");
+    const cell = booleanCell("myBooleanField");
 
     const wrapper = mountWithAppContext(
       <cell.Cell original={{ myBooleanField: booleanString }} />
     );
 
     expect(cell.accessor).toEqual("myBooleanField");
-    expect(wrapper.text()).toEqual("False");
+    expect(wrapper.debug()).toMatchSnapshot();
   });
 
   it("Renders an empty string with null value", () => {
     const booleanString = null;
-    const cell = BooleanCell("myBooleanField");
+    const cell = booleanCell("myBooleanField");
 
     const wrapper = mountWithAppContext(
       <cell.Cell original={{ myBooleanField: booleanString }} />
     );
 
     expect(cell.accessor).toEqual("myBooleanField");
-    expect(wrapper.text()).toEqual("");
+    expect(wrapper.debug()).toMatchSnapshot();
   });
 
   it("Renders an empty string with another value other than a boolean", () => {
     const booleanString = "stringTest";
-    const cell = BooleanCell("myBooleanField");
+    const cell = booleanCell("myBooleanField");
 
     const wrapper = mountWithAppContext(
       <cell.Cell original={{ myBooleanField: booleanString }} />
     );
 
     expect(cell.accessor).toEqual("myBooleanField");
-    expect(wrapper.text()).toEqual("");
+    expect(wrapper.debug()).toMatchSnapshot();
   });
 });

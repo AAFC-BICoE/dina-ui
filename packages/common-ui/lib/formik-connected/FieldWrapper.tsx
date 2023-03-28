@@ -41,6 +41,9 @@ export interface FieldWrapperProps {
   /** Disables how clicking a label clicks the inner element. */
   disableLabelClick?: boolean;
 
+  /** Provide an ID of a tooltip to use, can be changed dynamically. */
+  tooltipOverride?: string;
+
   /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
   tooltipImage?: string;
 
@@ -164,6 +167,7 @@ function LabelWrapper({
     removeLabel,
     tooltipImage,
     templateCheckboxFieldName,
+    tooltipOverride,
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
@@ -186,6 +190,7 @@ function LabelWrapper({
     <FieldHeader
       name={name}
       customName={customName}
+      tooltipOverride={tooltipOverride}
       tooltipImage={tooltipImage}
       tooltipImageAlt={tooltipImageAlt}
       tooltipLink={tooltipLink}

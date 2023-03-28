@@ -30,6 +30,7 @@ export interface SelectFieldProps<T> extends FieldWrapperProps {
 
   selectProps?: Partial<ComponentProps<typeof Select>>;
   filterValues?: any;
+  readOnlyBold?: boolean;
 }
 
 /** The value could be one element or an array. */
@@ -48,6 +49,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
     selectProps,
     readOnlyRender,
     filterValues,
+    readOnlyBold,
     ...labelWrapperProps
   } = props;
 
@@ -64,6 +66,7 @@ export function SelectField<T>(props: SelectFieldProps<T>) {
         <ReadOnlyValue
           link={labelWrapperProps.link}
           value={labels ?? [].join(", ")}
+          bold={readOnlyBold}
         />
       </div>
     );

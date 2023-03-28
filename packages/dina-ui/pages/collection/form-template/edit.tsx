@@ -1,10 +1,12 @@
 import {
   BackButton,
+  CheckBoxField,
   DeleteButton,
   DinaForm,
   DinaFormSection,
   DinaFormSubmitParams,
   FieldSet,
+  FieldSpy,
   SubmitButton,
   TextField,
   useQuery,
@@ -149,6 +151,7 @@ export function FormTemplateEditPageLoaded({
 
   // Provide initial values for the material sample form.
   const initialValues: any = {
+    restrictToCreatedBy: true,
     ...fetchedFormTemplateWithoutComponents,
     ...allMaterialSampleComponentValues,
     ...formTemplateCheckboxes,
@@ -214,7 +217,7 @@ export function FormTemplateEditPageLoaded({
       type: "form-template",
       name: submittedValues.name,
       group: submittedValues.group,
-      restrictToCreatedBy: false,
+      restrictToCreatedBy: submittedValues.restrictToCreatedBy,
       viewConfiguration: { type: "material-sample-form-template" },
       components: MATERIAL_SAMPLE_FORM_LEGEND.map(
         (dataComponent, componentIndex) => ({
@@ -330,6 +333,36 @@ export function FormTemplateEditPageLoaded({
             <div className="row">
               <div className="col-md-6">
                 <TextField name="name" className="row" />
+                <FieldSpy<string> fieldName={"group"}>
+                  {(group) => (
+                    <FieldSpy<boolean> fieldName={"restrictToCreatedBy"}>
+                      {(privateFormTemplate) => (
+                        <CheckBoxField
+                          name="restrictToCreatedBy"
+                          tooltipOverride={
+                            privateFormTemplate
+                              ? formatMessage("formTemplatePrivate_tooltip")
+                              : group
+                              ? formatMessage("formTemplatePublic_tooltip", {
+                                  group: group?.toUpperCase()
+                                })
+                              : formatMessage(
+                                  "formTemplateGroupVisibility_tooltip"
+                                )
+                          }
+                          overridecheckboxProps={{
+                            style: {
+                              height: "30px",
+                              width: "30px"
+                            }
+                          }}
+                        />
+                      )}
+                    </FieldSpy>
+                  )}
+                </FieldSpy>
+              </div>
+              <div className="col-md-6">
                 <GroupSelectField
                   name="group"
                   enableStoredDefaultGroup={true}

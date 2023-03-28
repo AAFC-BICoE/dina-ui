@@ -12,7 +12,7 @@ export function MaterialSampleFormTemplateSelect({
   onChange,
   value
 }: MaterialSampleFormTemplateSelectProps) {
-  const { isAdmin, groupNames } = useAccount();
+  const { isAdmin, groupNames, username } = useAccount();
 
   const filterByGroup = filterBy(
     [],
@@ -45,6 +45,9 @@ export function MaterialSampleFormTemplateSelect({
             // Filter by the groups you are currently in.
             ...filterByGroup("")
           })}
+          filterList={(item) =>
+            item?.restrictToCreatedBy === false || item?.createdBy === username
+          }
           optionLabel={(view) => view.name || view.id}
           model="collection-api/form-template"
           onChange={(selectedFormTemplate) =>

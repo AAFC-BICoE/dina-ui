@@ -65,7 +65,7 @@ exports[`AutoSuggestTextField Snapshot test 1`] = `
                   <label className=\\"examplePersonNameField-field mb-2 w-100 mb-3\\" htmlFor={[undefined]}>
                     <div className=\\"field-label label-col mb-2\\" style={[undefined]}>
                       <strong>
-                        <FieldHeader name=\\"examplePersonNameField\\" customName={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]}>
+                        <FieldHeader name=\\"examplePersonNameField\\" customName={[undefined]} tooltipOverride={[undefined]} tooltipImage={[undefined]} tooltipImageAlt={[undefined]} tooltipLink={[undefined]} tooltipLinkText={[undefined]}>
                           <div className=\\"examplePersonNameField-field-header\\">
                             Example Person Name Field
                           </div>
