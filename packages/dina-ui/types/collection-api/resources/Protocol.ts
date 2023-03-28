@@ -18,6 +18,7 @@ export interface ProtocolData {
 export interface ProtocolAttributes {
   type: "protocol";
   name: string;
+  protocolType?: string;
   createdBy?: string;
   createdOn?: string;
   group?: string;
