@@ -4,7 +4,7 @@ import {
   dateCell,
   stringArrayCell,
   QueryPage,
-  BooleanCell
+  booleanCell
 } from "common-ui";
 import Link from "next/link";
 import { TableColumn } from "common-ui/lib/list-page/types";
@@ -34,7 +34,7 @@ const TABLE_COLUMNS: TableColumn<Transaction>[] = [
     isKeyword: true
   },
   stringArrayCell("otherIdentifiers", "data.attributes.otherIdentifiers"),
-  BooleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
+  booleanCell("materialToBeReturned", "data.attributes.materialToBeReturned"),
   {
     label: "purpose",
     accessor: "data.attributes.purpose",

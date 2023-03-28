@@ -5,7 +5,7 @@ import { FormTemplate } from "../../../../types/collection-api";
 import {
   ManagedAttributesViewForm,
   ManagedAttributesViewFormProps,
-  useManagedAttributesView
+  useFormTemplates
 } from "./ManagedAttributesViewForm";
 
 export function useManagedAttributesViewEditModal(
@@ -59,7 +59,7 @@ function EditManagedAttributesView({
   onSaved: (formTemplate: PersistedResource<FormTemplate>) => Promise<void>;
   defaultManagedAttributeComponent?: string;
 }) {
-  const query = useManagedAttributesView(id ?? undefined);
+  const query = useFormTemplates(id ?? undefined);
 
   const formProps: ManagedAttributesViewFormProps = {
     onSaved,

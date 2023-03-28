@@ -8,6 +8,9 @@ export interface FieldNameProps {
   /** Override the default "name" prop used to get labels and tooltips from the intl messages. */
   customName?: string;
 
+  /** Provide an ID of a tooltip to use, can be changed dynamically. */
+  tooltipOverride?: string;
+
   /** Optional image source to display an image in a tooltip. */
   tooltipImage?: string;
 
@@ -27,18 +30,22 @@ export function useFieldLabels() {
 
   function getFieldLabel({
     name,
+    tooltipOverride,
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText
   }: FieldNameProps) {
     const messageKey = `field_${name}`;
-    const tooltipKey = `${messageKey}_tooltip`;
+    const tooltipKey = tooltipOverride
+      ? tooltipOverride
+      : `${messageKey}_tooltip`;
 
     const tooltip =
-      messages[tooltipKey] || tooltipImage || tooltipLink ? (
+      messages[tooltipKey] || tooltipImage || tooltipLink || tooltipOverride ? (
         <Tooltip
           id={messages[tooltipKey] ? tooltipKey : undefined}
+          directText={tooltipOverride}
           image={tooltipImage}
           altImage={tooltipImageAlt}
           link={tooltipLink}
@@ -64,6 +71,7 @@ export function useFieldLabels() {
 export function FieldHeader({
   name,
   customName,
+  tooltipOverride,
   tooltipImage,
   tooltipImageAlt,
   tooltipLink,
@@ -72,6 +80,7 @@ export function FieldHeader({
   const { getFieldLabel } = useFieldLabels();
   const { fieldLabel, tooltip } = getFieldLabel({
     name: customName ?? name,
+    tooltipOverride,
     tooltipImage,
     tooltipImageAlt,
     tooltipLink,

@@ -243,11 +243,7 @@ describe("Material sample bulk edit tab", () => {
       // Keeps the name and type:
       type: "material-sample",
       materialSampleName: "test-sample",
-      // Adds the acq event and Col event:
-      acquisitionEvent: {
-        id: "11111111-1111-1111-1111-111111111111",
-        type: "acquisition-event"
-      },
+      // Adds the Col event:
       collectingEvent: {
         id: "11111111-1111-1111-1111-111111111111",
         type: "collecting-event"

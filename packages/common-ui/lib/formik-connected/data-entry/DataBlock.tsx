@@ -121,6 +121,7 @@ export function DataBlock({
                     onChange={onCreatableSelectFieldChange}
                     disableTemplateCheckbox={true}
                     filterValues={selectedBlockOptions}
+                    readOnlyBold={true}
                   />
                 ) : (
                   <SelectField
@@ -131,6 +132,7 @@ export function DataBlock({
                     onChange={onBlockSelectChange}
                     disableTemplateCheckbox={true}
                     filterValues={selectedBlockOptions}
+                    readOnlyBold={true}
                   />
                 )}
               </div>

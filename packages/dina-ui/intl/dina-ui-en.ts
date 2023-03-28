@@ -425,6 +425,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   field_publiclyReleasable_tooltip:
     "Indicates if the object could be released publicly on a web page or open data portals.",
   field_remarks: "Remarks",
+  field_restrictToCreatedBy: "Private",
   field_scientificNameInput: "Scientific Name",
   field_startDate: "Start Date",
   field_startEventDateTime: "Start Event Date Time",
@@ -864,5 +865,12 @@ export const DINAUI_MESSAGES_ENGLISH = {
   workBookInvalidManagedAttributeKey:
     "Invalid Managed Attribute key: managed attribute key {key} not found.",
   materialDirection_tooltip:
-    "Transaction Material Direction: {materialDirection}"
+    "Transaction Material Direction: {materialDirection}",
+  formTemplateEditPermission_tooltip:
+    "Only the creator of this form template can edit this form template.",
+  formTemplatePrivate_tooltip: "Form template is visible only to you.",
+  formTemplatePublic_tooltip:
+    "Form template is visible to everyone that is part of the {group} group.",
+  formTemplateGroupVisibility_tooltip:
+    "Please select a group for this form template, this will determine the visibility."
 };
