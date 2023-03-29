@@ -38,6 +38,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
 
+  filterList?: (item: any | undefined) => boolean;
+
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
 
@@ -102,6 +104,7 @@ export interface AsyncOption<TData extends KitsuResource> {
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
   filter,
+  filterList,
   include,
   isMulti = false,
   model,
@@ -297,7 +300,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       classNamePrefix="react-select"
       value={selectValue}
       // The filtering is already done at the API level:
-      filterOption={() => true}
+      filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       // react-sortable-hoc config:
       axis="xy"

@@ -34,7 +34,7 @@ export interface ManagedAttributesViewFormProps {
   onSaved: (data: PersistedResource<FormTemplate>) => Promise<void>;
 }
 
-export function useManagedAttributesView(id?: string) {
+export function useFormTemplates(id?: string) {
   return useQuery<FormTemplate>(
     { path: `collection-api/form-template/${id}` },
     {
@@ -122,7 +122,7 @@ export function ManagedAttributesViewFormLayout({
   const ATTRIBUTE_COMPONENT_OPTIONS: {
     label: string;
     value: string;
-  }[] = COLLECTION_MODULE_TYPES.map(dataType => ({
+  }[] = COLLECTION_MODULE_TYPES.map((dataType) => ({
     label: formatMessage(COLLECTION_MODULE_TYPE_LABELS[dataType] as any),
     value: dataType
   }));
@@ -147,9 +147,10 @@ export function ManagedAttributesViewFormLayout({
             name="viewConfiguration.managedAttributeComponent"
             customName="managedAttributeComponent"
             options={ATTRIBUTE_COMPONENT_OPTIONS}
-            readOnlyRender={value =>
-              ATTRIBUTE_COMPONENT_OPTIONS.find(option => option.value === value)
-                ?.label
+            readOnlyRender={(value) =>
+              ATTRIBUTE_COMPONENT_OPTIONS.find(
+                (option) => option.value === value
+              )?.label
             }
             onChange={(_, form) =>
               form.setFieldValue("viewConfiguration.attributeKeys", [])
@@ -158,7 +159,7 @@ export function ManagedAttributesViewFormLayout({
         </div>
       </DinaFormSection>
       <FieldSpy<string> fieldName="viewConfiguration.managedAttributeComponent">
-        {managedAttributeComponent =>
+        {(managedAttributeComponent) =>
           managedAttributeComponent ? (
             <>
               <hr />

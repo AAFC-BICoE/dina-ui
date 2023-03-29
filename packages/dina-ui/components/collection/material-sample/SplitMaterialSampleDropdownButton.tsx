@@ -1,7 +1,7 @@
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { useRouter } from "next/router";
 import { writeStorage } from "@rehooks/local-storage";
-import { BULK_SPLIT_IDS, Tooltip, useQuery } from "common-ui";
+import { BULK_SPLIT_IDS, Tooltip, useAccount, useQuery } from "common-ui";
 import Dropdown from "react-bootstrap/Dropdown";
 import Select from "react-select";
 import React, { useState } from "react";
@@ -33,6 +33,7 @@ export function SplitMaterialSampleDropdownButton({
   materialSampleType
 }: SplitMaterialSampleDropdownButtonProps) {
   const router = useRouter();
+  const { groupNames, username } = useAccount();
 
   // List of all the split configurations available.
   const [splitConfigurationOptions, setSplitConfigurationOptions] = useState<
@@ -47,7 +48,12 @@ export function SplitMaterialSampleDropdownButton({
   // Retrieve all of the form templates, then filter for the correct one.
   useQuery<FormTemplate[]>(
     {
-      path: "collection-api/form-template"
+      path: "collection-api/form-template",
+
+      // Display all user form templates and public to the group templates.
+      filter: {
+        rsql: `group=in=(${groupNames});(createdBy==${username},restrictToCreatedBy==false)`
+      }
     },
     {
       disabled,

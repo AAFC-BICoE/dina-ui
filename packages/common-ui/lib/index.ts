@@ -61,7 +61,7 @@ export * from "./page-split/SplitPagePanel";
 export * from "./resource-select/ResourceSelect";
 export * from "./resource-select/useBulkGet";
 export * from "./table/QueryTable";
-export * from "./table/BooleanCell";
+export * from "./table/booleanCell";
 export * from "./table/date-cell";
 export * from "./table/multilingual-cells";
 export * from "./table/stringArray-cell";
