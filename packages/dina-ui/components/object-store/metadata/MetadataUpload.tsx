@@ -70,13 +70,13 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
       acCaption: objectUpload.originalFilename,
       acDigitizationDate: objectUpload.dateTimeDigitized
         ? moment(objectUpload.dateTimeDigitized).format()
-        : null,
+        : undefined,
       acMetadataCreator: agentId
         ? {
             id: agentId,
             type: "person"
           }
-        : null,
+        : undefined,
       bucket: group,
       dcType: objectUpload.dcType,
       fileIdentifier: objectUpload.id,

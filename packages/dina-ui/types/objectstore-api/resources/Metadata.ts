@@ -27,7 +27,7 @@ export interface MetadataAttributes {
   acCaption?: string;
   dcFormat?: string;
   createdDate?: string;
-  acDigitizationDate?: string | null;
+  acDigitizationDate?: string;
   xmpMetadataDate?: string;
   acTags?: string[];
   originalFilename?: string;
@@ -45,10 +45,10 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Person | KitsuResource | null;
-  dcCreator?: Person | KitsuResource | null;
-  managedAttributes?: Record<string, string | null | undefined>;
-  derivatives?: PersistedResource<Derivative>[] | null;
+  acMetadataCreator?: Person | KitsuResource;
+  dcCreator?: Person | KitsuResource;
+  managedAttributes?: Record<string, string | undefined>;
+  derivatives?: PersistedResource<Derivative>[];
 }
 
 export type Metadata = KitsuResource &
