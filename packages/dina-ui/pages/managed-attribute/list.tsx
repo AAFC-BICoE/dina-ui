@@ -90,7 +90,7 @@ function CollectionAttributeListView() {
   >[] = [
     {
       Cell: ({ original: { id, name } }) => (
-        <Link href={`/collection/managed-attribute/edit?id=${id}`}>
+        <Link href={`/collection/managed-attribute/view?id=${id}`}>
           <a>{name}</a>
         </Link>
       ),
@@ -164,9 +164,7 @@ function ObjectStoreAttributeListView() {
     [
       {
         Cell: ({ original: { id, name } }) => (
-          <Link
-            href={`/object-store/managedAttributesView/detailsView?id=${id}`}
-          >
+          <Link href={`/object-store/managed-attribute/view?id=${id}`}>
             <a>{name}</a>
           </Link>
         ),
@@ -206,7 +204,7 @@ function ObjectStoreAttributeListView() {
       </h3>
 
       {/* Quick create menu */}
-      <CreateNewSection href="/object-store/managedAttributesView/detailsView" />
+      <CreateNewSection href="/object-store/managed-attribute/edit" />
 
       <ListPageLayout
         filterAttributes={OBJECT_STORE_ATTRIBUTES_FILTER_ATTRIBUTES}
@@ -227,7 +225,7 @@ function TransactionAttributeListView() {
     [
       {
         Cell: ({ original: { id, name } }) => (
-          <Link href={`/loan-transaction/managed-attribute/edit?id=${id}`}>
+          <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
             <a>{name}</a>
           </Link>
         ),

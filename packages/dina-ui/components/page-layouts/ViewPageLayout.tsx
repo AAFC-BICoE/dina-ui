@@ -36,6 +36,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     queryOptions?: QueryOptions<T, unknown>;
     form: (formProps: ResourceFormProps<T>) => ReactNode;
     entityLink: string;
+    customBackButton?: JSX.Element;
     type: string;
     apiBaseUrl: string;
 
@@ -85,6 +86,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   customQueryHook,
   queryOptions,
   entityLink,
+  customBackButton,
   type,
   apiBaseUrl,
   nameField = "name",
@@ -146,12 +148,16 @@ export function ViewPageLayout<T extends KitsuResource>({
             <>
               <Head title={title} />
               <ButtonBar className="gap-2">
-                <BackButton
-                  entityId={id}
-                  className="me-auto"
-                  entityLink={entityLink}
-                  byPassView={true}
-                />
+                {customBackButton ? (
+                  customBackButton
+                ) : (
+                  <BackButton
+                    entityId={id}
+                    className="me-auto"
+                    entityLink={entityLink}
+                    byPassView={true}
+                  />
+                )}
                 {canEdit &&
                   (editButton?.(formProps) ?? (
                     <EditButton entityId={id} entityLink={entityLink} />

@@ -1,5 +1,6 @@
 import { useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { withRouter } from "next/router";
 import {
   Footer,
@@ -23,11 +24,26 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
     { disabled: id === undefined }
   );
 
+  const backButton =
+    id === undefined ? (
+      <Link href="/managed-attribute/list?step=2">
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToList" />
+        </a>
+      </Link>
+    ) : (
+      <Link href={`/loan-transaction/managed-attribute/view?id=${id}`}>
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToReadOnlyPage" />
+        </a>
+      </Link>
+    );
+
   const formProps: ManagedAttributeFormProps = {
     router,
     postSaveRedirect: "/managed-attribute/list?step=2",
     apiBaseUrl: "/loan-transaction-api",
-    listHref: "/managed-attribute/list?step=2"
+    backButton
   };
 
   return (

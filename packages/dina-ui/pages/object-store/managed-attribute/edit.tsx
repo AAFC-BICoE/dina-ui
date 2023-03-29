@@ -2,7 +2,6 @@
 import {
   ButtonBar,
   DateField,
-  DeleteButton,
   DinaForm,
   DinaFormOnSubmit,
   SelectField,
@@ -12,6 +11,7 @@ import {
   useQuery,
   withResponse
 } from "common-ui";
+import { fromPairs, toPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
 import { NextRouter, withRouter } from "next/router";
@@ -23,14 +23,14 @@ import {
   ManagedAttributeType,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
-import { fromPairs, toPairs } from "lodash";
 
 interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
   router: NextRouter;
+  backButton: JSX.Element;
 }
 
-export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
+export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { formatMessage } = useDinaIntl();
   const { id } = router.query;
   const title = id ? "editManagedAttributeTitle" : "addManagedAttributeTitle";
@@ -41,6 +41,21 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
     },
     { disabled: id === undefined }
   );
+
+  const backButton =
+    id === undefined ? (
+      <Link href="/managed-attribute/list?step=1">
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToList" />
+        </a>
+      </Link>
+    ) : (
+      <Link href={`/object-store/managed-attribute/view?id=${id}`}>
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToReadOnlyPage" />
+        </a>
+      </Link>
+    );
 
   return (
     <div>
@@ -54,7 +69,11 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
               <DinaMessage id="editManagedAttributeTitle" />
             </h1>
             {withResponse(query, ({ data }) => (
-              <ManagedAttributeForm profile={data} router={router} />
+              <ManagedAttributeForm
+                profile={data}
+                router={router}
+                backButton={backButton}
+              />
             ))}
           </div>
         ) : (
@@ -63,7 +82,7 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
               <DinaMessage id="addManagedAttributeTitle" />
             </h1>
             <br />
-            <ManagedAttributeForm router={router} />
+            <ManagedAttributeForm router={router} backButton={backButton} />
           </div>
         )}
       </main>
@@ -72,7 +91,11 @@ export function ManagedAttributesDetailsPage({ router }: WithRouterProps) {
   );
 }
 
-function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
+function ManagedAttributeForm({
+  profile,
+  router,
+  backButton
+}: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
 
   const id = profile?.id;
@@ -156,19 +179,8 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
+        {backButton}
         <SubmitButton />
-        <Link href="/managed-attribute/list?step=1">
-          <a className="btn btn-dark">
-            <DinaMessage id="cancelButtonText" />
-          </a>
-        </Link>
-        <DeleteButton
-          className="ms-5"
-          id={id}
-          options={{ apiBaseUrl: "/objectstore-api" }}
-          postDeleteRedirect="/managed-attribute/list?step=1"
-          type="managed-attribute"
-        />
       </ButtonBar>
       <div className="row">
         <TextField
@@ -216,4 +228,4 @@ function ManagedAttributeForm({ profile, router }: ManagedAttributeFormProps) {
   );
 }
 
-export default withRouter(ManagedAttributesDetailsPage);
+export default withRouter(ManagedAttributesEditPage);

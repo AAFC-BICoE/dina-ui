@@ -6,19 +6,19 @@ import {
   SelectField,
   StringArrayField,
   SubmitButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
-import Link from "next/link";
-import { NextRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import { useState } from "react";
 import { GroupSelectField } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
-  VocabularyElementType,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  VocabularyElementType
 } from "../../types/collection-api/resources/ManagedAttribute";
 
 export interface ManagedAttributeFormProps {
@@ -26,8 +26,7 @@ export interface ManagedAttributeFormProps {
   router: NextRouter;
   apiBaseUrl: string;
   postSaveRedirect: string;
-  /** THe href to the list page. */
-  listHref: string;
+  backButton: JSX.Element;
   /** Optionally render a "managedAttributeComponent field." */
   componentField?: JSX.Element;
 }
@@ -37,7 +36,7 @@ export function ManagedAttributeForm({
   router,
   apiBaseUrl,
   postSaveRedirect,
-  listHref,
+  backButton,
   componentField
 }: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
@@ -67,10 +66,6 @@ export function ManagedAttributeForm({
   if (type === "PICKLIST") {
     initialValues.vocabularyElementType = "PICKLIST";
   }
-
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
-    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
-  );
 
   const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
@@ -113,13 +108,38 @@ export function ManagedAttributeForm({
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
-        <Link href={listHref}>
-          <a className="btn btn-dark">
-            <DinaMessage id="cancelButtonText" />
-          </a>
-        </Link>
+        {backButton}
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
+      <ManagedAttributeFormLayout
+        type={type}
+        setType={setType}
+        componentField={componentField}
+      />
+    </DinaForm>
+  );
+}
+
+export interface ManagedAttributeFormLayoutLayoutProps {
+  type?: string;
+  setType?: React.Dispatch<React.SetStateAction<string | undefined>>;
+  componentField?: JSX.Element;
+}
+
+export function ManagedAttributeFormLayout({
+  type,
+  setType,
+  componentField
+}: ManagedAttributeFormLayoutLayoutProps) {
+  const { formatMessage } = useDinaIntl();
+  const { readOnly } = useDinaFormContext();
+  const router = useRouter();
+  const uuid = String(router?.query?.id);
+  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
+  );
+  return (
+    <>
       <div className="row">
         <GroupSelectField
           className="col-md-6"
@@ -131,7 +151,7 @@ export function ManagedAttributeForm({
         <TextField
           className="col-md-6"
           name="name"
-          readOnly={id !== undefined}
+          readOnly={uuid !== undefined && uuid !== "undefined"}
         />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
@@ -142,7 +162,7 @@ export function ManagedAttributeForm({
           name="vocabularyElementType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: VocabularyElementType) =>
-            setType(selectValue)
+            setType && setType(selectValue)
           }
         />
       </div>
@@ -167,7 +187,7 @@ export function ManagedAttributeForm({
           multiLines={true}
         />
       </div>
-      {id && (
+      {readOnly && (
         <div className="row">
           <DateField
             className="col-md-6"
@@ -178,6 +198,6 @@ export function ManagedAttributeForm({
           <TextField className="col-md-6" name="createdBy" readOnly={true} />
         </div>
       )}
-    </DinaForm>
+    </>
   );
 }
