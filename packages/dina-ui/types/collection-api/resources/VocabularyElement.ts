@@ -7,7 +7,7 @@ export interface VocabularyAttributes {
 export type MultilingualTitle = { lang: string; title: string };
 
 export interface VocabularyElement {
-  key?: string;
+  key: string;
   name?: string;
   term?: string;
   multilingualTitle?: { titles?: MultilingualTitle[] };
