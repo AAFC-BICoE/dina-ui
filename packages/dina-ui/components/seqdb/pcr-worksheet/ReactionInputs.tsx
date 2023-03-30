@@ -1,6 +1,7 @@
 import {
   Protocol,
-  ProtocolData
+  ProtocolData,
+  ProtocolDataUnitEnum
 } from "../../../../dina-ui/types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 
@@ -19,8 +20,7 @@ export function ReactionInputs({ protocol }: { protocol?: Protocol }) {
     ) {
       const totalReactionMixVolumes = pd.protocolDataElement?.filter(
         (pde) =>
-          pde.elementType === "quantity" &&
-          (pde.unit === "µl" || pde.unit === "https://w3id.org/uom/uL")
+          pde.elementType === "quantity" && pde.unit === ProtocolDataUnitEnum.UL
       );
       if (totalReactionMixVolumes) {
         reactionMixVolumePerTube =

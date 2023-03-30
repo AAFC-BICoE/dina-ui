@@ -2,7 +2,8 @@ import { useState } from "react";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 import {
   Protocol,
-  ProtocolData
+  ProtocolData,
+  ProtocolDataUnitEnum
 } from "../../../../dina-ui/types/collection-api";
 import { convertNumber } from "../../workbook/utils/workbookMappingUtils";
 import styles from "./ReactionRxns.module.css";
@@ -37,8 +38,7 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
     if (reactionMix === undefined && pd.key === "total_reaction_mix_volume") {
       const totalReactionMixVolumes = pd.protocolDataElement?.filter(
         (pde) =>
-          pde.elementType === "quantity" &&
-          (pde.unit === "µl" || pde.unit === "https://w3id.org/uom/uL")
+          pde.elementType === "quantity" && pde.unit === ProtocolDataUnitEnum.UL
       );
       if (totalReactionMixVolumes) {
         reactionMix = convertNumber(totalReactionMixVolumes[0]?.value) || 0;
@@ -48,7 +48,9 @@ export function ReactionRxns({ protocol }: { protocol?: Protocol }) {
 
   function populateReactionRxnsData(pd: ProtocolData) {
     const ulRnxQuantityeElements = pd.protocolDataElement?.filter(
-      (pde) => pde.elementType === "quantity" && pde.unit === "µl/rxn"
+      (pde) =>
+        pde.elementType === "quantity" &&
+        pde.unit === ProtocolDataUnitEnum.UL_RXN
     );
     if (ulRnxQuantityeElements) {
       for (const el of ulRnxQuantityeElements) {
