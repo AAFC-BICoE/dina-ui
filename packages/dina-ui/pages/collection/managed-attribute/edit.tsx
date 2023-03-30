@@ -47,7 +47,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
     ) : (
       <Link href={`/collection/managed-attribute/view?id=${id}`}>
         <a className="back-button my-auto me-auto">
-          <DinaMessage id="backToList" />
+          <DinaMessage id="backToReadOnlyPage" />
         </a>
       </Link>
     );
