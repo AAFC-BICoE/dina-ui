@@ -8,13 +8,6 @@ import Link from "next/link";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export default function ManagedAttributesViewPage() {
-  const backButton = (
-    <Link href="/managed-attribute/list?step=1">
-      <a className="back-button my-auto me-auto">
-        <DinaMessage id="backToList" />
-      </a>
-    </Link>
-  );
   return (
     <ViewPageLayout<ManagedAttribute>
       form={(props) => (
@@ -24,9 +17,9 @@ export default function ManagedAttributesViewPage() {
       )}
       query={(id) => ({ path: `objectstore-api/managed-attribute/${id}` })}
       entityLink="/object-store/managed-attribute"
-      customBackButton={backButton}
+      specialListUrl="/managed-attribute/list?step=1"
       type="managed-attribute"
-      apiBaseUrl="objectstore-api/"
+      apiBaseUrl="/objectstore-api"
     />
   );
 }

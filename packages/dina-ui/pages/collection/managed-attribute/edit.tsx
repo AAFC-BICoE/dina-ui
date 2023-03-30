@@ -54,7 +54,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/collection/managed-attribute",
+    postSaveRedirect: "/collection/managed-attribute/view",
     apiBaseUrl: "/collection-api",
     backButton,
     componentField: (

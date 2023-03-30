@@ -28,6 +28,7 @@ interface ManagedAttributeFormProps {
   profile?: ManagedAttribute;
   router: NextRouter;
   backButton: JSX.Element;
+  postSaveRedirect: string;
 }
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
@@ -56,7 +57,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
         </a>
       </Link>
     );
-
+  const postSaveRedirect = "/object-store/managed-attribute/view";
   return (
     <div>
       {/* <Head title="Managed Attribute Details" /> */}
@@ -73,6 +74,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
                 profile={data}
                 router={router}
                 backButton={backButton}
+                postSaveRedirect={postSaveRedirect}
               />
             ))}
           </div>
@@ -82,7 +84,11 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
               <DinaMessage id="addManagedAttributeTitle" />
             </h1>
             <br />
-            <ManagedAttributeForm router={router} backButton={backButton} />
+            <ManagedAttributeForm
+              router={router}
+              backButton={backButton}
+              postSaveRedirect={postSaveRedirect}
+            />
           </div>
         )}
       </main>
@@ -94,7 +100,8 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 function ManagedAttributeForm({
   profile,
   router,
-  backButton
+  backButton,
+  postSaveRedirect
 }: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -163,7 +170,7 @@ function ManagedAttributeForm({
         .filter((it) => it.desc)
     };
 
-    await save(
+    const [savedAttribute] = await save(
       [
         {
           resource: { type: "managed-attribute", ...submittedValues },
@@ -173,7 +180,7 @@ function ManagedAttributeForm({
       { apiBaseUrl: "/objectstore-api" }
     );
 
-    await router.push(`/managed-attribute/list?step=1`);
+    await router.push(`${postSaveRedirect}?id=${savedAttribute.id}`);
   };
 
   return (

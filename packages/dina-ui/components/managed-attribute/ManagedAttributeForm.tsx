@@ -92,7 +92,7 @@ export function ManagedAttributeForm({
       )
     };
 
-    await save(
+    const [savedAttribute] = await save(
       [
         {
           resource: { type: "managed-attribute", ...submittedValues },
@@ -102,7 +102,7 @@ export function ManagedAttributeForm({
       { apiBaseUrl }
     );
 
-    await router.push(postSaveRedirect);
+    await router.push(`${postSaveRedirect}?id=${savedAttribute.id}`);
   };
 
   return (

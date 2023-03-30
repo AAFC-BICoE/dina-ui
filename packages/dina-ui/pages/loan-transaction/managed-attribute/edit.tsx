@@ -41,7 +41,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/managed-attribute/list?step=2",
+    postSaveRedirect: "/loan-transaction/managed-attribute/view",
     apiBaseUrl: "/loan-transaction-api",
     backButton
   };

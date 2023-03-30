@@ -28,13 +28,6 @@ export default function ManagedAttributesViewPage() {
       options={ATTRIBUTE_COMPONENT_OPTIONS}
     />
   );
-  const backButton = (
-    <Link href="/managed-attribute/list?step=0">
-      <a className="back-button my-auto me-auto">
-        <DinaMessage id="backToList" />
-      </a>
-    </Link>
-  );
   return (
     <ViewPageLayout<ManagedAttribute>
       form={(props) => (
@@ -44,7 +37,7 @@ export default function ManagedAttributesViewPage() {
       )}
       query={(id) => ({ path: `collection-api/managed-attribute/${id}` })}
       entityLink="/collection/managed-attribute"
-      customBackButton={backButton}
+      specialListUrl="/managed-attribute/list?step=0"
       type="managed-attribute"
       apiBaseUrl="/collection-api"
     />

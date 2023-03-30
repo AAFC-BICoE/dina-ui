@@ -8,13 +8,6 @@ import Link from "next/link";
 import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export default function ManagedAttributesViewPage() {
-  const backButton = (
-    <Link href="/managed-attribute/list?step=2">
-      <a className="back-button my-auto me-auto">
-        <DinaMessage id="backToList" />
-      </a>
-    </Link>
-  );
   return (
     <ViewPageLayout<ManagedAttribute>
       form={(props) => (
@@ -24,7 +17,7 @@ export default function ManagedAttributesViewPage() {
       )}
       query={(id) => ({ path: `loan-transaction-api/managed-attribute/${id}` })}
       entityLink="/loan-transaction/managed-attribute"
-      customBackButton={backButton}
+      specialListUrl="/managed-attribute/list?step=2"
       type="managed-attribute"
       apiBaseUrl="/loan-transaction-api"
     />
