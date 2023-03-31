@@ -80,7 +80,7 @@ export function UploadingMetadataBulkEditor({
             id: agentId,
             type: "person"
           }
-        : null,
+        : undefined,
       bucket: group,
       dcType: objectUpload.dcType,
       fileIdentifier: objectUpload.id,
