@@ -115,6 +115,7 @@ export function Tooltip({
         }
         placement={placement}
         trigger={["focus", "hover"]}
+        zIndex={3001}
       >
         <span>
           {visibleElement ? (
