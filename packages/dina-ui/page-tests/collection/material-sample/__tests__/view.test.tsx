@@ -39,7 +39,7 @@ const TEST_SAMPLE_WITH_ORGANISMS: PersistedResource<MaterialSample> = {
   ]
 };
 
-const mockGet = jest.fn<any, any>(async path => {
+const mockGet = jest.fn<any, any>(async (path) => {
   switch (path) {
     case "collection-api/material-sample/1":
       return { data: TEST_MATERIAL_SAMPLE };
@@ -64,7 +64,7 @@ const mockPost = jest.fn<any, any>(async (path) => {
   }
 });
 
-const mockBulkGet = jest.fn<any, any>(async paths => {
+const mockBulkGet = jest.fn<any, any>(async (paths) => {
   if (!paths.length) {
     return [];
   }
@@ -78,7 +78,7 @@ const testCtx = {
         post: mockPost
       }
     },
-    bulkGet: mockBulkGet,
+    bulkGet: mockBulkGet
   }
 } as any;
 

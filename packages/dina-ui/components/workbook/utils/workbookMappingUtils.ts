@@ -44,10 +44,23 @@ export function findMatchField(
     value: string;
   }[]
 ) {
-  const option = find(
-    fieldOptions,
-    (item) => _toPlainString(item.label) === _toPlainString(columnHeader)
-  );
+  const option = find(fieldOptions, (item) => {
+    const pos = columnHeader.lastIndexOf(".");
+    if (pos !== -1) {
+      const prefix = columnHeader.substring(0, pos + 1);
+      if (
+        item.value.startsWith(prefix) &&
+        _toPlainString(item.label) ===
+          _toPlainString(columnHeader.substring(pos + 1))
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return _toPlainString(item.label) === _toPlainString(columnHeader);
+    }
+  });
   return option;
 }
 
@@ -308,4 +321,38 @@ export function convertDate(value: string) {
   } else {
     return null;
   }
+}
+
+function isObject(input: any) {
+  return typeof input === "object" && input !== null;
+}
+
+/**
+ * Flattern an object into a one level property:value object. For example, it will convert
+ *   mockEntity: {
+ *      objectField: {
+ *        name: { dataType: DataTypeEnum.STRING },
+ *      }
+ *    }
+ *   into
+ *   {
+ *    "mockEntity.objectField.name.dataType": DataTypeEnum.STRING
+ *   }
+ * @param source
+ * @returns
+ */
+export function flattenObject(source: any) {
+  return isObject(source)
+    ? Object.fromEntries(
+        Object.entries(source).flatMap(([key, value]) =>
+          ((flattenValue) =>
+            isObject(flattenValue)
+              ? Object.entries(flattenValue).map(([valueKey, valueValue]) => [
+                  `${key}.${valueKey}`,
+                  valueValue
+                ])
+              : [[key, value]])(flattenObject(value))
+        )
+      )
+    : source;
 }

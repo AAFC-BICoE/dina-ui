@@ -332,7 +332,7 @@ function OrganismsTable({
       readOnly: true
     };
     tableColumns.splice(1, 0, {
-      Header: formatMessage("isTarget"),
+      Header: formatMessage("isTargetHeader"),
       id: "isTarget",
       Cell: ({ original: o }) => {
         const isTarget: boolean = o?.isTarget;
