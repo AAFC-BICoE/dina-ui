@@ -1,11 +1,10 @@
 import { DinaForm } from "common-ui";
+import { fromPairs } from "lodash";
 import {
   ManagedAttributeFormLayout,
   ViewPageLayout
 } from "../../../components";
 import { ManagedAttribute } from "../../../types/objectstore-api";
-import Link from "next/link";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export default function ManagedAttributesViewPage() {
   return (
@@ -16,6 +15,23 @@ export default function ManagedAttributesViewPage() {
         </DinaForm>
       )}
       query={(id) => ({ path: `loan-transaction-api/managed-attribute/${id}` })}
+      alterInitialValues={(data) =>
+        data
+          ? {
+              ...data,
+              // Convert multilingualDescription to editable Dictionary format:
+              multilingualDescription: fromPairs<string | undefined>(
+                data.multilingualDescription?.descriptions?.map(
+                  ({ desc, lang }) => [lang ?? "", desc ?? ""]
+                )
+              ),
+              vocabularyElementType:
+                (data && data?.acceptedValues?.length) || 0 > 0
+                  ? "PICKLIST"
+                  : data.vocabularyElementType
+            }
+          : { type: "managed-attribute" }
+      }
       entityLink="/loan-transaction/managed-attribute"
       specialListUrl="/managed-attribute/list?step=2"
       type="managed-attribute"

@@ -55,15 +55,7 @@ export function ManagedAttributeForm({
       }
     : { type: "managed-attribute" };
 
-  const [type, setType] = useState(
-    fetchedManagedAttribute
-      ? fetchedManagedAttribute?.acceptedValues?.length
-        ? "PICKLIST"
-        : fetchedManagedAttribute.vocabularyElementType
-      : undefined
-  );
-
-  if (type === "PICKLIST") {
+  if ((initialValues && initialValues?.acceptedValues?.length) || 0 > 0) {
     initialValues.vocabularyElementType = "PICKLIST";
   }
 
@@ -111,28 +103,28 @@ export function ManagedAttributeForm({
         {backButton}
         <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <ManagedAttributeFormLayout
-        type={type}
-        setType={setType}
-        componentField={componentField}
-      />
+      <ManagedAttributeFormLayout componentField={componentField} />
     </DinaForm>
   );
 }
 
 export interface ManagedAttributeFormLayoutLayoutProps {
-  type?: string;
-  setType?: React.Dispatch<React.SetStateAction<string | undefined>>;
   componentField?: JSX.Element;
 }
 
 export function ManagedAttributeFormLayout({
-  type,
-  setType,
   componentField
 }: ManagedAttributeFormLayoutLayoutProps) {
   const { formatMessage } = useDinaIntl();
-  const { readOnly } = useDinaFormContext();
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [type, setType] = useState(
+    initialValues
+      ? initialValues?.acceptedValues?.length
+        ? "PICKLIST"
+        : initialValues.vocabularyElementType
+      : undefined
+  );
+
   const router = useRouter();
   const uuid = String(router?.query?.id);
   const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
