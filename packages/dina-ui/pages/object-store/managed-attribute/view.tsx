@@ -1,10 +1,8 @@
 import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
-import {
-  ManagedAttributeFormLayout,
-  ViewPageLayout
-} from "../../../components";
+import { ViewPageLayout } from "../../../components";
 import { ManagedAttribute } from "../../../types/objectstore-api";
+import { ManagedAttributeFormLayout } from "./edit";
 
 export default function ManagedAttributesViewPage() {
   return (

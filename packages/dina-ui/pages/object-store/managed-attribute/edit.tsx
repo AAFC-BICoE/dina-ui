@@ -8,13 +8,14 @@ import {
   StringArrayField,
   SubmitButton,
   TextField,
+  useDinaFormContext,
   useQuery,
   withResponse
 } from "common-ui";
 import { fromPairs, toPairs } from "lodash";
 import { WithRouterProps } from "next/dist/client/with-router";
 import Link from "next/link";
-import { NextRouter, withRouter } from "next/router";
+import { NextRouter, withRouter, useRouter } from "next/router";
 import { useState } from "react";
 import { Footer, Head, Nav } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
@@ -25,7 +26,7 @@ import {
 } from "../../../types/objectstore-api/resources/ManagedAttribute";
 
 interface ManagedAttributeFormProps {
-  profile?: ManagedAttribute;
+  fetchedManagedAttribute?: ManagedAttribute;
   router: NextRouter;
   backButton: JSX.Element;
   postSaveRedirect: string;
@@ -71,7 +72,7 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
             </h1>
             {withResponse(query, ({ data }) => (
               <ManagedAttributeForm
-                profile={data}
+                fetchedManagedAttribute={data}
                 router={router}
                 backButton={backButton}
                 postSaveRedirect={postSaveRedirect}
@@ -98,21 +99,21 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
 }
 
 function ManagedAttributeForm({
-  profile,
+  fetchedManagedAttribute,
   router,
   backButton,
   postSaveRedirect
 }: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
 
-  const id = profile?.id;
+  const id = fetchedManagedAttribute?.id;
 
-  const initialValues: Partial<ManagedAttribute> = profile
+  const initialValues: Partial<ManagedAttribute> = fetchedManagedAttribute
     ? {
-        ...profile,
+        ...fetchedManagedAttribute,
         // Convert multilingualDescription to editable Dictionary format:
         multilingualDescription: fromPairs<string | undefined>(
-          profile.multilingualDescription?.descriptions?.map(
+          fetchedManagedAttribute.multilingualDescription?.descriptions?.map(
             ({ desc, lang }) => [lang ?? "", desc ?? ""]
           )
         )
@@ -121,23 +122,9 @@ function ManagedAttributeForm({
         type: "managed-attribute"
       };
 
-  const acceptedValueLen = profile?.acceptedValues?.length;
-
-  const [type, setType] = useState(
-    profile
-      ? acceptedValueLen
-        ? "PICKLIST"
-        : profile.vocabularyElementType
-      : undefined
-  );
-
-  if (type === "PICKLIST") {
+  if ((initialValues && initialValues?.acceptedValues?.length) || 0 > 0) {
     initialValues.vocabularyElementType = "PICKLIST";
   }
-
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
-    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
-  );
 
   const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
@@ -189,11 +176,31 @@ function ManagedAttributeForm({
         {backButton}
         <SubmitButton />
       </ButtonBar>
+      <ManagedAttributeFormLayout />
+    </DinaForm>
+  );
+}
+
+export function ManagedAttributeFormLayout() {
+  const { readOnly, initialValues } = useDinaFormContext();
+  const { formatMessage } = useDinaIntl();
+  const router = useRouter();
+  const { id: uuid } = router.query;
+  const acceptedValueLen = initialValues?.acceptedValues?.length;
+  const [type, setType] = useState(
+    acceptedValueLen > 0 ? "PICKLIST" : initialValues.vocabularyElementType
+  );
+  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
+  );
+
+  return (
+    <>
       <div className="row">
         <TextField
           className="col-md-6"
           name="name"
-          readOnly={id !== undefined}
+          readOnly={uuid !== undefined}
         />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
@@ -220,7 +227,7 @@ function ManagedAttributeForm({
           multiLines={true}
         />
       </div>
-      {id && (
+      {uuid && (
         <div className="row">
           <DateField
             showTime={true}
@@ -231,7 +238,7 @@ function ManagedAttributeForm({
           <TextField name="createdBy" className="col-md-6" readOnly={true} />
         </div>
       )}
-    </DinaForm>
+    </>
   );
 }
 
