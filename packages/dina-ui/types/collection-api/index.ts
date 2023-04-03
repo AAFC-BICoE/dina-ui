@@ -8,7 +8,6 @@ export * from "./resources/Determination";
 export * from "./resources/GeographicPlaceNameSourceDetail";
 export * from "./resources/GeoReferenceAssertion";
 export * from "./resources/Institution";
-export * from "./resources/ManagedAttributesView";
 export * from "./resources/MaterialSample";
 export * from "./resources/form-legends/MaterialSampleForm";
 export * from "./resources/MaterialSampleRunConfig";

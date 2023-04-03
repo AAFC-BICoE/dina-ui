@@ -13,6 +13,7 @@ import { PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
 import { NextRouter, useRouter } from "next/router";
 import { useState } from "react";
+import { boolean } from "zod";
 import { GroupSelectField } from "..";
 import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
@@ -29,6 +30,7 @@ export interface ManagedAttributeFormProps {
   backButton: JSX.Element;
   /** Optionally render a "managedAttributeComponent field." */
   componentField?: JSX.Element;
+  withGroup?: boolean;
 }
 
 export function ManagedAttributeForm({
@@ -37,7 +39,8 @@ export function ManagedAttributeForm({
   apiBaseUrl,
   postSaveRedirect,
   backButton,
-  componentField
+  componentField,
+  withGroup = true
 }: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -103,17 +106,22 @@ export function ManagedAttributeForm({
         {backButton}
         <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <ManagedAttributeFormLayout componentField={componentField} />
+      <ManagedAttributeFormLayout
+        componentField={componentField}
+        withGroup={withGroup}
+      />
     </DinaForm>
   );
 }
 
 export interface ManagedAttributeFormLayoutLayoutProps {
   componentField?: JSX.Element;
+  withGroup?: boolean;
 }
 
 export function ManagedAttributeFormLayout({
-  componentField
+  componentField,
+  withGroup = true
 }: ManagedAttributeFormLayoutLayoutProps) {
   const { formatMessage } = useDinaIntl();
   const { readOnly, initialValues } = useDinaFormContext();
@@ -132,13 +140,15 @@ export function ManagedAttributeFormLayout({
   );
   return (
     <>
-      <div className="row">
-        <GroupSelectField
-          className="col-md-6"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
+      {withGroup ? (
+        <div className="row">
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        </div>
+      ) : undefined}
       <div className="row">
         <TextField
           className="col-md-6"

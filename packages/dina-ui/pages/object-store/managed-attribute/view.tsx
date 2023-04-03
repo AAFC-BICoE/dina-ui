@@ -1,15 +1,17 @@
 import { DinaForm } from "common-ui";
 import { fromPairs } from "lodash";
-import { ViewPageLayout } from "../../../components";
+import {
+  ManagedAttributeFormLayout,
+  ViewPageLayout
+} from "../../../components";
 import { ManagedAttribute } from "../../../types/objectstore-api";
-import { ManagedAttributeFormLayout } from "./edit";
 
 export default function ManagedAttributesViewPage() {
   return (
     <ViewPageLayout<ManagedAttribute>
       form={(props) => (
         <DinaForm<ManagedAttribute> {...props}>
-          <ManagedAttributeFormLayout />
+          <ManagedAttributeFormLayout withGroup={false} />
         </DinaForm>
       )}
       query={(id) => ({ path: `objectstore-api/managed-attribute/${id}` })}
