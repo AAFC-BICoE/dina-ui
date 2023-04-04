@@ -29,7 +29,6 @@ export function DataEntryViewer({
     <DataEntry
       legend={legend}
       name={name}
-      initialValues={processedExtensionValues}
       blockOptionsEndpoint={blockOptionsEndpoint}
       readOnly={true}
       width={"100%"}
@@ -43,7 +42,6 @@ export function DataEntryViewer({
       <DataEntry
         legend={legend}
         name={name}
-        initialValues={processedExtensionValues}
         blockOptionsEndpoint={blockOptionsEndpoint}
         readOnly={true}
         width={"100%"}

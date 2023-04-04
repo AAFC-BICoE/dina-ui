@@ -6,7 +6,6 @@ export interface DataEntryFieldProps {
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
   readOnly?: boolean;
-  initialValues?: any;
   legend: JSX.Element;
   width?: string;
   isTemplate?: boolean;
