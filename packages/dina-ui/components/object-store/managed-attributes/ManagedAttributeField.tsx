@@ -11,7 +11,7 @@ import {
 import { PersistedResource } from "kitsu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../../dina-ui/types/collection-api/resources/ManagedAttribute";
 
 export interface ManagedAttributeFieldProps {
   attribute: PersistedResource<ManagedAttribute>;

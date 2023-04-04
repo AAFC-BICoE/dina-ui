@@ -8,7 +8,7 @@ export interface ManagedAttributeAttributes<TComponent = string> {
   vocabularyElementType: string;
   managedAttributeComponent: TComponent;
   acceptedValues?: string[] | null;
-  key?: string;
+  key: string;
   group?: string;
   createdBy?: string;
   createdOn?: string;
@@ -74,3 +74,7 @@ export const MANAGED_ATTRIBUTE_TYPE_OPTIONS: {
 
 export type ManagedAttribute<TComponent = string> = KitsuResource &
   ManagedAttributeAttributes<TComponent>;
+
+export type ManagedAttributeValues = {
+  [managedAttributeId: string]: string;
+};
