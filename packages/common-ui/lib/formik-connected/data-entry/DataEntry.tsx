@@ -47,25 +47,20 @@ export function DataEntry({
 
   const blockOptionsQuery: any = isVocabularyBasedEnabledForBlock
     ? useVocabularyOptions({
-        path: "collection-api/vocabulary/protocolData"
+        path: blockOptionsEndpoint
       })
     : useQuery<FieldExtension[]>({
-        path: blockOptionsEndpoint
+        path: blockOptionsEndpoint,
+        filter: blockOptionsFilter
       });
-
   const blockOptions = isVocabularyBasedEnabledForBlock
     ? blockOptionsQuery?.vocabOptions
-    : blockOptionsQuery?.response?.data
-        .filter(
-          (data) =>
-            data.extension.fields?.[0].dinaComponent === blockOptionsFilter
-        )
-        .map((data) => {
-          return {
-            label: data.extension.name,
-            value: data.extension.key
-          };
-        });
+    : blockOptionsQuery?.response?.data.map((data) => {
+        return {
+          label: data.extension.name,
+          value: data.extension.key
+        };
+      });
 
   const [queriedTypeOptions, setQueriedTypeOptions] = useState<
     SelectOption<string>[]

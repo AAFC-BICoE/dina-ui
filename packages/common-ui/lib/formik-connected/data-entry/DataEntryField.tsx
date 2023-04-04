@@ -17,7 +17,7 @@ export interface DataEntryFieldProps {
   isVocabularyBasedEnabledForBlock?: boolean;
   isVocabularyBasedEnabledForType?: boolean;
   blockOptionsEndpoint: string;
-  blockOptionsFilter?: string;
+  blockOptionsFilter?: { [field: string]: string };
   typeOptionsEndpoint?: string;
   unitOptionsEndpoint?: string;
 }

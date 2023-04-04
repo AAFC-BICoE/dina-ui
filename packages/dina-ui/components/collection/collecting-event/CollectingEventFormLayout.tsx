@@ -992,7 +992,9 @@ export function CollectingEventFormLayout({
             readOnly={readOnly}
             isTemplate={isTemplate}
             blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={"COLLECTING_EVENT"}
+            blockOptionsFilter={{
+              "extension.fields.dinaComponent": "COLLECTING_EVENT"
+            }}
           />
         </DinaFormSection>
       </div>
