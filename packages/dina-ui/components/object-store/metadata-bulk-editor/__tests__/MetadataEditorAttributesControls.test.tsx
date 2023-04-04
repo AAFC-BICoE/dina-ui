@@ -2,7 +2,7 @@ import { writeStorage } from "@rehooks/local-storage";
 import { DinaForm, ResourceSelect } from "common-ui";
 import Select from "react-select";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { ManagedAttribute } from "../../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../../types/collection-api";
 import {
   ATTRIBUTE_TEMPLATES_STORAGE_KEY,
   MetadataEditorAttributesControls,

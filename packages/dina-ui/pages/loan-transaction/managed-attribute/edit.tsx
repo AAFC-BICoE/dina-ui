@@ -10,7 +10,7 @@ import {
   Nav
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/collection-api/resources/ManagedAttribute";
+import { ManagedAttribute } from "../../../types/collection-api";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;

@@ -13,7 +13,7 @@ import { PersistedResource } from "kitsu";
 import { castArray, compact, flatMap, get, keys, uniq } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../../dina-ui/types/collection-api/resources/ManagedAttribute";
+import { ManagedAttribute } from "../../../../dina-ui/types/collection-api";
 import { ManagedAttributesSorter } from "./managed-attributes-custom-views/ManagedAttributesSorter";
 import { ManagedAttributeFieldWithLabel } from "./ManagedAttributeField";
 

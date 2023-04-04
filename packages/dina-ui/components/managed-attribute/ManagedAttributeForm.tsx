@@ -20,7 +20,7 @@ import {
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS,
   VocabularyElementType
-} from "../../types/collection-api/resources/ManagedAttribute";
+} from "../../types/collection-api";
 
 export interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: PersistedResource<ManagedAttribute>;

@@ -4,7 +4,7 @@ import {
   ManagedAttributeFormLayout,
   ViewPageLayout
 } from "../../../components";
-import { ManagedAttribute } from "../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../types/collection-api";
 
 export default function ManagedAttributesViewPage() {
   return (

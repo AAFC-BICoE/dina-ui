@@ -10,7 +10,7 @@ import {
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS,
   ManagedAttribute
-} from "../../../types/collection-api/resources/ManagedAttribute";
+} from "../../../types/collection-api";
 
 export default function ManagedAttributesViewPage() {
   const { formatMessage } = useDinaIntl();

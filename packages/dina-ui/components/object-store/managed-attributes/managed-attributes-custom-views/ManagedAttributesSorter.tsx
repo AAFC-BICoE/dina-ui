@@ -19,7 +19,7 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api/resources/ManagedAttribute";
+import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
 
 export interface ManagedAttributeSorterProps {

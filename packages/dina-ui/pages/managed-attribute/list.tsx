@@ -14,7 +14,7 @@ import {
   COLLECTION_MODULE_TYPE_LABELS,
   ManagedAttribute,
   MANAGED_ATTRIBUTE_TYPE_OPTIONS
-} from "../../types/collection-api/resources/ManagedAttribute";
+} from "../../types/collection-api";
 
 export default function ManagedAttributesListPage() {
   const { formatMessage } = useDinaIntl();
