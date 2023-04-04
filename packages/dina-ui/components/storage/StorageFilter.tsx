@@ -115,36 +115,37 @@ export function StorageFilter({ onChange }: StorageFilterProps) {
         <div className="col-sm-6">
           <label className="w-100">
             <strong>
-              <DinaMessage id="storageUnitType" />
+              <DinaMessage id="name" />
             </strong>
-            <ResourceSelect<StorageUnitType>
-              model="collection-api/storage-unit-type"
-              optionLabel={(it) => it.name}
-              filter={filterBy(["name"])}
-              onChange={setStorageTypeFilter as any}
-              value={storageTypeFilter}
+            <input
+              className="storage-tree-search form-control"
+              type="text"
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              // Pressing enter should set the filter, not submit the form:
+              onKeyDown={(e) => {
+                if (e.keyCode === 13) {
+                  e.preventDefault();
+                  doSearch();
+                }
+              }}
+              autoComplete="none"
             />
           </label>
         </div>
         <div className="col-sm-6">
           <label className="w-100">
             <strong>
-              <DinaMessage id="name" />
+              <DinaMessage id="storageUnitType" />
             </strong>
             <div className="input-group col-sm-6">
-              <input
-                className="storage-tree-search form-control"
-                type="text"
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                // Pressing enter should set the filter, not submit the form:
-                onKeyDown={(e) => {
-                  if (e.keyCode === 13) {
-                    e.preventDefault();
-                    doSearch();
-                  }
-                }}
-                autoComplete="none"
+              <ResourceSelect<StorageUnitType>
+                model="collection-api/storage-unit-type"
+                optionLabel={(it) => it.name}
+                filter={filterBy(["name"])}
+                onChange={setStorageTypeFilter as any}
+                value={storageTypeFilter}
+                styles={{ container: () => ({ flex: "auto" }) }}
               />
               <button
                 className="storage-tree-search btn btn-primary"

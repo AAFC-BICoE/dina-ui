@@ -138,6 +138,31 @@ export function StorageUnitFormFields({
         />
       </div>
       <div className="row">
+        <div className="col-md-6 d-flex ">
+          {!readOnly && !initialValues.id && (
+            <ToggleField
+              className="me-4"
+              onChangeExternal={onStorageUnitMultipleToggled}
+              name="isMultiple"
+              label={formatMessage("multipleUnits")}
+            />
+          )}
+          {!showTextAreaInput && (
+            <TextField
+              className="flex-grow-1"
+              name="name"
+              label={formatMessage("storageUnitName")}
+            />
+          )}
+
+          {showTextAreaInput && (
+            <StringArrayField
+              className="flex-grow-1"
+              name="name"
+              label={formatMessage("storageUnitName")}
+            />
+          )}
+        </div>
         <ResourceSelectField<StorageUnitType>
           className="col-md-6"
           model="collection-api/storage-unit-type"
@@ -147,30 +172,6 @@ export function StorageUnitFormFields({
           omitNullOption={true}
           readOnlyLink="/collection/storage-unit-type/view?id="
         />
-        <div className="col-md-6 d-flex ">
-          {!readOnly && !initialValues.id && (
-            <ToggleField
-              onChangeExternal={onStorageUnitMultipleToggled}
-              name="isMultiple"
-              label={formatMessage("multipleUnits")}
-            />
-          )}
-          {!showTextAreaInput && (
-            <TextField
-              className="ms-4 flex-grow-1"
-              name="name"
-              label={formatMessage("storageUnitName")}
-            />
-          )}
-
-          {showTextAreaInput && (
-            <StringArrayField
-              className="ms-4 flex-grow-1"
-              name="name"
-              label={formatMessage("storageUnitName")}
-            />
-          )}
-        </div>
       </div>
       <div className="row">
         <TextField
