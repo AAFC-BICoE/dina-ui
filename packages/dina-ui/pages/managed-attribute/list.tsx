@@ -103,7 +103,9 @@ function CollectionAttributeListView() {
         return (
           <div>
             {formatMessage(
-              COLLECTION_MODULE_TYPE_LABELS[ma.managedAttributeComponent] as any
+              COLLECTION_MODULE_TYPE_LABELS[
+                ma.managedAttributeComponent ?? "MATERIAL_SAMPLE"
+              ] as any
             )}
           </div>
         );
