@@ -57,7 +57,7 @@ export function StorageUnitChildrenViewer({
     );
 
     const children = [
-      ...(nestedStorages?.map(it => ({
+      ...(nestedStorages?.map((it) => ({
         id: it.uuid ?? it.id,
         type: "storage-unit"
       })) ?? []),
@@ -67,7 +67,7 @@ export function StorageUnitChildrenViewer({
     // Set first level children to new parent
     if (children) {
       await save(
-        children.map(child => ({
+        children.map((child) => ({
           resource: {
             id: child.id,
             type: child.type,
@@ -137,7 +137,7 @@ export function StorageUnitChildrenViewer({
       )}
       {actionMode === "VIEW" && (
         <div>
-          <div className="d-flex align-items-center gap-2 mb-2">
+          <div className="d-flex align-items-center gap-2 mb-3">
             <strong>
               <DinaMessage id="browseContents" />
             </strong>
@@ -205,11 +205,25 @@ export function StorageUnitContents({
   ];
 
   return (
-    <div
-      className="p-2 mb-3"
-      style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
-    >
-      <div className="mb-3">
+    <>
+      <div
+        className="p-2 mb-3"
+        style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
+      >
+        <strong>
+          <DinaMessage id="childrenStorageUnits" />
+        </strong>
+        <StorageTreeList
+          storageUnitChildren={
+            storageUnit.storageUnitChildren as PersistedResource<StorageUnit>[]
+          }
+          disabled={true}
+        />
+      </div>
+      <div
+        className="p-2 mb-3"
+        style={{ border: "1px solid #d3d7cf", backgroundColor: "#f3f3f3" }}
+      >
         <strong>
           <DinaMessage id="materialSamples" />
         </strong>
@@ -227,17 +241,6 @@ export function StorageUnitContents({
           }}
         />
       </div>
-      <div className="mb-3">
-        <strong>
-          <DinaMessage id="childrenStorageUnits" />
-        </strong>
-        <StorageTreeList
-          storageUnitChildren={
-            storageUnit.storageUnitChildren as PersistedResource<StorageUnit>[]
-          }
-          disabled={true}
-        />
-      </div>
-    </div>
+    </>
   );
 }
