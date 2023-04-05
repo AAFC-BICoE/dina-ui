@@ -1,7 +1,7 @@
 import { PersistedResource } from "kitsu";
 import MetadataViewPage from "../../../../pages/object-store/object/view";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { ManagedAttribute, Metadata } from "../../../../types/objectstore-api";
+import { Metadata } from "../../../../types/objectstore-api";
 
 const TEST_METADATA: PersistedResource<Metadata> = {
   acTags: ["tag1", "tag2"],

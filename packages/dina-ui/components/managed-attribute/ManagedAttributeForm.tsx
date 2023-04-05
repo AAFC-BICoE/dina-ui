@@ -6,30 +6,31 @@ import {
   SelectField,
   StringArrayField,
   SubmitButton,
-  TextField
+  TextField,
+  useDinaFormContext
 } from "common-ui";
 import { PersistedResource } from "kitsu";
 import { fromPairs, toPairs } from "lodash";
-import Link from "next/link";
-import { NextRouter } from "next/router";
+import { NextRouter, useRouter } from "next/router";
 import { useState } from "react";
+import { boolean } from "zod";
 import { GroupSelectField } from "..";
-import { DinaMessage, useDinaIntl } from "../../intl/dina-ui-intl";
+import { useDinaIntl } from "../../intl/dina-ui-intl";
 import {
   ManagedAttribute,
-  VocabularyElementType,
-  MANAGED_ATTRIBUTE_TYPE_OPTIONS
-} from "../../types/collection-api/resources/ManagedAttribute";
+  MANAGED_ATTRIBUTE_TYPE_OPTIONS,
+  VocabularyElementType
+} from "../../types/collection-api";
 
 export interface ManagedAttributeFormProps {
   fetchedManagedAttribute?: PersistedResource<ManagedAttribute>;
   router: NextRouter;
   apiBaseUrl: string;
   postSaveRedirect: string;
-  /** THe href to the list page. */
-  listHref: string;
+  backButton: JSX.Element;
   /** Optionally render a "managedAttributeComponent field." */
   componentField?: JSX.Element;
+  withGroup?: boolean;
 }
 
 export function ManagedAttributeForm({
@@ -37,8 +38,9 @@ export function ManagedAttributeForm({
   router,
   apiBaseUrl,
   postSaveRedirect,
-  listHref,
-  componentField
+  backButton,
+  componentField,
+  withGroup = true
 }: ManagedAttributeFormProps) {
   const { formatMessage } = useDinaIntl();
 
@@ -56,21 +58,9 @@ export function ManagedAttributeForm({
       }
     : { type: "managed-attribute" };
 
-  const [type, setType] = useState(
-    fetchedManagedAttribute
-      ? fetchedManagedAttribute?.acceptedValues?.length
-        ? "PICKLIST"
-        : fetchedManagedAttribute.vocabularyElementType
-      : undefined
-  );
-
-  if (type === "PICKLIST") {
+  if ((initialValues && initialValues?.acceptedValues?.length) || 0 > 0) {
     initialValues.vocabularyElementType = "PICKLIST";
   }
-
-  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
-    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
-  );
 
   const onSubmit: DinaFormOnSubmit<Partial<ManagedAttribute>> = async ({
     api: { save },
@@ -97,7 +87,7 @@ export function ManagedAttributeForm({
       )
     };
 
-    await save(
+    const [savedAttribute] = await save(
       [
         {
           resource: { type: "managed-attribute", ...submittedValues },
@@ -107,31 +97,63 @@ export function ManagedAttributeForm({
       { apiBaseUrl }
     );
 
-    await router.push(postSaveRedirect);
+    await router.push(`${postSaveRedirect}?id=${savedAttribute.id}`);
   };
 
   return (
     <DinaForm initialValues={initialValues} onSubmit={onSubmit}>
       <ButtonBar>
-        <SubmitButton />
-        <Link href={listHref}>
-          <a className="btn btn-dark">
-            <DinaMessage id="cancelButtonText" />
-          </a>
-        </Link>
+        {backButton}
+        <SubmitButton className="ms-auto" />
       </ButtonBar>
-      <div className="row">
-        <GroupSelectField
-          className="col-md-6"
-          name="group"
-          enableStoredDefaultGroup={true}
-        />
-      </div>
+      <ManagedAttributeFormLayout
+        componentField={componentField}
+        withGroup={withGroup}
+      />
+    </DinaForm>
+  );
+}
+
+export interface ManagedAttributeFormLayoutLayoutProps {
+  componentField?: JSX.Element;
+  withGroup?: boolean;
+}
+
+export function ManagedAttributeFormLayout({
+  componentField,
+  withGroup = true
+}: ManagedAttributeFormLayoutLayoutProps) {
+  const { formatMessage } = useDinaIntl();
+  const { readOnly, initialValues } = useDinaFormContext();
+  const [type, setType] = useState(
+    initialValues
+      ? initialValues?.acceptedValues?.length
+        ? "PICKLIST"
+        : initialValues.vocabularyElementType
+      : undefined
+  );
+
+  const router = useRouter();
+  const uuid = String(router?.query?.id);
+  const ATTRIBUTE_TYPE_OPTIONS = MANAGED_ATTRIBUTE_TYPE_OPTIONS.map(
+    ({ labelKey, value }) => ({ label: formatMessage(labelKey), value })
+  );
+  return (
+    <>
+      {withGroup ? (
+        <div className="row">
+          <GroupSelectField
+            className="col-md-6"
+            name="group"
+            enableStoredDefaultGroup={true}
+          />
+        </div>
+      ) : undefined}
       <div className="row">
         <TextField
           className="col-md-6"
           name="name"
-          readOnly={id !== undefined}
+          readOnly={uuid !== undefined && uuid !== "undefined"}
         />
         <TextField className="col-md-6" name="key" readOnly={true} />
       </div>
@@ -142,7 +164,7 @@ export function ManagedAttributeForm({
           name="vocabularyElementType"
           options={ATTRIBUTE_TYPE_OPTIONS}
           onChange={(selectValue: VocabularyElementType) =>
-            setType(selectValue)
+            setType && setType(selectValue)
           }
         />
       </div>
@@ -167,7 +189,7 @@ export function ManagedAttributeForm({
           multiLines={true}
         />
       </div>
-      {id && (
+      {readOnly && (
         <div className="row">
           <DateField
             className="col-md-6"
@@ -178,6 +200,6 @@ export function ManagedAttributeForm({
           <TextField className="col-md-6" name="createdBy" readOnly={true} />
         </div>
       )}
-    </DinaForm>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { Person } from "../../agent-api/resources/Person";
-import { ManagedAttributeValues } from "../../objectstore-api";
+import { ManagedAttributeValues } from "./ManagedAttribute";
 
 export interface Determination {
   verbatimScientificName?: string;
