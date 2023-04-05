@@ -22,6 +22,9 @@ export interface ResourceSelectFieldProps<TData extends KitsuResource>
 
   /** Link that is shown in read-only mode. */
   readOnlyLink?: string;
+
+  /** If true, disable the dropdown when the selected option is the only one available */
+  cannotBeChanged?: boolean;
 }
 
 /** Formik-connected Dropdown select input for selecting a resource from the API. */
@@ -83,7 +86,7 @@ export function ReadOnlyResourceLink<TData extends KitsuResource>({
   const valueIsShallowReference = isShallowReference(values);
   const resources =
     useBulkGet<TData>({
-      ids: values.map(it => it.id),
+      ids: values.map((it) => it.id),
       listPath: model,
       disabled: !valueIsShallowReference
     }).data ?? values;
