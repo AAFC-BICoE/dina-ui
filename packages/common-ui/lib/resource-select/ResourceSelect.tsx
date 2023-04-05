@@ -141,7 +141,7 @@ export function ResourceSelect<TData extends KitsuResource>({
     ["", undefined].includes(val as string)
   );
 
-  const [isDisabled, setIsDisabled] = useState(isDisabledProp);
+  let isDisabled = isDisabledProp;
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
@@ -220,15 +220,6 @@ export function ResourceSelect<TData extends KitsuResource>({
       const resources = newSelected?.map((o) => o.resource) || [];
       onChangeProp(isMulti ? resources : resources[0], actionMeta);
     }
-
-    // Disable dropdown if the selected option is the only option available
-    if (cannotBeChanged && !isMulti) {
-      setIsDisabled(
-        !isAdmin &&
-          resourceOptions.length === 1 &&
-          newSelected?.[0]?.value === resourceOptions?.[0]?.value
-      );
-    }
   }
 
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -279,6 +270,14 @@ export function ResourceSelect<TData extends KitsuResource>({
     };
   });
   const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;
+
+  // Disable dropdown if the selected option is the only option available
+  if (cannotBeChanged && !isMulti) {
+    isDisabled =
+      !isAdmin &&
+      resourceOptions.length === 1 &&
+      selectValue?.value === resourceOptions?.[0]?.value;
+  }
 
   const customStyle: any = {
     ...styles,
