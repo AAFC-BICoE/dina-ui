@@ -4,7 +4,7 @@ import { PcrBatch } from "./PcrBatch";
 
 export interface SeqSubmissionAttributes {
   type: "seq-submission";
-  group?: string;
+  group: string;
   name: string;
   createdBy?: string;
   createdOn?: string;
