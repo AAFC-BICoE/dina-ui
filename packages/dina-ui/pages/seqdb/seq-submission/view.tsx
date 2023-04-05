@@ -9,7 +9,7 @@ import {
 } from "common-ui";
 import { useState } from "react";
 import { useDinaIntl } from "../../../../dina-ui/intl/dina-ui-intl";
-import { PcrBatch } from "../../../../dina-ui/types/seqdb-api";
+import { SeqBatch } from "../../../../dina-ui/types/seqdb-api";
 import { SeqSubmission } from "../../../../dina-ui/types/seqdb-api/resources/SeqSubmission";
 import {
   GroupSelectField,
@@ -54,9 +54,9 @@ export function SeqSubmissionFields() {
         <PersonSelectField className="col-md-6" name="submittedBy" />
       </div>
       <div className="row">
-        <ResourceSelectField<PcrBatch>
-          name="pcrBatch"
-          label={formatMessage("pcrBatch")}
+        <ResourceSelectField<SeqBatch>
+          name="seqBatch"
+          label={formatMessage("seqBatch")}
           className="col-md-6"
           filter={filterBy(
             ["name"],
@@ -73,9 +73,9 @@ export function SeqSubmissionFields() {
               : undefined
           )}
           isDisabled={!group}
-          readOnlyLink="/seqdb/pcr-batch/view?id="
-          model="seqdb-api/pcr-batch"
-          optionLabel={(pcrBatch) => `${pcrBatch.name || pcrBatch.id}`}
+          readOnlyLink="/seqdb/seq-batch/view?id="
+          model="seqdb-api/seq-batch"
+          optionLabel={(seqBatch) => `${seqBatch.name || seqBatch.id}`}
         />
       </div>
       {readOnly && (

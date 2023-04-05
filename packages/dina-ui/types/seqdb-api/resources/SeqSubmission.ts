@@ -1,6 +1,6 @@
 import { KitsuResource } from "kitsu";
 import { Person } from "../../objectstore-api";
-import { PcrBatch } from "./PcrBatch";
+import { SeqBatch } from "./SeqBatch";
 
 export interface SeqSubmissionAttributes {
   type: "seq-submission";
@@ -11,7 +11,7 @@ export interface SeqSubmissionAttributes {
 }
 
 export interface SeqSubmissionRelationships {
-  pcrBatch?: PcrBatch;
+  seqBatch?: SeqBatch;
   submittedBy?: Person;
 }
 
