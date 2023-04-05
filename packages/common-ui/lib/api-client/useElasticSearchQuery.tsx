@@ -3,7 +3,7 @@ import useSWR from "swr";
 import { useApiClient } from "./ApiClientContext";
 import { v4 as uuidv4 } from "uuid";
 
-export interface useElasticSearchQueryProps {
+export interface UseElasticSearchQueryProps {
   indexName: string;
   queryDSL: any;
 
@@ -23,7 +23,7 @@ export function useElasticSearchQuery({
   onSuccess,
   disabled,
   deps
-}: useElasticSearchQueryProps) {
+}: UseElasticSearchQueryProps) {
   if (disabled) {
     return undefined;
   }

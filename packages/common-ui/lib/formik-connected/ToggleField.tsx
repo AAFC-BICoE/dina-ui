@@ -16,14 +16,14 @@ export function ToggleField({
   return (
     <FieldWrapper
       {...props}
-      readOnlyRender={value => String(!!value)}
+      readOnlyRender={(value) => String(!!value)}
       disableLabelClick={true}
     >
       {({ value, setValue, formik }) => (
         <Switch
           disabled={disableSwitch}
           checked={!!value ?? false}
-          onChange={checked => {
+          onChange={(checked) => {
             setValue(checked);
             onChangeExternal?.(checked, formik);
           }}
@@ -43,7 +43,7 @@ export function StringToggleField({
       {({ value, setValue, formik }) => (
         <Switch
           checked={(value === "true" || value === true) ?? false}
-          onChange={checked => {
+          onChange={(checked) => {
             setValue(String(checked));
             onChangeExternal?.(checked, formik);
           }}
@@ -63,7 +63,7 @@ export function InverseToggleField({
       {({ value, setValue, formik }) => (
         <Switch
           checked={!value ?? true}
-          onChange={checked => {
+          onChange={(checked) => {
             setValue(!checked);
             onChangeExternal?.(!checked, formik);
           }}
