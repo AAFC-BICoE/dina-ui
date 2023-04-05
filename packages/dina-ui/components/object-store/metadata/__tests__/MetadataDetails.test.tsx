@@ -1,6 +1,6 @@
 import { PersistedResource } from "kitsu";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import { ManagedAttribute, Metadata } from "../../../../types/objectstore-api";
+import { Metadata } from "../../../../types/objectstore-api";
 import { MetadataDetails } from "../MetadataDetails";
 
 const TEST_METADATA: PersistedResource<Metadata> = {

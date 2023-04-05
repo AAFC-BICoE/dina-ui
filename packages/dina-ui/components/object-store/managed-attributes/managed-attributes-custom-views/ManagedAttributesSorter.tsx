@@ -19,7 +19,7 @@ import {
   SortEnd
 } from "react-sortable-hoc";
 import { DinaMessage, useDinaIntl } from "../../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 import { ManagedAttributeField } from "../ManagedAttributeField";
 
 export interface ManagedAttributeSorterProps {
@@ -63,14 +63,14 @@ export function ManagedAttributesSorter({
                 style={{ maxWidth: "30rem" }}
               >
                 <ResourceSelect<ManagedAttribute>
-                  filter={input => ({
+                  filter={(input) => ({
                     ...filterBy(["name"])(input),
                     ...(managedAttributeComponent
                       ? { managedAttributeComponent }
                       : {})
                   })}
                   model={managedAttributeApiPath}
-                  onChange={ma => {
+                  onChange={(ma) => {
                     if (
                       !Array.isArray(ma) &&
                       !attributeKeys.includes?.(ma.key)
@@ -78,7 +78,7 @@ export function ManagedAttributesSorter({
                       push(ma.key);
                     }
                   }}
-                  optionLabel={ma => ma.name}
+                  optionLabel={(ma) => ma.name}
                   placeholder={formatMessage("addManagedAttribute")}
                   omitNullOption={true}
                 />
@@ -114,7 +114,7 @@ export function ManagedAttributesSorter({
             )}
             <div>
               <FieldSpy<string[]> fieldName={name}>
-                {keys => (
+                {(keys) => (
                   <SortableAttributesViewList
                     axis="xy"
                     onSortStart={onSortStart}
@@ -125,7 +125,7 @@ export function ManagedAttributesSorter({
                     keys={keys ?? []}
                     managedAttributeApiPath={managedAttributeApiPath}
                     managedAttributeComponent={managedAttributeComponent}
-                    onRemoveClick={index => remove(index)}
+                    onRemoveClick={(index) => remove(index)}
                     valuesPath={valuesPath}
                   />
                 )}
@@ -159,7 +159,7 @@ function AttributesViewList({
   // Fetch the attributes, but omit any that are missing e.g. were deleted.
   const { dataWithNullForMissing: fetchedAttributes, loading } =
     useBulkGet<ManagedAttribute>({
-      ids: keys.map(key =>
+      ids: keys.map((key) =>
         // Use the component prefix if needed by the back-end:
         compact([managedAttributeComponent, key]).join(".")
       ),

@@ -6,7 +6,7 @@ import {
 } from "./GeographicPlaceNameSourceDetail";
 import { CollectorGroup } from "./CollectorGroup";
 import { GeoReferenceAssertion } from "./GeoReferenceAssertion";
-import { ManagedAttributeValues } from "../../objectstore-api";
+import { ManagedAttributeValues } from "./ManagedAttribute";
 
 import { JsonValue } from "type-fest";
 

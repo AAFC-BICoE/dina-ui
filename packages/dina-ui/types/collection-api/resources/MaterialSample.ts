@@ -1,7 +1,7 @@
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { InputResource, KitsuResource, KitsuResourceLink } from "kitsu";
 import { BLANK_PREPARATION, BLANK_RESTRICTION } from "../../../components";
-import { ManagedAttributeValues, Person } from "../../objectstore-api";
+import { ManagedAttributeValues } from "./ManagedAttribute";
 import { AcquisitionEvent } from "./AcquisitionEvent";
 import { Assemblage } from "./Assemblage";
 import { CollectingEvent } from "./CollectingEvent";
@@ -12,6 +12,7 @@ import { Organism } from "./Organism";
 import { PreparationType } from "./PreparationType";
 import { Project } from "./Project";
 import { HierarchyItem, StorageUnit } from "./StorageUnit";
+import { Person } from "../../objectstore-api";
 
 export interface MaterialSampleAttributes {
   type: "material-sample";

@@ -36,6 +36,7 @@ export type ViewPageLayoutProps<T extends KitsuResource> =
     queryOptions?: QueryOptions<T, unknown>;
     form: (formProps: ResourceFormProps<T>) => ReactNode;
     entityLink: string;
+    specialListUrl?: string;
     type: string;
     apiBaseUrl: string;
 
@@ -85,6 +86,7 @@ export function ViewPageLayout<T extends KitsuResource>({
   customQueryHook,
   queryOptions,
   entityLink,
+  specialListUrl,
   type,
   apiBaseUrl,
   nameField = "name",
@@ -146,12 +148,20 @@ export function ViewPageLayout<T extends KitsuResource>({
             <>
               <Head title={title} />
               <ButtonBar className="gap-2">
-                <BackButton
-                  entityId={id}
-                  className="me-auto"
-                  entityLink={entityLink}
-                  byPassView={true}
-                />
+                {specialListUrl ? (
+                  <Link href={specialListUrl}>
+                    <a className="back-button my-auto me-auto">
+                      <DinaMessage id="backToList" />
+                    </a>
+                  </Link>
+                ) : (
+                  <BackButton
+                    entityId={id}
+                    className="me-auto"
+                    entityLink={entityLink}
+                    byPassView={true}
+                  />
+                )}
                 {canEdit &&
                   (editButton?.(formProps) ?? (
                     <EditButton entityId={id} entityLink={entityLink} />
@@ -170,7 +180,9 @@ export function ViewPageLayout<T extends KitsuResource>({
                     <DeleteButton
                       id={id}
                       options={{ apiBaseUrl }}
-                      postDeleteRedirect={`${entityLink}/list`}
+                      postDeleteRedirect={
+                        specialListUrl ? specialListUrl : `${entityLink}/list`
+                      }
                       type={type}
                     />
                   ))}
