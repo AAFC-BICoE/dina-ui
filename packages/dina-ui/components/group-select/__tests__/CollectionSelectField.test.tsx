@@ -129,10 +129,6 @@ describe("CollectionSelectField", () => {
     expect(mockGet.mock.calls).toEqual([
       [
         "collection-api/collection",
-        { filter: { rsql: "group=in=(aafc,cnc)" } }
-      ],
-      [
-        "collection-api/collection",
         {
           filter: { rsql: "group=in=(aafc,cnc)" },
           page: { limit: 6 },
