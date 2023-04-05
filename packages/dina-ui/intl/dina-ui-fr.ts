@@ -502,7 +502,7 @@ export const DINAUI_MESSAGES_FRENCH: Partial<typeof DINAUI_MESSAGES_ENGLISH> = {
   institution: "Établissement",
   institutionListTitle: "Établissements",
   isFiledAs: "Classé en tant que",
-  isTarget: "Est-ce ciblé?",
+  isTargetHeader: "Est-ce ciblé?",
   isolation: "Isolation",
   keepContentsTogether: "Ne pas séparer le contenu",
   languageDescriptionEnglish: "Anglais",
