@@ -12,9 +12,9 @@ const blockOptions = {
   id: "blockOptions",
   type: "vocabulary",
   vocabularyElements: [
-    { name: "BLOCK_OPTION_1", term: "BLOCK_OPTION_1" },
-    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_2" },
-    { name: "BLOCK_OPTION_2", term: "BLOCK_OPTION_3" }
+    { name: "BLOCK_OPTION_1", key: "BLOCK_OPTION_1" },
+    { name: "BLOCK_OPTION_2", key: "BLOCK_OPTION_2" },
+    { name: "BLOCK_OPTION_2", key: "BLOCK_OPTION_3" }
   ]
 };
 
@@ -22,9 +22,9 @@ const unitsOptions = {
   id: "unitsOptions",
   type: "vocabulary",
   vocabularyElements: [
-    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_1" },
-    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_2" },
-    { name: "BLOCK_OPTION_2", term: "UNIT_OPTION_3" }
+    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_1" },
+    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_2" },
+    { name: "BLOCK_OPTION_2", key: "UNIT_OPTION_3" }
   ]
 };
 const typeOptions = [
