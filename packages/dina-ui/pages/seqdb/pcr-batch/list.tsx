@@ -49,7 +49,7 @@ export default function PcrBatchListPage() {
           <CreateButton entityLink="/seqdb/pcr-batch" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}
@@ -58,7 +58,8 @@ export default function PcrBatchListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/pcr-batch",
-            include: "primerForward,primerReverse"
+            include: "primerForward,primerReverse",
+            filter: { isCompleted: false }
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
