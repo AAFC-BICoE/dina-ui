@@ -1,6 +1,6 @@
 import { DinaForm, FieldView, useApiClient, useIsMounted } from "common-ui";
 import { toPairs } from "lodash";
-import { ManagedAttribute } from "packages/dina-ui/types/objectstore-api";
+import { ManagedAttribute } from "../../../types/collection-api";
 import { useEffect, useState } from "react";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
 

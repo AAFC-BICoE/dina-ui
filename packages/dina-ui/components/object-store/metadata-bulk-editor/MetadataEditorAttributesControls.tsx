@@ -13,7 +13,7 @@ import {
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { DinaMessage } from "../../../intl/dina-ui-intl";
-import { ManagedAttribute } from "../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../types/collection-api";
 
 /** A named set of attributes used for editing Metadatas. */
 export interface AttributesTemplate {
@@ -92,7 +92,7 @@ function useMetadataEditorSavedTemplates() {
 
   function deleteTemplate(templateToRemove: AttributesTemplate) {
     const newTemplates = attributesTemplates.filter(
-      template => template !== templateToRemove
+      (template) => template !== templateToRemove
     );
     setAttributesTemplates(newTemplates);
   }
@@ -108,11 +108,8 @@ function useMetadataEditorSavedTemplates() {
 export function MetadataEditorAttributesControls({
   builtInAttributes
 }: MetadataEditorAttributesControlsProps) {
-  const {
-    attributesTemplates,
-    deleteTemplate,
-    openAttributesTemplateForm
-  } = useMetadataEditorSavedTemplates();
+  const { attributesTemplates, deleteTemplate, openAttributesTemplateForm } =
+    useMetadataEditorSavedTemplates();
 
   const formikCtx = useFormikContext<MetadataEditorControls>();
 
@@ -133,7 +130,7 @@ export function MetadataEditorAttributesControls({
   }
 
   function saveAttributeTemplate() {
-    openAttributesTemplateForm(formikCtx.values, newTemplate => {
+    openAttributesTemplateForm(formikCtx.values, (newTemplate) => {
       formikCtx.setValues({
         ...formikCtx.values,
         attributesTemplate: newTemplate
@@ -158,7 +155,7 @@ export function MetadataEditorAttributesControls({
             onChange={(template: AttributesTemplate) =>
               setCurrentAttributesTemplate(template)
             }
-            options={attributesTemplates.map(template => ({
+            options={attributesTemplates.map((template) => ({
               label: template.name,
               value: template
             }))}
@@ -180,7 +177,7 @@ export function MetadataEditorAttributesControls({
           className="col-6 editable-builtin-attributes-select"
           name="editableBuiltInAttributes"
           isMulti={true}
-          options={builtInAttributes.map(col => ({
+          options={builtInAttributes.map((col) => ({
             label: col.title ?? "",
             value: col.data
           }))}
@@ -191,7 +188,7 @@ export function MetadataEditorAttributesControls({
           name="editableManagedAttributes"
           isMulti={true}
           model="objectstore-api/managed-attribute"
-          optionLabel={attr => attr.name}
+          optionLabel={(attr) => attr.name}
         />
         <div className="col-3 pt-3">
           <FormikButton

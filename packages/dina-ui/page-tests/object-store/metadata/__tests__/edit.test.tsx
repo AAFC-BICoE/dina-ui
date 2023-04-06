@@ -1,13 +1,9 @@
 import { PersistedResource } from "kitsu";
-import {
-  License,
-  ManagedAttribute,
-  Metadata,
-  Person
-} from "../../../../types/objectstore-api";
+import { ManagedAttribute } from "../../../../types/collection-api";
+import CreatableSelect from "react-select/creatable";
 import MetadataEditPage from "../../../../pages/object-store/metadata/edit";
 import { mountWithAppContext } from "../../../../test-util/mock-app-context";
-import CreatableSelect from "react-select/creatable";
+import { License, Metadata, Person } from "../../../../types/objectstore-api";
 
 const mockGet = jest.fn(async (path) => {
   switch (path) {

@@ -21,7 +21,7 @@ import {
   FieldMappingConfigType,
   useWorkbookConverter
 } from "./utils/useWorkbookConverter";
-import { startCase } from "lodash";
+import lodash, { startCase } from "lodash";
 import {
   convertMap,
   findMatchField,
@@ -148,6 +148,12 @@ export function WorkbookColumnMapping({
   // Generate field options
   const fieldOptions = useMemo(() => {
     if (!!selectedType?.value) {
+      const nonNestedRowOptions: { label: string; value: string }[] = [];
+      const nestedRowOptions: {
+        label: string;
+        value: string;
+        parentPath: string;
+      }[] = [];
       const newFieldOptions: { label: string; value: string }[] = [];
       Object.keys(flattenedConfig).forEach((fieldPath) => {
         const config = flattenedConfig[fieldPath];
@@ -155,18 +161,63 @@ export function WorkbookColumnMapping({
           config.dataType !== DataTypeEnum.OBJECT &&
           config.dataType !== DataTypeEnum.OBJECT_ARRAY
         ) {
-          let label = fieldPath.substring(fieldPath.lastIndexOf(".") + 1);
-          label =
-            formatMessage(`field_${label}` as any)?.trim() ||
-            formatMessage(label as any)?.trim() ||
-            startCase(label);
-          const option = {
-            label,
+          // Handle creating options for all flattened fields to be used for mapping, not actually used for dropdown component
+          const newLabelPath = fieldPath.substring(
+            fieldPath.lastIndexOf(".") + 1
+          );
+          const newLabel =
+            formatMessage(`field_${newLabelPath}` as any)?.trim() ||
+            formatMessage(newLabelPath as any)?.trim() ||
+            startCase(newLabelPath);
+          const newOption = {
+            label: newLabel,
             value: fieldPath
           };
-          newFieldOptions.push(option);
+          newFieldOptions.push(newOption);
+
+          // Handle creating options for nested path for dropdown component
+          if (fieldPath.includes(".")) {
+            const lastIndex = fieldPath.lastIndexOf(".");
+            const parentPath = fieldPath.substring(0, lastIndex);
+            const labelPath = fieldPath.substring(lastIndex + 1);
+            const label =
+              formatMessage(`field_${labelPath}` as any)?.trim() ||
+              formatMessage(labelPath as any)?.trim() ||
+              startCase(labelPath);
+            const option = {
+              label,
+              value: fieldPath,
+              parentPath
+            };
+            nestedRowOptions.push(option);
+          } else {
+            // Handle creating options for non nested path for dropdown component
+            const label =
+              formatMessage(`field_${fieldPath}` as any)?.trim() ||
+              formatMessage(fieldPath as any)?.trim() ||
+              startCase(fieldPath);
+            const option = {
+              label,
+              value: fieldPath
+            };
+            nonNestedRowOptions.push(option);
+          }
         }
       });
+      nonNestedRowOptions.sort((a, b) => a.label.localeCompare(b.label));
+
+      // Using the parent name, group the relationships into sections.
+      const groupedNestRowOptions = lodash
+        .chain(nestedRowOptions)
+        .groupBy((prop) => prop.parentPath)
+        .map((group, key) => {
+          return {
+            label: key.toUpperCase(),
+            options: group
+          };
+        })
+        .sort((a, b) => a.label.localeCompare(b.label))
+        .value();
       const map = [] as FieldMapType;
       const _fieldHeaderPair = {};
       for (const columnHeader of headers || []) {
@@ -178,7 +229,9 @@ export function WorkbookColumnMapping({
       }
       setFieldMap(map);
       setFieldHeaderPair(_fieldHeaderPair);
-      return newFieldOptions;
+      return nonNestedRowOptions
+        ? [...nonNestedRowOptions, ...groupedNestRowOptions]
+        : [];
     } else {
       return [];
     }
@@ -367,6 +420,51 @@ export function WorkbookColumnMapping({
     return errors;
   }
 
+  // Custom styling to indent the group option menus.
+  const customStyles = useMemo(
+    () => ({
+      placeholder: (provided, _) => ({
+        ...provided,
+        color: "rgb(87,120,94)"
+      }),
+      menu: (base) => ({ ...base, zIndex: 1050 }),
+      control: (base) => ({
+        ...base
+      }),
+      // Grouped options (relationships) should be indented.
+      option: (baseStyle, { data }) => {
+        if (data?.parentPath) {
+          return {
+            ...baseStyle,
+            paddingLeft: "25px"
+          };
+        }
+
+        // Default style for everything else.
+        return {
+          ...baseStyle
+        };
+      },
+
+      // When viewing a group item, the parent path should be prefixed on to the value.
+      singleValue: (baseStyle, { data }) => {
+        if (data?.parentPath) {
+          return {
+            ...baseStyle,
+            ":before": {
+              content: `'${startCase(data.parentPath)} '`
+            }
+          };
+        }
+
+        return {
+          ...baseStyle
+        };
+      }
+    }),
+    [selectedType]
+  );
+
   return (
     <DinaForm<Partial<WorkbookColumnMappingFields>>
       initialValues={{
@@ -426,6 +524,7 @@ export function WorkbookColumnMapping({
                               name={`fieldMap[${index}]`}
                               options={fieldOptions}
                               hideLabel={true}
+                              styles={customStyles}
                             />
                           </td>
                         </tr>
