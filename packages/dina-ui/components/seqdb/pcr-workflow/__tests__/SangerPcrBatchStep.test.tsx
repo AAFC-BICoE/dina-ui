@@ -10,7 +10,8 @@ const PCR_BATCH: PcrBatch = {
   name: PCR_BATCH_NAME,
   type: "pcr-batch",
   id: PCR_BATCH_ID,
-  createdBy: "test-user"
+  createdBy: "test-user",
+  isCompleted: false
 };
 
 const mockOnSaved = jest.fn();

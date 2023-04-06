@@ -19,6 +19,7 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
   type: "pcr-batch",
   name: "test pcr batch",
   group: "cnc",
+  isCompleted: false,
   createdBy: "poffm",
   primerForward: {
     id: FORWARD_PRIMER_UUID,
