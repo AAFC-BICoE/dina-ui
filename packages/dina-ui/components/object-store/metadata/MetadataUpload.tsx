@@ -76,7 +76,7 @@ export function MetadataUpload({ buttonBar }: MetadataUploadProps) {
             id: agentId,
             type: "person"
           }
-        : null,
+        : undefined,
       bucket: group,
       dcType: objectUpload.dcType,
       fileIdentifier: objectUpload.id,

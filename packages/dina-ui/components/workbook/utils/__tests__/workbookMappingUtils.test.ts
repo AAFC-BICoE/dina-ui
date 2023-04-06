@@ -1,9 +1,11 @@
+import { DataTypeEnum } from "../useWorkbookConverter";
 import {
   convertDate,
   convertMap,
   convertNumber,
   convertNumberArray,
   convertStringArray,
+  flattenObject,
   getColumnHeaders,
   getDataFromWorkbook,
   isBoolean,
@@ -11,6 +13,33 @@ import {
   isMap,
   isNumber
 } from "../workbookMappingUtils";
+
+const mockConfig = {
+  mockEntity: {
+    stringField: {
+      dataType: DataTypeEnum.VOCABULARY,
+      vocabularyEndpoint: "/collection-api/vocabulary/materialSampleType"
+    },
+    numberField: { dataType: DataTypeEnum.NUMBER },
+    booleanField: { dataType: DataTypeEnum.BOOLEAN },
+    stringArrayField: { dataType: DataTypeEnum.STRING_ARRAY },
+    numberArrayField: { dataType: DataTypeEnum.NUMBER_ARRAY },
+    mapField: { dataType: DataTypeEnum.MANAGED_ATTRIBUTES },
+    objectField: {
+      name: { dataType: DataTypeEnum.STRING },
+      age: { dataType: DataTypeEnum.NUMBER },
+      address: {
+        dataType: DataTypeEnum.OBJECT,
+        attributes: {
+          addressLine1: { dataType: DataTypeEnum.STRING },
+          city: { dataType: DataTypeEnum.STRING },
+          province: { dataType: DataTypeEnum.STRING },
+          postalCode: { dataType: DataTypeEnum.STRING }
+        }
+      }
+    }
+  }
+};
 
 describe("workbookMappingUtils functions", () => {
   describe("getColumnHeaders", () => {
@@ -204,5 +233,26 @@ describe("workbookMappingUtils functions", () => {
 
   it("convertDate", () => {
     expect(convertDate("43831")).toEqual("2020-01-01");
+  });
+
+  it("flattenObject", () => {
+    expect(flattenObject(mockConfig)).toEqual({
+      "mockEntity.booleanField.dataType": "boolean",
+      "mockEntity.mapField.dataType": "managedAttributes",
+      "mockEntity.numberArrayField.dataType": "number[]",
+      "mockEntity.numberField.dataType": "number",
+      "mockEntity.objectField.age.dataType": "number",
+      "mockEntity.objectField.name.dataType": "string",
+      "mockEntity.stringArrayField.dataType": "string[]",
+      "mockEntity.stringField.dataType": "vocabulary",
+      "mockEntity.stringField.vocabularyEndpoint":
+        "/collection-api/vocabulary/materialSampleType",
+      "mockEntity.objectField.address.attributes.addressLine1.dataType":
+        "string",
+      "mockEntity.objectField.address.attributes.city.dataType": "string",
+      "mockEntity.objectField.address.attributes.postalCode.dataType": "string",
+      "mockEntity.objectField.address.attributes.province.dataType": "string",
+      "mockEntity.objectField.address.dataType": "object"
+    });
   });
 });

@@ -246,8 +246,29 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
 
                 <MaterialSampleInfoSection />
                 {withResponse(colEventQuery, ({ data: colEvent }) => {
+                  function legendWrapper():
+                    | ((legendElement: JSX.Element) => JSX.Element)
+                    | undefined {
+                    return (legendElement) => {
+                      return (
+                        <div className="d-flex align-items-center justify-content-between">
+                          {legendElement}
+                          <Link
+                            href={`/collection/collecting-event/view?id=${colEvent.id}`}
+                          >
+                            <a>
+                              <DinaMessage id="detailsPageLink" />
+                            </a>
+                          </Link>
+                        </div>
+                      );
+                    };
+                  }
                   return (
-                    <FieldSet legend={<DinaMessage id="collectingEvent" />}>
+                    <FieldSet
+                      legend={<DinaMessage id="collectingEvent" />}
+                      wrapLegend={legendWrapper()}
+                    >
                       {materialSample.parentMaterialSample && (
                         <div
                           style={{
@@ -261,15 +282,6 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                         </div>
                       )}
                       <DinaForm initialValues={colEvent} readOnly={true}>
-                        <div className="mb-3 d-flex justify-content-end align-items-center">
-                          <Link
-                            href={`/collection/collecting-event/view?id=${colEvent.id}`}
-                          >
-                            <a>
-                              <DinaMessage id="detailsPageLink" />
-                            </a>
-                          </Link>
-                        </div>
                         <CollectingEventFormLayout />
                       </DinaForm>
                     </FieldSet>

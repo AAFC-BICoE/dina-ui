@@ -501,7 +501,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   institution: "Institution",
   institutionListTitle: "Institutions",
   isFiledAs: "Filed As",
-  isTarget: "Is Target ?",
+  isTargetHeader: "Is Target ?",
   isolation: "Isolation",
   keepContentsTogether: "Keep Contents Together",
   languageDescriptionEnglish: "English",

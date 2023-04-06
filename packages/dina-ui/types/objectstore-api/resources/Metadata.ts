@@ -45,7 +45,7 @@ export interface MetadataAttributes {
 }
 
 export interface MetadataRelationships {
-  acMetadataCreator?: Person | KitsuResource | null;
+  acMetadataCreator?: Person | KitsuResource;
   dcCreator?: Person | KitsuResource | null;
   managedAttributes?: Record<string, string | null | undefined>;
   derivatives?: PersistedResource<Derivative>[] | null;
