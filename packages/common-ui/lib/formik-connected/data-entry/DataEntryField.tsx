@@ -6,7 +6,6 @@ export interface DataEntryFieldProps {
   /** Name that will be passed down to DataBlock and FieldArray component. */
   name: string;
   readOnly?: boolean;
-  initialValues?: any;
   legend: JSX.Element;
   width?: string;
   isTemplate?: boolean;
@@ -17,7 +16,7 @@ export interface DataEntryFieldProps {
   isVocabularyBasedEnabledForBlock?: boolean;
   isVocabularyBasedEnabledForType?: boolean;
   blockOptionsEndpoint: string;
-  blockOptionsFilter?: string;
+  blockOptionsFilter?: { [field: string]: string };
   typeOptionsEndpoint?: string;
   unitOptionsEndpoint?: string;
 }

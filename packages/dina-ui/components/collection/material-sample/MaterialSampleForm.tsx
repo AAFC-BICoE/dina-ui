@@ -370,7 +370,9 @@ export function MaterialSampleForm({
             isTemplate={isTemplate}
             id={id}
             blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={"MATERIAL_SAMPLE"}
+            blockOptionsFilter={{
+              "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+            }}
           />
         </DinaFormSection>
       ),
