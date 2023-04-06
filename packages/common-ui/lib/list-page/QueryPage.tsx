@@ -48,6 +48,7 @@ import React from "react";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
 import { useLocalStorage } from "@rehooks/local-storage";
+import { DynamicFieldsMappingConfig } from "./query-builder/query-builder-core-components/QueryManagedAttributeSelector";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [
@@ -82,6 +83,15 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * `UserPreference.savedSearches.dina_material_sample_index.default.filters`
    */
   indexName: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping: DynamicFieldsMappingConfig;
 
   /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this
@@ -191,6 +201,7 @@ const GROUP_STORAGE_KEY = "groupStorage";
  */
 export function QueryPage<TData extends KitsuResource>({
   indexName,
+  dynamicFieldMapping,
   columns,
   bulkDeleteButtonProps,
   bulkEditPath,
@@ -240,10 +251,11 @@ export function QueryPage<TData extends KitsuResource>({
     useState<ImmutableTree>(defaultQueryTree());
 
   // The query builder configuration.
-  const { queryBuilderConfig } = useQueryBuilderConfig(
+  const { queryBuilderConfig } = useQueryBuilderConfig({
     indexName,
+    dynamicFieldMapping,
     customViewFields
-  );
+  });
 
   // Groups selected for the search.
   const [groups, setGroups] = useLocalStorage<string[]>(

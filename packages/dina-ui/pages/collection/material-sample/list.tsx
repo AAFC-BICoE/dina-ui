@@ -291,6 +291,23 @@ export default function MaterialSampleListPage() {
         </ButtonBar>
         <QueryPage
           indexName={"dina_material_sample_index"}
+          dynamicFieldMapping={{
+            fields: [
+              {
+                type: "MANAGED_ATTRIBUTE",
+                component: "MATERIAL_SAMPLE",
+                path: "data.attributes.managedAttribute"
+              }
+            ],
+            relationshipFields: [
+              {
+                type: "MANAGED_ATTRIBUTE",
+                component: "COLLECTING_EVENT",
+                path: "attributes.managedAttribute",
+                referencedBy: "collectingEvent"
+              }
+            ]
+          }}
           columns={columns}
           bulkDeleteButtonProps={{
             typeName: "material-sample",

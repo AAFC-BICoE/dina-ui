@@ -18,6 +18,7 @@ import { ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
+import { DynamicFieldsMappingConfig } from "./query-builder-core-components/QueryManagedAttributeSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
 import QueryBuilderBooleanSearch, {
@@ -129,15 +130,34 @@ export interface CustomViewField {
   type: string;
 }
 
+export interface UseQueryBuilderConfigProps {
+  indexName: string;
+
+  /**
+   * This is used to indicate to the QueryBuilder all the possible places for dynamic fields to
+   * be searched against. It will also define the path and data component if required.
+   *
+   * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
+   * or grouped terms.
+   */
+  dynamicFieldMapping: DynamicFieldsMappingConfig;
+
+  customViewFields?: CustomViewField[];
+}
+
 /**
  * Custom hook for generating the query builder hook. It should only be generated once.
  */
-export function useQueryBuilderConfig(
-  indexName: string,
-  customViewFields?: CustomViewField[]
-) {
+export function useQueryBuilderConfig({
+  indexName,
+  dynamicFieldMapping,
+  customViewFields
+}: UseQueryBuilderConfigProps) {
   // Load index map using the index name.
-  const { indexMap } = useIndexMapping(indexName);
+  const { indexMap } = useIndexMapping({
+    indexName,
+    dynamicFieldMapping
+  });
   const { formatMessage } = useIntl();
 
   const [queryBuilderConfig, setQueryBuilderConfig] = useState<Config>();
