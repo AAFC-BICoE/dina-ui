@@ -14,11 +14,10 @@ import {
 import { Button } from "react-bootstrap";
 import { FaTrash } from "react-icons/fa";
 import { useIntl } from "react-intl";
-import { ESIndexMapping } from "../types";
+import { DynamicFieldsMappingConfig, ESIndexMapping } from "../types";
 import { useIndexMapping } from "../useIndexMapping";
 import { QueryConjunctionSwitch } from "./query-builder-core-components/QueryConjunctionSwitch";
 import { QueryFieldSelector } from "./query-builder-core-components/QueryFieldSelector";
-import { DynamicFieldsMappingConfig } from "./query-builder-core-components/QueryManagedAttributeSelector";
 import { QueryOperatorSelector } from "./query-builder-core-components/QueryOperatorSelector";
 import { QueryBuilderAutoSuggestionTextSearchMemo } from "./query-builder-value-types/QueryBuilderAutoSuggestionSearch";
 import QueryBuilderBooleanSearch, {

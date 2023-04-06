@@ -294,14 +294,16 @@ export default function MaterialSampleListPage() {
           dynamicFieldMapping={{
             fields: [
               {
-                type: "MANAGED_ATTRIBUTE",
+                type: "managedAttribute",
+                label: "managedAttribute",
                 component: "MATERIAL_SAMPLE",
                 path: "data.attributes.managedAttribute"
               }
             ],
             relationshipFields: [
               {
-                type: "MANAGED_ATTRIBUTE",
+                type: "managedAttribute",
+                label: "managedAttribute",
                 component: "COLLECTING_EVENT",
                 path: "attributes.managedAttribute",
                 referencedBy: "collectingEvent"

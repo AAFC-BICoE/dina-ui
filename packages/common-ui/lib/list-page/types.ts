@@ -118,6 +118,11 @@ export interface ESIndexMapping {
    * Example: preparation-method
    */
   parentType?: string;
+
+  /**
+   * Only provided if it was added using a dynamic field config.
+   */
+  dynamicField?: DynamicField;
 }
 
 /**
@@ -162,4 +167,37 @@ export interface TransformToDSLProps {
    * The elastic search mapping for the field.
    */
   fieldInfo?: ESIndexMapping;
+}
+
+export type DynamicFieldType = "managedAttribute" | "fieldExtension";
+
+export interface DynamicFieldsMappingConfig {
+  /** Attribute level dynamic fields */
+  fields: DynamicField[];
+
+  /** Dynamic fields for relationships */
+  relationshipFields: RelationshipDynamicField[];
+}
+
+export interface DynamicField {
+  /**
+   * Option label that should be used.
+   */
+  label: string;
+
+  type: DynamicFieldType;
+
+  path: string;
+
+  /**
+   * Optional field to indicate which Managed Attributes or Field Extensions should be listed.
+   */
+  component?: string;
+}
+
+/**
+ * Configuration for where the Dynamic Field can be found within the relationship index mapping.
+ */
+export interface RelationshipDynamicField extends DynamicField {
+  referencedBy: string;
 }

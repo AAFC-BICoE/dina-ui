@@ -29,7 +29,7 @@ import { toPairs, uniqBy } from "lodash";
 import { FormikButton, useAccount } from "..";
 import { LoadingSpinner } from "../loading-spinner/LoadingSpinner";
 import { useEffect } from "react";
-import { TableColumn } from "./types";
+import { DynamicFieldsMappingConfig, TableColumn } from "./types";
 import { FormikContextType } from "formik";
 import { ImmutableTree, JsonTree, Utils } from "react-awesome-query-builder";
 import {
@@ -48,7 +48,6 @@ import React from "react";
 import { GroupSelectField } from "../../../dina-ui/components";
 import { useMemo } from "react";
 import { useLocalStorage } from "@rehooks/local-storage";
-import { DynamicFieldsMappingConfig } from "./query-builder/query-builder-core-components/QueryManagedAttributeSelector";
 
 const DEFAULT_PAGE_SIZE: number = 25;
 const DEFAULT_SORT: SortingRule[] = [

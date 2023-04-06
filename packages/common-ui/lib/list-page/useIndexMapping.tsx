@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useApiClient } from "..";
-import { DynamicFieldsMappingConfig } from "./query-builder/query-builder-core-components/QueryManagedAttributeSelector";
-import { ESIndexMapping } from "./types";
+import { DynamicFieldsMappingConfig, ESIndexMapping } from "./types";
 
 export interface UseIndexMappingProps {
   indexName: string;
@@ -24,7 +23,10 @@ export interface UseIndexMappingProps {
  *
  * @param indexName The index to retrieve. Example: `dina-material-sample-index`
  */
-export function useIndexMapping({ indexName }: UseIndexMappingProps) {
+export function useIndexMapping({
+  indexName,
+  dynamicFieldMapping
+}: UseIndexMappingProps) {
   const { apiClient } = useApiClient();
 
   // State to store the index map after it has been retrieved.
@@ -101,6 +103,33 @@ export function useIndexMapping({ indexName }: UseIndexMappingProps) {
           });
         });
       });
+
+      // Inject dynamic field mapping config into these.
+      dynamicFieldMapping.fields.forEach((fieldMapping) => {
+        result.push({
+          dynamicField: fieldMapping,
+          value: fieldMapping.path,
+          distinctTerm: false,
+          label: fieldMapping.label,
+          path: fieldMapping.path,
+          type: fieldMapping.type
+        });
+      });
+      dynamicFieldMapping.relationshipFields.forEach(
+        (relationshipFieldMapping) => {
+          result.push({
+            dynamicField: relationshipFieldMapping,
+            parentName: relationshipFieldMapping.referencedBy,
+            parentPath: relationshipFieldMapping.referencedBy,
+            value: relationshipFieldMapping.path,
+            distinctTerm: false,
+            label: relationshipFieldMapping.label,
+            path: relationshipFieldMapping.path,
+            type: relationshipFieldMapping.type
+          });
+        }
+      );
+
       return result;
     } catch (error) {
       return undefined;
