@@ -155,6 +155,7 @@ describe("SangerPcrBatchStep component", () => {
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: PCR_BATCH_NAME,
+      isCompleted: false,
       objective: "test-objective",
       storageUnit: {
         id: null,

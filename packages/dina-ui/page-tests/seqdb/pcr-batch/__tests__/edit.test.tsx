@@ -213,6 +213,7 @@ describe("PcrBatch edit page", () => {
           resource: {
             createdBy: "poffm",
             group: "cnc",
+            isCompleted: false,
             id: PCR_BATCH_UUID,
             name: "test pcr batch",
             primerForward: {
