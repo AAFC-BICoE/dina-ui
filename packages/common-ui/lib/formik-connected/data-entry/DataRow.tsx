@@ -110,13 +110,15 @@ export function DataRow({
               />
             </div>
 
-            <div
-              style={{
-                marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
-              }}
-            >
-              <Tooltip directText={typeTooltip} />
-            </div>
+            {typeTooltip !== "" ? (
+              <div
+                style={{
+                  marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
+                }}
+              >
+                <Tooltip directText={typeTooltip} />
+              </div>
+            ) : undefined}
           </div>
         )}
       </div>
