@@ -73,15 +73,12 @@ export function DataEntry({
           typeOptionsEndpoint,
           {}
         );
-        const options = data.map((rec) => {
-          return {
-            label:
-              rec.multilingualTitle?.titles?.find(
-                (item) => item.lang === locale
-              )?.title || "",
-            value: rec.id
-          };
-        });
+        const options = data.map((rec) => ({
+          label:
+            rec.multilingualTitle?.titles?.find((item) => item.lang === locale)
+              ?.title || "",
+          value: rec.id
+        }));
         setQueriedTypeOptions(options);
       }
     }
