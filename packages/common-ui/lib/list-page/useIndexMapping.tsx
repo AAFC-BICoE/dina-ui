@@ -62,9 +62,9 @@ export function useIndexMapping(indexName: string) {
 
             // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
-            prefixSupport: false,
-            infixSupport: false,
-            suffixSupport: false
+            prefixSupport: key?.fields?.includes("prefix") ?? false,
+            infixSupport: key?.fields?.includes("infix") ?? false,
+            suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
           });
         });
 
@@ -91,25 +91,15 @@ export function useIndexMapping(indexName: string) {
 
             // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
-            prefixSupport: false,
-            infixSupport: false,
-            suffixSupport: false
+            prefixSupport:
+              relationshipAttribute?.fields?.includes("prefix") ?? false,
+            infixSupport:
+              relationshipAttribute?.fields?.includes("infix") ?? false,
+            suffixSupport:
+              relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
           });
         });
       });
-
-      // Hard code the Material Sample Name field for testing purposes.
-      const materialSampleNameIndex = result.findIndex(
-        (fieldMapping) => fieldMapping.label === "materialSampleName"
-      );
-      if (materialSampleNameIndex >= 0) {
-        const fieldMapping = result[materialSampleNameIndex];
-
-        // Update the properties of the fieldMapping object
-        fieldMapping.prefixSupport = true;
-        fieldMapping.infixSupport = true;
-        fieldMapping.suffixSupport = true;
-      }
 
       return result;
     } catch (error) {
