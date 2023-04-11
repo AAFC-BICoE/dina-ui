@@ -35,7 +35,7 @@ export function useIndexMapping(indexName: string) {
   async function fetchQueryFieldsByIndex(searchIndexName) {
     try {
       const resp = await apiClient.axios.get("search-api/search-ws/mapping", {
-        params: { indexName: searchIndexName },
+        params: { indexName: searchIndexName }
       });
 
       const result: ESIndexMapping[] = [];
@@ -59,7 +59,12 @@ export function useIndexMapping(indexName: string) {
               : key.name,
             type: key.type,
             path: key.path,
+
+            // Additional options for the field:
             distinctTerm: key.distinct_term_agg,
+            prefixSupport: false,
+            infixSupport: false,
+            suffixSupport: false
           });
         });
 
@@ -83,10 +88,29 @@ export function useIndexMapping(indexName: string) {
             parentName: relationship.referencedBy,
             parentType: relationship.value,
             parentPath: relationship.path,
+
+            // Additional options for the field:
             distinctTerm: relationshipAttribute.distinct_term_agg,
+            prefixSupport: false,
+            infixSupport: false,
+            suffixSupport: false
           });
         });
       });
+
+      // Hard code the Material Sample Name field for testing purposes.
+      const materialSampleNameIndex = result.findIndex(
+        (fieldMapping) => fieldMapping.label === "materialSampleName"
+      );
+      if (materialSampleNameIndex >= 0) {
+        const fieldMapping = result[materialSampleNameIndex];
+
+        // Update the properties of the fieldMapping object
+        fieldMapping.prefixSupport = true;
+        fieldMapping.infixSupport = true;
+        fieldMapping.suffixSupport = true;
+      }
+
       return result;
     } catch (error) {
       return undefined;

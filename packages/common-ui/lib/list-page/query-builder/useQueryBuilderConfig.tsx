@@ -30,7 +30,6 @@ import QueryBuilderDateSearch, {
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
-import QueryBuilderNgramsSearch from "./query-builder-value-types/QueryBuilderNgramsSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
@@ -195,10 +194,6 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_prefix" }),
       cardinality: 1
     },
-    infix: {
-      label: formatMessage({ id: "queryBuilder_operator_infix" }),
-      cardinality: 1
-    },
     suffix: {
       label: formatMessage({ id: "queryBuilder_operator_suffix" }),
       cardinality: 1
@@ -294,20 +289,6 @@ function generateBuilderConfig(
         });
       }
     },
-    // Type that supports prefix, infix and suffix matching.
-    partialMatchText: {
-      ...BasicConfig.widgets.text,
-      type: "partialMatchText",
-      valueSrc: "value",
-      factory: (factoryProps) => (
-        <QueryBuilderNgramsSearch
-          matchType={factoryProps?.operator}
-          value={factoryProps?.value}
-          setValue={factoryProps?.setValue}
-        />
-      )
-      // Add elastic search format values.
-    },
     // UUID is a special type used for custom views.
     uuid: {
       ...BasicConfig.widgets.text,
@@ -397,6 +378,9 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "partialMatch",
+            "prefix", // Only displayed if supported on the mapping.
+            "contains", // Only displayed if supported on the mapping.
+            "suffix", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
             "notEmpty"
@@ -410,23 +394,6 @@ function generateBuilderConfig(
       widgets: {
         autoComplete: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
-        }
-      }
-    },
-    partialMatchText: {
-      valueSources: ["value"],
-      defaultOperator: "equals",
-      widgets: {
-        partialMatchText: {
-          operators: [
-            "equals",
-            "prefix",
-            "infix",
-            "suffix",
-            "notEquals",
-            "empty",
-            "notEmpty"
-          ]
         }
       }
     },
@@ -533,13 +500,22 @@ function generateBuilderConfig(
         setField={fieldDropdownProps?.setField}
       />
     ),
-    renderOperator: (operatorDropdownProps) => (
-      <QueryOperatorSelector
-        options={operatorDropdownProps?.items}
-        selectedOperator={operatorDropdownProps?.selectedKey ?? ""}
-        setOperator={operatorDropdownProps?.setField}
-      />
-    ),
+    renderOperator: (operatorDropdownProps) => {
+      const indexSettings = fieldValueToIndexSettings(
+        (operatorDropdownProps as any)?.fieldConfig?.fieldSettings?.mapping
+          ?.value,
+        indexMap
+      );
+
+      return (
+        <QueryOperatorSelector
+          options={operatorDropdownProps?.items}
+          selectedOperator={operatorDropdownProps?.selectedKey ?? ""}
+          setOperator={operatorDropdownProps?.setField}
+          selectedFieldMapping={indexSettings}
+        />
+      );
+    },
     renderConjs: (conjunctionProps) => (
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
@@ -584,6 +560,7 @@ function generateBuilderConfig(
         type,
         valueSources: ["value"],
         fieldSettings: {
+          mapping: indexItem,
           validateValue: (value, _fieldSettings) =>
             validateField(value, type, formatMessage)
         }

@@ -35,10 +35,7 @@ export default function QueryRowTextSearch({
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      {(matchType === "equals" ||
-        matchType === "exactMatch" ||
-        matchType === "partialMatch" ||
-        matchType === "notEquals") && (
+      {matchType !== "empty" && matchType !== "notEmpty" && (
         <input
           type="text"
           value={value ?? ""}
@@ -251,22 +248,8 @@ export function transformTextSearchToDSL({
             }
           };
 
-    // Default case
+    // Unsupported case.
     default:
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [
-                    matchQuery(fieldPath, value),
-                    includedTypeQuery(parentType)
-                  ]
-                }
-              }
-            }
-          }
-        : matchQuery(fieldPath, value);
+      throw new Error("Unsupported operation for the text widget.");
   }
 }
