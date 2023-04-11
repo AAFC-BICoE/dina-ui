@@ -30,6 +30,7 @@ import QueryBuilderDateSearch, {
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
+import QueryBuilderNgramsSearch from "./query-builder-value-types/QueryBuilderNgramsSearch";
 import QueryBuilderTextSearch, {
   transformTextSearchToDSL
 } from "./query-builder-value-types/QueryBuilderTextSearch";
@@ -190,6 +191,18 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
+    prefix: {
+      label: formatMessage({ id: "queryBuilder_operator_prefix" }),
+      cardinality: 1
+    },
+    infix: {
+      label: formatMessage({ id: "queryBuilder_operator_infix" }),
+      cardinality: 1
+    },
+    suffix: {
+      label: formatMessage({ id: "queryBuilder_operator_suffix" }),
+      cardinality: 1
+    },
     equals: {
       label: formatMessage({ id: "queryBuilder_operator_equals" }),
       cardinality: 1
@@ -280,6 +293,20 @@ function generateBuilderConfig(
           fieldInfo: indexSettings
         });
       }
+    },
+    // Type that supports prefix, infix and suffix matching.
+    partialMatchText: {
+      ...BasicConfig.widgets.text,
+      type: "partialMatchText",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderNgramsSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
+      // Add elastic search format values.
     },
     // UUID is a special type used for custom views.
     uuid: {
@@ -383,6 +410,23 @@ function generateBuilderConfig(
       widgets: {
         autoComplete: {
           operators: ["equals", "notEquals", "empty", "notEmpty"]
+        }
+      }
+    },
+    partialMatchText: {
+      valueSources: ["value"],
+      defaultOperator: "equals",
+      widgets: {
+        partialMatchText: {
+          operators: [
+            "equals",
+            "prefix",
+            "infix",
+            "suffix",
+            "notEquals",
+            "empty",
+            "notEmpty"
+          ]
         }
       }
     },
