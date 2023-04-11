@@ -12,7 +12,7 @@ import {
   PersonSelectField,
   TagsAndRestrictionsSection
 } from "../..";
-import { ManagedAttributesEditor } from "../managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import { MetadataFileView } from "./MetadataFileView";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
