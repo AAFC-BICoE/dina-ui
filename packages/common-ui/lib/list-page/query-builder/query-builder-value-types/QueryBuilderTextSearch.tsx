@@ -3,7 +3,10 @@ import {
   includedTypeQuery,
   matchQuery,
   termQuery,
-  existsQuery
+  existsQuery,
+  prefixQuery,
+  suffixQuery,
+  infixQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
@@ -93,6 +96,18 @@ export function transformTextSearchToDSL({
         : isExactMatch
         ? termQuery(fieldPath, value, true)
         : matchQuery(fieldPath, value);
+
+    // Prefix partial match
+    case "prefix":
+      return prefixQuery(fieldPath, value, parentType);
+
+    // Infix partial match
+    case "contains":
+      return infixQuery(fieldPath, value, parentType);
+
+    // Suffix partial match
+    case "suffix":
+      return suffixQuery(fieldPath, value, parentType);
 
     // Not equals match type.
     case "notEquals":

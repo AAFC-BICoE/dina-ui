@@ -408,3 +408,110 @@ export function rangeQuery(fieldName: string, rangeOptions: any): any {
     }
   };
 }
+
+// Query used for prefix partial matches
+export function prefixQuery(
+  fieldName: string,
+  matchValue: any,
+  parentType: string | undefined
+): any {
+  // Lowercase the matchValue here, if it's a string.
+  if (typeof matchValue === "string") {
+    matchValue = matchValue.toLowerCase();
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  prefix: {
+                    [fieldName + ".prefix"]: matchValue
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        prefix: {
+          [fieldName + ".prefix"]: matchValue
+        }
+      };
+}
+
+// Query used for infix partial matches.
+export function infixQuery(
+  fieldName: string,
+  matchValue: any,
+  parentType: string | undefined
+): any {
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  match: {
+                    [fieldName + ".infix"]: {
+                      query: matchValue
+                    }
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        match: {
+          [fieldName + ".infix"]: {
+            query: matchValue
+          }
+        }
+      };
+}
+
+// Query used for suffix partial matches
+export function suffixQuery(
+  fieldName: string,
+  matchValue: any,
+  parentType: string | undefined
+): any {
+  // Reverse and lowercase the matchValue here, if it's a string.
+  if (typeof matchValue === "string") {
+    matchValue = matchValue.split("").reverse().join("").toLowerCase();
+  }
+
+  return parentType
+    ? {
+        nested: {
+          path: "included",
+          query: {
+            bool: {
+              must: [
+                {
+                  prefix: {
+                    [fieldName + ".prefix_reverse"]: matchValue
+                  }
+                },
+                includedTypeQuery(parentType)
+              ]
+            }
+          }
+        }
+      }
+    : {
+        prefix: {
+          [fieldName + ".prefix_reverse"]: matchValue
+        }
+      };
+}
