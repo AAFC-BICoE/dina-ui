@@ -1,5 +1,105 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions infixQuery attribute 1`] = `
+Object {
+  "match": Object {
+    "data.attribute.materialSampleName.infix": Object {
+      "query": "searchValue",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions infixQuery relationship 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "match": Object {
+              "included.attributes.dwcRecordNumber.infix": Object {
+                "query": "searchValue",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery attribute 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName.prefix": "searchvalue",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions prefixQuery relationship 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber.prefix": "searchvalue",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions suffixQuery attribute 1`] = `
+Object {
+  "prefix": Object {
+    "data.attribute.materialSampleName.prefix_reverse": "eulavhcraes",
+  },
+}
+`;
+
+exports[`QueryBuilderElasticSearchExport functionality Partial matching query helper functions suffixQuery relationship 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.dwcRecordNumber.prefix_reverse": "eulavhcraes",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collecting-event",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderElasticSearchExport functionality Query helper functions existsQuery 1`] = `
 Object {
   "exists": Object {

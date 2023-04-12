@@ -1,5 +1,5 @@
 import { KitsuResource } from "kitsu";
-import { uniq } from "lodash";
+import { uniq, reject, isEmpty } from "lodash";
 import { Config, ImmutableTree } from "react-awesome-query-builder";
 import { SortingRule } from "react-table";
 import { TableColumn } from "../../types";
@@ -139,10 +139,11 @@ function buildEsGroup(
   if (!result.length) return undefined;
 
   const resultFlat = result.flat(Infinity);
+  const compactedResult = reject(resultFlat, isEmpty);
 
   return {
     bool: {
-      [conjunctionTerm]: resultFlat
+      [conjunctionTerm]: compactedResult
     }
   };
 }
@@ -415,6 +416,10 @@ export function prefixQuery(
   matchValue: any,
   parentType: string | undefined
 ): any {
+  if (matchValue === "") {
+    return {};
+  }
+
   // Lowercase the matchValue here, if it's a string.
   if (typeof matchValue === "string") {
     matchValue = matchValue.toLowerCase();
@@ -451,6 +456,10 @@ export function infixQuery(
   matchValue: any,
   parentType: string | undefined
 ): any {
+  if (matchValue === "") {
+    return {};
+  }
+
   return parentType
     ? {
         nested: {
@@ -486,6 +495,10 @@ export function suffixQuery(
   matchValue: any,
   parentType: string | undefined
 ): any {
+  if (matchValue === "") {
+    return {};
+  }
+
   // Reverse and lowercase the matchValue here, if it's a string.
   if (typeof matchValue === "string") {
     matchValue = matchValue.split("").reverse().join("").toLowerCase();
