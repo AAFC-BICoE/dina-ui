@@ -90,7 +90,7 @@ export interface QueryPageProps<TData extends KitsuResource> {
    * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
    * or grouped terms.
    */
-  dynamicFieldMapping: DynamicFieldsMappingConfig;
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   /**
    * By default, the QueryPage will try sorting using `createdOn` attribute. You can override this

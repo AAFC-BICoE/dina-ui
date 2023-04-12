@@ -12,7 +12,7 @@ export interface UseIndexMappingProps {
    * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
    * or grouped terms.
    */
-  dynamicFieldMapping: DynamicFieldsMappingConfig;
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
 }
 
 /**
@@ -105,30 +105,32 @@ export function useIndexMapping({
       });
 
       // Inject dynamic field mapping config into these.
-      dynamicFieldMapping.fields.forEach((fieldMapping) => {
-        result.push({
-          dynamicField: fieldMapping,
-          value: fieldMapping.path,
-          distinctTerm: false,
-          label: fieldMapping.label,
-          path: fieldMapping.path,
-          type: fieldMapping.type
-        });
-      });
-      dynamicFieldMapping.relationshipFields.forEach(
-        (relationshipFieldMapping) => {
+      if (dynamicFieldMapping) {
+        dynamicFieldMapping.fields.forEach((fieldMapping) => {
           result.push({
-            dynamicField: relationshipFieldMapping,
-            parentName: relationshipFieldMapping.referencedBy,
-            parentPath: relationshipFieldMapping.referencedBy,
-            value: relationshipFieldMapping.path,
+            dynamicField: fieldMapping,
+            value: fieldMapping.path,
             distinctTerm: false,
-            label: relationshipFieldMapping.label,
-            path: relationshipFieldMapping.path,
-            type: relationshipFieldMapping.type
+            label: fieldMapping.label,
+            path: fieldMapping.path,
+            type: fieldMapping.type
           });
-        }
-      );
+        });
+        dynamicFieldMapping.relationshipFields.forEach(
+          (relationshipFieldMapping) => {
+            result.push({
+              dynamicField: relationshipFieldMapping,
+              parentName: relationshipFieldMapping.referencedBy,
+              parentPath: relationshipFieldMapping.referencedBy,
+              value: relationshipFieldMapping.path,
+              distinctTerm: false,
+              label: relationshipFieldMapping.label,
+              path: relationshipFieldMapping.path,
+              type: relationshipFieldMapping.type
+            });
+          }
+        );
+      }
 
       return result;
     } catch (error) {

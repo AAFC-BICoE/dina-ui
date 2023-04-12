@@ -81,6 +81,7 @@ function getQueryBuilderTypeFromIndexType(
     case "text":
     case "date":
     case "boolean":
+    case "managedAttribute":
       return type;
 
     // Elastic search contains many different number fields.
@@ -139,7 +140,7 @@ export interface UseQueryBuilderConfigProps {
    * Dynamic fields are like Managed Attributes or Field Extensions where they are provided by users
    * or grouped terms.
    */
-  dynamicFieldMapping: DynamicFieldsMappingConfig;
+  dynamicFieldMapping?: DynamicFieldsMappingConfig;
 
   customViewFields?: CustomViewField[];
 }
@@ -377,6 +378,19 @@ function generateBuilderConfig(
           fieldInfo: indexSettings
         });
       }
+    },
+    managedAttribute: {
+      ...BasicConfig.widgets.text,
+      type: "managedAttribute",
+      valueSrc: "value",
+      factory: (factoryProps) => (
+        <QueryBuilderTextSearch
+          matchType={factoryProps?.operator}
+          value={factoryProps?.value}
+          setValue={factoryProps?.setValue}
+        />
+      )
+      // TODO: Add elastic search query.
     }
   };
 
@@ -464,6 +478,21 @@ function generateBuilderConfig(
       widgets: {
         boolean: {
           operators: ["equals", "empty", "notEmpty"]
+        }
+      }
+    },
+    managedAttribute: {
+      valueSources: ["value"],
+      defaultOperator: "equals",
+      widgets: {
+        boolean: {
+          operators: [
+            "exactMatch",
+            "partialMatch",
+            "notEquals",
+            "empty",
+            "notEmpty"
+          ]
         }
       }
     }
