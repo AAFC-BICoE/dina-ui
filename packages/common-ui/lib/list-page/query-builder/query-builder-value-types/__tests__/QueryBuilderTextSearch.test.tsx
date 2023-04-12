@@ -96,6 +96,171 @@ describe("QueryBuilderTextSearch", () => {
       });
     });
 
+    describe("Prefix operation", () => {
+      test("With relationship as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "prefix",
+            value: "text search",
+            fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
+              parentType: "collection",
+              parentPath: "included",
+              distinctTerm: true
+            } as any,
+            fieldPath: "included.attributes.name",
+            queryType: "prefix"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "prefix",
+            value: "text",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName"
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "prefix"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "prefix",
+            value: "text search",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "prefix"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("Contains (Infix) operation", () => {
+      test("With relationship as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "contains",
+            value: "text search",
+            fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
+              parentType: "collection",
+              parentPath: "included",
+              distinctTerm: true
+            } as any,
+            fieldPath: "included.attributes.name",
+            queryType: "contains"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "contains",
+            value: "text",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName"
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "contains"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "contains",
+            value: "text search",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "contains"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
+    describe("Suffix operation", () => {
+      test("With relationship as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "suffix",
+            value: "text search",
+            fieldInfo: {
+              label: "name",
+              value: "collection.name",
+              type: "text",
+              path: "attributes",
+              parentName: "collection",
+              parentType: "collection",
+              parentPath: "included",
+              distinctTerm: true
+            } as any,
+            fieldPath: "included.attributes.name",
+            queryType: "suffix"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("With relationship containing complex path as field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "suffix",
+            value: "text",
+            fieldInfo: {
+              label: "determination.scientificName",
+              parentName: "organism",
+              parentPath: "included",
+              parentType: "organism",
+              path: "attributes.determination",
+              type: "text",
+              value: "organism.determination.scientificName"
+            } as any,
+            fieldPath: "included.attributes.determination.scientificName",
+            queryType: "suffix"
+          })
+        ).toMatchSnapshot();
+      });
+
+      test("Normal field", async () => {
+        expect(
+          transformTextSearchToDSL({
+            operation: "suffix",
+            value: "text search",
+            fieldInfo: {} as any,
+            fieldPath: "data.attributes.textField",
+            queryType: "suffix"
+          })
+        ).toMatchSnapshot();
+      });
+    });
+
     describe("Partial Match operation", () => {
       test("With relationship as field", async () => {
         expect(
