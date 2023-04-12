@@ -114,21 +114,22 @@ export function SangerPcrReactionStep({
         id,
         value: results[id]
       }));
-
-      // Using the results, generate the operations.
-      const operations = resultsWithId.map<Operation>((result) => ({
-        op: "PATCH",
-        path: "pcr-batch-item/" + result.id,
-        value: {
-          id: result.id,
-          type: "pcr-batch-item",
-          attributes: {
-            result: result.value
+      if (resultsWithId.length > 0) {
+        // Using the results, generate the operations.
+        const operations = resultsWithId.map<Operation>((result) => ({
+          op: "PATCH",
+          path: "pcr-batch-item/" + result.id,
+          value: {
+            id: result.id,
+            type: "pcr-batch-item",
+            attributes: {
+              result: result.value
+            }
           }
-        }
-      }));
+        }));
 
-      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+        await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+      }
     }
 
     // Leave edit mode...
