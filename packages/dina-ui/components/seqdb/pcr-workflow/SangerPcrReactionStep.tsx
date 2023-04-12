@@ -25,7 +25,7 @@ export interface SangerPcrReactionProps {
   editMode: boolean;
   setEditMode?: (newValue: boolean) => void;
   performSave: boolean;
-  setPerformSave: (newValue: boolean) => void;
+  setPerformSave?: (newValue: boolean) => void;
 }
 
 export function SangerPcrReactionStep({
@@ -132,7 +132,9 @@ export function SangerPcrReactionStep({
     }
 
     // Leave edit mode...
-    setPerformSave(false);
+    if (!!setPerformSave) {
+      setPerformSave(false);
+    }
     if (!!setEditMode) {
       setEditMode(false);
     }

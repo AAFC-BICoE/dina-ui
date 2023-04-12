@@ -217,7 +217,7 @@ interface LoadExternalDataForPcrBatchFormProps {
   dinaFormProps: DinaFormProps<PcrBatch>;
   buttonBar?: ReactNode;
   performSave: boolean;
-  setPerformSave: (newValue: boolean) => void;
+  setPerformSave?: (newValue: boolean) => void;
 }
 
 export function LoadExternalDataForPcrBatchForm({
@@ -273,7 +273,7 @@ export function LoadExternalDataForPcrBatchForm({
 
 interface PcrBatchFormFieldsProps {
   performSave: boolean;
-  setPerformSave: (newValue: boolean) => void;
+  setPerformSave?: (newValue: boolean) => void;
 }
 
 /** Re-usable field layout between edit and view pages. */
