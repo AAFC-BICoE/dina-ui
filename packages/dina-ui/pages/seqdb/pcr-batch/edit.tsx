@@ -5,6 +5,7 @@ import {
   DinaForm,
   DinaFormProps,
   DinaFormSubmitParams,
+  FieldSet,
   filterBy,
   LoadingSpinner,
   ResourceSelectField,
@@ -23,8 +24,8 @@ import {
   StorageUnitType,
   StorageUnit,
   Protocol
-} from "packages/dina-ui/types/collection-api";
-import { ReactNode } from "react";
+} from "../../../types/collection-api";
+import { ReactNode, useState } from "react";
 import {
   AttachmentsField,
   GroupSelectField,
@@ -43,6 +44,7 @@ import {
   Region
 } from "../../../types/seqdb-api";
 import { cloneDeep } from "lodash";
+import { SangerPcrReactionStep } from "../../../components/seqdb/pcr-workflow/SangerPcrReactionStep";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -108,6 +110,7 @@ export function PcrBatchForm({
   readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
+  const [performSave, setPerformSave] = useState<boolean>(false);
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -119,6 +122,7 @@ export function PcrBatchForm({
     submittedValues,
     api: { save }
   }: DinaFormSubmitParams<PcrBatch>) {
+    setPerformSave(true);
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -203,6 +207,8 @@ export function PcrBatchForm({
         readOnly: readOnlyOverride
       }}
       buttonBar={buttonBar as any}
+      performSave={performSave}
+      setPerformSave={setPerformSave}
     />
   );
 }
@@ -210,11 +216,15 @@ export function PcrBatchForm({
 interface LoadExternalDataForPcrBatchFormProps {
   dinaFormProps: DinaFormProps<PcrBatch>;
   buttonBar?: ReactNode;
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
 }
 
 export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
-  buttonBar
+  buttonBar,
+  performSave,
+  setPerformSave
 }: LoadExternalDataForPcrBatchFormProps) {
   // Create a copy of the initial value so we don't change the prop version.
   const initialValues = cloneDeep(dinaFormProps.initialValues);
@@ -253,13 +263,24 @@ export function LoadExternalDataForPcrBatchForm({
       initialValues={initialValues}
     >
       {buttonBar}
-      <PcrBatchFormFields />
+      <PcrBatchFormFields
+        performSave={performSave}
+        setPerformSave={setPerformSave}
+      />
     </DinaForm>
   ));
 }
 
+interface PcrBatchFormFieldsProps {
+  performSave: boolean;
+  setPerformSave: (newValue: boolean) => void;
+}
+
 /** Re-usable field layout between edit and view pages. */
-export function PcrBatchFormFields() {
+function PcrBatchFormFields({
+  performSave,
+  setPerformSave
+}: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
 
@@ -385,6 +406,16 @@ export function PcrBatchFormFields() {
           restrictedFieldValue={values?.storageUnitType?.id}
         />
       </div>
+      {initialValues.id ? (
+        <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
+          <SangerPcrReactionStep
+            pcrBatchId={initialValues.id}
+            editMode={!readOnly}
+            performSave={performSave}
+            setPerformSave={setPerformSave}
+          />
+        </FieldSet>
+      ) : undefined}
       <AttachmentsField
         name="attachment"
         attachmentPath={`seqdb-api/pcr-batch/${initialValues.id}/attachment`}

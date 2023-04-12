@@ -23,7 +23,7 @@ import { getScientificNames } from "../../collection/material-sample/organismUti
 export interface SangerPcrReactionProps {
   pcrBatchId: string;
   editMode: boolean;
-  setEditMode: (newValue: boolean) => void;
+  setEditMode?: (newValue: boolean) => void;
   performSave: boolean;
   setPerformSave: (newValue: boolean) => void;
 }
@@ -56,19 +56,21 @@ export function SangerPcrReactionStep({
   useEffect(() => {
     if (selectedResources.length !== 0) {
       fetchMaterialSamples();
+    } else {
+      setLoading(false);
     }
   }, [selectedResources]);
 
   // Check if a save was requested from the top level button bar.
   useEffect(() => {
-    if (performSave) {
+    if (performSave && !!pcrBatchId) {
       performSaveInternal();
     }
   }, [performSave]);
 
-  async function fetchPcrBatchItems() {
-    await apiClient
-      .get<PcrBatchItem[]>("/seqdb-api/pcr-batch-item", {
+  function fetchPcrBatchItems() {
+    apiClient
+      .get<PcrBatchItem[]>("seqdb-api/pcr-batch-item", {
         filter: filterBy([], {
           extraFilters: [
             {
@@ -89,10 +91,10 @@ export function SangerPcrReactionStep({
       });
   }
 
-  async function fetchMaterialSamples() {
+  function fetchMaterialSamples() {
     if (!selectedResources) return;
 
-    await bulkGet<MaterialSample>(
+    bulkGet<MaterialSample>(
       selectedResources.map(
         (item) =>
           "/material-sample/" + item?.materialSample?.id + "?include=organism"
@@ -131,7 +133,9 @@ export function SangerPcrReactionStep({
 
     // Leave edit mode...
     setPerformSave(false);
-    setEditMode(false);
+    if (!!setEditMode) {
+      setEditMode(false);
+    }
   }
 
   const PCR_REACTION_COLUMN: Column<PcrBatchItem>[] = [
