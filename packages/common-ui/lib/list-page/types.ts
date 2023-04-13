@@ -211,6 +211,13 @@ export interface DynamicField {
   path: string;
 
   /**
+   * Endpoint where these dynamic fields can be retrieved to list.
+   *
+   * Example: "collection-api/managed-attribute"
+   */
+  apiEndpoint: string;
+
+  /**
    * Optional field to indicate which Managed Attributes or Field Extensions should be listed.
    */
   component?: string;

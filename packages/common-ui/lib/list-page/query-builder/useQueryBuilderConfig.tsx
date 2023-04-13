@@ -403,6 +403,10 @@ function generateBuilderConfig(
         <QueryRowManagedAttributeSearch
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
+          managedAttributeConfig={
+            (factoryProps?.fieldDefinition?.fieldSettings as any)
+              ?.mapping as ESIndexMapping
+          }
         />
       ),
       elasticSearchFormatValue: (queryType, val, op, field, _config) => {

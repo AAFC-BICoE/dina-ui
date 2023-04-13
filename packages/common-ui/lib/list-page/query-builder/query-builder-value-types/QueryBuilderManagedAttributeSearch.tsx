@@ -5,10 +5,12 @@ import {
   termQuery,
   existsQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
-import { TransformToDSLProps } from "../../types";
+import { TransformToDSLProps, ESIndexMapping } from "../../types";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { useEffect } from "react";
+import { LoadingSpinner, useQuery } from "common-ui";
+import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
 
 interface QueryRowTextSearchProps {
   /**
@@ -20,6 +22,12 @@ interface QueryRowTextSearchProps {
    * Pass the selected value to the Query Builder to store.
    */
   setValue?: (fieldPath: string) => void;
+
+  /**
+   * Managed attribute field settings. This is passed to the QueryPage from the Dynamic Mapping
+   * config and will be used to determine what endpoint to use to retrieve the managed attributes.
+   */
+  managedAttributeConfig?: ESIndexMapping;
 }
 
 export interface ManagedAttributeSearchStates {
@@ -35,9 +43,12 @@ export interface ManagedAttributeSearchStates {
 
 export default function QueryRowManagedAttributeSearch({
   value,
-  setValue
+  setValue,
+  managedAttributeConfig
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
+
+  const [managedAttributeOptions, setManagedAttributeOptions] = useState();
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -63,6 +74,21 @@ export default function QueryRowManagedAttributeSearch({
       setManagedAttributeState(JSON.parse(value));
     }
   }, [value]);
+
+  const query = useQuery<ManagedAttribute[]>(
+    {
+      path: managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""
+    },
+    {
+      // onSuccess: ({ data }) => {},
+      disabled: managedAttributeConfig?.dynamicField === undefined
+    }
+  );
+
+  // If loading, just render a spinner.
+  if (query.loading) {
+    return <LoadingSpinner loading={true} />;
+  }
 
   return (
     <div className="d-flex">

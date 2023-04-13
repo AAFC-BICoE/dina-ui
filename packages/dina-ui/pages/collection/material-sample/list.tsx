@@ -297,7 +297,8 @@ export default function MaterialSampleListPage() {
                 type: "managedAttribute",
                 label: "managedAttribute",
                 component: "MATERIAL_SAMPLE",
-                path: "data.attributes.managedAttribute"
+                path: "data.attributes.managedAttribute",
+                apiEndpoint: "collection-api/managed-attribute"
               }
             ],
             relationshipFields: [
@@ -306,7 +307,8 @@ export default function MaterialSampleListPage() {
                 label: "managedAttribute",
                 component: "COLLECTING_EVENT",
                 path: "attributes.managedAttribute",
-                referencedBy: "collectingEvent"
+                referencedBy: "collectingEvent",
+                apiEndpoint: "collection-api/managed-attribute"
               }
             ]
           }}
