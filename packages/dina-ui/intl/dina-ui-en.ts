@@ -116,7 +116,7 @@ export const DINAUI_MESSAGES_ENGLISH = {
   collectingEventManagedAttributes: "Collecting Event Managed Attributes",
   collectingLocationLegend: "Collecting Location",
   collection: "Collection",
-  collectionListTitle: "Collections",
+  collectionListTitle: "Collection",
   collectionManagedAttributeListTitle: "Collection Module Managed Attributes",
   collectionMethodListTitle: "Collection Method",
   collectionMethodNameLabel: "Collection Method Name",
