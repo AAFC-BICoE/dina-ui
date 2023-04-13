@@ -7,10 +7,7 @@ export default function PcrBatchDetailsPage() {
   return (
     <ViewPageLayout<PcrBatch>
       form={(props) => (
-        <LoadExternalDataForPcrBatchForm
-          dinaFormProps={{ ...props }}
-          performSave={false}
-        />
+        <LoadExternalDataForPcrBatchForm dinaFormProps={{ ...props }} />
       )}
       customQueryHook={(id) => usePcrBatchQuery(id)}
       entityLink="/seqdb/pcr-batch"
