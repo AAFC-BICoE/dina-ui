@@ -8,23 +8,25 @@ import {
   FieldSet,
   filterBy,
   LoadingSpinner,
+  Operation,
   ResourceSelectField,
   SubmitButton,
   TextField,
   useAccount,
+  useApiClient,
   useDinaFormContext,
   useQuery,
   withResponse,
   withResponseOrDisabled
 } from "common-ui";
+import { connect, useFormikContext } from "formik";
 import { PersistedResource } from "kitsu";
-import { useFormikContext, connect } from "formik";
+import { assign, cloneDeep } from "lodash";
 import { useRouter } from "next/router";
 import {
-  StorageUnitType,
-  StorageUnit,
-  Protocol
-} from "../../../types/collection-api";
+  PcrReactionTable,
+  usePcrReactionData
+} from "packages/dina-ui/components/seqdb/pcr-workflow/PcrReactionTable";
 import { ReactNode, useState } from "react";
 import {
   AttachmentsField,
@@ -38,13 +40,18 @@ import { DinaMessage } from "../../../intl/dina-ui-intl";
 import { SeqdbMessage, useSeqdbIntl } from "../../../intl/seqdb-intl";
 import { Person } from "../../../types/agent-api";
 import {
+  MaterialSample,
+  Protocol,
+  StorageUnit,
+  StorageUnitType
+} from "../../../types/collection-api";
+import {
   PcrBatch,
+  PcrBatchItem,
   PcrPrimer,
-  ThermocyclerProfile,
-  Region
+  Region,
+  ThermocyclerProfile
 } from "../../../types/seqdb-api";
-import { cloneDeep } from "lodash";
-import { SangerPcrReactionStep } from "../../../components/seqdb/pcr-workflow/SangerPcrReactionStep";
 
 export function usePcrBatchQuery(id?: string, deps?: any[]) {
   return useQuery<PcrBatch>(
@@ -93,6 +100,7 @@ export default function PcrBatchEditPage() {
 
 export interface PcrBatchFormProps {
   pcrBatch?: PersistedResource<PcrBatch>;
+  results?: { [key: string]: string };
   onSaved: (resource: PersistedResource<PcrBatch>) => Promise<void>;
   buttonBar?: ReactNode;
   readOnlyOverride?: boolean;
@@ -110,7 +118,7 @@ export function PcrBatchForm({
   readOnlyOverride
 }: PcrBatchFormProps) {
   const { username } = useAccount();
-  const [performSave, setPerformSave] = useState<boolean>(false);
+  const { doOperations } = useApiClient();
 
   const initialValues = pcrBatch || {
     // TODO let the back-end set this:
@@ -118,11 +126,37 @@ export function PcrBatchForm({
     type: "pcr-batch"
   };
 
+  async function savePcrReactionResults(submittedValues: any) {
+    const results = submittedValues.results;
+    delete submittedValues.results;
+
+    const resultsWithId = Object.keys(results).map((id) => ({
+      id,
+      value: results[id]
+    }));
+    if (resultsWithId.length > 0) {
+      // Using the results, generate the operations.
+      const operations = resultsWithId.map<Operation>((result) => ({
+        op: "PATCH",
+        path: "pcr-batch-item/" + result.id,
+        value: {
+          id: result.id,
+          type: "pcr-batch-item",
+          attributes: {
+            result: result.value
+          }
+        }
+      }));
+
+      await doOperations(operations, { apiBaseUrl: "/seqdb-api" });
+    }
+  }
+
   async function onSubmit({
     submittedValues,
     api: { save }
-  }: DinaFormSubmitParams<PcrBatch>) {
-    setPerformSave(true);
+  }: DinaFormSubmitParams<PcrBatch & { [key: string]: string }>) {
+    savePcrReactionResults(submittedValues);
     // Init relationships object for one-to-many relations:
     (submittedValues as any).relationships = {};
 
@@ -207,8 +241,6 @@ export function PcrBatchForm({
         readOnly: readOnlyOverride
       }}
       buttonBar={buttonBar as any}
-      performSave={performSave}
-      setPerformSave={setPerformSave}
     />
   );
 }
@@ -216,18 +248,24 @@ export function PcrBatchForm({
 interface LoadExternalDataForPcrBatchFormProps {
   dinaFormProps: DinaFormProps<PcrBatch>;
   buttonBar?: ReactNode;
-  performSave: boolean;
-  setPerformSave?: (newValue: boolean) => void;
 }
 
 export function LoadExternalDataForPcrBatchForm({
   dinaFormProps,
-  buttonBar,
-  performSave,
-  setPerformSave
+  buttonBar
 }: LoadExternalDataForPcrBatchFormProps) {
+  const {
+    loading: loadingReactionData,
+    pcrBatchItems,
+    materialSamples
+  } = usePcrReactionData(dinaFormProps?.initialValues?.id);
+
   // Create a copy of the initial value so we don't change the prop version.
-  const initialValues = cloneDeep(dinaFormProps.initialValues);
+  const initialValues = assign(cloneDeep(dinaFormProps.initialValues), {
+    results: Object.fromEntries(
+      pcrBatchItems.map((obj) => [obj.id, obj.result])
+    )
+  });
 
   // Query to perform if a storage unit is present, used to retrieve the storageUnitType.
   const storageUnitQuery = useQuery<StorageUnit>(
@@ -252,7 +290,7 @@ export function LoadExternalDataForPcrBatchForm({
   }
 
   // Display loading indicator if not ready.
-  if (storageUnitQuery.loading) {
+  if (storageUnitQuery.loading || loadingReactionData) {
     return <LoadingSpinner loading={true} />;
   }
 
@@ -264,22 +302,22 @@ export function LoadExternalDataForPcrBatchForm({
     >
       {buttonBar}
       <PcrBatchFormFields
-        performSave={performSave}
-        setPerformSave={setPerformSave}
+        pcrBatchItems={pcrBatchItems}
+        materialSamples={materialSamples}
       />
     </DinaForm>
   ));
 }
 
 interface PcrBatchFormFieldsProps {
-  performSave: boolean;
-  setPerformSave?: (newValue: boolean) => void;
+  pcrBatchItems: PcrBatchItem[];
+  materialSamples: MaterialSample[];
 }
 
 /** Re-usable field layout between edit and view pages. */
 function PcrBatchFormFields({
-  performSave,
-  setPerformSave
+  pcrBatchItems,
+  materialSamples
 }: PcrBatchFormFieldsProps) {
   const { readOnly, initialValues } = useDinaFormContext();
   const { values } = useFormikContext<any>();
@@ -408,11 +446,9 @@ function PcrBatchFormFields({
       </div>
       {initialValues.id ? (
         <FieldSet legend={<DinaMessage id="pcrReactionTitle" />}>
-          <SangerPcrReactionStep
-            pcrBatchId={initialValues.id}
-            editMode={!readOnly}
-            performSave={performSave}
-            setPerformSave={setPerformSave}
+          <PcrReactionTable
+            pcrBatchItems={pcrBatchItems}
+            materialSamples={materialSamples}
           />
         </FieldSet>
       ) : undefined}
