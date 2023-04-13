@@ -26,7 +26,7 @@ import { useRouter } from "next/router";
 import {
   PcrReactionTable,
   usePcrReactionData
-} from "packages/dina-ui/components/seqdb/pcr-workflow/PcrReactionTable";
+} from "../../../components/seqdb/pcr-workflow/PcrReactionTable";
 import { ReactNode, useState } from "react";
 import {
   AttachmentsField,

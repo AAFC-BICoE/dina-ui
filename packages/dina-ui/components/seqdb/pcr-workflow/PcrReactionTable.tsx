@@ -31,7 +31,7 @@ export function usePcrReactionData(pcrBatchId?: string) {
 
   function fetchPcrBatchItems() {
     if (!pcrBatchId) {
-      return { loading, pcrBatchItems, materialSamples };
+      return { loading: false, pcrBatchItems, materialSamples };
     }
     setLoading(true);
     apiClient
