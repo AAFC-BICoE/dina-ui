@@ -59,9 +59,11 @@ export function MaterialSampleIdentifiersSection({
           <CollectionSelectField
             name={`${namePrefix}collection`}
             customName="collection"
+            disableTemplateCheckbox={true}
           />
           <div className="d-flex">
             <TextField
+              disableTemplateCheckbox={true}
               name={`${namePrefix}materialSampleName`}
               inputProps={{ disabled: primaryIdDisabled }}
               customName="materialSampleName"
