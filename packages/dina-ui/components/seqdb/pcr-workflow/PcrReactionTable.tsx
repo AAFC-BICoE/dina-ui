@@ -31,30 +31,31 @@ export function usePcrReactionData(pcrBatchId?: string) {
 
   function fetchPcrBatchItems() {
     if (!pcrBatchId) {
-      return { loading: false, pcrBatchItems, materialSamples };
+      setLoading(false);
+    } else {
+      setLoading(true);
+      apiClient
+        .get<PcrBatchItem[]>("seqdb-api/pcr-batch-item", {
+          filter: filterBy([], {
+            extraFilters: [
+              {
+                selector: "pcrBatch.uuid",
+                comparison: "==",
+                arguments: pcrBatchId
+              }
+            ]
+          })(""),
+          include: "materialSample"
+        })
+        .then((response) => {
+          const batchItems: PersistedResource<PcrBatchItem>[] =
+            response.data?.filter(
+              (item) => item?.materialSample?.id !== undefined
+            );
+          setPcrBatchItems(batchItems);
+          fetchMaterialSamples(batchItems);
+        });
     }
-    setLoading(true);
-    apiClient
-      .get<PcrBatchItem[]>("seqdb-api/pcr-batch-item", {
-        filter: filterBy([], {
-          extraFilters: [
-            {
-              selector: "pcrBatch.uuid",
-              comparison: "==",
-              arguments: pcrBatchId
-            }
-          ]
-        })(""),
-        include: "materialSample"
-      })
-      .then((response) => {
-        const batchItems: PersistedResource<PcrBatchItem>[] =
-          response.data?.filter(
-            (item) => item?.materialSample?.id !== undefined
-          );
-        setPcrBatchItems(batchItems);
-        fetchMaterialSamples(batchItems);
-      });
   }
 
   function fetchMaterialSamples(batchItems: PersistedResource<PcrBatchItem>[]) {
