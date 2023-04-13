@@ -19,7 +19,7 @@ import {
   Organism,
   Vocabulary
 } from "../../../types/collection-api";
-import { ManagedAttributesEditor } from "../../object-store/managed-attributes/ManagedAttributesEditor";
+import { ManagedAttributesEditor } from "../../managed-attributes/ManagedAttributesEditor";
 import {
   GlobalNamesField,
   SelectedScientificNameView
