@@ -30,6 +30,18 @@ interface QueryRowTextSearchProps {
   managedAttributeConfig?: ESIndexMapping;
 }
 
+export interface ManagedAttributeOption {
+  label: string;
+  value: string;
+  type: string;
+  acceptedValues?: string[] | null;
+}
+
+export interface ManagedAttributeOperatorOption {
+  label: string;
+  value: string;
+}
+
 export interface ManagedAttributeSearchStates {
   /** UUID of the selected managed attribute to search against. */
   selectedManagedAttribute: string;
@@ -41,6 +53,32 @@ export interface ManagedAttributeSearchStates {
   searchValue: string;
 }
 
+const SupportedOperatorsForType: (type: string) => string[] = (type) => {
+  switch (type) {
+    case "INTEGER":
+    case "DECIMAL":
+    case "DATE":
+      return [
+        "equals",
+        "notEquals",
+        "greaterThan",
+        "greaterThanOrEqual",
+        "lessThan",
+        "lessThanOrEqual",
+        "empty",
+        "notEmpty"
+      ];
+    case "PICK_LIST":
+      return ["equals", "notEquals", "empty", "notEmpty"];
+    case "BOOL":
+      return ["equals"];
+    case "STRING":
+      return ["exactMatch", "partialMatch", "notEquals", "empty", "notEmpty"];
+    default:
+      return [];
+  }
+};
+
 export default function QueryRowManagedAttributeSearch({
   value,
   setValue,
@@ -48,7 +86,8 @@ export default function QueryRowManagedAttributeSearch({
 }: QueryRowTextSearchProps) {
   const { formatMessage } = useIntl();
 
-  const [managedAttributeOptions, setManagedAttributeOptions] = useState();
+  const [managedAttributeOptions, setManagedAttributeOptions] =
+    useState<ManagedAttributeOption[]>();
 
   const [managedAttributeState, setManagedAttributeState] =
     useState<ManagedAttributeSearchStates>(() =>
@@ -75,15 +114,43 @@ export default function QueryRowManagedAttributeSearch({
     }
   }, [value]);
 
+  // If component is provided, add a filter for it.
+  const filter = managedAttributeConfig?.dynamicField?.component
+    ? {
+        managedAttributeComponent: managedAttributeConfig.dynamicField.component
+      }
+    : undefined;
   const query = useQuery<ManagedAttribute[]>(
     {
-      path: managedAttributeConfig?.dynamicField?.apiEndpoint ?? ""
+      path: managedAttributeConfig?.dynamicField?.apiEndpoint ?? "",
+      filter
     },
     {
-      // onSuccess: ({ data }) => {},
+      onSuccess: ({ data }) => {
+        setManagedAttributeOptions(
+          data.map<ManagedAttributeOption>((managedAttribute) => ({
+            label: managedAttribute.name,
+            value: managedAttribute.id,
+            type: managedAttribute.vocabularyElementType,
+            acceptedValues: managedAttribute.acceptedValues
+          }))
+        );
+      },
       disabled: managedAttributeConfig?.dynamicField === undefined
     }
   );
+
+  // Generate the operator options
+  const operatorOptions = SupportedOperatorsForType(
+    managedAttributeOptions?.find(
+      (managedAttribute) =>
+        managedAttribute.value ===
+        managedAttributeState.selectedManagedAttribute
+    )?.type ?? "STRING"
+  ).map<ManagedAttributeOperatorOption>((option) => ({
+    label: formatMessage({ id: "queryBuilder_operator_" + option }),
+    value: option
+  }));
 
   // If loading, just render a spinner.
   if (query.loading) {
@@ -93,20 +160,40 @@ export default function QueryRowManagedAttributeSearch({
   return (
     <div className="d-flex">
       {/* Managed Attribute Selection */}
-      <Select
-        options={[]}
+      <Select<ManagedAttributeOption>
+        options={managedAttributeOptions}
         className={`flex-grow-1 me-2 ps-0`}
-        value={value}
-        onChange={(selected) => setValue?.("")}
+        value={managedAttributeOptions?.find(
+          (managedAttribute) =>
+            managedAttribute.value ===
+            managedAttributeState.selectedManagedAttribute
+        )}
+        placeholder={"Select managed attribute to search against..."}
+        onChange={(selected) =>
+          setManagedAttributeState({
+            ...managedAttributeState,
+            selectedManagedAttribute: selected?.value ?? ""
+          })
+        }
       />
 
       {/* Operator */}
-      <Select
-        options={[]}
+      <Select<ManagedAttributeOperatorOption>
+        options={operatorOptions}
         className={`flex-grow-1 me-2 ps-0`}
-        value={value}
-        onChange={(selected) => setValue?.("")}
+        value={operatorOptions?.find(
+          (operator) =>
+            operator.value === managedAttributeState.selectedOperator
+        )}
+        onChange={(selected) =>
+          setManagedAttributeState({
+            ...managedAttributeState,
+            selectedOperator: selected?.value ?? ""
+          })
+        }
       />
+
+      {/* Value Searching (changes based ont he type selected) */}
     </div>
   );
 }
