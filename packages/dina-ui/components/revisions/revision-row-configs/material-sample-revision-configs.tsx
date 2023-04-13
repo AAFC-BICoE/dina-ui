@@ -185,7 +185,9 @@ export const MATERIAL_SAMPLE_REVISION_ROW_CONFIG: RevisionRowConfig<MaterialSamp
           legend={<></>}
           name={"extensionValuesForm"}
           blockOptionsEndpoint={`collection-api/extension`}
-          dinaComponent={"MATERIAL_SAMPLE"}
+          blockOptionsFilter={{
+            "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+          }}
         />
       ),
       // Don't render this one because it isn't an editable field:

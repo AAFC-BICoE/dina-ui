@@ -3,7 +3,10 @@ import {
   includedTypeQuery,
   matchQuery,
   termQuery,
-  existsQuery
+  existsQuery,
+  prefixQuery,
+  suffixQuery,
+  infixQuery
 } from "../query-builder-elastic-search/QueryBuilderElasticSearchExport";
 import { TransformToDSLProps } from "../../types";
 import { useIntl } from "react-intl";
@@ -35,10 +38,7 @@ export default function QueryRowTextSearch({
   return (
     <>
       {/* Depending on the matchType, it changes the rest of the query row. */}
-      {(matchType === "equals" ||
-        matchType === "exactMatch" ||
-        matchType === "partialMatch" ||
-        matchType === "notEquals") && (
+      {matchType !== "empty" && matchType !== "notEmpty" && (
         <input
           type="text"
           value={value ?? ""}
@@ -96,6 +96,18 @@ export function transformTextSearchToDSL({
         : isExactMatch
         ? termQuery(fieldPath, value, true)
         : matchQuery(fieldPath, value);
+
+    // Prefix partial match
+    case "prefix":
+      return prefixQuery(fieldPath, value, parentType);
+
+    // Infix partial match
+    case "contains":
+      return infixQuery(fieldPath, value, parentType);
+
+    // Suffix partial match
+    case "suffix":
+      return suffixQuery(fieldPath, value, parentType);
 
     // Not equals match type.
     case "notEquals":
@@ -251,22 +263,8 @@ export function transformTextSearchToDSL({
             }
           };
 
-    // Default case
+    // Unsupported case.
     default:
-      return parentType
-        ? {
-            nested: {
-              path: "included",
-              query: {
-                bool: {
-                  must: [
-                    matchQuery(fieldPath, value),
-                    includedTypeQuery(parentType)
-                  ]
-                }
-              }
-            }
-          }
-        : matchQuery(fieldPath, value);
+      throw new Error("Unsupported operation for the text widget.");
   }
 }

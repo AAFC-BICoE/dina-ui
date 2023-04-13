@@ -8,6 +8,68 @@ exports[`QueryBuilderTextSearch QueryBuilderTextSearch Component Display field i
 </QueryRowTextSearch>"
 `;
 
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation Normal field 1`] = `
+Object {
+  "match": Object {
+    "data.attributes.textField.infix": Object {
+      "query": "text search",
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "match": Object {
+              "included.attributes.name.infix": Object {
+                "query": "text search",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Contains (Infix) operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "match": Object {
+              "included.attributes.determination.scientificName.infix": Object {
+                "query": "text",
+              },
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Edge cases If no field value is provided, nothing should be generated. 1`] = `Object {}`;
 
 exports[`QueryBuilderTextSearch transformTextSearchToDSL function Empty operation Normal field 1`] = `
@@ -379,6 +441,118 @@ Object {
           Object {
             "term": Object {
               "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation Normal field 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.textField.prefix": "text search",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.name.prefix": "text search",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Prefix operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.determination.scientificName.prefix": "text",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation Normal field 1`] = `
+Object {
+  "prefix": Object {
+    "data.attributes.textField.prefix_reverse": "hcraes txet",
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation With relationship as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.name.prefix_reverse": "hcraes txet",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "collection",
+            },
+          },
+        ],
+      },
+    },
+  },
+}
+`;
+
+exports[`QueryBuilderTextSearch transformTextSearchToDSL function Suffix operation With relationship containing complex path as field 1`] = `
+Object {
+  "nested": Object {
+    "path": "included",
+    "query": Object {
+      "bool": Object {
+        "must": Array [
+          Object {
+            "prefix": Object {
+              "included.attributes.determination.scientificName.prefix_reverse": "txet",
+            },
+          },
+          Object {
+            "term": Object {
+              "included.type": "organism",
             },
           },
         ],

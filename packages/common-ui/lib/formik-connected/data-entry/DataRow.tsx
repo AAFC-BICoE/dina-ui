@@ -1,13 +1,18 @@
 import {
   CheckBoxField,
   CreatableSelectField,
+  FieldSpy,
   SelectField,
-  TextField
+  TextField,
+  Tooltip
 } from "common-ui";
 import { useFormikContext } from "formik";
 import { find, get } from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -40,6 +45,7 @@ export function DataRow({
   unitsAddable = false,
   isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
+  const { locale } = useDinaIntl();
   const valueTextFieldName = `${name}.value`;
   const typeSelectFieldName = `${name}.type`;
   const unitSelectFieldName = `${name}.unit`;
@@ -71,34 +77,65 @@ export function DataRow({
       formik.setFieldValue(rowsPath, newRows);
     }
   }
+
   return (
     <div className="d-flex">
-      {
-        <div style={{ width: "15rem", marginLeft: "12rem" }}>
-          {typesAddable ? (
-            <CreatableSelectField
-              options={typeOptions}
-              name={typeSelectFieldName}
-              label={<DinaMessage id="dataType" />}
-              removeBottomMargin={true}
-              disableTemplateCheckbox={true}
-              onChange={onCreatableSelectFieldChange}
-              hideLabel={rowIndex !== 0}
-              readOnlyBold={true}
-            />
-          ) : (
-            <SelectField
-              options={typeOptions}
-              name={typeSelectFieldName}
-              label={<DinaMessage id="dataType" />}
-              removeBottomMargin={true}
-              disableTemplateCheckbox={true}
-              hideLabel={rowIndex !== 0}
-              readOnlyBold={true}
-            />
-          )}
-        </div>
-      }
+      <div style={{ width: "15rem", marginLeft: "12rem" }}>
+        {typesAddable ? (
+          <CreatableSelectField
+            options={typeOptions}
+            name={typeSelectFieldName}
+            label={<DinaMessage id="dataType" />}
+            removeBottomMargin={true}
+            disableTemplateCheckbox={true}
+            onChange={onCreatableSelectFieldChange}
+            hideLabel={rowIndex !== 0}
+            readOnlyBold={true}
+          />
+        ) : (
+          <div className="d-flex flex-row align-items-center">
+            <div style={{ width: "15rem" }}>
+              <SelectField
+                options={typeOptions}
+                name={typeSelectFieldName}
+                label={<DinaMessage id="dataType" />}
+                removeBottomMargin={true}
+                disableTemplateCheckbox={true}
+                hideLabel={rowIndex !== 0}
+                readOnlyBold={true}
+              />
+            </div>
+
+            <FieldSpy fieldName={typeSelectFieldName}>
+              {(value) => (
+                <>
+                  {value && typeOptions ? (
+                    <div
+                      style={{
+                        marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
+                      }}
+                    >
+                      <Tooltip
+                        directText={
+                          find(
+                            typeOptions,
+                            (item) => item.value === value
+                          )?.descriptions?.find((desc) => desc.lang === locale)
+                            ?.desc
+                        }
+                        placement={"right"}
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
+            </FieldSpy>
+          </div>
+        )}
+      </div>
+
       <div style={{ width: "15rem", marginLeft: "3rem" }}>
         <TextField
           name={valueTextFieldName}
