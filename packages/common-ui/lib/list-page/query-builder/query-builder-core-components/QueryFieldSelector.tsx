@@ -1,6 +1,6 @@
 import lodash, { startCase, flatMapDeep } from "lodash";
 import { DinaMessage } from "../../../../../dina-ui/intl/dina-ui-intl";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useIntl } from "react-intl";
 import Select from "react-select";
 import { ESIndexMapping } from "../../types";
@@ -30,13 +30,6 @@ export function QueryFieldSelector({
 }: QueryFieldSelectorProps) {
   const { formatMessage, messages, locale } = useIntl();
 
-  const [secondaryOption, setSecondaryOption] =
-    useState<{ label: string; value: string }>();
-  const [secondaryOptions, setSecondaryOptions] = useState<
-    { label: string; value: string }[]
-  >([]);
-  const [secondaryLoading, setSecondaryLoading] = useState<boolean>(true);
-
   // Generate the options that can be selected for the field dropdown.
   const queryRowOptions = useMemo(() => {
     // Get all of the attributes from the index for the filter dropdown.
@@ -46,8 +39,7 @@ export function QueryFieldSelector({
         label: messages["field_" + prop.label]
           ? formatMessage({ id: "field_" + prop.label })
           : startCase(prop.label),
-        value: prop.value,
-        type: prop.type
+        value: prop.value
       }))
       ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
 
@@ -60,8 +52,7 @@ export function QueryFieldSelector({
           label: messages["field_" + prop.label]
             ? formatMessage({ id: "field_" + prop.label })
             : startCase(prop.label),
-          value: prop.value,
-          type: prop.type
+          value: prop.value
         };
       })
       ?.sort((aProp, bProp) => aProp.label.localeCompare(bProp.label));
@@ -155,7 +146,7 @@ export function QueryFieldSelector({
   }, [currentField, locale]);
 
   return (
-    <div style={{ width: "100%" }} className="d-flex">
+    <div style={{ width: "100%" }}>
       {/* Field Selection */}
       <Select
         options={queryRowOptions as any}
@@ -165,19 +156,6 @@ export function QueryFieldSelector({
         placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
         onChange={(selected) => setField?.(selected?.value)}
       />
-
-      {/* Secondary Field Selection (Used for Managed Attributes or Field Extensions) */}
-      {selectedOption.type === "managedAttribute" ? (
-        <Select
-          options={secondaryOptions as any}
-          className={`flex-grow-1 me-2 ps-0`}
-          styles={customStyles}
-          isLoading={secondaryLoading}
-          value={secondaryOption}
-          placeholder={<DinaMessage id="queryBuilder_field_placeholder" />}
-          onChange={(selected) => setField?.(selected?.value)}
-        />
-      ) : undefined}
     </div>
   );
 }

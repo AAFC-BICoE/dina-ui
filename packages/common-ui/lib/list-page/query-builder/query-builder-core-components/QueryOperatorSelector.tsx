@@ -25,6 +25,12 @@ export function QueryOperatorSelector({
   selectedOperator,
   setOperator
 }: QueryOperatorSelectorProps) {
+  // Do not render if no operators are available, specifically the managed attributes.
+  if (options?.length === 1 && options[0].key === "noOperator") {
+    setOperator?.("noOperator");
+    return <></>;
+  }
+
   /* istanbul ignore next */
   const customStyles = {
     placeholder: (provided, _) => ({

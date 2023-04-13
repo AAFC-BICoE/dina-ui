@@ -27,6 +27,9 @@ import QueryBuilderDateSearch, {
   transformDateSearchToDSL,
   validateDate
 } from "./query-builder-value-types/QueryBuilderDateSearch";
+import QueryRowManagedAttributeSearch, {
+  transformManagedAttributeToDSL
+} from "./query-builder-value-types/QueryBuilderManagedAttributeSearch";
 import QueryBuilderNumberSearch, {
   transformNumberSearchToDSL
 } from "./query-builder-value-types/QueryBuilderNumberSearch";
@@ -249,6 +252,11 @@ function generateBuilderConfig(
     uuid: {
       label: "UUID",
       cardinality: 1
+    },
+    // Special case not to display any operators.
+    noOperator: {
+      label: "noOperator",
+      cardinality: 1
     }
   };
 
@@ -384,13 +392,21 @@ function generateBuilderConfig(
       type: "managedAttribute",
       valueSrc: "value",
       factory: (factoryProps) => (
-        <QueryBuilderTextSearch
-          matchType={factoryProps?.operator}
+        <QueryRowManagedAttributeSearch
           value={factoryProps?.value}
           setValue={factoryProps?.setValue}
         />
-      )
-      // TODO: Add elastic search query.
+      ),
+      elasticSearchFormatValue: (queryType, val, op, field, _config) => {
+        const indexSettings = fieldValueToIndexSettings(field, indexMap);
+        return transformManagedAttributeToDSL({
+          fieldPath: indexSettingsToFieldPath(indexSettings),
+          operation: op,
+          value: val,
+          queryType,
+          fieldInfo: indexSettings
+        });
+      }
     }
   };
 
@@ -483,16 +499,10 @@ function generateBuilderConfig(
     },
     managedAttribute: {
       valueSources: ["value"],
-      defaultOperator: "equals",
+      defaultOperator: "noOperator",
       widgets: {
-        boolean: {
-          operators: [
-            "exactMatch",
-            "partialMatch",
-            "notEquals",
-            "empty",
-            "notEmpty"
-          ]
+        managedAttribute: {
+          operators: ["noOperator"]
         }
       }
     }
