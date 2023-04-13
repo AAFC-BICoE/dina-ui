@@ -213,6 +213,14 @@ function generateBuilderConfig(
       label: formatMessage({ id: "queryBuilder_operator_partialMatch" }),
       cardinality: 1
     },
+    prefix: {
+      label: formatMessage({ id: "queryBuilder_operator_prefix" }),
+      cardinality: 1
+    },
+    suffix: {
+      label: formatMessage({ id: "queryBuilder_operator_suffix" }),
+      cardinality: 1
+    },
     equals: {
       label: formatMessage({ id: "queryBuilder_operator_equals" }),
       cardinality: 1
@@ -419,6 +427,9 @@ function generateBuilderConfig(
           operators: [
             "exactMatch",
             "partialMatch",
+            "prefix", // Only displayed if supported on the mapping.
+            "contains", // Only displayed if supported on the mapping.
+            "suffix", // Only displayed if supported on the mapping.
             "notEquals",
             "empty",
             "notEmpty"
@@ -547,13 +558,22 @@ function generateBuilderConfig(
         setField={fieldDropdownProps?.setField}
       />
     ),
-    renderOperator: (operatorDropdownProps) => (
-      <QueryOperatorSelector
-        options={operatorDropdownProps?.items}
-        selectedOperator={operatorDropdownProps?.selectedKey ?? ""}
-        setOperator={operatorDropdownProps?.setField}
-      />
-    ),
+    renderOperator: (operatorDropdownProps) => {
+      const indexSettings = fieldValueToIndexSettings(
+        (operatorDropdownProps as any)?.fieldConfig?.fieldSettings?.mapping
+          ?.value,
+        indexMap
+      );
+
+      return (
+        <QueryOperatorSelector
+          options={operatorDropdownProps?.items}
+          selectedOperator={operatorDropdownProps?.selectedKey ?? ""}
+          setOperator={operatorDropdownProps?.setField}
+          selectedFieldMapping={indexSettings}
+        />
+      );
+    },
     renderConjs: (conjunctionProps) => (
       <QueryConjunctionSwitch
         currentConjunction={conjunctionProps?.selectedConjunction}
@@ -598,6 +618,7 @@ function generateBuilderConfig(
         type,
         valueSources: ["value"],
         fieldSettings: {
+          mapping: indexItem,
           validateValue: (value, _fieldSettings) =>
             validateField(value, type, formatMessage)
         }

@@ -41,6 +41,9 @@ export interface FieldWrapperProps {
   /** Disables how clicking a label clicks the inner element. */
   disableLabelClick?: boolean;
 
+  /** Provide an ID of a tooltip to use, can be changed dynamically. */
+  tooltipOverride?: string;
+
   /** Add an image inside of the tooltip. Provide the URL of the image to display it. */
   tooltipImage?: string;
 
@@ -101,17 +104,17 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
     // First find the component we are looking for.
     const componentFound = find(formTemplate?.components, {
-      name: componentName,
+      name: componentName
     });
     if (componentFound) {
       // Next find the right section.
       const sectionFound = find(componentFound?.sections, {
-        name: sectionName,
+        name: sectionName
       });
       if (sectionFound) {
         if (name.includes("managedAttributes")) {
           const visibleManagedAttributes = find(sectionFound.items, {
-            name: "managedAttributesOrder",
+            name: "managedAttributesOrder"
           })?.defaultValue;
           return visibleManagedAttributes.includes(
             templateCheckboxFieldName ?? name
@@ -120,7 +123,7 @@ export function FieldWrapper(props: FieldWrapperProps) {
 
         return (
           !find(sectionFound.items, {
-            name: templateCheckboxFieldName ?? name,
+            name: templateCheckboxFieldName ?? name
           })?.visible ?? false
         );
       }
@@ -164,28 +167,30 @@ function LabelWrapper({
     removeLabel,
     tooltipImage,
     templateCheckboxFieldName,
+    tooltipOverride,
     tooltipImageAlt,
     tooltipLink,
     tooltipLinkText,
-    disableTemplateCheckbox,
+    disableTemplateCheckbox
   },
   fieldSpyProps: {
     field: { value },
-    isChanged,
+    isChanged
   },
-  children,
+  children
 }: PropsWithChildren<FieldWrapperInternalProps>) {
   const { horizontal, isTemplate, componentName, sectionName } =
     useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
-    currentValue: value,
+    currentValue: value
   });
 
   const fieldLabel = label ?? (
     <FieldHeader
       name={name}
       customName={customName}
+      tooltipOverride={tooltipOverride}
       tooltipImage={tooltipImage}
       tooltipImageAlt={tooltipImageAlt}
       tooltipLink={tooltipLink}
@@ -289,14 +294,14 @@ function FormikConnectedField({
   fieldSpyProps: {
     form,
     field: { name, value: formikValue },
-    meta: { error },
+    meta: { error }
   },
-  fieldWrapperProps: { readOnlyRender, link, children },
+  fieldWrapperProps: { readOnlyRender, link, children }
 }: FieldWrapperInternalProps) {
   const { readOnly } = useDinaFormContext();
   const bulkTab = useBulkEditTabFieldIndicators({
     fieldName: name,
-    currentValue: formikValue,
+    currentValue: formikValue
   });
 
   function setValue(input: any) {
@@ -321,7 +326,7 @@ function FormikConnectedField({
     formik: form,
 
     // Only used within the bulk editor's "Edit All" tab:
-    placeholder: bulkTab?.placeholder,
+    placeholder: bulkTab?.placeholder
   };
   return (
     <ErrorBoundary

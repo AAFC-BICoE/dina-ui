@@ -14,7 +14,7 @@ import Select, {
 } from "react-select";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { useDebounce } from "use-debounce";
-import { SelectOption } from "../..";
+import { SelectOption, useAccount } from "../..";
 import { JsonApiQuerySpec, useQuery } from "../api-client/useQuery";
 import { useBulkGet } from "./useBulkGet";
 
@@ -37,6 +37,8 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
 
   /** Function that is passed the dropdown's search input value and returns a JSONAPI filter param. */
   filter: (inputValue: string) => FilterParam;
+
+  filterList?: (item: any | undefined) => boolean;
 
   /** Whether this is a multi-select dropdown. */
   isMulti?: boolean;
@@ -77,6 +79,9 @@ export interface ResourceSelectProps<TData extends KitsuResource> {
   placeholder?: string;
 
   isLoading?: boolean;
+
+  /** If true, disable the dropdown when the selected option is the only one available */
+  cannotBeChanged?: boolean;
 }
 
 type ResourceSelectValue<TData extends KitsuResource> =
@@ -102,6 +107,7 @@ export interface AsyncOption<TData extends KitsuResource> {
 /** Dropdown select input for selecting a resource from the API. */
 export function ResourceSelect<TData extends KitsuResource>({
   filter,
+  filterList,
   include,
   isMulti = false,
   model,
@@ -110,7 +116,7 @@ export function ResourceSelect<TData extends KitsuResource>({
   styles,
   value,
   asyncOptions,
-  isDisabled,
+  isDisabled: isDisabledProp,
   omitNullOption,
   invalid,
   selectProps,
@@ -118,9 +124,11 @@ export function ResourceSelect<TData extends KitsuResource>({
   useCustomQuery,
   removeDefaultSort,
   placeholder,
-  isLoading: loadingProp
+  isLoading: loadingProp,
+  cannotBeChanged
 }: ResourceSelectProps<TData>) {
   const { formatMessage } = useIntl();
+  const { isAdmin } = useAccount();
 
   /** The value of the input element. */
   const [inputValue, setInputValue] = useState("");
@@ -132,6 +140,8 @@ export function ResourceSelect<TData extends KitsuResource>({
   const filterParam = omitBy(filter(searchValue), (val) =>
     ["", undefined].includes(val as string)
   );
+
+  let isDisabled = isDisabledProp;
 
   // "6" is chosen here to give enough room for the main options, the <none> option, and the
   const page = { limit: pageSize ?? 6 };
@@ -261,6 +271,14 @@ export function ResourceSelect<TData extends KitsuResource>({
   });
   const selectValue = isMulti ? selectedAsArray : selectedAsArray[0] ?? null;
 
+  // Disable dropdown if the selected option is the only option available
+  if (cannotBeChanged && !isMulti) {
+    isDisabled =
+      !isAdmin &&
+      resourceOptions.length === 1 &&
+      selectValue?.value === resourceOptions?.[0]?.value;
+  }
+
   const customStyle: any = {
     ...styles,
     multiValueLabel: (base) => ({ ...base, cursor: "move" }),
@@ -297,7 +315,7 @@ export function ResourceSelect<TData extends KitsuResource>({
       classNamePrefix="react-select"
       value={selectValue}
       // The filtering is already done at the API level:
-      filterOption={() => true}
+      filterOption={({ data }) => filterList?.((data as any)?.resource) ?? true}
       isDisabled={isDisabled}
       // react-sortable-hoc config:
       axis="xy"

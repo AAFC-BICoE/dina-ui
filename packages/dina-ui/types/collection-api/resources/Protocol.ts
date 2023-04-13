@@ -2,6 +2,15 @@ import { KitsuResource } from "kitsu";
 import { ResourceIdentifierObject } from "jsonapi-typescript";
 import { MultilingualDescription } from "../../common";
 
+export enum ProtocolDataUnitEnum {
+  MM = "millimolar",
+  UG_ML = "microgram_per_millilitre",
+  UL = "microlitre",
+  UL_ML = "microgram_per_millilitre",
+  UL_RXN = "microliter_per_reaction",
+  UM = "micromole_per_liter"
+}
+
 export interface ProtocolData {
   key?: string;
   vocabularyBased?: boolean;
@@ -18,6 +27,7 @@ export interface ProtocolData {
 export interface ProtocolAttributes {
   type: "protocol";
   name: string;
+  protocolType?: string;
   createdBy?: string;
   createdOn?: string;
   group?: string;

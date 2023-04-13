@@ -75,7 +75,12 @@ export function useIndexMapping({
               : key.name,
             type: key.type,
             path: key.path,
-            distinctTerm: key.distinct_term_agg
+
+            // Additional options for the field:
+            distinctTerm: key.distinct_term_agg,
+            prefixSupport: key?.fields?.includes("prefix") ?? false,
+            infixSupport: key?.fields?.includes("infix") ?? false,
+            suffixSupport: key?.fields?.includes("prefix_reverse") ?? false
           });
         });
 
@@ -99,7 +104,15 @@ export function useIndexMapping({
             parentName: relationship.referencedBy,
             parentType: relationship.value,
             parentPath: relationship.path,
-            distinctTerm: relationshipAttribute.distinct_term_agg
+
+            // Additional options for the field:
+            distinctTerm: relationshipAttribute.distinct_term_agg,
+            prefixSupport:
+              relationshipAttribute?.fields?.includes("prefix") ?? false,
+            infixSupport:
+              relationshipAttribute?.fields?.includes("infix") ?? false,
+            suffixSupport:
+              relationshipAttribute?.fields?.includes("prefix_reverse") ?? false
           });
         });
       });
@@ -113,7 +126,10 @@ export function useIndexMapping({
             distinctTerm: false,
             label: fieldMapping.label,
             path: fieldMapping.path,
-            type: fieldMapping.type
+            type: fieldMapping.type,
+            prefixSupport: false,
+            infixSupport: false,
+            suffixSupport: false
           });
         });
         dynamicFieldMapping.relationshipFields.forEach(
@@ -126,7 +142,10 @@ export function useIndexMapping({
               distinctTerm: false,
               label: relationshipFieldMapping.label,
               path: relationshipFieldMapping.path,
-              type: relationshipFieldMapping.type
+              type: relationshipFieldMapping.type,
+              prefixSupport: false,
+              infixSupport: false,
+              suffixSupport: false
             });
           }
         );

@@ -596,7 +596,7 @@ export function CollectingEventFormLayout({
         <NotPubliclyReleasableWarning />
         <TagsAndRestrictionsSection resourcePath="collection-api/collecting-event" />
       </DinaFormSection>
-      <div className="row">
+      <div className="row mb-3">
         <div>
           <FieldSet
             legend={<DinaMessage id="identifiers" />}
@@ -633,7 +633,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingDateLegend" />}
             id="collectingDateLegend"
-            className="non-strip"
+            className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-date-section"
           >
@@ -668,7 +668,7 @@ export function CollectingEventFormLayout({
           <FieldSet
             legend={<DinaMessage id="collectingAgentsLegend" />}
             id="collectingAgentsLegend"
-            className="non-strip"
+            className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-agents-section"
           >
@@ -719,12 +719,12 @@ export function CollectingEventFormLayout({
           </FieldSet>
         </div>
       </div>
-      <div className="row">
+      <div className="row mb-3">
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="verbatimLabelLegend" />}
             id="verbatimLabelLegend"
-            className="non-strip"
+            className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="verbatim-label-section"
           >
@@ -895,7 +895,7 @@ export function CollectingEventFormLayout({
         <div className="col-md-6">
           <FieldSet
             legend={<DinaMessage id="collectingEventDetails" />}
-            className="non-strip"
+            className="non-strip h-100"
             componentName={COLLECTING_EVENT_COMPONENT_NAME}
             sectionName="collecting-event-details"
           >
@@ -992,7 +992,9 @@ export function CollectingEventFormLayout({
             readOnly={readOnly}
             isTemplate={isTemplate}
             blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={"COLLECTING_EVENT"}
+            blockOptionsFilter={{
+              "extension.fields.dinaComponent": "COLLECTING_EVENT"
+            }}
           />
         </DinaFormSection>
       </div>

@@ -273,36 +273,37 @@ export function MaterialSampleForm({
           targetType="materialSample"
         />
       ),
-    [ACQUISITION_EVENT_COMPONENT_NAME]: (id) =>
-      dataComponentState.enableAcquisitionEvent && (
-        <TabbedResourceLinker<AcquisitionEvent>
-          fieldSetId={id}
-          legend={<DinaMessage id="acquisitionEvent" />}
-          briefDetails={(acqEvent) => (
-            <DinaForm initialValues={acqEvent} readOnly={true}>
-              <AcquisitionEventFormLayout />
-            </DinaForm>
-          )}
-          linkerTabContent={
-            reduceRendering ? null : (
-              <AcquisitionEventLinker
-                onAcquisitionEventSelect={(acqEventToLink) => {
-                  setAcqEventId(acqEventToLink.id);
-                }}
-              />
-            )
-          }
-          nestedForm={nestedAcqEventForm}
-          useResourceQuery={useAcquisitionEvent}
-          setResourceId={setAcqEventId}
-          disableLinkerTab={templateAttachesAcquisitionEvent}
-          readOnlyLink="/collection/acquisition-event/view?id="
-          resourceId={acqEventId}
-          fieldName="acquisitionEvent"
-          targetType="materialSample"
-          hideLinkerTab={hideLinkerTab}
-        />
-      ),
+    // TODO: Remove this block when Acquisition Event is confirmed to be removed entirely
+    // [ACQUISITION_EVENT_COMPONENT_NAME]: (id) =>
+    //   dataComponentState.enableAcquisitionEvent && (
+    //     <TabbedResourceLinker<AcquisitionEvent>
+    //       fieldSetId={id}
+    //       legend={<DinaMessage id="acquisitionEvent" />}
+    //       briefDetails={(acqEvent) => (
+    //         <DinaForm initialValues={acqEvent} readOnly={true}>
+    //           <AcquisitionEventFormLayout />
+    //         </DinaForm>
+    //       )}
+    //       linkerTabContent={
+    //         reduceRendering ? null : (
+    //           <AcquisitionEventLinker
+    //             onAcquisitionEventSelect={(acqEventToLink) => {
+    //               setAcqEventId(acqEventToLink.id);
+    //             }}
+    //           />
+    //         )
+    //       }
+    //       nestedForm={nestedAcqEventForm}
+    //       useResourceQuery={useAcquisitionEvent}
+    //       setResourceId={setAcqEventId}
+    //       disableLinkerTab={templateAttachesAcquisitionEvent}
+    //       readOnlyLink="/collection/acquisition-event/view?id="
+    //       resourceId={acqEventId}
+    //       fieldName="acquisitionEvent"
+    //       targetType="materialSample"
+    //       hideLinkerTab={hideLinkerTab}
+    //     />
+    //   ),
     [PREPARATIONS_COMPONENT_NAME]: (id) =>
       !reduceRendering &&
       dataComponentState.enablePreparations && <PreparationField id={id} />,
@@ -369,7 +370,9 @@ export function MaterialSampleForm({
             isTemplate={isTemplate}
             id={id}
             blockOptionsEndpoint={`collection-api/extension`}
-            blockOptionsFilter={"MATERIAL_SAMPLE"}
+            blockOptionsFilter={{
+              "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+            }}
           />
         </DinaFormSection>
       ),

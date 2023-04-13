@@ -10,6 +10,13 @@ export interface TooltipProps {
   intlValues?: Record<string, any>;
 
   /**
+   * By-pass localization to provide direct text. This is helpful for user provided content.
+   *
+   * ID should be used for hard-coded messages.
+   */
+  directText?: string;
+
+  /**
    * The element shown that you hover on to see the tooltip.
    * Default is a small "i" image.
    */
@@ -41,6 +48,7 @@ export type tooltipPlacements = "top" | "bottom" | "left" | "right";
 
 export function Tooltip({
   id,
+  directText,
   intlValues,
   visibleElement,
   link,
@@ -54,8 +62,11 @@ export function Tooltip({
   const { messages, formatMessage } = useIntl();
 
   // Determine if a tooltip message needs to be displayed.
-  const tooltipMessage =
-    id != null ? <FormattedMessage id={id} values={intlValues} /> : null;
+  const tooltipMessage = directText ? (
+    directText
+  ) : id ? (
+    <FormattedMessage id={id} values={intlValues} />
+  ) : null;
 
   // Determine if an image should be displayed.
   const tooltipImage =
@@ -104,6 +115,7 @@ export function Tooltip({
         }
         placement={placement}
         trigger={["focus", "hover"]}
+        zIndex={3001}
       >
         <span>
           {visibleElement ? (

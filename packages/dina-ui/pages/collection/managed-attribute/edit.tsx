@@ -1,12 +1,13 @@
 import { SelectField, useQuery, withResponse } from "common-ui";
 import { WithRouterProps } from "next/dist/client/with-router";
+import Link from "next/link";
 import { withRouter } from "next/router";
 import {
   Footer,
   Head,
-  Nav,
   ManagedAttributeForm,
-  ManagedAttributeFormProps
+  ManagedAttributeFormProps,
+  Nav
 } from "../../../components";
 import { DinaMessage, useDinaIntl } from "../../../intl/dina-ui-intl";
 import {
@@ -14,7 +15,7 @@ import {
   COLLECTION_MODULE_TYPES,
   COLLECTION_MODULE_TYPE_LABELS,
   ManagedAttribute
-} from "../../../types/collection-api/resources/ManagedAttribute";
+} from "../../../types/collection-api";
 
 export function ManagedAttributesEditPage({ router }: WithRouterProps) {
   const { id } = router.query;
@@ -36,11 +37,26 @@ export function ManagedAttributesEditPage({ router }: WithRouterProps) {
     value: dataType
   }));
 
+  const backButton =
+    id === undefined ? (
+      <Link href="/managed-attribute/list?step=0">
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToList" />
+        </a>
+      </Link>
+    ) : (
+      <Link href={`/collection/managed-attribute/view?id=${id}`}>
+        <a className="back-button my-auto me-auto">
+          <DinaMessage id="backToReadOnlyPage" />
+        </a>
+      </Link>
+    );
+
   const formProps: ManagedAttributeFormProps = {
     router,
-    postSaveRedirect: "/managed-attribute/list?step=0",
+    postSaveRedirect: "/collection/managed-attribute/view",
     apiBaseUrl: "/collection-api",
-    listHref: "/managed-attribute/list?step=0",
+    backButton,
     componentField: (
       <SelectField
         className="col-md-6"

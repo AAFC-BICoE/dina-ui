@@ -65,7 +65,8 @@ export function DataBlock({
     const selectedExtensionFieldsOptions =
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
-        value: data.key
+        value: data.key,
+        descriptions: data.multilingualDescription?.descriptions
       }));
     setDynamicSelectedTypeOptions(selectedExtensionFieldsOptions);
 
@@ -104,7 +105,6 @@ export function DataBlock({
   if (blockOptionsQuery?.loading) {
     return <LoadingSpinner loading={true} />;
   }
-
   return (
     <div>
       {
@@ -121,6 +121,7 @@ export function DataBlock({
                     onChange={onCreatableSelectFieldChange}
                     disableTemplateCheckbox={true}
                     filterValues={selectedBlockOptions}
+                    readOnlyBold={true}
                   />
                 ) : (
                   <SelectField
@@ -131,6 +132,7 @@ export function DataBlock({
                     onChange={onBlockSelectChange}
                     disableTemplateCheckbox={true}
                     filterValues={selectedBlockOptions}
+                    readOnlyBold={true}
                   />
                 )}
               </div>
