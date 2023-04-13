@@ -58,8 +58,7 @@ export default function PcrBatchListPage() {
           queryTableProps={{
             columns: TABLE_COLUMNS,
             path: "seqdb-api/pcr-batch",
-            include: "primerForward,primerReverse",
-            filter: { isCompleted: false }
+            include: "primerForward,primerReverse"
           }}
           filterFormchildren={({ submitForm }) => (
             <div className="mb-3">
