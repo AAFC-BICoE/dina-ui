@@ -11,10 +11,7 @@ import {
   SelectField
 } from "../../../../common-ui/lib";
 import { DataRow } from "../../../../dina-ui/components";
-import {
-  DinaMessage,
-  useDinaIntl
-} from "../../../../dina-ui/intl/dina-ui-intl";
+import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
 
 export interface DataBlockProps extends FieldWrapperProps {
   removeBlock?: (blockPath) => void;
@@ -48,7 +45,6 @@ export function DataBlock({
   typeOptions,
   ...props
 }: DataBlockProps) {
-  const { locale } = useDinaIntl();
   const extensionKeys = extensionValues[blockKey].rows;
   const formik = useFormikContext<any>();
   const rootName = props.name.split(".")[0];
@@ -70,10 +66,7 @@ export function DataBlock({
       selectedFieldExtension?.extension.fields.map((data) => ({
         label: data.name,
         value: data.key,
-        tooltipOverride:
-          data.multilingualDescription?.descriptions?.find(
-            (item) => item.lang === locale
-          )?.desc || ""
+        descriptions: data.multilingualDescription?.descriptions
       }));
     setDynamicSelectedTypeOptions(selectedExtensionFieldsOptions);
 

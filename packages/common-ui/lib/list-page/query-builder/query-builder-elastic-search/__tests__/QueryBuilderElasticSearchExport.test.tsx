@@ -10,7 +10,10 @@ import {
   termQuery,
   matchQuery,
   existsQuery,
-  rangeQuery
+  rangeQuery,
+  prefixQuery,
+  infixQuery,
+  suffixQuery
 } from "../QueryBuilderElasticSearchExport";
 
 const ELASTIC_SEARCH_QUERY: any = {
@@ -276,6 +279,80 @@ describe("QueryBuilderElasticSearchExport functionality", () => {
 
     test("rangeQuery", async () => {
       expect(rangeQuery("fieldTest", { lt: 500 })).toMatchSnapshot();
+    });
+  });
+
+  describe("Partial matching query helper functions", () => {
+    test("prefixQuery attribute", async () => {
+      expect(
+        prefixQuery(
+          "data.attribute.materialSampleName",
+          "searchValue",
+          undefined
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("prefixQuery relationship", async () => {
+      expect(
+        prefixQuery(
+          "included.attributes.dwcRecordNumber",
+          "searchValue",
+          "collecting-event"
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("infixQuery attribute", async () => {
+      expect(
+        infixQuery(
+          "data.attribute.materialSampleName",
+          "searchValue",
+          undefined
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("infixQuery relationship", async () => {
+      expect(
+        infixQuery(
+          "included.attributes.dwcRecordNumber",
+          "searchValue",
+          "collecting-event"
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("suffixQuery attribute", async () => {
+      expect(
+        suffixQuery(
+          "data.attribute.materialSampleName",
+          "searchValue",
+          undefined
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("suffixQuery relationship", async () => {
+      expect(
+        suffixQuery(
+          "included.attributes.dwcRecordNumber",
+          "searchValue",
+          "collecting-event"
+        )
+      ).toMatchSnapshot();
+    });
+
+    test("Empty values are left as empty queries", async () => {
+      expect(
+        prefixQuery("data.attribute.materialSampleName", "", undefined)
+      ).toStrictEqual({});
+      expect(
+        infixQuery("data.attribute.materialSampleName", "", undefined)
+      ).toStrictEqual({});
+      expect(
+        suffixQuery("data.attribute.materialSampleName", "", undefined)
+      ).toStrictEqual({});
     });
   });
 });
