@@ -84,6 +84,27 @@ export interface ESIndexMapping {
   distinctTerm: boolean;
 
   /**
+   * If enabled it will allow the user to search based on the starting of a word.
+   *
+   * Example: Hexapoda can be matched with "hex".
+   */
+  prefixSupport: boolean;
+
+  /**
+   * If enabled it will allow the user to search based in the middle of a word.
+   *
+   * Example: Hexapoda can be matched with "pod".
+   */
+  infixSupport: boolean;
+
+  /**
+   * If enabled it will allow the user to search based on the ending of a word.
+   *
+   * Example: Hexapoda can be matched with "poda".
+   */
+  suffixSupport: boolean;
+
+  /**
    * The path for the attribute without the attribute name. This path does not include the parent
    * path.
    *

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { KeyValueTable } from "common-ui";
 import { Transaction } from "../../../types/loan-transaction-api";
 import { RevisionRowConfig } from "../revision-row-config";
-import { ManagedAttributesViewer } from "../../object-store/managed-attributes/ManagedAttributesViewer";
+import { ManagedAttributesViewer } from "../../managed-attributes/ManagedAttributesViewer";
 import { ReferenceLink } from "../ReferenceLink";
 import { Person } from "../../../types/objectstore-api";
 
@@ -24,7 +24,10 @@ export const TRANSACTION_REVISION_ROW_CONFIG: RevisionRowConfig<Transaction> = {
       />
     ),
     managedAttributes: ({ original: { value } }) => (
-      <ManagedAttributesViewer values={value} />
+      <ManagedAttributesViewer
+        values={value}
+        managedAttributeApiPath="loan-transaction-api/managed-attribute"
+      />
     ),
     // Computed value; don't show audits.
     involvedAgents: () => null,

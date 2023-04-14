@@ -338,7 +338,9 @@ export function MaterialSampleViewPage({ router }: WithRouterProps) {
                   extensionValues={materialSample.extensionValues}
                   disableDinaForm={true}
                   blockOptionsEndpoint={`collection-api/extension`}
-                  dinaComponent={"MATERIAL_SAMPLE"}
+                  blockOptionsFilter={{
+                    "extension.fields.dinaComponent": "MATERIAL_SAMPLE"
+                  }}
                 />
                 <div className="row">
                   <div className="col-md-6">
