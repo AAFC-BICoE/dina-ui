@@ -248,9 +248,8 @@ function NavCollectionDropdown({ formatMessage }) {
         onKeyDown={submenuOnKeyDown}
         onMouseLeave={submenuHideDropdown}
         show={submenuShow}
+        className="submenu"
         variant="light"
-        key={`dropdown-button-drop-end`}
-        id={`dropdown-button-drop-end`}
       >
         <Link href="/collection/collection/list" passHref={true}>
           <NavDropdown.Item>
