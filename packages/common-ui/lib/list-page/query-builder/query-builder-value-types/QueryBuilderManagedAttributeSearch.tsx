@@ -11,10 +11,18 @@ import Select from "react-select";
 import { useEffect } from "react";
 import { LoadingSpinner, useQuery } from "common-ui";
 import { ManagedAttribute } from "../../../../../dina-ui/types/collection-api";
-import QueryBuilderNumberSearch from "./QueryBuilderNumberSearch";
-import QueryBuilderDateSearch from "./QueryBuilderDateSearch";
-import QueryBuilderBooleanSearch from "./QueryBuilderBooleanSearch";
-import QueryBuilderTextSearch from "./QueryBuilderTextSearch";
+import QueryBuilderNumberSearch, {
+  transformNumberSearchToDSL
+} from "./QueryBuilderNumberSearch";
+import QueryBuilderDateSearch, {
+  transformDateSearchToDSL
+} from "./QueryBuilderDateSearch";
+import QueryBuilderBooleanSearch, {
+  transformBooleanSearchToDSL
+} from "./QueryBuilderBooleanSearch";
+import QueryBuilderTextSearch, {
+  transformTextSearchToDSL
+} from "./QueryBuilderTextSearch";
 
 interface QueryRowTextSearchProps {
   /**
@@ -47,8 +55,11 @@ export interface ManagedAttributeOperatorOption {
 }
 
 export interface ManagedAttributeSearchStates {
-  /** UUID of the selected managed attribute to search against. */
+  /** The key of the selected managed attribute to search against. */
   selectedManagedAttribute: string;
+
+  /** The type of the selected managed attribute. */
+  selectedType: string;
 
   /** Operator to be used on the managed attribute search. */
   selectedOperator: string;
@@ -74,7 +85,8 @@ export default function QueryRowManagedAttributeSearch({
         : {
             searchValue: "",
             selectedOperator: "",
-            selectedManagedAttribute: ""
+            selectedManagedAttribute: "",
+            selectedType: ""
           }
     );
 
@@ -108,7 +120,7 @@ export default function QueryRowManagedAttributeSearch({
         setManagedAttributeOptions(
           data.map<ManagedAttributeOption>((managedAttribute) => ({
             label: managedAttribute.name,
-            value: managedAttribute.id,
+            value: managedAttribute.key,
             type: managedAttribute.vocabularyElementType,
             acceptedValues: managedAttribute.acceptedValues
           }))
@@ -162,6 +174,11 @@ export default function QueryRowManagedAttributeSearch({
     value: option
   }));
 
+  // Currently selected option, if no option can be found just select the first one.
+  const selectedOperator = operatorOptions?.find(
+    (operator) => operator.value === managedAttributeState.selectedOperator
+  );
+
   // Determine the value input to display based on the type.
   const supportedValueForType = (type: string) => {
     const commonProps = {
@@ -211,6 +228,23 @@ export default function QueryRowManagedAttributeSearch({
     }
   };
 
+  // Set the type and the operator if the managed attribute selected has changed.
+  if (
+    managedAttributeState.selectedType === "" &&
+    managedAttributeType !== ""
+  ) {
+    setManagedAttributeState({
+      ...managedAttributeState,
+      selectedType: managedAttributeType
+    });
+  }
+  if (!selectedOperator && operatorOptions?.[0]) {
+    setManagedAttributeState({
+      ...managedAttributeState,
+      selectedOperator: operatorOptions?.[0].value
+    });
+  }
+
   // If loading, just render a spinner.
   if (query.loading) {
     return <LoadingSpinner loading={true} />;
@@ -227,7 +261,9 @@ export default function QueryRowManagedAttributeSearch({
         onChange={(selected) =>
           setManagedAttributeState({
             ...managedAttributeState,
-            selectedManagedAttribute: selected?.value ?? ""
+            selectedManagedAttribute: selected?.value ?? "",
+            selectedOperator: "",
+            selectedType: ""
           })
         }
       />
@@ -237,10 +273,7 @@ export default function QueryRowManagedAttributeSearch({
         <Select<ManagedAttributeOperatorOption>
           options={operatorOptions}
           className={`flex-grow-1 me-2 ps-0`}
-          value={operatorOptions?.find(
-            (operator) =>
-              operator.value === managedAttributeState.selectedOperator
-          )}
+          value={selectedOperator}
           onChange={(selected) =>
             setManagedAttributeState({
               ...managedAttributeState,
@@ -261,8 +294,48 @@ export default function QueryRowManagedAttributeSearch({
 }
 
 /**
- * Using the query row for a text search, generate the elastic search request to be made.
+ * Using the query row for a managed attribute search, generate the elastic search request to be
+ * made.
  */
-export function transformManagedAttributeToDSL({}: TransformToDSLProps): any {
-  return "work in progress";
+export function transformManagedAttributeToDSL({
+  fieldPath,
+  value,
+  fieldInfo
+}: TransformToDSLProps): any {
+  // Parse the managed attribute search options.
+  const managedAttributeSearchValue: ManagedAttributeSearchStates =
+    JSON.parse(value);
+
+  // console.log(fieldPath);
+  // console.log(managedAttributeSearchValue);
+  // console.log(fieldInfo);
+
+  const commonProps = {
+    fieldPath:
+      fieldPath + "." + managedAttributeSearchValue.selectedManagedAttribute,
+    operation: managedAttributeSearchValue.selectedOperator,
+    queryType: "",
+    value: managedAttributeSearchValue.searchValue,
+    fieldInfo: {
+      ...fieldInfo,
+      distinctTerm: true
+    } as ESIndexMapping
+  };
+
+  switch (managedAttributeSearchValue.selectedType) {
+    case "INTEGER":
+    case "DECIMAL":
+      return transformNumberSearchToDSL({ ...commonProps });
+    case "DATE":
+      return transformDateSearchToDSL({ ...commonProps });
+    case "PICK_LIST":
+    case "STRING":
+    case "BOOL":
+      return transformTextSearchToDSL({ ...commonProps });
+  }
+
+  throw new Error(
+    "Unsupported managed attribute type: " +
+      managedAttributeSearchValue.selectedType
+  );
 }
