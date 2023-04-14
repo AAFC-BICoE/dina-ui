@@ -45,7 +45,10 @@ export function usePcrReactionData(pcrBatchId?: string) {
               }
             ]
           })(""),
-          include: "materialSample"
+          include: "materialSample",
+          page: {
+            limit: 1000 // Maximum page limit
+          }
         })
         .then((response) => {
           const batchItems: PersistedResource<PcrBatchItem>[] =
