@@ -471,6 +471,7 @@ export function MaterialSampleForm({
                 <div className="row">
                   <div className="col-md-6">
                     <GroupSelectField
+                      disableTemplateCheckbox={true}
                       name="group"
                       enableStoredDefaultGroup={enableStoredDefaultGroup}
                     />

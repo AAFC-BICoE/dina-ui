@@ -124,5 +124,6 @@ export const SEQDB_MESSAGES_ENGLISH = {
   "field_shippingAddress.country": "Country",
   addSeqSubmissionTitle: "Add Seq Submission",
   editSeqSubmissionTitle: "Edit Seq Submission",
-  seqSubmissionListTitle: "Seq Submission"
+  seqSubmissionListTitle: "Seq Submission",
+  pcrReactionTitle: "PCR Reaction"
 };
