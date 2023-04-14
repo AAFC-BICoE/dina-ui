@@ -667,6 +667,8 @@ export const DINAUI_MESSAGES_ENGLISH = {
   queryBuilder_operator_notEmpty: "Not empty",
   queryBuilder_operator_notEquals: "Not equals",
   queryBuilder_operator_partialMatch: "Partial match",
+  queryBuilder_operator_prefix: "Prefix",
+  queryBuilder_operator_suffix: "Suffix",
   queryBuilder_value_false: "False",
   queryBuilder_value_number_placeholder: "Enter number search value...",
   queryBuilder_value_text_placeholder: "Enter text search value...",

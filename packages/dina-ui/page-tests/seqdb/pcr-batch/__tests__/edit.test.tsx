@@ -19,6 +19,7 @@ const TEST_PCRBATCH: PersistedResource<PcrBatch> = {
   type: "pcr-batch",
   name: "test pcr batch",
   group: "cnc",
+  isCompleted: false,
   createdBy: "poffm",
   primerForward: {
     id: FORWARD_PRIMER_UUID,
@@ -43,15 +44,11 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "seqdb-api/pcr-batch/" + PCR_BATCH_UUID:
       return { data: TEST_PCRBATCH };
     case "user-api/group":
-      return { data: [] };
     case "agent-api/person":
-      return { data: [] };
     case "seqdb-api/region":
-      return { data: [] };
     case "seqdb-api/pcr-primer":
-      return { data: [] };
+    case "seqdb-api/pcr-batch-item":
     case "seqdb-api/thermocycler-profile":
-      return { data: [] };
     case "objectstore-api/metadata":
       return { data: [] };
     case "collection-api/storage-unit":
@@ -212,6 +209,7 @@ describe("PcrBatch edit page", () => {
           resource: {
             createdBy: "poffm",
             group: "cnc",
+            isCompleted: false,
             id: PCR_BATCH_UUID,
             name: "test pcr batch",
             primerForward: {

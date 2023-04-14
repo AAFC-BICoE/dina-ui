@@ -10,7 +10,8 @@ const PCR_BATCH: PcrBatch = {
   name: PCR_BATCH_NAME,
   type: "pcr-batch",
   id: PCR_BATCH_ID,
-  createdBy: "test-user"
+  createdBy: "test-user",
+  isCompleted: false
 };
 
 const mockOnSaved = jest.fn();
@@ -22,6 +23,7 @@ const mockGet = jest.fn<any, any>(async (path) => {
     case "agent-api/person":
     case "seqdb-api/thermocycler-profile":
     case "user-api/group":
+    case "seqdb-api/pcr-batch-item":
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID + "/attachment":
       return { data: [] };
     case "seqdb-api/pcr-batch/" + PCR_BATCH_ID:
@@ -154,6 +156,7 @@ describe("SangerPcrBatchStep component", () => {
       createdBy: "test-user",
       id: "11111111-1111-1111-1111-111111111111",
       name: PCR_BATCH_NAME,
+      isCompleted: false,
       objective: "test-objective",
       storageUnit: {
         id: null,

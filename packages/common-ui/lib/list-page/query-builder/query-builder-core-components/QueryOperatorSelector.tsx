@@ -1,5 +1,6 @@
 import Select from "react-select";
 import { FieldItems } from "react-awesome-query-builder";
+import { ESIndexMapping } from "../../types";
 
 interface QueryOperatorSelectorProps {
   options?: FieldItems;
@@ -13,6 +14,12 @@ interface QueryOperatorSelectorProps {
    * Pass the selected option to the Query Builder.
    */
   setOperator: ((fieldPath: string) => void) | undefined;
+
+  /**
+   * Field mapping for the selected field. This can determined what options are displayed
+   * to the user for the operations.
+   */
+  selectedFieldMapping?: ESIndexMapping;
 }
 
 interface QueryOperationOption {
@@ -23,7 +30,8 @@ interface QueryOperationOption {
 export function QueryOperatorSelector({
   options,
   selectedOperator,
-  setOperator
+  setOperator,
+  selectedFieldMapping
 }: QueryOperatorSelectorProps) {
   /* istanbul ignore next */
   const customStyles = {
@@ -37,10 +45,24 @@ export function QueryOperatorSelector({
     })
   };
 
-  const operationOptions = options?.map<QueryOperationOption>((option) => ({
-    label: option.label,
-    value: option.key ?? ""
-  }));
+  // Some options are displayed only if it is supported.
+  const operationOptions = options
+    ?.filter((option) => {
+      if (option.key === "prefix" && !selectedFieldMapping?.prefixSupport) {
+        return false;
+      }
+      if (option.key === "contains" && !selectedFieldMapping?.infixSupport) {
+        return false;
+      }
+      if (option.key === "suffix" && !selectedFieldMapping?.suffixSupport) {
+        return false;
+      }
+      return true;
+    })
+    ?.map<QueryOperationOption>((option) => ({
+      label: option.label,
+      value: option.key ?? ""
+    }));
 
   const selectedOption = operationOptions?.find(
     (dropdownItem) => dropdownItem.value === selectedOperator

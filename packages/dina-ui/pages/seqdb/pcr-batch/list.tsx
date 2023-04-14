@@ -49,7 +49,7 @@ export default function PcrBatchListPage() {
           <CreateButton entityLink="/seqdb/pcr-batch" />
         </ButtonBar>
         <ListPageLayout
-          additionalFilters={filterForm => ({
+          additionalFilters={(filterForm) => ({
             // Apply group filter:
             ...(filterForm.group && { rsql: `group==${filterForm.group}` })
           })}

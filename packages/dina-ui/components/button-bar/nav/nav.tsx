@@ -409,6 +409,16 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="regionListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/seq-batch/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqBatchListTitle" />
+        </NavDropdown.Item>
+      </Link>
+      <Link href="/seqdb/seq-submission/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqSubmissionListTitle" />
+        </NavDropdown.Item>
+      </Link>
       <Link href="/seqdb/sequencing-facility/list" passHref={true}>
         <NavDropdown.Item>
           <SeqdbMessage id="sequencingFacilityListTitle" />

@@ -1,6 +1,7 @@
 import {
   CheckBoxField,
   CreatableSelectField,
+  FieldSpy,
   SelectField,
   TextField,
   Tooltip
@@ -8,8 +9,10 @@ import {
 import { useFormikContext } from "formik";
 import { find, get } from "lodash";
 import { FaMinus, FaPlus } from "react-icons/fa";
-import { DinaMessage } from "../../../../dina-ui/intl/dina-ui-intl";
-import { useState } from "react";
+import {
+  DinaMessage,
+  useDinaIntl
+} from "../../../../dina-ui/intl/dina-ui-intl";
 
 export function getFieldName(
   fieldArrayName: string,
@@ -42,12 +45,12 @@ export function DataRow({
   unitsAddable = false,
   isVocabularyBasedEnabledForType = false
 }: DataRowProps) {
+  const { locale } = useDinaIntl();
   const valueTextFieldName = `${name}.value`;
   const typeSelectFieldName = `${name}.type`;
   const unitSelectFieldName = `${name}.unit`;
   const vocabularyBasedFieldName = `${name}.vocabularyBased`;
   const formik = useFormikContext<any>();
-  const [typeTooltip, setTypeTooltip] = useState<string>("");
 
   function onCreatableSelectFieldChange(value, formikCtx) {
     if (isVocabularyBasedEnabledForType) {
@@ -75,12 +78,6 @@ export function DataRow({
     }
   }
 
-  function onTypeSelectChange(selected, _formikCtx, _oldValue?) {
-    const tooltipOverride = typeOptions?.find(
-      (option) => selected === option.value
-    ).tooltipOverride;
-    setTypeTooltip(tooltipOverride);
-  }
   return (
     <div className="d-flex">
       <div style={{ width: "15rem", marginLeft: "12rem" }}>
@@ -106,19 +103,35 @@ export function DataRow({
                 disableTemplateCheckbox={true}
                 hideLabel={rowIndex !== 0}
                 readOnlyBold={true}
-                onChange={onTypeSelectChange}
               />
             </div>
 
-            {typeTooltip !== "" ? (
-              <div
-                style={{
-                  marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
-                }}
-              >
-                <Tooltip directText={typeTooltip} />
-              </div>
-            ) : undefined}
+            <FieldSpy fieldName={typeSelectFieldName}>
+              {(value) => (
+                <>
+                  {value && typeOptions ? (
+                    <div
+                      style={{
+                        marginTop: rowIndex === 0 ? "1.4rem" : "0rem"
+                      }}
+                    >
+                      <Tooltip
+                        directText={
+                          find(
+                            typeOptions,
+                            (item) => item.value === value
+                          )?.descriptions?.find((desc) => desc.lang === locale)
+                            ?.desc
+                        }
+                        placement={"right"}
+                      />
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              )}
+            </FieldSpy>
           </div>
         )}
       </div>

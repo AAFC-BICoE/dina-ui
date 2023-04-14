@@ -1,7 +1,7 @@
 import { DinaForm, ResourceSelect } from "common-ui";
 import { PersistedResource } from "kitsu";
-import { FormTemplate } from "../../../../types/collection-api";
-import { mountWithAppContext } from "../../../../test-util/mock-app-context";
+import { FormTemplate } from "../../../types/collection-api";
+import { mountWithAppContext } from "../../../test-util/mock-app-context";
 import { ManagedAttributesEditor } from "../ManagedAttributesEditor";
 
 const EXAMPLE_MA_1 = {
