@@ -429,6 +429,11 @@ function NavSequenceDropdown({ formatMessage }) {
           <SeqdbMessage id="thermocyclerProfileListTitle" />
         </NavDropdown.Item>
       </Link>
+      <Link href="/seqdb/seq-submission/list" passHref={true}>
+        <NavDropdown.Item>
+          <SeqdbMessage id="seqSubmissionListTitle" />
+        </NavDropdown.Item>
+      </Link>
     </NavDropdown>
   );
 }
