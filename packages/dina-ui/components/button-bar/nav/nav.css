@@ -38,3 +38,9 @@ a.nav-link.dropdown-toggle:focus,
 button.navbar-toggler {
   background-color: #fff;
 }
+
+.submenu-dropdown-button {
+  color: #000;
+  background-color: #fff;
+  border-color: #fff;
+}
